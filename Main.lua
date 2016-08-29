@@ -17,7 +17,7 @@ ER.MainFrame:SetScript("OnEvent", AddonLoaded);
 
 -- Main
 local PulseTimer = 0;
-function ER.Pulse ()
+function ER.Pulse () -- TODO : Don't refresh when GCD is on CD except like 200-800ms before or so. Maybe reset the icon between gcd cd start and next icon appearance.
 	if GetTime() > PulseTimer then
 		local Spec = GetSpecializationInfo(GetSpecialization()); -- To optimize, bad to call this OnUpdate (likely make event based on spec / change spec, TODO)
 		if ER.APLs[Spec] then
