@@ -395,7 +395,7 @@ local function APL ()
 		end
 		-- Blade Flurry Expiration Offset
 		if EnemiesCount[6] == 1 and BFReset then
-			BFTimer, BFReset = ER.GetTime() + Outlaw.BFOffset, false;
+			BFTimer, BFReset = ER.GetTime() + Settings.Outlaw.BFOffset, false;
 		elseif EnemiesCount[6] > 1 then
 			BFReset = true;
 		end
