@@ -26,4 +26,4 @@ UI.lua
 Main.lua
 
 # Debug
-Old\Debug.lua
+# Old\Debug.lua
