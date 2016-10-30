@@ -1,0 +1,29 @@
+## Interface: 70100
+## Title: EasyRaid
+## Author: Aethys, SimCMinMax Team
+## Version: 7.1.01
+## Notes: Attempt to provide the useful and precise informations to execute the best possible DPS rotation in every situation.
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## SavedVariables: ERSettings
+
+
+# API
+Core.lua
+Events.lua
+Settings.lua
+
+# APL
+APL\DemonHunter_Vengeance.lua
+APL\Paladin_Retribution.lua
+APL\Rogue_Outlaw.lua
+APL\Rogue_Subtlety.lua
+
+# UI
+UI.lua
+
+# Main
+Main.lua
+
+# Debug
+Old\Debug.lua
