@@ -290,7 +290,7 @@ local function APL ()
 			-- PrePot w/ DBM Count
 			-- Symbols of Death
 			if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true) and (ER.BMPullTime() == 60 or (ER.BMPullTime() <= 15 and ER.BMPullTime() >= 14) or (ER.BMPullTime() <= 4 and ER.BMPullTime() >= 3)) then
-				ER.CastGCD(S.SymbolsofDeath);
+				ER.CastOffGCD(S.SymbolsofDeath);
 			end
 			-- Opener (Evi)
 			if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
