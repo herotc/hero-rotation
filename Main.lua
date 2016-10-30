@@ -44,7 +44,6 @@ ER.MainFrame:RegisterEvent("ADDON_LOADED");
 -- AddonLoaded
 local function AfterLoaded ()
 	ER.MainFrame:UnregisterEvent("ADDON_LOADED");
-	ER.CRC.Init();
 	ER.MainFrame:SetScript("OnUpdate", ER.Pulse);
 	ER.TTDRefresh();
 end
