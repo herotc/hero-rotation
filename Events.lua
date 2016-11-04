@@ -289,12 +289,17 @@ ER:RegisterForEvent(
 	if ({UnitClass("player")})[3] == 4 then
 		ER.BleedTable = {
 			-- Assassination
-			Garrote = {},
-			Rupture = {},
+			Assassination = {
+				Garrote = {},
+				Rupture = {}
+			},
 			-- Subtlety
-			Nightblade = {},
-			FinalityNightblade = false,
-			FinalityNightbladeTime = 0
+			Subtlety = {
+				Nightblade = {},
+				FinalityNightblade = false,
+				FinalityNightbladeTime = 0
+			}
+			
 		};
 		local BleedGUID;
 		--- Exsanguinated Handler
@@ -303,12 +308,12 @@ ER:RegisterForEvent(
 				BleedGUID = Unit:GUID();
 				if BleedGUID then
 					if SpellName == "Garrote" then
-						if ER.BleedTable.Garrote[BleedGUID] then
-							return ER.BleedTable.Garrote[BleedGUID][3];
+						if ER.BleedTable.Assassination.Garrote[BleedGUID] then
+							return ER.BleedTable.Assassination.Garrote[BleedGUID][3];
 						end
 					elseif SpellName == "Rupture" then
-						if ER.BleedTable.Rupture[BleedGUID] then
-							return ER.BleedTable.Rupture[BleedGUID][3];
+						if ER.BleedTable.Assassination.Rupture[BleedGUID] then
+							return ER.BleedTable.Assassination.Rupture[BleedGUID][3];
 						end
 					end
 				end
@@ -321,11 +326,11 @@ ER:RegisterForEvent(
 
 					-- Exsanguinate
 					if SpellID == 200806 then
-						for Key, _ in pairs(ER.BleedTable) do
-							for Key2, _ in pairs(ER.BleedTable[Key]) do
+						for Key, _ in pairs(ER.BleedTable.Assassination) do
+							for Key2, _ in pairs(ER.BleedTable.Assassination[Key]) do
 								if Key2 == DestGUID then
 									-- Change the Exsanguinate info to true
-									ER.BleedTable[Key][Key2][3] = true;
+									ER.BleedTable.Assassination[Key][Key2][3] = true;
 								end
 							end
 						end
@@ -347,11 +352,11 @@ ER:RegisterForEvent(
 					-- Garrote
 					if SpellID == 703 then
 						BleedDuration, BleedExpires = GetBleedInfos(DestGUID, SpellID);
-						ER.BleedTable.Garrote[DestGUID] = {BleedDuration, BleedExpires, false};
+						ER.BleedTable.Assassination.Garrote[DestGUID] = {BleedDuration, BleedExpires, false};
 					-- Rupture
 					elseif SpellID == 1943 then
 						BleedDuration, BleedExpires = GetBleedInfos(DestGUID, SpellID);
-						ER.BleedTable.Rupture[DestGUID] = {BleedDuration, BleedExpires, false};
+						ER.BleedTable.Assassination.Rupture[DestGUID] = {BleedDuration, BleedExpires, false};
 					end
 				end
 				, "SPELL_AURA_APPLIED"
@@ -364,13 +369,13 @@ ER:RegisterForEvent(
 
 					-- Removes the Unit from Garrote Table
 					if SpellID == 703 then
-						if ER.BleedTable.Garrote[DestGUID] then
-							ER.BleedTable.Garrote[DestGUID] = nil;
+						if ER.BleedTable.Assassination.Garrote[DestGUID] then
+							ER.BleedTable.Assassination.Garrote[DestGUID] = nil;
 						end
 					-- Removes the Unit from Rupture Table
 					elseif SpellID == 1943 then
-						if ER.BleedTable.Rupture[DestGUID] then
-							ER.BleedTable.Rupture[DestGUID] = nil;
+						if ER.BleedTable.Assassination.Rupture[DestGUID] then
+							ER.BleedTable.Assassination.Rupture[DestGUID] = nil;
 						end
 					end
 				end
@@ -381,12 +386,12 @@ ER:RegisterForEvent(
 					DestGUID = select(8, ...);
 
 					-- Removes the Unit from Garrote Table
-					if ER.BleedTable.Garrote[DestGUID] then
-						ER.BleedTable.Garrote[DestGUID] = nil;
+					if ER.BleedTable.Assassination.Garrote[DestGUID] then
+						ER.BleedTable.Assassination.Garrote[DestGUID] = nil;
 					end
 					-- Removes the Unit from Rupture Table
-					if ER.BleedTable.Rupture[DestGUID] then
-						ER.BleedTable.Rupture[DestGUID] = nil;
+					if ER.BleedTable.Assassination.Rupture[DestGUID] then
+						ER.BleedTable.Assassination.Rupture[DestGUID] = nil;
 					end
 				end
 				, "UNIT_DIED"
@@ -396,8 +401,8 @@ ER:RegisterForEvent(
 			function ER.Finality (Unit)
 				BleedGUID = Unit:GUID();
 				if BleedGUID then
-					if ER.BleedTable.Nightblade[BleedGUID] then
-						return ER.BleedTable.Nightblade[BleedGUID];
+					if ER.BleedTable.Subtlety.Nightblade[BleedGUID] then
+						return ER.BleedTable.Subtlety.Nightblade[BleedGUID];
 					end
 				end
 				return false;
@@ -409,8 +414,8 @@ ER:RegisterForEvent(
 
 					-- Exsanguinate
 					if SpellID == 195452 then
-						ER.BleedTable.FinalityNightblade = Player:Buff(Spell.Rogue.Subtlety.FinalityNightblade) and true or false; -- To replace by Spell.Rogue.Subtlety.FinalityNightblade
-						ER.BleedTable.FinalityNightbladeTime = ER.GetTime() + 0.3;
+						ER.BleedTable.Subtlety.FinalityNightblade = Player:Buff(Spell.Rogue.Subtlety.FinalityNightblade) and true or false; -- To replace by Spell.Rogue.Subtlety.FinalityNightblade
+						ER.BleedTable.Subtlety.FinalityNightbladeTime = ER.GetTime() + 0.3;
 					end
 				end
 				, "SPELL_CAST_SUCCESS"
@@ -421,7 +426,7 @@ ER:RegisterForEvent(
 					DestGUID, _, _, _, SpellID = select(8, ...);
 
 					if SpellID == 195452 then
-						ER.BleedTable.Nightblade[DestGUID] = ER.GetTime() < ER.BleedTable.FinalityNightbladeTime and ER.BleedTable.FinalityNightblade;
+						ER.BleedTable.Subtlety.Nightblade[DestGUID] = ER.GetTime() < ER.BleedTable.Subtlety.FinalityNightbladeTime and ER.BleedTable.Subtlety.FinalityNightblade;
 					end
 				end
 				, "SPELL_AURA_APPLIED"
@@ -433,8 +438,8 @@ ER:RegisterForEvent(
 					DestGUID, _, _, _, SpellID = select(8, ...);
 
 					if SpellID == 195452 then
-						if ER.BleedTable.Nightblade[DestGUID] then
-							ER.BleedTable.Nightblade[DestGUID] = nil;
+						if ER.BleedTable.Subtlety.Nightblade[DestGUID] then
+							ER.BleedTable.Subtlety.Nightblade[DestGUID] = nil;
 						end
 					end
 				end
@@ -444,8 +449,8 @@ ER:RegisterForEvent(
 				function (...)
 					DestGUID = select(8, ...);
 
-					if ER.BleedTable.Nightblade[DestGUID] then
-						ER.BleedTable.Nightblade[DestGUID] = nil;
+					if ER.BleedTable.Subtlety.Nightblade[DestGUID] then
+						ER.BleedTable.Subtlety.Nightblade[DestGUID] = nil;
 					end
 				end
 				, "UNIT_DIED"
