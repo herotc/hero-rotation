@@ -11,6 +11,9 @@ local Item = ER.Item;
 local pairs = pairs;
 local stringlower = string.lower;
 local tostring = tostring;
+-- UI Locals
+local FrameID, Nameplate, ThisUnit, Count; -- ER.Nameplate.AddTTD (& AddIcon for Nameplate)
+local Token; -- ER.Nameplate.AddIcon
 
 
 ER.MainIconFrame = CreateFrame("Frame", "EasyRaid_MainIconFrame", UIParent);
@@ -217,7 +220,6 @@ end
 
 	-- Add TTD Infos to Nameplates
 	function ER.Nameplate.AddTTD ()
-		local FrameID, Nameplate, ThisUnit, Count;
 		for i = 1, 40 do
 			Count = tostring(i);
 			
@@ -257,7 +259,6 @@ end
 
 	-- Add the Icon on Enemy Grid (and on Left Icon frame)
 	function ER.Nameplate.AddIcon (ThisUnit, SpellID)
-		local Token, Nameplate;
 		Token = stringlower(ThisUnit.UnitID);
 		Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
 		if Nameplate then

@@ -78,6 +78,9 @@ local tostring = tostring;
 		[6] = 1
 	};
 	local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
+	local Sequence; -- RtB_List
+	local Count; -- Used when Counting Units
+	local BestUnit, BestUnitTTD; -- Used for cycling
 -- GUI Settings
 	local Settings = {
 		General = ER.GUISettings.General,
@@ -96,14 +99,14 @@ local RtB_BuffsList = {
 local function RtB_List (Type, List)
 	if not ER.Cache.APLVar.RtB_List then ER.Cache.APLVar.RtB_List = {}; end
 	if not ER.Cache.APLVar.RtB_List[Type] then ER.Cache.APLVar.RtB_List[Type] = {}; end
-	local Sequence = "";
+	Sequence = "";
 	for i = 1, #List do
 		Sequence = Sequence..tostring(List[i]);
 	end
 	-- All
 	if Type == "All" then
 		if not ER.Cache.APLVar.RtB_List[Type][Sequence] then
-			local Count = 0;
+			Count = 0;
 			for i = 1, #List do
 				if Player:Buff(RtB_BuffsList[List[i]]) then
 					Count = Count + 1;
@@ -226,8 +229,7 @@ local function CDs ()
 	-- TODO: Add Potion
 	-- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
 	if ER.AoEON() and S.CannonballBarrage:IsAvailable() and EnemiesCount[8] >= 1 and not S.CannonballBarrage:IsOnCooldown() then
-		ER.CastGCD(S.CannonballBarrage);
-		return "Cast Cannonball Barrage";
+		if ER.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
 	end
 	if Target:IsInRange(5) then
 		-- actions.cds+=/blood_fury
@@ -267,8 +269,7 @@ local function Stealth ()
 	if Target:IsInRange(5) then
 		-- actions.stealth+=/ambush
 		if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
-			ER.CastGCD(S.Ambush);
-			return "Cast Ambush";
+			if ER.Cast(S.Ambush) then return "Cast Ambush"; end
 		else
 			if ER.CDsON() and Stealth_Condition() and not Player:IsTanking(Target) then
 				-- actions.stealth+=/vanish,if=variable.stealth_condition
@@ -287,18 +288,15 @@ end
 local function Finish ()
 	-- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&buff.shark_infested_waters.up
 	if I.GreenskinsWaterloggedWristcuffs:IsEquipped(9) and Target:IsInRange(20) and S.BetweentheEyes:IsCastable() and Player:Buff(S.SharkInfestedWaters) then
-		ER.CastGCD(S.BetweentheEyes);
-		return "Cast Between the Eyes";
+		if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
 	end
 	-- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
 	if (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:Cooldown() + 3.5) and Target:IsInRange(6) and S.RunThrough:IsCastable() then
-		ER.CastGCD(S.RunThrough);
-		return "Cast Run Through";
+		if ER.Cast(S.RunThrough) then return "Cast Run Through"; end
 	end
 	-- OutofRange BtE
 	if not Target:IsInRange(10) and Target:IsInRange(20) and S.BetweentheEyes:IsCastable() then
-		ER.CastGCD(S.BetweentheEyes);
-		return "Cast Between the Eyes OoR";
+		if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OoR)"; end
 	end
 	return false;
 end
@@ -306,33 +304,30 @@ end
 local function Build ()
 	-- actions.build=ghostly_strike,if=(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(combo_points>=3|variable.rtb_reroll&time>=10)
 	if Target:IsInRange(5) and S.GhostlyStrike:IsCastable() and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (ER.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:Cooldown() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and ER.CombatTime() >= 10)) then
-		ER.CastGCD(S.GhostlyStrike);
-		return "Cast Ghostly Strike";
+		if ER.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
 	end
 	-- actions.build+=/pistol_shot,if=buff.opportunity.up&energy.time_to_max>2-talent.quick_draw.enabled&combo_points.deficit>=1+buff.broadsides.up
 	if Target:IsInRange(20) and S.PistolShot:IsCastable() and Player:Buff(S.Opportunity) and Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) then
-		ER.CastGCD(S.PistolShot);
-		return "Cast Pistol Shot";
+		if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
 	end
 	-- actions.build+=/saber_slash,if=variable.ss_useable
 	if Target:IsInRange(5) and S.SaberSlash:IsCastable() and SS_Useable() then
-		ER.CastGCD(S.SaberSlash);
-		return "Cast Saber Slash";
+		if ER.Cast(S.SaberSlash) then return "Cast Saber Slash"; end
 	end
 	return false;
 end
 local SappedSoulSpells = {
-	{S.Feint, "Cast Feint Sappel Soul", function () return true; end},
-	{S.CrimsonVial, "Cast Crimson Vial Sappel Soul", function () return true; end},
-	{S.Kick, "Cast Kick Sappel Soul", function () return Target:IsInRange(5); end}
+	{S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
+	{S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end},
+	{S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end}
 };
 local function MythicDungeon ()
 	-- Sapped Soul
 	if ER.MythicDungeon() == "Sapped Soul" then
 		for i = 1, #SappedSoulSpells do
-			if not SappedSoulSpells[i][1]:IsOnCooldown() and SappedSoulSpells[i][3]() then
-				ER.CastGCD(SappedSoulSpells[i][1]);
-				ER.ChangePulseTimer(0.5);
+			if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
+				ER.Cast(SappedSoulSpells[i][1]);
+				ER.ChangePulseTimer(1);
 				return SappedSoulSpells[i][2];
 			end
 		end
@@ -343,8 +338,7 @@ local function TrainingScenario ()
 	if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
 		-- Between the Eyes
 		if Player:ComboPoints() > 0 and not S.BetweentheEyes:IsOnCooldown() and Target:IsInRange(20) then
-			ER.CastGCD(S.BetweentheEyes);
-			return "Cast Between the Eyes Training Scenario";
+			if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Training Scenario)"; end
 		end
 	end
 	return false;
@@ -368,12 +362,14 @@ local function APL ()
 		-- PrePot w/ DBM Count
 		-- Opener (Ambush or SaberSlash)
 		if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
-			if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
-				ER.CastGCD(S.Ambush);
-				return "Cast Ambush";
+			if Player:ComboPoints() >= 5 then
+				if S.RunThrough:IsCastable() then
+					if ER.Cast(S.RunThrough) then return "Cast Run Through (Opener)"; end
+				end
+			elseif Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
+				if ER.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
 			elseif S.SaberSlash:IsCastable() then
-				ER.CastGCD(S.SaberSlash);
-				return "Cast Saber Slash";
+				if ER.Cast(S.SaberSlash) then return "Cast Saber Slash (Opener)"; end
 			end
 		end
 		return;
@@ -401,7 +397,7 @@ local function APL ()
 		end
 		-- MfD Sniping
 		if S.MarkedforDeath:IsCastable() then
-			local BestUnit, BestUnitTTD = nil, 60;
+			BestUnit, BestUnitTTD = nil, 60;
 			for Key, Value in pairs(ER.Cache.Enemies[30]) do
 				if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
 					BestUnit, BestUnitTTD = Value, Value:TimeToDie();
@@ -449,28 +445,24 @@ local function APL ()
 			end
 			-- actions+=/death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
 			if S.DeathfromAbove:IsCastable() and not SS_Useable_NoReroll() and Player:EnergyTimeToMax() > 2 then
-				ER.CastGCD(S.DeathfromAbove);
-				return "Cast Death from above";
+				if ER.Cast(S.DeathfromAbove) then return "Cast Death from above"; end
 			end
 			if not SS_Useable() then
 				-- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
 				if S.SliceandDice:IsAvailable() then
 					if S.SliceandDice:IsCastable() and Player:BuffRemains(S.SliceandDice) < Target:TimeToDie() and Player:BuffRemains(S.SliceandDice) < (1+Player:ComboPoints())*1.8 then
-						ER.CastGCD(S.SliceandDice);
-						return "Cast Slice and Dice";
+						if ER.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
 					end
 				-- actions+=/roll_the_bones,if=!variable.ss_useable&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
 				else
 					if S.RolltheBones:IsCastable() and RtB_BuffRemains() < Target:TimeToDie() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
-						ER.CastGCD(S.RolltheBones);
-						return "Cast Roll the Bones";
+						if ER.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
 					end
 				end
 			end
 			-- actions+=/killing_spree,if=energy.time_to_max>5|energy<15
 			if ER.CDsON() and S.KillingSpree:IsCastable() and (Player:EnergyTimeToMax() > 5 or Player:Energy() < 15) then
-				ER.CastGCD(S.KillingSpree);
-				return "Cast Killing Spree";
+				if ER.Cast(S.KillingSpree) then return "Cast Killing Spree"; end
 			end
 			-- actions+=/call_action_list,name=build
 			if Build() then
@@ -484,8 +476,7 @@ local function APL ()
 			end
 			-- OutofRange Pistol Shot
 			if not Target:IsInRange(10) and Target:IsInRange(20) and S.PistolShot:IsCastable() and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
-				ER.CastGCD(S.PistolShot);
-				return "Cast Pistol Shot";
+				if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
 			end
 		end
 end
