@@ -15,6 +15,17 @@ local tableremove = table.remove;
 local tonumber = tonumber;
 local tostring = tostring;
 local unpack = unpack;
+local wipe = table.wipe;
+-- Core Locals
+local _T = { -- Temporary Vars
+	Argument, -- CmdHandler
+	Parts, -- NPCID
+	ThisUnit, -- GetEnemies / TTDRefresh
+	DistanceValues, -- GetEnemies
+	Start, End, -- CastPercentage
+	Infos, -- GetBuffs / GetDebuffs
+	ExpirationTime -- BuffRemains / DebuffRemains
+};
 -- Max # Buffs and Max # Nameplates.
 ER.MAXIMUM = 40; 
 -- Defines our cached tables.
@@ -34,7 +45,7 @@ ER.Cache = {
 };
 function ER.CacheReset ()
 	for Key, Value in pairs(ER.Cache) do
-		table.wipe(ER.Cache[Key]);
+		wipe(ER.Cache[Key]);
 	end
 end
 
@@ -73,32 +84,37 @@ function ER.GetTexture (Object)
 	end
 end
 
--- Display the Spell On GCD to cast.
-function ER.CastGCD (Object)
-	ER.MainIconFrame:ChangeMainIcon(ER.GetTexture(Object));
+-- Display the Spell to cast.
+ER.CastOffGCDOffset = 1;
+function ER.Cast (Object, OffGCD)
+	if OffGCD and OffGCD[1] then
+		if ER.CastOffGCDOffset <= 2 then
+			ER.SmallIconFrame:ChangeSmallIcon(ER.CastOffGCDOffset, ER.GetTexture(Object));
+			ER.CastOffGCDOffset = ER.CastOffGCDOffset + 1;
+			Object.LastDisplayTime = ER.GetTime();
+			return OffGCD[2] and "Should Return" or false;
+		end
+	else
+		ER.MainIconFrame:ChangeMainIcon(ER.GetTexture(Object));
+		Object.LastDisplayTime = ER.GetTime();
+		return "Should Return";
+	end
+	return false;
 end
 
--- Display the Spell Off GCD to cast.
-ER.CastOffGCDOffset = 1;
-function ER.CastOffGCD (Object)
-	if ER.CastOffGCDOffset <= 2 then
-		ER.SmallIconFrame:ChangeSmallIcon(ER.CastOffGCDOffset, ER.GetTexture(Object));
-		ER.CastOffGCDOffset = ER.CastOffGCDOffset + 1;
-	end
-end
 
 function ER.CmdHandler (Message)
-	local Argument = stringlower(Message);
-	if Argument == "cds" then
+	_T.Argument = stringlower(Message);
+	if _T.Argument == "cds" then
 		ERSettings.Toggles[1] = not ERSettings.Toggles[1];
 		ER.Print("CDs are now "..(ERSettings.Toggles[1] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-	elseif Argument == "aoe" then
+	elseif _T.Argument == "aoe" then
 		ERSettings.Toggles[2] = not ERSettings.Toggles[2];
 		ER.Print("AoE is now "..(ERSettings.Toggles[2] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-	elseif Argument == "toggle" then
+	elseif _T.Argument == "toggle" then
 		ERSettings.Toggles[3] = not ERSettings.Toggles[3];
 		ER.Print("EasyRaid is now "..(ERSettings.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-	elseif Argument == "help" then
+	elseif _T.Argument == "help" then
 		ER.Print("CDs : /eraid cds | AoE : /eraid cds | Toggle : /eraid toggle");
 	end
 end
@@ -190,6 +206,7 @@ end
 		self.SpellID = ID;
 		self.SpellType = Type or "Player"; -- For Pet, put "Pet". Default is "Player".
 		self.LastCastTime = 0;
+		self.LastDisplayTime = 0;
 	end
 
 	-- Defines the Item Class.
@@ -214,49 +231,45 @@ end
 
 	-- Get if the unit Exists and is visible.
 	function Unit:Exists ()
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if ER.Cache.UnitInfo[GUID].Exists == nil then
-				ER.Cache.UnitInfo[GUID].Exists = UnitExists(self.UnitID) and UnitIsVisible(self.UnitID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].Exists == nil then
+				ER.Cache.UnitInfo[self:GUID()].Exists = UnitExists(self.UnitID) and UnitIsVisible(self.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].Exists;
+			return ER.Cache.UnitInfo[self:GUID()].Exists;
 		end
 		return nil;
 	end
 
 	-- Get the unit NPC ID.
 	function Unit:NPCID ()
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if not ER.Cache.UnitInfo[GUID].NPCID then
-				local Parts = {};
-				for Part in string.gmatch(GUID, "([^-]+)") do
-					tableinsert(Parts, Part);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if not ER.Cache.UnitInfo[self:GUID()].NPCID then
+				_T.Parts = {};
+				for Part in string.gmatch(self:GUID(), "([^-]+)") do
+					tableinsert(_T.Parts, Part);
 				end
-				if Parts[1] == "Creature" or Parts[1] == "Pet" or Parts[1] == "Vehicle" then
-					ER.Cache.UnitInfo[GUID].NPCID = tonumber(Parts[6]);
+				if _T.Parts[1] == "Creature" or _T.Parts[1] == "Pet" or _T.Parts[1] == "Vehicle" then
+					ER.Cache.UnitInfo[self:GUID()].NPCID = tonumber(_T.Parts[6]);
 				else
-					ER.Cache.UnitInfo[GUID].NPCID = -2;
+					ER.Cache.UnitInfo[self:GUID()].NPCID = -2;
 				end
 			end
-			return ER.Cache.UnitInfo[GUID].NPCID;
+			return ER.Cache.UnitInfo[self:GUID()].NPCID;
 		end
 		return -1;
 	end
 
 	-- Get if the unit CanAttack the other one.
 	function Unit:CanAttack (Other)
-		local GUID = self:GUID();
-		local GUID2 = Other:GUID();
-		if GUID and GUID2 then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if not ER.Cache.UnitInfo[GUID].CanAttack then ER.Cache.UnitInfo[GUID].CanAttack = {}; end
-			if ER.Cache.UnitInfo[GUID].CanAttack[GUID2] == nil then
-				ER.Cache.UnitInfo[GUID].CanAttack[GUID2] = UnitCanAttack(self.UnitID, Other.UnitID);
+		if self:GUID() and Other:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if not ER.Cache.UnitInfo[self:GUID()].CanAttack then ER.Cache.UnitInfo[self:GUID()].CanAttack = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].CanAttack[Other:GUID()] == nil then
+				ER.Cache.UnitInfo[self:GUID()].CanAttack[Other:GUID()] = UnitCanAttack(self.UnitID, Other.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].CanAttack[GUID2];
+			return ER.Cache.UnitInfo[self:GUID()].CanAttack[Other:GUID()];
 		end
 		return nil;
 	end
@@ -270,26 +283,24 @@ end
 
 	-- Get the unit Health.
 	function Unit:Health ()
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if not ER.Cache.UnitInfo[GUID].Health then
-				ER.Cache.UnitInfo[GUID].Health = UnitHealth(self.UnitID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if not ER.Cache.UnitInfo[self:GUID()].Health then
+				ER.Cache.UnitInfo[self:GUID()].Health = UnitHealth(self.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].Health;
+			return ER.Cache.UnitInfo[self:GUID()].Health;
 		end
 		return -1;
 	end
 
 	-- Get the unit MaxHealth.
 	function Unit:MaxHealth ()
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if not ER.Cache.UnitInfo[GUID].MaxHealth then
-				ER.Cache.UnitInfo[GUID].MaxHealth = UnitHealthMax(self.UnitID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if not ER.Cache.UnitInfo[self:GUID()].MaxHealth then
+				ER.Cache.UnitInfo[self:GUID()].MaxHealth = UnitHealthMax(self.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].MaxHealth;
+			return ER.Cache.UnitInfo[self:GUID()].MaxHealth;
 		end
 		return -1;
 	end
@@ -301,42 +312,37 @@ end
 
 	-- Get if the unit Is Dead Or Ghost.
 	function Unit:IsDeadOrGhost ()
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if ER.Cache.UnitInfo[GUID].IsDeadOrGhost == nil then
-				ER.Cache.UnitInfo[GUID].IsDeadOrGhost = UnitIsDeadOrGhost(self.UnitID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].IsDeadOrGhost == nil then
+				ER.Cache.UnitInfo[self:GUID()].IsDeadOrGhost = UnitIsDeadOrGhost(self.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].IsDeadOrGhost;
+			return ER.Cache.UnitInfo[self:GUID()].IsDeadOrGhost;
 		end
 		return nil;
 	end
 
 	-- Get if the unit Affecting Combat.
 	function Unit:AffectingCombat ()
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if ER.Cache.UnitInfo[GUID].AffectingCombat == nil then
-				ER.Cache.UnitInfo[GUID].AffectingCombat = UnitAffectingCombat(self.UnitID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].AffectingCombat == nil then
+				ER.Cache.UnitInfo[self:GUID()].AffectingCombat = UnitAffectingCombat(self.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].AffectingCombat;
+			return ER.Cache.UnitInfo[self:GUID()].AffectingCombat;
 		end
 		return nil;
 	end
 
 	-- Get if two unit are the same.
-	function Unit:IsUnit (UnitID)
-		local Other = Unit(UnitID);
-		local GUID = self:GUID();
-		local GUID2 = Other:GUID();
-		if GUID and GUID2 then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if not ER.Cache.UnitInfo[GUID].IsUnit then ER.Cache.UnitInfo[GUID].IsUnit = {}; end
-			if ER.Cache.UnitInfo[GUID].IsUnit[GUID2] == nil then
-				ER.Cache.UnitInfo[GUID].IsUnit[GUID2] = UnitIsUnit(self.UnitID, Other.UnitID);
+	function Unit:IsUnit (Other)
+		if self:GUID() and Other:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if not ER.Cache.UnitInfo[self:GUID()].IsUnit then ER.Cache.UnitInfo[self:GUID()].IsUnit = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].IsUnit[Other:GUID()] == nil then
+				ER.Cache.UnitInfo[self:GUID()].IsUnit[Other:GUID()] = UnitIsUnit(self.UnitID, Other.UnitID);
 			end
-			return ER.Cache.UnitInfo[GUID].IsUnit[GUID2];
+			return ER.Cache.UnitInfo[self:GUID()].IsUnit[Other:GUID()];
 		end
 		return nil;
 	end
@@ -361,14 +367,13 @@ end
 		[100]	=	33119	-- Malister's Frost Wand
 	};
 	function Unit:IsInRange (Distance)
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if not ER.Cache.UnitInfo[GUID].IsInRange then ER.Cache.UnitInfo[GUID].IsInRange = {}; end
-			if ER.Cache.UnitInfo[GUID].IsInRange[Distance] == nil then
-				ER.Cache.UnitInfo[GUID].IsInRange[Distance] = IsItemInRange(ER.IsInRangeItemTable[Distance], self.UnitID) or false;
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if not ER.Cache.UnitInfo[self:GUID()].IsInRange then ER.Cache.UnitInfo[self:GUID()].IsInRange = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance] == nil then
+				ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance] = IsItemInRange(ER.IsInRangeItemTable[Distance], self.UnitID) or false;
 			end
-			return ER.Cache.UnitInfo[GUID].IsInRange[Distance];
+			return ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance];
 		end
 		return nil;
 	end
@@ -376,34 +381,32 @@ end
 	-- Get if we are Tanking or not the Unit.
 	-- TODO: Use both GUID like CanAttack / IsUnit for better management.
 	function Unit:IsTanking (Other)
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-			if ER.Cache.UnitInfo[GUID].Tanked == nil then
-				ER.Cache.UnitInfo[GUID].Tanked = UnitThreatSituation(self.UnitID, Other.UnitID) and UnitThreatSituation(self.UnitID, Other.UnitID) >= 2 and true or false;
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+			if ER.Cache.UnitInfo[self:GUID()].Tanked == nil then
+				ER.Cache.UnitInfo[self:GUID()].Tanked = UnitThreatSituation(self.UnitID, Other.UnitID) and UnitThreatSituation(self.UnitID, Other.UnitID) >= 2 and true or false;
 			end
-			return ER.Cache.UnitInfo[GUID].Tanked;
+			return ER.Cache.UnitInfo[self:GUID()].Tanked;
 		end
 		return nil;
 	end
 
 	--- Get all the casting infos from an unit and put it into the Cache.
-	function Unit:GetCastingInfo (GUID)
-		if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-		ER.Cache.UnitInfo[GUID].Casting = {UnitCastingInfo(self.UnitID)};
+	function Unit:GetCastingInfo ()
+		if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+		ER.Cache.UnitInfo[self:GUID()].Casting = {UnitCastingInfo(self.UnitID)};
 	end
 
 	-- Get the Casting Infos from the Cache.
 	function Unit:CastingInfo (Index)
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] or not ER.Cache.UnitInfo[GUID].Casting then
-				self:GetCastingInfo(GUID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] or not ER.Cache.UnitInfo[self:GUID()].Casting then
+				self:GetCastingInfo();
 			end
 			if Index then
-				return ER.Cache.UnitInfo[GUID].Casting[Index];
+				return ER.Cache.UnitInfo[self:GUID()].Casting[Index];
 			else
-				return unpack(ER.Cache.UnitInfo[GUID].Casting);
+				return unpack(ER.Cache.UnitInfo[self:GUID()].Casting);
 			end
 		end
 		return nil;
@@ -420,22 +423,21 @@ end
 	end
 
 	--- Get all the Channeling Infos from an unit and put it into the Cache.
-	function Unit:GetChannelingInfo (GUID)
-		if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-		ER.Cache.UnitInfo[GUID].Channeling = {UnitChannelInfo(self.UnitID)};
+	function Unit:GetChannelingInfo ()
+		if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+		ER.Cache.UnitInfo[self:GUID()].Channeling = {UnitChannelInfo(self.UnitID)};
 	end
 
 	-- Get the Channeling Infos from the Cache.
 	function Unit:ChannelingInfo (Index)
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] or not ER.Cache.UnitInfo[GUID].Channeling then
-				self:GetChannelingInfo(GUID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] or not ER.Cache.UnitInfo[self:GUID()].Channeling then
+				self:GetChannelingInfo();
 			end
 			if Index then
-				return ER.Cache.UnitInfo[GUID].Channeling[Index];
+				return ER.Cache.UnitInfo[self:GUID()].Channeling[Index];
 			else
-				return unpack(ER.Cache.UnitInfo[GUID].Channeling);
+				return unpack(ER.Cache.UnitInfo[self:GUID()].Channeling);
 			end
 		end
 		return nil;
@@ -459,42 +461,40 @@ end
 	-- Get the progression of the cast in percentage if there is any.
 	function Unit:CastPercentage ()
 		if self:IsCasting() then
-			local Start, End = select(5, self:CastingInfo());
-			return (ER.GetTime()*1000 - Start)/(End - Start)*100;
+			_T.Start, _T.End = select(5, self:CastingInfo());
+			return (ER.GetTime()*1000 - _T.Start)/(_T.End - _T.Start)*100;
 		end
 		if self:IsChanneling() then
-			local Start, End = select(5, self:ChannelingInfo());
-			return (ER.GetTime()*1000 - Start)/(End - Start)*100;
+			_T.Start, _T.End = select(5, self:ChannelingInfo());
+			return (ER.GetTime()*1000 - _T.Start)/(_T.End - _T.Start)*100;
 		end
 		return -1;
 	end
 
 	--- Get all the buffs from an unit and put it into the Cache.
-	function Unit:GetBuffs (GUID)
-		if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-		ER.Cache.UnitInfo[GUID].Buffs = {};
-		local Infos;
+	function Unit:GetBuffs ()
+		if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+		ER.Cache.UnitInfo[self:GUID()].Buffs = {};
 		for i = 1, ER.MAXIMUM do
-			Infos = {UnitBuff(self.UnitID, i)};
-			if not Infos[11] then break; end
-			tableinsert(ER.Cache.UnitInfo[GUID].Buffs, Infos);
+			_T.Infos = {UnitBuff(self.UnitID, i)};
+			if not _T.Infos[11] then break; end
+			tableinsert(ER.Cache.UnitInfo[self:GUID()].Buffs, _T.Infos);
 		end
 	end
 
 	-- buff.foo.up (does return the buff table and not only true/false)
 	function Unit:Buff (Spell, Index, AnyCaster)
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] or not ER.Cache.UnitInfo[GUID].Buffs then
-				self:GetBuffs(GUID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] or not ER.Cache.UnitInfo[self:GUID()].Buffs then
+				self:GetBuffs();
 			end
-			for i = 1, #ER.Cache.UnitInfo[GUID].Buffs do
-				if Spell:ID() == ER.Cache.UnitInfo[GUID].Buffs[i][11] then
-					if AnyCaster or (ER.Cache.UnitInfo[GUID].Buffs[i][8] and Player:IsUnit(ER.Cache.UnitInfo[GUID].Buffs[i][8])) then
+			for i = 1, #ER.Cache.UnitInfo[self:GUID()].Buffs do
+				if Spell:ID() == ER.Cache.UnitInfo[self:GUID()].Buffs[i][11] then
+					if AnyCaster or (ER.Cache.UnitInfo[self:GUID()].Buffs[i][8] and Player:IsUnit(Unit(ER.Cache.UnitInfo[self:GUID()].Buffs[i][8]))) then
 						if Index then
-							return ER.Cache.UnitInfo[GUID].Buffs[i][Index];
+							return ER.Cache.UnitInfo[self:GUID()].Buffs[i][Index];
 						else
-							return unpack(ER.Cache.UnitInfo[GUID].Buffs[i]);
+							return unpack(ER.Cache.UnitInfo[self:GUID()].Buffs[i]);
 						end
 					end
 				end
@@ -505,8 +505,8 @@ end
 
 	-- buff.foo.remains
 	function Unit:BuffRemains (Spell, AnyCaster)
-		local ExpirationTime = self:Buff(Spell, 7, AnyCaster);
-		return ExpirationTime and ExpirationTime - ER.GetTime() or 0;
+		_T.ExpirationTime = self:Buff(Spell, 7, AnyCaster);
+		return _T.ExpirationTime and _T.ExpirationTime - ER.GetTime() or 0;
 	end
 
 	-- buff.foo.duration
@@ -526,31 +526,29 @@ end
 	end
 
 	--- Get all the debuffs from an unit and put it into the Cache.
-	function Unit:GetDebuffs (GUID)
-		if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-		ER.Cache.UnitInfo[GUID].Debuffs = {};
-		local Infos;
+	function Unit:GetDebuffs ()
+		if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+		ER.Cache.UnitInfo[self:GUID()].Debuffs = {};
 		for i = 1, ER.MAXIMUM do
-			Infos = {UnitDebuff(self.UnitID, i)};
-			if not Infos[11] then break; end
-			tableinsert(ER.Cache.UnitInfo[GUID].Debuffs, Infos);
+			_T.Infos = {UnitDebuff(self.UnitID, i)};
+			if not _T.Infos[11] then break; end
+			tableinsert(ER.Cache.UnitInfo[self:GUID()].Debuffs, _T.Infos);
 		end
 	end
 
 	-- debuff.foo.up or dot.foo.up (does return the debuff table and not only true/false)
 	function Unit:Debuff (Spell, Index, AnyCaster)
-		local GUID = self:GUID();
-		if GUID then
-			if not ER.Cache.UnitInfo[GUID] or not ER.Cache.UnitInfo[GUID].Debuffs then
-				self:GetDebuffs(GUID);
+		if self:GUID() then
+			if not ER.Cache.UnitInfo[self:GUID()] or not ER.Cache.UnitInfo[self:GUID()].Debuffs then
+				self:GetDebuffs();
 			end
-			for i = 1, #ER.Cache.UnitInfo[GUID].Debuffs do
-				if Spell:ID() == ER.Cache.UnitInfo[GUID].Debuffs[i][11] then
-					if AnyCaster or (ER.Cache.UnitInfo[GUID].Debuffs[i][8] and Player:IsUnit(ER.Cache.UnitInfo[GUID].Debuffs[i][8])) then
+			for i = 1, #ER.Cache.UnitInfo[self:GUID()].Debuffs do
+				if Spell:ID() == ER.Cache.UnitInfo[self:GUID()].Debuffs[i][11] then
+					if AnyCaster or (ER.Cache.UnitInfo[self:GUID()].Debuffs[i][8] and Player:IsUnit(Unit(ER.Cache.UnitInfo[self:GUID()].Debuffs[i][8]))) then
 						if Index then
-							return ER.Cache.UnitInfo[GUID].Debuffs[i][Index];
+							return ER.Cache.UnitInfo[self:GUID()].Debuffs[i][Index];
 						else
-							return unpack(ER.Cache.UnitInfo[GUID].Debuffs[i]);
+							return unpack(ER.Cache.UnitInfo[self:GUID()].Debuffs[i]);
 						end
 					end
 				end
@@ -561,8 +559,8 @@ end
 
 	-- debuff.foo.remains or dot.foo.remains
 	function Unit:DebuffRemains (Spell, AnyCaster)
-		local ExpirationTime = self:Debuff(Spell, 7, AnyCaster);
-		return ExpirationTime and ExpirationTime - ER.GetTime() or 0;
+		_T.ExpirationTime = self:Debuff(Spell, 7, AnyCaster);
+		return _T.ExpirationTime and _T.ExpirationTime - ER.GetTime() or 0;
 	end
 
 	-- debuff.foo.duration or dot.foo.duration
@@ -614,39 +612,54 @@ end
 				HistoryTime = 10+0.4, -- History time (seconds) : min=5, max=120, default = 20, Aethys = 10
 				HistoryCount = 100 -- Max history count : min=20, max=500, default = 120, Aethys = 100
 			},
+			_T = {
+				-- Both
+				Values,
+				-- TTDRefresh
+				UnitFound,
+				Time,
+				-- TimeToX
+				Seconds,
+				MaxHealth, StartingTime,
+				UnitTable,
+				MinSamples, -- In TimeToDie aswell
+				a, b,
+				n,
+				x, y,
+				Ex2, Ex, Exy, Ey,
+				Invariant
+			},
 			Units = {},
 			Throttle = 0
 		};
 		local TTD = ER.TTD;
 		function ER.TTDRefresh ()
-			local UnitFound;
 			for Key, Value in pairs(TTD.Units) do -- TODO: Need to be optimized
-				UnitFound = false;
+				TTD._T.UnitFound = false;
 				for i = 1, ER.MAXIMUM do
-					ThisUnit = Unit["Nameplate"..tostring(i)];
-					if Key == ThisUnit:GUID() and ThisUnit:Exists() then
-						UnitFound = true;
+					_T.ThisUnit = Unit["Nameplate"..tostring(i)];
+					if Key == _T.ThisUnit:GUID() and _T.ThisUnit:Exists() then
+						TTD._T.UnitFound = true;
 					end
 				end
-				if not UnitFound then
+				if not TTD._T.UnitFound then
 					TTD.Units[Key] = nil;
 				end
 			end
-			local ThisUnit, Values, Time;
 			for i = 1, ER.MAXIMUM do
-				ThisUnit = Unit["Nameplate"..tostring(i)];
-				if ThisUnit:Exists() and Player:CanAttack(ThisUnit) and ThisUnit:Health() < ThisUnit:MaxHealth() then
-					if not TTD.Units[ThisUnit:GUID()] or ThisUnit:Health() > TTD.Units[ThisUnit:GUID()][1][1][2] then
-						TTD.Units[ThisUnit:GUID()] = {{}, ThisUnit:MaxHealth(), ER.GetTime(), -1};
+				_T.ThisUnit = Unit["Nameplate"..tostring(i)];
+				if _T.ThisUnit:Exists() and Player:CanAttack(_T.ThisUnit) and _T.ThisUnit:Health() < _T.ThisUnit:MaxHealth() then
+					if not TTD.Units[_T.ThisUnit:GUID()] or _T.ThisUnit:Health() > TTD.Units[_T.ThisUnit:GUID()][1][1][2] then
+						TTD.Units[_T.ThisUnit:GUID()] = {{}, _T.ThisUnit:MaxHealth(), ER.GetTime(), -1};
 					end
-					Values = TTD.Units[ThisUnit:GUID()][1];
-					Time = ER.GetTime() - TTD.Units[ThisUnit:GUID()][3];
-					if ThisUnit:Health() ~= TTD.Units[ThisUnit:GUID()][4] then
-						tableinsert(Values, 1, {Time, ThisUnit:Health()});
-						while (#Values > TTD.Settings.HistoryCount) or (Time - Values[#Values][1] > TTD.Settings.HistoryTime) do
-							tableremove(Values);
+					TTD._T.Values = TTD.Units[_T.ThisUnit:GUID()][1];
+					TTD._T.Time = ER.GetTime() - TTD.Units[_T.ThisUnit:GUID()][3];
+					if _T.ThisUnit:Health() ~= TTD.Units[_T.ThisUnit:GUID()][4] then
+						tableinsert(TTD._T.Values, 1, {TTD._T.Time, _T.ThisUnit:Health()});
+						while (#TTD._T.Values > TTD.Settings.HistoryCount) or (TTD._T.Time - TTD._T.Values[#TTD._T.Values][1] > TTD.Settings.HistoryTime) do
+							tableremove(TTD._T.Values);
 						end
-						TTD.Units[ThisUnit:GUID()][4] = ThisUnit:Health();
+						TTD.Units[_T.ThisUnit:GUID()][4] = _T.ThisUnit:Health();
 					end
 				end
 			end
@@ -659,71 +672,69 @@ end
 		--	11111 : No GUID		9999 : Dummy		8888 : Not Enough Samples or No Health Change		7777 : No DPS		6666 : Negative TTD
 		function Unit:TimeToX (Percentage, MinSamples) -- TODO : See with Skasch how accuracy & prediction can be improved.
 			if self:IsDummy() then return 9999; end
-			local Seconds = 8888;
-			local MaxHealth, StartingTime;
-			local UnitTable = TTD.Units[self:GUID()];
-			local MinSamples = MinSamples or 3;
-			local a, b = 0, 0;
+			TTD._T.Seconds = 8888;
+			TTD._T.UnitTable = TTD.Units[self:GUID()];
+			TTD._T.MinSamples = MinSamples or 3;
+			TTD._T.a, TTD._T.b = 0, 0;
 			-- Simple linear regression
 			-- ( E(x^2)   E(x) )  ( a )   ( E(xy) )
 			-- ( E(x)       n  )  ( b ) = ( E(y)  )
 			-- Format of the above: ( 2x2 Matrix ) * ( 2x1 Vector ) = ( 2x1 Vector )
 			-- Solve to find a and b, satisfying y = a + bx
 			-- Matrix arithmetic has been expanded and solved to make the following operation as fast as possible
-			if UnitTable then
-				local Values = UnitTable[1];
-				local n = #Values;
-				if n > MinSamples then
-					MaxHealth = UnitTable[2];
-					StartingTime = UnitTable[3];
-					local x, y = 0, 0;
-					local Ex2, Ex, Exy, Ey = 0, 0, 0, 0;
+			if TTD._T.UnitTable then
+				TTD._T.Values = TTD._T.UnitTable[1];
+				TTD._T.n = #TTD._T.Values;
+				if TTD._T.n > MinSamples then
+					TTD._T.MaxHealth = TTD._T.UnitTable[2];
+					TTD._T.StartingTime = TTD._T.UnitTable[3];
+					TTD._T.x, TTD._T.y = 0, 0;
+					TTD._T.Ex2, TTD._T.Ex, TTD._T.Exy, TTD._T.Ey = 0, 0, 0, 0;
 					
-					for _, Value in pairs(Values) do
-						x, y = unpack(Value);
+					for _, Value in pairs(TTD._T.Values) do
+						TTD._T.x, TTD._T.y = unpack(Value);
 
-						Ex2 = Ex2 + x * x;
-						Ex = Ex + x;
-						Exy = Exy + x * y;
-						Ey = Ey + y;
+						TTD._T.Ex2 = TTD._T.Ex2 + TTD._T.x * TTD._T.x;
+						TTD._T.Ex = TTD._T.Ex + TTD._T.x;
+						TTD._T.Exy = TTD._T.Exy + TTD._T.x * TTD._T.y;
+						TTD._T.Ey = TTD._T.Ey + TTD._T.y;
 					end
 					-- Invariant to find matrix inverse
-					local Invariant = Ex2*n - Ex*Ex;
+					TTD._T.Invariant = TTD._T.Ex2*TTD._T.n - TTD._T.Ex*TTD._T.Ex;
 					-- Solve for a and b
-					a = (-Ex * Exy / Invariant) + (Ex2 * Ey / Invariant);
-					b = (n * Exy / Invariant) - (Ex * Ey / Invariant);
+					TTD._T.a = (-TTD._T.Ex * TTD._T.Exy / TTD._T.Invariant) + (TTD._T.Ex2 * TTD._T.Ey / TTD._T.Invariant);
+					TTD._T.b = (TTD._T.n * TTD._T.Exy / TTD._T.Invariant) - (TTD._T.Ex * TTD._T.Ey / TTD._T.Invariant);
 				end
 			end
-			if b ~= 0 then
+			if TTD._T.b ~= 0 then
 				-- Use best fit line to calculate estimated time to reach target health
-				Seconds = (Percentage * 0.01 * MaxHealth - a) / b;
+				TTD._T.Seconds = (Percentage * 0.01 * TTD._T.MaxHealth - TTD._T.a) / TTD._T.b;
 				-- Subtract current time to obtain "time remaining"
-				Seconds = mathmin(7777, Seconds - (ER.GetTime() - StartingTime));
-				if Seconds < 0 then Seconds = 6666; end
+				TTD._T.Seconds = mathmin(7777, TTD._T.Seconds - (ER.GetTime() - TTD._T.StartingTime));
+				if TTD._T.Seconds < 0 then TTD._T.Seconds = 6666; end
 			end
-			return mathfloor(Seconds);
+			return mathfloor(TTD._T.Seconds);
 		end
 
 		-- Get the unit TimeToDie
 		function Unit:TimeToDie (MinSamples)
-			local GUID = self:GUID();
-			if GUID then
-				local MinSamples = MinSamples or 3;
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].TTD then ER.Cache.UnitInfo[GUID].TTD = {}; end
-				if not ER.Cache.UnitInfo[GUID].TTD[MinSamples] then
+			if self:GUID() then
+				TTD._T.MinSamples = MinSamples or 3;
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].TTD then ER.Cache.UnitInfo[self:GUID()].TTD = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] then
 					-- TODO : Make a Table with a loop to avoid endless if
 					-- Odyn (Halls of Valor)
 					if self:NPCID() == 96589 then
-						ER.Cache.UnitInfo[GUID].TTD[MinSamples] = self:TimeToX(80, MinSamples);
+						ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(80, TTD._T.MinSamples);
 					-- Helya (Maw of Souls)
 					elseif self:NPCID() == 96759 then
-						ER.Cache.UnitInfo[GUID].TTD[MinSamples] = self:TimeToX(70, MinSamples);
+						ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(70, TTD._T.MinSamples);
 					else
-						ER.Cache.UnitInfo[GUID].TTD[MinSamples] = self:TimeToX(0, MinSamples);
+						ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(0, TTD._T.MinSamples);
 					end
 				end
-				return ER.Cache.UnitInfo[GUID].TTD[MinSamples];
+				return ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples];
 			end
 			return 11111;
 		end
@@ -735,35 +746,32 @@ end
 		----------------------------
 		-- energy.max
 		function Unit:EnergyMax ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].EnergyMax then
-					ER.Cache.UnitInfo[GUID].EnergyMax = UnitPowerMax(self.UnitID, SPELL_POWER_ENERGY);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].EnergyMax then
+					ER.Cache.UnitInfo[self:GUID()].EnergyMax = UnitPowerMax(self.UnitID, SPELL_POWER_ENERGY);
 				end
-				return ER.Cache.UnitInfo[GUID].EnergyMax;
+				return ER.Cache.UnitInfo[self:GUID()].EnergyMax;
 			end
 		end
 		-- energy
 		function Unit:Energy ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].Energy then
-					ER.Cache.UnitInfo[GUID].Energy = UnitPower(self.UnitID, SPELL_POWER_ENERGY);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].Energy then
+					ER.Cache.UnitInfo[self:GUID()].Energy = UnitPower(self.UnitID, SPELL_POWER_ENERGY);
 				end
-				return ER.Cache.UnitInfo[GUID].Energy;
+				return ER.Cache.UnitInfo[self:GUID()].Energy;
 			end
 		end
 		-- energy.regen
 		function Unit:EnergyRegen ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].EnergyRegen then
-					ER.Cache.UnitInfo[GUID].EnergyRegen = select(2, GetPowerRegen(self.UnitID));
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].EnergyRegen then
+					ER.Cache.UnitInfo[self:GUID()].EnergyRegen = select(2, GetPowerRegen(self.UnitID));
 				end
-				return ER.Cache.UnitInfo[GUID].EnergyRegen;
+				return ER.Cache.UnitInfo[self:GUID()].EnergyRegen;
 			end
 		end
 		-- energy.pct
@@ -803,24 +811,22 @@ end
 		----------------------------------
 		-- combo_points.max
 		function Unit:ComboPointsMax ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].ComboPointsMax then
-					ER.Cache.UnitInfo[GUID].ComboPointsMax = UnitPowerMax(self.UnitID, SPELL_POWER_COMBO_POINTS);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].ComboPointsMax then
+					ER.Cache.UnitInfo[self:GUID()].ComboPointsMax = UnitPowerMax(self.UnitID, SPELL_POWER_COMBO_POINTS);
 				end
-				return ER.Cache.UnitInfo[GUID].ComboPointsMax;
+				return ER.Cache.UnitInfo[self:GUID()].ComboPointsMax;
 			end
 		end
 		-- combo_points
 		function Unit:ComboPoints ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].ComboPoints then
-					ER.Cache.UnitInfo[GUID].ComboPoints = UnitPower(self.UnitID, SPELL_POWER_COMBO_POINTS);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].ComboPoints then
+					ER.Cache.UnitInfo[self:GUID()].ComboPoints = UnitPower(self.UnitID, SPELL_POWER_COMBO_POINTS);
 				end
-				return ER.Cache.UnitInfo[GUID].ComboPoints;
+				return ER.Cache.UnitInfo[self:GUID()].ComboPoints;
 			end
 		end
 		-- combo_points.deficit
@@ -833,24 +839,22 @@ end
 		---------------------------
 		-- fury.max
 		function Unit:FuryMax ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].FuryMax then
-					ER.Cache.UnitInfo[GUID].FuryMax = UnitPowerMax(self.UnitID, SPELL_POWER_FURY);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].FuryMax then
+					ER.Cache.UnitInfo[self:GUID()].FuryMax = UnitPowerMax(self.UnitID, SPELL_POWER_FURY);
 				end
-				return ER.Cache.UnitInfo[GUID].FuryMax;
+				return ER.Cache.UnitInfo[self:GUID()].FuryMax;
 			end
 		end
 		-- fury
 		function Unit:Fury ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].Fury then
-					ER.Cache.UnitInfo[GUID].Fury = UnitPower(self.UnitID, SPELL_POWER_FURY);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].Fury then
+					ER.Cache.UnitInfo[self:GUID()].Fury = UnitPower(self.UnitID, SPELL_POWER_FURY);
 				end
-				return ER.Cache.UnitInfo[GUID].Fury;
+				return ER.Cache.UnitInfo[self:GUID()].Fury;
 			end
 		end
 		-- fury.pct
@@ -871,24 +875,22 @@ end
 		---------------------------
 		-- pain.max
 		function Unit:PainMax ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].PainMax then
-					ER.Cache.UnitInfo[GUID].PainMax = UnitPowerMax(self.UnitID, SPELL_POWER_PAIN);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].PainMax then
+					ER.Cache.UnitInfo[self:GUID()].PainMax = UnitPowerMax(self.UnitID, SPELL_POWER_PAIN);
 				end
-				return ER.Cache.UnitInfo[GUID].PainMax;
+				return ER.Cache.UnitInfo[self:GUID()].PainMax;
 			end
 		end
 		-- pain
 		function Unit:Pain ()
-			local GUID = self:GUID();
-			if GUID then
-				if not ER.Cache.UnitInfo[GUID] then ER.Cache.UnitInfo[GUID] = {}; end
-				if not ER.Cache.UnitInfo[GUID].PainMax then
-					ER.Cache.UnitInfo[GUID].PainMax = UnitPower(self.UnitID, SPELL_POWER_PAIN);
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].PainMax then
+					ER.Cache.UnitInfo[self:GUID()].PainMax = UnitPower(self.UnitID, SPELL_POWER_PAIN);
 				end
-				return ER.Cache.UnitInfo[GUID].PainMax;
+				return ER.Cache.UnitInfo[self:GUID()].PainMax;
 			end
 		end
 		-- pain.pct
@@ -1114,18 +1116,18 @@ function ER.GetEnemies (Distance)
 	ER.Cache.Enemies[Distance] = {};
 	-- Check if there is another Enemies table with a greater Distance to filter from it.
 	if #ER.Cache.Enemies >= 1 then
-		local DistanceValues = {};
+		_T.DistanceValues = {};
 		for Key, Value in pairs(ER.Cache.Enemies) do
 			if Key > Distance then
-				tableinsert(DistanceValues, Key);
+				tableinsert(_T.DistanceValues, Key);
 			end
 		end
 		-- Check if we have caught a table that we can use.
-		if #DistanceValues >= 1 then
-			if #DistanceValues >= 2 then
-				table.sort(DistanceValues, function(a, b) return a < b; end);
+		if #_T.DistanceValues >= 1 then
+			if #_T.DistanceValues >= 2 then
+				table.sort(_T.DistanceValues, function(a, b) return a < b; end);
 			end
-			for Key, Value in pairs(ER.Cache.Enemies[DistanceValues[1]]) do
+			for Key, Value in pairs(ER.Cache.Enemies[_T.DistanceValues[1]]) do
 				if Value:IsInRange(Distance) then
 					tableinsert(ER.Cache.Enemies[Distance], Value);
 				end
@@ -1134,11 +1136,10 @@ function ER.GetEnemies (Distance)
 		end
 	end
 	-- Else build from all the nameplates.
-	local ThisUnit;
 	for i = 1, ER.MAXIMUM do
-		ThisUnit = Unit["Nameplate"..tostring(i)];
-		if ThisUnit:Exists() and not ThisUnit:IsDeadOrGhost() and Player:CanAttack(ThisUnit) and ThisUnit:IsInRange(Distance) then
-			tableinsert(ER.Cache.Enemies[Distance], ThisUnit);
+		_T.ThisUnit = Unit["Nameplate"..tostring(i)];
+		if _T.ThisUnit:Exists() and not _T.ThisUnit:IsDeadOrGhost() and Player:CanAttack(_T.ThisUnit) and _T.ThisUnit:IsInRange(Distance) then
+			tableinsert(ER.Cache.Enemies[Distance], _T.ThisUnit);
 		end
 	end
 end
@@ -1152,17 +1153,17 @@ end
 
 	-- Get the spell Type.
 	function Spell:Type ()
-		return self.SpellType
-	end
-
-	-- Get the spell Last Cast Time.
-	function Spell:LastCastTime ()
-		return self.LastCastTime;
+		return self.SpellType;
 	end
 
 	-- Get the Time since Last spell Cast.
 	function Spell:TimeSinceLastCast ()
 		return ER.GetTime() - self.LastCastTime;
+	end
+
+	-- Get the Time since Last spell Display.
+	function Spell:TimeSinceLastDisplay ()
+		return ER.GetTime() - self.LastDisplayTime;
 	end
 
 	--- WoW Specific Function
