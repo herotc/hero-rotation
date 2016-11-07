@@ -60,7 +60,7 @@ end
 
 -- Print with ER Prefix
 function ER.Print (...)
-	print("[|cFFFF6600Easy Rogue|r]", ...);
+	print("[|cFFFF6600Easy Raid|r]", ...);
 end
 
 -- Defines the APL
