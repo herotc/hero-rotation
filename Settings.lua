@@ -17,7 +17,12 @@ ER.GUISettings = {
 	APL = {
 		DemonHunter = {
 			Vengeance = {
-
+				-- {Display OffGCD as OffGCD, ForceReturn}
+				OffGCDasOffGCD = {
+					ConsumeMagic = {true, false},
+					DemonSpikes = {true, false},
+					InfernalStrike = {true, false}
+				}
 			}
 		},
 		Paladin = {
