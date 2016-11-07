@@ -38,6 +38,11 @@ local pairs = pairs;
 		[15] = 1,
 		[8] = 1
 	};
+-- GUI Settings
+	local Settings = {
+		General = ER.GUISettings.General,
+		Vengeance = ER.GUISettings.APL.DemonHunter.Vengeance
+	};
 
 -- APL Main
 local function APL ()
@@ -49,8 +54,7 @@ local function APL ()
 		-- PrePot w/ DBM Count
 		-- Opener (Shear)
 		if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) and S.Shear:IsCastable() then
-			ER.CastGCD(S.Shear);
-			return "Cast Shear";
+			if ER.Cast(S.Shear) then return "Cast Shear"; end
 		end
 		return;
 	end
@@ -69,57 +73,49 @@ local function APL ()
 		end
 		-- Demon Spikes
 		if S.DemonSpikes:IsCastable() and Player:HealthPercentage() <= 70 and Player:Pain() >= 20 and not Player:Buff(S.DemonSpikesBuff) then
-			ER.CastOffGCD(S.DemonSpikes);
+			if ER.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
 		end
 		if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
 			-- Consume Magic
 			if Settings.General.InterruptEnabled and Target:IsInRange(20) and S.ConsumeMagic:IsCastable() and Target:IsInterruptible() then
-				ER.CastOffGCD(S.ConsumeMagic);
+				if ER.Cast(S.ConsumeMagic, Settings.Vengeance.OffGCDasOffGCD.ConsumeMagic) then return "Cast Consume Magic"; end
 			end
 			-- actions+=/soul_carver
 			if ER.CDsON() and Target:IsInRange(5) and S.SoulCarver:IsCastable() then
-				ER.CastGCD(S.SoulCarver);
-				return "Cast Soul Carver";
+				if ER.Cast(S.SoulCarver) then return "Cast Soul Carver"; end
 			end
 			-- actions+=/immolation_aura,if=pain<=80
 			if Target:IsInRange(8) and S.ImmolationAura:IsCastable() and not Player:Buff(S.ImmolationAura) then
-				ER.CastGCD(S.ImmolationAura);
-				return "Cast Immolation Aura";
+				if ER.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
 			end
 			-- actions+=/felblade,if=pain<=70
 			if Target:IsInRange(15) and S.Felblade:IsCastable() then
-				ER.CastGCD(S.Felblade);
-				return "Cast Felblade";
+				if ER.Cast(S.Felblade) then return "Cast Felblade"; end
 			end
 			-- actions+=/fel_devastation
 			if ER.CDsON() and ER.AoEON() and Target:IsInRange(15) and S.FelDevastation:IsCastable() and GetUnitSpeed("player") == 0 and Player:Pain() >= 30 then
-				ER.CastGCD(S.FelDevastation);
-				return "Cast Fel Devastation";
+				if ER.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
 			end
 			-- actions+=/sigil_of_flame
 			if ER.AoEON() and Target:IsInRange(8) and S.SigilofFlame:IsCastable() then
-				ER.CastGCD(S.SigilofFlame);
-				return "Cast Sigil of Flame";
+				if ER.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
 			end
 			if Target:IsInRange(5) then
 				-- actions+=/soul_cleave,if=pain>=80
 				if S.SoulCleave:IsCastable() and Player:Pain() >= 60 then
-					ER.CastGCD(S.SoulCleave);
-					return "Cast Soul Cleave";
+					if ER.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
 				end
 				-- Infernal Strike Charges Dump
 				if S.InfernalStrike:IsCastable() and S.InfernalStrike:Charges() > 1 then
-					ER.CastOffGCD(S.InfernalStrike);
+					if ER.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
 				end
 				-- actions+=/shear
 				if S.Shear:IsCastable() then
-					ER.CastGCD(S.Shear);
-					return "Cast Shear";
+					if ER.Cast(S.Shear) then return "Cast Shear"; end
 				end
 			end
 			if Target:IsInRange(30) and S.ThrowGlaive:IsCastable() then
-				ER.CastGCD(S.ThrowGlaive);
-				return "Cast Throw Glaive";
+				if ER.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OoR)"; end
 			end
 		end
 end
