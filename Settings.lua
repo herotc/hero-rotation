@@ -27,7 +27,14 @@ ER.GUISettings = {
 		},
 		Paladin = {
 			Retribution = {
-
+				-- {Display GCD as OffGCD, ForceReturn}
+				GCDasOffGCD = {
+					HolyWrath = {true, false}
+				},
+				-- {Display OffGCD as OffGCD, ForceReturn}
+				OffGCDasOffGCD = {
+					AvengingWrath = {true, false},
+					Crusade = {true, false}
 			}
 		},
 		Rogue = {
