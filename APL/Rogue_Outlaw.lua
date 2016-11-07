@@ -215,11 +215,11 @@ end
 local function BF ()
 	-- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
 	if Player:Buff(S.BladeFlurry) and ((EnemiesCount[6] < 2 and ER.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and EnemiesCount[6] >= 2)) then
-		ER.CastOffGCD(S.BladeFlurry);
+		if ER.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
 	end
 	-- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
 	if not S.BladeFlurry:IsOnCooldown() and not Player:Buff(S.BladeFlurry) and EnemiesCount[6] >= 2 then
-		ER.CastOffGCD(S.BladeFlurry);
+		if ER.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
 	end
 	return false;
 end
@@ -234,32 +234,32 @@ local function CDs ()
 	if Target:IsInRange(5) then
 		-- actions.cds+=/blood_fury
 		if S.BloodFury:IsCastable() then
-			ER.CastOffGCD(S.BloodFury);
+			if ER.Cast(S.BloodFury, Settings.Outlaw.OffGCDasOffGCD.BloodFury) then return "Cast"; end
 		end
 		-- actions.cds+=/berserking
 		if S.Berserking:IsCastable() then
-			ER.CastOffGCD(S.Berserking);
+			if ER.Cast(S.Berserking, Settings.Outlaw.OffGCDasOffGCD.Berserking) then return "Cast"; end
 		end
 		-- actions.cds+=/arcane_torrent,if=energy.deficit>40
 		if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 40 then
-			ER.CastOffGCD(S.ArcaneTorrent);
+			if ER.Cast(S.ArcaneTorrent, Settings.Outlaw.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
 		end
 		-- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
 		if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
-			ER.CastOffGCD(S.AdrenalineRush);
+			if ER.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
 		end
 		-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
 		--[[Normal MfD
 		if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStrategem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
-			ER.CastOffGCD(S.MarkedforDeath);
+			if ER.Cast(S.MarkedforDeath, Settings.Outlaw.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
 		end]]
 		-- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
 		if I.ThraxisTricksyTreads:IsEquipped(8) and S.Sprint:IsCastable() and not SS_Useable() then
-			ER.CastOffGCD(S.Sprint);
+			if ER.Cast(S.Sprint, Settings.Outlaw.OffGCDasOffGCD.Sprint) then return "Cast"; end
 		end
 		-- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
 		if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
-			ER.CastOffGCD(S.CurseoftheDreadblades);
+			if ER.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast"; end
 		end
 	end
 	return false;
@@ -274,10 +274,10 @@ local function Stealth ()
 			if ER.CDsON() and Stealth_Condition() and not Player:IsTanking(Target) then
 				-- actions.stealth+=/vanish,if=variable.stealth_condition
 				if S.Vanish:IsCastable() then
-					ER.CastOffGCD(S.Vanish);
+					if ER.Cast(S.Vanish, Settings.Outlaw.OffGCDasOffGCD.Vanish) then return "Cast"; end
 				-- actions.stealth+=/shadowmeld,if=variable.stealth_condition
 				elseif S.Shadowmeld:IsCastable() then
-					ER.CastOffGCD(S.Shadowmeld);
+					if ER.Cast(S.Shadowmeld, Settings.Outlaw.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
 				end
 			end
 		end
@@ -349,12 +349,11 @@ local function APL ()
 	--- Out of Combat
 	if not Player:AffectingCombat() then
 		if not InCombatLockdown() and not S.Stealth:IsOnCooldown() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and ER.OutOfCombatTime() > 1 then
-			ER.CastOffGCD(S.Stealth);
+			if ER.Cast(S.Stealth, Settings.Outlaw.OffGCDasOffGCD.Stealth) then return "Cast Stealth"; end
 		end
 		-- Crimson Vial
 		if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 80 then
-			ER.CastGCD(S.CrimsonVial);
-			return "Cast Crimson Vial";
+			if ER.Cast(S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial"; end
 		end
 		-- Flask
 		-- Food
@@ -409,13 +408,11 @@ local function APL ()
 		end
 		-- Crimson Vial
 		if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 35 then
-			ER.CastGCD(S.CrimsonVial);
-			return "Cast Crimson Vial";
+			if ER.Cast(S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial"; end
 		end
 		-- Feint
 		if S.Feint:IsCastable() and not Player:Buff(S.Feint) and Player:HealthPercentage() <= 10 then
-			ER.CastGCD(S.Feint);
-			return "Cast Feint";
+			if ER.Cast(S.Feint, Settings.Outlaw.GCDasOffGCD.Feint) then return "Cast Feint"; end
 		end
 		-- actions+=/call_action_list,name=bf
 		if BF() then
@@ -432,7 +429,7 @@ local function APL ()
 			end
 			-- Kick
 			if Settings.General.InterruptEnabled and Target:IsInRange(5) and S.Kick:IsCastable() and Target:IsInterruptible() then
-				ER.CastOffGCD(S.Kick);
+				if ER.Cast(S.Kick, Settings.Outlaw.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
 			end
 			-- actions+=/call_action_list,name=cds
 			if ER.CDsON() and CDs() then

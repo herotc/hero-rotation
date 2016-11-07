@@ -50,8 +50,11 @@ ER.GUISettings = {
 					Vanish = {true, false},
 					-- Others
 					AdrenalineRush = {true, false},
+					CurseoftheDreadblades = {true, false},
+					BladeFlurry = {true, false},
 					Kick = {true, false},
 					MarkedforDeath = {false, false},
+					Sprint = {true, false},
 					Stealth = {true, false},
 					SymbolsofDeath = {true, false}
 				}
