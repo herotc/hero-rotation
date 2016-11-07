@@ -35,6 +35,7 @@ ER.GUISettings = {
 				OffGCDasOffGCD = {
 					AvengingWrath = {true, false},
 					Crusade = {true, false}
+				}
 			}
 		},
 		Rogue = {
