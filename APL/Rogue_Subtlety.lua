@@ -27,17 +27,50 @@ local pairs = pairs;
 		Anticipation = Spell(114015),
 		Backstab = Spell(53),
 		DeathFromAbove = Spell(152150),
-		DeeperStrategem = Spell(193531),
+		DeeperStratagem = Spell(193531),
 		EnvelopingShadows = Spell(206237),
-		Eviscerate = Spell(196819),
+		Eviscerate = Spell(196819--[[, 
+			Eviscerate DMG Formula (Pre-Mitigation):
+				AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * LegionBlade_M * MoS_M * DS_M * SoD_M * Versa_M * Mastery_M
+			function () 
+				return 
+					-- Attack Power
+					Player:AttackPower() * 
+					-- Combo Points	
+					Player:ComboPoints() * 
+					-- Eviscerate R1 AP Coef
+					0.98130 * 
+					-- Eviscerate R2 Multiplier			
+					1.5 * 
+					-- Finality: Eviscerate Multiplier | Used 1.2 atm (TODO: Check the % from Tooltip or do an Event Listener)
+					(Player:Buff(S.FinalityEviscerate) and 1.2 or 1) * 
+					-- Shadow Fangs Multiplier
+					(S.ShadowFangs:Exists() and 1.4 or 1) * 
+					-- Legion Blade Multiplier
+					(S.LegionBlade():ArtifactRank() > 0 and 1.05+0.005*(S.LegionBlade():ArtifactRank()-1) or 1) * 
+					-- Master of Subtlety Multiplier
+					(Player:Buff(S.MasterOfSubtletyBuff) and 1.1 or 1) * 
+					-- Deeper Stratagem Multiplier
+					(S.DeeperStratagem:Exists() and 1.1 or 1) * 
+					-- Symbols of Death Multiplier
+					(Player:Buff(S.SymbolsofDeath) and 1.2 or 1) * 
+					-- Versatility Damage Multiplier
+					(1 + Player:VersatilyDmgPct()) * 
+					-- Mastery Finisher Multiplier
+					(1 + Player:MasteryPct());
+			end]]
+		),
+		FinalityEviscerate = Spell(197496),
+		FinalityNightblade = Spell(195452),
 		Gloomblade = Spell(200758),
 		KidneyShot = Spell(408),
+		LegionBlade = Spell(214930),
 		MasterofShadows = Spell(196976),
 		MasterOfSubtlety = Spell(31223),
 		MasterOfSubtletyBuff = Spell(31665),
 		Nightblade = Spell(195452),
-		FinalityNightblade = Spell(195452),
 		Premeditation = Spell(196979),
+		ShadowFangs = Spell(221856),
 		ShadowFocus = Spell(108209),
 		Shadowstrike = Spell(185438),
 		ShurikenStorm = Spell(197835),
@@ -137,7 +170,7 @@ local function CDs ()
 		end
 		-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
 		--[[Normal MfD
-		if not S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStrategem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
+		if not S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
 			if ER.Cast(S.MarkedforDeath, Settings.Subtlety.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
 		end]]
 	end
@@ -192,7 +225,7 @@ local function Stealth_CDs ()
 			if ER.Cast(S.Vanish, Settings.Subtlety.OffGCDasOffGCD.Vanish) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadow_dance,if=charges>=2&combo_points<=1
-		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
+		if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
 			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadowmeld,if=energy>=40-variable.ssw_er&energy.deficit>10
@@ -204,7 +237,7 @@ local function Stealth_CDs ()
 			if ER.Cast(S.Shadowmeld, Settings.Subtlety.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
-		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
+		if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
 			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
 		end
 	end

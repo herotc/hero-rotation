@@ -30,7 +30,7 @@ local tostring = tostring;
 		BetweentheEyes = Spell(199804),
 		BladeFlurry = Spell(13877),
 		DeathfromAbove = Spell(152150),
-		DeeperStrategem = Spell(193531),
+		DeeperStratagem = Spell(193531),
 		GhostlyStrike = Spell(196937),
 		HiddenBlade = Spell(202754),
 		Opportunity = Spell(195627),
@@ -191,7 +191,7 @@ end
 local function SS_Useable_NoReroll ()
 	-- actions+=/variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
 	if not ER.Cache.APLVar.SS_Useable_NoReroll then
-		ER.Cache.APLVar.SS_Useable_NoReroll = (Player:ComboPoints() < 5+(S.DeeperStrategem:IsAvailable() and 1 or 0)-((Player:Buff(S.Broadsides) or Player:Buff(S.JollyRoger)) and 1 or 0)-((S.Alacrity:IsAvailable() and Player:BuffStack(S.AlacrityBuff) <= 4) and 1 or 0)) and true or false;
+		ER.Cache.APLVar.SS_Useable_NoReroll = (Player:ComboPoints() < 5+(S.DeeperStratagem:IsAvailable() and 1 or 0)-((Player:Buff(S.Broadsides) or Player:Buff(S.JollyRoger)) and 1 or 0)-((S.Alacrity:IsAvailable() and Player:BuffStack(S.AlacrityBuff) <= 4) and 1 or 0)) and true or false;
 	end
 	return ER.Cache.APLVar.SS_Useable_NoReroll;
 end
@@ -199,7 +199,7 @@ end
 local function SS_Useable ()
 	-- actions+=/variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
 	if not ER.Cache.APLVar.SS_Useable then
-		ER.Cache.APLVar.SS_Useable = ((S.Anticipation:IsAvailable() and Player:ComboPoints() < 4) or (not S.Anticipation:IsAvailable() and ((RtB_Reroll() and Player:ComboPoints() < 4+(S.DeeperStrategem:IsAvailable() and 1 or 0)) or (not RtB_Reroll() and SS_Useable_NoReroll())))) and true or false;
+		ER.Cache.APLVar.SS_Useable = ((S.Anticipation:IsAvailable() and Player:ComboPoints() < 4) or (not S.Anticipation:IsAvailable() and ((RtB_Reroll() and Player:ComboPoints() < 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)) or (not RtB_Reroll() and SS_Useable_NoReroll())))) and true or false;
 	end
 	return ER.Cache.APLVar.SS_Useable;
 end
@@ -250,7 +250,7 @@ local function CDs ()
 		end
 		-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
 		--[[Normal MfD
-		if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStrategem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
+		if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
 			if ER.Cast(S.MarkedforDeath, Settings.Outlaw.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
 		end]]
 		-- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
