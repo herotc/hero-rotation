@@ -184,7 +184,7 @@ end
 local function Stealth_CDs ()
 	if Target:IsInRange(5) then
 		-- actions.stealth_cds=shadow_dance,if=charges_fractional>=2.45
-		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= 2.45 then
+		if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= 2.45 then
 			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/vanish

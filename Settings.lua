@@ -65,12 +65,8 @@ ER.GUISettings = {
 				}
 			},
 			Subtlety = {
-				-- Shadow Dance
-				ShD = {
-					-- Eco Mode
-					EcoCharge = 2,
-					EcoCD = 20
-				},
+				-- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
+				ShDEcoCharge = 2.8,
 				-- {Display GCD as OffGCD, ForceReturn}
 				GCDasOffGCD = {
 					CrimsonVial = {true, false},
