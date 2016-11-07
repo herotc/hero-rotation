@@ -188,15 +188,15 @@ local function Stealth_CDs ()
 			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/vanish
-		if ER.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:Charges() <= 2 then
+		if ER.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 then
 			if ER.Cast(S.Vanish, Settings.Subtlety.OffGCDasOffGCD.Vanish) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadow_dance,if=charges>=2&combo_points<=1
-		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
+		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
 			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadowmeld,if=energy>=40-variable.ssw_er&energy.deficit>10
-		if ER.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10 then
+		if ER.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10 then
 			-- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40-variable.ssw_er
 			if Player:Energy() < 40-SSW_ER() then
 				return "Pool for Shadowmeld";
@@ -204,7 +204,7 @@ local function Stealth_CDs ()
 			if ER.Cast(S.Shadowmeld, Settings.Subtlety.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
-		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
+		if (ER.CDsON() or (S.ShadowDance:Charges() >= Settings.Subtlety.ShD.EcoCharge and S.ShadowDance:Recharge() <= Settings.Subtlety.ShD.EcoCD)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
 			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
 		end
 	end
