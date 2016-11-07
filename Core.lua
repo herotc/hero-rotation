@@ -741,6 +741,25 @@ end
 
 	--- PLAYER SPECIFIC
 
+		-- gcd
+		-- TODO : Improve perfs
+		function Unit:GCD ()
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].GCD then
+					local SpecID = GetSpecializationInfo(GetSpecialization());
+					-- Rogue, Feral, Brewmaster, Windwalker got 1S.
+					if ({UnitClass("player")})[2] == "ROGUE" or SpecID == 103 or SpecID == 268 or SpecID == 269 then
+						ER.Cache.UnitInfo[self:GUID()].GCD = 1;
+					else
+						local GCD = 1.5/(1+(self:Haste()/100));
+						ER.Cache.UnitInfo[self:GUID()].GCD = GCD > 0.75 and GCD or 0.75;
+					end
+				end
+				return ER.Cache.UnitInfo[self:GUID()].GCD;
+			end
+		end
+
 		----------------------------
 		--- 3 | Energy Functions ---
 		----------------------------
@@ -832,6 +851,42 @@ end
 		-- combo_points.deficit
 		function Unit:ComboPointsDeficit ()
 			return self:ComboPointsMax() - self:ComboPoints();
+		end
+
+		--------------------------------
+		--- 9 | Holy Power Functions ---
+		--------------------------------
+		-- holy_power.max
+		function Unit:HolyPowerMax ()
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].HolyPowerMax then
+					ER.Cache.UnitInfo[self:GUID()].HolyPowerMax = UnitPowerMax(self.UnitID, SPELL_POWER_HOLY_POWER);
+				end
+				return ER.Cache.UnitInfo[self:GUID()].HolyPowerMax;
+			end
+		end
+		-- holy_power
+		function Unit:HolyPower ()
+			if self:GUID() then
+				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+				if not ER.Cache.UnitInfo[self:GUID()].HolyPower then
+					ER.Cache.UnitInfo[self:GUID()].HolyPower = UnitPower(self.UnitID, SPELL_POWER_HOLY_POWER);
+				end
+				return ER.Cache.UnitInfo[self:GUID()].HolyPower;
+			end
+		end
+		-- holy_power.pct
+		function Unit:HolyPowerPercentage ()
+			return (self:HolyPower() / self:HolyPowerMax()) * 100;
+		end
+		-- holy_power.deficit
+		function Unit:HolyPowerDeficit ()
+			return self:HolyPowerMax() - self:HolyPower();
+		end
+		-- "holy_power.deficit.pct"
+		function Unit:HolyPowerDeficitPercentage ()
+			return (self:HolyPowerDeficit() / self:HolyPowerMax()) * 100;
 		end
 
 		---------------------------
