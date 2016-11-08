@@ -37,6 +37,7 @@ ER.PersistentCache = {
 ER.Cache = {
 	APLVar = {},
 	Enemies = {},
+	EnemiesCount = {},
 	GUIDInfo = {},
 	MiscInfo = {},
 	SpellInfo = {},
@@ -1197,6 +1198,8 @@ function ER.GetEnemies (Distance)
 			tableinsert(ER.Cache.Enemies[Distance], _T.ThisUnit);
 		end
 	end
+	-- Cache the count of enemies
+	ER.Cache.EnemiesCount[Distance] = #ER.Cache.Enemies[Distance];
 end
 
 --- ============== SPELL CLASS ==============
