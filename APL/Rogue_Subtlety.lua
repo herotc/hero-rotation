@@ -29,9 +29,9 @@ local pairs = pairs;
 		DeathFromAbove = Spell(152150),
 		DeeperStratagem = Spell(193531),
 		EnvelopingShadows = Spell(206237),
-		Eviscerate = Spell(196819--[[, 
-			Eviscerate DMG Formula (Pre-Mitigation):
-				AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * LegionBlade_M * MoS_M * DS_M * SoD_M * Versa_M * Mastery_M
+		Eviscerate = Spell(196819, 
+			-- Eviscerate DMG Formula (Pre-Mitigation):
+			--	AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * LegionBlade_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M
 			function () 
 				return 
 					-- Attack Power
@@ -54,11 +54,11 @@ local pairs = pairs;
 					(S.DeeperStratagem:Exists() and 1.1 or 1) * 
 					-- Symbols of Death Multiplier
 					(Player:Buff(S.SymbolsofDeath) and 1.2 or 1) * 
-					-- Versatility Damage Multiplier
-					(1 + Player:VersatilyDmgPct()) * 
 					-- Mastery Finisher Multiplier
-					(1 + Player:MasteryPct());
-			end]]
+					(1 + Player:MasteryPct()) * 
+					-- Versatility Damage Multiplier
+					(1 + Player:VersatilityDmgPct());
+			end
 		),
 		FinalityEviscerate = Spell(197496),
 		FinalityNightblade = Spell(195452),
