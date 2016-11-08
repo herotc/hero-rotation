@@ -137,36 +137,6 @@ function ER.ON ()
 	return ERSettings.Toggles[3];
 end
 
--- Get the Latency (it's updated every 30s).
--- TODO: Cache it in Persistent Cache and update it only when it changes
-function ER.Latency ()
-	return select(4, GetNetStats());
-end
-
--- Compute the Recovery Offset with Lag Compensation.
-function ER.RecoveryOffset ()
-	return (ER.Latency() + ER.GUISettings.General.Recovery)/1000;
-end
-
--- Get the time since combat has started.
-function ER.CombatTime ()
-	return ER.CombatStarted ~= 0 and ER.GetTime()-ER.CombatStarted or 0;
-end
-
--- Get the time since combat has ended.
-function ER.OutOfCombatTime ()
-	return ER.CombatEnded ~= 0 and ER.GetTime()-ER.CombatEnded or 0;
-end
-
--- Get the Boss Mod Pull Timer.
-function ER.BMPullTime ()
-	if not ER.BossModTime or ER.BossModTime == 0 or ER.BossModEndTime-ER.GetTime() < 0 then
-		return 60;
-	else
-		return ER.BossModEndTime-ER.GetTime();
-	end
-end
-
 --- ============== CLASS FUNCTIONS ==============
 	-- Class
 	local function Class ()
@@ -754,7 +724,7 @@ end
 					if ({UnitClass("player")})[2] == "ROGUE" or SpecID == 103 or SpecID == 268 or SpecID == 269 then
 						ER.Cache.UnitInfo[self:GUID()].GCD = 1;
 					else
-						local GCD = 1.5/(1+self:HastePct());
+						local GCD = 1.5/(1+self:HastePct()/100);
 						ER.Cache.UnitInfo[self:GUID()].GCD = GCD > 0.75 and GCD or 0.75;
 					end
 				end
@@ -1586,3 +1556,41 @@ end
 	function Item:LastCastTime ()
 		return self.LastCastTime;
 	end
+
+--- ============== MISC FUNCTIONS ==============
+
+-- Get the Latency (it's updated every 30s).
+-- TODO: Cache it in Persistent Cache and update it only when it changes
+function ER.Latency ()
+	return select(4, GetNetStats());
+end
+
+-- Retrieve the Recovery Timer based on Settings.
+-- TODO: Optimize, to see how we'll implement it in the GUI.
+function ER.RecoveryTimer ()
+	return ER.GUISettings.General.RecoveryMode == "GCD" and Player:GCD()*1000 or ER.GUISettings.General.RecoveryTimer;
+end
+
+-- Compute the Recovery Offset with Lag Compensation.
+function ER.RecoveryOffset ()
+	return (ER.Latency() + ER.RecoveryTimer())/1000;
+end
+
+-- Get the time since combat has started.
+function ER.CombatTime ()
+	return ER.CombatStarted ~= 0 and ER.GetTime()-ER.CombatStarted or 0;
+end
+
+-- Get the time since combat has ended.
+function ER.OutOfCombatTime ()
+	return ER.CombatEnded ~= 0 and ER.GetTime()-ER.CombatEnded or 0;
+end
+
+-- Get the Boss Mod Pull Timer.
+function ER.BMPullTime ()
+	if not ER.BossModTime or ER.BossModTime == 0 or ER.BossModEndTime-ER.GetTime() < 0 then
+		return 60;
+	else
+		return ER.BossModEndTime-ER.GetTime();
+	end
+end
