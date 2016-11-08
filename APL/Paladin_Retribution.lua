@@ -24,11 +24,13 @@ local pairs = pairs;
 		CrusaderStrike = Spell(35395),
 		DivineHamme = Spell(198034),
 		DivinePurpose = Spell(223817),
+		DivinePurposeBuff = Spell(223819),
 		DivineStorm = Spell(53385),
 		ExecutionSentence = Spell(213757),
 		GreaterJudgment = Spell(218718),
 		HolyWrath = Spell(210220),
 		Judgment = Spell(20271),
+		JudgmentDebuff = Spell(197277),
 		JusticarsVengeance = Spell(215661),
 		TemplarsVerdict = Spell(85256),
 		TheFiresofJustice = Spell(203316),
@@ -49,9 +51,6 @@ local pairs = pairs;
 	};
 	local I = Item.Paladin.Outlaw;
 -- Rotation Var
-	local EnemiesCount = {
-		[5] = 0
-	};
 -- GUI Settings
 	local Settings = {
 		General = ER.GUISettings.General,
@@ -91,15 +90,6 @@ local function APL ()
 		-- Unit Update
 		ER.GetEnemies(8); -- Divine Storm
 		ER.GetEnemies(5); -- Melee
-		if ER.AoEON() then
-			for Key, Value in pairs(EnemiesCount) do
-				EnemiesCount[Key] = #ER.Cache.Enemies[Key];
-			end
-		else
-			for Key, Value in pairs(EnemiesCount) do
-				EnemiesCount[Key] = 1;
-			end
-		end
 		if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
 			--[[ Disabled since not coded for Retribution yet
 			-- Mythic Dungeon
@@ -111,34 +101,55 @@ local function APL ()
 				return;
 			end
 			]]
-			-- actions+=/holy_wrath
-			if ER.CDsON() and S.HolyWrath:IsCastable() then
-				if ER.Cast(S.HolyWrath, Settings.Retribution.GCDasOffGCD.HolyWrath) then return "Cast Holy Wrath" end
-			end
-			-- actions+=/avenging_wrath
-			if ER.CDsON() and S.AvengingWrath:IsCastable() then
-				if ER.Cast(S.AvengingWrath, Settings.Retribution.OffGCDasOffGCD.AvengingWrath) then return "Cast Avenging Wrath" end
-			end
-			-- actions+=/shield_of_vengeance
-			-- TODO: Add it if dmg are taken, not honly based on HP.
-			-- actions+=/crusade,if=holy_power>=5
-			if ER.CDsON() and S.Crusade:IsCastable() and Player:HolyPower() >= 5 then
-				if ER.Cast(S.Crusade, Settings.Retribution.OffGCDasOffGCD.Crusade) then return "Cast Crusade" end
-			end
-			-- actions+=/wake_of_ashes,if=holy_power>=0&time<2
-			if ER.CDsON() and S.WakeofAshes:IsCastable() and Player:HolyPower() >= 0 and ER.CombatTime() < 2 then
-				if ER.Cast(S.WakeofAshes) then return "Cast Wake of Ashes" end
+			if Target:IsInRange(5) then
+				-- actions+=/holy_wrath
+				if ER.CDsON() and S.HolyWrath:IsCastable() then
+					if ER.Cast(S.HolyWrath, Settings.Retribution.GCDasOffGCD.HolyWrath) then return "Cast Holy Wrath" end
+				end
+				-- actions+=/avenging_wrath
+				if ER.CDsON() and S.AvengingWrath:IsCastable() then
+					if ER.Cast(S.AvengingWrath, Settings.Retribution.OffGCDasOffGCD.AvengingWrath) then return "Cast Avenging Wrath" end
+				end
+				-- actions+=/shield_of_vengeance
+				-- TODO: Add it if dmg are taken, not honly based on HP.
+				-- actions+=/crusade,if=holy_power>=5
+				if ER.CDsON() and S.Crusade:IsCastable() and Player:HolyPower() >= 5 then
+					if ER.Cast(S.Crusade, Settings.Retribution.OffGCDasOffGCD.Crusade) then return "Cast Crusade" end
+				end
+				-- actions+=/wake_of_ashes,if=holy_power>=0&time<2
+				if ER.CDsON() and S.WakeofAshes:IsCastable() and Player:HolyPower() >= 0 and ER.CombatTime() < 2 then
+					if ER.Cast(S.WakeofAshes) then return "Cast Wake of Ashes" end
+				end
 			end
 			-- actions+=/execution_sentence,if=spell_targets.divine_storm<=3&(cooldown.judgment.remains<gcd*4.5|debuff.judgment.remains>gcd*4.67)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
-			if S.ExecutionSentence:IsCastable() and EnemiesCount[8] <= 3 and (S.Judgment:Cooldown() < Player:GCD()*4.5 or Target:DebuffRemains(S.Judgment) > Player:GCD()*4.67) and (not S.Crusade:IsAvailable() or S.Crusade:Cooldown() > Player:GCD()*2) then
+			if Target:IsInRange(20) and S.ExecutionSentence:IsCastable() and EnemiesCount[8] <= 3 and (S.Judgment:Cooldown() < Player:GCD()*4.5 or Target:DebuffRemains(S.Judgment) > Player:GCD()*4.67) and (not S.Crusade:IsAvailable() or S.Crusade:Cooldown() > Player:GCD()*2) then
 				if ER.Cast(S.ExecutionSentence) then return "Cast Execution Sentence" end
 			end
-			-- actions+=/blood_fury
-			-- actions+=/berserking
-			-- actions+=/arcane_torrent,if=holy_power<5
-			-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
-			-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&buff.divine_purpose.react
-			-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
+			if Target:IsInRange(5) then
+				-- actions+=/blood_fury
+				-- actions+=/berserking
+				-- actions+=/arcane_torrent,if=holy_power<5
+				if S.ArcaneTorrent:IsCastable() and Player:HolyPowerDeficit() < 5 then
+					if ER.Cast(S.ArcaneTorrent, Settings.Retribution.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+				end
+			end
+			if ER.Cache.EnemiesCount[8] >= 2 and Target:Debuff(S.JudgmentDebuff) then
+				-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
+				if Player:Buff(S.DivinePurposeBuff) and Player:BuffRemains(S.DivinePurposeBuff) < Player:GCD() * 2 then
+
+				end
+				if Player:HolyPower() >= 5 then
+					-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&buff.divine_purpose.react
+					if Player:Buff(S.DivinePurposeBuff) then
+
+					end
+					-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
+					if (not S.Crusade:Exists() or S.Crusade:Cooldown() > Player:GCD() * 3) then
+
+					end
+				end
+			end
+			
 			-- actions+=/justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2&!equipped.whisper_of_the_nathrezim
 			-- actions+=/justicars_vengeance,if=debuff.judgment.up&holy_power>=5&buff.divine_purpose.react&!equipped.whisper_of_the_nathrezim
 			-- actions+=/templars_verdict,if=debuff.judgment.up&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2

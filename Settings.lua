@@ -19,6 +19,7 @@ ER.GUISettings = {
 			Vengeance = {
 				-- {Display OffGCD as OffGCD, ForceReturn}
 				OffGCDasOffGCD = {
+					-- Spec
 					ConsumeMagic = {true, false},
 					DemonSpikes = {true, false},
 					InfernalStrike = {true, false}
@@ -33,6 +34,9 @@ ER.GUISettings = {
 				},
 				-- {Display OffGCD as OffGCD, ForceReturn}
 				OffGCDasOffGCD = {
+					-- Racials
+					ArcaneTorrent = {true, false},
+					-- Spec
 					AvengingWrath = {true, false},
 					Crusade = {true, false}
 				}
@@ -61,7 +65,7 @@ ER.GUISettings = {
 					-- Stealth CDs
 					Shadowmeld = {true, false},
 					Vanish = {true, false},
-					-- Others
+					-- Spec
 					AdrenalineRush = {true, false},
 					CurseoftheDreadblades = {true, false},
 					BladeFlurry = {true, false},
@@ -90,7 +94,7 @@ ER.GUISettings = {
 					ShadowDance = {true, false},
 					Shadowmeld = {true, false},
 					Vanish = {true, false},
-					-- Others
+					-- Spec
 					Kick = {true, false},
 					MarkedforDeath = {false, false},
 					ShadowBlades = {true, false},
