@@ -359,7 +359,7 @@ local function APL ()
 		-- Food
 		-- Rune
 		-- PrePot w/ DBM Count
-		-- Opener (Ambush or SaberSlash)
+		-- Opener
 		if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
 			if Player:ComboPoints() >= 5 then
 				if S.RunThrough:IsCastable() then
