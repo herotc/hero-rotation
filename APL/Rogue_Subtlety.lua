@@ -103,11 +103,6 @@ local pairs = pairs;
 	};
 	local I = Item.Rogue.Outlaw;
 -- Rotation Var
-	local EnemiesCount = {
-		[10] = 0,
-		[8] = 0,
-		[5] = 0
-	};
 	local ShouldReturn, ShouldReturn2; -- Used to get the return string
 	local BestUnit, BestUnitTTD; -- Used for cycling
 -- GUI Settings
@@ -128,7 +123,7 @@ end
 -- # Builders
 local function Build ()
 	-- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
-	if EnemiesCount[10] >= 2 and S.ShurikenStorm:IsCastable() then
+	if ER.AoEON() and ER.Cache.EnemiesCount[10] >= 2 and S.ShurikenStorm:IsCastable() then
 		if ER.Cast(S.ShurikenStorm) then return "Cast"; end
 	end
 	if Target:IsInRange(5) then
@@ -183,7 +178,7 @@ local function Finish ()
 		if ER.Cast(S.EnvelopingShadows) then return "Cast"; end
 	end
 	-- actions.finish+=/death_from_above,if=spell_targets.death_from_above>=6
-	if EnemiesCount[8] >= 6 and Target:IsInRange(15) and S.DeathFromAbove:IsCastable() then
+	if ER.AoEON() and ER.Cache.EnemiesCount[8] >= 6 and Target:IsInRange(15) and S.DeathFromAbove:IsCastable() then
 		if ER.Cast(S.DeathFromAbove) then return "Cast"; end
 	end
 	-- actions.finish+=/nightblade,target_if=max:target.time_to_die,if=target.time_to_die>8&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time)
@@ -257,7 +252,7 @@ local function Stealthed ()
 		end
 	end
 	-- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|buff.the_dreadlords_deceit.stack>=29)
-	if ER.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld) and ((Player:ComboPointsDeficit() >= 3 and EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0)) or (Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+	if ER.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld) and ((Player:ComboPointsDeficit() >= 3 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0)) or (Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
 		if ER.Cast(S.ShurikenStorm) then return "Cast"; end
 	end
 	-- actions.stealthed+=/shadowstrike
@@ -333,19 +328,10 @@ local function APL ()
 		end
 	-- In Combat
 		-- Unit Update
-		if S.MarkedforDeath:IsAvailable() then ER.GetEnemies(30); end
+		ER.GetEnemies(30); -- Marked for Death
 		ER.GetEnemies(10); -- Shuriken Storm
 		ER.GetEnemies(8); -- Death From Above
 		ER.GetEnemies(5); -- Melee
-		if ER.AoEON() then
-			for Key, Value in pairs(EnemiesCount) do
-				EnemiesCount[Key] = #ER.Cache.Enemies[Key];
-			end
-		else
-			for Key, Value in pairs(EnemiesCount) do
-				EnemiesCount[Key] = 1;
-			end
-		end
 		-- MfD Sniping
 		if S.MarkedforDeath:IsCastable() then
 			BestUnit, BestUnitTTD = nil, 60;
@@ -398,7 +384,7 @@ local function APL ()
 				return "Stealthed Pooling"; -- run_action_list forces the return
 			end
 			-- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
-			if Player:ComboPoints() >= 5 or (Player:ComboPoints() >= 4 and EnemiesCount[10] >= 3 and EnemiesCount[10] <= 4) then
+			if Player:ComboPoints() >= 5 or (ER.AoEON() and Player:ComboPoints() >= 4 and ER.Cache.EnemiesCount[10] >= 3 and ER.Cache.EnemiesCount[10] <= 4) then
 				ShouldReturn = Finish();
 				if ShouldReturn then
 					return ShouldReturn;
