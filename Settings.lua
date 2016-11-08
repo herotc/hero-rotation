@@ -6,7 +6,8 @@ ER.GUISettings = {
 		-- Main Frame Strata
 		MainFrameStrata = "HIGH",
 		-- Recovery Timer
-		Recovery = 950,
+		RecoveryMode = "GCD"; -- "GCD" to always display the next ability, "Custom" for Custom Timer.
+		RecoveryTimer = 950;
 		-- Interrupt
 		InterruptEnabled = false
 	},
