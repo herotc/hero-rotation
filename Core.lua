@@ -186,8 +186,9 @@ end
 	ER.Unit = Class();
 	local Unit = ER.Unit;
 	-- Unit Constructor
-	function Unit:Constructor (UnitID)
+	function Unit:Constructor (UnitID, DmgFormula)
 		self.UnitID = UnitID;
+		self.DmgFormula = DmgFormula or false;
 	end
 	-- Defines Unit Objects.
 	Unit.Player = Unit("Player");
@@ -753,12 +754,42 @@ end
 					if ({UnitClass("player")})[2] == "ROGUE" or SpecID == 103 or SpecID == 268 or SpecID == 269 then
 						ER.Cache.UnitInfo[self:GUID()].GCD = 1;
 					else
-						local GCD = 1.5/(1+(self:Haste()/100));
+						local GCD = 1.5/(1+self:HastePct());
 						ER.Cache.UnitInfo[self:GUID()].GCD = GCD > 0.75 and GCD or 0.75;
 					end
 				end
 				return ER.Cache.UnitInfo[self:GUID()].GCD;
 			end
+		end
+
+		-- attack_power
+		-- TODO : Use Cache
+		function Unit:AttackPower ()
+			return UnitAttackPower(self.UnitID);
+		end
+
+		-- crit_chance
+		-- TODO : Use Cache
+		function Unit:CritChancePct ()
+			return GetCritChance();
+		end
+
+		-- haste
+		-- TODO : Use Cache
+		function Unit:HastePct ()
+			return GetHaste();
+		end
+
+		-- mastery
+		-- TODO : Use Cache
+		function Unit:MasteryPct ()
+			return GetMasteryEffect();
+		end
+
+		-- versatility
+		-- TODO : Use Cache
+		function Unit:VersatilityDmgPct ()
+			return GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE);
 		end
 
 		----------------------------
@@ -1522,6 +1553,26 @@ end
 
 --- ============== ITEM CLASS ==============
 
+	-- Inventory slots
+	-- INVSLOT_HEAD       = 1;
+	-- INVSLOT_NECK       = 2;
+	-- INVSLOT_SHOULDER   = 3;
+	-- INVSLOT_BODY       = 4;
+	-- INVSLOT_CHEST      = 5;
+	-- INVSLOT_WAIST      = 6;
+	-- INVSLOT_LEGS       = 7;
+	-- INVSLOT_FEET       = 8;
+	-- INVSLOT_WRIST      = 9;
+	-- INVSLOT_HAND       = 10;
+	-- INVSLOT_FINGER1    = 11;
+	-- INVSLOT_FINGER2    = 12;
+	-- INVSLOT_TRINKET1   = 13;
+	-- INVSLOT_TRINKET2   = 14;
+	-- INVSLOT_BACK       = 15;
+	-- INVSLOT_MAINHAND   = 16;
+	-- INVSLOT_OFFHAND    = 17;
+	-- INVSLOT_RANGED     = 18;
+	-- INVSLOT_TABARD     = 19;
 	-- Check if a given item is currently equipped in the given slot.
 	function Item:IsEquipped (Slot)
 		if not ER.Cache.ItemInfo[self.ItemID] then ER.Cache.ItemInfo[self.ItemID] = {}; end
