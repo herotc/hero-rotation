@@ -29,7 +29,7 @@ local pairs = pairs;
 		DeathFromAbove = Spell(152150),
 		DeeperStratagem = Spell(193531),
 		EnvelopingShadows = Spell(206237),
-		Eviscerate = Spell(196819, 
+		Eviscerate = Spell(196819, nil, 
 			-- Eviscerate DMG Formula (Pre-Mitigation):
 			--	AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * LegionBlade_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M
 			function () 
