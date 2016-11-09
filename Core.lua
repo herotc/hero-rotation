@@ -156,9 +156,8 @@ end
 	ER.Unit = Class();
 	local Unit = ER.Unit;
 	-- Unit Constructor
-	function Unit:Constructor (UnitID, DmgFormula)
+	function Unit:Constructor (UnitID)
 		self.UnitID = UnitID;
-		self.DmgFormula = DmgFormula or false;
 	end
 	-- Defines Unit Objects.
 	Unit.Player = Unit("Player");
@@ -174,9 +173,10 @@ end
 	ER.Spell = Class();
 	local Spell = ER.Spell;
 	-- Spell Constructor
-	function Spell:Constructor (ID, Type)
+	function Spell:Constructor (ID, Type, DmgFormula)
 		self.SpellID = ID;
 		self.SpellType = Type or "Player"; -- For Pet, put "Pet". Default is "Player".
+		self.DmgFormula = DmgFormula or false;
 		self.LastCastTime = 0;
 		self.LastDisplayTime = 0;
 	end
