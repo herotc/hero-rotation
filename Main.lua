@@ -39,32 +39,31 @@ ER.MainFrame:SetMovable(true);
 			end
 		end
 	);
-ER.MainFrame:RegisterEvent("ADDON_LOADED");
-
 -- AddonLoaded
-local function AfterLoaded ()
-	ER.MainFrame:UnregisterEvent("ADDON_LOADED");
-	ER.MainFrame:SetScript("OnUpdate", ER.Pulse);
-	ER.TTDRefresh();
-end
-local function AddonLoaded (self, Event, Arg1)
-	if Event == "ADDON_LOADED" then
-		if Arg1 == "EasyRaid" then
-			if ERSettings and ERSettings.IconFramePos then
-				ER.MainFrame:SetPoint(ERSettings.IconFramePos[1], UIParent, ERSettings.IconFramePos[3], ERSettings.IconFramePos[4], ERSettings.IconFramePos[5]);
-			else
-				ER.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
+ER.MainFrame:RegisterEvent("ADDON_LOADED");
+ER.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
+		if Event == "ADDON_LOADED" then
+			if Arg1 == "EasyRaid" then
+				if ERSettings and ERSettings.IconFramePos then
+					ER.MainFrame:SetPoint(ERSettings.IconFramePos[1], UIParent, ERSettings.IconFramePos[3], ERSettings.IconFramePos[4], ERSettings.IconFramePos[5]);
+				else
+					ER.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
+				end
+				ER.MainFrame:Show();
+				ER.MainIconFrame:Init();
+				ER.LeftIconFrame:Init();
+				ER.SmallIconFrame:Init();
+				ER.ToggleIconFrame:Init();
+				C_Timer.After(2, function ()
+						ER.MainFrame:UnregisterEvent("ADDON_LOADED");
+						ER.MainFrame:SetScript("OnUpdate", ER.Pulse);
+						ER.TTDRefresh();
+					end
+				);
 			end
-			ER.MainFrame:Show();
-			ER.MainIconFrame:Init();
-			ER.LeftIconFrame:Init();
-			ER.SmallIconFrame:Init();
-			ER.ToggleIconFrame:Init();
-			C_Timer.After(2, AfterLoaded);
 		end
 	end
-end
-ER.MainFrame:SetScript("OnEvent", AddonLoaded);
+);
 
 -- Main
 local PulseTimer = 0;
