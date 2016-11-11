@@ -29,6 +29,10 @@ ER.GUISettings = {
 		},
 		Paladin = {
 			Retribution = {
+				-- SoloMode try to maximize survivability when not near full life
+				SoloMode = true,
+				SoloJusticarDP = 80,
+				SoloJusticar5HP = 60,
 				-- {Display GCD as OffGCD, ForceReturn}
 				GCDasOffGCD = {
 					HolyWrath = {true, false}
