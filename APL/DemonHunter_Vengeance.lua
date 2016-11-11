@@ -16,7 +16,7 @@ local pairs = pairs;
 	if not Spell.DemonHunter then Spell.DemonHunter = {}; end
 	Spell.DemonHunter.Vengeance = {
 		-- Abilities
-		Felblade = Spell(213241),
+		Felblade = Spell(232893),
 		FelDevastation = Spell(212084),
 		ImmolationAura = Spell(178740),
 		Shear = Spell(203782),
