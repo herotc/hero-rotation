@@ -210,7 +210,8 @@ ER:RegisterForEvent(
 		-- Checks the same event as Blizzard Spell Book, from SpellBookFrame_OnLoad in SpellBookFrame.lua
 		ER:RegisterForEvent(
 			function ()
-				wipe(ER.PersistentCache.SpellLearned);
+				wipe(ER.PersistentCache.SpellLearned.Player);
+				wipe(ER.PersistentCache.SpellLearned.Pet);
 				Spell:BookScan();
 			end
 			, "SPELLS_CHANGED"
