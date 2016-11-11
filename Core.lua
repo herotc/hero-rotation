@@ -641,9 +641,9 @@ end
 		-- Get the estimated time to reach a Percentage
 		-- TODO : Cache the result, not done yet since we mostly use TimeToDie that cache for TimeToX 0%.
 		-- Returns Codes :
-		--	11111 : No GUID		9999 : Dummy		8888 : Not Enough Samples or No Health Change		7777 : No DPS		6666 : Negative TTD
+		--	11111 : No GUID		9999 : Negative TTD		8888 : Not Enough Samples or No Health Change		7777 : No DPS		6666 : Dummy
 		function Unit:TimeToX (Percentage, MinSamples) -- TODO : See with Skasch how accuracy & prediction can be improved.
-			if self:IsDummy() then return 9999; end
+			if self:IsDummy() then return 6666; end
 			TTD._T.Seconds = 8888;
 			TTD._T.UnitTable = TTD.Units[self:GUID()];
 			TTD._T.MinSamples = MinSamples or 3;
@@ -683,7 +683,7 @@ end
 				TTD._T.Seconds = (Percentage * 0.01 * TTD._T.MaxHealth - TTD._T.a) / TTD._T.b;
 				-- Subtract current time to obtain "time remaining"
 				TTD._T.Seconds = mathmin(7777, TTD._T.Seconds - (ER.GetTime() - TTD._T.StartingTime));
-				if TTD._T.Seconds < 0 then TTD._T.Seconds = 6666; end
+				if TTD._T.Seconds < 0 then TTD._T.Seconds = 9999; end
 			end
 			return mathfloor(TTD._T.Seconds);
 		end
@@ -1364,11 +1364,20 @@ end
 				if OffSpec == 0 then
 					for j = 1, (Offset + NumSpells) do
 						CurrentSpellID = select(7, GetSpellInfo(j, BOOKTYPE_SPELL))
-						if CurrentSpellID then
+						if CurrentSpellID and GetSpellBookItemInfo(j, BOOKTYPE_SPELL) == "SPELL" then
+							--[[ Debug Code
 							CurrentSpell = Spell(CurrentSpellID);
-							if CurrentSpell:IsAvailable() and (CurrentSpell:IsKnown() or IsTalentSpell(j, BOOKTYPE_SPELL)) then
-								ER.PersistentCache.SpellLearned.Player[CurrentSpell:ID()] = true;
-							end
+							print(
+								tostring(CurrentSpell:ID()) .. " | " .. 
+								tostring(CurrentSpell:Name()) .. " | " .. 
+								tostring(CurrentSpell:IsAvailable()) .. " | " .. 
+								tostring(CurrentSpell:IsKnown()) .. " | " .. 
+								tostring(IsTalentSpell(j, BOOKTYPE_SPELL)) .. " | " .. 
+								tostring(GetSpellBookItemInfo(j, BOOKTYPE_SPELL)) .. " | " .. 
+								tostring(GetSpellLevelLearned(CurrentSpell:ID()))
+							);
+							]]
+							ER.PersistentCache.SpellLearned.Player[CurrentSpellID] = true;
 						end
 					end
 				end
@@ -1380,12 +1389,9 @@ end
 				NumSlots, IsKnown = select(3, GetFlyoutInfo(FlyoutID));
 				if IsKnown and NumSlots > 0 then
 					for j = 1, NumSlots do
-						CurrentSpellID, IsKnownSpell = GetFlyoutSlotInfo(FlyoutID, j);
-						if CurrentSpellID then
-							CurrentSpell = Spell(CurrentSpellID);
-							if CurrentSpell:IsAvailable() and (CurrentSpell:IsKnown() or IsKnownSpell) then
-								ER.PersistentCache.SpellLearned.Player[CurrentSpell:ID()] = true;
-							end
+						CurrentSpellID, _, IsKnownSpell = GetFlyoutSlotInfo(FlyoutID, j);
+						if CurrentSpellID and IsKnownSpell then
+							ER.PersistentCache.SpellLearned.Player[CurrentSpellID] = true;
 						end
 					end
 				end
