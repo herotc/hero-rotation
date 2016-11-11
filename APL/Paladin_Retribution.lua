@@ -141,6 +141,18 @@ local function APL ()
 					if ER.Cast(S.ArcaneTorrent, Settings.Retribution.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
 				end
 			end
+			-- SoloMode : Justicar's Vengeance
+			if Settings.Retribution.SoloMode and S.JusticarsVengeance:IsCastable() then
+				-- Divine Purpose 
+				if Player:HealthPercentage() <= Settings.Retribution.SoloJusticarDP and Player:Buff(S.DivinePurposeBuff) then
+					if ER.Cast(S.JusticarsVengeance) then return "Cast Justicars Vengeance"; end
+				end
+				-- Regular
+				if Player:HealthPercentage() <= Settings.Retribution.SoloJusticar5HP and Player:HolyPower() >= 5 then
+					if ER.Cast(S.JusticarsVengeance) then return "Cast Justicars Vengeance"; end
+				end
+			end
+
 			if Target:Debuff(S.JudgmentDebuff) then
 				if ER.AoEON() and ER.Cache.EnemiesCount[8] >= 2 and S.DivineStorm:IsCastable() then
 					-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
@@ -244,11 +256,11 @@ local function APL ()
 						if ER.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
 					end
 					-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.the_fires_of_justice.react&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
-					if Player:Buff(S.TheFiresofJusticeBuff) and (not S.Crusade:IsAvailable() or S.Crusade:Cooldown() > Player:GCD()*3) then
+					if Player:HolyPower() >= 3 and Player:Buff(S.TheFiresofJusticeBuff) and (not S.Crusade:IsAvailable() or S.Crusade:Cooldown() > Player:GCD()*3) then
 						if ER.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
 					end
 					-- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&(holy_power>=4|((cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd)))&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
-					if (Player:HolyPower() >= 4 or ((S.Zeal:ChargesFractional() <= 1.34 or S.CrusaderStrike:ChargesFractional() <= 1.34) and (S.DivineHammer:Cooldown() > Player:GCD() or S.BladeofJustice:Cooldown() > Player:GCD()))) and (not S.Crusade:IsAvailable() or S.Crusade:Cooldown() > Player:GCD()*4) then
+					if (Player:HolyPower() >= 4 or (Player:HolyPower() >= 3 and (S.Zeal:ChargesFractional() <= 1.34 or S.CrusaderStrike:ChargesFractional() <= 1.34) and (S.DivineHammer:Cooldown() > Player:GCD() or S.BladeofJustice:Cooldown() > Player:GCD()))) and (not S.Crusade:IsAvailable() or S.Crusade:Cooldown() > Player:GCD()*4) then
 						if ER.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
 					end
 				end
