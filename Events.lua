@@ -15,6 +15,7 @@ local stringfind = string.find;
 local tableinsert = table.insert;
 local tableremove = table.remove;
 local tonumber = tonumber;
+local wipe = table.wipe;
 
 
 -- Used for every Events
@@ -209,6 +210,7 @@ ER:RegisterForEvent(
 		-- Checks the same event as Blizzard Spell Book, from SpellBookFrame_OnLoad in SpellBookFrame.lua
 		ER:RegisterForEvent(
 			function ()
+				wipe(ER.PersistentCache.SpellLearned);
 				Spell:BookScan();
 			end
 			, "SPELLS_CHANGED"
