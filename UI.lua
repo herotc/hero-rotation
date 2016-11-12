@@ -295,6 +295,7 @@ end
 
 			-- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
 			ER.LastUnitCycled = ThisUnit;
+			ER.LastUnitCycledTime = ER.GetTime();
 		end
 	end
 
