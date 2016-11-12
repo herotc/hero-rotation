@@ -995,11 +995,14 @@ end
 		function Unit:IterateStealthBuffs (Abilities, Special)
 			-- TODO: Add Assassination Spells when it'll be done and improve code
 			-- TODO: Add Feral if we do supports it some day
-			if Spell.Rogue.Outlaw.Shadowmeld:TimeSinceLastCast() < 0.3 
-				or Spell.Rogue.Outlaw.Vanish:TimeSinceLastCast() < 0.3 
-				or Spell.Rogue.Subtlety.ShadowDance:TimeSinceLastCast() < 0.3 
-				or Spell.Rogue.Subtlety.Shadowmeld:TimeSinceLastCast() < 0.3 
-				or Spell.Rogue.Subtlety.Vanish:TimeSinceLastCast() < 0.3 then
+			if	Spell.Rogue.Outlaw.Vanish:TimeSinceLastCast() < 0.3 or
+				Spell.Rogue.Subtlety.ShadowDance:TimeSinceLastCast() < 0.3 or
+				Spell.Rogue.Subtlety.Vanish:TimeSinceLastCast() < 0.3 or
+				(Special and (
+					Spell.Rogue.Outlaw.Shadowmeld:TimeSinceLastCast() < 0.3 or
+					Spell.Rogue.Subtlety.Shadowmeld:TimeSinceLastCast() < 0.3
+				))
+			then
 				return true;
 			end
 			-- Normal Stealth
