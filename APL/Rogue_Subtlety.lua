@@ -92,7 +92,9 @@ local pairs = pairs;
 		Kick = Spell(1766),
 		Sprint = Spell(2983),
 		-- Legendaries
-		DreadlordsDeceit = Spell(228224)
+		DreadlordsDeceit = Spell(228224),
+		-- Misc
+		PoolEnergy = Spell(161576)
 	};
 	local S = Spell.Rogue.Subtlety;
 -- Items
@@ -227,7 +229,7 @@ local function Stealth_CDs ()
 		if ER.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10 then
 			-- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40-variable.ssw_er
 			if Player:Energy() < 40-SSW_ER() then
-				return "Pool for Shadowmeld";
+				if ER.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
 			end
 			if ER.Cast(S.Shadowmeld, Settings.Subtlety.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
 		end
@@ -381,7 +383,9 @@ local function APL ()
 				if ShouldReturn then
 					return ShouldReturn;
 				end
-				return "Stealthed Pooling"; -- run_action_list forces the return
+				if S.Shadowstrike:IsCastable() then -- Trick to take in consideration the Recovery Setting
+					if ER.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end -- run_action_list forces the return
+				end
 			end
 			-- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
 			if Player:ComboPoints() >= 5 or (ER.AoEON() and Player:ComboPoints() >= 4 and ER.Cache.EnemiesCount[10] >= 3 and ER.Cache.EnemiesCount[10] <= 4) then
@@ -407,6 +411,9 @@ local function APL ()
 			-- Shuriken Toss Out of Range
 			if not Target:IsInRange(10) and Target:IsInRange(20) and S.ShurikenToss:IsCastable() and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
 				if ER.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
+			end
+			if S.Shadowstrike:IsCastable() then -- Trick to take in consideration the Recovery Setting
+				if ER.Cast(S.PoolEnergy) then return "Normal Pooling"; end
 			end
 		end
 end
