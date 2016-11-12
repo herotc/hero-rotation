@@ -383,9 +383,7 @@ local function APL ()
 				if ShouldReturn then
 					return ShouldReturn;
 				end
-				if S.Shadowstrike:IsCastable() then -- Trick to take in consideration the Recovery Setting
-					if ER.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end -- run_action_list forces the return
-				end
+				if ER.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end -- run_action_list forces the return
 			end
 			-- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
 			if Player:ComboPoints() >= 5 or (ER.AoEON() and Player:ComboPoints() >= 4 and ER.Cache.EnemiesCount[10] >= 3 and ER.Cache.EnemiesCount[10] <= 4) then
