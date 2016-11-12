@@ -223,6 +223,20 @@ ER:RegisterForEvent(
 			, "CANCEL_GLYPH_CAST"
 			, "ACTIVATE_GLYPH"
 		);
+	
+	-- Not Facing Unit Blacklist
+		ER.UnitNotInFront = Player;
+		ER.UnitNotInFrontTime = 0;
+		ER.LastUnitCycled = Player;
+		ER:RegisterForEvent(
+			function (MessageType, Message)
+				if MessageType == 50 and Message == SPELL_FAILED_UNIT_NOT_INFRONT then
+					ER.UnitNotInFront = ER.LastUnitCycled;
+					ER.UnitNotInFrontTime = ER.GetTime();
+				end
+			end
+			, "UI_ERROR_MESSAGE"
+		);
 
 --- ============== COMBATLOG ==============
 

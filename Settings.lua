@@ -9,7 +9,13 @@ ER.GUISettings = {
 		RecoveryMode = "GCD"; -- "GCD" to always display the next ability, "Custom" for Custom Timer.
 		RecoveryTimer = 950;
 		-- Interrupt
-		InterruptEnabled = false
+		InterruptEnabled = false,
+		-- Blacklist Settings
+		Blacklist = {
+			-- During how many times the GCD time you want to blacklist an unit from Cycling
+			-- when you got an error when trying to cast on it.
+			NotFacingExpireMultiplier = 3
+		}
 	},
 	NameplatesTTD = {
 		XOffset = 5,

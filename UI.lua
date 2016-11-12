@@ -292,6 +292,9 @@ end
 
 			-- Display the left icon
 			ER.LeftIconFrame:ChangeLeftIcon(ER.GetTexture(SpellID));
+
+			-- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
+			ER.LastUnitCycled = ThisUnit;
 		end
 	end
 

@@ -577,6 +577,13 @@ end
 		return false;
 	end
 
+	function Unit:IsFacingBlacklisted ()
+		if self:IsUnit(ER.UnitNotInFront) and ER.GetTime()-ER.UnitNotInFrontTime <= Player:GCD()*ER.GUISettings.General.Blacklist.NotFacingExpireMultiplier then
+			return true;
+		end
+		return false;
+	end
+
 	--- TimeToDie
 		ER.TTD = {
 			Settings = {
