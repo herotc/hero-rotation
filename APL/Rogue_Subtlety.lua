@@ -183,13 +183,13 @@ local function Finish ()
 	end
 	-- actions.finish+=/nightblade,target_if=max:target.time_to_die,if=target.time_to_die>8&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time)
 	if S.Nightblade:IsCastable() then
-		if Target:IsInRange(5) and Target:TimeToDie() > 8 and ((Target:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Target:DebuffRemains(S.Nightblade) < 2) then
+		if Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 10 and ((Target:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Target:DebuffRemains(S.Nightblade) < 2) then
 			if ER.Cast(S.Nightblade) then return "Cast"; end
 		end
 		if ER.AoEON() then
-			BestUnit, BestUnitTTD = nil, 8;
+			BestUnit, BestUnitTTD = nil, 10;
 			for Key, Value in pairs(ER.Cache.Enemies[5]) do
-				if Value:TimeToDie() > BestUnitTTD and ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Value:DebuffRemains(S.Nightblade) < 2) then
+				if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie()- Value:DebuffRemains(S.Nightblade) > BestUnitTTD and ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Value:DebuffRemains(S.Nightblade) < 2) then
 					BestUnit, BestUnitTTD = Value, Value:TimeToDie();
 				end
 			end
@@ -328,7 +328,7 @@ local function APL ()
 		end
 	-- In Combat
 		-- Unit Update
-		ER.GetEnemies(30); -- Marked for Death
+		if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
 		ER.GetEnemies(10); -- Shuriken Storm
 		ER.GetEnemies(8); -- Death From Above
 		ER.GetEnemies(5); -- Melee
