@@ -228,11 +228,12 @@ ER:RegisterForEvent(
 		ER.UnitNotInFront = Player;
 		ER.UnitNotInFrontTime = 0;
 		ER.LastUnitCycled = Player;
+		ER.LastUnitCycledTime = 0;
 		ER:RegisterForEvent(
 			function (MessageType, Message)
 				if MessageType == 50 and Message == SPELL_FAILED_UNIT_NOT_INFRONT then
 					ER.UnitNotInFront = ER.LastUnitCycled;
-					ER.UnitNotInFrontTime = ER.GetTime();
+					ER.UnitNotInFrontTime = ER.LastUnitCycledTime;
 				end
 			end
 			, "UI_ERROR_MESSAGE"
