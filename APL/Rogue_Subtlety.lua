@@ -22,13 +22,7 @@ local pairs = pairs;
 		GiftoftheNaaru = Spell(59547),
 		Shadowmeld = Spell(58984),
 		-- Abilities
-		Alacrity = Spell(193539),
-		AlacrityBuff = Spell(193538),
-		Anticipation = Spell(114015),
 		Backstab = Spell(53),
-		DeathFromAbove = Spell(152150),
-		DeeperStratagem = Spell(193531),
-		EnvelopingShadows = Spell(206237),
 		Eviscerate = Spell(196819, nil, 
 			-- Eviscerate DMG Formula (Pre-Mitigation):
 			--	AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * LegionBlade_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M
@@ -42,7 +36,8 @@ local pairs = pairs;
 					0.98130 * 
 					-- Eviscerate R2 Multiplier			
 					1.5 * 
-					-- Finality: Eviscerate Multiplier | Used 1.2 atm (TODO: Check the % from Tooltip or do an Event Listener)
+					-- Finality: Eviscerate Multiplier | Used 1.2 atm
+					-- TODO: Check the % from Tooltip or do an Event Listener
 					(Player:Buff(S.FinalityEviscerate) and 1.2 or 1) * 
 					-- Shadow Fangs Multiplier
 					(S.ShadowFangs:Exists() and 1.4 or 1) * 
@@ -60,31 +55,38 @@ local pairs = pairs;
 					(1 + Player:VersatilityDmgPct());
 			end
 		),
-		FinalityEviscerate = Spell(197496),
-		FinalityNightblade = Spell(195452),
-		Gloomblade = Spell(200758),
 		KidneyShot = Spell(408),
-		LegionBlade = Spell(214930),
-		MasterofShadows = Spell(196976),
-		MasterOfSubtlety = Spell(31223),
-		MasterOfSubtletyBuff = Spell(31665),
 		Nightblade = Spell(195452),
-		Premeditation = Spell(196979),
-		ShadowFangs = Spell(221856),
-		ShadowFocus = Spell(108209),
+		ShadowBlades = Spell(121471),
+		ShadowDance = Spell(185313),
 		Shadowstrike = Spell(185438),
 		ShurikenStorm = Spell(197835),
 		ShurikenToss = Spell(114014),
 		Stealth = Spell(1784),
-		Subterfuge = Spell(108208),
 		SymbolsofDeath = Spell(212283),
-		Vigor = Spell(14983),
-		-- Offensive
-		GoremawsBite = Spell(209782),
-		MarkedforDeath = Spell(137619),
-		ShadowBlades = Spell(121471),
-		ShadowDance = Spell(185313),
 		Vanish = Spell(1856),
+		-- Talents
+		Alacrity = Spell(193539),
+		AlacrityBuff = Spell(193538),
+		Anticipation = Spell(114015),
+		DeathFromAbove = Spell(152150),
+		DeeperStratagem = Spell(193531),
+		EnvelopingShadows = Spell(206237),
+		Gloomblade = Spell(200758),
+		MarkedforDeath = Spell(137619),
+		MasterofShadows = Spell(196976),
+		MasterOfSubtlety = Spell(31223),
+		MasterOfSubtletyBuff = Spell(31665),
+		Premeditation = Spell(196979),
+		ShadowFocus = Spell(108209),
+		Subterfuge = Spell(108208),
+		Vigor = Spell(14983),
+		-- Artifact
+		FinalityEviscerate = Spell(197496),
+		FinalityNightblade = Spell(195452),
+		GoremawsBite = Spell(209782),
+		LegionBlade = Spell(214930),
+		ShadowFangs = Spell(221856),
 		-- Defensive
 		CrimsonVial = Spell(185311),
 		Feint = Spell(1966),
@@ -99,11 +101,11 @@ local pairs = pairs;
 	local S = Spell.Rogue.Subtlety;
 -- Items
 	if not Item.Rogue then Item.Rogue = {}; end
-	Item.Rogue.Outlaw = {
+	Item.Rogue.Subtlety = {
 		-- Legendaries
 		ShadowSatyrsWalk = Item(137032) -- 8
 	};
-	local I = Item.Rogue.Outlaw;
+	local I = Item.Rogue.Subtlety;
 -- Rotation Var
 	local ShouldReturn, ShouldReturn2; -- Used to get the return string
 	local BestUnit, BestUnitTTD; -- Used for cycling
@@ -191,7 +193,7 @@ local function Finish ()
 		if ER.AoEON() then
 			BestUnit, BestUnitTTD = nil, 10;
 			for Key, Value in pairs(ER.Cache.Enemies[5]) do
-				if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie()- Value:DebuffRemains(S.Nightblade) > BestUnitTTD and ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Value:DebuffRemains(S.Nightblade) < 2) then
+				if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD and ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Value:DebuffRemains(S.Nightblade) < 2) then
 					BestUnit, BestUnitTTD = Value, Value:TimeToDie();
 				end
 			end
@@ -360,12 +362,10 @@ local function APL ()
 			if ShouldReturn then
 				return ShouldReturn;
 			end
-			--[[ Disabled since not coded for Subtlety yet
 			-- Training Scenario
 			if TrainingScenario() then
 				return;
 			end
-			]]
 			-- Kick
 			if Settings.General.InterruptEnabled and not S.Kick:IsOnCooldown() and Target:IsInRange(5) and Target:IsInterruptible() then
 				if ER.Cast(S.Kick, Settings.Subtlety.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
