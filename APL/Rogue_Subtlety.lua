@@ -96,6 +96,7 @@ local pairs = pairs;
 		-- Legendaries
 		DreadlordsDeceit = Spell(228224),
 		-- Misc
+		DeathlyShadows = Spell(188700),
 		PoolEnergy = Spell(161576)
 	};
 	local S = Spell.Rogue.Subtlety;
@@ -313,6 +314,15 @@ local function APL ()
 			-- Symbols of Death
 			if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true) and (ER.BMPullTime() == 60 or (ER.BMPullTime() <= 15 and ER.BMPullTime() >= 14) or (ER.BMPullTime() <= 4 and ER.BMPullTime() >= 3)) then
 				if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
+			end
+			-- T18 2PC Reswap
+			if ER.Tier18_2Pc then
+				if S.Sprint:IsCastable() and ER.BMPullTime() <= 5.5 and ER.BMPullTime() >= 4 then
+					if ER.Cast(S.Sprint, {true, false}) then return "Cast"; end
+				end
+				if Player:Buff(S.DeathlyShadows) or ER.BMPullTime() <= 1 then
+					UseEquipmentSet(GetEquipmentSetInfo(2));
+				end
 			end
 			-- Opener
 			if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
