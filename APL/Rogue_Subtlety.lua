@@ -84,6 +84,7 @@ local pairs = pairs;
 		-- Artifact
 		FinalityEviscerate = Spell(197496),
 		FinalityNightblade = Spell(195452),
+		FlickeringShadows = Spell(197256),
 		GoremawsBite = Spell(209782),
 		LegionBlade = Spell(214930),
 		ShadowFangs = Spell(221856),
@@ -316,12 +317,12 @@ local function APL ()
 				if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
 			end
 			-- T18 2PC Reswap
-			if ER.Tier18_2Pc then
-				if S.Sprint:IsCastable() and ER.BMPullTime() <= 5.5 and ER.BMPullTime() >= 4 then
+			if Settings.Subtlety.T18Prepull.Enabled and ER.Tier18_2Pc then
+				if S.FlickeringShadows:IsAvailable() and S.Sprint:IsCastable() and ER.BMPullTime() <= Settings.Subtlety.T18Prepull.PullTime[1] and ER.BMPullTime() >= Settings.Subtlety.T18Prepull.PullTime[2] then
 					if ER.Cast(S.Sprint, {true, false}) then return "Cast"; end
 				end
 				if Player:Buff(S.DeathlyShadows) or ER.BMPullTime() <= 1 then
-					UseEquipmentSet(GetEquipmentSetInfo(2));
+					UseEquipmentSet(GetEquipmentSetInfo(Settings.Subtlety.T18Prepull.EquipmentSetID));
 				end
 			end
 			-- Opener
