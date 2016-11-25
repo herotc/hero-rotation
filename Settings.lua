@@ -54,6 +54,27 @@ ER.GUISettings = {
 			}
 		},
 		Rogue = {
+			Assassination = {
+				-- {Display GCD as OffGCD, ForceReturn}
+				GCDasOffGCD = {
+					CrimsonVial = {true, false},
+					Feint = {true, false}
+				},
+				-- {Display OffGCD as OffGCD, ForceReturn}
+				OffGCDasOffGCD = {
+					-- Racials
+					ArcaneTorrent = {true, false},
+					Berserking = {true, false},
+					BloodFury = {true, false},
+					-- Stealth CDs
+					Vanish = {true, false},
+					-- Spec
+					Kick = {true, false},
+					MarkedforDeath = {false, false},
+					Stealth = {true, false},
+					Vendetta = {true, false}
+				}
+			},
 			Outlaw = {
 				-- Roll the Bones Logic, accepts "Default", "1+ Buff" and every "RtBName".
 				-- Useful for Cenarius where you want to fish for Cenarius
@@ -88,6 +109,12 @@ ER.GUISettings = {
 				}
 			},
 			Subtlety = {
+				-- T18 Prepull
+				T18Prepull = {
+					Enabled = true,
+					PullTime = {5, 4},
+					EquipmentSetID = 2
+				},
 				-- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
 				ShDEcoCharge = 2.8,
 				-- {Display GCD as OffGCD, ForceReturn}
