@@ -318,10 +318,10 @@ local function APL ()
 			end
 			-- T18 2PC Reswap
 			if Settings.Subtlety.T18Prepull.Enabled and ER.Tier18_2Pc then
-				if S.FlickeringShadows:IsAvailable() and S.Sprint:IsCastable() and ER.BMPullTime() <= Settings.Subtlety.T18Prepull.PullTime[1] and ER.BMPullTime() >= Settings.Subtlety.T18Prepull.PullTime[2] then
+				if S.FlickeringShadows:ArtifactEnabled() and S.Sprint:IsCastable() and ER.BMPullTime() <= Settings.Subtlety.T18Prepull.PullTime[1] and ER.BMPullTime() >= Settings.Subtlety.T18Prepull.PullTime[2] then
 					if ER.Cast(S.Sprint, {true, false}) then return "Cast"; end
 				end
-				if Player:Buff(S.DeathlyShadows) or ER.BMPullTime() <= 1 then
+				if Player:Buff(S.DeathlyShadows) or ER.BMPullTime() <= Settings.Subtlety.T18Prepull.PullTime[3] then
 					UseEquipmentSet(GetEquipmentSetInfo(Settings.Subtlety.T18Prepull.EquipmentSetID));
 				end
 			end

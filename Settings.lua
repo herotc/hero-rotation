@@ -112,7 +112,8 @@ ER.GUISettings = {
 				-- T18 Prepull
 				T18Prepull = {
 					Enabled = true,
-					PullTime = {5, 4},
+					-- SprintStart, SprintEnd, SwitchFallback
+					PullTime = {5, 4, 1},
 					EquipmentSetID = 2
 				},
 				-- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
