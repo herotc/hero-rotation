@@ -24,4 +24,6 @@ Rogue Assassination is coming very soon along with Enhancement Shaman.
 More features including a GUI are coming when more rotations will be done. Currently every rotation settings are in the Settings.lua file.
 Stay tuned !
 
+Also, feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
+
 _PS : You can drag & drop the main icon with Shift + Left-Click._
