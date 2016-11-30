@@ -31,6 +31,7 @@ ER.MAXIMUM = 40;
 -- Defines our cached tables.
 ER.PersistentCache = {
 	Equipment = {},
+	Player = {Class = {}, Spec = {}},
 	SpellLearned = {Pet = {}, Player = {}},
 	Texture = {Spell = {}, Item = {}}
 };
@@ -165,6 +166,9 @@ end
 	for i = 1, ER.MAXIMUM do
 		Unit["Nameplate"..tostring(i)] = Unit("Nameplate"..tostring(i));
 	end
+	for i = 1, 4 do
+		Unit["Boss"..tostring(i)] = Unit("Boss"..tostring(i));
+	end
 	-- Locals
 	local Player = Unit.Player;
 	local Target = Unit.Target;
@@ -231,6 +235,16 @@ end
 			return ER.Cache.UnitInfo[self:GUID()].NPCID;
 		end
 		return -1;
+	end
+
+	-- Get if an unit with a given NPC ID is in the Boss list and has less HP than the given ones.
+	function Unit:IsInBossList (NPCID, HP)
+		for i = 1, 4 do
+			if Unit["Boss"..tostring(i)]:NPCID() == NPCID and Unit["Boss"..tostring(i)]:HealthPercentage() <= HP then
+				return true;
+			end
+		end
+		return false;
 	end
 
 	-- Get if the unit CanAttack the other one.
@@ -559,21 +573,26 @@ end
 		--- Legion
 			----- Dungeons (7.0 Patch) -----
 			--- Halls of Valor
-			-- Hymdall leaves the fight at 10%.
-			if IsMfdBlacklisted_NPCID == 94960 then return true; end
-			-- Solsten and Olmyr doesn't "really" die
-			if IsMfdBlacklisted_NPCID == 102558 or IsMfdBlacklisted_NPCID == 97202 then return true; end
+				-- Hymdall leaves the fight at 10%.
+				if IsMfdBlacklisted_NPCID == 94960 then return true; end
+				-- Solsten and Olmyr doesn't "really" die
+				if IsMfdBlacklisted_NPCID == 102558 or IsMfdBlacklisted_NPCID == 97202 then return true; end
+
+			----- Trial of Valor (T19 - 7.1 Patch) -----
+			--- Odyn
+				-- Hyrja & Hymdall leaves the fight at 25% during first stage and 85%/90% during second stage (HM/MM)
+				if IsMfdBlacklisted_NPCID == 114360 or IsMfdBlacklisted_NPCID == 114361 then return true; end
 
 		--- Warlord of Draenor (WoD)
 			----- HellFire Citadel (T18 - 6.2 Patch) -----
 			--- Hellfire Assault
-			-- Mar'Tak doesn't die and leave fight at 50% (blocked at 1hp anyway).
-			if IsMfdBlacklisted_NPCID == 93023 then return true; end
+				-- Mar'Tak doesn't die and leave fight at 50% (blocked at 1hp anyway).
+				if IsMfdBlacklisted_NPCID == 93023 then return true; end
 
 			----- Dungeons (6.0 Patch) -----
 			--- Shadowmoon Burial Grounds
-			-- Carrion Worm : They doesn't die but leave the area at 10%.
-			if IsMfdBlacklisted_NPCID == 88769 or IsMfdBlacklisted_NPCID == 76057 then return true; end
+				-- Carrion Worm : They doesn't die but leave the area at 10%.
+				if IsMfdBlacklisted_NPCID == 88769 or IsMfdBlacklisted_NPCID == 76057 then return true; end
 		return false;
 	end
 
@@ -642,7 +661,6 @@ end
 					end
 				end
 			end
-			C_Timer.After(TTD.Settings.Refresh, ER.TTDRefresh);
 		end
 
 		-- Get the estimated time to reach a Percentage
@@ -695,6 +713,49 @@ end
 			return mathfloor(TTD._T.Seconds);
 		end
 
+		local SpecialTTDPercentageData = {
+			--- Legion
+				----- Dungeons (7.0 Patch) -----
+				--- Halls of Valor
+					-- Hymdall leaves the fight at 10%.
+					[94960] = 10,
+					-- Odyn leaves the fight at 80%.
+					[96589] = 80,
+				--- Maw of Souls
+					-- Helya leaves the fight at 70%.
+					[96759] = 70,
+
+				----- Trial of Valor (T19 - 7.1 Patch) -----
+				--- Odyn
+					-- Hyrja & Hymdall leaves the fight at 25% during first stage and 85%/90% during second stage (HM/MM).
+					-- TODO : Put GetInstanceInfo into PersistentCache.
+					[114360] = function () return (not Unit:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
+					[114361] = function () return (not Unit:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
+
+			--- Warlord of Draenor (WoD)
+				----- HellFire Citadel (T18 - 6.2 Patch) -----
+				--- Hellfire Assault
+					-- Mar'Tak doesn't die and leave fight at 50% (blocked at 1hp anyway).
+					[93023] = 50,
+
+				----- Dungeons (6.0 Patch) -----
+				--- Shadowmoon Burial Grounds
+					-- Carrion Worm : They doesn't die but leave the area at 10%.
+					[88769] = 10,
+					[76057] = 10
+		};
+		-- Get the unit TTD Percentage
+		function Unit:SpecialTTDPercentage (NPCID)
+			if SpecialTTDPercentageData[NPCID] then
+				if type(SpecialTTDPercentageData[NPCID]) == "number" then
+					return SpecialTTDPercentageData[NPCID];
+				else
+					return SpecialTTDPercentageData[NPCID]();
+				end
+			end
+			return 0;
+		end
+
 		-- Get the unit TimeToDie
 		function Unit:TimeToDie (MinSamples)
 			if self:GUID() then
@@ -702,16 +763,7 @@ end
 				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
 				if not ER.Cache.UnitInfo[self:GUID()].TTD then ER.Cache.UnitInfo[self:GUID()].TTD = {}; end
 				if not ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] then
-					-- TODO : Make a Table with a loop to avoid endless if
-					-- Odyn (Halls of Valor)
-					if self:NPCID() == 96589 then
-						ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(80, TTD._T.MinSamples);
-					-- Helya (Maw of Souls)
-					elseif self:NPCID() == 96759 then
-						ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(70, TTD._T.MinSamples);
-					else
-						ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(0, TTD._T.MinSamples);
-					end
+					ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples] = self:TimeToX(self:SpecialTTDPercentage(self:NPCID()), TTD._T.MinSamples)
 				end
 				return ER.Cache.UnitInfo[self:GUID()].TTD[TTD._T.MinSamples];
 			end
@@ -726,9 +778,11 @@ end
 			if self:GUID() then
 				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
 				if not ER.Cache.UnitInfo[self:GUID()].GCD then
-					local SpecID = GetSpecializationInfo(GetSpecialization());
 					-- Rogue, Feral, Brewmaster, Windwalker got 1S.
-					if ({UnitClass("player")})[2] == "ROGUE" or SpecID == 103 or SpecID == 268 or SpecID == 269 then
+					if ER.PersistentCache.Player.Class[2] == "ROGUE" or
+						ER.PersistentCache.Player.Spec[1] == 103 or
+						ER.PersistentCache.Player.Spec[1] == 268 or
+						ER.PersistentCache.Player.Spec[1] == 269 then
 						ER.Cache.UnitInfo[self:GUID()].GCD = 1;
 					else
 						local GCD = 1.5/(1+self:HastePct()/100);
@@ -1053,121 +1107,122 @@ end
 		end
 
 		-- Check player set bonuses (call ER.GetEquipment before to refresh the current gear)
-		local HasTierSlots = {
-			1, -- INVSLOT_HEAD
-			3, -- INVSLOT_SHOULDER
-			5, -- INVSLOT_CHEST
-			7, -- INVSLOT_LEGS
-			10, -- INVSLOT_HAND
-			15 -- INVSLOT_BACK
-		};
-		local HasTierSets = {
+		HasTierSets = {
 			["T18"] = {
-				-- Warrior
-				[1]		=	{[5] = 124319, [10] = 124329, [1] = 124334, [7] = 124340, [3] = 124346, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Paladin
-				[2]		=	{[5] = 124318, [10] = 124328, [1] = 124333, [7] = 124339, [3] = 124345, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Hunter
-				[3]		=	{[5] = 124284, [10] = 124292, [1] = 124296, [7] = 124301, [3] = 124307, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Rogue
-				[4]		=	{[5] = 124248, [10] = 124257, [1] = 124263, [7] = 124269, [3] = 124274, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Priest
-				[5]		=	{[5] = 124172, [10] = 124155, [1] = 124161, [7] = 124166, [3] = 124178, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- DeathKnight
-				[6]		=	{[5] = 124317, [10] = 124327, [1] = 124332, [7] = 124338, [3] = 124344, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Shaman
-				[7]		=	{[5] = 124303, [10] = 124293, [1] = 124297, [7] = 124302, [3] = 124308, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Mage
-				[8]		=	{[5] = 124171, [10] = 124154, [1] = 124160, [7] = 124165, [3] = 124177, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Warlock
-				[9]		=	{[5] = 124173, [10] = 124156, [1] = 124162, [7] = 124167, [3] = 124179, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Monk
-				[10]	=	{[5] = 124247, [10] = 124256, [1] = 124262, [7] = 124268, [3] = 124273, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Druid
-				[11]	=	{[5] = 124246, [10] = 124255, [1] = 124261, [7] = 124267, [3] = 124272, [15] = 999999},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Demon Hunter
-				[12]	=	{[5] = 999999, [10] = 999999, [1] = 999999, [7] = 999999, [3] = 999999, [15] = 999999}		-- Chest, Hands, Head, Legs, Shoulder, Back
+				[0]		=	function (Count) return Count > 1, Count > 3; end,								-- Return Function
+				[1]		=	{[5] = 124319, [10] = 124329, [1] = 124334, [7] = 124340, [3] = 124346},		-- Warrior: Chest, Hands, Head, Legs, Shoulder
+				[2]		=	{[5] = 124318, [10] = 124328, [1] = 124333, [7] = 124339, [3] = 124345},		-- Paladin: Chest, Hands, Head, Legs, Shoulder
+				[3]		=	{[5] = 124284, [10] = 124292, [1] = 124296, [7] = 124301, [3] = 124307},		-- Hunter: Chest, Hands, Head, Legs, Shoulder
+				[4]		=	{[5] = 124248, [10] = 124257, [1] = 124263, [7] = 124269, [3] = 124274},		-- Rogue: Chest, Hands, Head, Legs, Shoulder
+				[5]		=	{[5] = 124172, [10] = 124155, [1] = 124161, [7] = 124166, [3] = 124178},		-- Priest: Chest, Hands, Head, Legs, Shoulder
+				[6]		=	{[5] = 124317, [10] = 124327, [1] = 124332, [7] = 124338, [3] = 124344},		-- Death Knight: Chest, Hands, Head, Legs, Shoulder
+				[7]		=	{[5] = 124303, [10] = 124293, [1] = 124297, [7] = 124302, [3] = 124308},		-- Shaman: Chest, Hands, Head, Legs, Shoulder
+				[8]		=	{[5] = 124171, [10] = 124154, [1] = 124160, [7] = 124165, [3] = 124177},		-- Mage: Chest, Hands, Head, Legs, Shoulder
+				[9]		=	{[5] = 124173, [10] = 124156, [1] = 124162, [7] = 124167, [3] = 124179},		-- Warlock: Chest, Hands, Head, Legs, Shoulder
+				[10]	=	{[5] = 124247, [10] = 124256, [1] = 124262, [7] = 124268, [3] = 124273},		-- Monk: Chest, Hands, Head, Legs, Shoulder
+				[11]	=	{[5] = 124246, [10] = 124255, [1] = 124261, [7] = 124267, [3] = 124272},		-- Druid: Chest, Hands, Head, Legs, Shoulder
+				[12]	=	nil																				-- Demon Hunter: Chest, Hands, Head, Legs, Shoulder
+			},
+			["T18_ClassTrinket"] = {
+				[0]		=	function (Count) return Count > 0; end,		-- Return Function
+				[1]		=	{[13] = 124523, [14] = 124523},				-- Warrior : Worldbreaker's Resolve
+				[2]		=	{[13] = 124518, [14] = 124518},				-- Paladin : Libram of Vindication
+				[3]		=	{[13] = 124515, [14] = 124515},				-- Hunter : Talisman of the Master Tracker
+				[4]		=	{[13] = 124520, [14] = 124520},				-- Rogue : Bleeding Hollow Toxin Vessel
+				[5]		=	{[13] = 124519, [14] = 124519},				-- Priest : Repudiation of War
+				[6]		=	{[13] = 124513, [14] = 124513},				-- Death Knight : Reaper's Harvest
+				[7]		=	{[13] = 124521, [14] = 124521},				-- Shaman : Core of the Primal Elements
+				[8]		=	{[13] = 124516, [14] = 124516},				-- Mage : Tome of Shifting Words
+				[9]		=	{[13] = 124522, [14] = 124522},				-- Warlock : Fragment of the Dark Star
+				[10]	=	{[13] = 124517, [14] = 124517},				-- Monk : Sacred Draenic Incense
+				[11]	=	{[13] = 124514, [14] = 124514},				-- Druid : Seed of Creation
+				[12]	=	{[13] = 139630, [14] = 139630}				-- Demon Hunter : Etching of Sargeras
 			},
 			["T19"] = {
-				-- Warrior
-				[1]		=	{[5] = 138351, [10] = 138354, [1] = 138357, [7] = 138360, [3] = 138363, [15] = 138374},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Paladin
-				[2]		=	{[5] = 138350, [10] = 138353, [1] = 138356, [7] = 138359, [3] = 138362, [15] = 138369},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Hunter
-				[3]		=	{[5] = 138339, [10] = 138340, [1] = 138342, [7] = 138344, [3] = 138347, [15] = 138368},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Rogue
-				[4]		=	{[5] = 138326, [10] = 138329, [1] = 138332, [7] = 138335, [3] = 138338, [15] = 138371},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Priest
-				[5]		=	{[5] = 138319, [10] = 138310, [1] = 138313, [7] = 138316, [3] = 138322, [15] = 138370},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- DeathKnight
-				[6]		=	{[5] = 138349, [10] = 138352, [1] = 138355, [7] = 138358, [3] = 138361, [15] = 138364},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Shaman
-				[7]		=	{[5] = 138346, [10] = 138341, [1] = 138343, [7] = 138345, [3] = 138348, [15] = 138372},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Mage
-				[8]		=	{[5] = 138318, [10] = 138309, [1] = 138312, [7] = 138315, [3] = 138321, [15] = 138365},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Warlock
-				[9]		=	{[5] = 138320, [10] = 138311, [1] = 138314, [7] = 138317, [3] = 138323, [15] = 138373},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Monk
-				[10]	=	{[5] = 138325, [10] = 138328, [1] = 138331, [7] = 138334, [3] = 138337, [15] = 138367},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Druid
-				[11]	=	{[5] = 138324, [10] = 138327, [1] = 138330, [7] = 138333, [3] = 138336, [15] = 138366},		-- Chest, Hands, Head, Legs, Shoulder, Back
-				-- Demon Hunter
-				[12]	=	{[5] = 138376, [10] = 138377, [1] = 138378, [7] = 138379, [3] = 138380, [15] = 138375} 		-- Chest, Hands, Head, Legs, Shoulder, Back
+				[0]		=	function (Count) return Count > 1, Count > 3; end,											-- Return Function
+				[1]		=	{[5] = 138351, [10] = 138354, [1] = 138357, [7] = 138360, [3] = 138363, [15] = 138374},		-- Warrior: Chest, Hands, Head, Legs, Shoulder, Back
+				[2]		=	{[5] = 138350, [10] = 138353, [1] = 138356, [7] = 138359, [3] = 138362, [15] = 138369},		-- Paladin: Chest, Hands, Head, Legs, Shoulder, Back
+				[3]		=	{[5] = 138339, [10] = 138340, [1] = 138342, [7] = 138344, [3] = 138347, [15] = 138368},		-- Hunter: Chest, Hands, Head, Legs, Shoulder, Back
+				[4]		=	{[5] = 138326, [10] = 138329, [1] = 138332, [7] = 138335, [3] = 138338, [15] = 138371},		-- Rogue: Chest, Hands, Head, Legs, Shoulder, Back
+				[5]		=	{[5] = 138319, [10] = 138310, [1] = 138313, [7] = 138316, [3] = 138322, [15] = 138370},		-- Priest: Chest, Hands, Head, Legs, Shoulder, Back
+				[6]		=	{[5] = 138349, [10] = 138352, [1] = 138355, [7] = 138358, [3] = 138361, [15] = 138364},		-- Death Knight: Chest, Hands, Head, Legs, Shoulder, Back
+				[7]		=	{[5] = 138346, [10] = 138341, [1] = 138343, [7] = 138345, [3] = 138348, [15] = 138372},		-- Shaman: Chest, Hands, Head, Legs, Shoulder, Back
+				[8]		=	{[5] = 138318, [10] = 138309, [1] = 138312, [7] = 138315, [3] = 138321, [15] = 138365},		-- Mage: Chest, Hands, Head, Legs, Shoulder, Back
+				[9]		=	{[5] = 138320, [10] = 138311, [1] = 138314, [7] = 138317, [3] = 138323, [15] = 138373},		-- Warlock: Chest, Hands, Head, Legs, Shoulder, Back
+				[10]	=	{[5] = 138325, [10] = 138328, [1] = 138331, [7] = 138334, [3] = 138337, [15] = 138367},		-- Monk: Chest, Hands, Head, Legs, Shoulder, Back
+				[11]	=	{[5] = 138324, [10] = 138327, [1] = 138330, [7] = 138333, [3] = 138336, [15] = 138366},		-- Druid: Chest, Hands, Head, Legs, Shoulder, Back
+				[12]	=	{[5] = 138376, [10] = 138377, [1] = 138378, [7] = 138379, [3] = 138380, [15] = 138375} 		-- Demon Hunter: Chest, Hands, Head, Legs, Shoulder, Back
 			}
 		};
 		function ER.HasTier (Tier)
 			-- Set Bonuses are disabled in Challenge Mode (Diff = 8) and in Proving Grounds (Map = 1148).
 			local DifficultyID, _, _, _, _, MapID = select(3, GetInstanceInfo());
-			if DifficultyID == 8 or MapID == 1148 then return 0; end
+			if DifficultyID == 8 or MapID == 1148 then return false; end
 			-- Check gear
-			local Count = 0;
-			local Item, Slot;
-			for i = 1, #HasTierSlots do
-				Slot = HasTierSlots[i];
-				Item = ER.Equipment[Slot];
-				if Item and Item == HasTierSets[Tier][({UnitClass("player")})[3]][Slot] then
-					Count = Count + 1;
+			if HasTierSets[Tier][ER.PersistentCache.Player.Class[3]] then
+				local Count = 0;
+				local Item;
+				for Slot, ItemID in pairs(HasTierSets[Tier][ER.PersistentCache.Player.Class[3]]) do
+					Item = ER.Equipment[Slot];
+					if Item and Item == ItemID then
+						Count = Count + 1;
+					end
 				end
+				return HasTierSets[Tier][0](Count);
+			else
+				return false;
 			end
-			return Count > 1, Count > 3;
-		end
-
-		-- Check player class trinket (call ER.GetEquipment before to refresh the current gear)
-		local HasClassTrinketsTable = {
-			[1]		=	124523,	-- Warrior : Worldbreaker's Resolve
-			[2]		=	124518,	-- Paladin : Libram of Vindication
-			[3]		=	124515,	-- Hunter : Talisman of the Master Tracker
-			[4]		=	124520,	-- Rogue : Bleeding Hollow Toxin Vessel
-			[5]		=	124519,	-- Priest : Repudiation of War
-			[6]		=	124513,	-- Death Knight : Reaper's Harvest
-			[7]		=	124521,	-- Shaman : Core of the Primal Elements
-			[8]		=	124516,	-- Mage : Tome of Shifting Words
-			[9]		=	124522,	-- Warlock : Fragment of the Dark Star
-			[10]	=	124517,	-- Monk : Sacred Draenic Incense
-			[11]	=	124514,	-- Druid : Seed of Creation
-			[12]	=	139630	-- Demon Hunter : Etching of Sargeras
-		};
-		function ER.HasClassTrinket ()
-			local Item, Slot;
-			for i = 13, 14 do
-				Item = ER.Equipment[i];
-				if Item and Item == HasClassTrinketsTable[({UnitClass("player")})[3]] then
-					return true;
-				end
-			end
-			return false;
 		end
 
 		-- Mythic Dungeon Abilites
 		local MDA = {
-			{Spell(200904), "Sapped Soul"},
-			{Spell(200291), "Blade Dance Cast"},
-			{Spell(200291), "Blade Dance Buff"}
-		};
-		function ER.MythicDungeon (Type)
-			for i = 1, #MDA do
-				if Player:Buff(MDA[i][1], nil, true) or Player:Debuff(MDA[i][1], nil, true) then
-					return MDA[i][2];
+			PlayerBuff = {
+			},
+			PlayerDebuff = {
+				--- Legion
+					----- Dungeons (7.0 Patch) -----
+					--- Vault of the Wardens
+						-- Inquisitor Tormentorum
+						{Spell(200904), "Sapped Soul"}
+			},
+			EnemiesBuff = {
+				--- Legion
+					----- Dungeons (7.0 Patch) -----
+					--- Black Rook Hold
+						-- Trashes
+						{Spell(200291), "Blade Dance Buff"} -- Risen Scout
+			},
+			EnemiesCast = {
+				--- Legion
+					----- Dungeons (7.0 Patch) -----
+					--- Black Rook Hold
+						-- Trashes
+						{Spell(200291), "Blade Dance Cast"} -- Risen Scout
+			},
+			EnemiesDebuff = {
+			}
+		}
+		function ER.MythicDungeon ()
+			-- TODO: Optimize
+			for Key, Value in pairs(MDA) do
+				if Key == "PlayerBuff" then
+					for i = 1, #Value do
+						if Player:Buff(Value[i][1], nil, true) then
+							return Value[i][2];
+						end
+					end
+				elseif Key == "PlayerDebuff" then
+					for i = 1, #Value do
+						if Player:Debuff(Value[i][1], nil, true) then
+							return Value[i][2];
+						end
+					end
+				elseif Key == "EnemiesBuff" then
+
+				elseif Key == "EnemiesCast" then
+
+				elseif Key == "EnemiesDebuff" then
+
 				end
 			end
 			return "";
