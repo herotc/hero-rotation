@@ -316,15 +316,6 @@ local function APL ()
 			if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true) and (ER.BMPullTime() == 60 or (ER.BMPullTime() <= 15 and ER.BMPullTime() >= 14) or (ER.BMPullTime() <= 4 and ER.BMPullTime() >= 3)) then
 				if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
 			end
-			-- T18 2PC Reswap
-			if Settings.Subtlety.T18Prepull.Enabled and ER.Tier18_2Pc then
-				if S.FlickeringShadows:ArtifactEnabled() and S.Sprint:IsCastable() and ER.BMPullTime() <= Settings.Subtlety.T18Prepull.PullTime[1] and ER.BMPullTime() >= Settings.Subtlety.T18Prepull.PullTime[2] then
-					if ER.Cast(S.Sprint, {true, false}) then return "Cast"; end
-				end
-				if Player:Buff(S.DeathlyShadows) or ER.BMPullTime() <= Settings.Subtlety.T18Prepull.PullTime[3] then
-					UseEquipmentSet(GetEquipmentSetInfo(Settings.Subtlety.T18Prepull.EquipmentSetID));
-				end
-			end
 			-- Opener
 			if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
 				if Player:ComboPoints() >= 5 then
