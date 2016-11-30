@@ -317,17 +317,17 @@ local function Build ()
 	return false;
 end
 local SappedSoulSpells = {
+	{S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end},
 	{S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
-	{S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end},
-	{S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end}
+	{S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
 };
 local function MythicDungeon ()
 	-- Sapped Soul
 	if ER.MythicDungeon() == "Sapped Soul" then
 		for i = 1, #SappedSoulSpells do
 			if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
-				ER.Cast(SappedSoulSpells[i][1]);
 				ER.ChangePulseTimer(1);
+				ER.Cast(SappedSoulSpells[i][1]);
 				return SappedSoulSpells[i][2];
 			end
 		end
