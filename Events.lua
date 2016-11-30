@@ -189,19 +189,24 @@ ER:RegisterForEvent(
 		);
 
 	-- OnSpecGearTalentUpdate
-		-- Gear Inspector
+		-- Player Inspector
+		-- TODO : Split based on events
 		ER:RegisterForEvent(
 			function ()
+				-- Refresh Player
+				ER.PersistentCache.Player.Class = {UnitClass("player")};
+				ER.PersistentCache.Player.Spec = {GetSpecializationInfo(GetSpecialization())};
 				-- Refresh Gear
 				ER.GetEquipment();
 				-- WoD
 				ER.Tier18_2Pc, ER.Tier18_4Pc = ER.HasTier("T18");
-				ER.Tier18_ClassTrinket = ER.HasClassTrinket();
+				ER.Tier18_ClassTrinket = ER.HasTier("T18_ClassTrinket");
 				-- Legion
 				Spell:ArtifactScan();
 				ER.Tier19_2Pc, ER.Tier19_4Pc = ER.HasTier("T19");
 			end
 			, "ZONE_CHANGED_NEW_AREA"
+			, "PLAYER_SPECIALIZATION_CHANGED"
 			, "PLAYER_TALENT_UPDATE"
 			, "PLAYER_EQUIPMENT_CHANGED"
 		);
