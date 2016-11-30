@@ -220,6 +220,7 @@ end
 
 	-- Add TTD Infos to Nameplates
 	function ER.Nameplate.AddTTD ()
+		ER.Nameplate.HideTTD();
 		for i = 1, 40 do
 			Count = tostring(i);
 			
@@ -301,7 +302,6 @@ end
 
 	-- Remove Icons
 	function ER.Nameplate.RemoveIcon () -- TODO: Improve performance
-		ER.Nameplate.HideTTD();
 		-- Nameplate Icon
 		if ER.NameplateIconFrame:IsVisible() then
 			ER.NameplateIconFrame:Hide();
