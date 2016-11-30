@@ -57,7 +57,6 @@ ER.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
 				C_Timer.After(2, function ()
 						ER.MainFrame:UnregisterEvent("ADDON_LOADED");
 						ER.MainFrame:SetScript("OnUpdate", ER.Pulse);
-						ER.TTDRefresh();
 					end
 				);
 			end
@@ -66,20 +65,26 @@ ER.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
 );
 
 -- Main
-local PulseTimer = 0;
-local Spec;
+local Timer = {
+	Pulse = 0,
+	TTD = 0
+};
 function ER.Pulse ()
-	if ER.GetTime(true) > PulseTimer then
-		PulseTimer = ER.GetTime() + mathmin(select(4, GetNetStats()), 30)/1000; -- Put a 30ms max limiter to save FPS (less if latency is low).
+	if ER.GetTime(true) > Timer.Pulse then
+		Timer.Pulse = ER.GetTime() + mathmin(select(4, GetNetStats()), 30)/1000; -- Put a 30ms max limiter to save FPS (less if latency is low).
 
 		ER.CacheReset();
+
+		if ER.GetTime() > Timer.TTD then
+			Timer.Pulse = ER.GetTime() + ER.TTD.Settings.Refresh;
+			ER.TTDRefresh();
+		end
+
 		ER.ResetIcons();
 		ER.Nameplate.AddTTD();
-
 		if ER.ON() and ER.Ready() then -- Check if we are ready to cast something to save FPS.
-			Spec = GetSpecializationInfo(GetSpecialization()); -- To optimize, bad to call this OnUpdate (likely make event based on spec / change spec, TODO)
-			if ER.APLs[Spec] then
-				ER.APLs[Spec]();
+			if ER.APLs[ER.PersistentCache.Player.Spec[1]] then
+				ER.APLs[ER.PersistentCache.Player.Spec[1]]();
 			end
 		end
 	end
