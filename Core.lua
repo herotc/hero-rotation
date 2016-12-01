@@ -731,6 +731,8 @@ end
 					-- TODO : Put GetInstanceInfo into PersistentCache.
 					[114360] = function () return (not Unit:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
 					[114361] = function () return (not Unit:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
+					-- Odyn leaves the fight at 10%.
+					[114263] = 10,
 
 			--- Warlord of Draenor (WoD)
 				----- HellFire Citadel (T18 - 6.2 Patch) -----
