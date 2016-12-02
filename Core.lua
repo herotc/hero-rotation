@@ -353,6 +353,7 @@ end
 		[80]	=	35278,	-- Reinforced Net
 		[100]	=	33119	-- Malister's Frost Wand
 	};
+	-- Get if the unit is in range, you can use a number or a spell as argument.
 	function Unit:IsInRange (Distance)
 		if self:GUID() then
 			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
@@ -779,21 +780,70 @@ end
 
 	--- PLAYER SPECIFIC
 
+		-- Get if the player is mounted on a non-combat mount.
+		function Unit:IsMounted ()
+			return IsMounted() and not self:IsOnCombatMount();
+		end
+
+		-- Get if the player is on a combat mount or not.
+		local CombatMountBuff = {
+			--- Classes
+				Spell(131347), -- Demon Hunter Glide
+				Spell(783), -- Druid Travel Form
+				Spell(165962), -- Druid Flight Form
+				Spell(220509), -- Paladin Divine Steed
+				Spell(221883), -- Paladin Divine Steed
+				Spell(221884), -- Paladin Divine Steed
+				Spell(221886), -- Paladin Divine Steed
+				Spell(221887), -- Paladin Divine Steed
+			--- Legion
+				-- Class Order Hall
+				Spell(220480), -- Death Knight Ebon Blade Deathcharger
+				Spell(220484), -- Death Knight Nazgrim's Deathcharger
+				Spell(220488), -- Death Knight Trollbane's Deathcharger
+				Spell(220489), -- Death Knight Whitemane's Deathcharger
+				Spell(220491), -- Death Knight Mograine's Deathcharger
+				Spell(220504), -- Paladin Silver Hand Charger
+				Spell(220507), -- Paladin Silver Hand Charger
+				-- Stormheim PVP Quest (Bareback Brawl)
+				Spell(221595), -- Storm's Reach Cliffwalker
+				Spell(221671), -- Storm's Reach Warbear
+				Spell(221672), -- Storm's Reach Greatstag
+				Spell(221673), -- Storm's Reach Worg
+				Spell(218964), -- Stormtalon
+			--- Warlord of Draenor (WoD)
+				-- Nagrand
+				Spell(164222), -- Frostwolf War Wolf
+				Spell(165803) -- Telaari Talbuk
+		};
+		function Unit:IsOnCombatMount ()
+			for i = 1, #CombatMountBuff do
+				if self:Buff(CombatMountBuff[i], nil, true) then
+					return true;
+				end
+			end
+			return false;
+		end
+
 		-- gcd
-		-- TODO : Improve perfs
+		local GCD_OneSecond = {
+			[103] = true, -- Feral
+			[259] = true, -- Assassination
+			[260] = true, -- Outlaw
+			[261] = true, -- Subtlety
+			[268] = true, -- Brewmaster
+			[269] = true  -- Windwalker
+		};
+		local GCD_Value = 1.5;
 		function Unit:GCD ()
 			if self:GUID() then
 				if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
 				if not ER.Cache.UnitInfo[self:GUID()].GCD then
-					-- Rogue, Feral, Brewmaster, Windwalker got 1S.
-					if ER.PersistentCache.Player.Class[2] == "ROGUE" or
-						ER.PersistentCache.Player.Spec[1] == 103 or
-						ER.PersistentCache.Player.Spec[1] == 268 or
-						ER.PersistentCache.Player.Spec[1] == 269 then
+					if GCD_OneSecond[ER.PersistentCache.Player.Spec[1]] then
 						ER.Cache.UnitInfo[self:GUID()].GCD = 1;
 					else
-						local GCD = 1.5/(1+self:HastePct()/100);
-						ER.Cache.UnitInfo[self:GUID()].GCD = GCD > 0.75 and GCD or 0.75;
+						GCD_Value = 1.5/(1+self:HastePct()/100);
+						ER.Cache.UnitInfo[self:GUID()].GCD = GCD_Value > 0.75 and GCD_Value or 0.75;
 					end
 				end
 				return ER.Cache.UnitInfo[self:GUID()].GCD;
@@ -1088,6 +1138,7 @@ end
 					end
 				end
 			end
+			return false;
 		end
 		local IsStealthedKey;
 		function Unit:IsStealthed (Abilities, Special)
