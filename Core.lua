@@ -14,6 +14,7 @@ local tableinsert = table.insert;
 local tableremove = table.remove;
 local tonumber = tonumber;
 local tostring = tostring;
+local type = type;
 local unpack = unpack;
 local wipe = table.wipe;
 -- Core Locals
@@ -357,7 +358,11 @@ end
 			if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
 			if not ER.Cache.UnitInfo[self:GUID()].IsInRange then ER.Cache.UnitInfo[self:GUID()].IsInRange = {}; end
 			if ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance] == nil then
-				ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance] = IsItemInRange(ER.IsInRangeItemTable[Distance], self.UnitID) or false;
+				if type(Distance) == "number" then
+					ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance] = IsItemInRange(ER.IsInRangeItemTable[Distance], self.UnitID) or false;
+				else
+					ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance] = IsSpellInRange(Distance:Name(), self.UnitID) or false;
+				end
 			end
 			return ER.Cache.UnitInfo[self:GUID()].IsInRange[Distance];
 		end
