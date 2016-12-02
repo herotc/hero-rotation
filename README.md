@@ -2,12 +2,12 @@
 
 EasyRaid is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation.
 The project is hosted on [GitHub](https://github.com/SimCMinMax/EasyRaid) and maintained by the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
+Also, you can find it on [Curse](https://mods.curse.com/addons/wow/easyraid) and [CurseForge](https://wow.curseforge.com/projects/easyraid).
 
-
-## Main Features
-- Main Icon that shows the next ability you should cast
-- Two smaller icons above the previous one that shows the useful CDs to use
-- One medium icon on the left that shows every abilities that should be cycled (i.e. multi-dotting)
+## Key Features
+- Main Icon that shows the next ability you should cast.
+- Two smaller icons above the previous one that shows the useful CDs to use.
+- One medium icon on the left that shows every abilities that should be cycled (i.e. multi-dotting).
 
 Every rotations are based on SimulationCraft Action Priority Lists.
 
