@@ -25,14 +25,19 @@ local _T = { -- Temporary Vars
 	DistanceValues = {}, -- GetEnemies
 	Start, End, -- CastPercentage
 	Infos, -- GetBuffs / GetDebuffs
-	ExpirationTime -- BuffRemains / DebuffRemains
+	ExpirationTime, -- BuffRemains / DebuffRemains
+	Charges, MaxCharges, CDTime, CDValue, -- Cooldown / Recharge
+	CD -- Cooldown / Recharge
 };
 -- Max # Buffs and Max # Nameplates.
-ER.MAXIMUM = 40; 
+ER.MAXIMUM = 40;
 -- Defines our cached tables.
 ER.PersistentCache = {
 	Equipment = {},
-	Player = {Class = {}, Spec = {}},
+	Player = {
+		Class = {UnitClass("player")},
+		Spec = {}
+	},
 	SpellLearned = {Pet = {}, Player = {}},
 	Texture = {Spell = {}, Item = {}}
 };
@@ -46,10 +51,33 @@ ER.Cache = {
 	ItemInfo = {},
 	UnitInfo = {}
 };
+
+-- Wipe a table while keeping the structure
+-- i.e. wipe every sub-table as long it doesn't contain a table
+function ER.WipeTableRecursively (Table)
+	for Key, Value in pairs(Table) do
+		if type(Value) == "table" then
+			ER.WipeTableRecursively(Value);
+		else
+			wipe(Table);
+		end
+	end
+end
+
+-- Reset the cache
 function ER.CacheReset ()
+	--[[-- foreach method
 	for Key, Value in pairs(ER.Cache) do
 		wipe(ER.Cache[Key]);
-	end
+	end]]
+	wipe(ER.Cache.APLVar);
+	wipe(ER.Cache.Enemies);
+	wipe(ER.Cache.EnemiesCount);
+	wipe(ER.Cache.GUIDInfo);
+	wipe(ER.Cache.MiscInfo);
+	wipe(ER.Cache.SpellInfo);
+	wipe(ER.Cache.ItemInfo);
+	wipe(ER.Cache.UnitInfo);
 end
 
 -- Get the GetTime and cache it.
@@ -1534,18 +1562,19 @@ end
 		--- Artifact Traits Scan
 		-- Fills the PowerTable with every traits informations.
 		local ArtifactUI, HasArtifactEquipped  = _G.C_ArtifactUI, _G.HasArtifactEquipped;
-		local PowerTable = {};
+		local ArtifactFrame = _G.ArtifactFrame;
+		local PowerTable, Powers = {}, {};
 		--- PowerTable Schema :
 		--    1      2         3          4         5       6  7      8          9         10         11
 		-- SpellID, Cost, CurrentRank, MaxRank, BonusRanks, x, y, PreReqsMet, IsStart, IsGoldMedal, IsFinal
 		function Spell:ArtifactScan ()
-			local ArtifactFrame = _G.ArtifactFrame;
+			ArtifactFrame = _G.ArtifactFrame;
 			-- Does the scan only if the Artifact is Equipped and the Frame not Opened.
 			if HasArtifactEquipped() and not (ArtifactFrame and ArtifactFrame:IsShown()) then
 				-- Unregister the events to prevent unwanted call.
 				UIParent:UnregisterEvent("ARTIFACT_UPDATE");
 				SocketInventoryItem(INVSLOT_MAINHAND);
-				local Powers = ArtifactUI.GetPowers();
+				Powers = ArtifactUI.GetPowers();
 				if Powers then
 					wipe(PowerTable);
 					for Index, Power in pairs(Powers) do
@@ -1582,15 +1611,15 @@ end
 			if not ER.Cache.SpellInfo[self.SpellID] then ER.Cache.SpellInfo[self.SpellID] = {}; end
 			if not ER.Cache.SpellInfo[self.SpellID].Recharge then
 				-- Get Spell Recharge Infos
-				local Charges, MaxCharges, CDTime, CDValue = self:Charges();
+				_T.Charges, _T.MaxCharges, _T.CDTime, _T.CDValue = self:Charges();
 				-- Return 0 if the Spell isn't in CD.
-				if Charges == MaxCharges then
+				if _T.Charges == _T.MaxCharges then
 					return 0;
 				end
 				-- Compute the CD.
-				local CD = CDTime + CDValue - ER.GetTime() - ER.RecoveryOffset();
+				_T.CD = _T.CDTime + _T.CDValue - ER.GetTime() - ER.RecoveryOffset();
 				-- Return the Spell CD
-				ER.Cache.SpellInfo[self.SpellID].Recharge = CD > 0 and CD or 0;
+				ER.Cache.SpellInfo[self.SpellID].Recharge = _T.CD > 0 and _T.CD or 0;
 			end
 			return ER.Cache.SpellInfo[self.SpellID].Recharge;
 		end
@@ -1615,15 +1644,15 @@ end
 			if not ER.Cache.SpellInfo[self.SpellID] then ER.Cache.SpellInfo[self.SpellID] = {}; end
 			if not ER.Cache.SpellInfo[self.SpellID].Cooldown then
 				-- Get Spell Cooldown Infos
-				local CDTime, CDValue = GetSpellCooldown(self.SpellID);
+				_T.CDTime, _T.CDValue = GetSpellCooldown(self.SpellID);
 				-- Return 0 if the Spell isn't in CD.
-				if CDTime == 0 then
+				if _T.CDTime == 0 then
 					return 0;
 				end
 				-- Compute the CD.
-				local CD = CDTime + CDValue - ER.GetTime() - ER.RecoveryOffset();
+				_T.CD = _T.CDTime + _T.CDValue - ER.GetTime() - ER.RecoveryOffset();
 				-- Return the Spell CD
-				ER.Cache.SpellInfo[self.SpellID].Cooldown = CD > 0 and CD or 0;
+				ER.Cache.SpellInfo[self.SpellID].Cooldown = _T.CD > 0 and _T.CD or 0;
 			end
 			return ER.Cache.SpellInfo[self.SpellID].Cooldown;
 		end
