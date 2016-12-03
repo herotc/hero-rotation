@@ -22,7 +22,7 @@ local _T = { -- Temporary Vars
 	Argument, -- CmdHandler
 	Parts, -- NPCID
 	ThisUnit, -- GetEnemies / TTDRefresh
-	DistanceValues, -- GetEnemies
+	DistanceValues = {}, -- GetEnemies
 	Start, End, -- CastPercentage
 	Infos, -- GetBuffs / GetDebuffs
 	ExpirationTime -- BuffRemains / DebuffRemains
@@ -1296,7 +1296,7 @@ function ER.GetEnemies (Distance)
 	ER.Cache.Enemies[Distance] = {};
 	-- Check if there is another Enemies table with a greater Distance to filter from it.
 	if #ER.Cache.Enemies >= 1 then
-		_T.DistanceValues = {};
+		wipe(_T.DistanceValues);
 		for Key, Value in pairs(ER.Cache.Enemies) do
 			if Key > Distance then
 				tableinsert(_T.DistanceValues, Key);
@@ -1533,26 +1533,26 @@ end
 
 		--- Artifact Traits Scan
 		-- Fills the PowerTable with every traits informations.
-		local AUI, PowerTable = C_ArtifactUI, {};
+		local ArtifactUI, HasArtifactEquipped  = _G.C_ArtifactUI, _G.HasArtifactEquipped;
+		local PowerTable = {};
 		--- PowerTable Schema :
 		--    1      2         3          4         5       6  7      8          9         10         11
 		-- SpellID, Cost, CurrentRank, MaxRank, BonusRanks, x, y, PreReqsMet, IsStart, IsGoldMedal, IsFinal
 		function Spell:ArtifactScan ()
-			-- Prevent Scan if the Artifact Frame is opened.
-			if _G.ArtifactFrame and _G.ArtifactFrame:IsShown() then return; end
-			-- Does the scan only if the Artifact is Equipped.
-			if HasArtifactEquipped() then
+			local ArtifactFrame = _G.ArtifactFrame;
+			-- Does the scan only if the Artifact is Equipped and the Frame not Opened.
+			if HasArtifactEquipped() and not (ArtifactFrame and ArtifactFrame:IsShown()) then
 				-- Unregister the events to prevent unwanted call.
 				UIParent:UnregisterEvent("ARTIFACT_UPDATE");
 				SocketInventoryItem(INVSLOT_MAINHAND);
-				local Powers = AUI.GetPowers();
+				local Powers = ArtifactUI.GetPowers();
 				if Powers then
-					PowerTable = {};
+					wipe(PowerTable);
 					for Index, Power in pairs(Powers) do
-						tableinsert(PowerTable, {AUI.GetPowerInfo(Power)});
+						tableinsert(PowerTable, {ArtifactUI.GetPowerInfo(Power)});
 					end
 				end
-				AUI.Clear();
+				ArtifactUI.Clear();
 				-- Register back the event.
 				UIParent:RegisterEvent("ARTIFACT_UPDATE");
 			end
