@@ -196,6 +196,9 @@ ER:RegisterForEvent(
 				-- Refresh Player
 				ER.PersistentCache.Player.Class = {UnitClass("player")};
 				ER.PersistentCache.Player.Spec = {GetSpecializationInfo(GetSpecialization())};
+				-- Wipe the texture from Persistent Cache
+				wipe(ER.PersistentCache.Texture.Spell);
+				wipe(ER.PersistentCache.Texture.Item);
 				-- Refresh Gear
 				ER.GetEquipment();
 				-- WoD
@@ -309,7 +312,7 @@ ER:RegisterForEvent(
 	local DestGUID, SpellID;
 
 	-- Rogue
-	if ({UnitClass("player")})[3] == 4 then
+	if ER.PersistentCache.Player.Class[3] == 4 then
 		ER.BleedTable = {
 			-- Assassination
 			Assassination = {
@@ -322,7 +325,6 @@ ER:RegisterForEvent(
 				FinalityNightblade = false,
 				FinalityNightbladeTime = 0
 			}
-			
 		};
 		local BleedGUID;
 		--- Exsanguinated Handler

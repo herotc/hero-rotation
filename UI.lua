@@ -45,12 +45,8 @@ end
 		self:Show();
 	end
 	-- Change Texture (1 Arg for Texture, 3 Args for Color)
-	function ER.MainIconFrame:ChangeMainIcon (...)
-		if #{...} > 1 then
-			self.TempTexture:SetColorTexture(...);
-		else
-			self.TempTexture:SetTexture(...);
-		end
+	function ER.MainIconFrame:ChangeMainIcon (Texture)
+		self.TempTexture:SetTexture(Texture);
 		self.TempTexture:SetAllPoints(self);
 		self.texture = self.TempTexture;
 	end
@@ -78,12 +74,8 @@ end
 		self.Icon[2]:Show();
 	end
 	-- Change Texture (1 Arg for Texture, 3 Args for Color)
-	function ER.SmallIconFrame:ChangeSmallIcon (FrameID, ...)
-		if #{...} > 1 then
-			self.Icon[FrameID].TempTexture:SetColorTexture(...);
-		else
-			self.Icon[FrameID].TempTexture:SetTexture(...);
-		end
+	function ER.SmallIconFrame:ChangeSmallIcon (FrameID, Texture)
+		self.Icon[FrameID].TempTexture:SetTexture(Texture);
 		self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
 		self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
 		if not self.Icon[FrameID]:IsVisible() then
@@ -107,12 +99,8 @@ end
 		self:Show();
 	end
 	-- Change Texture (1 Arg for Texture, 3 Args for Color)
-	function ER.LeftIconFrame:ChangeLeftIcon (...)
-		if #{...} > 1 then
-			self.TempTexture:SetColorTexture(...);
-		else
-			self.TempTexture:SetTexture(...);
-		end
+	function ER.LeftIconFrame:ChangeLeftIcon (Texture)
+		self.TempTexture:SetTexture(Texture);
 		self.TempTexture:SetAllPoints(self);
 		self.texture = self.TempTexture;
 		if not self:IsVisible() then
@@ -258,12 +246,11 @@ end
 		end	
 	end
 
-	-- Add the Icon on Enemy Grid (and on Left Icon frame)
+	-- Add the Icon on Nameplates (and on Left Icon frame)
 	function ER.Nameplate.AddIcon (ThisUnit, SpellID)
 		Token = stringlower(ThisUnit.UnitID);
 		Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
 		if Nameplate then
-
 			-- Init Frame if not already
 			if not ER.Nameplate.IconInit then
 				-- Frame
@@ -278,11 +265,7 @@ end
 			end
 
 			-- Set the Texture
-			if #{ER.GetTexture(SpellID)} > 1 then
-				ER.NameplateIconFrame.TempTexture:SetColorTexture(ER.GetTexture(SpellID));
-			else
-				ER.NameplateIconFrame.TempTexture:SetTexture(ER.GetTexture(SpellID));
-			end
+			ER.NameplateIconFrame.TempTexture:SetTexture(ER.GetTexture(SpellID));
 			ER.NameplateIconFrame.TempTexture:SetAllPoints(ER.NameplateIconFrame);
 			ER.NameplateIconFrame.texture = ER.NameplateIconFrame.TempTexture;
 			if not ER.NameplateIconFrame:IsVisible() then
