@@ -65,19 +65,25 @@ function ER.WipeTableRecursively (Table)
 end
 
 -- Reset the cache
+ER.CacheHasBeenReset = false;
 function ER.CacheReset ()
-	--[[-- foreach method
-	for Key, Value in pairs(ER.Cache) do
-		wipe(ER.Cache[Key]);
-	end]]
-	wipe(ER.Cache.APLVar);
-	wipe(ER.Cache.Enemies);
-	wipe(ER.Cache.EnemiesCount);
-	wipe(ER.Cache.GUIDInfo);
-	wipe(ER.Cache.MiscInfo);
-	wipe(ER.Cache.SpellInfo);
-	wipe(ER.Cache.ItemInfo);
-	wipe(ER.Cache.UnitInfo);
+	if not ER.CacheHasBeenReset then
+		--[[-- foreach method
+		for Key, Value in pairs(ER.Cache) do
+			wipe(ER.Cache[Key]);
+		end]]
+
+		wipe(ER.Cache.APLVar);
+		wipe(ER.Cache.Enemies);
+		wipe(ER.Cache.EnemiesCount);
+		wipe(ER.Cache.GUIDInfo);
+		wipe(ER.Cache.MiscInfo);
+		wipe(ER.Cache.SpellInfo);
+		wipe(ER.Cache.ItemInfo);
+		wipe(ER.Cache.UnitInfo);
+
+		ER.CacheHasBeenReset = true;
+	end
 end
 
 -- Get the GetTime and cache it.
