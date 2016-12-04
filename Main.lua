@@ -72,17 +72,18 @@ local Timer = {
 function ER.Pulse ()
 	if ER.GetTime(true) > Timer.Pulse then
 		Timer.Pulse = ER.GetTime() + mathmin(select(4, GetNetStats()), 30)/1000; -- Put a 30ms max limiter to save FPS (less if latency is low).
-
-		ER.CacheReset();
+		ER.CacheHasBeenReset = false;
 
 		if ER.GetTime() > Timer.TTD then
 			Timer.Pulse = ER.GetTime() + ER.TTD.Settings.Refresh;
+			ER.CacheReset();
 			ER.TTDRefresh();
+			ER.Nameplate.AddTTD();
 		end
 
 		ER.ResetIcons();
-		ER.Nameplate.AddTTD();
 		if ER.ON() and ER.Ready() then -- Check if we are ready to cast something to save FPS.
+			ER.CacheReset();
 			if ER.APLs[ER.PersistentCache.Player.Spec[1]] then
 				ER.APLs[ER.PersistentCache.Player.Spec[1]]();
 			end
