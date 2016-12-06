@@ -195,7 +195,11 @@ local function Finish ()
 		if ER.AoEON() then
 			BestUnit, BestUnitTTD = nil, 10;
 			for Key, Value in pairs(ER.Cache.Enemies[5]) do
-				if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD and ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or Value:DebuffRemains(S.Nightblade) < 2) then
+				if not Value:IsFacingBlacklisted() and not Value:IsUserCycleBlacklisted() and
+					Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD and
+					((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and
+					(not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
+					Value:DebuffRemains(S.Nightblade) < 2) then
 					BestUnit, BestUnitTTD = Value, Value:TimeToDie();
 				end
 			end
@@ -342,7 +346,9 @@ local function APL ()
 		if S.MarkedforDeath:IsCastable() then
 			BestUnit, BestUnitTTD = nil, 60;
 			for Key, Value in pairs(ER.Cache.Enemies[30]) do
-				if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
+				if not Value:IsMfdBlacklisted() and
+					Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and
+					Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
 					BestUnit, BestUnitTTD = Value, Value:TimeToDie();
 				end
 			end
