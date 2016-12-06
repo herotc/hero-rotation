@@ -605,34 +605,89 @@ end
 		return PandemicThreshold and self:DebuffRemains(Spell, AnyCaster) <= PandemicThreshold;
 	end
 
+	-- Check if the unit is coded as blacklisted or not.
+	local SpecialBlacklistData = {
+		--- Legion
+			----- Trial of Valor (T19 - 7.1 Patch) -----
+			--- Helya
+				-- Striking Tentacle cannot be hit.
+				[114881] = true
+	}
+	function Unit:IsBlacklisted ()
+		if SpecialBlacklistData[self:NPCID()] then
+			if type(SpecialBlacklistData[self:NPCID()]) == "boolean" then
+				return true;
+			else
+				return SpecialBlacklistData[self:NPCID()](self);
+			end
+		end
+		return false;
+	end
+
+	-- Check if the unit is coded as blacklisted by the user or not.
+	function Unit:IsUserBlacklisted ()
+		if ER.GUISettings.General.Blacklist.UserDefined[self:NPCID()] then
+			if type(ER.GUISettings.General.Blacklist.UserDefined[self:NPCID()]) == "boolean" then
+				return true;
+			else
+				return ER.GUISettings.General.Blacklist.UserDefined[self:NPCID()](self);
+			end
+		end
+		return false;
+	end
+
+	-- Check if the unit is coded as blacklisted for cycling by the user or not.
+	function Unit:IsUserCycleBlacklisted ()
+		if ER.GUISettings.General.Blacklist.CycleUserDefined[self:NPCID()] then
+			if type(ER.GUISettings.General.Blacklist.CycleUserDefined[self:NPCID()]) == "boolean" then
+				return true;
+			else
+				return ER.GUISettings.General.Blacklist.CycleUserDefined[self:NPCID()](self);
+			end
+		end
+		return false;
+	end
+
 	--- Check if the unit is coded as blacklisted for Marked for Death (Rogue) or not.
 	-- Most of the time if the unit doesn't really die and isn't the last unit of an instance.
-	local IsMfdBlacklisted_NPCID;
-	function Unit:IsMfdBlacklisted ()
-		IsMfdBlacklisted_NPCID = self:NPCID();
+	local SpecialMfdBlacklistData = {
 		--- Legion
 			----- Dungeons (7.0 Patch) -----
 			--- Halls of Valor
 				-- Hymdall leaves the fight at 10%.
-				if IsMfdBlacklisted_NPCID == 94960 then return true; end
+				[94960] = true,
 				-- Solsten and Olmyr doesn't "really" die
-				if IsMfdBlacklisted_NPCID == 102558 or IsMfdBlacklisted_NPCID == 97202 then return true; end
+				[102558] = true,
+				[97202] = true,
+				-- Fenryr leaves the fight at 60%. We take 50% as check value since it doesn't get immune at 60%.
+				[95674] = function (self) return self:HealthPercentage() > 50 and true or false; end
 
 			----- Trial of Valor (T19 - 7.1 Patch) -----
 			--- Odyn
 				-- Hyrja & Hymdall leaves the fight at 25% during first stage and 85%/90% during second stage (HM/MM)
-				if IsMfdBlacklisted_NPCID == 114360 or IsMfdBlacklisted_NPCID == 114361 then return true; end
+				[114360] = true,
+				[114361] = true,
 
 		--- Warlord of Draenor (WoD)
 			----- HellFire Citadel (T18 - 6.2 Patch) -----
 			--- Hellfire Assault
 				-- Mar'Tak doesn't die and leave fight at 50% (blocked at 1hp anyway).
-				if IsMfdBlacklisted_NPCID == 93023 then return true; end
+				[93023] = true,
 
 			----- Dungeons (6.0 Patch) -----
 			--- Shadowmoon Burial Grounds
 				-- Carrion Worm : They doesn't die but leave the area at 10%.
-				if IsMfdBlacklisted_NPCID == 88769 or IsMfdBlacklisted_NPCID == 76057 then return true; end
+				[88769] = true,
+				[76057] = true
+	};
+	function Unit:IsMfdBlacklisted ()
+		if SpecialMfdBlacklistData[self:NPCID()] then
+			if type(SpecialMfdBlacklistData[self:NPCID()]) == "boolean" then
+				return true;
+			else
+				return SpecialMfdBlacklistData[self:NPCID()](self);
+			end
+		end
 		return false;
 	end
 
@@ -753,14 +808,17 @@ end
 			return mathfloor(TTD._T.Seconds);
 		end
 
+		-- Get the unit TTD Percentage
 		local SpecialTTDPercentageData = {
 			--- Legion
 				----- Dungeons (7.0 Patch) -----
 				--- Halls of Valor
 					-- Hymdall leaves the fight at 10%.
 					[94960] = 10,
+					-- Fenryr leaves the fight at 60%. We take 50% as check value since it doesn't get immune at 60%.
+					[95674] = function (self) return (self:HealthPercentage() > 50 and 60) or 0 then return true; end,
 					-- Odyn leaves the fight at 80%.
-					[96589] = 80,
+					[95676] = 80,
 				--- Maw of Souls
 					-- Helya leaves the fight at 70%.
 					[96759] = 70,
@@ -769,8 +827,8 @@ end
 				--- Odyn
 					-- Hyrja & Hymdall leaves the fight at 25% during first stage and 85%/90% during second stage (HM/MM).
 					-- TODO : Put GetInstanceInfo into PersistentCache.
-					[114360] = function () return (not Unit:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
-					[114361] = function () return (not Unit:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
+					[114360] = function (self) return (not self:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
+					[114361] = function (self) return (not self:IsInBossList(114263, 99) and 25) or (select(3, GetInstanceInfo()) == 16 and 85) or 90; end,
 					-- Odyn leaves the fight at 10%.
 					[114263] = 10,
 
@@ -786,13 +844,12 @@ end
 					[88769] = 10,
 					[76057] = 10
 		};
-		-- Get the unit TTD Percentage
 		function Unit:SpecialTTDPercentage (NPCID)
 			if SpecialTTDPercentageData[NPCID] then
 				if type(SpecialTTDPercentageData[NPCID]) == "number" then
 					return SpecialTTDPercentageData[NPCID];
 				else
-					return SpecialTTDPercentageData[NPCID]();
+					return SpecialTTDPercentageData[NPCID](self);
 				end
 			end
 			return 0;
@@ -1352,7 +1409,12 @@ function ER.GetEnemies (Distance)
 	-- Else build from all the nameplates.
 	for i = 1, ER.MAXIMUM do
 		_T.ThisUnit = Unit["Nameplate"..tostring(i)];
-		if _T.ThisUnit:Exists() and not _T.ThisUnit:IsDeadOrGhost() and Player:CanAttack(_T.ThisUnit) and _T.ThisUnit:IsInRange(Distance) then
+		if _T.ThisUnit:Exists() and
+			not _T.ThisUnit:IsBlacklisted() and
+			not _T.ThisUnit:IsUserBlacklisted() and
+			not _T.ThisUnit:IsDeadOrGhost() and
+			Player:CanAttack(_T.ThisUnit) and
+			_T.ThisUnit:IsInRange(Distance) then
 			tableinsert(ER.Cache.Enemies[Distance], _T.ThisUnit);
 		end
 	end
