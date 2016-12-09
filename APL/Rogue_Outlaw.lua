@@ -398,7 +398,9 @@ local function APL ()
 		if S.MarkedforDeath:IsCastable() then
 			BestUnit, BestUnitTTD = nil, 60;
 			for Key, Value in pairs(ER.Cache.Enemies[30]) do
-				if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
+				if not Value:IsMfdBlacklisted() and
+					Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and
+					Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
 					BestUnit, BestUnitTTD = Value, Value:TimeToDie();
 				end
 			end

@@ -14,7 +14,19 @@ ER.GUISettings = {
 		Blacklist = {
 			-- During how many times the GCD time you want to blacklist an unit from Cycling
 			-- when you got an error when trying to cast on it.
-			NotFacingExpireMultiplier = 3
+			NotFacingExpireMultiplier = 3,
+			-- Custom List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key.
+			UserDefined = {
+				-- Example with fake NPCID:
+				-- [123456] = true;
+				-- [123456] = function (self) return self:HealthPercentage() <= 80 and true or false; end
+			},
+			-- Custom Cycle List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key.
+			CycleUserDefined = {
+				-- Example with fake NPCID:
+				-- [123456] = true;
+				-- [123456] = function (self) return self:HealthPercentage() <= 80 and true or false; end
+			}
 		}
 	},
 	NameplatesTTD = {
