@@ -660,7 +660,7 @@ end
 				[102558] = true,
 				[97202] = true,
 				-- Fenryr leaves the fight at 60%. We take 50% as check value since it doesn't get immune at 60%.
-				[95674] = function (self) return self:HealthPercentage() > 50 and true or false; end
+				[95674] = function (self) return self:HealthPercentage() > 50 and true or false; end,
 
 			----- Trial of Valor (T19 - 7.1 Patch) -----
 			--- Odyn
@@ -816,7 +816,7 @@ end
 					-- Hymdall leaves the fight at 10%.
 					[94960] = 10,
 					-- Fenryr leaves the fight at 60%. We take 50% as check value since it doesn't get immune at 60%.
-					[95674] = function (self) return (self:HealthPercentage() > 50 and 60) or 0 then return true; end,
+					[95674] = function (self) return (self:HealthPercentage() > 50 and 60) or 0 end,
 					-- Odyn leaves the fight at 80%.
 					[95676] = 80,
 				--- Maw of Souls
