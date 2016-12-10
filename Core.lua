@@ -39,7 +39,7 @@ ER.PersistentCache = {
 		Spec = {}
 	},
 	SpellLearned = {Pet = {}, Player = {}},
-	Texture = {Spell = {}, Item = {}}
+	Texture = {Spell = {}, Item = {}, Custom = {}}
 };
 ER.Cache = {
 	APLVar = {},
@@ -110,7 +110,12 @@ end
 function ER.GetTexture (Object)
 	if Object.SpellID then
 		if not ER.PersistentCache.Texture.Spell[Object.SpellID] then
-			ER.PersistentCache.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
+			-- Check if the SpellID is the one from Custom Icons or a Reguler WoW Spell
+			if Object.SpellID >= 9999000 then
+				ER.PersistentCache.Texture.Spell[Object.SpellID] = "Interface\\Addons\\EasyRaid\\Media\\Icons\\"..tostring(Object.SpellID);
+			else
+				ER.PersistentCache.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
+			end
 		end
 		return ER.PersistentCache.Texture.Spell[Object.SpellID];
 	elseif Object.ItemID then

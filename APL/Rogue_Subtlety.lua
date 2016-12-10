@@ -98,7 +98,19 @@ local pairs = pairs;
 		DreadlordsDeceit = Spell(228224),
 		-- Misc
 		DeathlyShadows = Spell(188700),
-		PoolEnergy = Spell(161576)
+		PoolEnergy = Spell(161576),
+		-- Macros
+		Macros = {
+			ShDSS = Spell(9999000),
+			ShDShStorm = Spell(9999010),
+			ShDSoDSS = Spell(9999100),
+			ShDSoDShStorm = Spell(9999110),
+			VanSS = Spell(9999001),
+			VanShStorm = Spell(9999011),
+			VanSoDSS = Spell(9999101),
+			VanSoDShStorm = Spell(9999111),
+			SMSS = Spell(9999002)
+		}
 	};
 	local S = Spell.Rogue.Subtlety;
 -- Items
@@ -111,6 +123,17 @@ local pairs = pairs;
 -- Rotation Var
 	local ShouldReturn, ShouldReturn2; -- Used to get the return string
 	local BestUnit, BestUnitTTD; -- Used for cycling
+	local MacroLookupSpell = {
+		[9999000] = S.Macros.ShDSS,
+		[9999010] = S.Macros.ShDShStorm,
+		[9999100] = S.Macros.ShDSoDSS,
+		[9999110] = S.Macros.ShDSoDShStorm,
+		[9999001] = S.Macros.VanSS,
+		[9999011] = S.Macros.VanShStorm,
+		[9999101] = S.Macros.VanSoDSS,
+		[9999111] = S.Macros.VanSoDShStorm,
+		[9999002] = S.Macros.SMSS
+	};
 -- GUI Settings
 	local Settings = {
 		General = ER.GUISettings.General,
@@ -218,20 +241,33 @@ local function Finish ()
 	end
 	return false;
 end
+local SoDCode, ShStormCode;
+local function Macro_ShDVanish (Offset)
+	SoDCode, ShStormCode = 0, 0;
+	-- Will we SoD ?
+	if S.SymbolsofDeath:IsCastable() and ((Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5)) or (I.ShadowSatyrsWalk:IsEquipped(8) and Player:EnergyTimeToMax() < 0.25)) then
+		SoDCode = 100;
+	end
+	-- Will we Shuriken Storm ?
+	if ER.AoEON() and S.ShurikenStorm:IsCastable() and ((Player:ComboPointsDeficit() >= 3 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0)) or (Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+		ShStormCode = 10;
+	end
+	return 9999000+SoDCode+ShStormCode+Offset;
+end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
 	if Target:IsInRange(5) then
 		-- actions.stealth_cds=shadow_dance,if=charges_fractional>=2.45
 		if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= 2.45 then
-			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
+			if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/vanish
 		if ER.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 then
-			if ER.Cast(S.Vanish, Settings.Subtlety.OffGCDasOffGCD.Vanish) then return "Cast"; end
+			if ER.Cast(MacroLookupSpell[Macro_ShDVanish(1)]) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadow_dance,if=charges>=2&combo_points<=1
 		if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
-			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
+			if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadowmeld,if=energy>=40-variable.ssw_er&energy.deficit>10
 		if ER.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10 then
@@ -239,11 +275,11 @@ local function Stealth_CDs ()
 			if Player:Energy() < 40-SSW_ER() then
 				if ER.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
 			end
-			if ER.Cast(S.Shadowmeld, Settings.Subtlety.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
+			if ER.Cast(MacroLookupSpell[9999002]) then return "Cast"; end
 		end
 		-- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
 		if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
-			if ER.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast"; end
+			if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
 		end
 	end
 	return false;

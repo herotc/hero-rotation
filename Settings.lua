@@ -134,10 +134,6 @@ ER.GUISettings = {
 					ArcaneTorrent = {true, false},
 					Berserking = {true, false},
 					BloodFury = {true, false},
-					-- Stealth CDs
-					ShadowDance = {true, false},
-					Shadowmeld = {true, false},
-					Vanish = {true, false},
 					-- Spec
 					Kick = {true, false},
 					MarkedforDeath = {false, false},
