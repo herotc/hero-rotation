@@ -160,7 +160,7 @@ local function SSW_Refund ()
 end
 -- actions.precombat+=/variable,name=stealth_threshold,value=(15+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+variable.ssw_refund)
 local function Stealth_Threshold ()
-  return (Player:EnergyDeficit() <= (15 + (S.Vigor:IsAvailable() and 35 or 0) + (S.MasterofShadows:IsAvailable() and 25 or 0) + SSW_Refund())) and true or false;
+  return 15 + (S.Vigor:IsAvailable() and 35 or 0) + (S.MasterofShadows:IsAvailable() and 25 or 0) + SSW_Refund();
 end
 -- # Builders
 local function Build ()
@@ -277,23 +277,6 @@ local function Macro_ShDVanish (Offset)
   end
   return 9999000+SoDCode+ShStormCode+Offset;
 end
--- # Stealth Action List Starter
-local function Stealth_ALS ()
-  -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=2.45|energy.deficit>=10)
-  if (Player:EnergyDeficit() <= Stealth_Threshold() and (not I.ShadowSatyrsWalk:IsEquipped(8) or S.ShadowDance:ChargesFractional() >= 2.45 or Player:EnergyDeficit() >= 10))
-  -- actions.stealth_als+=/sprint_offensive,if=energy.time_to_max>3
-  -- TODO: Sprint thing.
-  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
-   or ER.Cache.EnemiesCount[10] >= 5
-  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
-   or (not S.Shadowmeld:IsOnCooldown() and S.Vanish:IsOnCooldown() and S.ShadowDance:Charges() <= 1)
-  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
-   or (Target:TimeToDie() < 12*S.ShadowDance:ChargesFractional()*(I.ShadowSatyrsWalk:IsEquipped(8) and 1.5 or 1))
-  then
-   return Stealth_CDs();
-  end
-  return false;
-end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
   if Target:IsInRange(5) then
@@ -321,6 +304,23 @@ local function Stealth_CDs ()
     if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
       if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
     end
+  end
+  return false;
+end
+-- # Stealth Action List Starter
+local function Stealth_ALS ()
+  -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=2.45|energy.deficit>=10)
+  if (Player:EnergyDeficit() <= Stealth_Threshold() and (not I.ShadowSatyrsWalk:IsEquipped(8) or S.ShadowDance:ChargesFractional() >= 2.45 or Player:EnergyDeficit() >= 10))
+  -- actions.stealth_als+=/sprint_offensive,if=energy.time_to_max>3
+  -- TODO: Sprint thing.
+  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
+   or ER.Cache.EnemiesCount[10] >= 5
+  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
+   or (not S.Shadowmeld:IsOnCooldown() and S.Vanish:IsOnCooldown() and S.ShadowDance:Charges() <= 1)
+  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
+   or (Target:TimeToDie() < 12*S.ShadowDance:ChargesFractional()*(I.ShadowSatyrsWalk:IsEquipped(8) and 1.5 or 1))
+  then
+   return Stealth_CDs();
   end
   return false;
 end
