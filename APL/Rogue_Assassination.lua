@@ -16,59 +16,59 @@ local pairs = pairs;
   if not Spell.Rogue then Spell.Rogue = {}; end
   Spell.Rogue.Assassination = {
     -- Racials
-    ArcaneTorrent = Spell(25046),
-    Berserking = Spell(26297),
-    BloodFury = Spell(20572),
-    GiftoftheNaaru = Spell(59547),
+    ArcaneTorrent               = Spell(25046),
+    Berserking                  = Spell(26297),
+    BloodFury                   = Spell(20572),
+    GiftoftheNaaru              = Spell(59547),
     -- Abilities
-      Envenom = Spell(32645),
-      FanofKnives = Spell(51723),
-     Garrote = Spell(703),
-    KidneyShot = Spell(408),
-      Mutilate = Spell(1329)
-      PoisonedKnife = Spell(185565),
-      Rupture = Spell(1943),
-    Stealth = Spell(1784),
-      Vanish = Spell(1856),
-      Vendetta = Spell(79140),
+      Envenom                   = Spell(32645),
+      FanofKnives               = Spell(51723),
+      Garrote                   = Spell(703),
+      KidneyShot                = Spell(408),
+      Mutilate                  = Spell(1329),
+      PoisonedKnife             = Spell(185565),
+      Rupture                   = Spell(1943),
+      Stealth                   = Spell(1784),
+      Vanish                    = Spell(1856),
+      Vendetta                  = Spell(79140),
       -- Talents
-      Alacrity = Spell(193539),
-    AlacrityBuff = Spell(193538),
-    Anticipation = Spell(114015),
-    DeathFromAbove = Spell(152150),
-    DeeperStratagem = Spell(193531),
-      ElaboratePlanning = Spell(193640),
-     ElaboratePlanningBuff = Spell(193641),
-      Exsanguinate = Spell(200806),
-      Hemorrhage = Spell(16511),
-      MarkedforDeath = Spell(137619),
-      MasterPoisoner = Spell(196864),
-      Nightstalker = Spell(14062),
-      ShadowFocus = Spell(108209),
-      Subterfuge = Spell(108208),
-    Vigor = Spell(14983),
+      Alacrity                  = Spell(193539),
+      AlacrityBuff              = Spell(193538),
+      Anticipation              = Spell(114015),
+      DeathFromAbove            = Spell(152150),
+      DeeperStratagem           = Spell(193531),
+      ElaboratePlanning         = Spell(193640),
+      ElaboratePlanningBuff     = Spell(193641),
+      Exsanguinate              = Spell(200806),
+      Hemorrhage                = Spell(16511),
+      MarkedforDeath            = Spell(137619),
+      MasterPoisoner            = Spell(196864),
+      Nightstalker              = Spell(14062),
+      ShadowFocus               = Spell(108209),
+      Subterfuge                = Spell(108208),
+      Vigor                     = Spell(14983),
       -- Artifact
-      BagofTricks = Spell(192657),
-      Kingsbane = Spell(192759),
-      UrgetoKill = Spell(192384),
-    -- Defensive
-    CrimsonVial = Spell(185311),
-    Feint = Spell(1966),
-    -- Utility
-    Kick = Spell(1766),
-    Sprint = Spell(2983),
+      BagofTricks               = Spell(192657),
+      Kingsbane                 = Spell(192759),
+      UrgetoKill                = Spell(192384),
+      -- Defensive
+      CrimsonVial               = Spell(185311),
+      Feint                     = Spell(1966),
+      -- Utility
+      Kick                      = Spell(1766),
+      Sprint                    = Spell(2983),
       -- Poisons
-      AgonizingPoison = Spell(200802),
-      AgonizingPoisonDebuff = Spell(200803),
-      DeadlyPoison = Spell(2823),
-      DeadlyPoisonDebuff = Spell(2818),
-      LeechingPoison = Spell(108211),
-    -- Legendaries
-    DreadlordsDeceit = Spell(228224),
+      AgonizingPoison           = Spell(200802),
+      AgonizingPoisonDebuff     = Spell(200803),
+      DeadlyPoison              = Spell(2823),
+      DeadlyPoisonDebuff        = Spell(2818),
+      LeechingPoison            = Spell(108211),
+      -- Legendaries
+      DreadlordsDeceit          = Spell(228224),
       -- Tier
-      MutilatedFlesh = Spell(211672),
-    -- Misc
-    PoolEnergy = Spell(161576)
+      MutilatedFlesh            = Spell(211672),
+      -- Misc
+      PoolEnergy                = Spell(161576)
   };
   local S = Spell.Rogue.Assassination;
 -- Items
@@ -393,7 +393,7 @@ local function APL ()
               if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and
                 not Value:DebuffRefreshable(Rupture, (4+Player:ComboPoints()*4)*0.3) and
                 Value:TimeToDie()-Value:DebuffRemains(Rupture) > 4 then
-                Count = Count + 1;
+                CountA = CountA + 1;
               end
 
               if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and
@@ -403,7 +403,7 @@ local function APL ()
            end
         end
         -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
-        if then
+        if true then
         ShouldReturn = Finish();
         if ShouldReturn then
           return ShouldReturn;
@@ -411,7 +411,7 @@ local function APL ()
       end
         
         -- actions+=/call_action_list,name=build,if=(combo_points.deficit>0|energy.time_to_max<1)
-        if then
+        if true then
         ShouldReturn = Build();
         if ShouldReturn then
           return ShouldReturn;
