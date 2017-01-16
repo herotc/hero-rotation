@@ -15,9 +15,12 @@ Settings.lua
 
 # APL
 APL\DemonHunter_Vengeance.lua
+APL\Druid_Feral.lua
 APL\Paladin_Retribution.lua
 APL\Rogue_Outlaw.lua
 APL\Rogue_Subtlety.lua
+APL\Warrior_Arms.lua
+APL\Warrior_Fury.lua
 
 # UI
 UI.lua
