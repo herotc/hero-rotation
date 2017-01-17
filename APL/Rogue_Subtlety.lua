@@ -392,7 +392,8 @@ local function APL ()
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   --- Out of Combat
     if not Player:AffectingCombat() then
-      if not InCombatLockdown() and not S.Stealth:IsOnCooldown() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and ER.OutOfCombatTime() > 1 then
+      -- Stealth
+      if S.Stealth:IsCastable() and not Player:IsStealthed() then
         if ER.Cast(S.Stealth, Settings.Subtlety.OffGCDasOffGCD.Stealth) then return "Cast"; end
       end
       -- Crimson Vial
@@ -402,7 +403,7 @@ local function APL ()
       -- Flask
       -- Food
       -- Rune
-      -- PrePot w/ DBM Count
+      -- PrePot w/ Bossmod Countdown
       -- Symbols of Death
       if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true) and (ER.BMPullTime() == 60 or (ER.BMPullTime() <= 15 and ER.BMPullTime() >= 14) or (ER.BMPullTime() <= 4 and ER.BMPullTime() >= 3)) then
         if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
@@ -415,8 +416,12 @@ local function APL ()
           elseif S.Eviscerate:IsCastable() then
            if ER.Cast(S.Eviscerate) then return "Cast"; end
           end
-        elseif Player:IsStealthed(true, true) and S.Shadowstrike:IsCastable() then
-          if ER.Cast(S.Shadowstrike) then return "Cast"; end
+        elseif Player:IsStealthed(true, true) then
+          if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+            if ER.Cast(S.ShurikenStorm) then return "Cast"; end
+          elseif S.Shadowstrike:IsCastable() then
+            if ER.Cast(S.Shadowstrike) then return "Cast"; end
+          end
         elseif S.Backstab:IsCastable() then
           if ER.Cast(S.Backstab) then return "Cast"; end
         end
@@ -433,8 +438,7 @@ local function APL ()
     if S.MarkedforDeath:IsCastable() then
       BestUnit, BestUnitTTD = nil, 60;
       for Key, Value in pairs(ER.Cache.Enemies[30]) do
-        -- I increased the SimC condition since we are slower.
-        -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+        -- I increased the SimC condition by 50% since we are slower.
         if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
         end
