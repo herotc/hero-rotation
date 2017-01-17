@@ -488,14 +488,14 @@ ER:RegisterForEvent(
           SpellID = select(12, ...);
 
           -- Shadow Dance
-          if SpellID == 185313 then
+          if SpellID == Spell.Rogue.Subtlety.ShadowDance:ID() then
             Spell.Rogue.Subtlety.ShadowDance.LastCastTime = ER.GetTime();
           -- Shadowmeld
-          elseif SpellID == 58984 then
+          elseif SpellID == Spell.Rogue.Subtlety.Shadowmeld:ID() then
             Spell.Rogue.Outlaw.Shadowmeld.LastCastTime = ER.GetTime();
             Spell.Rogue.Subtlety.Shadowmeld.LastCastTime = ER.GetTime();
           -- Vanish
-          elseif SpellID == 1856 then
+          elseif SpellID == Spell.Rogue.Subtlety.Vanish:ID() then
             Spell.Rogue.Outlaw.Vanish.LastCastTime = ER.GetTime();
             Spell.Rogue.Subtlety.Vanish.LastCastTime = ER.GetTime();
           end
