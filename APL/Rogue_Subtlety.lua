@@ -263,33 +263,51 @@ local function Finish ()
   end
   return false;
 end
-local SoDCode, ShStormCode;
-local function Macro_ShDVanish (Offset)
-  SoDCode, ShStormCode = 0, 0;
+local SoDMacro, ShStormMacro;
+local function StealthMacro(MacroType)
+  SoDMacro, ShStormMacro = false, false;
   -- Will we SoD ?
   if S.SymbolsofDeath:IsCastable() and ((Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5)) or (I.ShadowSatyrsWalk:IsEquipped(8) and Player:EnergyTimeToMax() < 0.25)) then
-    SoDCode = 100;
+    SoDMacro = true;
   end
   -- Will we Shuriken Storm ?
-  if ER.AoEON() and S.ShurikenStorm:IsCastable() and ((Player:ComboPointsDeficit() >= 3 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0)) or (Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-    ShStormCode = 10;
+  if ER.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
+      and ((Player:ComboPointsDeficit() >= 3 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
+        or (Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2 + (S.Premeditation:IsAvailable() and 1 or 0)
+          + (Player:Buff(S.ShadowBlades) and 1 or 0) and Player:BuffStack(S.DreadlordsDeceit) >= 29))
+  then
+    ShStormMacro = true;
   end
-  return 9999000+SoDCode+ShStormCode+Offset;
+  if MacroType == "ShD" then
+    if ShStormMacro then
+      return SoDMacro and 9999261004 or 9999261002;
+    else
+      return SoDMacro and 9999261003 or 9999261001;
+    end
+  elseif MacroType == "Van" then
+    if ShStormMacro then
+      return SoDMacro and 9999261008 or 9999261006;
+    else
+      return SoDMacro and 9999261007 or 9999261005;
+    end
+  elseif MacroType == "SM" then
+    return SoDMacro and 9999261010 or 9999261009;
+  end
 end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
   if Target:IsInRange(5) then
     -- actions.stealth_cds=shadow_dance,if=charges_fractional>=2.45
     if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= 2.45 then
-      if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
+      if ER.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/vanish
     if ER.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 then
-      if ER.Cast(MacroLookupSpell[Macro_ShDVanish(1)]) then return "Cast"; end
+      if ER.Cast(MacroLookupSpell[StealthMacro("Van")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=charges>=2&combo_points<=1
     if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
-      if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
+      if ER.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40-variable.ssw_refund&energy.deficit>=10+variable.ssw_refund
     if ER.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and S.ShadowDance:ChargesFractional() < 2.45 and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10+SSW_Refund() then
@@ -297,11 +315,11 @@ local function Stealth_CDs ()
       if Player:Energy() < 40 then
         if ER.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
       end
-      if ER.Cast(MacroLookupSpell[9999002]) then return "Cast"; end
+      if ER.Cast(MacroLookupSpell[StealthMacro("SM")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
     if (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
-      if ER.Cast(MacroLookupSpell[Macro_ShDVanish(0)]) then return "Cast"; end
+      if ER.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
   end
   return false;
@@ -332,11 +350,9 @@ local function Stealthed ()
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
   if ER.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-      and ((Player:ComboPointsDeficit() >= 3 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable()
-        and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
-      or (Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2
-        + (S.Premeditation:IsAvailable() and 1 or 0)
-        + (Player:Buff(S.ShadowBlades) and 1 or 0) and Player:BuffStack(S.DreadlordsDeceit) >= 29))
+      and ((Player:ComboPointsDeficit() >= 3 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
+        or (Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2 + (S.Premeditation:IsAvailable() and 1 or 0)
+          + (Player:Buff(S.ShadowBlades) and 1 or 0) and Player:BuffStack(S.DreadlordsDeceit) >= 29))
   then
     if ER.Cast(S.ShurikenStorm) then return "Cast"; end
   end
