@@ -211,7 +211,7 @@ end
     ER.Nameplate.HideTTD();
     for i = 1, 40 do
       Count = tostring(i);
-      
+
       Nameplate = C_NamePlate.GetNamePlateForUnit("nameplate"..Count);
       if Nameplate then
         -- Update TTD
@@ -231,7 +231,7 @@ end
             ER.Nameplate.TTD[FrameID]:Show();
           end
         end
-        
+
       end
     end
   end
@@ -243,7 +243,7 @@ end
       if Value:IsVisible() then
         Value:Hide();
       end
-    end  
+    end
   end
 
   -- Add the Icon on Nameplates (and on Left Icon frame)
@@ -272,7 +272,6 @@ end
         ER.NameplateIconFrame:SetPoint("CENTER", Nameplate.UnitFrame.healthBar, "CENTER", 0, 0);
         ER.NameplateIconFrame:Show();
       end
-      ER.Nameplate.IconAdded = true;
 
       -- Display the left icon
       ER.LeftIconFrame:ChangeLeftIcon(ER.GetTexture(SpellID));
@@ -280,6 +279,8 @@ end
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
       ER.LastUnitCycled = ThisUnit;
       ER.LastUnitCycledTime = ER.GetTime();
+
+      ER.Nameplate.IconAdded = true;
     end
   end
 
@@ -289,9 +290,9 @@ end
     if ER.NameplateIconFrame:IsVisible() then
       ER.NameplateIconFrame:Hide();
     end
-    ER.Nameplate.IconAdded = false;
     -- Left Icon
     if ER.LeftIconFrame:IsVisible() then
       ER.LeftIconFrame:Hide();
     end
+    ER.Nameplate.IconAdded = false;
   end
