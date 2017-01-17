@@ -7,11 +7,17 @@
 ## LoadOnDemand: 0
 ## SavedVariables: ERSettings
 
+# TODO: Make APL & APL Commons loaded as module, instead of loaded every classes.
 
 # API
 Core.lua
 Events.lua
 Settings.lua
+
+# APL Commons
+APL\Commons\Everyone.lua
+APL\Commons\Rogue.lua
+#APL\Commons\Warrior.lua
 
 # APL
 APL\DemonHunter_Vengeance.lua
