@@ -1875,8 +1875,8 @@ end
     end
 
     -- !cooldown.foo.up
-    function Spell:IsOnCooldown ()
-      return self:Cooldown() ~= 0;
+    function Spell:IsOnCooldown (BypassRecovery)
+      return self:Cooldown(BypassRecovery) ~= 0;
     end
 
     -- artifact.foo.rank
