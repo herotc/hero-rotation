@@ -69,7 +69,7 @@ local pairs = pairs;
     DreadlordsDeceit        = Spell(228224),
     -- Misc
     DeathlyShadows          = Spell(188700),
-    PoolEnergy              = Spell(161576),
+    PoolEnergy              = Spell(9999000001),
     -- Macros
     Macros = {
       ShDSS                 = Spell(9999261001),
@@ -406,6 +406,11 @@ end
 local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
+  -- Unit Update
+  if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
+  ER.GetEnemies(10); -- Shuriken Storm
+  ER.GetEnemies(8); -- Death From Above
+  ER.GetEnemies(5); -- Melee
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
@@ -447,11 +452,6 @@ local function APL ()
       return;
     end
   -- In Combat
-    -- Unit Update
-    if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
-    ER.GetEnemies(10); -- Shuriken Storm
-    ER.GetEnemies(8); -- Death From Above
-    ER.GetEnemies(5); -- Melee
     -- MfD Sniping
     if S.MarkedforDeath:IsCastable() then
       BestUnit, BestUnitTTD = nil, 60;
