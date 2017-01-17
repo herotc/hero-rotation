@@ -16,79 +16,78 @@ local pairs = pairs;
   if not Spell.Rogue then Spell.Rogue = {}; end
   Spell.Rogue.Subtlety = {
     -- Racials
-    ArcaneTorrent         = Spell(25046),
-    Berserking           = Spell(26297),
-    BloodFury            = Spell(20572),
-    GiftoftheNaaru        = Spell(59547),
-    Shadowmeld           = Spell(58984),
+    ArcaneTorrent           = Spell(25046),
+    Berserking              = Spell(26297),
+    BloodFury               = Spell(20572),
+    GiftoftheNaaru          = Spell(59547),
+    Shadowmeld              = Spell(58984),
     -- Abilities
-    Backstab            = Spell(53),
-    Eviscerate           = Spell(196819),
-    Nightblade           = Spell(195452),
-    ShadowBlades          = Spell(121471),
-    ShadowDance          = Spell(185313),
-    Shadowstrike          = Spell(185438),
-    ShurikenStorm         = Spell(197835),
-    ShurikenToss          = Spell(114014),
-    Stealth             = Spell(1784),
-    SymbolsofDeath        = Spell(212283),
-    Vanish              = Spell(1856),
+    Backstab                = Spell(53),
+    Eviscerate              = Spell(196819),
+    Nightblade              = Spell(195452),
+    ShadowBlades            = Spell(121471),
+    ShadowDance             = Spell(185313),
+    Shadowstrike            = Spell(185438),
+    ShurikenStorm           = Spell(197835),
+    ShurikenToss            = Spell(114014),
+    Stealth                 = Spell(1784),
+    SymbolsofDeath          = Spell(212283),
+    Vanish                  = Spell(1856),
     -- Talents
-    Alacrity            = Spell(193539),
-    AlacrityBuff          = Spell(193538),
-    Anticipation          = Spell(114015),
-    DeathFromAbove        = Spell(152150),
-    DeeperStratagem        = Spell(193531),
-    EnvelopingShadows      = Spell(206237),
-    Gloomblade           = Spell(200758),
-    MarkedforDeath        = Spell(137619),
-    MasterofShadows        = Spell(196976),
-    MasterOfSubtlety       = Spell(31223),
+    Alacrity                = Spell(193539),
+    AlacrityBuff            = Spell(193538),
+    Anticipation            = Spell(114015),
+    DeathFromAbove          = Spell(152150),
+    DeeperStratagem         = Spell(193531),
+    EnvelopingShadows       = Spell(206237),
+    Gloomblade              = Spell(200758),
+    MarkedforDeath          = Spell(137619),
+    MasterofShadows         = Spell(196976),
+    MasterOfSubtlety        = Spell(31223),
     MasterOfSubtletyBuff    = Spell(31665),
-    Premeditation         = Spell(196979),
-    ShadowFocus          = Spell(108209),
-    Subterfuge           = Spell(108208),
-    Vigor              = Spell(14983),
+    Premeditation           = Spell(196979),
+    ShadowFocus             = Spell(108209),
+    Subterfuge              = Spell(108208),
+    Vigor                   = Spell(14983),
     -- Artifact
     FinalityEviscerate      = Spell(197496),
     FinalityNightblade      = Spell(195452),
-    FlickeringShadows      = Spell(197256),
-    GoremawsBite          = Spell(209782),
-    LegionBlade          = Spell(214930),
-    ShadowFangs          = Spell(221856),
+    FlickeringShadows       = Spell(197256),
+    GoremawsBite            = Spell(209782),
+    LegionBlade             = Spell(214930),
+    ShadowFangs             = Spell(221856),
     -- Defensive
-    CrimsonVial          = Spell(185311),
-    Feint              = Spell(1966),
+    CrimsonVial             = Spell(185311),
+    Feint                   = Spell(1966),
     -- Utility
-    Blind              = Spell(2094),
-    CheapShot            = Spell(1833),
-    Kick               = Spell(1766),
-    KidneyShot           = Spell(408),
-    Sprint              = Spell(2983),
+    Blind                   = Spell(2094),
+    CheapShot               = Spell(1833),
+    Kick                    = Spell(1766),
+    KidneyShot              = Spell(408),
+    Sprint                  = Spell(2983),
     -- Legendaries
-    DreadlordsDeceit       = Spell(228224),
+    DreadlordsDeceit        = Spell(228224),
     -- Misc
-    DeathlyShadows        = Spell(188700),
-    PoolEnergy           = Spell(161576),
+    DeathlyShadows          = Spell(188700),
+    PoolEnergy              = Spell(161576),
     -- Macros
     Macros = {
-      ShDSS             = Spell(9999261001),
-      ShDShStorm          = Spell(9999261002),
-      ShDSoDSS           = Spell(9999261003),
-      ShDSoDShStorm        = Spell(9999261004),
-      VanSS             = Spell(9999261005),
-      VanShStorm          = Spell(9999261006),
-      VanSoDSS           = Spell(9999261007),
-      VanSoDShStorm        = Spell(9999261008),
-      SMSS              = Spell(9999261009),
-      SMSoDSS            = Spell(9999261010)
+      ShDSS                 = Spell(9999261001),
+      ShDShStorm            = Spell(9999261002),
+      ShDSoDSS              = Spell(9999261003),
+      ShDSoDShStorm         = Spell(9999261004),
+      VanSS                 = Spell(9999261005),
+      VanShStorm            = Spell(9999261006),
+      VanSoDSS              = Spell(9999261007),
+      VanSoDShStorm         = Spell(9999261008),
+      SMSS                  = Spell(9999261009),
+      SMSoDSS               = Spell(9999261010)
     }
   };
   local S = Spell.Rogue.Subtlety;
   S.Eviscerate:RegisterDamage(
     -- Eviscerate DMG Formula (Pre-Mitigation):
     --  AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * LegionBlade_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M
-    -- TODO: Update DS Coef to 5% instead of 10% in 7.1.5
     function ()
       return
         -- Attack Power
@@ -109,7 +108,7 @@ local pairs = pairs;
         -- Master of Subtlety Multiplier
         (Player:Buff(S.MasterOfSubtletyBuff) and 1.1 or 1) *
         -- Deeper Stratagem Multiplier
-        (S.DeeperStratagem:IsAvailable() and 1.1 or 1) *
+        (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
         -- Symbols of Death Multiplier
         (Player:Buff(S.SymbolsofDeath) and 1.2 or 1) *
         -- Mastery Finisher Multiplier
@@ -130,15 +129,16 @@ local pairs = pairs;
   local ShouldReturn, ShouldReturn2; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling
   local MacroLookupSpell = {
-    [9999000] = S.Macros.ShDSS,
-    [9999010] = S.Macros.ShDShStorm,
-    [9999100] = S.Macros.ShDSoDSS,
-    [9999110] = S.Macros.ShDSoDShStorm,
-    [9999001] = S.Macros.VanSS,
-    [9999011] = S.Macros.VanShStorm,
-    [9999101] = S.Macros.VanSoDSS,
-    [9999111] = S.Macros.VanSoDShStorm,
-    [9999002] = S.Macros.SMSS
+    [9999261001] = S.Macros.ShDSS,
+    [9999261002] = S.Macros.ShDShStorm,
+    [9999261003] = S.Macros.ShDSoDSS,
+    [9999261004] = S.Macros.ShDSoDShStorm,
+    [9999261005] = S.Macros.VanSS,
+    [9999261006] = S.Macros.VanShStorm,
+    [9999261007] = S.Macros.VanSoDSS,
+    [9999261008] = S.Macros.VanSoDShStorm,
+    [9999261009] = S.Macros.SMSS,
+    [9999261010] = S.Macros.SMSoDSS
   };
 -- GUI Settings
   local Settings = {
@@ -205,9 +205,8 @@ local function CDs ()
    end
    -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=2.45&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
    if S.GoremawsBite:IsCastable() and not Player:IsStealthed(true, true) and S.ShadowDance:ChargesFractional() <= 2.45
-       and ((Player:ComboPointsDeficit() >= 4-(ER.CombatTime() < 10 and 2 or 0)
-         and Player:EnergyDeficit() > 50 + (S.Vigor:IsAvailable() and 25 or 0) - (ER.CombatTime() >= 10 and 15 or 0))
-       or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8))
+       and ((Player:ComboPointsDeficit() >= 4-(ER.CombatTime() < 10 and 2 or 0) and Player:EnergyDeficit() > 50 + (S.Vigor:IsAvailable() and 25 or 0) - (ER.CombatTime() >= 10 and 15 or 0))
+         or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8))
    then
     if ER.Cast(S.GoremawsBite) then return "Cast"; end
    end
@@ -434,9 +433,9 @@ local function APL ()
     if S.MarkedforDeath:IsCastable() then
       BestUnit, BestUnitTTD = nil, 60;
       for Key, Value in pairs(ER.Cache.Enemies[30]) do
-        if not Value:IsMfdBlacklisted() and
-          Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and
-          Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
+        -- I increased the SimC condition since we are slower.
+        -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+        if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
         end
       end
@@ -518,9 +517,8 @@ local function APL ()
         end
       end
       -- Shuriken Toss Out of Range
-      if S.ShurikenToss:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(20)
-        and not Player:IsStealthed(true, true) and not Player:Buff(S.Sprint) and Player:EnergyDeficit() < 20
-        and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2)
+      if S.ShurikenToss:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(20) and not Player:IsStealthed(true, true) and not Player:Buff(S.Sprint)
+          and Player:EnergyDeficit() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2)
       then
         if ER.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end
