@@ -348,17 +348,18 @@ end
 local function APL ()
   --- Out of Combat
   if not Player:AffectingCombat() then
-    if not InCombatLockdown() and not S.Stealth:IsOnCooldown() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and ER.OutOfCombatTime() > 1 then
-      if ER.Cast(S.Stealth, Settings.Outlaw.OffGCDasOffGCD.Stealth) then return "Cast Stealth"; end
+    -- Stealth
+    if S.Stealth:IsCastable() and not Player:IsStealthed() then
+      if ER.Cast(S.Stealth, Settings.Outlaw.OffGCDasOffGCD.Stealth) then return "Cast"; end
     end
     -- Crimson Vial
     if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 80 then
-      if ER.Cast(S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial"; end
+      if ER.Cast(S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial) then return "Cast"; end
     end
     -- Flask
     -- Food
     -- Rune
-    -- PrePot w/ DBM Count
+    -- PrePot w/ Bossmod Countdown
     -- Opener
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
       if Player:ComboPoints() >= 5 then

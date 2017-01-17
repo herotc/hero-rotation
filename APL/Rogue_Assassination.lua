@@ -311,7 +311,8 @@ local function APL ()
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   --- Out of Combat
     if not Player:AffectingCombat() then
-      if not InCombatLockdown() and not S.Stealth:IsOnCooldown() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and ER.OutOfCombatTime() > 1 then
+      -- Stealth
+      if S.Stealth:IsCastable() and not Player:IsStealthed() then
         if ER.Cast(S.Stealth, Settings.Assassination.OffGCDasOffGCD.Stealth) then return "Cast"; end
       end
       -- Crimson Vial
@@ -321,7 +322,7 @@ local function APL ()
       -- Flask
       -- Food
       -- Rune
-      -- PrePot w/ DBM Count
+      -- PrePot w/ Bossmod Countdown
       -- Opener
       if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
