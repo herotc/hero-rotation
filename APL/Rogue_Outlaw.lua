@@ -73,6 +73,7 @@ local tostring = tostring;
   };
   local I = Item.Rogue.Outlaw;
 -- Rotation Var
+  local ShouldReturn; -- Used to get the return string
   local EnemiesCount = {
     [8] = 1,
     [6] = 1
@@ -349,12 +350,14 @@ local function APL ()
   --- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
-    if S.Stealth:IsCastable() and not Player:IsStealthed() then
-      if ER.Cast(S.Stealth, Settings.Outlaw.OffGCDasOffGCD.Stealth) then return "Cast"; end
+    ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth, Settings.Outlaw.OffGCDasOffGCD.Stealth);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     -- Crimson Vial
-    if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 80 then
-      if ER.Cast(S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial) then return "Cast"; end
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial, 80);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     -- Flask
     -- Food
@@ -410,12 +413,14 @@ local function APL ()
       end
     end
     -- Crimson Vial
-    if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 35 then
-      if ER.Cast(S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial"; end
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial, 35);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     -- Feint
-    if S.Feint:IsCastable() and not Player:Buff(S.Feint) and Player:HealthPercentage() <= 10 then
-      if ER.Cast(S.Feint, Settings.Outlaw.GCDasOffGCD.Feint) then return "Cast Feint"; end
+    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint, Settings.Outlaw.GCDasOffGCD.Feint, 10);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     -- actions+=/call_action_list,name=bf
     if BF() then

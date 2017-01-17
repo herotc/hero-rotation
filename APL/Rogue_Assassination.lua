@@ -357,12 +357,14 @@ local function APL ()
       end
     end
     -- Crimson Vial
-    if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 35 then
-      if ER.Cast(S.CrimsonVial, Settings.Assassination.GCDasOffGCD.CrimsonVial) then return "Cast"; end
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Assassination.GCDasOffGCD.CrimsonVial, 35);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     -- Feint
-    if S.Feint:IsCastable() and not Player:Buff(S.Feint) and Player:HealthPercentage() <= 10 then
-      if ER.Cast(S.Feint, Settings.Assassination.GCDasOffGCD.Feint) then return "Cast Kick"; end
+    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint, Settings.Assassination.GCDasOffGCD.Feint, 10);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       -- Mythic Dungeon

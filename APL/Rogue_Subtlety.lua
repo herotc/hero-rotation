@@ -126,7 +126,7 @@ local pairs = pairs;
   };
   local I = Item.Rogue.Subtlety;
 -- Rotation Var
-  local ShouldReturn, ShouldReturn2; -- Used to get the return string
+  local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling
   local MacroLookupSpell = {
     [9999261001] = S.Macros.ShDSS,
@@ -393,12 +393,14 @@ local function APL ()
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-      if S.Stealth:IsCastable() and not Player:IsStealthed() then
-        if ER.Cast(S.Stealth, Settings.Subtlety.OffGCDasOffGCD.Stealth) then return "Cast"; end
+      ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth, Settings.Subtlety.OffGCDasOffGCD.Stealth);
+      if ShouldReturn then
+        return ShouldReturn;
       end
       -- Crimson Vial
-      if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 80 then
-        if ER.Cast(S.CrimsonVial, Settings.Subtlety.GCDasOffGCD.CrimsonVial) then return "Cast"; end
+      ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Subtlety.GCDasOffGCD.CrimsonVial, 80);
+      if ShouldReturn then
+        return ShouldReturn;
       end
       -- Flask
       -- Food
@@ -448,12 +450,14 @@ local function APL ()
       end
     end
     -- Crimson Vial
-    if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 35 then
-      if ER.Cast(S.CrimsonVial, Settings.Subtlety.GCDasOffGCD.CrimsonVial) then return "Cast"; end
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Subtlety.GCDasOffGCD.CrimsonVial, 35);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     -- Feint
-    if S.Feint:IsCastable() and not Player:Buff(S.Feint) and Player:HealthPercentage() <= 10 then
-      if ER.Cast(S.Feint, Settings.Subtlety.GCDasOffGCD.Feint) then return "Cast Kick"; end
+    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint, Settings.Subtlety.GCDasOffGCD.Feint, 10);
+    if ShouldReturn then
+      return ShouldReturn;
     end
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       -- Mythic Dungeon
