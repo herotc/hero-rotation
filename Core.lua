@@ -111,7 +111,7 @@ function ER.GetTexture (Object)
   if Object.SpellID then
     if not ER.PersistentCache.Texture.Spell[Object.SpellID] then
       -- Check if the SpellID is the one from Custom Icons or a Reguler WoW Spell
-      if Object.SpellID >= 9999000 then
+      if Object.SpellID >= 9999000000 then
         ER.PersistentCache.Texture.Spell[Object.SpellID] = "Interface\\Addons\\EasyRaid\\Media\\Icons\\"..tostring(Object.SpellID);
       else
         ER.PersistentCache.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);

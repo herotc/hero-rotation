@@ -25,7 +25,7 @@ ER.NameplateIconFrame = CreateFrame("Frame", "EasyRaid_NameplateIconFrame", UIPa
 
 
 --- Reset Textures
-local IdleSpell = Spell(134400);
+local IdleSpell = Spell(9999000000);
 function ER.ResetIcons ()
   ER.MainIconFrame:ChangeMainIcon(ER.GetTexture(IdleSpell)); -- "No Icon"
   ER.SmallIconFrame:HideIcons();

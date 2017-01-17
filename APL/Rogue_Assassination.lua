@@ -68,7 +68,7 @@ local pairs = pairs;
       -- Tier
       MutilatedFlesh            = Spell(211672),
       -- Misc
-      PoolEnergy                = Spell(161576)
+      PoolEnergy                = Spell(9999000001)
   };
   local S = Spell.Rogue.Assassination;
 -- Items
