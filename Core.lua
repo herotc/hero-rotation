@@ -1852,9 +1852,9 @@ end
     end
 
     -- cooldown.foo.remains
-    function Spell:Cooldown ()
+    function Spell:Cooldown (BypassRecovery)
       if not ER.Cache.SpellInfo[self.SpellID] then ER.Cache.SpellInfo[self.SpellID] = {}; end
-      if not ER.Cache.SpellInfo[self.SpellID].Cooldown then
+      if (not BypassRecovery and not ER.Cache.SpellInfo[self.SpellID].Cooldown) or (BypassRecovery and not ER.Cache.SpellInfo[self.SpellID].CooldownNoRecovery) then
         -- Get Spell Cooldown Infos
         _T.CDTime, _T.CDValue = GetSpellCooldown(self.SpellID);
         -- Return 0 if the Spell isn't in CD.
@@ -1862,11 +1862,16 @@ end
           return 0;
         end
         -- Compute the CD.
-        _T.CD = _T.CDTime + _T.CDValue - ER.GetTime() - ER.RecoveryOffset();
-        -- Return the Spell CD
-        ER.Cache.SpellInfo[self.SpellID].Cooldown = _T.CD > 0 and _T.CD or 0;
+        _T.CD = _T.CDTime + _T.CDValue - ER.GetTime() - (BypassRecovery and 0 or ER.RecoveryOffset());
+        if BypassRecovery then
+          -- Return the Spell CD
+          ER.Cache.SpellInfo[self.SpellID].CooldownNoRecovery = _T.CD > 0 and _T.CD or 0;
+        else
+          -- Return the Spell CD
+          ER.Cache.SpellInfo[self.SpellID].Cooldown = _T.CD > 0 and _T.CD or 0;
+        end
       end
-      return ER.Cache.SpellInfo[self.SpellID].Cooldown;
+      return BypassRecovery and ER.Cache.SpellInfo[self.SpellID].CooldownNoRecovery or ER.Cache.SpellInfo[self.SpellID].Cooldown;
     end
 
     -- !cooldown.foo.up
