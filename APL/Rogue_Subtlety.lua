@@ -143,6 +143,7 @@ local pairs = pairs;
 -- GUI Settings
   local Settings = {
     General = ER.GUISettings.General,
+    Commons = ER.GUISettings.APL.Rogue.Commons,
     Subtlety = ER.GUISettings.APL.Rogue.Subtlety
   };
 
@@ -411,107 +412,71 @@ local function APL ()
   ER.GetEnemies(10); -- Shuriken Storm
   ER.GetEnemies(8); -- Death From Above
   ER.GetEnemies(5); -- Melee
+  --- Defensives
+    -- Crimson Vial
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial);
+    if ShouldReturn then return ShouldReturn; end
+    -- Feint
+    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint);
+    if ShouldReturn then return ShouldReturn; end
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-      ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth, Settings.Subtlety.OffGCDasOffGCD.Stealth);
-      if ShouldReturn then
-        return ShouldReturn;
-      end
-      -- Crimson Vial
-      ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Subtlety.GCDasOffGCD.CrimsonVial, 80);
-      if ShouldReturn then
-        return ShouldReturn;
-      end
+      ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth);
+      if ShouldReturn then return ShouldReturn; end
       -- Flask
       -- Food
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Symbols of Death
       if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true) and (ER.BMPullTime() == 60 or (ER.BMPullTime() <= 15 and ER.BMPullTime() >= 14) or (ER.BMPullTime() <= 4 and ER.BMPullTime() >= 3)) then
-        if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
+        if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death (OOC)"; end
       end
       -- Opener
       if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
           if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade) and Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset then
-           if ER.Cast(S.Nightblade) then return "Cast"; end
+           if ER.Cast(S.Nightblade) then return "Cast Nightblade (OOC)"; end
           elseif S.Eviscerate:IsCastable() then
-           if ER.Cast(S.Eviscerate) then return "Cast"; end
+           if ER.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
           end
         elseif Player:IsStealthed(true, true) then
           if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
-            if ER.Cast(S.ShurikenStorm) then return "Cast"; end
+            if ER.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
           elseif S.Shadowstrike:IsCastable() then
-            if ER.Cast(S.Shadowstrike) then return "Cast"; end
+            if ER.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
           end
         elseif S.Backstab:IsCastable() then
-          if ER.Cast(S.Backstab) then return "Cast"; end
+          if ER.Cast(S.Backstab) then return "Cast Backstab (OOC)"; end
         end
       end
       return;
     end
   -- In Combat
     -- MfD Sniping
-    if S.MarkedforDeath:IsCastable() then
-      BestUnit, BestUnitTTD = nil, 60;
-      for Key, Value in pairs(ER.Cache.Enemies[30]) do
-        -- I increased the SimC condition by 50% since we are slower.
-        if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then
-          BestUnit, BestUnitTTD = Value, Value:TimeToDie();
-        end
-      end
-      if BestUnit then
-        ER.Nameplate.AddIcon(BestUnit, S.MarkedforDeath);
-      end
-    end
-    -- Crimson Vial
-    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Subtlety.GCDasOffGCD.CrimsonVial, 35);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
-    -- Feint
-    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint, Settings.Subtlety.GCDasOffGCD.Feint, 10);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
+    ER.Commons.Rogue.MfDSniping(S.MarkedforDeath);
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       -- Mythic Dungeon
       ShouldReturn = MythicDungeon();
-      if ShouldReturn then
-        return ShouldReturn;
-      end
+      if ShouldReturn then return ShouldReturn; end
       -- Training Scenario
-      if TrainingScenario() then
-        return;
-      end
+      ShouldReturn = TrainingScenario();
+      if ShouldReturn then return ShouldReturn; end
       -- Interrupts
-      if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(5) then
-        if S.Kick:IsCastable() then
-          if ER.Cast(S.Kick, Settings.Subtlety.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
-        elseif Settings.General.InterruptWithStun and Target:CanBeStunned() then
-          if S.Blind:IsCastable() then
-           if ER.Cast(S.Blind) then return "Cast"; end
-          elseif S.KidneyShot:IsCastable() and Player:ComboPoints() > 0 then
-           if ER.Cast(S.KidneyShot) then return "Cast"; end
-          elseif S.CheapShot:IsCastable() and Player:IsStealthed(true, true) then
-           if ER.Cast(S.CheapShot) then return "Cast"; end
-          end
-        end
-      end
+      ER.Commons.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
+        {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
+        {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
+        {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
+      });
       -- actions+=/call_action_list,name=cds
       if ER.CDsON() then
         ShouldReturn = CDs();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/run_action_list,name=stealthed,if=stealthed.all
       if Player:IsStealthed(true, true) then
         ShouldReturn = Stealthed();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
         -- run_action_list forces the return
         if Player:Energy() < 30 then -- To avoid pooling icon spam
           if ER.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end
@@ -522,23 +487,17 @@ local function APL ()
       -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
       if Player:ComboPoints() >= 5 or (ER.AoEON() and Player:ComboPoints() >= 4 and ER.Cache.EnemiesCount[10] >= 3 and ER.Cache.EnemiesCount[10] <= 4) then
         ShouldReturn = Finish();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=stealth_als,if=combo_points.deficit>=2+talent.premeditation.enabled
       if Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0) then
         ShouldReturn = Stealth_ALS();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
       if Player:EnergyDeficit() <= Stealth_Threshold() then
         ShouldReturn = Build();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
       -- Shuriken Toss Out of Range
       if S.ShurikenToss:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(20) and not Player:IsStealthed(true, true) and not Player:Buff(S.Sprint)
@@ -556,6 +515,7 @@ end
 ER.SetAPL(261, APL);
 
 -- Last Update: 01/16/2017
+
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
 -- actions.precombat+=/augmentation,name=defiled
@@ -570,7 +530,7 @@ ER.SetAPL(261, APL);
 -- actions.precombat+=/variable,name=stealth_threshold,value=(15+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+variable.ssw_refund)
 -- actions.precombat+=/enveloping_shadows,if=combo_points>=5
 -- actions.precombat+=/symbols_of_death
---
+
 -- # Executed every time the actor is available.
 -- actions=call_action_list,name=cds
 -- # Fully switch to the Stealthed Rotation (by doing so, it forces pooling if nothing is available)
@@ -578,12 +538,12 @@ ER.SetAPL(261, APL);
 -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
 -- actions+=/call_action_list,name=stealth_als,if=combo_points.deficit>=2+talent.premeditation.enabled
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
---
+
 -- # Builders
 -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
---
+
 -- # Cooldowns
 -- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
 -- actions.cds+=/blood_fury,if=stealthed.rogue
@@ -592,21 +552,21 @@ ER.SetAPL(261, APL);
 -- actions.cds+=/shadow_blades,if=combo_points<=2|(equipped.denial_of_the_halfgiants&combo_points>=1)
 -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=2.45&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
---
+
 -- # Finishers
 -- actions.finish=enveloping_shadows,if=buff.enveloping_shadows.remains<target.time_to_die&buff.enveloping_shadows.remains<=combo_points*1.8
 -- actions.finish+=/death_from_above,if=spell_targets.death_from_above>=6
 -- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die>8&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time)
 -- actions.finish+=/death_from_above
 -- actions.finish+=/eviscerate
---
+
 -- # Stealth Action List Starter
 -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=2.45|energy.deficit>=10)
 -- actions.stealth_als+=/sprint_offensive,if=energy.time_to_max>3
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
---
+
 -- # Stealth Cooldowns
 -- actions.stealth_cds=shadow_dance,if=charges_fractional>=2.45
 -- actions.stealth_cds+=/vanish
@@ -614,7 +574,7 @@ ER.SetAPL(261, APL);
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10+variable.ssw_refund
 -- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
---
+
 -- # Stealthed Rotation
 -- actions.stealthed=symbols_of_death,if=(buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3)|equipped.shadow_satyrs_walk&energy.time_to_max<0.25
 -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
