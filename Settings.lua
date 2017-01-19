@@ -6,23 +6,25 @@ ER.GUISettings = {
     -- Main Frame Strata
     MainFrameStrata = "HIGH",
     -- Recovery Timer
-    RecoveryMode = "GCD"; -- "GCD" to always display the next ability, "Custom" for Custom Timer.
+    RecoveryMode = "GCD"; -- "GCD" to always display the next ability, "Custom" for Custom RecoveryTimer
     RecoveryTimer = 950;
     -- Interrupt
     InterruptEnabled = false,
-    InterruptWithStun = false,
+    InterruptWithStun = false, -- EXPERIMENTAL
+    -- SoloMode try to maximize survivability at the cost of dps
+    SoloMode = true,
     -- Blacklist Settings
     Blacklist = {
       -- During how many times the GCD time you want to blacklist an unit from Cycling
-      -- when you got an error when trying to cast on it.
+      -- when you got an error when trying to cast on it
       NotFacingExpireMultiplier = 3,
-      -- Custom List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key.
+      -- Custom List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key
       UserDefined = {
         -- Example with fake NPCID:
         -- [123456] = true;
         -- [123456] = function (self) return self:HealthPercentage() <= 80 and true or false; end
       },
-      -- Custom Cycle List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key.
+      -- Custom Cycle List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key
       CycleUserDefined = {
         -- Example with fake NPCID:
         -- [123456] = true;
@@ -58,10 +60,9 @@ ER.GUISettings = {
     },
     Paladin = {
       Retribution = {
-        -- SoloMode try to maximize survivability when not near full life
-        SoloMode = true,
-        SoloJusticarDP = 80,
-        SoloJusticar5HP = 60,
+        -- SoloMode Settings
+        SoloJusticarDP = 80, -- % HP threshold to use Justicar's Vengeance with Divine Purpose proc.
+        SoloJusticar5HP = 60, -- % HP threshold to use Justicar's Vengeance with 5 Holy Power.
         -- {Display GCD as OffGCD, ForceReturn}
         GCDasOffGCD = {
           HolyWrath = {true, false}
@@ -77,35 +78,10 @@ ER.GUISettings = {
       }
     },
     Rogue = {
-      Assassination = {
-        -- {Display GCD as OffGCD, ForceReturn}
-        GCDasOffGCD = {
-          CrimsonVial = {true, false},
-          Feint = {true, false}
-        },
-        -- {Display OffGCD as OffGCD, ForceReturn}
-        OffGCDasOffGCD = {
-          -- Racials
-          ArcaneTorrent = {true, false},
-          Berserking = {true, false},
-          BloodFury = {true, false},
-          -- Stealth CDs
-          Vanish = {true, false},
-          -- Spec
-          Kick = {true, false},
-          MarkedforDeath = {false, false},
-          Stealth = {true, false},
-          Vendetta = {true, false}
-        }
-      },
-      Outlaw = {
-        -- Roll the Bones Logic, accepts "Default", "1+ Buff" and every "RtBName".
-        -- Useful for Cenarius where you want to fish for Cenarius
-        -- "Default", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"
-        RolltheBonesLogic = "Default",
-        RolltheBonesLeechHP = 60, -- False or % HP, reroll for Grand Melee when HP <.
-        -- Blade Flurry TimeOut
-        BFOffset = 3,
+      Commons = {
+        -- SoloMode Settings
+        CrimsonVialHP = 30,
+        FeintHP = 10,
         -- {Display GCD as OffGCD, ForceReturn}
         GCDasOffGCD = {
           CrimsonVial = {true, false},
@@ -120,38 +96,55 @@ ER.GUISettings = {
           -- Stealth CDs
           Shadowmeld = {true, false},
           Vanish = {true, false},
-          -- Spec
-          AdrenalineRush = {true, false},
-          CurseoftheDreadblades = {true, false},
-          BladeFlurry = {true, false},
+          -- Abilities
           Kick = {true, false},
           MarkedforDeath = {false, false},
           Sprint = {true, false},
-          Stealth = {true, false},
-          SymbolsofDeath = {true, false}
+          Stealth = {true, false}
+        }
+      },
+      Assassination = {
+        -- {Display GCD as OffGCD, ForceReturn}
+        GCDasOffGCD = {
+        },
+        -- {Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+          -- Abilities
+          Vendetta = {true, false}
+        }
+      },
+      Outlaw = {
+        -- Roll the Bones Logic, accepts "Default", "1+ Buff" and every "RtBName".
+        -- Useful for Cenarius where you want to fish for Cenarius
+        -- "Default", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"
+        RolltheBonesLogic = "Default",
+        -- Blade Flurry TimeOut
+        BFOffset = 3,
+        -- SoloMode Settings
+        RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
+        -- {Display GCD as OffGCD, ForceReturn}
+        GCDasOffGCD = {
+        },
+        -- {Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+          -- Abilities
+          AdrenalineRush = {true, false},
+          CurseoftheDreadblades = {true, false},
+          BladeFlurry = {true, false},
         }
       },
       Subtlety = {
         -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
-        ShDEcoCharge = 2.6,
+        ShDEcoCharge = 2.45,
         -- Eviscerate Damage Offset
         EviscerateDMGOffset = 3,
         -- {Display GCD as OffGCD, ForceReturn}
         GCDasOffGCD = {
-          CrimsonVial = {true, false},
-          Feint = {true, false}
         },
         -- {Display OffGCD as OffGCD, ForceReturn}
         OffGCDasOffGCD = {
-          -- Racials
-          ArcaneTorrent = {true, false},
-          Berserking = {true, false},
-          BloodFury = {true, false},
-          -- Spec
-          Kick = {true, false},
-          MarkedforDeath = {false, false},
+          -- Abilities
           ShadowBlades = {true, false},
-          Stealth = {true, false},
           SymbolsofDeath = {true, false}
         }
       }
