@@ -82,24 +82,38 @@ local pairs = pairs;
     WindStrikesBuff         = Spell(198292),
     -- Defensive
     AstralShift             = Spell(108271),
-    HealingSurge            = Spell(),
+    HealingSurge            = Spell(188070),
     -- Utility
-    CleanseSpirit           = Spell(),
-    GhostWolf               = Spell(),
-    Hex                     = Spell(),
-    Purge                   = Spell(),
-    Reincarnation           = Spell(),
-    SpiritWalking           = Spell(),
-    WaterWalking            = Spell(),
-    WindShear               = Spell(),
+    CleanseSpirit           = Spell(51886),
+    GhostWolf               = Spell(2645),
+    Hex                     = Spell(51514),
+    Purge                   = Spell(370),
+    Reincarnation           = Spell(20608),
+    SpiritWalk              = Spell(58875),
+    WaterWalking            = Spell(546),
+    WindShear               = Spell(57994),
     -- Legendaries
-    EmalonChargedCore       = Spell(),
-    StormTempest            = Spell(),
+    EmalonChargedCore       = Spell(208742),
+    StormTempest            = Spell(214265),
     -- Misc
 
     -- Macros
     Macros = {}
     };
+    local S = Spell.Shaman.Enhancement;
+
+    --Items 
+    if not Item.Shaman then Item.Shaman = {}; end
+    Item.Shaman.Enhancement = {
+        --Legendaries
+        EmalonChargedCore = Item(),
+        StromTempests = Item()
+    };
+    local I = Item.Shaman.Enhancement;
+
+--Cooldowns
+
+--AOE
 
 -- APL Main
 local function APL ()
@@ -112,12 +126,34 @@ local function APL ()
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      return;
+        if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+            if S.Boulderfist:IsCastable()  then
+                if ER.Cast(S.Boulderfist) then return "Cast Boulderfist"; end
+            elseif S.Rockbiter:IsCastable()  then 
+                if ER.Cast(S.Rockbiter) then return "Cast Rockbiter"; end
+            end
+        end
+        return;
     end
+
+  --- Interrupts 
+    if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(30) then
+        if S.WindShear:IsCastable() then 
+            if ER.Cast(S.WindShear) then return "Cast"; end
+        end
+    end
+
   --- In Combat
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+            if S.Boulderfist:IsCastable() and Player:BuffRemains(S.BoulderfistBuff) < Player:GCD() then
+                if ER.Cast(S.Boulderfist) then return "Cast Boulderfist"; end
+            elseif S.Rockbiter:IsCastable and Player:IsKnown(S.Landslide) and Player:BuffRemains(S.LandslideBuff) < Player:GCD() then 
+                if ER.Cast(S.Rockbiter) then return "Cast Rockbiter"; end
 
-    end
+            end
+            if not Player:Buff(S.FuryOfAirBuff) and S.FuryOfAir:IsCastable() and Player:Maelstrom() > 15 then 
+                if ER.Cast(S.FuryOfAir) then return "Cast FuryOfAir"; end
+
 end
 
 ER.SetAPL(263, APL);
