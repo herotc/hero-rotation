@@ -1304,6 +1304,42 @@ end
       return (self:PainDeficit() / self:PainMax()) * 100;
     end
 
+        ---------------------------
+    --- 19 | Maelstrom Functions ---
+    ---------------------------
+    -- Maelstrom.max
+    function Unit:MaelstromMax ()
+      if self:GUID() then
+        if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+        if not ER.Cache.UnitInfo[self:GUID()].MaelstromMax then
+          ER.Cache.UnitInfo[self:GUID()].MaelstromMax = UnitPowerMax(self.UnitID, SPELL_POWER_MAELSTROM);
+        end
+        return ER.Cache.UnitInfo[self:GUID()].MaelstromMax;
+      end
+    end
+    -- Maelstrom
+    function Unit:Pain ()
+      if self:GUID() then
+        if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
+        if not ER.Cache.UnitInfo[self:GUID()].MaelstromMax then
+          ER.Cache.UnitInfo[self:GUID()].MaelstromMax = UnitPower(self.UnitID, SPELL_POWER_MAELSTROM);
+        end
+        return ER.Cache.UnitInfo[self:GUID()].MaelstromMax;
+      end
+    end
+    -- Maelstrom.pct
+    function Unit:MaelstromPercentage ()
+      return (self:Maelstrom() / self:MaelstromMax()) * 150;
+    end
+    -- Maelstrom.deficit
+    function Unit:MaelstromDeficit ()
+      return self:MaelstromMax() - self:Maelstrom();
+    end
+    -- "Maelstrom.deficit.pct"
+    function Unit:MaelstromDeficitPercentage ()
+      return (self:MaelstromDeficit() / self:MaelstromMax()) * 150;
+    end
+
     -- Get if the player is stealthed or not
     local IsStealthedBuff = {
       -- Normal Stealth
