@@ -157,7 +157,7 @@ local function APL ()
         end
       end
       -- SoloMode : Justicar's Vengeance
-      if Settings.Retribution.SoloMode and S.JusticarsVengeance:IsCastable() then
+      if Settings.General.SoloMode and S.JusticarsVengeance:IsCastable() then
         -- Divine Purpose 
         if Player:HealthPercentage() <= Settings.Retribution.SoloJusticarDP and Player:Buff(S.DivinePurposeBuff) then
           if ER.Cast(S.JusticarsVengeance) then return "Cast Justicars Vengeance"; end
