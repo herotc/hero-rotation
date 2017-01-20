@@ -1318,7 +1318,7 @@ end
       end
     end
     -- Maelstrom
-    function Unit:Pain ()
+    function Unit:Maelstrom ()
       if self:GUID() then
         if not ER.Cache.UnitInfo[self:GUID()] then ER.Cache.UnitInfo[self:GUID()] = {}; end
         if not ER.Cache.UnitInfo[self:GUID()].MaelstromMax then
