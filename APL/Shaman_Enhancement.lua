@@ -42,7 +42,7 @@ local pairs = pairs;
     Stormlash                     = Spell(195255),
     StormlashBuff                 = Spell(207835),
     Windfurry                     = Spell(33757),
-    Windstrike                    = Spell(),
+    Windstrike                    = Spell(115356),
     -- Talents
     AncestralSwiftness            = Spell(192087),
     Ascendance                    = Spell(114049),
@@ -82,20 +82,20 @@ local pairs = pairs;
     WindStrikes                   = Spell(198292),
     WindStrikesBuff               = Spell(198292),
     -- Defensive
-    AstralShift             = Spell(108271),
-    HealingSurge            = Spell(188070),
+    AstralShift                   = Spell(108271),
+    HealingSurge                  = Spell(188070),
     -- Utility
-    CleanseSpirit           = Spell(51886),
-    GhostWolf               = Spell(2645),
-    Hex                     = Spell(51514),
-    Purge                   = Spell(370),
-    Reincarnation           = Spell(20608),
-    SpiritWalk              = Spell(58875),
-    WaterWalking            = Spell(546),
-    WindShear               = Spell(57994),
+    CleanseSpirit                 = Spell(51886),
+    GhostWolf                     = Spell(2645),
+    Hex                           = Spell(51514),
+    Purge                         = Spell(370),
+    Reincarnation                 = Spell(20608),
+    SpiritWalk                    = Spell(58875),
+    WaterWalking                  = Spell(546),
+    WindShear                     = Spell(57994),
     -- Legendaries
-    EmalonChargedCore       = Spell(208742),
-    StormTempest            = Spell(214265),
+    EmalonChargedCore             = Spell(208742),
+    StormTempests                 = Spell(214265),
     -- Misc
 
     -- Macros
@@ -107,10 +107,16 @@ local pairs = pairs;
     if not Item.Shaman then Item.Shaman = {}; end
     Item.Shaman.Enhancement = {
         --Legendaries
-        EmalonChargedCore = Item(),
-        StormTempests = Item()
+        EmalonChargedCore  = Item(137616),
+        StormTempests      = Item(137103)
     };
     local I = Item.Shaman.Enhancement;
+
+-- GUI Settings
+  local Settings = {
+    General = ER.GUISettings.General,
+    Enhancement = ER.GUISettings.APL.Shaman.Enhancement
+  };
 
 --Cooldowns
 
@@ -119,7 +125,8 @@ local pairs = pairs;
 -- APL Main
 local function APL ()
   -- Unit Update
-  ER.GetEnemies(8); -- Melee
+  ER.GetEnemies(8); -- CrashLightning
+  ER.GetEnemies(5); -- Melee
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Flask
@@ -142,12 +149,28 @@ local function APL ()
   --- Interrupts 
     if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(30) then
         if S.WindShear:IsCastable() then 
-            if ER.Cast(S.WindShear) then return "Cast"; end
+            if ER.Cast(S.WindShear, Settings.Enhancement.OffGCDasOffGCD.WindShear) then return "Cast"; end
         end
     end
 
   --- In Combat
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(5) and not Target:IsDeadOrGhost() then
+                -- Legendaries
+            if I.EmalonChargedCore.IsEquipped[5] and Player:Buff(S.EmalonChargedCore) then
+                if ER.Cast(Settings.Enhancement.OffGCDasOffGCD.EmalonChargedCore) then return "Cast EmalonChargedCore"; end
+            end
+
+            if I.StormTempests.IsEquipped[6] and Targat:Debuff(S.StormTempests) then
+                if ER.Cast(Settings.Enhancement?OffGCDasOffGCD.StormTempests) then return "Cast StormTempests"; end
+            end
+                 -- actions+=/feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
+            if S.FeralSpirit:IsCastable() and ((not Player:IsKnown(S.AlphaWolf)) or (S.CrashLightning:Cooldown() <= Player:GCD() and Player:Maelstrom()>=20) ) then
+                if ER.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit";end
+            end
+                -- actions+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
+            if Player:IsKnown(S.AlphaWolf) and Pet:BuffRemains(S.AlphaWolfBuff) < Player:GCD() and S.CrashLightning:IsCastable() then
+                if ER.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
+            end
                 --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(maelstrom<=50&active_enemies>=3)
                 --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
             if S.Boulderfist:IsCastable() and Player:BuffRemains(S.BoulderfistBuff) < Player:GCD() then
@@ -169,9 +192,13 @@ local function APL ()
             if S.Flametongue:IsCastable() and Player:BuffRemains(S.FlametongueBuff) < Player:GCD() then
                 if ER.Cast(S.Flametongue) then return "Cast Flametongue"; end
             end
+                -- Aoe Legendarie
+            if I.EmalonChargedCore:IsEquipped[5] and S.CrashLightning:IsCastable() and ER.Cast.EnnemiesCount[8] >=3 then
+                if ER.Cast(S.CrashLightning) then return "Cast CrashLightning";end
+            end
                 -- actions+=/doom_winds
             if S.DoomWinds:IsCastable() then 
-                if ER.Cast(S.DoomWinds) then return "Cast DoomWinds";end
+                if ER.Cast(S.DoomWinds, Settings.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds";end
             end
                 -- actions+=/crash_lightning,if=talent.crashing_storm.enabled&active_enemies>=3&(!talent.hailstorm.enabled|buff.frostbrand.remains>gcd)
             if ER.AoEON() and S.CrashLightning:IsCastable() and Player:IsKnown(S.CrashingStorm) and ER.Cache.EnnemiesCount[8] >= 3 
@@ -276,14 +303,14 @@ local function APL ()
 
 
 
-   -- actions+=/feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
-   -- actions+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
-   --actions+=/berserking,if=buff.ascendance.up|!talent.ascendance.enabled|level<100
---actions+=/blood_fury
---actions+=/potion,name=prolonged_power,if=feral_spirit.remains>5|target.time_to_die<=60
---actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(maelstrom<=50&active_enemies>=3)
---actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
---actions+=/rockbiter,if=talent.landslide.enabled&buff.landslide.remains<gcd
+-- actions+=/feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
+-- actions+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
+-- actions+=/berserking,if=buff.ascendance.up|!talent.ascendance.enabled|level<100
+-- actions+=/blood_fury
+-- actions+=/potion,name=prolonged_power,if=feral_spirit.remains>5|target.time_to_die<=60
+-- actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(maelstrom<=50&active_enemies>=3)
+-- actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
+-- actions+=/rockbiter,if=talent.landslide.enabled&buff.landslide.remains<gcd
 -- actions+=/fury_of_air,if=!ticking&maelstrom>22
 -- actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
 -- actions+=/flametongue,if=buff.flametongue.remains<gcd|(cooldown.doom_winds.remains<6&buff.flametongue.remains<4)
