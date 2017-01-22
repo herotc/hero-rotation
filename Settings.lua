@@ -158,7 +158,7 @@ ER.GUISettings = {
         OffGCDasOffGCD = {
         }
       }
-    }
+    },
     Shaman = {
       Enhancement = {
           --{Display GCD as OffGcd, ForceReturn}
