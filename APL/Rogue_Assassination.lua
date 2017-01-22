@@ -84,6 +84,7 @@ local pairs = pairs;
 -- GUI Settings
   local Settings = {
     General = ER.GUISettings.General,
+    Commons = ER.GUISettings.APL.Rogue.Commons,
     Assassination = ER.GUISettings.APL.Rogue.Assassination
   };
 
@@ -309,22 +310,28 @@ end
 local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
+  -- Unit Update
+  if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
+  ER.GetEnemies(10); -- Fan of Knives
+  ER.GetEnemies(5); -- Melee
+  --- Defensives
+    -- Crimson Vial
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial);
+    if ShouldReturn then return ShouldReturn; end
+    -- Feint
+    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint);
+    if ShouldReturn then return ShouldReturn; end
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-      if S.Stealth:IsCastable() and not Player:IsStealthed() then
-        if ER.Cast(S.Stealth, Settings.Assassination.OffGCDasOffGCD.Stealth) then return "Cast"; end
-      end
-      -- Crimson Vial
-      if S.CrimsonVial:IsCastable() and Player:HealthPercentage() <= 80 then
-        if ER.Cast(S.CrimsonVial, Settings.Assassination.GCDasOffGCD.CrimsonVial) then return "Cast"; end
-      end
+      ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth);
+      if ShouldReturn then return ShouldReturn; end
       -- Flask
       -- Food
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
+      if ER.Commons.TargetIsValid() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
           if S.Rupture:IsCastable() and not Target:Debuff(S.Rupture) then
             if ER.Cast(S.Rupture) then return "Cast"; end
@@ -340,56 +347,28 @@ local function APL ()
       return;
     end
   -- In Combat
-    -- Unit Update
-    if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
-    ER.GetEnemies(10); -- Fan of Knives
-    ER.GetEnemies(5); -- Melee
     -- MfD Sniping
-    if S.MarkedforDeath:IsCastable() then
-      BestUnit, BestUnitTTD = nil, 60;
-      for Key, Value in pairs(ER.Cache.Enemies[30]) do
-        if not Value:IsMfdBlacklisted() and Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
-          BestUnit, BestUnitTTD = Value, Value:TimeToDie();
-        end
-      end
-      if BestUnit then
-        ER.Nameplate.AddIcon(BestUnit, S.MarkedforDeath);
-      end
-    end
-    -- Crimson Vial
-    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Assassination.GCDasOffGCD.CrimsonVial, 35);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
-    -- Feint
-    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint, Settings.Assassination.GCDasOffGCD.Feint, 10);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    ER.Commons.Rogue.MfDSniping(S.MarkedforDeath);
+    if ER.Commons.TargetIsValid() then
       -- Mythic Dungeon
       ShouldReturn = MythicDungeon();
-      if ShouldReturn then
-        return ShouldReturn;
-      end
+      if ShouldReturn then return ShouldReturn; end
       -- Training Scenario
-      if TrainingScenario() then
-        return;
-      end
-      -- Kick
-      if Settings.General.InterruptEnabled and Target:IsInRange(5) and S.Kick:IsCastable() and Target:IsInterruptible() then
-        if ER.Cast(S.Kick, Settings.Assassination.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
-      end
+      ShouldReturn = TrainingScenario();
+      if ShouldReturn then return ShouldReturn; end
+      -- Interrupts
+      ER.Commons.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
+        {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
+        {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end}
+      });
       -- actions+=/call_action_list,name=cds
       if ER.CDsON() then
         ShouldReturn = CDs();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
         -- actions+=/call_action_list,name=maintain
         -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
-        CountA, CountB = 0;
+        CountA, CountB = 0, 0;
         if ER.AoEON() then
            for Key, Value in pairs(ER.Cache.Enemies[5]) do
               
@@ -408,17 +387,13 @@ local function APL ()
         -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
         if true then
         ShouldReturn = Finish();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
         
         -- actions+=/call_action_list,name=build,if=(combo_points.deficit>0|energy.time_to_max<1)
         if true then
         ShouldReturn = Build();
-        if ShouldReturn then
-          return ShouldReturn;
-        end
+        if ShouldReturn then return ShouldReturn; end
       end
       -- Shuriken Toss Out of Range
       if not Target:IsInRange(10) and Target:IsInRange(20) and S.ShurikenToss:IsCastable() and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
@@ -432,7 +407,20 @@ end
 
 ER.SetAPL(259, APL);
 
--- Last Update: 11/14
+-- Last Update: 01/19/2017
+
+-- # Executed before combat begins. Accepts non-harmful actions only.
+-- actions.precombat=flask,name=flask_of_the_seventh_demon
+-- actions.precombat+=/augmentation,name=defiled
+-- actions.precombat+=/food,name=seedbattered_fish_plate
+-- # Snapshot raid buffed stats before combat begins and pre-potting is done.
+-- actions.precombat+=/snapshot_stats
+-- actions.precombat+=/apply_poison
+-- actions.precombat+=/stealth
+-- actions.precombat+=/potion,name=old_war
+-- actions.precombat+=/marked_for_death,if=raid_event.adds.in>40
+
+-- # Executed every time the actor is available.
 -- actions=call_action_list,name=cds
 -- actions+=/call_action_list,name=maintain
 -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
@@ -453,19 +441,22 @@ ER.SetAPL(259, APL);
 -- actions.cds+=/arcane_torrent,if=debuff.vendetta.up&energy.deficit>50
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|combo_points.deficit>=5
 -- actions.cds+=/vendetta,if=talent.exsanguinate.enabled&cooldown.exsanguinate.remains<5&dot.rupture.ticking
--- actions.cds+=/vendetta,if=!talent.exsanguinate.enabled&(!artifact.urge_to_kill.enabled|energy.deficit>=70)
+-- actions.cds+=/vendetta,if=talent.exsanguinate.enabled&(artifact.master_assassin.rank>=4-equipped.convergence_of_fates|equipped.duskwalkers_footpads)&energy.deficit>=75&!(artifact.master_assassin.rank=5-equipped.convergence_of_fates&equipped.duskwalkers_footpads)
+-- actions.cds+=/vendetta,if=!talent.exsanguinate.enabled&energy.deficit>=88-!talent.venom_rush.enabled*10
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&((talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&(dot.rupture.ticking|time>10))|(!talent.exsanguinate.enabled&dot.rupture.refreshable))
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
 -- actions.cds+=/vanish,if=talent.shadow_focus.enabled&energy.time_to_max>=2&combo_points.deficit>=4
--- actions.cds+=/exsanguinate,if=prev_gcd.rupture&dot.rupture.remains>4+4*cp_max_spend
+-- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
 
 -- # Finishers
 -- actions.finish=death_from_above,if=combo_points>=cp_max_spend
--- actions.finish+=/envenom,if=combo_points>=cp_max_spend-talent.master_poisoner.enabled|(talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<2)
+-- actions.finish+=/envenom,if=combo_points>=4|(talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.1)
 
 -- # Maintain
--- actions.maintain=rupture,if=(talent.nightstalker.enabled&stealthed.rogue)|(talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled))))
+-- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue
+-- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
+-- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&!ticking
 -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=cp_max_spend-talent.exsanguinate.enabled&refreshable&(!exsanguinated|remains<=1.5)&target.time_to_die-remains>4
--- actions.maintain+=/kingsbane,if=(talent.exsanguinate.enabled&dot.rupture.exsanguinated)|(!talent.exsanguinate.enabled&(debuff.vendetta.up|cooldown.vendetta.remains>10))
+-- actions.maintain+=/kingsbane,if=(talent.exsanguinate.enabled&dot.rupture.exsanguinated)|(!talent.exsanguinate.enabled&buff.envenom.up&(debuff.vendetta.up|cooldown.vendetta.remains>10))
 -- actions.maintain+=/pool_resource,for_next=1
 -- actions.maintain+=/garrote,cycle_targets=1,if=refreshable&(!exsanguinated|remains<=1.5)&target.time_to_die-remains>4

@@ -148,6 +148,7 @@ local pairs = pairs;
   };
 
 local ExtraSSWRefundTable = {
+  [101002] = 2, -- Nighthold: Krosus
   [114537] = 2 -- Trial of Valor: Helya
 };
 local function SSW_RefundOffset ()
@@ -433,7 +434,7 @@ local function APL ()
         if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death (OOC)"; end
       end
       -- Opener
-      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
+      if ER.Commons.TargetIsValid() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
           if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade) and Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset then
            if ER.Cast(S.Nightblade) then return "Cast Nightblade (OOC)"; end
@@ -455,7 +456,7 @@ local function APL ()
   -- In Combat
     -- MfD Sniping
     ER.Commons.Rogue.MfDSniping(S.MarkedforDeath);
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if ER.Commons.TargetIsValid() then
       -- Mythic Dungeon
       ShouldReturn = MythicDungeon();
       if ShouldReturn then return ShouldReturn; end

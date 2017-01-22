@@ -13,6 +13,10 @@ ER.Commons.Everyone = {};
 -- GUI Settings
 local Settings = ER.GUISettings.General;
 
+-- Is Target Valid
+function ER.Commons.TargetIsValid ()
+  return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost();
+end
 
 -- Interrupt
 function ER.Commons.Interrupt (Range, Spell, Setting, StunSpells)

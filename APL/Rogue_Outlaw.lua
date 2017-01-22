@@ -74,10 +74,6 @@ local tostring = tostring;
   local I = Item.Rogue.Outlaw;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local EnemiesCount = {
-    [8] = 1,
-    [6] = 1
-  };
   local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
   local Sequence; -- RtB_List
   local Count; -- Used when Counting Units
@@ -85,6 +81,7 @@ local tostring = tostring;
 -- GUI Settings
   local Settings = {
     General = ER.GUISettings.General,
+    Commons = ER.GUISettings.APL.Rogue.Commons,
     Outlaw = ER.GUISettings.APL.Rogue.Outlaw
   };
 
@@ -215,11 +212,11 @@ end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and ((EnemiesCount[6] < 2 and ER.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and EnemiesCount[6] >= 2)) then
+  if Player:Buff(S.BladeFlurry) and (((ER.AoEON() or ER.Cache.EnemiesCount[6] < 2) and ER.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and ER.Cache.EnemiesCount[6] >= 2)) then
     if ER.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-  if not S.BladeFlurry:IsOnCooldown() and not Player:Buff(S.BladeFlurry) and EnemiesCount[6] >= 2 then
+  if not S.BladeFlurry:IsOnCooldown() and not Player:Buff(S.BladeFlurry) and ER.Cache.EnemiesCount[6] >= 2 then
     if ER.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   return false;
@@ -229,7 +226,7 @@ local function CDs ()
   -- actions.cds=potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
   -- TODO: Add Potion
   -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
-  if ER.AoEON() and S.CannonballBarrage:IsAvailable() and EnemiesCount[8] >= 1 and not S.CannonballBarrage:IsOnCooldown() then
+  if ER.AoEON() and S.CannonballBarrage:IsAvailable() and ER.Cache.EnemiesCount[8] >= 1 and not S.CannonballBarrage:IsOnCooldown() then
     if ER.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
   end
   if Target:IsInRange(5) then
@@ -347,24 +344,29 @@ end
 
 -- APL Main
 local function APL ()
+  -- Unit Update
+    if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
+    ER.GetEnemies(8); -- Cannonball Barrage
+    ER.GetEnemies(6); -- Blade Flurry
+    ER.GetEnemies(5); -- Melee
+  --- Defensives
+    -- Crimson Vial
+    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial);
+    if ShouldReturn then return ShouldReturn; end
+    -- Feint
+    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint);
+    if ShouldReturn then return ShouldReturn; end
   --- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
-    ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth, Settings.Outlaw.OffGCDasOffGCD.Stealth);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
-    -- Crimson Vial
-    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial, 80);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
+    ShouldReturn = ER.Commons.Rogue.Stealth (S.Stealth);
+    if ShouldReturn then return ShouldReturn; end
     -- Flask
     -- Food
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
+    if ER.Commons.TargetIsValid() and Target:IsInRange(5) then
       if Player:ComboPoints() >= 5 then
         if S.RunThrough:IsCastable() then
           if ER.Cast(S.RunThrough) then return "Cast Run Through (Opener)"; end
@@ -378,55 +380,19 @@ local function APL ()
     return;
   end
   -- In Combat
-    -- Unit Update
-    if S.MarkedforDeath:IsAvailable() then ER.GetEnemies(30); end
-    ER.GetEnemies(8); -- Cannonball Barrage
-    ER.GetEnemies(6); -- Blade Flurry
-    ER.GetEnemies(5); -- Melee
-    if ER.AoEON() then
-      for Key, Value in pairs(EnemiesCount) do
-        EnemiesCount[Key] = #ER.Cache.Enemies[Key];
-      end
-    else
-      for Key, Value in pairs(EnemiesCount) do
-        EnemiesCount[Key] = 1;
-      end
-    end
-    -- Blade Flurry Expiration Offset
-    if EnemiesCount[6] == 1 and BFReset then
-      BFTimer, BFReset = ER.GetTime() + Settings.Outlaw.BFOffset, false;
-    elseif EnemiesCount[6] > 1 then
-      BFReset = true;
-    end
     -- MfD Sniping
-    if S.MarkedforDeath:IsCastable() then
-      BestUnit, BestUnitTTD = nil, 60;
-      for Key, Value in pairs(ER.Cache.Enemies[30]) do
-        if not Value:IsMfdBlacklisted() and
-          Value:TimeToDie() < Player:ComboPointsDeficit()*1.5 and
-          Value:TimeToDie() < BestUnitTTD then -- I increased the SimC condition since we are slower.
-          BestUnit, BestUnitTTD = Value, Value:TimeToDie();
-        end
-      end
-      if BestUnit then
-        ER.Nameplate.AddIcon(BestUnit, S.MarkedforDeath);
-      end
-    end
-    -- Crimson Vial
-    ShouldReturn = ER.Commons.Rogue.CrimsonVial (S.CrimsonVial, Settings.Outlaw.GCDasOffGCD.CrimsonVial, 35);
-    if ShouldReturn then
-      return ShouldReturn;
-    end
-    -- Feint
-    ShouldReturn = ER.Commons.Rogue.Feint (S.Feint, Settings.Outlaw.GCDasOffGCD.Feint, 10);
-    if ShouldReturn then
-      return ShouldReturn;
+    ER.Commons.Rogue.MfDSniping(S.MarkedforDeath);
+    -- Blade Flurry Expiration Offset
+    if (not ER.AoEON() or ER.Cache.EnemiesCount[6] == 1) and BFReset then
+      BFTimer, BFReset = ER.GetTime() + Settings.Outlaw.BFOffset, false;
+    elseif ER.Cache.EnemiesCount[6] > 1 then
+      BFReset = true;
     end
     -- actions+=/call_action_list,name=bf
     if BF() then
       return;
     end
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if ER.Commons.TargetIsValid() then
       -- Mythic Dungeon
       if MythicDungeon() then
         return;
