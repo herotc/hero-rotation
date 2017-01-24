@@ -118,6 +118,23 @@ local pairs = pairs;
     Enhancement = ER.GUISettings.APL.Shaman.Enhancement
   };
 
+-- Storm Tempests Nameplate cleave
+
+local BestUnit, BestUnitTTD;
+function StormTempestsSniping (StormTempests)
+  BestUnit, BestUnitTTD = nil, 1;
+  for _, Unit in pairs(ER.Cache.Enemies[5]) do
+    if not Unit:Debuff(S.StormTempests) and Unit:TimeToDie() > BestUnitTTD then
+      BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();  
+    elseif Unit:DebuffRemains(S.StormTempests) < BestUnit:DebuffRemains(StormTempests) then
+      BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+    end
+  end
+  if BestUnit then
+    ER.Nameplate.AddIcon(BestUnit, StormTempests);
+  end
+end
+
 --Cooldowns
 
 --AOE
@@ -153,17 +170,24 @@ local function APL ()
         end
     end
 
+  --- Legendaries
+    if Target:Exixts() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+        if I.EmalonChargedCore.IsEquipped[5] and Player:Buff(S.EmalonChargedCore) then
+            if ER.LeftIconFrame:ChangeLeftIcon(ER.GetTexture(S.EmalonChargedCore)) then return "Cast EmalonChargedCore"; end
+        end
+        if I.StormTempests.IsEquipped[6] and Target:Debuff(S.StormTempests) then
+            if ER.LeftIconFrame:ChangeLeftIcon(ER.GetTexture(S.StormTempests)) then return "Cast StormTempests"; end
+        end
+    end
+
   --- In Combat
     if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(5) and not Target:IsDeadOrGhost() then
-                -- Legendaries
-            if I.EmalonChargedCore.IsEquipped[5] and Player:Buff(S.EmalonChargedCore) then
-                if ER.Cast(Settings.Enhancement.OffGCDasOffGCD.EmalonChargedCore) then return "Cast EmalonChargedCore"; end
-            end
+                -- StormtempestsSniping
+            if I.StormTempests:IsEquipped[6] and ER.AoEON() then
+                StormtempestsSniping(S.StormTempests);
+             end
 
-            if I.StormTempests.IsEquipped[6] and Targat:Debuff(S.StormTempests) then
-                if ER.Cast(Settings.Enhancement?OffGCDasOffGCD.StormTempests) then return "Cast StormTempests"; end
-            end
-                 -- actions+=/feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
+                -- actions+=/feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
             if S.FeralSpirit:IsCastable() and ((not Player:IsKnown(S.AlphaWolf)) or (S.CrashLightning:Cooldown() <= Player:GCD() and Player:Maelstrom()>=20) ) then
                 if ER.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit";end
             end
@@ -236,6 +260,7 @@ local function APL ()
                 or (not Player:IsKnown(S.FuryOfAir))) then
                 if ER.Cast(S.Stormstrike) then return "Cast Stormstrike"; end
             end
+
                 -- actions+=/lava_lash,if=talent.hot_hand.enabled&buff.hot_hand.react
             if S.LavaLash:IsCastable() and Player:IsKnown(S.HotHand) and Player:Buff(S.HotHandBuff) then
                 if ER.Cast(S.LavaLash) then return "Cast LavaLash"; end
