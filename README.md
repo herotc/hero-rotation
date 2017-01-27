@@ -17,8 +17,9 @@ Every rotations are based on SimulationCraft Action Priority Lists.
 - Paladin Retribution
 - Rogue Outlaw
 - Rogue Subtlety
+- Shaman Enhancement (Beta)
 
-Rogue Assassination is coming very soon along with Enhancement Shaman.
+Rogue Assassination is coming very soon.
 
 
 More features including a GUI are coming when more rotations will be done. Currently every rotation settings are in the Settings.lua file.
