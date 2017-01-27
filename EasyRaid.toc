@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: EasyRaid
 ## Author: Aethys, SimCMinMax Team
-## Version: 7.1.51
+## Version: 7.1.52
 ## Notes: Attempt to provide the useful and precise informations to execute the best possible DPS rotation in every situation.
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
@@ -26,7 +26,7 @@ APL\Paladin_Retribution.lua
 #APL\Rogue_Assassination.lua
 APL\Rogue_Outlaw.lua
 APL\Rogue_Subtlety.lua
-#APL\Shaman_Enhancement.lua
+APL\Shaman_Enhancement.lua
 #APL\Warrior_Arms.lua
 #APL\Warrior_Fury.lua
 
