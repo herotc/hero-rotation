@@ -29,6 +29,7 @@ local tostring = tostring;
     Anticipation                  = Spell(114015),
     BetweentheEyes                = Spell(199804),
     BladeFlurry                   = Spell(13877),
+    Blunderbuss                   = Spell(202895),
     DeathfromAbove                = Spell(152150),
     DeeperStratagem               = Spell(193531),
     GhostlyStrike                 = Spell(196937),
@@ -212,11 +213,11 @@ end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and (((ER.AoEON() or ER.Cache.EnemiesCount[6] < 2) and ER.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and ER.Cache.EnemiesCount[6] >= 2)) then
+  if Player:Buff(S.BladeFlurry) and (((not ER.AoEON() or ER.Cache.EnemiesCount[6] < 2) and ER.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and ER.AoEON() and ER.Cache.EnemiesCount[6] >= 2)) then
     if ER.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-  if not S.BladeFlurry:IsOnCooldown() and not Player:Buff(S.BladeFlurry) and ER.Cache.EnemiesCount[6] >= 2 then
+  if ER.AoEON() and S.BladeFlurry:IsCastable() and not Player:Buff(S.BladeFlurry) and ER.Cache.EnemiesCount[6] >= 2 then
     if ER.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   return false;
@@ -226,7 +227,7 @@ local function CDs ()
   -- actions.cds=potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
   -- TODO: Add Potion
   -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
-  if ER.AoEON() and S.CannonballBarrage:IsAvailable() and ER.Cache.EnemiesCount[8] >= 1 and not S.CannonballBarrage:IsOnCooldown() then
+  if ER.AoEON() and S.CannonballBarrage:IsCastable() and ER.Cache.EnemiesCount[8] >= 1 then
     if ER.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
   end
   if Target:IsInRange(5) then
@@ -305,8 +306,12 @@ local function Build ()
     if ER.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
   end
   -- actions.build+=/pistol_shot,if=buff.opportunity.up&energy.time_to_max>2-talent.quick_draw.enabled&combo_points.deficit>=1+buff.broadsides.up
-  if Target:IsInRange(20) and S.PistolShot:IsCastable() and Player:Buff(S.Opportunity) and Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) then
-    if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+  if Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Player:Buff(S.Opportunity) and Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) then
+    if S.Blunderbuss:IsCastable() then
+      if ER.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
+    else
+      if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+    end
   end
   -- actions.build+=/saber_slash,if=variable.ss_useable
   if Target:IsInRange(5) and S.SaberSlash:IsCastable() and SS_Useable() then
@@ -345,7 +350,6 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-    if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
     ER.GetEnemies(8); -- Cannonball Barrage
     ER.GetEnemies(6); -- Blade Flurry
     ER.GetEnemies(5); -- Melee
@@ -385,7 +389,7 @@ local function APL ()
     -- Blade Flurry Expiration Offset
     if (not ER.AoEON() or ER.Cache.EnemiesCount[6] == 1) and BFReset then
       BFTimer, BFReset = ER.GetTime() + Settings.Outlaw.BFOffset, false;
-    elseif ER.Cache.EnemiesCount[6] > 1 then
+    elseif ER.AoEON() and ER.Cache.EnemiesCount[6] > 1 then
       BFReset = true;
     end
     -- actions+=/call_action_list,name=bf
@@ -446,10 +450,17 @@ local function APL ()
         end
       end
       -- OutofRange Pistol Shot
-      if not Target:IsInRange(10) and Target:IsInRange(20) and S.PistolShot:IsCastable() and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
-        if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+      if not Target:IsInRange(10) and Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
+        if S.Blunderbuss:IsCastable() then
+          if ER.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
+        else
+          if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+        end
       end
     end
 end
 
 ER.SetAPL(260, APL);
+
+-- Last Update: 01/27/2017
+
