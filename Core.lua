@@ -158,6 +158,14 @@ function ER.CmdHandler (Message)
     ER.Print("EasyRaid is now "..(ERSettings.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
   elseif _T.Argument == "help" then
     ER.Print("CDs : /eraid cds | AoE : /eraid cds | Toggle : /eraid toggle");
+  elseif _T.Argument == "uilock" then
+    ER.MainFrame:EnableMouse(false);
+    ER.MainFrame:SetMovable(false);
+    ER.Print("EasyRaid UI is now |cffff0000locked|r.");
+  elseif _T.Argument == "uiunlock" then
+    ER.MainFrame:EnableMouse(true);
+    ER.MainFrame:SetMovable(true);
+    ER.Print("EasyRaid is now |cff00ff00unlocked|r.");
   end
 end
 SLASH_EASYRAID1 = "/eraid"
@@ -1035,6 +1043,12 @@ end
         end
         return ER.Cache.UnitInfo[self:GUID()].GCD;
       end
+    end
+
+    -- buff.bloodlust.up
+    -- TODO
+    function Unit:HasBloodlust ()
+      return;
     end
 
     -- attack_power
