@@ -311,7 +311,6 @@ local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   -- Unit Update
-  if S.MarkedforDeath:IsCastable() then ER.GetEnemies(30); end -- Marked for Death
   ER.GetEnemies(10); -- Fan of Knives
   ER.GetEnemies(5); -- Melee
   --- Defensives
