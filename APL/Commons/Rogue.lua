@@ -40,14 +40,16 @@ end
 -- Marked for Death Sniping
 local BestUnit, BestUnitTTD;
 function ER.Commons.Rogue.MfDSniping (MarkedforDeath)
-  BestUnit, BestUnitTTD = nil, 60;
-  for _, Unit in pairs(ER.Cache.Enemies[30]) do
-    -- I increased the SimC condition by 50% since we are slower.
-    if not Unit:IsMfdBlacklisted() and Unit:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Unit:TimeToDie() < BestUnitTTD then
-      BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+  if MarkedforDeath:IsCastable() then
+    BestUnit, BestUnitTTD = nil, 60;
+    for _, Unit in pairs(ER.Cache.Enemies[30]) do
+      -- I increased the SimC condition by 50% since we are slower.
+      if not Unit:IsMfdBlacklisted() and Unit:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Unit:TimeToDie() < BestUnitTTD then
+        BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+      end
     end
-  end
-  if BestUnit then
-    ER.Nameplate.AddIcon(BestUnit, MarkedforDeath);
+    if BestUnit then
+      ER.Nameplate.AddIcon(BestUnit, MarkedforDeath);
+    end
   end
 end
