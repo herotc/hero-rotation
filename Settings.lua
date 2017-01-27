@@ -4,7 +4,7 @@ local addonName, ER = ...;
 ER.GUISettings = {
   General = {
     -- Main Frame Strata
-    MainFrameStrata = "HIGH",
+    MainFrameStrata = "BACKGROUND",
     -- Recovery Timer
     RecoveryMode = "GCD"; -- "GCD" to always display the next ability, "Custom" for Custom RecoveryTimer
     RecoveryTimer = 950;
@@ -23,6 +23,8 @@ ER.GUISettings = {
         -- Example with fake NPCID:
         -- [123456] = true;
         -- [123456] = function (self) return self:HealthPercentage() <= 80 and true or false; end
+        -- Tito Pet Cows
+        [71444] = true;
       },
       -- Custom Cycle List (User Defined), must be a valid Lua Boolean or Function as Value and have the NPCID as Key
       CycleUserDefined = {
