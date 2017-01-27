@@ -41,6 +41,9 @@ end
 local BestUnit, BestUnitTTD;
 function ER.Commons.Rogue.MfDSniping (MarkedforDeath)
   if MarkedforDeath:IsCastable() then
+    -- Get Units up to 30y for MfD.
+    ER.GetEnemies(30);
+
     BestUnit, BestUnitTTD = nil, 60;
     for _, Unit in pairs(ER.Cache.Enemies[30]) do
       -- I increased the SimC condition by 50% since we are slower.
