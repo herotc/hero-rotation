@@ -182,5 +182,5 @@ ER.GUISettings = {
         }
     }
   }
-  }
+  },
 };
