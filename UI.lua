@@ -117,7 +117,6 @@ end
     self:SetPoint("TOPLEFT", ER.MainIconFrame, "BOTTOMLEFT", 0, 0);
     self:SetFrameStrata(ER.GUISettings.General.MainFrameStrata);
     self:SetFrameLevel(ER.MainIconFrame:GetFrameLevel() + 1);
-    self:EnableMouse(true);
     self:AddButton("C", 1, "CDs");
     self:AddButton("A", 2, "AoE");
     self:AddButton("O", 3, "On/Off");
