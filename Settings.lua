@@ -151,6 +151,27 @@ ER.GUISettings = {
         }
       }
     },
+    Shaman = {
+      Enhancement = {
+        --{Display GCD as OffGcd, ForceReturn}
+        GCDasOffGCD = {
+          -- Abilities
+          FeralSpirit = {true, false}
+        },
+        --{Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+          -- Abilities 
+          DoomWinds = {true, false},
+          -- Legendaries
+          StormTempests = {true, false},
+          EmalonChargedCore = {true, false},
+          -- Kick
+          WindShear = {true, false},
+          -- Racial
+          Berserking = {true, false}
+        }
+      }
+    },
     Warrior = {
       Arms = {
         -- {Display GCD as OffGCD, ForceReturn}
@@ -160,27 +181,6 @@ ER.GUISettings = {
         OffGCDasOffGCD = {
         }
       }
-    },
-    Shaman = {
-      Enhancement = {
-          --{Display GCD as OffGcd, ForceReturn}
-          GCDasOffGCD = {
-          --Abilities
-          FeralSpirit = {true, false}
-          },
-          --{Display OffGCD as OffGCD, ForceReturn}
-          OffGCDasOffGCD = {
-          -- Abilities 
-          DoomWinds = {true, false},
-          --Legendaries
-          StormTempests = {true, false},
-          EmalonChargedCore = {true, false},
-          -- Kick
-          WindShear = {true, false},
-          -- Racial
-          Berserking = {true, false}
-        }
     }
   }
-  },
 };
