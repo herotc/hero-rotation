@@ -157,7 +157,7 @@ function ER.CmdHandler (Message)
     ERSettings.Toggles[3] = not ERSettings.Toggles[3];
     ER.Print("EasyRaid is now "..(ERSettings.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
   elseif _T.Argument == "help" then
-    ER.Print("CDs : /eraid cds | AoE : /eraid cds | Toggle : /eraid toggle");
+    ER.Print("CDs : /eraid cds | AoE : /eraid aoe | Toggle : /eraid toggle");
   elseif _T.Argument == "uilock" then
     ER.MainFrame:EnableMouse(false);
     ER.MainFrame:SetMovable(false);
@@ -169,6 +169,7 @@ function ER.CmdHandler (Message)
   end
 end
 SLASH_EASYRAID1 = "/eraid"
+SLASH_EASYRAID2 = "/er"
 SlashCmdList["EASYRAID"] = ER.CmdHandler;
 
 -- Get if the CDs are enabled.
