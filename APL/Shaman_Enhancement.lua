@@ -176,6 +176,9 @@ local function APL ()
         if I.EmalonChargedCore:IsEquipped(5) and Player:Buff(S.EmalonChargedCore) then
             if ER.LeftIconFrame:ChangeLeftIcon(ER.GetTexture(S.EmalonChargedCore)) then return "Cast EmalonChargedCore"; end
         end
+        if I.EmalonChargedCore:IsEquipped(5) and not Player:Buff(S.EmalonChargedCore) then
+            if ER.LeftIconFrame:ChangeLeftIcon(nil) then return "Cast EmalonChargedCore"; end
+        end
         if I.StormTempests:IsEquipped(6) and Target:Debuff(S.StormTempests) then
             if ER.LeftIconFrame:ChangeLeftIcon(ER.GetTexture(S.StormTempests)) then return "Cast StormTempests"; end
         end
@@ -199,7 +202,8 @@ local function APL ()
       --      if ER.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
       --  end
             --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(maelstrom<=50&active_enemies>=3)
-        if S.Boulderfist:IsCastable() and Player:BuffRemains(S.BoulderfistBuff) < Player:GCD() or (Player:Maelstrom()<= 50 and ER.Cache.EnemiesCount[8]>=3) then
+        if S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable() and (Player:BuffRemains(S.BoulderfistBuff) < Player:GCD() 
+            or (Player:Maelstrom()<= 50 and ER.Cache.EnemiesCount[8]>=3)) then
             if ER.Cast(S.Boulderfist) then return "Cast Boulderfist"; end
         end
 
@@ -208,7 +212,7 @@ local function APL ()
             if ER.Cast(S.Rockbiter) then return "Cast Rockbiter"; end
         end
             -- actions+=/fury_of_air,if=!ticking&maelstrom>22
-        if not Player:Buff(S.FuryOfAirBuff) and S.FuryOfAir:IsCastable() and Player:Maelstrom() > 15 then 
+        if not Player:Buff(S.FuryOfAir) and S.FuryOfAir:IsCastable() and Player:Maelstrom() > 15 then 
             if ER.Cast(S.FuryOfAir) then return "Cast FuryOfAir"; end
         end
             -- actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
@@ -220,8 +224,8 @@ local function APL ()
             if ER.Cast(S.Flametongue) then return "Cast Flametongue"; end
         end
             --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
-        if S.Boulderfist:IsCastable() and Player:BuffRemains(S.BoulderfistBuff)<Player:GCD() or (S.Boulderfist:ChargesFractional()>1.75 and Player:Maelstrom()<= 100
-        	and ER.Cache.EnemiesCount[8]<=2) then
+        if S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable() and (Player:BuffRemains(S.BoulderfistBuff)<Player:GCD() or
+         (S.Boulderfist:ChargesFractional()>1.75 and Player:Maelstrom()<= 100 and ER.Cache.EnemiesCount[8]<=2)) then
         	if ER.Cast(S.Boulderfist) then return "Cast Boulderfist";end
         end
 
@@ -245,7 +249,7 @@ local function APL ()
             -- actions+=/lightning_bolt,if=(talent.overcharge.enabled&maelstrom>=40&!talent.fury_of_air.enabled)|(talent.overcharge.enabled&talent.fury_of_air.enabled&maelstrom>46)
         if S.LightningBolt:IsCastable() and ((S.Overcharge:IsAvailable() and Player:Maelstrom() >= 40 and not S.FuryOfAir:IsCastable()) 
             or (S.Overcharge:IsAvailable() and S.FuryOfAir:IsCastable() and Player:Maelstrom() >= 46 )) then
-            if ER.Cast(LightningBolt) then return "Cast LightningBolt"; end
+            if ER.Cast(S.LightningBolt) then return "Cast LightningBolt"; end
         end
         -- actions+=/crash_lightning,if=buff.crash_lightning.remains<gcd&active_enemies>=2
         if  ER.AoEON() and S.CrashLightning:IsCastable() and Player:BuffRemains(S.CrashLightningBuff) < Player:GCD() and ER.Cache.EnemiesCount[8] >= 2 then
@@ -295,7 +299,8 @@ local function APL ()
             if ER.Cast(S.Stormstrike) then return "Cast Stormstrike"; end
         end
             -- actions+=/crash_lightning,if=((active_enemies>1|talent.crashing_storm.enabled|talent.boulderfist.enabled)&!set_bonus.tier19_4pc)|feral_spirit.remains>5  --or S.FeralSpirit:BuffRemains(S.AlphaWolfBuff)>5
-        if S.CrashLightning:IsCastable() and (((ER.Cache.EnemiesCount[8]>1 or S.CrashingStorm:IsAvailable() or S.Boulderfist.IsCastable())and not ER.Tier19_4Pc) ) then
+        if S.CrashLightning:IsCastable() and (ER.Cache.EnemiesCount[8]>1 or S.CrashingStorm:IsAvailable() or 
+            (S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable()) and not ER.Tier19_4Pc) then
             if ER.Cast(S.CrashLightning) then return "Cast CrashLightning"; end 
         end
             -- actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
@@ -307,11 +312,11 @@ local function APL ()
             if ER.Cast(S.LavaLash) then return "Cast LavaLash"; end
         end
             -- actions+=/lava_lash,if=talent.fury_of_air.enabled&!talent.overcharge.enabled&(set_bonus.tier19_4pc&maelstrom>=53)
-            if S.LavaLash:IsCastable() and S.FuryOfAir:IsCastable() and not S.Overcharge:IsAvailable() and ER.Tier19_4Pc and Player:Maelstrom() >= 53 then
+        if S.LavaLash:IsCastable() and S.FuryOfAir:IsCastable() and not S.Overcharge:IsAvailable() and ER.Tier19_4Pc and Player:Maelstrom() >= 53 then
             if ER.Cast(S.LavaLash) then return "Cast LavaLash"; end
         end
             -- actions+=/lava_lash,if=(!set_bonus.tier19_4pc&maelstrom>=120)|(!talent.fury_of_air.enabled&set_bonus.tier19_4pc&maelstrom>=40)
-            if S.LavaLash:IsCastable() and ((not ER.Tier19_4Pc and Player:Maelstrom()>=120) or (not S.FuryOfAir:IsCastable() and ER.Tier19_4Pc and Player:Maelstrom()>=40)) then
+        if S.LavaLash:IsCastable() and ((not ER.Tier19_4Pc and Player:Maelstrom()>=120) or (not S.FuryOfAir:IsCastable() and ER.Tier19_4Pc and Player:Maelstrom()>=40)) then
             if ER.Cast(S.LavaLash) then return "Cast LavaLash"; end
         end
             -- actions+=/flametongue,if=buff.flametongue.remains<4.8
