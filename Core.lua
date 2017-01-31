@@ -157,19 +157,10 @@ function ER.CmdHandler (Message)
     ERSettings.Toggles[3] = not ERSettings.Toggles[3];
     ER.Print("EasyRaid is now "..(ERSettings.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
   elseif _T.Argument == "help" then
-    ER.Print("CDs : /eraid cds | AoE : /eraid aoe | Toggle : /eraid toggle");
-  elseif _T.Argument == "lock" then
-    ER.MainFrame:EnableMouse(false);
-    ER.MainFrame:SetMovable(false);
-    ER.Print("EasyRaid UI is now |cffff0000locked|r.");
-  elseif _T.Argument == "unlock" then
-    ER.MainFrame:EnableMouse(true);
-    ER.MainFrame:SetMovable(true);
-    ER.Print("EasyRaid is now |cff00ff00unlocked|r.");
+    ER.Print("CDs : /eraid cds | AoE : /eraid cds | Toggle : /eraid toggle");
   end
 end
 SLASH_EASYRAID1 = "/eraid"
-SLASH_EASYRAID2 = "/er"
 SlashCmdList["EASYRAID"] = ER.CmdHandler;
 
 -- Get if the CDs are enabled.
@@ -1046,12 +1037,6 @@ end
       end
     end
 
-    -- buff.bloodlust.up
-    -- TODO
-    function Unit:HasBloodlust ()
-      return;
-    end
-
     -- attack_power
     -- TODO : Use Cache
     function Unit:AttackPower ()
@@ -1344,7 +1329,7 @@ end
     end
     -- Maelstrom.pct
     function Unit:MaelstromPercentage ()
-      return (self:Maelstrom() / self:MaelstromMax()) * 150;
+      return (self:Maelstrom() / self:MaelstromMax()) * 100;
     end
     -- Maelstrom.deficit
     function Unit:MaelstromDeficit ()
@@ -1352,7 +1337,7 @@ end
     end
     -- "Maelstrom.deficit.pct"
     function Unit:MaelstromDeficitPercentage ()
-      return (self:MaelstromDeficit() / self:MaelstromMax()) * 150;
+      return (self:MaelstromDeficit() / self:MaelstromMax()) * 100;
     end
 
     -- Get if the player is stealthed or not
