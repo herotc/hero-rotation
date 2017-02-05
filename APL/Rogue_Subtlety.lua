@@ -33,6 +33,7 @@ local pairs = pairs;
     Stealth                       = Spell(1784),
     SymbolsofDeath                = Spell(212283),
     Vanish                        = Spell(1856),
+    VanishBuff                    = Spell(115193),
     -- Talents
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
@@ -442,7 +443,7 @@ local function APL ()
           end
         elseif Player:IsStealthed(true, true) then
           -- World of Subterfuge Bug
-          if S.Subterfuge:IsAvailable() and (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() then
+          if S.Subterfuge:IsAvailable() and not Player:Buff(S.VanishBuff) and not Player:Buff(S.Shadowmeld) and (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() then
             if ER.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
           else
             if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
