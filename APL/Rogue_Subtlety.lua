@@ -441,10 +441,15 @@ local function APL ()
            if ER.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
           end
         elseif Player:IsStealthed(true, true) then
-          if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
-            if ER.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
-          elseif S.Shadowstrike:IsCastable() then
-            if ER.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
+          -- World of Subterfuge Bug
+          if S.Subterfuge:IsAvailable() and (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() then
+            if ER.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
+          else
+            if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+              if ER.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
+            elseif S.Shadowstrike:IsCastable() then
+              if ER.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
+            end
           end
         elseif S.Backstab:IsCastable() then
           if ER.Cast(S.Backstab) then return "Cast Backstab (OOC)"; end
