@@ -236,7 +236,7 @@ local function Finish ()
     if Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 10 and
       Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
       ((Target:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
-      Target:DebuffRemains(S.Nightblade) < 2) then
+      Target:DebuffRemains(S.Nightblade) < 3) then
       if ER.Cast(S.Nightblade) then return "Cast"; end
     end
     if ER.AoEON() then
@@ -247,7 +247,7 @@ local function Finish ()
           Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
           ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and
           (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
-          Value:DebuffRemains(S.Nightblade) < 2) then
+          Value:DebuffRemains(S.Nightblade) < 3) then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
         end
       end
@@ -346,10 +346,14 @@ local function Stealth_ALS ()
 end
 -- # Stealthed Rotation
 local function Stealthed ()
-  -- actions.stealthed=symbols_of_death,if=(buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3)|(equipped..shadow_satyrs_walk&energy.time_to_max<0.25)
-  -- Added condition to check stealth won't expire until we can cast it. 'Player:IsStealthed(true, true, true) > Player:EnergyTimeToX(40)', took 5 extra energy.
-  if S.SymbolsofDeath:IsCastable() and ((Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5)) or (I.ShadowSatyrsWalk:IsEquipped(8) and Player:EnergyTimeToMax() < 0.25)) then
+  -- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3
+  -- TODO: Added condition to check stealth won't expire until we can cast it.
+  if S.SymbolsofDeath:IsCastable() and Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5) then
     if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
+  end
+  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk
+  if Player:ComboPoints() >= 5 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+    return Finish();
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
   if ER.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
@@ -520,7 +524,7 @@ end
 
 ER.SetAPL(261, APL);
 
--- Last Update: 01/16/2017
+-- Last Update: 02/06/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
@@ -582,7 +586,8 @@ ER.SetAPL(261, APL);
 -- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
 
 -- # Stealthed Rotation
--- actions.stealthed=symbols_of_death,if=(buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3)|equipped.shadow_satyrs_walk&energy.time_to_max<0.25
+-- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3
+-- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk
 -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
 -- actions.stealthed+=/shadowstrike,if=combo_points.deficit>=2+talent.premeditation.enabled+buff.shadow_blades.up
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5
