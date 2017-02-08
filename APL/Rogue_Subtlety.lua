@@ -200,10 +200,8 @@ local function CDs ()
        if ER.Cast(S.ArcaneTorrent, Settings.Subtlety.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
      end
    end
-   -- actions.cds+=/shadow_blades,if=combo_points<=2|(equipped.denial_of_the_halfgiants&combo_points>=1)
-   if S.ShadowBlades:IsCastable() and (Player:ComboPoints() <= 2 or (I.DenialoftheHalfGiants:IsEquipped(9)
-       and Player:ComboPoints() >= 1)) and not Player:Buff(S.ShadowBlades)
-   then
+   -- actions.cds+=/shadow_blades
+   if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
     if ER.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast"; end
    end
    -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=2.45&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
@@ -270,7 +268,7 @@ local SoDMacro, ShStormMacro;
 local function StealthMacro(MacroType)
   SoDMacro, ShStormMacro = false, false;
   -- Will we SoD ?
-  if S.SymbolsofDeath:IsCastable() and ((Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5)) or (I.ShadowSatyrsWalk:IsEquipped(8) and Player:EnergyTimeToMax() < 0.25)) then
+  if S.SymbolsofDeath:IsCastable() and Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5) then
     SoDMacro = true;
   end
   -- Will we Shuriken Storm ?
@@ -446,15 +444,10 @@ local function APL ()
            if ER.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
           end
         elseif Player:IsStealthed(true, true) then
-          -- World of Subterfuge Bug
-          if S.Subterfuge:IsAvailable() and not Player:Buff(S.VanishBuff) and not Player:Buff(S.Shadowmeld) and (ER.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() then
-            if ER.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
-          else
-            if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
-              if ER.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
-            elseif S.Shadowstrike:IsCastable() then
-              if ER.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
-            end
+          if ER.AoEON() and S.ShurikenStorm:IsCastable() and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+            if ER.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
+          elseif S.Shadowstrike:IsCastable() then
+            if ER.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
           end
         elseif S.Backstab:IsCastable() then
           if ER.Cast(S.Backstab) then return "Cast Backstab (OOC)"; end
