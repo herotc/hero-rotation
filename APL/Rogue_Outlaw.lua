@@ -23,26 +23,29 @@ local tostring = tostring;
     GiftoftheNaaru                = Spell(59547),
     Shadowmeld                    = Spell(58984),
     -- Abilities
-    Alacrity                      = Spell(193539),
-    AlacrityBuff                  = Spell(193538),
     Ambush                        = Spell(8676),
-    Anticipation                  = Spell(114015),
     BetweentheEyes                = Spell(199804),
     BladeFlurry                   = Spell(13877),
     BladeFlurry2                  = Spell(103828), -- Protection Warrior Warbringer Icon
-    Blunderbuss                   = Spell(202895),
-    DeathfromAbove                = Spell(152150),
-    DeeperStratagem               = Spell(193531),
-    GhostlyStrike                 = Spell(196937),
-    HiddenBlade                   = Spell(202754),
     Opportunity                   = Spell(195627),
     PistolShot                    = Spell(185763),
-    QuickDraw                     = Spell(196938),
     RolltheBones                  = Spell(193316),
     RunThrough                    = Spell(2098),
     SaberSlash                    = Spell(193315),
-    SliceandDice                  = Spell(5171),
     Stealth                       = Spell(1784),
+    -- Talents
+    Alacrity                      = Spell(193539),
+    AlacrityBuff                  = Spell(193538),
+    Anticipation                  = Spell(114015),
+    DeathfromAbove                = Spell(152150),
+    DeeperStratagem               = Spell(193531),
+    DirtyTricks                   = Spell(108216),
+    GhostlyStrike                 = Spell(196937),
+    QuickDraw                     = Spell(196938),
+    SliceandDice                  = Spell(5171),
+    -- Artifact
+    Blunderbuss                   = Spell(202895),
+    HiddenBlade                   = Spell(202754),
     -- Offensive
     AdrenalineRush                = Spell(13750),
     CannonballBarrage             = Spell(185767),
@@ -54,6 +57,7 @@ local tostring = tostring;
     CrimsonVial                   = Spell(185311),
     Feint                         = Spell(1966),
     -- Utility
+    Gouge                         = Spell(1776),
     Kick                          = Spell(1766),
     Sprint                        = Spell(2983),
     -- Roll the Bones
@@ -62,16 +66,18 @@ local tostring = tostring;
     GrandMelee                    = Spell(193358),
     JollyRoger                    = Spell(199603),
     SharkInfestedWaters           = Spell(193357),
-    TrueBearing                   = Spell(193359)
+    TrueBearing                   = Spell(193359),
+    -- Legendaries
+    GreenskinsBuff                = Spell(209423)
   };
   local S = Spell.Rogue.Outlaw;
 -- Items
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Outlaw = {
     -- Legendaries
-    GreenskinsWaterloggedWristcuffs = Item(137099), -- 9
-    ShivarranSymmetry = Item(141321), -- 10
-    ThraxisTricksyTreads = Item(137031) -- 8
+    GreenskinsItem                = Item(137099), -- 9
+    ShivarranSymmetry             = Item(141321), -- 10
+    ThraxisTricksyTreads          = Item(137031) -- 8
   };
   local I = Item.Rogue.Outlaw;
 -- Rotation Var
@@ -152,12 +158,12 @@ local function RtB_Buffs ()
   end
   return ER.Cache.APLVar.RtB_Buffs;
 end
--- # Condition to continue rerolling RtB (2- or not TB alone or not SIW alone during CDs); If SnD: consider that you never have to reroll.
+-- # Fish for '3 Buffs' or 'True Bearing'. With SnD, consider that we never have to reroll.
 local function RtB_Reroll ()
-  -- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=1&!rtb_list.any.6&((!buff.curse_of_the_dreadblades.up&!buff.adrenaline_rush.up)|!rtb_list.any.5))
+  -- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
   if not ER.Cache.APLVar.RtB_Reroll then
     -- Defensive Override : Grand Melee if HP < 60
-    if Settings.Outlaw.RolltheBonesLeechHP and Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechHP then
+    if Settings.General.SoloMode and Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechHP then
       ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:Buff(S.GrandMelee)) and true or false;
     -- 1+ Buff
     elseif Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
@@ -182,7 +188,7 @@ local function RtB_Reroll ()
       ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:Buff(S.TrueBearing)) and true or false;
     -- SimC Default
     else
-      ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and (RtB_Buffs() <= 1 and not RtB_List("Any", {6}) and ((not Player:Debuff(S.CurseoftheDreadblades) and not Player:Buff(S.AdrenalineRush)) or not RtB_List("Any", {5})))) and true or false;
+      ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and (RtB_Buffs() <= 2 or not RtB_List("Any", {6}))) and true or false;
     end
   end
   return ER.Cache.APLVar.RtB_Reroll;
@@ -211,6 +217,28 @@ local function Stealth_Condition ()
   end
   return ER.Cache.APLVar.Stealth_Condition;
 end
+
+
+-- # Builders
+local function Build ()
+  -- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
+  if S.GhostlyStrike:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (ER.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:Cooldown() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and ER.CombatTime() >= 10))
+    if ER.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
+  end
+  -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
+  if (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Target:IsInRange(20) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsBuff))) then
+    if S.Blunderbuss:IsCastable() then
+      if ER.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
+    elseif S.PistolShot:IsCastable() then
+      if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+    end
+  end
+  -- actions.build+=/saber_slash,if=variable.ss_useable
+  if Target:IsInRange(5) and S.SaberSlash:IsCastable() and SS_Useable() then
+    if ER.Cast(S.SaberSlash) then return "Cast Saber Slash"; end
+  end
+  return false;
+end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
@@ -225,7 +253,7 @@ local function BF ()
 end
 -- # Cooldowns
 local function CDs ()
-  -- actions.cds=potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+  -- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
   -- TODO: Add Potion
   -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
   if ER.AoEON() and S.CannonballBarrage:IsCastable() and ER.Cache.EnemiesCount[8] >= 1 then
@@ -264,6 +292,22 @@ local function CDs ()
   end
   return false;
 end
+-- # Finishers
+local function Finish ()
+  -- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
+  if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and I.GreenskinsItem:IsEquipped(9) and not Player:Buff(S.GreenskinsBuff) then
+    if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
+  end
+  -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
+  if S.RunThrough:IsCastable() and Target:IsInRange(6) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:Cooldown() + 3.5) then
+    if ER.Cast(S.RunThrough) then return "Cast Run Through"; end
+  end
+  -- OutofRange BtE
+  if S.BetweentheEyes:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(20) then
+    if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OoR)"; end
+  end
+  return false;
+end
 -- # Stealth
 local function Stealth ()
   if Target:IsInRange(5) then
@@ -281,42 +325,6 @@ local function Stealth ()
         end
       end
     end
-  end
-  return false;
-end
--- # Finishers
-local function Finish ()
-  -- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&buff.shark_infested_waters.up
-  if I.GreenskinsWaterloggedWristcuffs:IsEquipped(9) and Target:IsInRange(20) and S.BetweentheEyes:IsCastable() and Player:Buff(S.SharkInfestedWaters) then
-    if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
-  end
-  -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
-  if (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:Cooldown() + 3.5) and Target:IsInRange(6) and S.RunThrough:IsCastable() then
-    if ER.Cast(S.RunThrough) then return "Cast Run Through"; end
-  end
-  -- OutofRange BtE
-  if not Target:IsInRange(10) and Target:IsInRange(20) and S.BetweentheEyes:IsCastable() then
-    if ER.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OoR)"; end
-  end
-  return false;
-end
--- # Builders
-local function Build ()
-  -- actions.build=ghostly_strike,if=(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(combo_points>=3|variable.rtb_reroll&time>=10)
-  if Target:IsInRange(5) and S.GhostlyStrike:IsCastable() and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (ER.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:Cooldown() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and ER.CombatTime() >= 10)) then
-    if ER.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
-  end
-  -- actions.build+=/pistol_shot,if=buff.opportunity.up&energy.time_to_max>2-talent.quick_draw.enabled&combo_points.deficit>=1+buff.broadsides.up
-  if Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Player:Buff(S.Opportunity) and Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) then
-    if S.Blunderbuss:IsCastable() then
-      if ER.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
-    elseif S.PistolShot:IsCastable() then
-      if ER.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
-    end
-  end
-  -- actions.build+=/saber_slash,if=variable.ss_useable
-  if Target:IsInRange(5) and S.SaberSlash:IsCastable() and SS_Useable() then
-    if ER.Cast(S.SaberSlash) then return "Cast Saber Slash"; end
   end
   return false;
 end
@@ -450,6 +458,11 @@ local function APL ()
           return;
         end
       end
+      -- # Gouge is used as a CP Generator while nothing else is available and you have Dirty Tricks talent. It's unlikely that you'll be able to do this optimally in-game since it requires to move in front of the target, but it's here so you can quantifiy its value.
+      -- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
+      if S.Gouge:IsCastable() and Target:IsInRange(10) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
+        if ER.Cast(S.Gouge) then return "Cast Gouge"; end
+      end
       -- OutofRange Pistol Shot
       if not Target:IsInRange(10) and Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if S.Blunderbuss:IsCastable() then
@@ -465,3 +478,65 @@ ER.SetAPL(260, APL);
 
 -- Last Update: 01/27/2017
 
+-- # Executed before combat begins. Accepts non-harmful actions only.
+-- actions.precombat=flask,name=flask_of_the_seventh_demon
+-- actions.precombat+=/augmentation,name=defiled
+-- actions.precombat+=/food,name=seedbattered_fish_plate
+-- # Snapshot raid buffed stats before combat begins and pre-potting is done.
+-- actions.precombat+=/snapshot_stats
+-- actions.precombat+=/stealth
+-- actions.precombat+=/potion,name=prolonged_power
+-- actions.precombat+=/marked_for_death,if=raid_event.adds.in>40
+-- actions.precombat+=/roll_the_bones,if=!talent.slice_and_dice.enabled
+
+-- # Executed every time the actor is available.
+-- # Fish for '3 Buffs' or 'True Bearing'. With SnD, consider that we never have to reroll.
+-- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
+-- # Condition to use Saber Slash when not rerolling RtB or when using SnD
+-- actions+=/variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
+-- # Condition to use Saber Slash, when you have RtB or not
+-- actions+=/variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
+-- # Normal rotation
+-- actions+=/call_action_list,name=bf
+-- actions+=/call_action_list,name=cds
+-- # Conditions are here to avoid worthless check if nothing is available
+-- actions+=/call_action_list,name=stealth,if=stealthed.rogue|cooldown.vanish.up|cooldown.shadowmeld.up
+-- actions+=/death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
+-- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
+-- actions+=/roll_the_bones,if=!variable.ss_useable&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
+-- actions+=/killing_spree,if=energy.time_to_max>5|energy<15
+-- actions+=/call_action_list,name=build
+-- actions+=/call_action_list,name=finish,if=!variable.ss_useable
+-- # Gouge is used as a CP Generator while nothing else is available and you have Dirty Tricks talent. It's unlikely that you'll be able to do this optimally in-game since it requires to move in front of the target, but it's here so you can quantifiy its value.
+-- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
+
+-- # Blade Flurry
+-- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
+-- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
+
+-- # Builders
+-- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
+-- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
+-- actions.build+=/saber_slash,if=variable.ss_useable
+
+-- # Cooldowns
+-- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+-- actions.cds+=/blood_fury
+-- actions.cds+=/berserking
+-- actions.cds+=/arcane_torrent,if=energy.deficit>40
+-- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
+-- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
+-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+-- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
+-- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
+
+-- # Finishers
+-- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
+-- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
+
+-- # Stealth
+-- # Condition to use stealth abilities
+-- actions.stealth=variable,name=stealth_condition,value=(combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up)
+-- actions.stealth+=/ambush
+-- actions.stealth+=/vanish,if=variable.stealth_condition
+-- actions.stealth+=/shadowmeld,if=variable.stealth_condition
