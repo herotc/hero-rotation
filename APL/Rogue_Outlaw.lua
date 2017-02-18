@@ -188,7 +188,7 @@ local function RtB_Reroll ()
       ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:Buff(S.TrueBearing)) and true or false;
     -- SimC Default
     else
-      ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and (RtB_Buffs() <= 2 or not RtB_List("Any", {6}))) and true or false;
+      ER.Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and (RtB_Buffs() <= 2 and not RtB_List("Any", {6}))) and true or false;
     end
   end
   return ER.Cache.APLVar.RtB_Reroll;
@@ -222,7 +222,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
-  if S.GhostlyStrike:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (ER.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:Cooldown() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and ER.CombatTime() >= 10))
+  if S.GhostlyStrike:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (ER.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:Cooldown() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and ER.CombatTime() >= 10)) then
     if ER.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
   end
   -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
@@ -369,6 +369,17 @@ local function APL ()
     -- Feint
     ShouldReturn = ER.Commons.Rogue.Feint (S.Feint);
     if ShouldReturn then return ShouldReturn; end
+  --- Blade Flurry
+    -- Blade Flurry Expiration Offset
+    if (not ER.AoEON() or ER.Cache.EnemiesCount[6] == 1) and BFReset then
+      BFTimer, BFReset = ER.GetTime() + Settings.Outlaw.BFOffset, false;
+    elseif ER.AoEON() and ER.Cache.EnemiesCount[6] > 1 then
+      BFReset = true;
+    end
+    -- actions+=/call_action_list,name=bf
+    if BF() then
+      return;
+    end
   --- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
@@ -392,19 +403,9 @@ local function APL ()
     end
     return;
   end
-  -- In Combat
+  --- In Combat
     -- MfD Sniping
     ER.Commons.Rogue.MfDSniping(S.MarkedforDeath);
-    -- Blade Flurry Expiration Offset
-    if (not ER.AoEON() or ER.Cache.EnemiesCount[6] == 1) and BFReset then
-      BFTimer, BFReset = ER.GetTime() + Settings.Outlaw.BFOffset, false;
-    elseif ER.AoEON() and ER.Cache.EnemiesCount[6] > 1 then
-      BFReset = true;
-    end
-    -- actions+=/call_action_list,name=bf
-    if BF() then
-      return;
-    end
     if ER.Commons.TargetIsValid() then
       -- Mythic Dungeon
       if MythicDungeon() then
