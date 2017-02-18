@@ -300,7 +300,11 @@ end
   end
 
   local DummyUnits = {
-    [31146] = true
+    [31146] = true,
+    -- Rogue Class Order Hall
+    [92164] = true, -- Training Dummy
+    [92165] = true, -- Dungeoneer's Training Dummy
+    [92166] = true  -- Raider's Training Dummy
   };
   function Unit:IsDummy ()
     return self:NPCID() >= 0 and DummyUnits[self:NPCID()] == true;
