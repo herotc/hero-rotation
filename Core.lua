@@ -138,12 +138,12 @@ function ER.Cast (Object, OffGCD)
     end
   else
     ER.MainIconFrame:ChangeMainIcon(ER.GetTexture(Object));
+    ER.MainIconFrame:SetCooldown(GetSpellCooldown(61304)); -- Put the GCD as Cast Cooldown
     Object.LastDisplayTime = ER.GetTime();
     return "Should Return";
   end
   return false;
 end
-
 
 function ER.CmdHandler (Message)
   _T.Argument = stringlower(Message);
