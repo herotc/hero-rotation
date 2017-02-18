@@ -463,7 +463,7 @@ local function APL ()
       end
       -- # Gouge is used as a CP Generator while nothing else is available and you have Dirty Tricks talent. It's unlikely that you'll be able to do this optimally in-game since it requires to move in front of the target, but it's here so you can quantifiy its value.
       -- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
-      if S.Gouge:IsCastable() and Target:IsInRange(10) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
+      if S.Gouge:IsCastable() and Target:IsInRange(5) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
         if ER.Cast(S.Gouge) then return "Cast Gouge"; end
       end
       -- OutofRange Pistol Shot
