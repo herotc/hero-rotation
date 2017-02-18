@@ -262,15 +262,15 @@ local function CDs ()
   if Target:IsInRange(5) then
     -- actions.cds+=/blood_fury
     if S.BloodFury:IsCastable() then
-      if ER.Cast(S.BloodFury, Settings.Outlaw.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+      if ER.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
     end
     -- actions.cds+=/berserking
     if S.Berserking:IsCastable() then
-      if ER.Cast(S.Berserking, Settings.Outlaw.OffGCDasOffGCD.Berserking) then return "Cast"; end
+      if ER.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
     end
     -- actions.cds+=/arcane_torrent,if=energy.deficit>40
     if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 40 then
-      if ER.Cast(S.ArcaneTorrent, Settings.Outlaw.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+      if ER.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
     end
     -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
     if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
@@ -279,11 +279,11 @@ local function CDs ()
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
     --[[Normal MfD
     if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
-      if ER.Cast(S.MarkedforDeath, Settings.Outlaw.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
+      if ER.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
     end]]
     -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
     if I.ThraxisTricksyTreads:IsEquipped(8) and S.Sprint:IsCastable() and not SS_Useable() then
-      if ER.Cast(S.Sprint, Settings.Outlaw.OffGCDasOffGCD.Sprint) then return "Cast"; end
+      if ER.Cast(S.Sprint, Settings.Commons.OffGCDasOffGCD.Sprint) then return "Cast"; end
     end
     -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
     if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
@@ -318,10 +318,10 @@ local function Stealth ()
       if ER.CDsON() and Stealth_Condition() and not Player:IsTanking(Target) then
         -- actions.stealth+=/vanish,if=variable.stealth_condition
         if S.Vanish:IsCastable() then
-          if ER.Cast(S.Vanish, Settings.Outlaw.OffGCDasOffGCD.Vanish) then return "Cast"; end
+          if ER.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
         -- actions.stealth+=/shadowmeld,if=variable.stealth_condition
         elseif S.Shadowmeld:IsCastable() then
-          if ER.Cast(S.Shadowmeld, Settings.Outlaw.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
+          if ER.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
         end
       end
     end
@@ -417,7 +417,7 @@ local function APL ()
       end
       -- Kick
       if Settings.General.InterruptEnabled and Target:IsInRange(5) and S.Kick:IsCastable() and Target:IsInterruptible() then
-        if ER.Cast(S.Kick, Settings.Outlaw.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
+        if ER.Cast(S.Kick, Settings.Commons.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
       end
       -- actions+=/call_action_list,name=cds
       if ER.CDsON() and CDs() then

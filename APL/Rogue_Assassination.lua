@@ -156,21 +156,21 @@ local function CDs ()
     if Target:Debuff(S.Vendetta) then
       -- actions.cds+=/blood_fury,if=debuff.vendetta.up
       if S.BloodFury:IsCastable() then
-        if ER.Cast(S.BloodFury, Settings.Assassination.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+        if ER.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
       end
       -- actions.cds+=/berserking,if=debuff.vendetta.up
       if S.Berserking:IsCastable() then
-        if ER.Cast(S.Berserking, Settings.Assassination.OffGCDasOffGCD.Berserking) then return "Cast"; end
+        if ER.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
       end
       -- actions.cds+=/arcane_torrent,if=debuff.vendetta.up&energy.deficit>50
       if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 50 then
-        if ER.Cast(S.ArcaneTorrent, Settings.Assassination.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+        if ER.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
       end
     end
       -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
     --[[Normal MfD
     if not S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
-      if ER.Cast(S.MarkedforDeath, Settings.Assassination.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
+      if ER.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
     end]]
       -- actions.cds+=/vendetta,if=talent.exsanguinate.enabled&cooldown.exsanguinate.remains<5&dot.rupture.ticking
       -- actions.cds+=/vendetta,if=!talent.exsanguinate.enabled&(!artifact.urge_to_kill.enabled|energy.deficit>=70)

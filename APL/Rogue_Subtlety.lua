@@ -189,15 +189,15 @@ local function CDs ()
    if Player:IsStealthed(true, false) then
      -- actions.cds+=/blood_fury,if=stealthed.rogue
      if S.BloodFury:IsCastable() then
-       if ER.Cast(S.BloodFury, Settings.Subtlety.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+       if ER.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
      end
      -- actions.cds+=/berserking,if=stealthed.rogue
      if S.Berserking:IsCastable() then
-       if ER.Cast(S.Berserking, Settings.Subtlety.OffGCDasOffGCD.Berserking) then return "Cast"; end
+       if ER.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
      end
      -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 70 then
-       if ER.Cast(S.ArcaneTorrent, Settings.Subtlety.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+       if ER.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
      end
    end
    -- actions.cds+=/shadow_blades
@@ -214,7 +214,7 @@ local function CDs ()
    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
    --[[Normal MfD
    if not S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
-    if ER.Cast(S.MarkedforDeath, Settings.Subtlety.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
+    if ER.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
    end]]
   end
   return false;
