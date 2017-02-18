@@ -117,7 +117,6 @@ ER.GUISettings = {
       },
       Outlaw = {
         -- Roll the Bones Logic, accepts "Default", "1+ Buff" and every "RtBName".
-        -- Useful for Cenarius where you want to fish for Cenarius
         -- "Default", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"
         RolltheBonesLogic = "Default",
         -- Blade Flurry TimeOut
