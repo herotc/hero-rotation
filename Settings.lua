@@ -12,7 +12,7 @@ ER.GUISettings = {
     InterruptEnabled = false,
     InterruptWithStun = false, -- EXPERIMENTAL
     -- SoloMode try to maximize survivability at the cost of dps
-    SoloMode = true,
+    SoloMode = false,
     -- Blacklist Settings
     Blacklist = {
       -- During how many times the GCD time you want to blacklist an unit from Cycling
