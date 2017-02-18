@@ -17,6 +17,7 @@ local Token; -- ER.Nameplate.AddIcon
 
 
 ER.MainIconFrame = CreateFrame("Frame", "EasyRaid_MainIconFrame", UIParent);
+ER.MainIconFrame.CooldownFrame = CreateFrame("Cooldown", "EasyRaid_MainIconCooldownFrame", ER.MainIconFrame, "CooldownFrameTemplate");
 ER.MainIconFrame.TempTexture = ER.MainIconFrame:CreateTexture(nil, "BACKGROUND");
 ER.LeftIconFrame = CreateFrame("Frame", "EasyRaid_LeftIconFrame", UIParent);
 ER.SmallIconFrame = CreateFrame("Frame", "EasyRaid_SmallIconFrame", UIParent);
@@ -41,6 +42,7 @@ end
     self:SetWidth(64);
     self:SetHeight(64);
     self:SetPoint("BOTTOMRIGHT", ER.MainFrame, "BOTTOMRIGHT", 0, 20);
+    self.CooldownFrame:SetAllPoints(self);
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
     self:Show();
   end
@@ -49,6 +51,9 @@ end
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
+  end
+  function ER.MainIconFrame:SetCooldown (Start, Duration)
+    self.CooldownFrame:SetCooldown(Start, Duration);
   end
 
 
