@@ -76,6 +76,7 @@ local tostring = tostring;
   Item.Rogue.Outlaw = {
     -- Legendaries
     GreenskinsItem                = Item(137099), -- 9
+    MantleoftheMasterAssassin     = Item(144236), -- 3
     ShivarranSymmetry             = Item(141321), -- 10
     ThraxisTricksyTreads          = Item(137031) -- 8
   };
@@ -211,7 +212,7 @@ local function SS_Useable ()
 end
 -- # Condition to use Stealth abilities
 local function Stealth_Condition ()
-  -- actions.stealth=variable,name=stealth_condition,value=(combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up)
+  -- actions.stealth=variable,name=stealth_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
   if not ER.Cache.APLVar.Stealth_Condition then
     ER.Cache.APLVar.Stealth_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Energy() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade) and not Player:Debuff(S.CurseoftheDreadblades)) and true or false;
   end
@@ -315,12 +316,13 @@ local function Stealth ()
     if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
       if ER.Cast(S.Ambush) then return "Cast Ambush"; end
     else
-      if ER.CDsON() and Stealth_Condition() and not Player:IsTanking(Target) then
-        -- actions.stealth+=/vanish,if=variable.stealth_condition
-        if S.Vanish:IsCastable() then
+      if ER.CDsON() and not Player:IsTanking(Target) then
+        -- actions.stealth+=/vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
+        if S.Vanish:IsCastable() and ((I.MantleoftheMasterAssassin:IsEquipped(3) and Player:Buff(S.TrueBearing)) or Stealth_Condition()) then
           if ER.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
+        end
         -- actions.stealth+=/shadowmeld,if=variable.stealth_condition
-        elseif S.Shadowmeld:IsCastable() then
+        if S.Shadowmeld:IsCastable() and Stealth_Condition() then
           if ER.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
         end
       end
@@ -537,7 +539,7 @@ ER.SetAPL(260, APL);
 
 -- # Stealth
 -- # Condition to use stealth abilities
--- actions.stealth=variable,name=stealth_condition,value=(combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up)
+-- actions.stealth=variable,name=stealth_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
 -- actions.stealth+=/ambush
--- actions.stealth+=/vanish,if=variable.stealth_condition
+-- actions.stealth+=/vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
 -- actions.stealth+=/shadowmeld,if=variable.stealth_condition
