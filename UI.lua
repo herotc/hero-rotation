@@ -84,6 +84,12 @@ end
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
+
+    if Texture == ER.GetTexture(IdleSpell) then
+      self.Backdrop:Hide()
+    else
+      self.Backdrop:Show()
+    end
   end
   function ER.MainIconFrame:SetCooldown (Start, Duration)
     self.CooldownFrame:SetCooldown(Start, Duration);
