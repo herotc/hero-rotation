@@ -5,6 +5,8 @@ ER.GUISettings = {
   General = {
     -- Main Frame Strata
     MainFrameStrata = "BACKGROUND",
+    -- Black Border Icon (Disable if you use custom icons)
+    BlackBorderIcon = true,
     -- Recovery Timer
     RecoveryMode = "GCD"; -- "GCD" to always display the next ability, "Custom" for Custom RecoveryTimer
     RecoveryTimer = 950;
