@@ -10,6 +10,7 @@ local Spell = ER.Spell;
 local Item = ER.Item;
 -- Lua
 local pairs = pairs;
+local mathmin = math.min;
 
 --- APL Local Vars
 -- Spells
@@ -52,7 +53,7 @@ local pairs = pairs;
     Vigor                         = Spell(14983),
     -- Artifact
     FinalityEviscerate            = Spell(197496),
-    FinalityNightblade            = Spell(195452),
+    FinalityNightblade            = Spell(197498),
     FlickeringShadows             = Spell(197256),
     GoremawsBite                  = Spell(209782),
     LegionBlade                   = Spell(214930),
@@ -129,6 +130,7 @@ local pairs = pairs;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling
+  local NightbladeThreshold; -- Used to compute the NB threshold (Cycling Performance)
   local MacroLookupSpell = {
     [9999261001] = S.Macros.ShDSS,
     [9999261002] = S.Macros.ShDShStorm,
@@ -230,11 +232,13 @@ local function Finish ()
     if ER.Cast(S.DeathFromAbove) then return "Cast"; end
   end
   -- actions.finish+=/nightblade,target_if=max:target.time_to_die,if=target.time_to_die>8&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time)
+  -- Replaced remains<tick_time by remains<tick_time*2 (i.e 4s) to avoid letting it falling
   if S.Nightblade:IsCastable() then
+    NightbladeThreshold = (6+mathmin(Player:ComboPoints(), 5+(S.DeeperStratagem:IsAvailable() and 1 or 0))*(2+(ER.Tier19_2Pc and 2 or 0)))*0.3;
     if Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 10 and
       Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
-      ((Target:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
-      Target:DebuffRemains(S.Nightblade) < 3) then
+      ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
+      Target:DebuffRemains(S.Nightblade) < 4) then
       if ER.Cast(S.Nightblade) then return "Cast"; end
     end
     if ER.AoEON() then
@@ -242,10 +246,10 @@ local function Finish ()
       for Key, Value in pairs(ER.Cache.Enemies[5]) do
         if not Value:IsFacingBlacklisted() and not Value:IsUserCycleBlacklisted() and
           Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD and
-          Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
-          ((Value:DebuffRefreshable(S.Nightblade, (6+Player:ComboPoints()*2)*0.3) and
-          (not ER.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
-          Value:DebuffRemains(S.Nightblade) < 3) then
+          Value:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
+          ((Value:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and
+          (not ER.Finality(Value) or Player:Buff(S.FinalityNightblade))) or
+          Value:DebuffRemains(S.Nightblade) < 4) then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
         end
       end
