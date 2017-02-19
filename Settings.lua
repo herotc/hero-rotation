@@ -139,6 +139,8 @@ ER.GUISettings = {
         ShDEcoCharge = 2.45,
         -- Eviscerate Damage Offset
         EviscerateDMGOffset = 3,
+        -- Shadowstrike Max Range
+        ShadowstrikeMaxRange = true,
         -- {Display GCD as OffGCD, ForceReturn}
         GCDasOffGCD = {
         },
