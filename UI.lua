@@ -29,6 +29,7 @@ ER.NameplateIconFrame = CreateFrame("Frame", "EasyRaid_NameplateIconFrame", UIPa
 local IdleSpell = Spell(9999000000);
 function ER.ResetIcons ()
   ER.MainIconFrame:ChangeMainIcon(ER.GetTexture(IdleSpell)); -- "No Icon"
+  if ER.GUISettings.General.BlackBorderIcon then ER.MainIconFrame.Backdrop:Hide(); end
   ER.SmallIconFrame:HideIcons();
   ER.CastOffGCDOffset = 1;
   if ER.Nameplate.IconAdded then
@@ -36,35 +37,35 @@ function ER.ResetIcons ()
   end
 end
 
-  -- CreateBackdrop
-  function ER:CreateBackdrop (Frame)
-    if Frame.Backdrop then return end
+--- Create a Backdrop
+function ER:CreateBackdrop (Frame)
+  if Frame.Backdrop or not ER.GUISettings.General.BlackBorderIcon then return; end
 
-    local Backdrop = CreateFrame("Frame", nil, Frame)
-    Backdrop:ClearAllPoints()
-    Backdrop:SetPoint("TOPLEFT", Frame, "TOPLEFT", -1, 1)
-    Backdrop:SetPoint("BOTTOMRIGHT", Frame, "BOTTOMRIGHT", 1, -1)
+  local Backdrop = CreateFrame("Frame", nil, Frame);
+  Backdrop:ClearAllPoints();
+  Backdrop:SetPoint("TOPLEFT", Frame, "TOPLEFT", -1, 1);
+  Backdrop:SetPoint("BOTTOMRIGHT", Frame, "BOTTOMRIGHT", 1, -1);
 
-    Backdrop:SetBackdrop({
-      bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-      edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
-      tile = false,
-      tileSize = 0,
-      edgeSize = 1,
-      insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
+  Backdrop:SetBackdrop({
+    bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+    edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
+    tile = false,
+    tileSize = 0,
+    edgeSize = 1,
+    insets = { left = 0, right = 0, top = 0, bottom = 0 },
+  });
 
-    Backdrop:SetBackdropBorderColor(0, 0, 0)
-    Backdrop:SetBackdropColor(0, 0, 0, 1)
+  Backdrop:SetBackdropBorderColor(0, 0, 0);
+  Backdrop:SetBackdropColor(0, 0, 0, 1);
 
-    if Frame:GetFrameLevel() - 1 >= 0 then
-      Backdrop:SetFrameLevel(Frame:GetFrameLevel() - 1)
-    else
-      Backdrop:SetFrameLevel(0)
-    end
-
-    Frame.Backdrop = Backdrop
+  if Frame:GetFrameLevel() - 1 >= 0 then
+    Backdrop:SetFrameLevel(Frame:GetFrameLevel() - 1);
+  else
+    Backdrop:SetFrameLevel(0);
   end
+
+  Frame.Backdrop = Backdrop;
+end
 
 --- Main Icon (On GCD)
   -- Init
@@ -74,9 +75,11 @@ end
     self:SetPoint("BOTTOMRIGHT", ER.MainFrame, "BOTTOMRIGHT", 0, 20);
     self.CooldownFrame:SetAllPoints(self);
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
-    self.TempTexture:SetTexCoord(.08, .92, .08, .92)
+    if ER.GUISettings.General.BlackBorderIcon then
+      self.TempTexture:SetTexCoord(.08, .92, .08, .92);
+      ER:CreateBackdrop(self);
+    end
     self:Show();
-    ER:CreateBackdrop(self)
   end
 
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
@@ -84,13 +87,10 @@ end
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
-
-    if Texture == ER.GetTexture(IdleSpell) then
-      self.Backdrop:Hide()
-    else
-      self.Backdrop:Show()
-    end
+    if ER.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
+
+  -- Set a Cooldown Frame
   function ER.MainIconFrame:SetCooldown (Start, Duration)
     self.CooldownFrame:SetCooldown(Start, Duration);
   end
@@ -100,24 +100,30 @@ end
   function ER.SmallIconFrame:Init ()
     self:SetWidth(64);
     self:SetHeight(32);
-    self:SetPoint("BOTTOMLEFT", ER.MainIconFrame, "TOPLEFT", 0, 1);
+    self:SetPoint("BOTTOMLEFT", ER.MainIconFrame, "TOPLEFT", 0, ER.GUISettings.General.BlackBorderIcon and 1 or 0);
     self:Show();
     self.Icon = {};
+
     self.Icon[1] = CreateFrame("Frame", "EasyRaid_SmallIconFrame1", UIParent);
-    self.Icon[1]:SetWidth(30);
-    self.Icon[1]:SetHeight(30);
+    self.Icon[1]:SetWidth(ER.GUISettings.General.BlackBorderIcon and 30 or 32);
+    self.Icon[1]:SetHeight(ER.GUISettings.General.BlackBorderIcon and 30 or 32);
     self.Icon[1]:SetPoint("LEFT", self, "LEFT", 0, 0);
     self.Icon[1].TempTexture = self.Icon[1]:CreateTexture(nil, "BACKGROUND");
-    self.Icon[1].TempTexture:SetTexCoord(.08, .92, .08, .92)
-    ER:CreateBackdrop(self.Icon[1])
-    self.Icon[1]:Show();
+
     self.Icon[2] = CreateFrame("Frame", "EasyRaid_SmallIconFrame2", UIParent);
-    self.Icon[2]:SetWidth(30);
-    self.Icon[2]:SetHeight(30);
+    self.Icon[2]:SetWidth(ER.GUISettings.General.BlackBorderIcon and 30 or 32);
+    self.Icon[2]:SetHeight(ER.GUISettings.General.BlackBorderIcon and 30 or 32);
     self.Icon[2]:SetPoint("RIGHT", self, "RIGHT", 0, 0);
     self.Icon[2].TempTexture = self.Icon[2]:CreateTexture(nil, "BACKGROUND");
-    self.Icon[2].TempTexture:SetTexCoord(.08, .92, .08, .92)
-    ER:CreateBackdrop(self.Icon[2])
+
+    if ER.GUISettings.General.BlackBorderIcon then
+      self.Icon[1].TempTexture:SetTexCoord(.08, .92, .08, .92);
+      ER:CreateBackdrop(self.Icon[1]);
+      self.Icon[2].TempTexture:SetTexCoord(.08, .92, .08, .92);
+      ER:CreateBackdrop(self.Icon[2]);
+    end
+
+    self.Icon[1]:Show();
     self.Icon[2]:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
@@ -161,7 +167,7 @@ end
   function ER.ToggleIconFrame:Init ()
     self:SetWidth(64);
     self:SetHeight(20);
-    self:SetPoint("TOPLEFT", ER.MainIconFrame, "BOTTOMLEFT", 0, -3);
+    self:SetPoint("TOPLEFT", ER.MainIconFrame, "BOTTOMLEFT", 0, ER.GUISettings.General.BlackBorderIcon and -3 or 0);
     self:SetFrameStrata(ER.GUISettings.General.MainFrameStrata);
     self:SetFrameLevel(ER.MainIconFrame:GetFrameLevel() + 1);
     self:AddButton("C", 1, "CDs");
