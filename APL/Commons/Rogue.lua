@@ -56,3 +56,40 @@ function ER.Commons.Rogue.MfDSniping (MarkedforDeath)
     end
   end
 end
+
+--- SimC Rogue Specific Expression
+  -- cp_max_spend
+  function ER.Commons.Rogue.CPMaxSpend ()
+    -- Should work for all 3 specs since they have same Deeper Stratagem Spell ID.
+    return Spell.Rogue.Subtlety.DeeperStratagem:IsAvailable() and 6 or 5;
+  end
+
+  -- mantle_duration
+  --[[ Original SimC Code
+    if ( buffs.mantle_of_the_master_assassin_aura -> check() )
+    {
+      timespan_t nominal_master_assassin_duration = timespan_t::from_seconds( spell.master_assassins_initiative -> effectN( 1 ).base_value() );
+      if ( buffs.vanish -> check() )
+        return buffs.vanish -> remains() + nominal_master_assassin_duration;
+      // Hardcoded 1.0 since we consider that stealth will break on next gcd.
+      else
+        return timespan_t::from_seconds( 1.0 ) + nominal_master_assassin_duration;
+    }
+    else if ( buffs.mantle_of_the_master_assassin -> check() )
+      return buffs.mantle_of_the_master_assassin -> remains();
+    else
+      return timespan_t::from_seconds( 0.0 );
+  ]]
+  local MasterAssassinsInitiative, NominalDuration = Spell(235027), 6;
+  function ER.Commons.Rogue.MantleDuration ()
+    if Player:BuffRemains(MasterAssassinsInitiative) < 0 then
+      -- Should work for all 3 specs since they have same Vanish Buff Spell ID.
+      if Player:Buff(Spell.Rogue.Subtlety.VanishBuff) then
+        return Player:BuffRemains(Spell.Rogue.Subtlety.VanishBuff) + NominalDuration;
+      else
+        return 1 + NominalDuration;
+      end
+    else
+      return Player:BuffRemains(MasterAssassinsInitiative);
+    end
+  end
