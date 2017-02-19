@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: EasyRaid
 ## Author: Aethys, SimCMinMax Team
-## Version: 7.1.55
+## Version: 7.1.583
 ## Notes: Attempt to provide the useful and precise informations to execute the best possible DPS rotation in every situation.
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
