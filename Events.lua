@@ -437,9 +437,9 @@ ER:RegisterForEvent(
         function (...)
           SpellID = select(12, ...);
 
-          -- Exsanguinate
+          -- Nightblade
           if SpellID == 195452 then
-            ER.BleedTable.Subtlety.FinalityNightblade = Player:Buff(Spell.Rogue.Subtlety.FinalityNightblade) and true or false; -- To replace by Spell.Rogue.Subtlety.FinalityNightblade
+            ER.BleedTable.Subtlety.FinalityNightblade = Player:Buff(Spell.Rogue.Subtlety.FinalityNightblade) and true or false;
             ER.BleedTable.Subtlety.FinalityNightbladeTime = ER.GetTime() + 0.3;
           end
         end
