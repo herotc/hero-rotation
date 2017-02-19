@@ -130,6 +130,7 @@ local mathmin = math.min;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling
+  local ShadowstrikeRange; -- Related to Shadowstrike Max Range setting
   local NightbladeThreshold; -- Used to compute the NB threshold (Cycling Performance)
   local MacroLookupSpell = {
     [9999261001] = S.Macros.ShDSS,
@@ -354,7 +355,7 @@ local function Stealthed ()
     if ER.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk
-  if Player:ComboPoints() >= 5 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+  if ER.AoEON() and Player:ComboPoints() >= 5 and ER.Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
     return Finish();
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
@@ -366,10 +367,7 @@ local function Stealthed ()
     if ER.Cast(S.ShurikenStorm) then return "Cast"; end
   end
   -- actions.stealthed+=/shadowstrike,if=combo_points.deficit>=2+talent.premeditation.enabled+buff.shadow_blades.up
-  if Target:IsInRange(5) and S.Shadowstrike:IsCastable()
-      and Player:ComboPointsDeficit() >= 2
-        + (S.Premeditation:IsAvailable() and 1 or 0)
-        + (Player:Buff(S.ShadowBlades) and 1 or 0)
+  if S.Shadowstrike:IsCastable() and Target:IsInRange(ShadowstrikeRange) and Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)
   then
     if ER.Cast(S.Shadowstrike) then return "Cast"; end
   end
@@ -378,7 +376,7 @@ local function Stealthed ()
     return Finish();
   end
   -- actions.stealthed+=/shadowstrike
-  if Target:IsInRange(5) and S.Shadowstrike:IsCastable() then
+  if S.Shadowstrike:IsCastable() and Target:IsInRange(ShadowstrikeRange) then
     if ER.Cast(S.Shadowstrike) then return "Cast"; end
   end
   return false;
@@ -415,6 +413,7 @@ end
 local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
+  ShadowstrikeRange = 5+(Settings.Subtlety.ShadowstrikeMaxRange and 10 or 0);
   -- Unit Update
   ER.GetEnemies(10); -- Shuriken Storm
   ER.GetEnemies(8); -- Death From Above
