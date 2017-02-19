@@ -104,16 +104,16 @@ end
     self:Show();
     self.Icon = {};
     self.Icon[1] = CreateFrame("Frame", "EasyRaid_SmallIconFrame1", UIParent);
-    self.Icon[1]:SetWidth(30);
-    self.Icon[1]:SetHeight(30);
+    self.Icon[1]:SetWidth(32);
+    self.Icon[1]:SetHeight(32);
     self.Icon[1]:SetPoint("LEFT", self, "LEFT", 0, 0);
     self.Icon[1].TempTexture = self.Icon[1]:CreateTexture(nil, "BACKGROUND");
     self.Icon[1].TempTexture:SetTexCoord(.08, .92, .08, .92)
     ER:CreateBackdrop(self.Icon[1])
     self.Icon[1]:Show();
     self.Icon[2] = CreateFrame("Frame", "EasyRaid_SmallIconFrame2", UIParent);
-    self.Icon[2]:SetWidth(30);
-    self.Icon[2]:SetHeight(30);
+    self.Icon[2]:SetWidth(32);
+    self.Icon[2]:SetHeight(32);
     self.Icon[2]:SetPoint("RIGHT", self, "RIGHT", 0, 0);
     self.Icon[2].TempTexture = self.Icon[2]:CreateTexture(nil, "BACKGROUND");
     self.Icon[2].TempTexture:SetTexCoord(.08, .92, .08, .92)
