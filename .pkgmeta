@@ -14,6 +14,7 @@ ignore:
 
 move-folders:
  AethysRotation/AethysRotation: AethysRotation
+ AethysRotation/AethysCore: AethysCore
  AethysRotation/AethysRotation_DemonHunter: AethysRotation_DemonHunter
  AethysRotation/AethysRotation_Druid: AethysRotation_Druid
  AethysRotation/AethysRotation_Paladin: AethysRotation_Paladin
