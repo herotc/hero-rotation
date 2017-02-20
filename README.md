@@ -1,8 +1,8 @@
 # AethysRotation
 
 AethysRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation.
-The project is hosted on [GitHub](https://github.com/SimCMinMax/AethysRotation) and maintained by the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
-Also, you can find it on [Curse](https://mods.curse.com/addons/wow/easyraid) and [CurseForge](https://wow.curseforge.com/projects/easyraid).
+The project is hosted on [GitHub](https://github.com/Aethys256/AethysRotation) and maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
+Also, you can find it on [Curse](https://mods.curse.com/addons/wow/aethysrotation) and [CurseForge](https://wow.curseforge.com/projects/aethysrotation).
 
 ## Key Features
 - Main Icon that shows the next ability you should cast.
@@ -12,7 +12,7 @@ Also, you can find it on [Curse](https://mods.curse.com/addons/wow/easyraid) and
 Every rotations are based on SimulationCraft Action Priority Lists.
 
 
-##Supported Rotations
+## Supported Rotations
 - Demon Hunter Vengeance
 - Paladin Retribution
 - Rogue Outlaw
