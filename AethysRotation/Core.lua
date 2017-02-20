@@ -74,18 +74,19 @@ function AR.Cast (Object, OffGCD)
   return false;
 end
 
+local Argument;
 function AR.CmdHandler (Message)
-  _T.Argument = stringlower(Message);
-  if _T.Argument == "cds" then
+  Argument = stringlower(Message);
+  if Argument == "cds" then
     AethysRotationDB.Toggles[1] = not AethysRotationDB.Toggles[1];
     AR.Print("CDs are now "..(AethysRotationDB.Toggles[1] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-  elseif _T.Argument == "aoe" then
+  elseif Argument == "aoe" then
     AethysRotationDB.Toggles[2] = not AethysRotationDB.Toggles[2];
     AR.Print("AoE is now "..(AethysRotationDB.Toggles[2] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-  elseif _T.Argument == "toggle" then
+  elseif Argument == "toggle" then
     AethysRotationDB.Toggles[3] = not AethysRotationDB.Toggles[3];
     AR.Print("AethysRotation is now "..(AethysRotationDB.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-  elseif _T.Argument == "help" then
+  elseif Argument == "help" then
     AR.Print("CDs : /eraid cds | AoE : /eraid cds | Toggle : /eraid toggle");
   end
 end
