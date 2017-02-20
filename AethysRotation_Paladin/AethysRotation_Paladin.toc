@@ -1,0 +1,11 @@
+## Interface: 70100
+
+## Title: |cFFFFF569Aethys|r Rotation |cFFF58CBAPaladin|r
+## Author: Aethys, SimCMinMax Team
+## Notes: Aethys Rotation - Paladin Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Retribution.lua

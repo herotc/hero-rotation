@@ -1,0 +1,11 @@
+## Interface: 70100
+
+## Title: |cFFFFF569Aethys|r Rotation |cFFFF7D0ADruid|r
+## Author: Aethys, SimCMinMax Team
+## Notes: Aethys Rotation - Druid Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Feral.lua
