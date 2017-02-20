@@ -1,0 +1,11 @@
+## Interface: 70100
+
+## Title: |cFFFFF569Aethys|r Rotation |cFF0070DEShaman|r
+## Author: Aethys, SimCMinMax Team
+## Notes: Aethys Rotation - Shaman Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Enhancement.lua

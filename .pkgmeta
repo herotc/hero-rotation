@@ -1,0 +1,22 @@
+package-as: AethysRotation
+
+externals:
+ AethysCore:  
+  url: https://github.com/Aethys256/AethysCore
+
+enable-nolib-creation: no
+
+ignore:
+ - .github
+ - .gitattributes
+ - LICENSE
+ - README.md
+
+move-folders:
+ AethysRotation/AethysRotation: AethysRotation
+ AethysRotation/AethysRotation_DemonHunter: AethysRotation_DemonHunter
+ AethysRotation/AethysRotation_Druid: AethysRotation_Druid
+ AethysRotation/AethysRotation_Paladin: AethysRotation_Paladin
+ AethysRotation/AethysRotation_Rogue: AethysRotation_Rogue
+ AethysRotation/AethysRotation_Shaman: AethysRotation_Shaman
+ AethysRotation/AethysRotation_Warrior: AethysRotation_Warrior

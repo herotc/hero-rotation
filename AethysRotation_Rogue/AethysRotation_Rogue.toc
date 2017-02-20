@@ -1,0 +1,14 @@
+## Interface: 70100
+
+## Title: |cFFFFF569Aethys|r Rotation |cFFFFF569Rogue|r
+## Author: Aethys, SimCMinMax Team
+## Notes: Aethys Rotation - Rogue Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Rogue.lua
+Assassination.lua
+Outlaw.lua
+Subtlety.lua

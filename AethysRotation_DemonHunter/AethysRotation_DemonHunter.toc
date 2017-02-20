@@ -1,0 +1,11 @@
+## Interface: 70100
+
+## Title: |cFFFFF569Aethys|r Rotation |cFFA330C9Demon Hunter|r
+## Author: Aethys, SimCMinMax Team
+## Notes: Aethys Rotation - Demon Hunter Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Vengeance.lua
