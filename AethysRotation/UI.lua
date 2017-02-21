@@ -31,13 +31,16 @@ AR.ToggleIconFrame = CreateFrame("Frame", "AethysRotation_ToggleIconFrame", UIPa
 --- Reset Textures
 local IdleSpell = Spell(9999000000);
 function AR.ResetIcons ()
-  AR.MainIconFrame:ChangeMainIcon(AR.GetTexture(IdleSpell)); -- "No Icon"
+  -- Main Icon
+  AR.MainIconFrame:ChangeMainIcon(AR.GetTexture(IdleSpell)); 
   if AR.GUISettings.General.BlackBorderIcon then AR.MainIconFrame.Backdrop:Hide(); end
+
+  -- Small Icons
   AR.SmallIconFrame:HideIcons();
   AR.CastOffGCDOffset = 1;
-  if AR.Nameplate.IconAdded then
-    AR.Nameplate.RemoveIcon();
-  end
+
+  -- Left/Nameplate Icons
+  AR.Nameplate.RemoveIcons();
 end
 
 --- Create a Backdrop
@@ -84,7 +87,6 @@ end
     end
     self:Show();
   end
-
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.MainIconFrame:ChangeMainIcon (Texture)
     self.TempTexture:SetTexture(Texture);
@@ -92,7 +94,6 @@ end
     self.texture = self.TempTexture;
     if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
-
   -- Set a Cooldown Frame
   function AR.MainIconFrame:SetCooldown (Start, Duration)
     self.CooldownFrame:SetCooldown(Start, Duration);
@@ -105,29 +106,23 @@ end
     self:SetHeight(32);
     self:SetPoint("BOTTOMLEFT", AR.MainIconFrame, "TOPLEFT", 0, AR.GUISettings.General.BlackBorderIcon and 1 or 0);
     self:Show();
+
     self.Icon = {};
-
-    self.Icon[1] = CreateFrame("Frame", "AethysRotation_SmallIconFrame1", UIParent);
-    self.Icon[1]:SetWidth(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
-    self.Icon[1]:SetHeight(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
-    self.Icon[1]:SetPoint("LEFT", self, "LEFT", 0, 0);
-    self.Icon[1].TempTexture = self.Icon[1]:CreateTexture(nil, "BACKGROUND");
-
-    self.Icon[2] = CreateFrame("Frame", "AethysRotation_SmallIconFrame2", UIParent);
-    self.Icon[2]:SetWidth(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
-    self.Icon[2]:SetHeight(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
-    self.Icon[2]:SetPoint("RIGHT", self, "RIGHT", 0, 0);
-    self.Icon[2].TempTexture = self.Icon[2]:CreateTexture(nil, "BACKGROUND");
-
+    self:CreateIcons(1, "LEFT");
+    self:CreateIcons(2, "RIGHT");
+  end
+  -- Create Small Icons Frames
+  function AR.SmallIconFrame:CreateIcons (Index, Align)
+    self.Icon[Index] = CreateFrame("Frame", "AethysRotation_SmallIconFrame"..tostring(Index), UIParent);
+    self.Icon[Index]:SetWidth(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
+    self.Icon[Index]:SetHeight(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
+    self.Icon[Index]:SetPoint(Align, self, Align, 0, 0);
+    self.Icon[Index].TempTexture = self.Icon[Index]:CreateTexture(nil, "BACKGROUND");
     if AR.GUISettings.General.BlackBorderIcon then
-      self.Icon[1].TempTexture:SetTexCoord(.08, .92, .08, .92);
-      AR:CreateBackdrop(self.Icon[1]);
-      self.Icon[2].TempTexture:SetTexCoord(.08, .92, .08, .92);
-      AR:CreateBackdrop(self.Icon[2]);
+      self.Icon[Index].TempTexture:SetTexCoord(.08, .92, .08, .92);
+      AR:CreateBackdrop(self.Icon[Index]);
     end
-
-    self.Icon[1]:Show();
-    self.Icon[2]:Show();
+    self.Icon[Index]:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.SmallIconFrame:ChangeSmallIcon (FrameID, Texture)
@@ -165,28 +160,24 @@ end
   end
 
 --- Nameplates
-
   AR.Nameplate = {
-    IconInit = false,
-    IconAdded = false
+    Initialized = false
   };
-
   -- Add the Icon on Nameplates (and on Left Icon frame)
   function AR.Nameplate.AddIcon (ThisUnit, SpellID)
     Token = stringlower(ThisUnit.UnitID);
     Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
     if Nameplate then
       -- Init Frame if not already
-      if not AR.Nameplate.IconInit then
+      if not AR.Nameplate.Initialized then
         -- Frame
         AR.NameplateIconFrame:SetFrameLevel(Nameplate.UnitFrame:GetFrameLevel() + 50);
         AR.NameplateIconFrame:SetWidth(Nameplate.UnitFrame:GetHeight()*0.8);
         AR.NameplateIconFrame:SetHeight(Nameplate.UnitFrame:GetHeight()*0.8);
-
         -- Texture
         AR.NameplateIconFrame.TempTexture = AR.NameplateIconFrame:CreateTexture(nil, "BACKGROUND");
 
-        AR.Nameplate.Init = true;
+        AR.Nameplate.Initialized = true;
       end
 
       -- Set the Texture
@@ -204,19 +195,14 @@ end
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
       AR.LastUnitCycled = ThisUnit;
       AR.LastUnitCycledTime = AC.GetTime();
-
-      AR.Nameplate.IconAdded = true;
     end
   end
-
   -- Remove Icons
-  function AR.Nameplate.RemoveIcon () -- TODO: Improve performance
+  function AR.Nameplate.RemoveIcons ()
     -- Nameplate Icon
-    if AR.NameplateIconFrame:IsVisible() then AR.NameplateIconFrame:Hide(); end
+    AR.NameplateIconFrame:Hide();
     -- Left Icon
-    if AR.LeftIconFrame:IsVisible() then AR.LeftIconFrame:Hide(); end
-
-    AR.Nameplate.IconAdded = false;
+    AR.LeftIconFrame:Hide();
   end
 
 --- Toggle Icons
@@ -233,7 +219,6 @@ end
     self:AddButton("O", 3, "On/Off");
     self:Show();
   end
-
   -- Button
   AR.Button = {};
   function AR.ToggleIconFrame:AddButton (Text, i, Tooltip)
