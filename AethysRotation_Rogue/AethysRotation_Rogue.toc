@@ -12,3 +12,4 @@ Rogue.lua
 Assassination.lua
 Outlaw.lua
 Subtlety.lua
+Events.lua
