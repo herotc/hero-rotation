@@ -27,4 +27,4 @@ Stay tuned !
 
 Also, feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
 
-_PS : You can drag & drop the main icon with Shift + Left-Click._
+_PS : There are a lot of helpful commands, do '/aer help' to see them in-game !._
