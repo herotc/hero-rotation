@@ -11,10 +11,10 @@ ignore:
  - .gitattributes
  - LICENSE
  - README.md
- - AethysRotation_ClassSqueleton/AethysRotation_Class.toc
- - AethysRotation_ClassSqueleton/Class.lua
- - AethysRotation_ClassSqueleton/Events.lua
- - AethysRotation_ClassSqueleton/Spec.lua
+ - AethysRotation_ClassTemplate/AethysRotation_Class.toc
+ - AethysRotation_ClassTemplate/Class.lua
+ - AethysRotation_ClassTemplate/Events.lua
+ - AethysRotation_ClassTemplate/Spec.lua
 
 move-folders:
  AethysRotation/AethysRotation: AethysRotation
