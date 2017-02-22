@@ -75,7 +75,7 @@ local pairs = pairs;
     DreadlordsDeceit              = Spell(228224),
     -- Misc
     DeathlyShadows                = Spell(188700),
-    PoolEnergy                    = Spell(9999000001),
+    PoolEnergy                    = Spell(9999000010),
     -- Macros
     Macros = {
       ShDSS                       = Spell(9999261001),

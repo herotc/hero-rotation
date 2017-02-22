@@ -13,6 +13,7 @@ local Item = AC.Item;
 local print = print;
 local select = select;
 local stringlower = string.lower;
+local strsplit = strsplit;
 local tostring = tostring;
 
 --- Globalize Vars
@@ -37,10 +38,10 @@ function AR.GetTexture (Object)
     if not Cache.Persistent.Texture.Spell[Object.SpellID] then
       -- Check if the SpellID is the one from Custom Icons or a Reguler WoW Spell
       if Object.SpellID >= 9999000000 then
-        if Object.SpellID >= 9999000000 and Object.SpellID <= 9999000001 then
+        if Object.SpellID >= 9999000000 and Object.SpellID <= 9999000010 then
           Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
         else
-          Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation_" .. AC.SpecID_Classes[tonumber(string.sub(tostring(Object.SpellID), 5, 7))] .. "\\Textures\\"..tostring(Object.SpellID);
+          Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation_" .. AC.SpecID_ClassesSpecs[tonumber(string.sub(tostring(Object.SpellID), 5, 7))][1] .. "\\Textures\\"..tostring(Object.SpellID);
         end
       else
         Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
@@ -56,17 +57,18 @@ function AR.GetTexture (Object)
 end
 
 -- Display the Spell to cast.
+-- TODO: Add LeftIcon Cast + LeftIcon & Nameplate Cast
 AR.CastOffGCDOffset = 1;
 function AR.Cast (Object, OffGCD)
   if OffGCD and OffGCD[1] then
     if AR.CastOffGCDOffset <= 2 then
-      AR.SmallIconFrame:ChangeSmallIcon(AR.CastOffGCDOffset, AR.GetTexture(Object));
+      AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object));
       AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
       Object.LastDisplayTime = AC.GetTime();
       return OffGCD[2] and "Should Return" or false;
     end
   else
-    AR.MainIconFrame:ChangeMainIcon(AR.GetTexture(Object));
+    AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
     AR.MainIconFrame:SetCooldown(GetSpellCooldown(61304)); -- Put the GCD as Cast Cooldown
     Object.LastDisplayTime = AC.GetTime();
     return "Should Return";
@@ -74,24 +76,69 @@ function AR.Cast (Object, OffGCD)
   return false;
 end
 
-local Argument;
+-- Command Handler
+local Argument1, Argument2, Argument3;
 function AR.CmdHandler (Message)
-  Argument = stringlower(Message);
-  if Argument == "cds" then
+  Argument1, Argument2, Argument3 = strsplit(" ", stringlower(Message));
+  if Argument1 == "cds" then
     AethysRotationDB.Toggles[1] = not AethysRotationDB.Toggles[1];
     AR.Print("CDs are now "..(AethysRotationDB.Toggles[1] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-  elseif Argument == "aoe" then
+  elseif Argument1 == "aoe" then
     AethysRotationDB.Toggles[2] = not AethysRotationDB.Toggles[2];
     AR.Print("AoE is now "..(AethysRotationDB.Toggles[2] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-  elseif Argument == "toggle" then
+  elseif Argument1 == "toggle" then
     AethysRotationDB.Toggles[3] = not AethysRotationDB.Toggles[3];
     AR.Print("AethysRotation is now "..(AethysRotationDB.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
-  elseif Argument == "help" then
-    AR.Print("CDs : /eraid cds | AoE : /eraid cds | Toggle : /eraid toggle");
+  elseif Argument1 == "unlock" then
+    AR.MainFrame:Unlock();
+    AR.Print("AethysRotation UI is now |cff00ff00unlocked|r.");
+  elseif Argument1 == "lock" then
+    AR.MainFrame:Lock();
+    AR.Print("AethysRotation UI is now |cffff0000locked|r.");
+  elseif Argument1 == "scale" then
+    if Argument2 and Argument3 then
+      Argument3 = tonumber(Argument3);
+      if Argument3 and type(Argument3) == "number" and Argument3 > 0 and Argument3 <= 10 then
+        if Argument2 == "ui" then
+          AR.MainFrame:ResizeUI(Argument3);
+        elseif Argument2 == "buttons" then
+          AR.MainFrame:ResizeButtons(Argument3);
+        elseif Argument2 == "all" then
+          AR.MainFrame:ResizeUI(Argument3);
+          AR.MainFrame:ResizeButtons(Argument3);
+        else
+          AR.Print("Invalid |cff88ff88[Type]|r for Scale.");
+          AR.Print("Should be |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
+          AR.Print("Type accepted are |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r.");
+        end
+      else
+        AR.Print("Invalid |cffff8888[Size]|r for Scale.");
+        AR.Print("Should be |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
+        AR.Print("Size accepted are |cffff8888number > 0 and <= 10|r.");
+      end
+    else
+      AR.Print("Invalid arguments for Scale.");
+      AR.Print("Should be |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
+      AR.Print("Type accepted are |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r.");
+      AR.Print("Size accepted are |cffff8888number > 0 and <= 10|r.");
+    end
+  elseif Argument1 == "resetbuttons" then
+    AR.ToggleIconFrame:ResetAnchor();
+  elseif Argument1 == "help" then
+    AR.Print("Toggle ON/OFF: |cff8888ff/aer toggle|r");
+    AR.Print("CDs: |cff8888ff/aer cds|r | AoE: |cff8888ff/aer aoe|r");
+    AR.Print("UI Lock: |cff8888ff/aer lock|r | UI Unlock: |cff8888ff/aer unlock|r");
+    AR.Print("UI Scale: |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r");
+    AR.Print("[Type]: |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r");
+    AR.Print("[Size]: |cffff8888number > 0 and <= 10|r");
+    AR.Print("Button Anchor Reset : |cff8888ff/aer resetbuttons|r");
+  else
+    AR.Print("Invalid arguments.");
+    AR.Print("Type |cff8888ff/aer help|r for more infos.");
   end
 end
-SLASH_EASYRAID1 = "/eraid"
-SlashCmdList["EASYRAID"] = AR.CmdHandler;
+SLASH_AETHYSROTATION1 = "/aer"
+SlashCmdList["AETHYSROTATION"] = AR.CmdHandler;
 
 -- Get if the CDs are enabled.
 function AR.CDsON ()
@@ -106,4 +153,9 @@ end
 -- Get if the main toggle is on.
 function AR.ON ()
   return AethysRotationDB.Toggles[3];
+end
+
+-- Get if the UI is locked.
+function AR.Locked ()
+  return AethysRotationDB.Locked;
 end

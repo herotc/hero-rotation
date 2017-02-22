@@ -32,7 +32,7 @@ AR.ToggleIconFrame = CreateFrame("Frame", "AethysRotation_ToggleIconFrame", UIPa
 local IdleSpell = Spell(9999000000);
 function AR.ResetIcons ()
   -- Main Icon
-  AR.MainIconFrame:ChangeMainIcon(AR.GetTexture(IdleSpell)); 
+  AR.MainIconFrame:ChangeIcon(AR.GetTexture(IdleSpell)); 
   if AR.GUISettings.General.BlackBorderIcon then AR.MainIconFrame.Backdrop:Hide(); end
 
   -- Small Icons
@@ -64,6 +64,7 @@ function AR:CreateBackdrop (Frame)
   Backdrop:SetBackdropBorderColor(0, 0, 0);
   Backdrop:SetBackdropColor(0, 0, 0, 1);
 
+  Backdrop:SetFrameStrata(AR.MainFrame:GetFrameStrata());
   if Frame:GetFrameLevel() - 1 >= 0 then
     Backdrop:SetFrameLevel(Frame:GetFrameLevel() - 1);
   else
@@ -76,9 +77,11 @@ end
 --- Main Icon (On GCD)
   -- Init
   function AR.MainIconFrame:Init ()
+    self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
+    self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
     self:SetHeight(64);
-    self:SetPoint("BOTTOMRIGHT", AR.MainFrame, "BOTTOMRIGHT", 0, 20);
+    self:SetPoint("BOTTOMRIGHT", AR.MainFrame, "BOTTOMRIGHT", 0, 0);
     self.CooldownFrame:SetAllPoints(self);
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
     if AR.GUISettings.General.BlackBorderIcon then
@@ -88,7 +91,7 @@ end
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.MainIconFrame:ChangeMainIcon (Texture)
+  function AR.MainIconFrame:ChangeIcon (Texture)
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
@@ -102,6 +105,8 @@ end
 --- Small Icons (Off GCD), Only 2 atm.
   -- Init
   function AR.SmallIconFrame:Init ()
+    self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
+    self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
     self:SetHeight(32);
     self:SetPoint("BOTTOMLEFT", AR.MainIconFrame, "TOPLEFT", 0, AR.GUISettings.General.BlackBorderIcon and 1 or 0);
@@ -114,6 +119,8 @@ end
   -- Create Small Icons Frames
   function AR.SmallIconFrame:CreateIcons (Index, Align)
     self.Icon[Index] = CreateFrame("Frame", "AethysRotation_SmallIconFrame"..tostring(Index), UIParent);
+    self.Icon[Index]:SetFrameStrata(self:GetFrameStrata());
+    self.Icon[Index]:SetFrameLevel(self:GetFrameLevel() - 1);
     self.Icon[Index]:SetWidth(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
     self.Icon[Index]:SetHeight(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
     self.Icon[Index]:SetPoint(Align, self, Align, 0, 0);
@@ -125,7 +132,7 @@ end
     self.Icon[Index]:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.SmallIconFrame:ChangeSmallIcon (FrameID, Texture)
+  function AR.SmallIconFrame:ChangeIcon (FrameID, Texture)
     self.Icon[FrameID].TempTexture:SetTexture(Texture);
     self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
     self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
@@ -143,6 +150,8 @@ end
 --- Left Icon (MO)
   -- Init LeftIcon
   function AR.LeftIconFrame:Init ()
+    self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
+    self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(48);
     self:SetHeight(48);
     self:SetPoint("RIGHT", AR.MainIconFrame, "LEFT", 0, 0);
@@ -150,7 +159,7 @@ end
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.LeftIconFrame:ChangeLeftIcon (Texture)
+  function AR.LeftIconFrame:ChangeIcon (Texture)
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
@@ -171,6 +180,7 @@ end
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
+        AR.NameplateIconFrame:SetFrameStrata(Nameplate.UnitFrame:GetFrameStrata());
         AR.NameplateIconFrame:SetFrameLevel(Nameplate.UnitFrame:GetFrameLevel() + 50);
         AR.NameplateIconFrame:SetWidth(Nameplate.UnitFrame:GetHeight()*0.8);
         AR.NameplateIconFrame:SetHeight(Nameplate.UnitFrame:GetHeight()*0.8);
@@ -190,7 +200,7 @@ end
       end
 
       -- Display the left icon
-      AR.LeftIconFrame:ChangeLeftIcon(AR.GetTexture(SpellID));
+      AR.LeftIconFrame:ChangeIcon(AR.GetTexture(SpellID));
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
       AR.LastUnitCycled = ThisUnit;
@@ -209,23 +219,49 @@ end
 
   -- Init
   function AR.ToggleIconFrame:Init ()
+    self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
+    self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
     self:SetHeight(20);
-    self:SetPoint("TOPLEFT", AR.MainIconFrame, "BOTTOMLEFT", 0, AR.GUISettings.General.BlackBorderIcon and -3 or 0);
-    self:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
-    self:SetFrameLevel(AR.MainIconFrame:GetFrameLevel() + 1);
+    if AethysRotationDB and AethysRotationDB.ButtonsFramePos then
+      self:SetPoint(AethysRotationDB.ButtonsFramePos[1], UIParent, AethysRotationDB.ButtonsFramePos[3], AethysRotationDB.ButtonsFramePos[4], AethysRotationDB.ButtonsFramePos[5]);
+    else
+      self:SetPoint("TOPLEFT", AR.MainIconFrame, "BOTTOMLEFT", 0, AR.GUISettings.General.BlackBorderIcon and -3 or 0);
+    end
+
+    -- Start Move
+    local function StartMove (self)
+      self:StartMoving();
+    end
+    self:SetScript("OnMouseDown", StartMove);
+    -- Stop Move
+    local function StopMove (self)
+      self:StopMovingOrSizing();
+      if not AethysRotationDB then AethysRotationDB = {}; end
+      AethysRotationDB.ButtonsFramePos = {self:GetPoint()};
+    end
+    self:SetScript("OnMouseUp", StopMove);
+    self:SetScript("OnHide", StopMove);
+
+    self:Show();
     self:AddButton("C", 1, "CDs");
     self:AddButton("A", 2, "AoE");
     self:AddButton("O", 3, "On/Off");
-    self:Show();
+  end
+  -- Reset Anchor
+  function AR.ToggleIconFrame:ResetAnchor ()
+    self:SetPoint("TOPLEFT", AR.MainIconFrame, "BOTTOMLEFT", 0, AR.GUISettings.General.BlackBorderIcon and -3 or 0);
+    AethysRotationDB.ButtonsFramePos = nil;
   end
   -- Button
   AR.Button = {};
   function AR.ToggleIconFrame:AddButton (Text, i, Tooltip)
     AR.Button[i] = CreateFrame("Button", "$parentButton"..tostring(i), self);
-    AR.Button[i]:SetPoint("LEFT", self, "LEFT", 20*(i-1)+i, 0);
+    AR.Button[i]:SetFrameStrata(self:GetFrameStrata());
+    AR.Button[i]:SetFrameLevel(self:GetFrameLevel() - 1);
     AR.Button[i]:SetWidth(20);
     AR.Button[i]:SetHeight(20);
+    AR.Button[i]:SetPoint("LEFT", self, "LEFT", 20*(i-1)+i, 0);
     AR.Button[i].TimeSinceLastUpdate = 0;
     AR.Button[i].UpdateInterval = 0.25;
     AR.Button[i]:SetScript("OnUpdate",
