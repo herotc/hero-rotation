@@ -56,6 +56,18 @@ AR.GUISettings = {
         }
       }
     },
+	Priest = {
+      Commons = {
+      },
+      Shadow = {
+        -- {Display GCD as OffGCD, ForceReturn}
+        GCDasOffGCD = {
+        },
+        -- {Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+        }
+      },
+    },
     Rogue = {
       Commons = {
         -- SoloMode Settings
