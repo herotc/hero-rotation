@@ -162,7 +162,7 @@
     -- Priest
       [256]   = false,                          -- Discipline
       [257]   = false,                          -- Holy
-      [258]   = false,                          -- Shadow
+      [258]   = "AethysRotation_Priest",        -- Shadow
     -- Rogue
       [259]   = false,                          -- Assassination
       [260]   = "AethysRotation_Rogue",         -- Outlaw
