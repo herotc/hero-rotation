@@ -251,7 +251,7 @@ end
   -- Reset Anchor
   function AR.ToggleIconFrame:ResetAnchor ()
     self:SetPoint("TOPLEFT", AR.MainIconFrame, "BOTTOMLEFT", 0, AR.GUISettings.General.BlackBorderIcon and -3 or 0);
-    AethysRotationDB.ButtonsFramePos = nil;
+    AethysRotationDB.ButtonsFramePos = false;
   end
   -- Button
   AR.Button = {};
