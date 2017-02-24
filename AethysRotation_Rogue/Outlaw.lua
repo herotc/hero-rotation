@@ -344,7 +344,7 @@ local function MythicDungeon ()
   if AC.MythicDungeon() == "Sapped Soul" then
     for i = 1, #SappedSoulSpells do
       if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
-        AC.ChangePulseTimer(1);
+        AR.ChangePulseTimer(1);
         AR.Cast(SappedSoulSpells[i][1]);
         return SappedSoulSpells[i][2];
       end
