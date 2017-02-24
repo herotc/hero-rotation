@@ -242,7 +242,7 @@
   -- TODO : IsCasting() and IsChanneling() may gives issues for Casters because I assume some may have to interrupt their casts/channels
   --   to cast something else. Will also need tweak to handle the bosses that interrupts casts.
   function AR.Ready ()
-    return not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsCasting() and not Player:IsChanneling();
+    return not Player:IsDeadOrGhost() and not Player:IsMounted();
   end
 
   -- Used to force a short/long pulse wait, it also resets the icons.
