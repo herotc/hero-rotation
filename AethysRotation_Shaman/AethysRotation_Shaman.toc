@@ -1,7 +1,7 @@
 ## Interface: 70100
 
 ## Title: |cFFFFF569Aethys|r Rotation |cFF0070DEShaman|r
-## Author: Aethys, SimCMinMax Team
+## Author: Tael
 ## Notes: Aethys Rotation - Shaman Module.
 
 ## DefaultState: Enabled

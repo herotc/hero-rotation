@@ -1,7 +1,7 @@
 ## Interface: 70100
 
 ## Title: |cFFFFF569Aethys|r Rotation |cFFABD473Hunter|r
-## Author: Nia, Aethys, SimCMinMax Team
+## Author: Nia
 ## Notes: Aethys Rotation - Hunter Module.
 
 ## DefaultState: Enabled
