@@ -14,10 +14,12 @@ Every rotations are based on SimulationCraft Action Priority Lists.
 
 ## Supported Rotations
 - Demon Hunter Vengeance
+- Hunter BeastMastery _Beta_ (Credits: Nia)
 - Paladin Retribution
+- Priest Shadow _Beta_ (Credits: KutiKuti)
 - Rogue Outlaw
 - Rogue Subtlety
-- Shaman Enhancement (Beta)
+- Shaman Enhancement _Beta_ (Credits: Tael)
 
 Rogue Assassination is coming very soon.
 
