@@ -1,7 +1,7 @@
 ## Interface: 70100
 
 ## Title: |cFFFFF569Aethys|r Rotation |cFFA330C9Demon Hunter|r
-## Author: Aethys, SimCMinMax Team
+## Author: Aethys
 ## Notes: Aethys Rotation - Demon Hunter Module.
 
 ## DefaultState: Enabled

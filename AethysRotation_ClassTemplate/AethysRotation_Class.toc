@@ -1,7 +1,7 @@
 ## Interface: 70100
 
 ## Title: |cFF(CLASS_COLOR_CODE)Aethys|r Rotation |cFF(CLASS_COLOR_CODE)Class|r
-## Author: Aethys, SimCMinMax Team
+## Author: Aethys
 ## Notes: Aethys Rotation - Class Module.
 
 ## DefaultState: Enabled
