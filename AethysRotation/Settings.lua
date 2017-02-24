@@ -37,6 +37,46 @@ AR.GUISettings = {
         }
       }
     },
+    Hunter = {
+        Commons = {
+        -- SoloMode Settings
+        ExhilarationHP = 30,
+        -- {Display GCD as OffGCD, ForceReturn}
+        GCDasOffGCD = {
+          Exhilaration = {true, false}
+        },
+        -- {Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+          -- Racials
+          ArcaneTorrent = {true, false},
+          Berserking = {true, false},
+          BloodFury = {true, false},
+          -- Abilities
+          CounterShot = {true, false}
+        }
+      },
+      BeastMastery = {
+        -- {Display GCD as OffGCD, ForceReturn}
+        GCDasOffGCD = {
+          Volley = {true, false}
+        },
+        -- {Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+          -- Spec
+          AspectoftheWild = {true, false},
+          BeastialWrath = {true, false},
+          TitansThunder = {true, false}
+        }
+      },
+      Marksmanship = {
+        -- {Display GCD as OffGCD, ForceReturn}
+        GCDasOffGCD = {
+        },
+        -- {Display OffGCD as OffGCD, ForceReturn}
+        OffGCDasOffGCD = {
+        }
+      }
+    },
     Paladin = {
       Retribution = {
         -- SoloMode Settings

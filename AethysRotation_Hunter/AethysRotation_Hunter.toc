@@ -1,0 +1,13 @@
+## Interface: 70100
+
+## Title: |cFFFFF569Aethys|r Rotation |cFFABD473Hunter|r
+## Author: Nia, Aethys, SimCMinMax Team
+## Notes: Aethys Rotation - Hunter Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Hunter.lua
+BeastMastery.lua
+Marksmanship.lua

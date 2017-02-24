@@ -144,8 +144,8 @@
       [104]   = false,                          -- Guardian
       [105]   = false,                          -- Restoration
     -- Hunter
-      [253]   = false,                          -- Beast Mastery
-      [254]   = false,                          -- Marksmanship
+      [253]   = "AethysRotation_Hunter",        -- Beast Mastery
+      [254]   = "AethysRotation_Hunter",        -- Marksmanship
       [255]   = false,                          -- Survival
     -- Mage
       [62]    = false,                          -- Arcane
