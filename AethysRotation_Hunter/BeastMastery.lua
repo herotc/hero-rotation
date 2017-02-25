@@ -40,6 +40,7 @@
     BindingShot                   = Spell(109248),
     ChimaeraShot                  = Spell(53209),
     DireFrenzy                    = Spell(217200),
+    DireStable                    = Spell(193532),
     Stampede                      = Spell(201430),
     Volley                        = Spell(194386),
     -- Artifact
@@ -64,7 +65,7 @@
   if not Item.Hunter then Item.Hunter = {}; end
   Item.Hunter.BeastMastery = {
     -- Legendaries
-    
+    TheMantleofCommand            = Item(144326) -- 3
   };
   local I = Item.Hunter.BeastMastery;
   -- Rotation Var
@@ -151,8 +152,10 @@
       if S.DireBeast:IsCastable() and (S.BeastialWrath:Cooldown() > 3 or not AR.CDsON())  then
         if AR.Cast(S.DireBeast) then return; end
       end
-      -- actions+=/dire_frenzy,if=cooldown.bestial_wrath.remains>6|target.time_to_die<9
-      if S.DireFrenzy:IsCastable() and ((S.BeastialWrath:Cooldown() > 6 or not AR.CDsON()) or Target:TimeToDie() < 9) then
+      -- actions+=/dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))|(charges>=2&focus.deficit>=25+talent.dire_stable.enabled*12)|target.time_to_die<9
+      if S.DireFrenzy:IsCastable() and (((S.BeastialWrath:Cooldown() > 6 or not AR.CDsON()) and (not I.TheMantleofCommand:IsEquipped(3) 
+      or Pet:BuffRemains(S.DireFrenzy) <= Player:GCD() * 1.2 )) or (S.DireFrenzy:Charges() >= 2 and Player:FocusDeficit() >= 25 + (S.DireStable:IsAvailable() and 25 or 0)) 
+      or (Target:TimeToDie() < 9)) then
         if AR.Cast(S.DireFrenzy) then return; end
       end
       -- actions+=/aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
@@ -165,7 +168,7 @@
         -- if AR.Cast(S.Barrage) then return; end
         AR.LeftIconFrame:ChangeIcon(AR.GetTexture(S.Barrage));
       end
-      -- actions+=/titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|buff.bestial_wrath.up&pet.dire_beast.active
+      -- actions+=/titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
       if AR.CDsON() and S.TitansThunder:IsCastable() and (S.DireFrenzy:IsAvailable() or S.DireBeast:Cooldown() >= 3 or (Player:Buff(S.BeastialWrath) and Player:Buff(S.DireBeast))) then
         if AR.Cast(S.TitansThunder, Settings.BeastMastery.OffGCDasOffGCD.TitansThunder) then return; end
       end
@@ -173,7 +176,7 @@
       if AR.CDsON() and S.BeastialWrath:IsCastable() then
         if AR.Cast(S.BeastialWrath, Settings.BeastMastery.OffGCDasOffGCD.BeastialWrath) then return; end
       end
-      -- actions+=/multishot,if=spell_targets>4&(pet.buff.beast_cleave.remains<gcd.max|pet.buff.beast_cleave.down)
+      -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
       if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 4 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
         -- TODO: Add Multishot in suggested icon instead of main icon when it'll be done.
         --if AR.Cast(S.MultiShot) then return; end
@@ -183,7 +186,7 @@
       if S.KillCommand:IsCastable() then
         if AR.Cast(S.KillCommand) then return; end
       end
-      -- actions+=/multishot,if=spell_targets>1&(pet.buff.beast_cleave.remains<gcd.max*2|pet.buff.beast_cleave.down)
+      -- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max*2|pet.cat.buff.beast_cleave.down)
       if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() * 2 or not Pet:Buff(S.BeastCleaveBuff)) then
         -- TODO: See the comment above  
         -- if AR.Cast(S.MultiShot) then return; end
@@ -193,7 +196,7 @@
       if S.ChimaeraShot:IsCastable() and Target:IsInRange(40) and Player:Focus() < 90 then
         if AR.Cast(S.ChimaeraShot) then return; end
       end
-      -- actions+=/cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
+      -- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
       if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:Cooldown() > Player:FocusTimeToMax() and (S.BeastialWrath:Cooldown() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BeastialWrath) and Player:FocusRegen()*S.KillCommand:Cooldown() > 30) or Target:TimeToDie() < S.KillCommand:Cooldown()) then
         if AR.Cast(S.CobraShot) then return; end
       end
@@ -205,7 +208,7 @@
   AR.SetAPL(253, APL);
 
 
---- Last Update: 02/24/2017
+--- Last Update: 02/25/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,type=flask_of_the_seventh_demon
@@ -226,13 +229,13 @@
 -- actions+=/a_murder_of_crows
 -- actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
 -- actions+=/dire_beast,if=cooldown.bestial_wrath.remains>3
--- actions+=/dire_frenzy,if=cooldown.bestial_wrath.remains>6|target.time_to_die<9
+-- actions+=/dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))|(charges>=2&focus.deficit>=25+talent.dire_stable.enabled*12)|target.time_to_die<9
 -- actions+=/aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
 -- actions+=/barrage,if=spell_targets.barrage>1
--- actions+=/titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|buff.bestial_wrath.up&pet.dire_beast.active
+-- actions+=/titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
 -- actions+=/bestial_wrath
--- actions+=/multishot,if=spell_targets>4&(pet.buff.beast_cleave.remains<gcd.max|pet.buff.beast_cleave.down)
+-- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
 -- actions+=/kill_command
--- actions+=/multishot,if=spell_targets>1&(pet.buff.beast_cleave.remains<gcd.max*2|pet.buff.beast_cleave.down)
+-- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max*2|pet.cat.buff.beast_cleave.down)
 -- actions+=/chimaera_shot,if=focus<90
--- actions+=/cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
+-- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
