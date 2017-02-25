@@ -192,7 +192,6 @@
     };
     AR.MainFrame:Lock();
   end
-  local AddonIsLoaded = {};
   function AR.PulseInit ()
     -- Force a refresh from the Core
     -- TODO: Make it a function instead of copy/paste from Core Events.lua
@@ -200,9 +199,8 @@
     Cache.Persistent.Player.Spec = {GetSpecializationInfo(GetSpecialization())};
 
     -- Load the Class Module if it's possible and not already loaded
-    if EnabledRotation[Cache.Persistent.Player.Spec[1]] and not AddonIsLoaded[EnabledRotation[Cache.Persistent.Player.Spec[1]]] then
+    if EnabledRotation[Cache.Persistent.Player.Spec[1]] and not IsAddOnLoaded(EnabledRotation[Cache.Persistent.Player.Spec[1]]) then
       LoadAddOn(EnabledRotation[Cache.Persistent.Player.Spec[1]]);
-      AddonIsLoaded[EnabledRotation[Cache.Persistent.Player.Spec[1]]] = true;
     end
 
     -- Check if there is a Rotation for this Spec
