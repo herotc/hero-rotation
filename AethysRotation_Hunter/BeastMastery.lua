@@ -153,8 +153,9 @@
         if AR.Cast(S.DireBeast) then return; end
       end
       -- actions+=/dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))|(charges>=2&focus.deficit>=25+talent.dire_stable.enabled*12)|target.time_to_die<9
+      -- NOTE: Increased gcd.max*1.2 to gcd.max*2.2 to take in concideration human factor.
       if S.DireFrenzy:IsCastable() and (((S.BeastialWrath:Cooldown() > 6 or not AR.CDsON()) and (not I.TheMantleofCommand:IsEquipped(3) 
-      or Pet:BuffRemains(S.DireFrenzy) <= Player:GCD() * 1.2 )) or (S.DireFrenzy:Charges() >= 2 and Player:FocusDeficit() >= 25 + (S.DireStable:IsAvailable() and 25 or 0)) 
+      or Pet:BuffRemains(S.DireFrenzy) <= Player:GCD() * 2.2 )) or (S.DireFrenzy:Charges() >= 2 and Player:FocusDeficit() >= 25 + (S.DireStable:IsAvailable() and 25 or 0)) 
       or (Target:TimeToDie() < 9)) then
         if AR.Cast(S.DireFrenzy) then return; end
       end
