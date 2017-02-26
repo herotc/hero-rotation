@@ -265,7 +265,7 @@ local function Finish ()
         end
       end
       if BestUnit then
-        AR.Nameplate.AddIcon(BestUnit, S.Nightblade);
+        AR.CastLeftNameplate(BestUnit, S.Nightblade);
       end
     end
   end
