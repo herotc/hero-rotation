@@ -178,13 +178,14 @@ local function APL ()
   --- Legendaries
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
         if I.EmalonChargedCore:IsEquipped(5) and Player:Buff(S.EmalonChargedCore) then
-            if AR.LeftIconFrame:ChangeIcon(AR.GetTexture(S.EmalonChargedCore)) then return "Cast EmalonChargedCore"; end
+            if AR.CastLeft(S.EmalonChargedCore) then return "Cast EmalonChargedCore"; end
         end
-        if I.EmalonChargedCore:IsEquipped(5) and not Player:Buff(S.EmalonChargedCore) then
-            if AR.LeftIconFrame:ChangeIcon(nil) then return "Cast EmalonChargedCore"; end
-        end
+        -- No need to cast a nil, it won't display anything by default.
+        -- if I.EmalonChargedCore:IsEquipped(5) and not Player:Buff(S.EmalonChargedCore) then
+        --     if AR.CastLeft(nil) then return "Cast EmalonChargedCore"; end
+        -- end
         if I.StormTempests:IsEquipped(6) and Target:Debuff(S.StormTempests) then
-            if AR.LeftIconFrame:ChangeIcon(AR.GetTexture(S.StormTempests)) then return "Cast StormTempests"; end
+            if AR.CastLeft(S.StormTempests) then return "Cast StormTempests"; end
         end
     end
 
