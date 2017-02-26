@@ -180,7 +180,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
-  if AR.AoEON() and Cache.EnemiesCount[10] >= 2 and S.ShurikenStorm:IsCastable() then
+  if Cache.EnemiesCount[10] >= 2 and S.ShurikenStorm:IsCastable() then
     if AR.Cast(S.ShurikenStorm) then return "Cast"; end
   end
   if Target:IsInRange(5) then
@@ -240,7 +240,7 @@ local function Finish ()
     if AR.Cast(S.EnvelopingShadows) then return "Cast"; end
   end
   -- actions.finish+=/death_from_above,if=spell_targets.death_from_above>=5
-  if AR.AoEON() and S.DeathFromAbove:IsCastable() and Cache.EnemiesCount[8] >= 5 and Target:IsInRange(15) then
+  if S.DeathFromAbove:IsCastable() and Cache.EnemiesCount[8] >= 5 and Target:IsInRange(15) then
     if AR.Cast(S.DeathFromAbove) then return "Cast"; end
   end
   -- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die-remains>10&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
@@ -287,11 +287,10 @@ local function StealthMacro(MacroType)
     SoDMacro = true;
   end
   -- Will we Shuriken Storm ?
-  if AR.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
+  if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
       and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
-        or (Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2 + (S.Premeditation:IsAvailable() and 1 or 0)
-          + (Player:Buff(S.ShadowBlades) and 1 or 0) and Player:BuffStack(S.DreadlordsDeceit) >= 29))
-  then
+        or (AR.AoEON() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)
+          and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     ShStormMacro = true;
   end
   if MacroType == "ShD" then
@@ -363,15 +362,14 @@ local function Stealthed ()
     if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
-  if Player:ComboPoints() >= 5 and ((AR.AoEON() and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0)) or (AR.Commons.Rogue.MantleDuration() <= 1.3 and AR.Commons.Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
+  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) or (AR.Commons.Rogue.MantleDuration() <= 1.3 and AR.Commons.Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
     return Finish();
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
-  if AR.AoEON() and S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
+  if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
       and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
-        or (Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2 + (S.Premeditation:IsAvailable() and 1 or 0)
-          + (Player:Buff(S.ShadowBlades) and 1 or 0) and Player:BuffStack(S.DreadlordsDeceit) >= 29))
-  then
+        or (AR.AoEON() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)
+          and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.ShurikenStorm) then return "Cast"; end
   end
   -- actions.stealthed+=/shadowstrike,if=combo_points.deficit>=2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
@@ -423,9 +421,10 @@ local function APL ()
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   ShadowstrikeRange = 5+(Settings.Subtlety.ShadowstrikeMaxRange and 10 or 0);
   -- Unit Update
-  AC.GetEnemies(10); -- Shuriken Storm
-  AC.GetEnemies(8); -- Death From Above
-  AC.GetEnemies(5); -- Melee
+  AC.GetEnemies(10);    -- Shuriken Storm
+  AC.GetEnemies(8);     -- Death From Above
+  AC.GetEnemies(5);     -- Melee
+  AR.Commons.AoEToggleEnemiesUpdate();
   --- Defensives
     -- Crimson Vial
     ShouldReturn = AR.Commons.Rogue.CrimsonVial (S.CrimsonVial);
@@ -455,7 +454,7 @@ local function APL ()
            if AR.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
           end
         elseif Player:IsStealthed(true, true) then
-          if AR.AoEON() and S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+          if S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
             if AR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
           elseif S.Shadowstrike:IsCastable() then
             if AR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
@@ -499,7 +498,7 @@ local function APL ()
         end
       end
       -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
-      if Player:ComboPoints() >= 5 or (AR.AoEON() and Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 3 and Cache.EnemiesCount[10] <= 4) then
+      if Player:ComboPoints() >= 5 or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 3 and Cache.EnemiesCount[10] <= 4) then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
