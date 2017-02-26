@@ -1,32 +1,41 @@
 # AethysRotation
 
 AethysRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation.
-The project is hosted on [GitHub](https://github.com/Aethys256/AethysRotation) and maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
+The project is hosted on [GitHub](https://github.com/Aethys256/AethysRotation) and powered by [AethysCore](https://github.com/Aethys256/AethysRotation).
+It is maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
 Also, you can find it on [Curse](https://mods.curse.com/addons/wow/aethysrotation) and [CurseForge](https://wow.curseforge.com/projects/aethysrotation).
+
+_There are a lot of helpful commands, do '/aer help' to see them in-game !._
+
+Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
 
 ## Key Features
 - Main Icon that shows the next ability you should cast.
-- Two smaller icons above the previous one that shows the useful CDs to use.
+- Two smaller icons above the previous one that shows the useful CDs/OffGCD-Abilities to use.
 - One medium icon on the left that shows every abilities that should be cycled (i.e. multi-dotting).
+- One medium-small icon on the upper-left that do proposals about situational abilities (trinkets, potions, ...).
 
-Every rotations are based on SimulationCraft Action Priority Lists.
+Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Action Priority Lists](https://github.com/simulationcraft/simc/wiki/ActionLists).
 
+## Special Features
+- Optimized Pooling of Ressources when needed (ex: Energy before Cooldowns for Rogues).
+- Next Cast Predicition for Casters.
+- Solo Mode toggleable to improve the survivability to the detriment of DPS.
 
 ## Supported Rotations
 - Demon Hunter Vengeance
-- Hunter BeastMastery _Beta_ (Credits: Nia)
+- Hunter BeastMastery _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
 - Paladin Retribution
-- Priest Shadow _Beta_ (Credits: KutiKuti)
+- Priest Shadow _[Beta]_ (Credits: [KutiKuti](https://github.com/Kutikuti))
 - Rogue Outlaw
 - Rogue Subtlety
-- Shaman Enhancement _Beta_ (Credits: Tael)
+- Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
 
-Rogue Assassination is coming very soon.
+## Special Thanks
+- [KutiKuti](https://github.com/Kutikuti), [Nia](https://github.com/Nianel) & [Tael](https://github.com/Tae-l) for their contribution to the project.
+- [Skasch](https://github.com/skasch) for what we built together and the motivation he gaves to me.
+- [Riff](https://github.com/tombell) for his great feedback.
 
 
 More features including a GUI are coming when more rotations will be done. Currently every rotation settings are in the Settings.lua file.
 Stay tuned !
-
-Also, feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
-
-_PS : There are a lot of helpful commands, do '/aer help' to see them in-game !._
