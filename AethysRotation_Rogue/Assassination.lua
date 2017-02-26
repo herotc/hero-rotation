@@ -112,7 +112,7 @@ local function Build ()
         end
       end
       if BestUnit then
-        AR.Nameplate.AddIcon(BestUnit, S.Hemorrhage);
+        AR.CastLeftNameplate(BestUnit, S.Hemorrhage);
       end
       end
    end
@@ -143,7 +143,7 @@ local function Build ()
         end
       end
       if BestUnit then
-        AR.Nameplate.AddIcon(BestUnit, S.Mutilate);
+        AR.CastLeftNameplate(BestUnit, S.Mutilate);
       end
       end
    end
@@ -240,7 +240,7 @@ local function Maintain ()
               end
            end
            if BestUnit then
-              AR.Nameplate.AddIcon(BestUnit, S.Rupture);
+              AR.CastLeftNameplate(BestUnit, S.Rupture);
            end
         end
       end
@@ -277,7 +277,7 @@ local function Maintain ()
            if Player:Energy() < 45 then
               if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (Cycle)"; end
            end
-           AR.Nameplate.AddIcon(BestUnit, S.Garrote);
+           AR.CastLeftNameplate(BestUnit, S.Garrote);
         end
       end
    end
