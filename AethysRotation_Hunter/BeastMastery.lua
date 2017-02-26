@@ -166,7 +166,7 @@
       if AR.AoEON() and S.Barrage:IsCastable() and Cache.EnemiesCount[40] > 1 then
         -- TODO: Add Barrage in suggested icon instead of main icon when it'll be done.
         -- if AR.Cast(S.Barrage) then return; end
-        AR.LeftIconFrame:ChangeIcon(AR.GetTexture(S.Barrage));
+        AR.CastLeft(S.Barrage);
       end
       -- actions+=/titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
       if AR.CDsON() and S.TitansThunder:IsCastable() and (S.DireFrenzy:IsAvailable() or S.DireBeast:Cooldown() >= 3 or (Player:Buff(S.BeastialWrath) and Player:Buff(S.DireBeast))) then
@@ -180,7 +180,7 @@
       if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 4 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
         -- TODO: Add Multishot in suggested icon instead of main icon when it'll be done.
         --if AR.Cast(S.MultiShot) then return; end
-        AR.LeftIconFrame:ChangeIcon(AR.GetTexture(S.MultiShot));
+        AR.CastLeft(S.MultiShot);
       end
       -- actions+=/kill_command
       if S.KillCommand:IsCastable() then
@@ -190,7 +190,7 @@
       if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() * 2 or not Pet:Buff(S.BeastCleaveBuff)) then
         -- TODO: See the comment above  
         -- if AR.Cast(S.MultiShot) then return; end
-        AR.LeftIconFrame:ChangeIcon(AR.GetTexture(S.MultiShot));
+        AR.CastLeft(S.MultiShot);
       end
       -- actions+=/chimaera_shot,if=focus<90
       if S.ChimaeraShot:IsCastable() and Target:IsInRange(40) and Player:Focus() < 90 then
