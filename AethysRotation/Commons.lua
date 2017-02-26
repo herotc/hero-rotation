@@ -9,6 +9,8 @@ local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = AC.Spell;
 local Item = AC.Item;
+-- Lua
+local pairs = pairs;
 -- Commons
 AR.Commons = {};
 AR.Commons.Everyone = {};
@@ -18,6 +20,15 @@ local Settings = AR.GUISettings.General;
 -- Is Target Valid
 function AR.Commons.TargetIsValid ()
   return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost();
+end
+
+-- Put EnemiesCount to 1 if we have AoEON
+function AR.Commons.AoEToggleEnemiesUpdate ()
+  if not AR.AoEON() then
+    for Key, Value in pairs(Cache.EnemiesCount) do
+      Cache.EnemiesCount[Key] = 1;
+    end
+  end
 end
 
 -- Interrupt
