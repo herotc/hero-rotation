@@ -41,6 +41,10 @@ function AR.ResetIcons ()
 
   -- Left/Nameplate Icons
   AR.Nameplate.RemoveIcons();
+  AR.CastLeftOffset = 1;
+
+  -- Suggested Icon
+  AR.CastSuggestedOffset = 1;
 end
 
 --- Create a Backdrop
@@ -172,8 +176,8 @@ end
   AR.Nameplate = {
     Initialized = false
   };
-  -- Add the Icon on Nameplates (and on Left Icon frame)
-  function AR.Nameplate.AddIcon (ThisUnit, SpellID)
+  -- Add the Icon on Nameplates
+  function AR.Nameplate.AddIcon (ThisUnit, Object)
     Token = stringlower(ThisUnit.UnitID);
     Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
     if Nameplate then
@@ -191,7 +195,7 @@ end
       end
 
       -- Set the Texture
-      AR.NameplateIconFrame.TempTexture:SetTexture(AR.GetTexture(SpellID));
+      AR.NameplateIconFrame.TempTexture:SetTexture(AR.GetTexture(Object));
       AR.NameplateIconFrame.TempTexture:SetAllPoints(AR.NameplateIconFrame);
       AR.NameplateIconFrame.texture = AR.NameplateIconFrame.TempTexture;
       if not AR.NameplateIconFrame:IsVisible() then
@@ -199,13 +203,13 @@ end
         AR.NameplateIconFrame:Show();
       end
 
-      -- Display the left icon
-      AR.LeftIconFrame:ChangeIcon(AR.GetTexture(SpellID));
-
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
       AR.LastUnitCycled = ThisUnit;
       AR.LastUnitCycledTime = AC.GetTime();
+
+      return true;
     end
+    return false;
   end
   -- Remove Icons
   function AR.Nameplate.RemoveIcons ()

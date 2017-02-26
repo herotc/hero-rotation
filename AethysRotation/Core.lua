@@ -56,25 +56,57 @@ function AR.GetTexture (Object)
   end
 end
 
--- Display the Spell to cast.
--- TODO: Add LeftIcon Cast + LeftIcon & Nameplate Cast
-AR.CastOffGCDOffset = 1;
-function AR.Cast (Object, OffGCD)
-  if OffGCD and OffGCD[1] then
-    if AR.CastOffGCDOffset <= 2 then
-      AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object));
-      AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
+--- Display the Spell to cast.
+  -- Main Cast
+  AR.CastOffGCDOffset = 1;
+  function AR.Cast (Object, OffGCD)
+    if OffGCD and OffGCD[1] then
+      if AR.CastOffGCDOffset <= 2 then
+        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object));
+        AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
+        Object.LastDisplayTime = AC.GetTime();
+        return OffGCD[2] and "Should Return" or false;
+      end
+    else
+      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
+      AR.MainIconFrame:SetCooldown(GetSpellCooldown(61304)); -- Put the GCD as Cast Cooldown
       Object.LastDisplayTime = AC.GetTime();
-      return OffGCD[2] and "Should Return" or false;
+      return "Should Return";
     end
-  else
-    AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
-    AR.MainIconFrame:SetCooldown(GetSpellCooldown(61304)); -- Put the GCD as Cast Cooldown
-    Object.LastDisplayTime = AC.GetTime();
-    return "Should Return";
+    return false;
   end
-  return false;
-end
+
+  -- Left (+ Nameplate) Cast
+  AR.CastLeftOffset = 1;
+  local function CastLeftCommon (Object)
+    AR.LeftIconFrame:ChangeIcon(AR.GetTexture(Object));
+    AR.CastLeftOffset = AR.CastLeftOffset + 1;
+    Object.LastDisplayTime = AC.GetTime();
+  end
+  function AR.CastLeft (Object)
+    if AR.CastLeftOffset == 1 then
+      CastLeftCommon(Object);
+    end
+    return false;
+  end
+  function AR.CastLeftNameplate (ThisUnit, Object)
+    if AR.CastLeftOffset == 1 and AR.Nameplate.AddIcon(ThisUnit, Object) then
+      CastLeftCommon(Object);
+    end
+    return false;
+  end
+
+  -- Suggested Icon Cast
+  AR.CastSuggestedOffset = 1;
+  -- TODO: Implement it
+  function AR.CastSuggested (Object)
+    -- if AR.CastSuggestedOffset == 1 then
+    --   AR.SuggestedIconFrame:ChangeIcon(AR.GetTexture(Object));
+    --   AR.CastSuggestedOffset = AR.CastSuggestedOffset + 1;
+    --   Object.LastDisplayTime = AC.GetTime();
+    -- end
+    return false;
+  end
 
 -- Command Handler
 local Argument1, Argument2, Argument3;
