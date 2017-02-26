@@ -73,12 +73,14 @@ end
       AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
 
       -- Icon Cooldown
-      if Player:IsCasting() then -- Only for Cast, not Channel
-        CastStart = select(5, Player:CastingInfo());
-        AR.MainIconFrame:SetCooldown(CastStart, Player:CastDuration());
-      else
-        AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
-      end
+      -- TODO: Disabled until fix
+      -- if Player:IsCasting() then -- Only for Cast, not Channel
+      --   CastStart = select(5, Player:CastingInfo());
+      --   AR.MainIconFrame:SetCooldown(CastStart, Player:CastDuration());
+      -- else
+      --   AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
+      -- end
+      AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
 
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";
