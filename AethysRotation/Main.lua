@@ -67,7 +67,7 @@
       AR.Cast(LockSpell, {false});  -- Main Icon
       AR.Cast(LockSpell, {true});   -- Small Icon 1
       AR.Cast(LockSpell, {true});   -- Small Icon 2
-      AR.LeftIconFrame:ChangeIcon(AR.GetTexture(LockSpell));
+      AR.CastLeft(LockSpell);       -- Left Icon
       -- Unlock the UI
       for Key, Value in pairs(UIFrames) do
         Value:EnableMouse(true);
