@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation
+## Title: Aethys |cFFA330C9Rotation|r
 ## Author: Aethys, SimCMinMax Team
 ## Version: 7.1.5843
 ## Notes: Attempt to provide the useful and precise informations to execute the best possible DPS rotation in every situation.
@@ -8,7 +8,7 @@
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## Dependencies: AethysCore
-## OptionalDeps: AethysTool
+## OptionalDeps: AethysTools
 ## SavedVariables: AethysRotationDB
 
 

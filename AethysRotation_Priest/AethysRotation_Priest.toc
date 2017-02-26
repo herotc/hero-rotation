@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFFFFFFFPriest|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FPriest|r]
 ## Author: KutiKuti
 ## Notes: Aethys Rotation - Priest Module.
 

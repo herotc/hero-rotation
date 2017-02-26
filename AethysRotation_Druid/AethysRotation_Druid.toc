@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFFF7D0ADruid|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FDruid|r]
 ## Author: Aethys
 ## Notes: Aethys Rotation - Druid Module.
 

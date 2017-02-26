@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFF0070DEShaman|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FShaman|r]
 ## Author: Tael
 ## Notes: Aethys Rotation - Shaman Module.
 

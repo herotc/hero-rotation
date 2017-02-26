@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFF58CBAPaladin|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FPaladin|r]
 ## Author: Aethys
 ## Notes: Aethys Rotation - Paladin Module.
 
