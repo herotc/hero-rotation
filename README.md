@@ -18,9 +18,11 @@ Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly 
 Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Action Priority Lists](https://github.com/simulationcraft/simc/wiki/ActionLists).
 
 ## Special Features
-- Optimized Pooling of Ressources when needed (ex: Energy before Cooldowns for Rogues).
-- Next Cast Predicition for Casters.
-- Solo Mode toggleable to improve the survivability to the detriment of DPS.
+- Optimized Pooling of Ressources when needed (ex: Energy before Cooldowns for Rogue).
+- Accurate TimeToDie Prediction.
+- Next Cast Prediction for Casters.
+- Special handlers for tricky abilities (ex: Finality or Exsanguinated Bleed for Rogue).
+- Solo Mode to improve the survivability to the detriment of DPS.
 
 ## Supported Rotations
 - Demon Hunter Vengeance
@@ -32,7 +34,7 @@ Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Act
 - Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
 
 ## Special Thanks
-- [KutiKuti](https://github.com/Kutikuti), [Nia](https://github.com/Nianel) & [Tael](https://github.com/Tae-l) for their contribution to the project.
+- [KutiKuti](https://github.com/Kutikuti), [Nia](https://github.com/Nianel) & [Tael](https://github.com/Tae-l) for their contributions to the project.
 - [Skasch](https://github.com/skasch) for what we built together and the motivation he gaves to me.
 - [Riff](https://github.com/tombell) for his great feedback.
 
