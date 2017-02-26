@@ -143,10 +143,7 @@
             AR.SmallIconFrame.Icon[2],
             AR.LeftIconFrame,
             AR.SuggestedIconFrame,
-            AR.ToggleIconFrame,
-            AR.Button[1],
-            AR.Button[2],
-            AR.Button[3]
+            AR.ToggleIconFrame
           };
           C_Timer.After(2, function ()
               AR.MainFrame:UnregisterEvent("ADDON_LOADED");
