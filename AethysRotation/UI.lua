@@ -25,6 +25,7 @@ AR.MainIconFrame.TempTexture = AR.MainIconFrame:CreateTexture(nil, "BACKGROUND")
 AR.SmallIconFrame = CreateFrame("Frame", "AethysRotation_SmallIconFrame", UIParent);
 AR.LeftIconFrame = CreateFrame("Frame", "AethysRotation_LeftIconFrame", UIParent);
 AR.NameplateIconFrame = CreateFrame("Frame", "AethysRotation_NameplateIconFrame", UIParent);
+AR.SuggestedIconFrame = CreateFrame("Frame", "AethysRotation_SuggestedIconFrame", UIParent);
 AR.ToggleIconFrame = CreateFrame("Frame", "AethysRotation_ToggleIconFrame", UIParent);
 
 
@@ -44,6 +45,7 @@ function AR.ResetIcons ()
   AR.CastLeftOffset = 1;
 
   -- Suggested Icon
+  AR.SuggestedIconFrame:HideIcon();
   AR.CastSuggestedOffset = 1;
 end
 
@@ -217,6 +219,31 @@ end
     AR.NameplateIconFrame:Hide();
     -- Left Icon
     AR.LeftIconFrame:Hide();
+  end
+
+--- Suggested Icon
+    -- Init LeftIcon
+  function AR.SuggestedIconFrame:Init ()
+    self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
+    self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
+    self:SetWidth(32);
+    self:SetHeight(32);
+    self:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3 or 4));
+    self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
+    self:Show();
+  end
+  -- Change Texture (1 Arg for Texture, 3 Args for Color)
+  function AR.SuggestedIconFrame:ChangeIcon (Texture)
+    self.TempTexture:SetTexture(Texture);
+    self.TempTexture:SetAllPoints(self);
+    self.texture = self.TempTexture;
+    if not self:IsVisible() then
+      self:Show();
+    end
+  end
+  -- Hide Small Icons
+  function AR.SuggestedIconFrame:HideIcon ()
+    AR.SuggestedIconFrame:Hide();
   end
 
 --- Toggle Icons

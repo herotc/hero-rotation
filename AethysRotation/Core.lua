@@ -98,13 +98,12 @@ end
 
   -- Suggested Icon Cast
   AR.CastSuggestedOffset = 1;
-  -- TODO: Implement it
   function AR.CastSuggested (Object)
-    -- if AR.CastSuggestedOffset == 1 then
-    --   AR.SuggestedIconFrame:ChangeIcon(AR.GetTexture(Object));
-    --   AR.CastSuggestedOffset = AR.CastSuggestedOffset + 1;
-    --   Object.LastDisplayTime = AC.GetTime();
-    -- end
+    if AR.CastSuggestedOffset == 1 then
+      AR.SuggestedIconFrame:ChangeIcon(AR.GetTexture(Object));
+      AR.CastSuggestedOffset = AR.CastSuggestedOffset + 1;
+      Object.LastDisplayTime = AC.GetTime();
+    end
     return false;
   end
 

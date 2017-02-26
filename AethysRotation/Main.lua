@@ -34,12 +34,14 @@
         {AR.SmallIconFrame, 64, 32},
         {AR.SmallIconFrame.Icon[1], AR.GUISettings.General.BlackBorderIcon and 30 or 32, AR.GUISettings.General.BlackBorderIcon and 30 or 32},
         {AR.SmallIconFrame.Icon[2], AR.GUISettings.General.BlackBorderIcon and 30 or 32, AR.GUISettings.General.BlackBorderIcon and 30 or 32},
-        {AR.LeftIconFrame, 48, 48}
+        {AR.LeftIconFrame, 48, 48},
+        {AR.SuggestedIconFrame, 32, 32},
       };
       for Key, Value in pairs(FramesToResize) do
         Value[1]:SetWidth(Value[2]*Multiplier);
         Value[1]:SetHeight(Value[3]*Multiplier);
       end
+      AR.SuggestedIconFrame:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
       AethysRotationDB.ScaleUI = Multiplier;
     end
     function AR.MainFrame:ResizeButtons (Multiplier)
@@ -68,6 +70,7 @@
       AR.Cast(LockSpell, {true});   -- Small Icon 1
       AR.Cast(LockSpell, {true});   -- Small Icon 2
       AR.CastLeft(LockSpell);       -- Left Icon
+      AR.CastSuggested(LockSpell);  -- Suggested Icon
       -- Unlock the UI
       for Key, Value in pairs(UIFrames) do
         Value:EnableMouse(true);
@@ -111,6 +114,7 @@
           AR.MainIconFrame:Init();
           AR.SmallIconFrame:Init();
           AR.LeftIconFrame:Init();
+          AR.SuggestedIconFrame:Init();
           AR.ToggleIconFrame:Init();
           if AethysRotationDB.ScaleUI then
             AR.MainFrame:ResizeUI(AethysRotationDB.ScaleUI);
@@ -182,13 +186,14 @@
   };
   function AR.PulsePreInit ()
     UIFrames = {
-      AR.MainFrame;
-      AR.MainIconFrame;
-      AR.SmallIconFrame;
-      AR.SmallIconFrame.Icon[1];
-      AR.SmallIconFrame.Icon[2];
-      AR.LeftIconFrame;
-      AR.ToggleIconFrame;
+      AR.MainFrame,
+      AR.MainIconFrame,
+      AR.SmallIconFrame,
+      AR.SmallIconFrame.Icon[1],
+      AR.SmallIconFrame.Icon[2],
+      AR.LeftIconFrame,
+      AR.SuggestedIconFrame,
+      AR.ToggleIconFrame
     };
     AR.MainFrame:Lock();
   end
