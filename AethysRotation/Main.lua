@@ -96,7 +96,20 @@
     local function StopMove (self)
       self:StopMovingOrSizing();
       if not AethysRotationDB then AethysRotationDB = {}; end
-      AethysRotationDB.IconFramePos = {self:GetPoint()};
+      local point, relativeTo, relativePoint, xOffset, yOffset, relativeToName;
+      point, relativeTo, relativePoint, xOffset, yOffset = self:GetPoint();
+      if not relativeTo then
+        relativeToName = "UIParent";
+      else
+        relativeToName = relativeTo:GetName();
+      end
+      AethysRotationDB.IconFramePos = {
+        point,
+        relativeToName,
+        relativePoint,
+        xOffset,
+        yOffset
+      };
     end
     AR.MainFrame:SetScript("OnMouseUp", StopMove);
     AR.MainFrame:SetScript("OnHide", StopMove);
@@ -106,7 +119,7 @@
       if Event == "ADDON_LOADED" then
         if Arg1 == "AethysRotation" then
           if AethysRotationDB and AethysRotationDB.IconFramePos then
-            AR.MainFrame:SetPoint(AethysRotationDB.IconFramePos[1], UIParent, AethysRotationDB.IconFramePos[3], AethysRotationDB.IconFramePos[4], AethysRotationDB.IconFramePos[5]);
+            AR.MainFrame:SetPoint(AethysRotationDB.IconFramePos[1], _G[AethysRotationDB.IconFramePos[2]], AethysRotationDB.IconFramePos[3], AethysRotationDB.IconFramePos[4], AethysRotationDB.IconFramePos[5]);
           else
             AR.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
           end
@@ -122,10 +135,23 @@
           if AethysRotationDB.ScaleButtons then
             AR.MainFrame:ResizeButtons(AethysRotationDB.ScaleButtons);
           end
+          UIFrames = {
+            AR.MainFrame,
+            AR.MainIconFrame,
+            AR.SmallIconFrame,
+            AR.SmallIconFrame.Icon[1],
+            AR.SmallIconFrame.Icon[2],
+            AR.LeftIconFrame,
+            AR.SuggestedIconFrame,
+            AR.ToggleIconFrame,
+            AR.Button[1],
+            AR.Button[2],
+            AR.Button[3]
+          };
           C_Timer.After(2, function ()
               AR.MainFrame:UnregisterEvent("ADDON_LOADED");
               AR.PulsePreInit();
-              AR.MainFrame:SetScript("OnUpdate", AR.PulseInit);
+              AR.PulseInit();
             end
           );
         end
@@ -185,16 +211,6 @@
       [73]    = false                           -- Protection
   };
   function AR.PulsePreInit ()
-    UIFrames = {
-      AR.MainFrame,
-      AR.MainIconFrame,
-      AR.SmallIconFrame,
-      AR.SmallIconFrame.Icon[1],
-      AR.SmallIconFrame.Icon[2],
-      AR.LeftIconFrame,
-      AR.SuggestedIconFrame,
-      AR.ToggleIconFrame
-    };
     AR.MainFrame:Lock();
   end
   function AR.PulseInit ()

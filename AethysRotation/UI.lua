@@ -255,7 +255,7 @@ end
     self:SetWidth(64);
     self:SetHeight(20);
     if AethysRotationDB and AethysRotationDB.ButtonsFramePos then
-      self:SetPoint(AethysRotationDB.ButtonsFramePos[1], UIParent, AethysRotationDB.ButtonsFramePos[3], AethysRotationDB.ButtonsFramePos[4], AethysRotationDB.ButtonsFramePos[5]);
+      self:SetPoint(AethysRotationDB.ButtonsFramePos[1], _G[AethysRotationDB.ButtonsFramePos[2]], AethysRotationDB.ButtonsFramePos[3], AethysRotationDB.ButtonsFramePos[4], AethysRotationDB.ButtonsFramePos[5]);
     else
       self:SetPoint("TOPLEFT", AR.MainIconFrame, "BOTTOMLEFT", 0, AR.GUISettings.General.BlackBorderIcon and -3 or 0);
     end
@@ -269,7 +269,20 @@ end
     local function StopMove (self)
       self:StopMovingOrSizing();
       if not AethysRotationDB then AethysRotationDB = {}; end
-      AethysRotationDB.ButtonsFramePos = {self:GetPoint()};
+      local point, relativeTo, relativePoint, xOffset, yOffset, relativeToName;
+      point, relativeTo, relativePoint, xOffset, yOffset = self:GetPoint();
+      if not relativeTo then
+        relativeToName = "UIParent";
+      else
+        relativeToName = relativeTo:GetName();
+      end
+      AethysRotationDB.ButtonsFramePos = {
+        point,
+        relativeToName,
+        relativePoint,
+        xOffset,
+        yOffset
+      };
     end
     self:SetScript("OnMouseUp", StopMove);
     self:SetScript("OnHide", StopMove);
