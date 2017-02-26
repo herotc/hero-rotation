@@ -234,6 +234,7 @@
       end
       AR.MainFrame:SetScript("OnUpdate", nil);
     end
+    if not AC.PulseInitialized then AC.PulseInitialized = true; end
   end
 
   AR.Timer = {

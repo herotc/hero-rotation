@@ -16,7 +16,9 @@ local Item = AC.Item;
   local SpecTimer = 0;
   AC:RegisterForEvent(
     function (Event)
-      -- Added a timer to prevent bug due to the double/triple event firing.
+      -- Prevent the first event firing (when login)
+      if not AC.PulseInitialized then return; end
+      -- Timer to prevent bug due to the double/triple event firing.
       if AC.GetTime() > SpecTimer then
         AR.PulseInit();
         SpecTimer = AC.GetTime() + 4;
