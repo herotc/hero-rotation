@@ -117,9 +117,7 @@ local function Build ()
       end
    end
    -- actions.build+=/fan_of_knives,if=spell_targets>=3|buff.the_dreadlords_deceit.stack>=29
-   if AR.AoEON() and
-      S.FanofKnives:IsCastable() and
-      (Cache.EnemiesCount[10] >= 3 or (Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+   if AR.AoEON() and S.FanofKnives:IsCastable() and (Cache.EnemiesCount[10] >= 3 or (Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
       if AR.Cast(S.Hemorrhage) then return "Cast"; end
    end
    -- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)|(set_bonus.tier19_2pc=1&dot.mutilated_flesh.refreshable)

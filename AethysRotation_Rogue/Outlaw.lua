@@ -247,11 +247,11 @@ end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and (not AR.AoEON() or (Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and AR.AoEON() and Cache.EnemiesCount[6] >= 2)) then
+  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and Cache.EnemiesCount[6] >= 2)) then
     if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-  if AR.AoEON() and S.BladeFlurry:IsCastable() and not Player:Buff(S.BladeFlurry) and Cache.EnemiesCount[6] >= 2 then
+  if S.BladeFlurry:IsCastable() and not Player:Buff(S.BladeFlurry) and Cache.EnemiesCount[6] >= 2 then
     if AR.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   return false;
@@ -365,28 +365,29 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-    AC.GetEnemies(8); -- Cannonball Barrage
-    AC.GetEnemies(6); -- Blade Flurry
-    AC.GetEnemies(5); -- Melee
-  --- Defensives
+  AC.GetEnemies(8);     -- Cannonball Barrage
+  AC.GetEnemies(6);     -- Blade Flurry
+  AC.GetEnemies(5);     -- Melee
+  AR.Commons.AoEToggleEnemiesUpdate();
+  -- Defensives
     -- Crimson Vial
     ShouldReturn = AR.Commons.Rogue.CrimsonVial (S.CrimsonVial);
     if ShouldReturn then return ShouldReturn; end
     -- Feint
     ShouldReturn = AR.Commons.Rogue.Feint (S.Feint);
     if ShouldReturn then return ShouldReturn; end
-  --- Blade Flurry
+  -- Blade Flurry
     -- Blade Flurry Expiration Offset
-    if (not AR.AoEON() or Cache.EnemiesCount[6] == 1) and BFReset then
+    if Cache.EnemiesCount[6] == 1 and BFReset then
       BFTimer, BFReset = AC.GetTime() + Settings.Outlaw.BFOffset, false;
-    elseif AR.AoEON() and Cache.EnemiesCount[6] > 1 then
+    elseif Cache.EnemiesCount[6] > 1 then
       BFReset = true;
     end
     -- actions+=/call_action_list,name=bf
     if BF() then
       return;
     end
-  --- Out of Combat
+  -- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
     ShouldReturn = AR.Commons.Rogue.Stealth (S.Stealth);
@@ -409,7 +410,7 @@ local function APL ()
     end
     return;
   end
-  --- In Combat
+  -- In Combat
     -- MfD Sniping
     AR.Commons.Rogue.MfDSniping(S.MarkedforDeath);
     if AR.Commons.TargetIsValid() then
