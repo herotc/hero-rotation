@@ -60,7 +60,6 @@ end
   -- Main Cast
   AR.CastOffGCDOffset = 1;
   local GCDSpell = Spell(61304);
-  local CastStart;
   function AR.Cast (Object, OffGCD)
     if OffGCD and OffGCD[1] then
       if AR.CastOffGCDOffset <= 2 then
@@ -73,14 +72,11 @@ end
       AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
 
       -- Icon Cooldown
-      -- TODO: Disabled until fix
-      -- if Player:IsCasting() then -- Only for Cast, not Channel
-      --   CastStart = select(5, Player:CastingInfo());
-      --   AR.MainIconFrame:SetCooldown(CastStart, Player:CastDuration());
-      -- else
-      --   AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
-      -- end
-      AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
+      if Player:IsCasting() then -- Only for Cast, not Channel
+        AR.MainIconFrame:SetCooldown(Player:CastStart(), Player:CastDuration());
+      else
+        AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
+      end
 
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";
