@@ -105,9 +105,14 @@
         Shadow = {
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
+			Shadowfiend = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
+		    PowerInfusion = {true, false},
+			ArcaneTorrent = {true, false},
+			Berserking = {true, false},
+			BloodFury = {true, false},
           }
         },
       },
