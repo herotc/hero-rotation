@@ -64,6 +64,7 @@
   local function APL ()
     -- Unit Update
     
+    AR.Commons.AoEToggleEnemiesUpdate();
     -- Defensives
     
     -- Out of Combat
