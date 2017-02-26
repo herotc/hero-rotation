@@ -18,7 +18,7 @@ local Item = AC.Item;
     function (Event)
       -- Added a timer to prevent bug due to the double/triple event firing.
       if AC.GetTime() > SpecTimer then
-        AR.MainFrame:SetScript("OnUpdate", AR.PulseInit);
+        AR.PulseInit();
         SpecTimer = AC.GetTime() + 4;
       end
     end
