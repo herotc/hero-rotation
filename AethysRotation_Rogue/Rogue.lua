@@ -57,7 +57,7 @@ function AR.Commons.Rogue.MfDSniping (MarkedforDeath)
       end
     end
     if BestUnit then
-      AR.Nameplate.AddIcon(BestUnit, MarkedforDeath);
+      AR.CastLeftNameplate(BestUnit, MarkedforDeath);
     end
   end
 end
