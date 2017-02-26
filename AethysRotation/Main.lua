@@ -1,4 +1,5 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
   -- Addon
   local addonName, AR = ...;
   -- AethysCore
@@ -14,10 +15,12 @@
   local mathmin = math.min;
   local pairs = pairs;
   local select = select;
-  -- Main Variables
+  -- File Locals
   local UIFrames;
 
---- MainFrame
+
+--- ============================ CONTENT ============================
+--- ======= MAIN FRAME =======
   AR.MainFrame = CreateFrame("Frame", "AethysRotation_MainFrame", UIParent);
   AR.MainFrame:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
   AR.MainFrame:SetFrameLevel(10);
@@ -156,7 +159,7 @@
     end
   );
 
---- Main
+--- ======= MAIN =======
   local EnabledRotation = {
     -- Death Knight
       [250]   = false,                          -- Blood

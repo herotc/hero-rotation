@@ -1,4 +1,5 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
   -- Addon
   local addonName, addonTable = ...;
   -- AethysCore
@@ -15,7 +16,8 @@
   
 
 
---- APL Local Vars
+--- ============================ CONTENT ============================
+--- ======= APL LOCALS =======
   -- Spells
   if not Spell.Class then Spell.Class = {}; end
   Spell.Class.Spec = {
@@ -56,11 +58,11 @@
   };
 
 
---- APL Action Lists (and Variables)
+--- ======= ACTION LISTS =======
   
 
 
---- APL Main
+--- ======= MAIN =======
   local function APL ()
     -- Unit Update
     
@@ -73,9 +75,10 @@
       -- Food
       -- Rune
       -- PrePot w/ Bossmod Countdown
-      
       -- Opener
-      
+      if AR.Commons.TargetIsValid() then
+        
+      end
       return;
     end
     -- In Combat
@@ -88,6 +91,7 @@
   AR.SetAPL(000, APL);
 
 
+--- ======= SIMC =======
 --- Last Update: 12/31/2999
 
 -- APL goes here

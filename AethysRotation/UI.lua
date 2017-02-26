@@ -1,86 +1,88 @@
---- Localize Vars
--- Addon
-local addonName, AR = ...;
--- AethysCore
-local AC = AethysCore;
-local Cache = AethysCore_Cache;
-local Unit = AC.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
--- Lua
-local pairs = pairs;
-local stringlower = string.lower;
-local tostring = tostring;
--- UI Locals
-local FrameID, Nameplate; -- AR.Nameplate.AddTTD (& AddIcon for Nameplate)
-local Token; -- AR.Nameplate.AddIcon
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
+  -- Addon
+  local addonName, AR = ...;
+  -- AethysCore
+  local AC = AethysCore;
+  local Cache = AethysCore_Cache;
+  local Unit = AC.Unit;
+  local Player = Unit.Player;
+  local Target = Unit.Target;
+  local Spell = AC.Spell;
+  local Item = AC.Item;
+  -- Lua
+  local pairs = pairs;
+  local stringlower = string.lower;
+  local tostring = tostring;
+  -- File Locals
+  local FrameID, Nameplate;       -- AR.Nameplate.AddIcon
+  local Token;                    -- AR.Nameplate.AddIcon
 
 
---- Create Frames
-AR.MainIconFrame = CreateFrame("Frame", "AethysRotation_MainIconFrame", UIParent);
-AR.MainIconFrame.CooldownFrame = CreateFrame("Cooldown", "AethysRotation_MainIconCooldownFrame", AR.MainIconFrame, "CooldownFrameTemplate");
-AR.MainIconFrame.TempTexture = AR.MainIconFrame:CreateTexture(nil, "BACKGROUND");
-AR.SmallIconFrame = CreateFrame("Frame", "AethysRotation_SmallIconFrame", UIParent);
-AR.LeftIconFrame = CreateFrame("Frame", "AethysRotation_LeftIconFrame", UIParent);
-AR.NameplateIconFrame = CreateFrame("Frame", "AethysRotation_NameplateIconFrame", UIParent);
-AR.SuggestedIconFrame = CreateFrame("Frame", "AethysRotation_SuggestedIconFrame", UIParent);
-AR.ToggleIconFrame = CreateFrame("Frame", "AethysRotation_ToggleIconFrame", UIParent);
+--- ============================ CONTENT ============================
+--- ======= MAIN FRAME =======
+  AR.MainIconFrame = CreateFrame("Frame", "AethysRotation_MainIconFrame", UIParent);
+  AR.MainIconFrame.CooldownFrame = CreateFrame("Cooldown", "AethysRotation_MainIconCooldownFrame", AR.MainIconFrame, "CooldownFrameTemplate");
+  AR.MainIconFrame.TempTexture = AR.MainIconFrame:CreateTexture(nil, "BACKGROUND");
+  AR.SmallIconFrame = CreateFrame("Frame", "AethysRotation_SmallIconFrame", UIParent);
+  AR.LeftIconFrame = CreateFrame("Frame", "AethysRotation_LeftIconFrame", UIParent);
+  AR.NameplateIconFrame = CreateFrame("Frame", "AethysRotation_NameplateIconFrame", UIParent);
+  AR.SuggestedIconFrame = CreateFrame("Frame", "AethysRotation_SuggestedIconFrame", UIParent);
+  AR.ToggleIconFrame = CreateFrame("Frame", "AethysRotation_ToggleIconFrame", UIParent);
 
+--- ======= MISC =======
+  -- Reset Textures
+  local IdleSpell = Spell(9999000000);
+  function AR.ResetIcons ()
+    -- Main Icon
+    AR.MainIconFrame:ChangeIcon(AR.GetTexture(IdleSpell)); 
+    if AR.GUISettings.General.BlackBorderIcon then AR.MainIconFrame.Backdrop:Hide(); end
 
---- Reset Textures
-local IdleSpell = Spell(9999000000);
-function AR.ResetIcons ()
-  -- Main Icon
-  AR.MainIconFrame:ChangeIcon(AR.GetTexture(IdleSpell)); 
-  if AR.GUISettings.General.BlackBorderIcon then AR.MainIconFrame.Backdrop:Hide(); end
+    -- Small Icons
+    AR.SmallIconFrame:HideIcons();
+    AR.CastOffGCDOffset = 1;
 
-  -- Small Icons
-  AR.SmallIconFrame:HideIcons();
-  AR.CastOffGCDOffset = 1;
+    -- Left/Nameplate Icons
+    AR.Nameplate.HideIcons();
+    AR.CastLeftOffset = 1;
 
-  -- Left/Nameplate Icons
-  AR.Nameplate.RemoveIcons();
-  AR.CastLeftOffset = 1;
-
-  -- Suggested Icon
-  AR.SuggestedIconFrame:HideIcon();
-  AR.CastSuggestedOffset = 1;
-end
-
---- Create a Backdrop
-function AR:CreateBackdrop (Frame)
-  if Frame.Backdrop or not AR.GUISettings.General.BlackBorderIcon then return; end
-
-  local Backdrop = CreateFrame("Frame", nil, Frame);
-  Backdrop:ClearAllPoints();
-  Backdrop:SetPoint("TOPLEFT", Frame, "TOPLEFT", -1, 1);
-  Backdrop:SetPoint("BOTTOMRIGHT", Frame, "BOTTOMRIGHT", 1, -1);
-
-  Backdrop:SetBackdrop({
-    bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-    edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
-    tile = false,
-    tileSize = 0,
-    edgeSize = 1,
-    insets = { left = 0, right = 0, top = 0, bottom = 0 },
-  });
-
-  Backdrop:SetBackdropBorderColor(0, 0, 0);
-  Backdrop:SetBackdropColor(0, 0, 0, 1);
-
-  Backdrop:SetFrameStrata(AR.MainFrame:GetFrameStrata());
-  if Frame:GetFrameLevel() - 1 >= 0 then
-    Backdrop:SetFrameLevel(Frame:GetFrameLevel() - 1);
-  else
-    Backdrop:SetFrameLevel(0);
+    -- Suggested Icon
+    AR.SuggestedIconFrame:HideIcon();
+    AR.CastSuggestedOffset = 1;
   end
 
-  Frame.Backdrop = Backdrop;
-end
+  -- Create a Backdrop
+  function AR:CreateBackdrop (Frame)
+    if Frame.Backdrop or not AR.GUISettings.General.BlackBorderIcon then return; end
 
---- Main Icon (On GCD)
+    local Backdrop = CreateFrame("Frame", nil, Frame);
+    Backdrop:ClearAllPoints();
+    Backdrop:SetPoint("TOPLEFT", Frame, "TOPLEFT", -1, 1);
+    Backdrop:SetPoint("BOTTOMRIGHT", Frame, "BOTTOMRIGHT", 1, -1);
+
+    Backdrop:SetBackdrop({
+      bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+      edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
+      tile = false,
+      tileSize = 0,
+      edgeSize = 1,
+      insets = { left = 0, right = 0, top = 0, bottom = 0 },
+    });
+
+    Backdrop:SetBackdropBorderColor(0, 0, 0);
+    Backdrop:SetBackdropColor(0, 0, 0, 1);
+
+    Backdrop:SetFrameStrata(AR.MainFrame:GetFrameStrata());
+    if Frame:GetFrameLevel() - 1 >= 0 then
+      Backdrop:SetFrameLevel(Frame:GetFrameLevel() - 1);
+    else
+      Backdrop:SetFrameLevel(0);
+    end
+
+    Frame.Backdrop = Backdrop;
+  end
+
+--- ======= MAIN ICON =======
   -- Init
   function AR.MainIconFrame:Init ()
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
@@ -108,7 +110,7 @@ end
     self.CooldownFrame:SetCooldown(Start, Duration);
   end
 
---- Small Icons (Off GCD), Only 2 atm.
+--- ======= SMALL ICONS =======
   -- Init
   function AR.SmallIconFrame:Init ()
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
@@ -153,7 +155,7 @@ end
     end
   end
 
---- Left Icon (MO)
+--- ======= LEFT ICON =======
   -- Init LeftIcon
   function AR.LeftIconFrame:Init ()
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
@@ -174,7 +176,7 @@ end
     end
   end
 
---- Nameplates
+--- ======= NAMEPLATES =======
   AR.Nameplate = {
     Initialized = false
   };
@@ -214,15 +216,15 @@ end
     return false;
   end
   -- Remove Icons
-  function AR.Nameplate.RemoveIcons ()
+  function AR.Nameplate.HideIcons ()
     -- Nameplate Icon
     AR.NameplateIconFrame:Hide();
     -- Left Icon
     AR.LeftIconFrame:Hide();
   end
 
---- Suggested Icon
-    -- Init LeftIcon
+--- ======= SUGGESTED ICON =======
+  -- Init
   function AR.SuggestedIconFrame:Init ()
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
@@ -241,13 +243,12 @@ end
       self:Show();
     end
   end
-  -- Hide Small Icons
+  -- Hide Icon
   function AR.SuggestedIconFrame:HideIcon ()
     AR.SuggestedIconFrame:Hide();
   end
 
---- Toggle Icons
-
+--- ======= TOGGLES =======
   -- Init
   function AR.ToggleIconFrame:Init ()
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
@@ -305,7 +306,7 @@ end
     self:SetPoint("TOPLEFT", AR.MainIconFrame, "BOTTOMLEFT", 0, AR.GUISettings.General.BlackBorderIcon and -3 or 0);
     AethysRotationDB.ButtonsFramePos = false;
   end
-  -- Button
+  -- Buttons
   AR.Button = {};
   function AR.ToggleIconFrame:AddButton (Text, i, Tooltip)
     AR.Button[i] = CreateFrame("Button", "$parentButton"..tostring(i), self);

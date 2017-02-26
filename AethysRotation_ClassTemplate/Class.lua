@@ -1,4 +1,5 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
   -- Addon
   local addonName, addonTable = ...;
   -- AethysCore
@@ -13,11 +14,10 @@
   local AR = AethysRotation;
   -- Lua
   
-  -- Commons
+  -- File Locals
   AR.Commons.Class = {};
-  -- GUI Settings
   local Settings = AR.GUISettings.APL.Class.Commons;
 
 
---- Commons Functions
+--- ============================ CONTENT ============================
   
