@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFABD473Hunter|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FHunter|r]
 ## Author: Nia
 ## Notes: Aethys Rotation - Hunter Module.
 

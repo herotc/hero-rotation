@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFA330C9Demon Hunter|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FDemon Hunter|r]
 ## Author: Aethys
 ## Notes: Aethys Rotation - Demon Hunter Module.
 

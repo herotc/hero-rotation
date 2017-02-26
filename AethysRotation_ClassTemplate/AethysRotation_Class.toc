@@ -1,7 +1,7 @@
 ## Interface: 70100
 
-## Title: |cFF(CLASS_COLOR_CODE)Aethys|r Rotation |cFF(CLASS_COLOR_CODE)Class|r
-## Author: Aethys
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FClass|r]
+## Author: (YOUR_NAME)
 ## Notes: Aethys Rotation - Class Module.
 
 ## DefaultState: Enabled

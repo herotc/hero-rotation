@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFC79C6EWarrior|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FWarrior|r]
 ## Author: Aethys
 ## Notes: Aethys Rotation - Warrior Module.
 

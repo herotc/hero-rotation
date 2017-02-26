@@ -1,6 +1,6 @@
 ## Interface: 70100
 
-## Title: |cFFFFF569Aethys|r Rotation |cFFFFF569Rogue|r
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FRogue|r]
 ## Author: Aethys, SimCMinMax Team
 ## Notes: Aethys Rotation - Rogue Module.
 
