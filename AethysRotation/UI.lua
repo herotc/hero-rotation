@@ -254,6 +254,14 @@ end
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
     self:SetHeight(20);
+
+    -- Reset the Anchor if saved data are not valid (i.e. data saved before 7.1.5843)
+    -- TODO: Remove this part later.
+    if AethysRotationDB and AethysRotationDB.ButtonsFramePos and type(AethysRotationDB.ButtonsFramePos[2]) ~= "string" then
+      self:ResetAnchor();
+    end
+
+    -- Anchor based on Settings
     if AethysRotationDB and AethysRotationDB.ButtonsFramePos then
       self:SetPoint(AethysRotationDB.ButtonsFramePos[1], _G[AethysRotationDB.ButtonsFramePos[2]], AethysRotationDB.ButtonsFramePos[3], AethysRotationDB.ButtonsFramePos[4], AethysRotationDB.ButtonsFramePos[5]);
     else
