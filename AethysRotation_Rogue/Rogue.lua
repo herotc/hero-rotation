@@ -1,68 +1,69 @@
---- Localize Vars
--- Addon
-local addonName, addonTable = ...;
--- AethysCore
-local AC = AethysCore;
-local Cache = AethysCore_Cache;
-local Unit = AC.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
--- AethysRotation
-local AR = AethysRotation;
--- Lua
-local pairs = pairs;
--- Commons
-AR.Commons.Rogue = {};
--- GUI Settings
-local Settings = AR.GUISettings.APL.Rogue.Commons;
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
+  -- Addon
+  local addonName, addonTable = ...;
+  -- AethysCore
+  local AC = AethysCore;
+  local Cache = AethysCore_Cache;
+  local Unit = AC.Unit;
+  local Player = Unit.Player;
+  local Target = Unit.Target;
+  local Spell = AC.Spell;
+  local Item = AC.Item;
+  -- AethysRotation
+  local AR = AethysRotation;
+  -- Lua
+  local pairs = pairs;
+  -- File Locals
+  AR.Commons.Rogue = {};
+  local Settings = AR.GUISettings.APL.Rogue.Commons;
 
 
--- Stealth
-function AR.Commons.Rogue.Stealth (Stealth, Setting)
-  if Stealth:IsCastable() and not Player:IsStealthed() then
-    if AR.Cast(Stealth, Settings.OffGCDasOffGCD.Stealth) then return "Cast Stealth (OOC)"; end
+--- ============================ CONTENT ============================
+  -- Stealth
+  function AR.Commons.Rogue.Stealth (Stealth, Setting)
+    if Stealth:IsCastable() and not Player:IsStealthed() then
+      if AR.Cast(Stealth, Settings.OffGCDasOffGCD.Stealth) then return "Cast Stealth (OOC)"; end
+    end
+    return false;
   end
-  return false;
-end
 
--- Crimson Vial
-function AR.Commons.Rogue.CrimsonVial (CrimsonVial)
-  if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.CrimsonVialHP then
-    if AR.Cast(CrimsonVial, Settings.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)"; end
+  -- Crimson Vial
+  function AR.Commons.Rogue.CrimsonVial (CrimsonVial)
+    if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.CrimsonVialHP then
+      if AR.Cast(CrimsonVial, Settings.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)"; end
+    end
+    return false;
   end
-  return false;
-end
 
--- Feint
-function AR.Commons.Rogue.Feint (Feint)
-  if Feint:IsCastable() and not Player:Buff(Feint) and Player:HealthPercentage() <= Settings.FeintHP then
-    if AR.Cast(Feint, Settings.GCDasOffGCD.Feint) then return "Cast Feint (Defensives)"; end
+  -- Feint
+  function AR.Commons.Rogue.Feint (Feint)
+    if Feint:IsCastable() and not Player:Buff(Feint) and Player:HealthPercentage() <= Settings.FeintHP then
+      if AR.Cast(Feint, Settings.GCDasOffGCD.Feint) then return "Cast Feint (Defensives)"; end
+    end
   end
-end
 
--- Marked for Death Sniping
-local BestUnit, BestUnitTTD;
-function AR.Commons.Rogue.MfDSniping (MarkedforDeath)
-  if MarkedforDeath:IsCastable() then
-    -- Get Units up to 30y for MfD.
-    AC.GetEnemies(30);
+  -- Marked for Death Sniping
+  local BestUnit, BestUnitTTD;
+  function AR.Commons.Rogue.MfDSniping (MarkedforDeath)
+    if MarkedforDeath:IsCastable() then
+      -- Get Units up to 30y for MfD.
+      AC.GetEnemies(30);
 
-    BestUnit, BestUnitTTD = nil, 60;
-    for _, Unit in pairs(Cache.Enemies[30]) do
-      -- I increased the SimC condition by 50% since we are slower.
-      if not Unit:IsMfdBlacklisted() and Unit:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Unit:TimeToDie() < BestUnitTTD then
-        BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+      BestUnit, BestUnitTTD = nil, 60;
+      for _, Unit in pairs(Cache.Enemies[30]) do
+        -- I increased the SimC condition by 50% since we are slower.
+        if not Unit:IsMfdBlacklisted() and Unit:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Unit:TimeToDie() < BestUnitTTD then
+          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+        end
+      end
+      if BestUnit then
+        AR.CastLeftNameplate(BestUnit, MarkedforDeath);
       end
     end
-    if BestUnit then
-      AR.CastLeftNameplate(BestUnit, MarkedforDeath);
-    end
   end
-end
 
---- SimC Rogue Specific Expression
+--- ======= SIMC CUSTOM EXPRESSION =======
   -- cp_max_spend
   function AR.Commons.Rogue.CPMaxSpend ()
     -- Should work for all 3 specs since they have same Deeper Stratagem Spell ID.

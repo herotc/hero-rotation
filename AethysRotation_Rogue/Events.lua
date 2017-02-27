@@ -1,4 +1,5 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
   -- Addon
   local addonName, addonTable = ...;
   -- AethysCore
@@ -12,9 +13,12 @@
   -- Lua
   local pairs = pairs;
   local select = select;
+  -- File Locals
 
 
---- ============== NON-COMBATLOG ==============
+
+--- ============================ CONTENT ============================
+--- ======= NON-COMBATLOG =======
 
 
 --- ======= COMBATLOG =======
