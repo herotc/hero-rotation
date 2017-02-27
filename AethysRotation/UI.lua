@@ -160,8 +160,12 @@ end
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(48);
     self:SetHeight(48);
-    self:SetPoint("RIGHT", AR.MainIconFrame, "LEFT", 0, 0);
+    self:SetPoint("RIGHT", AR.MainIconFrame, "LEFT", AR.GUISettings.General.BlackBorderIcon and -1 or 0, 0);
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
+    if AR.GUISettings.General.BlackBorderIcon then
+      self.TempTexture:SetTexCoord(.08, .92, .08, .92);
+      AR:CreateBackdrop(self);
+    end
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
@@ -172,6 +176,7 @@ end
     if not self:IsVisible() then
       self:Show();
     end
+    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
 
 --- Nameplates
