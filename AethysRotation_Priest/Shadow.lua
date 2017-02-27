@@ -408,15 +408,18 @@ end
 					end]]--
 					
 					--actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
+					if Target:DebuffRemains(S.VampiricTouch) < (4+(4/3))*Player:GCD() and not (Player:CastID() == S.VampiricTouch:ID()) then
 						if AR.Cast(S.VampiricTouch) then return "Cast"; end
 					end
 					
 					--actions.main+=/shadow_word_pain,if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
+					if Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD() then
 						if AR.Cast(S.ShadowWordPain) then return "Cast"; end
 					end
 					
 					--actions.main+=/void_eruption,if=insanity>=70|(talent.auspicious_spirits.enabled&insanity>=(65-shadowy_apparitions_in_flight*3))|set_bonus.tier19_4pc
 					--NEW ? actions.main+=/void_eruption,if=insanity>=65+35*!talents.legacy_of_the_void.enabled
+					if Player:Insanity()>=Insanity_Threshold() or (Player:CastID() == S.MindBlast:ID() and ((Player:Insanity()+(15*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 )*(S.FortressOfTheMind:IsAvailable() and 1.2 or 1.0)) ) >= Insanity_Threshold())) then
 						VTUsed=false
 						if AR.Cast(S.VoidEruption) then return "Cast"; end
 					end
@@ -459,6 +462,7 @@ end
 					
 					--actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
 					--actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
+					if S.MindBlast:IsCastable() and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[40]<=4)) and Player:Insanity()<Insanity_Threshold() and not (Player:CastID() == S.MindBlast:ID()) then
 						if AR.Cast(S.MindBlast) then return "Cast"; end
 					end
 					
