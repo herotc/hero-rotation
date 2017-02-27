@@ -390,7 +390,7 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
-    ShouldReturn = AR.Commons.Rogue.Stealth (S.Stealth);
+    ShouldReturn = AR.Commons.Rogue.Stealth(S.Stealth);
     if ShouldReturn then return ShouldReturn; end
     -- Flask
     -- Food

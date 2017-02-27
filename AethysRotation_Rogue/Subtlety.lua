@@ -225,11 +225,9 @@ local function CDs ()
       if AR.Cast(S.GoremawsBite) then return "Cast"; end
     end
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
-    -- TODO: Add MfD Suggestion
-    --[[Normal MfD
-    if not S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= AR.Commons.Rogue.CPMaxSpend() then
-      if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
-    end]]
+    if S.MarkedforDeath:IsCastable() and (Target:TimeToDie() < Player:ComboPointsDeficit() or Player:ComboPointsDeficit() >= AR.Commons.Rogue.CPMaxSpend()) then
+      AR.CastSuggested(S.MarkedforDeath);
+    end
   end
   return false;
 end
@@ -435,7 +433,7 @@ local function APL ()
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-      ShouldReturn = AR.Commons.Rogue.Stealth (S.Stealth);
+      ShouldReturn = AR.Commons.Rogue.Stealth(S.Stealth);
       if ShouldReturn then return ShouldReturn; end
       -- Flask
       -- Food
