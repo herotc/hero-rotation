@@ -194,7 +194,7 @@
       [257]   = false,                          -- Holy
       [258]   = "AethysRotation_Priest",        -- Shadow
     -- Rogue
-      [259]   = false,                          -- Assassination
+      [259]   = "AethysRotation_Rogue",         -- Assassination
       [260]   = "AethysRotation_Rogue",         -- Outlaw
       [261]   = "AethysRotation_Rogue",         -- Subtlety
     -- Shaman

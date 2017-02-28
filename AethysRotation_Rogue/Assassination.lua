@@ -395,7 +395,8 @@ local function APL ()
       if not Target:IsInRange(10) and Target:IsInRange(20) and S.PoisonedKnife:IsCastable() and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if AR.Cast(S.PoisonedKnife) then return "Cast Shuriken Toss"; end
       end
-      if S.Mutilate:IsCastable() then -- Trick to take in consideration the Recovery Setting
+      -- Trick to take in consideration the Recovery Setting
+      if S.Mutilate:IsCastable() and Target:IsInRange(5) then
         if AR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
       end
     end
