@@ -246,7 +246,7 @@ local function Maintain ()
   end
   -- actions.maintain+=/kingsbane,if=(talent.exsanguinate.enabled&dot.rupture.exsanguinated)|(!talent.exsanguinate.enabled&buff.envenom.up&(debuff.vendetta.up|cooldown.vendetta.remains>10))
   if S.Kingsbane:IsCastable() and Target:IsInRange(5) and ((S.Exsanguinate:IsAvailable() and AC.Exsanguinated(Target, "Rupture"))
-      or (not S.Exsanguinate:IsAvailable() and Player:Buff(S.EnvenomBuff) and (Target:Debuff(S.Vendetta) or S.Vendetta:Cooldown() > 10))) then
+      or (not S.Exsanguinate:IsAvailable() and Player:Buff(S.Envenom) and (Target:Debuff(S.Vendetta) or S.Vendetta:Cooldown() > 10))) then
     if AR.Cast(S.Kingsbane) then return "Cast"; end
   end
   -- actions.maintain+=/garrote,cycle_targets=1,if=combo_points.deficit>=1&refreshable&(!exsanguinated|remains<=1.5)&target.time_to_die-remains>4
