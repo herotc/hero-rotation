@@ -103,6 +103,8 @@
         Commons = {
         },
         Shadow = {
+		  DispersionHP=10,
+		  
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
 			Shadowfiend = {true, false}
