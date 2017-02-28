@@ -304,10 +304,15 @@ local function APL ()
             if AR.Cast(S.Stormstrike) then return "Cast Stormstrike"; end
         end
             -- actions+=/crash_lightning,if=((active_enemies>1|talent.crashing_storm.enabled|talent.boulderfist.enabled)&!set_bonus.tier19_4pc)|feral_spirit.remains>5  --or S.FeralSpirit:BuffRemains(S.AlphaWolfBuff)>5
-        if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[8]>1 or S.CrashingStorm:IsAvailable() or 
-            (S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable()) and not AC.Tier19_4Pc) then
+        if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[8]>1 and not AC.Tier19_4Pc) then
             if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end 
         end
+        if S.CrashLightning:IsCastable() and (S.CrashingStorm:IsAvailable() and not AC.Tier19_4Pc) then
+            if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end 
+        end
+        if S.CrashLightning:IsCastable() and ((S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable()) and not AC.Tier19_4Pc) then
+            if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end 
+        end          
             -- actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
         if S.Frostbrand:IsCastable() and S.Hailstorm:IsAvailable() and Player:BuffRemains(S.FrostbrandBuff) < 4.8 then
             if AR.Cast(S.Frostbrand) then return "Cast Frostbrand"; end
