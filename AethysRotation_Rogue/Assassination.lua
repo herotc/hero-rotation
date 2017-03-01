@@ -136,8 +136,9 @@ local function Build ()
         AR.CastLeftNameplate(BestUnit, S.Mutilate);
       end
     end
-    -- actions.build+=/mutilate,if=cooldown.vendetta.remains<7|debuff.vendetta.up|debuff.kingsbane.up|energy.deficit<=22|target.time_to_die<6
-    if Target:IsInRange(5) and ((AR.CDsON() and S.Vendetta:Cooldown() < 7) or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane) or Player:EnergyDeficit() <= 22 or Target:TimeToDie() < 6) then
+    -- actions.build+=/mutilate,if=cooldown.vendetta.remains<7|debuff.vendetta.up|debuff.kingsbane.up|energy.deficit<=25+talent.vigor.enabled*20|target.time_to_die<6
+    -- TODO: Fast double rupture for exsanguinate, check exsang cd ?
+    if Target:IsInRange(5) and ((AR.CDsON() and S.Vendetta:Cooldown() < 7) or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane) or (AR.CDsON() and not S.Exsanguinate:IsOnCooldown()) or Player:EnergyDeficit() <= 25+(S.Vigor:IsAvailable() and 1 or 0) or Target:TimeToDie() < 6) then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
   end
@@ -215,6 +216,7 @@ local function Maintain ()
         if AR.Cast(S.Rupture) then return "Cast"; end
       end
       -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
+      -- TODO: Test 4-5 cp rupture for Exsg
       if AR.CDsON() and S.Exsanguinate:IsAvailable() and ((Player:ComboPoints() >= AR.Commons.Rogue.CPMaxSpend() and S.Exsanguinate:Cooldown() < 1) or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
         if AR.Cast(S.Rupture) then return "Cast"; end
       end
@@ -386,8 +388,8 @@ local function APL ()
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
-      -- actions+=/call_action_list,name=build,if=(combo_points.deficit>0|energy.time_to_max<1)
-      if Player:ComboPointsDeficit() > 0 or Player:EnergyTimeToMax() < 1 then
+      -- actions+=/call_action_list,name=build,if=(combo_points.deficit>0|energy.time_to_max<1.5)
+      if Player:ComboPointsDeficit() > 0 or Player:EnergyTimeToMax() < 1.5 then
         ShouldReturn = Build();
         if ShouldReturn then return ShouldReturn; end
       end
@@ -423,14 +425,14 @@ AR.SetAPL(259, APL);
 -- actions+=/call_action_list,name=maintain
 -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
 -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
--- actions+=/call_action_list,name=build,if=combo_points.deficit>0|energy.time_to_max<1
+-- actions+=/call_action_list,name=build,if=combo_points.deficit>0|energy.time_to_max<1.5
 
 -- # Builders
 -- actions.build=hemorrhage,if=refreshable
 -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<3+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)
 -- actions.build+=/fan_of_knives,if=spell_targets>=3+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)|buff.the_dreadlords_deceit.stack>=29
 -- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)
--- actions.build+=/mutilate,if=cooldown.vendetta.remains<7|debuff.vendetta.up|debuff.kingsbane.up|energy.deficit<=22|target.time_to_die<6
+-- actions.build+=/mutilate,if=cooldown.vendetta.remains<7|debuff.vendetta.up|debuff.kingsbane.up|energy.deficit<=25+talent.vigor.enabled*20|target.time_to_die<6
 
 -- # Cooldowns
 -- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
