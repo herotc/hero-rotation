@@ -176,7 +176,7 @@
     -- Hunter
       [253]   = "AethysRotation_Hunter",        -- Beast Mastery
       [254]   = false,                          -- Marksmanship
-      [255]   = false,                          -- Survival
+      [255]   = "AethysRotation_Hunter",        -- Survival
     -- Mage
       [62]    = false,                          -- Arcane
       [63]    = false,                          -- Fire

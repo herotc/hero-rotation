@@ -78,6 +78,15 @@
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
           }
+        },
+        Survival = {
+          -- {Display GCD as OffGCD, ForceReturn}
+          GCDasOffGCD = {
+          },
+          -- {Display OffGCD as OffGCD, ForceReturn}
+          OffGCDasOffGCD = {
+            AspectoftheEagle = {true, false}
+          }
         }
       },
       Paladin = {
