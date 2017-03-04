@@ -23,7 +23,7 @@
         Vengeance = {
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
-            -- Spec
+            -- Abilities
             ConsumeMagic = {true, false},
             DemonSpikes = {true, false},
             InfernalStrike = {true, false}
@@ -46,6 +46,7 @@
           ExhilarationHP = 30,
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
+            -- Abilities
             Exhilaration = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
@@ -61,11 +62,12 @@
         BeastMastery = {
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
+            -- Abilities
             Volley = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
-            -- Spec
+            -- Abilities
             AspectoftheWild = {true, false},
             BeastialWrath = {true, false},
             TitansThunder = {true, false}
@@ -85,6 +87,7 @@
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
+            -- Abilities
             AspectoftheEagle = {true, false}
           }
         }
@@ -96,13 +99,14 @@
           SoloJusticar5HP = 60, -- % HP threshold to use Justicar's Vengeance with 5 Holy Power.
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
+            -- Abilities
             HolyWrath = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
             -- Racials
             ArcaneTorrent = {true, false},
-            -- Spec
+            -- Abilities
             AvengingWrath = {true, false},
             Crusade = {true, false}
           }
@@ -112,18 +116,20 @@
         Commons = {
         },
         Shadow = {
-		  DispersionHP=10,
-		  
+          DispersionHP = 10,
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
-			Shadowfiend = {true, false}
+            -- Abilities
+            Shadowfiend = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
-		    PowerInfusion = {true, false},
-			ArcaneTorrent = {true, false},
-			Berserking = {true, false},
-			BloodFury = {true, false},
+            -- Racials
+            ArcaneTorrent = {true, false},
+            Berserking = {true, false},
+            BloodFury = {true, false},
+            -- Abilities
+            PowerInfusion = {true, false},
           }
         },
       },
