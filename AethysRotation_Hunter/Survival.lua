@@ -148,7 +148,7 @@
       if AR.Cast(S.Butchery) then return ""; end
     end
     -- actions.moknathal+=/carve,if=active_enemies>1&focus>65-buff.moknathal_tactics.remains*focus.regen&(buff.mongoose_fury.down&focus>65-buff.moknathal_tactics.remains*focus.regen|buff.mongoose_fury.remains>gcd*cooldown.mongoose_bite.charges&focus>70-buff.moknathal_tactics.remains*focus.regen)
-    if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and (not Player:Buff(S.MongooseFury) and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() or
+    if S.Carve:IsCastable() and Cache.EnemiesCount[5] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and (not Player:Buff(S.MongooseFury) and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() or
     Player:BuffRemains(S.MongooseFury) > Player:GCD() * S.MongooseBite:Charges() and Player:Focus() > 70 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen()) then
       if AR.Cast(S.Carve) then return ""; end
     end
@@ -295,7 +295,7 @@
     end
     -- AOE
     -- actions.nomok+=/carve,if=active_enemies>1&talent.serpent_sting.enabled&dot.serpent_sting.refreshable
-    if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:FocusPredicted(0.2) > 35 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentStingDebuff, 4.5) then
+    if S.Carve:IsCastable() and Cache.EnemiesCount[5] > 1 and Player:FocusPredicted(0.2) > 35 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentStingDebuff, 4.5) then
       if AR.Cast(S.Carve) then return ""; end
     end
     -- actions.nomok+=/dragonsfire_grenade,if=buff.mongoose_fury.duration>=gcd&cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.stack<3|buff.mongoose_fury.down&cooldown.mongoose_bite.charges<3
