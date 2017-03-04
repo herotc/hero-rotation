@@ -5,7 +5,7 @@ The project is hosted on [GitHub](https://github.com/Aethys256/AethysRotation) a
 It is maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
 Also, you can find it on [Curse](https://mods.curse.com/addons/wow/aethysrotation) and [CurseForge](https://wow.curseforge.com/projects/aethysrotation).
 
-_There are a lot of helpful commands, do '/aer help' to see them in-game !._
+_There are a lot of helpful commands, do '/aer help' to see them in-game !_
 
 Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
 
@@ -19,9 +19,9 @@ Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Act
 
 ## Special Features
 - Handle both Single Target and AoE rotations (it auto adapts).
-- Optimized Pooling of Ressources when needed (ex: Energy before Cooldowns for Rogue).
-- Accurate TimeToDie Prediction.
-- Next Cast Prediction for Casters.
+- Optimized Pooling of ressources when needed (ex: energy before using cooldowns for Rogue).
+- Accurate TimeToDie prediction.
+- Next cast prediction for Casters.
 - Special handlers for tricky abilities (ex: Finality or Exsanguinated Bleed for Rogue).
 - Solo Mode to improve the survivability to the detriment of DPS.
 
@@ -37,16 +37,16 @@ Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Act
 - Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
 
 ## Special Mention About SimC APL
-As said earlier, every rotations are based on Simulationcraft Action Priority Lists (APL).
-What does it means is, it heavily relies on how optimized those APLs are, especially for some talents, tier bonuses and legendaries support.
-Do remember that what the addon tells you is what the "robot" on Simulationcraft would do if he was in your situation.
-It also means that you can improve the current APL by using the addon and reporting the issues you might encounter.
-I (Aethys) am one of the Main Rogue Theorycrafter and contributor to the Simulationcraft Rogue Module, both SimC APL and Addon Rotation are 100% synced. I use both tools to improve the APL and do Rogue Theorycrafting.
+As said earlier, every rotations are based on SimulationCraft Action Priority Lists (APL).
+What it means is, it heavily relies on how optimized those APLs are, especially for some talents, tier bonuses and legendaries support.
+Do remember that what the addon tells you is what the "robot" on SimulationCraft would do if they were in your situation.
+It also means that you can improve the current APL by using the addon and report the issues you might encounter.
+I (Aethys) am one of the main Rogue theorycrafter and contributor to the SimulationCraft Rogue Module, both SimC APL and Addon Rotation are 100% synced. I use both tools to improve the APL and do Rogue Theorycrafting.
 
 ## Special Thanks
-- [Simulationcraft](http://simulationcraft.org/) for everything the project gives to the whole WoW Community.
+- [SimulationCraft](http://SimulationCraft.org/) for everything the project gives to the whole WoW Community.
 - [KutiKuti](https://github.com/Kutikuti), [Nia](https://github.com/Nianel) & [Tael](https://github.com/Tae-l) for their contributions to the project.
-- [Skasch](https://github.com/skasch) for what we built together and the motivation he gaves to me.
+- [Skasch](https://github.com/skasch) for what we built together and the motivation he gave to me.
 - [Riff](https://github.com/tombell) for his great feedback.
 
 
