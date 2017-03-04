@@ -260,7 +260,7 @@
 
   -- Is the player ready ?
   function AR.Ready ()
-    return not Player:IsDeadOrGhost() and not Player:IsMounted();
+    return not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
   end
 
   -- Used to force a short/long pulse wait, it also resets the icons.
