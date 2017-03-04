@@ -64,9 +64,11 @@ local pairs = pairs;
     -- Poisons
     AgonizingPoison               = Spell(200802),
     AgonizingPoisonDebuff         = Spell(200803),
+    CripplingPoison               = Spell(3408),
     DeadlyPoison                  = Spell(2823),
     DeadlyPoisonDebuff            = Spell(2818),
     LeechingPoison                = Spell(108211),
+    WoundPoison                   = Spell(8679),
     -- Legendaries
     DreadlordsDeceit              = Spell(228224),
     -- Tier
@@ -316,14 +318,31 @@ local function APL ()
   AC.GetEnemies(10);    -- Fan of Knives
   AC.GetEnemies(5);     -- Melee
   AR.Commons.AoEToggleEnemiesUpdate();
-  --- Defensives
+  -- Defensives
     -- Crimson Vial
     ShouldReturn = AR.Commons.Rogue.CrimsonVial(S.CrimsonVial);
     if ShouldReturn then return ShouldReturn; end
     -- Feint
     ShouldReturn = AR.Commons.Rogue.Feint(S.Feint);
     if ShouldReturn then return ShouldReturn; end
-  --- Out of Combat
+  -- Poisons
+    -- Lethal Poison
+    if Player:BuffRemains(S.DeadlyPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.WoundPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.AgonizingPoison) < Settings.Assassination.PoisonRefresh then
+      if S.AgonizingPoison:IsAvailable() then
+        AR.CastSuggested(S.AgonizingPoison);
+      else
+        AR.CastSuggested(S.DeadlyPoison);
+      end
+    end
+    -- Non-Lethal Poison
+    if Player:BuffRemains(S.CripplingPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.LeechingPoison) < Settings.Assassination.PoisonRefresh then
+      if S.LeechingPoison:IsAvailable() then
+        AR.CastSuggested(S.LeechingPoison);
+      else
+        AR.CastSuggested(S.CripplingPoison);
+      end
+    end
+  -- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
       ShouldReturn = AR.Commons.Rogue.Stealth(S.Stealth);
