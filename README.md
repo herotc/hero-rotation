@@ -44,7 +44,7 @@ It also means that you can improve the current APL by using the addon and report
 I (Aethys) am one of the main Rogue theorycrafter and contributor to the SimulationCraft Rogue Module, both SimC APL and Addon Rotation are 100% synced. I use both tools to improve the APL and do Rogue Theorycrafting.
 
 ## Special Thanks
-- [SimulationCraft](http://SimulationCraft.org/) for everything the project gives to the whole WoW Community.
+- [SimulationCraft](http://simulationcraft.org/) for everything the project gives to the whole WoW Community.
 - [KutiKuti](https://github.com/Kutikuti), [Nia](https://github.com/Nianel) & [Tael](https://github.com/Tae-l) for their contributions to the project.
 - [Skasch](https://github.com/skasch) for what we built together and the motivation he gave to me.
 - [Riff](https://github.com/tombell) for his great feedback.
