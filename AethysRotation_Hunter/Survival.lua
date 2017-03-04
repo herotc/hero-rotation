@@ -46,6 +46,7 @@
     DragonsfireGrenade            = Spell(194855),
     MokNathalTactics              = Spell(201081),
     SerpentSting                  = Spell(87935),
+    SerpentStingDebuff            = Spell(118253),
     SnakeHunter                   = Spell(201078),
     SpittingCobra                 = Spell(194407),
     SteelTrap                     = Spell(187650),
@@ -208,7 +209,7 @@
       if AR.Cast(S.AMurderofCrows) then return ""; end
     end
     -- actions.moknathal+=/caltrops,if=(!dot.caltrops.ticking)
-    if S.Caltrops:IsCastable() and and not S.CaltropsTalent:IsOnCooldown() not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
       if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.moknathal+=/explosive_trap
@@ -294,7 +295,7 @@
     end
     -- AOE
     -- actions.nomok+=/carve,if=active_enemies>1&talent.serpent_sting.enabled&dot.serpent_sting.refreshable
-    if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:FocusPredicted(0.2) > 35 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentSting, 4.5) then
+    if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:FocusPredicted(0.2) > 35 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentStingDebuff, 4.5) then
       if AR.Cast(S.Carve) then return ""; end
     end
     -- actions.nomok+=/dragonsfire_grenade,if=buff.mongoose_fury.duration>=gcd&cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.stack<3|buff.mongoose_fury.down&cooldown.mongoose_bite.charges<3
@@ -306,11 +307,11 @@
       if AR.Cast(S.ExplosiveTrap) then return ""; end
     end
     -- actions.nomok+=/raptor_strike,if=talent.serpent_sting.enabled&dot.serpent_sting.refreshable&buff.mongoose_fury.stack<3&cooldown.mongoose_bite.charges<1
-    if S.RaptorStrike:IsCastable() and Player:FocusPredicted(0.2) > 20 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentSting, 4.5) and Player:BuffStack(S.MongooseFury) < 3 and S.MongooseBite:Charges() < 1 then
+    if S.RaptorStrike:IsCastable() and Player:FocusPredicted(0.2) > 20 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentStingDebuff, 4.5) and Player:BuffStack(S.MongooseFury) < 3 and S.MongooseBite:Charges() < 1 then
       if AR.Cast(S.RaptorStrike) then return ""; end
     end
     -- actions.nomok+=/fury_of_the_eagle,if=buff.mongoose_fury.stack=6&cooldown.mongoose_bite.charges<=1
-    if AR.CDsON() and S.FuryoftheEagle:IsCastable() and Player:BuffStack(S.MongooseFury) == 6 and S.MongooseBite:Charges() <= 1 then
+    if AR.CDsON() and S.FuryoftheEagle:IsCastable() and Player:BuffStack(S.MongooseFury) == 6 and S.MongooseBite:ChargesFractional() <= 1.8 then
       if AR.Cast(S.FuryoftheEagle) then return ""; end
     end
     -- actions.nomok+=/mongoose_bite,if=buff.aspect_of_the_eagle.up&buff.mongoose_fury.up
@@ -321,8 +322,8 @@
     if AR.CDsON() and S.AspectoftheEagle:IsCastable() and Player:Buff(S.MongooseFury) and Player:BuffDuration(S.MongooseFury) > 6 and S.MongooseBite:Charges() >= 2 then
       if AR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return ""; end
     end
-    -- actions.nomok+=/fury_of_the_eagle,if=cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.duration>6
-    if AR.CDsON() and S.FuryoftheEagle:IsCastable() and S.MongooseBite:Charges() <= 1 and Player:BuffDuration(S.MongooseFury) > 6 then
+    -- actions.nomok+=/fury_of_the_eagle,if=!set_bonus.tier19_4pc=1&cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.duration>6
+    if AR.CDsON() and S.FuryoftheEagle:IsCastable() and not AC.Tier19_4Pc and S.MongooseBite:ChargesFractional() <= 1.8 and Player:BuffDuration(S.MongooseFury) > 6 then
       if AR.Cast(S.FuryoftheEagle) then return ""; end
     end
     -- actions.nomok+=/flanking_strike,if=cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.remains>(1+action.mongoose_bite.charges*gcd)
@@ -461,6 +462,7 @@
 
 --- Last Update: 03/04/2017
 
+-- NOTE: For human reactivity, "cooldown.mongoose_bite.charges<=1" is replaced by ChargesFractional <= 1.8.
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,type=flask_of_the_seventh_demon
@@ -542,7 +544,7 @@
 -- actions.nomok+=/fury_of_the_eagle,if=buff.mongoose_fury.stack=6&cooldown.mongoose_bite.charges<=1
 -- actions.nomok+=/mongoose_bite,if=buff.aspect_of_the_eagle.up&buff.mongoose_fury.up
 -- actions.nomok+=/aspect_of_the_eagle,if=buff.mongoose_fury.up&buff.mongoose_fury.duration>6&cooldown.mongoose_bite.charges>=2
--- actions.nomok+=/fury_of_the_eagle,if=cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.duration>6
+-- actions.nomok+=/fury_of_the_eagle,if=!set_bonus.tier19_4pc=1&cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.duration>6
 -- actions.nomok+=/flanking_strike,if=cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.remains>(1+action.mongoose_bite.charges*gcd)
 -- actions.nomok+=/mongoose_bite,if=buff.mongoose_fury.up&buff.mongoose_fury.remains<cooldown.aspect_of_the_eagle.remains
 -- actions.nomok+=/flanking_strike,if=talent.animal_instincts.enabled&cooldown.mongoose_bite.charges<3
