@@ -404,6 +404,7 @@
   local function APL ()
     -- Unit Update
     AC.GetEnemies(8);
+    AC.GetEnemies(5);
     AR.Commons.AoEToggleEnemiesUpdate();
     -- Defensives
       -- Exhilaration
