@@ -84,8 +84,9 @@ local pairs = pairs;
   local I = Item.Rogue.Assassination;
 -- Rotation Var
   local ShouldReturn, ShouldReturn2; -- Used to get the return string
-   local CountA, CountB; -- Used for potential Rupture units
   local BestUnit, BestUnitTTD; -- Used for cycling
+  local CountA, CountB; -- Used for potential Rupture units
+  local RuptureThreshold; -- Used to compute the Rupture threshold (Cycling Performance)
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -98,14 +99,14 @@ local pairs = pairs;
 local function Build ()
   if S.Hemorrhage:IsCastable() then
     -- actions.build=hemorrhage,if=refreshable
-    if Target:IsInRange(5) and Target:DebuffRefreshable(S.Hemorrhage) then
+    if Target:IsInRange(5) and Target:DebuffRefreshable(S.Hemorrhage, 6) then
       if AR.Cast(S.Hemorrhage) then return "Cast"; end
     end
     -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<3+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)
     if AR.AoEON() and Cache.EnemiesCount[10] < 3+(S.AgonizingPoison:IsAvailable() and (I.InsigniaofRavenholdt:IsEquipped(11) or I.InsigniaofRavenholdt:IsEquipped(12)) and 1 or 0) then
       BestUnit, BestUnitTTD = nil, 0;
       for Key, Value in pairs(Cache.Enemies[5]) do
-        if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie() > BestUnitTTD and Value:DebuffRefreshable(S.Hemorrhage) and Value:Debuff(S.Rupture) then
+        if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie() > BestUnitTTD and Value:DebuffRefreshable(S.Hemorrhage, 6) and Value:Debuff(S.Rupture) then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
         end
       end
@@ -138,7 +139,7 @@ local function Build ()
     end
     -- actions.build+=/mutilate,if=cooldown.vendetta.remains<7|debuff.vendetta.up|debuff.kingsbane.up|energy.deficit<=25+talent.vigor.enabled*20|target.time_to_die<6
     -- TODO: Fast double rupture for exsanguinate, check exsang cd ?
-    if Target:IsInRange(5) and ((AR.CDsON() and S.Vendetta:Cooldown() < 7) or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane) or (AR.CDsON() and not S.Exsanguinate:IsOnCooldown()) or Player:EnergyDeficit() <= 25+(S.Vigor:IsAvailable() and 1 or 0) or Target:TimeToDie() < 6) then
+    if Target:IsInRange(5) and ((AR.CDsON() and S.Vendetta:Cooldown() < 7) or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane) or (AR.CDsON() and not S.Exsanguinate:IsOnCooldown()) or Player:EnergyDeficit() <= 25+(S.Vigor:IsAvailable() and 20 or 0) or Target:TimeToDie() < 6) then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
   end
@@ -176,7 +177,7 @@ local function CDs ()
     end
     if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
       -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&((talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&(dot.rupture.ticking|time>10))|(!talent.exsanguinate.enabled&dot.rupture.refreshable))
-      if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= AR.Commons.Rogue.CPMaxSpend() and ((S.Exsanguinate:IsAvailable() and S.Exsanguinate:Cooldown() < 1 and (Target:Debuff(S.Rupture) or AC.CombatTime() > 10)) or (not S.Exsanguinate:IsAvailable() and Target:DebuffRefreshable(S.Rupture, (4+Player:ComboPoints()*4)*0.3))) then
+      if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= AR.Commons.Rogue.CPMaxSpend() and ((S.Exsanguinate:IsAvailable() and S.Exsanguinate:Cooldown() < 1 and (Target:Debuff(S.Rupture) or AC.CombatTime() > 10)) or (not S.Exsanguinate:IsAvailable() and Target:DebuffRefreshable(S.Rupture, RuptureThreshold))) then
         if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
       end
       -- actions.cds+=/vanish,if=talent.subterfuge.enabled&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
@@ -227,7 +228,7 @@ local function Maintain ()
     end
     -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=cp_max_spend-talent.exsanguinate.enabled&refreshable&(!exsanguinated|remains<=1.5)&target.time_to_die-remains>4
     if Player:ComboPoints() >= AR.Commons.Rogue.CPMaxSpend()-(S.Exsanguinate:IsAvailable() and 1 or 0) then
-      if Target:IsInRange(5) and Target:DebuffRefreshable(S.Rupture, (4+Player:ComboPoints()*4)*0.3)
+      if Target:IsInRange(5) and Target:DebuffRefreshable(S.Rupture, RuptureThreshold)
           and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemains(S.Rupture) <= 1.5)
           and Target:TimeToDie()-Target:DebuffRemains(S.Rupture) > 4 then
          if AR.Cast(S.Rupture) then return "Cast"; end
@@ -236,7 +237,7 @@ local function Maintain ()
          BestUnit, BestUnitTTD = nil, 4;
          for Key, Value in pairs(Cache.Enemies[5]) do
             if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Rupture) > BestUnitTTD
-                and Value:DebuffRefreshable(S.Rupture, (4+Player:ComboPoints()*4)*0.3) and (not AC.Exsanguinated(Value, "Rupture") or Value:DebuffRemains(S.Rupture) <= 1.5) then
+                and Value:DebuffRefreshable(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Value, "Rupture") or Value:DebuffRemains(S.Rupture) <= 1.5) then
               BestUnit, BestUnitTTD = Value, Value:TimeToDie();
             end
          end
@@ -367,6 +368,8 @@ local function APL ()
         ShouldReturn = CDs();
         if ShouldReturn then return ShouldReturn; end
       end
+      -- Rupture Threshold Compute (Checked in Maintain and Finish Action List Call)
+      RuptureThreshold = (4+Player:ComboPoints()*4)*0.3;
       -- actions+=/call_action_list,name=maintain
       ShouldReturn = Maintain();
       if ShouldReturn then return ShouldReturn; end
@@ -376,7 +379,7 @@ local function APL ()
       if AR.AoEON() then
         for Key, Value in pairs(Cache.Enemies[5]) do
           if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Rupture) > 4 then
-            if not Value:DebuffRefreshable(S.Rupture, (4+Player:ComboPoints()*4)*0.3) then
+            if not Value:DebuffRefreshable(S.Rupture, RuptureThreshold) then
               CountA = CountA + 1;
             else
               CountB = CountB + 1;
@@ -384,7 +387,7 @@ local function APL ()
           end
         end
       end
-      if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:Cooldown() > 2) and (not Target:DebuffRefreshable(S.Rupture, (4+Player:ComboPoints()*4)*0.3) or (AC.Exsanguinated(Target, "Rupture") and Target:DebuffRemains(S.Rupture) >= 3.5) or Target:TimeToDie()-Target:DebuffRemains(S.Rupture) <= 4) and CountA >= Cache.EnemiesCount[5]-CountB then
+      if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:Cooldown() > 2) and (not Target:DebuffRefreshable(S.Rupture, RuptureThreshold) or (AC.Exsanguinated(Target, "Rupture") and Target:DebuffRemains(S.Rupture) >= 3.5) or Target:TimeToDie()-Target:DebuffRemains(S.Rupture) <= 4) and CountA >= Cache.EnemiesCount[5]-CountB then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
