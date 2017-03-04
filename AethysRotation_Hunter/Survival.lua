@@ -130,7 +130,7 @@
       if AR.Cast(S.Butchery) then return ""; end
     end
     -- actions.moknathal+=/lacerate,if=refreshable&((focus>55-buff.moknathal_tactics.remains*focus.regen&buff.mongoose_fury.duration>=gcd&cooldown.mongoose_bite.charges=0&buff.mongoose_fury.stack<3)|(focus>65-buff.moknathal_tactics.remains*focus.regen&buff.mongoose_fury.down&cooldown.mongoose_bite.charges<3))
-    if S.Lacerate:IsCastable() and Player:FocusPredicted(0.2) > 30 and Target:DebuffRefreshable(S.Lacerate, 3.6) and ((Player:Focus() > 55 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and S.MongooseBite:Charges() == 0 and Player:BuffStack(S.MongooseFury) < 3 ) or 
+    if S.Lacerate:IsCastable() and Player:FocusPredicted(0.2) > 30 and Target:DebuffRefreshable(S.Lacerate, 3.6) and ((Player:Focus() > 55 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and S.MongooseBite:Charges() == 0 and Player:BuffStack(S.MongooseFury) < 3 ) or
     (Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and not Player:Buff(S.MongooseFury) and S.MongooseBite:Charges() < 3 )) then
       if AR.Cast(S.Lacerate) then return ""; end
     end
@@ -147,7 +147,7 @@
       if AR.Cast(S.Butchery) then return ""; end
     end
     -- actions.moknathal+=/carve,if=active_enemies>1&focus>65-buff.moknathal_tactics.remains*focus.regen&(buff.mongoose_fury.down&focus>65-buff.moknathal_tactics.remains*focus.regen|buff.mongoose_fury.remains>gcd*cooldown.mongoose_bite.charges&focus>70-buff.moknathal_tactics.remains*focus.regen)
-    if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and (not Player:Buff(S.MongooseFury) and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() or 
+    if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and (not Player:Buff(S.MongooseFury) and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() or
     Player:BuffRemains(S.MongooseFury) > Player:GCD() * S.MongooseBite:Charges() and Player:Focus() > 70 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen()) then
       if AR.Cast(S.Carve) then return ""; end
     end
@@ -287,12 +287,12 @@
     if S.Lacerate:IsCastable() and Player:FocusPredicted(0.2) > 30 and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Target:DebuffRefreshable(S.Lacerate, 3.6) and S.MongooseBite:Charges() == 0 and Player:BuffStack(S.MongooseFury) < 2 or not Player:Buff(S.MongooseFury) and S.MongooseBite:Charges() < 3 and Target:DebuffRefreshable(S.Lacerate, 3.6) then
       if AR.Cast(S.Lacerate) then return ""; end
       end
-    -- AOE 
+    -- AOE
     -- actions.nomok+=/butchery,if=active_enemies>1&focus>65
     if S.Butchery:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:Focus() > 65 then
       if AR.Cast(S.Butchery) then return ""; end
     end
-    -- AOE 
+    -- AOE
     -- actions.nomok+=/carve,if=active_enemies>1&talent.serpent_sting.enabled&dot.serpent_sting.refreshable
     if S.Carve:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:FocusPredicted(0.2) > 35 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentSting, 4.5) then
       if AR.Cast(S.Carve) then return ""; end
@@ -385,7 +385,7 @@
     if S.FlankingStrike:IsCastable() and Player:FocusPredicted(0.2) > 45 then
       if AR.Cast(S.FlankingStrike) then return ""; end
     end
-    -- actions.nomok+=/butchery 
+    -- actions.nomok+=/butchery
     if S.Butchery:IsCastable() and Player:FocusPredicted(0.2) > 35 then
       if AR.Cast(S.Butchery) then return ""; end
     end
