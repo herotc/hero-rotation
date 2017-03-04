@@ -418,9 +418,14 @@
       -- PrePot w/ Bossmod Countdown
       
       -- Opener
-      if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
-        if S.Harpoon:IsCastable() then
+      if AR.Commons.TargetIsValid() then
+        if not Target:IsInRange(5) and Target:IsInRange(40) and S.Harpoon:IsCastable() then
           if AR.Cast(S.Harpoon) then return ""; end
+        end
+        if Target:IsInRange(5) then
+          if S.Lacerate:IsCastable() then
+            if AR.Cast(S.Lacerate) then return ""; end
+          end
         end
       end
       return;
