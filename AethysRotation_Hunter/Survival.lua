@@ -41,7 +41,7 @@
     AnimalInstincts               = Spell(204315),
     Butchery                      = Spell(212436),
     Caltrops                      = Spell(187698),
-    CaltropsDot                   = Spell(194279),
+    CaltropsDebuff                = Spell(194279),
     CaltropsTalent                = Spell(194277),
     DragonsfireGrenade            = Spell(194855),
     MokNathalTactics              = Spell(201081),
@@ -50,7 +50,7 @@
     SnakeHunter                   = Spell(201078),
     SpittingCobra                 = Spell(194407),
     SteelTrap                     = Spell(187650),
-    SteelTrapDot                  = Spell(162487),
+    SteelTrapDebuff               = Spell(162487),
     SteelTrapTalent               = Spell(162488),
     ThrowingAxes                  = Spell(200163),
     WayoftheMokNathal             = Spell(201082),
@@ -111,7 +111,7 @@
       if AR.Cast(S.SpittingCobra) then return ""; end
     end
     -- actions.moknathal+=/steel_trap,if=buff.mongoose_fury.duration>=gcd&buff.mongoose_fury.stack<1
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 1 and not Target:Debuff(S.SteelTrapDot) and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 1 and not Target:Debuff(S.SteelTrapDebuff) and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.moknathal+=/a_murder_of_crows,if=focus>55-buff.moknathal_tactics.remains*focus.regen&buff.mongoose_fury.stack<4&buff.mongoose_fury.duration>=gcd
@@ -136,7 +136,7 @@
       if AR.Cast(S.Lacerate) then return ""; end
     end
     -- actions.moknathal+=/caltrops,if=(buff.mongoose_fury.duration>=gcd&buff.mongoose_fury.stack<1&!dot.caltrops.ticking)
-    if S.Caltrops:IsCastable() and (Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 1 ) and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and (Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 1 and not Target:Debuff(S.CaltropsDebuff)) and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
       if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.moknathal+=/explosive_trap,if=buff.mongoose_fury.duration>=gcd&cooldown.mongoose_bite.charges=0&buff.mongoose_fury.stack<1
@@ -201,7 +201,7 @@
       if AR.Cast(S.SpittingCobra) then return ""; end
     end
     -- actions.moknathal+=/steel_trap
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and not Target:Debuff(S.SteelTrapDot) and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and not Target:Debuff(S.SteelTrapDebuff) and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.moknathal+=/a_murder_of_crows,if=focus>55-buff.moknathal_tactics.remains*focus.regen
@@ -209,7 +209,7 @@
       if AR.Cast(S.AMurderofCrows) then return ""; end
     end
     -- actions.moknathal+=/caltrops,if=(!dot.caltrops.ticking)
-    if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
       if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.moknathal+=/explosive_trap
@@ -257,7 +257,7 @@
       if AR.Cast(S.SpittingCobra) then return ""; end
     end
     -- actions.nomok+=/steel_trap,if=buff.mongoose_fury.duration>=gcd&buff.mongoose_fury.stack<1
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 1 and not Target:Debuff(S.SteelTrapDot) and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 1 and not Target:Debuff(S.SteelTrapDebuff) and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.nomok+=/a_murder_of_crows,if=cooldown.mongoose_bite.charges>=0&buff.mongoose_fury.stack<4
@@ -269,7 +269,7 @@
       if AR.Cast(S.SnakeHunter) then return ""; end
     end
     -- actions.nomok+=/caltrops,if=(buff.mongoose_fury.duration>=gcd&buff.mongoose_fury.stack<4&!dot.caltrops.ticking)
-    if S.Caltrops:IsCastable() and (Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 4 ) and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and (Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Player:BuffStack(S.MongooseFury) < 4 and not Target:Debuff(S.CaltropsDebuff)) and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
       if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.nomok+=/flanking_strike,if=cooldown.mongoose_bite.charges<=1&buff.aspect_of_the_eagle.remains>=gcd
@@ -351,7 +351,7 @@
       if AR.Cast(S.AMurderofCrows) then return ""; end
     end
     -- actions.nomok+=/caltrops,if=(!dot.caltrops.ticking)
-     if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
+     if S.Caltrops:IsCastable() and not Target:Debuff(S.CaltropsDebuff) and not S.CaltropsTalent:IsOnCooldown() and not S.SteelTrapTalent:IsAvailable() then
       if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.nomok+=/explosive_trap
@@ -462,7 +462,8 @@
 
 --- Last Update: 03/04/2017
 
--- NOTE: For human reactivity, "cooldown.mongoose_bite.charges<=1" is replaced by ChargesFractional <= 1.8.
+-- NOTE: For human reactivity, "cooldown.mongoose_bite.charges<=1" is replaced by ChargesFractional <= 1.8 in this action:
+-- actions.nomok+=/fury_of_the_eagle,if=buff.mongoose_fury.stack=6&cooldown.mongoose_bite.charges<=1
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,type=flask_of_the_seventh_demon
