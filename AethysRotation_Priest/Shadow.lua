@@ -371,7 +371,7 @@ end
 		AC.GetEnemies(40);
 		-- Defensives
 		if S.Dispersion:IsCastable() and Player:HealthPercentage() <= Settings.Shadow.DispersionHP then
-			if AR.Cast(S.Dispersion, Settings.GCDasOffGCD.Dispersion) then return "Cast"; end
+			if AR.Cast(S.Dispersion, Settings.OffGCDasOffGCD.Dispersion) then return "Cast"; end
 	    end
 		-- Out of Combat
 		if not Player:AffectingCombat() then

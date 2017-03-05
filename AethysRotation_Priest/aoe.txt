@@ -1,0 +1,10 @@
+si targets (TTD <10 sec) > 5 
+	SWDsnip + Pain + MF
+
+si targets (TTD 10 sec) > 4 
+	Dots
+
+MindBlast
+
+targets (TTD 10 sec) >1 & <=4
+	Dots

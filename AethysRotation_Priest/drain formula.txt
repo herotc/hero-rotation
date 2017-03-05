@@ -1,0 +1,3 @@
+( buffs.voidform->data().effectN( 2 ).base_value() / -500.0 ) + ( ( buffs.insanity_drain_stacks->check() - 1 ) *2.0/3.0 ) 
+
+6 + 0.67 per drain stack
