@@ -144,7 +144,7 @@
       if AR.Cast(S.ExplosiveTrap) then return ""; end
     end
     -- actions.moknathal+=/butchery,if=active_enemies>1&focus>65-buff.moknathal_tactics.remains*focus.regen&(buff.mongoose_fury.down|buff.mongoose_fury.remains>gcd*cooldown.mongoose_bite.charges)
-    if S.Butchery:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() (not Player:Buff(S.MongooseFury) or Player:BuffRemains(S.MongooseFury) > Player:GCD() * S.MongooseBite:Charges()) then
+    if S.Butchery:IsCastable() and Cache.EnemiesCount[8] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and (not Player:Buff(S.MongooseFury) or Player:BuffRemains(S.MongooseFury) > Player:GCD() * S.MongooseBite:Charges()) then
       if AR.Cast(S.Butchery) then return ""; end
     end
     -- actions.moknathal+=/carve,if=active_enemies>1&focus>65-buff.moknathal_tactics.remains*focus.regen&(buff.mongoose_fury.down&focus>65-buff.moknathal_tactics.remains*focus.regen|buff.mongoose_fury.remains>gcd*cooldown.mongoose_bite.charges&focus>70-buff.moknathal_tactics.remains*focus.regen)
