@@ -116,20 +116,25 @@
         Commons = {
         },
         Shadow = {
-          DispersionHP = 10,
+		  DispersionHP=10,
+
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
-            -- Abilities
-            Shadowfiend = {true, false}
+			-- Abilities
+			Shadowfiend = {true, false},
+			Shadowform = {true, false}
           },
+		  
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
-            -- Racials
-            ArcaneTorrent = {true, false},
-            Berserking = {true, false},
-            BloodFury = {true, false},
-            -- Abilities
-            PowerInfusion = {true, false},
+			-- Abilities
+		    PowerInfusion = {true, false},
+		    Dispersion = {true, false},
+			
+			-- Racials
+			ArcaneTorrent = {true, false},
+			Berserking = {true, false},
+			BloodFury = {true, false},
           }
         },
       },

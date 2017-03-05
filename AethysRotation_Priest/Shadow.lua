@@ -71,6 +71,7 @@
 		VampiricEmbrace 		= Spell(15286),
     -- Legendaries
     -- Misc
+		Shadowform				= Spell(232698),
 		VoidForm				= Spell(194249)
     -- Macros
     
@@ -130,7 +131,7 @@ local function nonexecuteActorsPct()
 end
 
 local function s2mbeltcheck()
---actions.precombat+=/variable,op=set,name=s2mbeltcheck,value=cooldown.mind_blast.charges>=2
+	--actions.precombat+=/variable,op=set,name=s2mbeltcheck,value=cooldown.mind_blast.charges>=2
 	return I.MangazasMadness:IsEquipped(6) and 1 or 0;
 end
 
@@ -189,18 +190,20 @@ local function CDs ()
 	end
 
 	--SF
+
 	--actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
+	--S2M:actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
+	--TODO : S2M
 	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() and Player:BuffStack(S.VoidForm)>15 then
 		if AR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend) then return "Cast"; end
 	end
 
 	--Mb
-	--TODO : S2M
 	--S2M:actions.main+=/mindbender,if=talent.mindbender.enabled&((talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck+60)|!talent.surrender_to_madness.enabled)
 	--S2M:actions.main+=/mindbender,if=talent.mindbender.enabled&set_bonus.tier18_2pc
 	--S2M:actions.s2m+=/mindbender,if=talent.mindbender.enabled
-	--S2M:actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--S2M:actions.vf+=/mindbender,if=talent.mindbender.enabled&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+30))
+	--TODO : S2M
 	if Player:Buff(S.VoidForm) then
 		if S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() then
 			if AR.Cast(S.Mindbender) then return "Cast"; end
@@ -213,12 +216,17 @@ local function CDs ()
 
 	--Berserking
 	--actions.vf+=/berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=20&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
+	--TODO : S2M
+	if S.Berserking:IsAvailable() and S.Berserking:IsCastable() and Player:BuffStack(S.VoidForm)>=10 and CurrentInsanityDrain()<=20 then
+		if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Berserking) then return "Cast"; end
+	end
+	
 	--Arcane Torrent
 
 end
 
 	local function s2m()
-		--	actions.s2m=void_bolt,if=buff.insanity_drain_stacks.stack<6&set_bonus.tier19_4pc
+		--actions.s2m=void_bolt,if=buff.insanity_drain_stacks.stack<6&set_bonus.tier19_4pc
 		--actions.s2m+=/shadow_crash,if=talent.shadow_crash.enabled
 		--actions.s2m+=/mindbender,if=talent.mindbender.enabled
 		--actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up
@@ -247,6 +255,14 @@ end
 	end
 
 	local function voidForm()
+		--void bolt prediction
+		if Player:CastID() == S.VoidEruption:ID() then
+			AR.CastLeft(S.VoidBolt);
+			if AR.Cast(S.VoidEruption) then return "Cast"; end
+		end
+		
+		--TODO : speed
+	
 		--actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
 		--TODO : S2M
 		
@@ -364,6 +380,9 @@ end
 		  -- Rune
 		  -- PrePot w/ Bossmod Countdown
 		  -- Opener
+			if not Player:Buff(S.Shadowform) and not Player:Buff(S.VoidForm) then
+				if AR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "Cast"; end
+			end
 			
 			if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
 				if AR.Cast(S.MindBlast) then return "Cast"; end
@@ -373,11 +392,19 @@ end
 		-- In Combat
 		if AR.Commons.TargetIsValid() then
 			if Target:IsInRange(40) then
+				--Shadowform icon if not in shadowform
+				if not Player:Buff(S.Shadowform) and not Player:Buff(S.VoidForm) then
+					if AR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "Cast"; end
+				end
+				
+				--CD usage
 				if AR.CDsON() then
 					ShouldReturn = CDs();
 					if ShouldReturn then return ShouldReturn; end
 				end
-				if Player:Buff(S.VoidForm) then
+				
+				--Specific APL for Voidform and Surrender
+				if Player:Buff(S.VoidForm) or (Player:CastID() == S.VoidEruption:ID()) then
 					--actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 					if Player:Buff(S.SurrendertoMadness) then
 						--ShouldReturn = s2m();
@@ -396,32 +423,27 @@ end
 				end
 				
 				if GetUnitSpeed("player") == 0 then 
-					--actions.main+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd.max,moving=1,cycle_targets=1
-					--actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max| or dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
-					--[[if S.Misery:IsAvailable() then
-						if Target:DebuffRemains(S.ShadowWordPain) < Player:GCD() then
-							if AR.Cast(S.ShadowWordPain) then return "Cast"; end
-						end
-						if Target:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() or Target:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD() then
-							if AR.Cast(S.VampiricTouch) then return "Cast"; end
-						end
-					end]]--
-					
 					--actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
-					if Target:DebuffRemains(S.VampiricTouch) < (4+(4/3))*Player:GCD() and not (Player:CastID() == S.VampiricTouch:ID()) then
-						if AR.Cast(S.VampiricTouch) then return "Cast"; end
+					if (Target:DebuffRemains(S.VampiricTouch) < (4+(4/3))*Player:GCD() or (S.Misery:IsAvailable() and  Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD()))
+						and not (Player:CastID() == S.VampiricTouch:ID()) 
+						and not (Player:CastID() == S.VoidEruption:ID()) then
+							if AR.Cast(S.VampiricTouch) then return "Cast"; end
 					end
 					
 					--actions.main+=/shadow_word_pain,if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
-					if Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD() then
-						if AR.Cast(S.ShadowWordPain) then return "Cast"; end
+					if Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD() 
+						and not (Player:CastID() == S.VoidEruption:ID()) then
+							if AR.Cast(S.ShadowWordPain) then return "Cast"; end
 					end
 					
 					--actions.main+=/void_eruption,if=insanity>=70|(talent.auspicious_spirits.enabled&insanity>=(65-shadowy_apparitions_in_flight*3))|set_bonus.tier19_4pc
-					--NEW ? actions.main+=/void_eruption,if=insanity>=65+35*!talents.legacy_of_the_void.enabled
-					if Player:Insanity()>=Insanity_Threshold() or (Player:CastID() == S.MindBlast:ID() and ((Player:Insanity()+(15*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 )*(S.FortressOfTheMind:IsAvailable() and 1.2 or 1.0)) ) >= Insanity_Threshold())) then
-						VTUsed=false
-						if AR.Cast(S.VoidEruption) then return "Cast"; end
+					if Player:Insanity()>=Insanity_Threshold() 
+						or (Player:CastID() == S.MindBlast:ID() and 
+							((Player:Insanity()+(15*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 )*(S.FortressOfTheMind:IsAvailable() and 1.2 or 1.0)) ) >= Insanity_Threshold())) 
+						or (Player:CastID() == S.VampiricTouch:ID() and 
+							((Player:Insanity()+(6*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 )) ) >= Insanity_Threshold())) then
+							VTUsed=false
+							if AR.Cast(S.VoidEruption) then return "Cast"; end
 					end
 					
 					--actions.main+=/shadow_crash,if=talent.shadow_crash.enabled
@@ -431,15 +453,18 @@ end
 					
 					--actions.main+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&talent.legacy_of_the_void.enabled&insanity>=70,cycle_targets=1
 					--actions.main+=/vampiric_touch,if=!talent.misery.enabled&!ticking&talent.legacy_of_the_void.enabled&insanity>=70,cycle_targets=1
+					--TODO : choose best enemy
 					if AR.AoEON() and Cache.EnemiesCount[40]<5 then
 						for Key, Value in pairs(Cache.Enemies[40]) do
-							if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold() and Value:HealthPercentage()<=ExecuteRange() then
-								AR.CastLeftNameplate(Value, S.ShadowWordDeath);
+							if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold() 
+								and Value:HealthPercentage()<=ExecuteRange() then
+									AR.CastLeftNameplate(Value, S.ShadowWordDeath);
 							end
 							if Value:TimeToDie() > 10 then			
 								if S.Misery:IsAvailable() then
-									if Value:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() or Value:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD() then
-										AR.CastLeftNameplate(Value, S.VampiricTouch);
+									if Value:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() 
+										or Value:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD() then
+											AR.CastLeftNameplate(Value, S.VampiricTouch);
 									end
 								else
 									if Value:DebuffRemains(S.VampiricTouch)< 3*Player:GCD() then
@@ -455,35 +480,30 @@ end
 					end
 					
 					--actions.main+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(85-15*talent.reaper_of_souls.enabled)
-					--TODO : manage active-enemies  Cache.EnemiesCount[40]?
-					if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold() and Target:HealthPercentage()<=ExecuteRange() then
-						if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
+					if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold() 
+						and Target:HealthPercentage()<=ExecuteRange() then
+							if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
 					end
 					
 					--actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
 					--actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
-					if S.MindBlast:IsCastable() and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[40]<=4)) and Player:Insanity()<Insanity_Threshold() and not (Player:CastID() == S.MindBlast:ID()) then
-						if AR.Cast(S.MindBlast) then return "Cast"; end
-					end
-					
-					--actions.main+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
-					--actions.main+=/vampiric_touch,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
-					--TODO : manage for AOE ?
-					if AR.AoEON() then
-						
+					if S.MindBlast:IsCastable() and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[40]<=4)) 
+						and Player:Insanity()<Insanity_Threshold() and not (Player:CastID() == S.MindBlast:ID()) then
+							if AR.Cast(S.MindBlast) then return "Cast"; end
 					end
 					
 					--actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=70&talent.legacy_of_the_void.enabled)|(insanity<=85&!talent.legacy_of_the_void.enabled)
-					--TODO : () missing in APL ? (after talent.shadow_word_void.enabled&)
-					if S.ShadowWordVoid:IsAvailable() and S.ShadowWordVoid:IsCastable() and (( S.LegacyOfTheVoid:IsAvailable() and Player:Insanity()<65) or ( not S.LegacyOfTheVoid:IsAvailable() and Player:Insanity()<85)) then
-						if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
+					if S.ShadowWordVoid:IsAvailable() and S.ShadowWordVoid:IsCastable() and Player:Insanity()<Insanity_Threshold() then
+							if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
 					end
 					
 					--actions.main+=/mind_flay,interrupt=1,chain=1
-					if S.MindFlay:IsCastable() and GetUnitSpeed("player") == 0 then
+					if S.MindFlay:IsCastable() then
 						if AR.Cast(S.MindFlay) then return "Cast"; end
 					end
-				else
+				else --moving
+					--SWP on other targets
+					--TODO : choose best target
 					if AR.AoEON() then
 						for Key, Value in pairs(Cache.Enemies[40]) do
 							if Value:TimeToDie() > 10 and Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() then
