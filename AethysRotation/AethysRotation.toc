@@ -25,6 +25,3 @@ UI.lua
 
 # Main
 Main.lua
-
-# Debug
-#Old\Debug.lua
