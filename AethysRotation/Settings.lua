@@ -112,29 +112,29 @@
           }
         }
       },
-    Priest = {
+      Priest = {
         Commons = {
         },
         Shadow = {
-		  DispersionHP=10,
+		        DispersionHP=10,
 
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
-			-- Abilities
-			Shadowfiend = {true, false},
-			Shadowform = {true, false}
+			      -- Abilities
+			      Shadowfiend = {true, false},
+			      Shadowform = {true, false}
           },
 		  
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
-			-- Abilities
-		    PowerInfusion = {true, false},
-		    Dispersion = {true, false},
+			      -- Abilities
+		        PowerInfusion = {true, false},
+		        Dispersion = {true, false},
 			
-			-- Racials
-			ArcaneTorrent = {true, false},
-			Berserking = {true, false},
-			BloodFury = {true, false},
+			      -- Racials
+			      ArcaneTorrent = {true, false},
+			      Berserking = {true, false},
+			      BloodFury = {true, false},
           }
         },
       },
@@ -236,6 +236,20 @@
       },
       Warrior = {
         Commons = {
+          -- SoloMode Settings
+          -- {Display GCD as OffGCD, ForceReturn}
+          GCDasOffGCD = {
+            -- Abilities
+          },
+          -- {Display OffGCD as OffGCD, ForceReturn}
+          OffGCDasOffGCD = {
+            -- Racials
+            ArcaneTorrent = {true, false},
+            Berserking = {true, false},
+            BloodFury = {true, false},
+            -- Abilities
+            Pummel = {true, false}
+          }
         },
         Arms = {
           -- {Display GCD as OffGCD, ForceReturn}
@@ -246,6 +260,15 @@
           }
         },
         Fury = {
+          -- {Display GCD as OffGCD, ForceReturn}
+          GCDasOffGCD = {
+          },
+          -- {Display OffGCD as OffGCD, ForceReturn}
+          OffGCDasOffGCD = {
+            -- Abilities
+            Avatar = {true, false},
+            BattleCry = {true, false}
+          }
         }
       }
     }
