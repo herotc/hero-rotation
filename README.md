@@ -35,6 +35,7 @@ Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Act
 - Rogue Outlaw
 - Rogue Subtlety
 - Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
+- Warrior Fury _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
 
 ## Special Mention About SimC APL
 As said earlier, every rotations are based on SimulationCraft Action Priority Lists (APL).
