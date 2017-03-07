@@ -207,7 +207,7 @@
       [267]   = false,                          -- Destruction
     -- Warrior
       [71]    = false,                          -- Arms
-      [72]    = false,                          -- Fury
+      [72]    = "AethysRotation_Warrior",       -- Fury
       [73]    = false                           -- Protection
   };
   function AR.PulsePreInit ()
