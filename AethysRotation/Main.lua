@@ -160,6 +160,9 @@
   );
 
 --- ======= MAIN =======
+  function AR.PulsePreInit ()
+    AR.MainFrame:Lock();
+  end
   local EnabledRotation = {
     -- Death Knight
       [250]   = false,                          -- Blood
@@ -210,9 +213,7 @@
       [72]    = "AethysRotation_Warrior",       -- Fury
       [73]    = false                           -- Protection
   };
-  function AR.PulsePreInit ()
-    AR.MainFrame:Lock();
-  end
+  local LatestSpecIDCheck = 0;
   function AR.PulseInit ()
     -- Force a refresh from the Core
     -- TODO: Make it a function instead of copy/paste from Core Events.lua
@@ -225,17 +226,20 @@
     end
 
     -- Check if there is a Rotation for this Spec
-    if EnabledRotation[Cache.Persistent.Player.Spec[1]] and AR.APLs[Cache.Persistent.Player.Spec[1]] then
-      for Key, Value in pairs(UIFrames) do
-        Value:Show();
+    if LatestSpecIDCheck ~= Cache.Persistent.Player.Spec[1] then
+      if EnabledRotation[Cache.Persistent.Player.Spec[1]] and AR.APLs[Cache.Persistent.Player.Spec[1]] then
+        for Key, Value in pairs(UIFrames) do
+          Value:Show();
+        end
+        AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
+      else
+        AR.Print("No Rotation found for this class/spec, addon disabled.");
+        for Key, Value in pairs(UIFrames) do
+          Value:Hide();
+        end
+        AR.MainFrame:SetScript("OnUpdate", nil);
       end
-      AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
-    else
-      AR.Print("No Rotation found for this class/spec, addon disabled.");
-      for Key, Value in pairs(UIFrames) do
-        Value:Hide();
-      end
-      AR.MainFrame:SetScript("OnUpdate", nil);
+      LatestSpecIDCheck = Cache.Persistent.Player.Spec[1];
     end
     if not AC.PulseInitialized then AC.PulseInitialized = true; end
   end

@@ -25,9 +25,10 @@
       -- Prevent the first event firing (when login)
       if not AC.PulseInitialized then return; end
       -- Timer to prevent bug due to the double/triple event firing.
+      -- Since it takes 5s to change spec, we'll take 3seconds as timer.
       if AC.GetTime() > SpecTimer then
         AR.PulseInit();
-        SpecTimer = AC.GetTime() + 4;
+        SpecTimer = AC.GetTime() + 3;
       end
     end
     , "PLAYER_SPECIALIZATION_CHANGED"
