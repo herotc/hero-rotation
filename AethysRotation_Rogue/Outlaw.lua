@@ -365,9 +365,9 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(8);     -- Cannonball Barrage
-  AC.GetEnemies(6);     -- Blade Flurry
-  AC.GetEnemies(5);     -- Melee
+  AC.GetEnemies(8); -- Cannonball Barrage
+  AC.GetEnemies(6); -- Blade Flurry
+  AC.GetEnemies(5); -- Melee
   AR.Commons.AoEToggleEnemiesUpdate();
   -- Defensives
     -- Crimson Vial

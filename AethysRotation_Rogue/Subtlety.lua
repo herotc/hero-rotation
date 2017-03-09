@@ -43,7 +43,7 @@ local pairs = pairs;
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
     Anticipation                  = Spell(114015),
-    DeathFromAbove                = Spell(152150),
+    DeathfromAbove                = Spell(152150),
     DeeperStratagem               = Spell(193531),
     EnvelopingShadows             = Spell(206237),
     Gloomblade                    = Spell(200758),
@@ -239,8 +239,8 @@ local function Finish ()
     if AR.Cast(S.EnvelopingShadows) then return "Cast"; end
   end
   -- actions.finish+=/death_from_above,if=spell_targets.death_from_above>=5
-  if S.DeathFromAbove:IsCastable() and Cache.EnemiesCount[8] >= 5 and Target:IsInRange(15) then
-    if AR.Cast(S.DeathFromAbove) then return "Cast"; end
+  if S.DeathfromAbove:IsCastable() and Cache.EnemiesCount[8] >= 5 and Target:IsInRange(15) then
+    if AR.Cast(S.DeathfromAbove) then return "Cast"; end
   end
   -- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die-remains>10&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
   if S.Nightblade:IsCastable() then
@@ -269,8 +269,8 @@ local function Finish ()
     end
   end
   -- actions.finish+=/death_from_above
-  if S.DeathFromAbove:IsCastable() and Target:IsInRange(15) then
-    if AR.Cast(S.DeathFromAbove) then return "Cast"; end
+  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15) then
+    if AR.Cast(S.DeathfromAbove) then return "Cast"; end
   end
   -- actions.finish+=/eviscerate
   if S.Eviscerate:IsCastable() and Target:IsInRange(5) then
@@ -418,8 +418,8 @@ local function APL ()
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   ShadowstrikeRange = 5+(Settings.Subtlety.ShadowstrikeMaxRange and 10 or 0);
   -- Unit Update
-  AC.GetEnemies(8);     -- Shuriken Storm & Death From Above
-  AC.GetEnemies(5);     -- Melee
+  AC.GetEnemies(8); -- Shuriken Storm & Death from Above
+  AC.GetEnemies(5); -- Melee
   AR.Commons.AoEToggleEnemiesUpdate();
   --- Defensives
     -- Crimson Vial

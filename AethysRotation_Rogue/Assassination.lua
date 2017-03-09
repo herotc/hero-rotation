@@ -39,7 +39,7 @@ local pairs = pairs;
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
     Anticipation                  = Spell(114015),
-    DeathFromAbove                = Spell(152150),
+    DeathfromAbove                = Spell(152150),
     DeeperStratagem               = Spell(193531),
     ElaboratePlanning             = Spell(193640),
     ElaboratePlanningBuff         = Spell(193641),
@@ -105,7 +105,7 @@ local function Build ()
       if AR.Cast(S.Hemorrhage) then return "Cast"; end
     end
     -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<3+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)
-    if AR.AoEON() and Cache.EnemiesCount[10] < 3+(S.AgonizingPoison:IsAvailable() and (I.InsigniaofRavenholdt:IsEquipped(11) or I.InsigniaofRavenholdt:IsEquipped(12)) and 1 or 0) then
+    if AR.AoEON() and Cache.EnemiesCount[8] < 3+(S.AgonizingPoison:IsAvailable() and (I.InsigniaofRavenholdt:IsEquipped(11) or I.InsigniaofRavenholdt:IsEquipped(12)) and 1 or 0) then
       BestUnit, BestUnitTTD = nil, 0;
       for Key, Value in pairs(Cache.Enemies[5]) do
         if not Value:IsFacingBlacklisted() and Value:TimeToDie() < 7777 and Value:TimeToDie() > BestUnitTTD and Value:DebuffRefreshable(S.Hemorrhage, 6) and Value:Debuff(S.Rupture) then
@@ -118,7 +118,7 @@ local function Build ()
     end
   end
   -- actions.build+=/fan_of_knives,if=spell_targets>=3+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)|buff.the_dreadlords_deceit.stack>=29
-  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[10] >= 3+(S.AgonizingPoison:IsAvailable() and (I.InsigniaofRavenholdt:IsEquipped(11) or I.InsigniaofRavenholdt:IsEquipped(12)) and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 3+(S.AgonizingPoison:IsAvailable() and (I.InsigniaofRavenholdt:IsEquipped(11) or I.InsigniaofRavenholdt:IsEquipped(12)) and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.FanofKnives) then return "Cast"; end
   end
   if S.Mutilate:IsCastable() then
@@ -183,7 +183,7 @@ local function CDs ()
         if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
       end
       -- actions.cds+=/vanish,if=talent.subterfuge.enabled&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
-      if S.Subterfuge:IsAvailable() and Target:DebuffRefreshable(S.Garrote, 5.4) and ((Cache.EnemiesCount[10] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and Player:ComboPointsDeficit())) then
+      if S.Subterfuge:IsAvailable() and Target:DebuffRefreshable(S.Garrote, 5.4) and ((Cache.EnemiesCount[8] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[8]) or (Cache.EnemiesCount[8] >= 4 and Player:ComboPointsDeficit())) then
         if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
       end
       -- actions.cds+=/vanish,if=talent.shadow_focus.enabled&energy.time_to_max>=2&combo_points.deficit>=4
@@ -201,8 +201,8 @@ end
 -- # Finishers
 local function Finish ()
   -- actions.finish=death_from_above,if=combo_points>=cp_max_spend
-  if S.DeathFromAbove:IsCastable() and Target:IsInRange(15) and Player:ComboPoints() >= AR.Commons.Rogue.CPMaxSpend() then
-    if AR.Cast(S.DeathFromAbove) then return "Cast"; end
+  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15) and Player:ComboPoints() >= AR.Commons.Rogue.CPMaxSpend() then
+    if AR.Cast(S.DeathfromAbove) then return "Cast"; end
   end
   -- actions.finish+=/envenom,if=combo_points>=4|(talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.3)
   if S.Envenom:IsCastable() and Target:IsInRange(5) and (Player:ComboPoints() >= 4 or (S.ElaboratePlanning:IsAvailable() and Player:ComboPoints() >= 3+(S.Exsanguinate:IsAvailable() and 0 or 1) and Player:BuffRemains(S.ElaboratePlanningBuff) <= 0.3)) then
@@ -315,8 +315,8 @@ local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   -- Unit Update
-  AC.GetEnemies(10);    -- Fan of Knives
-  AC.GetEnemies(5);     -- Melee
+  AC.GetEnemies(8); -- Fan of Knives & Death from Above
+  AC.GetEnemies(5); -- Melee
   AR.Commons.AoEToggleEnemiesUpdate();
   -- Defensives
     -- Crimson Vial
