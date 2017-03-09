@@ -93,7 +93,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Bloodthrist) then return ""; end
     end
     -- actions.cooldowns+=/execute,if=equipped.draught_of_souls&cooldown.draught_of_souls.remains<1&buff.juggernaut.remains<3
-    if S.Execute:IsCastable() and Target:HealthPercentage() < 20 and (I.DraughtofSouls:IsEquipped(13) or I.DraughtofSouls:IsEquipped(14)) and I.DraughtofSouls:Cooldown() < 1 and Player:BuffRemains(S.Juggernaut) < 3 then
+    if S.Execute:IsCastable() and Player:Rage() >= 25 and Target:HealthPercentage() < 20 and (I.DraughtofSouls:IsEquipped(13) or I.DraughtofSouls:IsEquipped(14)) and I.DraughtofSouls:Cooldown() < 1 and Player:BuffRemains(S.Juggernaut) < 3 then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.cooldowns+=/use_item,name=draught_of_souls,if=equipped.draught_of_souls&buff.battle_cry.remains>2&buff.enrage.remains>2&((talent.dragon_roar.enabled&buff.dragon_roar.remains>=3)|!talent.dragon_roar.enabled)
@@ -110,7 +110,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Whirlwind) then return ""; end
     end
     -- actions.cooldowns+=/execute
-    if S.Execute:IsCastable() and Target:HealthPercentage() < 20 then
+    if S.Execute:IsCastable() and Player:Rage() >= 25 and Target:HealthPercentage() < 20 then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.cooldowns+=/raging_blow,if=talent.inner_rage.enabled&buff.enrage.up
@@ -171,7 +171,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Whirlwind) then return ""; end
     end
     -- actions.aoe+=/execute,if=spell_targets.whirlwind<6&talent.massacre.enabled&!buff.massacre.react
-    if S.Execute:IsCastable() and Cache.EnemiesCount[8] < 6 and S.Massacre:IsAvailable() and not Player:Buff(S.Massacre) then
+    if S.Execute:IsCastable() and Player:Rage() >= 25 and Cache.EnemiesCount[8] < 6 and S.Massacre:IsAvailable() and not Player:Buff(S.Massacre) then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.aoe+=/rampage,if=buff.meat_cleaver.up&(buff.enrage.down&!talent.frothing_berserker.enabled|buff.massacre.react|rage>=100)
@@ -196,7 +196,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Bloodthrist) then return ""; end
     end
     -- actions.execute+=/execute,if=artifact.juggernaut.enabled&(!buff.juggernaut.up|buff.juggernaut.remains<2)|buff.stone_heart.react
-    if S.Execute:IsCastable() and S.Juggernaut:IsAvailable() and ((not Player:Buff(S.Juggernaut) or Player:BuffRemains(S.Juggernaut) < 2) or Player:Buff(S.StoneHeart)) then
+    if S.Execute:IsCastable() and Player:Rage() >= 25 and S.Juggernaut:IsAvailable() and ((not Player:Buff(S.Juggernaut) or Player:BuffRemains(S.Juggernaut) < 2) or Player:Buff(S.StoneHeart)) then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.execute+=/furious_slash,if=talent.frenzy.enabled&buff.frenzy.remains<=2
@@ -208,7 +208,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.execute+=/execute
-    if S.Execute:IsCastable() then
+    if S.Execute:IsCastable() and Player:Rage() >= 25 then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.execute+=/bloodthirst
@@ -264,7 +264,7 @@ local AR = AethysRotation;
       if AR.Cast(S.RagingBlow) then return ""; end
     end
     -- actions.single_target+=/execute,if=buff.stone_heart.react
-    if S.Execute:IsCastable() and Player:Buff(S.StoneHeart) then
+    if S.Execute:IsCastable() and Player:Rage() >= 25 and Player:Buff(S.StoneHeart) then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.single_target+=/whirlwind,if=buff.wrecking_ball.react&buff.enrage.up
