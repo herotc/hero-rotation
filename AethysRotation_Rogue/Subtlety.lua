@@ -128,6 +128,7 @@ local pairs = pairs;
   Item.Rogue.Subtlety = {
     -- Legendaries
     DenialoftheHalfGiants         = Item(137100), -- 9
+    DraughtofSouls                = Item(140808), -- 13 & 14
     MantleoftheMasterAssassin     = Item(144236), -- 3
     ShadowSatyrsWalk              = Item(137032)  -- 8
   };
@@ -180,7 +181,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
-  if Cache.EnemiesCount[10] >= 2 and S.ShurikenStorm:IsCastable() then
+  if Cache.EnemiesCount[8] >= 2 and S.ShurikenStorm:IsCastable() then
     if AR.Cast(S.ShurikenStorm) then return "Cast"; end
   end
   if Target:IsInRange(5) then
@@ -197,7 +198,7 @@ end
 -- # Cooldowns
 local function CDs ()
   if Target:IsInRange(5) then
-    -- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
+    -- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
     -- TODO: Add Potion Suggestion
     -- Racials
     if Player:IsStealthed(true, false) then
@@ -277,6 +278,11 @@ local function Finish ()
   end
   return false;
 end
+-- # Sprinted
+local function Sprinted ()
+  -- actions.sprinted=cancel_autoattack
+  -- actions.sprinted+=/use_item,name=draught_of_souls
+end
 local SoDMacro, ShStormMacro;
 local function StealthMacro(MacroType)
   SoDMacro, ShStormMacro = false, false;
@@ -286,7 +292,7 @@ local function StealthMacro(MacroType)
   end
   -- Will we Shuriken Storm ?
   if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-      and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
+      and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
         or (AR.AoEON() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)
           and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     ShStormMacro = true;
@@ -310,16 +316,12 @@ end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
   if Target:IsInRange(5) then
-    -- actions.stealth_cds=shadow_dance,if=charges_fractional>=variable.shd_fractionnal
-    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() then
-      if AR.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
-    end
-    -- actions.stealth_cds+=/vanish,if=mantle_duration<=3
-    if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and AR.Commons.Rogue.MantleDuration() <= 3 then
+    -- actions.stealth_cds=vanish,if=mantle_duration=0&(cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal|(equipped.mantle_of_the_master_assassin&time<30))
+    if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and AR.Commons.Rogue.MantleDuration() == 0 and (S.ShadowDance:ChargesFractional() < ShD_Fractionnal() or (I.MantleoftheMasterAssassin:IsEquipped(3) and AC.CombatTime() < 30)) then
       if AR.Cast(MacroLookupSpell[StealthMacro("Van")]) then return "Cast"; end
     end
-    -- actions.stealth_cds+=/shadow_dance,if=charges>=2&combo_points<=1
-    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 2 and Player:ComboPoints() <= 1 then
+    -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractionnal
+    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() then
       if AR.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40-variable.ssw_refund&energy.deficit>=10+variable.ssw_refund
@@ -330,8 +332,8 @@ local function Stealth_CDs ()
       end
       if AR.Cast(MacroLookupSpell[StealthMacro("SM")]) then return "Cast"; end
     end
-    -- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
-    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and Player:ComboPoints() <= 1 and S.ShadowDance:Charges() >= 1 then
+    -- actions.stealth_cds+=/shadow_dance,if=combo_points.deficit>=5-talent.vigor.enabled
+    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1 and Player:ComboPointsDeficit() >= 5-(S.Vigor:IsAvailable() and 1 or 0) then
       if AR.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
   end
@@ -341,8 +343,10 @@ end
 local function Stealth_ALS ()
   -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=variable.shd_fractionnal|energy.deficit>=10)
   if (Player:EnergyDeficit() <= Stealth_Threshold() and (not I.ShadowSatyrsWalk:IsEquipped(8) or S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() or Player:EnergyDeficit() >= 10))
+  -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=mantle_duration>2.3
+   or AR.Commons.Rogue.MantleDuration() > 2.3
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
-   or Cache.EnemiesCount[10] >= 5
+   or Cache.EnemiesCount[8] >= 5
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
    or (not S.Shadowmeld:IsOnCooldown() and S.Vanish:IsOnCooldown() and S.ShadowDance:Charges() <= 1)
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
@@ -360,23 +364,18 @@ local function Stealthed ()
     if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
-  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) or (AR.Commons.Rogue.MantleDuration() <= 1.3 and AR.Commons.Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
+  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) or (AR.Commons.Rogue.MantleDuration() <= 1.3 and AR.Commons.Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
     return Finish();
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
   if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-      and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
+      and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0))
         or (AR.AoEON() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)
           and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.ShurikenStorm) then return "Cast"; end
   end
-  -- actions.stealthed+=/shadowstrike,if=combo_points.deficit>=2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
-  if S.Shadowstrike:IsCastable() and Target:IsInRange(ShadowstrikeRange) and Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped(3) and 1 or 0)
-  then
-    if AR.Cast(S.Shadowstrike) then return "Cast"; end
-  end
-  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5
-  if Player:ComboPoints() >= 5 then
+  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
+  if Player:ComboPoints() >= 5 and Player:ComboPointsDeficit() < 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped(3) and 1 or 0) then
     return Finish();
   end
   -- actions.stealthed+=/shadowstrike
@@ -419,8 +418,7 @@ local function APL ()
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   ShadowstrikeRange = 5+(Settings.Subtlety.ShadowstrikeMaxRange and 10 or 0);
   -- Unit Update
-  AC.GetEnemies(10);    -- Shuriken Storm
-  AC.GetEnemies(8);     -- Death From Above
+  AC.GetEnemies(8);     -- Shuriken Storm & Death From Above
   AC.GetEnemies(5);     -- Melee
   AR.Commons.AoEToggleEnemiesUpdate();
   --- Defensives
@@ -452,7 +450,7 @@ local function APL ()
            if AR.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
           end
         elseif Player:IsStealthed(true, true) then
-          if S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
+          if S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
             if AR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
           elseif S.Shadowstrike:IsCastable() then
             if AR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
@@ -479,6 +477,8 @@ local function APL ()
         {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
         {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
       });
+      -- actions=run_action_list,name=sprinted,if=buff.faster_than_light_trigger.up
+      -- TODO
       -- actions+=/call_action_list,name=cds
       if AR.CDsON() then
         ShouldReturn = CDs();
@@ -495,16 +495,26 @@ local function APL ()
           return "Stealthed Pooling";
         end
       end
-      -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
-      if Player:ComboPoints() >= 5 or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 3 and Cache.EnemiesCount[10] <= 4) then
-        ShouldReturn = Finish();
-        if ShouldReturn then return ShouldReturn; end
+      if S.Sprint:IsCastable() and AR.Commons.Rogue.MantleDuration() == 0 then
+        -- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8
+        -- TODO: Not DoS
+        if not I.DraughtofSouls:IsEquipped(13) and not I.DraughtofSouls:IsEquipped(14) and Player:EnergyTimeToMax() >= 1.5 and S.ShadowDance:ChargesFractional() < ShD_Fractionnal() and S.Vanish:IsOnCooldown() and Target:TimeToDie() >= 8 then
+          AR.CastSuggested(S.Sprint);
+        end
+        -- actions+=/sprint,if=equipped.draught_of_souls&trinket.cooldown.up&mantle_duration=0
+        -- TODO: DoS CD
+        if I.DraughtofSouls:IsEquipped(13) or I.DraughtofSouls:IsEquipped(14) then
+          AR.CastSuggested(S.Sprint);
+        end
       end
-      -- actions+=/sprint_offensive,if=energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal-1&!cooldown.vanish.up&target.time_to_die>=8
-      -- TODO: Add Sprint Suggestion
       -- actions+=/call_action_list,name=stealth_als,if=combo_points.deficit>=2+talent.premeditation.enabled
       if Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0) then
         ShouldReturn = Stealth_ALS();
+        if ShouldReturn then return ShouldReturn; end
+      end
+      -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
+      if Player:ComboPoints() >= 5 or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[8] >= 3 and Cache.EnemiesCount[8] <= 4) then
+        ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
@@ -527,12 +537,12 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 02/06/2017
+-- Last Update: 03/08/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
 -- actions.precombat+=/augmentation,name=defiled
--- actions.precombat+=/food,name=seedbattered_fish_plate
+-- actions.precombat+=/food,name=nightborne_delicacy_platter
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/stealth
@@ -543,15 +553,18 @@ AR.SetAPL(261, APL);
 -- actions.precombat+=/variable,name=stealth_threshold,value=(15+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+variable.ssw_refund)
 -- actions.precombat+=/variable,name=shd_fractionnal,value=2.45
 -- actions.precombat+=/enveloping_shadows,if=combo_points>=5
+-- actions.precombat+=/shadow_dance,if=talent.subterfuge.enabled&equipped.mantle_of_the_master_assassin
 -- actions.precombat+=/symbols_of_death
 
 -- # Executed every time the actor is available.
--- actions=call_action_list,name=cds
+-- actions=run_action_list,name=sprinted,if=buff.faster_than_light_trigger.up
+-- actions+=/call_action_list,name=cds
 -- # Fully switch to the Stealthed Rotation (by doing so, it forces pooling if nothing is available)
 -- actions+=/run_action_list,name=stealthed,if=stealthed.all
--- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
--- actions+=/sprint_offensive,if=energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal-1&!cooldown.vanish.up&target.time_to_die>=8
+-- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8
+-- actions+=/sprint,if=equipped.draught_of_souls&trinket.cooldown.up&mantle_duration=0
 -- actions+=/call_action_list,name=stealth_als,if=combo_points.deficit>=2+talent.premeditation.enabled
+-- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
 -- # Builders
@@ -560,7 +573,7 @@ AR.SetAPL(261, APL);
 -- actions.build+=/backstab
 
 -- # Cooldowns
--- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
+-- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
 -- actions.cds+=/blood_fury,if=stealthed.rogue
 -- actions.cds+=/berserking,if=stealthed.rogue
 -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
@@ -575,24 +588,27 @@ AR.SetAPL(261, APL);
 -- actions.finish+=/death_from_above
 -- actions.finish+=/eviscerate
 
+-- # Sprinted
+-- actions.sprinted=cancel_autoattack
+-- actions.sprinted+=/use_item,name=draught_of_souls
+
 -- # Stealth Action List Starter
 -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=variable.shd_fractionnal|energy.deficit>=10)
+-- actions.stealth_als+=/call_action_list,name=stealth_cds,if=mantle_duration>2.3
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
 
 -- # Stealth Cooldowns
--- actions.stealth_cds=shadow_dance,if=charges_fractional>=variable.shd_fractionnal
--- actions.stealth_cds+=/vanish,if=mantle_duration<=3
--- actions.stealth_cds+=/shadow_dance,if=charges>=2&combo_points<=1
+-- actions.stealth_cds=vanish,if=mantle_duration=0&(cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal|(equipped.mantle_of_the_master_assassin&time<30))
+-- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractionnal
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10+variable.ssw_refund
--- actions.stealth_cds+=/shadow_dance,if=combo_points<=1
+-- actions.stealth_cds+=/shadow_dance,if=combo_points.deficit>=5-talent.vigor.enabled
 
 -- # Stealthed Rotation
 -- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
 -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
--- actions.stealthed+=/shadowstrike,if=combo_points.deficit>=2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
--- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5
+-- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
 -- actions.stealthed+=/shadowstrike
