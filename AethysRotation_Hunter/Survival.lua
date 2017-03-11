@@ -438,11 +438,11 @@
           if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
         end
         -- actions+=/berserking,if=(buff.spitting_cobra.up&buff.mongoose_fury.stack>2&buff.aspect_of_the_eagle.up)|(!talent.spitting_cobra.enabled&buff.aspect_of_the_eagle.up)
-        if S.Berserking:IsCastable() and (Player:Buff(S.SpittingCobra) and Player:BuffStack(S.MongooseFury) > 2 and Player:Buff(S.AspectoftheEagle)) or (not S.SpittingCobra:IsAvailable() and Player:Buff(S.AspectoftheEagle)) then
+        if S.Berserking:IsCastable() and ((Player:Buff(S.SpittingCobra) and Player:BuffStack(S.MongooseFury) > 2 and Player:Buff(S.AspectoftheEagle)) or (not S.SpittingCobra:IsAvailable() and Player:Buff(S.AspectoftheEagle))) then
           if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return ""; end
         end
         -- actions+=/blood_fury,if=(buff.spitting_cobra.up&buff.mongoose_fury.stack>2&buff.aspect_of_the_eagle.up)|(!talent.spitting_cobra.enabled&buff.aspect_of_the_eagle.up)
-        if S.BloodFury:IsCastable() and (Player:Buff(S.SpittingCobra) and Player:BuffStack(S.MongooseFury) > 2 and Player:Buff(S.AspectoftheEagle)) or (not S.SpittingCobra:IsAvailable() and Player:Buff(S.AspectoftheEagle)) then
+        if S.BloodFury:IsCastable() and ((Player:Buff(S.SpittingCobra) and Player:BuffStack(S.MongooseFury) > 2 and Player:Buff(S.AspectoftheEagle)) or (not S.SpittingCobra:IsAvailable() and Player:Buff(S.AspectoftheEagle))) then
           if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return ""; end
         end
       end
