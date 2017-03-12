@@ -215,13 +215,18 @@ local function CDs ()
         if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
       end
     end
-    -- actions.cds+=/shadow_blades
-    if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
+    -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all-equipped.mantle_of_the_master_assassin&(cooldown.sprint.remains>buff.shadow_blades.duration*0.5|mantle_duration>0|cooldown.shadow_dance.charges_fractional>variable.shd_fractionnal|cooldown.vanish.up|target.time_to_die<=buff.shadow_blades.duration*1.1)
+    -- TODO : SBlades duration (SB Traits)
+    if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
+      and Player:ComboPointsDeficit() >= 2+(Player:IsStealthed(true, true) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped(3) and 1 or 0)
+      and (S.Sprint:Cooldown() > 12.5 or AR.Commons.Rogue.MantleDuration() > 0 or S.ShadowDance:ChargesFractional() > ShD_Fractionnal()
+        or not S.Vanish:IsOnCooldown() or Target:TimeToDie() <= 27.5) then
       if AR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast"; end
     end
     -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.shd_fractionnal&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
     if S.GoremawsBite:IsCastable() and not Player:IsStealthed(true, true) and S.ShadowDance:ChargesFractional() <= ShD_Fractionnal()
-        and ((Player:ComboPointsDeficit() >= 4-(AC.CombatTime() < 10 and 2 or 0) and Player:EnergyDeficit() > 50 + (S.Vigor:IsAvailable() and 25 or 0) - (AC.CombatTime() >= 10 and 15 or 0))
+        and ((Player:ComboPointsDeficit() >= 4-(AC.CombatTime() < 10 and 2 or 0)
+            and Player:EnergyDeficit() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
           or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8)) then
       if AR.Cast(S.GoremawsBite) then return "Cast"; end
     end
@@ -245,21 +250,23 @@ local function Finish ()
   -- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die-remains>10&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
   if S.Nightblade:IsCastable() then
     NightbladeThreshold = (6+mathmin(Player:ComboPoints(), 5+(S.DeeperStratagem:IsAvailable() and 1 or 0))*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
-    if Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 10 and
-      Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
-      ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade))) or
-      Target:DebuffRemains(S.Nightblade) < 4) then
+    -- actions.finish+=/nightblade,if=target.time_to_die-remains>8&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+    if Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 8
+      and (Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Target:IsDummy())
+      and (AR.Commons.Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= AR.Commons.Rogue.MantleDuration())
+      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade)))
+        or Target:DebuffRemains(S.Nightblade) < 4) then
       if AR.Cast(S.Nightblade) then return "Cast"; end
     end
-    if AR.AoEON() then
-      BestUnit, BestUnitTTD = nil, 10;
+    -- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die-remains>8&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+    if AR.AoEON() and AR.Commons.Rogue.MantleDuration() == 0 then
+      BestUnit, BestUnitTTD = nil, 8;
       for Key, Value in pairs(Cache.Enemies[5]) do
-        if not Value:IsFacingBlacklisted() and not Value:IsUserCycleBlacklisted() and
-          Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD and
-          Value:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset and
-          ((Value:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and
-          (not AC.Finality(Value) or Player:Buff(S.FinalityNightblade))) or
-          Value:DebuffRemains(S.Nightblade) < 4) then
+        if not Value:IsFacingBlacklisted() and not Value:IsUserCycleBlacklisted()
+          and Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD
+          and (Value:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Value:IsDummy())
+          and ((Value:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Value) or Player:Buff(S.FinalityNightblade)))
+            or Value:DebuffRemains(S.Nightblade) < 4) then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
         end
       end
@@ -317,15 +324,19 @@ end
 local function Stealth_CDs ()
   if Target:IsInRange(5) then
     -- actions.stealth_cds=vanish,if=mantle_duration=0&(cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal|(equipped.mantle_of_the_master_assassin&time<30))
-    if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and AR.Commons.Rogue.MantleDuration() == 0 and (S.ShadowDance:ChargesFractional() < ShD_Fractionnal() or (I.MantleoftheMasterAssassin:IsEquipped(3) and AC.CombatTime() < 30)) then
+    if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
+      and AR.Commons.Rogue.MantleDuration() == 0
+      and (S.ShadowDance:ChargesFractional() < ShD_Fractionnal() or (I.MantleoftheMasterAssassin:IsEquipped(3) and AC.CombatTime() < 30)) then
       if AR.Cast(MacroLookupSpell[StealthMacro("Van")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractionnal
-    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() then
+    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
+      and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() then
       if AR.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40-variable.ssw_refund&energy.deficit>=10+variable.ssw_refund
-    if AR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target) and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10+SSW_Refund() then
+    if AR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
+      and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10+SSW_Refund() then
       -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40-variable.ssw_refund
       if Player:Energy() < 40 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
@@ -333,7 +344,9 @@ local function Stealth_CDs ()
       if AR.Cast(MacroLookupSpell[StealthMacro("SM")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=combo_points.deficit>=5-talent.vigor.enabled
-    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1 and Player:ComboPointsDeficit() >= 5-(S.Vigor:IsAvailable() and 1 or 0) then
+    if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge)) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
+      and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1
+      and Player:ComboPointsDeficit() >= 5-(S.Vigor:IsAvailable() and 1 or 0) then
       if AR.Cast(MacroLookupSpell[StealthMacro("ShD")]) then return "Cast"; end
     end
   end
@@ -342,29 +355,32 @@ end
 -- # Stealth Action List Starter
 local function Stealth_ALS ()
   -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=variable.shd_fractionnal|energy.deficit>=10)
-  if (Player:EnergyDeficit() <= Stealth_Threshold() and (not I.ShadowSatyrsWalk:IsEquipped(8) or S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() or Player:EnergyDeficit() >= 10))
+  if (Player:EnergyDeficit() <= Stealth_Threshold()
+    and (not I.ShadowSatyrsWalk:IsEquipped(8) or S.ShadowDance:ChargesFractional() >= ShD_Fractionnal() or Player:EnergyDeficit() >= 10))
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=mantle_duration>2.3
-   or AR.Commons.Rogue.MantleDuration() > 2.3
+    or AR.Commons.Rogue.MantleDuration() > 2.3
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
-   or Cache.EnemiesCount[8] >= 5
+    or Cache.EnemiesCount[8] >= 5
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
-   or (not S.Shadowmeld:IsOnCooldown() and S.Vanish:IsOnCooldown() and S.ShadowDance:Charges() <= 1)
+    or (not S.Shadowmeld:IsOnCooldown() and S.Vanish:IsOnCooldown() and S.ShadowDance:Charges() <= 1)
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
-   or (Target:TimeToDie() < 12*S.ShadowDance:ChargesFractional()*(I.ShadowSatyrsWalk:IsEquipped(8) and 1.5 or 1))
-  then
+    or (Target:TimeToDie() < 12*S.ShadowDance:ChargesFractional()*(I.ShadowSatyrsWalk:IsEquipped(8) and 1.5 or 1)) then
    return Stealth_CDs();
   end
   return false;
 end
 -- # Stealthed Rotation
 local function Stealthed ()
-  -- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3
-  -- TODO: Added condition to check stealth won't expire until we can cast it.
-  if S.SymbolsofDeath:IsCastable() and Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5) then
+  -- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3&(mantle_duration=0|buff.symbols_of_death.remains<=mantle_duration)
+  -- Note: Added condition to check stealth won't expire until we can cast it (with an offset of 0.1s) : Player:IsStealthedRemains(true, true) > Player:EnergyTimeToX(35, 0.1)
+  if S.SymbolsofDeath:IsCastable() and Player:IsStealthedRemains(true, true) > Player:EnergyTimeToX(35, 0.1)
+    and Player:BuffRemains(S.SymbolsofDeath) < Target:TimeToDie(10)-4 and Player:BuffRefreshable(S.SymbolsofDeath, 10.5)
+    and (AR.Commons.Rogue.MantleDuration() == 0 or Player:BuffRemains(S.SymbolsofDeath) <= AR.Commons.Rogue.MantleDuration() ) then
     if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast"; end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
-  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) or (AR.Commons.Rogue.MantleDuration() <= 1.3 and AR.Commons.Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
+  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0)
+      or (AR.Commons.Rogue.MantleDuration() <= 1.3 and AR.Commons.Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
     return Finish();
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
@@ -375,7 +391,8 @@ local function Stealthed ()
     if AR.Cast(S.ShurikenStorm) then return "Cast"; end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
-  if Player:ComboPoints() >= 5 and Player:ComboPointsDeficit() < 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped(3) and 1 or 0) then
+  if Player:ComboPoints() >= 5
+    and Player:ComboPointsDeficit() < 2+(S.Premeditation:IsAvailable() and 1 or 0)+(Player:Buff(S.ShadowBlades) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped(3) and 1 or 0) then
     return Finish();
   end
   -- actions.stealthed+=/shadowstrike
@@ -422,12 +439,6 @@ local function APL ()
   AC.GetEnemies(5); -- Melee
   AR.Commons.AoEToggleEnemiesUpdate();
   --- Defensives
-    -- Crimson Vial
-    ShouldReturn = AR.Commons.Rogue.CrimsonVial (S.CrimsonVial);
-    if ShouldReturn then return ShouldReturn; end
-    -- Feint
-    ShouldReturn = AR.Commons.Rogue.Feint (S.Feint);
-    if ShouldReturn then return ShouldReturn; end
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
@@ -438,16 +449,18 @@ local function APL ()
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Symbols of Death
-      if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true) and (AC.BMPullTime() == 60 or (AC.BMPullTime() <= 15 and AC.BMPullTime() >= 14) or (AC.BMPullTime() <= 4 and AC.BMPullTime() >= 3)) then
+      if S.SymbolsofDeath:IsCastable() and Player:IsStealthed(true, true)
+        and (AC.BMPullTime() == 60 or (AC.BMPullTime() <= 15 and AC.BMPullTime() >= 14) or (AC.BMPullTime() <= 4 and AC.BMPullTime() >= 3)) then
         if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death (OOC)"; end
       end
       -- Opener
       if AR.Commons.TargetIsValid() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
-          if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade) and Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset then
-           if AR.Cast(S.Nightblade) then return "Cast Nightblade (OOC)"; end
+          if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade)
+            and (Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Target:IsDummy()) then
+            if AR.Cast(S.Nightblade) then return "Cast Nightblade (OOC)"; end
           elseif S.Eviscerate:IsCastable() then
-           if AR.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
+            if AR.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
           end
         elseif Player:IsStealthed(true, true) then
           if S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[8] >= 2+(S.Premeditation:IsAvailable() and 1 or 0)+(I.ShadowSatyrsWalk:IsEquipped(8) and 1 or 0) then
@@ -496,9 +509,10 @@ local function APL ()
         end
       end
       if S.Sprint:IsCastable() and AR.Commons.Rogue.MantleDuration() == 0 then
-        -- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8
-        -- TODO: Not DoS
-        if not I.DraughtofSouls:IsEquipped(13) and not I.DraughtofSouls:IsEquipped(14) and Player:EnergyTimeToMax() >= 1.5 and S.ShadowDance:ChargesFractional() < ShD_Fractionnal() and S.Vanish:IsOnCooldown() and Target:TimeToDie() >= 8 then
+        -- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8&(dot.nightblade.remains>=14|target.time_to_die<=45)
+        if not I.DraughtofSouls:IsEquipped(13) and not I.DraughtofSouls:IsEquipped(14) and Player:EnergyTimeToMax() >= 1.5
+          and S.ShadowDance:ChargesFractional() < ShD_Fractionnal() and S.Vanish:IsOnCooldown() and Target:TimeToDie() >= 8
+          and (Target:DebuffRemains(S.Nightblade) >= 14 or Target:TimeToDie() <= 45) then
           AR.CastSuggested(S.Sprint);
         end
         -- actions+=/sprint,if=equipped.draught_of_souls&trinket.cooldown.up&mantle_duration=0
@@ -507,8 +521,8 @@ local function APL ()
           AR.CastSuggested(S.Sprint);
         end
       end
-      -- actions+=/call_action_list,name=stealth_als,if=combo_points.deficit>=2+talent.premeditation.enabled
-      if Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0) then
+      -- actions+=/call_action_list,name=stealth_als,if=(combo_points.deficit>=2+talent.premeditation.enabled|cooldown.shadow_dance.charges_fractional>=2.9)
+      if Player:ComboPointsDeficit() >= 2+(S.Premeditation:IsAvailable() and 1 or 0) or S.ShadowDance:ChargesFractional() >= 2.9 then
         ShouldReturn = Stealth_ALS();
         if ShouldReturn then return ShouldReturn; end
       end
@@ -537,7 +551,8 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 03/08/2017
+-- Last Update: 03/12/2017
+
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
@@ -553,7 +568,8 @@ AR.SetAPL(261, APL);
 -- actions.precombat+=/variable,name=stealth_threshold,value=(15+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+variable.ssw_refund)
 -- actions.precombat+=/variable,name=shd_fractionnal,value=2.45
 -- actions.precombat+=/enveloping_shadows,if=combo_points>=5
--- actions.precombat+=/shadow_dance,if=talent.subterfuge.enabled&equipped.mantle_of_the_master_assassin
+-- # In 7.1.5, casting Shadow Dance before going in combat let you extends the stealth buff, so it's worth to use with Subterfuge talent. Will likely be fixed in 7.2!
+-- actions.precombat+=/shadow_dance,if=talent.subterfuge.enabled&bugs
 -- actions.precombat+=/symbols_of_death
 
 -- # Executed every time the actor is available.
@@ -561,9 +577,9 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=cds
 -- # Fully switch to the Stealthed Rotation (by doing so, it forces pooling if nothing is available)
 -- actions+=/run_action_list,name=stealthed,if=stealthed.all
--- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8
+-- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8&(dot.nightblade.remains>=14|target.time_to_die<=45)
 -- actions+=/sprint,if=equipped.draught_of_souls&trinket.cooldown.up&mantle_duration=0
--- actions+=/call_action_list,name=stealth_als,if=combo_points.deficit>=2+talent.premeditation.enabled
+-- actions+=/call_action_list,name=stealth_als,if=(combo_points.deficit>=2+talent.premeditation.enabled|cooldown.shadow_dance.charges_fractional>=2.9)
 -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
@@ -577,14 +593,15 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/blood_fury,if=stealthed.rogue
 -- actions.cds+=/berserking,if=stealthed.rogue
 -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
--- actions.cds+=/shadow_blades
+-- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all-equipped.mantle_of_the_master_assassin&(cooldown.sprint.remains>buff.shadow_blades.duration*0.5|mantle_duration>0|cooldown.shadow_dance.charges_fractional>variable.shd_fractionnal|cooldown.vanish.up|target.time_to_die<=buff.shadow_blades.duration*1.1)
 -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.shd_fractionnal&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
 
 -- # Finishers
 -- actions.finish=enveloping_shadows,if=buff.enveloping_shadows.remains<target.time_to_die&buff.enveloping_shadows.remains<=combo_points*1.8
 -- actions.finish+=/death_from_above,if=spell_targets.death_from_above>=5
--- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die-remains>10&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+-- actions.finish+=/nightblade,if=target.time_to_die-remains>8&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+-- actions.finish+=/nightblade,cycle_targets=1,if=target.time_to_die-remains>8&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
 -- actions.finish+=/death_from_above
 -- actions.finish+=/eviscerate
 
@@ -607,7 +624,7 @@ AR.SetAPL(261, APL);
 -- actions.stealth_cds+=/shadow_dance,if=combo_points.deficit>=5-talent.vigor.enabled
 
 -- # Stealthed Rotation
--- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3
+-- actions.stealthed=symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3&(mantle_duration=0|buff.symbols_of_death.remains<=mantle_duration)
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
 -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=2+talent.premeditation.enabled+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1+buff.shadow_blades.up&buff.the_dreadlords_deceit.stack>=29))
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<2+talent.premeditation.enabled+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
