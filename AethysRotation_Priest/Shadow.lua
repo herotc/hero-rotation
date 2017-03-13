@@ -110,7 +110,7 @@ end
 
 local function CurrentInsanityDrain ()
 	if not Player:Buff(S.VoidForm) then return 0.0; end
-	return 6+ 0.67*(Player:BuffStack(S.VoidForm)-(3*(I.MotherShahrazsSeduction:IsEquipped(3) and 1 or 0))-4*(VTUsed and 1 or 0))
+	return 6+ 0.67*(Player:BuffStack(S.VoidForm)-(2*(I.MotherShahrazsSeduction:IsEquipped(3) and 1 or 0))-4*(VTUsed and 1 or 0))
 end
 
 local function actorsFightTimeMod()
@@ -183,14 +183,12 @@ end
 local function CDs ()
 	--PI
 	--actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.stack>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up+5*variable.s2mbeltcheck)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+61))
-	--TODO : ADD BL (+5*Player:HasHeroism())
 	--TODO : S2M
-	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and Player:BuffStack(S.VoidForm)>=(10+2*(T192P and 1 or 0)+5*s2mbeltcheck()+3*(I.MotherShahrazsSeduction:IsEquipped(3) and 1 or 0)+4*(VTUsed and 1 or 0)) then
+	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and Player:BuffStack(S.VoidForm)>=(10 + 2*(T192P and 1 or 0) + 5*s2mbeltcheck() + 2*(I.MotherShahrazsSeduction:IsEquipped(3) and 1 or 0) + 4*(VTUsed and 1 or 0) + 5*(Player:HasHeroism() and 1 or 0)) then
 		if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
 	end
 
 	--SF
-
 	--actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--S2M:actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--TODO : S2M
@@ -222,7 +220,7 @@ local function CDs ()
 	end
 	
 	--Arcane Torrent
-
+	--TODO
 end
 
 	local function s2m()
@@ -373,6 +371,10 @@ end
 		if S.Dispersion:IsCastable() and Player:HealthPercentage() <= Settings.Shadow.DispersionHP then
 			if AR.Cast(S.Dispersion, Settings.Shadow.OffGCDasOffGCD.Dispersion) then return "Cast"; end
 	    end
+		--Shadowform icon if not in shadowform
+		if not Player:Buff(S.Shadowform) and not Player:Buff(S.VoidForm) then
+			if AR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "Cast"; end
+		end
 		-- Out of Combat
 		if not Player:AffectingCombat() then
 		  -- Flask
@@ -380,9 +382,6 @@ end
 		  -- Rune
 		  -- PrePot w/ Bossmod Countdown
 		  -- Opener
-			if not Player:Buff(S.Shadowform) and not Player:Buff(S.VoidForm) then
-				if AR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "Cast"; end
-			end
 			
 			if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
 				if AR.Cast(S.MindBlast) then return "Cast"; end
@@ -392,10 +391,6 @@ end
 		-- In Combat
 		if AR.Commons.TargetIsValid() then
 			if Target:IsInRange(40) then
-				--Shadowform icon if not in shadowform
-				if not Player:Buff(S.Shadowform) and not Player:Buff(S.VoidForm) then
-					if AR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "Cast"; end
-				end
 				
 				--CD usage
 				if AR.CDsON() then
