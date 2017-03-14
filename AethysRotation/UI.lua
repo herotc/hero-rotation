@@ -373,7 +373,9 @@
     if not AethysRotationDB.Toggles then
       AethysRotationDB.Toggles = {};
     end
-    AethysRotationDB.Toggles[i] = true;
+    if AethysRotationDB.Toggles[i] == nil then
+      AethysRotationDB.Toggles[i] = true;
+    end
     local Argument = i == 1 and "cds" or i == 2 and "aoe" or i == 3 and "toggle";
     AR.Button[i]:SetScript("OnMouseDown",
       function (self, Button)
