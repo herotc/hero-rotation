@@ -31,9 +31,9 @@ Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Act
 - Demon Hunter Vengeance _[Beta]_
 - Hunter BeastMastery (Credits: [Nia](https://github.com/Nianel))
 - Hunter Survival (Credits: [Nia](https://github.com/Nianel))
-- Paladin Retribution _[Beta]_
+- Paladin Retribution _[Outdated]_
 - Priest Shadow _[Beta]_ (Credits: [KutiKuti](https://github.com/Kutikuti))
-- Rogue Assassination
+- Rogue Assassination _[Outdated]_
 - Rogue Outlaw
 - Rogue Subtlety
 - Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
