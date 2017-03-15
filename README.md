@@ -6,6 +6,7 @@ It is maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax]
 Also, you can find it on [Curse](https://mods.curse.com/addons/wow/aethysrotation) and [CurseForge](https://wow.curseforge.com/projects/aethysrotation).
 
 _There are a lot of helpful commands, do '/aer help' to see them in-game !_
+_Toggles can now use directly keybinds, set them in 'Game Menu -> Key Bindings -> AddOns'_
 
 Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
 
@@ -14,6 +15,7 @@ Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly 
 - Two smaller icons above the previous one that shows the useful CDs/OffGCD-Abilities to use.
 - One medium icon on the left that shows every abilities that should be cycled (i.e. multi-dotting).
 - One medium-small icon on the upper-left that do proposals about situational abilities (trinkets, potions, ...).
+- Toggles to turn On/Off the CDs or AoE to adjust the rotation according to the needs (the addon can be disabled this way aswell).
 
 Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Action Priority Lists](https://github.com/simulationcraft/simc/wiki/ActionLists).
 
