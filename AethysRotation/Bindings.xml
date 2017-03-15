@@ -1,0 +1,11 @@
+<Bindings>
+  <Binding name="AETHYSROTATION_CDS" description="Toggle On/Off the CDs." header="AETHYSROTATION" category="ADDONS">
+    AethysRotation.CmdHandler("cds");
+  </Binding>
+  <Binding name="AETHYSROTATION_AOE" description="Toggle On/Off the AoE." category="ADDONS">
+    AethysRotation.CmdHandler("aoe");
+  </Binding>
+  <Binding name="AETHYSROTATION_TOGGLE" description="Toggle On/Off the Addon." category="ADDONS">
+    AethysRotation.CmdHandler("toggle");
+  </Binding>
+</Bindings>

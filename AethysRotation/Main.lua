@@ -20,6 +20,12 @@
 
 
 --- ============================ CONTENT ============================
+--- ======= BINDINGS =======
+  BINDING_HEADER_AETHYSROTATION = "AethysRotation";
+  BINDING_NAME_AETHYSROTATION_CDS = "Toggle CDs";
+  BINDING_NAME_AETHYSROTATION_AOE = "Toggle AoE";
+  BINDING_NAME_AETHYSROTATION_TOGGLE = "Toggle On/Off";
+
 --- ======= MAIN FRAME =======
   AR.MainFrame = CreateFrame("Frame", "AethysRotation_MainFrame", UIParent);
   AR.MainFrame:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
