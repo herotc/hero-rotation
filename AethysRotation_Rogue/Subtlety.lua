@@ -127,10 +127,10 @@ local pairs = pairs;
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Subtlety = {
     -- Legendaries
-    DenialoftheHalfGiants         = Item(137100), -- 9
-    DraughtofSouls                = Item(140808), -- 13 & 14
-    MantleoftheMasterAssassin     = Item(144236), -- 3
-    ShadowSatyrsWalk              = Item(137032)  -- 8
+    DenialoftheHalfGiants         = Item(137100, {9}),
+    DraughtofSouls                = Item(140808, {13, 14}),
+    MantleoftheMasterAssassin     = Item(144236, {3}),
+    ShadowSatyrsWalk              = Item(137032, {8})
   };
   local I = Item.Rogue.Subtlety;
 -- Rotation Var
@@ -219,7 +219,7 @@ local function CDs ()
     -- TODO : SBlades duration (SB Traits)
     if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
       and Player:ComboPointsDeficit() >= 2+(Player:IsStealthed(true, true) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped(3) and 1 or 0)
-      and (S.Sprint:Cooldown() > 25*(0.4+(I.DenialoftheHalfGiants:IsEquipped(9) and 0.2 or 0)) or AR.Commons.Rogue.MantleDuration() > 0 or S.ShadowDance:ChargesFractional() > ShD_Fractionnal()
+      and (S.Sprint:Cooldown() > 25*(0.4+(I.DenialoftheHalfGiants:IsEquipped() and 0.2 or 0)) or AR.Commons.Rogue.MantleDuration() > 0 or S.ShadowDance:ChargesFractional() > ShD_Fractionnal()
         or not S.Vanish:IsOnCooldown() or Target:TimeToDie() <= 25*1.1) then
       if AR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast"; end
     end
@@ -326,7 +326,7 @@ local function Stealth_CDs ()
     -- actions.stealth_cds=vanish,if=mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal+(equipped.mantle_of_the_master_assassin&time<30)*0.3
     if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
       and AR.Commons.Rogue.MantleDuration() == 0
-      and (S.ShadowDance:ChargesFractional() < ShD_Fractionnal()+(I.MantleoftheMasterAssassin:IsEquipped(3) and AC.CombatTime() < 30 and 0.3 or 0) then
+      and (S.ShadowDance:ChargesFractional() < ShD_Fractionnal()+(I.MantleoftheMasterAssassin:IsEquipped(3) and AC.CombatTime() < 30 and 0.3 or 0)) then
       if AR.Cast(MacroLookupSpell[StealthMacro("Van")]) then return "Cast"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractionnal
