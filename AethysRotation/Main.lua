@@ -51,16 +51,16 @@
       local FramesToResize = {
         -- TODO: Put the Size in one Array in UI.lua and pull it out here
         {AR.ToggleIconFrame, 64, 20},
-        {AR.Button[1], 20, 20},
-        {AR.Button[2], 20, 20},
-        {AR.Button[3], 20, 20}
+        {AR.ToggleIconFrame.Button[1], 20, 20},
+        {AR.ToggleIconFrame.Button[2], 20, 20},
+        {AR.ToggleIconFrame.Button[3], 20, 20}
       };
       for Key, Value in pairs(FramesToResize) do
         Value[1]:SetWidth(Value[2]*Multiplier);
         Value[1]:SetHeight(Value[3]*Multiplier);
       end
       for i = 1, 3 do
-        AR.Button[i]:SetPoint("LEFT", AR.ToggleIconFrame, "LEFT", AR.Button[i]:GetWidth()*(i-1)+i, 0);
+        AR.ToggleIconFrame.Button[i]:SetPoint("LEFT", AR.ToggleIconFrame, "LEFT", AR.ToggleIconFrame.Button[i]:GetWidth()*(i-1)+i, 0);
       end
       AethysRotationDB.ScaleButtons = Multiplier;
     end

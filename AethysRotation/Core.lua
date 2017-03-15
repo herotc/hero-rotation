@@ -127,12 +127,15 @@
     Argument1, Argument2, Argument3 = strsplit(" ", stringlower(Message));
     if Argument1 == "cds" then
       AethysRotationDB.Toggles[1] = not AethysRotationDB.Toggles[1];
+      AR.ToggleIconFrame:UpdateButtonText(1);
       AR.Print("CDs are now "..(AethysRotationDB.Toggles[1] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "aoe" then
       AethysRotationDB.Toggles[2] = not AethysRotationDB.Toggles[2];
+      AR.ToggleIconFrame:UpdateButtonText(2);
       AR.Print("AoE is now "..(AethysRotationDB.Toggles[2] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "toggle" then
       AethysRotationDB.Toggles[3] = not AethysRotationDB.Toggles[3];
+      AR.ToggleIconFrame:UpdateButtonText(3);
       AR.Print("AethysRotation is now "..(AethysRotationDB.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "unlock" then
       AR.MainFrame:Unlock();
