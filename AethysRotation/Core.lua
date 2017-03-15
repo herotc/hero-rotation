@@ -173,13 +173,17 @@
     elseif Argument1 == "resetbuttons" then
       AR.ToggleIconFrame:ResetAnchor();
     elseif Argument1 == "help" then
-      AR.Print("Toggle ON/OFF: |cff8888ff/aer toggle|r");
-      AR.Print("CDs: |cff8888ff/aer cds|r | AoE: |cff8888ff/aer aoe|r");
-      AR.Print("UI Lock: |cff8888ff/aer lock|r | UI Unlock: |cff8888ff/aer unlock|r");
-      AR.Print("UI Scale: |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r");
-      AR.Print("[Type]: |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r");
-      AR.Print("[Size]: |cffff8888number > 0 and <= 10|r");
-      AR.Print("Button Anchor Reset : |cff8888ff/aer resetbuttons|r");
+      AR.Print("|cffffff00--[Toggles]--|r");
+      AR.Print("  On/Off: |cff8888ff/aer toggle|r");
+      AR.Print("  CDs: |cff8888ff/aer cds|r");
+      AR.Print("  AoE: |cff8888ff/aer aoe|r");
+      AR.Print("|cffffff00--[User Interface]--|r");
+      AR.Print("  UI Lock: |cff8888ff/aer lock|r");
+      AR.Print("  UI Unlock: |cff8888ff/aer unlock|r");
+      AR.Print("  UI Scale: |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r");
+      AR.Print("    [Type]: |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r");
+      AR.Print("    [Size]: |cffff8888number > 0 and <= 10|r");
+      AR.Print("  Button Anchor Reset : |cff8888ff/aer resetbuttons|r");
     else
       AR.Print("Invalid arguments.");
       AR.Print("Type |cff8888ff/aer help|r for more infos.");
