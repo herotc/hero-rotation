@@ -405,13 +405,13 @@
     self.Button[i]:SetPushedTexture(pushedTexture);
 
     -- Button Setting
-    if not type(AethysRotationDB) == "table" then
+    if type(AethysRotationDB) ~= "table" then
       AethysRotationDB = {};
     end
-    if not type(AethysRotationDB.Toggles) == "table" then
+    if type(AethysRotationDB.Toggles) ~= "table" then
       AethysRotationDB.Toggles = {};
     end
-    if not type(AethysRotationDB.Toggles[i]) == "boolean" then
+    if type(AethysRotationDB.Toggles[i]) ~= "boolean" then
       AethysRotationDB.Toggles[i] = true;
     end
 
