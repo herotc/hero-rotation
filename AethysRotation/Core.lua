@@ -11,6 +11,7 @@
   local Spell = AC.Spell;
   local Item = AC.Item;
   -- Lua
+  local mathmin = math.min;
   local print = print;
   local select = select;
   local stringlower = string.lower;
@@ -43,7 +44,7 @@
       if not Cache.Persistent.Texture.Spell[Object.SpellID] then
         -- Check if the SpellID is the one from Custom Icons or a Reguler WoW Spell
         if Object.SpellID >= 9999000000 then
-          if Object.SpellID >= 9999000000 and Object.SpellID <= 9999000010 then
+          if Object.SpellID <= 9999000010 then
             Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
           else
             Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation_" .. AC.SpecID_ClassesSpecs[tonumber(string.sub(tostring(Object.SpellID), 5, 7))][1] .. "\\Textures\\"..tostring(Object.SpellID);
@@ -62,9 +63,16 @@
   end
 
 --- ======= CASTS =======
+  local GCDSpell = Spell(61304);
+  local function GCDDislay ()
+    if Player:IsCasting() then -- Only for Cast, not Channel
+      AR.MainIconFrame:SetCooldown(Player:CastStart(), Player:CastDuration());
+    else
+      AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
+    end
+  end
   -- Main Cast
   AR.CastOffGCDOffset = 1;
-  local GCDSpell = Spell(61304);
   function AR.Cast (Object, OffGCD)
     if OffGCD and OffGCD[1] then
       if AR.CastOffGCDOffset <= 2 then
@@ -75,18 +83,26 @@
       end
     else
       AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
-
-      -- Icon Cooldown
-      if Player:IsCasting() then -- Only for Cast, not Channel
-        AR.MainIconFrame:SetCooldown(Player:CastStart(), Player:CastDuration());
-      else
-        AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
-      end
-
+      GCDDislay();
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";
     end
     return false;
+  end
+  -- Main Cast Queue
+  local QueueSpellTable, QueueLength, QueueTextureTable;
+  AR.MaxQueuedCasts = 3;
+  function AR.CastQueue (...)
+    QueueSpellTable = {...};
+    QueueLength = mathmin(#QueueSpellTable, AR.MaxQueuedCasts);
+    QueueTextureTable = {};
+    for i = 1, QueueLength do
+      QueueTextureTable[i] = AR.GetTexture(QueueSpellTable[i]);
+      QueueSpellTable[i].LastDisplayTime = AC.GetTime();
+    end
+    AR.MainIconFrame:SetupParts(QueueTextureTable);
+    GCDDislay();
+    return "Should Return";
   end
 
   -- Left (+ Nameplate) Cast

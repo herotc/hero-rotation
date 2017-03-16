@@ -37,6 +37,7 @@
     -- Main Icon
     AR.MainIconFrame:ChangeIcon(AR.GetTexture(IdleSpell)); 
     if AR.GUISettings.General.BlackBorderIcon then AR.MainIconFrame.Backdrop:Hide(); end
+    AR.MainIconFrame:HideParts();
 
     -- Small Icons
     AR.SmallIconFrame:HideIcons();
@@ -96,6 +97,7 @@
       self.TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
     end
+    self:InitParts();
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
@@ -108,6 +110,46 @@
   -- Set a Cooldown Frame
   function AR.MainIconFrame:SetCooldown (Start, Duration)
     self.CooldownFrame:SetCooldown(Start, Duration);
+  end
+  function AR.MainIconFrame:InitParts ()
+    self.Part = {};
+    for i = 1, AR.MaxQueuedCasts do
+      self.Part[i] = CreateFrame("Frame", "AethysRotation_MainIconPartFrame"..tostring(i), UIParent);
+      self.Part[i]:SetFrameStrata(self:GetFrameStrata());
+      self.Part[i]:SetFrameLevel(self:GetFrameLevel() + 1);
+      self.Part[i]:SetWidth(64);
+      self.Part[i]:SetHeight(64);
+      self.Part[i]:SetPoint("Left", self, "Left", 0, 0);
+      self.Part[i].TempTexture = self.Part[i]:CreateTexture(nil, "BACKGROUND");
+      if AR.GUISettings.General.BlackBorderIcon then
+        self.Part[i].TempTexture:SetTexCoord(.08, .92, .08, .92);
+        AR:CreateBackdrop(self.Part[i]);
+      end
+      self.Part[i]:Show();
+    end
+  end
+  local QueuedCasts;
+  function AR.MainIconFrame:SetupParts (Textures)
+    QueuedCasts = #Textures;
+    for i = 1, QueuedCasts do
+      self.Part[i]:SetWidth(64/QueuedCasts);
+      self.Part[i]:SetPoint("Left", self, "Left", 64/QueuedCasts*(i-1), 0);
+      self.Part[i].TempTexture:SetTexture(Textures[i]);
+      self.Part[i].TempTexture:SetAllPoints(self.Part[i]);
+      self.Part[i].TempTexture:SetTexCoord(i == 1 and (AR.GUISettings.General.BlackBorderIcon and 0.08 or 0) or (i-1)/QueuedCasts,
+                                            i == AR.MaxQueuedCasts and (AR.GUISettings.General.BlackBorderIcon and 0.92 or 1) or i/QueuedCasts,
+                                            AR.GUISettings.General.BlackBorderIcon and 0.08 or 0,
+                                            AR.GUISettings.General.BlackBorderIcon and 0.92 or 1);
+      self.Part[i].texture = self.Part[i].TempTexture;
+      if not self.Part[i]:IsVisible() then
+        self.Part[i]:Show();
+      end
+    end
+  end
+  function AR.MainIconFrame:HideParts ()
+    for i = 1, #self.Part do
+      self.Part[i]:Hide();
+    end
   end
 
 --- ======= SMALL ICONS =======
