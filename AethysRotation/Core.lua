@@ -42,13 +42,9 @@
   function AR.GetTexture (Object)
     if Object.SpellID then
       if not Cache.Persistent.Texture.Spell[Object.SpellID] then
-        -- Check if the SpellID is the one from Custom Icons or a Reguler WoW Spell
+        -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
         if Object.SpellID >= 9999000000 then
-          if Object.SpellID <= 9999000010 then
-            Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
-          else
-            Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation_" .. AC.SpecID_ClassesSpecs[tonumber(string.sub(tostring(Object.SpellID), 5, 7))][1] .. "\\Textures\\"..tostring(Object.SpellID);
-          end
+          Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
         else
           Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
         end
