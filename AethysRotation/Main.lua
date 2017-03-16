@@ -4,7 +4,7 @@
   local addonName, AR = ...;
   -- AethysCore
   local AC = AethysCore;
-  local Cache = AethysCore_Cache;
+  local Cache = AethysCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
@@ -262,7 +262,7 @@
       -- Check if we are ready to cast something to save FPS.
       if AR.ON() and AR.Ready() then
         AC.CacheHasBeenReset = false;
-        AC.CacheReset();
+        Cache.Reset();
         AR.APLs[Cache.Persistent.Player.Spec[1]]();
       end
     end
