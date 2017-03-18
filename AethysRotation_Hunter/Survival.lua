@@ -3,7 +3,7 @@
   local addonName, addonTable = ...;
   -- AethysCore
   local AC = AethysCore;
-  local Cache = AethysCache;
+  local Cache = AethysCore_Cache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
@@ -95,7 +95,7 @@
       if AR.Cast(S.RaptorStrike) then return ""; end
     end
     -- actions.moknathal+=/fury_of_the_eagle,if=buff.mongoose_fury.stack>=4&buff.mongoose_fury.remains<gcd
-    if S.FuryoftheEagle:IsCastable() and Player:BuffStack(S.MongooseFury) >= 4 and Player:BuffRemains(S.MongooseFury) < Player:GCD() then
+    if S.FuryoftheEagle:IsCastable() and Player:BuffStack(S.MongooseFury) >= 4 and Player:BuffRemains(S.MongooseFury) < Player:GCD() * 1.5 then
       if AR.Cast(S.FuryoftheEagle) then return ""; end
     end
     -- actions.moknathal+=/raptor_strike,if=buff.mongoose_fury.stack>=4&buff.mongoose_fury.remains>gcd&buff.moknathal_tactics.stack>=3&buff.moknathal_tactics.remains<4&cooldown.fury_of_the_eagle.remains<buff.mongoose_fury.remains
@@ -148,9 +148,9 @@
       if AR.Cast(S.Butchery) then return ""; end
     end
     -- actions.moknathal+=/carve,if=active_enemies>1&focus>65-buff.moknathal_tactics.remains*focus.regen&(buff.mongoose_fury.down&focus>65-buff.moknathal_tactics.remains*focus.regen|buff.mongoose_fury.remains>gcd*cooldown.mongoose_bite.charges&focus>70-buff.moknathal_tactics.remains*focus.regen)
-    if S.Carve:IsCastable() and Cache.EnemiesCount[5] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and (not Player:Buff(S.MongooseFury) and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() or
-    Player:BuffRemains(S.MongooseFury) > Player:GCD() * S.MongooseBite:Charges() and Player:Focus() > 70 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen()) then
-      if AR.Cast(S.Carve) then return ""; end
+    if AR.AoEON() and S.Carve:IsCastable() and Player:FocusPredicted(0.2) > 40 and Cache.EnemiesCount[5] > 1 and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen() and ((not Player:Buff(S.MongooseFury) and Player:Focus() > 65 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen()) or
+    (Player:BuffRemains(S.MongooseFury) > Player:GCD() * S.MongooseBite:Charges() and Player:Focus() > 70 - Player:BuffRemains(S.MokNathalTactics) * Player:FocusRegen())) then
+      AR.CastSuggested(S.Carve);
     end
     -- actions.moknathal+=/raptor_strike,if=buff.moknathal_tactics.stack=2
     if S.RaptorStrike:IsCastable() and Player:FocusPredicted(0.2) > 20 and Player:BuffStack(S.MokNathalTactics) == 2 then
@@ -285,7 +285,7 @@
       if AR.Cast(S.Butchery) then return ""; end
     end
     -- actions.nomok+=/lacerate,if=buff.mongoose_fury.duration>=gcd&refreshable&cooldown.mongoose_bite.charges=0&buff.mongoose_fury.stack<2|buff.mongoose_fury.down&cooldown.mongoose_bite.charges<3&refreshable
-    if S.Lacerate:IsCastable() and Player:FocusPredicted(0.2) > 30 and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Target:DebuffRefreshable(S.Lacerate, 3.6) and S.MongooseBite:Charges() == 0 and Player:BuffStack(S.MongooseFury) < 2 or not Player:Buff(S.MongooseFury) and S.MongooseBite:Charges() < 3 and Target:DebuffRefreshable(S.Lacerate, 3.6) then
+    if S.Lacerate:IsCastable() and (Player:FocusPredicted(0.2) > 30 and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and Target:DebuffRefreshable(S.Lacerate, 3.6) and S.MongooseBite:Charges() == 0 and Player:BuffStack(S.MongooseFury) < 2 or not Player:Buff(S.MongooseFury) and S.MongooseBite:Charges() < 3 and Target:DebuffRefreshable(S.Lacerate, 3.6)) then
       if AR.Cast(S.Lacerate) then return ""; end
       end
     -- AOE
@@ -295,11 +295,11 @@
     end
     -- AOE
     -- actions.nomok+=/carve,if=active_enemies>1&talent.serpent_sting.enabled&dot.serpent_sting.refreshable
-    if S.Carve:IsCastable() and Cache.EnemiesCount[5] > 1 and Player:FocusPredicted(0.2) > 35 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentStingDebuff, 4.5) then
-      if AR.Cast(S.Carve) then return ""; end
+    if AR.AoEON() and S.Carve:IsCastable() and Cache.EnemiesCount[5] > 1 and Player:FocusPredicted(0.2) > 40 and S.SerpentSting:IsAvailable() and Target:DebuffRefreshable(S.SerpentStingDebuff, 4.5) then
+      AR.CastSuggested(S.Carve);
     end
     -- actions.nomok+=/dragonsfire_grenade,if=buff.mongoose_fury.duration>=gcd&cooldown.mongoose_bite.charges<=1&buff.mongoose_fury.stack<3|buff.mongoose_fury.down&cooldown.mongoose_bite.charges<3
-    if S.DragonsfireGrenade:IsCastable() and Player:BuffDuration(S.MongooseFury) >= Player:GCD() and S.MongooseBite:Charges() <= 1 and (Player:BuffStack(S.MongooseFury) < 3 or not Player:Buff(S.MongooseFury) and S.MongooseFury:Charges() < 3) then
+    if S.DragonsfireGrenade:IsCastable() and (Player:BuffDuration(S.MongooseFury) >= Player:GCD() and S.MongooseBite:Charges() <= 1 and (Player:BuffStack(S.MongooseFury) < 3 or not Player:Buff(S.MongooseFury) and S.MongooseFury:Charges() < 3)) then
       if AR.Cast(S.DragonsfireGrenade) then return ""; end
     end
     -- actions.nomok+=/explosive_trap,if=buff.mongoose_fury.duration>=gcd&cooldown.mongoose_bite.charges>=0&buff.mongoose_fury.stack<4
