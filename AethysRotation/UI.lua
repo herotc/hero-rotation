@@ -49,6 +49,7 @@
 
     -- Suggested Icon
     AR.SuggestedIconFrame:HideIcon();
+    if AR.GUISettings.General.BlackBorderIcon then AR.SuggestedIconFrame.Backdrop:Hide(); end
     AR.CastSuggestedOffset = 1;
   end
 
@@ -279,6 +280,10 @@
     self:SetHeight(32);
     self:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3 or 4));
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
+    if AR.GUISettings.General.BlackBorderIcon then
+      self.TempTexture:SetTexCoord(.08, .92, .08, .92);
+      AR:CreateBackdrop(self);
+    end
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
@@ -289,6 +294,7 @@
     if not self:IsVisible() then
       self:Show();
     end
+    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
   -- Hide Icon
   function AR.SuggestedIconFrame:HideIcon ()
