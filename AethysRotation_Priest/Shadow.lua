@@ -443,7 +443,7 @@ local function APL ()
 					or (Player:CastID() == S.VampiricTouch:ID() and 
 						((Player:Insanity()+(6*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 )) ) >= Insanity_Threshold())) then
 						VTUsed=false
-						--if AR.Cast(S.VoidEruption) then return "Cast"; end
+						if AR.Cast(S.VoidEruption) then return "Cast"; end
 				end
 				
 				--actions.main+=/shadow_crash,if=talent.shadow_crash.enabled
@@ -463,8 +463,8 @@ local function APL ()
 						
 						if S.Misery:IsAvailable() then
 							if Value:TimeToDie()-Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
-								or Value:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() 
-								or Value:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD() then
+								and (Value:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() 
+								or Value:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD()) then
 									BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
 							end
 						else
