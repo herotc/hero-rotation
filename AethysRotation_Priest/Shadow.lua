@@ -99,7 +99,7 @@
 
 --- APL Action Lists (and Variables)
 local function ExecuteRange()
-	if Player:Buff(S.ZeksExterminatus) then return 101;
+	if Player:Buff(S.ZeksExterminatus) then return 101; end
 	return S.ReaperOfSouls:IsAvailable() and 35 or 20;
 end
 
@@ -258,7 +258,7 @@ local function voidForm()
 		if AR.Cast(S.VoidEruption) then return "Cast"; end
 	end
 	
-	--TODO : speed
+	--TODO : static/moving
 
 	--actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
 	--TODO : S2M
@@ -511,21 +511,30 @@ local function APL ()
 			end
 			
 			--moving
-			--TODO : SWD
-			
+			if Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD() then
+				if AR.Cast(S.ShadowWordPain) then return "Cast"; end
+			end
+			if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold()
+				and Target:HealthPercentage()<=ExecuteRange() then
+					if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
+			end
 			
 			--SWP on other targets if worth
 			if AR.AoEON() then
-				BestUnit, BestUnitTTD = nil, 10;
-
+				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 				for Key, Value in pairs(Cache.Enemies[40]) do
+					if S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+						and Value:HealthPercentage()<=ExecuteRange() then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+					end	
+					
 					if Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
-						or Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() then
-							BestUnit, BestUnitTTD = Value, Value:TimeToDie();
+						and Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() and BestUnitSpellToCast ~= S.VampiricTouch then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
 					end
 				end
 				if BestUnit then
-					if AR.CastLeftNameplate(BestUnit, S.ShadowWordPain) then return "Cast"; end
+					if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
 				end
 			end
 		
