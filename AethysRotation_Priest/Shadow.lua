@@ -78,7 +78,7 @@
   if not Item.Priest then Item.Priest = {}; end
   Item.Priest.Shadow = {
     -- Legendaries
-	MotherShahrazsSeduction		= Item(132437), --3?
+	MotherShahrazsSeduction		= Item(132437), --3
 	MangazasMadness 			= Item(132864), --6
 	ZeksExterminatus 			= Item(137100) --15
 
@@ -218,6 +218,9 @@ local function CDs ()
 		if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Berserking) then return "Cast"; end
 	end
 	
+	--actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
+	--TODO : S2M
+	
 	--Arcane Torrent
 	--TODO
 end
@@ -258,108 +261,191 @@ local function voidForm()
 		if AR.Cast(S.VoidEruption) then return "Cast"; end
 	end
 	
-	--TODO : static/moving
+	if Target:IsInRange(40) then --in range
+		--actions.vf+=/void_bolt
+		--TODO : cast prediction
+		if S.VoidBolt:IsCastable() then
+			if AR.Cast(S.VoidBolt) then return "Cast"; end
+		end 
+		
+		--actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
+		if S.ShadowCrash:IsAvailable() and S.ShadowCrash:IsCastable() then
+			if AR.Cast(S.ShadowCrash) then return "Cast"; end
+		end
+		
+		if GetUnitSpeed("player") == 0 then
+			--actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
+			--TODO : S2M
+			--TODO : cast prediction
+			if S.VoidTorrent:IsAvailable() and S.VoidTorrent:IsCastable() and Target:DebuffRemains(S.ShadowWordPain) > 5.5 and Target:DebuffRemains(S.VampiricTouch) > 5.5 then
+				VTUsed=true
+				if AR.Cast(S.VoidTorrent) then return "Cast"; end
+			end
+			
+			--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(15+15*talent.reaper_of_souls.enabled))<100
+			if Target:HealthPercentage() < ExecuteRange() and (S.ShadowWordDeath:Charges() > 0 and CurrentInsanityDrain()*Player:GCD()>Player:Insanity() and ((CurrentInsanityDrain()*Player:GCD())+(15+15*(S.ReaperOfSouls:IsAvailable() and 1 or 0)))<100) or Player:Buff(S.ZeksExterminatus) then
+				if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
+			end
+			
+			--actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+			--TODO : cast prediction
+			if S.VoidBolt:Cooldown()<Player:GCD()*0.28 then
+				if AR.Cast(S.VoidBolt) then return "Cast"; end
+			end
+			
+			--actions.vf+=/mind_blast,if=active_enemies<=4
+			--actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
+			--TODO : enemies ?
+			if S.MindBlast:IsCastable() or S.MindBlast:Cooldown()<Player:GCD()*0.28 then 
+				if AR.Cast(S.MindBlast) then return "Cast"; end
+			end 
+			
+			--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
+			--TODO : enemies ?
+			if S.ShadowWordDeath:Charges() == 2 and Target:HealthPercentage() < ExecuteRange() then
+				if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
+			end
+			
+			--actions.vf+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+25)<100
+			if S.ShadowWordVoid:IsAvailable() and S.ShadowWordVoid:IsCastable() and (Player:Insanity()-(CurrentInsanityDrain()*Player:GCD())+25)<100 then
+				if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
+			end
+			
+			if (Target:DebuffRemains(S.VampiricTouch) < (4+(4/3))*Player:GCD() or (S.Misery:IsAvailable() and  Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD()))
+				and not (Player:CastID() == S.VampiricTouch:ID()) then
+					if AR.Cast(S.VampiricTouch) then return "Cast"; end
+			end
+			if Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD() then
+					if AR.Cast(S.ShadowWordPain) then return "Cast"; end
+			end
+			
+			--multidoting
+			if AR.AoEON() and Cache.EnemiesCount[40]<5  then
+				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+				for Key, Value in pairs(Cache.Enemies[40]) do
+					if S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+						and Value:HealthPercentage()<=ExecuteRange() then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+							break
+					end	
+					
+					if S.Misery:IsAvailable() then
+						if Value:TimeToDie()-Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
+							and (Value:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() 
+							or Value:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD()) then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
+						end
+					else
+						if (Value:TimeToDie()-Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
+							and Value:DebuffRemains(S.VampiricTouch)< 3*Player:GCD()) or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.ShadowWordPain and Value:DebuffRemains(S.VampiricTouch)< 3*Player:GCD()) then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
+						elseif Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
+							and Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() and BestUnitSpellToCast ~= S.VampiricTouch then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
+						end
+					end
+					
+				end
+				if BestUnit then
+					if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+				end
+			end
+			
+			--actions.vf+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
+			if S.MindFlay:IsCastable() then
+				if AR.Cast(S.MindFlay) then return "Cast"; end
+			end
+			
+			return
+		end
+		
+		--moving
+		if Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD() then
+			if AR.Cast(S.ShadowWordPain) then return "Cast"; end
+		end
+		if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold()
+			and Target:HealthPercentage()<=ExecuteRange() then
+				if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
+		end
+		
+		--SWP on other targets if worth
+		if AR.AoEON() then
+			BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+			for Key, Value in pairs(Cache.Enemies[40]) do
+				if S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+					and Value:HealthPercentage()<=ExecuteRange() then
+						BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+						break
+				end	
+				
+				if Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
+					and Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() and BestUnitSpellToCast ~= S.VampiricTouch then
+						BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
+				end
+			end
+			if BestUnit then
+				if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+			end
+		end
 
-	--actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
-	--TODO : S2M
-	
-	--actions.vf+=/void_bolt
-	if S.VoidBolt:IsCastable() then
-		if AR.Cast(S.VoidBolt) then return "Cast"; end
-	end 
-	
-	--actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
-	if S.ShadowCrash:IsAvailable() and S.ShadowCrash:IsCastable() then
-		if AR.Cast(S.ShadowCrash) then return "Cast"; end
-	end
-	
-	--actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
-	--TODO : S2M
-	if S.VoidTorrent:IsAvailable() and S.VoidTorrent:IsCastable() and Target:DebuffRemains(S.ShadowWordPain) > 5.5 and Target:DebuffRemains(S.VampiricTouch) > 5.5 then
-		VTUsed=true
-		if AR.Cast(S.VoidTorrent) then return "Cast"; end
-	end
-	
-	--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(15+15*talent.reaper_of_souls.enabled))<100
-	if Target:HealthPercentage() < ExecuteRange() and (S.ShadowWordDeath:Charges() > 0 and CurrentInsanityDrain()*Player:GCD()>Player:Insanity() and ((CurrentInsanityDrain()*Player:GCD())+(15+15*(S.ReaperOfSouls:IsAvailable() and 1 or 0)))<100) or Player:Buff(S.ZeksExterminatus) then
-		if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
-	end
-	
-	--actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
-	if S.VoidBolt:Cooldown()<Player:GCD()*0.28 then
-		if AR.Cast(S.VoidBolt) then return "Cast"; end
-	end
-	
-	--actions.vf+=/mind_blast,if=active_enemies<=4
-	--actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
-	--TODO : enemies ?
-	if S.MindBlast:IsCastable() or S.MindBlast:Cooldown()<Player:GCD()*0.28 then 
-		if AR.Cast(S.MindBlast) then return "Cast"; end
-	end 
-	
-	--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
-	--TODO : enemies ?
-	if S.ShadowWordDeath:Charges() == 2 and Target:HealthPercentage() < ExecuteRange() then
-		if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
-	end
-	
-	--actions.vf+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+25)<100
-	if S.ShadowWordVoid:IsAvailable() and S.ShadowWordVoid:IsCastable() and (Player:Insanity()-(CurrentInsanityDrain()*Player:GCD())+25)<100 then
-		if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
-	end
-	
-	--actions.vf+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
-	--actions.vf+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
-	if S.Misery:IsAvailable() then
-		if Target:DebuffRemains(S.ShadowWordPain) < Player:GCD() and GetUnitSpeed("player") ~= 0 then
+		
+		--actions.main+=/shadow_word_pain
+		if S.ShadowWordPain:IsCastable() then
 			if AR.Cast(S.ShadowWordPain) then return "Cast"; end
-		end
-		if Target:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() or Target:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD() then
-			if AR.Cast(S.VampiricTouch) then return "Cast"; end
-		end
-	else
-		--actions.vf+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
-		--todo : enemies : and (s.AuspiciousSpirit:IsAvailable() or s.ShadowInsight:IsAvailable() or s.SphereOfInsanity:IsAvailable())
-		if S.ShadowWordPain:IsCastable() and Target:DebuffRemains(S.ShadowWordPain)==0 then
-			if AR.Cast(S.ShadowWordPain) then return "Cast"; end
-		end
-		
-		--actions.vf+=/vampiric_touch,if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
-		--todo : enemies and ( s.Sanlayn:IsAvailable() or (s.AuspiciousSpirit:IsAvailable() and s.UnleashTheShadows:IsAvailable())) 
-		if S.VampiricTouch:IsCastable() and Target:DebuffRemains(S.VampiricTouch)==0 then
-			if AR.Cast(S.VampiricTouch) then return "Cast"; end
-		end
-		
-		--actions.vf+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1		
-		--todo : enemies and (s.AuspiciousSpirit:IsAvailable() or s.ShadowInsight:IsAvailable() or s.SphereOfInsanity:IsAvailable())
-		--if S.ShadowWordPain:IsCastable() and not Target:Debuff(ShadowWordPain) and Target:TimeToDie()>10  then
-		--	if AR.Cast(S.ShadowWordPain) then return "Cast"; end
-		--end
-		
-		--actions.vf+=/vampiric_touch,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
-		--todo : enemies 
-		--if S.VampiricTouch:IsCastable() and not Target:Debuff(VampiricTouch) and Target:TimeToDie()>10 then
-		--	if AR.Cast(S.VampiricTouch) then return "Cast"; end
-		--end
-		
-		--actions.vf+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
-		--todo : enemies 
-		--if S.ShadowWordPain:IsCastable() and not Target:Debuff(ShadowWordPain) and Target:TimeToDie()>10  then
-		--	if AR.Cast(S.ShadowWordPain) then return "Cast"; end
-		--end
+		end 
+			
+		return
 	end
 	
-	--actions.vf+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
-	--todo : finir
-	if S.MindFlay:IsCastable() and GetUnitSpeed("player") == 0 then
-		if AR.Cast(S.MindFlay) then return "Cast"; end
+	-- not in range
+	if AR.AoEON() and Cache.EnemiesCount[40]>0 then
+		BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+		for Key, Value in pairs(Cache.Enemies[40]) do
+			
+			if S.VoidBolt:IsCastable() then
+				BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.VoidBolt;
+				break
+			end 
+		
+			if  S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or Cache.EnemiesCount[40]<=4 or S.ShadowWordDeath:Charges() == 2)
+				and Value:HealthPercentage()<=ExecuteRange() then
+					BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+					break
+			end	
+			
+			--moving
+			if GetUnitSpeed("player") ~= 0 then
+				if Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
+					or Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() then
+						BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
+				end
+				
+			--static
+			else
+				if S.Misery:IsAvailable() then
+					if Value:TimeToDie()-Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
+						or Value:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() 
+						or Value:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD() then
+							BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
+					end
+				else
+					if Value:TimeToDie()-Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
+						or Value:DebuffRemains(S.VampiricTouch)< 3*Player:GCD() then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
+					elseif Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
+						or Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
+					end
+				end
+			end
+			
+		end
+		if BestUnit then
+			if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+		end
 	end
 	
-	--actions.vf+=/shadow_word_pain
-	if S.ShadowWordPain:IsCastable() then
-		if AR.Cast(S.ShadowWordPain) then return "Cast"; end
-	end 
-	return ""
+	return
 end
 
 --- APL Main
@@ -461,6 +547,7 @@ local function APL ()
 						if S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
 							and Value:HealthPercentage()<=ExecuteRange() then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+								break
 						end	
 						
 						if S.Misery:IsAvailable() then
@@ -526,6 +613,7 @@ local function APL ()
 					if S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
 						and Value:HealthPercentage()<=ExecuteRange() then
 							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+							break
 					end	
 					
 					if Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
@@ -553,6 +641,7 @@ local function APL ()
 				if S.ShadowWordDeath:Charges() > 0 and (Player:Insanity()<Insanity_Threshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or Cache.EnemiesCount[40]<=4 or S.ShadowWordDeath:Charges() == 2)
 					and Value:HealthPercentage()<=ExecuteRange() then
 						BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
+						break
 				end	
 				
 				--moving
