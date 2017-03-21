@@ -66,6 +66,7 @@
     -- Utility
 		VampiricEmbrace 		= Spell(15286),
     -- Legendaries
+		ZeksExterminatus		= Spell(236546),
     -- Misc
 		Shadowform				= Spell(232698),
 		VoidForm				= Spell(194249)
@@ -98,6 +99,7 @@
 
 --- APL Action Lists (and Variables)
 local function ExecuteRange()
+	if Player:Buff(S.ZeksExterminatus) then return 101;
 	return S.ReaperOfSouls:IsAvailable() and 35 or 20;
 end
 
@@ -279,7 +281,7 @@ local function voidForm()
 	end
 	
 	--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(15+15*talent.reaper_of_souls.enabled))<100
-	if Target:HealthPercentage() < ExecuteRange() and S.ShadowWordDeath:Charges() > 0 and CurrentInsanityDrain()*Player:GCD()>Player:Insanity() and ((CurrentInsanityDrain()*Player:GCD())+(15+15*(S.ReaperOfSouls:IsAvailable() and 1 or 0)))<100 then
+	if Target:HealthPercentage() < ExecuteRange() and (S.ShadowWordDeath:Charges() > 0 and CurrentInsanityDrain()*Player:GCD()>Player:Insanity() and ((CurrentInsanityDrain()*Player:GCD())+(15+15*(S.ReaperOfSouls:IsAvailable() and 1 or 0)))<100) or Player:Buff(S.ZeksExterminatus) then
 		if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
 	end
 	
@@ -484,7 +486,7 @@ local function APL ()
 				end
 				
 				--actions.main+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(85-15*talent.reaper_of_souls.enabled)
-				if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold() 
+				if S.ShadowWordDeath:Charges() > 0 and Player:Insanity()<Insanity_Threshold()
 					and Target:HealthPercentage()<=ExecuteRange() then
 						if AR.Cast(S.ShadowWordDeath) then return "Cast"; end
 				end
@@ -509,6 +511,9 @@ local function APL ()
 			end
 			
 			--moving
+			--TODO : SWD
+			
+			
 			--SWP on other targets if worth
 			if AR.AoEON() then
 				BestUnit, BestUnitTTD = nil, 10;
@@ -541,14 +546,14 @@ local function APL ()
 						BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
 				end	
 				
-				--static
+				--moving
 				if GetUnitSpeed("player") ~= 0 then
 					if Value:TimeToDie()-Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
 						or Value:DebuffRemains(S.ShadowWordPain)< 3*Player:GCD() then
 							BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
 					end
 					
-				--moving
+				--static
 				else
 					if S.Misery:IsAvailable() then
 						if Value:TimeToDie()-Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
