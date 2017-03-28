@@ -88,7 +88,8 @@
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
             -- Abilities
-            AspectoftheEagle = {true, false}
+            AspectoftheEagle = {true, false},
+            Butchery = {true, false}
           }
         }
       },
