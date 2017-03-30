@@ -140,15 +140,18 @@ function StormTempestsSniping (StormTempests)
 end
 
 --Cooldowns
+-- FeralSpirit expire
+
 
 --AOE
 
 -- APL Main
 local function APL ()
   -- Unit Update
+  AC.GetEnemies(20); -- Boulderfist,Flametongue
   AC.GetEnemies(8); -- CrashLightning
   AC.GetEnemies(5); -- Melee
-  AC.GetEnemies(20); -- Boulderfist,Flametongue
+
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Flask
@@ -156,7 +159,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-        if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+        if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(20) and not Target:IsDeadOrGhost() then
             if S.Boulderfist:IsCastable()  then
                 if AR.Cast(S.Boulderfist) then return "Cast Boulderfist"; end
             elseif S.Rockbiter:IsCastable()  then 
@@ -198,18 +201,37 @@ local function APL ()
             StormtempestsSniping(S.StormTempests);
             end
 
+        if S.BloodFury:IsCastable() then
+            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return ""; end
+        end
+
+
+        if S.Berserking:IsCastable() then
+            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return ""; end
+        end
+
             -- actions+=/feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
         if S.FeralSpirit:IsCastable() and ((not S.AlphaWolf:ArtifactEnabled()) or (S.CrashLightning:Cooldown() <= Player:GCD() and Player:Maelstrom()>=20) ) then
             if AR.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit";end
         end
             -- actions+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
-      --  if S.AlphaWolf:ArtifactEnabled() and S.FeralSpirit:TimeSinceLastCast < 0.5 and S.CrashLightning:IsCastable() then
-      --      if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
-      --  end
+        if S.AlphaWolf:ArtifactEnabled() and S.FeralSpirit:TimeSinceLastCast() < 7 and S.CrashLightning:IsCastable() then
+            if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
+        end
+
+        if S.AlphaWolf:ArtifactEnabled() and S.FeralSpirit:TimeSinceLastCast() < 14 and S.CrashLightning:IsCastable() and S.CrashLightning:TimeSinceLastCast() > 7  then
+            if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
+        end
             --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(maelstrom<=50&active_enemies>=3)
         if S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable() and (Player:BuffRemains(S.BoulderfistBuff) < Player:GCD() 
             or (Player:Maelstrom()<= 50 and Cache.EnemiesCount[8]>=3)) then
             if AR.Cast(S.Boulderfist) then return "Cast Boulderfist"; end
+        end
+
+        --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
+        if S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable() and (Player:BuffRemains(S.BoulderfistBuff)<Player:GCD() or
+         (S.Boulderfist:ChargesFractional()>(1.75-0.10) and Player:Maelstrom()<= 100 and Cache.EnemiesCount[8]<=2)) then
+            if AR.Cast(S.Boulderfist) then return "Cast Boulderfist";end
         end
 
             --actions+=/rockbiter,if=talent.landslide.enabled&buff.landslide.remains<gcd
@@ -221,17 +243,16 @@ local function APL ()
             if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir"; end
         end
             -- actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
-        if S.Hailstorm:IsAvailable() and Player:BuffRemains(S.FrostbrandBuff) < Player:GCD() then
+        if S.Hailstorm:IsAvailable() and Player:BuffRemains(S.FrostbrandBuff) < (Player:GCD()+1) then
             if AR.Cast(S.Frostbrand) then return "Cast Frostbrand"; end
         end
             -- actions+=/flametongue,if=buff.flametongue.remains<gcd|(cooldown.doom_winds.remains<6&buff.flametongue.remains<4)
-        if S.Flametongue:IsCastable() and Player:BuffRemains(S.FlametongueBuff) < Player:GCD() then
+        if S.Flametongue:IsCastable() and 
+            (Player:BuffRemains(S.FlametongueBuff) < (Player:GCD()+1))
+            or 
+            (S.DoomWinds:Cooldown()<6 and Player:BuffRemains(S.FlametongueBuff)<4)
+            then
             if AR.Cast(S.Flametongue) then return "Cast Flametongue"; end
-        end
-            --actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
-        if S.Boulderfist:IsCastable() and not S.Rockbiter:IsCastable() and (Player:BuffRemains(S.BoulderfistBuff)<Player:GCD() or
-         (S.Boulderfist:ChargesFractional()>1.75 and Player:Maelstrom()<= 100 and Cache.EnemiesCount[8]<=2)) then
-        	if AR.Cast(S.Boulderfist) then return "Cast Boulderfist";end
         end
 
             -- Aoe Legendarie
