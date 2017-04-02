@@ -13,6 +13,7 @@
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
+  local mathmin = math.min;
   local pairs = pairs;
   -- File Locals
   AR.Commons.Rogue = {};
@@ -70,16 +71,23 @@
     return Spell.Rogue.Subtlety.DeeperStratagem:IsAvailable() and 6 or 5;
   end
 
+  -- "cp_spend"
+  function AR.Commons.Rogue.CPSpend ()
+    return mathmin(Player:ComboPoints(), AR.Commons.Rogue.CPMaxSpend());
+  end
+
+  -- "bleeds"
+  function AR.Commons.Rogue.Bleeds ()
+    return (Target:Debuff(Spell.Rogue.Assassination.Garrote) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.Rupture) and 1 or 0);
+  end
+
   -- mantle_duration
   --[[ Original SimC Code
     if ( buffs.mantle_of_the_master_assassin_aura -> check() )
     {
       timespan_t nominal_master_assassin_duration = timespan_t::from_seconds( spell.master_assassins_initiative -> effectN( 1 ).base_value() );
-      if ( buffs.vanish -> check() )
-        return buffs.vanish -> remains() + nominal_master_assassin_duration;
-      // Hardcoded 1.0 since we consider that stealth will break on next gcd.
-      else
-        return timespan_t::from_seconds( 1.0 ) + nominal_master_assassin_duration;
+      timespan_t gcd_remains = timespan_t::from_seconds( std::max( ( gcd_ready - sim -> current_time() ).total_seconds(), 0.0 ) );
+      return gcd_remains + nominal_master_assassin_duration;
     }
     else if ( buffs.mantle_of_the_master_assassin -> check() )
       return buffs.mantle_of_the_master_assassin -> remains();
@@ -89,12 +97,7 @@
   local MasterAssassinsInitiative, NominalDuration = Spell(235027), 6;
   function AR.Commons.Rogue.MantleDuration ()
     if Player:BuffRemains(MasterAssassinsInitiative) < 0 then
-      -- Should work for all 3 specs since they have same Vanish Buff Spell ID.
-      if Player:Buff(Spell.Rogue.Subtlety.VanishBuff) then
-        return Player:BuffRemains(Spell.Rogue.Subtlety.VanishBuff) + NominalDuration;
-      else
-        return 1 + NominalDuration;
-      end
+      return Player:GCDRemains() + NominalDuration;
     else
       return Player:BuffRemains(MasterAssassinsInitiative);
     end
