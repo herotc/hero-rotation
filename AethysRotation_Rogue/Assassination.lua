@@ -16,6 +16,8 @@ local pairs = pairs;
 
 
 --- APL Local Vars
+-- Commons
+  local Rogue = AR.Commons.Rogue;
 -- Spells
   if not Spell.Rogue then Spell.Rogue = {}; end
   Spell.Rogue.Assassination = {
@@ -90,8 +92,6 @@ local pairs = pairs;
     MantleoftheMasterAssassin     = Item(144236, {3})
   };
   local I = Item.Rogue.Assassination;
--- Commons
-  local Rogue = AR.Commons.Rogue;
 -- Rotation Var
   local ShouldReturn, ShouldReturn2; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling

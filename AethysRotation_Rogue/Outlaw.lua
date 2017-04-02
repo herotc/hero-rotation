@@ -18,6 +18,8 @@ local tostring = tostring;
 
 
 --- APL Local Vars
+-- Commons
+  local Rogue = AR.Commons.Rogue;
 -- Spells
   if not Spell.Rogue then Spell.Rogue = {}; end
   Spell.Rogue.Outlaw = {
@@ -86,8 +88,6 @@ local tostring = tostring;
     ThraxisTricksyTreads            = Item(137031, {8})
   };
   local I = Item.Rogue.Outlaw;
--- Commons
-  local Rogue = AR.Commons.Rogue;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
