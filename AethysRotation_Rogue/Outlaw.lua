@@ -13,6 +13,7 @@ local Item = AC.Item;
 local AR = AethysRotation;
 -- Lua
 local pairs = pairs;
+local tableconcat = table.concat;
 local tostring = tostring;
 
 
@@ -21,76 +22,78 @@ local tostring = tostring;
   if not Spell.Rogue then Spell.Rogue = {}; end
   Spell.Rogue.Outlaw = {
     -- Racials
-    ArcaneTorrent                 = Spell(25046),
-    Berserking                    = Spell(26297),
-    BloodFury                     = Spell(20572),
-    GiftoftheNaaru                = Spell(59547),
-    Shadowmeld                    = Spell(58984),
+    ArcaneTorrent                   = Spell(25046),
+    Berserking                      = Spell(26297),
+    BloodFury                       = Spell(20572),
+    GiftoftheNaaru                  = Spell(59547),
+    Shadowmeld                      = Spell(58984),
     -- Abilities
-    Ambush                        = Spell(8676),
-    BetweentheEyes                = Spell(199804),
-    BladeFlurry                   = Spell(13877),
-    BladeFlurry2                  = Spell(103828), -- Protection Warrior Warbringer Icon
-    Opportunity                   = Spell(195627),
-    PistolShot                    = Spell(185763),
-    RolltheBones                  = Spell(193316),
-    RunThrough                    = Spell(2098),
-    SaberSlash                    = Spell(193315),
-    Stealth                       = Spell(1784),
+    AdrenalineRush                  = Spell(13750),
+    Ambush                          = Spell(8676),
+    BetweentheEyes                  = Spell(199804),
+    BladeFlurry                     = Spell(13877),
+    BladeFlurry2                    = Spell(103828), -- Icon: Prot. Warrior Warbringer
+    Opportunity                     = Spell(195627),
+    PistolShot                      = Spell(185763),
+    RolltheBones                    = Spell(193316),
+    RunThrough                      = Spell(2098),
+    SaberSlash                      = Spell(193315),
+    Stealth                         = Spell(1784),
+    Vanish                          = Spell(1856),
     -- Talents
-    Alacrity                      = Spell(193539),
-    AlacrityBuff                  = Spell(193538),
-    Anticipation                  = Spell(114015),
-    DeathfromAbove                = Spell(152150),
-    DeeperStratagem               = Spell(193531),
-    DirtyTricks                   = Spell(108216),
-    GhostlyStrike                 = Spell(196937),
-    QuickDraw                     = Spell(196938),
-    SliceandDice                  = Spell(5171),
+    Alacrity                        = Spell(193539),
+    AlacrityBuff                    = Spell(193538),
+    Anticipation                    = Spell(114015),
+    CannonballBarrage               = Spell(185767),
+    DeathfromAbove                  = Spell(152150),
+    DeeperStratagem                 = Spell(193531),
+    DirtyTricks                     = Spell(108216),
+    GhostlyStrike                   = Spell(196937),
+    KillingSpree                    = Spell(51690),
+    MarkedforDeath                  = Spell(137619),
+    QuickDraw                       = Spell(196938),
+    SliceandDice                    = Spell(5171),
+    Vigor                           = Spell(14983),
     -- Artifact
-    Blunderbuss                   = Spell(202895),
-    HiddenBlade                   = Spell(202754),
-    -- Offensive
-    AdrenalineRush                = Spell(13750),
-    CannonballBarrage             = Spell(185767),
-    CurseoftheDreadblades         = Spell(202665),
-    KillingSpree                  = Spell(51690),
-    MarkedforDeath                = Spell(137619),
-    Vanish                        = Spell(1856),
+    Blunderbuss                     = Spell(202895),
+    CurseoftheDreadblades           = Spell(202665),
+    HiddenBlade                     = Spell(202754),
     -- Defensive
-    CrimsonVial                   = Spell(185311),
-    Feint                         = Spell(1966),
+    CrimsonVial                     = Spell(185311),
+    Feint                           = Spell(1966),
     -- Utility
-    Gouge                         = Spell(1776),
-    Kick                          = Spell(1766),
-    Sprint                        = Spell(2983),
+    Gouge                           = Spell(1776),
+    Kick                            = Spell(1766),
+    Sprint                          = Spell(2983),
     -- Roll the Bones
-    Broadsides                    = Spell(193356),
-    BuriedTreasure                = Spell(199600),
-    GrandMelee                    = Spell(193358),
-    JollyRoger                    = Spell(199603),
-    SharkInfestedWaters           = Spell(193357),
-    TrueBearing                   = Spell(193359),
+    Broadsides                      = Spell(193356),
+    BuriedTreasure                  = Spell(199600),
+    GrandMelee                      = Spell(193358),
+    JollyRoger                      = Spell(199603),
+    SharkInfestedWaters             = Spell(193357),
+    TrueBearing                     = Spell(193359),
     -- Legendaries
-    GreenskinsBuff                = Spell(209423)
+    GreenskinsWaterloggedWristcuffs = Spell(209423)
   };
   local S = Spell.Rogue.Outlaw;
 -- Items
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Outlaw = {
     -- Legendaries
-    GreenskinsItem                = Item(137099), -- 9
-    MantleoftheMasterAssassin     = Item(144236), -- 3
-    ShivarranSymmetry             = Item(141321), -- 10
-    ThraxisTricksyTreads          = Item(137031) -- 8
+    GreenskinsWaterloggedWristcuffs = Item(137099, {9}),
+    MantleoftheMasterAssassin       = Item(144236, {3}),
+    ShivarranSymmetry               = Item(141321, {10}),
+    ThraxisTricksyTreads            = Item(137031, {8})
   };
   local I = Item.Rogue.Outlaw;
+-- Commons
+  local Rogue = AR.Commons.Rogue;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
-  local Sequence; -- RtB_List
-  local Count; -- Used when Counting Units
-  local BestUnit, BestUnitTTD; -- Used for cycling
+  -- RtB_List
+  local Sequence; 
+  local Count;
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -110,10 +113,7 @@ local RtB_BuffsList = {
 local function RtB_List (Type, List)
   if not Cache.APLVar.RtB_List then Cache.APLVar.RtB_List = {}; end
   if not Cache.APLVar.RtB_List[Type] then Cache.APLVar.RtB_List[Type] = {}; end
-  Sequence = "";
-  for i = 1, #List do
-    Sequence = Sequence..tostring(List[i]);
-  end
+  Sequence = table.concat(List);
   -- All
   if Type == "All" then
     if not Cache.APLVar.RtB_List[Type][Sequence] then
@@ -231,7 +231,7 @@ local function Build ()
     if AR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
   end
   -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
-  if (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Target:IsInRange(20) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsBuff))) then
+  if (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Target:IsInRange(20) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
     if S.Blunderbuss:IsCastable() then
       if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
     elseif S.PistolShot:IsCastable() then
@@ -247,7 +247,7 @@ end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped(10) and not S.BladeFlurry:IsOnCooldown() and Cache.EnemiesCount[6] >= 2)) then
+  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped() and not S.BladeFlurry:IsOnCooldown() and Cache.EnemiesCount[6] >= 2)) then
     if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
@@ -281,14 +281,13 @@ local function CDs ()
     if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
       if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
     end
-    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
-    --[[Normal MfD
-    if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)+(S.Anticipation:IsAvailable() and 1 or 0) then
-      if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
-    end]]
+    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
+    if S.MarkedforDeath:IsCastable() and (Target:TimeToDie() < Player:ComboPointsDeficit() or Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
+      AR.CastSuggested(S.MarkedforDeath);
+    end
     -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
-    if I.ThraxisTricksyTreads:IsEquipped(8) and S.Sprint:IsCastable() and not SS_Useable() then
-      if AR.Cast(S.Sprint, Settings.Commons.OffGCDasOffGCD.Sprint) then return "Cast"; end
+    if I.ThraxisTricksyTreads:IsEquipped() and S.Sprint:IsCastable() and not SS_Useable() then
+      AR.CastSuggested(S.Sprint);
     end
     -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
     if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
@@ -300,7 +299,7 @@ end
 -- # Finishers
 local function Finish ()
   -- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
-  if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and I.GreenskinsItem:IsEquipped(9) and not Player:Buff(S.GreenskinsBuff) then
+  if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs) then
     if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
@@ -322,7 +321,7 @@ local function Stealth ()
     else
       if AR.CDsON() and not Player:IsTanking(Target) then
         -- actions.stealth+=/vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
-        if S.Vanish:IsCastable() and ((I.MantleoftheMasterAssassin:IsEquipped(3) and Player:Buff(S.TrueBearing)) or Stealth_Condition()) then
+        if S.Vanish:IsCastable() and ((I.MantleoftheMasterAssassin:IsEquipped() and Player:Buff(S.TrueBearing)) or Stealth_Condition()) then
           if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
         end
         -- actions.stealth+=/shadowmeld,if=variable.stealth_condition
@@ -371,10 +370,10 @@ local function APL ()
   AR.Commons.AoEToggleEnemiesUpdate();
   -- Defensives
     -- Crimson Vial
-    ShouldReturn = AR.Commons.Rogue.CrimsonVial (S.CrimsonVial);
+    ShouldReturn = Rogue.CrimsonVial (S.CrimsonVial);
     if ShouldReturn then return ShouldReturn; end
     -- Feint
-    ShouldReturn = AR.Commons.Rogue.Feint (S.Feint);
+    ShouldReturn = Rogue.Feint (S.Feint);
     if ShouldReturn then return ShouldReturn; end
   -- Blade Flurry
     -- Blade Flurry Expiration Offset
@@ -390,7 +389,7 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
-    ShouldReturn = AR.Commons.Rogue.Stealth(S.Stealth);
+    ShouldReturn = Rogue.Stealth(S.Stealth);
     if ShouldReturn then return ShouldReturn; end
     -- Flask
     -- Food
@@ -412,7 +411,7 @@ local function APL ()
   end
   -- In Combat
     -- MfD Sniping
-    AR.Commons.Rogue.MfDSniping(S.MarkedforDeath);
+    Rogue.MfDSniping(S.MarkedforDeath);
     if AR.Commons.TargetIsValid() then
       -- Mythic Dungeon
       if MythicDungeon() then
