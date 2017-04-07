@@ -3,7 +3,7 @@
   local addonName, addonTable = ...;
   -- AethysCore
   local AC = AethysCore;
-  local Cache = AethysCore_Cache;
+  local Cache = AethysCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
@@ -127,7 +127,7 @@
       TrueshotCooldown = AC.CombatTime() * 1.1;
     end
     -- actions.cooldowns+=/trueshot,if=variable.trueshot_cooldown=0|buff.bloodlust.up|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16
-    if S.TrueShot:IsCastable() and (TrueshotCooldown == 0 or Player:HasHeroism() or (TrueshotCooldown > 0 and Target:TimeToDie() > (TrueshotCooldown + 15)) or Player:BuffStack(S.BullsEye) > 25 or Target:TimeToDie() < 16) then
+    if AR.CDsON() and S.TrueShot:IsCastable() and (TrueshotCooldown == 0 or Player:HasHeroism() or (TrueshotCooldown > 0 and Target:TimeToDie() > (TrueshotCooldown + 15)) or Player:BuffStack(S.BullsEye) > 25 or Target:TimeToDie() < 16) then
       if AR.Cast(S.TrueShot) then return ""; end
     end
     return false;
@@ -136,11 +136,11 @@
   -- # Non_Patient_Sniper
   local function Non_Patient_Sniper ()
     -- actions.non_patient_sniper=explosive_shot
-    if S.ExplosiveShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 15*0.85 or 15) then
+    if AR.CDsON() and S.ExplosiveShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 15*0.85 or 15) then
       if AR.Cast(S.ExplosiveShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/piercing_shot,if=lowest_vuln_within.5>0&focus>100
-    if S.PiercingShot:IsCastable() and Target:DebuffRemains(S.Vulnerability) > 0 and Player:FocusPredicted(0.2) > 100 then
+    if AR.CDsON() and S.PiercingShot:IsCastable() and Target:DebuffRemains(S.Vulnerability) > 0 and Player:FocusPredicted(0.2) > 100 then
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&buff.sentinels_sight.stack=20
@@ -164,7 +164,7 @@
       if AR.Cast(S.BlackArrow) then return ""; end
     end
     -- actions.non_patient_sniper+=/a_murder_of_crows
-    if S.AMurderofCrows:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 25*0.85 or 25) then
+    if AR.CDsON() and S.AMurderofCrows:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 25*0.85 or 25) then
       if AR.Cast(S.AMurderofCrows) then return ""; end
     end
     -- actions.non_patient_sniper+=/windburst
@@ -192,7 +192,11 @@
     if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 45*0.85 or 45)
       and not S.Sidewinders:IsAvailable() and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime()
       and (not PoolingforPiercing() or (Player:Buff(S.LockandLoad) and Target:DebuffRemains(S.Vulnerability) > Player:GCD()))
-      and (Cache.EnemiesCount[40] < 4 or S.TrickShot:IsAvailable() or Player:BuffStack(S.SentinelsSight) == 20) then
+      and (Cache.EnemiesCount[40] < 4 or S.TrickShot:IsAvailable() or Player:BuffStack(S.SentinelsSight) == 20)
+      and not Player:Buff(S.MarkingTargets) and not Player:Buff(S.TrueShot) and not Target:Debuff(S.HuntersMark) then
+      if AR.Cast(S.AimedShot) then return ""; end
+    end
+    if S.AimedShot:IsCastable() and Player:Buff(S.LockandLoad) and Target:DebuffRemains(S.Vulnerability) > Player:GCD() then
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/marked_shot
@@ -222,6 +226,12 @@
     if S.Sidewinders:IsAvailable() and (24 - S.Sidewinders:ChargesFractional() * 12) * Player:HastePct() < Vuln_Window then
       Vuln_Window = (24 - S.Sidewinders:ChargesFractional() * 12) * Player:HastePct();
     end
+    -- actions.patient_sniper=variable,name=vuln_window,op=setif,value=cooldown.sidewinders.full_recharge_time,value_else=debuff.vulnerability.remains,condition=talent.sidewinders.enabled&cooldown.sidewinders.full_recharge_time<variable.vuln_window
+    if S.Sidewinders:IsAvailable() and S.Sidewinders:FullRechargeTime() < Vuln_Window then
+      Vuln_Window = S.Sidewinders:FullRechargeTime();
+    else
+      Vuln_Window = Target:DebuffRemains(S.Vulnerability);
+    end
     -- actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor(variable.vuln_window%action.aimed_shot.execute_time)
     Vuln_Aim_Casts = math.floor(Vuln_Window/S.AimedShot:CastTime());
     -- actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor((focus+action.aimed_shot.cast_regen*(variable.vuln_aim_casts-1))%action.aimed_shot.cost),if=variable.vuln_aim_casts>0&variable.vuln_aim_casts>floor((focus+action.aimed_shot.cast_regen*(variable.vuln_aim_casts-1))%action.aimed_shot.cost)
@@ -231,11 +241,11 @@
     -- actions.patient_sniper+=/variable,name=can_gcd,value=variable.vuln_window>variable.vuln_aim_casts*action.aimed_shot.execute_time+gcd.max
     Can_GCD = Vuln_Window > Vuln_Aim_Casts * S.AimedShot:CastTime() + Player:GCD();
     -- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets=1&lowest_vuln_within.5>0&lowest_vuln_within.5<1
-    if S.PiercingShot:IsCastable() and Player:Cooldown(S.PiercingShot) and Cache.EnemiesCount[40] == 1 and Target:DebuffRemains(S.Vulnerability) > 0 and Target:DebuffRemains(S.Vulnerability) < 1 then
+    if AR.CDsON() and S.PiercingShot:IsCastable() and Player:Cooldown(S.PiercingShot) and Cache.EnemiesCount[40] == 1 and Target:DebuffRemains(S.Vulnerability) > 0 and Target:DebuffRemains(S.Vulnerability) < 1 then
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets>1&lowest_vuln_within.5>0&((!buff.trueshot.up&focus>80&(lowest_vuln_within.5<1|debuff.hunters_mark.up))|(buff.trueshot.up&focus>105&lowest_vuln_within.5<6))
-    if S.PiercingShot:IsCastable() and Player:Cooldown(S.PiercingShot) and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > 0 and ((not Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 80 and (Target:DebuffRemains(S.Vulnerability) < 1 or Target:Debuff(S.HuntersMark))) or (Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 105 and Target:DebuffRemains(S.Vulnerability) < 6)) then
+    if AR.CDsON() and S.PiercingShot:IsCastable() and Player:Cooldown(S.PiercingShot) and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > 0 and ((not Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 80 and (Target:DebuffRemains(S.Vulnerability) < 1 or Target:Debuff(S.HuntersMark))) or (Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 105 and Target:DebuffRemains(S.Vulnerability) < 6)) then
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&(buff.sentinels_sight.stack=20|(buff.trueshot.up&buff.sentinels_sight.stack>=spell_targets.multishot*5))
@@ -260,7 +270,7 @@
       if AR.Cast(S.BlackArrow) then return ""; end
     end
     -- actions.patient_sniper+=/a_murder_of_crows,if=(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)&(target.time_to_die>=cooldown+duration|target.health.pct<20|target.time_to_die<16)
-    if S.AMurderofCrows:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 25*0.85 or 25) and (not PoolingforPiercing() or Target:DebuffRemains(S.Vulnerability) > Player:GCD()) and (Target:TimeToDie() >= 60 + 15 or (Target:HealthPercentage() < 20 or Target:TimeToDie() < 16)) then
+    if AR.CDsON() and S.AMurderofCrows:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 25*0.85 or 25) and (not PoolingforPiercing() or Target:DebuffRemains(S.Vulnerability) > Player:GCD()) and (Target:TimeToDie() >= 60 + 15 or (Target:HealthPercentage() < 20 or Target:TimeToDie() < 16)) then
       if AR.Cast(S.AMurderofCrows) then return ""; end
     end
     -- actions.patient_sniper+=/barrage,if=spell_targets>2|(target.health.pct<20&buff.bullseye.stack<25)
@@ -292,8 +302,8 @@
     if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 45*0.85 or 45) and not S.Sidewinders:IsAvailable() and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() and (not PoolingforPiercing() or (Player:FocusPredicted(0.2) > 100 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() + Player:GCD())) then
       if AR.Cast(S.AimedShot) then return ""; end
     end
-    -- actions.patient_sniper+=/marked_shot,if=!talent.sidewinders.enabled&!variable.pooling_for_piercing
-    if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 20*0.85 or 20) and Target:Debuff(S.HuntersMark) and not S.Sidewinders:IsAvailable() and not PoolingforPiercing() then
+    -- actions.patient_sniper+=/marked_shot,if=!talent.sidewinders.enabled&!variable.pooling_for_piercing&(focus>=70|buff.trueshot.up)&!action.windburst.in_flight
+    if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 20*0.85 or 20) and Target:Debuff(S.HuntersMark) and not S.Sidewinders:IsAvailable() and not PoolingforPiercing() and (Player:FocusPredicted(0.2) >= 70 or Player:Buff(S.TrueShot)) and S.Windburst:TimeSinceLastDisplay() > 0.5 then
       if AR.Cast(S.MarkedShot) then return ""; end
     end
     -- actions.patient_sniper+=/marked_shot,if=talent.sidewinders.enabled&(variable.vuln_aim_casts<1|buff.trueshot.up|variable.vuln_window<action.aimed_shot.cast_time)
@@ -322,33 +332,20 @@
   -- # Targetdie
   local function TargetDie () 
     -- actions.targetdie=piercing_shot,if=debuff.vulnerability.up
-    if S.PiercingShot:IsCastable() and Target:Debuff(S.Vulnerability) then
+    if AR.CDsON() and S.PiercingShot:IsCastable() and Target:Debuff(S.Vulnerability) then
       if AR.Cast(S.PiercingShot) then return ""; end
-    end
-    -- actions.targetdie+=/explosive_shot
-    if S.ExplosiveShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 15*0.85 or 15) then
-      if AR.Cast(S.ExplosiveShot) then return ""; end
     end
     -- actions.targetdie+=/windburst
     if S.Windburst:IsCastable() then
       if AR.Cast(S.Windburst) then return ""; end
     end
-    -- actions.targetdie+=/aimed_shot,if=debuff.vulnerability.up&buff.lock_and_load.up
-    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 45*0.85 or 45) and Target:Debuff(S.Vulnerability) and Player:Buff(S.LockandLoad) then
+    -- actions.targetdie+=/aimed_shot,if=debuff.vulnerability.remains>cast_time&target.time_to_die>cast_time
+    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 45*0.85 or 45) and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() and Target:TimeToDie() > S.AimedShot:CastTime() then
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.targetdie+=/marked_shot
     if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 20*0.85 or 20) and Target:Debuff(S.HuntersMark) then
       if AR.Cast(S.MarkedShot) then return ""; end
-    end
-    -- actions.targetdie+=/arcane_shot,if=buff.marking_targets.up|buff.trueshot.up
-    if S.ArcaneShot:IsCastable() and (Player:Buff(S.MarkingTargets) or Player:Buff(S.TrueShot)) then
-      if AR.Cast(S.ArcaneShot) then return ""; end
-    end
-    -- actions.targetdie+=/aimed_shot,if=debuff.vulnerability.remains>execute_time&target.time_to_die>cast_time
-    -- TODO: Find the travel time of AimedShot when max range and replace the 0.3 with the new value 
-    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 45*0.85 or 45) and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() + Player:GCDRemains() + 0.3 and Target:TimeToDie() > S.AimedShot:CastTime() + Player:GCDRemains() + 0.3 then
-      if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.targetdie+=/sidewinders
     if S.Sidewinders:IsCastable() then
@@ -378,7 +375,7 @@
       -- PrePot w/ Bossmod Countdown
       -- Volley toggle
       if S.Volley:IsCastable() and not Player:Buff(S.Volley) then
-        if AR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return; end
+        if AR.Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley) then return; end
       end
       -- Opener
       if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
@@ -499,3 +496,78 @@
 -- actions.targetdie+=/aimed_shot,if=debuff.vulnerability.remains>execute_time&target.time_to_die>cast_time
 -- actions.targetdie+=/sidewinders
 -- actions.targetdie+=/arcane_shot
+
+
+-- # Executed every time the actor is available.
+-- actions=auto_shot
+-- actions+=/volley,toggle=on
+-- # Start being conservative with focus if expecting a Piercing Shot at the end of the current window.
+-- actions+=/variable,name=pooling_for_piercing,value=talent.piercing_shot.enabled&cooldown.piercing_shot.remains<5&lowest_vuln_within.5>0&lowest_vuln_within.5>cooldown.piercing_shot.remains&(buff.trueshot.down|spell_targets=1)
+-- # Make sure a Marking Targets proc isn't wasted if the Hunter's Mark debuff will be overwritten by an active Sentinel before we can use Marked Shot.
+-- actions+=/variable,name=waiting_for_sentinel,value=talent.sentinel.enabled&(buff.marking_targets.up|buff.trueshot.up)&!cooldown.sentinel.up&((cooldown.sentinel.remains>54&cooldown.sentinel.remains<(54+gcd.max))|(cooldown.sentinel.remains>48&cooldown.sentinel.remains<(48+gcd.max))|(cooldown.sentinel.remains>42&cooldown.sentinel.remains<(42+gcd.max)))
+-- actions+=/call_action_list,name=cooldowns
+-- actions+=/call_action_list,name=patient_sniper,if=talent.patient_sniper.enabled
+-- actions+=/call_action_list,name=non_patient_sniper,if=!talent.patient_sniper.enabled
+
+-- actions.cooldowns=arcane_torrent,if=focus.deficit>=30&(!talent.sidewinders.enabled|cooldown.sidewinders.charges<2)
+-- actions.cooldowns+=/berserking,if=buff.trueshot.up
+-- actions.cooldowns+=/blood_fury,if=buff.trueshot.up
+-- actions.cooldowns+=/potion,if=(buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|((consumable.prolonged_power&target.time_to_die<62)|target.time_to_die<31)
+-- # Estimate the real Trueshot cooldown based on the first, fudging it a bit to account for Bloodlust.
+-- actions.cooldowns+=/variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
+-- actions.cooldowns+=/trueshot,if=variable.trueshot_cooldown=0|buff.bloodlust.up|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16
+
+-- actions.non_patient_sniper=explosive_shot
+-- actions.non_patient_sniper+=/piercing_shot,if=lowest_vuln_within.5>0&focus>100
+-- actions.non_patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&buff.sentinels_sight.stack=20
+-- actions.non_patient_sniper+=/marked_shot,if=spell_targets>1
+-- actions.non_patient_sniper+=/multishot,if=spell_targets>1&(buff.marking_targets.up|buff.trueshot.up)
+-- actions.non_patient_sniper+=/sentinel,if=!debuff.hunters_mark.up
+-- actions.non_patient_sniper+=/black_arrow,if=talent.sidewinders.enabled|spell_targets.multishot<6
+-- actions.non_patient_sniper+=/a_murder_of_crows
+-- actions.non_patient_sniper+=/windburst
+-- actions.non_patient_sniper+=/barrage,if=spell_targets>2|(target.health.pct<20&buff.bullseye.stack<25)
+-- actions.non_patient_sniper+=/marked_shot,if=buff.marking_targets.up|buff.trueshot.up
+-- actions.non_patient_sniper+=/sidewinders,if=!variable.waiting_for_sentinel&(debuff.hunters_mark.down|(buff.trueshot.down&buff.marking_targets.down))&((buff.marking_targets.up|buff.trueshot.up)|charges_fractional>1.8)&(focus.deficit>cast_regen)
+-- actions.non_patient_sniper+=/aimed_shot,if=talent.sidewinders.enabled&debuff.vulnerability.remains>cast_time
+-- actions.non_patient_sniper+=/aimed_shot,if=!talent.sidewinders.enabled&debuff.vulnerability.remains>cast_time&(!variable.pooling_for_piercing|(buff.lock_and_load.up&lowest_vuln_within.5>gcd.max))&(spell_targets.multishot<4|talent.trick_shot.enabled|buff.sentinels_sight.stack=20)
+-- actions.non_patient_sniper+=/marked_shot
+-- actions.non_patient_sniper+=/aimed_shot,if=talent.sidewinders.enabled&spell_targets.multi_shot=1&focus>110
+-- actions.non_patient_sniper+=/multishot,if=spell_targets.multi_shot>1&!variable.waiting_for_sentinel
+-- actions.non_patient_sniper+=/arcane_shot,if=spell_targets.multi_shot<2&!variable.waiting_for_sentinel
+
+-- # Sidewinders charges could cap sooner than the Vulnerable debuff ends, so clip the current window to the recharge time if it will.
+-- actions.patient_sniper=variable,name=vuln_window,op=setif,value=cooldown.sidewinders.full_recharge_time,value_else=debuff.vulnerability.remains,condition=talent.sidewinders.enabled&cooldown.sidewinders.full_recharge_time<variable.vuln_window
+-- # Determine the number of Aimed Shot casts that are possible according to available focus and remaining Vulnerable duration.
+-- actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor(variable.vuln_window%action.aimed_shot.execute_time)
+-- actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor((focus+action.aimed_shot.cast_regen*(variable.vuln_aim_casts-1))%action.aimed_shot.cost),if=variable.vuln_aim_casts>0&variable.vuln_aim_casts>floor((focus+action.aimed_shot.cast_regen*(variable.vuln_aim_casts-1))%action.aimed_shot.cost)
+-- actions.patient_sniper+=/variable,name=can_gcd,value=variable.vuln_window>variable.vuln_aim_casts*action.aimed_shot.execute_time+gcd.max
+-- actions.patient_sniper+=/call_action_list,name=targetdie,if=target.time_to_die<variable.vuln_window&spell_targets.multishot=1
+-- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets=1&lowest_vuln_within.5>0&lowest_vuln_within.5<1
+-- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets>1&lowest_vuln_within.5>0&((!buff.trueshot.up&focus>80&(lowest_vuln_within.5<1|debuff.hunters_mark.up))|(buff.trueshot.up&focus>105&lowest_vuln_within.5<6))
+-- actions.patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&(buff.sentinels_sight.stack=20|(buff.trueshot.up&buff.sentinels_sight.stack>=spell_targets.multishot*5))
+-- actions.patient_sniper+=/marked_shot,if=spell_targets>1
+-- actions.patient_sniper+=/multishot,if=spell_targets>1&(buff.marking_targets.up|buff.trueshot.up)
+-- actions.patient_sniper+=/windburst,if=variable.vuln_aim_casts<1&!variable.pooling_for_piercing
+-- actions.patient_sniper+=/black_arrow,if=variable.can_gcd&(talent.sidewinders.enabled|spell_targets.multishot<6)&(!variable.pooling_for_piercing|(lowest_vuln_within.5>gcd.max&focus>85))
+-- actions.patient_sniper+=/a_murder_of_crows,if=(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)&(target.time_to_die>=cooldown+duration|target.health.pct<20|target.time_to_die<16)
+-- actions.patient_sniper+=/barrage,if=spell_targets>2|(target.health.pct<20&buff.bullseye.stack<25)
+-- actions.patient_sniper+=/aimed_shot,if=debuff.vulnerability.up&buff.lock_and_load.up&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)&(spell_targets.multi_shot<4|talent.trick_shot.enabled)
+-- actions.patient_sniper+=/aimed_shot,if=spell_targets.multishot>1&debuff.vulnerability.remains>execute_time&(!variable.pooling_for_piercing|(focus>100&lowest_vuln_within.5>(execute_time+gcd.max)))&(spell_targets.multishot<4|buff.sentinels_sight.stack=20|talent.trick_shot.enabled)
+-- actions.patient_sniper+=/multishot,if=spell_targets>1&variable.can_gcd&focus+cast_regen+action.aimed_shot.cast_regen<focus.max&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)
+-- actions.patient_sniper+=/arcane_shot,if=spell_targets.multi_shot=1&variable.vuln_aim_casts>0&variable.can_gcd&focus+cast_regen+action.aimed_shot.cast_regen<focus.max&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)
+-- actions.patient_sniper+=/aimed_shot,if=talent.sidewinders.enabled&(debuff.vulnerability.remains>cast_time|(buff.lock_and_load.down&action.windburst.in_flight))&(variable.vuln_window-(execute_time*variable.vuln_aim_casts)<1|focus.deficit<25|buff.trueshot.up)&(spell_targets.multishot=1|focus>100)
+-- actions.patient_sniper+=/aimed_shot,if=!talent.sidewinders.enabled&debuff.vulnerability.remains>cast_time&(!variable.pooling_for_piercing|(focus>100&lowest_vuln_within.5>(execute_time+gcd.max)))
+-- actions.patient_sniper+=/marked_shot,if=!talent.sidewinders.enabled&!variable.pooling_for_piercing&(focus>=70|buff.trueshot.up)&!action.windburst.in_flight
+-- actions.patient_sniper+=/marked_shot,if=talent.sidewinders.enabled&(variable.vuln_aim_casts<1|buff.trueshot.up|variable.vuln_window<action.aimed_shot.cast_time)
+-- actions.patient_sniper+=/aimed_shot,if=spell_targets.multi_shot=1&focus>110
+-- actions.patient_sniper+=/sidewinders,if=(!debuff.hunters_mark.up|(!buff.marking_targets.up&!buff.trueshot.up))&((buff.marking_targets.up&variable.vuln_aim_casts<1)|buff.trueshot.up|charges_fractional>1.9)
+-- actions.patient_sniper+=/arcane_shot,if=spell_targets.multi_shot=1&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)
+-- actions.patient_sniper+=/multishot,if=spell_targets>1&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)
+
+-- actions.targetdie=piercing_shot,if=debuff.vulnerability.up
+-- actions.targetdie+=/windburst
+-- actions.targetdie+=/aimed_shot,if=debuff.vulnerability.remains>cast_time&target.time_to_die>cast_time
+-- actions.targetdie+=/marked_shot
+-- actions.targetdie+=/arcane_shot
+-- actions.targetdie+=/sidewinders

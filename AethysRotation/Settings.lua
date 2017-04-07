@@ -76,6 +76,8 @@
         Marksmanship = {
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
+            -- Abilities
+            Volley = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
@@ -89,7 +91,8 @@
           OffGCDasOffGCD = {
             -- Abilities
             AspectoftheEagle = {true, false},
-            Butchery = {true, false}
+            Butchery = {true, false},
+            SnakeHunter = {true, false},
           }
         }
       },
