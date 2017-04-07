@@ -181,7 +181,7 @@
       [577]   = false,                          -- Havoc
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
     -- Druid
-      [102]   = false,                          -- Balance
+      [102]   = "AethysRotation_Druid",         -- Balance
       [103]   = false,                          -- Feral
       [104]   = false,                          -- Guardian
       [105]   = false,                          -- Restoration
@@ -233,7 +233,7 @@
     if EnabledRotation[Cache.Persistent.Player.Spec[1]] and not IsAddOnLoaded(EnabledRotation[Cache.Persistent.Player.Spec[1]]) then
       LoadAddOn(EnabledRotation[Cache.Persistent.Player.Spec[1]]);
     end
-
+	
     -- Check if there is a Rotation for this Spec
     if LatestSpecIDCheck ~= Cache.Persistent.Player.Spec[1] then
       if EnabledRotation[Cache.Persistent.Player.Spec[1]] and AR.APLs[Cache.Persistent.Player.Spec[1]] then
