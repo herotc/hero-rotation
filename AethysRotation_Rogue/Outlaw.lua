@@ -19,6 +19,7 @@ local tostring = tostring;
 
 --- APL Local Vars
 -- Commons
+  local Everyone = AR.Commons.Everyone;
   local Rogue = AR.Commons.Rogue;
 -- Spells
   if not Spell.Rogue then Spell.Rogue = {}; end
@@ -367,7 +368,7 @@ local function APL ()
   AC.GetEnemies(8); -- Cannonball Barrage
   AC.GetEnemies(6); -- Blade Flurry
   AC.GetEnemies(5); -- Melee
-  AR.Commons.AoEToggleEnemiesUpdate();
+  Everyone.AoEToggleEnemiesUpdate();
   -- Defensives
     -- Crimson Vial
     ShouldReturn = Rogue.CrimsonVial (S.CrimsonVial);
@@ -396,7 +397,7 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if AR.Commons.TargetIsValid() and Target:IsInRange(5) then
+    if Everyone.TargetIsValid() and Target:IsInRange(5) then
       if Player:ComboPoints() >= 5 then
         if S.RunThrough:IsCastable() then
           if AR.Cast(S.RunThrough) then return "Cast Run Through (Opener)"; end
@@ -412,7 +413,7 @@ local function APL ()
   -- In Combat
     -- MfD Sniping
     Rogue.MfDSniping(S.MarkedforDeath);
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
       -- Mythic Dungeon
       if MythicDungeon() then
         return;
