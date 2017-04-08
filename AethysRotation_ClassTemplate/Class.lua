@@ -17,6 +17,7 @@
   -- File Locals
   AR.Commons.Class = {};
   local Settings = AR.GUISettings.APL.Class.Commons;
+  local Class = AR.Commons.Class;
 
 
 --- ============================ CONTENT ============================

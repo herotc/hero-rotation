@@ -18,6 +18,8 @@
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
+  local Everyone = AR.Commons.Everyone;
+  local Class = AR.Commons.Class;
   -- Spells
   if not Spell.Class then Spell.Class = {}; end
   Spell.Class.Spec = {
@@ -66,7 +68,7 @@
   local function APL ()
     -- Unit Update
     
-    AR.Commons.AoEToggleEnemiesUpdate();
+    Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
     
     -- Out of Combat
@@ -76,13 +78,13 @@
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      if AR.Commons.TargetIsValid() then
+      if Everyone.TargetIsValid() then
         
       end
       return;
     end
     -- In Combat
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
       
       return;
     end
