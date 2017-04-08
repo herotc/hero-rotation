@@ -128,7 +128,6 @@ local tableinsert = table.insert;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling
-  local ShadowstrikeRange; -- Related to Shadowstrike Max Range setting
   local NightbladeThreshold; -- Used to compute the NB threshold (Cycling Performance)
 -- GUI Settings
   local Settings = {
@@ -415,7 +414,7 @@ local function Stealthed ()
     return Finish();
   end
   -- actions.stealthed+=/shadowstrike
-  if S.Shadowstrike:IsCastable() and Target:IsInRange(ShadowstrikeRange) then
+  if S.Shadowstrike:IsCastable() and Target:IsInRange(5) then
     if AR.Cast(S.Shadowstrike) then return ""; end
   end
   return false;
@@ -452,7 +451,6 @@ end
 local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
-  ShadowstrikeRange = 5+(Settings.Subtlety.ShadowstrikeMaxRange and 10 or 0);
   -- Unit Update
   AC.GetEnemies(8); -- Shuriken Storm & Death from Above
   AC.GetEnemies(5); -- Melee

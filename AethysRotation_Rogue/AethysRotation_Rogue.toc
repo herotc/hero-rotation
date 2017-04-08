@@ -8,6 +8,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: AethysRotation
 
+Settings.lua
 Rogue.lua
 Assassination.lua
 Outlaw.lua
