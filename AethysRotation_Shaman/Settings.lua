@@ -5,6 +5,7 @@
   -- AethysRotation
   local AR = AethysRotation;
 
+
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
   AR.GUISettings.APL.Shaman = {
