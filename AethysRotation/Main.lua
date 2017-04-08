@@ -181,7 +181,7 @@
       [577]   = false,                          -- Havoc
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
     -- Druid
-      [102]   = "AethysRotation_Druid",         -- Balance
+      [102]   = false,                          -- Balance
       [103]   = false,                          -- Feral
       [104]   = false,                          -- Guardian
       [105]   = false,                          -- Restoration
