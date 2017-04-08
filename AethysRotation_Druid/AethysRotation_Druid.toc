@@ -8,5 +8,6 @@
 ## LoadOnDemand: 1
 ## Dependencies: AethysRotation
 
+Settings.lua
 Feral.lua
 Balance.lua
