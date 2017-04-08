@@ -8,4 +8,5 @@
 ## LoadOnDemand: 1
 ## Dependencies: AethysRotation
 
+Settings.lua
 Vengeance.lua
