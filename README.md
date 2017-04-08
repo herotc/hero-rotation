@@ -12,21 +12,21 @@ Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly 
 ## Key Features
 - Main Icon that shows the next ability you should cast.
 - Two smaller icons above the previous one that shows the useful CDs/OffGCD-Abilities to use.
-- One medium icon on the left that shows every abilities that should be cycled (i.e. multi-dotting).
-- One medium-small icon on the upper-left that do proposals about situational abilities (trinkets, potions, ...).
-- Toggles to turn On/Off the CDs or AoE to adjust the rotation according to the needs (the addon can be disabled this way aswell).
+- One medium icon on the left that shows every ability that should be cycled (i.e. multi-dotting).
+- One medium-small icon on the upper-left that does proposals about situational abilities (trinkets, potions, ...).
+- Toggles to turn On/Off the CDs or AoE to adjust the rotation according to the situation (the addon can be disabled this way aswell).
 
 _Toggles can now use directly key bindings, set them in 'Game Menu -> Key Bindings -> AddOns'_
 
-Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Action Priority Lists](https://github.com/simulationcraft/simc/wiki/ActionLists).
+Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Action Priority Lists](https://github.com/simulationcraft/simc/wiki/ActionLists).
 
 ## Special Features
 - Handle both Single Target and AoE rotations (it auto adapts).
-- Optimized Pooling of ressources when needed (ex: energy before using cooldowns for Rogue).
+- Optimized Pooling of resources when needed (ex: energy before using cooldowns for Rogue).
 - Accurate TimeToDie prediction.
 - Next cast prediction for Casters.
 - Special handlers for tricky abilities (ex: Finality or Exsanguinated Bleed for Rogue).
-- Solo Mode to improve the survivability to the detriment of DPS.
+- Solo Mode to prioritize survivability over DPS.
 
 ## Supported Rotations
 - Demon Hunter Vengeance _[Beta]_
@@ -41,7 +41,7 @@ Every rotations are based on [SimulationCraft](http://simulationcraft.org/) [Act
 - Warrior Fury _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
 
 ## Special Mention About SimC APL
-As said earlier, every rotations are based on SimulationCraft Action Priority Lists (APL).
+As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
 What it means is, it heavily relies on how optimized those APLs are, especially for some talents, tier bonuses and legendaries support.
 Do remember that what the addon tells you is what the "robot" on SimulationCraft would do if they were in your situation.
 It also means that you can improve the current APL by using the addon and report the issues you might encounter.
