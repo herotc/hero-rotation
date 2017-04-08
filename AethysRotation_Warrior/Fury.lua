@@ -15,6 +15,8 @@ local AR = AethysRotation;
 
 
 --- APL Local Vars
+-- Commons
+  local Everyone = AR.Commons.Everyone;
 -- Spells
   if not Spell.Warrior then Spell.Warrior = {}; end
   Spell.Warrior.Fury = {
@@ -299,7 +301,7 @@ local function APL ()
     -- Unit Update
       AC.GetEnemies(8);
       AC.GetEnemies(14);
-      AR.Commons.AoEToggleEnemiesUpdate();
+      Everyone.AoEToggleEnemiesUpdate();
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Flask
@@ -308,7 +310,7 @@ local function APL ()
       -- PrePot w/ DBM Count
 
       -- Opener
-      if AR.Commons.TargetIsValid() then
+      if Everyone.TargetIsValid() then
         if not Target:IsInRange(8) and Target:IsInRange(25) and S.Charge:IsCastable() then
           if AR.Cast(S.Charge) then return ""; end
         end
@@ -321,7 +323,7 @@ local function APL ()
       return;
     end
   --- In Combat
-  if AR.Commons.TargetIsValid() then
+  if Everyone.TargetIsValid() then
     -- actions+=/potion,name=old_war,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<30
     -- actions+=/use_item,name=ring_of_collapsing_futures,if=equipped.ring_of_collapsing_futures&buff.battle_cry.up&buff.enrage.up&!buff.temptation.up
     -- actions+=/dragon_roar,if=(equipped.convergence_of_fates&cooldown.battle_cry.remains<2)|!equipped.convergence_of_fates&(!cooldown.battle_cry.remains<=10|cooldown.battle_cry.remains<2)
