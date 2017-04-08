@@ -18,6 +18,7 @@ local tableinsert = table.insert;
 
 --- APL Local Vars
 -- Commons
+  local Everyone = AR.Commons.Everyone;
   local Rogue = AR.Commons.Rogue;
 -- Spells
   if not Spell.Rogue then Spell.Rogue = {}; end
@@ -454,7 +455,7 @@ local function APL ()
   -- Unit Update
   AC.GetEnemies(8); -- Shuriken Storm & Death from Above
   AC.GetEnemies(5); -- Melee
-  AR.Commons.AoEToggleEnemiesUpdate();
+  Everyone.AoEToggleEnemiesUpdate();
   --- Defensives
     -- Crimson Vial
     ShouldReturn = Rogue.CrimsonVial (S.CrimsonVial);
@@ -477,7 +478,7 @@ local function APL ()
         if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death (OOC)"; end
       end
       -- Opener
-      if AR.Commons.TargetIsValid() and Target:IsInRange(5) then
+      if Everyone.TargetIsValid() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
           if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade)
             and (Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Target:IsDummy()) then
@@ -500,7 +501,7 @@ local function APL ()
   -- In Combat
     -- MfD Sniping
     Rogue.MfDSniping(S.MarkedforDeath);
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
       -- Mythic Dungeon
       ShouldReturn = MythicDungeon();
       if ShouldReturn then return ShouldReturn; end
@@ -508,7 +509,7 @@ local function APL ()
       ShouldReturn = TrainingScenario();
       if ShouldReturn then return ShouldReturn; end
       -- Interrupts
-      AR.Commons.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
+      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
         {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
         {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
         {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
