@@ -8,6 +8,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: AethysRotation
 
+Settings.lua
 Hunter.lua
 BeastMastery.lua
 Marksmanship.lua
