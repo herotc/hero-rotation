@@ -16,16 +16,17 @@
   AR.Commons = {};
   AR.Commons.Everyone = {};
   local Settings = AR.GUISettings.General;
+  local Everyone = AR.Commons.Everyone;
 
 
 --- ============================ CONTENT ============================
-  -- Is Target Valid
-  function AR.Commons.TargetIsValid ()
+  -- Is the current target valid ?
+  function Everyone.TargetIsValid ()
     return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost();
   end
 
   -- Put EnemiesCount to 1 if we have AoEON
-  function AR.Commons.AoEToggleEnemiesUpdate ()
+  function Everyone.AoEToggleEnemiesUpdate ()
     if not AR.AoEON() then
       for Key, Value in pairs(Cache.EnemiesCount) do
         Cache.EnemiesCount[Key] = 1;
@@ -33,8 +34,13 @@
     end
   end
 
+  -- Is the current unit valid during cycle ?
+  function Everyone.UnitIsCycleValid (Unit, TimeToDieCheck, BestUnitTTD)
+    return not Unit:IsFacingBlacklisted() and Unit:TimeToDie() < 7777 and TimeToDieCheck > BestUnitTTD;
+  end
+
   -- Interrupt
-  function AR.Commons.Interrupt (Range, Spell, Setting, StunSpells)
+  function Everyone.Interrupt (Range, Spell, Setting, StunSpells)
     if Settings.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(Range) then
       if Spell:IsCastable() then
         if AR.Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
