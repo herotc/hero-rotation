@@ -8,6 +8,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: AethysRotation
 
+Settings.lua
 Warrior.lua
 Arms.lua
 Fury.lua
