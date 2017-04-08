@@ -16,6 +16,9 @@
 
 
 --- APL Local Vars
+-- Commons
+  local Everyone = AR.Commons.Everyone;
+  local Hunter = AR.Commons.Hunter;
   -- Spells
   if not Spell.Hunter then Spell.Hunter = {}; end
   Spell.Hunter.Survival = {
@@ -413,10 +416,10 @@
     -- Unit Update
     AC.GetEnemies(8);
     AC.GetEnemies(5);
-    AR.Commons.AoEToggleEnemiesUpdate();
+    Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
       -- Exhilaration
-      ShouldReturn = AR.Commons.Hunter.Exhilaration(S.Exhilaration);
+      ShouldReturn = Hunter.Exhilaration(S.Exhilaration);
       if ShouldReturn then return ShouldReturn; end
     -- Out of Combat
     if not Player:AffectingCombat() then
@@ -426,7 +429,7 @@
       -- PrePot w/ Bossmod Countdown
       
       -- Opener
-      if AR.Commons.TargetIsValid() then
+      if Everyone.TargetIsValid() then
         if not Target:IsInRange(5) and Target:IsInRange(40) and S.Harpoon:IsCastable() then
           if AR.Cast(S.Harpoon) then return ""; end
         end
@@ -439,7 +442,7 @@
       return;
     end
     -- In Combat
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
       if AR.CDsON() then
         -- actions+=/arcane_torrent,if=focus.deficit>=30
         if S.ArcaneTorrent:IsCastable() and Player:FocusDeficit() >= 30 then

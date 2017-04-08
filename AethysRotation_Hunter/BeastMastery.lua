@@ -17,6 +17,9 @@
 
 
 --- APL Local Vars
+-- Commons
+  local Everyone = AR.Commons.Everyone;
+  local Hunter = AR.Commons.Hunter;
   -- Spells
   if not Spell.Hunter then Spell.Hunter = {}; end
   Spell.Hunter.BeastMastery = {
@@ -88,7 +91,7 @@
     AC.GetEnemies(40);
     -- Defensives
       -- Exhilaration
-      ShouldReturn = AR.Commons.Hunter.Exhilaration(S.Exhilaration);
+      ShouldReturn = Hunter.Exhilaration(S.Exhilaration);
       if ShouldReturn then return ShouldReturn; end
     -- Out of Combat
     if not Player:AffectingCombat() then
@@ -101,7 +104,7 @@
         if AR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return; end
       end
       -- Opener
-      if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
+      if Everyone.TargetIsValid() and Target:IsInRange(40) then
         if AR.CDsON() then
           if S.AMurderofCrows:IsCastable() then
             if AR.Cast(S.AMurderofCrows) then return; end
@@ -117,7 +120,7 @@
       return;
     end
     -- In Combat
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
       if AR.CDsON() then
         -- actions+=/arcane_torrent,if=focus.deficit>=30
         if S.ArcaneTorrent:IsCastable() and Player:FocusDeficit() >= 30 then
