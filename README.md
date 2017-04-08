@@ -34,7 +34,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Hunter Survival (Credits: [Nia](https://github.com/Nianel))
 - Paladin Retribution _[Outdated]_
 - Priest Shadow _[Beta]_ (Credits: [KutiKuti](https://github.com/Kutikuti))
-- Rogue Assassination _[Outdated]_
+- Rogue Assassination
 - Rogue Outlaw
 - Rogue Subtlety
 - Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
