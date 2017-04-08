@@ -18,6 +18,7 @@
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
+  local Everyone = AR.Commons.Everyone;
   -- Spells
   if not Spell.DemonHunter then Spell.DemonHunter = {}; end
   Spell.DemonHunter.Havoc = {
@@ -131,7 +132,7 @@
   local function APL ()
     -- Unit Update
     
-    AR.Commons.AoEToggleEnemiesUpdate();
+    Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
     
     -- Out of Combat
@@ -141,7 +142,7 @@
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      if AR.Commons.TargetIsValid() then
+      if Everyone.TargetIsValid() then
        if AR.CDsON() then
           if S.Nemesis:IsCastable() then
             if AR.Cast(S.Nemesis) then return; end
@@ -157,7 +158,7 @@
       return;
     end
     -- In Combat
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
       
       
       -- actions+=/pick_up_fragment,if=talent.demonic_appetite.enabled&fury.deficit>=35&(!talent.demonic.enabled|cooldown.eye_beam.remains>5)
