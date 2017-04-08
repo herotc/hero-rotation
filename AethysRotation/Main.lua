@@ -233,7 +233,7 @@
     if EnabledRotation[Cache.Persistent.Player.Spec[1]] and not IsAddOnLoaded(EnabledRotation[Cache.Persistent.Player.Spec[1]]) then
       LoadAddOn(EnabledRotation[Cache.Persistent.Player.Spec[1]]);
     end
-	
+
     -- Check if there is a Rotation for this Spec
     if LatestSpecIDCheck ~= Cache.Persistent.Player.Spec[1] then
       if EnabledRotation[Cache.Persistent.Player.Spec[1]] and AR.APLs[Cache.Persistent.Player.Spec[1]] then

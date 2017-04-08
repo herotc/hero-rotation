@@ -39,15 +39,15 @@
           OffGCDasOffGCD = {
           }
         },
-		Balance = {
+        Balance = {
           -- {Display GCD as OffGCD, ForceReturn}
           GCDasOffGCD = {
-			MoonkinForm = {true, false}
+            MoonkinForm = {true, false}
           },
           -- {Display OffGCD as OffGCD, ForceReturn}
           OffGCDasOffGCD = {
-			BlessingofElune = {true, false},
-			AstralCommunion = {true, false}
+            BlessingofElune = {true, false},
+            AstralCommunion = {true, false}
           }
         }
       },
