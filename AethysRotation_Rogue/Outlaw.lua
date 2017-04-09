@@ -228,7 +228,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
-  if S.GhostlyStrike:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:Cooldown() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
+  if S.GhostlyStrike:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemains() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
     if AR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
   end
   -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
@@ -248,7 +248,7 @@ end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped() and not S.BladeFlurry:IsOnCooldown() and Cache.EnemiesCount[6] >= 2)) then
+  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped() and S.BladeFlurry:CooldownUp() and Cache.EnemiesCount[6] >= 2)) then
     if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
@@ -304,7 +304,7 @@ local function Finish ()
     if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
-  if S.RunThrough:IsCastable() and Target:IsInRange(6) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:Cooldown() + 3.5) then
+  if S.RunThrough:IsCastable() and Target:IsInRange(6) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemains() + 3.5) then
     if AR.Cast(S.RunThrough) then return "Cast Run Through"; end
   end
   -- OutofRange BtE
@@ -355,7 +355,7 @@ end
 local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
     -- Between the Eyes
-    if Player:ComboPoints() > 0 and not S.BetweentheEyes:IsOnCooldown() and Target:IsInRange(20) then
+    if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and Player:ComboPoints() > 0 then
       if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Training Scenario)"; end
     end
   end
