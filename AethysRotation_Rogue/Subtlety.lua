@@ -199,8 +199,8 @@ local function CDs ()
     -- TODO : SBlades duration (SB Traits)
     if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
       and Player:ComboPointsDeficit() >= 2+(Player:IsStealthed(true, true) and 1 or 0)-(I.MantleoftheMasterAssassin:IsEquipped() and 1 or 0)
-      and (not Settings.Subtlety.SprintAsDPSCD or S.Sprint:Cooldown() > 25*(0.4+(I.DenialoftheHalfGiants:IsEquipped() and 0.2 or 0)) or Rogue.MantleDuration() > 0 or S.ShadowDance:ChargesFractional() > ShD_Fractionnal()
-        or not S.Vanish:IsOnCooldown() or Target:TimeToDie() <= 25*1.1) then
+      and (not Settings.Subtlety.SprintAsDPSCD or S.Sprint:CooldownRemains() > 25*(0.4+(I.DenialoftheHalfGiants:IsEquipped() and 0.2 or 0)) or Rogue.MantleDuration() > 0 or S.ShadowDance:ChargesFractional() > ShD_Fractionnal()
+        or S.Vanish:CooldownUp() or Target:TimeToDie() <= 25*1.1) then
       if AR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return ""; end
     end
     -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.shd_fractionnal&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
@@ -381,7 +381,7 @@ local function Stealth_ALS ()
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=5
     or Cache.EnemiesCount[8] >= 5
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
-    or (not S.Shadowmeld:IsOnCooldown() and S.Vanish:IsOnCooldown() and S.ShadowDance:Charges() <= 1)
+    or (S.Shadowmeld:CooldownUp() and not S.Vanish:CooldownUp() and S.ShadowDance:Charges() <= 1)
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
     or (Target:TimeToDie() < 12*S.ShadowDance:ChargesFractional()*(I.ShadowSatyrsWalk:IsEquipped() and 1.5 or 1)) then
    return Stealth_CDs();
@@ -541,7 +541,7 @@ local function APL ()
       if S.Sprint:IsCastable() and Rogue.MantleDuration() == 0 then
         if not I.DraughtofSouls:IsEquipped() then
           -- actions+=/sprint,if=!equipped.draught_of_souls&mantle_duration=0&energy.time_to_max>=1.5&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal&!cooldown.vanish.up&target.time_to_die>=8&(dot.nightblade.remains>=14|target.time_to_die<=45)
-          if Player:EnergyTimeToMax() >= 1.5 and S.ShadowDance:ChargesFractional() < ShD_Fractionnal() and S.Vanish:IsOnCooldown() and Target:TimeToDie() >= 8
+          if Player:EnergyTimeToMax() >= 1.5 and S.ShadowDance:ChargesFractional() < ShD_Fractionnal() and not S.Vanish:CooldownUp() and Target:TimeToDie() >= 8
             and (Target:DebuffRemains(S.Nightblade) >= 14 or Target:TimeToDie() <= 45) then
             AR.CastSuggested(S.Sprint);
           end
