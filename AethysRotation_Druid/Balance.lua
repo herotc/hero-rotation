@@ -15,6 +15,8 @@ local AR = AethysRotation;
 
 
 --- APL Local Vars
+-- Commons
+  local Everyone = AR.Commons.Everyone;
 -- Spells
   if not Spell.Druid then Spell.Druid = {}; end
   Spell.Druid.Balance = {
@@ -215,7 +217,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ DBM Count
       -- Opener
-		if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
+		if Everyone.TargetIsValid() and Target:IsInRange(40) then
 			if S.NewMoon:IsAvailable() and S.NewMoon:IsCastable() then
 				if AR.Cast(S.NewMoon) then return "Cast"; end
 				return
@@ -236,7 +238,7 @@ local function APL ()
     end
 	
 	-- In Combat
-    if AR.Commons.TargetIsValid() then
+    if Everyone.TargetIsValid() then
 		if Target:IsInRange(40) then --in range
 			--CD usage
 			if AR.CDsON() then
