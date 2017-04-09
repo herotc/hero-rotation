@@ -74,6 +74,7 @@
     
   };
   local S = Spell.Priest.Shadow;
+  local Everyone = AR.Commons.Everyone;
   -- Items
   if not Item.Priest then Item.Priest = {}; end
   Item.Priest.Shadow = {
@@ -475,14 +476,14 @@ local function APL ()
 	  -- Opener
 		
 		--precast
-		if AR.Commons.TargetIsValid() and Target:IsInRange(40) then
+		if Everyone.TargetIsValid() and Target:IsInRange(40) then
 			if AR.Cast(S.MindBlast) then return "Cast"; end
 		end
 		return
 	end
 	
 	-- In Combat
-	if AR.Commons.TargetIsValid() then
+	if Everyone.TargetIsValid() then
 		if Target:IsInRange(40) then --in range
 			
 			--CD usage
@@ -490,9 +491,7 @@ local function APL ()
 				ShouldReturn = CDs();
 				if ShouldReturn then return ShouldReturn; end
 			end
-			
-			--print(Player:IsCasting())
-			
+						
 			--Specific APL for Voidform and Surrender
 			if Player:Buff(S.VoidForm) or (Player:CastID() == S.VoidEruption:ID()) then
 				--actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
