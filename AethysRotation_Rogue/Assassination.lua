@@ -165,12 +165,12 @@ local function Build ()
         AR.CastLeftNameplate(BestUnit, S.Mutilate);
       end
     end
-    -- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.vendetta.remains<=6|target.time_to_die<=6
+    -- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.exsanguinate.up|cooldown.vendetta.remains<=6|target.time_to_die<=6
     -- TODO: Fast double rupture for exsanguinate, check exsang cd ?
     if Target:IsInRange(5) and
       (Player:EnergyDeficit() <= 25 + Energy_Regen_Combined() or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane)
-        or (AR.CDsON() and not S.Exsanguinate:IsOnCooldown()) or Target:TimeToDie() < 6
-        or (AR.CDsON() and S.Vendetta:Cooldown() <= 6)) then
+        or (AR.CDsON() and S.Exsanguinate:CooldownUp()) or (AR.CDsON() and S.Vendetta:CooldownRemains() <= 6))
+        or Target:TimeToDie() < 6 then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
   end
@@ -235,7 +235,7 @@ local function CDs ()
           end
         else
           -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&(dot.rupture.ticking|time>10)
-          if S.Exsanguinate:IsAvailable() and S.Exsanguinate:Cooldown() < 1 and (Target:Debuff(S.Rupture) or AC.CombatTime() > 10) then
+          if S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemains() < 1 and (Target:Debuff(S.Rupture) or AC.CombatTime() > 10) then
             if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
           end
         end
@@ -272,9 +272,9 @@ local function Finish ()
     if AR.Cast(S.DeathfromAbove) then return "Cast"; end
   end
   if S.Envenom:IsCastable() and Target:IsInRange(5) then
-    -- actions.finish+=/envenom,if=combo_points>=4&(debuff.vendetta.up|mantle_duration>=gcd.remains+0.2|debuff.surge_of_toxins.remains<gcd.remains+0.2|variable.energy_time_to_max_combined<3)
+    -- actions.finish+=/envenom,if=combo_points>=4&(debuff.vendetta.up|mantle_duration>=gcd.remains+0.2|debuff.surge_of_toxins.remains<gcd.remains+0.2|energy.deficit<=25+variable.energy_regen_combined)
     if Player:ComboPoints() >= 4 and (Target:Debuff(S.Vendetta) or Rogue.MantleDuration() >= Player:GCDRemains() + 0.2
-      or Target:DebuffRemains(S.SurgeofToxins) < Player:GCDRemains() + 0.2  or Energy_Time_To_Max_Combined() < 3) then
+      or Target:DebuffRemains(S.SurgeofToxins) < Player:GCDRemains() + 0.2 or Player:EnergyDeficit() <= 25 + Energy_Regen_Combined()) then
       if AR.Cast(S.Envenom) then return "Cast"; end
     end
     -- actions.finish+=/envenom,if=talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<gcd.remains+0.2
@@ -296,7 +296,7 @@ local function Kingsbane ()
   end
   -- actions.kb+=/kingsbane,if=!talent.exsanguinate.enabled&buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
   if not S.Exsanguinate:IsAvailable() and Player:Buff(S.Envenom)
-    and ((Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)) or S.Vendetta:Cooldown() <= 5.8 or S.Vendetta:Cooldown() >= 10) then
+    and ((Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)) or S.Vendetta:CooldownRemains() <= 5.8 or S.Vendetta:CooldownRemains() >= 10) then
     if AR.Cast(S.Kingsbane) then return "Cast"; end
   end
   -- actions.kb+=/kingsbane,if=talent.exsanguinate.enabled&dot.rupture.exsanguinated
@@ -358,7 +358,7 @@ local function Maintain ()
   end
   -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
   -- TODO: Test 4-5 cp rupture for Exsg
-  if AR.CDsON() and S.Rupture:IsCastable() and Target:IsInRange(5) and S.Exsanguinate:IsAvailable() and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:Cooldown() < 1) 
+  if AR.CDsON() and S.Rupture:IsCastable() and Target:IsInRange(5) and S.Exsanguinate:IsAvailable() and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemains() < 1) 
     or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
@@ -529,7 +529,7 @@ local function APL ()
       -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
       -- Note: We disable 'active_dot.rupture>=spell_targets.rupture' in the addon since Multi-Dotting is suggested and not forced (CastLeftNameplate).
       -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
-      if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:Cooldown() > 2)
+      if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() > 2)
         and (not Target:DebuffRefreshable(S.Rupture, RuptureThreshold) or (AC.Exsanguinated(Target, "Rupture") and Target:DebuffRemains(S.Rupture) >= 3.5)
           or Target:TimeToDie()-Target:DebuffRemains(S.Rupture) <= 4) then
         ShouldReturn = Finish();
@@ -556,7 +556,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 04/01/2017
+-- Last Update: 04/09/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
@@ -583,7 +583,7 @@ AR.SetAPL(259, APL);
 -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)
 -- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)|buff.the_dreadlords_deceit.stack>=29
 -- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)
--- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.vendetta.remains<=6|target.time_to_die<=6
+-- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.exsanguinate.up|cooldown.vendetta.remains<=6|target.time_to_die<=6
 -- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<=gcd.max*2.5&debuff.agonizing_poison.stack>=5
 
 -- # Cooldowns
@@ -605,7 +605,7 @@ AR.SetAPL(259, APL);
 
 -- # Finishers
 -- actions.finish=death_from_above,if=combo_points>=5
--- actions.finish+=/envenom,if=combo_points>=4&(debuff.vendetta.up|mantle_duration>=gcd.remains+0.2|debuff.surge_of_toxins.remains<gcd.remains+0.2|variable.energy_time_to_max_combined<3)
+-- actions.finish+=/envenom,if=combo_points>=4&(debuff.vendetta.up|mantle_duration>=gcd.remains+0.2|debuff.surge_of_toxins.remains<gcd.remains+0.2|energy.deficit<=25+variable.energy_regen_combined)
 -- actions.finish+=/envenom,if=talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<gcd.remains+0.2
 
 -- # Kingsbane
