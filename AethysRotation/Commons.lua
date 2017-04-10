@@ -25,9 +25,16 @@
     return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost();
   end
 
-  -- Put EnemiesCount to 1 if we have AoEON
+  -- Put EnemiesCount to 1 if we have AoEON or are targetting an AoE insensible unit
+  local AoEInsensibleUnit = {
+    --- Legion
+      ----- Dungeons (7.0 Patch) -----
+      --- Mythic+ Affixes
+        -- Fel Explosives (7.2 Patch)
+        [120651] = true
+  }
   function Everyone.AoEToggleEnemiesUpdate ()
-    if not AR.AoEON() then
+    if not AR.AoEON() or AoEInsensibleUnit[Target:NPCID()] then
       for Key, Value in pairs(Cache.EnemiesCount) do
         Cache.EnemiesCount[Key] = 1;
       end
