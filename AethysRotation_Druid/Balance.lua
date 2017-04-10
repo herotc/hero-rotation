@@ -358,7 +358,7 @@ local function APL ()
 				if AR.Cast(S.StellarFlare) then return "Cast"; end
 			end
 			--multidoting Moon/Sun
-			if AR.AoEON() and Cache.EnemiesCount[40]<4 then
+			if AR.AoEON() and Cache.EnemiesCount[45]<4 then
 				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 				for Key, Value in pairs(Cache.Enemies[45]) do
 					if (Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
