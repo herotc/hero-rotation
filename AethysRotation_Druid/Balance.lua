@@ -157,48 +157,121 @@ end
 
 local function CelestialAlignmentPhase ()
 	-- actions.celestial_alignment_phase=starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
+	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=60 and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
+		if AR.Cast(S.Starfall) then return "Cast"; end
+	end
 	-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
+	if S.Starsurge:IsCastable() and  Player:AstralPower()>=40 and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
+		if AR.Cast(S.Starsurge) then return "Cast"; end
+	end
 	-- actions.celestial_alignment_phase+=/warrior_of_elune
+	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
+		if AR.Cast(S.WarriorofElune) then return "Cast"; end
+	end
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.warrior_of_elune.up
+	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() then
+		if AR.Cast(S.LunarStrike) then return "Cast"; end
+	end
 	-- actions.celestial_alignment_phase+=/solar_wrath,if=buff.solar_empowerment.up
+	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable() then
+		if AR.Cast(S.SolarWrath) then return "Cast"; end
+	end	
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.lunar_empowerment.up
+	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() then
+		if AR.Cast(S.LunarStrike) then return "Cast"; end
+	end
 	-- actions.celestial_alignment_phase+=/solar_wrath,if=talent.natures_balance.enabled&dot.sunfire_dmg.remains<5&cast_time<dot.sunfire_dmg.remains
+	if S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.SolarWrath:CastTime()<Target:DebuffRemains(S.MoonFireDebuff) then
+		if AR.Cast(S.SolarWrath) then return "Cast"; end
+	end	
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=(talent.natures_balance.enabled&dot.moonfire_dmg.remains<5&cast_time<dot.moonfire_dmg.remains)|active_enemies>=2
+	if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.LunarStrike:CastTime()<Target:DebuffRemains(S.MoonFireDebuff)) or (AR.AoEON() and Cache.EnemiesCount[45]>=2) then
+		if AR.Cast(S.LunarStrike) then return "Cast"; end
+	end	
 	-- actions.celestial_alignment_phase+=/solar_wrath
+	if AR.Cast(S.SolarWrath) then return "Cast"; end
 end
 
 local function SingleTarget ()
 	-- actions.single_target=new_moon,if=astral_power<=90
+	if S.NewMoon:IsAvailable() and S.NewMoon:IsCastable() and Player:AstralPower()<=90 then
+		if AR.Cast(S.NewMoon) then return "Cast"; end
+	end
 	-- actions.single_target+=/half_moon,if=astral_power<=80
+	if S.NewMoon:IsAvailable() and S.HalfMoon:IsCastable() and Player:AstralPower()<=80 then
+		if AR.Cast(S.HalfMoon) then return "Cast"; end
+	end
 	-- actions.single_target+=/full_moon,if=astral_power<=60
+	if S.NewMoon:IsAvailable() and S.FullMoon:IsCastable() and Player:AstralPower()<=60 then
+		if AR.Cast(S.FullMoon) then return "Cast"; end
+	end
 	-- actions.single_target+=/starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
+	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=60 and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
+		if AR.Cast(S.Starfall) then return "Cast"; end
+	end
 	-- actions.single_target+=/starsurge,if=active_enemies<=2
+	if S.Starsurge:IsCastable() and  Player:AstralPower()>=40 and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
+		if AR.Cast(S.Starsurge) then return "Cast"; end
+	end
 	-- actions.single_target+=/warrior_of_elune
+	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
+		if AR.Cast(S.WarriorofElune) then return "Cast"; end
+	end
 	-- actions.single_target+=/lunar_strike,if=buff.warrior_of_elune.up
+	if Player:Buff(S.WarriorofElune) and S.LunarStrike:IsCastable() then
+		if AR.Cast(S.LunarStrike) then return "Cast"; end
+	end
 	-- actions.single_target+=/solar_wrath,if=buff.solar_empowerment.up
+	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable() then
+		if AR.Cast(S.SolarWrath) then return "Cast"; end
+	end	
 	-- actions.single_target+=/lunar_strike,if=buff.lunar_empowerment.up
+	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() then
+		if AR.Cast(S.LunarStrike) then return "Cast"; end
+	end
 	-- actions.single_target+=/solar_wrath,if=talent.natures_balance.enabled&dot.sunfire_dmg.remains<5&cast_time<dot.sunfire_dmg.remains
+	if S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.SolarWrath:CastTime()<Target:DebuffRemains(S.MoonFireDebuff) then
+		if AR.Cast(S.SolarWrath) then return "Cast"; end
+	end	
 	-- actions.single_target+=/lunar_strike,if=(talent.natures_balance.enabled&dot.moonfire_dmg.remains<5&cast_time<dot.moonfire_dmg.remains)|active_enemies>=2
+	if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.LunarStrike:CastTime()<Target:DebuffRemains(S.MoonFireDebuff)) or (AR.AoEON() and Cache.EnemiesCount[45]>=2) then
+		if AR.Cast(S.LunarStrike) then return "Cast"; end
+	end	
 	-- actions.single_target+=/solar_wrath
+	if AR.Cast(S.SolarWrath) then return "Cast"; end
 end
 
 local function CDs ()
-	-- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
 	-- actions+=/blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
+	if S.BloodFury:IsAvailable() and S.BloodFury:IsCastable() and (Player:Buff(S.IncarnationChosenOfElune) or Player:Buff(S.CelestialAlignment)) then
+		if AR.Cast(S.BloodFury, Settings.Balance.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+	end
 	-- actions+=/berserking,if=buff.celestial_alignment.up|buff.incarnation.up
+	if S.Berserking:IsAvailable() and S.Berserking:IsCastable() and (Player:Buff(S.IncarnationChosenOfElune) or Player:Buff(S.CelestialAlignment)) then
+		if AR.Cast(S.Berserking, Settings.Balance.OffGCDasOffGCD.Berserking) then return "Cast"; end
+	end
 	-- actions+=/arcane_torrent,if=buff.celestial_alignment.up|buff.incarnation.up
+	if S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:IsCastable() and (Player:Buff(S.IncarnationChosenOfElune) or Player:Buff(S.CelestialAlignment)) then
+		if AR.Cast(S.ArcaneTorrent, Settings.Balance.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+	end
 	-- actions+=/incarnation,if=astral_power>=40
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=40 then
+		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
+	end
 	-- actions+=/celestial_alignment,if=astral_power>=40
+	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and Player:AstralPower()>=40 then
+		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return "Cast"; end
+	end
 	-- actions+=/astral_communion,if=astral_power.deficit>=75
-	if S.AstralCommunion:IsAvailable() and Player:AstralPowerDeficit()>=75 then
-		if AR.Cast(S.AstralCommunion, Settings.Balance.GCDasOffGCD.AstralCommunion) then return "Cast"; end
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=75 then
+		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
 	end
 end
   
 -- APL Main
 local function APL ()
 	-- Unit Update
-    AC.GetEnemies(40);
+    AC.GetEnemies(45);
 	
 	--Buffs
 	if not Player:Buff(S.MoonkinForm) then
@@ -217,18 +290,15 @@ local function APL ()
       -- Rune
       -- PrePot w/ DBM Count
       -- Opener
-		if Everyone.TargetIsValid() and Target:IsInRange(40) then
+		if Everyone.TargetIsValid() and Target:IsInRange(45) then
 			if S.NewMoon:IsAvailable() and S.NewMoon:IsCastable() then
 				if AR.Cast(S.NewMoon) then return "Cast"; end
-				return
 			end
 			if S.NewMoon:IsAvailable() and S.HalfMoon:IsCastable() then
 				if AR.Cast(S.HalfMoon) then return "Cast"; end
-				return
 			end
 			if S.NewMoon:IsAvailable() and S.FullMoon:IsCastable() then
 				if AR.Cast(S.FullMoon) then return "Cast"; end
-				return
 			end
 			
 			if AR.Cast(S.SolarWrath) then return "Cast"; end
@@ -239,7 +309,7 @@ local function APL ()
 	
 	-- In Combat
     if Everyone.TargetIsValid() then
-		if Target:IsInRange(40) then --in range
+		if Target:IsInRange(45) then --in range
 			--CD usage
 			if AR.CDsON() then
 				ShouldReturn = CDs();
@@ -248,8 +318,8 @@ local function APL ()
 		
 			-- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
 			-- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
-			if (Cache.EnemiesCount[40]<=2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) )
-				or (Cache.EnemiesCount[40]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe)) then
+			if (Cache.EnemiesCount[45]<=2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) )
+				or (AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe)) then
 				if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
 			end
 			
@@ -261,7 +331,7 @@ local function APL ()
 			end
 			
 			-- actions+=/call_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=2
-			if (I.EmeraldDreamcatcher:IsEquipped(1) and 1 or 0) and Cache.EnemiesCount[40]<=2 then
+			if (I.EmeraldDreamcatcher:IsEquipped(1) and 1 or 0) and Cache.EnemiesCount[45]<=2 then
 				-- TODO : ED
 				--ShouldReturn = Dreamcatcher ();
 				if ShouldReturn then return ShouldReturn; end
@@ -284,7 +354,7 @@ local function APL ()
 			
 			-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
 			--TODO : AOE
-			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[40]<4 and Player:AstralPower()>=15 and Target:DebuffRemains(S.StellarFlare) < 7.2 then
+			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=15 and Target:DebuffRemains(S.StellarFlare) < 7.2 then
 				if AR.Cast(S.StellarFlare) then return "Cast"; end
 			end
 			
@@ -317,7 +387,7 @@ local function APL ()
 			
 			-- actions+=/call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
 			if Player:Buff(S.CelestialAlignment) or Player:Buff(S.IncarnationChosenOfElune) then
-				--ShouldReturn = CelestialAlignmentPhase();
+				ShouldReturn = CelestialAlignmentPhase();
 				if ShouldReturn then return ShouldReturn; end
 			end
 			

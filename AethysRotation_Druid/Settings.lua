@@ -20,12 +20,22 @@
     Balance = {
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+		-- Abilities
         MoonkinForm = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
+		-- Abilities
         BlessingofElune = {true, false},
-        AstralCommunion = {true, false}
+        AstralCommunion = {true, false},
+        IncarnationChosenOfElune = {true, false},
+        CelestialAlignment = {true, false},
+		
+		
+		--Racials
+		ArcaneTorrent = {true, false},
+        Berserking = {true, false},
+        BloodFury = {true, false},
       }
     }
   };
