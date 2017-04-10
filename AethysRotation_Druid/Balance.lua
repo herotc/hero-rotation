@@ -100,7 +100,7 @@ local AR = AethysRotation;
   local I = Item.Druid.Balance;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local BestUnit, BestUnitTTD; -- Used for cycling
+  local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -357,17 +357,45 @@ local function APL ()
 			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=15 and Target:DebuffRemains(S.StellarFlare) < 7.2 then
 				if AR.Cast(S.StellarFlare) then return "Cast"; end
 			end
+			--multidoting Moon/Sun
+			if AR.AoEON() and Cache.EnemiesCount[40]<4 then
+				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+				for Key, Value in pairs(Cache.Enemies[45]) do
+					if (Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
+						or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.StellarFlare and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
+					end					
+				end
+				if BestUnit then
+					if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+				end
+			end
 			
 			-- actions+=/moonfire,cycle_targets=1,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
-			--TODO : AOE
 			if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
 				if AR.Cast(S.MoonFire) then return "Cast"; end
 			end
 			
 			-- actions+=/sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
-			--TODO : AOE
 			if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
 				if AR.Cast(S.SunFire) then return "Cast"; end
+			end
+			
+			--multidoting Moon/Sun
+			if AR.AoEON() then
+				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+				for Key, Value in pairs(Cache.Enemies[45]) do
+					if (Value:TimeToDie()-Value:DebuffRemains(S.MoonFireDebuff) > BestUnitTTD and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) 
+						or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.MoonFire and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
+					elseif Value:TimeToDie()-Value:DebuffRemains(S.SunFireDebuff) > BestUnitTTD
+						and Value:DebuffRemains(S.SunFireDebuff)< 3*Player:GCD() and BestUnitSpellToCast ~= S.MoonFire then
+							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
+					end					
+				end
+				if BestUnit then
+					if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+				end
 			end
 			
 			-- actions+=/starfall,if=buff.oneths_overconfidence.up
