@@ -59,6 +59,7 @@
 		MassHysteria			= Spell(194378),
 		SphereOfInsanity		= Spell(194179),
 		UnleashTheShadows		= Spell(194093),
+		FiendingDark			= Spell(238065),
     -- Defensive
 		Dispersion				= Spell(47585),
 		Fade					= Spell(586),
@@ -192,7 +193,7 @@ local function CDs ()
 	--actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--S2M:actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--TODO : S2M
-	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() and Player:BuffStack(S.VoidForm)>15 then
+	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() and Player:BuffStack(S.VoidForm)> (15-4.5*(S.FiendingDark:ArtifactRank() or 0)) then
 		if AR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend) then return "Cast"; end
 	end
 
