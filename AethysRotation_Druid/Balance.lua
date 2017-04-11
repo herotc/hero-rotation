@@ -101,6 +101,8 @@ local AR = AethysRotation;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
+  local nextMoon;
+  local currentGeneration;
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -157,7 +159,7 @@ end
 
 local function CelestialAlignmentPhase ()
 	-- actions.celestial_alignment_phase=starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
-	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=60 and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
+	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
@@ -194,23 +196,35 @@ end
 
 local function SingleTarget ()
 	-- actions.single_target=new_moon,if=astral_power<=90
-	if S.NewMoon:IsAvailable() and S.NewMoon:IsCastable() and Player:AstralPower()<=90 then
-		if AR.Cast(S.NewMoon) then return "Cast"; end
+	if S.NewMoon:IsAvailable() 
+		and ((S.NewMoon:Charges()>1 and nextMoon==S.NewMoon)
+		or (S.NewMoon:Charges()==1 and nextMoon==S.NewMoon and not(Player:CastID()==S.NewMoon:ID() or Player:CastID()==S.HalfMoon:ID() or Player:CastID()==S.FullMoon:ID())) 
+		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.NewMoon))  
+		and Player:AstralPower()<=(90-currentGeneration) then
+			if AR.Cast(S.NewMoon) then return "Cast"; end
 	end
 	-- actions.single_target+=/half_moon,if=astral_power<=80
-	if S.NewMoon:IsAvailable() and S.HalfMoon:IsCastable() and Player:AstralPower()<=80 then
-		if AR.Cast(S.HalfMoon) then return "Cast"; end
+	if S.NewMoon:IsAvailable() 
+		and ((S.NewMoon:Charges()>1 and nextMoon==S.HalfMoon)
+		or (S.NewMoon:Charges()==1 and nextMoon==S.HalfMoon and not(Player:CastID()==S.NewMoon:ID() or Player:CastID()==S.HalfMoon:ID() or Player:CastID()==S.FullMoon:ID())) 
+		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.HalfMoon))
+		and Player:AstralPower()<=(80-currentGeneration) then	
+			if AR.Cast(S.HalfMoon) then return "Cast"; end
 	end
-	-- actions.single_target+=/full_moon,if=astral_power<=60
-	if S.NewMoon:IsAvailable() and S.FullMoon:IsCastable() and Player:AstralPower()<=60 then
-		if AR.Cast(S.FullMoon) then return "Cast"; end
+	-- actions.single_target+=/full_moon,if=astral_power<=60 
+	if S.NewMoon:IsAvailable() 
+		and ((S.NewMoon:Charges()>1 and nextMoon==S.FullMoon)
+		or (S.NewMoon:Charges()==1 and nextMoon==S.FullMoon and not(Player:CastID()==S.NewMoon:ID() or Player:CastID()==S.HalfMoon:ID() or Player:CastID()==S.FullMoon:ID())) 
+		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.FullMoon)) 
+		and Player:AstralPower()<=(60-currentGeneration) then
+			if AR.Cast(S.FullMoon) then return "Cast"; end
 	end
 	-- actions.single_target+=/starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
-	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=60 and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
+	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.single_target+=/starsurge,if=active_enemies<=2
-	if S.Starsurge:IsCastable() and  Player:AstralPower()>=40 and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
+	if S.Starsurge:IsCastable() and Player:AstralPower()>=(40-currentGeneration) and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.single_target+=/warrior_of_elune
@@ -255,17 +269,38 @@ local function CDs ()
 		if AR.Cast(S.ArcaneTorrent, Settings.Balance.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
 	end
 	-- actions+=/incarnation,if=astral_power>=40
-	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=40 then
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=(40-currentGeneration) then
 		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
 	end
 	-- actions+=/celestial_alignment,if=astral_power>=40
-	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and Player:AstralPower()>=40 then
+	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and Player:AstralPower()>=(40-currentGeneration) then
 		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return "Cast"; end
 	end
 	-- actions+=/astral_communion,if=astral_power.deficit>=75
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=75 then
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
 	end
+end
+
+local function nextMoonCalculation()
+	if not S.NewMoon:IsAvailable() then return nil; end
+	if Player:IsCasting() then
+		if Player:CastID()== S.NewMoon:ID() then return S.HalfMoon end
+		if Player:CastID()== S.HalfMoon:ID() then return S.FullMoon end
+		if Player:CastID()== S.FullMoon:ID() then return S.NewMoon end
+	end
+	if S.NewMoon:IsCastable() then return S.NewMoon end
+	if S.HalfMoon:IsCastable() then return S.HalfMoon end
+	if S.FullMoon:IsCastable() then return S.FullMoon end
+end
+
+local function currentGenerationCalculation()
+	if not Player:IsCasting() then return 0; end
+	if Player:CastID()==S.NewMoon:ID() then return 10; end
+	if Player:CastID()==S.HalfMoon:ID() then return 20; end
+	if Player:CastID()==S.FullMoon:ID() then return 40; end
+	if Player:CastID()==S.SolarWrath:ID() then return (Player:Buff(S.BlessingofElune) and 10 or 8); end
+	if Player:CastID()==S.LunarStrike:ID() then return (Player:Buff(S.BlessingofElune) and 15 or 10); end
 end
   
 -- APL Main
@@ -277,8 +312,6 @@ local function APL ()
 	if not Player:Buff(S.MoonkinForm) then
 		if AR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "Cast"; end
 	end
-	
-
 	
 	-- Out of Combat
     if not Player:AffectingCombat() then
@@ -309,6 +342,8 @@ local function APL ()
 	
 	-- In Combat
     if Everyone.TargetIsValid() then
+		nextMoon = nextMoonCalculation()
+		currentGeneration = currentGenerationCalculation()
 		if Target:IsInRange(45) then --in range
 			--CD usage
 			if AR.CDsON() then
@@ -354,7 +389,7 @@ local function APL ()
 			
 			-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
 			--TODO : AOE
-			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=15 and Target:DebuffRemains(S.StellarFlare) < 7.2 then
+			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare) < 7.2 then
 				if AR.Cast(S.StellarFlare) then return "Cast"; end
 			end
 			--multidoting Moon/Sun
