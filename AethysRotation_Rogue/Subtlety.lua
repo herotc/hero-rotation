@@ -84,7 +84,7 @@ local tableinsert = table.insert;
   local S = Spell.Rogue.Subtlety;
   S.Eviscerate:RegisterDamage(
     -- Eviscerate DMG Formula (Pre-Mitigation):
-    --  AP * CP * EviscR1_APCoef * EviscR2_M * F:Evisc_M * ShadowFangs_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
+    --  AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * F:Evisc_M * ShadowFangs_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
     function ()
       return
         -- Attack Power
@@ -95,6 +95,8 @@ local tableinsert = table.insert;
         0.98130 *
         -- Eviscerate R2 Multiplier
         1.5 *
+        -- Aura Multiplier (SpellID: 137035)
+        1.09 *
         -- Finality: Eviscerate Multiplier | Used 1.2 atm
         -- TODO: Check the % from Tooltip or do an Event Listener
         (Player:Buff(S.FinalityEviscerate) and 1.2 or 1) *
@@ -112,7 +114,7 @@ local tableinsert = table.insert;
         (1 + Player:VersatilityDmgPct()/100) *
         -- Legion Blade Multiplier
         (S.LegionBlade:ArtifactEnabled() and 1.05 or 1) *
-        -- Legion Blade Multiplier
+        -- Shadows of the Uncrowned Multiplier
         (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
     end
   );
@@ -240,7 +242,7 @@ local function Finish (ReturnSpellOnly)
     NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
     -- actions.finish+=/nightblade,if=target.time_to_die-remains>8&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
     if Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 8
-      and (Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Target:IsDummy())
+      and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
       and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= Rogue.MantleDuration())
       and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade)))
         or Target:DebuffRemains(S.Nightblade) < 4) then
@@ -256,7 +258,7 @@ local function Finish (ReturnSpellOnly)
       for Key, Value in pairs(Cache.Enemies[5]) do
         if not Value:IsFacingBlacklisted() and not Value:IsUserCycleBlacklisted()
           and Value:TimeToDie() < 7777 and Value:TimeToDie()-Value:DebuffRemains(S.Nightblade) > BestUnitTTD
-          and (Value:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Value:IsDummy())
+          and Everyone.CanDoTUnit(Value, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
           and ((Value:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Value) or Player:Buff(S.FinalityNightblade)))
             or Value:DebuffRemains(S.Nightblade) < 4) then
           BestUnit, BestUnitTTD = Value, Value:TimeToDie();
@@ -481,7 +483,7 @@ local function APL ()
       if Everyone.TargetIsValid() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
           if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade)
-            and (Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Target:IsDummy()) then
+            and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset) then
             if AR.Cast(S.Nightblade) then return "Cast Nightblade (OOC)"; end
           elseif S.Eviscerate:IsCastable() then
             if AR.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
@@ -534,7 +536,7 @@ local function APL ()
       end
       -- actions+=/nightblade,if=target.time_to_die>8&remains<gcd.max&combo_points>=4
       if S.Nightblade:IsCastable() and Target:IsInRange(5) and Target:TimeToDie() < 7777 and Target:TimeToDie() > 8
-        and (Target:Health() >= S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset or Target:IsDummy())
+        and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
         and Target:DebuffRemains(S.Nightblade) < Player:GCD() and Player:ComboPoints() >= 4 then
         if AR.Cast(S.Nightblade) then return ""; end
       end
