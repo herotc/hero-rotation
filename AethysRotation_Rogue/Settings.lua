@@ -35,8 +35,10 @@
       }
     },
     Assassination = {
+      -- Envenom Damage Offset
+      EnvenomDMGOffset = 3,
       -- Poison Refresh (in seconds)
-      PoisonRefresh = 15 * 60; -- *60 to convert it to seconds
+      PoisonRefresh = 15 * 60, -- *60 to convert it to seconds
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
       },
