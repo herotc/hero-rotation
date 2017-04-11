@@ -18,6 +18,7 @@
   -- File Locals
   AR.Commons.Rogue = {};
   local Settings = AR.GUISettings.APL.Rogue.Commons;
+  local Everyone = AR.Commons.Everyone;
   local Rogue = AR.Commons.Rogue;
 
 
@@ -65,7 +66,12 @@
     end
   end
 
---- ======= SIMC CUSTOM EXPRESSION =======
+  -- Everyone CanDotUnit override to account for Mantle
+  -- Is it worth to DoT the unit ?
+  function Rogue.CanDoTUnit (Unit, HealthThreshold)
+    return Everyone.CanDoTUnit(Unit, HealthThreshold*(Rogue.MantleDuration() > 0 and 1.33 or 1));
+  end
+--- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
   -- cp_max_spend
   function Rogue.CPMaxSpend ()
     -- Should work for all 3 specs since they have same Deeper Stratagem Spell ID.
@@ -115,7 +121,7 @@
            tdata -> dots.rupture -> is_ticking();
   ]]
   function Rogue.Bleeds ()
-    return (Target:Debuff(Spell.Rogue.Assassination.Garrote) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.Rupture) and 1 or 0);
+    return (Target:Debuff(Spell.Rogue.Assassination.Garrote) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.Rupture) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.InternalBleeding) and 1 or 0);
   end
 
   -- poisoned_bleeds
@@ -153,6 +159,26 @@
       end
     end
     return PoisonedBleedsCount;
+  end
+
+  -- Assassination Tier 19 4PC Envenom Multiplier
+  --[[ Original SimC Code
+    if ( p() -> sets.has_set_bonus( ROGUE_ASSASSINATION, T19, B4 ) )
+    {
+      size_t bleeds = 0;
+      rogue_td_t* tdata = td( target );
+      bleeds += tdata -> dots.garrote -> is_ticking();
+      bleeds += tdata -> dots.internal_bleeding -> is_ticking();
+      bleeds += tdata -> dots.rupture -> is_ticking();
+      // As of 04/08/2017, Mutilated Flesh works on T19 4PC.
+      bleeds += tdata -> dots.mutilated_flesh -> is_ticking();
+
+      m *= 1.0 + p() -> sets.set( ROGUE_ASSASSINATION, T19, B4 ) -> effectN( 1 ).percent() * bleeds;
+    }
+  ]]
+  local T19_4C_BaseMultiplier = 0.1;
+  function Rogue.Assa_T19_4PC_EnvMultiplier ()
+    return 1 + T19_4C_BaseMultiplier * (Rogue.Bleeds() + (Target:Debuff(Spell.Rogue.Assassination.MutilatedFlesh) and 1 or 0));
   end
 
   -- mantle_duration
