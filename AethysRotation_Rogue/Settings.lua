@@ -13,6 +13,8 @@
       -- SoloMode Settings
       CrimsonVialHP = 0,
       FeintHP = 0,
+      -- Evisc/Env Mantle Damage Offset Multiplier
+      EDMGMantleOffset = 2,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         CrimsonVial = {true, false},
