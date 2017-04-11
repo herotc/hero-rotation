@@ -69,7 +69,7 @@
   -- Everyone CanDotUnit override to account for Mantle
   -- Is it worth to DoT the unit ?
   function Rogue.CanDoTUnit (Unit, HealthThreshold)
-    return Everyone.CanDoTUnit(Unit, HealthThreshold*(Rogue.MantleDuration() > 0 and 1.33 or 1));
+    return Everyone.CanDoTUnit(Unit, HealthThreshold*(Rogue.MantleDuration() > 0 and Settings.EDMGMantleOffset or 1));
   end
 --- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
   -- cp_max_spend
