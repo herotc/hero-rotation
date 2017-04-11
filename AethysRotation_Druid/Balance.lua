@@ -168,7 +168,7 @@ local function CelestialAlignmentPhase ()
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/warrior_of_elune
-	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
+	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune) then
 		if AR.Cast(S.WarriorofElune) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.warrior_of_elune.up
@@ -235,7 +235,7 @@ local function SingleTarget ()
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.single_target+=/warrior_of_elune
-	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
+	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune) then
 		if AR.Cast(S.WarriorofElune, Settings.Balance.OffGCDasOffGCD.WarriorofElune) then return "Cast"; end
 	end
 	-- actions.single_target+=/lunar_strike,if=buff.warrior_of_elune.up
@@ -482,11 +482,13 @@ local function APL ()
 					if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
 				end
 				-- actions+=/moonfire,cycle_targets=1,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
-				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) 
+					or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
 					if AR.Cast(S.MoonFire) then return "Cast"; end
 				end
 				-- actions+=/sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
-				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) 
+					or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
 					if AR.Cast(S.SunFire) then return "Cast"; end
 				end
 				--multidoting Moon/Sun
@@ -515,15 +517,18 @@ local function APL ()
 					if AR.Cast(S.Starsurge) then return "Cast"; end
 				end
 				-- actions.celestial_alignment_phase+=/warrior_of_elune
-				if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
+				if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune) then
 					if AR.Cast(S.WarriorofElune) then return "Cast"; end
 				end
 				-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.warrior_of_elune.up
 				if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() and Player:Buff(S.WarriorofElune) 
-					and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.LunarEmpowerment)==1) then
+					and not (Player:CastID()==S.LunarStrike:ID() then
 					if AR.Cast(S.LunarStrike) then return "Cast"; end
 				end
 				--default
+				if AR.AoEON() and Cache.EnemiesCount[45]>=2 then
+					if AR.Cast(S.SunFire) then return "Cast"; end
+				end
 				if AR.Cast(S.MoonFire) then return "Cast"; end
 			end
 		end
