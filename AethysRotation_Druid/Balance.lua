@@ -158,7 +158,8 @@ end
 
 local function CelestialAlignmentPhase ()
 	-- actions.celestial_alignment_phase=starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
-	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
+	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) 
+		and ((Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
@@ -176,7 +177,7 @@ local function CelestialAlignmentPhase ()
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/solar_wrath,if=buff.solar_empowerment.up
-	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable() and Player:Buff(S.WarriorofElune) 
+	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable()
 		and not (Player:CastID()==S.SolarWrath:ID() and Player:BuffStack(S.SolarEmpowerment)==1) then
 		if AR.Cast(S.SolarWrath) then return "Cast"; end
 	end	
@@ -355,123 +356,176 @@ local function APL ()
 				if ShouldReturn then return ShouldReturn; end
 			end
 		
-			-- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
-			-- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
-			if (Cache.EnemiesCount[45]<=2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) )
-				or (AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe)) then
-				if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
-			end
-			
-			-- actions+=/call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elue.remains<target.time_to_die
-			if S.FuryofElune:IsAvailable() and S.FuryofElune:Cooldown()<Target:TimeToDie() then
-				-- TODO : FoE
-				--ShouldReturn = FuryOfElune();
-				if ShouldReturn then return ShouldReturn; end
-			end
-			
-			-- actions+=/call_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=2
-			if (I.EmeraldDreamcatcher:IsEquipped(1) and 1 or 0) and Cache.EnemiesCount[45]<=2 then
-				-- TODO : ED
-				--ShouldReturn = Dreamcatcher ();
-				if ShouldReturn then return ShouldReturn; end
-			end
-			
-			-- actions+=/new_moon,if=(charges=2&recharge_time<5)|charges=3
-			if S.NewMoon:IsCastable() 
-				and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()] ) 
-				or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])) then
-				if AR.Cast(S.NewMoon) then return "Cast"; end
-			end
-			
-			-- actions+=/half_moon,if=(charges=2&recharge_time<5)|charges=3|(target.time_to_die<15&charges=2)
-			if S.HalfMoon:IsCastable() 
-				and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
-				or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]) 
-				or (S.NewMoon:Charges()==2 and Target:TimeToDie()<15)) then
-				if AR.Cast(S.HalfMoon) then return "Cast"; end
-			end
-			
-			-- actions+=/full_moon,if=(charges=2&recharge_time<5)|charges=3|target.time_to_die<15
-			if S.FullMoon:IsCastable() 
-				and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
-				or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]) 
-				or (Target:TimeToDie()<15)) then
-				if AR.Cast(S.FullMoon) then return "Cast"; end
-			end
-			
-			
-			-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
-			--TODO : AOE
-			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare) < 7.2 then
-				if AR.Cast(S.StellarFlare) then return "Cast"; end
-			end
-			--multidoting Moon/Sun
-			if AR.AoEON() and Cache.EnemiesCount[45]<4 then
-				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-				for Key, Value in pairs(Cache.Enemies[45]) do
-					if (Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
-						or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.StellarFlare and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) then
-							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
-					end					
+			--static
+			if GetUnitSpeed("player") == 0 then
+				-- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
+				-- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
+				if (Cache.EnemiesCount[45]<=2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) )
+					or (AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe)) then
+					if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
 				end
-				if BestUnit then
-					if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+				
+				-- actions+=/call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elue.remains<target.time_to_die
+				if S.FuryofElune:IsAvailable() and S.FuryofElune:Cooldown()<Target:TimeToDie() then
+					-- TODO : FoE
+					--ShouldReturn = FuryOfElune();
+					if ShouldReturn then return ShouldReturn; end
 				end
-			end
+				
+				-- actions+=/call_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=2
+				if (I.EmeraldDreamcatcher:IsEquipped(1) and 1 or 0) and Cache.EnemiesCount[45]<=2 then
+					-- TODO : ED
+					--ShouldReturn = Dreamcatcher ();
+					if ShouldReturn then return ShouldReturn; end
+				end
+				
+				-- actions+=/new_moon,if=(charges=2&recharge_time<5)|charges=3
+				if S.NewMoon:IsCastable() 
+					and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()] ) 
+					or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])) then
+					if AR.Cast(S.NewMoon) then return "Cast"; end
+				end
+				
+				-- actions+=/half_moon,if=(charges=2&recharge_time<5)|charges=3|(target.time_to_die<15&charges=2)
+				if S.HalfMoon:IsCastable() 
+					and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
+					or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]) 
+					or (S.NewMoon:Charges()==2 and Target:TimeToDie()<15)) then
+					if AR.Cast(S.HalfMoon) then return "Cast"; end
+				end
+				
+				-- actions+=/full_moon,if=(charges=2&recharge_time<5)|charges=3|target.time_to_die<15
+				if S.FullMoon:IsCastable() 
+					and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
+					or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]) 
+					or (Target:TimeToDie()<15)) then
+					if AR.Cast(S.FullMoon) then return "Cast"; end
+				end
+				
+				
+				-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
+				if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare) < 7.2 then
+					if AR.Cast(S.StellarFlare) then return "Cast"; end
+				end
+				--multidoting Stellar Flare
+				if AR.AoEON() and Cache.EnemiesCount[45]<4 then
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+					for Key, Value in pairs(Cache.Enemies[45]) do
+						if (Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
+							or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.StellarFlare and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
+						end					
+					end
+					if BestUnit then
+						if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+					end
+				end
+				
+				-- actions+=/moonfire,cycle_targets=1,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
+					if AR.Cast(S.MoonFire) then return "Cast"; end
+				end
+				
+				-- actions+=/sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
+					if AR.Cast(S.SunFire) then return "Cast"; end
+				end
+				
+				--multidoting Moon/Sun
+				if AR.AoEON() then
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+					for Key, Value in pairs(Cache.Enemies[45]) do
+						if (Value:TimeToDie()-Value:DebuffRemains(S.MoonFireDebuff) > BestUnitTTD and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) 
+							or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.MoonFire and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
+						elseif Value:TimeToDie()-Value:DebuffRemains(S.SunFireDebuff) > BestUnitTTD
+							and Value:DebuffRemains(S.SunFireDebuff)< 3*Player:GCD() and BestUnitSpellToCast ~= S.MoonFire then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
+						end					
+					end
+					if BestUnit then
+						if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+					end
+				end
+				
+				-- actions+=/starfall,if=buff.oneths_overconfidence.up
+				if Player:Buff(S.OnethsIntuition) then
+					if AR.Cast(S.Starfall) then return "Cast"; end
+				end
+				
+				-- actions+=/solar_wrath,if=buff.solar_empowerment.stack=3
+				if Player:BuffStack(S.SolarEmpowerment)==3 then
+					if AR.Cast(S.SolarWrath) then return "Cast"; end
+				end
+				
+				-- actions+=/lunar_strike,if=buff.lunar_empowerment.stack=3
+				if Player:BuffStack(S.LunarEmpowerment)==3 then
+					if AR.Cast(S.LunarStrike) then return "Cast"; end
+				end
+				
+				-- actions+=/call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
+				if Player:Buff(S.CelestialAlignment) or Player:Buff(S.IncarnationChosenOfElune) then
+					ShouldReturn = CelestialAlignmentPhase();
+					if ShouldReturn then return ShouldReturn; end
+				end
+				
+				-- actions+=/call_action_list,name=single_target
+				ShouldReturn = SingleTarget();
+				if ShouldReturn then return ShouldReturn; end
 			
-			-- actions+=/moonfire,cycle_targets=1,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
-			if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
+			--moving
+			else
+				-- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
+				-- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
+				if (Cache.EnemiesCount[45]<=2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) )
+					or (AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe)) then
+					if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
+				end
+				-- actions+=/moonfire,cycle_targets=1,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
+					if AR.Cast(S.MoonFire) then return "Cast"; end
+				end
+				-- actions+=/sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
+					if AR.Cast(S.SunFire) then return "Cast"; end
+				end
+				--multidoting Moon/Sun
+				if AR.AoEON() then
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+					for Key, Value in pairs(Cache.Enemies[45]) do
+						if (Value:TimeToDie()-Value:DebuffRemains(S.MoonFireDebuff) > BestUnitTTD and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) 
+							or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.MoonFire and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
+						elseif Value:TimeToDie()-Value:DebuffRemains(S.SunFireDebuff) > BestUnitTTD
+							and Value:DebuffRemains(S.SunFireDebuff)< 3*Player:GCD() and BestUnitSpellToCast ~= S.MoonFire then
+								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
+						end					
+					end
+					if BestUnit then
+						if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+					end
+				end
+				-- actions+=/starfall,if=buff.oneths_overconfidence.up
+				if Player:Buff(S.OnethsIntuition) then
+					if AR.Cast(S.Starfall) then return "Cast"; end
+				end
+				-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
+				if S.Starsurge:IsCastable() and  Player:AstralPower()>=(40-currentGeneration) 
+					and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
+					if AR.Cast(S.Starsurge) then return "Cast"; end
+				end
+				-- actions.celestial_alignment_phase+=/warrior_of_elune
+				if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
+					if AR.Cast(S.WarriorofElune) then return "Cast"; end
+				end
+				-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.warrior_of_elune.up
+				if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() and Player:Buff(S.WarriorofElune) 
+					and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.LunarEmpowerment)==1) then
+					if AR.Cast(S.LunarStrike) then return "Cast"; end
+				end
+				--default
 				if AR.Cast(S.MoonFire) then return "Cast"; end
 			end
-			
-			-- actions+=/sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
-			if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
-				if AR.Cast(S.SunFire) then return "Cast"; end
-			end
-			
-			--multidoting Moon/Sun
-			if AR.AoEON() then
-				BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-				for Key, Value in pairs(Cache.Enemies[45]) do
-					if (Value:TimeToDie()-Value:DebuffRemains(S.MoonFireDebuff) > BestUnitTTD and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) 
-						or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.MoonFire and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) then
-							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
-					elseif Value:TimeToDie()-Value:DebuffRemains(S.SunFireDebuff) > BestUnitTTD
-						and Value:DebuffRemains(S.SunFireDebuff)< 3*Player:GCD() and BestUnitSpellToCast ~= S.MoonFire then
-							BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
-					end					
-				end
-				if BestUnit then
-					if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
-				end
-			end
-			
-			-- actions+=/starfall,if=buff.oneths_overconfidence.up
-			if Player:Buff(S.OnethsIntuition) then
-				if AR.Cast(S.Starfall) then return "Cast"; end
-			end
-			
-			-- actions+=/solar_wrath,if=buff.solar_empowerment.stack=3
-			if Player:BuffStack(S.SolarEmpowerment)==3 then
-				if AR.Cast(S.SolarWrath) then return "Cast"; end
-			end
-			
-			-- actions+=/lunar_strike,if=buff.lunar_empowerment.stack=3
-			if Player:BuffStack(S.LunarEmpowerment)==3 then
-				if AR.Cast(S.LunarStrike) then return "Cast"; end
-			end
-			
-			-- actions+=/call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
-			if Player:Buff(S.CelestialAlignment) or Player:Buff(S.IncarnationChosenOfElune) then
-				ShouldReturn = CelestialAlignmentPhase();
-				if ShouldReturn then return ShouldReturn; end
-			end
-			
-			-- actions+=/call_action_list,name=single_target
-			ShouldReturn = SingleTarget();
-			if ShouldReturn then return ShouldReturn; end
-		else
-			
 		end
 	end
 end
