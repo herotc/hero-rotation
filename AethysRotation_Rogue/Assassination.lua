@@ -265,7 +265,7 @@ local function CDs ()
           -- # Nightstalker w/o Exsanguinate: Vanish Envenom if Mantle & T19_4PC, else Vanish Rupture
           -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc&mantle_duration=0)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
           if (I.MantleoftheMasterAssassin:IsEquipped() and AC.Tier19_4Pc and Rogue.MantleDuration() == 0)
-            or ((not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc) and (Target:DebuffRefreshable(S.Rupture, RuptureThreshold) or Target:Debuff(S.Vendetta))) then
+            or ((not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc) and ((Target:DebuffRefreshable(S.Rupture, RuptureThreshold) and Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset)) or Target:Debuff(S.Vendetta))) then
             if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
           end
         else
@@ -344,7 +344,7 @@ local function Maintain ()
   if Player:IsStealthed(true, false) then
     -- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(talent.exsanguinate.enabled|target.time_to_die-remains>4)
     if S.Rupture:IsCastable() and Target:IsInRange(5) and S.Nightstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc)
-      and (S.Exsanguinate:IsAvailable() or Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture))) then
+      and (S.Exsanguinate:IsAvailable() or (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture)) and Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset))) then
       if AR.Cast(S.Rupture) then return "Cast"; end
     end
     -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
@@ -388,7 +388,8 @@ local function Maintain ()
     end
   end
   -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=gcd.remains+0.2&target.time_to_die>4
-  if S.Rupture:IsCastable() and Target:IsInRange(5) and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3 and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= Player:GCDRemains() + 0.2 and Target:FilteredTimeToDie(">", 4) then
+  if S.Rupture:IsCastable() and Target:IsInRange(5) and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
+    and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= Player:GCDRemains() + 0.2 and Target:FilteredTimeToDie(">", 4) and Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset) then
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
   -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
@@ -401,13 +402,14 @@ local function Maintain ()
   -- TODO: pmultiplier (core handler rather than rogue specific)
   if Player:ComboPoints() >= 4 then
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemains(S.Rupture) <= 1.5)
-      and Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture)) then
+      and Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture)) and Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset) then
       if AR.Cast(S.Rupture) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD = nil, 4;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Rupture))
+          and Rogue.CanDoTUnit(Unit, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset)
           and Unit:DebuffRefreshable(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Unit, "Rupture") or Unit:DebuffRemains(S.Rupture) <= 1.5) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
@@ -523,7 +525,8 @@ local function APL ()
       -- Opener
       if Everyone.TargetIsValid() and Target:IsInRange(5) then
         if Player:ComboPoints() >= 5 then
-          if S.Rupture:IsCastable() and not Target:Debuff(S.Rupture) then
+          if S.Rupture:IsCastable() and not Target:Debuff(S.Rupture)
+            and Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset) then
             if AR.Cast(S.Rupture) then return "Cast"; end
           elseif S.Envenom:IsCastable() then
             if AR.Cast(S.Envenom) then return "Cast"; end
@@ -563,10 +566,11 @@ local function APL ()
       if ShouldReturn then return ShouldReturn; end
       -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
       -- Note: We disable 'active_dot.rupture>=spell_targets.rupture' in the addon since Multi-Dotting is suggested and not forced (CastLeftNameplate).
+      -- Note: We add 'Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset)' to account for when Rupture isn't castable
       -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
       if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() > 2)
         and (not Target:DebuffRefreshable(S.Rupture, RuptureThreshold) or (AC.Exsanguinated(Target, "Rupture") and Target:DebuffRemains(S.Rupture) >= 3.5)
-          or Target:FilteredTimeToDie("<=", 4, -Target:DebuffRemains(S.Rupture))) then
+          or Target:FilteredTimeToDie("<=", 4, -Target:DebuffRemains(S.Rupture)) or not Rogue.CanDoTUnit(Target, S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset)) then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
