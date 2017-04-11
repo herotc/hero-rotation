@@ -42,8 +42,13 @@
   end
 
   -- Is the current unit valid during cycle ?
-  function Everyone.UnitIsCycleValid (Unit, TimeToDieCheck, BestUnitTTD)
-    return not Unit:IsFacingBlacklisted() and Unit:TimeToDie() < 7777 and TimeToDieCheck > BestUnitTTD;
+  function Everyone.UnitIsCycleValid (Unit, BestUnitTTD, TimeToDieOffset)
+    return not Unit:IsFacingBlacklisted() and Target:FilteredTimeToDie(">", BestUnitTTD, TimeToDieOffset);
+  end
+
+  -- Is it worth to DoT the unit ?
+  function Everyone.CanDoTUnit (Unit, HealthThreshold)
+    return Unit:Health() >= HealthThreshold or Unit:IsDummy();
   end
 
   -- Interrupt
