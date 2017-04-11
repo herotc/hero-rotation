@@ -94,8 +94,6 @@ local AR = AethysRotation;
   Item.Druid.Balance = {
     -- Legendaries
 		EmeraldDreamcatcher		= Item(137062), --1
-	
-		--the_emerald_dreamcatcher
   };
   local I = Item.Druid.Balance;
 -- Rotation Var
@@ -103,6 +101,7 @@ local AR = AethysRotation;
   local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
   local nextMoon;
   local currentGeneration;
+  local moons={[S.NewMoon:ID()]=true, [S.HalfMoon:ID()]=true, [S.FullMoon:ID()]=true}
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -163,7 +162,8 @@ local function CelestialAlignmentPhase ()
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
-	if S.Starsurge:IsCastable() and  Player:AstralPower()>=40 and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
+	if S.Starsurge:IsCastable() and  Player:AstralPower()>=(40-currentGeneration) 
+		and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/warrior_of_elune
@@ -171,15 +171,18 @@ local function CelestialAlignmentPhase ()
 		if AR.Cast(S.WarriorofElune) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.warrior_of_elune.up
-	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() then
+	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() and Player:Buff(S.WarriorofElune) 
+		and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.LunarEmpowerment)==1) then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/solar_wrath,if=buff.solar_empowerment.up
-	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable() then
+	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable() and Player:Buff(S.WarriorofElune) 
+		and not (Player:CastID()==S.SolarWrath:ID() and Player:BuffStack(S.SolarEmpowerment)==1) then
 		if AR.Cast(S.SolarWrath) then return "Cast"; end
 	end	
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=buff.lunar_empowerment.up
-	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() then
+	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() 
+		and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.LunarEmpowerment)==1) then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/solar_wrath,if=talent.natures_balance.enabled&dot.sunfire_dmg.remains<5&cast_time<dot.sunfire_dmg.remains
@@ -187,7 +190,8 @@ local function CelestialAlignmentPhase ()
 		if AR.Cast(S.SolarWrath) then return "Cast"; end
 	end	
 	-- actions.celestial_alignment_phase+=/lunar_strike,if=(talent.natures_balance.enabled&dot.moonfire_dmg.remains<5&cast_time<dot.moonfire_dmg.remains)|active_enemies>=2
-	if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.LunarStrike:CastTime()<Target:DebuffRemains(S.MoonFireDebuff)) or (AR.AoEON() and Cache.EnemiesCount[45]>=2) then
+	if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.LunarStrike:CastTime()<Target:DebuffRemains(S.MoonFireDebuff)) 
+		or (AR.AoEON() and Cache.EnemiesCount[45]>=2) then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end	
 	-- actions.celestial_alignment_phase+=/solar_wrath
@@ -198,7 +202,7 @@ local function SingleTarget ()
 	-- actions.single_target=new_moon,if=astral_power<=90
 	if S.NewMoon:IsAvailable() 
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.NewMoon)
-		or (S.NewMoon:Charges()==1 and nextMoon==S.NewMoon and not(Player:CastID()==S.NewMoon:ID() or Player:CastID()==S.HalfMoon:ID() or Player:CastID()==S.FullMoon:ID())) 
+		or (S.NewMoon:Charges()==1 and nextMoon==S.NewMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.NewMoon))  
 		and Player:AstralPower()<=(90-currentGeneration) then
 			if AR.Cast(S.NewMoon) then return "Cast"; end
@@ -206,7 +210,7 @@ local function SingleTarget ()
 	-- actions.single_target+=/half_moon,if=astral_power<=80
 	if S.NewMoon:IsAvailable() 
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.HalfMoon)
-		or (S.NewMoon:Charges()==1 and nextMoon==S.HalfMoon and not(Player:CastID()==S.NewMoon:ID() or Player:CastID()==S.HalfMoon:ID() or Player:CastID()==S.FullMoon:ID())) 
+		or (S.NewMoon:Charges()==1 and nextMoon==S.HalfMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.HalfMoon))
 		and Player:AstralPower()<=(80-currentGeneration) then	
 			if AR.Cast(S.HalfMoon) then return "Cast"; end
@@ -214,33 +218,37 @@ local function SingleTarget ()
 	-- actions.single_target+=/full_moon,if=astral_power<=60 
 	if S.NewMoon:IsAvailable() 
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.FullMoon)
-		or (S.NewMoon:Charges()==1 and nextMoon==S.FullMoon and not(Player:CastID()==S.NewMoon:ID() or Player:CastID()==S.HalfMoon:ID() or Player:CastID()==S.FullMoon:ID())) 
+		or (S.NewMoon:Charges()==1 and nextMoon==S.FullMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.FullMoon)) 
 		and Player:AstralPower()<=(60-currentGeneration) then
 			if AR.Cast(S.FullMoon) then return "Cast"; end
 	end
 	-- actions.single_target+=/starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
-	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
+	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) 
+		and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.single_target+=/starsurge,if=active_enemies<=2
-	if S.Starsurge:IsCastable() and Player:AstralPower()>=(40-currentGeneration) and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
+	if S.Starsurge:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
+		and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.single_target+=/warrior_of_elune
 	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() then
-		if AR.Cast(S.WarriorofElune) then return "Cast"; end
+		if AR.Cast(S.WarriorofElune, Settings.Balance.OffGCDasOffGCD.WarriorofElune) then return "Cast"; end
 	end
 	-- actions.single_target+=/lunar_strike,if=buff.warrior_of_elune.up
 	if Player:Buff(S.WarriorofElune) and S.LunarStrike:IsCastable() then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end
 	-- actions.single_target+=/solar_wrath,if=buff.solar_empowerment.up
-	if Player:Buff(S.SolarEmpowerment) and S.SolarWrath:IsCastable() then
+	if (Player:Buff(S.SolarEmpowerment) or Player:CastID()==S.Starsurge:ID()) and S.SolarWrath:IsCastable() 
+		and not (Player:CastID()==S.SolarWrath:ID() and Player:BuffStack(S.SolarEmpowerment)==1) then
 		if AR.Cast(S.SolarWrath) then return "Cast"; end
 	end	
 	-- actions.single_target+=/lunar_strike,if=buff.lunar_empowerment.up
-	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() then
+	if Player:Buff(S.LunarEmpowerment) and S.LunarStrike:IsCastable() 
+		and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.LunarEmpowerment)==1) then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end
 	-- actions.single_target+=/solar_wrath,if=talent.natures_balance.enabled&dot.sunfire_dmg.remains<5&cast_time<dot.sunfire_dmg.remains
@@ -248,7 +256,8 @@ local function SingleTarget ()
 		if AR.Cast(S.SolarWrath) then return "Cast"; end
 	end	
 	-- actions.single_target+=/lunar_strike,if=(talent.natures_balance.enabled&dot.moonfire_dmg.remains<5&cast_time<dot.moonfire_dmg.remains)|active_enemies>=2
-	if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.LunarStrike:CastTime()<Target:DebuffRemains(S.MoonFireDebuff)) or (AR.AoEON() and Cache.EnemiesCount[45]>=2) then
+	if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 5 and S.LunarStrike:CastTime()<Target:DebuffRemains(S.MoonFireDebuff)) 
+		or (AR.AoEON() and Cache.EnemiesCount[45]>=2) then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end	
 	-- actions.single_target+=/solar_wrath
@@ -323,15 +332,10 @@ local function APL ()
       -- Rune
       -- PrePot w/ DBM Count
       -- Opener
+		nextMoon = nextMoonCalculation()
 		if Everyone.TargetIsValid() and Target:IsInRange(45) then
-			if S.NewMoon:IsAvailable() and S.NewMoon:IsCastable() then
-				if AR.Cast(S.NewMoon) then return "Cast"; end
-			end
-			if S.NewMoon:IsAvailable() and S.HalfMoon:IsCastable() then
-				if AR.Cast(S.HalfMoon) then return "Cast"; end
-			end
-			if S.NewMoon:IsAvailable() and S.FullMoon:IsCastable() then
-				if AR.Cast(S.FullMoon) then return "Cast"; end
+			if S.NewMoon:IsAvailable() and  nextMoon:IsCastable() then
+				if AR.Cast(nextMoon) then return "Cast"; end
 			end
 			
 			if AR.Cast(S.SolarWrath) then return "Cast"; end
@@ -373,19 +377,28 @@ local function APL ()
 			end
 			
 			-- actions+=/new_moon,if=(charges=2&recharge_time<5)|charges=3
-			if S.NewMoon:IsCastable() and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 ) or S.NewMoon:Charges()==3) then
+			if S.NewMoon:IsCastable() 
+				and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()] ) 
+				or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])) then
 				if AR.Cast(S.NewMoon) then return "Cast"; end
 			end
 			
 			-- actions+=/half_moon,if=(charges=2&recharge_time<5)|charges=3|(target.time_to_die<15&charges=2)
-			if S.HalfMoon:IsCastable() and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 ) or S.NewMoon:Charges()==3 or (S.NewMoon:Charges()==2 and Target:TimeToDie()<15)) then
+			if S.HalfMoon:IsCastable() 
+				and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
+				or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]) 
+				or (S.NewMoon:Charges()==2 and Target:TimeToDie()<15)) then
 				if AR.Cast(S.HalfMoon) then return "Cast"; end
 			end
 			
 			-- actions+=/full_moon,if=(charges=2&recharge_time<5)|charges=3|target.time_to_die<15
-			if S.FullMoon:IsCastable() and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 ) or S.NewMoon:Charges()==3 or (Target:TimeToDie()<15)) then
+			if S.FullMoon:IsCastable() 
+				and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
+				or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]) 
+				or (Target:TimeToDie()<15)) then
 				if AR.Cast(S.FullMoon) then return "Cast"; end
 			end
+			
 			
 			-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
 			--TODO : AOE

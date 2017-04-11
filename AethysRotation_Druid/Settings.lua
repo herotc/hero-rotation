@@ -30,7 +30,7 @@
         AstralCommunion = {true, false},
         IncarnationChosenOfElune = {true, false},
         CelestialAlignment = {true, false},
-		
+		WarriorofElune = {true, false},
 		
 		--Racials
 		ArcaneTorrent = {true, false},
