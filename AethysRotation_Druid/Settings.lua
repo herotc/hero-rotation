@@ -27,6 +27,7 @@
       OffGCDasOffGCD = {
 		-- Abilities
         BlessingofElune = {true, false},
+        BlessingofAnshe = {true, false},
         AstralCommunion = {true, false},
         IncarnationChosenOfElune = {true, false},
         CelestialAlignment = {true, false},

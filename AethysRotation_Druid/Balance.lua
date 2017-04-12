@@ -421,8 +421,14 @@ local function APL ()
 	
 	-- Out of Combat
     if not Player:AffectingCombat() then
-		if S.BlessingofTheAncients:IsAvailable() and not Player:Buff(S.BlessingofElune) then
+		if (Cache.EnemiesCount[45]<=2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and Player:BuffRemains(S.BlessingofElune)==0 then
+			print("elune")
 			if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
+		end
+		print(AR.AoEON(),Cache.EnemiesCount[45],S.BlessingofTheAncients:IsAvailable(),S.BlessingofTheAncients:IsCastable(),(Player:BuffRemains(S.BlessingofAnshe)==0))
+		if AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and Player:BuffRemains(S.BlessingofAnshe)==0 then
+			print("anshe")
+			if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return "Cast"; end
 		end
       -- Flask
       -- Food
@@ -452,11 +458,16 @@ local function APL ()
 				if ShouldReturn then return ShouldReturn; end
 			end
 		
+			print(Cache.EnemiesCount[45],S.BlessingofTheAncients:IsAvailable(),S.BlessingofTheAncients:IsCastable(),Player:BuffRemains(S.BlessingofElune),Player:BuffRemains(S.BlessingofAnshe))
 			-- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
 			-- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
-			if (Cache.EnemiesCount[45]<=2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) )
-				or (AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe)) then
+			if (Cache.EnemiesCount[45]<=2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and Player:BuffRemains(S.BlessingofElune)==0 then
+				print("elune")
 				if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return "Cast"; end
+			end
+			if AR.AoEON() and Cache.EnemiesCount[45]>=3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and Player:BuffRemains(S.BlessingofAnshe)==0 then
+				print("anshe")
+				if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return "Cast"; end
 			end
 			
 			-- actions+=/call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elue.remains<target.time_to_die
