@@ -207,7 +207,7 @@ local function FuryOfElune ()
 	end
 	-- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune_up.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
 	if S.Starsurge:IsCastable() and not Player:Buff(S.FuryofElune) 
-	and ((Player:AstralPower()>=(92-currentGeneration) and S.FuryofElune:Cooldown()>Player:GCD*3) 
+	and ((Player:AstralPower()>=(92-currentGeneration) and S.FuryofElune:Cooldown()>Player:GCD()*3) 
 		or (S.WarriorofElune:Cooldown()<=5 and S.FuryofElune:Cooldown()>=35  and Player:BuffStack(S.WarriorofElune)<2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
