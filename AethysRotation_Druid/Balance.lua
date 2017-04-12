@@ -434,11 +434,13 @@ local function APL ()
       -- Opener
 		nextMoon = nextMoonCalculation()
 		if Everyone.TargetIsValid() and Target:IsInRange(45) then
-			if S.NewMoon:IsAvailable() and  nextMoon:IsCastable() then
+			if S.NewMoon:IsAvailable() and nextMoon:IsCastable() then
 				if AR.Cast(nextMoon) then return "Cast"; end
 			end
-			
-			if AR.Cast(S.SolarWrath) then return "Cast"; end
+			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) then
+				if AR.Cast(S.StellarFlare) then return "Cast"; end
+			end
+			if AR.Cast(S.MoonFire) then return "Cast"; end
 		end
 		
 		return;
@@ -504,7 +506,7 @@ local function APL ()
 				end
 				
 				-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
-				if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare) < 7.2 then
+				if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
 					if AR.Cast(S.StellarFlare) then return "Cast"; end
 				end
 				--multidoting Stellar Flare
@@ -522,12 +524,12 @@ local function APL ()
 				end
 				
 				-- actions+=/moonfire,cycle_targets=1,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
-				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 6.6) then
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff)+Player:CastRemains() < 6.6) then
 					if AR.Cast(S.MoonFire) then return "Cast"; end
 				end
 				
 				-- actions+=/sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
-				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 5.4) then
+				if (S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff)+Player:CastRemains() < 5.4) then
 					if AR.Cast(S.SunFire) then return "Cast"; end
 				end
 				
@@ -554,12 +556,12 @@ local function APL ()
 				end
 				
 				-- actions+=/solar_wrath,if=buff.solar_empowerment.stack=3
-				if Player:BuffStack(S.SolarEmpowerment)==3 then
+				if Player:BuffStack(S.SolarEmpowerment)==3 and not (Player:CastID()==S.SolarWrath:ID() and Player:BuffStack(S.SolarEmpowerment)==3) then
 					if AR.Cast(S.SolarWrath) then return "Cast"; end
 				end
 				
 				-- actions+=/lunar_strike,if=buff.lunar_empowerment.stack=3
-				if Player:BuffStack(S.LunarEmpowerment)==3 then
+				if Player:BuffStack(S.LunarEmpowerment)==3 and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.LunarEmpowerment)==3) then
 					if AR.Cast(S.LunarStrike) then return "Cast"; end
 				end
 				
