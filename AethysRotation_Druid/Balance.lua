@@ -184,15 +184,15 @@ local function FuryOfElune ()
 			if AR.Cast(S.FullMoon) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/moonfire,if=buff.fury_of_elune_up.down&remains<=6.6
-	if not Player:Buff(S.FuryofElune) and Target:DebuffRemains(S.MoonFireDebuff) < 6.6  then
+	if not Player:Buff(S.FuryofElune) and Target:DebuffRemains(S.MoonFireDebuff)+Player:CastRemains() < 6.6  then
 		if AR.Cast(S.MoonFire) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/sunfire,if=buff.fury_of_elune_up.down&remains<5.4
-	if not Player:Buff(S.FuryofElune) and Target:DebuffRemains(S.SunFireDebuff) < 5.4  then
+	if not Player:Buff(S.FuryofElune) and Target:DebuffRemains(S.SunFireDebuff)+Player:CastRemains() < 5.4  then
 		if AR.Cast(S.SunFire) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/stellar_flare,if=remains<7.2&active_enemies=1
-	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]==1 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare) < 7.2 then
+	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]==1 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
 		if AR.Cast(S.StellarFlare) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/starfall,if=(active_enemies>=2&talent.stellar_flare.enabled|active_enemies>=3)&buff.fury_of_elune_up.down&cooldown.fury_of_elune.remains>10
