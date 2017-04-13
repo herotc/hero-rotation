@@ -415,10 +415,11 @@ local function APL ()
     AC.GetEnemies(45);
 	
 	--Buffs
-	if not Player:Buff(S.MoonkinForm) then
+	if not Player:Buff(S.MoonkinForm) and not Player:AffectingCombat()then
 		if AR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "Cast"; end
 	end
-	
+	nextMoon = nextMoonCalculation()
+	currentGeneration = currentGenerationCalculation()
 	-- Out of Combat
     if not Player:AffectingCombat() then
 		if (Cache.EnemiesCount[45]<=2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and Player:BuffRemains(S.BlessingofElune)==0 then
@@ -432,7 +433,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ DBM Count
       -- Opener
-		nextMoon = nextMoonCalculation()
+		--nextMoon = nextMoonCalculation()
 		if Everyone.TargetIsValid() and Target:IsInRange(45) then
 			if S.NewMoon:IsAvailable() and nextMoon:IsCastable() then
 				if AR.Cast(nextMoon) then return "Cast"; end
@@ -448,9 +449,8 @@ local function APL ()
 	
 	-- In Combat
     if Everyone.TargetIsValid() then
-		nextMoon = nextMoonCalculation()
-		currentGeneration = currentGenerationCalculation()
-		if Target:IsInRange(45) then --in range
+		
+		if Target:IsInRange(45) and Player:Buff(S.MoonkinForm) then --in range
 			--CD usage
 			if AR.CDsON() then
 				ShouldReturn = CDs();
@@ -513,8 +513,8 @@ local function APL ()
 				if AR.AoEON() and Cache.EnemiesCount[45]<4 then
 					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 					for Key, Value in pairs(Cache.Enemies[45]) do
-						if (Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
-							or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.StellarFlare and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) then
+						if S.StellarFlare:IsAvailable() and ((Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
+							or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.StellarFlare and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD())) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
 						end					
 					end
@@ -633,6 +633,8 @@ local function APL ()
 				end
 				if AR.Cast(S.MoonFire) then return "Cast"; end
 			end
+		elseif not Player:Buff(S.MoonkinForm) then
+			if AR.Cast(S.MoonkinForm) then return "Cast"; end
 		end
 	end
 end
