@@ -150,13 +150,13 @@ local pairs = pairs;
 -- APL Action Lists (and Variables)
 -- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*(7+talent.venom_rush.enabled*3)%2
 local function Energy_Regen_Combined ()
-  return Cache.Get("APLVar.Energy_Regen_Combined")
-    or Cache.Set("APLVar.Energy_Regen_Combined", Player:EnergyRegen() + Rogue.PoisonedBleeds() * (7 + (S.VenomRush:IsAvailable() and 3 or 0)) / 2);
+  return Cache.Get("APLVar", "Energy_Regen_Combined",
+                   function() return Player:EnergyRegen() + Rogue.PoisonedBleeds() * (7 + (S.VenomRush:IsAvailable() and 3 or 0)) / 2; end);
 end
 -- actions+=/variable,name=energy_time_to_max_combined,value=energy.deficit%variable.energy_regen_combined
 local function Energy_Time_To_Max_Combined ()
-  return Cache.Get("Energy_Time_To_Max_Combined")
-    or Cache.Set("Energy_Time_To_Max_Combined", Player:EnergyDeficit() / Energy_Regen_Combined());
+  return Cache.Get("APLVar", "Energy_Time_To_Max_Combined",
+                   function() return Player:EnergyDeficit() / Energy_Regen_Combined(); end);
 end
 -- # Builders
 local function Build ()
