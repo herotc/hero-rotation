@@ -165,8 +165,8 @@ local function Build ()
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Hemorrhage, 6) then
       if AR.Cast(S.Hemorrhage) then return "Cast"; end
     end
-    -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)
-    if AR.AoEON() and Cache.EnemiesCount[8] < 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (Player:Buff(S.AgonizingPoison) and I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
+    -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt
+    if AR.AoEON() and Cache.EnemiesCount[8] < 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
       BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
@@ -179,8 +179,8 @@ local function Build ()
       end
     end
   end
-  -- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)|buff.the_dreadlords_deceit.stack>=29
-  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (Player:Buff(S.AgonizingPoison) and I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+  -- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
+  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.FanofKnives) then return "Cast"; end
   end
   if S.Mutilate:IsCastable() then
@@ -632,8 +632,8 @@ AR.SetAPL(259, APL);
 
 -- # Builders
 -- actions.build=hemorrhage,if=refreshable
--- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)
--- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+(talent.agonizing_poison.enabled&equipped.insignia_of_ravenholdt)|buff.the_dreadlords_deceit.stack>=29
+-- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt
+-- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
 -- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)
 -- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.exsanguinate.up|cooldown.vendetta.remains<=6|target.time_to_die<=6
 -- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<=gcd.max*2.5&debuff.agonizing_poison.stack>=5
