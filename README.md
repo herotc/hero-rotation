@@ -31,13 +31,14 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 ## Supported Rotations
 - Demon Hunter Vengeance _[Beta]_
 - Hunter BeastMastery (Credits: [Nia](https://github.com/Nianel))
+- Hunter Marskmanship _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
 - Hunter Survival (Credits: [Nia](https://github.com/Nianel))
 - Paladin Retribution _[Outdated]_
-- Priest Shadow _[Beta]_ (Credits: [KutiKuti](https://github.com/Kutikuti))
+- Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
 - Rogue Assassination
 - Rogue Outlaw
 - Rogue Subtlety
-- Shaman Enhancement _[Beta]_ (Credits: [Tael](https://github.com/Tae-l))
+- Shaman Enhancement (Credits: [Tael](https://github.com/Tae-l))
 - Warrior Fury _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
 
 ## Special Mention About SimC APL
