@@ -206,7 +206,7 @@ local function Build ()
     if Target:IsInRange(5) and
       (Player:EnergyDeficit() <= 25 + Energy_Regen_Combined() or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane)
         or (AR.CDsON() and S.Exsanguinate:CooldownUp()) or (AR.CDsON() and S.Vendetta:CooldownRemains() <= 6)
-        or Target:FilteredTimeToDie("<", 6)
+        or Target:FilteredTimeToDie("<=", 6)
         or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
@@ -434,7 +434,7 @@ local function Maintain ()
   end
   -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
   -- TODO: pmultiplier (core handler rather than rogue specific)
-  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemains() <= 4)) and Player:ComboPointsDeficit() >= 1 then
+  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemains() <= 4)) and Player:ComboPointsDeficit() >= 1 then
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemains(S.Garrote) <= 1.5)
         and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote))
           or Rogue.CanDoTUnit(Target, GarroteDMGThreshold)) then
@@ -499,6 +499,10 @@ local function APL ()
   AC.GetEnemies(8); -- Fan of Knives & Death from Above
   AC.GetEnemies(5); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
+  -- Compute Cache
+  RuptureThreshold = (4 + Player:ComboPoints() * 4) * 0.3;
+  RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset;
+  GarroteDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset/3;
   -- Defensives
     -- Crimson Vial
     ShouldReturn = Rogue.CrimsonVial(S.CrimsonVial);
@@ -564,10 +568,6 @@ local function APL ()
         {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
         {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end}
       });
-      -- Compute Cache
-      RuptureThreshold = (4 + Player:ComboPoints() * 4) * 0.3;
-      RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset;
-      GarroteDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset/3;
       -- actions=call_action_list,name=cds
       if AR.CDsON() then
         ShouldReturn = CDs();
@@ -579,10 +579,11 @@ local function APL ()
       -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
       -- Note: We disable 'active_dot.rupture>=spell_targets.rupture' in the addon since Multi-Dotting is suggested and not forced (CastLeftNameplate).
       -- Note: We add 'Rogue.CanDoTUnit(Target, RuptureDMGThreshold)' to account for when Rupture isn't castable
-      -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
+      -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=6)&active_dot.rupture>=spell_targets.rupture
       if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() > 2)
         and (not Target:DebuffRefreshable(S.Rupture, RuptureThreshold) or (AC.Exsanguinated(Target, "Rupture") and Target:DebuffRemains(S.Rupture) >= 3.5)
-          or Target:FilteredTimeToDie("<=", 4, -Target:DebuffRemains(S.Rupture))
+          or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Rupture))
+          or Target:TimeToDieIsNotValid()
           or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
@@ -627,7 +628,7 @@ AR.SetAPL(259, APL);
 -- actions+=/call_action_list,name=cds
 -- actions+=/call_action_list,name=maintain
 -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
--- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=4)&active_dot.rupture>=spell_targets.rupture
+-- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=6)&active_dot.rupture>=spell_targets.rupture
 -- actions+=/call_action_list,name=build,if=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined
 
 -- # Builders
