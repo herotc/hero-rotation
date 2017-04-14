@@ -356,7 +356,7 @@ local function Maintain ()
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
       if Target:IsInRange(5) and Target:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemains(S.Garrote) <= ExsanguinatedBleedTickTime*2)
         and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemains(S.Garrote))
-          or Rogue.CanDoTUnit(Target, GarroteDMGThreshold)) then
+          or (Target:TimeToDieIsNotValid() and Rogue.CanDoTUnit(Target, GarroteDMGThreshold))) then
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
@@ -377,7 +377,7 @@ local function Maintain ()
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
       if Target:IsInRange(5) and Target:DebuffRemains(S.Garrote) <= 10 and not AC.Exsanguinated(Target, "Garrote")
         and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemains(S.Garrote))
-          or Rogue.CanDoTUnit(Target, GarroteDMGThreshold)) then
+          or (Target:TimeToDieIsNotValid() and Rogue.CanDoTUnit(Target, GarroteDMGThreshold))) then
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
@@ -437,7 +437,7 @@ local function Maintain ()
   if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemains() <= 4)) and Player:ComboPointsDeficit() >= 1 then
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemains(S.Garrote) <= 1.5)
         and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote))
-          or Rogue.CanDoTUnit(Target, GarroteDMGThreshold)) then
+          or (Target:TimeToDieIsNotValid() and Rogue.CanDoTUnit(Target, GarroteDMGThreshold))) then
       -- actions.maintain+=/pool_resource,for_next=1
       if Player:Energy() < 45 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
@@ -501,8 +501,8 @@ local function APL ()
   Everyone.AoEToggleEnemiesUpdate();
   -- Compute Cache
   RuptureThreshold = (4 + Player:ComboPoints() * 4) * 0.3;
-  RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset;
-  GarroteDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset/3;
+  RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
+  GarroteDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset/2; -- Used as TTD Not Valid fallback since it's a generator.
   -- Defensives
     -- Crimson Vial
     ShouldReturn = Rogue.CrimsonVial(S.CrimsonVial);
