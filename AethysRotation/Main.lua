@@ -229,6 +229,11 @@
     Cache.Persistent.Player.Class = {UnitClass("player")};
     Cache.Persistent.Player.Spec = {GetSpecializationInfo(GetSpecialization())};
 
+    -- Note: Prevent the UI to disappear if the spec isn't yet known by the WoW API.
+    if EnabledRotation[Cache.Persistent.Player.Spec[1]] == nil then
+      return "Invalid SpecID";
+    end
+
     -- Load the Class Module if it's possible and not already loaded
     if EnabledRotation[Cache.Persistent.Player.Spec[1]] and not IsAddOnLoaded(EnabledRotation[Cache.Persistent.Player.Spec[1]]) then
       LoadAddOn(EnabledRotation[Cache.Persistent.Player.Spec[1]]);

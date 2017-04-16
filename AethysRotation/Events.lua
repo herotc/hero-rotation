@@ -27,8 +27,10 @@
       -- Timer to prevent bug due to the double/triple event firing.
       -- Since it takes 5s to change spec, we'll take 3seconds as timer.
       if AC.GetTime() > SpecTimer then
-        AR.PulseInit();
-        SpecTimer = AC.GetTime() + 3;
+        -- Update the timer only on valid scan.
+        if AR.PulseInit() ~= "Invalid SpecID" then
+          SpecTimer = AC.GetTime() + 3;
+        end
       end
     end
     , "PLAYER_SPECIALIZATION_CHANGED"
