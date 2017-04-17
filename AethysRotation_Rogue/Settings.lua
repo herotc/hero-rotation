@@ -31,7 +31,7 @@
         Vanish = {true, false},
         -- Abilities
         Kick = {true, false},
-        MarkedforDeath = {false, false},
+        MarkedforDeath = {true, false},
         Sprint = {true, false},
         Stealth = {true, false}
       }

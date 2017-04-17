@@ -91,6 +91,7 @@ local tostring = tostring;
   local I = Item.Rogue.Outlaw;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
+  local RTIdentifier, SSIdentifier = tostring(S.RunThrough:ID()), tostring(S.SaberSlash:ID());
   local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
   -- RtB_List
   local Sequence; 
@@ -228,7 +229,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
-  if S.GhostlyStrike:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemains() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
+  if S.GhostlyStrike:IsCastable() and Target:IsInRange(S.SaberSlash, SSIdentifier) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemains() < 3 and Target:DebuffRemains(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
     if AR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
   end
   -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
@@ -240,7 +241,7 @@ local function Build ()
     end
   end
   -- actions.build+=/saber_slash,if=variable.ss_useable
-  if Target:IsInRange(5) and S.SaberSlash:IsCastable() and SS_Useable() then
+  if Target:IsInRange(S.SaberSlash, SSIdentifier) and S.SaberSlash:IsCastable() and SS_Useable() then
     if AR.Cast(S.SaberSlash) then return "Cast Saber Slash"; end
   end
   return false;
@@ -248,51 +249,61 @@ end
 -- # Blade Flurry
 local function BF ()
   -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[6] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped() and S.BladeFlurry:CooldownUp() and Cache.EnemiesCount[6] >= 2)) then
+  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[RTIdentifier] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped() and S.BladeFlurry:CooldownUp() and Cache.EnemiesCount[RTIdentifier] >= 2)) then
     if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-  if S.BladeFlurry:IsCastable() and not Player:Buff(S.BladeFlurry) and Cache.EnemiesCount[6] >= 2 then
+  if S.BladeFlurry:IsCastable() and not Player:Buff(S.BladeFlurry) and Cache.EnemiesCount[RTIdentifier] >= 2 then
     if AR.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
   end
   return false;
 end
 -- # Cooldowns
 local function CDs ()
-  -- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
-  -- TODO: Add Potion
-  -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
-  if AR.AoEON() and S.CannonballBarrage:IsCastable() and Cache.EnemiesCount[8] >= 1 then
-    if AR.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
+  if AR.CDsON() then
+    -- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+    -- TODO: Add Potion
+    -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
+    if AR.AoEON() and S.CannonballBarrage:IsCastable() and Cache.EnemiesCount[8] >= 1 then
+      if AR.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
+    end
   end
-  if Target:IsInRange(5) then
-    -- actions.cds+=/blood_fury
-    if S.BloodFury:IsCastable() then
-      if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+  if Target:IsInRange(S.SaberSlash, SSIdentifier) then
+    if AR.CDsON() then
+      -- actions.cds+=/blood_fury
+      if S.BloodFury:IsCastable() then
+        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+      end
+      -- actions.cds+=/berserking
+      if S.Berserking:IsCastable() then
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
+      end
+      -- actions.cds+=/arcane_torrent,if=energy.deficit>40
+      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 40 then
+        if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+      end
+      -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
+      if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
+        if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
+      end
     end
-    -- actions.cds+=/berserking
-    if S.Berserking:IsCastable() then
-      if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
+    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=cp_max_spend-1)
+    if S.MarkedforDeath:IsCastable() then
+      if Target:TimeToDie() < Player:ComboPointsDeficit() or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemains(S.TrueBearing) > 15) or Target:IsDummy()) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
+        if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
+      elseif Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
+        AR.CastSuggested(S.MarkedforDeath);
+      end
     end
-    -- actions.cds+=/arcane_torrent,if=energy.deficit>40
-    if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 40 then
-      if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
-    end
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
-    if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
-      if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
-    end
-    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
-    if S.MarkedforDeath:IsCastable() and (Target:TimeToDie() < Player:ComboPointsDeficit() or Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
-      AR.CastSuggested(S.MarkedforDeath);
-    end
-    -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
-    if I.ThraxisTricksyTreads:IsEquipped() and S.Sprint:IsCastable() and not SS_Useable() then
-      AR.CastSuggested(S.Sprint);
-    end
-    -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
-    if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
-      if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast"; end
+    if AR.CDsON() then
+      -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
+      if I.ThraxisTricksyTreads:IsEquipped() and S.Sprint:IsCastable() and not SS_Useable() then
+        AR.CastSuggested(S.Sprint);
+      end
+      -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
+      if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
+        if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast"; end
+      end
     end
   end
   return false;
@@ -304,7 +315,7 @@ local function Finish ()
     if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
-  if S.RunThrough:IsCastable() and Target:IsInRange(6) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemains() + 3.5) then
+  if S.RunThrough:IsCastable() and Target:IsInRange(S.RunThrough, RTIdentifier) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemains() + 3.5) then
     if AR.Cast(S.RunThrough) then return "Cast Run Through"; end
   end
   -- OutofRange BtE
@@ -315,7 +326,7 @@ local function Finish ()
 end
 -- # Stealth
 local function Stealth ()
-  if Target:IsInRange(5) then
+  if Target:IsInRange(S.SaberSlash, SSIdentifier) then
     -- actions.stealth+=/ambush
     if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
       if AR.Cast(S.Ambush) then return "Cast Ambush"; end
@@ -335,7 +346,7 @@ local function Stealth ()
   return false;
 end
 local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end},
+  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(S.SaberSlash, SSIdentifier); end},
   {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
 };
@@ -366,8 +377,8 @@ end
 local function APL ()
   -- Unit Update
   AC.GetEnemies(8); -- Cannonball Barrage
-  AC.GetEnemies(6); -- Blade Flurry
-  AC.GetEnemies(5); -- Melee
+  AC.GetEnemies(S.RunThrough, RTIdentifier); -- Blade Flurry
+  AC.GetEnemies(S.SaberSlash, SSIdentifier); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
   -- Defensives
     -- Crimson Vial
@@ -378,9 +389,9 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
   -- Blade Flurry
     -- Blade Flurry Expiration Offset
-    if Cache.EnemiesCount[6] == 1 and BFReset then
+    if Cache.EnemiesCount[RTIdentifier] == 1 and BFReset then
       BFTimer, BFReset = AC.GetTime() + Settings.Outlaw.BFOffset, false;
-    elseif Cache.EnemiesCount[6] > 1 then
+    elseif Cache.EnemiesCount[RTIdentifier] > 1 then
       BFReset = true;
     end
     -- actions+=/call_action_list,name=bf
@@ -397,7 +408,7 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange(5) then
+    if Everyone.TargetIsValid() and Target:IsInRange(S.SaberSlash, SSIdentifier) then
       if Player:ComboPoints() >= 5 then
         if S.RunThrough:IsCastable() then
           if AR.Cast(S.RunThrough) then return "Cast Run Through (Opener)"; end
@@ -423,11 +434,11 @@ local function APL ()
         return;
       end
       -- Kick
-      if Settings.General.InterruptEnabled and Target:IsInRange(5) and S.Kick:IsCastable() and Target:IsInterruptible() then
+      if Settings.General.InterruptEnabled and Target:IsInRange(S.SaberSlash, SSIdentifier) and S.Kick:IsCastable() and Target:IsInterruptible() then
         if AR.Cast(S.Kick, Settings.Commons.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
       end
       -- actions+=/call_action_list,name=cds
-      if AR.CDsON() and CDs() then
+      if CDs() then
         return;
       end
       -- # Conditions are here to avoid worthless check if nothing is available
@@ -468,7 +479,7 @@ local function APL ()
       end
       -- # Gouge is used as a CP Generator while nothing else is available and you have Dirty Tricks talent. It's unlikely that you'll be able to do this optimally in-game since it requires to move in front of the target, but it's here so you can quantifiy its value.
       -- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
-      if S.Gouge:IsCastable() and Target:IsInRange(5) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
+      if S.Gouge:IsCastable() and Target:IsInRange(S.SaberSlash, SSIdentifier) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
         if AR.Cast(S.Gouge) then return "Cast Gouge"; end
       end
       -- OutofRange Pistol Shot
@@ -534,7 +545,7 @@ AR.SetAPL(260, APL);
 -- actions.cds+=/arcane_torrent,if=energy.deficit>40
 -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
--- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=cp_max_spend-1)
 -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
 -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
 
