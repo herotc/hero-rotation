@@ -84,6 +84,7 @@ local AR = AethysRotation;
 		SolarBeam 				= Spell(78675),
     -- Legendaries
 		OnethsIntuition			= Spell(209405),
+		EmeraldDreamcatcher		= Spell(208190),
     -- Misc
 		SolarEmpowerment		= Spell(164545),
 		LunarEmpowerment		= Spell(164547),
@@ -100,7 +101,7 @@ local AR = AethysRotation;
   local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
   local nextMoon;
-  local currentGeneration;
+  local currentGeneration=0;
   local moons={[S.NewMoon:ID()]=true, [S.HalfMoon:ID()]=true, [S.FullMoon:ID()]=true}
 -- GUI Settings
   local Settings = {
@@ -227,16 +228,84 @@ local function FuryOfElune ()
 
 end 
   
-local function Dreamcatcher ()
+local function DreamcatcherUsage ()
 	-- actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) then
+		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
+	end
 	-- actions.ed+=/incarnation,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up|buff.bloodlust.up
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() 
+		and ((Player:AstralPower()>=(85-currentGeneration) and not Player:Buff(S.EmeraldDreamcatcher)) or Player:HasHeroism() )then
+		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
+	end
 	-- actions.ed+=/celestial_alignment,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up
+	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() 
+		and Player:AstralPower()>=(85-currentGeneration) and not Player:Buff(S.EmeraldDreamcatcher) then
+		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return "Cast"; end
+	end
 	-- actions.ed+=/starsurge,if=(buff.celestial_alignment.up&buff.celestial_alignment.remains<(10))|(buff.incarnation.up&buff.incarnation.remains<(3*execute_time)&astral_power>78)|(buff.incarnation.up&buff.incarnation.remains<(2*execute_time)&astral_power>52)|(buff.incarnation.up&buff.incarnation.remains<execute_time&astral_power>26)
+	-- (buff.celestial_alignment.up&buff.celestial_alignment.remains<(10))|
+	-- (buff.incarnation.up&buff.incarnation.remains<(3*execute_time)&astral_power>78)|
+	-- (buff.incarnation.up&buff.incarnation.remains<(2*execute_time)&astral_power>52)|
+	-- (buff.incarnation.up&buff.incarnation.remains<execute_time&astral_power>26)
+	if S.Starsurge:IsCastable() 
+		and ((Player:AstralPower()>=(40-currentGeneration) and Player:Buff(S.CelestialAlignment) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<10)
+		or (Player:AstralPower()>(78-currentGeneration) and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<(3*Player:GCD()))
+		or (Player:AstralPower()>(52-currentGeneration) and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<(2*Player:GCD()))
+		or (Player:AstralPower()>=(26-currentGeneration) and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<Player:GCD())) then
+		if AR.Cast(S.Starsurge) then return "Cast"; end
+	end
 	-- actions.ed+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
-	-- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
-	-- actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
+	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
+		if AR.Cast(S.StellarFlare) then return "Cast"; end
+	end
+	--multidoting Stellar Flare
+	if AR.AoEON() and Cache.EnemiesCount[45]<4 then
+		BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+		for Key, Value in pairs(Cache.Enemies[45]) do
+			if S.StellarFlare:IsAvailable() and ((Value:TimeToDie()-Value:DebuffRemains(S.StellarFlare) > BestUnitTTD and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD()) 
+				or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.StellarFlare and Value:DebuffRemains(S.StellarFlare)< 3*Player:GCD())) then
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
+			end					
+		end
+		if BestUnit then
+			if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+		end
+	end
+	-- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))
+	--&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
+	if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.MoonFireDebuff)+Player:CastRemains() < 6.6))
+		and (Player:BuffRemains(S.EmeraldDreamcatcher)>Player:GCD() or not Player:Buff(S.EmeraldDreamcatcher) ) then
+		if AR.Cast(S.MoonFire) then return "Cast"; end
+	end
+	-- actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))
+	--&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)			
+	if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemains(S.SunFireDebuff)+Player:CastRemains() < 5.4))
+		and (Player:BuffRemains(S.EmeraldDreamcatcher)>Player:GCD() or not Player:Buff(S.EmeraldDreamcatcher) ) then
+		if AR.Cast(S.SunFire) then return "Cast"; end
+	end
+	--multidoting Moon/Sun
+	if AR.AoEON() and (Player:BuffRemains(S.EmeraldDreamcatcher)>Player:GCD() or not Player:Buff(S.EmeraldDreamcatcher) ) then
+		BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+		for Key, Value in pairs(Cache.Enemies[45]) do
+			if (Value:TimeToDie()-Value:DebuffRemains(S.MoonFireDebuff) > BestUnitTTD and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) 
+				or (Value:TimeToDie() > 10 and BestUnitSpellToCast == S.MoonFire and Value:DebuffRemains(S.MoonFireDebuff)< 3*Player:GCD()) then
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
+			elseif Value:TimeToDie()-Value:DebuffRemains(S.SunFireDebuff) > BestUnitTTD
+				and Value:DebuffRemains(S.SunFireDebuff)< 3*Player:GCD() and BestUnitSpellToCast ~= S.MoonFire then
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
+			end					
+		end
+		if BestUnit then
+			if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+		end
+	end
 	-- actions.ed+=/starfall,if=buff.oneths_overconfidence.up&buff.the_emerald_dreamcatcher.remains>execute_time&remains<2
+	if Player:Buff(S.OnethsIntuition) and Player:BuffRemains(S.OnethsIntuition)<2 and Player:BuffRemains(S.EmeraldDreamcatcher)>Player:GCD() then
+		if AR.Cast(S.Starfall) then return "Cast"; end
+	end
 	-- actions.ed+=/half_moon,if=astral_power<=80&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=6
+	
 	-- actions.ed+=/full_moon,if=astral_power<=60&buff.the_emerald_dreamcatcher.remains>execute_time
 	-- actions.ed+=/solar_wrath,if=buff.solar_empowerment.stack>1&buff.the_emerald_dreamcatcher.remains>2*execute_time&astral_power>=6&(dot.moonfire.remains>5|(dot.sunfire.remains<5.4&dot.moonfire.remains>6.6))&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=90|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=85)
 	-- actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=11&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=85|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=77.5)
@@ -375,15 +444,18 @@ local function CDs ()
 		if AR.Cast(S.ArcaneTorrent, Settings.Balance.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
 	end
 	-- actions+=/incarnation,if=astral_power>=40
-	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=(40-currentGeneration) and not S.FuryofElune:IsAvailable() then
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
+		and not S.FuryofElune:IsAvailable() and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
 	end
 	-- actions+=/celestial_alignment,if=astral_power>=40
-	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and Player:AstralPower()>=(40-currentGeneration) then
+	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
+		and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return "Cast"; end
 	end
 	-- actions+=/astral_communion,if=astral_power.deficit>=75
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) and not S.FuryofElune:IsAvailable() then
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) 
+		and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
 	end
 end
@@ -451,6 +523,7 @@ local function APL ()
     if Everyone.TargetIsValid() then
 		
 		if Target:IsInRange(45) and Player:Buff(S.MoonkinForm) then --in range
+			
 			--CD usage
 			if AR.CDsON() then
 				ShouldReturn = CDs();
@@ -473,9 +546,8 @@ local function APL ()
 			end
 			
 			-- actions+=/call_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=2
-			if (I.EmeraldDreamcatcher:IsEquipped(1) and 1 or 0) and Cache.EnemiesCount[45]<=2 then
-				-- TODO : ED
-				--ShouldReturn = Dreamcatcher ();
+			if (I.EmeraldDreamcatcher:IsEquipped(1) and 1 or 0) and (Cache.EnemiesCount[45]<=2 or not AR.AoEON()) then
+				--ShouldReturn = DreamcatcherUsage ();
 				if ShouldReturn then return ShouldReturn; end
 			end
 			
