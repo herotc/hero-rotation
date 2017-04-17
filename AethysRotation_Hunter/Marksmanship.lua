@@ -286,7 +286,7 @@
       if AR.Cast(S.AMurderofCrows) then return ""; end
     end
     -- actions.patient_sniper+=/barrage,if=spell_targets>2|(target.health.pct<20&buff.bullseye.stack<25)
-    if S.Barrage:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 55*0.85 or 55) and Cache.EnemiesCount[40] > 2 or (Target:HealthPercentage() < 20 and Player:BuffStack(S.BullsEye) < 25) then
+    if S.Barrage:IsCastable() and Player:FocusPredicted(0.2) > (Player:Buff(S.TrueShot) and AC.Tier19_4Pc and 55*0.85 or 55) and (Cache.EnemiesCount[40] > 2 or (Target:HealthPercentage() < 20 and Player:BuffStack(S.BullsEye) < 25)) then
       AR.CastSuggested(S.Barrage);
     end
     -- actions.patient_sniper+=/aimed_shot,if=debuff.vulnerability.up&buff.lock_and_load.up&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)&(spell_targets.multi_shot<4|talent.trick_shot.enabled)
