@@ -201,26 +201,21 @@ local function Build ()
         AR.CastLeftNameplate(BestUnit, S.Mutilate);
       end
     end
-    -- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.exsanguinate.up|cooldown.vendetta.remains<=6|target.time_to_die<=6
-    -- TODO: Fast double rupture for exsanguinate, check exsang cd ?
-    if Target:IsInRange(5) and
-      (Player:EnergyDeficit() <= 25 + Energy_Regen_Combined() or Target:Debuff(S.Vendetta) or Target:Debuff(S.Kingsbane)
-        or (AR.CDsON() and S.Exsanguinate:CooldownUp()) or (AR.CDsON() and S.Vendetta:CooldownRemains() <= 6)
-        or Target:FilteredTimeToDie("<=", 6)
-        or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
+    -- actions.build+=/mutilate
+    if Target:IsInRange(5) then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
   end
-  -- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<=gcd.max*2.5&debuff.agonizing_poison.stack>=5
+  -- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3&debuff.agonizing_poison.stack>=5
   if S.PoisonedKnife:IsCastable() and Player:Buff(S.AgonizingPoison) then
-    if Target:IsInRange(30) and Target:DebuffRemains(S.AgonizingPoisonDebuff) <= Player:GCD() * 2.5 and Target:DebuffStack(S.AgonizingPoisonDebuff) >= 5 then
+    if Target:IsInRange(30) and Target:DebuffRefreshable(S.AgonizingPoisonDebuff, 4) and Target:DebuffStack(S.AgonizingPoisonDebuff) >= 5 then
       if AR.Cast(S.PoisonedKnife) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies[30]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
-          and Unit:DebuffRemains(S.AgonizingPoisonDebuff) < Player:GCD() * 2.5 and Unit:DebuffStack(S.AgonizingPoisonDebuff) >= 5 then
+          and Unit:DebuffRefreshable(S.AgonizingPoisonDebuff, 4) and Unit:DebuffStack(S.AgonizingPoisonDebuff) >= 5 then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -609,7 +604,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 04/13/2017
+-- Last Update: 04/18/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
@@ -636,8 +631,8 @@ AR.SetAPL(259, APL);
 -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt
 -- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
 -- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)
--- actions.build+=/mutilate,if=energy.deficit<=25+variable.energy_regen_combined|debuff.vendetta.up|dot.kingsbane.ticking|cooldown.exsanguinate.up|cooldown.vendetta.remains<=6|target.time_to_die<=6
--- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<=gcd.max*2.5&debuff.agonizing_poison.stack>=5
+-- actions.build+=/mutilate
+-- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3&debuff.agonizing_poison.stack>=5
 
 -- # Cooldowns
 -- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
