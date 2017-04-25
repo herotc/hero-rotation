@@ -57,6 +57,7 @@ local pairs = pairs;
     VenomRush             = Spell(152152),
     Vigor                 = Spell(14983),
     -- Artifact
+    AssassinsBlades       = Spell(214368),
     Kingsbane             = Spell(192759),
     MasterAssassin        = Spell(192349),
     SilenceoftheUncrowned = Spell(241152),
@@ -88,6 +89,18 @@ local pairs = pairs;
     PoolEnergy            = Spell(9999000010)
   };
   local S = Spell.Rogue.Assassination;
+-- Items
+  if not Item.Rogue then Item.Rogue = {}; end
+  Item.Rogue.Assassination = {
+    -- Legendaries
+    ConvergenceofFates            = Item(140806, {13, 14}),
+    DuskwalkersFootpads           = Item(137030, {8}),
+    DraughtofSouls                = Item(140808, {13, 14}),
+    InsigniaofRavenholdt          = Item(137049, {11, 12}),
+    MantleoftheMasterAssassin     = Item(144236, {3})
+  };
+  local I = Item.Rogue.Assassination;
+-- Spells Damage
   S.Envenom:RegisterDamage(
     -- Envenom DMG Formula:
     --  AP * CP * Env_APCoef * AssaResolv_M * Aura_M * ToxicB_M * T19_4PC_M * DS_M * AgoP_M * Mastery_M * Versa_M * SlayersPrecision_M * SiUncrowned_M
@@ -122,21 +135,39 @@ local pairs = pairs;
         (S.SilenceoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
     end
   );
--- Items
-  if not Item.Rogue then Item.Rogue = {}; end
-  Item.Rogue.Assassination = {
-    -- Legendaries
-    ConvergenceofFates            = Item(140806, {13, 14}),
-    DuskwalkersFootpads           = Item(137030, {8}),
-    DraughtofSouls                = Item(140808, {13, 14}),
-    InsigniaofRavenholdt          = Item(137049, {11, 12}),
-    MantleoftheMasterAssassin     = Item(144236, {3})
-  };
-  local I = Item.Rogue.Assassination;
+  S.Mutilate:RegisterDamage(
+    function ()
+      -- TODO: Implement most of those thing in the core.
+      local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, physicalBonusPos, physicalBonusNeg, percent = UnitDamage("player");
+      local speed, offhandSpeed = UnitAttackSpeed("player");
+      local wSpeed = speed * (1 + Player:HastePct()/100);
+      local AvgWpnDmg = (minDamage + maxDamage) / 2 / wSpeed / percent - (Player:AttackPower() / 3.5);
+      return
+        -- (Average Weapon Damage [Weapon DPS * Swing Speed] + (Attack Power * NormalizedWeaponSpeed / 3.5)) * (MH Factor +OH Factor)
+        (AvgWpnDmg * wSpeed + (Player:AttackPower() * 1.7 / 3.5)) * 1.5 *
+        -- Mutilate Coefficient
+        3.6 *
+        -- Assassin's Resolve (SpellID: 84601)
+        1.17 *
+        -- Aura Multiplier (SpellID: 137037)
+        1.11 *
+        -- Assassin's Blades Multiplier
+        (S.AssassinsBlades:ArtifactEnabled() and 1.15 or 1) *
+        -- Agonizing Poison Multiplier
+        (Target:Debuff(S.AgonizingPoisonDebuff) and 1 + Target:Debuff(S.AgonizingPoisonDebuff, 17) / 100 or 1) *
+        -- Versatility Damage Multiplier
+        (1 + Player:VersatilityDmgPct()/100) *
+        -- Slayer's Precision Multiplier
+        (S.SlayersPrecision:ArtifactEnabled() and 1.05 or 1) *
+        -- Silence of the Uncrowned Multiplier
+        (S.SilenceoftheUncrowned:ArtifactEnabled() and 1.1 or 1) *
+        -- Insignia of Ravenholdt Effect
+        (I.InsigniaofRavenholdt:IsEquipped() and 1.3 or 1);
+    end
+  );
 -- Rotation Var
   local ShouldReturn, ShouldReturn2; -- Used to get the return string
   local BestUnit, BestUnitTTD; -- Used for cycling
-  local CountA, CountB; -- Used for potential Rupture units
   local RuptureThreshold; -- Used to compute the Rupture threshold (Cycling Performance)
   local BleedTickTime, ExsanguinatedBleedTickTime = 2, 1;
   local RuptureDMGThreshold, GarroteDMGThreshold;
@@ -497,7 +528,7 @@ local function APL ()
   -- Compute Cache
   RuptureThreshold = (4 + Player:ComboPoints() * 4) * 0.3;
   RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
-  GarroteDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset/2; -- Used as TTD Not Valid fallback since it's a generator.
+  GarroteDMGThreshold = S.Mutilate:Damage()*Settings.Assassination.MutilateDMGOffset; -- Used as TTD Not Valid fallback since it's a generator.
   -- Defensives
     -- Crimson Vial
     ShouldReturn = Rogue.CrimsonVial(S.CrimsonVial);
@@ -540,7 +571,8 @@ local function APL ()
           elseif S.Envenom:IsCastable() then
             if AR.Cast(S.Envenom) then return "Cast"; end
           end
-        elseif S.Garrote:IsCastable() then
+        elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote)
+          and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
           if AR.Cast(S.Garrote) then return "Cast"; end
         elseif S.Mutilate:IsCastable() then
           if AR.Cast(S.Mutilate) then return "Cast"; end

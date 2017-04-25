@@ -37,8 +37,9 @@
       }
     },
     Assassination = {
-      -- Envenom Damage Offset
+      -- Damage Offsets
       EnvenomDMGOffset = 3,
+      MutilateDMGOffset = 3,
       -- Poison Refresh (in seconds)
       PoisonRefresh = 15 * 60, -- *60 to convert it to seconds
       -- {Display GCD as OffGCD, ForceReturn}
@@ -70,10 +71,10 @@
       }
     },
     Subtlety = {
+      -- Damage Offsets
+      EviscerateDMGOffset = 3,
       -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
       ShDEcoCharge = 2.45,
-      -- Eviscerate Damage Offset
-      EviscerateDMGOffset = 3,
       -- Sprint as DPS CD
       SprintAsDPSCD = true,
       -- {Display GCD as OffGCD, ForceReturn}
