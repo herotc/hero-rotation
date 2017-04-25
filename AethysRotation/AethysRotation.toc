@@ -21,6 +21,7 @@ Events.lua
 Commons.lua
 
 # UI
+UI.xml
 UI.lua
 
 # Main

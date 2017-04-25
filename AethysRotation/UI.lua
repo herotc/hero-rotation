@@ -22,7 +22,7 @@
 --- ============================ CONTENT ============================
 --- ======= MAIN FRAME =======
   AR.MainIconFrame = CreateFrame("Frame", "AethysRotation_MainIconFrame", UIParent);
-  AR.MainIconFrame.CooldownFrame = CreateFrame("Cooldown", "AethysRotation_MainIconCooldownFrame", AR.MainIconFrame, "CooldownFrameTemplate");
+  AR.MainIconFrame.CooldownFrame = CreateFrame("Cooldown", "AethysRotation_MainIconCooldownFrame", AR.MainIconFrame, "AR_CooldownFrameTemplate");
   AR.MainIconFrame.TempTexture = AR.MainIconFrame:CreateTexture(nil, "BACKGROUND");
   AR.SmallIconFrame = CreateFrame("Frame", "AethysRotation_SmallIconFrame", UIParent);
   AR.LeftIconFrame = CreateFrame("Frame", "AethysRotation_LeftIconFrame", UIParent);
@@ -184,9 +184,11 @@
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.SmallIconFrame:ChangeIcon (FrameID, Texture)
+    -- Icon
     self.Icon[FrameID].TempTexture:SetTexture(Texture);
     self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
     self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
+
     if not self.Icon[FrameID]:IsVisible() then
       self.Icon[FrameID]:Show();
     end
@@ -194,6 +196,7 @@
   -- Hide Small Icons
   function AR.SmallIconFrame:HideIcons ()
     for i = 1, #self.Icon do
+      -- Icon
       self.Icon[i]:Hide();
     end
   end
@@ -238,8 +241,8 @@
         -- Frame
         AR.NameplateIconFrame:SetFrameStrata(Nameplate.UnitFrame:GetFrameStrata());
         AR.NameplateIconFrame:SetFrameLevel(Nameplate.UnitFrame:GetFrameLevel() + 50);
-        AR.NameplateIconFrame:SetWidth(Nameplate.UnitFrame:GetHeight()*0.8);
-        AR.NameplateIconFrame:SetHeight(Nameplate.UnitFrame:GetHeight()*0.8);
+        AR.NameplateIconFrame:SetWidth(Nameplate.UnitFrame:GetHeight());
+        AR.NameplateIconFrame:SetHeight(Nameplate.UnitFrame:GetHeight());
         -- Texture
         AR.NameplateIconFrame.TempTexture = AR.NameplateIconFrame:CreateTexture(nil, "BACKGROUND");
 
