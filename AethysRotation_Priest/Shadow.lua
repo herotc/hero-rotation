@@ -261,10 +261,10 @@ local function voidForm()
 	if Player:CastID() == S.VoidEruption:ID() then
 		if AR.Cast(S.VoidBolt) then return "Cast"; end
 	end
-	
+	-- print(Player:ChannelName())
 	if Target:IsInRange(40) then --in range
 		--actions.vf+=/void_bolt
-		if S.VoidBolt:IsCastable() or (Player:IsCasting() and ((Player:CastRemains() + Player:GCD()*0.28) >= S.VoidBolt:Cooldown())) then
+		if S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName()==S.VoidTorrent:Name()))  and (Player:CastRemains() >= S.VoidBolt:Cooldown())) then
 			if AR.Cast(S.VoidBolt) then return "Cast"; end
 		end 
 		
@@ -486,6 +486,8 @@ local function APL ()
 	-- In Combat
 	if Everyone.TargetIsValid() then
 		if Target:IsInRange(40) then --in range
+			
+			--print(Player:CastRemains())
 			
 			--CD usage
 			if AR.CDsON() then
