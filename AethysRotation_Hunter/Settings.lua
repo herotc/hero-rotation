@@ -37,7 +37,7 @@
       OffGCDasOffGCD = {
         -- Abilities
         AspectoftheWild = {true, false},
-        BeastialWrath = {true, false},
+        BestialWrath = {true, false},
         TitansThunder = {true, false}
       }
     },
