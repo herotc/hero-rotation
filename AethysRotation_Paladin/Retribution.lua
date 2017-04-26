@@ -273,7 +273,7 @@ local function APL ()
         end
       end
       -- actions+=/divine_hammer,if=holy_power<=2|(holy_power<=3&(cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34))
-      if S.DivineHammer:IsCastable() and Target:IsInRange(8) and Player:HolyPower() <= 2 or (Player:HolyPower() <= 3 and (S.Zeal:ChargesFractional() <= 1.34 or S.CrusaderStrike:ChargesFractional() <= 1.34)) then
+      if S.DivineHammer:IsCastable() and Target:IsInRange(8) and (Player:HolyPower() <= 2 or (Player:HolyPower() <= 3 and (S.Zeal:ChargesFractional() <= 1.34 or S.CrusaderStrike:ChargesFractional() <= 1.34))) then
         if AR.Cast(S.DivineHammer) then return "Cast Divine Hammer"; end
       end
       -- actions+=/judgment
