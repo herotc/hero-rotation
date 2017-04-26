@@ -165,16 +165,16 @@
       if AR.CDsON() and S.AspectoftheWild:IsCastable() and (Player:Buff(S.BestialWrath) or Target:TimeToDie() < 12) then
         if AR.Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return; end
       end
-      -- actions+=/barrage,if=spell_targets.barrage>1
-      if AR.AoEON() and S.Barrage:IsCastable() and Cache.EnemiesCount[40] > 1 then
-        AR.CastSuggested(S.Barrage);
-      end
       -- actions+=/bestial_wrath
       if AR.CDsON() and S.BestialWrath:IsCastable() then
         if AR.Cast(S.BestialWrath, Settings.BeastMastery.OffGCDasOffGCD.BestialWrath) then return; end
       end
-      -- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&(buff.bestial_wrath.up|cooldown.bestial_wraht.remains>35))|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
-      if AR.CDsON() and S.TitansThunder:IsCastable() and (S.DireFrenzy:IsAvailable() and (Player:Buff(S.BestialWrath) or S.BestialWrath:Cooldown() > 35) or S.DireBeast:Cooldown() >= 3 or (Player:Buff(S.BestialWrath) and Player:Buff(S.DireBeast))) then
+      -- actions+=/barrage,if=spell_targets.barrage>1
+      if AR.AoEON() and S.Barrage:IsCastable() and Cache.EnemiesCount[40] > 1 then
+        AR.CastSuggested(S.Barrage);
+      end
+      -- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&buff.bestial_wrath.up)|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
+      if AR.CDsON() and S.TitansThunder:IsCastable() and ((S.DireFrenzy:IsAvailable() and Player:Buff(S.BestialWrath)) or S.DireBeast:Cooldown() >= 3 or (Player:Buff(S.BestialWrath) and Player:Buff(S.DireBeast))) then
         if AR.Cast(S.TitansThunder, Settings.BeastMastery.OffGCDasOffGCD.TitansThunder) then return; end
       end
       -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
@@ -232,8 +232,8 @@
 -- actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
 -- actions+=/dire_beast,if=cooldown.bestial_wrath.remains>3
 -- actions+=/aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
--- actions+=/barrage,if=spell_targets.barrage>1
 -- actions+=/bestial_wrath
+-- actions+=/barrage,if=spell_targets.barrage>1
 -- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&buff.bestial_wrath.up)|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
 -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
 -- actions+=/kill_command
