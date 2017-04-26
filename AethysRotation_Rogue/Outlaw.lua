@@ -387,17 +387,6 @@ local function APL ()
     -- Feint
     ShouldReturn = Rogue.Feint (S.Feint);
     if ShouldReturn then return ShouldReturn; end
-  -- Blade Flurry
-    -- Blade Flurry Expiration Offset
-    if Cache.EnemiesCount[RTIdentifier] == 1 and BFReset then
-      BFTimer, BFReset = AC.GetTime() + Settings.Outlaw.BFOffset, false;
-    elseif Cache.EnemiesCount[RTIdentifier] > 1 then
-      BFReset = true;
-    end
-    -- actions+=/call_action_list,name=bf
-    if BF() then
-      return;
-    end
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
@@ -436,6 +425,16 @@ local function APL ()
       -- Kick
       if Settings.General.InterruptEnabled and Target:IsInRange(S.SaberSlash, SSIdentifier) and S.Kick:IsCastable() and Target:IsInterruptible() then
         if AR.Cast(S.Kick, Settings.Commons.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
+      end
+      -- Blade Flurry Expiration Offset
+      if Cache.EnemiesCount[RTIdentifier] == 1 and BFReset then
+        BFTimer, BFReset = AC.GetTime() + Settings.Outlaw.BFOffset, false;
+      elseif Cache.EnemiesCount[RTIdentifier] > 1 then
+        BFReset = true;
+      end
+      -- actions+=/call_action_list,name=bf
+      if BF() then
+        return;
       end
       -- actions+=/call_action_list,name=cds
       if CDs() then
