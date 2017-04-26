@@ -230,7 +230,7 @@
 -- actions+=/aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
 -- actions+=/barrage,if=spell_targets.barrage>1
 -- actions+=/bestial_wrath
--- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&(buff.bestial_wrath.up|cooldown.bestial_wraht.remains>35))|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
+-- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&buff.bestial_wrath.up)|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
 -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
 -- actions+=/kill_command
 -- actions+=/dire_frenzy,if=target.time_to_die<9
