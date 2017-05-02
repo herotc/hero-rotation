@@ -181,7 +181,7 @@
       [577]   = false,                          -- Havoc
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
     -- Druid
-      [102]   = "AethysRotation_Druid",			-- Balance
+      [102]   = "AethysRotation_Druid",         -- Balance
       [103]   = false,                          -- Feral
       [104]   = false,                          -- Guardian
       [105]   = false,                          -- Restoration
@@ -199,7 +199,7 @@
       [270]   = false,                          -- Mistweaver
     -- Paladin
       [65]    = false,                          -- Holy
-      [66]    = false,                          -- Protection
+      [66]    = "AethysRotation_Paladin",       -- Protection
       [70]    = "AethysRotation_Paladin",       -- Retribution
     -- Priest
       [256]   = false,                          -- Discipline
