@@ -374,22 +374,24 @@ local function Maintain ()
   if Player:IsStealthed(true, false) then
     -- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(talent.exsanguinate.enabled|target.time_to_die-remains>4)
     if S.Rupture:IsCastable() and Target:IsInRange(5) and S.Nightstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc)
-      and (S.Exsanguinate:IsAvailable() or (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture))
-      and Rogue.CanDoTUnit(Target, RuptureDMGThreshold))) then
+      and (S.Exsanguinate:IsAvailable()
+        or ((Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid())
+          and Rogue.CanDoTUnit(Target, RuptureDMGThreshold))) then
       if AR.Cast(S.Rupture) then return "Cast"; end
     end
     -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>2
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
       if Target:IsInRange(5) and Target:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemains(S.Garrote) <= ExsanguinatedBleedTickTime*2)
-        and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemains(S.Garrote))
-          or (Target:TimeToDieIsNotValid() and Rogue.CanDoTUnit(Target, GarroteDMGThreshold))) then
+        and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid())
+        and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
         BestUnit, BestUnitTTD = nil, 2;
         for _, Unit in pairs(Cache.Enemies[5]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Garrote))
-              and Unit:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemains(S.Garrote) <= ExsanguinatedBleedTickTime*2) then
+            and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
+            and Unit:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemains(S.Garrote) <= ExsanguinatedBleedTickTime*2) then
               BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
           end
         end
@@ -402,15 +404,16 @@ local function Maintain ()
     -- TODO: pmultiplier (core handler rather than rogue specific)
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
       if Target:IsInRange(5) and Target:DebuffRemains(S.Garrote) <= 10 and not AC.Exsanguinated(Target, "Garrote")
-        and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemains(S.Garrote))
-          or (Target:TimeToDieIsNotValid() and Rogue.CanDoTUnit(Target, GarroteDMGThreshold))) then
+        and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid())
+        and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
         BestUnit, BestUnitTTD = nil, 2;
         for _, Unit in pairs(Cache.Enemies[5]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Garrote))
-              and Unit:DebuffRemains(S.Garrote) <= 10 and not AC.Exsanguinated(Unit, "Garrote") then
+            and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
+            and Unit:DebuffRemains(S.Garrote) <= 10 and not AC.Exsanguinated(Unit, "Garrote") then
               BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
           end
         end
@@ -422,7 +425,8 @@ local function Maintain ()
   end
   -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=gcd.remains+0.2&target.time_to_die>6
   if S.Rupture:IsCastable() and Target:IsInRange(5) and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
-    and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= Player:GCDRemains() + 0.2 and Target:FilteredTimeToDie(">", 6)
+    and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= Player:GCDRemains() + 0.2 
+    and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
@@ -436,7 +440,7 @@ local function Maintain ()
   -- TODO: pmultiplier (core handler rather than rogue specific)
   if Player:ComboPoints() >= 4 then
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemains(S.Rupture) <= 1.5)
-      and Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Rupture))
+      and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if AR.Cast(S.Rupture) then return "Cast"; end
     end
@@ -462,8 +466,8 @@ local function Maintain ()
   -- TODO: pmultiplier (core handler rather than rogue specific)
   if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemains() <= 4)) and Player:ComboPointsDeficit() >= 1 then
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemains(S.Garrote) <= 1.5)
-        and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote))
-          or (Target:TimeToDieIsNotValid() and Rogue.CanDoTUnit(Target, GarroteDMGThreshold))) then
+        and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.Garrote)) or Target:TimeToDieIsNotValid())
+        and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
       -- actions.maintain+=/pool_resource,for_next=1
       if Player:Energy() < 45 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
@@ -474,6 +478,7 @@ local function Maintain ()
       BestUnit, BestUnitTTD = nil, 4;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Garrote))
+          and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
           and Unit:DebuffRefreshable(S.Garrote, 5.4) and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemains(S.Garrote) <= 1.5) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
@@ -571,6 +576,8 @@ local function APL ()
           elseif S.Envenom:IsCastable() then
             if AR.Cast(S.Envenom) then return "Cast"; end
           end
+        elseif S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+          if AR.Cast(S.FanofKnives) then return "Cast"; end
         elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote)
           and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
           if AR.Cast(S.Garrote) then return "Cast"; end
