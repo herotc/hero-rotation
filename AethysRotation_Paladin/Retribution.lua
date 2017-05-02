@@ -181,7 +181,7 @@ local function APL ()
         end
       end
 
-      if (Target:Debuff(S.JudgmentDebuff) or S.Judgment:Cooldown() > Player:GCD()*3) then
+      if (Target:Debuff(S.JudgmentDebuff) or S.Judgment:Cooldown() > Player:GCD()*2) then
         if AR.AoEON() and Cache.EnemiesCount[8] >= 2 and S.DivineStorm:IsCastable() then
           -- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
           if Player:Buff(S.DivinePurposeBuff) and Player:BuffRemains(S.DivinePurposeBuff) < Player:GCD()*2 then
@@ -192,7 +192,7 @@ local function APL ()
             if AR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
           end
           -- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=3&buff.crusade.up&(buff.crusade.stack<15|buff.bloodlust.up)
-          if Player:HolyPower() >= 3 and Player:Buff(S.Crusade) and (Player:BuffStack(S.Crusade) < 15 or Player:HasBloodlust()) then
+          if Player:HolyPower() >= 3 and Player:Buff(S.Crusade) and (Player:BuffStack(S.Crusade) < 15 or Player:HasHeroism()) then
             if AR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
           end
           -- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
@@ -222,7 +222,7 @@ local function APL ()
               if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
             end
             -- actions+=/templars_verdict,if=debuff.judgment.up&holy_power>=3&buff.crusade.up&(buff.crusade.stack<15|buff.bloodlust.up)
-            if Player:HolyPower() >= 3 and Player:Buff(S.Crusade) and (Player:BuffStack(S.Crusade) < 15 or Player:HasBloodlust()) then
+            if Player:HolyPower() >= 3 and Player:Buff(S.Crusade) and (Player:BuffStack(S.Crusade) < 15 or Player:HasHeroism()) then
               if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
             end
             -- actions+=/templars_verdict,if=debuff.judgment.up&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|-- cooldown.execution_sentence.remains>gcd)
@@ -284,7 +284,7 @@ local function APL ()
       if Target:IsInRange(8) and S.Consecration:IsCastable() then
         if AR.Cast(S.Consecration) then return "Cast Consecration"; end
       end
-      if (Target:Debuff(S.JudgmentDebuff) or S.Judgment:Cooldown() > Player:GCD()*3) then
+      if (Target:Debuff(S.JudgmentDebuff) or S.Judgment:Cooldown() > Player:GCD()*2) then
         if AR.AoEON() and Cache.EnemiesCount[8] >= 2 and S.DivineStorm:IsCastable() then
           -- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.react
           if Player:Buff(S.DivinePurposeBuff) then
@@ -330,7 +330,7 @@ local function APL ()
           if AR.Cast(S.CrusaderStrike) then return "Cast CrusaderStrike"; end
         end
       end
-      if (Target:Debuff(S.JudgmentDebuff) or S.Judgment:Cooldown() > Player:GCD()*3) and Player:HolyPower() >= 3 and (not S.Crusade:IsAvailable() or not AR.CDsON() or S.Crusade:Cooldown() > Player:GCD()*5) then
+      if (Target:Debuff(S.JudgmentDebuff) or S.Judgment:Cooldown() > Player:GCD()*2) and Player:HolyPower() >= 3 and (not S.Crusade:IsAvailable() or not AR.CDsON() or S.Crusade:Cooldown() > Player:GCD()*5) then
         -- actions+=/divine_storm,if=debuff.judgment.up&holy_power>=3&spell_targets.divine_storm>=2&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*5)
         if AR.AoEON() and Cache.EnemiesCount[8] >= 2 and S.DivineStorm:IsCastable() then
           if AR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
