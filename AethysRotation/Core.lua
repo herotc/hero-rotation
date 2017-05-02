@@ -103,20 +103,20 @@
 
   -- Left (+ Nameplate) Cast
   AR.CastLeftOffset = 1;
-  local function CastLeftCommon (Object)
+  function AR.CastLeftCommon (Object)
     AR.LeftIconFrame:ChangeIcon(AR.GetTexture(Object));
     AR.CastLeftOffset = AR.CastLeftOffset + 1;
     Object.LastDisplayTime = AC.GetTime();
   end
   function AR.CastLeft (Object)
     if AR.CastLeftOffset == 1 then
-      CastLeftCommon(Object);
+      AR.CastLeftCommon(Object);
     end
     return false;
   end
   function AR.CastLeftNameplate (ThisUnit, Object)
     if AR.CastLeftOffset == 1 and AR.Nameplate.AddIcon(ThisUnit, Object) then
-      CastLeftCommon(Object);
+      AR.CastLeftCommon(Object);
     end
     return false;
   end
