@@ -25,7 +25,8 @@
         -- Kick
         WindShear = {true, false},
         -- Racial
-        Berserking = {true, false}
+        Berserking = {true, false};
+        BloodFury = {true, false}
       }
     }
   };
