@@ -28,6 +28,7 @@ local tostring = tostring;
     ArcaneTorrent                   = Spell(25046),
     Berserking                      = Spell(26297),
     BloodFury                       = Spell(20572),
+    Darkflight                      = Spell(68992),
     GiftoftheNaaru                  = Spell(59547),
     Shadowmeld                      = Spell(58984),
     -- Abilities
@@ -217,12 +218,12 @@ local function SS_Useable ()
   return Cache.APLVar.SS_Useable;
 end
 -- # Condition to use Stealth abilities
-local function Stealth_Condition ()
-  -- actions.stealth=variable,name=stealth_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
-  if not Cache.APLVar.Stealth_Condition then
-    Cache.APLVar.Stealth_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Energy() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade) and not Player:Debuff(S.CurseoftheDreadblades)) and true or false;
+local function Ambush_Condition ()
+  -- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
+  if not Cache.APLVar.Ambush_Condition then
+    Cache.APLVar.Ambush_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Energy() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade) and not Player:Debuff(S.CurseoftheDreadblades)) and true or false;
   end
-  return Cache.APLVar.Stealth_Condition;
+  return Cache.APLVar.Ambush_Condition;
 end
 
 
@@ -234,10 +235,14 @@ local function Build ()
   end
   -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
   if (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Target:IsInRange(20) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
-    if S.Blunderbuss:IsCastable() then
-      if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
-    elseif S.PistolShot:IsCastable() then
+    if Settings.Outlaw.BlunderbussAsPistolShot then
       if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+    else
+      if S.Blunderbuss:IsCastable() then
+        if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
+      elseif S.PistolShot:IsCastable() then
+        if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+      end
     end
   end
   -- actions.build+=/saber_slash,if=variable.ss_useable
@@ -248,9 +253,15 @@ local function Build ()
 end
 -- # Blade Flurry
 local function BF ()
-  -- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-  if Player:Buff(S.BladeFlurry) and ((Cache.EnemiesCount[RTIdentifier] < 2 and AC.GetTime() > BFTimer) or (I.ShivarranSymmetry:IsEquipped() and S.BladeFlurry:CooldownUp() and Cache.EnemiesCount[RTIdentifier] >= 2)) then
-    if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
+  if Player:Buff(S.BladeFlurry) then
+    -- actions.bf=cancel_buff,name=blade_flurry,if=spell_targets.blade_flurry<2&buff.blade_flurry.up
+    if Cache.EnemiesCount[RTIdentifier] < 2 and AC.GetTime() > BFTimer then
+      if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
+    end
+    -- actions.bf+=/cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2
+    if I.ShivarranSymmetry:IsEquipped() and S.BladeFlurry:CooldownUp() and Cache.EnemiesCount[RTIdentifier] >= 2 then
+      if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
+    end
   end
   -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
   if S.BladeFlurry:IsCastable() and not Player:Buff(S.BladeFlurry) and Cache.EnemiesCount[RTIdentifier] >= 2 then
@@ -287,18 +298,24 @@ local function CDs ()
         if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
       end
     end
-    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=cp_max_spend-1)
+    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
     if S.MarkedforDeath:IsCastable() then
-      if Target:TimeToDie() < Player:ComboPointsDeficit() or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemains(S.TrueBearing) > 15) or Target:IsDummy()) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
+      if Target:TimeToDie() < Player:ComboPointsDeficit() or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemains(S.TrueBearing) > 15 - (Player:Buff(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
         if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
-      elseif Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
+      elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
         AR.CastSuggested(S.MarkedforDeath);
       end
     end
     if AR.CDsON() then
-      -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
-      if I.ThraxisTricksyTreads:IsEquipped() and S.Sprint:IsCastable() and not SS_Useable() then
-        AR.CastSuggested(S.Sprint);
+      if I.ThraxisTricksyTreads:IsEquipped() and not SS_Useable() then
+        -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
+        if S.Sprint:IsCastable() then
+          AR.CastSuggested(S.Sprint);
+        end
+        -- actions.cds+=/darkflight,if=equipped.thraxis_tricksy_treads&!variable.ss_useable&buff.sprint.down
+        if S.Darkflight:IsCastable() and not Player:Buff(S.Sprint) then
+          AR.CastSuggested(S.Darkflight);
+        end
       end
       -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
       if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
@@ -310,8 +327,8 @@ local function CDs ()
 end
 -- # Finishers
 local function Finish ()
-  -- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
-  if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs) then
+  -- actions.finish=between_the_eyes,if=(mantle_duration>=gcd.remains+0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
+  if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and ((Rogue.MantleDuration() >= Player:GCDRemains() + 0.2 and not I.ThraxisTricksyTreads:IsEquipped()) or (I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
     if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
@@ -327,17 +344,17 @@ end
 -- # Stealth
 local function Stealth ()
   if Target:IsInRange(S.SaberSlash, SSIdentifier) then
-    -- actions.stealth+=/ambush
-    if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
+    -- actions.stealth+=/ambush,if=variable.ambush_condition
+    if Player:IsStealthed(true, true) and S.Ambush:IsCastable() and Ambush_Condition() then
       if AR.Cast(S.Ambush) then return "Cast Ambush"; end
     else
       if AR.CDsON() and not Player:IsTanking(Target) then
-        -- actions.stealth+=/vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
-        if S.Vanish:IsCastable() and ((I.MantleoftheMasterAssassin:IsEquipped() and Player:Buff(S.TrueBearing)) or Stealth_Condition()) then
+        -- actions.stealth+=/vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
+        if S.Vanish:IsCastable() and (Ambush_Condition() or (I.MantleoftheMasterAssassin:IsEquipped() and Rogue.MantleDuration() == 0 and not RtB_Reroll() and not SS_Useable)) then
           if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
         end
-        -- actions.stealth+=/shadowmeld,if=variable.stealth_condition
-        if S.Shadowmeld:IsCastable() and Stealth_Condition() then
+        -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
+        if S.Shadowmeld:IsCastable() and Ambush_Condition() then
           if AR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
         end
       end
@@ -451,13 +468,15 @@ local function APL ()
       end
       if not SS_Useable() then
         -- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
+        -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
         if S.SliceandDice:IsAvailable() then
-          if S.SliceandDice:IsCastable() and Player:BuffRemains(S.SliceandDice) < Target:TimeToDie() and Player:BuffRemains(S.SliceandDice) < (1+Player:ComboPoints())*1.8 then
+          if S.SliceandDice:IsCastable() and (Player:BuffRemains(S.SliceandDice) < Target:TimeToDie() or Player:BuffRemains(S.SliceandDice) == 0) and Player:BuffRemains(S.SliceandDice) < (1+Player:ComboPoints())*1.8 then
             if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
           end
-        -- actions+=/roll_the_bones,if=!variable.ss_useable&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
+        -- actions+=/roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
+        -- Note: Added RtB_BuffRemains() == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
         else
-          if S.RolltheBones:IsCastable() and RtB_BuffRemains() < Target:TimeToDie() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
+          if S.RolltheBones:IsCastable() and (Target:TimeToDie() > 20 or RtB_BuffRemains() < Target:TimeToDie() or RtB_BuffRemains() == 0) and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
             if AR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
           end
         end
@@ -494,12 +513,12 @@ end
 
 AR.SetAPL(260, APL);
 
--- Last Update: 01/27/2017
+-- Last Update: 05/07/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask,name=flask_of_the_seventh_demon
 -- actions.precombat+=/augmentation,name=defiled
--- actions.precombat+=/food,name=seedbattered_fish_plate
+-- actions.precombat+=/food,name=lavish_suramar_feast
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/stealth
@@ -521,7 +540,7 @@ AR.SetAPL(260, APL);
 -- actions+=/call_action_list,name=stealth,if=stealthed.rogue|cooldown.vanish.up|cooldown.shadowmeld.up
 -- actions+=/death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
 -- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
--- actions+=/roll_the_bones,if=!variable.ss_useable&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
+-- actions+=/roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
 -- actions+=/killing_spree,if=energy.time_to_max>5|energy<15
 -- actions+=/call_action_list,name=build
 -- actions+=/call_action_list,name=finish,if=!variable.ss_useable
@@ -529,7 +548,8 @@ AR.SetAPL(260, APL);
 -- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
 
 -- # Blade Flurry
--- actions.bf=cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
+-- actions.bf=cancel_buff,name=blade_flurry,if=spell_targets.blade_flurry<2&buff.blade_flurry.up
+-- actions.bf+=/cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2
 -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
 
 -- # Builders
@@ -544,17 +564,17 @@ AR.SetAPL(260, APL);
 -- actions.cds+=/arcane_torrent,if=energy.deficit>40
 -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
--- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=cp_max_spend-1)
+-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
+-- actions.cds+=/darkflight,if=equipped.thraxis_tricksy_treads&!variable.ss_useable&buff.sprint.down
 -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
 
 -- # Finishers
--- actions.finish=between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
+-- actions.finish=between_the_eyes,if=(mantle_duration>=gcd.remains+0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
 -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
 
 -- # Stealth
--- # Condition to use stealth abilities
--- actions.stealth=variable,name=stealth_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
--- actions.stealth+=/ambush
--- actions.stealth+=/vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
--- actions.stealth+=/shadowmeld,if=variable.stealth_condition
+-- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
+-- actions.stealth+=/ambush,if=variable.ambush_condition
+-- actions.stealth+=/vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
+-- actions.stealth+=/shadowmeld,if=variable.ambush_condition
