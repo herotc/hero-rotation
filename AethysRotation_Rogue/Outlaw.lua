@@ -368,7 +368,7 @@ local function APL ()
           else
             if AR.CDsON() and not Player:IsTanking(Target) then
               -- actions.stealth+=/vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
-              if S.Vanish:IsCastable() and (Ambush_Condition or (I.MantleoftheMasterAssassin:IsEquipped() and Rogue.MantleDuration() == 0 and not RtB_Reroll() and not SS_Useable)) then
+              if S.Vanish:IsCastable() and (Ambush_Condition or (I.MantleoftheMasterAssassin:IsEquipped() and Rogue.MantleDuration() == 0 and not RtB_Reroll() and not SS_Useable())) then
                 if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
               end
               -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
