@@ -2,7 +2,7 @@ package-as: AethysRotation
 
 externals:
  AethysCore:
-  url: https://github.com/Aethys256/AethysCore
+  url: https://github.com/SimCMinMax/AethysCore
 
 move-folders:
  AethysRotation/AethysRotation: AethysRotation
