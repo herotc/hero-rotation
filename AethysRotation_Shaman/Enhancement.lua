@@ -265,7 +265,7 @@ local function APL ()
         end
             -- actions+=/crash_lightning,if=talent.crashing_storm.enabled&active_enemies>=3&(!talent.hailstorm.enabled|buff.frostbrand.remains>gcd)
         if AR.AoEON() and S.CrashLightning:IsCastable() and S.CrashingStorm:IsAvailable() and Cache.EnemiesCount[8] >= 3 
-            and (not S.Hailstorm:IsAvailable() or Player:BuffRemains(FrostbrandBuff) > Player:GCD()) then
+            and (not S.Hailstorm:IsAvailable() or Player:BuffRemains(S.FrostbrandBuff) > Player:GCD()) then
             if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
         end
             -- actions+=/earthen_spike
