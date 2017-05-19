@@ -1,0 +1,14 @@
+## Interface: 70200
+
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FMage|r]
+## Author: Nia
+## Notes: Aethys Rotation - Mage Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Settings.lua
+Mage.lua
+Frost.lua
+Events.lua
