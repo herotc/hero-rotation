@@ -8,6 +8,7 @@
   local Unit = AC.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
+  local MouseOver = Unit.MouseOver;
   local Spell = AC.Spell;
   local Item = AC.Item;
   -- AethysRotation
@@ -54,10 +55,17 @@
       AC.GetEnemies(30);
 
       BestUnit, BestUnitTTD = nil, 60;
+      local MOTTD = MouseOver:IsInRange(30) and MouseOver:TimeToDie() or 11111;
+      local TTD;
       for _, Unit in pairs(Cache.Enemies[30]) do
-        -- I increased the SimC condition by 50% since we are slower.
-        if not Unit:IsMfdBlacklisted() and Unit:TimeToDie() < Player:ComboPointsDeficit()*1.5 and Unit:TimeToDie() < BestUnitTTD then
-          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+        TTD = Unit:TimeToDie();
+        -- Note: Increased the SimC condition by 50% since we are slower.
+        if not Unit:IsMfdBlacklisted() and TTD < Player:ComboPointsDeficit()*1.5 and TTD < BestUnitTTD then
+          if MOTTD - TTD > 1 then
+            BestUnit, BestUnitTTD = Unit, TTD;
+          else
+            BestUnit, BestUnitTTD = MouseOver, MOTTD;
+          end
         end
       end
       if BestUnit then
