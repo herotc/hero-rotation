@@ -334,7 +334,8 @@ local function APL ()
           end
           -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
           if S.MarkedforDeath:IsCastable() then
-            if Target:TimeToDie() < Player:ComboPointsDeficit() or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemains(S.TrueBearing) > 15 - (Player:Buff(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
+            -- Note: Increased the SimC condition by 50% since we are slower.
+            if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (Target:FilteredTimeToDie("<", 2) and Player:ComboPointsDeficit() > 0) or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemains(S.TrueBearing) > 15 - (Player:Buff(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
               if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
             elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
               AR.CastSuggested(S.MarkedforDeath);
@@ -386,13 +387,13 @@ local function APL ()
         -- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
         -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
         if S.SliceandDice:IsAvailable() then
-          if S.SliceandDice:IsCastable() and (Player:BuffRemains(S.SliceandDice) < Target:TimeToDie() or Player:BuffRemains(S.SliceandDice) == 0) and Player:BuffRemains(S.SliceandDice) < (1+Player:ComboPoints())*1.8 then
+          if S.SliceandDice:IsCastable() and (Target:FilteredTimeToDie(">", Player:BuffRemains(S.SliceandDice)) or Player:BuffRemains(S.SliceandDice) == 0) and Player:BuffRemains(S.SliceandDice) < (1+Player:ComboPoints())*1.8 then
             if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
           end
         -- actions+=/roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
         -- Note: Added RtB_BuffRemains() == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
         else
-          if S.RolltheBones:IsCastable() and (Target:TimeToDie() > 20 or RtB_BuffRemains() < Target:TimeToDie() or RtB_BuffRemains() == 0) and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
+          if S.RolltheBones:IsCastable() and (Target:FilteredTimeToDie(">", 20) or Target:FilteredTimeToDie(">", RtB_BuffRemains()) or RtB_BuffRemains() == 0) and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
             if AR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
           end
         end

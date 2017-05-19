@@ -56,7 +56,7 @@
       -- "Default", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"
       RolltheBonesLogic = "Default",
       -- Blade Flurry TimeOut
-      BFOffset = 3,
+      BFOffset = 2,
       -- SoloMode Settings
       RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
       -- Pistol Shot icon for Blunderbuss
