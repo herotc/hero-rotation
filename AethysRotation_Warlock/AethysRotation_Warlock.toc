@@ -1,0 +1,13 @@
+## Interface: 70200
+
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FWarlock|r]
+## Author: KutiKuti
+## Notes: Aethys Rotation - Warlock Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Settings.lua
+Warlock.lua
+Destruction.lua
