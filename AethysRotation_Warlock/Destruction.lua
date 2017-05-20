@@ -42,8 +42,8 @@
 	SummonDoomGuard			= Spell(18540),
 	SummonInfernal 			= Spell(1122),
 	SummonDemon 			= Spell(1122),
-	GrimoireImp, 			= Spell(111859),
-	SoulHarvest, 			= Spell(196098),
+	GrimoireImp 			= Spell(111859),
+	SoulHarvest 			= Spell(196098),
 	
     -- Talents
     Backdraft 				= Spell(196406),
