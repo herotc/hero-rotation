@@ -239,8 +239,8 @@
     end
   end
   local function PreBitePhase ()
-    -- actions.preBitePhase=flanking_strike
-    if S.FlankingStrike:IsCastable() and Player:FocusPredicted(0.2) > 45 then
+    -- actions.preBitePhase=flanking_strike,if=cooldown.mongoose_bite.charges<3
+    if S.FlankingStrike:IsCastable() and Player:FocusPredicted(0.2) > 45 and S.MongooseBite:Charges() < 3 then
       if AR.Cast(S.FlankingStrike) then return ""; end
     end
     -- actions.preBitePhase+=/spitting_cobra
@@ -427,7 +427,7 @@
 -- actions.mokMaintain=raptor_strike,if=buff.moknathal_tactics.remains<gcd
 -- actions.mokMaintain+=/raptor_strike,if=buff.moknathal_tactics.stack<2
 
--- actions.preBitePhase=flanking_strike
+-- actions.preBitePhase=flanking_strike,if=cooldown.mongoose_bite.charges<3
 -- actions.preBitePhase+=/spitting_cobra
 -- actions.preBitePhase+=/lacerate,if=!dot.lacerate.ticking
 -- actions.preBitePhase+=/raptor_strike,if=active_enemies=1&talent.serpent_sting.enabled&!dot.serpent_sting.ticking
