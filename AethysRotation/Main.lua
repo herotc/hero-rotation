@@ -222,26 +222,28 @@
       [72]    = "AethysRotation_Warrior",       -- Fury
       [73]    = false                           -- Protection
   };
-  local LatestSpecIDCheck = 0;
+  local LatestSpecIDChecked = 0;
   function AR.PulseInit ()
     -- Force a refresh from the Core
     -- TODO: Make it a function instead of copy/paste from Core Events.lua
-    Cache.Persistent.Player.Class = {UnitClass("player")};
     Cache.Persistent.Player.Spec = {GetSpecializationInfo(GetSpecialization())};
 
+    local SpecID = Cache.Persistent.Player.Spec[1];
+
     -- Note: Prevent the UI to disappear if the spec isn't yet known by the WoW API.
-    if EnabledRotation[Cache.Persistent.Player.Spec[1]] == nil then
+    if EnabledRotation[SpecID] == nil then
       return "Invalid SpecID";
     end
 
     -- Load the Class Module if it's possible and not already loaded
-    if EnabledRotation[Cache.Persistent.Player.Spec[1]] and not IsAddOnLoaded(EnabledRotation[Cache.Persistent.Player.Spec[1]]) then
-      LoadAddOn(EnabledRotation[Cache.Persistent.Player.Spec[1]]);
+    if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
+      LoadAddOn(EnabledRotation[SpecID]);
     end
 
     -- Check if there is a Rotation for this Spec
-    if LatestSpecIDCheck ~= Cache.Persistent.Player.Spec[1] then
-      if EnabledRotation[Cache.Persistent.Player.Spec[1]] and AR.APLs[Cache.Persistent.Player.Spec[1]] then
+    if LatestSpecIDChecked ~= SpecID then
+      if EnabledRotation[SpecID] and AR.APLs[SpecID] then
+        Player:FilterTriggerGCD(SpecID);
         for Key, Value in pairs(UIFrames) do
           Value:Show();
         end
@@ -253,7 +255,7 @@
         end
         AR.MainFrame:SetScript("OnUpdate", nil);
       end
-      LatestSpecIDCheck = Cache.Persistent.Player.Spec[1];
+      LatestSpecIDChecked = SpecID;
     end
     if not AC.PulseInitialized then AC.PulseInitialized = true; end
   end
