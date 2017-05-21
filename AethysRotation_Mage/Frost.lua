@@ -7,6 +7,7 @@
   local Cache = AethysCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
+  local Pet = Unit.Pet;
   local Target = Unit.Target;
   local Spell = AC.Spell;
   local Item = AC.Item;
