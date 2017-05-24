@@ -192,7 +192,7 @@
     -- Mage
       [62]    = false,                          -- Arcane
       [63]    = false,                          -- Fire
-      [64]    = false,                          -- Frost
+      [64]    = "AethysRotation_Mage",          -- Frost
     -- Monk
       [268]   = false,                          -- Brewmaster
       [269]   = false,                          -- Windwalker
