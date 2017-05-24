@@ -7,8 +7,8 @@
   local Cache = AethysCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
-  local Pet = Unit.Pet;
   local Target = Unit.Target;
+  local Pet = Unit.Pet;
   local Spell = AC.Spell;
   local Item = AC.Item;
   -- AethysRotation
@@ -35,8 +35,9 @@
     BrainFreeze                   = Spell(190446),
     ConeofCold                    = Spell(120),
     FingersofFrost                = Spell(44544),
+    Icicles                       = Spell(205473);
     Flurry                        = Spell(44614),
-    Freeze                        = Spell(33395),
+    Freeze                        = Spell(33395,"Pet"),
     FrostNova                     = Spell(122),
     Frostbolt                     = Spell(116),
     FrozenOrb                     = Spell(84714),
@@ -44,7 +45,7 @@
     IcyVeins                      = Spell(12472),
     SummonWaterElemental          = Spell(31687),
     TimeWarp                      = Spell(80353),
-    WaterJet                      = Spell(135029),
+    WaterJet                      = Spell(135029,"Pet"),
     WintersChill                  = Spell(228358),
     -- Talents
     BoneChilling                  = Spell(205027),
@@ -85,7 +86,7 @@
   if not Item.Mage then Item.Mage = {}; end
   Item.Mage.Frost = {
     -- Legendaries
-    -- LadyVashjsGrasp                = Item(132411, {})
+    --LadyVashjsGrasp                = Item(132411, {10}) --Left commented out since this APL does not require it (stack and react are identical in AR). If LVG APL gets fully merged it will be needed though so added slot
   };
   local I = Item.Mage.Frost;
   -- Rotation Var
@@ -134,11 +135,17 @@
         if AR.Cast(S.IceNova) then return ""; end
       end
       -- actions.aoe+=/water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
-      if S.WaterJet:IsCastable() and Player:PrevGCD(1, S.Frostbolt) and Player:BuffStack(S.FingersofFrost) < (2 + S.IcyHand:IsAvailable()) and Player:BuffStack(S.BrainFreeze) == 0 then
-        if AR.Cast(S.WaterJet) then return ""; end
-      end
+	  if S.IcyHand:ArtifactEnabled() then
+	      if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 3 and Player:BuffStack(S.BrainFreeze) == 0 then
+			  if AR.Cast(S.WaterJet) then return ""; end
+		  end
+	  else
+		  if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 2 and Player:BuffStack(S.BrainFreeze) == 0 then
+			  if AR.Cast(S.WaterJet) then return ""; end
+		  end
+	  end
       -- actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|prev_gcd.1.frostbolt&buff.brain_freeze.react
-      if S.Flurry:IsCastable() and (Player:PrevGCD(1, S.Ebonbolt) or (Player:PrevGCD(1, S.Frostbolt) and Player:Buff(S.BrainFreeze))) then
+      if S.Flurry:IsCastable() and ((Player:CastID() == S.Ebonbolt:ID()) or ((Player:CastID() == S.Frostbolt:ID()) and Player:Buff(S.BrainFreeze))) then
         if AR.Cast(S.Flurry) then return ""; end
       end
       -- actions.aoe+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react>0
@@ -154,7 +161,7 @@
         if AR.Cast(S.Ebonbolt) then return ""; end
       end
       -- actions.aoe+=/glacial_spike
-      if S.GlacialSpike:IsCastable() then
+      if S.GlacialSpike:IsCastable() and Player:BuffStack(S.Icicles) == 5 then
         if AR.Cast(S.GlacialSpike) then return ""; end
       end
       -- actions.aoe+=/frostbolt
@@ -190,9 +197,7 @@
         if AR.Cast(S.Berserking) then return ""; end
       end
       -- actions.cooldowns+=/arcane_torrent
-      if S.ArcaneTorrent:IsCastable() then
-        if AR.Cast(S.ArcaneTorrent) then return ""; end
-      end
+	  -- Torrent has no impact on frost dps we just do it in SIMC to be lazy (since arc likes it), let user handle their own for interrupts
     end
   end
   -- # Single
@@ -202,19 +207,25 @@
       if AR.Cast(S.IceNova) then return ""; end
     end
     -- actions.single+=/frostbolt,if=prev_off_gcd.water_jet
-    if S.Frostbolt:IsCastable() and Pet:PrevOffGCD(1, S.WaterJet) then
+    if S.Frostbolt:IsCastable() and Pet:PrevOffGCD(1, S.WaterJet) and Target:DebuffRemains(S.WaterJet) > (S.Frostbolt:TravelTime() + S.Frostbolt:CastTime()) then
       if AR.Cast(S.Frostbolt) then return ""; end
     end
     -- actions.single+=/water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
-    if S.WaterJet:IsCastable() and Player:PrevGCD(1, S.Frostbolt) and Player:BuffStack(S.FingersofFrost) < (2 + S.IcyHand:IsAvailable()) and Player:BuffStack(S.BrainFreeze) == 0 then
-      if AR.Cast(S.WaterJet) then return ""; end
-    end
+	if S.IcyHand:ArtifactEnabled() then
+	    if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 3 and Player:BuffStack(S.BrainFreeze) == 0 then
+			if AR.Cast(S.WaterJet) then return ""; end
+		end
+	else
+		if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 2 and Player:BuffStack(S.BrainFreeze) == 0 then
+			if AR.Cast(S.WaterJet) then return ""; end
+		end
+	end
     -- actions.single+=/ray_of_frost,if=buff.icy_veins.up|(cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down)
     if S.RayofFrost:IsCastable() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:Cooldown() > S.RayofFrost:Cooldown() and not Player:Buff(S.RuneofPower))) then
       if AR.Cast(S.RayofFrost) then return ""; end
     end
     -- actions.single+=/flurry,if=prev_gcd.1.ebonbolt|prev_gcd.1.frostbolt&buff.brain_freeze.react
-    if S.Flurry:IsCastable() and (Player:PrevGCD(1, S.Ebonbolt) or (Player:PrevGCD(1, S.Frostbolt) and Player:Buff(S.BrainFreeze))) then
+    if S.Flurry:IsCastable() and ((Player:CastID() == S.Ebonbolt:ID()) or ((Player:CastID() == S.Frostbolt:ID()) and Player:Buff(S.BrainFreeze))) then
       if AR.Cast(S.Flurry) then return ""; end
     end
     -- actions.single+=/blizzard,if=cast_time=0&active_enemies>1&variable.fof_react<3
@@ -251,7 +262,7 @@
       if AR.Cast(S.Ebonbolt) then return ""; end
     end
     -- actions.single+=/glacial_spike
-    if S.GlacialSpike:IsCastable() then
+    if S.GlacialSpike:IsCastable() and Player:BuffStack(S.Icicles) == 5 then
       if AR.Cast(S.GlacialSpike) then return ""; end
     end
     -- actions.single+=/frostbolt
@@ -276,9 +287,12 @@
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
+	  if Pet:IsActive() == false and S.SummonWaterElemental:IsCastable() then
+		if AR.Cast(S.SummonWaterElemental) then return; end
+	  end
       if Everyone.TargetIsValid() and Target:IsInRange(40) then
         if S.Ebonbolt:IsCastable() then
-          if AR.Cast(S.Ebonbolt) then return; end
+          if AR.CastQueue(S.Ebonbolt, S.Flurry) then return; end
         end
         if S.Frostbolt:IsCastable() then
           if AR.Cast(S.Frostbolt) then return; end
@@ -287,10 +301,13 @@
       return;
     end
     -- In Combat
+	if Pet:IsActive() == false and S.SummonWaterElemental:IsCastable() then
+		if AR.Cast(S.SummonWaterElemental) then return ""; end
+	end
     if Everyone.TargetIsValid() then
       -- actions+=/ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
       if S.IceLance:IsCastable() and FoFReact()== 0 and Player:PrevGCD(1, S.Flurry) then
-        if AR.Cast(S.Frostbolt) then return ""; end
+        if AR.Cast(S.IceLance) then return ""; end
       end
       -- actions+=/time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410&(cooldown.icy_veins.remains<1|target.time_to_die<50))
       -- actions+=/call_action_list,name=cooldowns
