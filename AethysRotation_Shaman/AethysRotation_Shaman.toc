@@ -10,3 +10,4 @@
 
 Settings.lua
 Enhancement.lua
+Events.lua
