@@ -413,7 +413,7 @@ local function APL ()
             if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
           else
             if S.Blunderbuss:IsCastable() then
-              if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
+                if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
             elseif S.PistolShot:IsCastable() then
               if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
             end
