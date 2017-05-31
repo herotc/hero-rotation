@@ -353,7 +353,8 @@ local function APL ()
               end
             end
             -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
-            if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
+            -- Added not player Stealthed since ambush doesn't works with, to be removed on 7.2.5. (Also, Ambush condition will need to have the CotD condition removed)
+            if S.CurseoftheDreadblades:IsCastable() and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
               if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast"; end
             end
           end
