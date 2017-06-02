@@ -1,0 +1,14 @@
+## Interface: 70200
+
+## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FDeathKnight|r]
+## Author: Voracek
+## Notes: Aethys Rotation - DeathKnight Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: AethysRotation
+
+Settings.lua
+DeathKnight.lua
+Frost.lua
+Events.lua

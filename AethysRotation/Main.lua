@@ -175,7 +175,7 @@
   local EnabledRotation = {
     -- Death Knight
       [250]   = false,                          -- Blood
-      [251]   = false,                          -- Frost
+      [251]   = "AethysRotation_DeathKnight",   -- Frost
       [252]   = false,                          -- Unholy
     -- Demon Hunter
       [577]   = false,                          -- Havoc
