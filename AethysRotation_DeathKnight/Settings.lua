@@ -18,7 +18,9 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        
+        ArcaneTorrent = {true, false},
+        Berserking = {true, false},
+        BloodFury = {true, false},
         -- Abilities
         
       }

@@ -41,7 +41,7 @@
     RemorselessWinter             = Spell(196770),
     KillingMachine                = Spell(51124),
     Rime                          = Spell(59052),
-    UnholyStrength                = Spell(53344),
+    UnholyStrength                = Spell(53365),
     -- Talents
     BreathofSindragosa            = Spell(152279),
     FrostScythe                   = Spell(207230),
@@ -113,17 +113,17 @@
 --- ======= ACTION LISTS =======
 local function Generic()
     --actions.generic=obliteration,if=(!talent.frozen_pulse.enabled|(rune<2&runic_power<28))&!talent.gathering_storm.enabled
-    if S.Obliteration:IsAvailable() and S.Obliteration:IsCastable() and (not S.FrozenPulse:IsAvailable() or Player:Runes() < 2 and Player:RunicPower() < 28) and not S.GatheringStorm:IsAvailable() then
-    if AR.Cast(S.FrostStrike) then return ""; end
+   if S.Obliteration:IsCastable() and (not S.FrozenPulse:IsAvailable() or (Player:Runes() < 2 and Player:RunicPower() < 28)) and not S.GatheringStorm:IsAvailable() then
+   if AR.Cast(S.Obliteration) then return ""; end
      end
 
       --  actions.generic+=/frost_strike,if=buff.icy_talons.remains<=gcd&talent.icy_talons.enabled
-   if S.FrostStrike:IsCastable() and S.IcyTalons:IsAvailable() and Player:BuffRemains(S.IcyTalonsBuff) < Player:GCD() then
+ if S.FrostStrike:IsCastable() and (S.IcyTalons:IsAvailable() and Player:BuffRemains(S.IcyTalonsBuff) < Player:GCD()) and Player:RunicPower() >= 25   then
     if AR.Cast(S.FrostStrike) then return ""; end
-     end
+    end
 
     -- actions.generic+=/frost_strike,if=talent.shattering_strikes.enabled&debuff.razorice.stack=5
-    if S.FrostStrike:IsCastable() and S.ShatteringStrikes:IsAvailable() and Target:DebuffStack(S.RazorIce) == 5 then
+    if S.FrostStrike:IsCastable()  and S.ShatteringStrikes:IsAvailable() and Target:DebuffStack(S.RazorIce) == 5 then
     if AR.Cast(S.FrostStrike) then return ""; end
       end
     --  actions.generic+=/howling_blast,target_if=!dot.frost_fever.ticking
@@ -132,37 +132,32 @@ local function Generic()
       end
 
     -- actions.generic+=/remorseless_winter,if=(buff.rime.react&equipped.132459&!(buff.obliteration.up&spell_targets.howling_blast<2))|talent.gathering_storm.enabled
-    if S.RemorselessWinter:IsCastable() and ((Player:Buff(S.Rime) and I.PerseveranceOfTheEbonMartyre:IsEquipped() and not(S.Obliteration:IsCastable() and Cache.EnemiesCount[10] < 2)) or (S.GatheringStorm:IsAvailable())) then
+    if S.RemorselessWinter:IsCastable()  and ((Player:Buff(S.Rime) and I.PerseveranceOfTheEbonMartyre:IsEquipped() and not Player:Buff(S.Obliteration)) or S.GatheringStorm:IsAvailable()) then
      if AR.Cast(S.RemorselessWinter) then return ""; end
       end
 
     --  actions.generic+=/howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&!(equipped.132459&talent.gathering_storm.enabled)
-    if S.HowlingBlast:IsCastable() and (Player:Buff(S.Rime)) and not (Player:Buff(S.Obliteration)) and not(I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.GatheringStorm:IsAvailable()) then
+    if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and not(Player:Buff(S.Obliteration) and Cache.EnemiesCount[10] < 2) and (not I.PerseveranceOfTheEbonMartyre:IsEquipped() and not S.GatheringStorm:IsAvailable()) then
       if AR.Cast(S.HowlingBlast) then return ""; end
       end
 
-    --  actions.generic+=/howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&equipped.132459&talent.gathering_storm.enabled&(debuff.perseverance_of_the_ebon_martyr.up|cooldown.remorseless_winter.remains>3)
-    if S.HowlingBlast:IsCastable() and (Player:Buff(S.Rime)) and not(S.obliteration:IsCastable() and Cache.EnemiesCount[10] < 2) and I.PerseveranceOfTheEbonMartyre:IsEquiped() and S.GatheringStorm:IsAvailable() and (Target:Debuff(S.PerseveranceOfTheEbonMartyre) or (S.RemorselessWinter:Cooldown()>3)) then
-     if AR.Cast(S.HowlingBlast) then return ""; end
+   -- actions.generic+=/howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&equipped.132459&talent.gathering_storm.enabled&(debuff.perseverance_of_the_ebon_martyr.up|cooldown.remorseless_winter.remains>3)
+    if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and not(Player:Buff(S.Obliteration) and Cache.EnemiesCount[10] < 2) and (I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.GatheringStorm:IsAvailable() and (Player:Buff(S.RemorselessWinter)) or (S.RemorselessWinter:Cooldown()>3)) then
+       if AR.Cast(S.HowlingBlast) then return ""; end
       end
     --  actions.generic+=/obliterate,if=!buff.obliteration.up&(equipped.132366&talent.frozen_pulse.enabled&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1))|rune.time_to_5<gcd
-    if S.Obliterate:IsCastable() and (not S.Obliteration:IsCastable() and (I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.FrozenPulse:IsAvailable()and (S.T192P:IsAvailable() or(AC.Tier19_4Pc)))) or Player:RuneTimeToX(5) < Player:GCD() then
+    if S.Obliterate:IsCastable() and not S.Obliteration:IsCastable() and (I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.FrozenPulse:IsAvailable() and (AC.Tier19_2Pc or AC.Tier19_4Pc )) or Player:RuneTimeToX(5) < Player:GCD() then
       if AR.Cast(S.Obliterate) then return ""; end
       end
 
-    --  actions.generic+=/sindragosas_fury,if=(equipped.144293|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5&!buff.obliteration.up
-    if S.SindragosasFury:IsCastable() and(I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 and not Player:Buff(S.Obliteration) then
-      if AR.Cast(S.SindragosasFury) then return ""; end
-        end
-
-    --  actions.generic+=/frost_strike,if=runic_power.deficit<=10
+      --  actions.generic+=/frost_strike,if=runic_power.deficit<=10
     if S.FrostStrike:IsCastable() and  Player:RunicPowerDeficit() <= 10 then
       if AR.Cast(S.FrostStrike) then return ""; end
       end
 
     --  actions.generic+=/frost_strike,if=buff.obliteration.up&!buff.killing_machine.react
-    if S.FrostStrike:IsCastable() and Player:Buff(S.Obliteration) and not (Player:Buff(S.KillingMachine)) then
-    if AR.Cast(S.FrostScythe) then return ""; end
+    if S.FrostStrike:IsCastable() and Player:Buff(S.Obliteration) and not Player:Buff(S.KillingMachine) then
+      if AR.Cast(S.FrostStrike) then return ""; end
       end
 
     --  actions.generic+=/remorseless_winter,if=spell_targets.remorseless_winter>=2&!(talent.frostscythe.enabled&buff.killing_machine.react&spell_targets.frostscythe>=2)
@@ -171,18 +166,18 @@ local function Generic()
       end
 
     --  actions.generic+=/frostscythe,if=(buff.killing_machine.react&spell_targets.frostscythe>=2)
-    if S.FrostScythe:IsAvailable() and S.FrostScythe:IsCastable() and Player:Buff(S.KillingMachine) and Cache.EnemiesCount[8] >= 2 then
-     if AR.CastSuggested(S.FrostScythe)then return ""; end
+    if S.FrostScythe:IsCastable() and Player:Buff(S.KillingMachine) and Cache.EnemiesCount[10] >= 2 then
+      AR.CastSuggested(S.FrostScythe); 
       end
 
     --  actions.generic+=/glacial_advance,if=spell_targets.glacial_advance>=2
     if S.GlacialAdvance:IsAvailable() and S.GlacialAdvance:IsCastable() and Cache.EnemiesCount[10] >= 2 then
-      if AR.CastSuggested(S.GlacialAdvance)then return ""; end
+      AR.CastSuggested(S.GlacialAdvance); 
       end
 
     --  actions.generic+=/frostscythe,if=spell_targets.frostscythe>=3
-    if S.FrostScythe:IsCastable() and Cache.EnemiesCount[8] >= 3 then
-      if AR.CastSuggested(S.FrostScythe)then return ""; end
+    if S.FrostScythe:IsCastable() and Cache.EnemiesCount[10] >= 3 then
+      AR.CastSuggested(S.FrostScythe); 
       end
 
     --  actions.generic+=/obliterate,if=buff.killing_machine.react
@@ -195,7 +190,7 @@ local function Generic()
        if AR.Cast(S.FrostStrike) then return ""; end
       end
     --  actions.generic+=/frost_strike,if=(talent.horn_of_winter.enabled|talent.hungering_Rune_weapon.enabled)&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1)
-    if S.FrostStrike:IsCastable() and (S.HornOfWinter:IsAvailable() or S.HungeringRuneWeapon:IsAvailable()) and (AC.Tier19_2Pc or AC.Tier19_4Pc) then
+   if S.FrostStrike:IsCastable() and (S.HornOfWinter:IsAvailable() or S.HungeringRuneWeapon:IsAvailable()) and (AC.Tier19_2Pc or AC.Tier19_4Pc) then
       if AR.Cast(S.FrostStrike) then return ""; end
       end
 
@@ -213,28 +208,28 @@ local function Generic()
        end
     --  actions.generic+=/frost_strike
     if S.FrostStrike:IsCastable() then
-      if AR.Cast(S.FrostStrike) then return ""; end
+     if AR.Cast(S.FrostStrike) then return ""; end
       end
     --  actions.generic+=/empower_Rune_weapon
     if S.EmpowerRuneWeapon:IsCastable() then
-       --if AR.Cast(S.EmpowerRuneWeapon, Settings.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
-       if AR.Cast(S.EmpowerRuneWeapon) then return ""; end
-    end
+       if AR.Cast(S.EmpowerRuneWeapon, Settings.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
+           end
+
     --  actions.generic+=/hungering_Rune_weapon,if=!buff.hungering_Rune_weapon.up
-    if S.HungeringRuneWeapon:IsCastable() and not Player:Buff(S.HungeringRuneWeapon) and Player:Runes() <= 1 and Player:RunicPower() <= 20 then
-     --if AR.Cast(S.HungeringRuneWeapon, Settings.Frost.OffGCDasOffGCD.HungeringRuneWeapon) then return ""; end
-     if AR.Cast(S.HungeringRuneWeapon) then return ""; end
-    end
+    if S.HungeringRuneWeapon:IsCastable() and not Player:Buff(S.HungeringRuneWeapon) then
+     if AR.Cast(S.HungeringRuneWeapon, Settings.Frost.OffGCDasOffGCD.HungeringRuneWeapon) then return ""; end
+       end
     return false;
 end
 
 local function BOS()
+
     --  actions.bos=frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<gcd&cooldown.breath_of_sindragosa.remains>rune.time_to_4
-    if S.FrostStrike:IsCastable()  and S.IcyTalons:IsAvailable() and Player:BuffRemains(S.IcyTalonsBuff) < Player:GCD() and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4) then
-      if AR.Cast(S.FrostStrike) then return ""; end
+  if S.FrostStrike:IsCastable()  and S.IcyTalons:IsAvailable() and Player:BuffRemains(S.IcyTalonsBuff) < Player:GCD() and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4) then
+    if AR.Cast(S.FrostStrike) then return ""; end
       end
     --  actions.bos+=/remorseless_winter,if=talent.gathering_storm.enabled
-     if S.RemorselessWinter:IsCastable()  and S.GatheringStorm:IsAvailable() and Player:Runes()>=3 then
+     if S.RemorselessWinter:IsCastable()  and S.GatheringStorm:IsAvailable() then
       if AR.Cast(S.RemorselessWinter) then return ""; end
       end
     --  actions.bos+=/howling_blast,target_if=!dot.frost_fever.ticking
@@ -243,17 +238,17 @@ local function BOS()
       end
    
     -- actions.bos+=/howling_blast,if=buff.rime.react&rune.time_to_4<(gcd*2)
-    if S.HowlingBlast:IsCastable() and Player:Buff(S.Rime) and Player:RuneTimeToX(4) < Player:GCD() * 2 then
-      if AR.Cast(S.HowlingBlast) then return ""; end
-      end
+   if S.HowlingBlast:IsCastable() and Player:Buff(S.Rime) and Player:RuneTimeToX(4) < (Player:GCD() * 2) then
+     if AR.Cast(S.HowlingBlast) then return ""; end
+    end
 
     -- actions.bos+=/obliterate,if=rune.time_to_6<gcd&!talent.gathering_storm.enabled
       if S.Obliterate:IsCastable() and Player:RuneTimeToX(6) < Player:GCD() and not S.GatheringStorm:IsAvailable()   then
-      if AR.Cast(S.HowlingBlast) then return ""; end
+      if AR.Cast(S.Obliterate) then return ""; end
       end
     -- actions.bos+=/obliterate,if=rune.time_to_4<gcd&(cooldown.breath_of_sindragosa.remains|runic_power<70)
     if S.Obliterate:IsCastable() and Player:RuneTimeToX(4) < Player:GCD() and (not S.BreathofSindragosa:IsCastable() or Player:RunicPower() < 70 )  then
-      if AR.Cast(S.HowlingBlast) then return ""; end
+      if AR.Cast(S.Obliterate) then return ""; end
       end
     --  actions.bos+=/frost_strike,if=runic_power>=90&set_bonus.tier19_4pc&cooldown.breath_of_sindragosa.remains
     if S.FrostStrike:IsCastable() and Player:RunicPower() >= 90 and AC.Tier19_4Pc and not S.BreathofSindragosa:IsCastable() then
@@ -264,7 +259,7 @@ local function BOS()
       if AR.Cast(S.RemorselessWinter) then return ""; end
        end
     --  actions.bos+=/howling_blast,if=buff.rime.react&(dot.remorseless_winter.ticking|cooldown.remorseless_winter.remains>gcd|(!equipped.132459&!talent.gathering_storm.enabled))
-     if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and ((Target:Debuff(S.RemorselessWinter) or S.RemorselessWinter:Cooldown() > Player:GCD()) or  ( not I.PerseveranceOfTheEbonMartyre:IsEquipped() and  not S.GatheringStorm:IsAvailable())) then
+    if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and (Player:Buff(S.RemorselessWinter) or S.RemorselessWinter:Cooldown() > Player:GCD()) or ( not I.PerseveranceOfTheEbonMartyre:IsEquipped() and not S.GatheringStorm:IsAvailable()) then
       if AR.Cast(S.HowlingBlast) then return ""; end
        end
     --  actions.bos+=/obliterate,if=!buff.rime.react&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>(gcd*2)|rune>4))&rune>3
@@ -272,33 +267,29 @@ local function BOS()
       if AR.Cast(S.Obliterate) then return ""; end
        end
 
-    --  actions.bos+=/sindragosas_fury,if=(equipped.144293|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5&!buff.obliteration.up
-    if S.SindragosasFury:IsCastable() and(I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 and not Player:Buff(S.Obliteration) and Player:RunicPower() > 50  then
-      if AR.Cast(S.SindragosasFury) then return ""; end
-        end
-    
+       
     -- actions.bos+=/frost_strike,if=runic_power>=70
-    if S.FrostStrike:IsCastable() and Player:RunicPower() >= 70 then
-      if AR.Cast(S.Obliterate) then return ""; end
+    if S.FrostStrike:IsCastable() and Player:RunicPower() >= 70 and S.HungeringRuneWeapon:Cooldown() >= 10 then
+      if AR.Cast(S.FrostStrike) then return ""; end
         end
     -- actions.bos+=/remorseless_winter,if=spell_targets.remorseless_winter>=2
     if S.RemorselessWinter:IsCastable() and Cache.EnemiesCount[10] > 2 then
       if AR.Cast(S.RemorselessWinter) then return ""; end
         end
     -- actions.bos+=/obliterate,if=!buff.rime.react&(!talent.gathering_storm.enabled|cooldown.remorseless_winter.remains>(gcd))
-    if S.Obliterate:IsCastable() and not Player:Buff(S.Rime) and (not S.GatheringStorm:IsAvailable() or S.RemorselessWinter:Cooldown() > Player:GCD()) then
-      if AR.Cast(S.RemorselessWinter) then return ""; end
+   if S.Obliterate:IsCastable() and not Player:Buff(S.Rime) and (not S.GatheringStorm:IsAvailable() or S.RemorselessWinter:Cooldown() > Player:GCD()) then
+      if AR.Cast(S.Obliterate) then return ""; end
         end
     -- actions.bos+=/frost_strike,if=(cooldown.remorseless_winter.remains<(gcd*2)|buff.gathering_storm.stack=10)&cooldown.breath_of_sindragosa.remains>rune.time_to_4&talent.gathering_storm.enabled    
-    if S.FrostStrike:IsCastable() and ((S.RemorselessWinter:Cooldown() < Player:GCD() or Player:BuffStack(S.GatheringStorm) == 10) and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4) and S.GatheringStorm:IsAvailable()) then
+    if S.FrostStrike:IsCastable() and (S.RemorselessWinter:Cooldown() < (Player:GCD()*2) or Player:BuffStack(S.GatheringStorm) == 10) and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4) and S.GatheringStorm:IsAvailable() then
       if AR.Cast(S.FrostStrike) then return ""; end
         end
     -- actions.bos+=/horn_of_winter,if=cooldown.breath_of_sindragosa.remains>15&runic_power<=70&rune.time_to_3>gcd
-    if S.HornOfWinter:IsCastable()  and S.BreathofSindragosa:Cooldown() > 15 and Player:RunicPower() <=70 and Player:RuneTimeToX(3) > Player:GCD()  then
+    if S.HornOfWinter:IsCastable() and Player:RunicPower() >= 25  and S.BreathofSindragosa:Cooldown() > 15 and Player:RunicPower() <=70 and Player:RuneTimeToX(3) > Player:GCD()  then
       if AR.Cast(S.HornOfWinter) then return ""; end
         end
     --  actions.bos+=/frost_strike,if=cooldown.breath_of_sindragosa.remains>rune.time_to_4
-    if S.FrostStrike:IsCastable() and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4)   then
+    if S.FrostStrike:IsCastable() and Player:RunicPower() >= 25 and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4)   then
       if AR.Cast(S.FrostStrike) then return ""; end
       end
     
@@ -315,22 +306,17 @@ local function BOS_Ticking()
       if AR.Cast(S.RemorselessWinter) then return ""; end
         end
     -- actions.bos_ticking+=/howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30|buff.hungering_rune_weapon.up)&buff.rime.react
-    if S.HowlingBlast:IsCastable() and ((Player:RunicPower() >= 25 and AC.Tier19_4Pc ) or Player:RunicPower() >= 30 or Player:Buff(S.HungeringRuneWeapon)) and Player:Buff(S.Rime) then
+    if S.HowlingBlast:IsCastable() and ((Player:RunicPower() >= 25 and AC.Tier19_4Pc ) or Player:RunicPower() >= 30 or Player:Buff(S.HungeringRuneWeapon)) and Player:Buff(S.Rime) and S.RemorselessWinter:Cooldown() > Player:GCD() then
       if AR.Cast(S.HowlingBlast) then return ""; end
         end
     --  actions.bos_ticking+=/obliterate,if=runic_power<=45|rune.time_to_5<gcd|buff.hungering_rune_weapon.remains>=2
-    if S.Obliterate:IsCastable() and (Player:RunicPower() <= 45 or Player:RuneTimeToX(5) < Player:GCD() or Player:BuffRemains(S.HungeringRuneWeapon) > 2 ) then
+    if S.Obliterate:IsCastable() and S.RemorselessWinter:Cooldown() > Player:GCD() and (Player:RunicPower() <= 45 or Player:RuneTimeToX(5) < Player:GCD() or Player:BuffRemains(S.HungeringRuneWeapon) > 2 ) then
       if AR.Cast(S.Obliterate) then return ""; end
         end
-
-    --  actions.bos_ticking+=/sindragosas_fury,if=(equipped.144293|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5&!buff.obliteration.up
-    if S.SindragosasFury:IsCastable() and(I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 and not Player:Buff(S.Obliteration) and Player:RunicPower() > 50  then
-      if AR.Cast(S.SindragosasFury) then return ""; end
-        end
-
+    
     --  actions.bos_ticking+=/remorseless_winter,if=spell_targets.remorseless_winter>=2
     if S.RemorselessWinter:IsCastable() and Cache.EnemiesCount[10] >= 2 then
-      if AR.Cast(S.Obliterate) then return ""; end
+      if AR.Cast(S.RemorselessWinter) then return ""; end
         end
     --  actions.bos_ticking+=/obliterate,if=runic_power<=75|rune>3
     if S.Obliterate:IsCastable() and Player:RunicPower() <= 75 or Player:Runes() > 3  then
@@ -341,7 +327,7 @@ local function BOS_Ticking()
       if AR.Cast(S.HornOfWinter) then return ""; end
         end
     --  actions.bos_ticking+=/hungering_rune_weapon,if=runic_power<70&!buff.hungering_rune_weapon.up&rune<2&cooldown.breath_of_sindragosa.remains>35&equipped.140806
-    if Player:RunicPower() < 70 and not Player:Buff(S.HungeringRuneWeapon) and Player:Runes() < 2 and S.BreathofSindragosa:Cooldown() > 35 and I.ConvergenceofFates:IsEquipped()  then
+    if S.HungeringRuneWeapon:IsCastable() and Player:RunicPower() < 70 and not Player:Buff(S.HungeringRuneWeapon) and Player:Runes() < 2 and S.BreathofSindragosa:Cooldown() > 35 and I.ConvergenceofFates:IsEquipped()  then
       if AR.Cast(S.HungeringRuneWeapon, Settings.Frost.OffGCDasOffGCD.HungeringRuneWeapon) then return; end
         end
     -- actions.bos_ticking+=/hungering_rune_weapon,if=runic_power<50&!buff.hungering_rune_weapon.up&rune.time_to_2>=3&cooldown.breath_of_sindragosa.remains>30
@@ -376,7 +362,7 @@ local function GS_Ticking()
       if AR.Cast(S.HowlingBlast) then return ""; end
         end
     -- actions.gs_ticking+=/howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)
-    if S.HowlingBlast:IsCastable() and Player:Buff(S.Rime) and not (Player:Buff(S.Obliteration) and Cache.EnemiesCount[8] < 2 ) then
+    if S.HowlingBlast:IsCastable() and Player:Buff(S.Rime) and not (Player:Buff(S.Obliteration) and Cache.EnemiesCount[10] < 1 ) then
       if AR.Cast(S.HowlingBlast) then return ""; end
         end
 
@@ -389,10 +375,7 @@ local function GS_Ticking()
     if S.Obliterate:IsCastable() and (Player:RuneTimeToX(5) < Player:GCD() or Player:Buff(S.KillingMachine) or Player:Buff(S.KillingMachine)) then
       if AR.Cast(S.Obliterate) then return ""; end
         end
-    --  actions.gs_ticking+=/sindragosas_fury,if=(equipped.144293|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5&!buff.obliteration.up
-    if S.SindragosasFury:IsCastable() and(I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 and not Player:Buff(S.Obliteration) then
-      if AR.Cast(S.SindragosasFury) then return ""; end
-        end
+    
     --  actions.gs_ticking+=/frost_strike,if=runic_power>80|(buff.obliteration.up&!buff.killing_machine.react)
     if S.FrostStrike:IsCastable() and (Player:RunicPower() > 80 or (Player:Buff(S.Obliteration) and not Player:Buff(S.KillingMachine))) then
       if AR.Cast(S.FrostStrike) then return ""; end
@@ -426,30 +409,31 @@ end
 
 local function CDS()
   
-  --actions+=/pillar_of_frost,if=!talent.breath_of_sindragosa.enabled
+   --actions+=/pillar_of_frost,if=!talent.breath_of_sindragosa.enabled
     if S.PillarOfFrost:IsCastable() and not S.BreathofSindragosa:IsAvailable() then
-   -- if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
-   if AR.Cast(S.PillarOfFrost) then return ""; end
-    end
---actions+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>40
+      if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
+       end
+  --actions+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>40
    if S.PillarOfFrost:IsCastable() and S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:Cooldown() > 40 then
-      --if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
-      if AR.Cast(S.PillarOfFrost) then return ""; end
-        end
---actions+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&!cooldown.breath_of_sindragosa.remains&runic_power>=50&equipped.140806&cooldown.hungering_rune_weapon.remains<10
+      if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
+       end
+  --actions+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&!cooldown.breath_of_sindragosa.remains&runic_power>=50&equipped.140806&cooldown.hungering_rune_weapon.remains<10
     if S.PillarOfFrost:IsCastable() and S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:IsCastable() and Player:RunicPower() >=50 and I.ConvergenceofFates:IsEquipped() and S.HungeringRuneWeapon:Cooldown() < 10 then
-      --if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
-      if AR.Cast(S.PillarOfFrost) then return ""; end
-        end
---actions+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&!cooldown.breath_of_sindragosa.remains&runic_power>=50&!equipped.140806&(cooldown.hungering_rune_weapon.remains<15|target.time_to_die>135)
-     if S.PillarOfFrost:IsCastable() and S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:IsCastable() and Player:RunicPower() >=50 and not I.ConvergenceofFates:IsEquipped() and (S.HungeringRuneWeapon:Cooldown() < 10 or Target:TimeToDie() > 135) then
-      -- if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
-      if AR.Cast(S.PillarOfFrost) then return ""; end
-        end
---actions+=/breath_of_sindragosa,if=buff.pillar_of_frost.up
+      if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
+         end
+  --actions+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&!cooldown.breath_of_sindragosa.remains&runic_power>=50&!equipped.140806&(cooldown.hungering_rune_weapon.remains<15|target.time_to_die>135)
+    if S.PillarOfFrost:IsCastable() and S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:IsCastable() and Player:RunicPower() >=50 and not I.ConvergenceofFates:IsEquipped() and (S.HungeringRuneWeapon:Cooldown() < 10 or Target:TimeToDie() > 135) then
+      if AR.Cast(S.PillarOfFrost, Settings.Frost.OffGCDasOffGCD.PillarOfFrost) then return ; end
+              end
+  --actions+=/breath_of_sindragosa,if=buff.pillar_of_frost.up
      if S.BreathofSindragosa:IsCastable()  and Player:Buff(S.PillarOfFrost) then
       if AR.Cast(S.BreathofSindragosa) then return ""; end
       end
+
+    --  actions.bos+=/sindragosas_fury,if=(equipped.144293|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5&!buff.obliteration.up
+    if S.SindragosasFury:IsCastable() and(I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and not Player:Buff(S.Obliteration) and Player:RunicPower() >= 70 then
+      AR.CastSuggested(S.SindragosasFury);
+        end
 
       
 
