@@ -11,4 +11,5 @@
 Settings.lua
 DeathKnight.lua
 Frost.lua
+Unholy.lua
 Events.lua
