@@ -114,7 +114,7 @@
   local function Generic()
     --actions.generic=obliteration,if=(!talent.frozen_pulse.enabled|(rune<2&runic_power<28))&!talent.gathering_storm.enabled
     if S.Obliteration:IsCastable() and (not S.FrozenPulse:IsAvailable() or (Player:Runes() < 2 and Player:RunicPower() < 28)) and not S.GatheringStorm:IsAvailable() then
-      if AR.Cast(S.Obliteration) then return ""; end
+      if AR.Cast(S.Obliteration, Settings.Frost.OffGCDasOffGCD.Obliteration) then return; end
     end
 
     -- actions.generic+=/frost_strike,if=buff.icy_talons.remains<=gcd&talent.icy_talons.enabled
