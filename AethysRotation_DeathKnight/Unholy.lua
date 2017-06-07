@@ -259,7 +259,7 @@ if S.DeathCoil:IsCastable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:I
  end
   
 -- just making sure sudden_doom procs are used with Instructors
- if S.DeathCoil:IsCastable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
+ if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
    return false;
@@ -315,7 +315,7 @@ end
   if AR.Cast(S.DeathCoil) then return ""; end
  end
  --sudden_doom usage
- if S.DeathCoil:IsCastable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
+ if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
    return false;
