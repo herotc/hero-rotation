@@ -138,17 +138,17 @@
     end
 
     --  actions.generic+=/howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&!(equipped.132459&talent.gathering_storm.enabled)
-    if S.HowlingBlast:IsCastable() and Player:Buff(S.Rime) and not(Player:Buff(S.Obliteration)) and ( not I.PerseveranceOfTheEbonMartyre:IsEquipped() and not  S.GatheringStorm:IsAvailable()) then
+    if S.HowlingBlast:IsCastable() and Player:Buff(S.Rime) and not((Player:Buff(S.Obliteration) and Cache.EnemiesCount[10] < 2) and  not I.PerseveranceOfTheEbonMartyre:IsEquipped()) then
       if AR.Cast(S.HowlingBlast) then return ""; end
     end
 
     -- actions.generic+=/howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&equipped.132459&talent.gathering_storm.enabled&(debuff.perseverance_of_the_ebon_martyr.up|cooldown.remorseless_winter.remains>3)
-    if S.HowlingBlast:IsCastable()  and (Player:Buff(S.Rime) and not (Player:Buff(S.Obliteration) and Cache.EnemiesCount[10] < 2) and I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.GatheringStorm:IsAvailable() and (Target:Debuff(S.PerseveranceOfTheEbonMartyre) or S.RemorselessWinter:Cooldown()>3)) then
+    if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and not (Player:Buff(S.Obliteration) and Cache.EnemiesCount[10] < 2) and I.PerseveranceOfTheEbonMartyre:IsEquipped() and (Target:Debuff(S.PerseveranceOfTheEbonMartyre) or S.RemorselessWinter:Cooldown()>3) then
       if AR.Cast(S.HowlingBlast) then return ""; end
     end
 
     --  actions.generic+=/obliterate,if=!buff.obliteration.up&(equipped.132366&talent.frozen_pulse.enabled&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1))|rune.time_to_5<gcd
-    if S.Obliterate:IsCastable() and (not Player:Buff(S.Obliteration) and (I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.FrozenPulse:IsAvailable() and (AC.Tier19_2Pc or AC.Tier19_4Pc ))) or Player:RuneTimeToX(5) < Player:GCD() then
+    if S.Obliterate:IsCastable() and (not Player:Buff(S.Obliteration) and (I.PerseveranceOfTheEbonMartyre:IsEquipped() and S.FrozenPulse:IsAvailable() and (AC.Tier19_2Pc or AC.Tier19_4Pc )) or Player:RuneTimeToX(5) < Player:GCD()) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
 
@@ -400,7 +400,7 @@
 
     --  actions.gs_ticking+=/obliteration,if=(!talent.frozen_pulse.enabled|(Runes()<2&runic_power<28))
     if S.Obliteration:IsCastable() and (not S.FrozenPulse:IsAvailable() or ((Player:Runes() < 2 and Player:RunicPower() < 28 ))) then
-      if AR.Cast(S.Obliteration, Settings.Commons.OffGCDasOffGCD.Obliteration) then return ""; end
+      if AR.Cast(S.Obliteration, Settings.Commons.OffGCDasOffGCD.Obliteration) then return; end
     end
 
     --  actions.gs_ticking+=/obliterate,if=rune.time_to_5<gcd|buff.killing_machine.react|buff.obliteration.up
