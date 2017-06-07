@@ -473,7 +473,7 @@ local function APL()
 		 --end
 		 
 	  --actions+=/call_action_list,name=generic 
-	   if not S.DarkArbiter:IsAvailable()  
+	   if not S.DarkArbiter:IsAvailable()  then
 	     ShouldReturn = Generic();
 		 if ShouldReturn then return ShouldReturn;  end
 		 end
