@@ -176,7 +176,7 @@
     -- Death Knight
       [250]   = false,                          -- Blood
       [251]   = "AethysRotation_DeathKnight",   -- Frost
-      [252]   = false,                          -- Unholy
+      [252]   = "AethysRotation_DeathKnight",   -- Unholy
     -- Demon Hunter
       [577]   = false,                          -- Havoc
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
