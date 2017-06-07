@@ -247,9 +247,12 @@
           Value:Show();
         end
         AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
-        -- Enums Filters
-        Player:FilterTriggerGCD(SpecID);
-        Spell:FilterProjectileSpeed(SpecID);
+        -- Spec Registers
+          -- Spells
+          Player:RegisterListenedSpells(SpecID);
+          -- Enums Filters
+          Player:FilterTriggerGCD(SpecID);
+          Spell:FilterProjectileSpeed(SpecID);
       else
         AR.Print("No Rotation found for this class/spec, addon disabled.");
         for Key, Value in pairs(UIFrames) do
