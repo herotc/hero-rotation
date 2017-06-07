@@ -318,9 +318,9 @@ end
   if AR.Cast(S.DeathCoil) then return ""; end
  end
  --sudden_doom usage
- --if S.DeathCoil:IsCastable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
-  --if AR.Cast(S.DeathCoil) then return ""; end
- --end
+ if S.DeathCoil:IsCastable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
+  if AR.Cast(S.DeathCoil) then return ""; end
+ end
    return false;
 end
  

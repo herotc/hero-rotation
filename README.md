@@ -29,6 +29,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Solo Mode to prioritize survivability over DPS.
 
 ## Supported Rotations
+- Death Knight Unholy _[Beta]_ (Credits: [chrislopez24](https://github.com/chrislopez24))
 - Death Knight Frost _[Beta]_ (Credits: [3L00DStrike](https://github.com/3L00DStrike))
 - Demon Hunter Vengeance _[Beta]_
 - Hunter BeastMastery (Credits: [Nia](https://github.com/Nianel))
