@@ -298,12 +298,12 @@
     end
 
     -- actions.bos+=/frost_strike,if=(cooldown.remorseless_winter.remains<(gcd*2)|buff.gathering_storm.stack=10)&cooldown.breath_of_sindragosa.remains>rune.time_to_4&talent.gathering_storm.enabled    
-    if S.FrostStrike:IsCastable() and (S.RemorselessWinter:Cooldown() < (Player:GCD()*2) or Player:BuffStack(S.GatheringStorm) == 10) and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4) and S.GatheringStorm:IsAvailable() then
+    if S.FrostStrike:IsCastable() and Player:RunicPower() >= 25 and (S.RemorselessWinter:Cooldown() < (Player:GCD()*2) or Player:BuffStack(S.GatheringStorm) == 10) and S.BreathofSindragosa:Cooldown() > Player:RuneTimeToX(4) and S.GatheringStorm:IsAvailable() then
       if AR.Cast(S.FrostStrike) then return ""; end
     end
 
     -- actions.bos+=/horn_of_winter,if=cooldown.breath_of_sindragosa.remains>15&runic_power<=70&rune.time_to_3>gcd
-    if S.HornOfWinter:IsCastable() and Player:RunicPower() >= 25  and S.BreathofSindragosa:Cooldown() > 15 and Player:RunicPower() <=70 and Player:RuneTimeToX(3) > Player:GCD()  then
+    if S.HornOfWinter:IsCastable() and S.BreathofSindragosa:Cooldown() > 15 and Player:RunicPower() <=70 and Player:RuneTimeToX(3) > Player:GCD()  then
       if AR.Cast(S.HornOfWinter) then return ""; end
     end
 
