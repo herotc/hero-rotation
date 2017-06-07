@@ -18,9 +18,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent = {true, false},
-        Berserking = {true, false},
-        BloodFury = {true, false},
+        
         -- Abilities
         
       }
@@ -29,16 +27,19 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        PillarOfFrost = {true, false},
-        HungeringRuneWeapon = {true, false},
-        EmpowerRuneWeapon = {true, false},
-        Obliteration = {true, false},
+        
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        
+        ArcaneTorrent = {true, false},
+        Berserking = {true, false},
+        BloodFury = {true, false},
         -- Abilities
+        PillarOfFrost = {true, false},
+        HungeringRuneWeapon = {true, false},
+        EmpowerRuneWeapon = {true, false},
+        Obliteration = {true, false},
         
       }
     }
