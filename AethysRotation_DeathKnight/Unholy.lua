@@ -258,7 +258,7 @@ if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsA
  end
   
 -- just making sure sudden_doom procs are used with Instructors
- if S.DeathCoil:IsUsable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
+ if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
    return false;
@@ -491,11 +491,10 @@ local function APL()
 		 end
 		 
 	  --actions.generic+=/call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
-	  if   S.DarkArbiter:IsAvailable() or S.SoulReaper:IsAvailable() and not S.Castigator:IsAvailable()  and I.InstructorsFourthLesson:IsEquipped() then
+	    if  not S.DarkArbiter:IsAvailable() or S.DarkArbiterActive:Cooldown() < 165 and not S.Castigator:IsAvailable() and not I.InstructorsFourthLesson:IsEquipped()   then
 	         ShouldReturn = Standard();
 	         if ShouldReturn then return ShouldReturn; end
-			 
-	 end
+	    end
 	 
       --actions.generic+=/call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
 	  if S.Castigator:IsAvailable() and not S.DarkArbiter:IsAvailable() and not I.InstructorsFourthLesson:IsEquipped() then
