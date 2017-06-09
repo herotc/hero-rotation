@@ -71,6 +71,8 @@
 	--Legendaries WIP
 	InstructorsFourthLesson       = Spell(208713),
 	KiljaedensBurningWish         = Spell(144259),
+	--DarkArbiter HiddenAura
+	DarkArbiterActive             = Spell(212412),
 	
 	
   };
@@ -136,14 +138,11 @@
   if AR.Cast(S.DeathCoil) then return ""; end
  end
   --actions.generic+=/death_coil,if=talent.dark_arbiter.enabled&buff.sudden_doom.up&cooldown.dark_arbiter.remains>5&rune<=3
- if S.DeathCoil:IsUsable() and S.DarkArbiter:IsAvailable() and Player:Buff(S.SuddenDoom) and S.DarkArbiter:Cooldown() > 5 and Player:Runes() <= 3 then
+ if S.DeathCoil:IsCastable() and S.DarkArbiter:IsAvailable() and Player:Buff(S.SuddenDoom) and S.DarkArbiter:Cooldown() > 5 and Player:Runes() <= 3 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
   --actions.generic+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<=6
  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and S.Apocalypse:Cooldown() <= 6 and Player:Runes() >= 2 then
-  if AR.Cast(S.FesteringStrike) then return ""; end
- end
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and Player:Runes() >= 2 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=3
@@ -214,12 +213,12 @@ local function Instructors()
   if AR.Cast(S.FesteringStrike) then return ""; end
  end 
 --actions.instructors+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
-if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsAvailable() and Player:Runes() <= 3 then
+if S.DeathCoil:IsCastable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsAvailable() and Player:Runes() <= 3 then
  if AR.Cast(S.DeathCoil) then return ""; end --TODO: maybe add sudden_doom buff condition and RP >= 35
  end 
 --actions.instructors+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
  if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 4 and Player:RunicPowerDeficit() > 29 and Player:Runes() >= 1 then
-  if AR.Cast(S.ScourgeStrike) then return ""; end
+  if AR.Cast(ScourgeStrike) then return ""; end
  end 
 --actions.instructors+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>11
  if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 11 and Player:Runes() >= 1 then
@@ -227,7 +226,7 @@ if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsA
  end
 -- actions.instructors+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
  if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 4 and Player:RunicPowerDeficit() > 29 and Player:Runes() >= 1 then
-  if AR.Cast(S.ScourgeStrike) then return ""; end
+  if AR.Cast(ScourgeStrike) then return ""; end
  end
 --actions.instructors+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>11
  if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 11 and Player:Runes() >= 1 then
@@ -242,24 +241,24 @@ if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsA
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
 --actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
- if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:Cooldown() > 15 then
+ if S.DeathCoil:IsCastable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:Cooldown() > 15 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
 --actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
- if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) then 
+ if S.DeathCoil:IsCastable() and S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) then 
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
 --actions.instructors+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
- if S.DeathCoil:IsUsable() and S.DarkArbiter:IsAvailable() and  S.DarkArbiter:Cooldown() > 15 then 
+ if S.DeathCoil:IsCastable() and S.DarkArbiter:IsAvailable() and  S.DarkArbiter:Cooldown() > 15 then 
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
 --actions.instructors+=/death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
- if S.DeathCoil:IsUsable() and not S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() then
+ if S.DeathCoil:IsCastable() and not S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
   
 -- just making sure sudden_doom procs are used with Instructors
- if S.DeathCoil:IsUsable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
+ if S.DeathCoil:IsCastable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
    return false;
@@ -315,7 +314,7 @@ end
   if AR.Cast(S.DeathCoil) then return ""; end
  end
  --sudden_doom usage
- if S.DeathCoil:IsUsable() and Player:Buff(SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
+ if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not Player:Buff(S.NecrosisBuff) then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
    return false;
@@ -327,20 +326,24 @@ local function DarkArbiter()
   if AR.Cast(S.Apocalypse) then return ""; end
  end 
  --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
- if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) and Player:RunicPower() < 35 and Player:Runes() >= 1 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
 --actions.valkyr=death_coil
- if S.DeathCoil:IsUsable() and (Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 35) then
+ if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 35 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
  
 --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=3
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 and Player:Runes() >= 2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 and Player:RunicPower() < 35 and Player:Runes() >= 2 then
   if AR.Cast(S.FesteringStrike) then return ""; end
- end 
+ end
+ -- less festering wounds needed if valkyr is active and dc is usable with t194 pc
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 1 and Player:RunicPower() < 35 and Player:Runes() >= 2 and AC.Tier19_4Pc then
+  if AR.Cast(S.FesteringStrike) then return ""; end
+ end
 --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<8&cooldown.apocalypse.remains<5
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and S.Apocalypse:Cooldown() < 6 and Player:Runes() >= 2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and Player:RunicPower() < 35 and S.Apocalypse:Cooldown() < 6 and Player:Runes() >= 2 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end 
 
@@ -352,62 +355,7 @@ local function DarkArbiter()
    return false;
 end
 --CDS
-local function CDS()
---actions+=/army_of_the_dead
-      if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
-			if AR.Cast(S.Outbreak) then return ""; end
-	   end
-       --actions+=/dark_transformation,if=equipped.137075&cooldown.dark_arbiter.remains>165
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.DarkArbiter:Cooldown() > 165 then
-          if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-       --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>55
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 55 then
-          if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-       --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>35
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 35 then
-         if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-       --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.dark_arbiter.remains-8
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.DarkArbiter:Cooldown() - 8 then
-         if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-      --actions+=/dark_transformation,if=equipped.137075&cooldown.summon_gargoyle.remains>160
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.SummonGargoyle:Cooldown() > 160 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>55
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 55 then
-         if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>35
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 35 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.summon_gargoyle.remains-8
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.SummonGargoyle:Cooldown() - 8 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=!equipped.137075&rune<=3
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/blighted_rune_weapon,if=rune<=3
-      if S.BlightedRuneWeapon:IsCastable() and Player:Runes() >= 3 then
-        if AR.Cast(S.BlightedRuneWeapon) then return ""; end
-     end
-	 return false;
-end
+
 --AOE
 local function AOE()
  if  AR.AoEON() then
@@ -460,18 +408,71 @@ local function APL()
    end
  --InCombat
     if Everyone.TargetIsValid()  then
-	      ShouldReturn = CDS();
+	      ShouldReturn = Generic();
 	      if ShouldReturn then return ShouldReturn;  end
 		  
 	  --actions+=/run_action_list,name=valkyr,if=talent.dark_arbiter.enabled&pet.valkyr_battlemaiden.active
 	  --TODO: Check if Valkyr is active (hidden buff?)
-	  --if S.DarkArbiter:IsAvailable() and  S.DarkArbiter:IsSummoned() then
-	    -- ShouldReturn = DarkArbiter();
-		--if ShouldReturn then return ShouldReturn;  end
-		 --end
+	   if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
+			if AR.Cast(S.Outbreak) then return ""; end
+	   end
+       --actions+=/dark_transformation,if=equipped.137075&cooldown.dark_arbiter.remains>165
+       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.DarkArbiter:Cooldown() > 165 then
+          if AR.Cast(S.DarkTransformation) then return ""; end
+       end
+ 
+       --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>55
+       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 55 then
+          if AR.Cast(S.DarkTransformation) then return ""; end
+       end
+ 
+       --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>35
+       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 35 then
+         if AR.Cast(S.DarkTransformation) then return ""; end
+       end
+ 
+       --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.dark_arbiter.remains-8
+       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.DarkArbiter:Cooldown() - 8 then
+         if AR.Cast(S.DarkTransformation) then return ""; end
+       end
+ 
+      --actions+=/dark_transformation,if=equipped.137075&cooldown.summon_gargoyle.remains>160
+      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.SummonGargoyle:Cooldown() > 160 then
+        if AR.Cast(S.DarkTransformation) then return ""; end
+      end
+ 
+      --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>55
+      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 55 then
+         if AR.Cast(S.DarkTransformation) then return ""; end
+      end
+ 
+      --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>35
+      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 35 then
+        if AR.Cast(S.DarkTransformation) then return ""; end
+      end
+ 
+      --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.summon_gargoyle.remains-8
+      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.SummonGargoyle:Cooldown() - 8 then
+        if AR.Cast(S.DarkTransformation) then return ""; end
+      end
+ 
+      --actions+=/dark_transformation,if=!equipped.137075&rune<=3
+      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
+        if AR.Cast(S.DarkTransformation) then return ""; end
+      end
+ 
+      --actions+=/blighted_rune_weapon,if=rune<=3
+      if S.BlightedRuneWeapon:IsCastable() and Player:Runes() >= 3 then
+        if AR.Cast(S.BlightedRuneWeapon) then return ""; end
+     end
+	 
+	  if S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165 then
+	     ShouldReturn = DarkArbiter();
+		if ShouldReturn then return ShouldReturn;  end
+		 end
 		 
 	  --actions+=/call_action_list,name=generic 
-	   if not S.DarkArbiter:IsAvailable()  then
+	   if not S.DarkArbiter:IsAvailable() then
 	     ShouldReturn = Generic();
 		 if ShouldReturn then return ShouldReturn;  end
 		 end
@@ -490,7 +491,7 @@ local function APL()
 		 end
 		 
 	  --actions.generic+=/call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
-	  if  not S.DarkArbiter:IsAvailable() and not S.Castigator:IsAvailable() and not I.InstructorsFourthLesson:IsEquipped() then
+	  if   S.DarkArbiter:IsAvailable() or S.SoulReaper:IsAvailable() and not S.Castigator:IsAvailable()  and I.InstructorsFourthLesson:IsEquipped() then
 	         ShouldReturn = Standard();
 	         if ShouldReturn then return ShouldReturn; end
 			 
