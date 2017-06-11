@@ -105,7 +105,6 @@ local Settings = {
 
 --- ======== FUNCTIONS =========
 
---- IsReady
 function Spell:IsReady()
     return self:IsAvailable() and self:IsCastable() and self:IsUsable();
 end
@@ -214,49 +213,20 @@ local function sef ()
     end
     -- actions.sef+=/call_action_list,name=cd
     if AR.CDsON() then
-        ShouldReturn = cooldowns();
-        if ShouldReturn then return ShouldReturn; end
+        ShouldReturn = cooldowns ();
+    if ShouldReturn then return ShouldReturn; end
     end
     -- actions.sef+=/storm_earth_and_fire,if=!buff.storm_earth_and_fire.up
-    if AR.CDsON() and not Player:Buff(S.StormEarthFire) then
-        if AR.CastLeft(S.StormEarthFire) then return ""; end
+    if AR.CDsON() and not Player:Buff(S.StormEarthAndFire) then
+        if AR.CastLeft(S.StormEarthAndFire) then return ""; end
     end
     -- actions.sef+=/call_action_list,name=st
-    ShouldReturn = single_target();
+    ShouldReturn = single_target ();
     if ShouldReturn then return ShouldReturn; end
     return false;
 end
 
-local function cooldowns ()
-    -- actions.cd=invoke_xuen
-    if S.InvokeXuentheWhiteTiger:IsCastable() then
-        if AR.Cast(S.InvokeXuentheWhiteTiger) then return ""; end
-    end
-    -- actions.cd+=/blood_fury
-    if S.BloodFury:IsCastable() then
-        if AR.Cast(S.BloodFury) then return ""; end
-    end
-    -- actions.cd+=/berserking
-    if S.Berserking:IsCastable() then
-        if AR.Cast(S.Berserking) then return ""; end
-    end
-    -- actions.cd+=/touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.hidden_masters_forbidden_touch&!prev_gcd.1.touch_of_death
-    -- actions.cd+=/touch_of_death,if=!artifact.gale_burst.enabled&!equipped.hidden_masters_forbidden_touch
-    -- actions.cd+=/touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&((talent.serenity.enabled&cooldown.serenity.remains<=1)|chi>=2)&
-    -- (cooldown.strike_of_the_windlord.remains<8|cooldown.fists_of_fury.remains<=4)&cooldown.rising_sun_kick.remains<7&!prev_gcd.1.touch_of_death
-    return false;
-end
-
 local function serenity ()
-    -- actions.serenity=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1&!buff.serenity.up
-    if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and Player:Energy() == Player:EnergyMax() and Player:Chi() < 1 and not Player:Buff(S.Serenity) then
-        if AR.Cast(S.TigerPalm) then return ""; end
-    end
-    -- actions.serenity+=/call_action_list,name=cd
-    if AR.CDsON() then
-        ShouldReturn = cooldowns();
-        if ShouldReturn then return ShouldReturn; end
-    end
     -- actions.serenity+=/serenity
     if AR.CDsON() and S.Serenity:IsCastable() then
         if AR.Cast(S.Serenity) then return ""; end
@@ -296,6 +266,29 @@ local function serenity ()
     return false;
 end
 
+local function cooldowns ()
+    -- actions.cd=invoke_xuen
+    if S.InvokeXuentheWhiteTiger:IsCastable() then
+        if AR.Cast(S.InvokeXuentheWhiteTiger) then return ""; end
+    end
+    -- actions.cd+=/blood_fury
+    if S.BloodFury:IsCastable() then
+        if AR.Cast(S.BloodFury) then return ""; end
+    end
+    -- actions.cd+=/berserking
+    if S.Berserking:IsCastable() then
+        if AR.Cast(S.Berserking) then return ""; end
+    end
+    -- actions.cd+=/touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.hidden_masters_forbidden_touch&!prev_gcd.1.touch_of_death
+    -- actions.cd+=/touch_of_death,if=!artifact.gale_burst.enabled&!equipped.hidden_masters_forbidden_touch
+    -- actions.cd+=/touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&((talent.serenity.enabled&cooldown.serenity.remains<=1)|chi>=2)&
+    -- (cooldown.strike_of_the_windlord.remains<8|cooldown.fists_of_fury.remains<=4)&cooldown.rising_sun_kick.remains<7&!prev_gcd.1.touch_of_death
+    -- actions.sef+=/call_action_list,name=st
+    ShouldReturn = single_target ();
+    if ShouldReturn then return ShouldReturn; end
+    return false;
+end
+
 --- ======= MAIN =======
 -- APL Main
 local function APL ()
@@ -304,29 +297,6 @@ local function APL ()
     AC.GetEnemies(8);
     Everyone.AoEToggleEnemiesUpdate();
 
-    -- Defensives
-
-    -- Out of Combat
-    if not Player:AffectingCombat() then
-        -- Flask
-        -- Food
-        -- Rune
-        -- PrePot w/ Bossmod Countdown
-        -- Opener
-        if Everyone.TargetIsValid() then
-            -- actions.st+=/chi_wave
-            if S.ChiWave:IsReady() then
-                if AR.Cast(S.ChiWave) then return ""; end
-            end
-            -- actions.st+=/chi_burst
-            if S.ChiBurst:IsReady() then
-                if AR.Cast(S.ChiBurst) then return ""; end
-            end
-        end
-        return;
-    end
-
-    -- In Combat
     if Everyone.TargetIsValid() then
         -- actions.st+=/chi_wave
         if S.ChiWave:IsReady() and not Target:IsInRange(5) then
@@ -340,6 +310,15 @@ local function APL ()
         if AR.CDsON() and S.TouchOfDeath:IsReady() and Target:TimeToDie() <= 9 then
             if AR.CastLeft(S.TouchOfDeath) then return ""; end
         end
+        -- actions.serenity=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1&!buff.serenity.up
+	    if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyPercentage() == 100 and Player:Chi() < 1 and not Player:Buff(S.Serenity) then
+	        if AR.Cast(S.TigerPalm) then return ""; end
+	    end
+	    -- actions.serenity+=/call_action_list,name=cd
+	    if AR.CDsON() then
+	        ShouldReturn = cooldowns ();
+	    if ShouldReturn then return ShouldReturn; end
+	    end
         -- actions+=/call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
         if S.Serenity:IsReady() or Player:Buff(S.Serenity) then
             ShouldReturn = serenity();
@@ -365,8 +344,8 @@ local function APL ()
             if ShouldReturn then return ShouldReturn; end
         end
         -- actions+=/call_action_list,name=st
-        ShouldReturn = single_target();
-        if ShouldReturn then return ShouldReturn; end
+        ShouldReturn = single_target ();
+    	if ShouldReturn then return ShouldReturn; end
         return;
     end
 end
