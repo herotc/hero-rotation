@@ -29,19 +29,20 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Solo Mode to prioritize survivability over DPS.
 
 ## Supported Rotations
-- Death Knight Unholy _[Beta]_ (Credits: [chrislopez24](https://github.com/chrislopez24))
 - Death Knight Frost _[Beta]_ (Credits: [3L00DStrike](https://github.com/3L00DStrike))
-- Demon Hunter Vengeance _[Beta]_
+- Death Knight Unholy _[Beta]_ (Credits: [chrislopez24](https://github.com/chrislopez24))
+- Demon Hunter Vengeance
 - Hunter BeastMastery (Credits: [Nia](https://github.com/Nianel))
-- Hunter Marskmanship _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
+- Hunter Marskmanship (Credits: [Nia](https://github.com/Nianel))
 - Hunter Survival (Credits: [Nia](https://github.com/Nianel))
-- Paladin Retribution _[Outdated]_
+- Monk Windwalker (Credits: [Lockem90](https://github.com/Lockem90))
+- Paladin Retribution _7.2.5 Ready_
 - Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
 - Rogue Assassination
 - Rogue Outlaw
 - Rogue Subtlety
 - Shaman Enhancement (Credits: [Tael](https://github.com/Tae-l))
-- Warrior Fury _[Beta]_ (Credits: [Nia](https://github.com/Nianel))
+- Warrior Fury (Credits: [Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90))
 
 ## Special Mention About SimC APL
 As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
