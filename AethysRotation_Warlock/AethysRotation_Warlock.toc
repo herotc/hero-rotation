@@ -11,3 +11,4 @@
 Settings.lua
 Warlock.lua
 Destruction.lua
+Events.lua
