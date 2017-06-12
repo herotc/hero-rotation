@@ -147,7 +147,7 @@
       -- end
       -- actions+=/dire_frenzy,if=(pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2)|(charges_fractional>=1.8)|target.time_to_die<9
       -- NOTE: Increased gcd.max to gcd.max*1.5 to take in concideration human factor.
-      if S.DireFrenzy:IsCastable() and (Pet:BuffRemains(S.DireFrenzy) <= Player:GCD() * 1.5) or (S.DireFrenzy:ChargesFractional() >= 1.8) or Target:TimeToDie() < 9 then
+      if S.DireFrenzy:IsCastable() and (Pet:BuffRemains(S.DireFrenzy) <= Player:GCD() * 1.5 or S.DireFrenzy:ChargesFractional() >= 1.8 or Target:TimeToDie() < 9) then
         if AR.Cast(S.DireFrenzy) then return; end
       end
       -- actions+=/a_murder_of_crows
@@ -159,7 +159,7 @@
         if AR.Cast(S.Stampede) then return; end
       end
       -- actions+=/dire_beast,if=cooldown.bestial_wrath.remains>3
-      if S.DireBeast:IsCastable() and (S.BestialWrath:Cooldown() > 3 or not AR.CDsON())  then
+      if S.DireBeast:IsCastable() and (S.BestialWrath:Cooldown() > 3 or not AR.CDsON()) then
         if AR.Cast(S.DireBeast) then return; end
       end
       -- actions+=/aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
@@ -194,7 +194,6 @@
       if S.ChimaeraShot:IsCastable() and Target:IsInRange(40) and Player:Focus() < 90 then
         if AR.Cast(S.ChimaeraShot) then return; end
       end
-      -- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
       -- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>action.kill_command.cost)|target.time_to_die<cooldown.kill_command.remains|(equipped.parsels_tongue&buff.parsels_tongue.remains<=gcd.max*2)
       if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:Cooldown() > Player:FocusTimeToMax() and (S.BestialWrath:Cooldown() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BestialWrath) and Player:FocusRegen()*S.KillCommand:Cooldown() > S.KillCommand:Cost()) or Target:TimeToDie() < S.KillCommand:Cooldown()) or (I.ParselsTongue:IsEquipped() and Player:Buff(S.ParselsTongueBuff) <= Player:GCD() * 2) then
         if AR.Cast(S.CobraShot) then return; end
