@@ -105,20 +105,20 @@
   if AR.Cast(S.Outbreak) then return ""; end
   end
  --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
- if S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
+ if AR.CDsON() and S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
   if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
   end
  
  --actions.generic+=/dark_arbiter,if=equipped.137075&runic_power.deficit<30&cooldown.dark_transformation.remains<2
- if S.DarkArbiter:IsCastable() and I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 and S.DarkTransformation:Cooldown() < 2 then
+ if AR.CDsON() and S.DarkArbiter:IsCastable() and I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 and S.DarkTransformation:Cooldown() < 2 then
   if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
  end
   --actions.generic+=/summon_gargoyle,if=!equipped.137075,if=rune<=3
- if S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
+ if AR.CDsON() and S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
   if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return ; end
  end
   --actions.generic+=/summon_gargoyle,if=equipped.137075&cooldown.dark_transformation.remains<10&rune<=3
- if S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and I.Taktheritrixs:IsEquipped() and S.DarkTransformation:Cooldown() < 10 and Player:Runes() <= 3 then
+ if AR.CDsON() and S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and I.Taktheritrixs:IsEquipped() and S.DarkTransformation:Cooldown() < 10 and Player:Runes() <= 3 then
   if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return ; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4 -- Player:Rune() > 1 (SR cost)
@@ -462,7 +462,7 @@ local function APL()
       end
  
       --actions+=/blighted_rune_weapon,if=rune<=3
-      if S.BlightedRuneWeapon:IsCastable() and Player:Runes() >= 3 then
+      if AR.CDsON() and S.BlightedRuneWeapon:IsCastable() and Player:Runes() >= 3 then
         if AR.Cast(S.BlightedRuneWeapon, Settings.Unholy.OffGCDasOffGCD.BlightedRuneWeapon) then return ; end
      end
 	 
