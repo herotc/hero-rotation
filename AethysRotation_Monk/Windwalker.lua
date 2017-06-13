@@ -25,56 +25,56 @@ if not Spell.Monk then Spell.Monk = {}; end
 Spell.Monk.Windwalker = {
 
   -- Racials
-  Bloodlust                 = Spell(2825),
-  ArcaneTorrent             = Spell(25046),
-  Berserking                = Spell(26297),
-  BloodFury                 = Spell(20572),
-  GiftoftheNaaru            = Spell(59547),
-  Shadowmeld                = Spell(58984),
-  QuakingPalm               = Spell(107079),
+  Bloodlust = Spell(2825),
+  ArcaneTorrent = Spell(25046),
+  Berserking = Spell(26297),
+  BloodFury = Spell(20572),
+  GiftoftheNaaru = Spell(59547),
+  Shadowmeld = Spell(58984),
+  QuakingPalm = Spell(107079),
 
   -- Abilities
-  TigerPalm                 = Spell(100780),
-  RisingSunKick             = Spell(107428),
-  FistsOfFury               = Spell(113656),
-  SpinningCraneKick         = Spell(101546),
-  StormEarthAndFire         = Spell(137639),
-  FlyingSerpentKick         = Spell(101545),
-  FlyingSerpentKick2        = Spell(115057),
-  TouchOfDeath              = Spell(115080),
-  CracklingJadeLightning    = Spell(117952),
-  BlackoutKick              = Spell(100784),
-  BlackoutKickBuff          = Spell(116768),
+  TigerPalm = Spell(100780),
+  RisingSunKick = Spell(107428),
+  FistsOfFury = Spell(113656),
+  SpinningCraneKick = Spell(101546),
+  StormEarthAndFire = Spell(137639),
+  FlyingSerpentKick = Spell(101545),
+  FlyingSerpentKick2 = Spell(115057),
+  TouchOfDeath = Spell(115080),
+  CracklingJadeLightning = Spell(117952),
+  BlackoutKick = Spell(100784),
+  BlackoutKickBuff = Spell(116768),
 
   -- Talents
-  ChiWave                   = Spell(115098),
-  InvokeXuentheWhiteTiger   = Spell(123904),
-  RushingJadeWind           = Spell(116847),
-  HitCombo                  = Spell(196741),
-  Serenity                  = Spell(152173),
-  WhirlingDragonPunch       = Spell(152175),
-  ChiBurst                  = Spell(123986),
+  ChiWave = Spell(115098),
+  InvokeXuentheWhiteTiger = Spell(123904),
+  RushingJadeWind = Spell(116847),
+  HitCombo = Spell(196741),
+  Serenity = Spell(152173),
+  WhirlingDragonPunch = Spell(152175),
+  ChiBurst = Spell(123986),
 
   -- Artifact
-  StrikeOfTheWindlord       = Spell(205320),
+  StrikeOfTheWindlord = Spell(205320),
 
   -- Defensive
-  TouchOfKarma              = Spell(122470),
-  DiffuseMagic              = Spell(122783), --Talent
-  DampenHarm                = Spell(122278), --Talent
+  TouchOfKarma = Spell(122470),
+  DiffuseMagic = Spell(122783), --Talent
+  DampenHarm = Spell(122278), --Talent
 
   -- Utility
-  Detox                     = Spell(218164),
-  Effuse                    = Spell(116694),
-  EnergizingElixir          = Spell(115288), --Talent
-  TigersLust                = Spell(116841), --Talent
-  LegSweep                  = Spell(119381), --Talent
-  Disable                   = Spell(116095),
-  HealingElixir             = Spell(122281), --Talent
-  Paralysis                 = Spell(115078),
+  Detox = Spell(218164),
+  Effuse = Spell(116694),
+  EnergizingElixir = Spell(115288), --Talent
+  TigersLust = Spell(116841), --Talent
+  LegSweep = Spell(119381), --Talent
+  Disable = Spell(116095),
+  HealingElixir = Spell(122281), --Talent
+  Paralysis = Spell(115078),
 
   -- Legendaries
-  TheEmperorsCapacitor      = Spell(235054),
+  TheEmperorsCapacitor = Spell(235054),
 
   -- Misc
   -- Macros
@@ -99,15 +99,11 @@ local Settings = {
 
 --- ======== FUNCTIONS =========
 
-function Spell:IsReady()
-  return self:IsAvailable() and self:IsCastable() and self:IsUsable();
-end
-
 --- ======= ACTION LISTS =======
 
 local function single_target ()
   -- actions.st+=/energizing_elixir,if=chi<=1&(cooldown.rising_sun_kick.remains=0|(artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains=0)|energy<50)
-  if S.EnergizingElixir:IsReady() and Player:Chi() <= 1 and AC.CombatTime() > 8 and (S.RisingSunKick:CooldownUp() or (S.StrikeOfTheWindlord:IsAvailable() and S.StrikeOfTheWindlord:CooldownUp()) or Player:Energy() < 50) then
+  if S.EnergizingElixir:IsReady() and Player:Chi() <= 1 and AC.CombatTime() > 8 and (S.RisingSunKick:CooldownUp() or (S.StrikeOfTheWindlord:IsAvailable() and S.StrikeOfTheWindlord:CooldownUp()) and Player:Energy() < 50) then
     if AR.CastLeft(S.EnergizingElixir) then return ""; end
   end
   -- actions.st+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
@@ -115,7 +111,7 @@ local function single_target ()
     if AR.CastLeft(S.ArcaneTorrent) then return ""; end
   end
   -- actions.st+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy.time_to_max<=0.5&chi.max-chi>=2
-  if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMax() <= 0.5 and Player:ChiDeficit() >= 2 then
+  if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) and Player:EnergyTimeToMax() <= 0.5 and Player:ChiDeficit() >= 2 then
     if AR.Cast(S.TigerPalm) then return ""; end
   end
   -- actions.st+=/strike_of_the_windlord,if=!talent.serenity.enabled|cooldown.serenity.remains>=10
@@ -166,31 +162,15 @@ local function single_target ()
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
   -- actions.st+=/chi_wave,if=energy.time_to_max>1
-  if (S.ChiWave:IsReady() or (S.ChiWave:IsAvailable() and S.ChiWave:CooldownRemains() < Player:EnergyTimeToX(50, 0))) and not S.RisingSunKick:IsReady() and Player:EnergyTimeToMax() > 1 then
+  if S.ChiWave:IsReady() and Player:EnergyTimeToMax() > 1 then
     if AR.Cast(S.ChiWave) then return ""; end
   end
   -- actions.st+=/chi_burst,if=energy.time_to_max>1
-  if (S.ChiBurst:IsReady() or (S.ChiBurst:IsAvailable() and S.ChiBurst:CooldownRemains() < Player:EnergyTimeToX(50, 0))) and not S.RisingSunKick:IsReady() and Player:EnergyTimeToMax() > 1 then
+  if S.ChiBurst:IsReady() and Player:EnergyTimeToMax() > 1 then
     if AR.Cast(S.ChiBurst) then return ""; end
   end
   -- actions.st+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&(chi.max-chi>=2|energy.time_to_max<1)
-  if (S.TigerPalm:IsReady() or (Player:EnergyTimeToX(50, 0) < S.ChiWave:CooldownRemains())) and not S.RisingSunKick:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and (Player:ChiDeficit() >= 2 or Player:EnergyTimeToMax() < 1) then
-    if AR.Cast(S.TigerPalm) then return ""; end
-  end
-  -- actions.st+=/chi_wave
-  if (S.ChiWave:IsReady() or (S.ChiWave:IsAvailable() and S.ChiWave:CooldownRemains() < Player:EnergyTimeToX(50, 0))) and not S.RisingSunKick:IsReady() then
-    if AR.Cast(S.ChiWave) then return ""; end
-  end
-  -- actions.st+=/chi_burst
-  if (S.ChiBurst:IsReady() or (S.ChiBurst:IsAvailable() and S.ChiBurst:CooldownRemains() < Player:EnergyTimeToX(50, 0))) and not S.RisingSunKick:IsReady() then
-    if AR.Cast(S.ChiBurst) then return ""; end
-  end
-  -- actions.st+=/Rising_Sun_Kick -- Fallback when nothing is available RSK > TP
-  if S.RisingSunKick:IsUsable() and S.RisingSunKick:CooldownRemains() < Player:EnergyTimeToX(50, 0) and S.RisingSunKick:CooldownRemains() < S.ChiWave:CooldownRemains() then
-    if AR.Cast(S.RisingSunKick) then return ""; end
-  end
-  -- actions.st+=/tiger_palm  -- Fallback when nothing is available
-  if not S.TigerPalm:IsUsable() and (Player:EnergyTimeToX(50, 0) < S.RisingSunKick:CooldownRemains() or Player:Chi() < 2) and Player:EnergyTimeToX(50, 0) < S.ChiWave:CooldownRemains() then
+  if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) and (Player:ChiDeficit() >= 2 or Player:EnergyTimeToMax() < 1) then
     if AR.Cast(S.TigerPalm) then return ""; end
   end
   return false;
@@ -242,7 +222,7 @@ local function serenity ()
   end
   -- actions.serenity+=/blackout_kick,cycle_targets=1,if=!prev_gcd.1.blackout_kick
   if S.BlackoutKick:IsReady() and not Player:PrevGCD(1, S.BlackoutKick) then
-    if AR.Cast(S.TigerPalm) then return ""; end
+    if AR.Cast(S.BlackoutKick) then return ""; end
   end
   -- actions.serenity+=/rushing_jade_wind,if=!prev_gcd.1.rushing_jade_wind
   if S.RushingJadeWind:IsReady() and not Player:PrevGCD(1, S.RushingJadeWind) then
@@ -296,7 +276,7 @@ local function APL ()
       if AR.CastLeft(S.TouchOfDeath) then return ""; end
     end
     -- actions+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1&!buff.serenity.up
-    if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyPercentage() == 100 and Player:Chi() < 1 and not Player:Buff(S.Serenity) then
+    if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) and Player:EnergyPercentage() == 100 and Player:Chi() < 1 and not Player:Buff(S.Serenity) then
       if AR.Cast(S.TigerPalm) then return ""; end
     end
     -- actions+=/call_action_list,name=cd
@@ -331,6 +311,27 @@ local function APL ()
     -- actions+=/call_action_list,name=st
     ShouldReturn = single_target ();
     if ShouldReturn then return ShouldReturn; end
+
+    --- Fallbacks - Used to perdict and fill in downtime
+    if not S.TigerPalm:IsUsable() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) and Player:Chi() < 2 and (Player:EnergyTimeToX(50, 0) < S.ChiWave:CooldownRemains() or Player:EnergyTimeToX(50, 0) < S.ChiBurst:CooldownRemains()) then
+      if AR.Cast(S.TigerPalm) then return ""; end
+    end
+    if S.RisingSunKick:IsUsable() and (S.RisingSunKick:CooldownRemains() < S.ChiWave:CooldownRemains() or S.RisingSunKick:CooldownRemains() < S.ChiBurst:CooldownRemains()) and
+    (S.RisingSunKick:CooldownRemains() < Player:EnergyTimeToX(50, 0) or Player:PrevGCD(1, S.TigerPalm)) then
+      if AR.Cast(S.RisingSunKick) then return ""; end
+    end
+    if S.ChiWave:IsAvailable() and (S.ChiWave:CooldownRemains() < Player:EnergyTimeToX(50, 0) or Player:PrevGCD(1, S.TigerPalm)) and (S.ChiWave:CooldownRemains() < S.RisingSunKick:CooldownRemains() or not S.RisingSunKick:IsUsable()) then
+      if AR.Cast(S.ChiWave) then return ""; end
+    end
+    if S.ChiBurst:IsAvailable() and (S.ChiBurst:CooldownRemains() < Player:EnergyTimeToX(50, 0) or Player:PrevGCD(1, S.TigerPalm)) and (S.ChiBurst:CooldownRemains() < S.RisingSunKick:CooldownRemains() or not S.RisingSunKick:IsUsable()) then
+      if AR.Cast(S.ChiBurst) then return ""; end
+    end
+    if S.TigerPalm:IsUsable() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) then
+      if AR.Cast(S.TigerPalm) then return ""; end
+    end
+    if not S.TigerPalm:IsUsable() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) and Player:EnergyTimeToX(50, 0) < S.RisingSunKick:CooldownRemains() then
+      if AR.Cast(S.TigerPalm) then return ""; end
+    end
     return;
   end
 end
