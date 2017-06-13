@@ -106,20 +106,20 @@
   end
  --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
  if S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
-  if AR.Cast(S.DarkArbiter) then return ""; end
+  if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
   end
  
  --actions.generic+=/dark_arbiter,if=equipped.137075&runic_power.deficit<30&cooldown.dark_transformation.remains<2
  if S.DarkArbiter:IsCastable() and I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 and S.DarkTransformation:Cooldown() < 2 then
-  if AR.Cast(S.DarkArbiter) then return ""; end
+  if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
  end
   --actions.generic+=/summon_gargoyle,if=!equipped.137075,if=rune<=3
  if S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
-  if AR.Cast(S.SummonGargoyle) then return ""; end
+  if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return ; end
  end
   --actions.generic+=/summon_gargoyle,if=equipped.137075&cooldown.dark_transformation.remains<10&rune<=3
  if S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and I.Taktheritrixs:IsEquipped() and S.DarkTransformation:Cooldown() < 10 and Player:Runes() <= 3 then
-  if AR.Cast(S.SummonGargoyle) then return ""; end
+  if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return ; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4 -- Player:Rune() > 1 (SR cost)
  if S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:Cooldown() < 4 and Player:Runes() >= 1 then
@@ -389,21 +389,23 @@ local function APL()
 	Everyone.AoEToggleEnemiesUpdate();
 	--Defensives
 	--OutOf Combat
-	if not Player:AffectingCombat() then
-	-- outbreak if virulent_plague is not  the target and we are not in combat
-	  if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
-			if AR.Cast(S.Outbreak) then return ""; end
-	end
-		
-	
-	 -- Reset Combat Variables
-      -- Flask
+    -- Reset Combat Variables
+    -- Flask
       -- Food
       -- Rune
       -- Army w/ Bossmod Countdown 
       -- Volley toggle
       -- Opener 
-	  -- TODO:
+	  if not Player:AffectingCombat() then
+	--army suggestion at pull
+	  if Everyone.TargetIsValid() and Target:IsInRange(30) and not S.ArmyOfDead:IsOnCooldown() then
+	        if AR.Cast(S.ArmyOfDead) then return ""; end
+	  end
+	-- outbreak if virulent_plague is not  the target and we are not in combat
+	  if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
+			if AR.Cast(S.Outbreak) then return ""; end
+	  end
+	
 	 return;
    end
  --InCombat
@@ -411,8 +413,6 @@ local function APL()
 	      ShouldReturn = Generic();
 	      if ShouldReturn then return ShouldReturn;  end
 		  
-	  --actions+=/run_action_list,name=valkyr,if=talent.dark_arbiter.enabled&pet.valkyr_battlemaiden.active
-	  --TODO: Check if Valkyr is active (hidden buff?)
 	   if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
 			if AR.Cast(S.Outbreak) then return ""; end
 	   end
@@ -463,7 +463,7 @@ local function APL()
  
       --actions+=/blighted_rune_weapon,if=rune<=3
       if S.BlightedRuneWeapon:IsCastable() and Player:Runes() >= 3 then
-        if AR.Cast(S.BlightedRuneWeapon) then return ""; end
+        if AR.Cast(S.BlightedRuneWeapon, Settings.Unholy.OffGCDasOffGCD.BlightedRuneWeapon) then return ; end
      end
 	 
 	  if S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165 then
