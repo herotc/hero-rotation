@@ -38,10 +38,10 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Monk Windwalker (Credits: [Lockem90](https://github.com/Lockem90))
 - Paladin Retribution _7.2.5 Ready_
 - Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
-- Rogue Assassination
-- Rogue Outlaw
+- Rogue Assassination _7.2.5 Ready_
+- Rogue Outlaw _7.2.5 Ready_
 - Rogue Subtlety
-- Shaman Enhancement (Credits: [Tael](https://github.com/Tae-l))
+- Shaman Enhancement _7.2.5 Ready_ (Credits: [Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
 - Warrior Fury (Credits: [Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90))
 
 ## Special Mention About SimC APL
