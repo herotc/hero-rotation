@@ -36,12 +36,12 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Hunter Marskmanship (Credits: [Nia](https://github.com/Nianel))
 - Hunter Survival (Credits: [Nia](https://github.com/Nianel))
 - Monk Windwalker (Credits: [Lockem90](https://github.com/Lockem90))
-- Paladin Retribution _7.2.5 Ready_
+- Paladin Retribution **7.2.5 Ready**
 - Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
-- Rogue Assassination _7.2.5 Ready_
-- Rogue Outlaw _7.2.5 Ready_
+- Rogue Assassination **7.2.5 Ready**
+- Rogue Outlaw **7.2.5 Ready**
 - Rogue Subtlety
-- Shaman Enhancement _7.2.5 Ready_ (Credits: [Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
+- Shaman Enhancement **7.2.5 Ready** (Credits: [Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
 - Warrior Fury (Credits: [Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90))
 
 ## Special Mention About SimC APL
