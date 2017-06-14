@@ -17,6 +17,7 @@
       GCDasOffGCD = {
         -- Abilities
         Shadowfiend = {true, false},
+        Mindbender = {true, false},
         Shadowform = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
