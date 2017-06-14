@@ -8,13 +8,17 @@ move-folders:
  AethysRotation/AethysRotation: AethysRotation
  AethysRotation/AethysCore/AethysCache: AethysCache
  AethysRotation/AethysCore/AethysCore: AethysCore
+ AethysRotation/AethysRotation_DeathKnight: AethysRotation_DeathKnight
  AethysRotation/AethysRotation_DemonHunter: AethysRotation_DemonHunter
  AethysRotation/AethysRotation_Druid: AethysRotation_Druid
  AethysRotation/AethysRotation_Hunter: AethysRotation_Hunter
+ AethysRotation/AethysRotation_Mage: AethysRotation_Mage
+ AethysRotation/AethysRotation_Monk: AethysRotation_Monk
  AethysRotation/AethysRotation_Paladin: AethysRotation_Paladin
  AethysRotation/AethysRotation_Priest: AethysRotation_Priest
  AethysRotation/AethysRotation_Rogue: AethysRotation_Rogue
  AethysRotation/AethysRotation_Shaman: AethysRotation_Shaman
+ AethysRotation/AethysRotation_Warlock: AethysRotation_Warlock
  AethysRotation/AethysRotation_Warrior: AethysRotation_Warrior
 
 ignore:
