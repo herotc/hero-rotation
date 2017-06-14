@@ -94,20 +94,16 @@
   -- poisoned
   --[[ Original SimC Code
     return dots.deadly_poison -> is_ticking() ||
-            debuffs.agonizing_poison -> check() ||
             debuffs.wound_poison -> check();
   ]]
   function Rogue.Poisoned (Unit)
-    return (Unit:Debuff(Spell.Rogue.Assassination.DeadlyPoisonDebuff) or Unit:Debuff(Spell.Rogue.Assassination.AgonizingPoisonDebuff)
-      or Unit:Debuff(Spell.Rogue.Assassination.WoundPoisonDebuff)) and true or false;
+    return (Unit:Debuff(Spell.Rogue.Assassination.DeadlyPoisonDebuff) or Unit:Debuff(Spell.Rogue.Assassination.WoundPoisonDebuff)) and true or false;
   end
 
   -- poison_remains
   --[[ Original SimC Code
     if ( dots.deadly_poison -> is_ticking() ) {
       return dots.deadly_poison -> remains();
-    } else if ( debuffs.agonizing_poison -> check() ) {
-      return debuffs.agonizing_poison -> remains();
     } else if ( debuffs.wound_poison -> check() ) {
       return debuffs.wound_poison -> remains();
     } else {
@@ -116,7 +112,6 @@
   ]]
   function Rogue.PoisonRemains (Unit)
     return (Unit:Debuff(Spell.Rogue.Assassination.DeadlyPoisonDebuff) and Unit:DebuffRemains(Spell.Rogue.Assassination.DeadlyPoisonDebuff))
-      or (Unit:Debuff(Spell.Rogue.Assassination.AgonizingPoisonDebuff) and Unit:DebuffRemains(Spell.Rogue.Assassination.AgonizingPoisonDebuff))
       or (Unit:Debuff(Spell.Rogue.Assassination.WoundPoisonDebuff) and Unit:DebuffRemains(Spell.Rogue.Assassination.WoundPoisonDebuff))
       or 0;
   end
