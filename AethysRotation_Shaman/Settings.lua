@@ -13,16 +13,13 @@
       --{Display GCD as OffGcd, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-		FeralSpirit = {true, false}
+		FeralSpirit = {true, false},
+		Ascendance = {true, false}
       },
       --{Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-
 		-- Abilities
 		DoomWinds = {true, false},
-		-- Legendaries
-		SmolderingHeart = {true, false},
-		AkainusAbsoluteJustice = {true, false},
 		-- Interrupt
 		WindShear = {true, false},
         -- Racial
