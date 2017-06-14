@@ -619,7 +619,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 04/18/2017
+-- Last Update: 06/14/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
