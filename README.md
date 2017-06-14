@@ -32,9 +32,9 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Death Knight Frost _[Beta]_ (Credits: [3L00DStrike](https://github.com/3L00DStrike))
 - Death Knight Unholy _[Beta]_ (Credits: [chrislopez24](https://github.com/chrislopez24))
 - Demon Hunter Vengeance
-- Hunter BeastMastery (Credits: [Nia](https://github.com/Nianel))
+- Hunter BeastMastery **7.2.5 Ready** (Credits: [Nia](https://github.com/Nianel))
 - Hunter Marskmanship (Credits: [Nia](https://github.com/Nianel))
-- Hunter Survival (Credits: [Nia](https://github.com/Nianel))
+- Hunter Survival **7.2.5 Ready** (Credits: [Nia](https://github.com/Nianel))
 - Monk Windwalker (Credits: [Lockem90](https://github.com/Lockem90))
 - Paladin Retribution **7.2.5 Ready**
 - Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
