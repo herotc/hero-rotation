@@ -40,7 +40,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
 - Rogue Assassination **7.2.5 Ready**
 - Rogue Outlaw **7.2.5 Ready**
-- Rogue Subtlety
+- Rogue Subtlety **7.2.5 Ready**
 - Shaman Enhancement **7.2.5 Ready** (Credits: [Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
 - Warrior Fury (Credits: [Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90))
 
