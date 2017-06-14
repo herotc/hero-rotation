@@ -185,9 +185,10 @@ end
 
 local function CDs ()
 	--PI
+  --actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up*(1+1*set_bonus.tier20_4pc)+3*equipped.mangazas_madness+6*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+61))
 	--actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.stack>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up+5*variable.s2mbeltcheck)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+61))
 	--TODO : S2M
-	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and Player:BuffStack(S.VoidForm)>=(10 + 2*(T192P and 1 or 0) + 5*s2mbeltcheck() + 2*(I.MotherShahrazsSeduction:IsEquipped(3) and 1 or 0) + 4*(VTUsed and 1 or 0) + 5*(Player:HasHeroism() and 1 or 0)) then
+	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and CurrentInsanityDrain()>=(10 + 2*(T192P and 1 or 0) +5*(Player:HasHeroism() and 1 or 0)*(1+1*(T204P and 1 or 0)) +3*(I.MangazasMadness:IsEquipped(6) and 1 or 0) +6*(T204P and 1 or 0) +2*(S.LashOfInsanity:ArtifactRank() or 0)) then
 		if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
 	end
 
