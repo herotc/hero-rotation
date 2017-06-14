@@ -62,6 +62,7 @@ local tostring = tostring;
     Blunderbuss                     = Spell(202895),
     CurseoftheDreadblades           = Spell(202665),
     HiddenBlade                     = Spell(202754),
+    LoadedDice                      = Spell(240837),
     -- Defensive
     CrimsonVial                     = Spell(185311),
     Feint                           = Spell(1966),
@@ -168,9 +169,9 @@ local function RtB_Buffs ()
   end
   return Cache.APLVar.RtB_Buffs;
 end
--- # Fish for '3 Buffs' or 'True Bearing'. With SnD, consider that we never have to reroll.
+-- # Fish for '2 Buffs' when Loaded Dice is up. With SnD, consider that we never have to reroll.
 local function RtB_Reroll ()
-  -- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
+  -- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&rtb_buffs<2&buff.loaded_dice.up
   if not Cache.APLVar.RtB_Reroll then
     -- Defensive Override : Grand Melee if HP < 60
     if Settings.General.SoloMode and Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechHP then
@@ -198,7 +199,7 @@ local function RtB_Reroll ()
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:Buff(S.TrueBearing)) and true or false;
     -- SimC Default
     else
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and (RtB_Buffs() <= 2 and not RtB_List("Any", {6}))) and true or false;
+      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and RtB_Buffs() < 2 and Player:Buff(S.LoadedDice)) and true or false;
     end
   end
   return Cache.APLVar.RtB_Reroll;
@@ -249,10 +250,16 @@ local function APL ()
         if S.RunThrough:IsCastable() then
           if AR.Cast(S.RunThrough) then return "Cast Run Through (Opener)"; end
         end
-      elseif Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
-        if AR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
-      elseif S.SaberSlash:IsCastable() then
-        if AR.Cast(S.SaberSlash) then return "Cast Saber Slash (Opener)"; end
+      else
+        -- actions.precombat+=/curse_of_the_dreadblades,if=combo_points.deficit>=4
+        if AR.CDsON() and S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 then
+          if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast Curse of the Dreadblades (Opener)"; end
+        end
+        if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
+          if AR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
+        elseif S.SaberSlash:IsCastable() then
+          if AR.Cast(S.SaberSlash) then return "Cast Saber Slash (Opener)"; end
+        end
       end
     end
     return;
@@ -306,8 +313,10 @@ local function APL ()
         end
       -- actions+=/call_action_list,name=cds
         if AR.CDsON() then
-          -- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+          -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
           -- TODO: Add Potion
+          -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+          -- TODO: Add Items
           -- actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
           if AR.AoEON() and S.CannonballBarrage:IsCastable() and Cache.EnemiesCount[8] >= 1 then
             if AR.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
@@ -353,8 +362,7 @@ local function APL ()
               end
             end
             -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
-            -- Added not player Stealthed since ambush doesn't works with, to be removed on 7.2.5. (Also, Ambush condition will need to have the CotD condition removed)
-            if S.CurseoftheDreadblades:IsCastable() and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
+            if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and (not S.GhostlyStrike:IsAvailable() or Target:Debuff(S.GhostlyStrike)) then
               if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast"; end
             end
           end
@@ -362,8 +370,8 @@ local function APL ()
       -- # Conditions are here to avoid worthless check if nothing is available
       -- actions+=/call_action_list,name=stealth,if=stealthed|cooldown.vanish.up|cooldown.shadowmeld.up
         if Target:IsInRange(S.SaberSlash, SSIdentifier) then
-          -- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
-          local Ambush_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Energy() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade) and not Player:Debuff(S.CurseoftheDreadblades)) and true or false;
+          -- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up
+          local Ambush_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Energy() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade)) and true or false;
           -- actions.stealth+=/ambush,if=variable.ambush_condition
           if Player:IsStealthed(true, true) and S.Ambush:IsCastable() and Ambush_Condition then
             if AR.Cast(S.Ambush) then return "Cast Ambush"; end
@@ -460,19 +468,20 @@ AR.SetAPL(260, APL);
 -- Last Update: 05/07/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
--- actions.precombat=flask,name=flask_of_the_seventh_demon
--- actions.precombat+=/augmentation,name=defiled
--- actions.precombat+=/food,name=lavish_suramar_feast
+-- actions.precombat=flask
+-- actions.precombat+=/augmentation
+-- actions.precombat+=/food
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/stealth
--- actions.precombat+=/potion,name=prolonged_power
+-- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,if=raid_event.adds.in>40
 -- actions.precombat+=/roll_the_bones,if=!talent.slice_and_dice.enabled
+-- actions.precombat+=/curse_of_the_dreadblades,if=combo_points.deficit>=4
 
 -- # Executed every time the actor is available.
--- # Fish for '3 Buffs' or 'True Bearing'. With SnD, consider that we never have to reroll.
--- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
+-- # Fish for '2 Buffs' when Loaded Dice is up. With SnD, consider that we never have to reroll.
+-- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&rtb_buffs<2&buff.loaded_dice.up
 -- # Condition to use Saber Slash when not rerolling RtB or when using SnD
 -- actions+=/variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
 -- # Condition to use Saber Slash, when you have RtB or not
@@ -502,7 +511,9 @@ AR.SetAPL(260, APL);
 -- actions.build+=/saber_slash,if=variable.ss_useable
 
 -- # Cooldowns
--- actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+-- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+-- actions.cds+=/use_item,name=vial_of_ceaseless_toxins,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+-- actions.cds+=/use_item,name=specter_of_betrayal,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
 -- actions.cds+=/arcane_torrent,if=energy.deficit>40
@@ -518,7 +529,7 @@ AR.SetAPL(260, APL);
 -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
 
 -- # Stealth
--- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
+-- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up
 -- actions.stealth+=/ambush,if=variable.ambush_condition
 -- actions.stealth+=/vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
 -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
