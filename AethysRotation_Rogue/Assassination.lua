@@ -54,6 +54,8 @@ local pairs = pairs;
     Nightstalker          = Spell(14062),
     ShadowFocus           = Spell(108209),
     Subterfuge            = Spell(108208),
+    ToxicBlade            = Spell(245388),
+    ToxicBladeDebuff      = Spell(245389),
     VenomRush             = Spell(152152),
     Vigor                 = Spell(14983),
     -- Artifact
@@ -73,8 +75,6 @@ local pairs = pairs;
     Kick                  = Spell(1766),
     Sprint                = Spell(2983),
     -- Poisons
-    AgonizingPoison       = Spell(200802),
-    AgonizingPoisonDebuff = Spell(200803),
     CripplingPoison       = Spell(3408),
     DeadlyPoison          = Spell(2823),
     DeadlyPoisonDebuff    = Spell(2818),
@@ -123,8 +123,6 @@ local pairs = pairs;
         (AC.Tier19_4Pc and Rogue.Assa_T19_4PC_EnvMultiplier() or 1) *
         -- Deeper Stratagem Multiplier
         (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
-        -- Agonizing Poison Multiplier
-        (Target:Debuff(S.AgonizingPoisonDebuff) and 1 + Target:Debuff(S.AgonizingPoisonDebuff, 17) / 100 or 1) *
         -- Mastery Finisher Multiplier
         (1 + Player:MasteryPct()/100) *
         -- Versatility Damage Multiplier
@@ -153,8 +151,6 @@ local pairs = pairs;
         1.11 *
         -- Assassin's Blades Multiplier
         (S.AssassinsBlades:ArtifactEnabled() and 1.15 or 1) *
-        -- Agonizing Poison Multiplier
-        (Target:Debuff(S.AgonizingPoisonDebuff) and 1 + Target:Debuff(S.AgonizingPoisonDebuff, 17) / 100 or 1) *
         -- Versatility Damage Multiplier
         (1 + Player:VersatilityDmgPct()/100) *
         -- Slayer's Precision Multiplier
@@ -196,8 +192,8 @@ local function Build ()
     if Target:IsInRange(5) and Target:DebuffRefreshable(S.Hemorrhage, 6) then
       if AR.Cast(S.Hemorrhage) then return "Cast"; end
     end
-    -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt
-    if AR.AoEON() and Cache.EnemiesCount[8] < 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
+    -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
+    if AR.AoEON() and Cache.EnemiesCount[8] < 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
       BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
@@ -210,21 +206,20 @@ local function Build ()
       end
     end
   end
-  -- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
-  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+  -- actions.build+=/fan_of_knives,if=spell_targets>=2+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
+  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.FanofKnives) then return "Cast"; end
   end
   if S.Mutilate:IsCastable() then
-    -- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)
-    if Target:IsInRange(5) and ((Player:Buff(S.DeadlyPoison) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff, 4)) or (Player:Buff(S.AgonizingPoison) and Target:DebuffRefreshable(S.AgonizingPoisonDebuff, 4))) then
+    -- actions.build+=/mutilate,cycle_targets=1,if=dot.deadly_poison_dot.refreshable
+    if Target:IsInRange(5) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff, 4) then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
-          and ((Player:Buff(S.DeadlyPoison) and Unit:DebuffRefreshable(S.DeadlyPoisonDebuff, 4))
-            or (Player:Buff(S.AgonizingPoison) and Unit:DebuffRefreshable(S.AgonizingPoisonDebuff, 4))) then
+          and Unit:DebuffRefreshable(S.DeadlyPoisonDebuff, 4) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -237,31 +232,13 @@ local function Build ()
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
   end
-  -- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3&debuff.agonizing_poison.stack>=5
-  if S.PoisonedKnife:IsCastable() and Player:Buff(S.AgonizingPoison) then
-    if Target:IsInRange(30) and Target:DebuffRefreshable(S.AgonizingPoisonDebuff, 4) and Target:DebuffStack(S.AgonizingPoisonDebuff) >= 5 then
-      if AR.Cast(S.PoisonedKnife) then return "Cast"; end
-    end
-    if AR.AoEON() then
-      BestUnit, BestUnitTTD = nil, 0;
-      for _, Unit in pairs(Cache.Enemies[30]) do
-        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
-          and Unit:DebuffRefreshable(S.AgonizingPoisonDebuff, 4) and Unit:DebuffStack(S.AgonizingPoisonDebuff) >= 5 then
-          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
-        end
-      end
-      if BestUnit then
-        AR.CastLeftNameplate(BestUnit, S.PoisonedKnife);
-      end
-    end
-  end
   return false;
 end
 -- # Cooldowns
 local function CDs ()
   if Target:IsInRange(5) then
-    -- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
-    -- actions.cds+=/use_item,name=draught_of_souls,if=energy.deficit>=35+variable.energy_regen_combined*2&(!equipped.mantle_of_the_master_assassin|cooldown.vanish.remains>8)&(!talent.agonizing_poison.enabled|debuff.agonizing_poison.stack>=5&debuff.surge_of_toxins.remains>=3)
+    -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
+    -- actions.cds+=/use_item,name=draught_of_souls,if=energy.deficit>=35+variable.energy_regen_combined*2&(!equipped.mantle_of_the_master_assassin|cooldown.vanish.remains>8)
     -- TODO: DoS 1
     -- actions.cds+=/use_item,name=draught_of_souls,if=mantle_duration>0&mantle_duration<3.5&dot.kingsbane.ticking
     -- TODO: DoS 2
@@ -291,10 +268,10 @@ local function CDs ()
       if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= Rogue.CPMaxSpend() then
         if not S.Exsanguinate:IsAvailable() then
           -- # Nightstalker w/o Exsanguinate: Vanish Envenom if Mantle & T19_4PC, else Vanish Rupture
-          -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc&mantle_duration=0)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
-          if (I.MantleoftheMasterAssassin:IsEquipped() and AC.Tier19_4Pc and Rogue.MantleDuration() == 0)
+          -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&mantle_duration=0&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
+          if Rogue.MantleDuration() == 0 and ((I.MantleoftheMasterAssassin:IsEquipped() and AC.Tier19_4Pc)
             or ((not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc)
-              and ((Target:DebuffRefreshable(S.Rupture, RuptureThreshold) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) or Target:Debuff(S.Vendetta))) then
+              and ((Target:DebuffRefreshable(S.Rupture, RuptureThreshold) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) or Target:Debuff(S.Vendetta)))) then
             if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
           end
         else
@@ -492,6 +469,10 @@ local function Maintain ()
       end
     end
   end
+  -- actions.maintain+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)&dot.rupture.remains>8
+  if S.ToxicBlade:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > Player:GCDRemains() + 0.2 and 1 or 0) and Target:DebuffRemains(S.Rupture) > 8 then
+    if AR.Cast(S.ToxicBlade) then return "Cast"; end
+  end
 end
 local SappedSoulSpells = {
   {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end},
@@ -543,12 +524,8 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
   -- Poisons
     -- Lethal Poison
-    if Player:BuffRemains(S.DeadlyPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.WoundPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.AgonizingPoison) < Settings.Assassination.PoisonRefresh then
-      if S.AgonizingPoison:IsAvailable() then
-        AR.CastSuggested(S.AgonizingPoison);
-      else
-        AR.CastSuggested(S.DeadlyPoison);
-      end
+    if Player:BuffRemains(S.DeadlyPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.WoundPoison) < Settings.Assassination.PoisonRefresh then
+      AR.CastSuggested(S.DeadlyPoison);
     end
     -- Non-Lethal Poison
     if Player:BuffRemains(S.CripplingPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.LeechingPoison) < Settings.Assassination.PoisonRefresh then
@@ -576,7 +553,7 @@ local function APL ()
           elseif S.Envenom:IsCastable() then
             if AR.Cast(S.Envenom) then return "Cast"; end
           end
-        elseif S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (Player:Buff(S.AgonizingPoison) and 1 or 0) + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+        elseif S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
           if AR.Cast(S.FanofKnives) then return "Cast"; end
         elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote)
           and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
@@ -630,8 +607,7 @@ local function APL ()
       -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
       if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:IsStealthed(true, true)
         and ((not Target:IsInRange(10) and Player:EnergyTimeToMax() <= Player:GCD()*1.2)
-          or (not Target:IsInRange(5) and ((Player:Buff(S.DeadlyPoison) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff, 4))
-            or (Player:Buff(S.AgonizingPoison) and Target:DebuffRefreshable(S.AgonizingPoisonDebuff, 4))))) then
+          or (not Target:IsInRange(5) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff, 4))) then
         if AR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife"; end
       end
       -- Trick to take in consideration the Recovery Setting
@@ -646,14 +622,14 @@ AR.SetAPL(259, APL);
 -- Last Update: 04/18/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
--- actions.precombat=flask,name=flask_of_the_seventh_demon
--- actions.precombat+=/augmentation,name=defiled
--- actions.precombat+=/food,name=lavish_suramar_feast
+-- actions.precombat=flask
+-- actions.precombat+=/augmentation
+-- actions.precombat+=/food
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/apply_poison
 -- actions.precombat+=/stealth
--- actions.precombat+=/potion,name=old_war
+-- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,if=raid_event.adds.in>40
 
 -- # Executed every time the actor is available.
@@ -667,23 +643,23 @@ AR.SetAPL(259, APL);
 
 -- # Builders
 -- actions.build=hemorrhage,if=refreshable
--- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt
--- actions.build+=/fan_of_knives,if=spell_targets>=2+talent.agonizing_poison.enabled+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
--- actions.build+=/mutilate,cycle_targets=1,if=(!talent.agonizing_poison.enabled&dot.deadly_poison_dot.refreshable)|(talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3)
+-- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
+-- actions.build+=/fan_of_knives,if=spell_targets>=2+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
+-- actions.build+=/mutilate,cycle_targets=1,if=dot.deadly_poison_dot.refreshable
 -- actions.build+=/mutilate
--- actions.build+=/poisoned_knife,cycle_targets=1,if=talent.agonizing_poison.enabled&debuff.agonizing_poison.remains<debuff.agonizing_poison.duration*0.3&debuff.agonizing_poison.stack>=5
 
 -- # Cooldowns
--- actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
--- actions.cds+=/use_item,name=draught_of_souls,if=energy.deficit>=35+variable.energy_regen_combined*2&(!equipped.mantle_of_the_master_assassin|cooldown.vanish.remains>8)&(!talent.agonizing_poison.enabled|debuff.agonizing_poison.stack>=5&debuff.surge_of_toxins.remains>=3)
+-- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
+-- actions.cds+=/use_item,name=draught_of_souls,if=energy.deficit>=35+variable.energy_regen_combined*2&(!equipped.mantle_of_the_master_assassin|cooldown.vanish.remains>8)
 -- actions.cds+=/use_item,name=draught_of_souls,if=mantle_duration>0&mantle_duration<3.5&dot.kingsbane.ticking
+-- actions.cds+=/use_item,name=specter_of_betrayal,if=buff.bloodlust.react|target.time_to_die<=20|debuff.vendetta.up
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
 -- actions.cds+=/vendetta,if=!artifact.urge_to_kill.enabled|energy.deficit>=60+variable.energy_regen_combined
 -- # Nightstalker w/o Exsanguinate: Vanish Envenom if Mantle & T19_4PC, else Vanish Rupture
--- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc&mantle_duration=0)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
+-- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&mantle_duration=0&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&(dot.rupture.ticking|time>10)
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&equipped.mantle_of_the_master_assassin&(debuff.vendetta.up|target.time_to_die<10)&mantle_duration=0
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!equipped.mantle_of_the_master_assassin&!stealthed.rogue&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
@@ -711,3 +687,4 @@ AR.SetAPL(259, APL);
 -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)
 -- actions.maintain+=/pool_resource,for_next=1
 -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
+-- actions.maintain+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)&dot.rupture.remains>8
