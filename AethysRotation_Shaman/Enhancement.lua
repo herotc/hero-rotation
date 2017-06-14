@@ -1,6 +1,7 @@
---- Localize Vars
+-- Localize Vars
 -- Addon
 local addonName, addonTable = ...;
+
 -- AethysCore
 local AC = AethysCore;
 local Cache = AethysCache;
@@ -9,6 +10,7 @@ local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = AC.Spell;
 local Item = AC.Item;
+
 -- AethysRotation
 local AR = AethysRotation;
 
@@ -18,120 +20,76 @@ local AR = AethysRotation;
 -- Spells
 if not Spell.Shaman then Spell.Shaman = {}; end
 Spell.Shaman.Enhancement = {
-    -- Racials
-    Berserking                    = Spell(26297),
-    BloodFury                     = Spell(20572),
+	-- Racials
+	Berserking						= Spell(26297),
+	BloodFury						= Spell(33697),
 
-    -- Abilities
-    CrashLightning                = Spell(187874),
-    CrashLightningBuff            = Spell(198300),
-    FeralSpirit                   = Spell(51533),
-    FeralSpiritPassive            = Spell(231723),
-    Flametongue                   = Spell(193796),
-    FlametongueBuff               = Spell(194084),
-    Frostbrand                    = Spell(196834),
-    FrostbrandBuff                = Spell(196834),
-    LavaLash                      = Spell(60103),
-    LightningBolt                 = Spell(187837),
-    Rockbiter                     = Spell(193786),
-    Stormstrike                   = Spell(17364),
-    Stormbringer                  = Spell(201845),
-    StormbringerBuff              = Spell(201846),
-    Stormlash                     = Spell(195255),
-    StormlashBuff                 = Spell(207835),
-    WindStrike                    = Spell(115356),
+	-- Abilities
+	CrashLightning					= Spell(187874),
+	CrashLightningBuff				= Spell(198300),
+	FeralSpirit						= Spell(51533),
+	Flametongue						= Spell(193796),
+	FlametongueBuff					= Spell(194084),
+	Frostbrand						= Spell(196834),
+	FrostbrandBuff					= Spell(196834),
+	LavaLash						= Spell(60103),
+	LightningBolt					= Spell(187837),
+	Rockbiter						= Spell(193786),
+	Stormstrike						= Spell(17364),
+	StormbringerBuff				= Spell(201846),
+	WindStrike						= Spell(115356),
 
-    -- Talents
-    AncestralSwiftness            = Spell(192087),
-    AscendanceBuff                = Spell(114051),
-    Boulderfist                   = Spell(201897),
-    BoulderfistBuff               = Spell(218825),
-    CrashingStorm                 = Spell(192246),
-    EarthgrabTotem                = Spell(51485),
-    EarthenSpike                  = Spell(188089),
-    EmpowerStormlash              = Spell(210731),
-    FeralLunge                    = Spell(196884),
-    FuryOfAir                     = Spell(197211),
-    FuryOfAirBuff                 = Spell(197385),
-    Hailstorm                     = Spell(210853),
-    HotHand                       = Spell(201900),
-    HotHandBuff                   = Spell(215785),
-    Landslide                     = Spell(197992),
-    LandslideBuff                 = Spell(202004),
-    LightningShield               = Spell(192106),
-    LightningShieldBuff           = Spell(192109),
-    LighningSurgeTotem            = Spell(192058),
-    Overcharge                    = Spell(210727),
-    Rainfall                      = Spell(215864),
-    Sundering                     = Spell(197214),
-    Tempest                       = Spell(192234),
-    VoodooTotem                   = Spell(196932),
-    WindRushTotem                 = Spell(192077),
-    Windsong                      = Spell(201898),
-    WindsongBuff                  = Spell(201898),
-    Ascendance                    = Spell(114049),
+	-- Talents
+	AscendanceBuff					= Spell(114051),
+	Boulderfist						= Spell(201897),
+	CrashingStorm					= Spell(192246),
+	EarthenSpike					= Spell(188089),
+	FuryOfAir						= Spell(197211),
+	Hailstorm						= Spell(210853),
+	HotHand							= Spell(201900),
+	HotHandBuff						= Spell(215785),
+	Landslide						= Spell(197992),
+	LandslideBuff					= Spell(202004),
+	Overcharge						= Spell(210727),
+	Sundering						= Spell(197214),
+	Windsong						= Spell(201898),
+	Ascendance						= Spell(114049),
 
-    -- Artifact
-    AlphaWolf                     = Spell(198434),
-    AlphaWolfBuff                 = Spell(198434),
-    DoomWinds                     = Spell(204945),
-    DoomWindsBuff                 = Spell(204945),
-    GatheringStorms               = Spell(198299),
-    GatheringStormsBuff           = Spell(198299),
-    WindStrikes                   = Spell(198292),
-    WindStrikesBuff               = Spell(198292),
+	-- Artifact
+	AlphaWolf						= Spell(198434),
+	DoomWinds						= Spell(204945),
+	DoomWindsBuff					= Spell(204945),
 
-    -- Defensive
-    AstralShift                   = Spell(108271),
-    HealingSurge                  = Spell(188070),
+	-- Utility
+	WindShear						= Spell(57994),
+}
 
-    -- Utility
-    CleanseSpirit                 = Spell(51886),
-    GhostWolf                     = Spell(2645),
-    Hex                           = Spell(51514),
-    Purge                         = Spell(370),
-    Reincarnation                 = Spell(20608),
-    SpiritWalk                    = Spell(58875),
-    WaterWalking                  = Spell(546),
-    WindShear                     = Spell(57994),
+local S = Spell.Shaman.Enhancement;
 
-    -- Legendaries
-    SmolderingHeart               = Spell(248029),
-	AkainusAbsoluteJustice        = Spell(213359),
-
-    -- Macros
-    Macros = {}
-    };
-    local S = Spell.Shaman.Enhancement;
-
-    --Items
-    if not Item.Shaman then Item.Shaman = {}; end
-    Item.Shaman.Enhancement = {
-        --Legendaries
-		SmolderingHeart           = Item(151819),
-		AkainusAbsoluteJustice    = Item(137084)
-    };
-    local I = Item.Shaman.Enhancement;
+--Items
+if not Item.Shaman then Item.Shaman = {}; end
+Item.Shaman.Enhancement = {
+	--Legendaries
+	SmolderingHeart				= Item(151819),
+	AkainusAbsoluteJustice		= Item(137084)
+}
+local I = Item.Shaman.Enhancement
 
 -- GUI Settings
-  local Settings = {
-    General = AR.GUISettings.General,
-    Enhancement = AR.GUISettings.APL.Shaman.Enhancement
-  };
+local Settings = {
+	General = AR.GUISettings.General,
+	Enhancement = AR.GUISettings.APL.Shaman.Enhancement
+}
 
 -- APL Main
-local function APL ()
+local function APL()
 	-- Unit Update
-	AC.GetEnemies(20); -- Boulderfist,Flametongue
-	AC.GetEnemies(8); -- CrashLightning
-	AC.GetEnemies(5); -- Melee
+	AC.GetEnemies(20);	-- Boulderfist, Flametongue
+	AC.GetEnemies(8);	-- CrashLightning
+	AC.GetEnemies(5);	-- Melee
 
 	-- Out of Combat
 	if not Player:AffectingCombat() then
-		-- Flask
-		-- Food
-		-- Rune
-		-- PrePot w/ Bossmod Countdown
 		-- Opener
 		if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(20) and not Target:IsDeadOrGhost() then
 			if Player:Maelstrom() < 15 then
@@ -140,7 +98,7 @@ local function APL ()
 				if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
 			end
 		end
-		return;
+		return
 	end
 
 	-- Interrupts
@@ -152,7 +110,6 @@ local function APL ()
 
 	-- In Combat
 	if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(5) and not Target:IsDeadOrGhost() then
-
 		-- actions+=/variable,name=heartEquipped,value=(equipped.151819)
 		-- actions+=/windstrike,if=(variable.heartEquipped|set_bonus.tier19_2pc)&(!talent.earthen_spike.enabled|(cooldown.earthen_spike.remains>1&cooldown.doom_winds.remains>1)|debuff.earthen_spike.up)
 		if S.WindStrike:IsCastable() and (I.SmolderingHeart:IsEquipped() or AC.Tier19_2Pc) and (not S.EarthenSpike:IsAvailable() or (S.EarthenSpike:Cooldown() > 1 and S.DoomWinds:Cooldown() > 1) or Target:Debuff(S.EarthenSpike)) then
@@ -170,9 +127,9 @@ local function APL ()
 		end
 
 		-- actions.buffs+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
-        if S.CrashLightning:IsCastable() and S.AlphaWolf:ArtifactEnabled() and S.FeralSpirit:TimeSinceLastCast() < 14 then
-            if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
-        end
+		if S.CrashLightning:IsCastable() and S.AlphaWolf:ArtifactEnabled() and S.FeralSpirit:TimeSinceLastCast() < 14 then
+			if AR.Cast(S.CrashLightning) then return "Cast CrashLightning"; end
+		end
 
 		-- actions.buffs+=/flametongue,if=!buff.flametongue.up
 		if S.Flametongue:IsCastable() and not Player:Buff(S.FlametongueBuff) then
@@ -229,7 +186,7 @@ local function APL ()
 		end
 
 		-- actions.core+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>=2
-		if S.CrashLightning:IsCastable() and not Player:Buff(S.CrashLightningBuff) and AR.AoEON() and Cache.EnemiesCount[5] >= 2 then
+		if S.CrashLightning:IsCastable() and not Player:Buff(S.CrashLightningBuff) and AR.AoEON() and Cache.EnemiesCount[8] >= 2 then
 			if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
 		end
 
@@ -239,7 +196,7 @@ local function APL ()
 		end
 
 		-- actions.core+=/crash_lightning,if=active_enemies>=8|(active_enemies>=6&talent.crashing_storm.enabled)
-		if S.CrashLightning:IsCastable() and AR.AoEON() and (Cache.EnemiesCount[5] >= 8) or (Cache.EnemiesCount[5] >= 6 and S.CrashingStorm:IsAvailable()) then
+		if S.CrashLightning:IsCastable() and AR.AoEON() and (Cache.EnemiesCount[8] >= 8) or (Cache.EnemiesCount[8] >= 6 and S.CrashingStorm:IsAvailable()) then
 			if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
 		end
 
@@ -255,7 +212,7 @@ local function APL ()
 		end
 
 		-- actions.core+=/crash_lightning,if=active_enemies>=4|(active_enemies>=2&talent.crashing_storm.enabled)
-		if S.CrashLightning:IsCastable() and AR.AoEON() and (Cache.EnemiesCount[5] >= 4) or (Cache.EnemiesCount[5] >= 2 and S.CrashingStorm:IsAvailable()) then
+		if S.CrashLightning:IsCastable() and AR.AoEON() and (Cache.EnemiesCount[8] >= 4) or (Cache.EnemiesCount[8] >= 2 and S.CrashingStorm:IsAvailable()) then
 			if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
 		end
 
@@ -286,14 +243,14 @@ local function APL ()
 		end
 
 		-- actions.core+=/sundering,if=active_enemies>=3
-		if S.Sundering:IsCastable() and AR.AoEON() and Cache.EnemiesCount[8] >= 3 then
+		if S.Sundering:IsCastable() and AR.AoEON() and Cache.EnemiesCount[5] >= 3 then
 			if AR.Cast(S.Sundering) then return "Cast Sundering" end
 		end
 
 		-- actions+=/variable,name=alphaWolfCheck,value=((pet.frost_wolf.buff.alpha_wolf.remains<2&pet.fiery_wolf.buff.alpha_wolf.remains<2&pet.lightning_wolf.buff.alpha_wolf.remains<2)&feral_spirit.remains>4)
 		-- actions+=/variable,name=LightningCrashNotUp,value=(!buff.lightning_crash.up&set_bonus.tier20_2pc)
 		-- actions.core+=/crash_lightning,if=active_enemies>=3|variable.LightningCrashNotUp|variable.alphaWolfCheck
-		if S.CrashLightning:IsCastable() and AR.AoEON() and (Cache.EnemiesCount[5] >= 3 or (not Player:Buff(CrashLightningBuff) and AC.Tier20_2Pc) or (S.FeralSpirit:TimeSinceLastCast() < 11)) then
+		if S.CrashLightning:IsCastable() and AR.AoEON() and (Cache.EnemiesCount[8] >= 3 or (not Player:Buff(S.CrashLightningBuff) and AC.Tier20_2Pc) or (S.FeralSpirit:TimeSinceLastCast() < 11)) then
 			if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
 		end
 
@@ -314,7 +271,7 @@ local function APL ()
 
 		-- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>60))
 		-- actions.filler+=/crash_lightning,if=(talent.crashing_storm.enabled|active_enemies>=2)&debuff.earthen_spike.up&maelstrom>=40&variable.OCPool60
-		if S.CrashLightning:IsCastable() and AR.AoEON() and (S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and Target:Debuff(S.EarthenSpike) and Player:Maelstrom() >= 40 and (not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60)) then
+		if S.CrashLightning:IsCastable() and AR.AoEON() and (S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[8] >= 2) and Target:Debuff(S.EarthenSpike) and Player:Maelstrom() >= 40 and (not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60)) then
 			if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
 		end
 
@@ -348,7 +305,7 @@ local function APL ()
 		-- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
 		-- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>60))
 		-- actions.filler+=/crash_lightning,if=(maelstrom>=65|talent.crashing_storm.enabled|active_enemies>=2)&variable.OCPool60&variable.furyCheck45
-		if S.CrashLightning:IsCastable() and (Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and (not S>Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60)) and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45)) then
+		if S.CrashLightning:IsCastable() and (Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[8] >= 2) and (not S>Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60)) and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45)) then
 			if AR.Cast(S.CrashLightning) then reurn "Cast CrashLightning" end
 		end
 
@@ -356,7 +313,7 @@ local function APL ()
 		if S.Flametongue:IsCastable() then
 			if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
 		end
-    end
+	end
 end
 
 AR.SetAPL(263, APL);
