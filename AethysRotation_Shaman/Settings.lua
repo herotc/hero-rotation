@@ -13,20 +13,18 @@
       --{Display GCD as OffGcd, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        FeralSpirit = {true, false}
+		FeralSpirit = {true, false},
+		Ascendance = {true, false}
       },
       --{Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        -- Abilities 
-        DoomWinds = {true, false},
-        -- Legendaries
-        StormTempests = {true, false},
-        EmalonChargedCore = {true, false},
-        -- Kick
-        WindShear = {true, false},
+		-- Abilities
+		DoomWinds = {true, false},
+		-- Interrupt
+		WindShear = {true, false},
         -- Racial
         Berserking = {true, false};
         BloodFury = {true, false}
       }
     }
-  };
+  }
