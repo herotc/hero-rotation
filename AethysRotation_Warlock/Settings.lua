@@ -27,7 +27,12 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        DemonicPower = {true, false}
+        DemonicPower = {true, false},
+		SummonDoomGuard = {true, false},
+		SummonInfernal = {true, false},
+		SummonImp = {true, false},
+		GrimoireOfSacrifice = {true, false},
+		LifeTap = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
