@@ -4,6 +4,7 @@
   local addonName, AR = ...;
   -- AethysCore
   local AC = AethysCore;
+  local AR = AethysRotation;
   local Cache = AethysCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
