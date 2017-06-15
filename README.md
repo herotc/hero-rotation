@@ -37,7 +37,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Hunter Survival (Credits: [Nia](https://github.com/Nianel))
 - Monk Windwalker (Credits: [Lockem90](https://github.com/Lockem90))
 - Paladin Retribution **7.2.5 Ready**
-- Priest Shadow (Credits: [KutiKuti](https://github.com/Kutikuti))
+- Priest Shadow **7.2.5 Ready** (Credits: [KutiKuti](https://github.com/Kutikuti))
 - Rogue Assassination **7.2.5 Ready**
 - Rogue Outlaw **7.2.5 Ready**
 - Rogue Subtlety
