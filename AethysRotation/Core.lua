@@ -202,6 +202,7 @@
     end
   end
   SLASH_AETHYSROTATION1 = "/aer"
+  SLASH_AETHYSROTATION2 = "/ar"
   SlashCmdList["AETHYSROTATION"] = AR.CmdHandler;
 
   -- Get if the CDs are enabled.

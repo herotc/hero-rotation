@@ -252,6 +252,7 @@ local function CDs ()
         if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
       end
       -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
+      -- Note: Temporarly modified the conditions
       if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 15 + Energy_Regen_Combined() * Player:GCDRemains() * 1.1 then
         if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
       end
