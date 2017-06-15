@@ -449,6 +449,7 @@ end
 local function APL ()
 	-- Unit Update
 	AC.GetEnemies(40);
+  Everyone.AoEToggleEnemiesUpdate();
 	
 	-- Defensives
 	if S.Dispersion:IsCastable() and Player:HealthPercentage() <= Settings.Shadow.DispersionHP then
