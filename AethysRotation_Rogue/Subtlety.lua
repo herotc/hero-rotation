@@ -42,6 +42,7 @@ local tableinsert = table.insert;
     SymbolsofDeath                = Spell(212283),
     Vanish                        = Spell(1856),
     VanishBuff                    = Spell(115193),
+    ShurikenComboBuff             = Spell(245640),
     -- Talents
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
@@ -86,7 +87,7 @@ local tableinsert = table.insert;
   local S = Spell.Rogue.Subtlety;
   S.Eviscerate:RegisterDamage(
     -- Eviscerate DMG Formula (Pre-Mitigation):
-    --  AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * F:Evisc_M * ShadowFangs_M * MoS_M * DS_M * SoD_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
+    --  AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * F:Evisc_M * ShadowFangs_M * MoS_M * DS_M * SoD_M * ShC_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
     function ()
       return
         -- Attack Power
@@ -98,10 +99,9 @@ local tableinsert = table.insert;
         -- Eviscerate R2 Multiplier
         1.5 *
         -- Aura Multiplier (SpellID: 137035)
-        1.09 *
-        -- Finality: Eviscerate Multiplier | Used 1.2 atm
-        -- TODO: Check the % from Tooltip or do an Event Listener
-        (Player:Buff(S.FinalityEviscerate) and 1.2 or 1) *
+        1.25 *
+        -- Finality: Eviscerate Multiplier
+        (Player:Buff(S.FinalityEviscerate) and 1 + Player:Buff(S.FinalityEviscerate, 17) / 100 or 1) *
         -- Shadow Fangs Multiplier
         (S.ShadowFangs:ArtifactEnabled() and 1.04 or 1) *
         -- Master of Subtlety Multiplier
@@ -109,7 +109,9 @@ local tableinsert = table.insert;
         -- Deeper Stratagem Multiplier
         (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
         -- Symbols of Death Multiplier
-        (Player:Buff(S.SymbolsofDeath) and 1.2+0.01*S.EtchedinShadow:ArtifactRank() or 1) *
+        (Player:Buff(S.SymbolsofDeath) and 1.15+(AC.Tier20_2Pc and 0.1 or 0) or 1) *
+        -- Shuriken Combo Multiplier
+        (Player:Buff(S.ShurikenComboBuff) and 1 + Player:Buff(S.ShurikenComboBuff, 17) / 100 or 1) *
         -- Mastery Finisher Multiplier
         (1 + Player:MasteryPct()/100) *
         -- Versatility Damage Multiplier
