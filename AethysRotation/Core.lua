@@ -60,7 +60,7 @@
 
 --- ======= CASTS =======
   local GCDSpell = Spell(61304);
-  local function GCDDislay ()
+  local function GCDDisplay ()
     if Player:IsCasting() then -- Only for Cast, not Channel
       AR.MainIconFrame:SetCooldown(Player:CastStart(), Player:CastDuration());
     else
@@ -79,7 +79,7 @@
       end
     else
       AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
-      GCDDislay();
+      GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";
     end
@@ -97,7 +97,7 @@
       QueueSpellTable[i].LastDisplayTime = AC.GetTime();
     end
     AR.MainIconFrame:SetupParts(QueueTextureTable);
-    GCDDislay();
+    GCDDisplay();
     return "Should Return";
   end
 
