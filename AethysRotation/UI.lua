@@ -246,6 +246,11 @@
         -- Texture
         AR.NameplateIconFrame.TempTexture = AR.NameplateIconFrame:CreateTexture(nil, "BACKGROUND");
 
+        if AR.GUISettings.General.BlackBorderIcon then
+          AR.NameplateIconFrame.TempTexture:SetTexCoord(.08, .92, .08, .92);
+          AR:CreateBackdrop(AR.NameplateIconFrame);
+        end
+
         AR.Nameplate.Initialized = true;
       end
 
