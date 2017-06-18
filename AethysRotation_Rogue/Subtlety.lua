@@ -176,7 +176,7 @@ local function Build ()
   if Cache.EnemiesCount[8] >= 2 and S.ShurikenStorm:IsCastable() then
     if AR.Cast(S.ShurikenStorm) then return ""; end
   end
-  if IsInMeleeRange then
+  if IsInMeleeRange() then
     -- actions.build+=/gloomblade
     if S.Gloomblade:IsCastable() then
       if AR.Cast(S.Gloomblade) then return ""; end
@@ -189,7 +189,7 @@ local function Build ()
 end
 -- # Cooldowns
 local function CDs ()
-  if IsInMeleeRange then
+  if IsInMeleeRange() then
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
     -- TODO: Add Potion Suggestion
     -- actions.cds+=/use_item,name=specter_of_betrayal
@@ -246,7 +246,7 @@ local function Finish (ReturnSpellOnly)
   if S.Nightblade:IsCastable() then
     NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
     -- actions.finish+=/nightblade,if=target.time_to_die-remains>8&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
-    if IsInMeleeRange and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 8
+    if IsInMeleeRange() and Target:TimeToDie() < 7777 and Target:TimeToDie()-Target:DebuffRemains(S.Nightblade) > 8
       and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
       and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= Rogue.MantleDuration())
       and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade)))
@@ -283,7 +283,7 @@ local function Finish (ReturnSpellOnly)
     end
   end
   -- actions.finish+=/eviscerate
-  if S.Eviscerate:IsCastable() and IsInMeleeRange then
+  if S.Eviscerate:IsCastable() and IsInMeleeRange() then
     if ReturnSpellOnly then
       return S.Eviscerate;
     else
@@ -305,7 +305,7 @@ local function StealthMacro (StealthSpell)
     -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
     elseif S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
         and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
-          or (AR.AoEON() and IsInMeleeRange and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+          or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
       tableinsert(MacroTable, S.ShurikenStorm);
     -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<3+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
     elseif Player:ComboPoints() >= 5
@@ -320,7 +320,7 @@ local function StealthMacro (StealthSpell)
     -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
     if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
         and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
-          or (AR.AoEON() and IsInMeleeRange and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+          or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
       tableinsert(MacroTable, S.ShurikenStorm);
     else
       tableinsert(MacroTable, S.Shadowstrike);
@@ -333,7 +333,7 @@ local function StealthMacro (StealthSpell)
 end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
-  if IsInMeleeRange then
+  if IsInMeleeRange() then
     -- actions.stealth_cds=vanish,if=mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractionnal+(equipped.mantle_of_the_master_assassin&time<30)*0.3
     if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
       and Rogue.MantleDuration() == 0
@@ -391,7 +391,7 @@ local function Stealthed ()
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
   if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
       and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
-        or (AR.AoEON() and IsInMeleeRange and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+        or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.ShurikenStorm) then return ""; end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<3+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
@@ -400,7 +400,7 @@ local function Stealthed ()
     return Finish();
   end
   -- actions.stealthed+=/shadowstrike
-  if S.Shadowstrike:IsCastable() and IsInMeleeRange then
+  if S.Shadowstrike:IsCastable() and IsInMeleeRange() then
     if AR.Cast(S.Shadowstrike) then return ""; end
   end
   return false;
@@ -426,7 +426,7 @@ end
 local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
     -- Kidney Shot
-    if IsInMeleeRange and S.KidneyShot:IsCastable() and Player:ComboPoints() > 0 then
+    if IsInMeleeRange() and S.KidneyShot:IsCastable() and Player:ComboPoints() > 0 then
       if AR.Cast(S.KidneyShot) then return "Cast Kidney Shot (Unstable Explosion)"; end
     end
   end
@@ -477,7 +477,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      if Everyone.TargetIsValid() and IsInMeleeRange then
+      if Everyone.TargetIsValid() and IsInMeleeRange() then
         ShouldReturn = Engage();
         if ShouldReturn then
           -- actions.precombat+=/symbols_of_death
@@ -531,7 +531,7 @@ local function APL ()
         end
       end
       -- actions+=/nightblade,if=target.time_to_die>8&remains<gcd.max&combo_points>=4
-      if S.Nightblade:IsCastable() and IsInMeleeRange and Target:TimeToDie() < 7777 and Target:TimeToDie() > 8
+      if S.Nightblade:IsCastable() and IsInMeleeRange() and Target:TimeToDie() < 7777 and Target:TimeToDie() > 8
         and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
         and Target:DebuffRemains(S.Nightblade) < Player:GCD() and Player:ComboPoints() >= 4 then
         if AR.Cast(S.Nightblade) then return ""; end
@@ -558,7 +558,7 @@ local function APL ()
         if AR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end
       -- Trick to take in consideration the Recovery Setting
-      if S.Shadowstrike:IsCastable() and IsInMeleeRange then
+      if S.Shadowstrike:IsCastable() and IsInMeleeRange() then
         if AR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
       end
     end
