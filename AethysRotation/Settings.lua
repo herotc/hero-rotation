@@ -10,8 +10,8 @@
     General = {
       -- Main Frame Strata
       MainFrameStrata = "BACKGROUND",
-      -- Black Border Icon (Disable if you use custom icons)
-      BlackBorderIcon = true,
+      -- Black Border Icon (Enable if you want clean black borders)
+      BlackBorderIcon = false,
       -- Interrupt
       InterruptEnabled = false,
       InterruptWithStun = false, -- EXPERIMENTAL
