@@ -117,6 +117,8 @@ local pairs = pairs;
         1.17 *
         -- Aura Multiplier (SpellID: 137037)
         1.22 *
+        -- Toxic Blade Multiplier
+        (Player:Debuff(S.ToxicBladeDebuff) and 1.35 or 1) *
         -- Toxic Blades Multiplier
         (S.ToxicBlades:ArtifactEnabled() and 1 + S.ToxicBlades:ArtifactRank()*0.03 or 1) *
         -- Tier 19 4PC  Multiplier
