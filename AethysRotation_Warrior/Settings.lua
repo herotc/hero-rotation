@@ -22,7 +22,7 @@
         Berserking = {true, false},
         BloodFury = {true, false},
         -- Abilities
-        Pummel = {true, false}
+        Pummel = {true, false},
       }
     },
     Arms = {
@@ -31,6 +31,9 @@
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
+        -- Abilities
+        Avatar = {true, false},
+        BattleCry = {true, false},
       }
     },
     Fury = {
@@ -41,7 +44,7 @@
       OffGCDasOffGCD = {
         -- Abilities
         Avatar = {true, false},
-        BattleCry = {true, false}
+        BattleCry = {true, false},
       }
     }
   };
