@@ -209,47 +209,47 @@ end
 --Instructors Fourth Lesson
 local function Instructors()
 --actions.instructors=festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 and Player:RunicPowerDeficit() > 13 and Player:Runes() >=2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 2 and Player:RunicPowerDeficit() > 5 and Player:Runes() >=2 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end 
 --actions.instructors+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
 if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsAvailable() and Player:Runes() <= 3 then
  if AR.Cast(S.DeathCoil) then return ""; end --TODO: maybe add sudden_doom buff condition and RP >= 35
  end 
---actions.instructors+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 4 and Player:RunicPowerDeficit() > 29 and Player:Runes() >= 1 then
+--actions.instructors+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
---actions.instructors+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>11
- if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 11 and Player:Runes() >= 1 then
+--actions.instructors+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
--- actions.instructors+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 4 and Player:RunicPowerDeficit() > 29 and Player:Runes() >= 1 then
+-- actions.instructors+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end
---actions.instructors+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>11
- if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 11 and Player:Runes() >= 1 then
+--actions.instructors+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
---actions.instructors+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=4&runic_power.deficit>29
- if S.ScourgeStrike:IsCastable() and Player:Runes() >= 2 and Player:DebuffStack(S.FesteringWounds) >= 4 and Player:RunicPowerDeficit() > 29 then 
+--actions.instructors+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>9
+ if S.ScourgeStrike:IsCastable() and Player:Runes() >= 2 and Player:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 then 
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
---actions.instructors+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>11
- if S.ClawingShadows:IsCastable() and Player:Runes() >= 2 and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 11 then
+--actions.instructors+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>9
+ if S.ClawingShadows:IsCastable() and Player:Runes() >= 2 and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
---actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
- if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:Cooldown() > 15 then
+--actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>10
+ if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:Cooldown() > 10 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
 --actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
  if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) then 
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
---actions.instructors+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
- if S.DeathCoil:IsUsable() and S.DarkArbiter:IsAvailable() and  S.DarkArbiter:Cooldown() > 15 then 
+--actions.instructors+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>10
+ if S.DeathCoil:IsUsable() and S.DarkArbiter:IsAvailable() and  S.DarkArbiter:Cooldown() > 10 then 
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
 --actions.instructors+=/death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
@@ -266,51 +266,51 @@ end
   --STANDARD
  local function Standard()
 --actions.standard=festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 and (Player:RunicPowerDeficit() > 13 and Player:Runes() >= 2) then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 2 and Player:RunicPowerDeficit() > 5 and Player:Runes() >= 2 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end
   --actions.standard+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
  if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsAvailable() and Player:Runes() <= 3 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
---actions.standard+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() >15 and Player:Runes() >= 1 then
+--actions.standard+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() >9 and Player:Runes() >= 1 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
---actions.standard+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>11
- if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 11 and Player:Runes() >= 1 then
+--actions.standard+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end 
---actions.standard+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 15 and Player:Runes() >= 1 then
+--actions.standard+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
---actions.standard+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>11
- if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 11 and Player:Runes() >= 1 then
+--actions.standard+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end 
---actions.standard+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>15
- if S.ScourgeStrike:IsCastable() and Player:Runes() >= 2 and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 15 then
+--actions.standard+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>9
+ if S.ScourgeStrike:IsCastable() and Player:Runes() >= 2 and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
---actions.standard+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>11
- if S.ClawingShadows:IsCastable() and Player:Runes() >= 2 and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 11 then
+--actions.standard+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>9
+ if S.ClawingShadows:IsCastable() and Player:Runes() >= 2 and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end 
---actions.standard+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
- if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:Cooldown() > 15 then
+--actions.standard+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>10
+ if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:Cooldown() > 10 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
 --actions.standard+=/death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
  if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
- --actions.standard+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
- if S.DeathCoil:IsUsable() and S.DarkArbiter:IsAvailable() and S.DarkArbiter:Cooldown() > 15 then
+ --actions.standard+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>10
+ if S.DeathCoil:IsUsable() and S.DarkArbiter:IsAvailable() and S.DarkArbiter:Cooldown() > 10 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
 --actions.standard+=/death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
- if S.DeathCoil:IsUsable() and not S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() and Player:RunicPower() >= 35 then
+ if S.DeathCoil:IsUsable() and not S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() then
   if AR.Cast(S.DeathCoil) then return ""; end
  end
  --sudden_doom usage
