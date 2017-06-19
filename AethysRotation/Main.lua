@@ -218,7 +218,7 @@
       [266]   = false,                          -- Demonology
       [267]   = false,                          -- Destruction
     -- Warrior
-      [71]    = false,                          -- Arms
+      [71]    = "AethysRotation_Warrior",       -- Arms
       [72]    = "AethysRotation_Warrior",       -- Fury
       [73]    = false                           -- Protection
   };
@@ -270,7 +270,7 @@
   };
   function AR.Pulse ()
     if AC.GetTime() > AR.Timer.Pulse and AR.Locked() then
-      AR.Timer.Pulse = AC.GetTime() + AC.Timer.PulseOffset; 
+      AR.Timer.Pulse = AC.GetTime() + AC.Timer.PulseOffset;
 
       AR.ResetIcons();
 

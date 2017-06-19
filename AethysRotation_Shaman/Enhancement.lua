@@ -14,7 +14,7 @@ local Item = AC.Item
 -- AethysRotation
 local AR = AethysRotation
 
--- Updated from Shaman_T20M APL on 6/13/2017
+-- APL from Shaman_Enhancement_T20M on 6/13/2017
 
 -- APL Local Vars
 -- Spells
