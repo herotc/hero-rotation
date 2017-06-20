@@ -77,7 +77,6 @@ Spell.Warrior.Arms = {
 	-- Legendaries
 	StoneHeartBuff					= Spell(225947)
 }
-
 local S = Spell.Warrior.Arms;
 
 -- Items
@@ -175,12 +174,12 @@ local function APL ()
 			end
 
 			-- actions.cleave+=/focused_rage,if=rage>100|buff.battle_cry_deadly_calm.up
-			if S.FocusedRage:IsCastable() and (Player:Rage() > 100 or Player:Buff(S.DeadlyCalm)) then
+			if S.FocusedRage:IsCastable() and (Player:Rage() > 100 or (Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable())) then
 				if AR.Cast(S.FocusedRage) then return "Cast FocusedRage" end
 			end
 
 			-- actions.cleave+=/whirlwind,if=talent.fervor_of_battle.enabled&(debuff.colossus_smash.up|rage.deficit<50)&(!talent.focused_rage.enabled|buff.battle_cry_deadly_calm.up|buff.cleave.up)
-			if S.WhirlWind:IsCastable() and (S.FervorOfBattle:IsAvailable() and (Target:Debuff(S.ColossusSmashDebuff) or Player:RageDeficit() < 50) and (not S.FocusedRage:IsAvailable() or Player:Buff(S.DeadlyCalm) or Player:Buff(S.CleaveBuff))) then
+			if S.WhirlWind:IsCastable() and (S.FervorOfBattle:IsAvailable() and (Target:Debuff(S.ColossusSmashDebuff) or Player:RageDeficit() < 50) and (not S.FocusedRage:IsAvailable() or (Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable()) or Player:Buff(S.CleaveBuff))) then
 				if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
 			end
 
@@ -228,7 +227,7 @@ local function APL ()
 			end
 
 			-- actions.aoe+=/colossus_smash,if=cooldown_react&buff.shattered_defenses.down&buff.precise_strikes.down
-			if S.ColossusSmash:IsCastable() and (not Player:Buff(S.ShatteredDefenses) and not Player:Buff(S.PreciseStrikesBuff)) then
+			if S.ColossusSmash:IsCastable() and (not Player:Buff(S.ShatteredDefensesBuff) and not Player:Buff(S.PreciseStrikesBuff)) then
 				if AR.Cast(S.ColossusSmash) then return "Cast ColossusSmash" end
 			end
 
@@ -243,7 +242,7 @@ local function APL ()
 			end
 
 			-- actions.aoe+=/rend,if=remains<=duration*0.3
-			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Target:DebuffDuration(S.Rend) * 0.3) then
+			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Target:DebuffDuration(S.RendDebuff) * 0.3) then
 				if AR.Cast(S.Rend) then return "Cast Rend" end
 			end
 
@@ -263,7 +262,7 @@ local function APL ()
 			end
 
 			-- actions.aoe+=/whirlwind,if=rage>=40
-			if S.WhirlWind:IsCastable() and (Player:Rage() > 40) then
+			if S.WhirlWind:IsCastable() and (Player:Rage() >= 40) then
 				if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
 			end
 
@@ -291,7 +290,7 @@ local function APL ()
 			end
 
 			-- actions.execute+=/colossus_smash,if=buff.shattered_defenses.down&(buff.battle_cry.down|buff.battle_cry.remains>gcd.max)
-			if S.ColossusSmash:IsCastable() and (not Player:Buff(S.ShatteredDefensesBuff) and (Player:Buff(S.BattleCryBuff) or Player:BuffRemains(S.BattleCryBuff) > Player:GCD())) then
+			if S.ColossusSmash:IsCastable() and (not Player:Buff(S.ShatteredDefensesBuff) and (not Player:Buff(S.BattleCryBuff) or Player:BuffRemains(S.BattleCryBuff) > Player:GCD())) then
 				if AR.Cast(S.ColossusSmash) then return "Cast ColossusSmash" end
 			end
 
@@ -306,7 +305,7 @@ local function APL ()
 			end
 
 			-- actions.execute+=/rend,if=remains<5&cooldown.battle_cry.remains<2&(cooldown.bladestorm.remains<2|!set_bonus.tier20_4pc)
-			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) < 5 and S.BattleCry:Cooldown() < 2 and (S.Bladestorm:Cooldown() < 2 and not AC.Tier20_4Pc)) then
+			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) < 5 and S.BattleCry:Cooldown() < 2 and (S.Bladestorm:Cooldown() < 2 or not AC.Tier20_4Pc)) then
 				if AR.Cast(S.Rend) then return "Cast Rend" end
 			end
 
@@ -358,13 +357,18 @@ local function APL ()
 				if AR.Cast(S.Warbreaker) then return "Cast Warbreaker" end
 			end
 
+			-- actions.single+=/focused_rage,if=!buff.battle_cry_deadly_calm.up&buff.focused_rage.stack<3&!cooldown.colossus_smash.up&(rage>=130|debuff.colossus_smash.down|talent.anger_management.enabled&cooldown.battle_cry.remains<=8)
+			if S.FocusedRage:IsCastable() and (not (Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable()) and Player:BuffStack(S.FocusedRage) < 3 and not S.ColossusSmash:Cooldown() and (Player:Rage() >= 130 or Target:Debuff(S.ColossusSmashDebuff) or S.AngerManagement:IsAvailable() and S.BattleCry:Cooldown() <= 8)) then
+				if AR.Cast(S.FocusedRage) then return "Cast FocusedRage" end
+			end
+
 			-- actions.single+=/rend,if=remains<=0|remains<5&cooldown.battle_cry.remains<2&(cooldown.bladestorm.remains<2|!set_bonus.tier20_4pc)
-			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= 0 or Target:DebuffRemains(S.RendDebuff) < 2 and (S.Bladestorm:Cooldown() < 2 or not AC.Tier20_4Pc)) then
+			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= 0 and S.BattleCry:Cooldown() < 2 and (S.Bladestorm:Cooldown() < 2 or not AC.Tier20_4Pc)) then
 				if AR.Cast(S.Rend) then return "Cast Rend" end
 			end
 
 			-- actions.single+=/execute,if=buff.stone_heart.react
-			if S.Execute:IsCastable() and Player:Buff(S.StoneHeartBuff) then
+			if S.Execute:IsCastable() and (Player:Buff(S.StoneHeartBuff)) then
 				if AR.Cast(S.Execute) then return "Cast Execute" end
 			end
 
@@ -379,7 +383,7 @@ local function APL ()
 			end
 
 			-- actions.single+=/rend,if=remains<=duration*0.3
-			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Target:DebuffDuration(S.Rend) * 0.3) then
+			if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Target:DebuffDuration(S.RendDebuff) * 0.3) then
 				if AR.Cast(S.Rend) then return "Cast Rend" end
 			end
 
@@ -399,7 +403,7 @@ local function APL ()
 			end
 
 			-- actions.single+=/bladestorm,if=(raid_event.adds.in>90|!raid_event.adds.exists)&!set_bonus.tier20_4pc
-			if S.Bladestorm:IsCastable() and (AC.Tier20_4Pc) then
+			if S.Bladestorm:IsCastable() and (not AC.Tier20_4Pc) then
 				if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
 			end
 		end
