@@ -14,7 +14,7 @@ local Item = AC.Item
 -- AethysRotation
 local AR = AethysRotation
 
--- APL from Shaman_Enhancement_T20M on 6/13/2017
+-- APL from Shaman_Enhancement_T20M on 6/20/2017
 
 -- APL Local Vars
 -- Spells
@@ -94,7 +94,7 @@ local function APL ()
 		-- Opener
 		if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(20) and not Target:IsDeadOrGhost() then
 			-- actions.opener=rockbiter,if=maelstrom<15&time<gcd
-			if Player:Maelstrom() < 15 then
+			if Player:Maelstrom() < 25 then
 				if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
 			else
 				if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
@@ -116,17 +116,17 @@ local function APL ()
 		if Player:Buff(S.AscendanceBuff) then
 			-- actions.asc=earthen_spike
 			if S.EarthenSpike:IsCastable() then
-				if AR.Cast(S.EarthenSpike) then return "Cast Rockbiter" end
+				if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
 			end
 
 			-- actions.asc+=/doom_winds,if=cooldown.windstrike.up
-			if S.DoomWinds:IsCastable() and (S.WindStrike:CooldownUp()) then
-				if AR.Cast(S.EarthenSpike) then return "Cast DoomWinds" end
+			if S.DoomWinds:IsCastable() and AR.CDsON() and (S.WindStrike:CooldownUp()) then
+				if AR.Cast(S.DoomWinds, Settings.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
 			end
 
 			-- actions.asc+=/windstrike
 			if S.WindStrike:IsCastable() then
-				if AR.Cast(S.Windstrike) then return "Cast WindStrike" end
+				if AR.Cast(S.WindStrike) then return "Cast WindStrike" end
 			end
 		end
 
@@ -136,7 +136,7 @@ local function APL ()
 		end
 
 		-- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
-		if S.FuryOfAir:IsCastable() and (not Player:Buff(S.FuryOfAir) and Player:Maelstrom() > 22) then
+		if S.FuryOfAir:IsCastable() and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
 			if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
 		end
 
@@ -163,7 +163,7 @@ local function APL ()
 
 		-- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<6+gcd&cooldown.doom_winds.remains<gcd*2
 		if S.Frostbrand:IsCastable() and (S.Hailstorm:IsAvailable() and Player:BuffRemains(S.FrostbrandBuff) < 6 + Player:GCD() and S.DoomWinds:CooldownRemains() < Player:GCD() * 2) then
-			if AR.Cast(S.Frostbrand) then return "Cast Hailstorm" end
+			if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
 		end
 
 		if AR.CDsON() then
@@ -191,8 +191,8 @@ local function APL ()
 
 			-- cooldown.strike.remains?
 			-- actions.cds+=/ascendance,if=(cooldown.strike.remains>0)&buff.ascendance.down
-			if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:AscendanceBuff()) then
-				if AR.Cast(S.Ascendance) then return "Cast Ascendance" end
+			if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
+				if AR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance" end
 			end
 		end
 
@@ -235,7 +235,7 @@ local function APL ()
 
 		-- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
 		-- actions.core+=/lightning_bolt,if=talent.overcharge.enabled&variable.furyCheck45&maelstrom>=40
-		if S.LightningBolt:IsCastable() and (S.Overcharge:IsAvailable() and (not S.FuryOfAir:IsAvailable() or S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45) and Player:Maelstrom() >= 40) then
+		if S.LightningBolt:IsCastable() and (S.Overcharge:IsAvailable() and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45)) and Player:Maelstrom() >= 40) then
 			if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
 		end
 
