@@ -28,15 +28,20 @@
       GCDasOffGCD = {
         -- Abilities
         DemonicPower = {true, false},
-		SummonDoomGuard = {true, false},
-		SummonInfernal = {true, false},
-		SummonImp = {true, false},
-		GrimoireOfSacrifice = {true, false},
-		LifeTap = {true, false}
+        SummonDoomGuard = {true, false},
+        SummonInfernal = {true, false},
+        SummonImp = {true, false},
+        GrimoireOfSacrifice = {true, false},
+        GrimoireImp = {true, false},
+        LifeTap = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
+        ArcaneTorrent = {true, false},
+        Berserking = {true, false},
+        BloodFury = {true, false},
+        SoulHarvest = {true, false},
         
         -- Abilities
         
