@@ -42,6 +42,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Rogue Outlaw **7.2.5 Ready**
 - Rogue Subtlety **7.2.5 Ready**
 - Shaman Enhancement **7.2.5 Ready** (Credits: [Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
+- Warlock Destruction beta **7.2.5 Ready** (Credits: [KutiKuti](https://github.com/Kutikuti))
 - Warrior Fury (Credits: [Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90))
 - Warrior Arms **7.2.5 Ready** (Credits: [lithium720](https://github.com/lithium720))
 
