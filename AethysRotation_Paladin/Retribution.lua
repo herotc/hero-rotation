@@ -71,6 +71,9 @@ local pairs = pairs;
   };
 
 -- APL Action Lists (and Variables)
+local function Judged ()
+  return Target:Debuff(S.JudgmentDebuff) or S.Judgment:CooldownRemains() > Player:GCD()*2;
+end
 local function MythicDungeon ()
   -- Sapped Soul
   if AC.MythicDungeon() == "Sapped Soul" then
@@ -209,7 +212,7 @@ local function APL ()
         local Var_DS_Castable = (Cache.EnemiesCount[8] >= 2 or (Player:BuffStack(S.ScarletInquisitorsExpurgation) >= 29 and (Player:Buff(S.AvengingWrath) or Player:BuffStack(S.Crusade) >= 15 or not AR.CDsON() or (S.Crusade:IsAvailable() and S.Crusade:CooldownRemains() > 15 and not Player:Buff(S.Crusade)) or (not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemains() > 15)))) and AR.AoEON();
         -- actions.priority+=/variable,name=crusade,value=!talent.crusade.enabled|cooldown.crusade.remains>gcd*3
         local Var_Crusade = (S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > Player:GCD() * 3) and AR.CDsON() or not AR.CDsON();
-        if Target:Debuff(S.JudgmentDebuff) then
+        if Judged() then
           if S.DivineStorm:IsReady() then
             if Var_DS_Castable and Player:Buff(S.DivinePurposeBuff) then
               -- actions.priority+=/divine_storm,if=debuff.judgment.up&variable.ds_castable&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
@@ -277,11 +280,11 @@ local function APL ()
         end
         if Var_Crusade and S.TemplarsVerdict:IsReady() and Target:IsInRange(5) then
           -- actions.priority+=/templars_verdict,if=(equipped.137020|debuff.judgment.up)&artifact.wake_of_ashes.enabled&cooldown.wake_of_ashes.remains<gcd*2&variable.crusade
-          if (I.WhisperoftheNathrezim:IsEquipped() or Target:Debuff(S.JudgmentDebuff)) and S.WakeofAshes:IsAvailable() and S.WakeofAshes:Cooldown() < Player:GCD()*2 then
+          if (I.WhisperoftheNathrezim:IsEquipped() or Judged()) and S.WakeofAshes:IsAvailable() and S.WakeofAshes:Cooldown() < Player:GCD()*2 then
             if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
           end
           -- actions.priority+=/templars_verdict,if=debuff.judgment.up&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd*1.5&variable.crusade
-          if Target:Debuff(S.JudgmentDebuff) and Player:Buff(S.WhisperoftheNathrezim) and Player:BuffRemains(S.WhisperoftheNathrezim) < Player:GCD() * 1.5 then
+          if Judged() and Player:Buff(S.WhisperoftheNathrezim) and Player:BuffRemains(S.WhisperoftheNathrezim) < Player:GCD() * 1.5 then
             if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
           end
         end
@@ -329,7 +332,7 @@ local function APL ()
         if AR.AoEON() and S.Consecration:IsCastable() and Target:IsInRange(8) then
           if AR.Cast(S.Consecration) then return "Cast Consecration"; end
         end
-        if Target:Debuff(S.JudgmentDebuff) then
+        if Judged() then
           if Var_DS_Castable and S.DivineStorm:IsReady() then
             -- actions.priority+=/divine_storm,if=debuff.judgment.up&variable.ds_castable&buff.divine_purpose.react
             if Player:Buff(S.DivinePurposeBuff) then
