@@ -61,7 +61,7 @@
 --- ======= CASTS =======
   local GCDSpell = Spell(61304);
   local function GCDDisplay ()
-    if Player:IsCasting() then -- Only for Cast, not Channel
+    if Player:IsCasting() or Player:IsChanneling() then
       AR.MainIconFrame:SetCooldown(Player:CastStart(), Player:CastDuration());
     else
       AR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
