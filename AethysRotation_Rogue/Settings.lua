@@ -77,8 +77,8 @@
       EviscerateDMGOffset = 3,
       -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
       ShDEcoCharge = 2.45,
-      -- Sprint as DPS CD
-      SprintAsDPSCD = true,
+      -- Single Target MfD as DPS CD
+      STMfDAsDPSCD = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
       },

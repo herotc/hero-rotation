@@ -217,7 +217,7 @@ local function CDs ()
     -- Note: Done at the start of the Rotation (Rogue Commmon)
     -- actions.cds+=/marked_for_death,if=raid_event.adds.in>40&combo_points.deficit>=cp_max_spend
     if S.MarkedforDeath:IsCastable() then
-      if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) then
+      if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) or (Settings.Subtlety.STMfDAsDPSCD and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
         if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
       elseif Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
         AR.CastSuggested(S.MarkedforDeath);
