@@ -199,7 +199,7 @@
 		
       -- Opener
       if Everyone.TargetIsValid() then
-		if AR.Cast(S.Immolate) then return "Cast"; end
+        if AR.Cast(S.Immolate) then return "Cast"; end
       end
       return;
     end
@@ -219,7 +219,7 @@
       end
       
       -- actions=havoc,target=2,if=active_enemies>1&(active_enemies<4|talent.wreak_havoc.enabled&active_enemies<6)&!debuff.havoc.remains
-      if AR.AoEON() and Cache.EnemiesCount[range]>1  then
+      if AR.AoEON() and Cache.EnemiesCount[range]>1 then
         BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD()*2, nil;
         for _, Value in pairs(Cache.Enemies[range]) do
           if S.Havoc:IsCastable() and (Cache.EnemiesCount[range]<4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range]<6)) and not Value:IsUnit(Target) then
@@ -261,7 +261,7 @@
       
       -- actions+=/immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2+set_bonus.tier19_4pc|(action.conflagrate.charges>=1+set_bonus.tier19_4pc&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
       if S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<= Consts.ImmolateBaseDuration and (GetImmolateStack(Target)==0 or GetImmolateStack(Target)==nil) and Target:TimeToDie()>10
-        and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) then
+        and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) and not(Player:IsCasting() and Player:CastID()==S.Immolate:ID()) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       
