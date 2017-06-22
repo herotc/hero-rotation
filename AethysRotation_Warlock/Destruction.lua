@@ -310,22 +310,22 @@
       end
       
       -- actions+=/service_pet
-      if S.GrimoireImp:IsAvailable() and S.GrimoireImp:IsCastable() and Player:SoulShards()>0 then
+      if S.GrimoireImp:IsAvailable() and S.GrimoireImp:IsCastable() and Player:SoulShards()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.GrimoireImp) then return "Cast"; end
       end
       
       -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-      if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and S.LordOfFlames:ArtifactRank()>0 and not Player:Debuff(S.LordOfFlamesDebuff) and Player:SoulShards ()>=1 then
+      if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and S.LordOfFlames:ArtifactRank()>0 and not Player:Debuff(S.LordOfFlamesDebuff) and Player:SoulShards ()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "Cast"; end
       end
       
       -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-      if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range]<=2 and (Target:TimeToDie()>180 or Target:HealthPercentage()<=20 or Target:TimeToDie()<30) and Player:SoulShards ()>=1 then
+      if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range]<=2 and (Target:TimeToDie()>180 or Target:HealthPercentage()<=20 or Target:TimeToDie()<30) and Player:SoulShards ()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.SummonDoomGuard, Settings.Destruction.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
       end
       
       -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-      if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range]>2 and Player:SoulShards ()>=1 then
+      if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range]>2 and Player:SoulShards ()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "Cast"; end
       end
       
@@ -335,7 +335,7 @@
       end
       
       -- actions+=/chaos_bolt,if=active_enemies<4&buff.active_havoc.remains>cast_time
-      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<4 and EnemyHasHavoc()>S.ChaosBolt:CastTime() then
+      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<4 and EnemyHasHavoc()>S.ChaosBolt:CastTime() and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       
@@ -345,7 +345,7 @@
       end
       
       -- actions+=/rain_of_fire,if=active_enemies>=3
-      if AR.AoEON() and S.RainOfFire:IsAvailable() and Cache.EnemiesCount[range]>=3 and Player:SoulShards ()>=3 then
+      if AR.AoEON() and S.RainOfFire:IsAvailable() and Cache.EnemiesCount[range]>=3 and Player:SoulShards ()>=3 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.RainOfFire) then return "Cast"; end
       end
       
@@ -360,17 +360,17 @@
       end
       
       -- actions+=/chaos_bolt,if=active_enemies<3&target.time_to_die<=10
-      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<3 and Target:TimeToDie()<=10 then
+      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<3 and Target:TimeToDie()<=10 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       
       -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)&(soul_shard>=5-spell_targets.infernal_awakening*0.5|buff.soul_harvest.remains>cast_time|buff.concordance_of_the_legionfall.remains>cast_time)
-      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:Cooldown()>12 or Cache.EnemiesCount[range]==1 or Player:SoulShards ()>=5-(Cache.EnemiesCount[range]*0.5)) and (Player:SoulShards ()>=5-(Cache.EnemiesCount[range]*0.5) or Player:BuffRemains(S.SoulHarvest)>S.ChaosBolt:CastTime() or Player:BuffRemains(S.Concordance)>S.ChaosBolt:CastTime())then
+      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:Cooldown()>12 or Cache.EnemiesCount[range]==1 or Player:SoulShards ()>=5-(Cache.EnemiesCount[range]*0.5)) and (Player:SoulShards ()>=5-(Cache.EnemiesCount[range]*0.5) or Player:BuffRemains(S.SoulHarvest)>S.ChaosBolt:CastTime() or Player:BuffRemains(S.Concordance)>S.ChaosBolt:CastTime()) and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       
       -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)
-      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:Cooldown()>12 or Cache.EnemiesCount[range]==1 or Player:SoulShards ()>=5-(Cache.EnemiesCount[range]*0.5)) then
+      if S.ChaosBolt:IsCastable() and Player:SoulShards ()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:Cooldown()>12 or Cache.EnemiesCount[range]==1 or Player:SoulShards ()>=5-(Cache.EnemiesCount[range]*0.5)) and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
         if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       
