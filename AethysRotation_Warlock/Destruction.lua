@@ -340,7 +340,7 @@
       end
       
       -- actions+=/channel_demonfire,if=dot.immolate.remains>cast_time&(active_enemies=1|buff.active_havoc.remains<action.chaos_bolt.cast_time)
-      if S.ChannelDemonfire:IsCastable() and S.ChannelDemonfire:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)>S.ChannelDemonfire:CastTime() and (Cache.EnemiesCount[range]==1 or EnemyHasHavoc()<S.ChaosBolt:CastTime()) and not (Player:IsChanneling() and Player:ChannelName()==S.ChannelDemonfire:Name())) then
+      if S.ChannelDemonfire:IsCastable() and S.ChannelDemonfire:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)>S.ChannelDemonfire:CastTime() and (Cache.EnemiesCount[range]==1 or EnemyHasHavoc()<S.ChaosBolt:CastTime()) and not (Player:IsChanneling() and Player:ChannelName()==S.ChannelDemonfire:Name()) then
         if AR.Cast(S.ChannelDemonfire) then return "Cast"; end
       end
       
