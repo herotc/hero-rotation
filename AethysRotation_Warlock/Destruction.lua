@@ -170,16 +170,16 @@
     --Precombat
     -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
     if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or not Player:Buff(S.DemonicPower)) and Player:SoulShards ()>=1 then
-      if AR.Cast(S.SummonImp, Settings.Destruction.GCDasOffGCD.SummonImp) then return "Cast"; end
+      if AR.Cast(S.SummonImp, Settings.Commons.GCDasOffGCD.SummonImp) then return "Cast"; end
     end
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
     if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:IsCastable() and not S.MeteorStrike:IsLearned() and  ((S.LordOfFlames:ArtifactRank()>0) or Cache.EnemiesCount[range]>1) and Player:SoulShards ()>=1 then
-      if AR.Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "Cast"; end
+      if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
     end
     -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
     if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:IsCastable() and not S.ShadowLock:IsLearned() and not S.LordOfFlames:ArtifactRank()==0 and Cache.EnemiesCount[range]==1 and Player:SoulShards ()>=1 then
-      if AR.Cast(S.SummonDoomGuard, Settings.Destruction.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
+      if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
     end
     -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
     if S.GrimoireOfSacrifice:IsCastable() and IsPetInvoked() and not Player:Buff(S.DemonicPower) then
@@ -187,7 +187,7 @@
     end
     -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
     if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and (Player:BuffRemains(S.EmpoweredLifeTapBuff)<0.3*Consts.EmpoweredLifeTapBaseDuration) then
-      if AR.Cast(S.LifeTap, Settings.Destruction.GCDasOffGCD.LifeTap) then return "Cast"; end
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
     end
     
     -- Out of Combat
@@ -311,22 +311,22 @@
       
       -- actions+=/service_pet
       if S.GrimoireImp:IsAvailable() and S.GrimoireImp:IsCastable() and Player:SoulShards()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
-        if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return "Cast"; end
+        if AR.Cast(S.GrimoireImp, Settings.Commons.GCDasOffGCD.GrimoireImp) then return "Cast"; end
       end
       
       -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
       if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and S.LordOfFlames:ArtifactRank()>0 and not Player:Debuff(S.LordOfFlamesDebuff) and Player:SoulShards ()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
-        if AR.Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "Cast"; end
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
       end
       
       -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
       if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range]<=2 and (Target:TimeToDie()>180 or Target:HealthPercentage()<=20 or Target:TimeToDie()<30) and Player:SoulShards ()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
-        if AR.Cast(S.SummonDoomGuard, Settings.Destruction.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
+        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
       end
       
       -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
       if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range]>2 and Player:SoulShards ()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
-        if AR.Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "Cast"; end
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
       end
       
       -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
