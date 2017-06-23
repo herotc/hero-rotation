@@ -282,25 +282,21 @@
       
       -- actions+=/conflagrate,if=talent.roaring_blaze.enabled&(charges=2+set_bonus.tier19_4pc|(charges>=1+set_bonus.tier19_4pc&recharge_time<gcd)|target.time_to_die<24)
       if S.RoaringBlaze:IsAvailable() and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) then
-        -- print("conf1")
         if AR.Cast(S.Conflagrate) then return "Cast"; end
       end
       
       -- actions+=/conflagrate,if=talent.roaring_blaze.enabled&debuff.roaring_blaze.stack>0& dot.immolate.remains>dot.immolate.duration*0.3&(active_enemies=1|soul_shard<3)&soul_shard<5
-      if S.RoaringBlaze:IsAvailable() and S.Conflagrate:Charges()>0 and GetImmolateStack(Target)>0 and Target:DebuffRemains(S.ImmolateDebuff)>Consts.ImmolateBaseDuration*0.3 and (Cache.EnemiesCount[range]==1 or Player:SoulShards()<3) and Player:SoulShards()<5 then
-        -- print("conf2")
+      if S.RoaringBlaze:IsAvailable() and S.Conflagrate:Charges()>0 and (GetImmolateStack(Target) and GetImmolateStack(Target)>0) and Target:DebuffRemains(S.ImmolateDebuff)>Consts.ImmolateBaseDuration*0.3 and (Cache.EnemiesCount[range]==1 or Player:SoulShards()<3) and Player:SoulShards()<5 then
         if AR.Cast(S.Conflagrate) then return "Cast"; end
       end
       
       -- actions+=/conflagrate,if=!talent.roaring_blaze.enabled&buff.backdraft.stack<3&buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
       if S.Backdraft:IsAvailable() and S.Conflagrate:Charges()>0 and Player:BuffStack(S.BackdraftBuff)<3 and Player:BuffRemains(S.ConflagrationOfChaosDebuff)<=S.ChaosBolt:CastTime() then
-        -- print("conf3")
         if AR.Cast(S.Conflagrate) then return "Cast"; end
       end
       
       -- actions+=/conflagrate,if=!talent.roaring_blaze.enabled&buff.backdraft.stack<3&(charges=1+set_bonus.tier19_4pc&recharge_time<action.chaos_bolt.cast_time|charges=2+set_bonus.tier19_4pc)& soul_shard<5
       if S.Backdraft:IsAvailable() and Player:BuffStack(S.BackdraftBuff)<3 and (( S.Conflagrate:Charges()==1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD()) or S.Conflagrate:Charges()==2+(T194P and 1 or 0)) and Player:SoulShards()<5 then
-        -- print("conf4")
         if AR.Cast(S.Conflagrate) then return "Cast"; end
       end
       
