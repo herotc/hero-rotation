@@ -267,7 +267,7 @@
       
       -- actions+=/berserking
       if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:IsCastable() then
-        if AR.Cast(S.Berserking, Settings.Destruction.OffGCDasOffGCD.Berserking) then return "Cast"; end
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
       end
       
       -- actions+=/shadowburn,if=buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
