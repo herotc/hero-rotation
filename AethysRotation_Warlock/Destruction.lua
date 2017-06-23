@@ -242,7 +242,7 @@
       end
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&remains<=tick_time
-      if (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemains(S.ImmolateDebuff)<Player:GCD() and not (Player:IsCasting() and Player:CastID()==S.Immolate:ID()) then
+      if (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemains(S.ImmolateDebuff)<Player:GCD() and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       
@@ -261,7 +261,7 @@
       
       -- actions+=/immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2+set_bonus.tier19_4pc|(action.conflagrate.charges>=1+set_bonus.tier19_4pc&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
       if S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<= Consts.ImmolateBaseDuration and (GetImmolateStack(Target)==0 or GetImmolateStack(Target)==nil) and Target:TimeToDie()>10
-        and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) and not(Player:IsCasting() and Player:CastID()==S.Immolate:ID()) then
+        and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) and not(Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm.ID())) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       
@@ -311,7 +311,7 @@
       
       -- actions+=/service_pet
       if S.GrimoireImp:IsAvailable() and S.GrimoireImp:IsCastable() and Player:SoulShards()>=1 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
-        if AR.Cast(S.GrimoireImp) then return "Cast"; end
+        if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return "Cast"; end
       end
       
       -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
@@ -385,7 +385,7 @@
       end
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
-      if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:Cooldown()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and Player:CastID()==S.Immolate:ID()) then
+      if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:Cooldown()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       
