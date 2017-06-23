@@ -1,4 +1,4 @@
---- ============================ HEADER ============================
+
 --- ======= LOCALIZE =======
   -- Addon
   local addonName, addonTable = ...;
@@ -121,8 +121,8 @@
   
   local Consts={
     ImmolateBaseDuration = 18,
-    ImmolateMaxDuration = 27
-  
+    ImmolateMaxDuration = 27,
+    EmpoweredLifeTapBaseDuration = 20
   }
   
   -- GUI Settings
@@ -186,7 +186,7 @@
       if AR.Cast(S.GrimoireOfSacrifice, Settings.Destruction.GCDasOffGCD.GrimoireOfSacrifice) then return "Cast"; end
     end
     -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
-    if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and (Player:BuffRemains(S.EmpoweredLifeTapBuff)<Player:GCD()) then
+    if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and (Player:BuffRemains(S.EmpoweredLifeTapBuff)<0.3*Consts.EmpoweredLifeTapBaseDuration) then
       if AR.Cast(S.LifeTap, Settings.Destruction.GCDasOffGCD.LifeTap) then return "Cast"; end
     end
     
@@ -199,7 +199,7 @@
 		
       -- Opener
       if Everyone.TargetIsValid() then
-        if AR.Cast(S.Immolate) then return "Cast"; end
+        if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       return;
     end
@@ -237,12 +237,12 @@
       end
       
       -- actions+=/cataclysm,if=spell_targets.cataclysm>=3
-      if AR.AoEON() and Cache.EnemiesCount[range]>=3 and S.Cataclysm:IsAvailable() and S.Cataclysm:IsCastable() then
+      if AR.AoEON() and Cache.EnemiesCount[range]>=3 and S.Cataclysm:IsAvailable() and S.Cataclysm:IsCastable() and not (Player:IsCasting() and Player:CastID()==S.Cataclysm:ID())then
         if AR.Cast(S.Cataclysm) then return "Cast"; end
       end
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&remains<=tick_time
-      if (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemains(S.ImmolateDebuff)<Player:GCD() then
+      if (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemains(S.ImmolateDebuff)<Player:GCD() and not (Player:IsCasting() and Player:CastID()==S.Immolate:ID()) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       
@@ -351,11 +351,11 @@
       
       -- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|((!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
       if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and (Target:TimeToDie()<=32 or not I.LessonsOfSpaceTime:IsEquipped(3) or S.DimensionalRift:Charges()>1 or ((not S.GrimoireOfService:IsAvailable() or S.DimensionalRift:Recharge()<S.GrimoireImp:Cooldown()) and (not S.SoulHarvest:IsAvailable() or S.DimensionalRift:Recharge()<S.SoulHarvest:Cooldown()))) then
-        if AR.Cast(S.DimensionalRift) then return "Cast"; end
+        if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return "Cast"; end
       end
       
       -- actions+=/cataclysm
-      if S.Cataclysm:IsAvailable() and S.Cataclysm:IsCastable() then
+      if S.Cataclysm:IsAvailable() and S.Cataclysm:IsCastable() and not (Player:IsCasting() and Player:CastID()==S.Cataclysm:ID()) then
         if AR.Cast(S.Cataclysm) then return "Cast"; end
       end
       
@@ -385,7 +385,7 @@
       end
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
-      if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:Cooldown()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 then
+      if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:Cooldown()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and Player:CastID()==S.Immolate:ID()) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       

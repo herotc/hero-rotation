@@ -35,7 +35,8 @@
         SummonImp = {true, false},
         GrimoireOfSacrifice = {true, false},
         GrimoireImp = {true, false},
-        LifeTap = {true, false}
+        LifeTap = {true, false},
+	DimensionalRift = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
