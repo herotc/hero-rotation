@@ -403,6 +403,11 @@
       if AR.Cast(S.Obliteration, Settings.Commons.OffGCDasOffGCD.Obliteration) then return; end
     end
 
+    -- actions.gs_ticking+=/frostscythe,if=buff.killing_machine.up&(!equipped.132366|talent.gathering_storm.enabled|spell_targets.frostscythe>=2)
+    if S.FrostScythe:IsCastable() and Player:Buff(S.KillingMachine) and (not I.KoltirasNewfoundWill:IsEquipped() or S.GatheringStorm:IsAvailable() or Cache.EnemiesCount[10] >=2) then
+      AR.CastSuggested(S.FrostScythe); 
+    end
+
     --  actions.gs_ticking+=/obliterate,if=rune.time_to_5<gcd|buff.killing_machine.react|buff.obliteration.up
     if S.Obliterate:IsCastable() and (Player:RuneTimeToX(5) < Player:GCD() or Player:Buff(S.KillingMachine) or Player:Buff(S.KillingMachine)) then
       if AR.Cast(S.Obliterate) then return ""; end
@@ -470,7 +475,10 @@
     if S.BreathofSindragosa:IsCastable()  and Player:Buff(S.PillarOfFrost) then
       if AR.Cast(S.BreathofSindragosa) then return ""; end
     end
-
+    --actions+=/chains_of_ice,if=buff.cold_heart.stack=20|(buff.pillar_of_frost.remains<gcd&buff.pillar_of_frost.up&(buff.cold_heart.stack>=11|(buff.cold_heart.stack>=10&set_bonus.tier20_4pc)))
+    if S.ChainsOfIce:IsCastable() and (Player:BuffStack(S.ChilledHearth) == 20 or (Player:BuffRemains(S.PillarOfFrost) < Player:GCD() and Player:Buff(S.PillarOfFrost) and (Player:BuffStack(S.ChilledHearth) >= 11 or (Player:BuffStack(S.ChilledHearth) >= 10 and AC.Tier20_4Pc)))) then
+      if AR.Cast(S.ChainsOfIce) then return ""; end
+    end
     --  actions.bos+=/sindragosas_fury,if=(equipped.144293|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5&!buff.obliteration.up
     if S.SindragosasFury:IsCastable() and(I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and not Player:Buff(S.Obliteration) and Player:RunicPower() >= 70 then
       AR.CastSuggested(S.SindragosasFury);
@@ -539,16 +547,17 @@ end
   AR.SetAPL(251, APL);
 
 --- ======= SIMC =======
--- actions+=/pillar_of_frost,if=!equipped.140806|!talent.breath_of_sindragosa.enabled
--- actions+=/pillar_of_frost,if=equipped.140806&talent.breath_of_sindragosa.enabled&((runic_power>=50&cooldown.hungering_Rune_weapon.remains<10)|(cooldown.breath_of_sindragosa.remains>20))
--- actions+=/mind_freeze
--- actions+=/arcane_torrent,if=runic_power.deficit>20&!talent.breath_of_sindragosa.enabled
--- actions+=/arcane_torrent,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking&runic_power<30&Runes()<2
--- actions+=/blood_fury,if=buff.pillar_of_frost.up
--- actions+=/berserking,if=buff.pillar_of_frost.up
+--  actions+=/pillar_of_frost,if=!equipped.140806|!talent.breath_of_sindragosa.enabled
+--  actions+=/pillar_of_frost,if=equipped.140806&talent.breath_of_sindragosa.enabled&((runic_power>=50&cooldown.hungering_Rune_weapon.remains<10)|(cooldown.breath_of_sindragosa.remains>20))
+--  actions+=/mind_freeze
+--  actions+=/arcane_torrent,if=runic_power.deficit>20&!talent.breath_of_sindragosa.enabled
+--  actions+=/arcane_torrent,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking&runic_power<30&Runes()<2
+--  actions+=/blood_fury,if=buff.pillar_of_frost.up
+--  actions+=/berserking,if=buff.pillar_of_frost.up
 --  actions+=/use_items
 --  actions+=/use_item,name=ring_of_collapsing_futures,if=(buff.temptation.stack=0&target.time_to_die>60)|target.time_to_die<60
 --  actions+=/potion,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
+--  actions+=/chains_of_ice,if=buff.cold_heart.stack=20|(buff.pillar_of_frost.remains<gcd&buff.pillar_of_frost.up&(buff.cold_heart.stack>=11|(buff.cold_heart.stack>=10&set_bonus.tier20_4pc)))
 --  actions+=/sindragosas_fury,if=!equipped.144293&buff.pillar_of_frost.up&(buff.unholy_strength.up|(buff.pillar_of_frost.remains<3&target.time_to_die<60))&debuff.razorice.stack=5&!buff.obliteration.up
 --  actions+=/sindragosas_fury,if=equipped.144293&buff.unholy_strength.up&cooldown.pillar_of_frost.remains>20
 --  actions+=/obliteration,if=(!talent.frozen_pulse.enabled|(Runes()<2&runic_power<28))&!talent.gathering_storm.enabled
