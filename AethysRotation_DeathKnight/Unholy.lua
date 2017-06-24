@@ -124,7 +124,7 @@
   if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return ; end
  end
   --actions.generic+=/chains_of_ice,if=buff.unholy_strength.up&buff.cold_heart.stack>19
- if S.ChainsOfIce:IsCastable() and Player:Buff(S.ColdHeartBuff) and Player:BuffStack:(S.ColdHeartBuff) > 19 then
+ if S.ChainsOfIce:IsCastable() and Player:Buff(S.ColdHeartBuff) and Player:BuffStack(S.ColdHeartBuff) > 19 then
   if AR.Cast(S.ChainsOfIce) then return ""; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4 -- Player:Rune() > 1 (SR cost)
