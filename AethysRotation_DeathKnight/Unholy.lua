@@ -23,10 +23,10 @@
   if not Spell.DeathKnight then Spell.DeathKnight = {}; end
   Spell.DeathKnight.Unholy = {
     -- Racials
-    ArcaneTorrent                 = Spell(80483),
-    Berserking                    = Spell(26297),
-    BloodFury                     = Spell(20572),
-    GiftoftheNaaru                = Spell(59547),
+        ArcaneTorrent                 = Spell(80483),
+        Berserking                    = Spell(26297),
+        BloodFury                     = Spell(20572),
+        GiftoftheNaaru                = Spell(59547),
     -- Artifact
 	Apocalypse                    = Spell(220143),
 	--Abilities
@@ -40,7 +40,7 @@
 	FesteringStrike               = Spell(85948),
 	Outbreak                      = Spell(77575),
 	SummonGargoyle                = Spell(49206),
-	--Talents
+     --Talents
 	BlightedRuneWeapon            = Spell(194918),
 	Epidemic                      = Spell(207317),
 	Castigator                    = Spell(207305),
@@ -57,18 +57,19 @@
 	DeathAndDecayBuff             = Spell(188290),
 	--Debuffs
 	SoulReaperDebuff              = Spell(130736),
-	FesteringWounds			      = Spell(194310), --max 8 stacks
-	VirulentPlagueDebuff           = Spell(191587), -- 13s debuff from Outbreak
+	FesteringWounds		      = Spell(194310), --max 8 stacks
+	VirulentPlagueDebuff          = Spell(191587), -- 13s debuff from Outbreak
 	--Defensives
 	AntiMagicShell                = Spell(48707),
 	IcebornFortitute              = Spell(48792),
 	 -- Utility
-    ControlUndead                 = Spell(45524),
-    DeathGrip                     = Spell(49576),
-    MindFreeze                    = Spell(47528),
-    PathOfFrost                   = Spell(3714),
-    WraithWalk                    = Spell(212552),
-	--Legendaries WIP
+        ControlUndead                 = Spell(45524),
+        DeathGrip                     = Spell(49576),
+        MindFreeze                    = Spell(47528),
+        PathOfFrost                   = Spell(3714),
+        WraithWalk                    = Spell(212552),
+	--Legendaries Buffs/SpellIds 
+	ColdHeartBuff                 = Spell(235592),
 	InstructorsFourthLesson       = Spell(208713),
 	KiljaedensBurningWish         = Spell(144259),
 	--DarkArbiter HiddenAura
@@ -84,6 +85,7 @@
 	ConvergenceofFates            = Item(140806, {13, 14}),
 	InstructorsFourthLesson       = Item(132448, {9}),
 	Taktheritrixs                 = Item(137075, {3}),
+	ColdHearth                    = Item(151796, {5}),
 	
 	
   };
@@ -120,6 +122,10 @@
   --actions.generic+=/summon_gargoyle,if=equipped.137075&cooldown.dark_transformation.remains<10&rune<=3
  if AR.CDsON() and S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and I.Taktheritrixs:IsEquipped() and S.DarkTransformation:Cooldown() < 10 and Player:Runes() <= 3 then
   if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return ; end
+ end
+  --actions.generic+=/chains_of_ice,if=buff.unholy_strength.up&buff.cold_heart.stack>19
+ if S.ChainsOfIce:IsCastable() and Player:Buff(S.ColdHeartBuff) and Player:BuffStack:(S.ColdHeartBuff) > 19 then
+  if AR.Cast(S.ChainsOfIce) then return ""; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4 -- Player:Rune() > 1 (SR cost)
  if S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:Cooldown() < 4 and Player:Runes() >= 1 then
@@ -516,7 +522,7 @@ local function APL()
 	 
 
 AR.SetAPL(252, APL);
-
+--- ====24/06/2017======
 --- ======= SIMC =======  
 --# Executed before combat begins. Accepts non-harmful actions only.
 --actions.precombat=flask
@@ -527,7 +533,6 @@ AR.SetAPL(252, APL);
 --actions.precombat+=/potion
 --actions.precombat+=/raise_dead
 --actions.precombat+=/army_of_the_dead
-
 --# Executed every time the actor is available.
 --actions=auto_attack
 --actions+=/mind_freeze
@@ -571,6 +576,7 @@ AR.SetAPL(252, APL);
 --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
 --actions.generic+=/dark_arbiter,if=equipped.137075&runic_power.deficit<30&cooldown.dark_transformation.remains<2
 --actions.generic+=/summon_gargoyle,if=!equipped.137075,if=rune<=3
+--actions.generic+=/chains_of_ice,if=buff.unholy_strength.up&buff.cold_heart.stack>19
 --actions.generic+=/summon_gargoyle,if=equipped.137075&cooldown.dark_transformation.remains<10&rune<=3
 --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4
 --actions.generic+=/apocalypse,if=debuff.festering_wound.stack>=6
@@ -588,30 +594,30 @@ AR.SetAPL(252, APL);
 --actions.generic+=/call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
 --actions.generic+=/call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
 
---actions.instructors=festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
+--actions.instructors=festering_strike,if=debuff.festering_wound.stack<=2&runic_power.deficit>5
 --actions.instructors+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
---actions.instructors+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
---actions.instructors+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>11
---actions.instructors+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
---actions.instructors+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>11
---actions.instructors+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=4&runic_power.deficit>29
---actions.instructors+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>11
---actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
+--actions.instructors+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+--actions.instructors+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+--actions.instructors+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+--actions.instructors+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
+--actions.instructors+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>9
+--actions.instructors+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>9
+--actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>10
 --actions.instructors+=/death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
---actions.instructors+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
+--actions.instructors+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>10
 --actions.instructors+=/death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
 
---actions.standard=festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
+--actions.standard=festering_strike,if=debuff.festering_wound.stack<=2&runic_power.deficit>5
 --actions.standard+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
---actions.standard+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
---actions.standard+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>11
---actions.standard+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
---actions.standard+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>11
---actions.standard+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>15
---actions.standard+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>11
---actions.standard+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
+--actions.standard+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+--actions.standard+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+--actions.standard+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+--actions.standard+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
+--actions.standard+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>9
+--actions.standard+=/clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>9
+--actions.standard+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>10
 --actions.standard+=/death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
---actions.standard+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
+--actions.standard+=/death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>10
 --actions.standard+=/death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
 
 --actions.valkyr=death_coil
