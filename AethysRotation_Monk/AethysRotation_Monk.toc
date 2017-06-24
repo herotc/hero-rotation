@@ -1,13 +1,14 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FMonk|r]
-## Author: Mindra
+## Author: Lockem
 ## Notes: Aethys Rotation - Monk Module.
 
 ## DefaultState: Enabled
 ## LoadOnDemand: 1
 ## Dependencies: AethysRotation
 
+Settings.lua
 Monk.lua
 Windwalker.lua
-Setting.lua
+Events.lua
