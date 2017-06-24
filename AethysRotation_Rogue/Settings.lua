@@ -59,8 +59,6 @@
       BFOffset = 2,
       -- SoloMode Settings
       RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
-      -- Pistol Shot icon for Blunderbuss
-      BlunderbussAsPistolShot = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
       },

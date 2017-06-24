@@ -418,15 +418,7 @@ local function APL ()
         end
         -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
         if (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Target:IsInRange(20) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
-          if Settings.Outlaw.BlunderbussAsPistolShot then
-            if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
-          else
-            if S.Blunderbuss:IsCastable() then
-              if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
-            elseif S.PistolShot:IsCastable() then
-              if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
-            end
-          end
+          if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
         end
         -- actions.build+=/saber_slash,if=variable.ss_useable
         if Target:IsInRange(S.SaberSlash, SSIdentifier) and S.SaberSlash:IsCastable() and SS_Useable() then
