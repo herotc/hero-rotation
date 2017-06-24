@@ -13,17 +13,11 @@
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
-  
-    -- Commons
+
+  -- File Locals
   AR.Commons.Monk = {};
-  -- GUI Settings
   local Settings = AR.GUISettings.APL.Monk.Commons;
   local Monk = AR.Commons.Monk;
-  
-  -- File Locals
-  AR.Commons.Class = {};
-  local Settings = AR.GUISettings.APL.Class.Commons;
-  local Class = AR.Commons.Class;
 
 
 --- ============================ CONTENT ============================
