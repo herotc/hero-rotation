@@ -92,13 +92,9 @@ local function APL ()
 	-- Out of Combat
 	if not Player:AffectingCombat() then
 		-- Opener
-		if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(40) and not Target:IsDeadOrGhost() then
+		if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(10) and not Target:IsDeadOrGhost() then
 			-- actions.opener=rockbiter,if=maelstrom<15&time<gcd
-			if Player:Maelstrom() < 29 and Target:IsInRange(5) then
-				if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
-			else
-				if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
-			end
+			if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
 		end
 		return
 	end
