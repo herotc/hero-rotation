@@ -33,8 +33,6 @@ Spell.Shaman.Enhancement = {
 	FrostbrandBuff					= Spell(196834),
 	Stormstrike						= Spell(17364),
 	StormbringerBuff				= Spell(201846),
-	FuryOfAir						= Spell(197211),
-	FuryOfAirBuff					= Spell(197211),
 
 	FeralSpirit						= Spell(51533),
 	LavaLash						= Spell(60103),
@@ -43,19 +41,21 @@ Spell.Shaman.Enhancement = {
 	WindStrike						= Spell(115356),
 
 	-- Talents
+	Windsong						= Spell(201898),
+	HotHandBuff						= Spell(215785),
 	Landslide						= Spell(197992),
 	LandslideBuff					= Spell(202004),
+	Hailstorm						= Spell(210853),
+	Overcharge						= Spell(210727),
+	CrashingStorm					= Spell(192246),
+	FuryOfAir						= Spell(197211),
+	FuryOfAirBuff					= Spell(197211),
+	Sundering						= Spell(197214),
 	Ascendance						= Spell(114051),
 	AscendanceBuff					= Spell(114051),
+	Boulderfist						= Spell(246035),
 	EarthenSpike					= Spell(188089),
 	EarthenSpikeDebuff				= Spell(188089),
-	CrashingStorm					= Spell(192246),
-	Hailstorm						= Spell(210853),
-	HotHandBuff						= Spell(215785),
-	Overcharge						= Spell(210727),
-	Sundering						= Spell(197214),
-	Windsong						= Spell(201898),
-	Boulderfist						= Spell(246035),
 
 	-- Artifact
 	DoomWinds						= Spell(204945),
@@ -116,7 +116,7 @@ local function APL ()
 		if Player:Buff(S.AscendanceBuff) then
 			-- actions.asc=earthen_spike
 			if S.EarthenSpike:IsCastable() then
-				if Player:Maelstrom() > 20 then
+				if Player:Maelstrom() > 20 and S.EarthenSpike:IsAvailable() then
 					if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
 				end
 			end
@@ -139,7 +139,9 @@ local function APL ()
 
 		-- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
 		if S.FuryOfAir:IsCastable() and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
-			if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
+			if S.FuryOfAir:IsAvailable() then
+				if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
+			end
 		end
 
 		-- actions.buffs+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
@@ -200,14 +202,16 @@ local function APL ()
 			-- cooldown.strike.remains?
 			-- actions.cds+=/ascendance,if=(cooldown.strike.remains>0)&buff.ascendance.down
 			if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
-				if AR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+				if S.Ascendance:IsAvailable() then
+					if AR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+				end
 			end
 		end
 
 		-- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
 		-- actions.core=earthen_spike,if=variable.furyCheck25
 		if S.EarthenSpike:IsCastable() and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25)) then
-			if Player:Maelstrom() > 20 then
+			if Player:Maelstrom() > 20 and S.EarthenSpike:IsAvailable() then
 				if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
 			end
 		end
@@ -221,7 +225,9 @@ local function APL ()
 
 		-- actions.core+=/windsong
 		if S.Windsong:IsCastable() then
-			if AR.Cast(S.Windsong) then return "Cast Windsong" end
+			if S.Windsong:IsAvailable() then
+				if AR.Cast(S.Windsong) then return "Cast Windsong" end
+			end
 		end
 
 		-- actions.core+=/crash_lightning,if=active_enemies>=8|(active_enemies>=6&talent.crashing_storm.enabled)
@@ -284,7 +290,7 @@ local function APL ()
 
 		-- actions.core+=/sundering,if=active_enemies>=3
 		if S.Sundering:IsCastable() and (Cache.EnemiesCount[5] >= 3) then
-			if Player:Maelstrom() > 20 then
+			if Player:Maelstrom() > 20 and S.Sundering:IsAvailable() then
 				if AR.Cast(S.Sundering) then return "Cast Sundering" end
 			end
 		end
@@ -328,7 +334,7 @@ local function APL ()
 
 		-- actions.filler+=/sundering
 		if S.Sundering:IsCastable() then
-			if Player:Maelstrom() > 20 then
+			if Player:Maelstrom() > 20 and S.Sundering:IsAvailable() then
 				if AR.Cast(S.Sundering) then return "Cast Sundering" end
 			end
 		end
