@@ -91,13 +91,24 @@
 
   -- Arguments Variables
   
-AC.ImmolationTable = {
-    Destruction = {
-      ImmolationDebuff = {},
-    }
-  };
+  AC.ImmolationTable = {
+      Destruction = {
+        ImmolationDebuff = {},
+      }
+    };
+    
+  AC.GuardiansTable = {
+      --{PetType,petID,dateEvent,UnitPetGUID,DE_Buffed}
+      Pets = {
+      },
+      PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal"}
+    };
   
-   -- Immolate OnApply/OnRefresh Listener
+  
+    --------------------------
+    ----- Destruction --------
+    --------------------------
+    -- Immolate OnApply/OnRefresh Listener
     AC:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
@@ -145,6 +156,42 @@ AC.ImmolationTable = {
         if SpellID == 17962 then
           if AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
                AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID]+1;
+          end
+        end
+      end
+      , "SPELL_CAST_SUCCESS"
+    );
+    
+    
+    --------------------------
+    ----- Demonology ---------
+    --------------------------
+    --Guardians table
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        dateEvent,_,_,_,_,_,_,UnitPetGUID=select(1,...)
+       
+        local t={} ; i=1
+        for str in string.gmatch(UnitPetGUID, "([^-]+)") do
+          t[i] = str
+          i = i + 1
+        end
+        local PetType=AC.GuardiansTable.PetList[tonumber(t[6])]
+        if PetType then
+          table.insert(AC.GuardiansTable.Pets,{PetType,tonumber(t[6]),GetTime(),UnitPetGUID,false})
+        end
+
+      end
+      , "SPELL_SUMMON"
+    );
+    
+    --Buff all guardians
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        DestGUID, _, _, _, SpellID = select(8, ...);
+        if SpellID == 193396 then
+          for key, Value in pairs(AC.GuardiansTable.Pets) do
+            AC.GuardiansTable.Pets[key][5]=true
           end
         end
       end

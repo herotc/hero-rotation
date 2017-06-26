@@ -9,6 +9,8 @@
 ## Dependencies: AethysRotation
 
 Settings.lua
+Events.lua
 Warlock.lua
 Destruction.lua
-Events.lua
+Demonology.lua
+

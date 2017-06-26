@@ -215,7 +215,7 @@
       [264]   = false,                          -- Restoration
     -- Warlock
       [265]   = false,                          -- Affliction
-      [266]   = false,                          -- Demonology
+      [266]   = "AethysRotation_Warlock",       -- Demonology
       [267]   = "AethysRotation_Warlock",       -- Destruction
     -- Warrior
       [71]    = "AethysRotation_Warrior",       -- Arms
