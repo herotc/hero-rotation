@@ -101,7 +101,7 @@
       --{PetType,petID,dateEvent,UnitPetGUID,DE_Buffed}
       Pets = {
       },
-      PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal"}
+      PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal",[103673]="DarkGlare"}
     };
   
   
@@ -192,6 +192,21 @@
         if SpellID == 193396 then
           for key, Value in pairs(AC.GuardiansTable.Pets) do
             AC.GuardiansTable.Pets[key][5]=true
+          end
+        end
+      end
+      , "SPELL_CAST_SUCCESS"
+    );
+    
+    --Implosion listener (kill all wild imps)
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        DestGUID, _, _, _, SpellID = select(8, ...);
+        if SpellID == 196277 then
+          for key, Value in pairs(AC.GuardiansTable.Pets) do
+            if AC.GuardiansTable.Pets[key][1]=="Wild Imp" then
+              AC.GuardiansTable.Pets[key]=nil
+            end
           end
         end
       end

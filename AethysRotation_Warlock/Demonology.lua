@@ -112,13 +112,14 @@
   local T202P,T204P = AC.HasTier("T20")
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range=40
+  local BuffCount={["All"]={},["Wild Imp"]={},["Dreadstalker"]={},["Doomguard"]={},["Infernal"]={},["DarkGlare"]={}}
   
   local Consts={
     DoomBaseDuration = 15,
     DoomMaxDuration = 20,
     DemonicEmpowermentDuration = 12,
-    PetDuration={[55659]=12,[99737]=12,[98035]=12,[11859]=25,[89]=25},
-    PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal"}
+    PetDuration={[55659]=12,[99737]=12,[98035]=12,[11859]=25,[89]=25,[103673]=12},
+    PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal",[103673]="DarkGlare"}
   }
   
   -- GUI Settings
@@ -176,6 +177,21 @@
     end
     return countBuffed,countNotBuffed
   end
+  
+  local function GetAllPetBuffed()
+    local countBuffed=0
+    local countNotBuffed=0
+    
+    for key, Value in pairs(BuffCount) do
+      if key=="All" then
+        countBuffed,countNotBuffed=GetPetBuffed()
+        BuffCount[key]={countBuffed,countNotBuffed,countBuffed+countNotBuffed}
+      else
+        countBuffed,countNotBuffed=GetPetBuffed(key)
+        BuffCount[key]={countBuffed,countNotBuffed,countBuffed+countNotBuffed}
+      end
+    end
+  end
 
 --- ======= MAIN =======
   local function APL ()
@@ -183,18 +199,14 @@
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
     RefreshPetsTimers()
+    GetAllPetBuffed()
     
-    local buffed,notbuffed
-    buffed,notbuffed=GetPetBuffed()
-    print("All : ".. buffed.."/"..(buffed+notbuffed))
-    buffed,notbuffed=GetPetBuffed(Consts.PetList[55659])
-    print(Consts.PetList[55659].." : ".. buffed.."/"..(buffed+notbuffed))
-    buffed,notbuffed=GetPetBuffed(Consts.PetList[98035])
-    print(Consts.PetList[98035].." : ".. buffed.."/"..(buffed+notbuffed))
-    buffed,notbuffed=GetPetBuffed(Consts.PetList[11859])
-    print(Consts.PetList[11859].." : ".. buffed.."/"..(buffed+notbuffed))
-    buffed,notbuffed=GetPetBuffed(Consts.PetList[89])
-    print(Consts.PetList[89].." : ".. buffed.."/"..(buffed+notbuffed))
+    -- print("All : ".. BuffCount["All"][1].."/"..(BuffCount["All"][3]))
+    -- print(Consts.PetList[55659].." : ".. BuffCount[Consts.PetList[55659]][1].."/"..(BuffCount[Consts.PetList[55659]][3]))
+    -- print(Consts.PetList[98035].." : ".. BuffCount[Consts.PetList[98035]][1].."/"..(BuffCount[Consts.PetList[98035]][3]))
+    -- print(Consts.PetList[11859].." : ".. BuffCount[Consts.PetList[11859]][1].."/"..(BuffCount[Consts.PetList[11859]][3]))
+    -- print(Consts.PetList[89].." : ".. BuffCount[Consts.PetList[89]][1].."/"..(BuffCount[Consts.PetList[89]][3]))
+    print(Consts.PetList[103673].." : ".. BuffCount[Consts.PetList[103673]][1].."/"..(BuffCount[Consts.PetList[103673]][3]))
     
     -- Defensives
     
@@ -211,10 +223,6 @@
     if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:IsCastable() and not S.ShadowLock:IsLearned() and Cache.EnemiesCount[range]==1 and Player:SoulShards ()>=1 then
       if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
     end
-    -- actions.precombat+=/demonic_empowerment
-    if S.DemonicEmpowerment:IsCastable() and DemonicEmpowermentDuration()<0.3*Consts.DemonicEmpowermentDuration then
-      if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return "Cast"; end
-    end
     
     -- Out of Combat
     if not Player:AffectingCombat() then
@@ -225,6 +233,9 @@
 		
       -- Opener
       if Everyone.TargetIsValid() then
+        if IsPetInvoked() and S.DemonicEmpowerment:IsCastable() and DemonicEmpowermentDuration()<0.3*Consts.DemonicEmpowermentDuration then
+          if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return "Cast"; end
+        end
         -- actions.precombat+=/call_dreadstalkers,if=!equipped.132369
         -- actions.precombat+=/demonbolt,if=equipped.132369
         -- actions.precombat+=/shadow_bolt,if=equipped.132369
@@ -243,6 +254,8 @@
             if AR.Cast(S.ShadowBolt) then return "Cast"; end
           end
         end
+        
+        
       end
       return;
     end
@@ -252,7 +265,7 @@
     end
   end
 
-  -- AR.SetAPL(266, APL);
+  AR.SetAPL(266, APL);
 
 
 --- ======= SIMC =======
