@@ -272,7 +272,7 @@
     end
 
     --  actions.bos+=/howling_blast,if=buff.rime.react&(dot.remorseless_winter.ticking|cooldown.remorseless_winter.remains>gcd|(!equipped.132459&!talent.gathering_storm.enabled))
-    if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and (Player:Buff(S.RemorselessWinter) or S.RemorselessWinter:Cooldown() > Player:GCD()) or ( not I.PerseveranceOfTheEbonMartyre:IsEquipped() and not S.GatheringStorm:IsAvailable()) then
+    if S.HowlingBlast:IsCastable()  and Player:Buff(S.Rime) and ((Player:Buff(S.RemorselessWinter) or S.RemorselessWinter:Cooldown() > Player:GCD()) or ( not I.PerseveranceOfTheEbonMartyre:IsEquipped() and not S.GatheringStorm:IsAvailable())) then
       if AR.Cast(S.HowlingBlast) then return ""; end
     end
 
