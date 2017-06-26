@@ -137,7 +137,6 @@
   end
   
   local function DemonicEmpowermentDuration()
-  --TODO : manage guardians
     if not IsPetActive() then
       return 0
     end
@@ -157,6 +156,21 @@
         AC.GuardiansTable.Pets[key]=nil
       end
     end
+  end
+  
+  local function GetPetRemains(PetType)
+    if not PetType then
+      return 0
+    end
+    local maxduration=0.0
+    for key, Value in pairs(AC.GuardiansTable.Pets) do
+      if AC.GuardiansTable.Pets[key][1]==PetType then
+        if (Consts.PetDuration[AC.GuardiansTable.Pets[key][2]] - (GetTime() - AC.GuardiansTable.Pets[key][3])) > maxduration then
+          maxduration=(Consts.PetDuration[AC.GuardiansTable.Pets[key][2]] - (GetTime() - AC.GuardiansTable.Pets[key][3]))
+        end
+      end
+    end
+    return maxduration
   end
 
   local function GetPetBuffed(PetType)
@@ -206,8 +220,8 @@
     -- print(Consts.PetList[98035].." : ".. BuffCount[Consts.PetList[98035]][1].."/"..(BuffCount[Consts.PetList[98035]][3]))
     -- print(Consts.PetList[11859].." : ".. BuffCount[Consts.PetList[11859]][1].."/"..(BuffCount[Consts.PetList[11859]][3]))
     -- print(Consts.PetList[89].." : ".. BuffCount[Consts.PetList[89]][1].."/"..(BuffCount[Consts.PetList[89]][3]))
-    print(Consts.PetList[103673].." : ".. BuffCount[Consts.PetList[103673]][1].."/"..(BuffCount[Consts.PetList[103673]][3]))
-    
+    -- print(Consts.PetList[103673].." : ".. BuffCount[Consts.PetList[103673]][1].."/"..(BuffCount[Consts.PetList[103673]][3]))
+    -- print(GetPetRemains(Consts.PetList[55659]))
     -- Defensives
     
     --Precombat
@@ -265,7 +279,7 @@
     end
   end
 
-  AR.SetAPL(266, APL);
+  -- AR.SetAPL(266, APL);
 
 
 --- ======= SIMC =======
