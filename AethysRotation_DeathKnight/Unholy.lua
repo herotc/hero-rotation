@@ -128,7 +128,7 @@
   if AR.Cast(S.ChainsOfIce) then return ""; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4 -- Player:Rune() > 1 (SR cost)
- if S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:Cooldown() < 4 and Player:Runes() >= 1 then
+ if S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:Cooldown() < 4 then
   if AR.Cast(S.SoulReaper) then return ""; end
  end
   --actions.generic+=/apocalypse,if=debuff.festering_wound.stack>=6
@@ -148,27 +148,27 @@
   if AR.Cast(S.DeathCoil) then return ""; end
  end
   --actions.generic+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<=6
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and S.Apocalypse:Cooldown() <= 6 and Player:Runes() >= 2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and S.Apocalypse:Cooldown() <= 6 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=3
- if S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:Runes() >= 1 then
+ if S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 3 then
   if AR.Cast(S.SoulReaper) then return ""; end
  end
   --actions.generic+=/festering_strike,if=debuff.soul_reaper.up&!debuff.festering_wound.up
- if S.FesteringStrike:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and not Target:Debuff(S.FesteringWounds) and Player:Runes() >= 2 then
+ if S.FesteringStrike:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and not Target:Debuff(S.FesteringWounds) then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end
   --actions.generic+=/scourge_strike,if=debuff.soul_reaper.up&debuff.festering_wound.stack>=1
- if S.ScourgeStrike:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:DebuffStack(S.FesteringWounds) >= 1 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end
   --actions.generic+=/clawing_shadows,if=debuff.soul_reaper.up&debuff.festering_wound.stack>=1
- if S.ClawingShadows:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:DebuffStack(S.FesteringWounds) >= 1 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
   --actions.generic+=/defile
- if S.Defile:IsAvailable() and S.Defile:IsCastable() and Player:Runes() >= 1 then
+ if S.Defile:IsAvailable() and S.Defile:IsCastable() then
   if AR.Cast(S.Defile) then return ""; end
   end
   return false;
@@ -215,7 +215,7 @@ end
 --Instructors Fourth Lesson
 local function Instructors()
 --actions.instructors=festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 2 and Player:RunicPowerDeficit() > 5 and Player:Runes() >=2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 2 and Player:RunicPowerDeficit() > 5 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end 
 --actions.instructors+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
@@ -223,19 +223,19 @@ if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsA
  if AR.Cast(S.DeathCoil) then return ""; end --TODO: maybe add sudden_doom buff condition and RP >= 35
  end 
 --actions.instructors+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
 --actions.instructors+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
- if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
 -- actions.instructors+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end
 --actions.instructors+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=3&runic_power.deficit>9
- if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 3 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
 --actions.instructors+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=3&runic_power.deficit>9
@@ -280,19 +280,19 @@ end
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
 --actions.standard+=/scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() >9 and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() >9 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
 --actions.standard+=/clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
- if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.NecrosisBuff) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end 
 --actions.standard+=/scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
- if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
 --actions.standard+=/clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>9
- if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.FesteringWounds) >= 1 and Player:RunicPowerDeficit() > 9 then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end 
 --actions.standard+=/scourge_strike,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>9
@@ -332,29 +332,29 @@ local function DarkArbiter()
   if AR.Cast(S.Apocalypse) then return ""; end
  end 
  --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
- if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) and Player:RunicPower() < 35 and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
 --actions.valkyr=death_coil
- if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 35 then
+ if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 45 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
  
 --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=3
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 and Player:RunicPower() < 35 and Player:Runes() >= 2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end
  -- less festering wounds needed if valkyr is active and dc is usable with t194 pc
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 1 and Player:RunicPower() < 35 and Player:Runes() >= 2 and AC.Tier19_4Pc then
-  if AR.Cast(S.FesteringStrike) then return ""; end
- end
+ --if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 1 and Player:RunicPower() < 35 and Player:Runes() >= 2 and AC.Tier19_4Pc then
+  --if AR.Cast(S.FesteringStrike) then return ""; end
+ --end
 --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<8&cooldown.apocalypse.remains<5
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and Player:RunicPower() < 35 and S.Apocalypse:Cooldown() < 6 and Player:Runes() >= 2 then
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6  and S.Apocalypse:Cooldown() < 6 then
   if AR.Cast(S.FesteringStrike) then return ""; end
  end 
 
  --actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
- if S.ScourgeStrike:IsCastable() and Target:Debuff(S.FesteringWounds) and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Target:Debuff(S.FesteringWounds) then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
  
@@ -366,23 +366,23 @@ end
 local function AOE()
  if  AR.AoEON() then
 --actions.aoe=death_and_decay,if=spell_targets.death_and_decay>=2
- if S.DeathAndDecay:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Runes() >= 1 then
+ if S.DeathAndDecay:IsCastable() and Cache.EnemiesCount[10] >= 2 then
   if AR.Cast(S.DeathAndDecay) then return ""; end
  end
 --actions.aoe+=/epidemic,if=spell_targets.epidemic>4
- if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 4 and Player:Runes() >= 1 then
+ if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 4 then
   if AR.Cast(S.Epidemic) then return ""; end
  end 
 --actions.aoe+=/scourge_strike,if=spell_targets.scourge_strike>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
- if S.ScourgeStrike:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() >= 1 then
+ if S.ScourgeStrike:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
 --actions.aoe+=/clawing_shadows,if=spell_targets.clawing_shadows>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
- if S.ClawingShadows:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() >= 1 then
+ if S.ClawingShadows:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
 --actions.aoe+=/epidemic,if=spell_targets.epidemic>2
- if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 2 and Player:Runes() >= 1 then
+ if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 2 then
   if AR.Cast(S.Epidemic) then return ""; end
  end
    return false;
