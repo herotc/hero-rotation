@@ -120,7 +120,7 @@
   local Consts={
     DoomBaseDuration = 15,
     DoomMaxDuration = 20,
-    DemonicEmpowermentDuration = 12,
+    DemonicEmpowermentMaxDuration = 12,
     PetDuration={[55659]=12,[99737]=12,[98035]=12,[11859]=25,[89]=25,[103673]=12},
     PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal",[103673]="DarkGlare"}
   }
@@ -236,11 +236,14 @@
   local function UpdateVars()
     -- local var_3min, var_no_de1, var_no_de2
 	-- actions+=/variable,name=3min,value=doomguard_no_de>0|infernal_no_de>0
-	var_3min = ((BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]==0) and 1 or 0) or ((BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]==0) and 1 or 0)
+	var_3min = (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) or (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0)
 	-- actions+=/variable,name=no_de1,value=dreadstalker_no_de>0|darkglare_no_de>0|doomguard_no_de>0|infernal_no_de>0|service_no_de>0
-	var_no_de1 = ((BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]==0) and 1 or 0) or ((BuffCount["DarkGlare"][3]>0 and BuffCount["DarkGlare"][2]==0) and 1 or 0) or ((BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]==0) and 1 or 0) or ((BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]==0) and 1 or 0) or (IsPetInvoked() and DemonicEmpowermentDuration()==0)
-	-- actions+=/variable,name=no_de2,value=(variable.3min&service_no_de>0)|(variable.3min&wild_imp_no_de>0)|(variable.3min&dreadstalker_no_de>0)|(service_no_de>0&dreadstalker_no_de>0)|(service_no_de>0&wild_imp_no_de>0)|(dreadstalker_no_de>0&wild_imp_no_de>0)|(prev_gcd.1.hand_of_guldan&variable.no_de1)
-	var_no_de2 = (var_3min and (IsPetInvoked() and DemonicEmpowermentDuration()==0)) or (var_3min and ((BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]==0) and 1 or 0)) or (var_3min and ((BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]==0) and 1 or 0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and ((BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]==0) and 1 or 0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and ((BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]==0) and 1 or 0)) or (((BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]==0) and 1 or 0) and ((BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]==0) and 1 or 0)) or (Player:PrevGCD(1,S.HandOfGuldan) and var_no_de1) 
+  -- print(BuffCount["DarkGlare"][1],BuffCount["DarkGlare"][2],BuffCount["DarkGlare"][3])
+  -- print ((BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0) , (BuffCount["DarkGlare"][3]>0 and BuffCount["DarkGlare"][2]>0) , (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) , (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0) , (IsPetInvoked() and DemonicEmpowermentDuration()==0))
+	var_no_de1 = (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0) or (BuffCount["DarkGlare"][3]>0 and BuffCount["DarkGlare"][2]>0) or (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) or (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0) or (IsPetInvoked() and DemonicEmpowermentDuration()==0)
+	-- print(var_no_de1)
+  -- actions+=/variable,name=no_de2,value=(variable.3min&service_no_de>0)|(variable.3min&wild_imp_no_de>0)|(variable.3min&dreadstalker_no_de>0)|(service_no_de>0&dreadstalker_no_de>0)|(service_no_de>0&wild_imp_no_de>0)|(dreadstalker_no_de>0&wild_imp_no_de>0)|(prev_gcd.1.hand_of_guldan&variable.no_de1)
+	var_no_de2 = (var_3min and (IsPetInvoked() and DemonicEmpowermentDuration()==0)) or (var_3min and (BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0)) or (var_3min and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and (BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0)) or ((BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0) and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or (Player:PrevGCD(1,S.HandOfGuldan) and var_no_de1) 
   end
 
 --- ======= MAIN =======
@@ -284,7 +287,7 @@
 		
       -- Opener
       if Everyone.TargetIsValid() then
-        if IsPetInvoked() and S.DemonicEmpowerment:IsCastable() and DemonicEmpowermentDuration()<0.3*Consts.DemonicEmpowermentDuration then
+        if IsPetInvoked() and S.DemonicEmpowerment:IsCastable() and DemonicEmpowermentDuration()<0.3*Consts.DemonicEmpowermentMaxDuration then
           if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return "Cast"; end
         end
         -- actions.precombat+=/call_dreadstalkers,if=!equipped.132369
@@ -422,14 +425,15 @@
 		end
 		
 		-- actions+=/hand_of_guldan,if=(soul_shard>=3&prev_gcd.1.call_dreadstalkers&!artifact.thalkiels_ascendance.rank)|soul_shard>=5|(soul_shard>=4&cooldown.summon_darkglare.remains>2)
-		if S.HandOfGuldan:IsCastable() and 
-			((Player:SoulShards()>=3 and Player:PrevGCD(1,S.CallDreadStalkers) and not S.ThalkielsAscendance:ArtifactRank()>0) or Player:SoulShards()==5 or (Player:SoulShards()>=4 and S.SummonDarkGlare:Cooldown()>2) ) then
+    if S.HandOfGuldan:IsCastable() and 
+			((Player:SoulShards()>=3 and Player:PrevGCD(1,S.CallDreadStalkers) and not (S.ThalkielsAscendance:ArtifactRank() or 0)==0) or Player:SoulShards()==5 or (Player:SoulShards()>=4 and S.SummonDarkGlare:Cooldown()>2) ) then
 			if AR.Cast(S.HandOfGuldan) then return "Cast"; end
 		end
 		
 		-- actions+=/demonic_empowerment,if=(((talent.power_trip.enabled&(!talent.implosion.enabled|spell_targets.demonwrath<=1))|!talent.implosion.enabled|(talent.implosion.enabled&!talent.soul_conduit.enabled&spell_targets.demonwrath<=3))&(wild_imp_no_de>3|prev_gcd.1.hand_of_guldan))|(prev_gcd.1.hand_of_guldan&wild_imp_no_de=0&wild_imp_remaining_duration<=0)|(prev_gcd.1.implosion&wild_imp_no_de>0)
 		if S.DemonicEmpowerment:IsCastable() and ((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range]<=1))or not S.Implosion:IsAvailable() or ( S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range]<=3)) and (BuffCount["Wild Imp"][2]>3 or Player:PrevGCD(1,S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and BuffCount["Wild Imp"][3]==0) or (Player:PrevGCD(1,S.Implosion) and BuffCount["Wild Imp"][2]==0)) then
-			if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return "Cast"; end
+			-- print("de1")
+      if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return "Cast"; end
 		end
 		
 		-- actions+=/demonic_empowerment,if=variable.no_de1|prev_gcd.1.hand_of_guldan
@@ -479,7 +483,7 @@
 		end
 		
 		-- actions+=/demonic_empowerment,if=artifact.thalkiels_ascendance.rank&talent.power_trip.enabled&!talent.demonbolt.enabled&talent.shadowy_inspiration.enabled
-		if S.DemonicEmpowerment:IsCastable() and S.ThalkielsAscendance:ArtifactRank()>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable() then
+		if S.DemonicEmpowerment:IsCastable() and (S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable() then
 			if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return "Cast"; end
 		end
 		
