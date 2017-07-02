@@ -195,7 +195,7 @@
       [64]    = "AethysRotation_Mage",          -- Frost
     -- Monk
       [268]   = false,                          -- Brewmaster
-      [269]   = false,                          -- Windwalker
+      [269]   = "AethysRotation_Monk",          -- Windwalker
       [270]   = false,                          -- Mistweaver
     -- Paladin
       [65]    = false,                          -- Holy
