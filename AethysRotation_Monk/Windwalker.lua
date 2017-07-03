@@ -104,36 +104,13 @@ local Settings = {
 };
 
 -- Functions --
-local function LowestReadyTime(arg)
-	local SpellList = {
-
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.07,
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.06,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.05,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.04,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.03,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.02,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.01,
-		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.0,
-
-	};
-
-	local SpellName = next(SpellList)
-	local ReadyTime = SpellList[SpellName]
-
-	for k, v in pairs(SpellList) do
-	    if SpellList[k] < ReadyTime then
-	        SpellName, ReadyTime = k, v
-	    end
-	end
-		return SpellName;
-end
 
 function Spell:ReadyTime(Index)
 	-- WDP Check
 	if self == S.WhirlingDragonPunch then
-		if S.RisingSunKick:CooldownRemains() > Player:CastRemains() and
-		S.FistsOfFury:CooldownRemains() > Player:CastRemains() then
+		if S.WhirlingDragonPunch:IsReadyPredicted() and
+		S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
+		S.FistsOfFury:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() then
 			return self:CooldownRemainsPredicted();
 		else
 			return 999; end
@@ -161,11 +138,36 @@ end
 function Spell:IsReadyPredicted(Index)
 	if not self:IsLearned() or not self:IsAvailable() then return false; end
 		if Player:IsCasting() or Player:IsChanneling() then
-			return (not self:IsOnCooldown() or self:CooldownRemainsPredicted() < Player:CastRemains()) and
+			return (not self:IsOnCooldown() or self:CooldownRemains() < Player:CastRemains()) and
 			(self:IsUsable() or self:ReadyTime(Index) < Player:CastRemains());
 		else
 			return self:IsUsable() and not self:IsOnCooldown();
 		end
+end
+
+local function LowestReadyTime(arg)
+	local SpellList = {
+
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.007,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.006,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.005,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.004,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.003,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.002,
+		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.001,
+		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.0,
+
+	};
+
+	local SpellName = next(SpellList)
+	local ReadyTime = SpellList[SpellName]
+
+	for k, v in pairs(SpellList) do
+	    if SpellList[k] < ReadyTime then
+	        SpellName, ReadyTime = k, v
+	    end
+	end
+		return SpellName;
 end
 
 -- Action Lists --
@@ -174,7 +176,7 @@ local function single_target ()
 	-- actions.st=call_action_list,name=cd
 	-- actions.st+=/energizing_elixir,if=chi<=1&(cooldown.rising_sun_kick.remains=0|(artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains=0)|energy<50)
 	if S.EnergizingElixir:IsReadyPredicted() and Player:Chi() <= 1 and Player:EnergyDeficitPredicted() >= 20 and
-	(S.RisingSunKick:CooldownRemainsPredicted() <= 0 or (S.StrikeOfTheWindlord:IsAvailable() and S.StrikeOfTheWindlord:CooldownRemainsPredicted() <= 0)) then
+	(S.RisingSunKick:CooldownRemainsPredicted() == 0 or (S.StrikeOfTheWindlord:IsAvailable() and S.StrikeOfTheWindlord:CooldownRemainsPredicted() == 0)) then
 		if AR.Cast(S.EnergizingElixir) then return ""; end
 	end
 	-- actions.st+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
@@ -214,8 +216,8 @@ local function single_target ()
   end
 	-- actions.st+=/whirling_dragon_punch
 	if S.WhirlingDragonPunch:IsReadyPredicted() and
-	S.RisingSunKick:CooldownRemainsPredicted() > (S.WhirlingDragonPunch:CooldownRemainsPredicted() + Player:GCDRemains()) and
-	S.FistsOfFury:CooldownRemainsPredicted() > (S.WhirlingDragonPunch:CooldownRemainsPredicted() + Player:GCDRemains()) then
+	S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
+	S.FistsOfFury:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() then
 		if AR.Cast(S.WhirlingDragonPunch) then return ""; end
 	end
 	-- actions.st+=/crackling_jade_lightning,if=equipped.the_emperors_capacitor&buff.the_emperors_capacitor.stack>=19&energy.time_to_max>3
@@ -243,7 +245,7 @@ local function single_target ()
 	if S.BlackoutKick:IsReadyPredicted() and (Player:Chi() > 1 or Player:Buff(S.BlackoutKickBuff) or
   (S.EnergizingElixir:IsAvailable() and S.EnergizingElixir:CooldownRemainsPredicted() < S.FistsOfFury:CooldownRemainsPredicted())) and
   ((S.RisingSunKick:CooldownRemainsPredicted() > 1 and (not S.StrikeOfTheWindlord:IsAvailable() or S.StrikeOfTheWindlord:CooldownRemainsPredicted() > 1) or Player:Chi() > 2) and
-  (S.FistsOfFury:CooldownRemainsPredicted() > 1 or Player:Chi() > 2) or Player:PrevGCD(1, S.TigerPalm)) and Player:EnergyTimeToMaxPredicted() > 0.5 and not Player:PrevGCD(1, S.BlackoutKick) then
+  (S.FistsOfFury:CooldownRemainsPredicted() > 1 or Player:Chi() > 3) or Player:PrevGCD(1, S.TigerPalm)) and not Player:PrevGCD(1, S.BlackoutKick) then
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
 	-- downtime_prediction
@@ -252,10 +254,10 @@ local function single_target ()
 end
 
 local function sef ()
-  -- -- actions.sef=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
-  -- if S.TigerPalm:IsReadyPredicted() and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyPercentage() == 100 and Player:Chi() < 1 then
-  --     if AR.Cast(S.TigerPalm) then return ""; end
-  --   end
+  -- actions.sef=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
+  if S.TigerPalm:IsReadyPredicted() and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() == 0 and Player:Chi() < 1 then
+      if AR.Cast(S.TigerPalm) then return ""; end
+    end
   -- actions.sef+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
   if S.ArcaneTorrent:IsReadyPredicted() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5 then
     if AR.CastSuggested(S.ArcaneTorrent) then return ""; end
