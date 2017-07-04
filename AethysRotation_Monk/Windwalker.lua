@@ -105,11 +105,14 @@ local Settings = {
 
 -- Functions --
 
+local function AvoidCap()
+	return S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2;
+end
+
 function Spell:ReadyTime(Index)
 	-- WDP Check
 	if self == S.WhirlingDragonPunch then
-		if S.WhirlingDragonPunch:IsReadyPredicted() and
-		S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
+		if S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
 		S.FistsOfFury:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() then
 			return self:CooldownRemainsPredicted();
 		else
@@ -123,13 +126,13 @@ function Spell:ReadyTime(Index)
 			return 999; end
 	end
 	if self:Cost(Index) == 0 then return self:CooldownRemainsPredicted(); end
-	if self:IsReady() then return 0; end
+	if self:IsReady() and AvoidCap() == false then return 0; end
 	-- Energy Check
 	if self:Cost(Index) and self:CostInfo(1,"type") == 3 then
     return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen(); end
 	-- Chi Check
 	if self:Cost(Index) and self:CostInfo(1,"type") == 12 then
-		if self:IsUsable() and self:IsOnCooldown() then
+		if self:IsUsable() and self:IsOnCooldown() and AvoidCap() == false then
 			return self:CooldownRemainsPredicted()
 		else return  999; end
 	end
@@ -138,8 +141,7 @@ end
 function Spell:IsReadyPredicted(Index)
 	if not self:IsLearned() or not self:IsAvailable() then return false; end
 		if Player:IsCasting() or Player:IsChanneling() then
-			return (not self:IsOnCooldown() or self:CooldownRemains() < Player:CastRemains()) and
-			(self:IsUsable() or self:ReadyTime(Index) < Player:CastRemains());
+			return self:ReadyTime(Index) <= Player:CastRemains();
 		else
 			return self:IsUsable() and not self:IsOnCooldown();
 		end
@@ -148,9 +150,9 @@ end
 local function LowestReadyTime(arg)
 	local SpellList = {
 
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.007,
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.006,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.005,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.070,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.060,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.050,
 		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.004,
 		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.003,
 		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.002,
@@ -188,12 +190,12 @@ local function single_target ()
     if AR.Cast(S.TigerPalm) then return ""; end
   end
 	-- actions.st+=/strike_of_the_windlord,if=!talent.serenity.enabled|cooldown.serenity.remains>=10
-	if S.StrikeOfTheWindlord:IsReadyPredicted() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 10 then
+	if S.StrikeOfTheWindlord:IsReadyPredicted() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 10 and AvoidCap() == false then
     if AR.Cast(S.StrikeOfTheWindlord) then return ""; end
   end
 	-- actions.st+=/rising_sun_kick,cycle_targets=1,if=((chi>=3&energy>=40)|chi>=5)&(!talent.serenity.enabled|cooldown.serenity.remains>=6)
   if S.RisingSunKick:IsReadyPredicted() and ((Player:Chi() >= 3 and Player:EnergyPredicted() >= 40) or Player:Chi() == 5) and
-	(not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 6) then
+	(not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 6) and AvoidCap() == false then
     if AR.Cast(S.RisingSunKick) then return ""; end
   end
 	-- actions.st+=/fists_of_fury,if=talent.serenity.enabled&!equipped.drinking_horn_cover&cooldown.serenity.remains>=5&energy.time_to_max>2
@@ -211,7 +213,7 @@ local function single_target ()
     if AR.Cast(S.FistsOfFury) then return ""; end
   end
 	-- actions.st+=/rising_sun_kick,cycle_targets=1,if=!talent.serenity.enabled|cooldown.serenity.remains>=5
-  if S.RisingSunKick:IsReadyPredicted() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 5 then
+  if S.RisingSunKick:IsReadyPredicted() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 5 and AvoidCap() == false then
     if AR.Cast(S.RisingSunKick) then return ""; end
   end
 	-- actions.st+=/whirling_dragon_punch
@@ -231,7 +233,7 @@ local function single_target ()
     if AR.Cast(S.CracklingJadeLightning) then return ""; end
   end
 	-- actions.st+=/spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
-  if S.SpinningCraneKick:IsReadyPredicted() and ((AR.AoEON() and Cache.EnemiesCount[8] >= 3) or GetSpellCount("Spinning Crane Kick") >= 3) and
+  if S.SpinningCraneKick:IsReadyPredicted() and Cache.EnemiesCount[8] >= 3 and GetSpellCount("Spinning Crane Kick") >= 2 and
 	not Player:PrevGCD(1, S.SpinningCraneKick) then
     if AR.Cast(S.SpinningCraneKick) then return ""; end
   end
@@ -255,7 +257,7 @@ end
 
 local function sef ()
   -- actions.sef=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
-  if S.TigerPalm:IsReadyPredicted() and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() == 0 and Player:Chi() < 1 then
+  if S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0 and Player:Chi() < 1 then
       if AR.Cast(S.TigerPalm) then return ""; end
     end
   -- actions.sef+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
