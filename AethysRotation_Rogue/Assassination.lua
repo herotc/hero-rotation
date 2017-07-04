@@ -306,6 +306,10 @@ local function CDs ()
     if S.Exsanguinate:IsCastable() and S.Rupture:TimeSinceLastDisplay() < 2 and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
       if AR.Cast(S.Exsanguinate) then return "Cast"; end
     end
+    -- actions.cds+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)&dot.rupture.remains>8
+    if S.ToxicBlade:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > Player:GCDRemains() + 0.2 and 1 or 0) and Target:DebuffRemains(S.Rupture) > 8 then
+      if AR.Cast(S.ToxicBlade) then return "Cast"; end
+    end
   end
   return false;
 end
@@ -339,13 +343,8 @@ local function Kingsbane ()
       or (S.Nighstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc))) then
     if AR.Cast(S.Kingsbane) then return "Cast"; end
   end
-  -- actions.kb+=/kingsbane,if=!talent.exsanguinate.enabled&buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
-  if not S.Exsanguinate:IsAvailable() and Player:Buff(S.Envenom)
-    and ((Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)) or S.Vendetta:CooldownRemains() <= 5.8 or S.Vendetta:CooldownRemains() >= 10) then
-    if AR.Cast(S.Kingsbane) then return "Cast"; end
-  end
-  -- actions.kb+=/kingsbane,if=talent.exsanguinate.enabled&dot.rupture.exsanguinated
-  if S.Exsanguinate:IsAvailable() and AC.Exsanguinated(Target, "Rupture") then
+  -- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
+  if Player:Buff(S.Envenom) and ((Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)) or S.Vendetta:CooldownRemains() <= 5.8 or S.Vendetta:CooldownRemains() >= 10) then
     if AR.Cast(S.Kingsbane) then return "Cast"; end
   end
 end
@@ -405,14 +404,14 @@ local function Maintain ()
   end
   -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=gcd.remains+0.2&target.time_to_die>6
   if S.Rupture:IsCastable() and Target:IsInRange(5) and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
-    and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= Player:GCDRemains() + 0.2 
+    and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= Player:GCDRemains() + 0.2
     and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
   -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
   -- TODO: Test 4-5 cp rupture for Exsg
-  if AR.CDsON() and S.Rupture:IsCastable() and Target:IsInRange(5) and S.Exsanguinate:IsAvailable() and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemains() < 1) 
+  if AR.CDsON() and S.Rupture:IsCastable() and Target:IsInRange(5) and S.Exsanguinate:IsAvailable() and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemains() < 1)
     or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
@@ -471,10 +470,6 @@ local function Maintain ()
         AR.CastLeftNameplate(BestUnit, S.Garrote);
       end
     end
-  end
-  -- actions.maintain+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)&dot.rupture.remains>8
-  if S.ToxicBlade:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > Player:GCDRemains() + 0.2 and 1 or 0) and Target:DebuffRemains(S.Rupture) > 8 then
-    if AR.Cast(S.ToxicBlade) then return "Cast"; end
   end
 end
 local SappedSoulSpells = {
@@ -622,7 +617,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 06/14/2017
+-- Last Update: 07/04/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -668,6 +663,7 @@ AR.SetAPL(259, APL);
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!equipped.mantle_of_the_master_assassin&!stealthed.rogue&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
 -- actions.cds+=/vanish,if=talent.shadow_focus.enabled&variable.energy_time_to_max_combined>=2&combo_points.deficit>=4
 -- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
+-- actions.cds+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)&dot.rupture.remains>8
 
 -- # Finishers
 -- actions.finish=death_from_above,if=combo_points>=5
@@ -677,8 +673,7 @@ AR.SetAPL(259, APL);
 -- # Kingsbane
 -- # Sinister Circulation makes it worth to cast Kingsbane on CD exceot if you're [stealthed w/ Nighstalker and have Mantle & T19_4PC to Envenom] or before vendetta if you have mantle during the opener.
 -- actions.kb=kingsbane,if=artifact.sinister_circulation.enabled&!(equipped.duskwalkers_footpads&equipped.convergence_of_fates&artifact.master_assassin.rank>=6)&(time>25|!equipped.mantle_of_the_master_assassin|(debuff.vendetta.up&debuff.surge_of_toxins.up))&(talent.subterfuge.enabled|!stealthed.rogue|(talent.nightstalker.enabled&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)))
--- actions.kb+=/kingsbane,if=!talent.exsanguinate.enabled&buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
--- actions.kb+=/kingsbane,if=talent.exsanguinate.enabled&dot.rupture.exsanguinated
+-- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
 
 -- # Maintain
 -- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(talent.exsanguinate.enabled|target.time_to_die-remains>4)
@@ -690,4 +685,3 @@ AR.SetAPL(259, APL);
 -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)
 -- actions.maintain+=/pool_resource,for_next=1
 -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
--- actions.maintain+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)&dot.rupture.remains>8
