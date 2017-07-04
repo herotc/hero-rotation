@@ -93,7 +93,7 @@
     Concordance         = Spell(242586),
     DemonicCallingBuff  = Spell(205146),
     GrimoireOfSynergyBuff = Spell(171982),
-	ShadowyInspiration = Spell(196606),
+    ShadowyInspirationBuff = Spell(196606),
     -- Macros
     
   };
@@ -398,7 +398,7 @@
 		--todo
 		
 		-- actions+=/shadow_bolt,if=buff.shadowy_inspiration.remains&soul_shard<5&!prev_gcd.1.doom&!variable.no_de2
-		if S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspiration) and GetFutureShard()<5 and not Player:PrevGCD(1,S.Doom) and not var_no_de2 then
+		if S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspirationBuff) and GetFutureShard()<5 and not Player:PrevGCD(1,S.Doom) and not var_no_de2 then
 			if AR.Cast(S.ShadowBolt) then return "Cast"; end
 		end
 		
@@ -481,7 +481,7 @@
 		end
 		
 		-- actions+=/shadow_bolt,if=buff.shadowy_inspiration.remains
-		if not S.Demonbolt:IsAvailable() and S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspiration) then
+		if not S.Demonbolt:IsAvailable() and S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspirationBuff) then
 			if AR.Cast(S.ShadowBolt) then return "Cast"; end
 		end
 
