@@ -460,7 +460,7 @@
 		end
 		
 		-- actions+=/thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time | talent.implosion.enabled & spell_targets.implosion>=3) & wild_imp_count>3 & wild_imp_remaining_duration>execute_time
-		if S.TalkielConsumption:IsAvailable() and S.TalkielConsumption:IsCastable() and (GetPetRemains("Dreadstalker")>S.TalkielConsumption:ExecuteTime() or (S.Implosion:IsAvailable() and Cache.EnemiesCount[range]>=3)) and  BuffCount["Wild Imp"][3]>3 and GetPetRemains("Wild Imp")>S.TalkielConsumption:ExecuteTime() then
+		if S.TalkielConsumption:IsAvailable() and S.TalkielConsumption:IsCastable() and not (Player:IsCasting() and Player:CastID()==S.TalkielConsumption:ID()) and (GetPetRemains("Dreadstalker")>S.TalkielConsumption:ExecuteTime() or (S.Implosion:IsAvailable() and Cache.EnemiesCount[range]>=3)) and  BuffCount["Wild Imp"][3]>3 and GetPetRemains("Wild Imp")>S.TalkielConsumption:ExecuteTime() then
 			if AR.Cast(S.TalkielConsumption) then return "Cast"; end
 		end
 		
