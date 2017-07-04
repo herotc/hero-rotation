@@ -127,6 +127,16 @@
   AR.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
       if Event == "ADDON_LOADED" then
         if Arg1 == "AethysRotation" then
+          -- Panels
+          if type(AethysRotationDB) ~= "table" then
+            AethysRotationDB = {};
+          end
+          if type(AethysRotationDB.GUISettings) ~= "table" then
+            AethysRotationDB.GUISettings = {};
+          end
+          AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+          AR.GUI.CorePanelSettingsInit();
+          -- UI
           if AethysRotationDB and AethysRotationDB.IconFramePos then
             AR.MainFrame:SetPoint(AethysRotationDB.IconFramePos[1], _G[AethysRotationDB.IconFramePos[2]], AethysRotationDB.IconFramePos[3], AethysRotationDB.IconFramePos[4], AethysRotationDB.IconFramePos[5]);
           else
@@ -157,14 +167,7 @@
             AR.SuggestedIconFrame,
             AR.ToggleIconFrame
           };
-          if type(AethysRotationDB) ~= "table" then
-            AethysRotationDB = {};
-          end
-          if type(AethysRotationDB.GUISettings) ~= "table" then
-            AethysRotationDB.GUISettings = {};
-          end
-          AR.GUI.LoadSettingsRecursively(AR.GUISettings);
-          AR.GUI.CorePanelSettingsInit();
+          -- Modules
           C_Timer.After(2, function ()
               AR.MainFrame:UnregisterEvent("ADDON_LOADED");
               AR.PulsePreInit();
