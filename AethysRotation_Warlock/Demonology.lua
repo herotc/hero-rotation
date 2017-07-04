@@ -324,12 +324,12 @@
     -- In Combat
     if Everyone.TargetIsValid() then
 		-- actions=implosion,if=wild_imp_remaining_duration<=action.shadow_bolt.execute_time&(buff.demonic_synergy.remains|talent.soul_conduit.enabled|(!talent.soul_conduit.enabled&spell_targets.implosion>1)|wild_imp_count<=4)
-		if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and BuffCount["Wild Imp"][3]>0 and (GetPetRemains("Wild Imp")<=S.ShadowBolt:ExecuteTime() or (Player:IsCasting() and GetPetRemains("Wild Imp")<=(Player:CastRemains()+Player:GCD()+S.ShadowBolt:ExecuteTime()))) and (Player:Buff(S.GrimoireOfSynergyBuff) or S.SoulConduit:IsAvailable() or (not S.SoulConduit:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range]>1)) or BuffCount["Wild Imp"][3]<=4) then
+		if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and BuffCount["Wild Imp"][3]>0 and (GetPetRemains("Wild Imp")<=S.ShadowBolt:ExecuteTime() or (Player:IsCasting() and GetPetRemains("Wild Imp")<=(Player:CastRemains()+Player:GCD()+S.ShadowBolt:ExecuteTime()))) and (Player:Buff(S.GrimoireOfSynergyBuff) or S.SoulConduit:IsAvailable() or (not S.SoulConduit:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range]>1)) or BuffCount["Wild Imp"][3]<=4) and not (Player:IsCasting() and (Player:CastRemains()+Player:GCD())>=GetPetRemains("Wild Imp")) then
 			if AR.Cast(S.Implosion) then return "Cast"; end
 		end
 		
 		-- actions+=/implosion,if=prev_gcd.1.hand_of_guldan&((wild_imp_remaining_duration<=3&buff.demonic_synergy.remains)|(wild_imp_remaining_duration<=4&spell_targets.implosion>2))
-		if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and Player:PrevGCD(1,S.HandOfGuldan) and ((GetPetRemains("Wild Imp")<=3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp")<=4 and Cache.EnemiesCount[range]>2)) then
+		if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and Player:PrevGCD(1,S.HandOfGuldan) and ((GetPetRemains("Wild Imp")<=3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp")<=4 and Cache.EnemiesCount[range]>2))  and not (Player:IsCasting() and (Player:CastRemains()+Player:GCD())>=GetPetRemains("Wild Imp")) then
 			if AR.Cast(S.Implosion) then return "Cast"; end
 		end
 		
