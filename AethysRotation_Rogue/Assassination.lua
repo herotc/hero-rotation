@@ -247,16 +247,16 @@ local function CDs ()
     if Target:Debuff(S.Vendetta) then
       -- actions.cds+=/blood_fury,if=debuff.vendetta.up
       if S.BloodFury:IsCastable() then
-        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
       end
       -- actions.cds+=/berserking,if=debuff.vendetta.up
       if S.Berserking:IsCastable() then
-        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
       end
       -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
       -- Note: Temporarly modified the conditions
       if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 15 + Energy_Regen_Combined() * Player:GCDRemains() * 1.1 then
-        if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+        if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
       end
     end
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
@@ -522,11 +522,11 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
   -- Poisons
     -- Lethal Poison
-    if Player:BuffRemains(S.DeadlyPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.WoundPoison) < Settings.Assassination.PoisonRefresh then
+    if Player:BuffRemains(S.DeadlyPoison) < Settings.Assassination.PoisonRefresh*60 and Player:BuffRemains(S.WoundPoison) < Settings.Assassination.PoisonRefresh*60 then
       AR.CastSuggested(S.DeadlyPoison);
     end
     -- Non-Lethal Poison
-    if Player:BuffRemains(S.CripplingPoison) < Settings.Assassination.PoisonRefresh and Player:BuffRemains(S.LeechingPoison) < Settings.Assassination.PoisonRefresh then
+    if Player:BuffRemains(S.CripplingPoison) < Settings.Assassination.PoisonRefresh*60 and Player:BuffRemains(S.LeechingPoison) < Settings.Assassination.PoisonRefresh*60 then
       if S.LeechingPoison:IsAvailable() then
         AR.CastSuggested(S.LeechingPoison);
       else
