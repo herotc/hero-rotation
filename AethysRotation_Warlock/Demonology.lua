@@ -215,13 +215,13 @@
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:CastID()==S.CallDreadStalkers then
+      if Player:CastID()==S.CallDreadStalkers:ID() then
         return Shard-2
-      elseif Player:CastID()==S.HandOfGuldan then
+      elseif Player:CastID()==S.HandOfGuldan:ID() then
         return 0
-      elseif Player:CastID()==S.SummonDoomGuard or Player:CastID()==S.SummonDoomGuardSuppremacy or Player:CastID()==S.SummonInfernal or Player:CastID()==S.SummonInfernalSuppremacy or Player:CastID()==S.GrimoireFelguard or Player:CastID()==S.SummonFelguard then
+      elseif Player:CastID()==S.SummonDoomGuard:ID() or Player:CastID()==S.SummonDoomGuardSuppremacy:ID() or Player:CastID()==S.SummonInfernal:ID() or Player:CastID()==S.SummonInfernalSuppremacy:ID() or Player:CastID()==S.GrimoireFelguard:ID() or Player:CastID()==S.SummonFelguard:ID() then
         return Shard-1
-      elseif Player:CastID()==S.ShadowBolt or Player:CastID()==S.Demonbolt then
+      elseif Player:CastID()==S.ShadowBolt:ID() or Player:CastID()==S.Demonbolt:ID() then
         if Shard==5 then
           return Shard
         else
@@ -294,11 +294,11 @@
         -- actions.precombat+=/demonbolt,if=equipped.132369
         -- actions.precombat+=/shadow_bolt,if=equipped.132369
         if not (I.WilfredsSigil:IsEquipped(11) or I.WilfredsSigil:IsEquipped(12)) then
-          if S.CallDreadStalkers:IsCastable() and Player:SoulShards ()>=2 then
+          if S.CallDreadStalkers:IsCastable() and GetFutureShard()>=2 then
             if AR.Cast(S.CallDreadStalkers) then return "Cast"; end
-          elseif Player:SoulShards () < 2 and S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
+          elseif GetFutureShard() < 2 and S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
             if AR.Cast(S.Demonbolt) then return "Cast"; end
-          elseif Player:SoulShards () < 2 then
+          elseif GetFutureShard() < 2 then
             if AR.Cast(S.ShadowBolt) then return "Cast"; end
           end
         else
@@ -432,7 +432,7 @@
 		
 		-- actions+=/demonic_empowerment,if=(((talent.power_trip.enabled&(!talent.implosion.enabled|spell_targets.demonwrath<=1))|!talent.implosion.enabled|(talent.implosion.enabled&!talent.soul_conduit.enabled&spell_targets.demonwrath<=3))&(wild_imp_no_de>3|prev_gcd.1.hand_of_guldan))|(prev_gcd.1.hand_of_guldan&wild_imp_no_de=0&wild_imp_remaining_duration<=0)|(prev_gcd.1.implosion&wild_imp_no_de>0)
 		-- actions+=/demonic_empowerment,if=variable.no_de1|prev_gcd.1.hand_of_guldan
-    if S.DemonicEmpowerment:IsCastable() and (((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range]<=1))or not S.Implosion:IsAvailable() or ( S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range]<=3)) and (BuffCount["Wild Imp"][2]>3 or Player:PrevGCD(1,S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and BuffCount["Wild Imp"][3]==0) or (Player:PrevGCD(1,S.Implosion) and BuffCount["Wild Imp"][2]==0)) or (var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) or ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable())) then
+    if S.DemonicEmpowerment:IsCastable() and not (Player:IsCasting() and Player:CastID() == S.DemonicEmpowerment:ID()) and (((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range]<=1))or not S.Implosion:IsAvailable() or ( S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range]<=3)) and (BuffCount["Wild Imp"][2]>3 or Player:PrevGCD(1,S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and BuffCount["Wild Imp"][3]==0) or (Player:PrevGCD(1,S.Implosion) and BuffCount["Wild Imp"][2]==0)) or (var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) or ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable())) then
       if AR.Cast(S.DemonicEmpowerment) then return "Cast"; end
 		end
 		
@@ -478,7 +478,7 @@
 		end
 
     -- actions+=/demonic_empowerment,if=artifact.thalkiels_ascendance.rank&talent.power_trip.enabled&!talent.demonbolt.enabled&talent.shadowy_inspiration.enabled
-    if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) then
+    if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not (Player:IsCasting() and Player:CastID() == S.DemonicEmpowerment:ID()) then
       if AR.Cast(S.DemonicEmpowerment) then return "Cast"; end
 		end
 		
