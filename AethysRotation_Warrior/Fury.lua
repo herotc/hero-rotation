@@ -101,7 +101,7 @@ local AR = AethysRotation;
       if AR.Cast(S.OdynsFury) then return ""; end
     end
     -- actions.cooldowns+=/whirlwind,if=spell_targets.whirlwind>4&(buff.enrage.up|cooldown.bloodthirst.remains>1|!rage=100)
-    if AR.AoEON() and S.Whirlwind:IsReady() and Cache.EnemiesCount[8] > 4 and (Player:Buff(S.Enrage) or S.Bloodthirst:CooldownRemains() > 1 or not Player:Rage() >= 100) then
+    if AR.AoEON() and S.Whirlwind:IsReady() and Cache.EnemiesCount[8] > 4 and (Player:Buff(S.Enrage) or S.Bloodthirst:CooldownRemains() > 1 or not Player:Rage() == 100) then
       if AR.Cast(S.Whirlwind) then return ""; end
     end
     -- actions.cooldowns+=/execute
