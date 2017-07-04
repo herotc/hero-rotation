@@ -233,6 +233,14 @@
     end
   end
   
+  local function IsCastingPet()
+    if Player:IsCasting() and (Player:CastID()==S.CallDreadStalkers:ID() or Player:CastID()==S.HandOfGuldan:ID() or Player:CastID()==S.SummonDoomGuard:ID() or Player:CastID()==S.SummonInfernal:ID()) then
+      return true
+    end
+  
+    return false
+  end
+  
   local function UpdateVars()
     -- local var_3min, var_no_de1, var_no_de2
 	-- actions+=/variable,name=3min,value=doomguard_no_de>0|infernal_no_de>0
@@ -432,7 +440,7 @@
 		
 		-- actions+=/demonic_empowerment,if=(((talent.power_trip.enabled&(!talent.implosion.enabled|spell_targets.demonwrath<=1))|!talent.implosion.enabled|(talent.implosion.enabled&!talent.soul_conduit.enabled&spell_targets.demonwrath<=3))&(wild_imp_no_de>3|prev_gcd.1.hand_of_guldan))|(prev_gcd.1.hand_of_guldan&wild_imp_no_de=0&wild_imp_remaining_duration<=0)|(prev_gcd.1.implosion&wild_imp_no_de>0)
 		-- actions+=/demonic_empowerment,if=variable.no_de1|prev_gcd.1.hand_of_guldan
-    if S.DemonicEmpowerment:IsCastable() and not (Player:IsCasting() and Player:CastID() == S.DemonicEmpowerment:ID()) and (((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range]<=1))or not S.Implosion:IsAvailable() or ( S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range]<=3)) and (BuffCount["Wild Imp"][2]>3 or Player:PrevGCD(1,S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and BuffCount["Wild Imp"][3]==0) or (Player:PrevGCD(1,S.Implosion) and BuffCount["Wild Imp"][2]==0)) or (var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) or ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable())) then
+    if S.DemonicEmpowerment:IsCastable() and not (Player:IsCasting() and Player:CastID() == S.DemonicEmpowerment:ID()) and (((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range]<=1))or not S.Implosion:IsAvailable() or ( S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range]<=3)) and (BuffCount["Wild Imp"][2]>3 or Player:PrevGCD(1,S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and BuffCount["Wild Imp"][3]==0) or (Player:PrevGCD(1,S.Implosion) and BuffCount["Wild Imp"][2]==0)) or (var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) or ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) or IsCastingPet()) then
       if AR.Cast(S.DemonicEmpowerment) then return "Cast"; end
 		end
 		
