@@ -326,15 +326,15 @@ local function APL ()
           if AR.CDsON() then
             -- actions.cds+=/blood_fury
             if S.BloodFury:IsCastable() then
-              if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast"; end
+              if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
             end
             -- actions.cds+=/berserking
             if S.Berserking:IsCastable() then
-              if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
+              if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
             end
             -- actions.cds+=/arcane_torrent,if=energy.deficit>40
             if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 40 then
-              if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
+              if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
             end
             -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
             if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
@@ -383,7 +383,7 @@ local function APL ()
               end
               -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
               if S.Shadowmeld:IsCastable() and Ambush_Condition then
-                if AR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Shadowmeld) then return "Cast"; end
+                if AR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
               end
             end
           end
