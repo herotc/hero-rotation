@@ -157,6 +157,14 @@
             AR.SuggestedIconFrame,
             AR.ToggleIconFrame
           };
+          if type(AethysRotationDB) ~= "table" then
+            AethysRotationDB = {};
+          end
+          if type(AethysRotationDB.GUISettings) ~= "table" then
+            AethysRotationDB.GUISettings = {};
+          end
+          AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+          AR.GUI.CorePanelSettingsInit();
           C_Timer.After(2, function ()
               AR.MainFrame:UnregisterEvent("ADDON_LOADED");
               AR.PulsePreInit();

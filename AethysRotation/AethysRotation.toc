@@ -11,6 +11,8 @@
 ## OptionalDeps: AethysTools
 ## SavedVariables: AethysRotationDB
 
+# GUI
+Panels.lua
 
 # API
 Settings.lua
