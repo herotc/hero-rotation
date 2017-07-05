@@ -4,7 +4,12 @@
   local addonName, addonTable = ...;
   -- AethysRotation
   local AR = AethysRotation;
-
+  -- AethysCore
+  local AC = AethysCore;
+  -- File Locals
+  local GUI = AC.GUI;
+  local CreateChildPanel = GUI.CreateChildPanel;
+  local CreatePanelOption = GUI.CreatePanelOption;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
@@ -32,3 +37,17 @@
       }
     },
   };
+
+  AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+
+  -- Child Panels
+  local ARPanel = AR.GUI.Panel;
+  local CP_Priest = CreateChildPanel(ARPanel, "Priest");
+  local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow");
+
+  CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.");
+  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.GCDasOffGCD.Shadowfiend", "Shadowfiend as Off GCD", "Enable if you want to put Shadowfiend shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.GCDasOffGCD.Mindbender", "Mindbender as Off GCD", "Enable if you want to put Mindbender shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.GCDasOffGCD.Shadowform", "Shadowform as Off GCD", "Enable if you want to put Shadowform shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.PowerInfusion", "Power Infusion as Off GCD", "Enable if you want to put Power Infusion shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.Dispersion", "Dispersion Off GCD", "Enable if you want to put Dispersion shown as Off GCD (top icons) instead of Main.");
