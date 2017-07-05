@@ -328,7 +328,7 @@ local function Finish (ReturnSpellOnly)
       end
     end
     -- actions.finish+=/nightblade,cycle_targets=1,if=!talent.death_from_above.enabled&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>8&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
-    if AR.AoEON() and S.DeathfromAbove:IsAvailable() and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff)) and Rogue.MantleDuration() == 0 then
+    if AR.AoEON() and not S.DeathfromAbove:IsAvailable() and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff)) and Rogue.MantleDuration() == 0 then
       BestUnit, BestUnitTTD = nil, 8;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Nightblade))
