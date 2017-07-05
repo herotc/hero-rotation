@@ -31,9 +31,7 @@
         PowerInfusion = {true, false},
         Dispersion = {true, false},
         -- Racials
-        ArcaneTorrent = {true, false},
-        Berserking = {true, false},
-        BloodFury = {true, false},
+        Racials = {true, false},
       }
     },
   };
@@ -51,3 +49,4 @@
   CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.GCDasOffGCD.Shadowform", "Shadowform as Off GCD", "Enable if you want to put Shadowform shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.PowerInfusion", "Power Infusion as Off GCD", "Enable if you want to put Power Infusion shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.Dispersion", "Dispersion Off GCD", "Enable if you want to put Dispersion shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.Racials", "Racials Off GCD", "Enable if you want to put Racials (Arcane Torrent, Berserking, ...) shown as Off GCD (top icons) instead of Main.");

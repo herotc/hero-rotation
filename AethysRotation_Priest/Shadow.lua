@@ -214,7 +214,7 @@ local function CDs ()
 	--actions.vf+=/berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=20&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
 	--TODO : S2M
 	if S.Berserking:IsAvailable() and S.Berserking:IsCastable() and Player:BuffStack(S.VoidForm)>=10 and CurrentInsanityDrain()<=20 then
-		if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Berserking) then return "Cast"; end
+		if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Racials) then return "Cast"; end
 	end
 	
 	--actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
