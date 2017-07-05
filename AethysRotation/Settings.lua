@@ -6,9 +6,9 @@
   local AC = AethysCore;
   -- File Locals
   local GUI = AC.GUI;
+  local CreatePanel = GUI.CreatePanel;
   local CreateChildPanel = GUI.CreateChildPanel;
-  local CreateCheckButton = GUI.CreateCheckButton;
-  local CreateDropdown = GUI.CreateDropdown;
+  local CreatePanelOption = GUI.CreatePanelOption;
 
 
 --- ============================ CONTENT ============================
@@ -30,13 +30,13 @@
 
   function AR.GUI.CorePanelSettingsInit ()
     -- GUI
-    local ARPanel = GUI.CreatePanel(AR.GUI, "AethysRotation", "PanelFrame", AR.GUISettings, AethysRotationDB.GUISettings);
+    local ARPanel = CreatePanel(AR.GUI, "AethysRotation", "PanelFrame", AR.GUISettings, AethysRotationDB.GUISettings);
     -- Child Panel
     local CP_General = CreateChildPanel(ARPanel, "General");
     -- Controls
-    CreateDropdown(CP_General, "General.MainFrameStrata", {"HIGH", "MEDIUM", "LOW", "BACKGROUND"}, "Main Frame Strata", "Test tooltip");
-    CreateCheckButton(CP_General, "General.BlackBorderIcon", "Black Border Icon", "Enable if you want clean black borders.");
-    CreateCheckButton(CP_General, "General.InterruptEnabled", "Interrupt", "Enable if you want to interrupt.");
-    CreateCheckButton(CP_General, "General.InterruptWithStun", "Interrupt With Stun", "EXPERIMENTAL: Enable if you want to interrupt with stuns.");
-    CreateCheckButton(CP_General, "General.SoloMode", "Solo Mode", "Enable if you want to try to maximize survivability at the cost of dps.");
+    CreatePanelOption("Dropdown", CP_General, "General.MainFrameStrata", {"HIGH", "MEDIUM", "LOW", "BACKGROUND"}, "Main Frame Strata", "Choose the frame strata to use for icons.", {ReloadRequired = true});
+    CreatePanelOption("CheckButton", CP_General, "General.BlackBorderIcon", "Black Border Icon", "Enable if you want clean black borders icons.", {ReloadRequired = true});
+    CreatePanelOption("CheckButton", CP_General, "General.InterruptEnabled", "Interrupt", "Enable if you want to interrupt.");
+    CreatePanelOption("CheckButton", CP_General, "General.InterruptWithStun", "Interrupt With Stun", "EXPERIMENTAL: Enable if you want to interrupt with stuns.");
+    CreatePanelOption("CheckButton", CP_General, "General.SoloMode", "Solo Mode", "Enable if you want to try to maximize survivability at the cost of dps.");
   end
