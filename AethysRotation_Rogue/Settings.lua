@@ -54,9 +54,9 @@
       }
     },
     Outlaw = {
-      -- Roll the Bones Logic, accepts "Default", "1+ Buff" and every "RtBName".
-      -- "Default", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"
-      RolltheBonesLogic = "Default",
+      -- Roll the Bones Logic, accepts "SimC", "1+ Buff" and every "RtBName".
+      -- "SimC", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"
+      RolltheBonesLogic = "SimC",
       -- SoloMode Settings
       RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
       -- Blade Flurry TimeOut
@@ -118,7 +118,7 @@
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "Poison Refresh", "Set the timer for the Poison Refresh.");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.OffGCDasOffGCD.Vendetta", "Vendetta as Off GCD", "Enable if you want to put Vendetta shown as Off GCD (top icons) instead of Main.");
   -- Outlaw
-  CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"Default", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.");
+  CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.");
   CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechHP", {1, 100, 1}, "Roll the Bones Leech HP", "Set the HP threshold before re-rolling for the leech buff (working only if Solo Mode is enabled).");
   CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.BFOffset", {1, 5, 1}, "Blade Flurry Offset", "Set the Blade Flurry timer before suggesting to disable it (to compensate fast movement).");
   CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.OffGCDasOffGCD.AdrenalineRush", "Adrenaline Rush as Off GCD", "Enable if you want to put Adrenaline Rush shown as Off GCD (top icons) instead of Main.");
