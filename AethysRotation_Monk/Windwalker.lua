@@ -105,60 +105,47 @@ local Settings = {
 
 -- Functions --
 
-local function AvoidCap()
-	return S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2;
-end
-
+-- ReadyTime - Returns a normalized number based on spell usability and cooldown so you can easliy compare.
 function Spell:ReadyTime(Index)
-	-- WDP Check
-	if self == S.WhirlingDragonPunch then
-		if S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
-		S.FistsOfFury:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() then
-			return self:CooldownRemainsPredicted();
-		else
-			return 999; end
-	end
-	-- TigerPalm Check
-	if self == S.TigerPalm then
-		if not Player:PrevGCD(1, S.TigerPalm) then
-			return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen();
-		else
-			return 999; end
-	end
-	if self:Cost(Index) == 0 then return self:CooldownRemainsPredicted(); end
-	if self:IsReady() and AvoidCap() == false then return 0; end
-	-- Energy Check
-	if self:Cost(Index) and self:CostInfo(1,"type") == 3 then
-    return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen(); end
-	-- Chi Check
-	if self:Cost(Index) and self:CostInfo(1,"type") == 12 then
-		if self:IsUsable() and self:IsOnCooldown() and AvoidCap() == false then
-			return self:CooldownRemainsPredicted()
-		else return  999; end
-	end
-end
+  if self:IsReady() and self ~= S.TigerPalm then return 0;
+  elseif self:Cost(Index) == 0 and not self == S.WhirlingDragonPunch then return self:CooldownRemainsPredicted(); end
 
-function Spell:IsReadyPredicted(Index)
-	if not self:IsLearned() or not self:IsAvailable() then return false; end
-		if Player:IsCasting() or Player:IsChanneling() then
-			return self:ReadyTime(Index) <= Player:CastRemains();
-		else
-			return self:IsUsable() and not self:IsOnCooldown();
+  if self == S.WhirlingDragonPunch then -- WDP Check
+    if S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
+      S.FistsOfFury:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() then
+      return self:CooldownRemainsPredicted();
+    else
+      return 999; end
+  elseif self == S.TigerPalm then
+    if not Player:PrevGCD(1, S.TigerPalm) then  -- TigerPalm Check
+      return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen();
+    else
+      return 999; end
+  elseif self:Cost(Index) and self:CostInfo(1,"type") == 3 then -- Energy Check
+    return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen();
+  elseif self:Cost(Index) and self:CostInfo(1,"type") == 12 then -- Chi Check
+    if self:IsUsable() and self:IsOnCooldown() then
+      return self:CooldownRemainsPredicted();
+    else
+      return 999;
 		end
+	else
+		return self:CooldownRemainsPredicted()
+  end
 end
 
-local function LowestReadyTime(arg)
+-- LowestReadyTime - Returns the lowest ReadyTime + Offset as a spell name.
+local function LowestReadyTime()
 	local SpellList = {
 
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.070,
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.060,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.050,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.004,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.003,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.002,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.001,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.30,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.20,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.10,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.04,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.03,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.02,
+		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.01,
 		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.0,
-
 	};
 
 	local SpellName = next(SpellList)
@@ -172,8 +159,23 @@ local function LowestReadyTime(arg)
 		return SpellName;
 end
 
--- Action Lists --
+-- IsReadyPredicted - Compare ReadyTime vs CastRemains / GCD
+function Spell:IsReadyPredicted(Index)
+	if not self:IsLearned() or not self:IsAvailable() then return false; end
+		if Player:IsCasting() or Player:IsChanneling() then
+			return self:ReadyTime(Index) <= Player:CastRemains();
+		else
+			return self:ReadyTime(Index) <= math.min(Player:GCDRemains() / 2, 0.3);
+		end
+end
 
+-- AvoidCap - Used to minimize clashing when about to cap.
+local function AvoidCap()
+	return S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and
+	Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2;
+end
+
+-- Action Lists --
 local function single_target ()
 	-- actions.st=call_action_list,name=cd
 	-- actions.st+=/energizing_elixir,if=chi<=1&(cooldown.rising_sun_kick.remains=0|(artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains=0)|energy<50)
@@ -251,10 +253,11 @@ local function single_target ()
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
 	-- downtime_prediction
-		if AR.Cast(S[LowestReadyTime()]) then return ""; end
+	if AR.Cast(S[LowestReadyTime()]) then return ""; end
   return false;
 end
 
+-- Storm Earth And Fire
 local function sef ()
   -- actions.sef=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
   if S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0 and Player:Chi() < 1 then
@@ -274,6 +277,7 @@ local function sef ()
   return false;
 end
 
+-- Serenity
 -- local function serenity ()
 --   -- actions.serenity+=/serenity
 --   if AR.CDsON() and S.Serenity:IsReadyPredicted() then
@@ -338,11 +342,11 @@ local function APL ()
 
   if Everyone.TargetIsValid() then
 		-- actions.st+=/chi_wave
-    if S.ChiWave:IsReadyPredicted() and not Target:IsInRange(5) then
+    if S.ChiWave:IsReady() and not Target:IsInRange(5) then
       if AR.Cast(S.ChiWave) then return ""; end
     end
     -- actions.st+=/chi_burst
-    if S.ChiBurst:IsReadyPredicted() and not Target:IsInRange(5) then
+    if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
       if AR.Cast(S.ChiBurst) then return ""; end
     end
 		-- actions+=/touch_of_death
