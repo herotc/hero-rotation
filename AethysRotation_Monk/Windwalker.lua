@@ -1,4 +1,3 @@
-
 ---- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
@@ -163,9 +162,9 @@ end
 function Spell:IsReadyPredicted(Index)
 	if not self:IsLearned() or not self:IsAvailable() then return false; end
 		if Player:IsCasting() or Player:IsChanneling() then
-			return self:ReadyTime(Index) <= Player:CastRemains();
+			return self == S[LowestReadyTime()] and self:ReadyTime(Index) <= Player:CastRemains();
 		else
-			return self:ReadyTime(Index) <= math.min(Player:GCDRemains() / 2, 0.3);
+			return self:ReadyTime(Index) <= math.min(Player:GCDRemains(), 0.2);
 		end
 end
 
