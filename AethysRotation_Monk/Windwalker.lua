@@ -137,13 +137,13 @@ end
 local function LowestReadyTime()
 	local SpellList = {
 
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.30,
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.20,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.10,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.04,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.03,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.02,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.01,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.200,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.150,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.100,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.004,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.003,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.002,
+		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.001,
 		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.0,
 	};
 
@@ -162,9 +162,9 @@ end
 function Spell:IsReadyPredicted(Index)
 	if not self:IsLearned() or not self:IsAvailable() then return false; end
 		if Player:IsCasting() or Player:IsChanneling() then
-			return self == S[LowestReadyTime()] and self:ReadyTime(Index) <= Player:CastRemains();
+			return self:ReadyTime(Index) <= Player:CastRemains();
 		else
-			return self:ReadyTime(Index) <= math.min(Player:GCDRemains(), 0.2);
+			return self:ReadyTime(Index) <= math.min(Player:GCDRemains(), 0.3);
 		end
 end
 
@@ -234,7 +234,7 @@ local function single_target ()
     if AR.Cast(S.CracklingJadeLightning) then return ""; end
   end
 	-- actions.st+=/spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
-  if S.SpinningCraneKick:IsReadyPredicted() and Cache.EnemiesCount[8] >= 3 and GetSpellCount("Spinning Crane Kick") >= 2 and
+  if AR.AoEON() and S.SpinningCraneKick:IsReady() and Cache.EnemiesCount[8] >= 3 and GetSpellCount("Spinning Crane Kick") >= 2 and
 	not Player:PrevGCD(1, S.SpinningCraneKick) then
     if AR.Cast(S.SpinningCraneKick) then return ""; end
   end
@@ -245,7 +245,7 @@ local function single_target ()
 	-- actions.st+=/blackout_kick,cycle_targets=1,if=(chi>1|buff.bok_proc.up|(talent.energizing_elixir.enabled&cooldown.energizing_elixir.remains<cooldown.fists_of_fury.remains))&
 	-- ((cooldown.rising_sun_kick.remains>1&(!artifact.strike_of_the_windlord.enabled|cooldown.strike_of_the_windlord.remains>1)|chi>2)&
 	-- (cooldown.fists_of_fury.remains>1|chi>3)|prev_gcd.1.tiger_palm)&!prev_gcd.1.blackout_kick
-	if S.BlackoutKick:IsReadyPredicted() and (Player:Chi() > 1 or Player:Buff(S.BlackoutKickBuff) or
+	if S.BlackoutKick:IsReady() and (Player:Chi() > 1 or Player:Buff(S.BlackoutKickBuff) or
   (S.EnergizingElixir:IsAvailable() and S.EnergizingElixir:CooldownRemainsPredicted() < S.FistsOfFury:CooldownRemainsPredicted())) and
   ((S.RisingSunKick:CooldownRemainsPredicted() > 1 and (not S.StrikeOfTheWindlord:IsAvailable() or S.StrikeOfTheWindlord:CooldownRemainsPredicted() > 1) or Player:Chi() > 2) and
   (S.FistsOfFury:CooldownRemainsPredicted() > 1 or Player:Chi() > 3) or Player:PrevGCD(1, S.TigerPalm)) and not Player:PrevGCD(1, S.BlackoutKick) then
