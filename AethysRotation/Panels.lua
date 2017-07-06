@@ -5,11 +5,12 @@
   -- AethysCore
   local AC = AethysCore;
   -- File Locals
-
+  local CreatePanelOption = AC.GUI.CreatePanelOption;
 
 
 --- ============================ CONTENT ============================
   AR.GUI = {};
+
   function AR.GUI.LoadSettingsRecursively (Table, KeyChain)
     local KeyChain = KeyChain or "";
     for Key, Value in pairs(Table) do
@@ -35,4 +36,22 @@
         end
       end
     end
+  end
+
+  local CreateARPanelOption = {
+    GCDasOffGCD =
+      function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting,
+                          Name .. " as Off GCD",
+                          "Enable if you want to put " .. Name .. " shown as Off GCD (top icons) instead of Main.");
+      end,
+    OffGCDasOffGCD = 
+      function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting,
+                          Name .. " as Off GCD",
+                          "Enable if you want to put " .. Name .. " shown as Off GCD (top icons) instead of Main.");
+      end
+  };
+  function AR.GUI.CreateARPanelOption (Type, Panel, Setting, ...)
+    CreateARPanelOption[Type](Panel, Setting, ...);
   end
