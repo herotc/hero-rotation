@@ -176,13 +176,13 @@ local function APL ()
       -- Racial
       -- actions.cds+=/berserking,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
       if S.Berserking:IsCastable() and (Player:Buff(S.AscendanceBuff) or S.FeralSpirit:TimeSinceLastCast() <= 10) then
-        if AR.Cast(S.Berserking, Settings.Enhancement.OffGCDasOffGCD.Berserking) then return "Cast Berserking" end
+        if AR.Cast(S.Berserking, Settings.Enhancement.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
       end
 
       -- Racial
       -- actions.cds+=/blood_fury,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
       if S.BloodFury:IsCastable() and (Player:Buff(S.AscendanceBuff) or S.FeralSpirit:TimeSinceLastCast() <= 10) then
-        if AR.Cast(S.BloodFury, Settings.Enhancement.OffGCDasOffGCD.BloodFury) then return "Cast BloodFury" end
+        if AR.Cast(S.BloodFury, Settings.Enhancement.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
       end
 
       -- actions.CDs+=/feral_spirit
@@ -199,7 +199,7 @@ local function APL ()
       -- actions.cds+=/ascendance,if=(cooldown.strike.remains>0)&buff.ascendance.down
       if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
         if S.Ascendance:IsAvailable() then
-          if AR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+          if AR.Cast(S.Ascendance, Settings.Enhancement.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
         end
       end
     end
