@@ -107,12 +107,12 @@
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.EDMGMantleOffset", {1, 5, 0.25}, "Mantle Damage Offset", "Set the Evisc/Env Mantle Damage Offset.");
   CreateARPanelOption("GCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.CrimsonVial", "Crimson Vial");
   CreateARPanelOption("GCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Feint", "Feint");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Racials", "Racials");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Vanish", "Vanish");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Kick", "Kick");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.MarkedforDeath", "Marked for Death");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Sprint", "Sprint");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Stealth", "Stealth");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Racials", "Racials");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Vanish", "Vanish");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Kick", "Kick");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.MarkedforDeath", "Marked for Death");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Sprint", "Sprint");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Stealth", "Stealth");
   -- Assassination
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
