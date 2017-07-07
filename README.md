@@ -54,6 +54,12 @@ Do remember that what the addon tells you is what the "robot" on SimulationCraft
 It also means that you can improve the current APL by using the addon and report the issues you might encounter.
 I (Aethys) am one of the main Rogue theorycrafter and contributor to the SimulationCraft Rogue Module, both SimC APL and Addon Rotation are 100% synced. I use both tools to improve the APL and do Rogue Theorycrafting.
 
+## Link Github to wow directory
+You can make a link between your github directory and you wow addon directory for ease of use (You won't have to manually copy everytime you sync your Github rep).
+Open symlink.bat and modify the two vars (WoWRep and GHRep) to match you local setup.
+Make sure AethysRotation's directory don't already exist as it will not override them.
+Finally, launch symlink.bat
+
 ## Special Thanks
 - [SimulationCraft](http://simulationcraft.org/) for everything the project gives to the whole WoW Community.
 - [KutiKuti](https://github.com/Kutikuti), [Nia](https://github.com/Nianel) & [Tael](https://github.com/Tae-l) for their contributions to the project.
