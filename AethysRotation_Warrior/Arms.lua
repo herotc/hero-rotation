@@ -127,19 +127,19 @@ local function APL ()
     -- Racial
     -- actions+=/blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
     if S.BloodFury:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or Target:TimeToDie() <= 16) then
-      if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast BloodFury" end
+      if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
     end
 
     -- Racial
     -- actions+=/berserking,if=buff.battle_cry.up|target.time_to_die<=11
     if S.Berserking:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or Target:TimeToDie() <= 11) then
-      if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast Berserking" end
+      if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
     end
 
     -- Racial
     -- actions+=/arcane_torrent,if=buff.battle_cry_deadly_calm.down&rage.deficit>40&cooldown.battle_cry.remains
     if S.ArcaneTorrent:IsReady() and AR.CDsON() and ((not Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable()) and Player:RageDeficit() > 40 and S.BattleCry:Cooldown() > 0) then
-      if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "Cast ArcaneTorrent" end
+      if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast ArcaneTorrent" end
     end
 
     -- actions+=/avatar,if=gcd.remains<0.25&(buff.battle_cry.up|cooldown.battle_cry.remains<15)|target.time_to_die<=20
