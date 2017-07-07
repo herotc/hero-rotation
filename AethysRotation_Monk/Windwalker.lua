@@ -106,6 +106,7 @@ local Settings = {
 
 -- ReadyTime - Returns a normalized number based on spell usability and cooldown so you can easliy compare.
 function Spell:ReadyTime(Index)
+	if not self:IsLearned() or not self:IsAvailable() then return 999; end
   if self:IsReady() and self ~= S.TigerPalm then return 0;
   elseif self:Cost(Index) == 0 and not self == S.WhirlingDragonPunch then return self:CooldownRemainsPredicted(); end
 
@@ -137,12 +138,12 @@ end
 local function LowestReadyTime()
 	local SpellList = {
 
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.28,
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.27,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.26,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.25,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.20,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.15,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.15,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.14,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.13,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.12,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.11,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.10,
 		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.00,
 		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	- 0.05,
 	};
@@ -353,7 +354,7 @@ local function APL ()
 	      if AR.Cast(S.ChiBurst) then return ""; end
 	    end
 			if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) then
-	      if AR.Cast(S.ChiWave) then return ""; end
+	      if AR.Cast(S.TigerPalm) then return ""; end
 	    end
 		end
 		return;
