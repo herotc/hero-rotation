@@ -137,14 +137,14 @@ end
 local function LowestReadyTime()
 	local SpellList = {
 
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.150,
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.100,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.050,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.004,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.003,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.002,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.001,
-		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.0,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.28,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.27,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.26,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.25,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.20,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.15,
+		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.00,
+		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	- 0.05,
 	};
 
 	local SpellName = next(SpellList)
@@ -164,7 +164,7 @@ function Spell:IsReadyPredicted(Index)
 		if Player:IsCasting() or Player:IsChanneling() then
 			return self:ReadyTime(Index) <= Player:CastRemains();
 		else
-			return self:ReadyTime(Index) <= math.max(Player:GCDRemains(), 0.50);
+			return self:ReadyTime(Index) <= Player:GCD() / 3.55;
 		end
 end
 
@@ -336,57 +336,75 @@ end
 --- ======= MAIN =======
 -- APL Main
 local function APL ()
-
   -- Unit Update
   AC.GetEnemies(5);
   AC.GetEnemies(8);
   Everyone.AoEToggleEnemiesUpdate();
 
-  if Everyone.TargetIsValid() then
+	-- Out of Combat
+	if not Player:AffectingCombat() then
+		if Everyone.TargetIsValid() then
+			-- actions.st+=/chi_wave
+			if S.ChiWave:IsReady() and not Target:IsInRange(5) then
+	      if AR.Cast(S.ChiWave) then return ""; end
+	    end
+	    -- actions.st+=/chi_burst
+	    if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
+	      if AR.Cast(S.ChiBurst) then return ""; end
+	    end
+			if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) then
+	      if AR.Cast(S.ChiWave) then return ""; end
+	    end
+		end
+		return;
+	end
+
+	-- In Combat
+	if Everyone.TargetIsValid() then
 		-- actions.st+=/chi_wave
-    if S.ChiWave:IsReady() and not Target:IsInRange(5) then
-      if AR.Cast(S.ChiWave) then return ""; end
-    end
-    -- actions.st+=/chi_burst
-    if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
-      if AR.Cast(S.ChiBurst) then return ""; end
-    end
+		if S.ChiWave:IsReady() and not Target:IsInRange(5) then
+			if AR.Cast(S.ChiWave) then return ""; end
+		end
+		-- actions.st+=/chi_burst
+		if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
+			if AR.Cast(S.ChiBurst) then return ""; end
+		end
 		-- actions+=/touch_of_death
-    if AR.CDsON() and S.TouchOfDeath:IsReadyPredicted() and Target:TimeToDie() >= 9 then
-      if AR.CastLeft(S.TouchOfDeath) then return ""; end
-    end
+		if AR.CDsON() and S.TouchOfDeath:IsReadyPredicted() and Target:TimeToDie() >= 9 then
+			if AR.CastLeft(S.TouchOfDeath) then return ""; end
+		end
 		-- -- actions+=/call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
-    -- if (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsPredicted() <= 0) or Player:Buff(S.Serenity) then
-    --   ShouldReturn = serenity();
-    --   if ShouldReturn then return ShouldReturn; end
-    -- end
-    -- actions+=/call_action_list,name=sef,if=!talent.serenity.enabled&(buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2)
-    if not S.Serenity:IsAvailable() and (Player:Buff(S.StormEarthAndFire) or S.StormEarthAndFire:Charges() == 2) then
-      ShouldReturn = sef();
-      if ShouldReturn then return ShouldReturn; end
-    end
-    -- actions+=/call_action_list,name=sef,if=!talent.serenity.enabled&equipped.drinking_horn_cover&
+		-- if (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsPredicted() <= 0) or Player:Buff(S.Serenity) then
+		--   ShouldReturn = serenity();
+		--   if ShouldReturn then return ShouldReturn; end
+		-- end
+		-- actions+=/call_action_list,name=sef,if=!talent.serenity.enabled&(buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2)
+		if not S.Serenity:IsAvailable() and (Player:Buff(S.StormEarthAndFire) or S.StormEarthAndFire:Charges() == 2) then
+			ShouldReturn = sef();
+			if ShouldReturn then return ShouldReturn; end
+		end
+		-- actions+=/call_action_list,name=sef,if=!talent.serenity.enabled&equipped.drinking_horn_cover&
 		-- (cooldown.strike_of_the_windlord.remains<=18&cooldown.fists_of_fury.remains<=12&chi>=3&cooldown.rising_sun_kick.remains<=1|target.time_to_die<=25|cooldown.touch_of_death.remains>112)&
 		-- cooldown.storm_earth_and_fire.charges=1
-    if not S.Serenity:IsAvailable() and I.DrinkingHornCover:IsEquipped() and
+		if not S.Serenity:IsAvailable() and I.DrinkingHornCover:IsEquipped() and
 		(S.StrikeOfTheWindlord:CooldownRemainsPredicted() <= 18 and S.FistsOfFury:CooldownRemainsPredicted() <= 12 and Player:Chi() >= 3 and S.RisingSunKick:CooldownRemainsPredicted() <= 1 or
-    Target:TimeToDie() <= 25 or S.TouchOfDeath:CooldownRemainsPredicted() > 112) and S.StormEarthAndFire:Charges() == 1 then
-      ShouldReturn = sef();
-      if ShouldReturn then return ShouldReturn; end
-    end
-    -- actions+=/call_action_list,name=sef,if=!talent.serenity.enabled&!equipped.drinking_horn_cover&(cooldown.strike_of_the_windlord.remains<=14&
+		Target:TimeToDie() <= 25 or S.TouchOfDeath:CooldownRemainsPredicted() > 112) and S.StormEarthAndFire:Charges() == 1 then
+			ShouldReturn = sef();
+			if ShouldReturn then return ShouldReturn; end
+		end
+		-- actions+=/call_action_list,name=sef,if=!talent.serenity.enabled&!equipped.drinking_horn_cover&(cooldown.strike_of_the_windlord.remains<=14&
 		-- cooldown.fists_of_fury.remains<=6&chi>=3&cooldown.rising_sun_kick.remains<=1|target.time_to_die<=15|cooldown.touch_of_death.remains>112)&cooldown.storm_earth_and_fire.charges=1
-    if not S.Serenity:IsAvailable() and not I.DrinkingHornCover:IsEquipped() and
+		if not S.Serenity:IsAvailable() and not I.DrinkingHornCover:IsEquipped() and
 		(S.StrikeOfTheWindlord:CooldownRemainsPredicted() <= 14 and S.FistsOfFury:CooldownRemainsPredicted() <= 6 and Player:Chi() >= 3 and S.RisingSunKick:CooldownRemainsPredicted() <= 1 or
-    Target:TimeToDie() <= 15 or S.TouchOfDeath:CooldownRemainsPredicted() > 112) and S.StormEarthAndFire:Charges() == 1 then
-      ShouldReturn = sef();
-      if ShouldReturn then return ShouldReturn; end
-    end
-    -- actions+=/call_action_list,name=st
-    ShouldReturn = single_target ();
-    if ShouldReturn then return ShouldReturn; end
-    return;
-  end
+		Target:TimeToDie() <= 15 or S.TouchOfDeath:CooldownRemainsPredicted() > 112) and S.StormEarthAndFire:Charges() == 1 then
+			ShouldReturn = sef();
+			if ShouldReturn then return ShouldReturn; end
+		end
+		-- actions+=/call_action_list,name=st
+		ShouldReturn = single_target ();
+		if ShouldReturn then return ShouldReturn; end
+		return;
+	end
 end
 
 AR.SetAPL(269, APL);

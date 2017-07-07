@@ -4,10 +4,11 @@ externals:
  AethysCore:
   url: https://github.com/SimCMinMax/AethysCore
 
+required-dependencies:
+  - 271528-aethyscore
+
 move-folders:
  AethysRotation/AethysRotation: AethysRotation
- AethysRotation/AethysCore/AethysCache: AethysCache
- AethysRotation/AethysCore/AethysCore: AethysCore
  AethysRotation/AethysRotation_DeathKnight: AethysRotation_DeathKnight
  AethysRotation/AethysRotation_DemonHunter: AethysRotation_DemonHunter
  AethysRotation/AethysRotation_Druid: AethysRotation_Druid
