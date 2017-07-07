@@ -126,13 +126,13 @@ local function APL ()
 
     -- Racial
     -- actions+=/blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
-    if S.BloodFury:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff)) then
+    if S.BloodFury:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or Target:TimeToDie() <= 16) then
       if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return "Cast BloodFury" end
     end
 
     -- Racial
     -- actions+=/berserking,if=buff.battle_cry.up|target.time_to_die<=11
-    if S.Berserking:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff)) then
+    if S.Berserking:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or Target:TimeToDie() <= 11) then
       if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast Berserking" end
     end
 
@@ -143,12 +143,12 @@ local function APL ()
     end
 
     -- actions+=/avatar,if=gcd.remains<0.25&(buff.battle_cry.up|cooldown.battle_cry.remains<15)|target.time_to_die<=20
-    if S.Avatar:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or S.BattleCry:Cooldown() < 15) then
+    if S.Avatar:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or S.BattleCry:Cooldown() < 15 or Target:TimeToDie() <= 20) then
       if AR.Cast(S.Avatar, Settings.Arms.OffGCDasOffGCD.Avatar) then return "Cast Avatar" end
     end
 
     -- actions+=/battle_cry,if=target.time_to_die<=6|prev_gcd.1.ravager|!talent.ravager.enabled&!gcd.remains&target.debuff.colossus_smash.remains>=5&(!cooldown.bladestorm.remains|!set_bonus.tier20_4pc)&(!talent.rend.enabled|dot.rend.remains>4)
-    if S.BattleCry:IsReady() and AR.CDsON() and (Player:PrevGCD(1, S.Ravager) or not S.Ravager:IsAvailable() and Target:DebuffRemains(S.ColossusSmashDebuff) >= 5 and (not AC.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemains(S.Rend) > 4)) then
+    if S.BattleCry:IsReady() and AR.CDsON() and (Target:TimeToDie() <= 6 or Player:PrevGCD(1, S.Ravager) or not S.Ravager:IsAvailable() and Target:DebuffRemains(S.ColossusSmashDebuff) >= 5 and (not AC.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemains(S.Rend) > 4)) then
       if AR.Cast(S.BattleCry, Settings.Arms.OffGCDasOffGCD.BattleCry) then return "Cast BattleCry" end
     end
 
