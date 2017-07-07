@@ -102,7 +102,7 @@ local function APL ()
   -- Interrupts
   if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(30) then
     if S.WindShear:IsCastable() then
-      if AR.Cast(S.WindShear, Settings.Enhancement.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
+      if AR.Cast(S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
     end
   end
 
@@ -176,13 +176,13 @@ local function APL ()
       -- Racial
       -- actions.cds+=/berserking,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
       if S.Berserking:IsCastable() and (Player:Buff(S.AscendanceBuff) or S.FeralSpirit:TimeSinceLastCast() <= 10) then
-        if AR.Cast(S.Berserking, Settings.Enhancement.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
       end
 
       -- Racial
       -- actions.cds+=/blood_fury,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
       if S.BloodFury:IsCastable() and (Player:Buff(S.AscendanceBuff) or S.FeralSpirit:TimeSinceLastCast() <= 10) then
-        if AR.Cast(S.BloodFury, Settings.Enhancement.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
+        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
       end
 
       -- actions.CDs+=/feral_spirit
