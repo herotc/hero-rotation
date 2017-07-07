@@ -265,7 +265,7 @@
           Player:FilterTriggerGCD(SpecID);
           Spell:FilterProjectileSpeed(SpecID);
       else
-        AR.Print("No Rotation found for this class/spec, addon disabled.");
+        AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
         for Key, Value in pairs(UIFrames) do
           Value:Hide();
         end
