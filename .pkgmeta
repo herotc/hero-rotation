@@ -22,6 +22,7 @@ move-folders:
  AethysRotation/AethysRotation_Warlock: AethysRotation_Warlock
  AethysRotation/AethysRotation_Warrior: AethysRotation_Warrior
  AethysRotation/AethysCore: AethysCore
+ AethysCore/AethysCore: AethysCore
  AethysCore/AethysCache: AethysCache
 
 ignore:
