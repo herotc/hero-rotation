@@ -79,7 +79,7 @@ local I = Item.Shaman.Enhancement
 -- GUI Settings
 local Settings = {
   General = AR.GUISettings.General,
-  Enhancement = AR.GUISettings.APL.Shaman.Enhancement
+  Shaman = AR.GUISettings.APL.Shaman
 }
 
 -- APL Main
@@ -102,7 +102,7 @@ local function APL ()
   -- Interrupts
   if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(30) then
     if S.WindShear:IsCastable() then
-      if AR.Cast(S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
+      if AR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
     end
   end
 
@@ -119,7 +119,7 @@ local function APL ()
 
       -- actions.asc+=/doom_winds,if=cooldown.windstrike.up
       if S.DoomWinds:IsCastable() and AR.CDsON() and (S.WindStrike:CooldownUp()) then
-        if AR.Cast(S.DoomWinds, Settings.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
+        if AR.Cast(S.DoomWinds, Settings.Shaman.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
       end
 
       -- actions.asc+=/windstrike
@@ -176,30 +176,30 @@ local function APL ()
       -- Racial
       -- actions.cds+=/berserking,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
       if S.Berserking:IsCastable() and (Player:Buff(S.AscendanceBuff) or S.FeralSpirit:TimeSinceLastCast() <= 10) then
-        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
+        if AR.Cast(S.Berserking, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking" end
       end
 
       -- Racial
       -- actions.cds+=/blood_fury,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
       if S.BloodFury:IsCastable() and (Player:Buff(S.AscendanceBuff) or S.FeralSpirit:TimeSinceLastCast() <= 10) then
-        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
+        if AR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
       end
 
       -- actions.CDs+=/feral_spirit
       if S.FeralSpirit:IsCastable() then
-        if AR.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit" end
+        if AR.Cast(S.FeralSpirit, Settings.Shaman.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit" end
       end
 
       -- actions.cds+=/doom_winds,if=cooldown.ascendance.remains>6|talent.boulderfist.enabled|debuff.earthen_spike.up
       if S.DoomWinds:IsCastable() and (S.Ascendance:CooldownRemains() > 6 or S.Boulderfist:IsAvailable() or Target:Debuff(S.EarthenSpikeDebuff)) then
-        if AR.Cast(S.DoomWinds, Settings.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
+        if AR.Cast(S.DoomWinds, Settings.Shaman.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
       end
 
       -- cooldown.strike.remains?
       -- actions.cds+=/ascendance,if=(cooldown.strike.remains>0)&buff.ascendance.down
       if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
         if S.Ascendance:IsAvailable() then
-          if AR.Cast(S.Ascendance, Settings.Enhancement.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+          if AR.Cast(S.Ascendance, Settings.Shaman.Enhancement.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
         end
       end
     end
