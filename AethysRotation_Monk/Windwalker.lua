@@ -254,9 +254,9 @@ local function single_target ()
 		(S.FistsOfFury:CooldownRemainsPredicted() > 1 or Player:Chi() > 3) or Player:PrevGCD(1, S.TigerPalm)) and not Player:PrevGCD(1, S.BlackoutKick) then
 		  if AR.Cast(S.BlackoutKick) then return ""; end
 		end
+		-- downtime_prediction
+		if AR.Cast(S[LowestReadyTime()]) then return ""; end
 	end
-	-- downtime_prediction
-	if AR.Cast(S[LowestReadyTime()]) then return ""; end
   return false;
 end
 
