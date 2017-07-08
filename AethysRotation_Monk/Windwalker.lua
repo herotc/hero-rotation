@@ -474,3 +474,4 @@ AR.SetAPL(269, APL);
 -- actions.st+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&(chi.max-chi>=2|energy.time_to_max<1)
 -- actions.st+=/chi_wave
 -- actions.st+=/chi_burst
+
