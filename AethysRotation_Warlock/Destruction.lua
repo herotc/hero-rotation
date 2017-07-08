@@ -261,7 +261,7 @@
       
       -- actions+=/immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2+set_bonus.tier19_4pc|(action.conflagrate.charges>=1+set_bonus.tier19_4pc&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
       if S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<= Consts.ImmolateBaseDuration and (GetImmolateStack(Target)==0 or GetImmolateStack(Target)==nil) and Target:TimeToDie()>10
-        and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) and not(Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm.ID())) then
+        and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) and not(Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
         if AR.Cast(S.Immolate) then return "Cast"; end
       end
       
