@@ -127,12 +127,8 @@ local function APL ()
         if S.Rebuke:IsCastable() then
           if AR.Cast(S.Rebuke) then return "Cast"; end
         elseif Settings.General.InterruptWithStun and Target:CanBeStunned() then
-          if S.Blind:IsCastable() then
-            if AR.Cast(S.Blind) then return "Cast"; end
-          elseif S.KidneyShot:IsCastable() and Player:ComboPoints() > 0 then
-            if AR.Cast(S.KidneyShot) then return "Cast"; end
-          elseif S.CheapShot:IsCastable() and Player:IsStealthed(true, true) then
-            if AR.Cast(S.CheapShot) then return "Cast"; end
+          if S.HammerofJustice:IsCastable() then
+            if AR.Cast(S.HammerofJustice) then return "Cast"; end
           end
         end
       end
