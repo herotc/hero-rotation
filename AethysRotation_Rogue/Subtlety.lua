@@ -299,8 +299,8 @@ local function CDs ()
         and Rogue.MantleDuration() == 0
         and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid())
         and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and Player:ComboPointsDeficit() >= 2 then
-        -- actions.cds+=/pool_resource,for_next=1,extra_amount=40-talent.shadow_focus.enabled*10
-        if Player:EnergyPredicted() < 40 - (S.ShadowFocus:IsAvailable() and 10 or 0) then
+        -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
+        if Player:EnergyPredicted() < 65 - (S.ShadowFocus:IsAvailable() and 10 or 0) then
           if AR.Cast(S.PoolEnergy) then return "Pool for Vanish"; end
         end
         if StealthMacro(S.Vanish) then return ""; end
@@ -653,7 +653,7 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>40&!stealthed.all&combo_points.deficit>=cp_max_spend
 -- actions.cds+=/shadow_blades,if=(time>10&combo_points.deficit>=2+stealthed.all-equipped.mantle_of_the_master_assassin)|(time<10&(!talent.marked_for_death.enabled|combo_points.deficit>=3|dot.nightblade.ticking))
 -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
--- actions.cds+=/pool_resource,for_next=1,extra_amount=40-talent.shadow_focus.enabled*10
+-- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
 -- actions.cds+=/vanish,if=variable.dsh_dfa&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&combo_points.deficit>=2
 
 -- # Finishers
