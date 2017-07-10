@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Shaman_Enhancement_T20M on 6/20/2017
+-- APL from Shaman_Enhancement_T20M on 7/10/2017
 
 -- APL Local Vars
 -- Spells
@@ -82,6 +82,67 @@ local Settings = {
   Shaman = AR.GUISettings.APL.Shaman
 }
 
+--- APL Variables
+-- actions+=/variable,name=hailstormCheck,value=((talent.hailstorm.enabled&!buff.frostbrand.up)|!talent.hailstorm.enabled)
+local function hailstormCheck()
+  return (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff)) or not S.Hailstorm:IsAvailable()
+end
+
+-- actions+=/variable,name=furyCheck80,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>80))
+local function furyCheck80()
+  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 80)
+end
+
+-- actions+=/variable,name=furyCheck70,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>70))
+local function furyCheck70()
+  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 70)
+end
+
+-- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
+local function furyCheck45()
+  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45)
+end
+
+-- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
+local function furyCheck25()
+  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25)
+end
+
+-- actions+=/variable,name=OCPool70,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>70))
+local function OCPool70()
+  return not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 70)
+end
+
+-- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>60))
+local function OCPool60()
+  return not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60)
+end
+
+-- actions+=/variable,name=heartEquipped,value=(equipped.151819)
+local function heartEquipped()
+  return I.SmolderingHeart:IsEquipped()
+end
+
+-- actions+=/variable,name=akainuEquipped,value=(equipped.137084)
+local function akainuEquipped()
+  return I.AkainusAbsoluteJustice:IsEquipped()
+end
+
+-- actions+=/variable,name=akainuAS,value=(variable.akainuEquipped&buff.hot_hand.react&!buff.frostbrand.up)
+local function akainuAS()
+  return akainuEquipped() and Player:Buff(S.HotHandBuff) and not Player:Buff(S.FrostbrandBuff)
+end
+
+-- actions+=/variable,name=LightningCrashNotUp,value=(!buff.lightning_crash.up&set_bonus.tier20_2pc)
+local function LightningCrashNotUp()
+  return not Player:Buff(S.CrashLightningBuff) and AC.Tier20_2Pc
+end
+
+-- actions+=/variable,name=alphaWolfCheck,value=((pet.frost_wolf.buff.alpha_wolf.remains<2&pet.fiery_wolf.buff.alpha_wolf.remains<2&pet.lightning_wolf.buff.alpha_wolf.remains<2)&feral_spirit.remains>4)
+local function alphaWolfCheck()
+  return S.AlphaWolf:ArtifactEnabled() and S.FeralSpirit:TimeSinceLastCast() <= 11 and (S.CrashLightning:TimeSinceLastCast() >= 6)
+end
+
 -- APL Main
 local function APL ()
   -- Unit Update
@@ -92,52 +153,60 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Opener
-    if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(10) and not Target:IsDeadOrGhost() then
+    -- actions+=/call_action_list,name=opener
+    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       -- actions.opener=rockbiter,if=maelstrom<15&time<gcd
-      if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      if S.Rockbiter:IsCastable() and Player:Maelstrom() < 15 then
+        if Target:IsInRange(10) then
+          if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+        end
+      end
     end
     return
   end
 
   -- Interrupts
-  if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(30) then
-    if S.WindShear:IsCastable() then
+  if S.WindShear:IsCastable() and Target:IsInterruptible() and Settings.General.InterruptEnabled then
+    if Target:IsInRange(30) then
       if AR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
     end
   end
 
   -- In Combat
-  if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(5) and not Target:IsDeadOrGhost() then
+  if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=earthen_spike
-      if S.EarthenSpike:IsCastable() then
-        if Player:Maelstrom() >= S.EarthenSpike:Cost() and S.EarthenSpike:IsAvailable() then
+      if S.EarthenSpike:IsCastable() and S.EarthenSpike:IsAvailable() then
+        if Player:Maelstrom() >= S.EarthenSpike:Cost() and Target:IsInRange(10) then
           if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
         end
       end
 
       -- actions.asc+=/doom_winds,if=cooldown.windstrike.up
-      if S.DoomWinds:IsCastable() and AR.CDsON() and (S.WindStrike:CooldownUp()) then
+      if S.DoomWinds:IsCastable() then
         if AR.Cast(S.DoomWinds, Settings.Shaman.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
       end
 
       -- actions.asc+=/windstrike
       if S.WindStrike:IsCastable() then
-        if AR.Cast(S.WindStrike) then return "Cast WindStrike" end
+        if Player:Maelstrom() >= S.EarthenSpike:Cost() and Target:IsInRange(30) then
+          if AR.Cast(S.WindStrike) then return "Cast WindStrike" end
+        end
       end
     end
 
+    -- actions+=/call_action_list,name=buffs
     -- actions.buffs=rockbiter,if=talent.landslide.enabled&!buff.landslide.up
     if S.Rockbiter:IsCastable() and (S.Landslide:IsAvailable() and not Player:Buff(S.LandslideBuff)) then
-      if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      end
     end
 
     -- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
-    if S.FuryOfAir:IsCastable() and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
-      if S.FuryOfAir:IsAvailable() then
-        if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
-      end
+    if S.FuryOfAir:IsCastable() and S.FuryOfAir:IsAvailable() and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
+      if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
     end
 
     -- actions.buffs+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
@@ -149,29 +218,33 @@ local function APL ()
 
     -- actions.buffs+=/flametongue,if=!buff.flametongue.up
     if S.Flametongue:IsCastable() and (not Player:Buff(S.FlametongueBuff)) then
-      if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      end
     end
 
-    -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
     -- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck45
-    if S.Frostbrand:IsCastable() and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45))) then
-      if Player:Maelstrom() >= S.Frostbrand:Cost() then
+    if S.Frostbrand:IsCastable() and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck45()) then
+      if Target:IsInRange(10) and Player:Maelstrom() >= S.Frostbrand:Cost() then
         if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
       end
     end
 
     -- actions.buffs+=/flametongue,if=buff.flametongue.remains<6+gcd&cooldown.doom_winds.remains<gcd*2
     if S.Flametongue:IsCastable() and (Player:BuffRemains(S.FlametongueBuff) < 6 + Player:GCD() and S.DoomWinds:CooldownRemains() < Player:GCD() * 2) then
-      if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      end
     end
 
     -- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<6+gcd&cooldown.doom_winds.remains<gcd*2
     if S.Frostbrand:IsCastable() and (S.Hailstorm:IsAvailable() and Player:BuffRemains(S.FrostbrandBuff) < 6 + Player:GCD() and S.DoomWinds:CooldownRemains() < Player:GCD() * 2) then
-      if Player:Maelstrom() >= S.Frostbrand:Cost() then
+      if Target:IsInRange(10) and Player:Maelstrom() >= S.Frostbrand:Cost() then
         if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
       end
     end
 
+    -- actions+=/call_action_list,name=cds
     if AR.CDsON() then
       -- Racial
       -- actions.cds+=/berserking,if=buff.ascendance.up|(feral_spirit.remains>5)|level<100
@@ -185,7 +258,7 @@ local function APL ()
         if AR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
       end
 
-      -- actions.CDs+=/feral_spirit
+      -- actions.cds+=/feral_spirit
       if S.FeralSpirit:IsCastable() then
         if AR.Cast(S.FeralSpirit, Settings.Shaman.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit" end
       end
@@ -195,7 +268,6 @@ local function APL ()
         if AR.Cast(S.DoomWinds, Settings.Shaman.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
       end
 
-      -- cooldown.strike.remains?
       -- actions.cds+=/ascendance,if=(cooldown.strike.remains>0)&buff.ascendance.down
       if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
         if S.Ascendance:IsAvailable() then
@@ -204,16 +276,16 @@ local function APL ()
       end
     end
 
-    -- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
+    -- actions+=/call_action_list,name=core
     -- actions.core=earthen_spike,if=variable.furyCheck25
-    if S.EarthenSpike:IsCastable() and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25)) then
-      if Player:Maelstrom() >= S.EarthenSpike:Cost() and S.EarthenSpike:IsAvailable() then
+    if S.EarthenSpike:IsCastable() and (furyCheck25()) then
+      if Player:Maelstrom() >= S.EarthenSpike:Cost() and S.EarthenSpike:IsAvailable() and Target:IsInRange(30) then
         if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
       end
     end
 
     -- actions.core+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>=2
-    if S.CrashLightning:IsCastable() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[5] >= 2) then
+    if S.CrashLightning:IsCastable() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[8] >= 2) then
       if Player:Maelstrom() >= S.CrashLightning:Cost() then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
@@ -221,7 +293,7 @@ local function APL ()
 
     -- actions.core+=/windsong
     if S.Windsong:IsCastable() then
-      if S.Windsong:IsAvailable() then
+      if S.Windsong:IsAvailable() and Target:IsInRange(10) then
         if AR.Cast(S.Windsong) then return "Cast Windsong" end
       end
     end
@@ -235,13 +307,14 @@ local function APL ()
 
     -- actions.core+=/windstrike
     if S.WindStrike:IsCastable() then
-      if AR.Cast(S.WindStrike) then return "Cast WindStrike" end
+      if Player:Maelstrom() >= S.EarthenSpike:Cost() and Target:IsInRange(30) then
+        if AR.Cast(S.WindStrike) then return "Cast WindStrike" end
+      end
     end
 
-    -- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
     -- actions.core+=/stormstrike,if=buff.stormbringer.up&variable.furyCheck25
-    if S.Stormstrike:IsCastable() and (Player:Buff(S.StormbringerBuff) and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25))) then
-      if Player:Maelstrom() >= S.Stormstrike:Cost() then
+    if S.Stormstrike:IsCastable() and (Player:Buff(S.StormbringerBuff) and furyCheck25()) then
+      if Player:Maelstrom() >= S.Stormstrike:Cost() and Target:IsInRange(5) then
         if AR.Cast(S.Stormstrike) then return "Cast Stormstrike" end
       end
     end
@@ -253,33 +326,30 @@ local function APL ()
       end
     end
 
-    -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
     -- actions.core+=/lightning_bolt,if=talent.overcharge.enabled&variable.furyCheck45&maelstrom>=40
-    if S.LightningBolt:IsCastable() and (S.Overcharge:IsAvailable() and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45)) and Player:Maelstrom() >= 40) then
-      if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+    if S.LightningBolt:IsCastable() and (S.Overcharge:IsAvailable() and furyCheck45() and Player:Maelstrom() >= 40) then
+      if Target:IsInRange(40) then
+        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+      end
     end
 
-    -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
-    -- actions+=/variable,name=furyCheck80,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>80))
     -- actions.core+=/stormstrike,if=(!talent.overcharge.enabled&variable.furyCheck45)|(talent.overcharge.enabled&variable.furyCheck80)
-    if S.Stormstrike:IsCastable() and ((not S.Overcharge:IsAvailable() and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45))) or (S.Overcharge:IsAvailable() and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 80)))) then
-      if Player:Maelstrom() >= S.Stormstrike:Cost() then
+    if S.Stormstrike:IsCastable() and ((not S.Overcharge:IsAvailable() and furyCheck45()) or (S.Overcharge:IsAvailable() and furyCheck80())) then
+      if Player:Maelstrom() >= S.Stormstrike:Cost() and Target:IsInRange(5) then
         if AR.Cast(S.Stormstrike) then return "Cast Stormstrike" end
       end
     end
 
-    -- actions+=/variable,name=akainuAS,value=(variable.akainuEquipped&buff.hot_hand.react&!buff.frostbrand.up)
     -- actions.core+=/frostbrand,if=variable.akainuAS
-    if S.Frostbrand:IsCastable() and (I.AkainusAbsoluteJustice:IsEquipped() and Player:Buff(S.HotHandBuff) and not Player:Buff(S.FrostbrandBuff)) then
-      if Player:Maelstrom() >= S.Frostbrand:Cost() then
+    if S.Frostbrand:IsCastable() and (akainuAS()) then
+      if Target:IsInRange(10) and Player:Maelstrom() >= S.Frostbrand:Cost() then
         if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
       end
     end
 
-    -- actions+=/variable,name=akainuEquipped,value=(equipped.137084)
     -- actions.core+=/lava_lash,if=buff.hot_hand.react&((variable.akainuEquipped&buff.frostbrand.up)|!variable.akainuEquipped)
-    if S.LavaLash:IsCastable() and (Player:Buff(S.HotHandBuff) and ((I.AkainusAbsoluteJustice:IsEquipped() and Player:Buff(FrostbrandBuff)) or not I.AkainusAbsoluteJustice:IsEquipped())) then
-      if Player:Maelstrom() >= S.LavaLash:Cost() then
+    if S.LavaLash:IsCastable() and (Player:Buff(S.HotHandBuff) and ((akainuEquipped() and Player:Buff(FrostbrandBuff)) or not akainuEquipped())) then
+      if Player:Maelstrom() >= S.LavaLash:Cost() and Target:IsInRange(5) then
         if AR.Cast(S.LavaLash) then return "Cast LavaLash" end
       end
     end
@@ -291,28 +361,30 @@ local function APL ()
       end
     end
 
-    -- actions+=/variable,name=alphaWolfCheck,value=((pet.frost_wolf.buff.alpha_wolf.remains<2&pet.fiery_wolf.buff.alpha_wolf.remains<2&pet.lightning_wolf.buff.alpha_wolf.remains<2)&feral_spirit.remains>4)
-    -- actions+=/variable,name=LightningCrashNotUp,value=(!buff.lightning_crash.up&set_bonus.tier20_2pc)
     -- actions.core+=/crash_lightning,if=active_enemies>=3|variable.LightningCrashNotUp|variable.alphaWolfCheck
-    if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[5] >= 3 or (not Player:Buff(S.CrashLightningBuff) and AC.Tier20_2Pc) or (S.FeralSpirit:TimeSinceLastCast() < 11)) then
+    if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[5] >= 3 or LightningCrashNotUp() or alphaWolfCheck()) then
       if Player:Maelstrom() >= S.CrashLightning:Cost() then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
 
+    -- actions+=/call_action_list,name=filler
     -- actions.filler=rockbiter,if=maelstrom<120
     if S.Rockbiter:IsCastable() and (Player:Maelstrom() < 120) then
-      if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      end
     end
 
     -- actions.filler+=/flametongue,if=buff.flametongue.remains<4.8
     if S.Flametongue:IsCastable() and (Player:BuffRemains(S.FlametongueBuff) < 4.8) then
-      if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      end
     end
 
-    -- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>60))
     -- actions.filler+=/crash_lightning,if=(talent.crashing_storm.enabled|active_enemies>=2)&debuff.earthen_spike.up&maelstrom>=40&variable.OCPool60
-    if S.CrashLightning:IsCastable() and ((S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and Target:Debuff(S.EarthenSpikeDebuff) and Player:Maelstrom() >= 40 and (not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60))) then
+    if S.CrashLightning:IsCastable() and ((S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and Target:Debuff(S.EarthenSpikeDebuff) and Player:Maelstrom() >= 40 and OCPool60()) then
       if Player:Maelstrom() >= S.CrashLightning:Cost() then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
@@ -320,12 +392,16 @@ local function APL ()
 
     -- actions.filler+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8&maelstrom>40
     if S.Frostbrand:IsCastable() and (S.Hailstorm:IsAvailable() and Player:BuffRemains(S.FrostbrandBuff) < 4.8 and Player:Maelstrom() > 40) then
-      if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
+      if Target:IsInRange(10) and Player:Maelstrom() >= S.Frostbrand:Cost() then
+        if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
+      end
     end
 
     -- actions.filler+=/frostbrand,if=variable.akainuEquipped&!buff.frostbrand.up&maelstrom>=75
-    if S.Frostbrand:IsCastable() and (I.AkainusAbsoluteJustice:IsEquipped() and not Player:Buff(S.FrostbrandBuff) and Player:Maelstrom() >= 75) then
-      if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
+    if S.Frostbrand:IsCastable() and (akainuEquipped() and not Player:Buff(S.FrostbrandBuff) and Player:Maelstrom() >= 75) then
+      if Target:IsInRange(10) and Player:Maelstrom() >= S.Frostbrand:Cost() then
+        if AR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
+      end
     end
 
     -- actions.filler+=/sundering
@@ -335,24 +411,22 @@ local function APL ()
       end
     end
 
-    -- actions+=/variable,name=OCPool70,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>70))
-    -- actions+=/variable,name=furyCheck80,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>80))
     -- actions.filler+=/lava_lash,if=maelstrom>=50&variable.OCPool70&variable.furyCheck80
-    if S.LavaLash:IsCastable() and (Player:Maelstrom() >= 50 and (not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 70)) and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 80))) then
-      if Player:Maelstrom() >= S.LavaLash:Cost() then
+    if S.LavaLash:IsCastable() and (Player:Maelstrom() >= 50 and OCPool70() and furyCheck80()) then
+      if Player:Maelstrom() >= S.LavaLash:Cost() and Target:IsInRange(5) then
         if AR.Cast(S.LavaLash) then return "Cast LavaLash" end
       end
     end
 
     -- actions.filler+=/rockbiter
     if S.Rockbiter:IsCastable() then
-      if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
+      end
     end
 
-    -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
-    -- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>60))
     -- actions.filler+=/crash_lightning,if=(maelstrom>=65|talent.crashing_storm.enabled|active_enemies>=2)&variable.OCPool60&variable.furyCheck45
-    if S.CrashLightning:IsCastable() and ((Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and (not S.Overcharge:IsAvailable() or (S.Overcharge:IsAvailable() and Player:Maelstrom() > 60)) and (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45))) then
+    if S.CrashLightning:IsCastable() and ((Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and OCPool60() and furyCheck45()) then
       if Player:Maelstrom() >= S.CrashLightning:Cost() then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
@@ -360,7 +434,9 @@ local function APL ()
 
     -- actions.filler+=/flametongue
     if S.Flametongue:IsCastable() then
-      if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      if Target:IsInRange(10) then
+        if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
+      end
     end
   end
 end
