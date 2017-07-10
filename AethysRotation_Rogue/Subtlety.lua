@@ -263,8 +263,8 @@ local function CDs ()
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       else
-        -- actions.cds+=/symbols_of_death,if=talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)
-        if AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 3 and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) then
+        -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc))|target.time_to_die-remains<=10
+        if AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 3 and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       end
@@ -293,12 +293,14 @@ local function CDs ()
             or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8)) then
         if AR.Cast(S.GoremawsBite) then return ""; end
       end
-      -- actions.cds+=/vanish,if=variable.dsh_dfa&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&combo_points.deficit>=2
+      -- actions.cds+=/vanish,if=energy>=65-talent.shadow_focus.enabled*10&variable.dsh_dfa&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&(time<10|combo_points.deficit>=2)|target.time_to_die<=7
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-        and DSh_DfA() and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
+        and DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
+        and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
         and Rogue.MantleDuration() == 0
         and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid())
-        and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and Player:ComboPointsDeficit() >= 2 then
+        and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and (AC.CombatTime() < 10 or Player:ComboPointsDeficit() >= 2)
+        or Target:FilteredTimeToDie("<=", 7) or Target:TimeToDieIsNotValid() then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
         if Player:EnergyPredicted() < 65 - (S.ShadowFocus:IsAvailable() and 10 or 0) then
           if AR.Cast(S.PoolEnergy) then return "Pool for Vanish"; end
@@ -365,10 +367,11 @@ end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
   if IsInMeleeRange() then
-    -- actions.stealth_cds=vanish,if=!variable.dsh_dfa&mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractional+(equipped.mantle_of_the_master_assassin&time<30)*0.3
+    -- actions.stealth_cds=vanish,if=!variable.dsh_dfa&mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractional+(equipped.mantle_of_the_master_assassin&time<30)*0.3&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)
     if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
       and not DSh_DfA() and Rogue.MantleDuration() == 0
-      and S.ShadowDance:ChargesFractional() < ShD_Fractional()+(I.MantleoftheMasterAssassin:IsEquipped() and AC.CombatTime() < 30 and 0.3 or 0) then
+      and S.ShadowDance:ChargesFractional() < ShD_Fractional()+(I.MantleoftheMasterAssassin:IsEquipped() and AC.CombatTime() < 30 and 0.3 or 0)
+      and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath)) then
       if StealthMacro(S.Vanish) then return ""; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractional
@@ -579,8 +582,9 @@ local function APL ()
           if ShouldReturn then return ShouldReturn; end
         end
       end
-      -- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
-      if Player:ComboPoints() >= 5 or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[8] >= 3 and Cache.EnemiesCount[8] <= 4)
+      -- actions+=/call_action_list,name=finish,if=combo_points>=5+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up)|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
+      if Player:ComboPoints() >= 5 + (S.DeeperStratagem:IsAvailable() and not Player:Buff(S.ShadowBlades) and 1 or 0)
+        or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[8] >= 3 and Cache.EnemiesCount[8] <= 4)
         or (Target:FilteredTimeToDie("<=", 1) and Player:ComboPoints() >= 3) then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
@@ -604,7 +608,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 07/09/2017
+-- Last Update: 07/10/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -632,7 +636,7 @@ AR.SetAPL(261, APL);
 -- actions+=/nightblade,if=target.time_to_die>6&remains<gcd.max&combo_points>=4-(time<10)*2
 -- actions+=/call_action_list,name=stealth_als,if=talent.dark_shadow.enabled&combo_points.deficit>=3&(dot.nightblade.remains>4+talent.subterfuge.enabled|cooldown.shadow_dance.charges_fractional>=1.9&(!equipped.denial_of_the_halfgiants|time>10))
 -- actions+=/call_action_list,name=stealth_als,if=!talent.dark_shadow.enabled&(combo_points.deficit>=3|cooldown.shadow_dance.charges_fractional>=1.9+talent.enveloping_shadows.enabled)
--- actions+=/call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
+-- actions+=/call_action_list,name=finish,if=combo_points>=5+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up)|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
 -- # Builders
@@ -648,13 +652,13 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/berserking,if=stealthed.rogue
 -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
 -- actions.cds+=/symbols_of_death,if=!talent.death_from_above.enabled&((time>10&energy.deficit>=40-stealthed.all*30)|(time<10&dot.nightblade.ticking))
--- actions.cds+=/symbols_of_death,if=talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)
+-- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc))|target.time_to_die-remains<=10
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>40&!stealthed.all&combo_points.deficit>=cp_max_spend
 -- actions.cds+=/shadow_blades,if=(time>10&combo_points.deficit>=2+stealthed.all-equipped.mantle_of_the_master_assassin)|(time<10&(!talent.marked_for_death.enabled|combo_points.deficit>=3|dot.nightblade.ticking))
 -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
 -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
--- actions.cds+=/vanish,if=variable.dsh_dfa&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&combo_points.deficit>=2
+-- actions.cds+=/vanish,if=energy>=65-talent.shadow_focus.enabled*10&variable.dsh_dfa&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&(time<10|combo_points.deficit>=2)|target.time_to_die<=7
 
 -- # Finishers
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
@@ -670,7 +674,7 @@ AR.SetAPL(261, APL);
 -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
 
 -- # Stealth Cooldowns
--- actions.stealth_cds=vanish,if=!variable.dsh_dfa&mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractional+(equipped.mantle_of_the_master_assassin&time<30)*0.3
+-- actions.stealth_cds=vanish,if=!variable.dsh_dfa&mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractional+(equipped.mantle_of_the_master_assassin&time<30)*0.3&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)
 -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractional|target.time_to_die<cooldown.symbols_of_death.remains
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10+variable.ssw_refund
