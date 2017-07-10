@@ -295,12 +295,12 @@ local function CDs ()
       end
       -- actions.cds+=/vanish,if=energy>=65-talent.shadow_focus.enabled*10&variable.dsh_dfa&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&(time<10|combo_points.deficit>=2)|target.time_to_die<=7
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-        and DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
-        and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
-        and Rogue.MantleDuration() == 0
-        and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid())
-        and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and (AC.CombatTime() < 10 or Player:ComboPointsDeficit() >= 2)
-        or Target:FilteredTimeToDie("<=", 7) or Target:TimeToDieIsNotValid() then
+        and (DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
+          and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
+          and Rogue.MantleDuration() == 0
+          and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid())
+          and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and (AC.CombatTime() < 10 or Player:ComboPointsDeficit() >= 2)
+          or Target:FilteredTimeToDie("<=", 7) or Target:TimeToDieIsNotValid()) then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
         if Player:EnergyPredicted() < 65 - (S.ShadowFocus:IsAvailable() and 10 or 0) then
           if AR.Cast(S.PoolEnergy) then return "Pool for Vanish"; end
