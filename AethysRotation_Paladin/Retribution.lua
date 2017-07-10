@@ -123,10 +123,10 @@ local function APL ()
       end
       ]]
       -- Interrupts
-      if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(5) then
-        if S.Rebuke:IsCastable() then
+      if Settings.General.InterruptEnabled and Target:IsInterruptible()  then
+        if S.Rebuke:IsCastable() and Target:IsInRange(5) then
           if AR.Cast(S.Rebuke) then return "Cast"; end
-        elseif Settings.General.InterruptWithStun and Target:CanBeStunned() then
+        elseif Settings.General.InterruptWithStun and Target:IsInRange(10) and Target:CanBeStunned() then
           if S.HammerofJustice:IsCastable() then
             if AR.Cast(S.HammerofJustice) then return "Cast"; end
           end
