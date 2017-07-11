@@ -106,46 +106,28 @@ local Settings = {
 
 -- ReadyTime - Returns a normalized number based on spell usability and cooldown so you can easliy compare.
 function Spell:ReadyTime(Index)
-	if not self:IsLearned() or not self:IsAvailable() then return 999; end
-  if self:IsReady() and self ~= S.TigerPalm then return 0;
-  elseif self:Cost(Index) == 0 and not self == S.WhirlingDragonPunch then return self:CooldownRemainsPredicted(); end
-
-  if self == S.WhirlingDragonPunch then -- WDP Check
-    if S.RisingSunKick:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() and
-		S.FistsOfFury:CooldownRemainsPredicted() > S.WhirlingDragonPunch:CooldownRemainsPredicted() then
-      return self:CooldownRemainsPredicted();
-    else
-      return 999; end
-  elseif self == S.TigerPalm then
-    if not Player:PrevGCD(1, S.TigerPalm) then  -- TigerPalm Check
-      return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen();
-    else
-      return 999; end
-  elseif self:Cost(Index) and self:CostInfo(1,"type") == 3 then -- Energy Check
-    return self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen();
-  elseif self:Cost(Index) and self:CostInfo(1,"type") == 12 then -- Chi Check
-    if self:IsUsable() and self:IsOnCooldown() then
-      return self:CooldownRemainsPredicted();
-    else
-      return 999;
-		end
-	else
-		return self:CooldownRemainsPredicted()
-  end
+	if not self:IsLearned() or not self:IsAvailable() or Player:PrevGCD(1, self) then return 999; end
+	if self:IsUsable() then
+		return self:CooldownRemains();
+	elseif not self:IsUsable() then
+		if self:Cost(Index) ~= 0 and self:CostInfo(1,"type") == 3 then
+			return math.max(self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen(), 0);
+		else return 999; end
+	end
 end
 
 -- LowestReadyTime - Returns the lowest ReadyTime + Offset as a spell name.
 local function LowestReadyTime()
 	local SpellList = {
 
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.15,
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.14,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.13,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.12,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.11,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.10,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.00,
-		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	- 0.05,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.008,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.007,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.006,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.005,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.004,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.003,
+		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.002,
+		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.001,
 	};
 
 	local SpellName = next(SpellList)
@@ -165,7 +147,7 @@ function Spell:IsReadyPredicted(Index)
 		if Player:IsCasting() or Player:IsChanneling() then
 			return self:ReadyTime(Index) <= Player:CastRemains();
 		else
-			return self:ReadyTime(Index) <= Player:GCD() / 3.55;
+			return self:ReadyTime(Index) + 0.5 <= Player:GCD() / 5.2;
 		end
 end
 
