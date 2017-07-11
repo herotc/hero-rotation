@@ -298,7 +298,7 @@ local function CDs ()
         and (DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
           and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
           and Rogue.MantleDuration() == 0
-          and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6, , -Target:DebuffRemains(S.Nightblade)) or not Target:TimeToDieIsNotValid())
+          and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Nightblade)) or not Target:TimeToDieIsNotValid())
           and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and (AC.CombatTime() < 10 or Player:ComboPointsDeficit() >= 2)
           or Target:FilteredTimeToDie("<=", 7) or Target:TimeToDieIsNotValid()) then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
