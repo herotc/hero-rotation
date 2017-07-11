@@ -56,7 +56,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 ## Special Mention About SimC APL
 As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
 What it means is, it heavily relies on how optimized those APLs are, especially for some talents, tier bonuses and legendaries support.
-Do remember that what the addon tells you is what the "robot" on SimulationCraft would do if they were in your situation.
+Do remember that what the addon tells you is what the "robot" on SimulationCraft would do in your situation.
 It also means that you can improve the current APL by using the addon and report the issues you might encounter.
 I (Aethys) am one of the main Rogue theorycrafter and contributor to the SimulationCraft Rogue Module, both SimC APL and Addon Rotation are 100% synced. I use both tools to improve the APL and do Rogue Theorycrafting.
 
