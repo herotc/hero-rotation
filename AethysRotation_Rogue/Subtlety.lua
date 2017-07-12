@@ -62,7 +62,7 @@ local tableinsert = table.insert;
     Subterfuge                    = Spell(108208),
     Vigor                         = Spell(14983),
     -- Artifact
-    EtchedinShadow                = Spell(238068),
+    WeakPoint                     = Spell(238068),
     FeedingFrenzy                 = Spell(242705),
     FinalityEviscerate            = Spell(197496),
     FinalityNightblade            = Spell(197498),
