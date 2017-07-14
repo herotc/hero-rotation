@@ -281,7 +281,7 @@
       end
       
       -- actions+=/conflagrate,if=talent.roaring_blaze.enabled&(charges=2+set_bonus.tier19_4pc|(charges>=1+set_bonus.tier19_4pc&recharge_time<gcd)|target.time_to_die<24)
-      if S.RoaringBlaze:IsAvailable() and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) then
+      if S.RoaringBlaze:IsAvailable() and S.Conflagrate:Charges()>0 and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) then
         if AR.Cast(S.Conflagrate) then return "Cast"; end
       end
       
