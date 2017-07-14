@@ -70,7 +70,7 @@
     PathOfFrost                   = Spell(3714),
     WraithWalk                    = Spell(212552),
         -- Legendaries
-    ChilledHearth                 = Spell(235592),
+    ChilledHearth                 = Spell(235599),
     ConsortsColdCore              = Spell(235605),
     KiljaedensBurningWish         = Spell(144259),
     KoltirasNewfoundWill          = Spell(208782),
