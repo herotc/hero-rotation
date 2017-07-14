@@ -211,7 +211,7 @@ local function APL ()
 
     -- actions.buffs+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
     if S.CrashLightning:IsCastable() and (S.AlphaWolf:ArtifactEnabled() and Player:PrevGCD(1, S.FeralSpirit)) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[8] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
