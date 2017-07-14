@@ -505,7 +505,6 @@ local function APL()
 	  --actions.generic+=/call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
 	  if  not S.DarkArbiter:IsAvailable() or S.DarkArbiterActive:Cooldown() < 165 and not S.Castigator:IsAvailable() and not I.InstructorsFourthLesson:IsEquipped()   then
 	         ShouldReturn = Standard();
-           AR.Print("standard")
 	         if ShouldReturn then return ShouldReturn; end
 	    end
 	 
