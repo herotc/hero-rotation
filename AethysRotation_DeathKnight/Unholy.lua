@@ -69,7 +69,7 @@
   PathOfFrost                   = Spell(3714),
   WraithWalk                    = Spell(212552),
 	--Legendaries Buffs/SpellIds 
-	ColdHeartBuff                 = Spell(235592),
+	ColdHeartBuff                 = Spell(235599),
 	InstructorsFourthLesson       = Spell(208713),
 	KiljaedensBurningWish         = Spell(144259),
 	--DarkArbiter HiddenAura
