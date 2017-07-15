@@ -145,13 +145,15 @@ local function APL ()
       if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast ArcaneTorrent" end
     end
 
+    -- Omit gcd.remains on this offGCD because we can't react quickly enough otherwise (the intention is to cast this before the next GCD ability, but is a OffGCD abiltiy).
     -- actions+=/avatar,if=gcd.remains<0.25&(buff.battle_cry.up|cooldown.battle_cry.remains<15)|target.time_to_die<=20
-    if S.Avatar:IsReady() and AR.CDsON() and (Player:GCDRemains() < 0.25 and (Player:Buff(S.BattleCryBuff) or S.BattleCry:Cooldown() < 15) or Target:TimeToDie() <= 20) then
+    if S.Avatar:IsReady() and AR.CDsON() and ((Player:Buff(S.BattleCryBuff) or S.BattleCry:Cooldown() < 15) or Target:TimeToDie() <= 20) then
       if AR.Cast(S.Avatar, Settings.Arms.OffGCDasOffGCD.Avatar) then return "Cast Avatar" end
     end
 
+    -- Omit gcd.remains on this offGCD because we can't react quickly enough otherwise (the intention is to cast this before the next GCD ability, but is a OffGCD abiltiy).
     -- actions+=/battle_cry,if=target.time_to_die<=6|(gcd.remains<=0.5&prev_gcd.1.ravager)|!talent.ravager.enabled&!gcd.remains&target.debuff.colossus_smash.remains>=5&(!cooldown.bladestorm.remains|!set_bonus.tier20_4pc)&(!talent.rend.enabled|dot.rend.remains>4)
-    if S.BattleCry:IsReady() and AR.CDsON() and (Target:TimeToDie() <= 6 or (Player:GCDRemains() <= 0.5 and Player:PrevGCD(1, S.Ravager)) or not S.Ravager:IsAvailable() and not Player:GCDRemains() and Target:DebuffRemains(S.ColossusSmashDebuff) >= 5 and (S.Bladestorm:CooldownRemains() == 0 or not AC.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemains(S.RendDebuff) > 4)) then
+    if S.BattleCry:IsReady() and AR.CDsON() and (Target:TimeToDie() <= 6 or (Player:PrevGCD(1, S.Ravager)) or not S.Ravager:IsAvailable() and Target:DebuffRemains(S.ColossusSmashDebuff) >= 5 and (S.Bladestorm:CooldownRemains() == 0 or not AC.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemains(S.RendDebuff) > 4)) then
       if AR.Cast(S.BattleCry, Settings.Arms.OffGCDasOffGCD.BattleCry) then return "Cast BattleCry" end
     end
 
