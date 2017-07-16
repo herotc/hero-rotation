@@ -294,10 +294,10 @@ local function CDs ()
         if AR.Cast(S.GoremawsBite) then return ""; end
       end
       -- actions.cds+=/vanish,if=energy>=55-talent.shadow_focus.enabled*10&variable.dsh_dfa&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+6|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&(time<10|combo_points>=3)|target.time_to_die<=7
+      -- Disable vanish while mantle buff is up, we put mantle_duration=0 as a mandatory condition. This isn't seen in SimC since combat length < 5s are rare, might be worth to port it tho. It won't hurt.
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-        and (DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
+        and Rogue.MantleDuration() == 0 and (DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
           and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
-          and Rogue.MantleDuration() == 0
           and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 6 or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Nightblade)) or not Target:TimeToDieIsNotValid())
           and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1 and (AC.CombatTime() < 10 or Player:ComboPoints() >= 3)
           or Target:FilteredTimeToDie("<=", 7) or Target:TimeToDieIsNotValid()) then
