@@ -176,7 +176,9 @@ local function APL ()
 
       -- actions.cleave+=/warbreaker,if=buff.shattered_defenses.down
       if S.Warbreaker:IsReady() and (not Player:Buff(S.ShatteredDefensesBuff)) then
-        if AR.Cast(S.Warbreaker) then return "Cast Warbreaker" end
+        if Settings.Arms.WarbreakerEnabled then
+          if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
+        end
       end
 
       -- actions.cleave+=/focused_rage,if=rage>100|buff.battle_cry_deadly_calm.up
@@ -239,7 +241,9 @@ local function APL ()
 
       -- actions.aoe+=/warbreaker,if=buff.shattered_defenses.down
       if S.Warbreaker:IsReady() and (not Player:Buff(S.ShatteredDefensesBuff)) then
-        if AR.Cast(S.Warbreaker) then return "Cast Warbreaker" end
+        if Settings.Arms.WarbreakerEnabled then
+          if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
+        end
       end
 
       -- actions.aoe+=/whirlwind,if=talent.fervor_of_battle.enabled&(debuff.colossus_smash.up|rage.deficit<50)&(!talent.focused_rage.enabled|buff.battle_cry_deadly_calm.up|buff.cleave.up)
@@ -299,7 +303,9 @@ local function APL ()
 
       -- actions.execute+=/warbreaker,if=(raid_event.adds.in>90|!raid_event.adds.exists)&cooldown.mortal_strike.remains<=gcd.remains&buff.shattered_defenses.down&buff.executioners_precision.stack=2
       if S.Warbreaker:IsReady() and (S.MortalStrike:Cooldown() <= Player:GCDRemains() and not Player:Buff(S.ShatteredDefensesBuff) and Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
-        if AR.Cast(S.Warbreaker) then return "Cast Warbreaker" end
+        if Settings.Arms.WarbreakerEnabled then
+          if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
+        end
       end
 
       -- actions.execute+=/focused_rage,if=rage.deficit<35
@@ -352,7 +358,9 @@ local function APL ()
 
       -- actions.single+=/warbreaker,if=(raid_event.adds.in>90|!raid_event.adds.exists)&((talent.fervor_of_battle.enabled&debuff.colossus_smash.remains<gcd)|!talent.fervor_of_battle.enabled&((buff.stone_heart.up|cooldown.mortal_strike.remains<=gcd.remains)&buff.shattered_defenses.down))
       if S.Warbreaker:IsReady() and ((S.FervorOfBattle:IsAvailable() and Target:DebuffRemains(S.ColossusSmashDebuff) < Player:GCD()) or not S.FervorOfBattle:IsAvailable() and ((Player:Buff(S.StoneHeartBuff) or S.MortalStrike:CooldownRemains() <= Player:GCDRemains()) and not Player:Buff(S.ShatteredDefensesBuff))) then
-        if AR.Cast(S.Warbreaker) then return "Cast Warbreaker" end
+        if Settings.Arms.WarbreakerEnabled then
+          if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
+        end
       end
 
       -- actions.single+=/focused_rage,if=!buff.battle_cry_deadly_calm.up&buff.focused_rage.stack<3&!cooldown.colossus_smash.up&(rage>=130|debuff.colossus_smash.down|talent.anger_management.enabled&cooldown.battle_cry.remains<=8)
