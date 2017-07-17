@@ -108,7 +108,7 @@ local Settings = {
 function Spell:ReadyTime(Index)
 	if not self:IsLearned() or not self:IsAvailable() or Player:PrevGCD(1, self) then return 999; end
 	if self:IsUsable() then
-		return self:CooldownRemains();
+		return self:CooldownRemainsPredicted();
 	elseif not self:IsUsable() then
 		if self:Cost(Index) ~= 0 and self:CostInfo(1,"type") == 3 then
 			return math.max(self:Cost(Index) < Player:Energy() and 0 or 0.1 + (self:Cost(Index) - Player:Energy()) / Player:EnergyRegen(), 0);
@@ -120,14 +120,14 @@ end
 local function LowestReadyTime()
 	local SpellList = {
 
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.008,
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.007,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.006,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.005,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.004,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.003,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.002,
-		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.001,
+		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.103,
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.102,
+		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.101,
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.053,
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.100,
+		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.052,
+		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.051,
+		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.050,
 	};
 
 	local SpellName = next(SpellList)
@@ -138,22 +138,22 @@ local function LowestReadyTime()
 	        SpellName, ReadyTime = k, v
 	    end
 	end
-		return SpellName;
+		if AR.Cast(S[SpellName]) then return ""; end
 end
 
--- IsReadyPredicted - Compare ReadyTime vs CastRemains / GCD
-function Spell:IsReadyPredicted(Index)
+-- IsReady - Compare ReadyTime vs CastRemains / GCD
+function Spell:Ready(Index)
 	if not self:IsLearned() or not self:IsAvailable() then return false; end
 		if Player:IsCasting() or Player:IsChanneling() then
 			return self:ReadyTime(Index) <= Player:CastRemains();
 		else
-			return self:ReadyTime(Index) + 0.5 <= Player:GCD() / 5.2;
+			return self:ReadyTime(Index) <= Player:GCD() / 3.5;
 		end
 end
 
 -- AvoidCap - Used to minimize clashing when about to cap.
 local function AvoidCap()
-	return S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and
+	return S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and
 	Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2;
 end
 
@@ -161,83 +161,81 @@ end
 local function single_target ()
 	-- actions.st=call_action_list,name=cd
 	-- actions.st+=/energizing_elixir,if=chi<=1&(cooldown.rising_sun_kick.remains=0|(artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains=0)|energy<50)
-	if S.EnergizingElixir:IsReadyPredicted() and Player:Chi() <= 1 and Player:EnergyDeficitPredicted() >= 20 and
+	if S.EnergizingElixir:Ready() and Player:Chi() <= 1 and Player:EnergyDeficitPredicted() >= 20 and
 	(S.RisingSunKick:CooldownRemainsPredicted() == 0 or (S.StrikeOfTheWindlord:IsAvailable() and S.StrikeOfTheWindlord:CooldownRemainsPredicted() == 0)) then
 		if AR.Cast(S.EnergizingElixir) then return ""; end
 	end
 	-- actions.st+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
-  if S.ArcaneTorrent:IsReadyPredicted() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() >= 0.5 then
+  if S.ArcaneTorrent:Ready() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() >= 0.5 then
     if AR.CastSuggested(S.ArcaneTorrent) then return ""; end
   end
 	-- actions.st+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy.time_to_max<=0.5&chi.max-chi>=2
-  if S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2 then
+  if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2 then
     if AR.Cast(S.TigerPalm) then return ""; end
   end
 
 	if AvoidCap() == false then
 		-- actions.st+=/strike_of_the_windlord,if=!talent.serenity.enabled|cooldown.serenity.remains>=10
-		if S.StrikeOfTheWindlord:IsReadyPredicted() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 10 then
+		if S.StrikeOfTheWindlord:Ready() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 10 then
 		  if AR.Cast(S.StrikeOfTheWindlord) then return ""; end
 		end
 		-- actions.st+=/rising_sun_kick,cycle_targets=1,if=((chi>=3&energy>=40)|chi>=5)&(!talent.serenity.enabled|cooldown.serenity.remains>=6)
-		if S.RisingSunKick:IsReadyPredicted() and ((Player:Chi() >= 3 and Player:EnergyPredicted() >= 40) or Player:Chi() == 5) and
+		if S.RisingSunKick:Ready() and ((Player:Chi() >= 3 and Player:EnergyPredicted() >= 40) or Player:Chi() == 5) and
 		(not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 6) then
 		  if AR.Cast(S.RisingSunKick) then return ""; end
 		end
 		-- actions.st+=/fists_of_fury,if=talent.serenity.enabled&!equipped.drinking_horn_cover&cooldown.serenity.remains>=5&energy.time_to_max>2
-		if S.FistsOfFury:IsReadyPredicted() and S.Serenity:IsAvailable() and not I.DrinkingHornCover:IsEquipped() and
+		if S.FistsOfFury:Ready() and S.Serenity:IsAvailable() and not I.DrinkingHornCover:IsEquipped() and
 		S.Serenity:CooldownRemainsPredicted() >= 5 and Player:EnergyTimeToMaxPredicted() > 2 then
 		  if AR.Cast(S.FistsOfFury) then return ""; end
 		end
 		-- actions.st+=/fists_of_fury,if=talent.serenity.enabled&equipped.drinking_horn_cover&(cooldown.serenity.remains>=15|cooldown.serenity.remains<=4)&energy.time_to_max>2
-		if S.FistsOfFury:IsReadyPredicted() and S.Serenity:IsAvailable() and I.DrinkingHornCover:IsEquipped() and
+		if S.FistsOfFury:Ready() and S.Serenity:IsAvailable() and I.DrinkingHornCover:IsEquipped() and
 		(S.Serenity:CooldownRemainsPredicted() >= 15 or S.Serenity:CooldownRemainsPredicted() <= 4) and Player:EnergyTimeToMaxPredicted() > 2 then
 		  if AR.Cast(S.FistsOfFury) then return ""; end
 		end
 		-- actions.st+=/fists_of_fury,if=!talent.serenity.enabled&energy.time_to_max>2
-		if S.FistsOfFury:IsReadyPredicted() and not S.Serenity:IsAvailable() and Player:EnergyTimeToMaxPredicted() > 2 then
+		if S.FistsOfFury:Ready() and not S.Serenity:IsAvailable() and Player:EnergyTimeToMaxPredicted() > 2 then
 		  if AR.Cast(S.FistsOfFury) then return ""; end
 		end
 		-- actions.st+=/rising_sun_kick,cycle_targets=1,if=!talent.serenity.enabled|cooldown.serenity.remains>=5
-		if S.RisingSunKick:IsReadyPredicted() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 5 then
+		if S.RisingSunKick:Ready() and not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsPredicted() >= 5 then
 		  if AR.Cast(S.RisingSunKick) then return ""; end
 		end
 		-- actions.st+=/whirling_dragon_punch
-		if S.WhirlingDragonPunch:IsReadyPredicted() and
-		S.RisingSunKick:CooldownRemainsPredicted() > math.max(S.WhirlingDragonPunch:CooldownRemainsPredicted(), Player:CastRemains()) and
-		S.FistsOfFury:CooldownRemainsPredicted() > math.max(S.WhirlingDragonPunch:CooldownRemainsPredicted(), Player:CastRemains()) then
+		if S.WhirlingDragonPunch:Ready() then
 			if AR.Cast(S.WhirlingDragonPunch) then return ""; end
 		end
 		-- actions.st+=/crackling_jade_lightning,if=equipped.the_emperors_capacitor&buff.the_emperors_capacitor.stack>=19&energy.time_to_max>3
-		if S.CracklingJadeLightning:IsReadyPredicted() and I.TheEmperorsCapacitor:IsEquipped() and
+		if S.CracklingJadeLightning:Ready() and I.TheEmperorsCapacitor:IsEquipped() and
 		Player:BuffStack(S.TheEmperorsCapacitor) >= 19 and Player:EnergyTimeToMaxPredicted() > 3 then
 		  if AR.Cast(S.CracklingJadeLightning) then return ""; end
 		end
 		-- actions.st+=/crackling_jade_lightning,if=equipped.the_emperors_capacitor&buff.the_emperors_capacitor.stack>=14&cooldown.serenity.remains<13&talent.serenity.enabled&energy.time_to_max>3
-		if S.CracklingJadeLightning:IsReadyPredicted() and I.TheEmperorsCapacitor:IsEquipped() and Player:BuffStack(S.TheEmperorsCapacitor) >= 14 and
+		if S.CracklingJadeLightning:Ready() and I.TheEmperorsCapacitor:IsEquipped() and Player:BuffStack(S.TheEmperorsCapacitor) >= 14 and
 		S.Serenity:CooldownRemainsPredicted() < 13 and S.Serenity:IsAvailable() and Player:EnergyTimeToMaxPredicted() > 3 then
 		  if AR.Cast(S.CracklingJadeLightning) then return ""; end
 		end
 		-- actions.st+=/spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
-		if AR.AoEON() and S.SpinningCraneKick:IsReady() and Cache.EnemiesCount[8] >= 3 and GetSpellCount("Spinning Crane Kick") >= 2 and
+		if AR.AoEON() and S.SpinningCraneKick:Ready() and Cache.EnemiesCount[8] >= 3 and GetSpellCount("Spinning Crane Kick") >= 2 and
 		not Player:PrevGCD(1, S.SpinningCraneKick) then
 		  if AR.Cast(S.SpinningCraneKick) then return ""; end
 		end
 		-- actions.st+=/rushing_jade_wind,if=chi.max-chi>1&!prev_gcd.1.rushing_jade_wind
-		if S.RushingJadeWind:IsReadyPredicted() and Player:ChiDeficit() > 1 and not Player:PrevGCD(1, S.RushingJadeWind) then
+		if S.RushingJadeWind:Ready() and Player:ChiDeficit() > 1 and not Player:PrevGCD(1, S.RushingJadeWind) then
 		  if AR.Cast(S.RushingJadeWind) then return ""; end
 		end
 		-- actions.st+=/blackout_kick,cycle_targets=1,if=(chi>1|buff.bok_proc.up|(talent.energizing_elixir.enabled&cooldown.energizing_elixir.remains<cooldown.fists_of_fury.remains))&
 		-- ((cooldown.rising_sun_kick.remains>1&(!artifact.strike_of_the_windlord.enabled|cooldown.strike_of_the_windlord.remains>1)|chi>2)&
 		-- (cooldown.fists_of_fury.remains>1|chi>3)|prev_gcd.1.tiger_palm)&!prev_gcd.1.blackout_kick
-		if S.BlackoutKick:IsReady() and (Player:Chi() > 1 or Player:Buff(S.BlackoutKickBuff) or
+		if S.BlackoutKick:Ready() and (Player:Chi() > 1 or Player:Buff(S.BlackoutKickBuff) or
 		(S.EnergizingElixir:IsAvailable() and S.EnergizingElixir:CooldownRemainsPredicted() < S.FistsOfFury:CooldownRemainsPredicted())) and
 		((S.RisingSunKick:CooldownRemainsPredicted() > 1 and (not S.StrikeOfTheWindlord:IsAvailable() or S.StrikeOfTheWindlord:CooldownRemainsPredicted() > 1) or Player:Chi() > 2) and
 		(S.FistsOfFury:CooldownRemainsPredicted() > 1 or Player:Chi() > 3) or Player:PrevGCD(1, S.TigerPalm)) and not Player:PrevGCD(1, S.BlackoutKick) then
 		  if AR.Cast(S.BlackoutKick) then return ""; end
 		end
 		-- downtime_prediction
-		if AR.Cast(S[LowestReadyTime()]) then return ""; end
+		LowestReadyTime()
 	end
   return false;
 end
@@ -245,11 +243,11 @@ end
 -- Storm Earth And Fire
 local function sef ()
   -- actions.sef=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
-  if S.TigerPalm:IsReadyPredicted(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0 and Player:Chi() < 1 then
+  if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0 and Player:Chi() < 1 then
       if AR.Cast(S.TigerPalm) then return ""; end
     end
   -- actions.sef+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
-  if S.ArcaneTorrent:IsReadyPredicted() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5 then
+  if S.ArcaneTorrent:Ready() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5 then
     if AR.CastSuggested(S.ArcaneTorrent) then return ""; end
   end
   -- actions.sef+=/storm_earth_and_fire,if=!buff.storm_earth_and_fire.up
@@ -265,52 +263,52 @@ end
 -- Serenity
 -- local function serenity ()
 --   -- actions.serenity+=/serenity
---   if AR.CDsON() and S.Serenity:IsReadyPredicted() then
+--   if AR.CDsON() and S.Serenity:Ready() then
 --     if AR.CastLeft(S.Serenity) then return ""; end
 --   end
 --   -- actions.serenity+=/spinning_crane_kick,if=buff.serenity.remains<=1&cooldown.rising_sun_kick.remains>=0.25&equipped.drinking_horn_cover&!prev_gcd.1.spinning_crane_kick
---   if S.SpinningCraneKick:IsReadyPredicted() and Player:BuffRemains(S.Serenity) <= 1 and S.RisingSunKick:CooldownRemainsPredicted() >= 0.25 and
+--   if S.SpinningCraneKick:Ready() and Player:BuffRemains(S.Serenity) <= 1 and S.RisingSunKick:CooldownRemainsPredicted() >= 0.25 and
 -- 	I.DrinkingHornCover:IsEquipped() and not Player:PrevGCD(1,S.SpinningCraneKick) then
 --     if AR.Cast(S.SpinningCraneKick) then return ""; end
 --   end
 --   -- actions.serenity+=/rising_sun_kick,cycle_targets=1,if=active_enemies<3
---   if S.RisingSunKick:IsReadyPredicted() and Cache.EnemiesCount[8] < 3 then
+--   if S.RisingSunKick:Ready() and Cache.EnemiesCount[8] < 3 then
 --     if AR.Cast(S.RisingSunKick) then return ""; end
 --   end
 --   -- actions.serenity+=/strike_of_the_windlord
---   if S.StrikeOfTheWindlord:IsReadyPredicted() then
+--   if S.StrikeOfTheWindlord:Ready() then
 --     if AR.Cast(S.StrikeOfTheWindlord) then return ""; end
 --   end
 --   -- actions.serenity+=/blackout_kick,cycle_targets=1,if=(!prev_gcd.1.blackout_kick)&(prev_gcd.1.strike_of_the_windlord|prev_gcd.1.fists_of_fury)&active_enemies<2
---   if S.BlackoutKick:IsReadyPredicted() and not Player:PrevGCD(1, S.BlackoutKick) and (Player:PrevGCD(1,S.StrikeOfTheWindlord) or Player:PrevGCD(1,S.FistsOfFury)) and Cache.EnemiesCount[8] < 2 then
+--   if S.BlackoutKick:Ready() and not Player:PrevGCD(1, S.BlackoutKick) and (Player:PrevGCD(1,S.StrikeOfTheWindlord) or Player:PrevGCD(1,S.FistsOfFury)) and Cache.EnemiesCount[8] < 2 then
 --     if AR.Cast(S.BlackoutKick) then return ""; end
 --   end
 --   -- actions.serenity+=/fists_of_fury,if=((equipped.drinking_horn_cover&buff.pressure_point.remains<=2&set_bonus.tier20_4pc)&(cooldown.rising_sun_kick.remains>1|active_enemies>1)),interrupt=1
---   if S.FistsOfFury:IsReadyPredicted() and ((I.DrinkingHornCover:IsEquipped() and Player:BuffRemains(S.PressurePoint) <= 2 and AC.Tier20_4Pc) and (S.RisingSunKick:CooldownRemainsPredicted() > 1 or Cache.EnemiesCount[8] > 1)) then
+--   if S.FistsOfFury:Ready() and ((I.DrinkingHornCover:IsEquipped() and Player:BuffRemains(S.PressurePoint) <= 2 and AC.Tier20_4Pc) and (S.RisingSunKick:CooldownRemainsPredicted() > 1 or Cache.EnemiesCount[8] > 1)) then
 --     if AR.Cast(S.FistsOfFury) then return ""; end
 --   end
 --   -- actions.serenity+=/fists_of_fury,if=((!equipped.drinking_horn_cover|buff.bloodlust.up|buff.serenity.remains<1)&(cooldown.rising_sun_kick.remains>1|active_enemies>1)),interrupt=1
---   if S.FistsOfFury:IsReadyPredicted() and ((not I.DrinkingHornCover:IsEquipped() or Player:Buff(S.Bloodlust) or Player:BuffRemains(S.Serenity) < 1) and (S.RisingSunKick:CooldownRemainsPredicted() > 1 or Cache.EnemiesCount[8] > 1)) then
+--   if S.FistsOfFury:Ready() and ((not I.DrinkingHornCover:IsEquipped() or Player:Buff(S.Bloodlust) or Player:BuffRemains(S.Serenity) < 1) and (S.RisingSunKick:CooldownRemainsPredicted() > 1 or Cache.EnemiesCount[8] > 1)) then
 --     if AR.Cast(S.FistsOfFury) then return ""; end
 --   end
 --   -- actions.serenity+=/spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
---   if AR.AoEON() and S.SpinningCraneKick:IsReadyPredicted() and Cache.EnemiesCount[8] >= 3 and not Player:PrevGCD(1, S.SpinningCraneKick) then
+--   if AR.AoEON() and S.SpinningCraneKick:Ready() and Cache.EnemiesCount[8] >= 3 and not Player:PrevGCD(1, S.SpinningCraneKick) then
 --     if AR.Cast(S.SpinningCraneKick) then return ""; end
 --   end
 --   -- actions.serenity+=/rising_sun_kick,cycle_targets=1,if=active_enemies>=3
---   if S.RisingSunKick:IsReadyPredicted() and Cache.EnemiesCount[8] >= 3 then
+--   if S.RisingSunKick:Ready() and Cache.EnemiesCount[8] >= 3 then
 --     if AR.Cast(S.RisingSunKick) then return ""; end
 --   end
 --   -- actions.serenity+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick
---   if S.SpinningCraneKick:IsReadyPredicted() and not Player:PrevGCD(1, S.SpinningCraneKick) then
+--   if S.SpinningCraneKick:Ready() and not Player:PrevGCD(1, S.SpinningCraneKick) then
 --     if AR.Cast(S.SpinningCraneKick) then return ""; end
 --   end
 --   -- actions.serenity+=/blackout_kick,cycle_targets=1,if=!prev_gcd.1.blackout_kick
---   if S.BlackoutKick:IsReadyPredicted() and not Player:PrevGCD(1, S.BlackoutKick) then
+--   if S.BlackoutKick:Ready() and not Player:PrevGCD(1, S.BlackoutKick) then
 --     if AR.Cast(S.BlackoutKick) then return ""; end
 --   end
 --   -- actions.serenity+=/rushing_jade_wind,if=!prev_gcd.1.rushing_jade_wind
---   if S.RushingJadeWind:IsReadyPredicted() and not Player:PrevGCD(1, S.RushingJadeWind) then
+--   if S.RushingJadeWind:Ready() and not Player:PrevGCD(1, S.RushingJadeWind) then
 --     if AR.Cast(S.RushingJadeWind) then return ""; end
 --   end
 --   return false;
@@ -328,14 +326,14 @@ local function APL ()
 	if not Player:AffectingCombat() then
 		if Everyone.TargetIsValid() then
 			-- actions.st+=/chi_wave
-			if S.ChiWave:IsReady() and not Target:IsInRange(5) then
+			if S.ChiWave:Ready() and not Target:IsInRange(5) then
 	      if AR.Cast(S.ChiWave) then return ""; end
 	    end
 	    -- actions.st+=/chi_burst
-	    if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
+	    if S.ChiBurst:Ready() and not Target:IsInRange(5) then
 	      if AR.Cast(S.ChiBurst) then return ""; end
 	    end
-			if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) then
+			if S.TigerPalm:Ready() and not Player:PrevGCD(1, S.TigerPalm) then
 	      if AR.Cast(S.TigerPalm) then return ""; end
 	    end
 		end
@@ -345,15 +343,15 @@ local function APL ()
 	-- In Combat
 	if Everyone.TargetIsValid() then
 		-- actions.st+=/chi_wave
-		if S.ChiWave:IsReady() and not Target:IsInRange(5) then
+		if S.ChiWave:Ready() and not Target:IsInRange(5) then
 			if AR.Cast(S.ChiWave) then return ""; end
 		end
 		-- actions.st+=/chi_burst
-		if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
+		if S.ChiBurst:Ready() and not Target:IsInRange(5) then
 			if AR.Cast(S.ChiBurst) then return ""; end
 		end
 		-- actions+=/touch_of_death
-		if AR.CDsON() and S.TouchOfDeath:IsReadyPredicted() and Target:TimeToDie() >= 9 then
+		if AR.CDsON() and S.TouchOfDeath:Ready() and Target:TimeToDie() >= 9 then
 			if AR.CastLeft(S.TouchOfDeath) then return ""; end
 		end
 		-- -- actions+=/call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
@@ -456,4 +454,3 @@ AR.SetAPL(269, APL);
 -- actions.st+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&(chi.max-chi>=2|energy.time_to_max<1)
 -- actions.st+=/chi_wave
 -- actions.st+=/chi_burst
-
