@@ -104,7 +104,7 @@ local function APL ()
   -- Unit Update
   AC.GetEnemies(8);  -- WhirlWind
   AC.GetEnemies(5);  -- Melee
-  print(tostring(Cache.EnemiesCount[8]))
+
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Opener
