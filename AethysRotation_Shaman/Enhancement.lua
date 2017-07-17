@@ -146,9 +146,8 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(20)  -- Boulderfist, Flametongue
-  AC.GetEnemies(8)  -- CrashLightning
-  AC.GetEnemies(5)  -- Melee
+  AC.GetEnemies(8);  -- CrashLightning
+  AC.GetEnemies(5);  -- Melee
 
   -- Out of Combat
   if not Player:AffectingCombat() then
