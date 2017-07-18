@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Warrior_Arms_T20M on 7/14/2017
+-- APL from Warrior_Arms_T20M on 7/18/2017
 
 -- APL Local Vars
 -- Spells
@@ -57,6 +57,8 @@ Spell.Warrior.Arms = {
   FervorOfBattle                 = Spell(202316),
   SweepingStrikes                = Spell(202161),
   AngerManagement                = Spell(152278),
+  InForTheKill                   = Spell(248621),
+  InForTheKillBuff               = Spell(248622),
 
   -- Artifact
   Warbreaker                     = Spell(209577),
@@ -223,9 +225,46 @@ local function APL ()
 
     -- actions+=/run_action_list,name=aoe,if=spell_targets.whirlwind>=5&!talent.sweeping_strikes.enabled
     if AR.AoEON() and (Cache.EnemiesCount[8] >= 5 and not S.SweepingStrikes:IsAvailable()) then
-      -- actions.aoe=mortal_strike,if=cooldown_react
-      if S.MortalStrike:IsReady() then
-        if AR.Cast(S.MortalStrike) then return "Cast MortalStrike" end
+      -- actions.aoe=warbreaker,if=(cooldown.bladestorm.up|cooldown.bladestorm.remains<=gcd)&(cooldown.battle_cry.up|cooldown.battle_cry.remains<=gcd)
+      if S.Warbreaker:IsReady() and ((S.Bladestorm:CooldownRemains() == 0 or S.Bladestorm:CooldownRemains() <= Player:GCD()) and (S.BattleCry:CooldownRemains() == 0 or S.BattleCry:CooldownRemains() <= Player:GCD())) then
+        if Settings.Arms.WarbreakerEnabled then
+          if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
+        end
+      end
+
+      -- actions.aoe+=/bladestorm,if=buff.battle_cry.up&(set_bonus.tier20_4pc|equipped.the_great_storms_eye)
+      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (AC.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
+        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+      end
+
+      -- actions.aoe+=/colossus_smash,if=buff.in_for_the_kill.down&talent.in_for_the_kill.enabled
+      if S.ColossusSmash:IsReady() and (not Player:Buff(S.InForTheKillBuff) and S.InForTheKill:IsAvailable()) then
+        if AR.Cast(S.ColossusSmash) then return "Cast ColossusSmash" end
+      end
+
+      -- actions.aoe+=/colossus_smash,cycle_targets=1,if=debuff.colossus_smash.down&spell_targets.whirlwind<=10
+      if S.ColossusSmash:IsReady() and (not Target:Debuff(S.ColossusSmashDebuff) and Cache.EnemiesCount[8] <= 10) then
+        if AR.Cast(S.ColossusSmash) then return "Cast ColossusSmash" end
+      end
+
+      -- actions.aoe+=/cleave,if=spell_targets.whirlwind>=5
+      if S.Cleave:IsReady() and (Cache.EnemiesCount[8] >= 5) then
+        if AR.Cast(S.Cleave) then return "Cast Cleave" end
+      end
+
+      -- actions.aoe+=/whirlwind,if=spell_targets.whirlwind>=5&buff.cleave.up
+      if S.WhirlWind:IsReady() and (Cache.EnemiesCount[8] >= 5 and Player:Buff(S.CleaveBuff)) then
+        if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
+      end
+
+      -- actions.aoe+=/whirlwind,if=spell_targets.whirlwind>=7
+      if S.WhirlWind:IsReady() and (Cache.EnemiesCount[8] >= 7) then
+        if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
+      end
+
+      -- actions.aoe+=/colossus_smash,if=buff.shattered_defenses.down
+      if S.ColossusSmash:IsReady() and (not Player:Buff(S.ShatteredDefensesBuff)) then
+        if AR.Cast(S.ColossusSmash) then return "Cast ColossusSmash" end
       end
 
       -- actions.aoe+=/execute,if=buff.stone_heart.react
@@ -233,31 +272,14 @@ local function APL ()
         if AR.Cast(S.Execute) then return "Cast Execute" end
       end
 
-      -- actions.aoe+=/colossus_smash,if=cooldown_react&buff.shattered_defenses.down&buff.precise_strikes.down
-      if S.ColossusSmash:IsReady() and (not Player:Buff(S.ShatteredDefensesBuff) and not Player:Buff(S.PreciseStrikesBuff)) then
-        if AR.Cast(S.ColossusSmash) then return "Cast ColossusSmash" end
+      -- actions.aoe+=/mortal_strike,if=buff.shattered_defenses.up|buff.executioners_precision.down
+      if S.MortalStrike:IsReady() and (Player:Buff(S.ShatteredDefensesBuff) or not Target:Debuff(S.ExecutionersPrecisionDebuff)) then
+        if AR.Cast(S.MortalStrike) then return "Cast MortalStrike" end
       end
 
-      -- actions.aoe+=/warbreaker,if=buff.shattered_defenses.down
-      if S.Warbreaker:IsReady() and (not Player:Buff(S.ShatteredDefensesBuff)) then
-        if Settings.Arms.WarbreakerEnabled then
-          if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
-        end
-      end
-
-      -- actions.aoe+=/whirlwind,if=talent.fervor_of_battle.enabled&(debuff.colossus_smash.up|rage.deficit<50)&(!talent.focused_rage.enabled|buff.battle_cry_deadly_calm.up|buff.cleave.up)
-      if S.WhirlWind:IsReady() and (S.FervorOfBattle:IsAvailable() and (Target:Debuff(S.ColossusSmashDebuff) or Player:RageDeficit() < 50) and (not S.FocusedRage:IsAvailable() or battle_cry_deadly_calm() or Player:Buff(S.CleaveBuff))) then
-        if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
-      end
-
-      -- actions.aoe+=/rend,if=remains<=duration*0.3
-      if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Target:DebuffDuration(S.RendDebuff) * 0.3) then
+      -- actions.aoe+=/rend,cycle_targets=1,if=remains<=duration*0.3&spell_targets.whirlwind<=3
+      if S.Rend:IsReady() and (Target:DebuffRemains(S.RendDebuff) <= Target:DebuffDuration(S.RendDebuff) * 0.3 and Cache.EnemiesCount[8] <= 3) then
         if AR.Cast(S.Rend) then return "Cast Rend" end
-      end
-
-      -- actions.aoe+=/bladestorm
-      if S.Bladestorm:IsReady() then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
       end
 
       -- actions.aoe+=/cleave
@@ -265,26 +287,9 @@ local function APL ()
         if AR.Cast(S.Cleave) then return "Cast Cleave" end
       end
 
-      -- actions.aoe+=/execute,if=rage>90
-      if S.Execute:IsReady() and (Player:Rage() > 90) then
-        if (Target:HealthPercentage() < 20) then
-          if AR.Cast(S.Execute) then return "Cast Execute" end
-        end
-      end
-
-      -- actions.aoe+=/whirlwind,if=rage>=40
-      if S.WhirlWind:IsReady() and (Player:Rage() >= 40) then
+      -- actions.aoe+=/whirlwind
+      if S.WhirlWind:IsReady() then
         if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
-      end
-
-      -- actions.aoe+=/shockwave
-      if S.Shockwave:IsReady() then
-        if AR.Cast(S.Shockwave) then return "Cast Shockwave" end
-      end
-
-      -- actions.aoe+=/storm_bolt
-      if S.StormBolt:IsReady() then
-        if AR.Cast(S.StormBolt) then return "Cast StormBolt" end
       end
     end
 
