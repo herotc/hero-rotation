@@ -9,4 +9,5 @@
 ## Dependencies: AethysRotation
 
 Settings.lua
+Elemental.lua
 Enhancement.lua

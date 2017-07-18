@@ -221,7 +221,7 @@
       [260]   = "AethysRotation_Rogue",         -- Outlaw
       [261]   = "AethysRotation_Rogue",         -- Subtlety
     -- Shaman
-      [262]   = false,                          -- Elemental
+      [262]   = "AethysRotation_Shaman",        -- Elemental
       [263]   = "AethysRotation_Shaman",        -- Enhancement
       [264]   = false,                          -- Restoration
     -- Warlock

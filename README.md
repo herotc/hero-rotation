@@ -48,6 +48,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Rogue Outlaw
 - Rogue Subtlety
 - Shaman Enhancement ([Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
+- Shaman Elemental ([lithium720](https://github.com/lithium720)) **[WIP]**
 - Warlock Destruction ([KutiKuti](https://github.com/Kutikuti)) **[Beta]**
 - Warlock Demonology ([KutiKuti](https://github.com/Kutikuti)) **[Beta]**
 - Warrior Fury ([Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90)) **[Beta]**
