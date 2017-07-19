@@ -195,7 +195,7 @@
         if AR.Cast(S.ChimaeraShot) then return; end
       end
       -- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>action.kill_command.cost)|target.time_to_die<cooldown.kill_command.remains|(equipped.parsels_tongue&buff.parsels_tongue.remains<=gcd.max*2)
-      if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:Cooldown() > Player:FocusTimeToMax() and (S.BestialWrath:Cooldown() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BestialWrath) and Player:FocusRegen()*S.KillCommand:Cooldown() > S.KillCommand:Cost()) or Target:TimeToDie() < S.KillCommand:Cooldown()) or (I.ParselsTongue:IsEquipped() and Player:Buff(S.ParselsTongueBuff) <= Player:GCD() * 2) then
+      if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:Cooldown() > Player:FocusTimeToMax() and (S.BestialWrath:Cooldown() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BestialWrath) and Player:FocusRegen()*S.KillCommand:Cooldown() > S.KillCommand:Cost()) or Target:TimeToDie() < S.KillCommand:Cooldown()) or (I.ParselsTongue:IsEquipped() and Player:BuffRemains(S.ParselsTongueBuff) <= Player:GCD() * 2) then
         if AR.Cast(S.CobraShot) then return; end
       end
       if AR.Cast(S.PoolFocus) then return "Normal Pooling"; end
