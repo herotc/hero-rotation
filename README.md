@@ -52,7 +52,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Warlock Destruction ([KutiKuti](https://github.com/Kutikuti)) **[Beta]**
 - Warlock Demonology ([KutiKuti](https://github.com/Kutikuti)) **[Beta]**
 - Warrior Fury ([Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90)) **[Beta]**
-- Warrior Arms ([lithium720](https://github.com/lithium720)) **[Beta]**
+- Warrior Arms ([lithium720](https://github.com/lithium720))
 
 ## Special Mention About SimC APL
 As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
