@@ -146,7 +146,6 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(8);  -- CrashLightning
   AC.GetEnemies(5);  -- Melee
 
   -- Out of Combat
@@ -210,7 +209,7 @@ local function APL ()
 
     -- actions.buffs+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
     if S.CrashLightning:IsCastable() and (S.AlphaWolf:ArtifactEnabled() and Player:PrevGCD(1, S.FeralSpirit)) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[8] > 0 then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
@@ -284,8 +283,8 @@ local function APL ()
     end
 
     -- actions.core+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>=2
-    if S.CrashLightning:IsCastable() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[8] >= 2) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+    if S.CrashLightning:IsCastable() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[5] >= 2) then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
@@ -299,7 +298,7 @@ local function APL ()
 
     -- actions.core+=/crash_lightning,if=active_enemies>=8|(active_enemies>=6&talent.crashing_storm.enabled)
     if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[5] >= 8 or (Cache.EnemiesCount[5] >= 6 and S.CrashingStorm:IsAvailable())) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
@@ -320,7 +319,7 @@ local function APL ()
 
     -- actions.core+=/crash_lightning,if=active_enemies>=4|(active_enemies>=2&talent.crashing_storm.enabled)
     if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[5] >= 4 or (Cache.EnemiesCount[5] >= 2 and S.CrashingStorm:IsAvailable())) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
@@ -362,7 +361,7 @@ local function APL ()
 
     -- actions.core+=/crash_lightning,if=active_enemies>=3|variable.LightningCrashNotUp|variable.alphaWolfCheck
     if S.CrashLightning:IsCastable() and (Cache.EnemiesCount[5] >= 3 or LightningCrashNotUp() or alphaWolfCheck()) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
@@ -384,7 +383,7 @@ local function APL ()
 
     -- actions.filler+=/crash_lightning,if=(talent.crashing_storm.enabled|active_enemies>=2)&debuff.earthen_spike.up&maelstrom>=40&variable.OCPool60
     if S.CrashLightning:IsCastable() and ((S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and Target:Debuff(S.EarthenSpikeDebuff) and Player:Maelstrom() >= 40 and OCPool60()) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
@@ -426,7 +425,7 @@ local function APL ()
 
     -- actions.filler+=/crash_lightning,if=(maelstrom>=65|talent.crashing_storm.enabled|active_enemies>=2)&variable.OCPool60&variable.furyCheck45
     if S.CrashLightning:IsCastable() and ((Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable() or Cache.EnemiesCount[5] >= 2) and OCPool60() and furyCheck45()) then
-      if Player:Maelstrom() >= S.CrashLightning:Cost() then
+      if Player:Maelstrom() >= S.CrashLightning:Cost() and Cache.EnemiesCount[5] > 0 then
         if AR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
