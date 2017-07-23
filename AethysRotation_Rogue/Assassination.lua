@@ -263,8 +263,8 @@ local function CDs ()
     if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
       AR.CastSuggested(S.MarkedforDeath);
     end
-    -- actions.cds+=/vendetta,if=!artifact.urge_to_kill.enabled|energy.deficit>=60+variable.energy_regen_combined
-    if S.Vendetta:IsCastable() and (not S.UrgetoKill:ArtifactEnabled() or Player:EnergyDeficit() >= 60 + Energy_Regen_Combined()) then
+    -- actions.cds+=/vendetta,if=!artifact.urge_to_kill.enabled|energy.deficit>=60-variable.energy_regen_combined
+    if S.Vendetta:IsCastable() and (not S.UrgetoKill:ArtifactEnabled() or Player:EnergyDeficit() >= 60 - Energy_Regen_Combined()) then
       if AR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast"; end
     end
     -- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
@@ -617,7 +617,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 07/15/2017
+-- Last Update: 07/23/2017
 -- Note: Some Exsang changes not synced yet, mostly due to missing pmultiplier.
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
@@ -656,7 +656,7 @@ AR.SetAPL(259, APL);
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
--- actions.cds+=/vendetta,if=!artifact.urge_to_kill.enabled|energy.deficit>=60+variable.energy_regen_combined
+-- actions.cds+=/vendetta,if=!artifact.urge_to_kill.enabled|energy.deficit>=60-variable.energy_regen_combined
 -- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
 -- # Nightstalker w/o Exsanguinate: Vanish Envenom if Mantle & T19_4PC, else Vanish Rupture
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&mantle_duration=0&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
