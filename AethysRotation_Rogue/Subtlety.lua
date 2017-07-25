@@ -130,6 +130,7 @@ local tableinsert = table.insert;
     -- Legendaries
     DenialoftheHalfGiants         = Item(137100, {9}),
     DraughtofSouls                = Item(140808, {13, 14}),
+    InsigniaOfRavenholdt          = Item(137049, {11, 12}),
     MantleoftheMasterAssassin     = Item(144236, {3}),
     ShadowSatyrsWalk              = Item(137032, {8})
   };
@@ -316,27 +317,29 @@ end
 local function Finish (ReturnSpellOnly)
   if S.Nightblade:IsCastable() then
     NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
-    -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+    -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff))
       and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
       and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= Rogue.MantleDuration())
-      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade)))
-        or Target:DebuffRemains(S.Nightblade) < 4) then
+      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
+        or Target:DebuffRemains(S.Nightblade) < 4)
+      and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
       if ReturnSpellOnly then
         return S.Nightblade;
       else
         if AR.Cast(S.Nightblade) then return ""; end
       end
     end
-    -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+    -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff)) and Rogue.MantleDuration() == 0 then
       BestUnit, BestUnitTTD = nil, 12;
       for _, Unit in pairs(Cache.Enemies[5]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Nightblade))
           and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
-          and ((Unit:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade)))
-            or Unit:DebuffRemains(S.Nightblade) < 4) then
+          and ((Unit:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
+            or Unit:DebuffRemains(S.Nightblade) < 4)
+          and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -430,9 +433,9 @@ local function Stealthed ()
       or (Rogue.MantleDuration() <= 1.3 and Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
     return Finish();
   end
-  -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
+  -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=2+equipped.insignia_of_ravenholdt&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
   if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-      and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
+      and ((Player:ComboPointsDeficit() >= 2 + (I.InsigniaOfRavenholdt:IsEquipped() and 1 or 0) and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
         or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.ShurikenStorm) then return ""; end
   end
@@ -608,7 +611,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 07/14/2017
+-- Last Update: 07/25/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -661,8 +664,8 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/vanish,if=energy>=55-talent.shadow_focus.enabled*10&variable.dsh_dfa&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+6|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1&(time<10|combo_points>=3)|target.time_to_die<=7
 
 -- # Finishers
--- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
--- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up))|remains<tick_time*2)
+-- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
+-- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
 -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|spell_targets>=4&buff.shadow_dance.up|spell_targets<4&!buff.shadow_dance.up&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)
 -- actions.finish+=/eviscerate
 
@@ -684,6 +687,6 @@ AR.SetAPL(261, APL);
 -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
 -- actions.stealthed=shadowstrike,if=buff.stealth.up
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
--- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
+-- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=2+equipped.insignia_of_ravenholdt&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<3+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
 -- actions.stealthed+=/shadowstrike
