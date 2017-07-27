@@ -347,6 +347,14 @@ local function Finish (ReturnSpellOnly)
         AR.CastLeftNameplate(BestUnit, S.Nightblade);
       end
     end
+    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=3
+    if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade) < S.SymbolsofDeath:CooldownRemains() + 10 and S.SymbolsofDeath:CooldownRemains() <= 3 then
+      if ReturnSpellOnly then
+        return S.Nightblade;
+      else
+        if AR.Cast(S.Nightblade) then return ""; end
+      end
+    end
   end
   -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|spell_targets>=4&buff.shadow_dance.up|spell_targets<4&!buff.shadow_dance.up&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)
   if AR.AoEON() and S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
@@ -611,7 +619,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 07/25/2017
+-- Last Update: 07/27/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -666,6 +674,7 @@ AR.SetAPL(261, APL);
 -- # Finishers
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
 -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
+-- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=3
 -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|spell_targets>=4&buff.shadow_dance.up|spell_targets<4&!buff.shadow_dance.up&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)
 -- actions.finish+=/eviscerate
 
