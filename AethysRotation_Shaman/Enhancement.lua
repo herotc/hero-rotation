@@ -71,8 +71,8 @@ local S = Spell.Shaman.Enhancement
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
   -- Legendaries
-  SmolderingHeart           = Item(151819),
-  AkainusAbsoluteJustice    = Item(137084)
+  SmolderingHeart           = Item(151819, {10}),
+  AkainusAbsoluteJustice    = Item(137084, {9})
 }
 local I = Item.Shaman.Enhancement
 
