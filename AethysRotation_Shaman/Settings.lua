@@ -20,7 +20,8 @@
       OffGCDasOffGCD = {
 	    WindShear = {true, false},
 	    Racials = {true, false}
-      }
+      },
+      OnUseTrinkets = false
     },
 
     Elemental = {
@@ -48,6 +49,7 @@
   -- Shared Shaman settings
   CreateARPanelOption("OffGCDasOffGCD", CP_Shaman, "APL.Shaman.Commons.OffGCDasOffGCD.WindShear", "Wind Shear");
   CreateARPanelOption("OffGCDasOffGCD", CP_Shaman, "APL.Shaman.Commons.OffGCDasOffGCD.Racials", "Racials");
+  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.OnUseTrinkets", "Show on use trinkets", "Enable this if you want to show on use trinkets when they are ready.");
 
   -- Elemental settings
 

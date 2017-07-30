@@ -64,6 +64,9 @@ Spell.Shaman.Enhancement = {
 
   -- Utility
   WindShear             = Spell(57994)
+
+  -- Trinkets
+  SpecterOfBetrayal     = Spell(246461)
 }
 local S = Spell.Shaman.Enhancement
 
@@ -72,7 +75,10 @@ if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
   -- Legendaries
   SmolderingHeart           = Item(151819, {10}),
-  AkainusAbsoluteJustice    = Item(137084, {9})
+  AkainusAbsoluteJustice    = Item(137084, {9}),
+
+  -- Trinkets
+  SpecterOfBetrayal         = Item(151190, {13, 14})
 }
 local I = Item.Shaman.Enhancement
 
@@ -172,6 +178,10 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(8) and S.SpecterOfBetrayal:CooldownRemains() == 0 then
+      if AR.Cast(S.SpecterOfBetrayal, {true}) then return "Cast SpecterOfBetrayal" end
+    end
+
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=earthen_spike
