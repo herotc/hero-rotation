@@ -59,7 +59,7 @@ local S = Spell.Shaman.Elemental
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Elemental = {
   -- Legendaries
-  SmolderingHeart           = Item(151819)
+  SmolderingHeart           = Item(151819, {10})
 }
 local I = Item.Shaman.Elemental
 

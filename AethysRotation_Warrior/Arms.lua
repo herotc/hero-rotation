@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Warrior_Arms_T20M on 7/18/2017
+-- APL from Warrior_Arms_T20M on 7/31/2017
 
 -- APL Local Vars
 -- Spells
@@ -85,7 +85,7 @@ local S = Spell.Warrior.Arms;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
   -- Legendaries
-  TheGreatStormsEye = Item(151823),
+  TheGreatStormsEye = Item(151823, {1}),
 };
 local I = Item.Warrior.Arms;
 
@@ -97,8 +97,9 @@ local Settings = {
 }
 
 -- APL Variables
-local function battle_cry_deadly_calm ()
-  return Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable()
+local function battle_cry_deadly_calm()
+  if Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable() then return true
+  else return false end
 end
 
 -- APL Main
@@ -127,7 +128,6 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange(5) and not Target:IsDeadOrGhost() then
-
     -- Racial
     -- actions+=/blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
     if S.BloodFury:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or Target:TimeToDie() <= 16) then
@@ -184,7 +184,7 @@ local function APL ()
 
       -- actions.cleave+=/focused_rage,if=rage>100|buff.battle_cry_deadly_calm.up
       if S.FocusedRage:IsReady() and (Player:Rage() > 100 or battle_cry_deadly_calm()) then
-        if AR.Cast(S.FocusedRage) then return "Cast FocusedRage" end
+        if AR.Cast(S.FocusedRage, Settings.Arms.OffGCDasOffGCD.FocusedRage) then return "Cast FocusedRage" end
       end
 
       -- actions.cleave+=/whirlwind,if=talent.fervor_of_battle.enabled&(debuff.colossus_smash.up|rage.deficit<50)&(!talent.focused_rage.enabled|buff.battle_cry_deadly_calm.up|buff.cleave.up)
@@ -314,7 +314,7 @@ local function APL ()
 
       -- actions.execute+=/focused_rage,if=rage.deficit<35
       if S.FocusedRage:IsReady() and (Player:RageDeficit() < 35) then
-        if AR.Cast(S.FocusedRage) then return "Cast FocusedRage" end
+        if AR.Cast(S.FocusedRage, Settings.Arms.OffGCDasOffGCD.FocusedRage) then return "Cast FocusedRage" end
       end
 
       -- actions.execute+=/rend,if=remains<5&cooldown.battle_cry.remains<2&(cooldown.bladestorm.remains<2|!set_bonus.tier20_4pc)
@@ -368,8 +368,8 @@ local function APL ()
       end
 
       -- actions.single+=/focused_rage,if=!buff.battle_cry_deadly_calm.up&buff.focused_rage.stack<3&!cooldown.colossus_smash.up&(rage>=130|debuff.colossus_smash.down|talent.anger_management.enabled&cooldown.battle_cry.remains<=8)
-      if S.FocusedRage:IsReady() and (not battle_cry_deadly_calm() and Player:BuffStack(S.FocusedRage) < 3 and not S.ColossusSmash:CooldownRemains() > 0 and (Player:Rage() >= 130 or not Target:Debuff(S.ColossusSmashDebuff) or S.AngerManagement:IsAvailable() and S.BattleCry:CooldownRemains() <= 8)) then
-        if AR.Cast(S.FocusedRage) then return "Cast FocusedRage" end
+      if S.FocusedRage:IsReady() and (not battle_cry_deadly_calm() and Player:BuffStack(S.FocusedRageBuff) < 3 and S.ColossusSmash:CooldownRemains() > 0 and (Player:Rage() >= 130 or Target:Debuff(S.ColossusSmashDebuff) or (S.AngerManagement:IsAvailable() and S.BattleCry:CooldownRemains() <= 8))) then
+        if AR.Cast(S.FocusedRage, Settings.Arms.OffGCDasOffGCD.FocusedRage) then return "Cast FocusedRage" end
       end
 
       -- actions.single+=/rend,if=remains<=gcd.max|remains<5&cooldown.battle_cry.remains<2&(cooldown.bladestorm.remains<2|!set_bonus.tier20_4pc)
@@ -407,8 +407,8 @@ local function APL ()
         if AR.Cast(S.WhirlWind) then return "Cast WhirlWind" end
       end
 
-      -- actions.single+=/slam,if=spell_targets.whirlwind=1&!talent.fervor_of_battle.enabled
-      if S.Slam:IsReady() and (Cache.EnemiesCount[5] == 1 and not S.FervorOfBattle:IsAvailable()) then
+      -- actions.single+=/slam,if=spell_targets.whirlwind=1&!talent.fervor_of_battle.enabled&(rage>=52|!talent.rend.enabled|!talent.ravager.enabled)
+      if S.Slam:IsReady() and (Cache.EnemiesCount[5] == 1 and not S.FervorOfBattle:IsAvailable() and (Player:Rage() >= 52 or not S.Rend:IsAvailable() or not S.Ravager:IsAvailable())) then
         if AR.Cast(S.Slam) then return "Cast Slam" end
       end
 

@@ -26,7 +26,8 @@
     Arms = {
       OffGCDasOffGCD = {
         Avatar = {true, false},
-        BattleCry = {true, false}
+        BattleCry = {true, false},
+        FocusedRage = {true, false}
       },
       GCDasOffGCD = {
         Warbreaker = {false, true}
@@ -56,5 +57,8 @@
   -- Arms settings
   CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.Avatar", "Avatar");
   CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.BattleCry", "Battle Cry");
-  CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Warbreaker", "Warbreaker");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.FocusedRage", "Focused Rage");
   CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.WarbreakerEnabled", "Enable Warbreaker", "Disable this if you want to omit Warbreaker from the rotation.");
+  CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Warbreaker", "Warbreaker");
+
+  -- Fury settings
