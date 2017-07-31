@@ -63,7 +63,7 @@ Spell.Shaman.Enhancement = {
   AlphaWolf             = Spell(198434),
 
   -- Utility
-  WindShear             = Spell(57994)
+  WindShear             = Spell(57994),
 
   -- Trinkets
   SpecterOfBetrayal     = Spell(246461)
@@ -178,10 +178,6 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
-    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(8) and S.SpecterOfBetrayal:CooldownRemains() == 0 then
-      if AR.Cast(S.SpecterOfBetrayal, {true}) then return "Cast SpecterOfBetrayal" end
-    end
-
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=earthen_spike
@@ -284,6 +280,11 @@ local function APL ()
       end
     end
 
+    -- On use trinkets (After OffGCDs)
+    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
+      if AR.Cast(S.SpecterOfBetrayal, {true}) then return "Cast SpecterOfBetrayal" end
+    end
+
     -- actions+=/call_action_list,name=core
     -- actions.core=earthen_spike,if=variable.furyCheck25
     if S.EarthenSpike:IsCastable() and (furyCheck25()) then
@@ -356,7 +357,7 @@ local function APL ()
     end
 
     -- actions.core+=/lava_lash,if=buff.hot_hand.react&((variable.akainuEquipped&buff.frostbrand.up)|!variable.akainuEquipped)
-    if S.LavaLash:IsCastable() and (Player:Buff(S.HotHandBuff) and ((akainuEquipped() and Player:Buff(FrostbrandBuff)) or not akainuEquipped())) then
+    if S.LavaLash:IsCastable() and (Player:Buff(S.HotHandBuff) and ((akainuEquipped() and Player:Buff(S.FrostbrandBuff)) or not akainuEquipped())) then
       if Player:Maelstrom() >= S.LavaLash:Cost() and Target:IsInRange(5) then
         if AR.Cast(S.LavaLash) then return "Cast LavaLash" end
       end
