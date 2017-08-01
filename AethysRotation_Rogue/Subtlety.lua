@@ -265,7 +265,7 @@ local function CDs ()
         end
       else
         -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc))|target.time_to_die-remains<=10
-        if AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 3 and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
+        if S.DeathfromAbove:CooldownRemains() <= 3 and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       end
@@ -296,12 +296,13 @@ local function CDs ()
       end
       -- actions.cds+=/vanish,if=energy>=55-talent.shadow_focus.enabled*10&variable.dsh_dfa&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)&cooldown.shadow_dance.charges_fractional<=variable.shd_fractional&!buff.shadow_dance.up&!buff.stealth.up&mantle_duration=0&(dot.nightblade.remains>=cooldown.death_from_above.remains+6|target.time_to_die-dot.nightblade.remains<=6)&cooldown.death_from_above.remains<=1|target.time_to_die<=7
       -- Disable vanish while mantle buff is up, we put mantle_duration=0 as a mandatory condition. This isn't seen in SimC since combat length < 5s are rare, might be worth to port it tho. It won't hurt.
+      -- Removed the TTD part for now.
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-        and Rogue.MantleDuration() == 0 and (DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
+        and Rogue.MantleDuration() == 0 and DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
           and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
-          and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 6 or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Nightblade)) or not Target:TimeToDieIsNotValid())
-          and AR.AoEON() and S.DeathfromAbove:CooldownRemains() <= 1
-          or Target:FilteredTimeToDie("<=", 7) or Target:TimeToDieIsNotValid()) then
+          and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 6 
+            or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Nightblade)) or not Target:TimeToDieIsNotValid())
+          and S.DeathfromAbove:CooldownRemains() <= 1 then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
         if Player:EnergyPredicted() < 55 - (S.ShadowFocus:IsAvailable() and 10 or 0) then
           if AR.Cast(S.PoolEnergy) then return "Pool for Vanish"; end
@@ -357,8 +358,11 @@ local function Finish (ReturnSpellOnly)
     end
   end
   -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|spell_targets>=4&buff.shadow_dance.up|spell_targets<4&!buff.shadow_dance.up&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)&!cooldown.vanish.up
-  if AR.AoEON() and S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
-    and (not S.DarkShadow:IsAvailable() or Cache.EnemiesCount[8] >= 4 and Player:Buff(S.ShadowDanceBuff) or Cache.EnemiesCount[8] < 4 and not Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 10 + (AC.Tier20_4Pc and 5 or 0)) and not S.Vanish:CooldownUp()) then
+  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
+    and (not S.DarkShadow:IsAvailable() or (Cache.EnemiesCount[8] >= 4 and Player:Buff(S.ShadowDanceBuff))
+      or (Cache.EnemiesCount[8] < 4 and not Player:Buff(S.ShadowDanceBuff) 
+        and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 10 + (AC.Tier20_4Pc and 5 or 0))
+        and not S.Vanish:CooldownUp())) then
     if ReturnSpellOnly then
       return S.DeathfromAbove;
     else
