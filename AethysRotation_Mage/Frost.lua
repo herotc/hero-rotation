@@ -15,8 +15,6 @@
   local AR = AethysRotation;
   -- Lua
 
-
-
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
   local Everyone = AR.Commons.Everyone;
@@ -26,6 +24,7 @@
   Spell.Mage.Frost = {
     -- Racials
     ArcaneTorrent                 = Spell(25046),
+    Berserking                    = Spell(26297),
     BloodFury                     = Spell(20572),
     GiftoftheNaaru                = Spell(59547),
     Shadowmeld                    = Spell(58984),
@@ -99,7 +98,6 @@
     Frost = AR.GUISettings.APL.Mage.Frost
   };
 
-
 --- ======= ACTION LISTS =======
   -- actions+=/variable,name=time_until_fof,value=10-(time-variable.iv_start-floor((time-variable.iv_start)%10)*10)
   local function TimeUntilFoF ()
@@ -110,12 +108,12 @@
   -- NOTE: react == stack on simc (react in fact gives you the number of stack based on reaction time)
   local function FoFReact ()
     return Player:BuffStack(S.FingersofFrost);
-  -- action is placed at the top of the APL
-  -- actions+=/ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
-        if S.IceLance:IsCastable() and FoFReact()= 0 & Player:PrevGCD(1, S.Flurry) then
-        if AR.Cast(S.IceLance) then return ""; end
-      end
   end
+ -- action is placed at the top of the APL
+ -- actions+=/ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
+       if S.IceLance:IsCastable() and FoFReact() == 0 and Player:PrevGCD(1, S.Flurry) then
+       if AR.Cast(S.IceLance) then return ""; end
+ end
   -- # AoE
   local function AoE ()
     if AR.AoEON() then
@@ -191,10 +189,11 @@
         if AR.Cast(S.RuneofPower) then return ""; end
       end
       -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
-       if I.PotionofProlongnedPower:IsUsable() and S.IcyVeins:IsCastable()
-       or Player:Buff(S.IcyVeins) then
-         if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
-         end
+      -- not working
+--       if I.PotionofProlongedPower:IsUsable() and S.IcyVeins:IsCastable()
+--       or Player:Buff(S.IcyVeins) then
+--         if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
+--         end
       -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
       if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
         if AR.Cast(S.IcyVeins) then return ""; end
@@ -317,7 +316,6 @@
   --For movement on the Frost APL, implemnt or not?
 --actions.single+=/blizzard,if=cast_time=0
 --actions.single+=/ice_lance
-
 
 --- ======= MAIN =======
   local function APL ()
@@ -476,7 +474,7 @@
 -- actions.single+=/blizzard,if=cast_time=0
 -- # Otherwise just use Ice Lance to do at least some damage.
 -- actions.single+=/ice_lance
--- 
+--
 -- # Variable which tracks when Icy Veins were used. For use in time_until_fof variable.
 -- actions.variables=variable,name=iv_start,value=time,if=prev_off_gcd.icy_veins
 -- # This variable tracks the remaining time until FoF proc from Lady Vashj's Grasp. Note that it doesn't check whether the actor actually has the legendary or that Icy Veins are currently active.
