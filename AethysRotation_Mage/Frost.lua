@@ -26,7 +26,6 @@
   Spell.Mage.Frost = {
     -- Racials
     ArcaneTorrent                 = Spell(25046),
-    Berserking                    = Spell(26297),
     BloodFury                     = Spell(20572),
     GiftoftheNaaru                = Spell(59547),
     Shadowmeld                    = Spell(58984),
@@ -111,6 +110,11 @@
   -- NOTE: react == stack on simc (react in fact gives you the number of stack based on reaction time)
   local function FoFReact ()
     return Player:BuffStack(S.FingersofFrost);
+  -- action is placed at the top of the APL
+  -- actions+=/ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
+        if S.IceLance:IsCastable() and FoFReact()= 0 & Player:PrevGCD(1, S.Flurry) then
+        if AR.Cast(S.IceLance) then return ""; end
+      end
   end
   -- # AoE
   local function AoE ()
@@ -187,7 +191,7 @@
         if AR.Cast(S.RuneofPower) then return ""; end
       end
       -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
-       if I.PotionofProlognedPower:IsUsable() and S.IcyVeins:IsCastable()
+       if I.PotionofProlongnedPower:IsUsable() and S.IcyVeins:IsCastable()
        or Player:Buff(S.IcyVeins) then
          if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
          end
