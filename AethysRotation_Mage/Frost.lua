@@ -84,7 +84,7 @@
   -- Items
   if not Item.Mage then Item.Mage = {}; end
   Item.Mage.Frost = {
-   ProlongedPower   = Spell(142117), -- We define the potion to use it later
+   PotionofProlongedPower   = Spell(142117), -- We define the potion to use it later
     -- Legendaries
     --LadyVashjsGrasp                = Item(132411, {10}) --Left commented out since this APL does not require it (stack and react are identical in AR). If LVG APL gets fully merged it will be needed though so added slot
   };
