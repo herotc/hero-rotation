@@ -66,7 +66,10 @@ Spell.Shaman.Enhancement = {
   WindShear             = Spell(57994),
 
   -- Trinkets
-  SpecterOfBetrayal     = Spell(246461)
+  SpecterOfBetrayal     = Spell(246461),
+
+  -- Misc
+  PoolFocus             = Spell(9999000010)
 }
 local S = Spell.Shaman.Enhancement
 
@@ -447,6 +450,8 @@ local function APL ()
         if AR.Cast(S.Flametongue) then return "Cast Flametongue" end
       end
     end
+
+    if AR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
   end
 end
 
