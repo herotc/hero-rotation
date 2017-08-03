@@ -77,7 +77,10 @@ Spell.Warrior.Arms = {
   PreciseStrikesBuff             = Spell(209492),
 
   -- Legendaries
-  StoneHeartBuff                 = Spell(225947)
+  StoneHeartBuff                 = Spell(225947),
+
+  -- Misc
+  PoolFocus                     = Spell(9999000010)
 }
 local S = Spell.Warrior.Arms;
 
@@ -422,6 +425,7 @@ local function APL ()
         if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
       end
     end
+    if AR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
   end
 end
 
