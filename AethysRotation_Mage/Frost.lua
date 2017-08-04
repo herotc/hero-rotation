@@ -190,11 +190,10 @@
         if AR.Cast(S.RuneofPower) then return ""; end
       end
       -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
-      -- not working
---       if I.PotionofProlongedPower:IsUsable() and S.IcyVeins:IsCastable()
---       or Player:Buff(S.IcyVeins) then
---         if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
---         end
+       if I.PotionofProlongedPower:IsUsable() and S.IcyVeins:IsCastable()
+       or Player:Buff(S.IcyVeins) then
+         if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
+         end
       -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
       if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
         if AR.Cast(S.IcyVeins) then return ""; end
