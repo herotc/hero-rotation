@@ -40,6 +40,7 @@
 	FesteringStrike               = Spell(85948),
 	Outbreak                      = Spell(77575),
 	SummonGargoyle                = Spell(49206),
+	SummonPet					  = Spell(46584),
      --Talents
 	BlightedRuneWeapon            = Spell(194918),
 	Epidemic                      = Spell(207317),
@@ -112,7 +113,10 @@
  if AR.CDsON() and S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
   if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
   end
- 
+ --generic->add_action(this, "Apocalypse", "if=equipped.137075&debuff.festering_wound.stack>=6&talent.dark_arbiter.
+ if S.Apocalypse:IsCastable() and I.Taktheritrixs:IsEquipped() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.DarkArbiter:IsAvailable() then
+	if AR.Cast(S.Apocalypse) then return ""; end
+ end
  --actions.generic+=/dark_arbiter,if=equipped.137075&runic_power.deficit<30&cooldown.dark_transformation.remains<2
  if AR.CDsON() and S.DarkArbiter:IsCastable() and I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 and S.DarkTransformation:Cooldown() < 2 then
   if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return "" ; end
@@ -335,32 +339,27 @@ end
 end
  --DarkArbiter
 local function DarkArbiter()
---actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=8
- if S.Apocalypse:IsCastable()  and Target:DebuffStack(S.FesteringWounds) == 8 then
+--actions.valkyr=death_coil
+ if S.DeathCoil:IsUsable() or Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 45 then
+  if AR.Cast(S.DeathCoil) then return ""; end
+ end 
+--actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=6
+ if S.Apocalypse:IsCastable()  and Target:DebuffStack(S.FesteringWounds) == 6 then
   if AR.Cast(S.Apocalypse) then return ""; end
  end 
+ --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<5
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6  and S.Apocalypse:Cooldown() < 3 then
+  if AR.Cast(S.FesteringStrike) then return ""; end
+ end 
+ --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=4
+ if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 4 then
+  if AR.Cast(S.FesteringStrike) then return ""; end
+ end
  --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
  if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) then
   if AR.Cast(S.ClawingShadows) then return ""; end
  end
---actions.valkyr=death_coil
- if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 45 then
-  if AR.Cast(S.DeathCoil) then return ""; end
- end 
- 
---actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=3
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 3 then
-  if AR.Cast(S.FesteringStrike) then return ""; end
- end
- -- less festering wounds needed if valkyr is active and dc is usable with t194 pc
- --if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 1 and Player:RunicPower() < 35 and Player:Runes() >= 2 and AC.Tier19_4Pc then
-  --if AR.Cast(S.FesteringStrike) then return ""; end
- --end
---actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<8&cooldown.apocalypse.remains<5
- if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6  and S.Apocalypse:Cooldown() < 6 then
-  if AR.Cast(S.FesteringStrike) then return ""; end
- end  
---actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
+ --actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
  if S.ScourgeStrike:IsCastable() and Target:Debuff(S.FesteringWounds) then
   if AR.Cast(S.ScourgeStrike) then return ""; end
  end 
@@ -409,6 +408,10 @@ local function APL()
       -- Volley toggle
       -- Opener 
 	  if not Player:AffectingCombat() then
+	  --check if we have our lovely pet with us
+	  if Pet:IsActive() == false and S.SummonPet:IsCastable() then
+		if AR.Cast(S.SummonPet) then return ""; end
+	  end
 	--army suggestion at pull
 	  if Everyone.TargetIsValid() and Target:IsInRange(30) and not S.ArmyOfDead:IsOnCooldown() then
 	        if AR.Cast(S.ArmyOfDead) then return ""; end
@@ -424,7 +427,7 @@ local function APL()
     if Everyone.TargetIsValid()  then
 	      ShouldReturn = Generic();
 	      if ShouldReturn then return ShouldReturn;  end
-		  
+	    
 	   if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
 			if AR.Cast(S.Outbreak) then return ""; end
 	   end
@@ -528,7 +531,7 @@ local function APL()
 	 
 
 AR.SetAPL(252, APL);
---- ====24/06/2017======
+--- ====4/08/2017======
 --- ======= SIMC =======  
 --# Executed before combat begins. Accepts non-harmful actions only.
 --actions.precombat=flask
@@ -627,10 +630,10 @@ AR.SetAPL(252, APL);
 --actions.standard+=/death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
 
 --actions.valkyr=death_coil
---actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=8
---actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<8&cooldown.apocalypse.remains<5
+--actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=6
+--actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<3
 --actions.valkyr+=/call_action_list,name=aoe,if=active_enemies>=2
---actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=3
+--actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=4
 --actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
 --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
 	
