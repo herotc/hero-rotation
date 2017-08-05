@@ -267,9 +267,18 @@ local function CDs ()
     if S.Vendetta:IsCastable() and (not S.UrgetoKill:ArtifactEnabled() or Player:EnergyDeficit() >= 60 - Energy_Regen_Combined()) then
       if AR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast"; end
     end
-    -- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
-    if S.Exsanguinate:IsCastable() and S.Rupture:TimeSinceLastDisplay() < 2 and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
-      if AR.Cast(S.Exsanguinate) then return "Cast"; end
+    if S.Exsanguinate:IsCastable() then
+      if not AC.Tier20_4Pc then
+        -- actions.cds+=/exsanguinate,if=!set_bonus.tier20_4pc&prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
+        if S.Rupture:TimeSinceLastDisplay() < 2 and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
+          if AR.Cast(S.Exsanguinate) then return "Cast"; end
+        end
+      else
+        -- actions.cds+=/exsanguinate,if=set_bonus.tier20_4pc&dot.garrote.remains>20&dot.rupture.remains>4+4*cp_max_spend
+        if Target:DebuffRemains(S.Garrote) > 20 and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
+          if AR.Cast(S.Exsanguinate) then return "Cast"; end
+        end
+      end
     end
     if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
       if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= Rogue.CPMaxSpend() then
@@ -471,6 +480,10 @@ local function Maintain ()
       end
     end
   end
+  -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1
+  if S.Garrote:IsCastable() and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and S.Rupture:TimeSinceLastDisplay() < 2 and S.Exsanguinate:CooldownRemains() < 1 then
+    if AR.Cast(S.Garrote) then return "Cast"; end
+  end
 end
 local SappedSoulSpells = {
   {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end},
@@ -617,7 +630,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 07/23/2017
+-- Last Update: 08/05/2017
 -- Note: Some Exsang changes not synced yet, mostly due to missing pmultiplier.
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
@@ -657,7 +670,8 @@ AR.SetAPL(259, APL);
 -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
 -- actions.cds+=/vendetta,if=!artifact.urge_to_kill.enabled|energy.deficit>=60-variable.energy_regen_combined
--- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
+-- actions.cds+=/exsanguinate,if=!set_bonus.tier20_4pc&prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
+-- actions.cds+=/exsanguinate,if=set_bonus.tier20_4pc&dot.garrote.remains>20&dot.rupture.remains>4+4*cp_max_spend
 -- # Nightstalker w/o Exsanguinate: Vanish Envenom if Mantle & T19_4PC, else Vanish Rupture
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&!talent.exsanguinate.enabled&mantle_duration=0&((equipped.mantle_of_the_master_assassin&set_bonus.tier19_4pc)|((!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(dot.rupture.refreshable|debuff.vendetta.up)))
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&(dot.rupture.ticking|time>10)
@@ -686,3 +700,4 @@ AR.SetAPL(259, APL);
 -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=gcd.remains+0.2)
 -- actions.maintain+=/pool_resource,for_next=1
 -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
+-- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1
