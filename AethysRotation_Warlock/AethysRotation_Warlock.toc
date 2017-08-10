@@ -13,4 +13,5 @@ Events.lua
 Warlock.lua
 Destruction.lua
 Demonology.lua
+Affliction.lua
 

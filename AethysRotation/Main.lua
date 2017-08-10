@@ -225,7 +225,7 @@
       [263]   = "AethysRotation_Shaman",        -- Enhancement
       [264]   = false,                          -- Restoration
     -- Warlock
-      [265]   = false,                          -- Affliction
+      [265]   = "AethysRotation_Warlock",       -- Affliction
       [266]   = "AethysRotation_Warlock",       -- Demonology
       [267]   = "AethysRotation_Warlock",       -- Destruction
     -- Warrior
