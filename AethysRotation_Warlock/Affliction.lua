@@ -92,11 +92,7 @@
   TormentedSouls        = Spell(216695),
   
     -- UA stack
-  UA1                   = Spell(233490),  
-  UA2                   = Spell(233496),  
-  UA3                   = Spell(233497),  
-  UA4                   = Spell(233498),  
-  UA5                   = Spell(233499),  
+     
     -- Macros
     
   };
@@ -139,6 +135,7 @@
   };
   
   local PetSpells={[S.Suffering:ID()]=true, [S.SpellLock:ID()]=true, [S.Whiplash:ID()]=true, [S.CauterizeMaster:ID()]=true }
+  local UnstableAfflictionDebuffs={Spell(233490),Spell(233496),Spell(233497),Spell(233498),Spell(233499)}
 
 
 --- ======= ACTION LISTS =======
@@ -153,11 +150,9 @@
   
   local function ActiveUAs()
     local UAcount = 0
-    if Target:Debuff(S.UA1) then UAcount=UAcount+1 end
-    if Target:Debuff(S.UA2) then UAcount=UAcount+1 end
-    if Target:Debuff(S.UA3) then UAcount=UAcount+1 end
-    if Target:Debuff(S.UA4) then UAcount=UAcount+1 end
-    if Target:Debuff(S.UA5) then UAcount=UAcount+1 end
+    for _,v in pairs(UnstableAfflictionDebuffs) do
+      if Target:Debuff(v) then UAcount=UAcount+1 end
+    end
     return UAcount
   end
   
