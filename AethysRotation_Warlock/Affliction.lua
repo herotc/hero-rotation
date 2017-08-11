@@ -85,6 +85,7 @@
     -- Legendaries
     
     -- Misc
+  DemonicPower 			    = Spell(196099),
   EmpoweredLifeTapBuff	= Spell(235156),
 	Concordance           = Spell(242586),
     
@@ -109,8 +110,13 @@
   local range=40
   
   local Consts={
-    ImmolateBaseDuration = 18,
-    ImmolateMaxDuration = 27,
+    AgonyBaseDuration = 18,
+    AgonyMaxDuration = 27,
+    CorruptionBaseDuration = 14,
+    CorruptionMaxDuration = 18,
+    UABaseDuration = 8,
+    SiphonLifeBaseDuration = 15,
+    SiphonLifeMaxDuration = 20,
     EmpoweredLifeTapBaseDuration = 20
   }
   
@@ -120,9 +126,15 @@
     Commons = AR.GUISettings.APL.Warlock.Commons,
     Affliction = AR.GUISettings.APL.Warlock.Affliction
   };
+  
+  local PetSpells={[S.Suffering:ID()]=true, [S.SpellLock:ID()]=true, [S.Whiplash:ID()]=true, [S.CauterizeMaster:ID()]=true }
+
 
 --- ======= ACTION LISTS =======
-
+  local function IsPetInvoked(testBigPets)
+		testBigPets = testBigPets or false
+		return S.Suffering:IsLearned() or S.SpellLock:IsLearned() or S.Whiplash:IsLearned() or S.CauterizeMaster:IsLearned() or (testBigPets and (S.ShadowLock:IsLearned() or S.MeteorStrike:IsLearned()))
+  end
 
 
 --- ======= MAIN =======
@@ -133,6 +145,34 @@
     -- Defensives
     
     --Precombat
+    -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+    -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
+    -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
+    -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
+    -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+    -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
+    -- actions.precombat+=/potion,name=prolonged_power
+    -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+    if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or not Player:Buff(S.DemonicPower)) and Player:SoulShards ()>=1 then
+      if AR.Cast(S.SummonImp, Settings.Commons.GCDasOffGCD.SummonImp) then return "Cast"; end
+    end
+    -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
+    -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:IsCastable() and not S.MeteorStrike:IsLearned() and  AR.AoEON() and Cache.EnemiesCount[range]>1 and Player:SoulShards ()>=1 then
+      if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
+    end
+    -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:IsCastable() and not S.ShadowLock:IsLearned() and Cache.EnemiesCount[range]==1 and Player:SoulShards ()>=1 then
+      if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
+    end
+    -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+    if S.GrimoireOfSacrifice:IsCastable() and IsPetInvoked() and not Player:Buff(S.DemonicPower) then
+      if AR.Cast(S.GrimoireOfSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "Cast"; end
+    end
+    -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
+    if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and (Player:BuffRemains(S.EmpoweredLifeTapBuff)<0.3*Consts.EmpoweredLifeTapBaseDuration) then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
     
     -- Out of Combat
     if not Player:AffectingCombat() then

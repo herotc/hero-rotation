@@ -60,5 +60,19 @@
         -- Abilities
         SoulHarvest = {true, false},
       }
+    },
+    Affliction = {
+      -- {Display GCD as OffGCD, ForceReturn}
+      GCDasOffGCD = {
+        -- Abilities
+        GrimoireOfSacrifice = {true, false},
+      },
+      -- {Display OffGCD as OffGCD, ForceReturn}
+      OffGCDasOffGCD = {
+        -- Racials
+        
+        -- Abilities
+        SoulHarvest = {true, false},
+      }
     }
   };
