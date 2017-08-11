@@ -98,24 +98,33 @@
     Commons = AR.GUISettings.APL.Mage.Commons,
     Frost = AR.GUISettings.APL.Mage.Frost
   };
-
 --- ======= ACTION LISTS =======
-  -- actions+=/variable,name=time_until_fof,value=10-(time-variable.iv_start-floor((time-variable.iv_start)%10)*10)
-  local function TimeUntilFoF ()
-    return 10 - (AC.CombatTime() - IvStart - math.floor((AC.CombatTime() - IvStart)/10)*10);
-  end
-  -- actions+=/variable,name=fof_react,value=buff.fingers_of_frost.react
-  -- actions+=/variable,name=fof_react,value=buff.fingers_of_frost.stack,if=equipped.lady_vashjs_grasp&buff.icy_veins.up&variable.time_until_fof>9|prev_off_gcd.freeze
-  -- NOTE: react == stack on simc (react in fact gives you the number of stack based on reaction time)
-  local function FoFReact ()
-    return Player:BuffStack(S.FingersofFrost);
-  end
- -- action is placed at the top of the APL
+
+--  Variables placed in Frost APL
+
+-- actions.variables=variable,name=iv_start,value=time,if=prev_off_gcd.icy_veins
+local function iv_start ()
+  return Player:PrevOffGCD(1, S.IcyVeins);
+end
+-- actions.variables+=/variable,name=time_until_fof,value=10-(time-variable.iv_start-floor((time-variable.iv_start)%10)*10)
+local function TimeUntilFoF ()
+  return 10 - (AC.CombatTime() - IvStart - math.floor((AC.CombatTime() - IvStart)/10)*10);
+end
+-- actions+=/variable,name=fof_react,value=buff.fingers_of_frost.react
+-- actions.variables+=/variable,name=fof_react,value=buff.fingers_of_frost.stack,if=equipped.lady_vashjs_grasp&buff.icy_veins.up&variable.time_until_fof>9|prev_off_gcd.freeze
+--|ground_aoe.frozen_orb.remains>8.5 (NEEDS TO BE ADDED)
+-- NOTE: react == stack on simc (react in fact gives you the number of stack based on reaction time)
+local function FoFReact ()
+  return Player:BuffStack(S.FingersofFrost);
+end
+
+ -- Action is placed at the top of the APL
  -- actions+=/ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
        if S.IceLance:IsCastable() and FoFReact() == 0 and Player:PrevGCD(1, S.Flurry) then
        if AR.Cast(S.IceLance) then return ""; end
  end
-  -- # AoE
+
+  -- # Start of AOE APL
   local function AoE ()
     if AR.AoEON() then
       -- actions.aoe=frostbolt,if=prev_off_gcd.water_jet
@@ -148,9 +157,15 @@
 			  if AR.Cast(S.WaterJet) then return ""; end
 		  end
 	  end
-      -- actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|prev_gcd.1.frostbolt&buff.brain_freeze.react
-      if S.Flurry:IsCastable() and ((Player:CastID() == S.Ebonbolt:ID()) or ((Player:CastID() == S.Frostbolt:ID()) and Player:Buff(S.BrainFreeze))) then
-        if AR.Cast(S.Flurry) then return ""; end
+--   actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt)&buff.brain_freeze.react
+      if S.Flurry:IsCastable() and
+              (
+            Player:Buff(S.BrainFreeze) and
+                  (
+                  Player:CastID() == S.Ebonbolt:ID()  or
+                  Player:CastID() == S.Frostbolt:ID()  or
+                  Player:CastID() == S.GlacialSpike:ID())) then
+        if AR.Cast (S.Flurry) then return ""; end
       end
       -- actions.aoe+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react>0
       if S.FrostBomb:IsCastable() and Target:DebuffRemains(S.FrostBomb) < S.IceLance:TravelTime() and FoFReact() > 0 then
@@ -182,7 +197,8 @@
       end
     end
   end
-  -- # Cooldowns
+
+  -- # Start of Cooldown APL
   local function Cooldowns ()
     if AR.CDsON() then
       -- actions.cooldowns=rune_of_power,if=(cooldown.icy_veins.remains<cast_time|(charges_fractional>1.9&cooldown.icy_veins.remains>10)|buff.icy_veins.up|target.time_to_die.remains+5<charges_fractional*10)
@@ -190,10 +206,10 @@
         if AR.Cast(S.RuneofPower) then return ""; end
       end
       -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
-       if I.PotionofProlongedPower:IsUsable() and S.IcyVeins:IsCastable()
-       or Player:Buff(S.IcyVeins) then
-         if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
-         end
+      --  if I.PotionofProlongedPower:IsUsable() and S.IcyVeins:IsCastable()
+      --  or Player:Buff(S.IcyVeins) then
+      --    if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
+      --    end
       -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
       if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
         if AR.Cast(S.IcyVeins) then return ""; end
@@ -202,7 +218,6 @@
       if S.MirrorImage:IsCastable() then
         if AR.Cast(S.MirrorImage) then return ""; end
       end
-      -- todo actions.cooldowns+=/use_items
       -- actions.cooldowns+=/blood_fury
       if S.BloodFury:IsCastable() then
         if AR.Cast(S.BloodFury) then return ""; end
@@ -215,11 +230,9 @@
 	  -- Torrent has no impact on frost dps we just do it in SIMC to be lazy (since arc likes it), let user handle their own for interrupts
     end
     -- Lines in the APL to account for disctance.
-    -- account for these or no?
-    --actions.movement=blink,if=movement.distance>10
-    --actions.movement+=/ice_floes,if=buff.ice_floes.down&movement.distance>0&variable.fof_react=0
   end
-  -- # Single
+
+  -- # Start of Single APL
   local function Single ()
     -- actions.single=ice_nova,if=debuff.winters_chill.up
     if S.IceNova:IsCastable() and Target:Debuff(S.WintersChill) then
@@ -247,19 +260,15 @@
     if S.RayofFrost:IsCastable() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:Cooldown() > S.RayofFrost:Cooldown() and not Player:Buff(S.RuneofPower))) then
       if AR.Cast(S.RayofFrost) then return ""; end
     end
-    -- actions.single+=/flurry,if=prev_gcd.1.ebonbolt|prev_gcd.1.frostbolt&buff.brain_freeze.react
-    if S.Flurry:IsCastable() and ((Player:CastID() == S.Ebonbolt:ID()) or ((Player:CastID() == S.Frostbolt:ID()) and Player:Buff(S.BrainFreeze))) then
-      if AR.Cast(S.Flurry) then return ""; end
-    end
     --actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(!talent.glacial_spike.enabled&prev_gcd.1.frostbolt|talent.glacial_spike.enabled&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(buff.icicles.stack<=3|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc)))
     if S.Flurry:IsCastable() and
             (
           Player:Buff(S.BrainFreeze) and
                 (
-                Player:PrevGCD(1, S.Ebonbolt) or
-                Player:PrevGCD(1, S.Frostbolt) and not S.GlacialSpike:IsAvailable() or
+                Player:CastID() == S.Ebonbolt:ID() or
+                Player:CastID() == S.Frostbolt:ID() and not S.GlacialSpike:IsAvailable() or
                 Player:BuffStack(S.Icicles) <= 3 or
-                Player:PrevGCD(1, S.GlacialSpike) and S.GlacialSpike:IsAvailable()
+                Player:CastID() == S.GlacialSpike:ID() and S.GlacialSpike:IsAvailable()
     or  S.FrozenOrb:CooldownRemains() <= 10  and AC.Tier20_2Pc)) then
       if AR.Cast (S.Flurry) then return ""; end
     end
@@ -304,8 +313,8 @@
       if AR.Cast(S.Frostbolt) then retrun ""; end
     end
 
-    -- actions.single+=/glacial_spike
-    if S.GlacialSpike:IsCastable() and Player:BuffStack(S.Icicles) == 5 and S.FrozenOrb:CooldownRemains() > 10  then
+    --actions.single+=/glacial_spike,if=cooldown.frozen_orb.remains>10|!set_bonus.tier20_2pc
+    if S.GlacialSpike:IsCastable() and Player:BuffStack(S.Icicles) == 5 and S.FrozenOrb:CooldownRemains() > 10 and not AC.Tier20_2Pc   then
       if AR.Cast(S.GlacialSpike) then return ""; end
     end
     -- actions.single+=/frostbolt
@@ -313,9 +322,6 @@
       if AR.Cast(S.Frostbolt) then return ""; end
     end
   end
-  --For movement on the Frost APL, implemnt or not?
---actions.single+=/blizzard,if=cast_time=0
---actions.single+=/ice_lance
 
 --- ======= MAIN =======
   local function APL ()
