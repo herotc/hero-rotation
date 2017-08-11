@@ -88,7 +88,15 @@
   DemonicPower 			    = Spell(196099),
   EmpoweredLifeTapBuff	= Spell(235156),
 	Concordance           = Spell(242586),
-    
+  DeadwindHarvester     = Spell(216708),
+  TormentedSouls        = Spell(216695),
+  
+    -- UA stack
+  UA1                   = Spell(233490),  
+  UA2                   = Spell(233496),  
+  UA3                   = Spell(233497),  
+  UA4                   = Spell(233498),  
+  UA5                   = Spell(233499),  
     -- Macros
     
   };
@@ -99,7 +107,10 @@
   if not Item.Warlock then Item.Warlock = {}; end
   Item.Warlock.Affliction = {
     -- Legendaries
-    
+    ReapAndSow = Item(144364), --15
+    SindoreiSpite = Item(132379), --9
+    StretensSleeplessShackles = Item(132381), --9
+    PowerCordofLethtendris = Item(132457) --6
   };
   local I = Item.Warlock.Affliction;
   -- Rotation Var
@@ -135,13 +146,162 @@
 		testBigPets = testBigPets or false
 		return S.Suffering:IsLearned() or S.SpellLock:IsLearned() or S.Whiplash:IsLearned() or S.CauterizeMaster:IsLearned() or (testBigPets and (S.ShadowLock:IsLearned() or S.MeteorStrike:IsLearned()))
   end
+  
+  local function SoulsAvailable()
+    return Player:BuffStack(S.TormentedSouls)
+  end
+  
+  local function ActiveUAs()
+    local UAcount = 0
+    if Target:Debuff(S.UA1) then UAcount=UAcount+1 end
+    if Target:Debuff(S.UA2) then UAcount=UAcount+1 end
+    if Target:Debuff(S.UA3) then UAcount=UAcount+1 end
+    if Target:Debuff(S.UA4) then UAcount=UAcount+1 end
+    if Target:Debuff(S.UA5) then UAcount=UAcount+1 end
+    return UAcount
+  end
+  
+  local function FutureShard()
+    local Shard=Player:SoulShards()
+    if not Player:IsCasting() then
+      return Shard
+    else
+      if Player:CastID()==S.UnstableAffliction:ID() or Player:CastID()==S.SeedOfCorruption:ID()  then
+        return Shard-1
+      elseif Player:CastID()==S.SummonDoomGuard:ID() or Player:CastID()==S.SummonDoomGuardSuppremacy:ID() or Player:CastID()==S.SummonInfernal:ID() or Player:CastID()==S.SummonInfernalSuppremacy:ID() or Player:CastID()==S.GrimoireFelguard:ID() or Player:CastID()==S.SummonFelguard:ID() then
+        return Shard-1
+      else
+        return Shard
+      end
+    end
+  end
 
+  local function HauntAPL()
+    -- actions.haunt=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.tormented_souls.react*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+    -- actions.haunt+=/reap_souls,if=debuff.haunt.remains&!buff.deadwind_harvester.remains
+    -- actions.haunt+=/reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
+    -- actions.haunt+=/agony,cycle_targets=1,if=remains<=tick_time+gcd
+    -- actions.haunt+=/service_pet,if=dot.corruption.remains&dot.agony.remains
+    -- actions.haunt+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
+    -- actions.haunt+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
+    -- actions.haunt+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    -- actions.haunt+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    -- actions.haunt+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
+    -- actions.haunt+=/blood_fury
+    -- actions.haunt+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1
+    -- actions.haunt+=/use_item,slot=trinket1
+    -- actions.haunt+=/use_item,slot=trinket2
+    -- actions.haunt+=/potion,name=prolonged_power,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
+    -- actions.haunt+=/potion,name=prolonged_power,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
+    -- actions.haunt+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd
+    -- actions.haunt+=/corruption,cycle_targets=1,if=remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<5)
+    -- actions.haunt+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
+    -- actions.haunt+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
+    -- actions.haunt+=/phantom_singularity
+    -- actions.haunt+=/haunt
+    -- actions.haunt+=/agony,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains
+    -- actions.haunt+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3|talent.malefic_grasp.enabled&target.time_to_die>15&mana.pct<10
+    -- actions.haunt+=/siphon_life,if=remains<=duration*0.3&target.time_to_die>=remains
+    -- actions.haunt+=/siphon_life,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*6&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*4
+    -- actions.haunt+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3|spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=3&dot.corruption.remains<=cast_time+travel_time
+    -- actions.haunt+=/corruption,if=remains<=duration*0.3&target.time_to_die>=remains
+    -- actions.haunt+=/corruption,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*6&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*4
+    -- actions.haunt+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&((soul_shard>=4&!talent.contagion.enabled)|soul_shard>=5|target.time_to_die<30)
+    -- actions.haunt+=/unstable_affliction,cycle_targets=1,if=active_enemies>1&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&soul_shard>=4&talent.contagion.enabled&cooldown.haunt.remains<15&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    -- actions.haunt+=/unstable_affliction,cycle_targets=1,if=active_enemies>1&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&(equipped.132381|equipped.132457)&cooldown.haunt.remains<15&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    -- actions.haunt+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&talent.contagion.enabled&soul_shard>=4&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    -- actions.haunt+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*2
+    -- actions.haunt+=/reap_souls,if=!buff.deadwind_harvester.remains&(buff.active_uas.stack>1|(prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1))
+    -- actions.haunt+=/life_tap,if=mana.pct<=10
+    -- actions.haunt+=/drain_soul,chain=1,interrupt=1
+    -- actions.haunt+=/life_tap
+  end
+  
+  local function WritheAPL()
+  -- actions.writhe=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.tormented_souls.react*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+  -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.soul_harvest.remains>(5+equipped.144364)&buff.active_uas.stack>1|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react|trinket.proc.spell_power.react|trinket.stacking_proc.spell_power.react)
+  -- actions.writhe+=/reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
+  -- actions.writhe+=/agony,cycle_targets=1,if=remains<=tick_time+gcd
+  -- actions.writhe+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&soul_shard=5
+  -- actions.writhe+=/service_pet,if=dot.corruption.remains&dot.agony.remains
+  -- actions.writhe+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
+  -- actions.writhe+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
+  -- actions.writhe+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+  -- actions.writhe+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+  -- actions.writhe+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
+  -- actions.writhe+=/blood_fury
+  -- actions.writhe+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=2
+  -- actions.writhe+=/use_item,slot=trinket1
+  -- actions.writhe+=/use_item,slot=trinket2
+  -- actions.writhe+=/potion,name=prolonged_power,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
+  -- actions.writhe+=/potion,name=prolonged_power,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
+  -- actions.writhe+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd
+  -- actions.writhe+=/corruption,cycle_targets=1,if=remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<5)
+  -- actions.writhe+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
+  -- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
+  -- actions.writhe+=/phantom_singularity
+  -- actions.writhe+=/agony,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains
+  -- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3|talent.malefic_grasp.enabled&target.time_to_die>15&mana.pct<10
+  -- actions.writhe+=/siphon_life,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains
+  -- actions.writhe+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3|spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=3&dot.corruption.remains<=cast_time+travel_time
+  -- actions.writhe+=/corruption,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains
+  -- actions.writhe+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&(soul_shard>=4|buff.soul_harvest.remains)
+  -- actions.writhe+=/unstable_affliction,cycle_targets=1,if=active_enemies>1&(equipped.132381|equipped.132457)&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&talent.contagion.enabled&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+  -- actions.writhe+=/unstable_affliction,if=(active_enemies>1|equipped.132457)&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&talent.contagion.enabled&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+  -- actions.writhe+=/unstable_affliction,if=(active_enemies=1|(!equipped.132381&!equipped.132457))&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&(buff.deadwind_harvester.remains|target.time_to_die<=20|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react)
+  -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&buff.active_uas.stack>1
+  -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1
+  -- actions.writhe+=/life_tap,if=mana.pct<=10
+  -- actions.writhe+=/drain_soul,chain=1,interrupt=1
+  -- actions.writhe+=/life_tap
+  end
+  
+  local function MGAPL()
+    print("souls"..SoulsAvailable())
+    print("ua"..ActiveUAs())
+  -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.tormented_souls.react*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+  -- actions.mg+=/reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
+  -- actions.mg+=/agony,cycle_targets=1,if=remains<=tick_time+gcd
+  -- actions.mg+=/service_pet,if=dot.corruption.remains&dot.agony.remains
+  -- actions.mg+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
+  -- actions.mg+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
+  -- actions.mg+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+  -- actions.mg+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+  -- actions.mg+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
+  -- actions.mg+=/blood_fury
+  -- actions.mg+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=2
+  -- actions.mg+=/use_item,slot=trinket1
+  -- actions.mg+=/use_item,slot=trinket2
+  -- actions.mg+=/potion,name=prolonged_power,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
+  -- actions.mg+=/potion,name=prolonged_power,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
+  -- actions.mg+=/siphon_life,if=remains<=tick_time+gcd
+  -- actions.mg+=/siphon_life,cycle_targets=1,if=active_enemies>1&remains<=tick_time+gcd&buff.active_uas.stack=0
+  -- actions.mg+=/corruption,if=remains<=tick_time+gcd&((spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled)|spell_targets.seed_of_corruption<5)
+  -- actions.mg+=/corruption,cycle_targets=1,if=active_enemies>1&remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<5)&(buff.active_uas.stack=0|equipped.132457)
+  -- actions.mg+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
+  -- actions.mg+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))&buff.active_uas.stack<1
+  -- actions.mg+=/phantom_singularity
+  -- actions.mg+=/agony,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&buff.active_uas.stack=0
+  -- actions.mg+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3|talent.malefic_grasp.enabled&target.time_to_die>15&mana.pct<10
+  -- actions.mg+=/siphon_life,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&buff.active_uas.stack=0
+  -- actions.mg+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3|spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=3&dot.corruption.remains<=cast_time+travel_time
+  -- actions.mg+=/corruption,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&buff.active_uas.stack=0
+  -- actions.mg+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&(target.time_to_die<30|prev_gcd.1.unstable_affliction&soul_shard>=4&(equipped.132457|buff.active_uas.stack<2))
+  -- actions.mg+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&(soul_shard>=4|(equipped.132457&soul_shard=5))
+  -- actions.mg+=/unstable_affliction,if=!equipped.132457&!prev_gcd.3.unstable_affliction&dot.agony.remains>cast_time*2+6.5&(dot.corruption.remains>cast_time+6.5|talent.absolute_corruption.enabled)&(!talent.siphon_life.enabled|dot.siphon_life.remains>cast_time+6.5)
+  -- actions.mg+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&equipped.132457&(buff.active_uas.stack=0|!prev_gcd.3.unstable_affliction&prev_gcd.1.unstable_affliction)&dot.agony.remains>cast_time+6.5
+  -- actions.mg+=/reap_souls,if=!buff.deadwind_harvester.remains&(buff.active_uas.stack>1|(prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1))
+  -- actions.mg+=/life_tap,if=mana.pct<=10
+  -- actions.mg+=/drain_soul,chain=1,interrupt=1
+  -- actions.mg+=/life_tap
+  end
 
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
+    
     -- Defensives
     
     --Precombat
@@ -189,7 +349,19 @@
     end
     -- In Combat
     if Everyone.TargetIsValid() then
-      
+        if S.Haunt:IsAvailable() then
+          ShouldReturn = HauntAPL();
+          if ShouldReturn then return ShouldReturn; end
+        end
+        if S.WritheInAgony:IsAvailable() then
+          ShouldReturn = WritheAPL();
+          if ShouldReturn then return ShouldReturn; end
+        end
+        if S.MaleficGrasp:IsAvailable() then
+          ShouldReturn = MGAPL();
+          if ShouldReturn then return ShouldReturn; end
+        end
+        
     end
   end
 
