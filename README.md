@@ -46,9 +46,9 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Paladin Protection ([Aethys](https://github.com/Aethys256)) **[Outdated]**
 - Paladin Retribution ([Aethys](https://github.com/Aethys256))
 - Priest Shadow ([KutiKuti](https://github.com/Kutikuti))
-- Rogue Assassination ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/orgs/Ravenholdt-TC/people/Mystler))
-- Rogue Outlaw ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/orgs/Ravenholdt-TC/people/Mystler))
-- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/orgs/Ravenholdt-TC/people/Mystler))
+- Rogue Assassination ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
+- Rogue Outlaw ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
+- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
 - Shaman Elemental ([lithium720](https://github.com/lithium720)) **[WIP]**
 - Shaman Enhancement ([lithium720](https://github.com/lithium720) & [Tael](https://github.com/Tae-l))
 - Warlock Demonology ([KutiKuti](https://github.com/Kutikuti))
