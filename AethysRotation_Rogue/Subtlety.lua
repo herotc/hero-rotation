@@ -556,9 +556,9 @@ local function APL ()
         {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
       });
       -- # This let us to use Shadow Dance right before the 2nd part of DfA lands. Only with Dark Shadow.
-      -- actions+=/shadow_dance,if=talent.dark_shadow.enabled&!stealthed.all&buff.death_from_above.up&buff.death_from_above.remains<=0.15
+      -- actions+=/shadow_dance,if=talent.dark_shadow.enabled&(!stealthed.all|buff.subterfuge.up)&buff.death_from_above.up&buff.death_from_above.remains<=0.15
       -- Note: DfA execute time is 1.475s, the buff is modeled to lasts 1.475s on SimC, while it's 1s in-game. So we retrieve it from TimeSinceLastCast.
-      if S.DarkShadow:IsAvailable() and not Player:IsStealthed(true, true) and S.DeathfromAbove:TimeSinceLastCast() <= 1.325
+      if S.DarkShadow:IsAvailable() and (not Player:IsStealthed(true, true) or Player:Buff(S.Subterfuge)) and S.DeathfromAbove:TimeSinceLastCast() <= 1.325
         and (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
         and S.ShadowDance:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.ShadowDance:Charges() >= 1 then
           if AR.Cast(S.ShadowDance) then return "Cast Shadow Dance (DfA)"; end
@@ -644,7 +644,7 @@ AR.SetAPL(261, APL);
 -- # Executed every time the actor is available.
 -- actions=variable,name=dsh_dfa,value=talent.death_from_above.enabled&talent.dark_shadow.enabled&spell_targets.death_from_above<4
 -- # This let us to use Shadow Dance right before the 2nd part of DfA lands. Only with Dark Shadow.
--- actions+=/shadow_dance,if=talent.dark_shadow.enabled&!stealthed.all&buff.death_from_above.up&buff.death_from_above.remains<=0.15
+-- actions+=/shadow_dance,if=talent.dark_shadow.enabled&(!stealthed.all|buff.subterfuge.up)&buff.death_from_above.up&buff.death_from_above.remains<=0.15
 -- # This is triggered only with DfA talent since we check shadow_dance even while the gcd is ongoing, it's purely for simulation performance.
 -- actions+=/wait,sec=0.1,if=buff.shadow_dance.up&gcd.remains>0
 -- actions+=/call_action_list,name=cds
