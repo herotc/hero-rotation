@@ -1,5 +1,7 @@
 **If you are using Curse Client V5, please update it to Twitch Client or download manually the addon, it's not longer supported by Curse and contains bugged updates.**
 
+**If you are experiencing issues with AoE rotation (likely Abilities not being recommended), be sure to have enemies nameplates enabled and enough nameplate shown (camera can hide them).**
+
 # AethysRotation
 
 AethysRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation.
@@ -32,27 +34,27 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Solo Mode to prioritize survivability over DPS. (If implemented in the rotation)
 
 ## Supported Rotations
-- Death Knight Frost ([3L00DStrike](https://github.com/3L00DStrike))
+- Death Knight Frost ([chrislopez24](https://github.com/chrislopez24) & [3L00DStrike](https://github.com/3L00DStrike))
 - Death Knight Unholy ([chrislopez24](https://github.com/chrislopez24))
 - Demon Hunter Vengeance **[Outdated]**
 - Druid Balance ([KutiKuti](https://github.com/Kutikuti)) **[WIP]**
 - Hunter BeastMastery ([Nia](https://github.com/Nianel))
 - Hunter Marskmanship ([Nia](https://github.com/Nianel))
 - Hunter Survival ([Nia](https://github.com/Nianel))
-- Mage Frost ([Nia](https://github.com/Nianel) & [Zulandia](https://github.com/AlexanderKenny)) **[WIP]**
+- Mage Frost ([Glynny](https://github.com/orgs/SimCMinMax/people/Glynnyx) & [Zulandia](https://github.com/AlexanderKenny) & [Nia](https://github.com/Nianel))
 - Monk Windwalker ([Lockem90](https://github.com/Lockem90))
-- Paladin Protection
-- Paladin Retribution
+- Paladin Protection ([Aethys](https://github.com/Aethys256)) **[Outdated]**
+- Paladin Retribution ([Aethys](https://github.com/Aethys256))
 - Priest Shadow ([KutiKuti](https://github.com/Kutikuti))
-- Rogue Assassination
-- Rogue Outlaw
-- Rogue Subtlety
-- Shaman Enhancement ([Tael](https://github.com/Tae-l) & [lithium720](https://github.com/lithium720))
+- Rogue Assassination ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/orgs/Ravenholdt-TC/people/Mystler))
+- Rogue Outlaw ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/orgs/Ravenholdt-TC/people/Mystler))
+- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/orgs/Ravenholdt-TC/people/Mystler))
 - Shaman Elemental ([lithium720](https://github.com/lithium720)) **[WIP]**
-- Warlock Destruction ([KutiKuti](https://github.com/Kutikuti)) **[Beta]**
-- Warlock Demonology ([KutiKuti](https://github.com/Kutikuti)) **[Beta]**
-- Warrior Fury ([Nia](https://github.com/Nianel) & [Lockem90](https://github.com/Lockem90)) **[Beta]**
+- Shaman Enhancement ([lithium720](https://github.com/lithium720) & [Tael](https://github.com/Tae-l))
+- Warlock Demonology ([KutiKuti](https://github.com/Kutikuti))
+- Warlock Destruction ([KutiKuti](https://github.com/Kutikuti))
 - Warrior Arms ([lithium720](https://github.com/lithium720))
+- Warrior Fury ([Lockem90](https://github.com/Lockem90) & [Nia](https://github.com/Nianel))
 
 ## Special Mention About SimC APL
 As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
@@ -63,11 +65,11 @@ I (Aethys) am one of the main Rogue theorycrafter and contributor to the Simulat
 
 ## Special Thanks
 - [SimulationCraft](http://simulationcraft.org/) for everything the project gives to the whole WoW Community.
-- [KutiKuti](https://github.com/Kutikuti) & [Nia](https://github.com/Nianel) for their support to the project.
+- [KutiKuti](https://github.com/Kutikuti) & [Nia](https://github.com/Nianel) for their daily support.
 - [Skasch](https://github.com/skasch) for what we built together and the motivation he gave to me.
 - [Riff](https://github.com/tombell) for his great feedback and UI tweaks.
-- [Mystler](https://github.com/Mystler) for his help on everything related to rogues that frees me some time to improves the addons.
-- [lithium720](https://github.com/lithium720), [Lockem90](https://github.com/Lockem90), [3L00DStrike](https://github.com/3L00DStrike), [chrislopez24](https://github.com/chrislopez24) for the daily maintenance of rotations.
+- [Mystler](https://github.com/Mystler) for his help on everything related to rogues that frees me a lot of time.
+- [lithium720](https://github.com/lithium720), [Lockem90](https://github.com/Lockem90), [3L00DStrike](https://github.com/3L00DStrike), [chrislopez24](https://github.com/chrislopez24), [Zulandia](https://github.com/AlexanderKenny), [Glynny](https://github.com/orgs/SimCMinMax/people/Glynnyx) for the daily maintenance of rotations.
 - [Tael](https://github.com/Tae-l) for his past contributions.
 
 ## Advanced Users / Developper Notes
