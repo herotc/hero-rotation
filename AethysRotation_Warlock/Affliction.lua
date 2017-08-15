@@ -31,8 +31,8 @@
 	Shadowmeld        = Spell(58984),
     
     -- Abilities
-  Agony 				    = Spell(980),
-  Corruption 				= Spell(172),
+	Agony 				    = Spell(980),
+	Corruption 				= Spell(172),
 	DrainSoul 				= Spell(198590),
 	SeedOfCorruption 	= Spell(27243),
 	UnstableAffliction= Spell(30108),
@@ -53,7 +53,7 @@
 	MeteorStrike			= Spell(171152),--infernal
 	
     -- Talents
-  Haunt 				    = Spell(48181),
+	Haunt 				    = Spell(48181),
 	WritheInAgony 		= Spell(196102),
 	MaleficGrasp			= Spell(235155),
 	
@@ -74,10 +74,10 @@
 	SoulConduit 			= Spell(215941),
 	
     -- Artifact
-  ReapSouls         = Spell(216698),
+	ReapSouls         = Spell(216698),
 	
-  WrathOfConsumption= Spell(199472),
-  RendSoul          = Spell(238144),
+	WrathOfConsumption= Spell(199472),
+	RendSoul          = Spell(238144),
     -- Defensive	
     
     -- Utility
@@ -85,11 +85,11 @@
     -- Legendaries
     
     -- Misc
-  DemonicPower 			    = Spell(196099),
-  EmpoweredLifeTapBuff	= Spell(235156),
+	DemonicPower 			    = Spell(196099),
+	EmpoweredLifeTapBuff	= Spell(235156),
 	Concordance           = Spell(242586),
-  DeadwindHarvester     = Spell(216708),
-  TormentedSouls        = Spell(216695),
+	DeadwindHarvester     = Spell(216708),
+	TormentedSouls        = Spell(216695),
   
     -- UA stack
      
@@ -252,11 +252,25 @@
   end
   
   local function MGAPL()
-    print("souls"..SoulsAvailable())
-    print("ua"..ActiveUAs())
-  -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.tormented_souls.react*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+    -- print("souls"..SoulsAvailable())
+    -- print("ua"..ActiveUAs())
+	
+	-- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.tormented_souls.react*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+	if not Player:Buff(S.DeadwindHarvester) and AR.CombatTime()>5 and (SoulsAvailable()>=5 or Target:TimeToDie()<=((SoulsAvailable()*(5+1.5*(I.ReapAndSow:IsEquipped(15) and 1 or 0)))+(SoulsAvailable()*(5+1.5*(I.ReapAndSow:IsEquipped(15) and 1 or 0))%12*(5+1.5*(I.ReapAndSow:IsEquipped(15) and 1 or 0))))) then
+		if AR.Cast(S.RendSoul) then return "Cast"; end
+	end
+	
   -- actions.mg+=/reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
+	if Cache.EnemiesCount[40]>1 and not Player:Buff(S.DeadwindHarvester) and SoulsAvailable()>=1 and AR.CombatTime()>5 and FutureShard()>0 and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[40]>=3) or (Cache.EnemiesCount[40]>=5)) then
+		if AR.Cast(S.RendSoul) then return "Cast"; end
+	end
+  
   -- actions.mg+=/agony,cycle_targets=1,if=remains<=tick_time+gcd
+  --todo : add tick_time
+	if Target:DebuffRemains(S.Agony)<=Player:GCD() then
+		if AR.Cast(S.Agony) then return "Cast"; end
+	end
+  
   -- actions.mg+=/service_pet,if=dot.corruption.remains&dot.agony.remains
   -- actions.mg+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
   -- actions.mg+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
