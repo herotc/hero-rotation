@@ -481,7 +481,7 @@ local function Maintain ()
     end
   end
   -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1
-  if S.Garrote:IsCastable() and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and S.Rupture:TimeSinceLastDisplay() < 2 and S.Exsanguinate:CooldownRemains() < 1 then
+  if S.Garrote:IsCastable() and Target:IsInRange(5) and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and S.Rupture:TimeSinceLastDisplay() < 2 and S.Exsanguinate:CooldownRemains() < 1 then
     if AR.Cast(S.Garrote) then return "Cast"; end
   end
 end

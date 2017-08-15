@@ -169,9 +169,9 @@ local function RtB_Buffs ()
   end
   return Cache.APLVar.RtB_Buffs;
 end
--- # Fish for '2 Buffs' when Loaded Dice is up. With SnD, consider that we never have to reroll.
+-- # Fish for '2 Buffs' when Loaded Dice is up. Also try to get TB with Loaded Dice and 2 other buffs up. With SnD, consider that we never have to reroll.
 local function RtB_Reroll ()
-  -- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&rtb_buffs<2&buff.loaded_dice.up
+  -- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&buff.loaded_dice.up&(rtb_buffs<2|rtb_buffs=2&!buff.true_bearing.up)
   if not Cache.APLVar.RtB_Reroll then
     -- Defensive Override : Grand Melee if HP < 60
     if Settings.General.SoloMode and Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechHP then
@@ -199,7 +199,7 @@ local function RtB_Reroll ()
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:Buff(S.TrueBearing)) and true or false;
     -- SimC Default
     else
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and RtB_Buffs() < 2 and Player:Buff(S.LoadedDice)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and Player:Buff(S.LoadedDice) and (RtB_Buffs() < 2 or not Player:Buff(S.TrueBearing))) and true or false;
     end
   end
   return Cache.APLVar.RtB_Reroll;
@@ -457,7 +457,7 @@ end
 
 AR.SetAPL(260, APL);
 
--- Last Update: 06/14/2017
+-- Last Update: 08/15/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -472,8 +472,8 @@ AR.SetAPL(260, APL);
 -- actions.precombat+=/curse_of_the_dreadblades,if=combo_points.deficit>=4
 
 -- # Executed every time the actor is available.
--- # Fish for '2 Buffs' when Loaded Dice is up. With SnD, consider that we never have to reroll.
--- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&rtb_buffs<2&buff.loaded_dice.up
+-- # Fish for '2 Buffs' when Loaded Dice is up. Also try to get TB with Loaded Dice and 2 other buffs up. With SnD, consider that we never have to reroll.
+-- actions=variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&buff.loaded_dice.up&(rtb_buffs<2|rtb_buffs=2&!buff.true_bearing.up)
 -- # Condition to use Saber Slash when not rerolling RtB or when using SnD
 -- actions+=/variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
 -- # Condition to use Saber Slash, when you have RtB or not
