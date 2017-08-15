@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Shaman_Elemental_T20M on 7/17/2017
+-- APL from Shaman_Elemental_T20M on 8/14/2017
 
 -- APL Local Vars
 -- Spells
@@ -25,6 +25,9 @@ Spell.Shaman.Elemental = {
   BloodFury             = Spell(20572),
 
   -- Abilities
+  FlameShock            = Spell(188389),
+  FlameShockDebuff      = Spell(188389),
+
   TotemMastery          = Spell(210643),
   EmberTotemBuff        = Spell(210658),
   TailwindTotemBuff     = Spell(210659),
@@ -36,22 +39,31 @@ Spell.Shaman.Elemental = {
   EarthElemental        = Spell(198103),
   LightningBolt         = Spell(188196),
   LavaBeam              = Spell(114074),
-  FlameShock            = Spell(188389),
-  FlameShockDebuff      = Spell(188389),
+  EarthQuake            = Spell(8042),
+  LavaSurgeBuff         = Spell(77762),
+  ChainLightning        = Spell(188443),
 
   -- Talents
   ElementalMastery      = Spell(16166),
   ElementalMasteryBuff  = Spell(16166),
   Ascendance            = Spell(114050),
   AscendanceBuff        = Spell(114050),
+  LightningRod          = Spell(210689),
+  LightningRodDebuff    = Spell(197209),
   LiquidMagmaTotem      = Spell(192222),
+  ElementalBlast        = Spell(117014),
 
   -- Artifact
   Stormkeeper           = Spell(205495),
   StormkeeperBuff       = Spell(205495),
 
   -- Utility
-  WindShear             = Spell(57994)
+  WindShear             = Spell(57994),
+
+  -- Trinkets
+
+  -- Misc
+  PoolFocus             = Spell(9999000010)
 }
 local S = Spell.Shaman.Elemental
 
@@ -153,12 +165,58 @@ local function APL ()
         end
       end
 
-      -- Refreshable?
+      -- TODO: refreshable
       -- actions.aoe+=/flame_shock,if=spell_targets.chain_lightning<4&maelstrom>=20,target_if=refreshable
       if S.FlameShock:IsCastable() and (Cache.EnemiesCount[40] < 4 and Player:Maelstrom() >= 20) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
+
+      -- actions.aoe+=/earthquake
+      if S.EarthQuake:IsCastable() then
+        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+      end
+
+      -- actions.aoe+=/lava_burst,if=dot.flame_shock.remains>cast_time&buff.lava_surge.up&!talent.lightning_rod.enabled&spell_targets.chain_lightning<4
+      if S.LavaBurst:IsCastable() and (Target:DebuffRemains(S.FlameShockDebuff) > S.LavaBurst:CastTime() and Player:Buff(S.LavaSurgeBuff) and not S.LightningRod:IsAvailable() and Cache.EnemiesCount[40] < 4) then
+        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+      end
+
+      -- actions.aoe+=/elemental_blast,if=!talent.lightning_rod.enabled&spell_targets.chain_lightning<5|talent.lightning_rod.enabled&spell_targets.chain_lightning<4
+      if S.ElementalBlast:IsCastable() and (not S.LightningRod:IsAvailable() and Cache.EnemiesCount[40] < 5 or S.LightningRod:IsAvailable() and Cache.EnemiesCount[40] < 4) then
+        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
+      end
+
+      -- actions.aoe+=/lava_beam
+      if S.LavaBeam:IsCastable() then
+        if AR.Cast(S.LavaBeam) then return "Cast LavaBeam" end
+      end
+
+      -- actions.aoe+=/chain_lightning,target_if=debuff.lightning_rod.down
+      if S.ChainLightning:IsCastable() and not Target:Debuff(S.LightningRodDebuff) then
+        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+      end
+
+      -- actions.aoe+=/chain_lightning
+      if S.ChainLightning:IsCastable() then
+        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+      end
+
+      -- actions.aoe+=/lava_burst,moving=1
+      if S.LavaBurst:IsCastable() then
+        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+      end
+
+      -- TODO: refreshable
+      -- actions.aoe+=/flame_shock,moving=1,target_if=refreshable
+      if S.FlameShock:IsCastable() then
+        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+      end
     end
+
+
+
+
+    if AR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
   end
 end
 
