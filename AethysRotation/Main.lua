@@ -225,7 +225,7 @@
       [263]   = "AethysRotation_Shaman",        -- Enhancement
       [264]   = false,                          -- Restoration
     -- Warlock
-      [265]   = false,       -- Affliction
+      [265]   = false,                          -- Affliction
       [266]   = "AethysRotation_Warlock",       -- Demonology
       [267]   = "AethysRotation_Warlock",       -- Destruction
     -- Warrior
@@ -264,6 +264,10 @@
           -- Enums Filters
           Player:FilterTriggerGCD(SpecID);
           Spell:FilterProjectileSpeed(SpecID);
+        -- Special Checks
+        if GetCVar("nameplateShowEnemies") ~= "1" then
+          AR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
+        end
       else
         AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
         for Key, Value in pairs(UIFrames) do
