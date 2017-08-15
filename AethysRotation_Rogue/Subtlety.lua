@@ -349,9 +349,9 @@ local function Finish (ReturnSpellOnly)
         AR.CastLeftNameplate(BestUnit, S.Nightblade);
       end
     end
-    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6*2)
+    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)
     if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade) < S.SymbolsofDeath:CooldownRemains() + 10
-      and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 2 or 0) then
+      and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 1 or 0) then
       if ReturnSpellOnly then
         return S.Nightblade;
       else
@@ -680,7 +680,7 @@ AR.SetAPL(261, APL);
 -- # Finishers
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
 -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
--- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6*2)
+-- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)
 -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|spell_targets>=4&buff.shadow_dance.up|spell_targets<4&!buff.shadow_dance.up&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)&!cooldown.vanish.up&buff.the_first_of_the_dead.remains<1
 -- actions.finish+=/eviscerate
 
