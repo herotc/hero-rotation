@@ -27,6 +27,8 @@ Spell.Shaman.Elemental = {
   -- Abilities
   FlameShock            = Spell(188389),
   FlameShockDebuff      = Spell(188389),
+  BloodLust             = Spell(2825),
+  BloodLustBuff         = Spell(2825),
 
   TotemMastery          = Spell(210643),
   EmberTotemBuff        = Spell(210658),
@@ -34,6 +36,7 @@ Spell.Shaman.Elemental = {
   ResonanceTotemBuff    = Spell(202192),
   StormTotemBuff        = Spell(210652),
 
+  EarthShock            = Spell(8042),
   LavaBurst             = Spell(51505),
   FireElemental         = Spell(198067),
   EarthElemental        = Spell(198103),
@@ -42,6 +45,7 @@ Spell.Shaman.Elemental = {
   EarthQuake            = Spell(8042),
   LavaSurgeBuff         = Spell(77762),
   ChainLightning        = Spell(188443),
+  ElementalFocusBuff    = Spell(16246),
 
   -- Talents
   ElementalMastery      = Spell(16166),
@@ -56,11 +60,17 @@ Spell.Shaman.Elemental = {
   -- Artifact
   Stormkeeper           = Spell(205495),
   StormkeeperBuff       = Spell(205495),
+  SwellingMaelstrom     = Spell(238105),
+  PowerOfTheMaelstrom   = Spell(191861),
+  PowerOfTheMaelstromBuff = Spell(191861),
 
   -- Utility
   WindShear             = Spell(57994),
 
   -- Trinkets
+
+  -- Item Buffs
+  EOTGS                 = Spell(208723),
 
   -- Misc
   PoolFocus             = Spell(9999000010)
@@ -213,7 +223,65 @@ local function APL ()
       end
     end
 
+    -- actions+=/run_action_list,name=single_asc,if=talent.ascendance.enabled
+    if S.Ascendance:IsAvailable() then
+      -- actions.single_asc=ascendance,if=dot.flame_shock.remains>buff.ascendance.duration&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&!buff.stormkeeper.up
+      if S.Ascendance:IsCastable() and (Target:DebuffRemains(S.FlameShockDebuff) > Player:BuffRemains(S.AscendanceBuff) and (AC.CombatTime() >= 60 or Player:Buff(S.BloodLustBuff)) and S.LavaBurst:CooldownRemains() > 0 and not Player:Buff(S.StormkeeperBuff)) then
+        if AR.Cast(S.Ascendance) then return "Cast Ascendance" end
+      end
 
+      -- actions.single_asc+=/flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
+      if S.FlameShock:IsCastable() and (not Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
+        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+      end
+
+      -- actions.single_asc+=/flame_shock,if=maelstrom>=20&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
+      if S.FlameShock:IsCastable() and (Player:Maelstrom() >= 20 and AC.CombatTime() <= Player:BuffRemains(S.AscendanceBuff) and S.Ascendance:CooldownRemains() + S.Ascendance:Duration() <= Target:DebuffRemains(S.FlameShockDebuff)) then
+        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+      end
+
+      -- actions.single_asc+=/elemental_blast
+      if S.ElementalBlast:IsCastable() then
+        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
+      end
+
+      -- actions.single_asc+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up&maelstrom>=86
+      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and not Player:Buff(S.AscendanceBuff) and Player:Maelstrom() >= 86) then
+        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+      end
+
+      -- actions.single_asc+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
+      if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 117 or not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 92) then
+        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+      end
+
+      -- actions.single_asc+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
+      if S.Stormkeeper:IsCastable() then
+        if AR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+      end
+
+      -- actions.single_asc+=/liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
+      if S.LiquidMagmaTotem:IsCastable() then
+        if AR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
+      end
+
+      -- actions.single_asc+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
+      if S.LightningBolt:IsCastable() and (Player:Buff(S.PowerOfTheMaelstromBuff) and Player:Buff(S.StormkeeperBuff) and Cache.EnemiesCount[40] < 3) then
+        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+      end
+
+      -- TODO: cooldown_react
+      -- actions.single_asc+=/lava_burst,if=dot.flame_shock.remains>cast_time&(cooldown_react|buff.ascendance.up)
+      if S.LavaBurst:IsCastable() and (Target:DebuffRemains(S.FlameShockDebuff) > S.LavaBurst:CastTime() and (Player:Buff(S.AscendanceBuff))) then
+        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+      end
+
+      -- TODO: refreshable
+      -- actions.single_asc+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
+      if S.FlameShock:IsCastable() and (Player:Maelstrom() >= 20 and Player:Buff(S.ElementalFocusBuff)) then
+        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+      end
+    end
 
 
     if AR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
