@@ -35,9 +35,11 @@
     Judgment                 = Spell(20271),
     ShieldoftheRighteous     = Spell(53600),
     ShieldoftheRighteousBuff = Spell(132403),
+    GrandCrusader            = Spell(85043),
     -- Talents
     BlessedHammer            = Spell(204019),
     ConsecratedHammer        = Spell(203785),
+    CrusadersJudgment        = Spell(204023),
     -- Artifact
     EyeofTyr                 = Spell(209202),
     -- Defensive
@@ -61,7 +63,8 @@
   };
   local I = Item.Paladin.Protection;
   -- Rotation Var
-  
+  local T202PC,T204PC = AC.HasTier("T20")
+
   -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -71,65 +74,25 @@
 
 
 --- ======= ACTION LISTS =======
-  
-
-
---- ======= MAIN =======
-  local function APL ()
-    -- Unit Update
-    
-    Everyone.AoEToggleEnemiesUpdate();
-    -- Defensives
-      -- HotP Aethys (For I play my Paladin + my Rogue)
-      if S.HandoftheProtector:IsCastable() then
-        if Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP - 30 then
+  local function Defensives()
+    if S.HandoftheProtector:IsCastable() then
+        if Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP - 35 then
           if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
-        else
-          for _, ThisUnit in pairs(Party) do
-            if ThisUnit:Name() == "Aèthÿs" and ThisUnit:IsInRange(30) and ThisUnit:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP + 5 then
-              AR.CastLeft(S.HandoftheProtector);
-            end
-          end
         end
       end
       -- LotP (HP) / HotP (HP)
-      if S.LightoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP then
-        if AR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return; end
-      end
-      if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP then
-        if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
-      end
-    -- Out of Combat
-    if not Player:AffectingCombat() then
-      -- Flask
-      -- Food
-      -- Rune
-      -- PrePot w/ Bossmod Countdown
-      -- Opener
-      if Everyone.TargetIsValid() and Target:IsInRange(5) then
-        -- Avenger's Shield
-        if S.AvengersShield:IsCastable() then
-          if AR.Cast(S.AvengersShield) then return; end
-        end
-        -- Judgment
-        if S.Judgment:IsCastable() then
-          if AR.Cast(S.Judgment) then return; end
-        end
-        -- Blessed Hammer
-        if S.BlessedHammer:IsCastable() then
-          if AR.Cast(S.BlessedHammer) then return; end
-        end
-        -- Hammer of the Righteous
-        if S.HammeroftheRighteous:IsCastable() then
-          if AR.Cast(S.HammeroftheRighteous) then return; end
-        end
-      end
-      return;
+    if S.LightoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP then
+      if AR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return; end
     end
-    -- In Combat
-    if Everyone.TargetIsValid() then
-      if Target:IsInRange(5) then
-        -- SotR (HP or (AS on CD and 3 Charges))
+    if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP then
+      if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
+    end
+    return false;
+  end
+  
+
+  local function CDS()
+    -- SotR (HP or (AS on CD and 3 Charges))
         if S.ShieldoftheRighteous:IsCastable() and not Player:Buff(S.ShieldoftheRighteousBuff) and (Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then
           if AR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return; end
         end
@@ -141,13 +104,54 @@
         if S.EyeofTyr:IsCastable() and Player:HealthPercentage() <= Settings.Protection.EyeofTyrHP then
           if AR.Cast(S.EyeofTyr) then return; end
         end
+      return false;
+    end
+    
+
+
+
+--- ======= MAIN =======
+  local function APL ()
+    -- Unit Update
+    AC.GetEnemies(10);
+    Everyone.AoEToggleEnemiesUpdate();
+    -- Out of Combat
+    if not Player:AffectingCombat() then
+      -- Flask
+      -- Food
+      -- Rune
+      -- PrePot w/ Bossmod Countdown
+      -- Opener
+      if Everyone.TargetIsValid() and Target:IsInRange(30) then
+        -- Avenger's Shield
+        if S.AvengersShield:IsCastable() then
+          if AR.Cast(S.AvengersShield) then return; end
+        end
+        -- Judgment
+        if S.Judgment:IsCastable() then
+          if AR.Cast(S.Judgment) then return; end
+        end
       end
+      return;
+    end
+    -- In Combat
+    if Everyone.TargetIsValid() then
+      --CDS
+      ShouldReturn = CDS();
+      if ShouldReturn then return ShouldReturn;
+      end
+      if Target:IsInRange(10) then
+        ShouldReturn = Defensives();
+        if ShouldReturn then return ShouldReturn;
+        end
       -- Avenger's Shield
-      if S.AvengersShield:IsCastable() and Target:IsInRange(30) then
+      if S.AvengersShield:IsCastable() and T204PC or (Player:Buff(S.GrandCrusader) and S.CrusadersJudgment:IsAvailable() and S.Judgment:Charges() < 1 )  and Target:IsInRange(30) then
         if AR.Cast(S.AvengersShield) then return; end
-      end
-      -- Consecration (not Moving)
-      if S.Consecration:IsCastable() and Target:IsInRange(5) and not Player:IsMoving() then
+          elseif S.AvengersShield:IsCastable() and not T204PC then
+            if AR.Cast(S.AvengersShield) then return; end
+        end
+      -- Consecration 
+      if S.Consecration:IsCastable() and Target:IsInRange(5) then
         if AR.Cast(S.Consecration) then return; end
       end
       -- Judgment
@@ -156,8 +160,12 @@
       end
       if Target:IsInRange(5) then
         -- Blessed Hammer
-        if S.BlessedHammer:IsCastable() then
+        if S.BlessedHammer:IsCastable() and S.BlessedHammer:Charges() > 1 then
           if AR.Cast(S.BlessedHammer) then return; end
+        end
+        -- Shield of the Righteous
+         if S.ShieldoftheRighteous:IsCastable() and S.ShieldoftheRighteous:Charges() == 3 then
+          if AR.Cast(S.ShieldoftheRighteous) then return; end
         end
         -- Hammer of the Righteous
         if (S.ConsecratedHammer:IsAvailable() or S.HammeroftheRighteous:IsCastable()) then
@@ -167,6 +175,7 @@
       return;
     end
   end
+end
 
   AR.SetAPL(66, APL);
 
