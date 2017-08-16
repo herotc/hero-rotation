@@ -32,12 +32,24 @@
     
     -- Abilities
   Incinerate 				= Spell(29722),
+  IncinerateAuto		= Spell(29722),
+  IncinerateOrange 	= Spell(40239),
+  IncinerateGreen 	= Spell(124472),
 	Immolate 				  = Spell(348),
+	ImmolateAuto 		  = Spell(348),
+	ImmolateOrange 		= Spell(118297),
+	ImmolateGreen 		= Spell(124470),
 	ImmolateDebuff 		= Spell(157736),
 	Conflagrate 			= Spell(17962),
+	ConflagrateAuto		= Spell(17962),
+	ConflagrateOrange = Spell(156960),
+	ConflagrateGreen 	= Spell(124480),
 	ChaosBolt 				= Spell(116858),
 	DrainLife 				= Spell(234153),
 	RainOfFire 				= Spell(5740),
+	RainOfFireAuto 		= Spell(5740),
+	RainOfFireOrange 	= Spell(42023),
+	RainOfFireGreen 	= Spell(173561),
 	Havoc 					  = Spell(80240),
 	LifeTap 				  = Spell(1454),
 	SummonDoomGuard		= Spell(18540),
@@ -118,6 +130,7 @@
   local T202P,T204P = AC.HasTier("T20")
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range=40
+  local CastIncinerate,CastImmolate,CastConflagrate,CastRainOfFire
   
   local Consts={
     ImmolateBaseDuration = 18,
@@ -159,12 +172,32 @@
     return 0
   end
 
+  local function handleSettings()
+    if Settings.Commons.SpellType=="Auto" then --auto
+      CastIncinerate=S.IncinerateAuto
+      CastImmolate=S.ImmolateAuto
+      CastConflagrate=S.ConflagrateAuto
+      CastRainOfFire=S.RainOfFireAuto
+    elseif Settings.Commons.SpellType=="Green" then --green
+      CastIncinerate=S.IncinerateGreen
+      CastImmolate=S.ImmolateGreen
+      CastConflagrate=S.ConflagrateGreen
+      CastRainOfFire=S.RainOfFireGreen
+    else --orange
+      CastIncinerate=S.IncinerateOrange
+      CastImmolate=S.ImmolateOrange
+      CastConflagrate=S.ConflagrateOrange
+      CastRainOfFire=S.RainOfFireOrange
+    end
+    
+  end
 
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
+    handleSettings()
     -- Defensives
     
     --Precombat
@@ -210,7 +243,7 @@
         BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = nil, Player:GCD()*2, nil, Consts.ImmolateMaxDuration;
         for _, Value in pairs(Cache.Enemies[range]) do
           if Value:DebuffRemains(S.ImmolateDebuff)<= S.Havoc:Cooldown() and Target:DebuffRemains(S.ImmolateDebuff) < DebuffRemains then
-            BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = Value, Value:TimeToDie(), S.Immolate, Target:DebuffRemains(S.ImmolateDebuff);
+            BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = Value, Value:TimeToDie(), CastImmolate, Target:DebuffRemains(S.ImmolateDebuff);
           end	
         end
         if BestUnit then
@@ -243,7 +276,7 @@
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&remains<=tick_time
       if (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemains(S.ImmolateDebuff)<Player:GCD() and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
-        if AR.Cast(S.Immolate) then return "Cast"; end
+        if AR.Cast(CastImmolate) then return "Cast"; end
       end
       
       -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&active_enemies>1&remains<=tick_time&(!talent.roaring_blaze.enabled|(!debuff.roaring_blaze.remains&action.conflagrate.charges<2+set_bonus.tier19_4pc))
@@ -251,7 +284,7 @@
         BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = nil, Player:GCD()*2, nil,Consts.ImmolateMaxDuration;
         for _, Value in pairs(Cache.Enemies[range]) do
           if Value:DebuffRemains(S.ImmolateDebuff)<Player:GCD() and (not S.RoaringBlaze:IsAvailable() or (S.RoaringBlaze:IsAvailable() and (GetImmolateStack(Value)==0 or GetImmolateStack(Value)==nil) and S.Conflagrate:Charges()<2+(T194P and 1 or 0))) and Value:DebuffRemains(S.ImmolateDebuff) < DebuffRemains and not Value:Debuff(S.Havoc) then
-            BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Immolate;
+            BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), CastImmolate;
           end	
         end
         if BestUnit then
@@ -262,7 +295,7 @@
       -- actions+=/immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2+set_bonus.tier19_4pc|(action.conflagrate.charges>=1+set_bonus.tier19_4pc&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
       if S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<= Consts.ImmolateBaseDuration and (GetImmolateStack(Target)==0 or GetImmolateStack(Target)==nil) and Target:TimeToDie()>10
         and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) and not(Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
-        if AR.Cast(S.Immolate) then return "Cast"; end
+        if AR.Cast(CastImmolate) then return "Cast"; end
       end
       
       -- actions+=/berserking
@@ -282,22 +315,22 @@
       
       -- actions+=/conflagrate,if=talent.roaring_blaze.enabled&(charges=2+set_bonus.tier19_4pc|(charges>=1+set_bonus.tier19_4pc&recharge_time<gcd)|target.time_to_die<24)
       if S.RoaringBlaze:IsAvailable() and S.Conflagrate:Charges()>0 and (S.Conflagrate:Charges()==2+(T194P and 1 or 0) or ( S.Conflagrate:Charges()>=1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD())or Target:TimeToDie()<24) then
-        if AR.Cast(S.Conflagrate) then return "Cast"; end
+        if AR.Cast(CastConflagrate) then return "Cast"; end
       end
       
       -- actions+=/conflagrate,if=talent.roaring_blaze.enabled&debuff.roaring_blaze.stack>0& dot.immolate.remains>dot.immolate.duration*0.3&(active_enemies=1|soul_shard<3)&soul_shard<5
       if S.RoaringBlaze:IsAvailable() and S.Conflagrate:Charges()>0 and (GetImmolateStack(Target) and GetImmolateStack(Target)>0) and Target:DebuffRemains(S.ImmolateDebuff)>Consts.ImmolateBaseDuration*0.3 and (Cache.EnemiesCount[range]==1 or Player:SoulShards()<3) and Player:SoulShards()<5 then
-        if AR.Cast(S.Conflagrate) then return "Cast"; end
+        if AR.Cast(CastConflagrate) then return "Cast"; end
       end
       
       -- actions+=/conflagrate,if=!talent.roaring_blaze.enabled&buff.backdraft.stack<3&buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
       if S.Backdraft:IsAvailable() and S.Conflagrate:Charges()>0 and Player:BuffStack(S.BackdraftBuff)<3 and Player:BuffRemains(S.ConflagrationOfChaosDebuff)<=S.ChaosBolt:CastTime() then
-        if AR.Cast(S.Conflagrate) then return "Cast"; end
+        if AR.Cast(CastConflagrate) then return "Cast"; end
       end
       
       -- actions+=/conflagrate,if=!talent.roaring_blaze.enabled&buff.backdraft.stack<3&(charges=1+set_bonus.tier19_4pc&recharge_time<action.chaos_bolt.cast_time|charges=2+set_bonus.tier19_4pc)& soul_shard<5
       if S.Backdraft:IsAvailable() and Player:BuffStack(S.BackdraftBuff)<3 and (( S.Conflagrate:Charges()==1+(T194P and 1 or 0) and S.Conflagrate:Recharge()<S.Immolate:CastTime()+Player:GCD()) or S.Conflagrate:Charges()==2+(T194P and 1 or 0)) and Player:SoulShards()<5 then
-        if AR.Cast(S.Conflagrate) then return "Cast"; end
+        if AR.Cast(CastConflagrate) then return "Cast"; end
       end
       
       -- actions+=/dimensional_rift,if=equipped.144369&!buff.lessons_of_spacetime.remains&((!talent.grimoire_of_supremacy.enabled&!cooldown.summon_doomguard.remains)|(talent.grimoire_of_service.enabled&!cooldown.service_pet.remains)|(talent.soul_harvest.enabled&!cooldown.soul_harvest.remains))
@@ -342,7 +375,7 @@
       
       -- actions+=/rain_of_fire,if=active_enemies>=3
       if AR.AoEON() and S.RainOfFire:IsAvailable() and Cache.EnemiesCount[range]>=3 and Player:SoulShards ()>=3 and not(Player:IsCasting() and Player:CastID()==S.ChaosBolt:ID() and Player:SoulShards()<=3) then
-        if AR.Cast(S.RainOfFire) then return "Cast"; end
+        if AR.Cast(CastRainOfFire) then return "Cast"; end
       end
       
       -- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|((!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
@@ -377,17 +410,17 @@
       
       -- actions+=/conflagrate,if=!talent.backdraft.enabled&buff.backdraft.stack<3
        if not S.Backdraft:IsAvailable() and Player:BuffStack(S.BackdraftBuff)<3 and  S.Conflagrate:Charges()>1 then
-        if AR.Cast(S.Conflagrate) then return "Cast"; end
+        if AR.Cast(CastConflagrate) then return "Cast"; end
       end
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
       if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:Cooldown()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
-        if AR.Cast(S.Immolate) then return "Cast"; end
+        if AR.Cast(CastImmolate) then return "Cast"; end
       end
       
       -- actions+=/incinerate
       if S.Incinerate:IsCastable() and (S.Incinerate:Cost()<=Player:Mana()) then
-        if AR.Cast(S.Incinerate) then return"Cast"; end
+        if AR.Cast(CastIncinerate) then return"Cast"; end
       end
       
       -- actions+=/life_tap   
