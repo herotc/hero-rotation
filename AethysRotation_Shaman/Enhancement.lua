@@ -285,7 +285,7 @@ local function APL ()
 
     -- On use trinkets (After OffGCDs)
     if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
-      if AR.Cast(S.SpecterOfBetrayal, {true}) then return "Cast SpecterOfBetrayal" end
+      if AR.CastSuggested(S.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
     end
 
     -- actions+=/call_action_list,name=core
