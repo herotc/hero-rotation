@@ -41,7 +41,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Hunter BeastMastery ([Nia](https://github.com/Nianel))
 - Hunter Marskmanship ([Nia](https://github.com/Nianel))
 - Hunter Survival ([Nia](https://github.com/Nianel))
-- Mage Frost ([Glynny](https://github.com/orgs/SimCMinMax/people/Glynnyx) & [Zulandia](https://github.com/AlexanderKenny) & [Nia](https://github.com/Nianel))
+- Mage Frost ([Glynny](https://github.com/Glynnyx) & [Zulandia](https://github.com/AlexanderKenny) & [Nia](https://github.com/Nianel))
 - Monk Windwalker ([Lockem90](https://github.com/Lockem90))
 - Paladin Protection ([Aethys](https://github.com/Aethys256) & [chrislopez24](https://github.com/chrislopez24))
 - Paladin Retribution ([Aethys](https://github.com/Aethys256))
