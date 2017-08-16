@@ -1,7 +1,7 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FRogue|r]
-## Author: Aethys, SimCMinMax Team
+## Author: Aethys, Mystler
 ## Notes: Aethys Rotation - Rogue Module.
 
 ## DefaultState: Enabled

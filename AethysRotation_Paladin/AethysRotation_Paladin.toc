@@ -1,7 +1,7 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FPaladin|r]
-## Author: Aethys
+## Author: Aethys, chrislopez24
 ## Notes: Aethys Rotation - Paladin Module.
 
 ## DefaultState: Enabled

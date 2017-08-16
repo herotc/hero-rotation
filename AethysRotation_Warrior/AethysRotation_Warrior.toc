@@ -1,7 +1,7 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FWarrior|r]
-## Author: Aethys
+## Author: lithium720, Lockem, Nia, Aethys
 ## Notes: Aethys Rotation - Warrior Module.
 
 ## DefaultState: Enabled

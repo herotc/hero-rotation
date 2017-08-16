@@ -1,7 +1,7 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FDeathKnight|r]
-## Author: Voracek
+## Author: chrislopez24, 3L00DStrike
 ## Notes: Aethys Rotation - DeathKnight Module.
 
 ## DefaultState: Enabled

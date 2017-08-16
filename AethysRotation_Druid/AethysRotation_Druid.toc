@@ -1,7 +1,7 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FDruid|r]
-## Author: Aethys
+## Author: Aethys, KutiKuti
 ## Notes: Aethys Rotation - Druid Module.
 
 ## DefaultState: Enabled

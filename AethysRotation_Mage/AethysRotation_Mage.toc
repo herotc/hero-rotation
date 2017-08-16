@@ -1,7 +1,7 @@
 ## Interface: 70200
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FMage|r]
-## Author: Nia
+## Author: Glynny, Zulandia, Nia
 ## Notes: Aethys Rotation - Mage Module.
 
 ## DefaultState: Enabled
