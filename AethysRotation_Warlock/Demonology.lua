@@ -446,7 +446,7 @@
 		
 		-- actions+=/berserking
 		if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:IsCastable() then
-			if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
+			if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
 		end
 		
 		-- actions+=/soul_harvest,if=!buff.soul_harvest.remains

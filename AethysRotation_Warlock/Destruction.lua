@@ -266,7 +266,7 @@
       
       -- actions+=/dimensional_rift,if=charges=3
       if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges() == 3 or (S.DimensionalRift:Charges() == 2 and S.DimensionalRift:Recharge() < Player:GCD()) then
-        if AR.Cast(S.DimensionalRift) then return "Cast"; end
+        if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return "Cast"; end
       end
       
       -- actions+=/cataclysm,if=spell_targets.cataclysm>=3
@@ -300,7 +300,7 @@
       
       -- actions+=/berserking
       if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:IsCastable() then
-        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return "Cast"; end
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
       end
       
       -- actions+=/shadowburn,if=buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
@@ -335,7 +335,7 @@
       
       -- actions+=/dimensional_rift,if=equipped.144369&!buff.lessons_of_spacetime.remains&((!talent.grimoire_of_supremacy.enabled&!cooldown.summon_doomguard.remains)|(talent.grimoire_of_service.enabled&!cooldown.service_pet.remains)|(talent.soul_harvest.enabled&!cooldown.soul_harvest.remains))
       if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and I.LessonsOfSpaceTime:IsEquipped(3) and not Player:Buff(S.LessonsOfSpaceTimeBuff) and ((not S.GrimoireOfSupremacy:IsAvailable() and not S.SummonDoomGuard:CooldownUp()) or(S.GrimoireOfService:IsAvailable() and not S.GrimoireImp:IsAvailable()) or (S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownUp())) then
-        if AR.Cast(S.DimensionalRift) then return "Cast"; end
+        if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return "Cast"; end
       end
       
       -- actions+=/service_pet
