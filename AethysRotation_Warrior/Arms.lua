@@ -411,7 +411,7 @@ local function APL ()
       end
 
       -- actions.single+=/slam,if=spell_targets.whirlwind=1&!talent.fervor_of_battle.enabled&(rage>=52|!talent.rend.enabled|!talent.ravager.enabled)
-      if S.Slam:IsReady() and (not Cache.EnemiesCount[5] > 1 and not S.FervorOfBattle:IsAvailable() and (Player:Rage() >= 52 or not S.Rend:IsAvailable() or not S.Ravager:IsAvailable())) then
+      if S.Slam:IsReady() and (Cache.EnemiesCount[5] <= 1 and not S.FervorOfBattle:IsAvailable() and (Player:Rage() >= 52 or not S.Rend:IsAvailable() or not S.Ravager:IsAvailable())) then
         if AR.Cast(S.Slam) then return "Cast Slam" end
       end
 
