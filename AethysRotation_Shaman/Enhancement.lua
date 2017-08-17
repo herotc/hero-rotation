@@ -39,6 +39,7 @@ Spell.Shaman.Enhancement = {
   LightningBolt         = Spell(187837),
   Rockbiter             = Spell(193786),
   WindStrike            = Spell(115356),
+  HealingSurge          = Spell(188070),
 
   -- Talents
   Windsong              = Spell(201898),
@@ -181,6 +182,13 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    -- Heal when we have less than the set health threshold (instant casts only)!
+    if Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingSurgeHPThreshold then
+      if S.HealingSurge:IsCastable() and (Player:Maelstrom() >= 20 and Player:Mana() >= S.HealingSurge:Cost()) then
+        if AR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
+      end
+    end
+
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=earthen_spike
