@@ -31,7 +31,7 @@
       Shadowmeld                    = Spell(58984),
       -- Abilities
       Fireball                      = Spell(133),
-      Pyroblast                     = Spell(147720)
+      Pyroblast                     = Spell(147720),
       CriticalMass                  = Spell(117216),
       Fireblast                     = Spell(108853),
       HotStreak                     = Spell(195283),
@@ -56,7 +56,6 @@
       Cinderstorm                   = Spell(198929),
       Meteor                        = Spell(153561),
       -- Artifact
-
       PheonixFlames                 = Spell(194466),
       -- Defensive
       IceBarrier                    = Spell(11426),
