@@ -177,6 +177,75 @@ end
 local function DSh_DfA ()
   return S.DeathfromAbove:IsAvailable() and S.DarkShadow:IsAvailable() and Cache.EnemiesCount[8] < 4;
 end
+-- # Finishers
+-- ReturnSpellOnly has been added to Predict Finisher in case of Stealth Macros (happens only when ShD Charges ~= 3)
+local function Finish (ReturnSpellOnly)
+  if S.Nightblade:IsCastable() then
+    NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
+    -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
+    if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff))
+      and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid())
+      and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
+      and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= Rogue.MantleDuration())
+      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
+        or Target:DebuffRemains(S.Nightblade) < 4)
+      and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
+      if ReturnSpellOnly then
+        return S.Nightblade;
+      else
+        if AR.Cast(S.Nightblade) then return ""; end
+      end
+    end
+    -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
+    if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff)) and Rogue.MantleDuration() == 0 then
+      BestUnit, BestUnitTTD = nil, 12;
+      for _, Unit in pairs(Cache.Enemies[5]) do
+        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Nightblade))
+          and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
+          and ((Unit:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
+            or Unit:DebuffRemains(S.Nightblade) < 4)
+          and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
+          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+        end
+      end
+      if BestUnit then
+        AR.CastLeftNameplate(BestUnit, S.Nightblade);
+      end
+    end
+    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
+    if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade) < S.SymbolsofDeath:CooldownRemains() + 10
+      and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
+      and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(), -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
+      if ReturnSpellOnly then
+        return S.Nightblade;
+      else
+        if AR.Cast(S.Nightblade) then return ""; end
+      end
+    end
+  end
+  -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|(!buff.shadow_dance.up|spell_targets>=4)&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)&buff.the_first_of_the_dead.remains<1&(buff.finality_eviscerate.up|spell_targets.shuriken_storm<4)
+  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
+    and (not S.DarkShadow:IsAvailable()
+      or (not Player:Buff(S.ShadowDanceBuff) or Cache.EnemiesCount[8] >= 4)
+        and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 10 + (AC.Tier20_4Pc and 5 or 0))
+        and Player:BuffRemains(S.TheFirstoftheDead) < 1
+        and (Player:Buff(S.FinalityEviscerate) or Cache.EnemiesCount[8] < 4)) then
+    if ReturnSpellOnly then
+      return S.DeathfromAbove;
+    else
+      if AR.Cast(S.DeathfromAbove) then return ""; end
+    end
+  end
+  -- actions.finish+=/eviscerate
+  if S.Eviscerate:IsCastable() and IsInMeleeRange() then
+    if ReturnSpellOnly then
+      return S.Eviscerate;
+    else
+      if AR.Cast(S.Eviscerate) then return ""; end
+    end
+  end
+  return false;
+end
 local MacroTable;
 local function StealthMacro (StealthSpell)
   MacroTable = {StealthSpell};
@@ -314,75 +383,6 @@ local function CDs ()
       if S.ShadowDance:IsCastable() and not Player:Buff(S.ShadowDance) and Target:FilteredTimeToDie("<=", 4 + (S.Subterfuge:IsAvailable() and 1 or 0)) then
         if StealthMacro(S.ShadowDance) then return ""; end
       end
-    end
-  end
-  return false;
-end
--- # Finishers
--- ReturnSpellOnly has been added to Predict Finisher in case of Stealth Macros (happens only when ShD Charges ~= 3)
-local function Finish (ReturnSpellOnly)
-  if S.Nightblade:IsCastable() then
-    NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
-    -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
-    if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff))
-      and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid())
-      and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
-      and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= Rogue.MantleDuration())
-      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
-        or Target:DebuffRemains(S.Nightblade) < 4)
-      and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
-      if ReturnSpellOnly then
-        return S.Nightblade;
-      else
-        if AR.Cast(S.Nightblade) then return ""; end
-      end
-    end
-    -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
-    if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not Player:Buff(S.ShadowDanceBuff)) and Rogue.MantleDuration() == 0 then
-      BestUnit, BestUnitTTD = nil, 12;
-      for _, Unit in pairs(Cache.Enemies[5]) do
-        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Nightblade))
-          and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
-          and ((Unit:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
-            or Unit:DebuffRemains(S.Nightblade) < 4)
-          and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
-          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
-        end
-      end
-      if BestUnit then
-        AR.CastLeftNameplate(BestUnit, S.Nightblade);
-      end
-    end
-    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
-    if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade) < S.SymbolsofDeath:CooldownRemains() + 10
-      and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
-      and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(), -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
-      if ReturnSpellOnly then
-        return S.Nightblade;
-      else
-        if AR.Cast(S.Nightblade) then return ""; end
-      end
-    end
-  end
-  -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|(!buff.shadow_dance.up|spell_targets>=4)&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)&buff.the_first_of_the_dead.remains<1&(buff.finality_eviscerate.up|spell_targets.shuriken_storm<4)
-  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
-    and (not S.DarkShadow:IsAvailable()
-      or (not Player:Buff(S.ShadowDanceBuff) or Cache.EnemiesCount[8] >= 4)
-        and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 10 + (AC.Tier20_4Pc and 5 or 0))
-        and Player:BuffRemains(S.TheFirstoftheDead) < 1
-        and (Player:Buff(S.FinalityEviscerate) or Cache.EnemiesCount[8] < 4)) then
-    if ReturnSpellOnly then
-      return S.DeathfromAbove;
-    else
-      if AR.Cast(S.DeathfromAbove) then return ""; end
-    end
-  end
-  -- actions.finish+=/eviscerate
-  if S.Eviscerate:IsCastable() and IsInMeleeRange() then
-    if ReturnSpellOnly then
-      return S.Eviscerate;
-    else
-      if AR.Cast(S.Eviscerate) then return ""; end
     end
   end
   return false;
