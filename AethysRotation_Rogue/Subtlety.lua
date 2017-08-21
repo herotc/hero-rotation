@@ -606,8 +606,8 @@ local function APL ()
           if ShouldReturn then return ShouldReturn; end
         end
       end
-      -- actions+=/call_action_list,name=finish,if=combo_points>=5+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
-      if Player:ComboPoints() >= 5 + (S.DeeperStratagem:IsAvailable() and not Player:Buff(S.ShadowBlades) and (Rogue.MantleDuration() == 0 or AC.Tier20_4Pc)
+      -- actions+=/call_action_list,name=finish,if=combo_points>=5+3*(buff.the_first_of_the_dead.up&talent.anticipation.enabled)+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
+      if Player:ComboPoints() >= 5 + (Player:Buff(S.TheFirstoftheDead) and S.Anticipation:IsAvailable() and 3 or 0) + (S.DeeperStratagem:IsAvailable() and not Player:Buff(S.ShadowBlades) and (Rogue.MantleDuration() == 0 or AC.Tier20_4Pc)
           and (not Player:Buff(S.TheFirstoftheDead) or DSh_DfA()) and 1 or 0)
         or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[8] >= 3 and Cache.EnemiesCount[8] <= 4)
         or (Target:FilteredTimeToDie("<=", 1) and Player:ComboPoints() >= 3) then
@@ -638,7 +638,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 08/20/2017
+-- Last Update: 08/21/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -666,7 +666,7 @@ AR.SetAPL(261, APL);
 -- actions+=/nightblade,if=target.time_to_die>6&remains<gcd.max&combo_points>=4-(time<10)*2
 -- actions+=/call_action_list,name=stealth_als,if=talent.dark_shadow.enabled&combo_points.deficit>=2+buff.shadow_blades.up&(dot.nightblade.remains>4+talent.subterfuge.enabled|cooldown.shadow_dance.charges_fractional>=1.9&(!equipped.denial_of_the_halfgiants|time>10))
 -- actions+=/call_action_list,name=stealth_als,if=!talent.dark_shadow.enabled&(combo_points.deficit>=2+buff.shadow_blades.up|cooldown.shadow_dance.charges_fractional>=1.9+talent.enveloping_shadows.enabled)
--- actions+=/call_action_list,name=finish,if=combo_points>=5+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
+-- actions+=/call_action_list,name=finish,if=combo_points>=5+3*(buff.the_first_of_the_dead.up&talent.anticipation.enabled)+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
 -- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&cooldown.symbols_of_death.remains<=1&combo_points>=2&equipped.the_first_of_the_dead&spell_targets.shuriken_storm<2
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
