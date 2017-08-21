@@ -33,6 +33,8 @@
         Dispersion = {true, false},
         -- Racials
         Racials = {true, false},
+        -- Items
+        PotionOfProlongedPower = {true, false},
       }
     },
   };
@@ -51,3 +53,4 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.PowerInfusion", "Power Infusion");
   CreateARPanelOption("OffGCDasOffGCD", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.Dispersion", "Dispersion");
   CreateARPanelOption("OffGCDasOffGCD", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.Racials", "Racials");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.PotionOfProlongedPower", "Potion Of Prolonged Power");
