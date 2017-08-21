@@ -70,6 +70,7 @@ Spell.Shaman.Enhancement = {
   SpecterOfBetrayal     = Spell(246461),
 
   -- Misc
+  PoPP                  = Spell(229206),
   PoolFocus             = Spell(9999000010)
 }
 local S = Spell.Shaman.Enhancement
@@ -82,7 +83,10 @@ Item.Shaman.Enhancement = {
   AkainusAbsoluteJustice    = Item(137084, {9}),
 
   -- Trinkets
-  SpecterOfBetrayal         = Item(151190, {13, 14})
+  SpecterOfBetrayal         = Item(151190, {13, 14}),
+
+  -- Misc
+  PoPP                      = Item(142117)
 }
 local I = Item.Shaman.Enhancement
 
@@ -293,7 +297,12 @@ local function APL ()
 
     -- On use trinkets (After OffGCDs)
     if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
-      if AR.CastSuggested(S.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
+      if AR.CastSuggested(I.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
+    end
+
+    -- Potion of Prolonged Power
+    if Settings.Shaman.Commons.ShowPoPP and (I.PoPP:CooldownRemains() == 0 and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
+      if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
     end
 
     -- actions+=/call_action_list,name=core
