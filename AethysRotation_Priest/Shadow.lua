@@ -53,7 +53,7 @@
 		
 		LegacyOfTheVoid		= Spell(193225),
 		ShadowCrash				= Spell(205385),
-		SurrendertoMadness= Spell(193223),
+		SurrenderToMadness= Spell(193223),
     -- Artifact
 		VoidTorrent				= Spell(205065),
 		MassHysteria			= Spell(194378),
@@ -75,7 +75,8 @@
     -- Misc
 		Shadowform				= Spell(232698),
 		VoidForm				  = Spell(194249),
-    SephuzBuff			  = Spell(208052)
+    SephuzBuff			  = Spell(208052),
+    PotionOfProlongedPowerBuff = Spell(229206)
     -- Macros
     
   };
@@ -178,7 +179,7 @@ end
 
 local function var_s2msetuptime()
 -- actions.precombat+=/variable,name=s2msetup_time,op=set,value=(0.8*(83+(20+20*talent.fortress_of_the_mind.enabled)*set_bonus.tier20_4pc-(5*talent.sanlayn.enabled)+(30+42*(desired_targets>1)+10*talent.lingering_insanity.enabled)*set_bonus.tier21_4pc*talent.auspicious_spirits.enabled+((33-13*set_bonus.tier20_4pc)*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*equipped.mangazas_madness+(raw_haste_pct*10*(1+0.7*set_bonus.tier20_4pc))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled)))),if=talent.surrender_to_madness.enabled
-  if (S.SurrendertoMadness:IsAvailable()) then
+  if (S.SurrenderToMadness:IsAvailable()) then
     v_s2msetuptime = 0.8 * (83 
     + ((20 + 20 * (S.FortressOfTheMind:IsAvailable() and 1 or 0)) * (T204P and 1 or 0))
     - (5 * (S.Sanlayn:IsAvailable() and 1 or 0))
@@ -206,8 +207,10 @@ local function varInit()
 end
 
 local function varCalc()
-  var_actorsFightTimeMod()
-  var_s2mCheck()
+  if (S.SurrenderToMadness:IsAvailable() and not Player:Buff(S.SurrenderToMadness)) then
+    var_actorsFightTimeMod()
+    var_s2mCheck()
+  end
 end
 
 
@@ -250,6 +253,11 @@ local function CDs ()
 	
 	--Arcane Torrent
 	--TODO
+  
+  -- actions+=/potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
+  if I.PotionOfProlongedPower:IsUsable() and I.PotionOfProlongedPower:CooldownRemains()==0 and (Player:HasHeroism() or Target:TimeToDie()<=80 or (Target:HealthPercentage()<35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
+    if AR.Cast(I.PotionOfProlongedPower,Settings.Shadow.OffGCDasOffGCD.PotionOfProlongedPower) then return "Cast"; end
+  end
 end
 
 local function s2m()
@@ -524,7 +532,7 @@ local function APL ()
 			if Player:Buff(S.VoidForm) or (Player:CastID() == S.VoidEruption:ID()) then
 				--actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 				--TODO : S2M
-				if Player:Buff(S.SurrendertoMadness) then
+				if Player:Buff(S.SurrenderToMadness) then
 					--ShouldReturn = s2m();
 					--if ShouldReturn then return ShouldReturn; end
 					
