@@ -22,56 +22,59 @@
     -- Racials
 		ArcaneTorrent			= Spell(25046),
 		Berserking				= Spell(26297),
-		BloodFury				= Spell(20572),
-		GiftoftheNaaru			= Spell(59547),
-		Shadowmeld           	= Spell(58984),
+		BloodFury				  = Spell(20572),
+		GiftoftheNaaru		= Spell(59547),
+		Shadowmeld        = Spell(58984),
     -- Abilities
-		MindBlast				= Spell(8092),
-		MindFlay				= Spell(15407),
+		MindBlast				  = Spell(8092),
+		MindFlay				  = Spell(15407),
 		VoidEruption			= Spell(228260),
-		VoidBolt				= Spell(205448),
-		ShadowWordDeath			= Spell(32379),
-		ShadowWordPain			= Spell(589),
+		VoidBolt				  = Spell(205448),
+		ShadowWordDeath		= Spell(32379),
+		ShadowWordPain		= Spell(589),
 		VampiricTouch			= Spell(34914),
 		Shadowfiend				= Spell(34433),
     -- Talents
 		TwistOfFate				= Spell(109142),
-		FortressOfTheMind		= Spell(193195),
-		ShadowWordVoid			= Spell(205351),
+		FortressOfTheMind	= Spell(193195),
+		ShadowWordVoid		= Spell(205351),
 
-		LingeringInsanity		= Spell(199849),
+		LingeringInsanity	= Spell(199849),
 		ReaperOfSouls			= Spell(199853),
-		VoidRay					= Spell(205371),
+		VoidRay					  = Spell(205371),
 
-		Sanlayn					= Spell(199855),
-		AuspiciousSpirit		= Spell(155271),
+		Sanlayn					  = Spell(199855),
+		AuspiciousSpirit	= Spell(155271),
 		ShadowInsight			= Spell(162452),
 		
 		PowerInfusion			= Spell(10060),
-		Misery					= Spell(238558),
+		Misery					  = Spell(238558),
 		Mindbender				= Spell(200174),
 		
-		LegacyOfTheVoid			= Spell(193225),
+		LegacyOfTheVoid		= Spell(193225),
 		ShadowCrash				= Spell(205385),
-		SurrendertoMadness		= Spell(193223),
+		SurrendertoMadness= Spell(193223),
     -- Artifact
 		VoidTorrent				= Spell(205065),
 		MassHysteria			= Spell(194378),
-		SphereOfInsanity		= Spell(194179),
-		UnleashTheShadows		= Spell(194093),
+		SphereOfInsanity	= Spell(194179),
+		UnleashTheShadows	= Spell(194093),
 		FiendingDark			= Spell(238065),
-		LashOfInsanity			= Spell(238137),
+		LashOfInsanity		= Spell(238137),
+    ToThePain         = Spell(193644),
+    TouchOfDarkness   = Spell(194007),
+    VoidCorruption    = Spell(194016),
     -- Defensive
 		Dispersion				= Spell(47585),
-		Fade					= Spell(586),
-		PowerWordShield			= Spell(17),
+		Fade					    = Spell(586),
+		PowerWordShield		= Spell(17),
     -- Utility
-		VampiricEmbrace 		= Spell(15286),
+		VampiricEmbrace 	= Spell(15286),
     -- Legendaries
-		ZeksExterminatus		= Spell(236546),
+		ZeksExterminatus	= Spell(236546),
     -- Misc
 		Shadowform				= Spell(232698),
-		VoidForm				= Spell(194249)
+		VoidForm				  = Spell(194249)
     -- Macros
     
   };
@@ -81,9 +84,10 @@
   if not Item.Priest then Item.Priest = {}; end
   Item.Priest.Shadow = {
     -- Legendaries
-	MotherShahrazsSeduction		= Item(132437), --3
-	MangazasMadness 			= Item(132864), --6
-	ZeksExterminatus 			= Item(137100) --15
+	MotherShahrazsSeduction	= Item(132437), --3
+	MangazasMadness 			  = Item(132864), --6
+	ZeksExterminatus 			  = Item(137100), --15
+	SephuzSecret 			      = Item(132452) --11/12
 
   };
   local I = Item.Priest.Shadow;
@@ -91,7 +95,12 @@
   local ShouldReturn; -- Used to get the return string
   local T192P,T194P = AC.HasTier("T19")
   local T202P,T204P = AC.HasTier("T20")
+  local T212P,T214P = AC.HasTier("T21")
   local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
+  local v_cdtime,v_dotswpdpgcd,v_dotvtdpgcd,v_seardpgcd,v_s2msetuptime
+  local v_actorsFightTimeMod,v_s2mcheck
+  local var_init=false
+  local var_calcCombat=false
   local VTUsed
   -- GUI Settings
   local Settings = {
@@ -102,6 +111,8 @@
 
 
 --- APL Action Lists (and Variables)
+
+
 local function ExecuteRange()
 	if Player:Buff(S.ZeksExterminatus) then return 101; end
 	return S.ReaperOfSouls:IsAvailable() and 35 or 20;
@@ -111,77 +122,92 @@ local function Insanity_Threshold()
 	return S.LegacyOfTheVoid:IsAvailable() and 65 or 100;
 end
 
-local function CurrentInsanityDrain ()
+local function CurrentInsanityDrain()
 	if not Player:Buff(S.VoidForm) then return 0.0; end
 	return 6+ 0.67*(Player:BuffStack(S.VoidForm)-(2*(I.MotherShahrazsSeduction:IsEquipped(3) and 1 or 0))-4*(VTUsed and 1 or 0))
 end
 
-local function actorsFightTimeMod()
---actions.check=variable,op=set,name=actors_fight_time_mod,value=0
---actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
---actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	local value = 0
+local function var_actorsFightTimeMod()
+-- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
+-- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
 	if (AC.CombatTime()+Target:TimeToDie())>450 and (AC.CombatTime()+Target:TimeToDie())<600 then
-		value=-((-(450)+(AC.CombatTime()+Target:TimeToDie()))%10)
+		v_actorsFightTimeMod=-((-450+(AC.CombatTime()+Target:TimeToDie()))%10)
 	elseif (AC.CombatTime()+Target:TimeToDie())<=450 then
-		value=((450-(AC.CombatTime()+Target:TimeToDie()))%5)
+		v_actorsFightTimeMod=((450-(AC.CombatTime()+Target:TimeToDie()))%5)
+  else
+    v_actorsFightTimeMod=0
 	end
-	return value
 end
 
-local function nonexecuteActorsPct()
-
+local function var_s2mCheck()
+-- actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+-- actions.check+=/variable,op=min,name=s2mcheck,value=180
+  --TODO : add nonexecute_actors_pct ?
+  v_s2mcheck = v_s2msetuptime - (v_actorsFightTimeMod)
+  if v_s2mcheck < 180 then
+    v_s2mcheck=180
+  end
+  return v_s2mcheck;
 end
 
-local function s2mbeltcheck()
-	--actions.precombat+=/variable,op=set,name=s2mbeltcheck,value=cooldown.mind_blast.charges>=2
-	return I.MangazasMadness:IsEquipped(6) and 1 or 0;
+local function var_cdtime()
+-- actions.precombat+=/variable,name=cd_time,op=set,value=(10+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(3-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
+  v_cdtime = 10 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (T192P and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (I.MangazasMadness:IsEquipped(6) and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (T204P and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
+  -- print(v_cdtime)
 end
 
-local function s2mCheck()
---actions.check+=/variable,op=set,name=s2mcheck,value=(0.8*(83-(5*talent.sanlayn.enabled)+(33*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*variable.s2mbeltcheck+((raw_haste_pct*10))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
---[[	local value=0
-	value = (
-	0.8*(
-		83-(
-			5*S.Sanlayn:IsAvailable()
-		)
-		+(
-			33*S.ReaperOfSouls:IsAvailable()
-		)
-		+(
-			1--4*set_bonus.tier19_2pc
-		)
-		+(
-			8*s2mbeltcheck()
-		)
-		+(
-			(Player:HastePct()*10))
-			*(
-				2+(
-					1--0.8*set_bonus.tier19_2pc
-				)
-				+(
-					1*S.ReaperOfSouls:IsAvailable()
-				)
-				+(
-					2*S.Sanlayn:MassHysteria()
-				)-(
-					1*S.Sanlayn:IsAvailable()
-				)
-			)
-		)
-)	
--(
-	actorsFightTimeMod()*nonexecuteActorsPct
-)
-	
-	if value < 180 then
-		value=180
-	end
-	return value;]]
-	return 0;
+local function var_dotswpdpgcd()
+-- actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
+  v_dotswpdpgcd = 38 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1+0.2+(Player:MasteryPct() % 16000)) * 0.75
+  -- print(v_dotswpdpgcd)
 end
+
+local function var_dotvtdpgcd()
+-- actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
+  v_dotvtdpgcd = 71 * 1.2 * (1 + 0.2 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (1 + 0.05 * (S.TouchOfDarkness:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() % 16000)) * 0.5
+  -- print(v_dotvtdpgcd)
+end
+
+local function var_seardpgcd()
+-- actions.precombat+=/variable,name=sear_dpgcd,op=set,value=80*(1+0.05*artifact.void_corruption.rank)
+  v_seardpgcd = 80 * (1 + 0.05 + (S.VoidCorruption:ArtifactRank() or 0))
+  -- print(v_seardpgcd)
+end
+
+local function var_s2msetuptime()
+-- actions.precombat+=/variable,name=s2msetup_time,op=set,value=(0.8*(83+(20+20*talent.fortress_of_the_mind.enabled)*set_bonus.tier20_4pc-(5*talent.sanlayn.enabled)+(30+42*(desired_targets>1)+10*talent.lingering_insanity.enabled)*set_bonus.tier21_4pc*talent.auspicious_spirits.enabled+((33-13*set_bonus.tier20_4pc)*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*equipped.mangazas_madness+(raw_haste_pct*10*(1+0.7*set_bonus.tier20_4pc))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled)))),if=talent.surrender_to_madness.enabled
+  if (S.SurrendertoMadness:IsAvailable()) then
+    v_s2msetuptime = 0.8 * (83 
+    + ((20 + 20 * (S.FortressOfTheMind:IsAvailable() and 1 or 0)) * (T204P and 1 or 0))
+    - (5 * (S.Sanlayn:IsAvailable() and 1 or 0))
+    + ((30 + 42 * ((Cache.EnemiesCount[40]>1) and 1 or 0) + 10 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (T214P and 1 or 0) * (S.AuspiciousSpirit:IsAvailable() and 1 or 0))
+    + ((33 - 13 * (T204P and 1 or 0)) * (S.ReaperOfSouls:IsAvailable() and 1 or 0))
+    + (4 * (T192P and 1 or 0))
+    + (8 * (I.MangazasMadness:IsEquipped(6) and 1 or 0))
+    + (Player:HastePct() * 10 * (1 + 0.7 * (T204P and 1 or 0)) * (2 + (0.8 * (T192P and 1 or 0)) + (1 * (S.ReaperOfSouls:IsAvailable() and 1 or 0)) + (2 * (S.MassHysteria:ArtifactRank() or 0)) - (1 * (S.Sanlayn:IsAvailable() and 1 or 0)))))
+  else
+    v_s2msetuptime = 0
+  end 
+  -- print(v_s2msetuptime)
+end
+
+local function varInit()
+  if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
+    var_cdtime()
+    var_dotswpdpgcd()
+    var_dotvtdpgcd()
+    var_seardpgcd()
+    var_s2msetuptime()
+    var_init=true
+    var_calcCombat=true
+  end
+end
+
+local function varCalc()
+  var_actorsFightTimeMod()
+  var_s2mCheck()
+end
+
 
 local function CDs ()
 	--PI
@@ -450,6 +476,8 @@ local function APL ()
 	-- Unit Update
 	AC.GetEnemies(40);
   Everyone.AoEToggleEnemiesUpdate();
+  varInit()
+  varCalc()
 	
 	-- Defensives
 	if S.Dispersion:IsCastable() and Player:HealthPercentage() <= Settings.Shadow.DispersionHP then
@@ -463,6 +491,8 @@ local function APL ()
 	
 	-- Out of Combat
 	if not Player:AffectingCombat() then
+    --RAZ combat
+      if var_calcCombat then var_calcCombat=false end
 	  -- Flask
 	  -- Food
 	  -- Rune
@@ -479,9 +509,6 @@ local function APL ()
 	-- In Combat
 	if Everyone.TargetIsValid() then
 		if Target:IsInRange(40) then --in range
-			
-			--print(Player:CastRemains())
-			
 			--CD usage
 			if AR.CDsON() then
 				ShouldReturn = CDs();
@@ -574,7 +601,6 @@ local function APL ()
 				
 				--actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
 				--actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
-				--print(Player:CastRemains(),S.MindBlast:Cooldown())
 				if (S.MindBlast:IsCastable() or  (Player:IsCasting() and Player:CastRemains() >= S.MindBlast:Cooldown())) 
 					and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[40]<=4)) 
 					and Player:Insanity()<Insanity_Threshold() 
@@ -678,8 +704,6 @@ local function APL ()
 end
 
 AR.SetAPL(258, APL);
-
-
 
 --[[ 11/06/2017 generation
 # Executed before combat begins. Accepts non-harmful actions only.
