@@ -301,7 +301,7 @@ local function APL ()
     end
 
     -- Potion of Prolonged Power
-    if Settings.Shaman.Commons.ShowPoPP and (I.PoPP:CooldownRemains() == 0 and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
+    if Settings.Shaman.Commons.ShowPoPP and (I.PoPP:IsUsable() and I.PoPP:CooldownRemains() == 0 and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
       if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
     end
 
