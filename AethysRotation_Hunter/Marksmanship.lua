@@ -255,11 +255,11 @@
     -- FAIT actions.patient_sniper+=/variable,name=can_gcd,value=variable.vuln_window<action.aimed_shot.cast_time|variable.vuln_window>variable.vuln_aim_casts*action.aimed_shot.execute_time+gcd.max
     Can_GCD = Vuln_Window < S.AimedShot:CastTime() or Vuln_Window > Vuln_Aim_Casts * S.AimedShot:CastTime() + Player:GCD();
     -- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets=1&lowest_vuln_within.5>0&lowest_vuln_within.5<1
-    if AR.CDsON() and S.PiercingShot:IsCastable() and Player:Cooldown(S.PiercingShot) and Cache.EnemiesCount[40] == 1 and Target:DebuffRemains(S.Vulnerability) > 0 and Target:DebuffRemains(S.Vulnerability) < 1 then
+    if AR.CDsON() and S.PiercingShot:IsAvailable() and S.PiercingShot:CooldownUp() and Cache.EnemiesCount[40] == 1 and Target:DebuffRemains(S.Vulnerability) > 0 and Target:DebuffRemains(S.Vulnerability) < 1 then
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets>1&lowest_vuln_within.5>0&((!buff.trueshot.up&focus>80&(lowest_vuln_within.5<1|debuff.hunters_mark.up))|(buff.trueshot.up&focus>105&lowest_vuln_within.5<6))
-    if AR.CDsON() and S.PiercingShot:IsCastable() and Player:Cooldown(S.PiercingShot) and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > 0 and ((not Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 80 and (Target:DebuffRemains(S.Vulnerability) < 1 or Target:Debuff(S.HuntersMark))) or (Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 105 and Target:DebuffRemains(S.Vulnerability) < 6)) then
+    if AR.CDsON() and S.PiercingShot:IsAvailable() and S.PiercingShot:CooldownUp() and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > 0 and ((not Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 80 and (Target:DebuffRemains(S.Vulnerability) < 1 or Target:Debuff(S.HuntersMark))) or (Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 105 and Target:DebuffRemains(S.Vulnerability) < 6)) then
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&(buff.sentinels_sight.stack=20|(buff.trueshot.up&buff.sentinels_sight.stack>=spell_targets.multishot*5))
