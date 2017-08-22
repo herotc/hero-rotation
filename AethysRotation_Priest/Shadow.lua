@@ -134,9 +134,9 @@ local function var_actorsFightTimeMod()
 -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
 	if (AC.CombatTime()+Target:TimeToDie())>450 and (AC.CombatTime()+Target:TimeToDie())<600 then
-		v_actorsFightTimeMod=-((-450+(AC.CombatTime()+Target:TimeToDie()))%10)
+		v_actorsFightTimeMod=-((-450+(AC.CombatTime()+Target:TimeToDie()))/10)
 	elseif (AC.CombatTime()+Target:TimeToDie())<=450 then
-		v_actorsFightTimeMod=((450-(AC.CombatTime()+Target:TimeToDie()))%5)
+		v_actorsFightTimeMod=((450-(AC.CombatTime()+Target:TimeToDie()))/5)
   else
     v_actorsFightTimeMod=0
 	end
@@ -161,13 +161,13 @@ end
 
 local function var_dotswpdpgcd()
 -- actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
-  v_dotswpdpgcd = 38 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1+0.2+(Player:MasteryPct() % 16000)) * 0.75
+  v_dotswpdpgcd = 38 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1+0.2+(Player:MasteryPct() / 16000)) * 0.75
   -- print(v_dotswpdpgcd)
 end
 
 local function var_dotvtdpgcd()
 -- actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
-  v_dotvtdpgcd = 71 * 1.2 * (1 + 0.2 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (1 + 0.05 * (S.TouchOfDarkness:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() % 16000)) * 0.5
+  v_dotvtdpgcd = 71 * 1.2 * (1 + 0.2 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (1 + 0.05 * (S.TouchOfDarkness:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() / 16000)) * 0.5
   -- print(v_dotvtdpgcd)
 end
 
@@ -532,19 +532,26 @@ local function APL ()
 			if Player:Buff(S.VoidForm) or (Player:CastID() == S.VoidEruption:ID()) then
 				--actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 				--TODO : S2M
-				if Player:Buff(S.SurrenderToMadness) then
+				-- if Player:Buff(S.SurrenderToMadness) then
 					--ShouldReturn = s2m();
 					--if ShouldReturn then return ShouldReturn; end
 					
 				--actions+=/run_action_list,name=vf,if=buff.voidform.up
-				else
+				-- else
 					ShouldReturn = voidForm();
 					if ShouldReturn then return ShouldReturn; end
-				end
+				-- end
 			end
 			
 			--static
-			if not Player:IsMoving() then 
+			if not Player:IsMoving() then
+        -- actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
+        -- actions.main+=/shadow_word_pain,if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
+        -- actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
+        -- if S.Misery:IsAvailable() and (Target:DebuffRemains(S.VampiricTouch) < 3*Player:GCD() or Target:DebuffRemains(S.ShadowWordPain) < 3*Player:GCD()) then
+          -- if AR.Cast(S.VampiricTouch) then return "Cast"; end
+        -- end
+      
 				--actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
 				if (Target:DebuffRemains(S.VampiricTouch) < (4+(4/3))*Player:GCD() 
 					or (S.Misery:IsAvailable() and  Target:DebuffRemains(S.ShadowWordPain) < (3+(4/3))*Player:GCD()))
