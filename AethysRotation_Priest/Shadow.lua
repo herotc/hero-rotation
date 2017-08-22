@@ -255,8 +255,8 @@ local function CDs ()
 	--TODO
   
   -- actions+=/potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
-  if I.PotionOfProlongedPower:IsUsable() and I.PotionOfProlongedPower:CooldownRemains()==0 and (Player:HasHeroism() or Target:TimeToDie()<=80 or (Target:HealthPercentage()<35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
-    if AR.Cast(I.PotionOfProlongedPower,Settings.Shadow.OffGCDasOffGCD.PotionOfProlongedPower) then return "Cast"; end
+  if Settings.Shadow.ShowPoPP and I.PotionOfProlongedPower:IsUsable() and I.PotionOfProlongedPower:CooldownRemains()==0 and (Player:HasHeroism() or Target:TimeToDie()<=80 or (Target:HealthPercentage()<35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
+    if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
   end
 end
 
@@ -499,7 +499,7 @@ local function APL ()
 	if not Player:Buff(S.Shadowform) and not Player:Buff(S.VoidForm) then
 		if AR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "Cast"; end
 	end
-	
+  
 	-- Out of Combat
 	if not Player:AffectingCombat() then
     --RAZ combat
