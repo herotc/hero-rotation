@@ -84,7 +84,7 @@
   -- Items
   if not Item.Mage then Item.Mage = {}; end
   Item.Mage.Frost = {
-   PotionofProlongedPower   = Spell(142117), -- We define the potion to use it later
+   PotionofProlongedPower   = Item(142117), -- We define the potion to use it later
     -- Legendaries
     --LadyVashjsGrasp                = Item(132411, {10}) --Left commented out since this APL does not require it (stack and react are identical in AR). If LVG APL gets fully merged it will be needed though so added slot
   };
@@ -206,10 +206,9 @@ end
         if AR.Cast(S.RuneofPower) then return ""; end
       end
       -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
-      --  if I.PotionofProlongedPower:IsUsable() and S.IcyVeins:IsCastable()
-      --  or Player:Buff(S.IcyVeins) then
-      --    if AR.UsePotion(I.PotionofProlongedPower) then return ""; end
-      --    end
+      if I.PotionofProlongedPower:IsUsable() and I.PotionofProlongedPower:CooldownRemains()==0 and (S.IcyVeins:IsCastable() or Player:Buff(S.IcyVeins)) then
+       if AR.CastSuggested(I.PotionofProlongedPower) then return ""; end
+      end
       -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
       if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
         if AR.Cast(S.IcyVeins) then return ""; end
