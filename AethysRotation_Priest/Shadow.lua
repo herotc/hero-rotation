@@ -255,7 +255,7 @@ local function CDs ()
 	--TODO
   
   -- actions+=/potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
-  if Settings.Shadow.ShowPoPP and I.PotionOfProlongedPower:IsUsable() and I.PotionOfProlongedPower:CooldownRemains()==0 and (Player:HasHeroism() or Target:TimeToDie()<=80 or (Target:HealthPercentage()<35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
+  if Settings.Shadow.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:HasHeroism() or Target:TimeToDie()<=80 or (Target:HealthPercentage()<35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
     if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
   end
 end
