@@ -94,7 +94,10 @@
   };
   local I = Item.DeathKnight.Unholy;
   --Rotation Var
-  
+  local function ValkyrUp()
+  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165;
+  end
+
   --GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -136,11 +139,11 @@
  -- t20 gameplay
  if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
   if AR.Cast(S.ArmyOfDead, Settings.Unholy.OffGCDasOffGCD.ArmyOfDead) then return ""; end
- elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:Cooldown() <= 5) and Player:Runes() <= 3 then
+ elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:Cooldown() <= 5) and not ValkyrUp() and Player:Runes() <= 3 then
   if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
  end
   --actions.generic+=/chains_of_ice,if=buff.unholy_strength.up&buff.cold_heart.stack>19
- if S.ChainsOfIce:IsCastable() and Player:Buff(S.ColdHeartBuff) and Player:BuffStack(S.ColdHeartBuff) > 19 then
+ if S.ChainsOfIce:IsCastable() and Player:Buff(S.UnholyStrength) and Player:BuffStack(S.ColdHeartBuff) > 19 then
   if AR.Cast(S.ChainsOfIce) then return ""; end
  end
   --actions.generic+=/soul_reaper,if=debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<4 -- Player:Rune() > 1 (SR cost)
@@ -348,7 +351,7 @@ local function DarkArbiter()
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
- if S.ArcaneTorrent:IsCastable() and Player:RunicPower() > 45 or Player:RunicPowerDeficit() > 20 then
+ if S.ArcaneTorrent:IsReady() and Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 then
  	if AR.CastLeft(S.ArcaneTorrent) then return ""; end
  end
 --actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=6
@@ -489,7 +492,7 @@ local function APL()
         if AR.Cast(S.BlightedRuneWeapon, Settings.Unholy.OffGCDasOffGCD.BlightedRuneWeapon) then return ; end
      end
 	 
-	  if S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165 then
+	  if ValkyrUp() then
 	     ShouldReturn = DarkArbiter();
 		   if ShouldReturn then return ShouldReturn;  end
 		end
@@ -514,7 +517,7 @@ local function APL()
 		end
 		 
 	  --actions.generic+=/call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
-	  if  not S.DarkArbiter:IsAvailable() or S.DarkArbiterActive:Cooldown() < 165 and not S.Castigator:IsAvailable() and not I.InstructorsFourthLesson:IsEquipped()   then
+	  if  not ValkyrUp() and not S.Castigator:IsAvailable() and not I.InstructorsFourthLesson:IsEquipped()   then
 	         ShouldReturn = Standard();
 	         if ShouldReturn then return ShouldReturn; end
 	    end
