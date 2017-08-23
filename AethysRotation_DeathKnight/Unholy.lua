@@ -23,7 +23,7 @@
   if not Spell.DeathKnight then Spell.DeathKnight = {}; end
   Spell.DeathKnight.Unholy = {
     -- Racials
-  ArcaneTorrent                 = Spell(80483),
+  ArcaneTorrent                 = Spell(50613),
   Berserking                    = Spell(26297),
   BloodFury                     = Spell(20572),
   GiftoftheNaaru                = Spell(59547),
@@ -106,14 +106,18 @@
   --- ===== APL =====
   --- ===============
  local function Generic() 
- if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) then
+ if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemains(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
   if AR.Cast(S.Outbreak) then return ""; end
   end
+  --actions.generic=outbreak,if=runic_power.deficit<30&((!cooldown.dark_arbiter.remains|cooldown.dark_arbiter.remains<gcd)&dot.virulent_plague.remains<6
+  --if S.Outbreak:IsUsable() and  ((S.DarkArbiter:IsCastable() or S.DarkArbiter:CooldownRemains() < Player:GCD()) and Target:DebuffRemains(S.VirulentPlagueDebuff) < 6) then
+  	--if AR.Cast(S.Outbreak) then return ""; end
+  --end
  --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
  if AR.CDsON() and S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
   if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
   end
- --generic->add_action(this, "Apocalypse", "if=equipped.137075&debuff.festering_wound.stack>=6&talent.dark_arbiter.
+ --generic apocalypse if=equipped.137075&debuff.festering_wound.stack>=6&talent.dark_arbiter.
  if S.Apocalypse:IsCastable() and I.Taktheritrixs:IsEquipped() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.DarkArbiter:IsAvailable() then
 	if AR.Cast(S.Apocalypse) then return ""; end
  end
@@ -343,6 +347,10 @@ local function DarkArbiter()
  if S.DeathCoil:IsUsable() or Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 45 then
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
+ --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
+ if S.ArcaneTorrent:IsCastable() and Player:RunicPower() > 45 or Player:RunicPowerDeficit() > 20 then
+ 	if AR.CastLeft(S.ArcaneTorrent) then return ""; end
+ end
 --actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=6
  if S.Apocalypse:IsCastable()  and Target:DebuffStack(S.FesteringWounds) == 6 then
   if AR.Cast(S.Apocalypse) then return ""; end
