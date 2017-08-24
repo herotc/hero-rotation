@@ -95,7 +95,7 @@
   local I = Item.DeathKnight.Unholy;
   --Rotation Var
   local function ValkyrUp()
-  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165;
+  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 160;
   end
 
   --GUI Settings
@@ -352,7 +352,7 @@ local function DarkArbiter()
  end 
  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
  if S.ArcaneTorrent:IsReady() and Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 then
- 	if AR.CastLeft(S.ArcaneTorrent) then return ""; end
+ 	if AR.CastSuggested(S.ArcaneTorrent) then return ""; end
  end
 --actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=6
  if S.Apocalypse:IsCastable()  and Target:DebuffStack(S.FesteringWounds) == 6 then
