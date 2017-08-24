@@ -95,7 +95,7 @@
   local I = Item.DeathKnight.Unholy;
   --Rotation Var
   local function ValkyrUp()
-  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165;
+  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 160;
   end
 
   --GUI Settings
