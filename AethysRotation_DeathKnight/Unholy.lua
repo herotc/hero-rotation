@@ -95,7 +95,7 @@
   local I = Item.DeathKnight.Unholy;
   --Rotation Var
   local function ValkyrUp()
-  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 160;
+  	return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 165;
   end
 
   --GUI Settings
@@ -116,6 +116,7 @@
   --if S.Outbreak:IsUsable() and  ((S.DarkArbiter:IsCastable() or S.DarkArbiter:CooldownRemains() < Player:GCD()) and Target:DebuffRemains(S.VirulentPlagueDebuff) < 6) then
   	--if AR.Cast(S.Outbreak) then return ""; end
   --end
+  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
  --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
  if AR.CDsON() and S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
   if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
@@ -351,8 +352,8 @@ local function DarkArbiter()
   if AR.Cast(S.DeathCoil) then return ""; end
  end 
  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
- if S.ArcaneTorrent:IsReady() and Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 then
- 	if AR.CastSuggested(S.ArcaneTorrent) then return ""; end
+  if S.ArcaneTorrent:IsCastable() and ( Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 ) then
+ 	if AR.Cast(S.ArcaneTorrent, Settings.Unholy.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
  end
 --actions.valkyr+=/apocalypse,if=debuff.festering_wound.stack=6
  if S.Apocalypse:IsCastable()  and Target:DebuffStack(S.FesteringWounds) == 6 then
