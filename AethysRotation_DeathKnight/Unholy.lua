@@ -40,7 +40,7 @@
   FesteringStrike               = Spell(85948),
   Outbreak                      = Spell(77575),
   SummonGargoyle                = Spell(49206),
-  SummonPet           = Spell(46584),
+  SummonPet                     = Spell(46584),
      --Talents
   BlightedRuneWeapon            = Spell(194918),
   Epidemic                      = Spell(207317),
@@ -58,7 +58,7 @@
   DeathAndDecayBuff             = Spell(188290),
   --Debuffs
   SoulReaperDebuff              = Spell(130736),
-  FesteringWounds         = Spell(194310), --max 8 stacks
+  FesteringWounds               = Spell(194310), --max 8 stacks
   VirulentPlagueDebuff          = Spell(191587), -- 13s debuff from Outbreak
   --Defensives
   AntiMagicShell                = Spell(48707),
@@ -76,7 +76,7 @@
   --DarkArbiter HiddenAura
   DarkArbiterActive             = Spell(212412),
   -- Misc
-  PoolForArmy            = Spell(9999000010)
+  PoolForArmy                   = Spell(9999000010)
   
   
   };
