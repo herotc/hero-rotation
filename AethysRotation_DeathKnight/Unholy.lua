@@ -188,6 +188,30 @@
   if S.Defile:IsAvailable() and S.Defile:IsCastable() then
     if AR.Cast(S.Defile) then return ""; end
   end
+  --              --
+  --    AOE APL   --
+  if AR.AoEON() and Cache.EnemiesCount[8] >= 2 then
+  --actions.aoe=death_and_decay,if=spell_targets.death_and_decay>=2
+  if S.DeathAndDecay:IsCastable() and Cache.EnemiesCount[8] >= 2 then
+    if AR.Cast(S.DeathAndDecay) then return ""; end
+  end
+  --actions.aoe+=/epidemic,if=spell_targets.epidemic>4
+  if S.Epidemic:IsCastable() and Cache.EnemiesCount[8] > 4 then
+    if AR.Cast(S.Epidemic) then return ""; end
+  end 
+  --actions.aoe+=/scourge_strike,if=spell_targets.scourge_strike>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
+  if S.ScourgeStrike:IsCastable() and Cache.EnemiesCount[8] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
+    if AR.Cast(S.ScourgeStrike) then return ""; end
+  end 
+  --actions.aoe+=/clawing_shadows,if=spell_targets.clawing_shadows>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
+  if S.ClawingShadows:IsCastable() and Cache.EnemiesCount[8] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
+    if AR.Cast(S.ClawingShadows) then return ""; end
+  end
+  --actions.aoe+=/epidemic,if=spell_targets.epidemic>2
+  if S.Epidemic:IsCastable() and Cache.EnemiesCount[8] > 2 then
+    if AR.Cast(S.Epidemic) then return ""; end
+  end
+  end
   --actions.generic+=/festering_strike,if=debuff.festering_wound.stack<=2&(debuff.festering_wound.stack<=4|(buff.blighted_rune_weapon.up|talent.castigator.enabled))&runic_power.deficit>5&(runic_power.deficit>23|!talent.castigator.enabled)
   if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 2 and (Target:DebuffStack(S.FesteringWounds) <= 4 or (Player:Buff(S.BlightedRuneWeapon) or S.Castigator:IsAvailable())) and Player:RunicPowerDeficit() > 5 and (Player:RunicPowerDeficit() > 23 or S.Castigator:IsAvailable()) then
     if AR.Cast(S.FesteringStrike) then return ""; end
@@ -304,36 +328,9 @@ local function ShortCDS()
   return false;
 end
 
---AOE
-local function AOE()
- if  AR.AoEON() then
---actions.aoe=death_and_decay,if=spell_targets.death_and_decay>=2
- if S.DeathAndDecay:IsCastable() and Cache.EnemiesCount[10] >= 2 then
-  if AR.Cast(S.DeathAndDecay) then return ""; end
- end
---actions.aoe+=/epidemic,if=spell_targets.epidemic>4
- if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 4 then
-  if AR.Cast(S.Epidemic) then return ""; end
- end 
---actions.aoe+=/scourge_strike,if=spell_targets.scourge_strike>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
- if S.ScourgeStrike:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
-  if AR.Cast(S.ScourgeStrike) then return ""; end
- end 
---actions.aoe+=/clawing_shadows,if=spell_targets.clawing_shadows>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
- if S.ClawingShadows:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
-  if AR.Cast(S.ClawingShadows) then return ""; end
- end
---actions.aoe+=/epidemic,if=spell_targets.epidemic>2
- if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 2 then
-  if AR.Cast(S.Epidemic) then return ""; end
- end
-   return false;
- end
-end
-
 local function APL()
-    --UnitUpdaate
-  AC.GetEnemies(10)
+    --UnitUpdate
+  AC.GetEnemies(8)
   Everyone.AoEToggleEnemiesUpdate();
   --Defensives
   --OutOf Combat
@@ -363,7 +360,7 @@ local function APL()
     if Everyone.TargetIsValid()  then
         ShouldReturn = ShortCDS();
         if ShouldReturn then return ShouldReturn; 
-        end
+    end
     if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 20) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() and ValkyrNotActive() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
@@ -372,12 +369,8 @@ local function APL()
     if S.DarkArbiter:TimeSinceLastCast() <= 20 then
        ShouldReturn = DarkArbiter();
        if ShouldReturn then return ShouldReturn;  end
-      end
-      --actions.generic+=/call_action_list,name=aoe,if=active_enemies>=2
-    if Cache.EnemiesCount[10] >= 2 then
-       ShouldReturn = AOE();
-       if ShouldReturn then return ShouldReturn; end
-      end
+    end
+    
 
    return;
    end
