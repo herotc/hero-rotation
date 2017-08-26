@@ -93,10 +93,8 @@
   
   };
   local I = Item.DeathKnight.Unholy;
-  --Rotation Var
-  local function ValkyrUp()
-    return S.DarkArbiter:IsAvailable() and S.DarkArbiterActive:Cooldown() >= 160;
-  end
+ --Rotation Var
+
 
   --GUI Settings
   local Settings = {
@@ -112,10 +110,10 @@
  if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemains(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
   if AR.Cast(S.Outbreak) then return ""; end
   end
-  --actions.generic=outbreak,if=runic_power.deficit<30&((!cooldown.dark_arbiter.remains|cooldown.dark_arbiter.remains<gcd)&dot.virulent_plague.remains<6
-  --if S.Outbreak:IsUsable() and  ((S.DarkArbiter:IsCastable() or S.DarkArbiter:CooldownRemains() < Player:GCD()) and Target:DebuffRemains(S.VirulentPlagueDebuff) < 6) then
-    --if AR.Cast(S.Outbreak) then return ""; end
-  --end
+  --[[actions.generic=outbreak,if=runic_power.deficit<30&((!cooldown.dark_arbiter.remains|cooldown.dark_arbiter.remains<gcd)&dot.virulent_plague.remains<6
+  if S.Outbreak:IsUsable() and  ((S.DarkArbiter:IsCastable() or S.DarkArbiter:CooldownRemains() < Player:GCD()) and Target:DebuffRemains(S.VirulentPlagueDebuff) < 6) then
+    if AR.Cast(S.Outbreak) then return ""; end
+  end]]
  --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
   if AR.CDsON() and S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
     if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
@@ -139,7 +137,7 @@
  -- t20 gameplay
   if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
     if AR.Cast(S.ArmyOfDead, Settings.Unholy.OffGCDasOffGCD.ArmyOfDead) then return ""; end
-  elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:Cooldown() <= 5) and not ValkyrUp() and Player:Runes() <= 3 then
+  elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:Cooldown() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 then
     if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
   end
   --actions.generic+=/chains_of_ice,if=buff.unholy_strength.up&buff.cold_heart.stack>19
@@ -189,10 +187,6 @@
   --actions.generic+=/defile
   if S.Defile:IsAvailable() and S.Defile:IsCastable() then
     if AR.Cast(S.Defile) then return ""; end
-  end
-  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
-  if S.ArcaneTorrent:IsCastable() and ValkyrUp() and ( Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 )  then
-    if AR.Cast(S.ArcaneTorrent, Settings.Unholy.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
   end
   --actions.generic+=/festering_strike,if=debuff.festering_wound.stack<=2&(debuff.festering_wound.stack<=4|(buff.blighted_rune_weapon.up|talent.castigator.enabled))&runic_power.deficit>5&(runic_power.deficit>23|!talent.castigator.enabled)
   if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 2 and (Target:DebuffStack(S.FesteringWounds) <= 4 or (Player:Buff(S.BlightedRuneWeapon) or S.Castigator:IsAvailable())) and Player:RunicPowerDeficit() > 5 and (Player:RunicPowerDeficit() > 23 or S.Castigator:IsAvailable()) then
@@ -261,7 +255,54 @@ local function DarkArbiter()
  end 
   return false;
 end
---CDS
+--ShortCDS as DT , BRW
+local function ShortCDS()
+  if Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
+    if AR.Cast(S.Outbreak) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&cooldown.dark_arbiter.remains>165
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.DarkArbiter:Cooldown() > 165 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>55
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 55 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>35
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 35 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+ 
+      --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.dark_arbiter.remains-8
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.DarkArbiter:Cooldown() - 8 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&cooldown.summon_gargoyle.remains>160
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.SummonGargoyle:Cooldown() > 160 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>55
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 55 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>35
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 35 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.summon_gargoyle.remains-8
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.SummonGargoyle:Cooldown() - 8 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/dark_transformation,if=!equipped.137075&rune<=3
+  if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
+    if AR.Cast(S.DarkTransformation) then return ""; end
+  end
+      --actions+=/blighted_rune_weapon,if=rune<=3
+  if AR.CDsON() and S.BlightedRuneWeapon:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 4 then
+    if AR.Cast(S.BlightedRuneWeapon, Settings.Unholy.OffGCDasOffGCD.BlightedRuneWeapon) then return ; end
+  end
+  return false;
+end
 
 --AOE
 local function AOE()
@@ -316,73 +357,23 @@ local function APL()
     if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
       if AR.Cast(S.Outbreak) then return ""; end
     end
-  
-   return;
-   end
+      return;
+    end
  --InCombat
     if Everyone.TargetIsValid()  then
-        ShouldReturn = Generic();
+        ShouldReturn = ShortCDS();
         if ShouldReturn then return ShouldReturn; 
         end
+    if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 20) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() and ValkyrNotActive() then
+    ShouldReturn = Generic();
+    if ShouldReturn then return ShouldReturn; end
+    end
 
-     if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
-      if AR.Cast(S.Outbreak) then return ""; end
-     end
-       --actions+=/dark_transformation,if=equipped.137075&cooldown.dark_arbiter.remains>165
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.DarkArbiter:Cooldown() > 165 then
-          if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-       --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>55
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 55 then
-          if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-       --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.dark_arbiter.remains>35
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:Cooldown() > 35 then
-         if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-       --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.dark_arbiter.remains-8
-       if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.DarkArbiter:Cooldown() - 8 then
-         if AR.Cast(S.DarkTransformation) then return ""; end
-       end
- 
-      --actions+=/dark_transformation,if=equipped.137075&cooldown.summon_gargoyle.remains>160
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.SummonGargoyle:Cooldown() > 160 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=equipped.137075&!talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>55
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and not S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 55 then
-         if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=equipped.137075&talent.shadow_infusion.enabled&cooldown.summon_gargoyle.remains>35
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and S.ShadowInfusion:IsAvailable() and S.SummonGargoyle:Cooldown() > 35 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.summon_gargoyle.remains-8
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.SummonGargoyle:Cooldown() - 8 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/dark_transformation,if=!equipped.137075&rune<=3
-      if S.DarkTransformation:IsCastable() and Pet:IsActive() == true and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
-        if AR.Cast(S.DarkTransformation) then return ""; end
-      end
- 
-      --actions+=/blighted_rune_weapon,if=rune<=3
-      if AR.CDsON() and S.BlightedRuneWeapon:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 4 then
-        if AR.Cast(S.BlightedRuneWeapon, Settings.Unholy.OffGCDasOffGCD.BlightedRuneWeapon) then return ; end
-     end
-   
-    if ValkyrUp() then
+    if S.DarkArbiter:TimeSinceLastCast() <= 20 then
        ShouldReturn = DarkArbiter();
        if ShouldReturn then return ShouldReturn;  end
       end
-    --actions.generic+=/call_action_list,name=aoe,if=active_enemies>=2
+      --actions.generic+=/call_action_list,name=aoe,if=active_enemies>=2
     if Cache.EnemiesCount[10] >= 2 then
        ShouldReturn = AOE();
        if ShouldReturn then return ShouldReturn; end
