@@ -361,7 +361,7 @@ local function APL()
         ShouldReturn = ShortCDS();
         if ShouldReturn then return ShouldReturn; 
     end
-    if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 20) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() and ValkyrNotActive() then
+    if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 20) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
     end
