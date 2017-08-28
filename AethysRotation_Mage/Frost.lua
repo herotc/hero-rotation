@@ -306,10 +306,10 @@ end
     end
     --actions.single+=/frostbolt,if=buff.frozen_mass.remains>execute_time+action.glacial_spike.execute_time+action.glacial_spike.travel_time&buff.brain_freeze.react=0&talent.glacial_spike.enabled
     if S.GlacialSpike:IsAvailable() and S.GlacialSpike:IsCastable() and Player:Buff(S.BrainFreeze) and Player:BuffRemains(S.FrozenMass) > (S.Frostbolt:ExecuteTime() + S.GlacialSpike:ExecuteTime() + S.GlacialSpike:TravelTime()) then
-       if AR.Cast(S.GlacialSpike) then retrun ""; end
+       if AR.Cast(S.GlacialSpike) then return ""; end
     end
     if S.GlacialSpike:IsAvailable() and S.GlacialSpike:IsCastable() and Player:Buff(S.BrainFreeze) and Player:BuffRemains(S.FrozenMass) > (S.Frostbolt:ExecuteTime() + S.GlacialSpike:ExecuteTime() + S.GlacialSpike:TravelTime()) then
-      if AR.Cast(S.Frostbolt) then retrun ""; end
+      if AR.Cast(S.Frostbolt) then return ""; end
     end
 
     --actions.single+=/glacial_spike,if=cooldown.frozen_orb.remains>10|!set_bonus.tier20_2pc
