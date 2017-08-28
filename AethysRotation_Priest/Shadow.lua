@@ -319,9 +319,9 @@ local function VoidForm()
     
     -- print(S.MindBomb:IsCastable(),SephuzEquipped(),S.SephuzBuff:TimeSinceLastBuff(),CurrentInsanityDrain())
     -- actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
-    if S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastBuff()>=30 and CurrentInsanityDrain()>10 then
-    	if AR.CastSuggested(S.MindBomb) then return "Cast"; end
-    end
+    -- if S.MindBomb:IsAvailable() and S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastBuff()>=30 and CurrentInsanityDrain()>10 then
+    	-- if AR.CastSuggested(S.MindBomb) then return "Cast"; end
+    -- end
     
 		--actions.vf+=/void_bolt
     --actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
