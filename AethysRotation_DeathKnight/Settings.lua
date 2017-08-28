@@ -16,18 +16,15 @@
   -- All settings here should be moved into the GUI someday.
   AR.GUISettings.APL.DeathKnight = {
     Commons = {
-      -- {Display GCD as OffGCD, ForceReturn}
-      GCDasOffGCD = {
-        -- Abilities
-
-      },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
         
         -- Abilities
         
-      }
+      },
+      UseTrinkets = false,
+      UsePotions  = false
     },
    Frost = {
       -- {Display GCD as OffGCD, ForceReturn}
@@ -45,15 +42,16 @@
         PillarOfFrost = {true, false},
         HungeringRuneWeapon = {true, false},
         EmpowerRuneWeapon = {true, false},
-        Obliteration = {true, false},
+        HornOfWinter = {true, false},
+        Obliteration = {true, false}
         
       }
     },
-   Unholy = {
-	  -- {Display GCD as OffGCD, ForceReturn}
+    Unholy = {
+    -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-		  
+      
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -63,12 +61,12 @@
         BloodFury = {true, false},
         -- Abilities
         BlightedRuneWeapon = {true, false},
-		    ArmyOfDead = {true, false},
-		    SummonGargoyle = {true, false},
-		    DarkArbiter = {true, false},
+        ArmyOfDead = {true, false},
+        SummonGargoyle = {true, false},
+        DarkArbiter = {true, false}
        }
-     }	 
-	
+     }   
+  
   };
   
   AR.GUI.LoadSettingsRecursively(AR.GUISettings);
@@ -77,6 +75,10 @@
   local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight");
   local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy");
   local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost");
+
+  --DeathKnight Panels
+  CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Show on use trinkets", "Fel Oiled Machine Supported.");
+  CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   --Unholy Panels
   CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.ArmyOfDead", "Army as Off GCD", "Enable if you want to put Army shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.SummonGargoyle", "Gargoyle as Off GCD", "Enable if you want to put Gargoyle shown as Off GCD (top icons) instead of Main.");
@@ -87,5 +89,5 @@
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.PillarOfFrost", "Pillar as OffGCD", "Enable if you want to put Pillar of Frost shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.OffGCDasOffGCD.HungeringRuneWeapon", "Hungering Rune Weapon as Off GCD", "Enable if you want to put Hungering Rune Weapon shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon as Off GCD", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.OffGCDasOffGCD.Obliteration", "Obliteration as Off GCD", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.GCDasOffGCD.Obliteration", "Obliteration as Off GCD", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
 
