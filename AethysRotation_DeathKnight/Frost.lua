@@ -468,28 +468,24 @@ local function APL ()
       --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<15
       if S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < 15 then
         ShouldReturn = BoS_Pooling();
-        print("BOS_POOLING");
         if ShouldReturn then return ShouldReturn; end
         end
 
       --actions+=/run_action_list,name=bos_ticking,if=dot.breath_of_sindragosa.ticking
       if Player:Buff(S.BreathofSindragosa) then
         ShouldReturn = BoS_Ticking();
-        print("BoS_Ticking");
         if ShouldReturn then return ShouldReturn; end
         end
 
       --actions+=/run_action_list,name=obliteration,if=buff.obliteration.up
       if Player:Buff(S.Obliteration) then
         ShouldReturn = Obliteration();
-        print("Obliteration");
         if ShouldReturn then return ShouldReturn; end
         end
 
       --actions+=/call_action_list,name=standard
       if S.BreathofSindragosa:IsAvailable() or S.Obliteration:IsAvailable() or S.HungeringRuneWeapon:IsAvailable() then
         ShouldReturn = Standard();
-        print("Standard");
         if ShouldReturn then return ShouldReturn; end
         end
 
