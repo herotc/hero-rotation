@@ -139,7 +139,7 @@
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.standard+=/frost_strike,if=(!talent.shattering_strikes.enabled|debuff.razorice.stack<5)&runic_power>=90
-    if S.FrostStrike:IsUsable() and (not ShatteringStrikes:IsAvailable() or Target:DebuffStack(S.RazorIce) < 5) and Player:RunicPower() >= 90 then
+    if S.FrostStrike:IsUsable() and (not S.ShatteringStrikes:IsAvailable() or Target:DebuffStack(S.RazorIce) < 5) and Player:RunicPower() >= 90 then
       if AR.Cast(S.FrostStrike) then return ""; end
     end
     --actions.standard+=/howling_blast,if=buff.rime.react
@@ -477,7 +477,7 @@ local function APL ()
         end
 
       --actions+=/run_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
-      if S.BreathOfSindragosa:IsAvailable() and Player:Buff(S.BreathofSindragosa) then
+      if S.S.BreathofSindragosa:IsAvailable() and Player:Buff(S.BreathofSindragosa) then
         ShouldReturn = BoS_Ticking();
         if ShouldReturn then return ShouldReturn; end
         end
