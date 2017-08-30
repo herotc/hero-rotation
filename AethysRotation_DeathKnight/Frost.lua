@@ -433,7 +433,7 @@
     end
     --actions.cds+=/hungering_rune_weapon,if=!buff.hungering_rune_weapon.up&rune.time_to_2>gcd&runic_power<40
     if S.HungeringRuneWeapon:IsCastable() and not Player:Buff(S.HungeringRuneWeapon) and Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 40 then
-      if AR.Cast(S.HungeringRuneWeapon, Settings.DeathKnight.OffGCDasOffGCD.Frost.HungeringRuneWeapon) then return ""; end
+      if AR.Cast(S.HungeringRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.HungeringRuneWeapon) then return ""; end
     end
     return false;
   end
