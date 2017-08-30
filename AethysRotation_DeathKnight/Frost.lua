@@ -410,7 +410,8 @@
     if I.ColdHeart:IsEquipped() and ((Player:BuffStack(S.ChilledHearth) >= 10 and not Player:Buff(S.Obliteration)) or Target:TimeToDie() <= Player:GCD()) then
     --[[COLD HEART LEGENDARY APL]]--
     --actions.cold_heart=chains_of_ice,if=buff.cold_heart.stack=20&buff.unholy_strength.up&cooldown.pillar_of_frost.remains>6
-      if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) == 20 and Player:Buff(S.UnholyStrength) and S.PillarOfFrost:CooldownRemains() > 6 then        if AR.Cast(S.ChainsOfIce) then return ""; end
+      if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) == 20 and Player:Buff(S.UnholyStrength) and S.PillarOfFrost:CooldownRemains() > 6 then
+        if AR.Cast(S.ChainsOfIce) then return ""; end
       end
     --actions.cold_heart+=/chains_of_ice,if=buff.pillar_of_frost.up&buff.pillar_of_frost.remains<gcd&(buff.cold_heart.stack>=11|(buff.cold_heart.stack>=10&set_bonus.tier20_4pc))
       if S.ChainsOfIce:IsCastable() and Player:Buff(S.PillarOfFrost) and Player:BuffRemains(S.PillarOfFrost) < Player:GCD() and (Player:BuffStack(S.ChilledHearth) >= 11 or (Player:BuffStack(S.ChilledHearth) >= 10 and T204P)) then
@@ -419,7 +420,7 @@
     --actions.cold_heart+=/chains_of_ice,if=buff.unholy_strength.up&buff.unholy_strength.remains<gcd&buff.cold_heart.stack>16&cooldown.pillar_of_frost.remains>6
       if S.ChainsOfIce:IsCastable() and Player:Buff(S.UnholyStrength) and Player:BuffRemains(S.UnholyStrength) < Player:GCD() and Player:BuffStack(S.ChilledHearth) > 16 and S.PillarOfFrost:CooldownRemains() > 6 then
         if AR.Cast(S.ChainsOfIce) then return ""; end
-      end&
+      end
     --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>=5&target.time_to_die<=gcd
       if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) >= 4 and Target:TimeToDie() <= Player:GCD() then
         if AR.Cast(S.ChainsOfIce) then return ""; end
