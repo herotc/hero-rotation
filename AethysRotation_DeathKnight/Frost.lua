@@ -47,6 +47,7 @@
     BreathofSindragosaTicking     = Spell(155166),
     FrostScythe                   = Spell(207230),
     FrozenPulse                   = Spell(194909),
+    FreezingFog                   = Spell(207060),
     GatheringStorm                = Spell(194912),
     GatheringStormBuff            = Spell(211805),
     GlacialAdvance                = Spell(194913),
@@ -477,7 +478,7 @@ local function APL ()
         end
 
       --actions+=/run_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
-      if S.S.BreathofSindragosa:IsAvailable() and Player:Buff(S.BreathofSindragosa) then
+      if S.BreathofSindragosa:IsAvailable() and Player:Buff(S.BreathofSindragosa) then
         ShouldReturn = BoS_Ticking();
         if ShouldReturn then return ShouldReturn; end
         end
