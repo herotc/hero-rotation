@@ -153,7 +153,7 @@
     end
     --actions.standard+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
     if S.SindragosasFury:IsCastable() and (I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 then
-      if AR.Cast(S.SindragosasFury) then return ""; end
+      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury) then return ""; end
     end
 
     --actions.standard+=/frost_strike,if=runic_power>=90&!buff.hungering_rune_weapon.up
@@ -238,7 +238,7 @@
     end
     --actions.bos_pooling+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
     if S.SindragosasFury:IsCastable() and (I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) ==5 then
-      if AR.Cast(S.SindragosasFury) then return ""; end
+      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury) then return ""; end
     end
     --actions.bos_pooling+=/frost_strike,if=runic_power>=70&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>rune.time_to_4)
     if S.FrostStrike:IsUsable() and Player:RunicPower() >= 70 and (not S.ShatteringStrikes:IsAvailable() or Target:DebuffStack(S.RazorIce) < 5 or S.BreathofSindragosa:CooldownRemains() > Player:RuneTimeToX(4)) then
@@ -298,7 +298,7 @@
     end
     --actions.bos_ticking+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
     if S.SindragosasFury:IsCastable() and (I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 then
-      if AR.Cast(S.SindragosasFury) then return ""; end
+      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury) then return ""; end
     end
     --actions.bos_ticking+=/horn_of_winter,if=runic_power<70&rune.time_to_3>gcd
     if S.HornOfWinter:IsCastable() and Player:RunicPower() < 70 and Player:RuneTimeToX(3) > Player:GCD() then

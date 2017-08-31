@@ -43,7 +43,8 @@
         HungeringRuneWeapon = {true, false},
         EmpowerRuneWeapon = {true, false},
         HornOfWinter = {true, false},
-        Obliteration = {true, false}
+        Obliteration = {true, false},
+        SindragosasFury = {true, false}
         
       }
     },
@@ -87,7 +88,8 @@
   CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent as Off GCD", "Enable if you want to put ArcaneTorrent shown as Off GCD (top icons) instead of Main.");
   --Frost Panels
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.PillarOfFrost", "Pillar as OffGCD", "Enable if you want to put Pillar of Frost shown as Off GCD (top icons) instead of Main.");
-  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.OffGCDasOffGCD.HungeringRuneWeapon", "Hungering Rune Weapon as Off GCD", "Enable if you want to put Hungering Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon as Off GCD", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Unholy.GCDasOffGCD.Obliteration", "Obliteration as Off GCD", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.HungeringRuneWeapon", "Hungering Rune Weapon as Off GCD", "Enable if you want to put Hungering Rune Weapon shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon as Off GCD", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.Obliteration", "Obliteration as Off GCD", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury", "Sindragosa's Fury as Off GCD", "Enable if you want to put Sindragosa's Fury shown as Off GCD (top icons) instead of Main.");
 
