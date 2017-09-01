@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Warrior_Arms_T20M on 7/31/2017
+-- APL from Warrior_Arms_T20M on 9/1/2017
 
 -- APL Local Vars
 -- Spells

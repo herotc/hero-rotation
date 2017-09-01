@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Shaman_Enhancement_T20M on 7/10/2017
+-- APL from Shaman_Enhancement_T20M on 9/1/2017
 
 -- APL Local Vars
 -- Spells
@@ -31,7 +31,7 @@ Spell.Shaman.Enhancement = {
   FlametongueBuff       = Spell(194084),
   Frostbrand            = Spell(196834),
   FrostbrandBuff        = Spell(196834),
-  Stormstrike           = Spell(17364),
+  StormStrike           = Spell(17364),
   StormbringerBuff      = Spell(201846),
 
   FeralSpirit           = Spell(51533),
@@ -202,8 +202,8 @@ local function APL ()
         end
       end
 
-      -- actions.asc+=/doom_winds,if=cooldown.windstrike.up
-      if S.DoomWinds:IsCastable() then
+      -- actions.asc+=/doom_winds,if=cooldown.strike.up
+      if S.DoomWinds:IsCastable() and (S.WindStrike:CooldownRemains() > 0 or S.StormStrike:CooldownRemains() > 0) then
         if AR.Cast(S.DoomWinds, Settings.Shaman.Enhancement.OffGCDasOffGCD.DoomWinds) then return "Cast DoomWinds" end
       end
 
@@ -288,7 +288,7 @@ local function APL ()
       end
 
       -- actions.cds+=/ascendance,if=(cooldown.strike.remains>0)&buff.ascendance.down
-      if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.Stormstrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
+      if S.Ascendance:IsCastable() and ((S.WindStrike:CooldownRemains() > 0 or S.StormStrike:CooldownRemains() > 0) and not Player:Buff(S.AscendanceBuff)) then
         if S.Ascendance:IsAvailable() then
           if AR.Cast(S.Ascendance, Settings.Shaman.Enhancement.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
         end
@@ -301,7 +301,7 @@ local function APL ()
     end
 
     -- Potion of Prolonged Power
-    if Settings.Shaman.Commons.ShowPoPP and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
+    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 50000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
       if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
     end
 
@@ -342,9 +342,9 @@ local function APL ()
     end
 
     -- actions.core+=/stormstrike,if=buff.stormbringer.up&variable.furyCheck25
-    if S.Stormstrike:IsCastable() and (Player:Buff(S.StormbringerBuff) and furyCheck25()) then
-      if Player:Maelstrom() >= S.Stormstrike:Cost() and Target:IsInRange(5) then
-        if AR.Cast(S.Stormstrike) then return "Cast Stormstrike" end
+    if S.StormStrike:IsCastable() and (Player:Buff(S.StormbringerBuff) and furyCheck25()) then
+      if Player:Maelstrom() >= S.StormStrike:Cost() and Target:IsInRange(5) then
+        if AR.Cast(S.StormStrike) then return "Cast StormStrike" end
       end
     end
 
@@ -363,9 +363,9 @@ local function APL ()
     end
 
     -- actions.core+=/stormstrike,if=(!talent.overcharge.enabled&variable.furyCheck45)|(talent.overcharge.enabled&variable.furyCheck80)
-    if S.Stormstrike:IsCastable() and ((not S.Overcharge:IsAvailable() and furyCheck45()) or (S.Overcharge:IsAvailable() and furyCheck80())) then
-      if Player:Maelstrom() >= S.Stormstrike:Cost() and Target:IsInRange(5) then
-        if AR.Cast(S.Stormstrike) then return "Cast Stormstrike" end
+    if S.StormStrike:IsCastable() and ((not S.Overcharge:IsAvailable() and furyCheck45()) or (S.Overcharge:IsAvailable() and furyCheck80())) then
+      if Player:Maelstrom() >= S.StormStrike:Cost() and Target:IsInRange(5) then
+        if AR.Cast(S.StormStrike) then return "Cast StormStrike" end
       end
     end
 
