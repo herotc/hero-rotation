@@ -461,7 +461,7 @@ local function CDs ()
 end
 
 local function nextMoonCalculation()
-	if not S.NewMoon:IsAvailable() then return nil; end
+	-- if not S.NewMoon:IsAvailable() then return nil; end
 	if Player:IsCasting() then
 		if Player:CastID()== S.NewMoon:ID() then return S.HalfMoon end
 		if Player:CastID()== S.HalfMoon:ID() then return S.FullMoon end
