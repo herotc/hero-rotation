@@ -283,7 +283,13 @@ local function StealthMacro (StealthSpell)
   else
     tableinsert(MacroTable, S.Shadowstrike);
   end
-  return AR.CastQueue(unpack(MacroTable));
+
+  -- Note: In case DfA is adviced (which can only be a combo for ShD), we swap them to let understand it's DfA then ShD during DfA (DfA - ShD bug)
+  if MacroTable[2] == S.DeathfromAbove then
+    return AR.CastQueue(MacroTable[2], MacroTable[1]);
+  else
+    return AR.CastQueue(unpack(MacroTable));
+  end
 end
 -- # Builders
 local function Build ()
@@ -517,8 +523,11 @@ local function APL ()
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-      ShouldReturn = Rogue.Stealth(S.Stealth);
-      if ShouldReturn then return ShouldReturn; end
+      -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
+      if not Player:Buff(S.ShadowDanceBuff) then
+        ShouldReturn = Rogue.Stealth(S.Stealth);
+        if ShouldReturn then return ShouldReturn; end
+      end
       -- Flask
       -- Food
       -- Rune
