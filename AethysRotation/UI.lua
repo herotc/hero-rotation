@@ -129,12 +129,13 @@
       self.Part[i]:Show();
     end
   end
-  local QueuedCasts;
+  local QueuedCasts, FrameWidth;
   function AR.MainIconFrame:SetupParts (Textures)
     QueuedCasts = #Textures;
+	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.ScaleUI or 1)
     for i = 1, QueuedCasts do
-      self.Part[i]:SetWidth(64/QueuedCasts);
-      self.Part[i]:SetPoint("Left", self, "Left", 64/QueuedCasts*(i-1), 0);
+      self.Part[i]:SetWidth(FrameWidth);
+      self.Part[i]:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
       self.Part[i].TempTexture:SetTexture(Textures[i]);
       self.Part[i].TempTexture:SetAllPoints(self.Part[i]);
       self.Part[i].TempTexture:SetTexCoord(i == 1 and (AR.GUISettings.General.BlackBorderIcon and 0.08 or 0) or (i-1)/QueuedCasts,

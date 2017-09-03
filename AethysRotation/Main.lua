@@ -50,6 +50,10 @@
         Value[1]:SetWidth(Value[2]*Multiplier);
         Value[1]:SetHeight(Value[3]*Multiplier);
       end
+	  for i = 1, AR.MaxQueuedCasts do
+		AR.MainIconFrame.Part[i]:SetWidth(64*Multiplier);
+		AR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
+	  end
       AR.SuggestedIconFrame:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
       AethysRotationDB.ScaleUI = Multiplier;
     end
