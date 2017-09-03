@@ -217,8 +217,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
     -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
     if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade) < S.SymbolsofDeath:CooldownRemains() + 10 
-	  and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
-	  and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(), -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
+    and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
+    and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(), -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
       if ReturnSpellOnly then
         return S.Nightblade;
       else
@@ -527,7 +527,7 @@ local function APL ()
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-	  -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
+    -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
       if not Player:Buff(S.ShadowDanceBuff) then
         ShouldReturn = Rogue.Stealth(S.Stealth);
         if ShouldReturn then return ShouldReturn; end
@@ -578,10 +578,14 @@ local function APL ()
       -- # This let us to use Shadow Dance right before the 2nd part of DfA lands. Only with Dark Shadow.
       -- actions+=/shadow_dance,if=talent.dark_shadow.enabled&(!stealthed.all|buff.subterfuge.up)&buff.death_from_above.up&buff.death_from_above.remains<=0.15
       -- Note: DfA execute time is 1.475s, the buff is modeled to lasts 1.475s on SimC, while it's 1s in-game. So we retrieve it from TimeSinceLastCast.
-	  if S.DarkShadow:IsAvailable() and (not Player:IsStealthed(true, true) or Player:Buff(S.Subterfuge)) and S.DeathfromAbove:TimeSinceLastCast() <= 1.325
+      if S.DarkShadow:IsAvailable() and (not Player:IsStealthed(true, true) or Player:Buff(S.Subterfuge)) and S.DeathfromAbove:TimeSinceLastCast() <= 1.325
         and (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
         and S.ShadowDance:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.ShadowDance:Charges() >= 1 then
-          if AR.Cast(S.ShadowDance) then return "Cast Shadow Dance (DfA)"; end
+          if AR.Cast(S.ShadowDance) then
+            -- Set the cooldown on the main frame to be equal to the delay we actually want, not the full GCD duration
+            AR.MainIconFrame:SetCooldown(S.DeathfromAbove.LastCastTime, 1.325);
+            return "Cast Shadow Dance (DfA)";
+          end
       end
       -- # This is triggered only with DfA talent since we check shadow_dance even while the gcd is ongoing, it's purely for simulation performance.
       -- actions+=/wait,sec=0.1,if=buff.shadow_dance.up&gcd.remains>0

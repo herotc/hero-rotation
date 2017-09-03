@@ -267,6 +267,10 @@
           elseif SpellID == Spell.Rogue.Subtlety.Vanish:ID() then
             Spell.Rogue.Outlaw.Vanish.LastCastTime = AC.GetTime();
             Spell.Rogue.Subtlety.Vanish.LastCastTime = AC.GetTime();
+          -- Death from Above
+          elseif SpellID == Spell.Rogue.Subtlety.DeathfromAbove:ID() then
+            Spell.Rogue.Outlaw.DeathfromAbove.LastCastTime = AC.GetTime();
+            Spell.Rogue.Subtlety.DeathfromAbove.LastCastTime = AC.GetTime();
           end
       end
       , "SPELL_CAST_SUCCESS"
