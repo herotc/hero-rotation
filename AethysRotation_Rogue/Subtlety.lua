@@ -178,10 +178,9 @@ local function DSh_DfA ()
   return S.DeathfromAbove:IsAvailable() and S.DarkShadow:IsAvailable() and Cache.EnemiesCount[8] < 4;
 end
 -- # Finishers
--- ReturnSpellOnly has been added to Predict Finisher in case of Stealth Macros (happens only when ShD Charges ~= 3)
+-- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Finish (ReturnSpellOnly, StealthSpell)
   ShadowDanceBuff = Player:Buff(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
-  VanishCooldownUp = S.Vanish:CooldownUp() and not (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
   
   if S.Nightblade:IsCastable() then
     NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
@@ -249,44 +248,57 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   end
   return false;
 end
+-- # Stealthed Rotation
+-- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
+local function Stealthed (ReturnSpellOnly, StealthSpell)
+  StealthBuff = Player:Buff(S.Stealth) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
+  
+  -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
+  -- actions.stealthed=shadowstrike,if=buff.stealth.up
+  if S.Shadowstrike:IsCastable() and IsInMeleeRange() and StealthBuff then
+    if ReturnSpellOnly then
+      return S.Shadowstrike
+    else
+      if AR.Cast(S.Shadowstrike) then return ""; end
+    end
+  end
+  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
+  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0)
+      or (Rogue.MantleDuration() <= 1.3 and Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
+    return Finish(ReturnSpellOnly, StealthSpell);
+  end
+  -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=2+equipped.insignia_of_ravenholdt&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
+  if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
+      and ((Player:ComboPointsDeficit() >= 2 + (I.InsigniaOfRavenholdt:IsEquipped() and 1 or 0) and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
+        or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+    if ReturnSpellOnly then
+      return S.ShurikenStorm
+    else
+      if AR.Cast(S.ShurikenStorm) then return ""; end
+    end
+  end
+  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<3+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
+  if Player:ComboPoints() >= 5
+    and Player:ComboPointsDeficit() < 3 + (Player:Buff(S.ShadowBlades) and 1 or 0) - (I.MantleoftheMasterAssassin:IsEquipped() and 1 or 0) then
+    return Finish(ReturnSpellOnly, StealthSpell);
+  end
+  -- actions.stealthed+=/shadowstrike
+  if S.Shadowstrike:IsCastable() and IsInMeleeRange() then
+    if ReturnSpellOnly then
+      return S.Shadowstrike
+    else
+      if AR.Cast(S.Shadowstrike) then return ""; end
+    end
+  end
+  return false;
+end
 -- # Stealth Macros
+-- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
 local MacroTable;
 local function StealthMacro (StealthSpell)
   MacroTable = {StealthSpell};
-  -- Will we do a Eviscerate (ShD Charges ~= 3) or ShurikenStorm or Shadowstrike?
-  -- Shadow Dance
-  if StealthSpell:ID() == S.ShadowDance:ID() then
-    -- actions.stealthed=call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
-    if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0)
-        or (Rogue.MantleDuration() <= 1.3 and Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
-      tableinsert(MacroTable, Finish(true, StealthSpell));
-    -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
-    elseif S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-        and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
-          or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-      tableinsert(MacroTable, S.ShurikenStorm);
-    -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<3+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
-    elseif Player:ComboPoints() >= 5
-      and Player:ComboPointsDeficit() < 3 + (Player:Buff(S.ShadowBlades) and 1 or 0) - (I.MantleoftheMasterAssassin:IsEquipped() and 1 or 0) then
-      tableinsert(MacroTable, Finish(true, StealthSpell));
-    -- actions.stealthed+=/shadowstrike
-    else
-      tableinsert(MacroTable, S.Shadowstrike);
-    end
-  -- Vanish
-  elseif StealthSpell:ID() == S.Vanish:ID() then
-    -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
-    if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-        and ((Player:ComboPointsDeficit() >= 3 and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
-          or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-      tableinsert(MacroTable, S.ShurikenStorm);
-    else
-      tableinsert(MacroTable, S.Shadowstrike);
-    end
-  -- Shadowmeld
-  else
-    tableinsert(MacroTable, S.Shadowstrike);
-  end
+  
+  tableinsert(MacroTable, Stealthed(true, StealthSpell))
   
    -- Note: In case DfA is adviced (which can only be a combo for ShD), we swap them to let understand it's DfA then ShD during DfA (DfA - ShD bug)
   if MacroTable[2] == S.DeathfromAbove then
@@ -449,35 +461,6 @@ local function Stealth_ALS ()
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
     or (Target:IsInBossList() and Target:TimeToDie() < 12*S.ShadowDance:ChargesFractional()*(I.ShadowSatyrsWalk:IsEquipped() and 1.5 or 1)) then
    return Stealth_CDs();
-  end
-  return false;
-end
--- # Stealthed Rotation
-local function Stealthed ()
-  -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
-  -- actions.stealthed=shadowstrike,if=buff.stealth.up
-  if S.Shadowstrike:IsCastable() and IsInMeleeRange() and Player:Buff(S.Stealth) then
-    if AR.Cast(S.Shadowstrike) then return ""; end
-  end
-  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration-gcd.remains>=0.3))
-  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0)
-      or (Rogue.MantleDuration() <= 1.3 and Rogue.MantleDuration()-Player:GCDRemains() >= 0.3)) then
-    return Finish();
-  end
-  -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=2+equipped.insignia_of_ravenholdt&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
-  if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-      and ((Player:ComboPointsDeficit() >= 2 + (I.InsigniaOfRavenholdt:IsEquipped() and 1 or 0) and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
-        or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-    if AR.Cast(S.ShurikenStorm) then return ""; end
-  end
-  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&combo_points.deficit<3+buff.shadow_blades.up-equipped.mantle_of_the_master_assassin
-  if Player:ComboPoints() >= 5
-    and Player:ComboPointsDeficit() < 3 + (Player:Buff(S.ShadowBlades) and 1 or 0) - (I.MantleoftheMasterAssassin:IsEquipped() and 1 or 0) then
-    return Finish();
-  end
-  -- actions.stealthed+=/shadowstrike
-  if S.Shadowstrike:IsCastable() and IsInMeleeRange() then
-    if AR.Cast(S.Shadowstrike) then return ""; end
   end
   return false;
 end
