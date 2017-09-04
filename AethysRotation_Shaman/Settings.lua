@@ -36,7 +36,7 @@
 	    Ascendance = {true, false}
       },
 	  GCDasOffGCD = {
-	    FeralSpirit = {false, true}
+	    FeralSpirit = {true, false}
 	  }
 	}
   };
