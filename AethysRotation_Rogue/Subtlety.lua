@@ -251,7 +251,7 @@ end
 -- # Stealthed Rotation
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Stealthed (ReturnSpellOnly, StealthSpell)
-  StealthBuff = Player:Buff(S.Stealth) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
+  StealthBuff = Player:Buff(S.Stealth) or (StealthSpell and StealthSpell:ID() == S.Stealth:ID())
   
   -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
   -- actions.stealthed=shadowstrike,if=buff.stealth.up
