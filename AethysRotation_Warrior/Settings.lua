@@ -30,7 +30,7 @@
         FocusedRage = {true, false}
       },
       GCDasOffGCD = {
-        Warbreaker = {false, true}
+        Warbreaker = {true, false}
       },
       WarbreakerEnabled = true
     },
