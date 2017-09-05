@@ -36,7 +36,7 @@
 	    Ascendance = {true, false}
       },
 	  GCDasOffGCD = {
-	    FeralSpirit = {true, false}
+	    FeralSpirit = {false, false}
 	  }
 	}
   };
@@ -53,7 +53,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Shaman, "APL.Shaman.Commons.OffGCDasOffGCD.WindShear", "Wind Shear");
   CreateARPanelOption("OffGCDasOffGCD", CP_Shaman, "APL.Shaman.Commons.OffGCDasOffGCD.Racials", "Racials");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.OnUseTrinkets", "Show on use trinkets", "Enable this if you want to show on use trinkets when they are ready.");
-  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power on mobs with more than 250M max health.");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.HealingSurgeEnabled", "Show Healing Surge", "Enable this if you want to show Healing Surge when you're low on health.");
   CreatePanelOption("Slider", CP_Shaman, "APL.Shaman.Commons.HealingSurgeHPThreshold", {0, 100, 1}, "Healing Surge HP threshold", "Healing Surge health threshold.");
 
