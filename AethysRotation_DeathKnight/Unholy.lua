@@ -361,12 +361,12 @@ local function APL()
         ShouldReturn = ShortCDS();
         if ShouldReturn then return ShouldReturn; 
     end
-    if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 20) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() then
+    if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 22) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
     end
 
-    if S.DarkArbiter:TimeSinceLastCast() <= 20 then
+    if S.DarkArbiter:TimeSinceLastCast() <= 22 then
        ShouldReturn = DarkArbiter();
        if ShouldReturn then return ShouldReturn;  end
     end
