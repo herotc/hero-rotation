@@ -42,7 +42,7 @@ local tableinsert = table.insert;
     Stealth                       = Spell(1784),
     SymbolsofDeath                = Spell(212283),
     Vanish                        = Spell(1856),
-    VanishBuff                    = Spell(115193),
+    VanishBuff                    = Spell(11327),
     ShurikenComboBuff             = Spell(245640),
     -- Talents
     Alacrity                      = Spell(193539),
@@ -306,7 +306,7 @@ local function StealthMacro (StealthSpell)
   tableinsert(MacroTable, Stealthed(true, StealthSpell))
   
    -- Note: In case DfA is adviced (which can only be a combo for ShD), we swap them to let understand it's DfA then ShD during DfA (DfA - ShD bug)
-  if MacroTable[2] == S.DeathfromAbove then
+  if MacroTable[1] == S.ShadowDance and MacroTable[2] == S.DeathfromAbove then
     return AR.CastQueue(MacroTable[2], MacroTable[1]);
   else
     return AR.CastQueue(unpack(MacroTable));
@@ -338,19 +338,19 @@ local function CDs ()
       -- TODO: Add Potion Suggestion
 
       -- Trinkets
-      TrinketSuggested = false
+      TrinketSuggested = false;
       if not TrinketSuggested and I.SpecterofBetrayal:IsEquipped() and I.SpecterofBetrayal:IsReady() then
         if S.DarkShadow:IsAvailable() then
           -- if=talent.dark_shadow.enabled&buff.shadow_dance.up&(!set_bonus.tier20_4pc|buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=43)))
           if Player:Buff(S.ShadowDanceBuff) and (not AC.Tier20_4Pc or Player:Buff(S.SymbolsofDeath) or 
             (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains() >= 43))) then 
-              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true end 
+              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end 
           end
         else 
           -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
           if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) 
             and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
-              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true end
+              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end
           end
         end
       end
@@ -359,13 +359,13 @@ local function CDs ()
           -- if=talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&buff.shadow_dance.up&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)))
           if not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) and Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or 
             (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()))) then 
-              if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true end
+              if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
           end
         else 
           -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
           if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) 
             and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
-              if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true end
+              if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
           end
         end
       end
@@ -373,7 +373,7 @@ local function CDs ()
         -- if=(!talent.dark_shadow.enabled|buff.shadow_dance.up)&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=60)))
         if (not S.DarkShadow:IsAvailable() or Player:Buff(S.ShadowDanceBuff)) and (Player:Buff(S.SymbolsofDeath) 
           or (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains() >= 60))) then
-            if AR.CastSuggested(I.VialofCeaselessToxins) then TrinketSuggested = true end
+            if AR.CastSuggested(I.VialofCeaselessToxins) then TrinketSuggested = true; end
         end
       end
     
@@ -541,6 +541,7 @@ end
 local function APL ()
   -- Spell ID Changes check
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
+  S.VanishBuff = S.Subterfuge:IsAvailable() and Spell(115193) or Spell(11327); -- w/ or w/o Subterfuge Talent
   -- Unit Update
   AC.GetEnemies(8); -- Shuriken Storm & Death from Above
   AC.GetEnemies(5); -- Melee
@@ -556,7 +557,7 @@ local function APL ()
     if not Player:AffectingCombat() then
       -- Stealth
     -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
-      if not Player:Buff(S.ShadowDanceBuff) then
+      if not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.VanishBuff) then
         ShouldReturn = Rogue.Stealth(S.Stealth);
         if ShouldReturn then return ShouldReturn; end
       end
@@ -566,21 +567,17 @@ local function APL ()
       -- PrePot w/ Bossmod Countdown
       -- Opener
       if Everyone.TargetIsValid() and IsInMeleeRange() then
-        -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
-        -- Note: Hence why IsStealthed is above Finishers.
         if Player:IsStealthed(true, true) then
-          if S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0) then
-            if AR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm (OOC)"; end
-          elseif S.Shadowstrike:IsCastable() then
-            if AR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (OOC)"; end
+          ShouldReturn = Stealthed();
+          if ShouldReturn then return ShouldReturn .. " (OOC)"; end
+          if Player:Energy() < 30 then -- To avoid pooling icon spam
+            if AR.Cast(S.PoolEnergy) then return "Stealthed Pooling (OOC)"; end
+          else
+            return "Stealthed Pooling (OOC)";
           end
         elseif Player:ComboPoints() >= 5 then
-          if S.Nightblade:IsCastable() and not Target:Debuff(S.Nightblade)
-            and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset) then
-            if AR.Cast(S.Nightblade) then return "Cast Nightblade (OOC)"; end
-          elseif S.Eviscerate:IsCastable() then
-            if AR.Cast(S.Eviscerate) then return "Cast Eviscerate (OOC)"; end
-          end
+          ShouldReturn = Finish();
+          if ShouldReturn then return ShouldReturn .. " (OOC)"; end
         elseif S.Backstab:IsCastable() then
           if AR.Cast(S.Backstab) then return "Cast Backstab (OOC)"; end
         end
