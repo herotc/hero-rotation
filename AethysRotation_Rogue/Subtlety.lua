@@ -129,11 +129,16 @@ local tableinsert = table.insert;
   Item.Rogue.Subtlety = {
     -- Legendaries
     DenialoftheHalfGiants         = Item(137100, {9}),
-    DraughtofSouls                = Item(140808, {13, 14}),
     InsigniaOfRavenholdt          = Item(137049, {11, 12}),
     MantleoftheMasterAssassin     = Item(144236, {3}),
     ShadowSatyrsWalk              = Item(137032, {8}),
     TheFirstoftheDead             = Item(151818, {10}),
+    -- Trinkets
+    KiljaedensBurningWish         = Item(144259, {13, 14}),
+    DraughtofSouls                = Item(140808, {13, 14}),
+    VialofCeaselessToxins         = Item(147011, {13, 14}),
+    UmbralMoonglaives             = Item(147012, {13, 14}),
+    SpecterofBetrayal             = Item(151190, {13, 14}),
   };
   local I = Item.Rogue.Subtlety;
 -- Rotation Var
@@ -325,13 +330,53 @@ local function Build ()
   return false;
 end
 -- # Cooldowns
+local TrinketSuggested;
 local function CDs ()
   if IsInMeleeRange() then
     if AR.CDsON() then
       -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|(buff.vanish.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=30))
-        -- TODO: Add Potion Suggestion
-      -- actions.cds+=/use_item,name=specter_of_betrayal,if=!buff.stealth.up&!buff.vanish.up
-        -- TODO: Trinkets handling
+      -- TODO: Add Potion Suggestion
+
+      -- Trinkets
+      TrinketSuggested = false
+      if not TrinketSuggested and I.SpecterofBetrayal:IsEquipped() and I.SpecterofBetrayal:IsReady() then
+        if S.DarkShadow:IsAvailable() then
+          -- if=talent.dark_shadow.enabled&buff.shadow_dance.up&(!set_bonus.tier20_4pc|buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=43)))
+          if Player:Buff(S.ShadowDanceBuff) and (not AC.Tier20_4Pc or Player:Buff(S.SymbolsofDeath) or 
+            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains() >= 43))) then 
+              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true end 
+          end
+        else 
+          -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
+          if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) 
+            and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
+              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true end
+          end
+        end
+      end
+      if not TrinketSuggested and I.UmbralMoonglaives:IsEquipped() and I.UmbralMoonglaives:IsReady() then
+        if S.DarkShadow:IsAvailable() then
+          -- if=talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&buff.shadow_dance.up&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)))
+          if not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) and Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or 
+            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()))) then 
+              if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true end
+          end
+        else 
+          -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
+          if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) 
+            and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
+              if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true end
+          end
+        end
+      end
+      if not TrinketSuggested and I.VialofCeaselessToxins:IsEquipped() and I.VialofCeaselessToxins:IsReady() then
+        -- if=(!talent.dark_shadow.enabled|buff.shadow_dance.up)&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=60)))
+        if (not S.DarkShadow:IsAvailable() or Player:Buff(S.ShadowDanceBuff)) and (Player:Buff(S.SymbolsofDeath) 
+          or (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains() >= 60))) then
+            if AR.CastSuggested(I.VialofCeaselessToxins) then TrinketSuggested = true end
+        end
+      end
+    
       -- Racials
       if Player:IsStealthed(true, false) then
         -- actions.cds+=/blood_fury,if=stealthed.rogue
@@ -402,7 +447,7 @@ local function CDs ()
         if StealthMacro(S.Vanish) then return ""; end
       end
       -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=4+talent.subterfuge.enabled
-      if S.ShadowDance:IsCastable() and not Player:Buff(S.ShadowDance) and Target:FilteredTimeToDie("<=", 4 + (S.Subterfuge:IsAvailable() and 1 or 0)) then
+      if S.ShadowDance:IsCastable() and not Player:Buff(S.ShadowDanceBuff) and Target:FilteredTimeToDie("<=", 4 + (S.Subterfuge:IsAvailable() and 1 or 0)) then
         if StealthMacro(S.ShadowDance) then return ""; end
    end
   end
