@@ -313,7 +313,7 @@ local function APL ()
     -- actions+=/call_action_list,name=core
     -- actions.core=earthen_spike,if=variable.furyCheck25
     if S.EarthenSpike:IsCastable() and (furyCheck25()) then
-      if Player:Maelstrom() >= S.EarthenSpike:Cost() and S.EarthenSpike:IsAvailable() and Target:IsInRange(30) then
+      if Player:Maelstrom() >= S.EarthenSpike:Cost() and S.EarthenSpike:IsAvailable() and Target:IsInRange(10) then
         if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
       end
     end
