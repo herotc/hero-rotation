@@ -198,6 +198,16 @@ local function APL ()
       end
     end
 
+    -- On use trinkets.
+    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
+      if AR.CastSuggested(I.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
+    end
+
+    -- Potion of Prolonged Power
+    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
+      if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
+    end
+
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=earthen_spike
@@ -298,16 +308,6 @@ local function APL ()
           if AR.Cast(S.Ascendance, Settings.Shaman.Enhancement.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
         end
       end
-    end
-
-    -- On use trinkets (After OffGCDs)
-    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
-      if AR.CastSuggested(I.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
-    end
-
-    -- Potion of Prolonged Power
-    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
-      if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
     end
 
     -- actions+=/call_action_list,name=core
