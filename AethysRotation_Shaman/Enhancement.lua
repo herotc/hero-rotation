@@ -70,7 +70,6 @@ Spell.Shaman.Enhancement = {
   SpecterOfBetrayal     = Spell(246461),
 
   -- Misc
-  PoPP                  = Spell(229206),
   PoolFocus             = Spell(9999000010)
 }
 local S = Spell.Shaman.Enhancement
@@ -86,7 +85,8 @@ Item.Shaman.Enhancement = {
   SpecterOfBetrayal         = Item(151190, {13, 14}),
 
   -- Misc
-  PoPP                      = Item(142117)
+  PoPP                      = Item(142117),
+  Healthstone               = Item(5512)
 }
 local I = Item.Shaman.Enhancement
 
@@ -186,6 +186,11 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    -- Use healthstone if we have it and our health is low.
+    if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 60) then
+      if AR.CastLeft(I.Healthstone) then return "Cast Healthstone" end
+    end
+
     -- Heal when we have less than the set health threshold (instant casts only)!
     if Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingSurgeHPThreshold then
       if S.HealingSurge:IsCastable() and (Player:Maelstrom() >= 20 and Player:Mana() >= S.HealingSurge:Cost()) then
