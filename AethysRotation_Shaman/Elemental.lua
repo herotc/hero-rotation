@@ -156,7 +156,7 @@ local function APL ()
     end
 
     -- actions+=/totem_mastery,if=buff.resonance_totem.remains<2
-    if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) then
+    if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff) or 120 - S.TotemMastery:TimeSinceLastCast() < 2) then
       if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
     end
 
@@ -437,7 +437,7 @@ local function APL ()
       end
 
       -- actions.single_if+=/totem_mastery,if=buff.resonance_totem.remains<10
-      if S.TotemMastery:IsCastable() and (Player:BuffRemains(S.ResonanceTotemBuff) < 10) then
+      if S.TotemMastery:IsCastable() and (120 - S.TotemMastery:TimeSinceLastCast() < 10) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
@@ -527,7 +527,7 @@ local function APL ()
       end
 
       -- actions.single_lr+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-      if S.TotemMastery:IsCastable() and (120 - S.ResonanceTotemBuff:TimeSinceLastCast() < 10 or (120 - S.ResonanceTotemBuff:TimeSinceLastCast() < Player:BuffRemains(S.AscendanceBuff) + S.Ascendance:CooldownRemains()) and S.Ascendance:CooldownRemains() < 15) then
+      if S.TotemMastery:IsCastable() and (120 - S.TotemMastery:TimeSinceLastCast() < 10 or (120 - S.TotemMastery:TimeSinceLastCast() < Player:BuffRemains(S.AscendanceBuff) + S.Ascendance:CooldownRemains()) and S.Ascendance:CooldownRemains() < 15) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
