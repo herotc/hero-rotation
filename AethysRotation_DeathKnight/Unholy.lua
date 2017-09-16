@@ -230,7 +230,7 @@
   end
   --actions.generic+=/death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
   if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) and S.DarkArbiter:CooldownRemains() > 15 then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if AR.Cast(S.DeathCoil) then return ""; end
   end
   --actions.generic+=/death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
   if S.DeathCoil:IsUsable() and S.ShadowInfusion:IsAvailable() and not S.DarkArbiter:IsAvailable() and not Pet:Buff(S.DarkTransformation) then
