@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Shaman_Elemental_T20M on 9/1/2017
+-- APL from Shaman_Elemental_T20M on 9/16/2017
 
 -- APL Local Vars
 -- Spells
@@ -42,7 +42,7 @@ Spell.Shaman.Elemental = {
   EarthElemental        = Spell(198103),
   LightningBolt         = Spell(188196),
   LavaBeam              = Spell(114074),
-  EarthQuake            = Spell(8042),
+  EarthQuake            = Spell(61882),
   LavaSurgeBuff         = Spell(77762),
   ChainLightning        = Spell(188443),
   ElementalFocusBuff    = Spell(16246),
@@ -92,6 +92,9 @@ Item.Shaman.Elemental = {
   -- Trinkets
   SpecterOfBetrayal         = Item(151190, {13, 14}),
 
+  -- Rings
+  GnawedThumbRing           = Item(134526, {11}, {12}),
+
   -- Misc
   PoPP                      = Item(142117),
   Healthstone               = Item(5512)
@@ -133,9 +136,14 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    -- Potion of Prolonged Power
+    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
+      if AR.CastLeft(I.PoPP) then return "Use PoPP" end
+    end
+
     -- Use healthstone if we have it and our health is low.
     if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 60) then
-      if AR.CastLeft(I.Healthstone) then return "Cast Healthstone" end
+      if AR.CastLeft(I.Healthstone) then return "Use Healthstone" end
     end
 
     -- Heal when we have less than the set health threshold (instant casts only)!
@@ -147,16 +155,11 @@ local function APL ()
 
     -- On use trinkets.
     if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
-      if AR.CastSuggested(I.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
-    end
-
-    -- Potion of Prolonged Power
-    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
-      if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
+      if AR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
     end
 
     -- actions+=/totem_mastery,if=buff.resonance_totem.remains<2
-    if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff) or 120 - S.TotemMastery:TimeSinceLastCast() < 2) then
+    if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) then
       if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
     end
 
@@ -175,7 +178,9 @@ local function APL ()
     end
 
     -- actions+=/use_item,name=gnawed_thumb_ring,if=equipped.gnawed_thumb_ring&(talent.ascendance.enabled&!buff.ascendance.up|!talent.ascendance.enabled)
-    -- TODO
+    if I.GnawedThumbRing:IsEquipped() and (S.Ascendance:IsAvailable() and not Player:Buff(S.AscendanceBuff) or not S.Ascendance:IsAvailable()) then
+      if AR.Cast(I.GnawedThumbRing) then return "Use GnawedThumbRing" end
+    end
 
     -- Racial
     -- actions+=/blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
@@ -218,7 +223,9 @@ local function APL ()
 
       -- actions.aoe+=/earthquake
       if S.EarthQuake:IsCastable() then
-        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        if Player:Maelstrom() >= S.EarthQuake:Cost() then
+          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        end
       end
 
       -- actions.aoe+=/lava_burst,if=dot.flame_shock.remains>cast_time&buff.lava_surge.up&!talent.lightning_rod.enabled&spell_targets.chain_lightning<4
@@ -266,7 +273,7 @@ local function APL ()
       end
 
       -- actions.single_asc+=/flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
-      if S.FlameShock:IsCastable() and (not Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
+      if S.FlameShock:IsCastable() and (not Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCD()) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
@@ -282,12 +289,16 @@ local function APL ()
 
       -- actions.single_asc+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up&maelstrom>=86
       if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and not Player:Buff(S.AscendanceBuff) and Player:Maelstrom() >= 86) then
-        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        if Player:Maelstrom() >= S.EarthQuake:Cost() then
+          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        end
       end
 
       -- actions.single_asc+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 117 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 92)) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_asc+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
@@ -319,7 +330,9 @@ local function APL ()
 
       -- actions.single_asc+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable())) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
@@ -354,7 +367,9 @@ local function APL ()
 
       -- actions.single_asc+=/earth_shock,moving=1
       if S.EarthShock:IsCastable() then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_asc+=/flame_shock,moving=1,if=movement.distance>6
@@ -372,7 +387,9 @@ local function APL ()
 
       -- actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>=86
       if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and Player:Maelstrom() >= 86) then
-        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        if Player:Maelstrom() >= S.EarthQuake:Cost() then
+          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        end
       end
 
       -- actions.single_if+=/frost_shock,if=buff.icefury.up&maelstrom>=111&!buff.ascendance.up
@@ -387,7 +404,9 @@ local function APL ()
 
       -- actions.single_if+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 117 or (S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 92)) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_if+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
@@ -433,7 +452,9 @@ local function APL ()
 
       -- actions.single_if+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable())) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_if+=/totem_mastery,if=buff.resonance_totem.remains<10
@@ -443,7 +464,9 @@ local function APL ()
 
       -- actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
       if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS)) then
-        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        if Player:Maelstrom() >= S.EarthQuake:Cost() then
+          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        end
       end
 
       -- actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
@@ -468,7 +491,9 @@ local function APL ()
 
       -- actions.single_if+=/earth_shock,moving=1
       if S.EarthShock:IsCastable() then
-        if AR.Cast(S.EarthShock) then return "Cast FlameShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast FlameShock" end
+        end
       end
 
       -- actions.single_if+=/flame_shock,moving=1,if=movement.distance>6
@@ -480,7 +505,7 @@ local function APL ()
     -- actions+=/run_action_list,name=single_lr,if=talent.lightning_rod.enabled
     if S.LightningRod:IsAvailable() then
       -- actions.single_lr=flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
-      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) and Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
+      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) and Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCD()) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
@@ -491,12 +516,16 @@ local function APL ()
 
       -- actions.single_lr+=/earthquake,if=buff.echoes_of_the_great_sundering.up
       if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS)) then
-        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        if Player:Maelstrom() >= S.EarthQuake:Cost() then
+          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        end
       end
 
       -- actions.single_lr+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 117 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 92)) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_lr+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
@@ -523,7 +552,9 @@ local function APL ()
 
       -- actions.single_lr+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable())) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_lr+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
@@ -567,8 +598,10 @@ local function APL ()
       end
 
       -- actions.single_lr+=/earth_shock,moving=1
-      if S.FlameShock:IsCastable() then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+      if S.EarthShock:IsCastable() then
+        if Player:Maelstrom() >= 10 then
+          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        end
       end
 
       -- actions.single_lr+=/flame_shock,moving=1,if=movement.distance>6
