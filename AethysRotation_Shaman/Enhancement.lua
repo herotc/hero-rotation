@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Shaman_Enhancement_T20M on 9/1/2017
+-- APL from Shaman_Enhancement_T20M on 9/16/2017
 
 -- APL Local Vars
 -- Spells
@@ -186,6 +186,11 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    -- Potion of Prolonged Power
+    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
+      if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
+    end
+
     -- Use healthstone if we have it and our health is low.
     if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 60) then
       if AR.CastLeft(I.Healthstone) then return "Cast Healthstone" end
@@ -203,16 +208,11 @@ local function APL ()
       if AR.CastSuggested(I.SpecterOfBetrayal) then return "Cast SpecterOfBetrayal" end
     end
 
-    -- Potion of Prolonged Power
-    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
-      if AR.CastLeft(I.PoPP) then return "Cast PoPP" end
-    end
-
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=earthen_spike
-      if S.EarthenSpike:IsCastable() and S.EarthenSpike:IsAvailable() then
-        if Player:Maelstrom() >= S.EarthenSpike:Cost() and Target:IsInRange(10) then
+      if S.EarthenSpike:IsCastable() then
+        if S.EarthenSpike:IsAvailable() and Player:Maelstrom() >= S.EarthenSpike:Cost() and Target:IsInRange(10) then
           if AR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
         end
       end
@@ -239,8 +239,10 @@ local function APL ()
     end
 
     -- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
-    if S.FuryOfAir:IsCastable() and S.FuryOfAir:IsAvailable() and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
-      if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
+    if S.FuryOfAir:IsCastable() and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
+      if S.FuryOfAir:IsAvailable() and Player:Maelstrom() >= S.FuryOfAir:Cost() + 6 then
+        if AR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
+      end
     end
 
     -- actions.buffs+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
