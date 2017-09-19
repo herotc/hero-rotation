@@ -154,7 +154,7 @@ local function APL ()
     end
 
     -- On use trinkets.
-    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
+    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
       if AR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
     end
 
@@ -254,13 +254,13 @@ local function APL ()
       end
 
       -- actions.aoe+=/lava_burst,moving=1
-      if S.LavaBurst:IsCastable() then
+      if S.LavaBurst:IsCastable() and Player:IsMoving() then
         if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
       end
 
       -- TODO: refreshable
       -- actions.aoe+=/flame_shock,moving=1,target_if=refreshable
-      if S.FlameShock:IsCastable() then
+      if S.FlameShock:IsCastable() and Player:IsMoving() then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
@@ -361,19 +361,19 @@ local function APL ()
       end
 
       -- actions.single_asc+=/flame_shock,moving=1,target_if=refreshable
-      if S.FlameShock:IsCastable() then
+      if S.FlameShock:IsCastable() and Player:IsMoving() then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_asc+=/earth_shock,moving=1
-      if S.EarthShock:IsCastable() then
+      if S.EarthShock:IsCastable() and Player:IsMoving() then
         if Player:Maelstrom() >= 10 then
           if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
         end
       end
 
       -- actions.single_asc+=/flame_shock,moving=1,if=movement.distance>6
-      if S.FlameShock:IsCastable() then
+      if S.FlameShock:IsCastable() and Player:IsMoving() then
         if AR.Cast(FlameShock) then return "Cast FlameShock" end
       end
     end
@@ -446,7 +446,7 @@ local function APL ()
       end
 
       -- actions.single_if+=/frost_shock,moving=1,if=buff.icefury.up
-      if S.FrostShock:IsCastable() and (Player:Buff(S.IcefuryBuff)) then
+      if S.FrostShock:IsCastable() and (Player:IsMoving() and Player:Buff(S.IcefuryBuff)) then
         if AR.Cast(S.FrostShock) then return "Cast FrostShock" end
       end
 
@@ -485,19 +485,19 @@ local function APL ()
       end
 
       -- actions.single_if+=/flame_shock,moving=1,target_if=refreshable
-      if S.FlameShock:IsCastable() then
+      if S.FlameShock:IsCastable() and Player:IsMoving() then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_if+=/earth_shock,moving=1
-      if S.EarthShock:IsCastable() then
+      if S.EarthShock:IsCastable() and Player:IsMoving() then
         if Player:Maelstrom() >= 10 then
           if AR.Cast(S.EarthShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_if+=/flame_shock,moving=1,if=movement.distance>6
-      if S.FlameShock:IsCastable() then
+      if S.FlameShock:IsCastable() and Player:IsMoving() then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
@@ -593,19 +593,19 @@ local function APL ()
       end
 
       -- actions.single_lr+=/flame_shock,moving=1,target_if=refreshable
-      if S.FlameShock:IsCastable() and (Target:DebuffRemains(S.FlameShockDebuff < 3)) then
+      if S.FlameShock:IsCastable() and (Player:IsMoving() and Target:DebuffRemains(S.FlameShockDebuff < 3)) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_lr+=/earth_shock,moving=1
-      if S.EarthShock:IsCastable() then
+      if S.EarthShock:IsCastable() and Player:IsMoving() then
         if Player:Maelstrom() >= 10 then
           if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
         end
       end
 
       -- actions.single_lr+=/flame_shock,moving=1,if=movement.distance>6
-      if S.FlameShock:IsCastable() then
+      if S.FlameShock:IsCastable() and Player:IsMoving() then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
