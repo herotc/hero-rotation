@@ -134,14 +134,14 @@
         if S.ArcaneTorrent:IsCastable() and Player:FocusDeficit() >= 30 then
           if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
         end
-      --   -- actions+=/berserking,if=buff.bestial_wrath.remains>7
-      --   if S.Berserking:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
-      --     if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return ""; end
-      --   end
-      --   -- actions+=/blood_fury,if=buff.bestial_wrath.remains>7
-      --   if S.BloodFury:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
-      --     if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return ""; end
-      --   end
+        -- actions+=/berserking,if=buff.bestial_wrath.remains>7
+        if S.Berserking:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
+          if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return ""; end
+        end
+        -- actions+=/blood_fury,if=buff.bestial_wrath.remains>7
+        if S.BloodFury:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
+          if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return ""; end
+        end
       end
       -- actions+=/volley,toggle=on
       if S.Volley:IsCastable() and not Player:Buff(S.Volley) then
@@ -208,6 +208,10 @@
         if AR.Cast(S.CobraShot) then return ""; end
       end
       -- actions+=/dire_beast,if=buff.bestial_wrath.up
+      if S.DireBeast:IsCastable() and Player:Buff(S.BestialWrath) then
+        if AR.Cast(S.DireBeast) then return ""; end
+      end
+      -- Pool
       if AR.Cast(S.PoolFocus) then return "Normal Pooling"; end
       return;
     end
