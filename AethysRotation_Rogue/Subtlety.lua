@@ -243,7 +243,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       if S.DarkShadow:IsAvailable() and (not Player:IsStealthed(true, true) or Player:Buff(S.Subterfuge))
         and (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
         and S.ShadowDance:IsCastable() and S.ShadowDance:Charges() >= 1 then
-        if AR.CastQueue(S.DeathfromAbove, S.ShadowDance) then return; end
+        if AR.CastQueue(S.DeathfromAbove, S.ShadowDance) then return ""; end
       else
         if AR.Cast(S.DeathfromAbove) then return ""; end
       end
