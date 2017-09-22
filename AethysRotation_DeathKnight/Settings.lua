@@ -66,7 +66,19 @@
         SummonGargoyle = {true, false},
         DarkArbiter = {true, false}
        }
-     }   
+     },
+
+     Blood = {
+     -- {Display GCD as OffGCD, ForceReturn}
+      GCDasOffGCD = {
+        -- Abilities
+      
+      },
+      -- {Display OffGCD as OffGCD, ForceReturn}
+      OffGCDasOffGCD = {
+
+       }
+   }   
   
   };
   
