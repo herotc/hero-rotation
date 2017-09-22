@@ -51,6 +51,9 @@
     AR.SuggestedIconFrame:HideIcon();
     if AR.GUISettings.General.BlackBorderIcon then AR.SuggestedIconFrame.Backdrop:Hide(); end
     AR.CastSuggestedOffset = 1;
+
+    -- Toggle icons
+    if AR.GUISettings.General.HideToggleIcons then AR.ToggleIconFrame:Hide(); end
   end
 
   -- Create a Backdrop
@@ -357,7 +360,6 @@
     end
     self:SetScript("OnMouseUp", StopMove);
     self:SetScript("OnHide", StopMove);
-
     self:Show();
 
     -- Button Creation
@@ -438,7 +440,6 @@
         end
       end
     );
-
     AR.ToggleIconFrame:UpdateButtonText(i);
     self.Button[i]:Show();
   end
@@ -450,3 +451,5 @@
       self.Button[i]:SetFormattedText("|cffff0000%s|r", self.Button[i].text);
     end
   end
+
+

@@ -23,7 +23,9 @@
       InterruptEnabled = false,
       InterruptWithStun = false, -- EXPERIMENTAL
       -- SoloMode try to maximize survivability at the cost of dps
-      SoloMode = false
+      SoloMode = false,
+      -- Remove the toggle icon buttons.
+      HideToggleIcons = false
     },
     APL = {}
   };
@@ -39,4 +41,5 @@
     CreatePanelOption("CheckButton", CP_General, "General.InterruptEnabled", "Interrupt", "Enable if you want to interrupt.");
     CreatePanelOption("CheckButton", CP_General, "General.InterruptWithStun", "Interrupt With Stun", "EXPERIMENTAL: Enable if you want to interrupt with stuns.");
     CreatePanelOption("CheckButton", CP_General, "General.SoloMode", "Solo Mode", "Enable if you want to try to maximize survivability at the cost of dps.");
+    CreatePanelOption("CheckButton", CP_General, "General.HideToggleIcons", "Hide toggle icons", "Enable if you want to hide the toggle buttons on the icon frame.", {ReloadRequired = true});
   end
