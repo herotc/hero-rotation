@@ -44,10 +44,10 @@
   BloodBoil						= Spell(50842)
 
 };
-local S = Spell.DeathKnight.Blood;
+  local S = Spell.DeathKnight.Blood;
 
   -- GUI Settings
-local Settings = {
+  local Settings = {
    General = AR.GUISettings.General,
    DeathKnight = AR.GUISettings.APL.DeathKnight
  };
@@ -132,7 +132,7 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.BloodBoil) then return ""; end
 	end
 
-	if S.DeathandDecay:IsCastable() and (Cache.EnemiesCount[10] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.CrimsonScourge)) then
+	if S.DeathandDecay:IsUsable() and (Cache.EnemiesCount[10] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.CrimsonScourge)) then
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
@@ -140,11 +140,11 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.DeathStrike) then return ""; end
 	end
 
-	if S.Marrowrend:IsCastable() and Player:BuffStack(S.BoneShield) <= 6 or (Player:BuffStack(S.BoneShield) < 5 and S.Ossuary:IsAvailable()) then
+	if S.Marrowrend:IsCastable() and (Player:BuffStack(S.BoneShield) < 5 and S.Ossuary:IsAvailable()) or Player:BuffStack(S.BoneShield) <= 6 then
 		if AR.Cast(S.Marrowrend) then return ""; end
 	end
 
-	if S.DeathandDecay:IsCastable() and (Cache.EnemiesCount[10] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable()) or Cache.EnemiesCount[10] >= 3 then
+	if S.DeathandDecay:IsUsable() and (Cache.EnemiesCount[10] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable() and S.DeathandDecay:CooldownRemains() == 0)  or (Cache.EnemiesCount[10] >= 3 and S.DeathandDecay:CooldownRemains() == 0) then
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
@@ -153,11 +153,11 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.DeathStrike) then return ""; end
 	end
 
-	if S.HeartStrike:IsCastable() and Player:Runes() >= 3 then
+	if S.HeartStrike:IsCastable() and (Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3 then
 		if AR.Cast(S.HeartStrike) then return ""; end
 	end
 
-	if S.DeathandDecay:IsCastable() and Player:Buff(S.CrimsonScourge) and not S.RapidDecomposition:IsAvailable() then
+	if S.DeathandDecay:IsUsable() and Player:Buff(S.CrimsonScourge) and not S.RapidDecomposition:IsAvailable() then
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
