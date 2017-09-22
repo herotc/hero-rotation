@@ -426,8 +426,8 @@ local function APL ()
         end
       -- actions+=/call_action_list,name=finish,if=!variable.ss_useable
       if not SS_Useable() then
-        -- actions.finish=between_the_eyes,if=(mantle_duration>=gcd.remains+0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
-        if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and ((Rogue.MantleDuration() >= Player:GCDRemains() + 0.2 and not I.ThraxisTricksyTreads:IsEquipped()) or (I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
+        -- actions.finish=between_the_eyes,if=(mantle_duration>=0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
+        if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and ((Rogue.MantleDuration() >= 0.2 and not I.ThraxisTricksyTreads:IsEquipped()) or (I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
           if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
         end
         -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
@@ -517,7 +517,7 @@ AR.SetAPL(260, APL);
 -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
 
 -- # Finishers
--- actions.finish=between_the_eyes,if=(mantle_duration>=gcd.remains+0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
+-- actions.finish=between_the_eyes,if=(mantle_duration>=0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
 -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
 
 -- # Stealth
