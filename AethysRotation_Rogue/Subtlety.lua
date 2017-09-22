@@ -185,17 +185,17 @@ end
 -- # Finishers
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Finish (ReturnSpellOnly, StealthSpell)
-  ShadowDanceBuff = Player:Buff(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
+  local ShadowDanceBuff = Player:Buff(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
   
   if S.Nightblade:IsCastable() then
     NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
     -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff)
-      and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid())
+      and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Nightblade, false, "GCDRemains")) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
-      and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade) <= Rogue.MantleDuration())
-      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
-        or Target:DebuffRemains(S.Nightblade) < 4)
+      and (Rogue.MantleDuration() == 0 or Target:DebuffRemains(S.Nightblade, false, "GCDRemains") <= Rogue.MantleDuration())
+      and ((Target:DebuffRefreshable(S.Nightblade, NightbladeThreshold, false, "GCDRemains") and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
+        or Target:DebuffRemains(S.Nightblade, false, "GCDRemains") < 4)
       and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
       if ReturnSpellOnly then
         return S.Nightblade;
@@ -207,10 +207,10 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff) and Rogue.MantleDuration() == 0 then
       BestUnit, BestUnitTTD = nil, 12;
       for _, Unit in pairs(Cache.Enemies[5]) do
-        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Nightblade))
+        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Nightblade, false, "GCDRemains"))
           and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
-          and ((Unit:DebuffRefreshable(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
-            or Unit:DebuffRemains(S.Nightblade) < 4)
+          and ((Unit:DebuffRefreshable(S.Nightblade, NightbladeThreshold, false, "GCDRemains") and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
+            or Unit:DebuffRemains(S.Nightblade, false, "GCDRemains") < 4)
           and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
@@ -220,9 +220,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
     -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
-    if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade) < S.SymbolsofDeath:CooldownRemains() + 10 
-    and S.SymbolsofDeath:CooldownRemains() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
-    and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(), -Target:DebuffRemains(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
+    if IsInMeleeRange() and Target:DebuffRemains(S.Nightblade, false, "GCDRemains") < S.SymbolsofDeath:CooldownRemains() + 10 
+    and S.SymbolsofDeath:CooldownRemains(false, "GCDRemains") <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
+    and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemains(false, "GCDRemains"), -Target:DebuffRemains(S.Nightblade, false, "GCDRemains")) or Target:TimeToDieIsNotValid()) then
       if ReturnSpellOnly then
         return S.Nightblade;
       else
@@ -234,8 +234,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   if S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
     and (not S.DarkShadow:IsAvailable()
       or (not ShadowDanceBuff or Cache.EnemiesCount[8] >= 4)
-        and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains() >= 10 + (AC.Tier20_4Pc and 5 or 0))
-        and Player:BuffRemains(S.TheFirstoftheDead) < 1
+        and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemains(false, "GCDRemains") >= 10 + (AC.Tier20_4Pc and 5 or 0))
+        and Player:BuffRemains(S.TheFirstoftheDead, false, "GCDRemains") < 1
         and (Player:Buff(S.FinalityEviscerate) or Cache.EnemiesCount[8] < 4)) then
     if ReturnSpellOnly then
       return S.DeathfromAbove;
@@ -349,7 +349,7 @@ local function CDs ()
         if S.DarkShadow:IsAvailable() then
           -- if=talent.dark_shadow.enabled&buff.shadow_dance.up&(!set_bonus.tier20_4pc|buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=43)))
           if Player:Buff(S.ShadowDanceBuff) and (not AC.Tier20_4Pc or Player:Buff(S.SymbolsofDeath) or 
-            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains() >= 43))) then 
+            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains(false, "GCDRemains") >= 43))) then 
               if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end 
           end
         else 
@@ -378,7 +378,7 @@ local function CDs ()
       if not TrinketSuggested and I.VialofCeaselessToxins:IsEquipped() and I.VialofCeaselessToxins:IsReady() then
         -- if=(!talent.dark_shadow.enabled|buff.shadow_dance.up)&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=60)))
         if (not S.DarkShadow:IsAvailable() or Player:Buff(S.ShadowDanceBuff)) and (Player:Buff(S.SymbolsofDeath) 
-          or (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains() >= 60))) then
+          or (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemains(false, "GCDRemains") >= 60))) then
             if AR.CastSuggested(I.VialofCeaselessToxins) then TrinketSuggested = true; end
         end
       end
@@ -408,7 +408,7 @@ local function CDs ()
         end
       else
         -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
-        if S.DeathfromAbove:CooldownRemains() <= 3 and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
+        if S.DeathfromAbove:CooldownRemains(false, "GCDRemains") <= 3 and (Target:DebuffRemains(S.Nightblade, false, "GCDRemains") >= S.DeathfromAbove:CooldownRemains(false, "GCDRemains") + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       end
@@ -443,9 +443,9 @@ local function CDs ()
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
         and Rogue.MantleDuration() == 0 and DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
           and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
-          and (Target:DebuffRemains(S.Nightblade) >= S.DeathfromAbove:CooldownRemains() + 6 
-            or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Nightblade)) or not Target:TimeToDieIsNotValid())
-          and S.DeathfromAbove:CooldownRemains() <= 1 then
+          and (Target:DebuffRemains(S.Nightblade, false, "GCDRemains") >= S.DeathfromAbove:CooldownRemains(false, "GCDRemains") + 6 
+            or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemains(S.Nightblade, false, "GCDRemains")) or not Target:TimeToDieIsNotValid())
+          and S.DeathfromAbove:CooldownRemains(false, "GCDRemains") <= 1 then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
         if Player:EnergyPredicted() < 55 - (S.ShadowFocus:IsAvailable() and 10 or 0) then
           if AR.Cast(S.PoolEnergy) then return "Pool for Vanish"; end
@@ -491,7 +491,7 @@ local function Stealth_CDs ()
     if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0))) and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1 and not DSh_DfA()
       and Player:ComboPointsDeficit() >= 2 + (S.Subterfuge:IsAvailable() and 2 or 0)
-      and (Player:BuffRemains(S.SymbolsofDeath) >= 1.2 + Player:GCDRemains() or S.SymbolsofDeath:CooldownRemains() >= 12 + (S.DarkShadow:IsAvailable() and AC.Tier20_4Pc and 3 or 0) - (not S.DarkShadow:IsAvailable() and AC.Tier20_4Pc and 4 or 0))
+      and (Player:BuffRemains(S.SymbolsofDeath, false, "GCDRemains") >= 1.2 or S.SymbolsofDeath:CooldownRemains(false, "GCDRemains") >= 12 + (S.DarkShadow:IsAvailable() and AC.Tier20_4Pc and 3 or 0) - (not S.DarkShadow:IsAvailable() and AC.Tier20_4Pc and 4 or 0))
       and (Cache.EnemiesCount[8] >= 4 or not Player:Buff(S.TheFirstoftheDead)) then
       if StealthMacro(S.ShadowDance) then return ""; end
     end
@@ -638,12 +638,12 @@ local function APL ()
       if S.Nightblade:IsCastable() and IsInMeleeRange()
         and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
-        and Target:DebuffRemains(S.Nightblade) < Player:GCD() and Player:ComboPoints() >= 4 - (AC.CombatTime() < 10 and 2 or 0) then
+        and Target:DebuffRemains(S.Nightblade, false, "GCDRemains") < Player:GCD() and Player:ComboPoints() >= 4 - (AC.CombatTime() < 10 and 2 or 0) then
         if AR.Cast(S.Nightblade) then return ""; end
       end
       if S.DarkShadow:IsAvailable() then
         -- actions+=/call_action_list,name=stealth_als,if=talent.dark_shadow.enabled&combo_points.deficit>=2+buff.shadow_blades.up&(dot.nightblade.remains>4+talent.subterfuge.enabled|cooldown.shadow_dance.charges_fractional>=1.9&(!equipped.denial_of_the_halfgiants|time>10))
-        if Player:ComboPointsDeficit() >= 2 + (Player:Buff(S.ShadowBlades) and 1 or 0) and (Target:DebuffRemains(S.Nightblade) > 4 + (S.Subterfuge:IsAvailable() and 1 or 0) or (S.ShadowDance:ChargesFractional() >= 1.9 and (not I.DenialoftheHalfGiants:IsEquipped() or AC.CombatTime() > 10))) then
+        if Player:ComboPointsDeficit() >= 2 + (Player:Buff(S.ShadowBlades) and 1 or 0) and (Target:DebuffRemains(S.Nightblade, false, "GCDRemains") > 4 + (S.Subterfuge:IsAvailable() and 1 or 0) or (S.ShadowDance:ChargesFractional() >= 1.9 and (not I.DenialoftheHalfGiants:IsEquipped() or AC.CombatTime() > 10))) then
           ShouldReturn = Stealth_ALS();
           if ShouldReturn then return ShouldReturn; end
         end
@@ -663,7 +663,7 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&cooldown.symbols_of_death.remains<=1&combo_points>=2&equipped.the_first_of_the_dead&spell_targets.shuriken_storm<2
-      if DSh_DfA() and S.SymbolsofDeath:CooldownRemains() <= 1 and Player:ComboPoints() >= 2 and I.TheFirstoftheDead:IsEquipped() and Cache.EnemiesCount[8] < 2 then
+      if DSh_DfA() and S.SymbolsofDeath:CooldownRemains(false, "GCDRemains") <= 1 and Player:ComboPoints() >= 2 and I.TheFirstoftheDead:IsEquipped() and Cache.EnemiesCount[8] < 2 then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
