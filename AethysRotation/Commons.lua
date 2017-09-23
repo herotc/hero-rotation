@@ -43,7 +43,7 @@
 
   -- Is the current unit valid during cycle ?
   function Everyone.UnitIsCycleValid (Unit, BestUnitTTD, TimeToDieOffset)
-    return not Unit:IsFacingBlacklisted() and not Unit:IsUserCycleBlacklisted() and Unit:FilteredTimeToDie(">", BestUnitTTD, TimeToDieOffset);
+    return not Unit:IsFacingBlacklisted() and not Unit:IsUserCycleBlacklisted() and (not BestUnitTTD or Unit:FilteredTimeToDie(">", BestUnitTTD, TimeToDieOffset));
   end
 
   -- Is it worth to DoT the unit ?
