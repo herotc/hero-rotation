@@ -66,7 +66,21 @@
         SummonGargoyle = {true, false},
         DarkArbiter = {true, false}
        }
-     }   
+     },
+
+     Blood = {
+     --Use the IcyVeins Rotation for blood instead of simc
+      useIcyVeinsRotation = false,
+     -- {Display GCD as OffGCD, ForceReturn}
+      GCDasOffGCD = {
+        -- Abilities
+      
+      },
+      -- {Display OffGCD as OffGCD, ForceReturn}
+      OffGCDasOffGCD = {
+
+       }
+   }   
   
   };
   
@@ -76,7 +90,8 @@
   local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight");
   local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy");
   local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost");
-
+  local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
+  
   --DeathKnight Panels
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Show on use trinkets", "Fel Oiled Machine Supported.");
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
@@ -92,4 +107,5 @@
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon as Off GCD", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.Obliteration", "Obliteration as Off GCD", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
   CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury", "Sindragosa's Fury as Off GCD", "Enable if you want to put Sindragosa's Fury shown as Off GCD (top icons) instead of Main.");
-
+  --Blood Panels
+  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.useIcyVeinsRotation", "Show the IcyVeins Rotation instead of the one from Simulationcraft");

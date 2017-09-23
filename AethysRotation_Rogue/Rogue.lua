@@ -202,6 +202,6 @@
     if Player:BuffRemains(MasterAssassinsInitiative) < 0 then
       return Player:GCDRemains() + NominalDuration;
     else
-      return Player:BuffRemains(MasterAssassinsInitiative);
+      return Player:BuffRemains(MasterAssassinsInitiative, false, "GCDRemains");
     end
   end

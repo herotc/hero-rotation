@@ -204,7 +204,7 @@ local function APL ()
     end
 
     -- On use trinkets.
-    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 then
+    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange(5) and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
       if AR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
     end
 

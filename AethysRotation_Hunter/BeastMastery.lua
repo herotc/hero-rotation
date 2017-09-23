@@ -134,36 +134,40 @@
         if S.ArcaneTorrent:IsCastable() and Player:FocusDeficit() >= 30 then
           if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
         end
-        -- actions+=/berserking,if=buff.bestial_wrath.remains>7
-        if S.Berserking:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
-          if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return ""; end
-        end
-        -- actions+=/blood_fury,if=buff.bestial_wrath.remains>7
-        if S.BloodFury:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
-          if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return ""; end
+        if Player:BuffRemains(S.BestialWrath) > 7 then
+          -- actions+=/berserking,if=buff.bestial_wrath.remains>7
+          if S.Berserking:IsCastable() then
+            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Berserking) then return ""; end
+          end
+          -- actions+=/blood_fury,if=buff.bestial_wrath.remains>7
+          if S.BloodFury:IsCastable() then
+            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.BloodFury) then return ""; end
+          end
         end
       end
       -- actions+=/volley,toggle=on
       if S.Volley:IsCastable() and not Player:Buff(S.Volley) then
         if AR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return ""; end
       end
-      -- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
-      -- actions+=/a_murder_of_crows,if=cooldown.bestial_wrath.remains<3|cooldown.bestial_wrath.remains>30|target.time_to_die<16
-      if AR.CDsON() and Target:IsInRange(40) and S.AMurderofCrows:IsCastable() and (S.BestialWrath:Cooldown() < 3 or S.BestialWrath:Cooldown() > 30 or Target:TimeToDie() < 16) then
-        if AR.Cast(S.AMurderofCrows) then return ""; end
-      end
-      -- actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
-      if AR.CDsON() and S.Stampede:IsCastable() and (Player:HasHeroism() or Player:Buff(S.BestialWrath) or ((S.BestialWrath:Cooldown() <= 2 or not AR.CDsON()) or (Target:TimeToDie() <= 14))) then
-        if AR.Cast(S.Stampede) then return ""; end
-      end
-      -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
-      if AR.CDsON() and S.BestialWrath:IsCastable() and not Player:Buff(S.BestialWrath) then
-        if AR.Cast(S.BestialWrath, Settings.BeastMastery.OffGCDasOffGCD.BestialWrath) then return ""; end
-      end
-      -- # With both AotW cdr sources and OwtP, there's no visible benefit if it's delayed, use it on cd. With only one or neither, pair it with Bestial Wrath. Also use it if the fight will end when the buff does.
-      -- actions+=/aspect_of_the_wild,if=(equipped.call_of_the_wild&equipped.convergence_of_fates&talent.one_with_the_pack.enabled)|buff.bestial_wrath.remains>7|target.time_to_die<12
-      if AR.CDsON() and S.AspectoftheWild:IsCastable() and ((I.CalloftheWild:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.OnewiththePack:IsAvailable()) or Player:BuffRemains(S.BestialWrath) > 7 or Target:TimeToDie() < 12) then
-        if AR.Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return ""; end
+      if AR.CDsON() then
+        -- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
+        -- actions+=/a_murder_of_crows,if=cooldown.bestial_wrath.remains<3|cooldown.bestial_wrath.remains>30|target.time_to_die<16
+        if Target:IsInRange(40) and S.AMurderofCrows:IsCastable() and (S.BestialWrath:Cooldown() < 3 or S.BestialWrath:Cooldown() > 30 or Target:TimeToDie() < 16) then
+          if AR.Cast(S.AMurderofCrows) then return ""; end
+        end
+        -- actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
+        if S.Stampede:IsCastable() and (Player:HasHeroism() or Player:Buff(S.BestialWrath) or S.BestialWrath:Cooldown() <= 2 or (Target:TimeToDie() <= 14)) then
+          if AR.Cast(S.Stampede) then return ""; end
+        end
+        -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
+        if S.BestialWrath:IsCastable() and not Player:Buff(S.BestialWrath) then
+          if AR.Cast(S.BestialWrath, Settings.BeastMastery.OffGCDasOffGCD.BestialWrath) then return ""; end
+        end
+        -- # With both AotW cdr sources and OwtP, there's no visible benefit if it's delayed, use it on cd. With only one or neither, pair it with Bestial Wrath. Also use it if the fight will end when the buff does.
+        -- actions+=/aspect_of_the_wild,if=(equipped.call_of_the_wild&equipped.convergence_of_fates&talent.one_with_the_pack.enabled)|buff.bestial_wrath.remains>7|target.time_to_die<12
+        if S.AspectoftheWild:IsCastable() and ((I.CalloftheWild:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.OnewiththePack:IsAvailable()) or Player:BuffRemains(S.BestialWrath) > 7 or Target:TimeToDie() < 12) then
+          if AR.Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return ""; end
+        end
       end
       -- actions+=/kill_command,target_if=min:bestial_ferocity.remains,if=equipped.qapla_eredun_war_order
       if S.KillCommand:IsCastable() and I.QaplaEredunWarOrder:IsEquipped() then

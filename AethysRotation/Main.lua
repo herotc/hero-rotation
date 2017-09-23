@@ -189,7 +189,7 @@
   end
   local EnabledRotation = {
     -- Death Knight
-      [250]   = false,                          -- Blood
+      [250]   = "AethysRotation_DeathKnight",   -- Blood
       [251]   = "AethysRotation_DeathKnight",   -- Frost
       [252]   = "AethysRotation_DeathKnight",   -- Unholy
     -- Demon Hunter

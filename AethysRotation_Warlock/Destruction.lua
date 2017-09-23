@@ -232,7 +232,7 @@
 		
       -- Opener
       if Everyone.TargetIsValid() then
-        if AR.Cast(S.ChaosBolt) then return "Cast"; end
+        if AR.Cast(S.Immolate) then return "Cast"; end
       end
       return;
     end
