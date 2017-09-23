@@ -296,8 +296,9 @@
     Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
       -- Exhilaration
-      ShouldReturn = Hunter.Exhilaration(S.Exhilaration);
-      if ShouldReturn then return ShouldReturn; end
+      if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Survival.ExhilarationHP then
+        if AR.Cast(S.Exhilaration, Settings.Survival.OffGCDasOffGCD.Exhilaration) then return "Cast"; end
+      end
     -- Out of Combat
     if not Player:AffectingCombat() then
       -- Flask
