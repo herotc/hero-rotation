@@ -111,8 +111,8 @@
     }
   ]]
   function Rogue.PoisonRemains (Unit)
-    return (Unit:Debuff(Spell.Rogue.Assassination.DeadlyPoisonDebuff) and Unit:DebuffRemains(Spell.Rogue.Assassination.DeadlyPoisonDebuff))
-      or (Unit:Debuff(Spell.Rogue.Assassination.WoundPoisonDebuff) and Unit:DebuffRemains(Spell.Rogue.Assassination.WoundPoisonDebuff))
+    return (Unit:Debuff(Spell.Rogue.Assassination.DeadlyPoisonDebuff) and Unit:DebuffRemainsP(Spell.Rogue.Assassination.DeadlyPoisonDebuff))
+      or (Unit:Debuff(Spell.Rogue.Assassination.WoundPoisonDebuff) and Unit:DebuffRemainsP(Spell.Rogue.Assassination.WoundPoisonDebuff))
       or 0;
   end
 
@@ -202,6 +202,6 @@
     if Player:BuffRemains(MasterAssassinsInitiative) < 0 then
       return Player:GCDRemains() + NominalDuration;
     else
-      return Player:BuffRemains(MasterAssassinsInitiative, false, "GCDRemains");
+      return Player:BuffRemainsP(MasterAssassinsInitiative);
     end
   end

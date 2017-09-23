@@ -150,7 +150,7 @@ local function RtB_BuffRemains ()
     Cache.APLVar.RtB_BuffRemains = 0;
     for i = 1, #RtB_BuffsList do
       if Player:Buff(RtB_BuffsList[i]) then
-        Cache.APLVar.RtB_BuffRemains = Player:BuffRemains(RtB_BuffsList[i], false, "GCDRemains");
+        Cache.APLVar.RtB_BuffRemains = Player:BuffRemainsP(RtB_BuffsList[i]);
         break;
       end
     end
@@ -344,7 +344,7 @@ local function APL ()
           -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
           if S.MarkedforDeath:IsCastable() then
             -- Note: Increased the SimC condition by 50% since we are slower.
-            if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (Target:FilteredTimeToDie("<", 2) and Player:ComboPointsDeficit() > 0) or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemains(S.TrueBearing, false, "GCDRemains") > 15 - (Player:Buff(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
+            if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (Target:FilteredTimeToDie("<", 2) and Player:ComboPointsDeficit() > 0) or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemainsP(S.TrueBearing) > 15 - (Player:Buff(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
               if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
             elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
               AR.CastSuggested(S.MarkedforDeath);
@@ -394,9 +394,9 @@ local function APL ()
       end
       if not SS_Useable() then
         -- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
-        -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
+        -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
         if S.SliceandDice:IsAvailable() then
-          if S.SliceandDice:IsCastable() and (Target:FilteredTimeToDie(">", Player:BuffRemains(S.SliceandDice, false, "GCDRemains")) or Player:BuffRemains(S.SliceandDice, false, "GCDRemains") == 0) and Player:BuffRemains(S.SliceandDice, false, "GCDRemains") < (1+Player:ComboPoints())*1.8 then
+          if S.SliceandDice:IsCastable() and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Player:BuffRemainsP(S.SliceandDice) == 0) and Player:BuffRemainsP(S.SliceandDice) < (1+Player:ComboPoints())*1.8 then
             if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
           end
         -- actions+=/roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
@@ -413,7 +413,7 @@ local function APL ()
       end
       -- actions+=/call_action_list,name=build
         -- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
-        if S.GhostlyStrike:IsCastable() and Target:IsInRange(S.SaberSlash, SSIdentifier) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshable(S.GhostlyStrike, 4.5, false, "GCDRemains") or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemains(false, "GCDRemains") < 3 and Target:DebuffRemains(S.GhostlyStrike, false, "GCDRemains") < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
+        if S.GhostlyStrike:IsCastable() and Target:IsInRange(S.SaberSlash, SSIdentifier) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshableP(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemainsP() < 3 and Target:DebuffRemainsP(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
           if AR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
         end
         -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
@@ -431,7 +431,7 @@ local function APL ()
           if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
         end
         -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
-        if S.RunThrough:IsCastable() and Target:IsInRange(S.RunThrough, RTIdentifier) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemains(false, "GCDRemains") + 3.5) then
+        if S.RunThrough:IsCastable() and Target:IsInRange(S.RunThrough, RTIdentifier) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemainsP() + 3.5) then
           if AR.Cast(S.RunThrough) then return "Cast Run Through"; end
         end
         -- OutofRange BtE
