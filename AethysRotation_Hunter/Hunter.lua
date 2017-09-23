@@ -21,10 +21,3 @@
 
 
 --- Commons Functions
-  -- Exhilaration
-  function Hunter.Exhilaration (Exhilaration)
-    if Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.ExhilarationHP then
-      if AR.Cast(Exhilaration, Settings.GCDasOffGCD.Exhilaration) then return "Cast Exhilaration (Defensives)"; end
-    end
-    return false;
-  end
