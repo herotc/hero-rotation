@@ -198,7 +198,7 @@
     -- Druid
       [102]   = "AethysRotation_Druid",         -- Balance
       [103]   = false,                          -- Feral
-      [104]   = false,                          -- Guardian
+      [104]   = "AethysRotation_Druid",         -- Guardian
       [105]   = false,                          -- Restoration
     -- Hunter
       [253]   = "AethysRotation_Hunter",        -- Beast Mastery
