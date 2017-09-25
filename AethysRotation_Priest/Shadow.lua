@@ -247,17 +247,17 @@ local function CDs ()
 	--actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--S2M:actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	--TODO : S2M
-	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() and Player:BuffStack(S.VoidForm)> (15-4.5*(S.FiendingDark:ArtifactRank() or 0)) then
+	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() and ((not Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) > (15 - 4.5 * (S.FiendingDark:ArtifactRank() or 0))) or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)) then
 		if AR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend) then return "Cast"; end
 	end
   
   -- actions.vf+=/mindbender,if=set_bonus.tier20_4pc&buff.insanity_drain_stacks.value>=(25-(3*(raid_event.movement.in<15)*((active_enemies-target.adds)=1))+2*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
   -- actions.vf+=/mindbender,if=!set_bonus.tier20_4pc&buff.insanity_drain_stacks.value>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up+3*equipped.mangazas_madness+2*artifact.lash_of_insanity.rank)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+30))
   --TODO : S2M
-  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and (T204P and 1 or 0) and CurrentInsanityDrain()>=(25+2*(Player:HasHeroism() and 1 or 0)+2*(S.FortressOfTheMind:IsAvailable() and 1 or 0)+2*(S.LashOfInsanity:ArtifactRank() or 0)) then 
+  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and ((not Settings.Shadow.ForceMindbender and (T204P and true or false) and CurrentInsanityDrain()>=(25+2*(Player:HasHeroism() and 1 or 0)+2*(S.FortressOfTheMind:IsAvailable() and 1 or 0)+2*(S.LashOfInsanity:ArtifactRank() or 0))) or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)) then 
     if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "Cast"; end
   end
-  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and (not T204P and 1 or 0) and CurrentInsanityDrain()>=(10+2*(T192P and 1 or 0)+5*(Player:HasHeroism() and 1 or 0)+3*(I.MangazasMadness:IsEquipped() and 1 or 0)+2*(S.LashOfInsanity:ArtifactRank() or 0)) then 
+  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and not Settings.Shadow.ForceMindbender and (not T204P and true or false) and CurrentInsanityDrain()>=(10+2*(T192P and 1 or 0)+5*(Player:HasHeroism() and 1 or 0)+3*(I.MangazasMadness:IsEquipped() and 1 or 0)+2*(S.LashOfInsanity:ArtifactRank() or 0)) then 
     if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "Cast"; end
   end
 
