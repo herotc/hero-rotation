@@ -36,6 +36,7 @@
         -- Abilities
         PowerInfusion = {true, false},
         Dispersion = {true, false},
+        SurrenderToMadness = {true, false},
         -- Racials
         Racials = {true, false},
         -- Items

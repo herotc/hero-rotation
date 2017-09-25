@@ -2,13 +2,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- AethysCore
-  local AC = AethysCore;
-  local Cache = AethysCache;
-  local Unit = AC.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local AC      = AethysCore;
+  local Cache   = AethysCache;
+  local Unit    = AC.Unit;
+  local Player  = Unit.Player;
+  local Target  = Unit.Target;
+  local Spell   = AC.Spell;
+  local Item    = AC.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -85,6 +85,7 @@
   };
   local S = Spell.Priest.Shadow;
   local Everyone = AR.Commons.Everyone;
+  
   -- Items
   if not Item.Priest then Item.Priest = {}; end
   Item.Priest.Shadow = {
@@ -96,6 +97,7 @@
     PotionOfProlongedPower  = Item(142117)
   };
   local I = Item.Priest.Shadow;
+  
   -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local T192P,T194P = AC.HasTier("T19")
@@ -104,10 +106,11 @@
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb; -- Used for cycling
   local v_cdtime,v_dotswpdpgcd,v_dotvtdpgcd,v_seardpgcd,v_s2msetuptime
   local v_actorsFightTimeMod,v_s2mcheck
-  local var_init=false
-  local var_calcCombat=false
-  local range=40
+  local var_init = false
+  local var_calcCombat = false
+  local range = 40
   local VTUsed
+  
   -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -117,8 +120,6 @@
 
 
 --- APL Action Lists (and Variables)
-
-
 local function ExecuteRange()
 	if Player:Buff(S.ZeksExterminatus) then return 101; end
 	return S.ReaperOfSouls:IsAvailable() and 35 or 20;
@@ -130,46 +131,46 @@ end
 
 local function FutureInsanity()
   --TODO : add MF ?
-  local insanity = Player:Insanity()
+  local Insanity = Player:Insanity()
   if not Player:IsCasting() then
-    return insanity
+    return Insanity
   else
-    if Player:CastID()==S.MindBlast:ID() then
-      return insanity+(15*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 )*(S.FortressOfTheMind:IsAvailable() and 1.2 or 1.0))
-    elseif Player:CastID()==S.VampiricTouch:ID() then
-      return insanity+(6*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 ))
-    elseif Player:CastID()==S.ShadowWordVoid:ID() then
-      return insanity+(25*(Player:Buff(S.PowerInfusion) and 1.25 or 1.0 ))
+    if Player:CastID() == S.MindBlast:ID() then
+      return Insanity + (15 * (Player:Buff(S.PowerInfusion) and 1.25 or 1.0) * (S.FortressOfTheMind:IsAvailable() and 1.2 or 1.0))
+    elseif Player:CastID() == S.VampiricTouch:ID() then
+      return Insanity + (6 * (Player:Buff(S.PowerInfusion) and 1.25 or 1.0))
+    elseif Player:CastID() ==S.ShadowWordVoid:ID() then
+      return Insanity + (25 * (Player:Buff(S.PowerInfusion) and 1.25 or 1.0))
     else
-      return insanity
+      return Insanity
     end
   end 
 end
 
 local function CurrentInsanityDrain()
 	if not Player:Buff(S.VoidForm) then return 0.0; end
-	return 6+ 0.67*(Player:BuffStack(S.VoidForm)-(2*(I.MotherShahrazsSeduction:IsEquipped() and 1 or 0))-4*(VTUsed and 1 or 0))
+	return 6 + 0.67 * (Player:BuffStack(S.VoidForm) - (2 * (I.MotherShahrazsSeduction:IsEquipped() and 1 or 0)) - 4 * (VTUsed and 1 or 0))
 end
 
 local function Var_ActorsFightTimeMod()
--- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
--- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	if (AC.CombatTime()+Target:TimeToDie())>450 and (AC.CombatTime()+Target:TimeToDie())<600 then
-		v_actorsFightTimeMod=-((-450+(AC.CombatTime()+Target:TimeToDie()))/10)
-	elseif (AC.CombatTime()+Target:TimeToDie())<=450 then
-		v_actorsFightTimeMod=((450-(AC.CombatTime()+Target:TimeToDie()))/5)
+  -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
+  -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
+	if (AC.CombatTime() + Target:TimeToDie()) > 450 and (AC.CombatTime() + Target:TimeToDie()) < 600 then
+		v_actorsFightTimeMod = -((-450 + (AC.CombatTime() + Target:TimeToDie())) / 10)
+	elseif (AC.CombatTime() + Target:TimeToDie()) <= 450 then
+		v_actorsFightTimeMod = ((450 - (AC.CombatTime() + Target:TimeToDie())) / 5)
   else
-    v_actorsFightTimeMod=0
+    v_actorsFightTimeMod = 0
 	end
 end
 
 local function Var_S2MCheck()
--- actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
--- actions.check+=/variable,op=min,name=s2mcheck,value=180
+  -- actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+  -- actions.check+=/variable,op=min,name=s2mcheck,value=180
   --TODO : add nonexecute_actors_pct ?
   v_s2mcheck = v_s2msetuptime - (v_actorsFightTimeMod)
   if v_s2mcheck < 180 then
-    v_s2mcheck=180
+    v_s2mcheck = 180
   end
   return v_s2mcheck;
 end
@@ -177,25 +178,21 @@ end
 local function Var_CdTime()
 -- actions.precombat+=/variable,name=cd_time,op=set,value=(10+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(3-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
   v_cdtime = 10 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (T192P and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (T204P and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
-  -- print(v_cdtime)
 end
 
 local function Var_DotSWPDPGCD()
 -- actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
-  v_dotswpdpgcd = 38 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1+0.2+(Player:MasteryPct() / 16000)) * 0.75
-  -- print(v_dotswpdpgcd)
+  v_dotswpdpgcd = 38 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() / 16000)) * 0.75
 end
 
 local function Var_DotVTDPGCD()
 -- actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
   v_dotvtdpgcd = 71 * 1.2 * (1 + 0.2 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (1 + 0.05 * (S.TouchOfDarkness:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() / 16000)) * 0.5
-  -- print(v_dotvtdpgcd)
 end
 
 local function Var_SearDPGCD()
 -- actions.precombat+=/variable,name=sear_dpgcd,op=set,value=80*(1+0.05*artifact.void_corruption.rank)
   v_seardpgcd = 80 * (1 + 0.05 + (S.VoidCorruption:ArtifactRank() or 0))
-  -- print(v_seardpgcd)
 end
 
 local function Var_S2MSetupTime()
@@ -212,9 +209,9 @@ local function Var_S2MSetupTime()
   else
     v_s2msetuptime = 0
   end 
-  -- print(v_s2msetuptime)
 end
 
+--One time cal vars
 local function VarInit()
   if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
     Var_CdTime()
@@ -227,6 +224,7 @@ local function VarInit()
   end
 end
 
+--When to S2M calc
 local function VarCalc()
   if (S.SurrenderToMadness:IsAvailable() and not Player:Buff(S.SurrenderToMadness)) then
     Var_ActorsFightTimeMod()
@@ -234,72 +232,119 @@ local function VarCalc()
   end
 end
 
+--Calls to cooldown
 local function CDs ()
-	--PI
-  --actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up*(1+1*set_bonus.tier20_4pc)+3*equipped.mangazas_madness+6*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+61))
-	--actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.stack>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up+5*variable.s2mbeltcheck)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+61))
-	--TODO : S2M
-	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and CurrentInsanityDrain()>=(10 + 2*(T192P and 1 or 0) +5*(Player:HasHeroism() and 1 or 0)*(1+1*(T204P and 1 or 0)) +3*(I.MangazasMadness:IsEquipped() and 1 or 0) +6*(T204P and 1 or 0) +2*(S.LashOfInsanity:ArtifactRank() or 0)) then
-		if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
+	--Power Infusion
+  -- actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(v_cdtime+5 * (Player:HasHeroism() and 1 or 0) *(1+1 * (T204P and 1 or 0)))
+  -- actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
+	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and not Player:Buff(S.SurrenderToMadness)
+    and CurrentInsanityDrain() >= (v_cdtime + 5 * (Player:HasHeroism() and 1 or 0) * (1 + 1 * (T204P and 1 or 0)))
+    and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 61)) then
+      if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
 	end
+  if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and Player:Buff(S.SurrenderToMadness)
+    and ((S.ShadowWordDeath:Charges() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0))) or Target:TimeToDie() <= 30) then
+      if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
+  end 
 
 	--SF
-	--actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
-	--S2M:actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
-	--TODO : S2M
-	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() and ((not Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) > (15 - 4.5 * (S.FiendingDark:ArtifactRank() or 0))) or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)) then
-		if AR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend) then return "Cast"; end
+	-- actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
+	-- actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
+	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() 
+    and ((not Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) > 15 ) 
+    or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)) then
+      if AR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend) then return "Cast"; end
 	end
   
-  -- actions.vf+=/mindbender,if=set_bonus.tier20_4pc&buff.insanity_drain_stacks.value>=(25-(3*(raid_event.movement.in<15)*((active_enemies-target.adds)=1))+2*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
-  -- actions.vf+=/mindbender,if=!set_bonus.tier20_4pc&buff.insanity_drain_stacks.value>=(10+2*set_bonus.tier19_2pc+5*buff.bloodlust.up+3*equipped.mangazas_madness+2*artifact.lash_of_insanity.rank)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+30))
-  --TODO : S2M
-  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and ((not Settings.Shadow.ForceMindbender and (T204P and true or false) and CurrentInsanityDrain()>=(25+2*(Player:HasHeroism() and 1 or 0)+2*(S.FortressOfTheMind:IsAvailable() and 1 or 0)+2*(S.LashOfInsanity:ArtifactRank() or 0))) or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)) then 
-    if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "Cast"; end
+  --Mindbender
+  -- actions.vf+=/mindbender,if=buff.insanity_drain_stacks.value>=(variable.cd_time-(3*set_bonus.tier20_4pc*((active_enemies-(raid_event.adds.count*(raid_event.adds.remains>0)))=1))+(5-3*set_bonus.tier20_4pc)*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled*set_bonus.tier20_4pc)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
+  -- actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
+  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and not Player:Buff(S.SurrenderToMadness)
+    and ((not Settings.Shadow.ForceMindbender and CurrentInsanityDrain() >= (v_cdtime-(3*(T204P and 1 or 0)+(5-3*(T204P and 1 or 0))*(Player:HasHeroism() and 1 or 0)+2*(S.FortressOfTheMind:IsAvailable() and 1 or 0)*(T204P and 1 or 0))) 
+      or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)))
+    and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain())) then 
+      if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "Cast"; end
   end
-  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and not Settings.Shadow.ForceMindbender and (not T204P and true or false) and CurrentInsanityDrain()>=(10+2*(T192P and 1 or 0)+5*(Player:HasHeroism() and 1 or 0)+3*(I.MangazasMadness:IsEquipped() and 1 or 0)+2*(S.LashOfInsanity:ArtifactRank() or 0)) then 
-    if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "Cast"; end
-  end
+  if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and Player:Buff(S.SurrenderToMadness)
+    and S.ShadowWordDeath:Charges() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0)) then
+      if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
+  end 
 
 	--Berserking
-	--actions.vf+=/berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=20&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
-	--TODO : S2M
-	if S.Berserking:IsAvailable() and S.Berserking:IsCastable() and Player:BuffStack(S.VoidForm)>=10 and CurrentInsanityDrain()<=20 then
-		if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Racials) then return "Cast"; end
+  -- actions.vf+=/berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.value<=20&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+60))
+	-- actions.s2m+=/berserking,if=buff.voidform.stack>=65
+	if Player:Buff(S.VoidForm) and S.Berserking:IsAvailable() and S.Berserking:IsCastable() and not Player:Buff(S.SurrenderToMadness) 
+    and Player:BuffStack(S.VoidForm) >= 10 and CurrentInsanityDrain() <= 20 
+    and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 60))then
+      if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Racials) then return "Cast"; end
+	end
+  if Player:Buff(S.VoidForm) and S.Berserking:IsAvailable() and S.Berserking:IsCastable() and Player:Buff(S.SurrenderToMadness) 
+    and Player:BuffStack(S.VoidForm) >= 65 then
+      if AR.Cast(S.Berserking, Settings.Shadow.OffGCDasOffGCD.Racials) then return "Cast"; end
 	end
 	
-	--actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
-	--TODO : S2M
-	
-	--Arcane Torrent
-	--TODO
+  --Surrender To Madness
+  -- actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.value)
+	if S.SurrenderToMadness:IsAvailable() and S.SurrenderToMadness:IsCastable() and FutureInsanity() >= 25 
+    and (S.VoidBolt:IsCastable() or S.VoidTorrent:IsCastable() or S.ShadowWordDeath:IsCastable() or Player:Buff(ShadowInsight))
+    and Target:TimeToDie() <= (v_s2mcheck - CurrentInsanityDrain()) then
+      if AR.Cast(S.SurrenderToMadness, Settings.Shadow.OffGCDasOffGCD.SurrenderToMadness) then return "Cast"; end
+  end
   
+	--Arcane Torrent
+  -- actions.vf+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=20&(insanity-(current_insanity_drain*gcd.max)+15)<100
+  -- actions.s2m+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=65& (insanity-(current_insanity_drain*gcd.max)+30)<100
+  if Player:Buff(S.VoidForm) and S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:IsCastable() and not Player:Buff(S.SurrenderToMadness) 
+    and CurrentInsanityDrain() >= 20 and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + 15) < 100 then
+    if AR.Cast(S.ArcaneTorrent, Settings.Shadow.OffGCDasOffGCD.Racials) then return "Cast"; end
+  end
+  if Player:Buff(S.VoidForm) and S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:IsCastable() and Player:Buff(S.SurrenderToMadness) 
+    and CurrentInsanityDrain() >= 65 and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + 30) < 100 then
+      if AR.Cast(S.ArcaneTorrent, Settings.Shadow.OffGCDasOffGCD.Racials) then return "Cast"; end
+	end
+
+  --Potion of Prolonged Power
   -- actions+=/potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
-  if Settings.Shadow.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:HasHeroism() or Target:TimeToDie()<=80 or (Target:HealthPercentage()<35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
-    if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
+  if Settings.Shadow.ShowPoPP and I.PotionOfProlongedPower:IsReady() 
+    and (Player:HasHeroism() or Target:TimeToDie() <= 80 or (Target:HealthPercentage() < 35 and S.PowerInfusion:IsAvailable() and S.PowerInfusion:CooldownRemains() < 30)) then
+      if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
   end
 end
 
+--S2M rotation
 local function s2m()
--- actions.main=surrender_to_madness,if=talent.surrender_to_madness.enabled&target.time_to_die<=variable.s2mcheck
--- actions.main+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd.max,moving=1,cycle_targets=1
--- actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
--- actions.main+=/shadow_word_pain,if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
--- actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
--- actions.main+=/void_eruption
--- actions.main+=/shadow_crash,if=talent.shadow_crash.enabled
--- actions.main+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(85-15*talent.reaper_of_souls.enabled)
--- actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
--- actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
--- actions.main+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
--- actions.main+=/vampiric_touch,if=active_enemies>1&!talent.misery.enabled&!ticking&(85.2*(1+0.2+stat.mastery_rating%16000)*(1+0.2*talent.sanlayn.enabled)*0.5*target.time_to_die%(gcd.max*(138+80*(active_enemies-1))))>1,cycle_targets=1
--- actions.main+=/shadow_word_pain,if=active_enemies>1&!talent.misery.enabled&!ticking&(47.12*(1+0.2+stat.mastery_rating%16000)*0.75*target.time_to_die%(gcd.max*(138+80*(active_enemies-1))))>1,cycle_targets=1
--- actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=75-10*talent.legacy_of_the_void.enabled)
--- actions.main+=/mind_flay,interrupt=1,chain=1
--- actions.main+=/shadow_word_pain
+-- actions.s2m=silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
+-- actions.s2m+=/void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
+-- actions.s2m+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
+-- actions.s2m+=/shadow_crash,if=talent.shadow_crash.enabled
+-- actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
+-- actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up|buff.voidform.stack<5
+-- actions.s2m+=/berserking,if=buff.voidform.stack>=65
+-- actions.s2m+=/shadow_word_death,if=current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled)<100)
+-- actions.s2m+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=65&(insanity-(current_insanity_drain*gcd.max)+30)<100
+-- actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
+-- actions.s2m+=/void_bolt
+-- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled))<100
+-- actions.s2m+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+-- actions.s2m+=/dispersion,if=current_insanity_drain*gcd.max>insanity&!buff.power_infusion.up|(buff.voidform.stack>76&cooldown.shadow_word_death.charges=0&current_insanity_drain*gcd.max>insanity)
+-- actions.s2m+=/mind_blast,if=active_enemies<=5
+-- actions.s2m+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=5
+-- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
+-- actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled&buff.voidform.stack>15
+-- actions.s2m+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+50)<100
+-- actions.s2m+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
+-- actions.s2m+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
+-- actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
+-- actions.s2m+=/vampiric_touch,if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
+-- actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
+-- actions.s2m+=/vampiric_touch,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
+-- actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
+-- actions.s2m+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+60)<100&cooldown.shadow_word_death.charges>=1))
+
 	return ""
 end
 
+--Classic VoidForm rotation
 local function VoidForm()
   
 	--void bolt prediction
@@ -784,7 +829,7 @@ end
 
 AR.SetAPL(258, APL);
 
---[[ 05/08/2017 generation
+--[[ 12/09/2017 generation
 # Executed before combat begins. Accepts non-harmful actions only.
 actions.precombat=flask,type=flask_of_the_whispered_pact
 actions.precombat+=/food,type=azshari_salad
@@ -831,12 +876,15 @@ actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=75
 actions.main+=/mind_flay,interrupt=1,chain=1
 actions.main+=/shadow_word_pain
 
-actions.s2m=void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
+actions.s2m=silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
+actions.s2m+=/void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
+actions.s2m+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
 actions.s2m+=/shadow_crash,if=talent.shadow_crash.enabled
 actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
 actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up|buff.voidform.stack<5
 actions.s2m+=/berserking,if=buff.voidform.stack>=65
 actions.s2m+=/shadow_word_death,if=current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled)<100)
+actions.s2m+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=65&(insanity-(current_insanity_drain*gcd.max)+30)<100
 actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
 actions.s2m+=/void_bolt
 actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled))<100
@@ -859,6 +907,7 @@ actions.s2m+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(act
 actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.value)
 actions.vf+=/silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
 actions.vf+=/void_bolt
+actions.vf+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=20&(insanity-(current_insanity_drain*gcd.max)+15)<100
 actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
 actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
 actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+60))
