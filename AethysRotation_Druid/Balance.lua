@@ -479,6 +479,7 @@ local function currentGenerationCalculation()
 	if Player:CastID()==S.FullMoon:ID() then return 40; end
 	if Player:CastID()==S.SolarWrath:ID() then return (Player:Buff(S.BlessingofElune) and 10 or 8); end
 	if Player:CastID()==S.LunarStrike:ID() then return (Player:Buff(S.BlessingofElune) and 15 or 10); end
+  return 0
 end
   
 -- APL Main
