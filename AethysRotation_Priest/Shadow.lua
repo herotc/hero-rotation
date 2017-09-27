@@ -250,8 +250,7 @@ local function CDs ()
 	-- actions.vf+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	-- actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 	if Player:Buff(S.VoidForm) and not S.Mindbender:IsAvailable() and S.Shadowfiend:IsCastable() 
-    and ((not Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) > 15 ) 
-    or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)) then
+    and Player:BuffStack(S.VoidForm) > (15 + Settings.Shadow.MindbenderUsage)  then
       if AR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend) then return "Cast"; end
 	end
   
@@ -259,14 +258,13 @@ local function CDs ()
   -- actions.vf+=/mindbender,if=buff.insanity_drain_stacks.value>=(variable.cd_time-(3*set_bonus.tier20_4pc*((active_enemies-(raid_event.adds.count*(raid_event.adds.remains>0)))=1))+(5-3*set_bonus.tier20_4pc)*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled*set_bonus.tier20_4pc)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
   -- actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
   if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and not Player:Buff(S.SurrenderToMadness)
-    and ((not Settings.Shadow.ForceMindbender and CurrentInsanityDrain() >= (v_cdtime - (3 * (T204P and 1 or 0) + (5 - 3 * (T204P and 1 or 0)) * (Player:HasHeroism() and 1 or 0) + 2 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) * (T204P and 1 or 0))) 
-      or (Settings.Shadow.ForceMindbender and Player:BuffStack(S.VoidForm) >= Settings.Shadow.MindbenderUsage)))
+    and CurrentInsanityDrain() >= (v_cdtime - (3 * (T204P and 1 or 0) + (5 - 3 * (T204P and 1 or 0)) * (Player:HasHeroism() and 1 or 0) + 2 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) + Settings.Shadow.MindbenderUsage)
     and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain())) then 
       if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "Cast"; end
   end
   if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and Player:Buff(S.SurrenderToMadness)
-    and S.ShadowWordDeath:Charges() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0)) then
-      if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
+    and S.ShadowWordDeath:Charges() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0) + Settings.Shadow.MindbenderUsage) then
+      if AR.Cast(S.Mindbender, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "Cast"; end
   end 
 
 	--Berserking

@@ -23,7 +23,7 @@
       UseSilence = false,
       UseMindBomb = false,
       ForceMindbender = false,
-      MindbenderUsage = 25,
+      MindbenderUsage = 0,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -62,7 +62,6 @@
   CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseSilence", "Use Silence for Sephuz", "Enable this if you want it to show you when to use Silence to proc Sephuz's Secret (only when equipped). ");
   -- CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseMindBomb", "Use Mind Bomb for Sephuz", "Enable this if you want it to show you when to use Mind Bomb to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.ForceMindbender", "Force Shadowfiend/Mindbender usage", "Enable this if you want it to manually set when to use Shadowfiend/Mindbender.");
-  CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MindbenderUsage", {0, 60, 1}, "Shadowfiend/Mindbender prefered usage", "Only if Force enabled.\nSet at how much vf stacks mindbender is used.");
+  CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MindbenderUsage", {0, 30, 1}, "Shadowfiend/Mindbender usage Offset", "Number of vf stacks MB/SF will be delayed that you can push");
 
   -- CreateARPanelOption("OffGCDasOffGCD", CP_Shadow, "APL.Priest.Shadow.OffGCDasOffGCD.PotionOfProlongedPower", "Potion Of Prolonged Power");
