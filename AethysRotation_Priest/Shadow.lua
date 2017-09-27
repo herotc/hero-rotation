@@ -316,7 +316,7 @@ end
 --S2M rotation
 local function s2m()
   --Void Torrent prediction
-	if Player:CastID() == S.VoidEruption:ID() and S.VoidTorrent:IsCastable() then
+	if Player:CastID() == S.VoidEruption:ID() and (S.VoidTorrent:IsCastable() or (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidTorrent:Cooldown())) then
 		if AR.Cast(S.VoidTorrent) then return "Cast"; end
 	end
 
@@ -464,7 +464,7 @@ end
 --Classic VoidForm rotation
 local function VoidForm()
 	--Void Torrent prediction
-	if Player:CastID() == S.VoidEruption:ID() and S.VoidTorrent:IsCastable() then
+	if Player:CastID() == S.VoidEruption:ID() and (S.VoidTorrent:IsCastable() or (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidTorrent:Cooldown())) then
 		if AR.Cast(S.VoidTorrent) then return "Cast"; end
 	end
 	
