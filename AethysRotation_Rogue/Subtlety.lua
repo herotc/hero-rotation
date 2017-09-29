@@ -308,6 +308,19 @@ end
 local MacroTable;
 local function StealthMacro (StealthSpell)
   MacroTable = {StealthSpell};
+
+  -- Handle StealthMacro GUI options
+  -- If false, just suggest them as off-GCD and bail out of the macro functionality
+  if StealthSpell == S.Vanish and not Settings.Subtlety.StealthMacro.Vanish then
+    if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return ""; end
+    return false;
+  elseif StealthSpell == S.Shadowmeld and not Settings.Subtlety.StealthMacro.Shadowmeld then
+    if AR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    return false;
+  elseif StealthSpell == S.ShadowDance and not Settings.Subtlety.StealthMacro.ShadowDance then
+    if AR.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return ""; end
+    return false;
+  end
   
   tableinsert(MacroTable, Stealthed(true, StealthSpell))
   

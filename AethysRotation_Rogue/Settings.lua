@@ -87,7 +87,15 @@
       OffGCDasOffGCD = {
         -- Abilities
         ShadowBlades = {true, false},
-        SymbolsofDeath = {true, false}
+        SymbolsofDeath = {true, false},
+        ShadowDance = {true, false}
+      },
+      -- Stealth Macro Enable/Disable Options
+      StealthMacro = {
+        -- Abilities
+        Vanish = true,
+        Shadowmeld = true,
+        ShadowDance = true
       }
     }
   };
@@ -131,3 +139,7 @@
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Subtlety, "APL.Rogue.Subtlety.OffGCDasOffGCD.ShadowBlades", "Shadow Blades");
   CreateARPanelOption("OffGCDasOffGCD", CP_Subtlety, "APL.Rogue.Subtlety.OffGCDasOffGCD.SymbolsofDeath", "Symbols of Death");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Subtlety, "APL.Rogue.Subtlety.OffGCDasOffGCD.ShadowDance", "Shadow Dance");
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)");
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.ShadowDance", "Stealth Combo - Shadow Dance", "Allow suggesting Shadow Dance stealth ability combos (recommended)");
