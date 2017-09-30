@@ -211,7 +211,7 @@ end
       end
       -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
       if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
-        if AR.Cast(S.IcyVeins) then return ""; end
+        if AR.Cast(S.IcyVeins, Settings.Frost.OffGCDasOffGCD.IcyVeins) then return "" end;
       end
       -- actions.cooldowns+=/mirror_image
       if S.MirrorImage:IsCastable() then
@@ -219,11 +219,11 @@ end
       end
       -- actions.cooldowns+=/blood_fury
       if S.BloodFury:IsCastable() then
-        if AR.Cast(S.BloodFury) then return ""; end
+        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- actions.cooldowns+=/berserking
       if S.Berserking:IsCastable() then
-        if AR.Cast(S.Berserking) then return ""; end
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- actions.cooldowns+=/arcane_torrent
 	  -- Torrent has no impact on frost dps we just do it in SIMC to be lazy (since arc likes it), let user handle their own for interrupts
