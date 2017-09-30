@@ -159,14 +159,23 @@ end
 	  end
 --   actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt)&buff.brain_freeze.react
       if S.Flurry:IsCastable() and
-              (
-            Player:Buff(S.BrainFreeze) and
-                  (
-                  Player:CastID() == S.Ebonbolt:ID()  or
-                  Player:CastID() == S.Frostbolt:ID()  or
-                  Player:CastID() == S.GlacialSpike:ID())) then
-        if AR.Cast (S.Flurry) then return ""; end
-      end
+        (
+          Player:CastID() == S.Ebonbolt:ID() or
+          Player:Buff(S.BrainFreeze) and
+       (
+       (  Player:CastID() == S.Frostbolt:ID() and not S.GlacialSpike:IsAvailable()) or
+            S.GlacialSpike:IsAvailable() and
+       (
+          Player:CastID() == S.GlacialSpike:ID() or
+          Player:CastID() == S.Frostbolt:ID() and
+       (
+          Player:BuffStack(S.Icicles) <= 3 or
+          S.FrozenOrb:CooldownRemains() <= 10 and AC.Tier20_2Pc
+            )
+        )
+    )
+) then if AR.Cast (S.Flurry) then return ""; end
+end
       -- actions.aoe+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react>0
       if S.FrostBomb:IsCastable() and Target:DebuffRemains(S.FrostBomb) < S.IceLance:TravelTime() and FoFReact() > 0 then
         if AR.Cast(S.FrostBomb) then return ""; end
@@ -261,16 +270,24 @@ end
     end
     --actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(!talent.glacial_spike.enabled&prev_gcd.1.frostbolt|talent.glacial_spike.enabled&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(buff.icicles.stack<=3|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc)))
     if S.Flurry:IsCastable() and
-            (
-          Player:Buff(S.BrainFreeze) and
-                (
-                Player:CastID() == S.Ebonbolt:ID() or
-                Player:CastID() == S.Frostbolt:ID() and not S.GlacialSpike:IsAvailable() or
-                Player:BuffStack(S.Icicles) <= 3 or
-                Player:CastID() == S.GlacialSpike:ID() and S.GlacialSpike:IsAvailable()
-    or  S.FrozenOrb:CooldownRemains() <= 10  and AC.Tier20_2Pc)) then
-      if AR.Cast (S.Flurry) then return ""; end
-    end
+      (
+        Player:CastID() == S.Ebonbolt:ID() or
+        Player:Buff(S.BrainFreeze) and
+     (
+     (  Player:CastID() == S.Frostbolt:ID() and not S.GlacialSpike:IsAvailable()) or
+          S.GlacialSpike:IsAvailable() and
+     (
+        Player:CastID() == S.GlacialSpike:ID() or
+        Player:CastID() == S.Frostbolt:ID() and
+     (
+        Player:BuffStack(S.Icicles) <= 3 or
+        S.FrozenOrb:CooldownRemains() <= 10 and AC.Tier20_2Pc
+          )
+      )
+  )
+) then if AR.Cast (S.Flurry) then return ""; end
+end
+
     -- actions.single+=/blizzard,if=cast_time=0&active_enemies>1&variable.fof_react<3
     if S.Blizzard:IsCastable() and S.Blizzard:CastTime() == 0 and Cache.EnemiesCount[40] > 1 and FoFReact() < 3 then
       if AR.Cast(S.Blizzard) then return ""; end
