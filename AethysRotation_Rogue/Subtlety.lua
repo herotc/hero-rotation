@@ -407,7 +407,7 @@ local function CDs ()
           if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
-        if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 70 then
+        if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 70 then
           if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
       end
@@ -446,7 +446,7 @@ local function CDs ()
       -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.ShD_Fractional&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
       if S.GoremawsBite:IsCastable() and not Player:IsStealthed(true, true) and S.ShadowDance:ChargesFractional() <= ShD_Fractional()
           and ((Player:ComboPointsDeficit() >= 4-(AC.CombatTime() < 10 and 2 or 0)
-              and Player:EnergyDeficit() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
+              and Player:EnergyDeficitPredicted() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
             or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8)) then
         if AR.Cast(S.GoremawsBite) then return ""; end
       end
@@ -493,7 +493,7 @@ local function Stealth_CDs ()
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10+variable.ssw_refund
     if AR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-      and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10+SSW_Refund() then
+      and GetUnitSpeed("player") == 0 and Player:EnergyDeficitPredicted() > 10+SSW_Refund() then
       -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
       if Player:EnergyPredicted() < 40 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
@@ -514,8 +514,8 @@ end
 -- # Stealth Action List Starter
 local function Stealth_ALS ()
   -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold-25*(!cooldown.goremaws_bite.up&!buff.feeding_frenzy.up)&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=variable.shd_fractional|energy.deficit>=10)
-  if (Player:EnergyDeficit() <= Stealth_Threshold() - ((not S.GoremawsBite:CooldownUp() and not Player:Buff(S.FeedingFrenzy)) and 25 or 0)
-    and (not I.ShadowSatyrsWalk:IsEquipped() or S.ShadowDance:ChargesFractional() >= ShD_Fractional() or Player:EnergyDeficit() >= 10))
+  if (Player:EnergyDeficitPredicted() <= Stealth_Threshold() - ((not S.GoremawsBite:CooldownUp() and not Player:Buff(S.FeedingFrenzy)) and 25 or 0)
+    and (not I.ShadowSatyrsWalk:IsEquipped() or S.ShadowDance:ChargesFractional() >= ShD_Fractional() or Player:EnergyDeficitPredicted() >= 10))
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=mantle_duration>2.3
     or Rogue.MantleDuration() > 2.3
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=4
@@ -589,7 +589,7 @@ local function APL ()
         if Player:IsStealthed(true, true) then
           ShouldReturn = Stealthed();
           if ShouldReturn then return ShouldReturn .. " (OOC)"; end
-          if Player:Energy() < 30 then -- To avoid pooling icon spam
+          if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
             if AR.Cast(S.PoolEnergy) then return "Stealthed Pooling (OOC)"; end
           else
             return "Stealthed Pooling (OOC)";
@@ -641,7 +641,7 @@ local function APL ()
         ShouldReturn = Stealthed();
         if ShouldReturn then return ShouldReturn; end
         -- run_action_list forces the return
-        if Player:Energy() < 30 then -- To avoid pooling icon spam
+        if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
           if AR.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end
         else
           return "Stealthed Pooling";
@@ -681,13 +681,13 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-      if Player:EnergyDeficit() <= Stealth_Threshold() then
+      if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
         ShouldReturn = Build();
         if ShouldReturn then return ShouldReturn; end
       end
       -- Shuriken Toss Out of Range
       if S.ShurikenToss:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(30) and not Player:IsStealthed(true, true) and not Player:Buff(S.Sprint)
-        and Player:EnergyDeficit() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
+        and Player:EnergyDeficitPredicted() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if AR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end
       -- Trick to take in consideration the Recovery Setting

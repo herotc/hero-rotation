@@ -333,11 +333,11 @@ local function APL ()
               if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
             end
             -- actions.cds+=/arcane_torrent,if=energy.deficit>40
-            if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 40 then
+            if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 40 then
               if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
             end
             -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
-            if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficit() > 0 then
+            if S.AdrenalineRush:IsCastable() and not Player:Buff(S.AdrenalineRush) and Player:EnergyDeficitPredicted() > 0 then
               if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
             end
           end
@@ -371,7 +371,8 @@ local function APL ()
       -- actions+=/call_action_list,name=stealth,if=stealthed|cooldown.vanish.up|cooldown.shadowmeld.up
         if Target:IsInRange(S.SaberSlash, SSIdentifier) then
           -- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up
-          local Ambush_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Energy() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade)) and true or false;
+          local Ambush_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)
+            + (Player:Buff(S.Broadsides) and 1 or 0) and Player:EnergyPredicted() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade)) and true or false;
           -- actions.stealth+=/ambush,if=variable.ambush_condition
           if Player:IsStealthed(true, true) and S.Ambush:IsCastable() and Ambush_Condition then
             if AR.Cast(S.Ambush) then return "Cast Ambush"; end
@@ -408,7 +409,7 @@ local function APL ()
         end
       end
       -- actions+=/killing_spree,if=energy.time_to_max>5|energy<15
-      if AR.CDsON() and S.KillingSpree:IsCastable() and (Player:EnergyTimeToMax() > 5 or Player:Energy() < 15) then
+      if AR.CDsON() and S.KillingSpree:IsCastable() and (Player:EnergyTimeToMax() > 5 or Player:EnergyPredicted() < 15) then
         if AR.Cast(S.KillingSpree) then return "Cast Killing Spree"; end
       end
       -- actions+=/call_action_list,name=build
@@ -445,7 +446,7 @@ local function APL ()
         if AR.Cast(S.Gouge) then return "Cast Gouge"; end
       end
       -- OutofRange Pistol Shot
-      if not Target:IsInRange(10) and Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and not Player:IsStealthed(true, true) and Player:EnergyDeficit() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
+      if not Target:IsInRange(10) and Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and not Player:IsStealthed(true, true) and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if S.Blunderbuss:IsCastable() then
           if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
         else

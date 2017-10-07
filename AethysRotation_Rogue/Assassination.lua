@@ -255,7 +255,7 @@ local function CDs ()
       end
       -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
       -- Note: Temporarly modified the conditions
-      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 15 + Energy_Regen_Combined() * Player:GCDRemains() * 1.1 then
+      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined() * Player:GCDRemains() * 1.1 then
         if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
       end
     end
@@ -331,7 +331,7 @@ local function Finish ()
   if S.Envenom:IsCastable() and Target:IsInRange(5) then
     -- actions.finish+=/envenom,if=combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc)&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
     if Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and not AC.Tier19_4Pc and 1 or 0) and (Target:Debuff(S.Vendetta) or Rogue.MantleDuration() >= 0.2
-      or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficit() <= 25 + Energy_Regen_Combined()
+      or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined()
       or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
       if AR.Cast(S.Envenom) then return "Cast"; end
     end
@@ -462,7 +462,7 @@ local function Maintain ()
         and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
       -- actions.maintain+=/pool_resource,for_next=1
-      if Player:Energy() < 45 then
+      if Player:EnergyPredicted() < 45 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
       end
       if AR.Cast(S.Garrote) then return "Cast"; end
@@ -478,7 +478,7 @@ local function Maintain ()
       end
       if BestUnit then
         -- actions.maintain+=/pool_resource,for_next=1
-        if Player:Energy() < 45 then
+        if Player:EnergyPredicted() < 45 then
           if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (Cycle)"; end
         end
         AR.CastLeftNameplate(BestUnit, S.Garrote);
@@ -620,7 +620,7 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=build,if=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined
-      if Player:ComboPointsDeficit() > 1 or Player:EnergyDeficit() <= 25 + Energy_Regen_Combined() then
+      if Player:ComboPointsDeficit() > 1 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined() then
         ShouldReturn = Build();
         if ShouldReturn then return ShouldReturn; end
       end
