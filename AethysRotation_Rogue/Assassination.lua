@@ -270,7 +270,7 @@ local function CDs ()
     if S.Exsanguinate:IsCastable() then
       if not AC.Tier20_4Pc then
         -- actions.cds+=/exsanguinate,if=!set_bonus.tier20_4pc&prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
-        if S.Rupture:TimeSinceLastDisplay() < 2 and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
+        if Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
           if AR.Cast(S.Exsanguinate) then return "Cast"; end
         end
       else
@@ -356,6 +356,7 @@ local function Kingsbane ()
   if Player:Buff(S.Envenom) and ((Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)) or S.Vendetta:CooldownRemainsP() <= 5.8 or S.Vendetta:CooldownRemainsP() >= 10) then
     if AR.Cast(S.Kingsbane) then return "Cast"; end
   end
+  return false;
 end
 -- # Maintain
 local function Maintain ()
@@ -448,7 +449,8 @@ local function Maintain ()
   end
   -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)
   if AR.CDsON() and S.Kingsbane:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0) then
-    return Kingsbane();
+    ShouldReturn2 = Kingsbane();
+    if ShouldReturn2 then return ShouldReturn2; end
   end
   -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
   -- TODO: pmultiplier (core handler rather than rogue specific)
@@ -481,9 +483,11 @@ local function Maintain ()
     end
   end
   -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1
-  if S.Garrote:IsCastable() and Target:IsInRange(5) and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and S.Rupture:TimeSinceLastDisplay() < 2 and S.Exsanguinate:CooldownRemainsP() < 1 then
+  if S.Garrote:IsCastable() and Target:IsInRange(5) and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() 
+    and Player:PrevGCD(1, S.Rupture) and S.Exsanguinate:CooldownRemainsP() < 1 then
     if AR.Cast(S.Garrote) then return "Cast"; end
   end
+  return false;
 end
 local SappedSoulSpells = {
   {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end},
