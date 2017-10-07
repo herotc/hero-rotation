@@ -263,8 +263,8 @@ local function CDs ()
     if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
       AR.CastSuggested(S.MarkedforDeath);
     end
-    -- actions.cds+=/vendetta
-    if S.Vendetta:IsCastable() then
+    -- actions.cds+=/vendetta,if=!talent.exsanguinate.enabled|dot.rupture.ticking
+    if S.Vendetta:IsCastable() and (not S.Exsanguinate:IsAvailable() or Target:Debuff(S.Rupture)) then
       if AR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast"; end
     end
     if S.Exsanguinate:IsCastable() then
@@ -362,7 +362,8 @@ end
 local function Maintain ()
   if Player:IsStealthed(true, false) then
     -- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(talent.exsanguinate.enabled|target.time_to_die-remains>4)
-    if S.Rupture:IsCastable() and Target:IsInRange(5) and S.Nightstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc)
+    if S.Rupture:IsCastable() and Player:ComboPoints() > 0 and Target:IsInRange(5) and S.Nightstalker:IsAvailable() 
+      and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc)
       and (S.Exsanguinate:IsAvailable()
         or ((Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid())
           and Rogue.CanDoTUnit(Target, RuptureDMGThreshold))) then
@@ -421,8 +422,9 @@ local function Maintain ()
   end
   -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
   -- TODO: Test 4-5 cp rupture for Exsg
-  if AR.CDsON() and S.Rupture:IsCastable() and Target:IsInRange(5) and S.Exsanguinate:IsAvailable() and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
-    or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
+  if AR.CDsON() and S.Rupture:IsCastable() and Player:ComboPoints() > 0 and Target:IsInRange(5) and S.Exsanguinate:IsAvailable()
+    and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1) 
+      or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
   -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>6
@@ -447,8 +449,9 @@ local function Maintain ()
       end
     end
   end
-  -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)
-  if AR.CDsON() and S.Kingsbane:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0) then
+  -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)&(!talent.exsanguinate.enabled|!cooldown.exanguinate.up|time>9)
+  if AR.CDsON() and S.Kingsbane:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0) 
+    and (not S.Exsanguinate:IsAvailable() or not S.Exsanguinate:CooldownUp() or AC.CombatTime() > 9) then
     ShouldReturn2 = Kingsbane();
     if ShouldReturn2 then return ShouldReturn2; end
   end
@@ -482,9 +485,9 @@ local function Maintain ()
       end
     end
   end
-  -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1
-  if S.Garrote:IsCastable() and Target:IsInRange(5) and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() 
-    and Player:PrevGCD(1, S.Rupture) and S.Exsanguinate:CooldownRemainsP() < 1 then
+  -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1&(!cooldown.vanish.up|time>12)
+  if S.Garrote:IsCastable() and Target:IsInRange(5) and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and Player:PrevGCD(1, S.Rupture) 
+    and S.Exsanguinate:CooldownRemainsP() < 1 and (not S.Vanish:CooldownUp() or AC.CombatTime() > 12) then
     if AR.Cast(S.Garrote) then return "Cast"; end
   end
   return false;
@@ -636,7 +639,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 08/05/2017
+-- Last Update: 10/07/2017
 -- Note: Some Exsang changes not synced yet, mostly due to missing pmultiplier.
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
@@ -675,7 +678,7 @@ AR.SetAPL(259, APL);
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 -- actions.cds+=/arcane_torrent,if=dot.kingsbane.ticking&!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
--- actions.cds+=/vendetta
+-- actions.cds+=/vendetta,if=!talent.exsanguinate.enabled|dot.rupture.ticking
 -- actions.cds+=/exsanguinate,if=!set_bonus.tier20_4pc&prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
 -- actions.cds+=/exsanguinate,if=set_bonus.tier20_4pc&dot.garrote.remains>20&dot.rupture.remains>4+4*cp_max_spend
 -- # Nightstalker w/o Exsanguinate: Vanish Envenom if Mantle & T19_4PC, else Vanish Rupture
@@ -703,7 +706,7 @@ AR.SetAPL(259, APL);
 -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=0.2&target.time_to_die>6
 -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
 -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>6
--- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)
+-- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)&(!talent.exsanguinate.enabled|!cooldown.exanguinate.up|time>9)
 -- actions.maintain+=/pool_resource,for_next=1
 -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
--- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1
+-- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1&(!cooldown.vanish.up|time>12)
