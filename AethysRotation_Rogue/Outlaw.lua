@@ -378,8 +378,9 @@ local function APL ()
             if AR.Cast(S.Ambush) then return "Cast Ambush"; end
           else
             if AR.CDsON() and not Player:IsTanking(Target) then
-              -- actions.stealth+=/vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
-              if S.Vanish:IsCastable() and (Ambush_Condition or (I.MantleoftheMasterAssassin:IsEquipped() and Rogue.MantleDuration() == 0 and not RtB_Reroll() and not SS_Useable())) then
+              -- actions.stealth+=/vanish,if=(variable.ambush_condition|equipped.mantle_of_the_master_assassin&!variable.rtb_reroll&!variable.ss_useable)&mantle_duration=0
+              if S.Vanish:IsCastable() and (Ambush_Condition or (I.MantleoftheMasterAssassin:IsEquipped() and not RtB_Reroll() and not SS_Useable()))
+                and Rogue.MantleDuration() == 0 then
                 if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
               end
               -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
@@ -458,7 +459,7 @@ end
 
 AR.SetAPL(260, APL);
 
--- Last Update: 08/15/2017
+-- Last Update: 10/08/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -524,5 +525,5 @@ AR.SetAPL(260, APL);
 -- # Stealth
 -- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up
 -- actions.stealth+=/ambush,if=variable.ambush_condition
--- actions.stealth+=/vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
+-- actions.stealth+=/vanish,if=(variable.ambush_condition|equipped.mantle_of_the_master_assassin&!variable.rtb_reroll&!variable.ss_useable)&mantle_duration=0
 -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
