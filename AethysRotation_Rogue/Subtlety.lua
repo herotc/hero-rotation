@@ -37,13 +37,13 @@ local tableinsert = table.insert;
     ShadowDance                   = Spell(185313),
     ShadowDanceBuff               = Spell(185422),
     Shadowstrike                  = Spell(185438),
+    ShurikenComboBuff             = Spell(245640),
     ShurikenStorm                 = Spell(197835),
     ShurikenToss                  = Spell(114014),
     Stealth                       = Spell(1784),
     SymbolsofDeath                = Spell(212283),
     Vanish                        = Spell(1856),
     VanishBuff                    = Spell(11327),
-    ShurikenComboBuff             = Spell(245640),
     -- Talents
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
@@ -62,7 +62,6 @@ local tableinsert = table.insert;
     Subterfuge                    = Spell(108208),
     Vigor                         = Spell(14983),
     -- Artifact
-    WeakPoint                     = Spell(238068),
     FeedingFrenzy                 = Spell(242705),
     FinalityEviscerate            = Spell(197496),
     FinalityNightblade            = Spell(197498),
@@ -71,6 +70,7 @@ local tableinsert = table.insert;
     LegionBlade                   = Spell(214930),
     ShadowFangs                   = Spell(221856),
     ShadowsoftheUncrowned         = Spell(241154),
+    WeakPoint                     = Spell(238068),
     -- Defensive
     CrimsonVial                   = Spell(185311),
     Feint                         = Spell(1966),
