@@ -51,6 +51,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
 - Shaman Elemental ([lithium720](https://github.com/lithium720)) **[WIP]**
 - Shaman Enhancement ([lithium720](https://github.com/lithium720) & [Tael](https://github.com/Tae-l))
+- Warlock Affliction ([KutiKuti](https://github.com/Kutikuti)) **[WIP]**
 - Warlock Demonology ([KutiKuti](https://github.com/Kutikuti))
 - Warlock Destruction ([KutiKuti](https://github.com/Kutikuti))
 - Warrior Arms ([lithium720](https://github.com/lithium720))
