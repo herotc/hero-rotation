@@ -93,7 +93,6 @@ local tostring = tostring;
   local I = Item.Rogue.Outlaw;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local RTIdentifier, SSIdentifier = tostring(S.RunThrough:ID()), tostring(S.SaberSlash:ID());
   local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
 -- GUI Settings
   local Settings = {
@@ -225,8 +224,8 @@ end
 local function APL ()
   -- Unit Update
   AC.GetEnemies(8); -- Cannonball Barrage
-  AC.GetEnemies(S.RunThrough, RTIdentifier); -- Blade Flurry
-  AC.GetEnemies(S.SaberSlash, SSIdentifier); -- Melee
+  AC.GetEnemies(S.RunThrough); -- Blade Flurry
+  AC.GetEnemies(S.SaberSlash); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
   -- Defensives
     -- Crimson Vial
