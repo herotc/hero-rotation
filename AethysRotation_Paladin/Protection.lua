@@ -93,15 +93,15 @@
 
   local function CDS()
     -- SotR (HP or (AS on CD and 3 Charges))
-        if S.ShieldoftheRighteous:IsCastable() and not Player:Buff(S.ShieldoftheRighteousBuff) and (Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then
+        if S.ShieldoftheRighteous:IsCastable(5) and not Player:Buff(S.ShieldoftheRighteousBuff) and (Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then
           if AR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return; end
         end
         -- Avengin Wrath (CDs On)
-        if AR.CDsON() and S.AvengingWrath:IsCastable() then
+        if AR.CDsON() and S.AvengingWrath:IsCastable(5) then
           if AR.Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return; end
         end
         -- Eye of Tyr (HP)
-        if S.EyeofTyr:IsCastable() and Player:HealthPercentage() <= Settings.Protection.EyeofTyrHP then
+        if S.EyeofTyr:IsCastable(8) and Player:HealthPercentage() <= Settings.Protection.EyeofTyrHP then
           if AR.Cast(S.EyeofTyr) then return; end
         end
       return false;
