@@ -191,13 +191,13 @@ end
 local function Build ()
   if S.Hemorrhage:IsCastable() then
     -- actions.build=hemorrhage,if=refreshable
-    if Target:IsInRange(5) and Target:DebuffRefreshableP(S.Hemorrhage, 6) then
+    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Hemorrhage, 6) then
       if AR.Cast(S.Hemorrhage) then return "Cast"; end
     end
     -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
-    if AR.AoEON() and Cache.EnemiesCount[8] < 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
+    if AR.AoEON() and Cache.EnemiesCount[10] < 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
       BestUnit, BestUnitTTD = nil, 0;
-      for _, Unit in pairs(Cache.Enemies[5]) do
+      for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
           and Unit:DebuffRefreshableP(S.Hemorrhage, 6) and Unit:Debuff(S.Rupture) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
@@ -209,17 +209,17 @@ local function Build ()
     end
   end
   -- actions.build+=/fan_of_knives,if=spell_targets>=2+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
-  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange(5) and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+  if S.FanofKnives:IsCastable() and (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange("Melee") and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if AR.Cast(S.FanofKnives) then return "Cast"; end
   end
   if S.Mutilate:IsCastable() then
     -- actions.build+=/mutilate,cycle_targets=1,if=dot.deadly_poison_dot.refreshable
-    if Target:IsInRange(5) and Target:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4) then
+    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4) then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD = nil, 0;
-      for _, Unit in pairs(Cache.Enemies[5]) do
+      for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
           and Unit:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
@@ -230,7 +230,7 @@ local function Build ()
       end
     end
     -- actions.build+=/mutilate
-    if Target:IsInRange(5) then
+    if Target:IsInRange("Melee") then
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
   end
@@ -238,7 +238,7 @@ local function Build ()
 end
 -- # Cooldowns
 local function CDs ()
-  if Target:IsInRange(5) then
+  if Target:IsInRange("Melee") then
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
     -- actions.cds+=/use_item,name=draught_of_souls,if=energy.deficit>=35+variable.energy_regen_combined*2&(!equipped.mantle_of_the_master_assassin|cooldown.vanish.remains>8)
     -- TODO: DoS 1
@@ -305,7 +305,7 @@ local function CDs ()
           end
         else
           -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!equipped.mantle_of_the_master_assassin&!stealthed.rogue&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
-          if not Player:IsStealthed(true, false) and Target:DebuffRefreshableP(S.Garrote, 5.4) and ((Cache.EnemiesCount[8] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[8]) or (Cache.EnemiesCount[8] >= 4 and Player:ComboPointsDeficit() >= 4)) then
+          if not Player:IsStealthed(true, false) and Target:DebuffRefreshableP(S.Garrote, 5.4) and ((Cache.EnemiesCount[10] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and Player:ComboPointsDeficit() >= 4)) then
             if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
           end
         end
@@ -316,7 +316,7 @@ local function CDs ()
       end
     end
     -- actions.cds+=/toxic_blade,if=combo_points.deficit>=1+(mantle_duration>=0.2)&dot.rupture.remains>8&cooldown.vendetta.remains>10
-    if S.ToxicBlade:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0)
+    if S.ToxicBlade:IsCastable("Melee") and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0)
       and Target:DebuffRemainsP(S.Rupture) > 8 and S.Vendetta:CooldownRemainsP() > 10 then
       if AR.Cast(S.ToxicBlade) then return "Cast"; end
     end
@@ -326,10 +326,10 @@ end
 -- # Finishers
 local function Finish ()
   -- actions.finish=death_from_above,if=combo_points>=5
-  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15) and Player:ComboPoints() >= 5 then
+  if S.DeathfromAbove:IsCastable(15) and Player:ComboPoints() >= 5 then
     if AR.Cast(S.DeathfromAbove) then return "Cast"; end
   end
-  if S.Envenom:IsCastable() and Target:IsInRange(5) then
+  if S.Envenom:IsCastable("Melee") then
     -- actions.finish+=/envenom,if=combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc)&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
     if Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and not AC.Tier19_4Pc and 1 or 0) and (Target:Debuff(S.Vendetta) or Rogue.MantleDuration() >= 0.2
       or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined()
@@ -363,7 +363,7 @@ end
 local function Maintain ()
   if Player:IsStealthed(true, false) then
     -- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(talent.exsanguinate.enabled|target.time_to_die-remains>4)
-    if S.Rupture:IsCastable() and Player:ComboPoints() > 0 and Target:IsInRange(5) and S.Nightstalker:IsAvailable()
+    if S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Nightstalker:IsAvailable()
       and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc)
       and (S.Exsanguinate:IsAvailable()
         or ((Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid())
@@ -372,14 +372,14 @@ local function Maintain ()
     end
     -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>2
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
-      if Target:IsInRange(5) and Target:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemainsP(S.Garrote) <= ExsanguinatedBleedTickTime*2)
+      if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemainsP(S.Garrote) <= ExsanguinatedBleedTickTime*2)
         and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
         BestUnit, BestUnitTTD = nil, 2;
-        for _, Unit in pairs(Cache.Enemies[5]) do
+        for _, Unit in pairs(Cache.Enemies["Melee"]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
             and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
             and Unit:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemainsP(S.Garrote) <= ExsanguinatedBleedTickTime*2) then
@@ -394,14 +394,14 @@ local function Maintain ()
     -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
     -- TODO: pmultiplier (core handler rather than rogue specific)
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
-      if Target:IsInRange(5) and Target:DebuffRemainsP(S.Garrote) <= 10 and not AC.Exsanguinated(Target, "Garrote")
+      if Target:IsInRange("Melee") and Target:DebuffRemainsP(S.Garrote) <= 10 and not AC.Exsanguinated(Target, "Garrote")
         and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
         BestUnit, BestUnitTTD = nil, 2;
-        for _, Unit in pairs(Cache.Enemies[5]) do
+        for _, Unit in pairs(Cache.Enemies["Melee"]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
             and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
             and Unit:DebuffRemainsP(S.Garrote) <= 10 and not AC.Exsanguinated(Unit, "Garrote") then
@@ -415,7 +415,7 @@ local function Maintain ()
     end
   end
   -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=0.2&target.time_to_die>6
-  if S.Rupture:IsCastable() and Target:IsInRange(5) and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
+  if S.Rupture:IsCastable("Melee") and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
     and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= 0.2
     and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
@@ -423,7 +423,7 @@ local function Maintain ()
   end
   -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
   -- TODO: Test 4-5 cp rupture for Exsg
-  if AR.CDsON() and S.Rupture:IsCastable() and Player:ComboPoints() > 0 and Target:IsInRange(5) and S.Exsanguinate:IsAvailable()
+  if AR.CDsON() and S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable()
     and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
       or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
     if AR.Cast(S.Rupture) then return "Cast"; end
@@ -431,14 +431,14 @@ local function Maintain ()
   -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>6
   -- TODO: pmultiplier (core handler rather than rogue specific)
   if Player:ComboPoints() >= 4 then
-    if Target:IsInRange(5) and Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemainsP(S.Rupture) <= 1.5)
+    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemainsP(S.Rupture) <= 1.5)
       and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if AR.Cast(S.Rupture) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD = nil, 6;
-      for _, Unit in pairs(Cache.Enemies[5]) do
+      for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Rupture))
           and Rogue.CanDoTUnit(Unit, RuptureDMGThreshold)
           and Unit:DebuffRefreshableP(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Unit, "Rupture") or Unit:DebuffRemainsP(S.Rupture) <= 1.5) then
@@ -451,7 +451,7 @@ local function Maintain ()
     end
   end
   -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)&(!talent.exsanguinate.enabled|!cooldown.exanguinate.up|time>9)
-  if AR.CDsON() and S.Kingsbane:IsCastable() and Target:IsInRange(5) and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0)
+  if AR.CDsON() and S.Kingsbane:IsCastable("Melee") and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0)
     and (not S.Exsanguinate:IsAvailable() or not S.Exsanguinate:CooldownUp() or AC.CombatTime() > 9) then
     ShouldReturn2 = Kingsbane();
     if ShouldReturn2 then return ShouldReturn2; end
@@ -459,7 +459,7 @@ local function Maintain ()
   -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
   -- TODO: pmultiplier (core handler rather than rogue specific)
   if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and Player:ComboPointsDeficit() >= 1 then
-    if Target:IsInRange(5) and Target:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemainsP(S.Garrote) <= 1.5)
+    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemainsP(S.Garrote) <= 1.5)
         and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
       -- actions.maintain+=/pool_resource,for_next=1
@@ -470,7 +470,7 @@ local function Maintain ()
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD = nil, 4;
-      for _, Unit in pairs(Cache.Enemies[5]) do
+      for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
           and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
           and Unit:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemainsP(S.Garrote) <= 1.5) then
@@ -487,14 +487,14 @@ local function Maintain ()
     end
   end
   -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1&(!cooldown.vanish.up|time>12)
-  if S.Garrote:IsCastable() and Target:IsInRange(5) and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and Player:PrevGCD(1, S.Rupture)
+  if S.Garrote:IsCastable("Melee") and AC.Tier20_4Pc and S.Exsanguinate:IsAvailable() and Player:PrevGCD(1, S.Rupture)
     and S.Exsanguinate:CooldownRemainsP() < 1 and (not S.Vanish:CooldownUp() or AC.CombatTime() > 12) then
     if AR.Cast(S.Garrote) then return "Cast"; end
   end
   return false;
 end
 local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(5); end},
+  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange("Melee"); end},
   {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
 };
@@ -514,7 +514,7 @@ end
 local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
     -- Kidney Shot
-    if Target:IsInRange(5) and S.KidneyShot:IsCastable() and Player:ComboPoints() > 0 then
+    if S.KidneyShot:IsCastable("Melee") and Player:ComboPoints() > 0 then
       if AR.Cast(S.KidneyShot) then return "Cast Kidney Shot (Unstable Explosion)"; end
     end
   end
@@ -527,8 +527,8 @@ local function APL ()
   S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
   -- Unit Update
   AC.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
-  AC.GetEnemies(8); -- Fan of Knives & Death from Above
-  AC.GetEnemies(5); -- Melee
+  AC.GetEnemies(10, true); -- Fan of Knives & Death from Above
+  AC.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
   -- Compute Cache
   RuptureThreshold = (4 + Player:ComboPoints() * 4) * 0.3;
@@ -566,7 +566,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      if Everyone.TargetIsValid() and Target:IsInRange(5) then
+      if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
         if Player:ComboPoints() >= 5 then
           if S.Rupture:IsCastable() and not Target:Debuff(S.Rupture)
             and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
@@ -574,7 +574,7 @@ local function APL ()
           elseif S.Envenom:IsCastable() then
             if AR.Cast(S.Envenom) then return "Cast"; end
           end
-        elseif S.FanofKnives:IsCastable() and (Cache.EnemiesCount[8] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+        elseif S.FanofKnives:IsCastable() and (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
           if AR.Cast(S.FanofKnives) then return "Cast"; end
         elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote)
           and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
@@ -626,13 +626,13 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
       end
       -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
-      if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:IsStealthed(true, true)
+      if S.PoisonedKnife:IsCastable(30) and not Player:IsStealthed(true, true)
         and ((not Target:IsInRange(10) and Player:EnergyTimeToMax() <= Player:GCD()*1.2)
-          or (not Target:IsInRange(5) and Target:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4))) then
+          or (not Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4))) then
         if AR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife"; end
       end
       -- Trick to take in consideration the Recovery Setting
-      if S.Mutilate:IsCastable() and Target:IsInRange(5) then
+      if S.Mutilate:IsCastable("Melee") then
         if AR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
       end
     end

@@ -104,7 +104,7 @@ local tostring = tostring;
 
 -- APL Action Lists (and Variables)
 local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(S.SaberSlash, SSIdentifier); end},
+  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange(S.SaberSlash); end},
   {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
 };
@@ -245,7 +245,7 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange(S.SaberSlash, SSIdentifier) then
+    if Everyone.TargetIsValid() and Target:IsInRange(S.SaberSlash) then
       if Player:ComboPoints() >= 5 then
         if S.RunThrough:IsCastable() then
           if AR.Cast(S.RunThrough) then return "Cast Run Through (Opener)"; end
@@ -282,12 +282,12 @@ local function APL ()
       -- Training Scenario
         if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
           -- Between the Eyes
-          if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and Player:ComboPoints() > 0 then
+          if S.BetweentheEyes:IsCastable(20) and Player:ComboPoints() > 0 then
             if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Training Scenario)"; end
           end
         end
       -- Kick
-      if Settings.General.InterruptEnabled and Target:IsInRange(S.SaberSlash, SSIdentifier) and S.Kick:IsCastable() and Target:IsInterruptible() then
+      if Settings.General.InterruptEnabled and S.Kick:IsCastable(S.SaberSlash) and Target:IsInterruptible() then
         if AR.Cast(S.Kick, Settings.Commons.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
       end
       -- Blade Flurry Expiration Offset
@@ -322,7 +322,7 @@ local function APL ()
             if AR.Cast(S.CannonballBarrage) then return "Cast Cannonball Barrage"; end
           end
         end
-        if Target:IsInRange(S.SaberSlash, SSIdentifier) then
+        if Target:IsInRange(S.SaberSlash) then
           if AR.CDsON() then
             -- actions.cds+=/blood_fury
             if S.BloodFury:IsCastable() then
@@ -369,7 +369,7 @@ local function APL ()
         end
       -- # Conditions are here to avoid worthless check if nothing is available
       -- actions+=/call_action_list,name=stealth,if=stealthed|cooldown.vanish.up|cooldown.shadowmeld.up
-        if Target:IsInRange(S.SaberSlash, SSIdentifier) then
+        if Target:IsInRange(S.SaberSlash) then
           -- actions.stealth=variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up
           local Ambush_Condition = (Player:ComboPointsDeficit() >= 2+2*((S.GhostlyStrike:IsAvailable() and not Target:Debuff(S.GhostlyStrike)) and 1 or 0)
             + (Player:Buff(S.Broadsides) and 1 or 0) and Player:EnergyPredicted() > 60 and not Player:Buff(S.JollyRoger) and not Player:Buff(S.HiddenBlade)) and true or false;
@@ -391,7 +391,7 @@ local function APL ()
           end
         end
       -- actions+=/death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
-      if S.DeathfromAbove:IsCastable() and not SS_Useable_NoReroll() and Player:EnergyTimeToMax() > 2 then
+      if S.DeathfromAbove:IsCastable(15) and not SS_Useable_NoReroll() and Player:EnergyTimeToMax() > 2 then
         if AR.Cast(S.DeathfromAbove) then return "Cast Death from above"; end
       end
       if not SS_Useable() then
@@ -410,44 +410,44 @@ local function APL ()
         end
       end
       -- actions+=/killing_spree,if=energy.time_to_max>5|energy<15
-      if AR.CDsON() and S.KillingSpree:IsCastable() and (Player:EnergyTimeToMax() > 5 or Player:EnergyPredicted() < 15) then
+      if AR.CDsON() and S.KillingSpree:IsCastable(10) and (Player:EnergyTimeToMax() > 5 or Player:EnergyPredicted() < 15) then
         if AR.Cast(S.KillingSpree) then return "Cast Killing Spree"; end
       end
       -- actions+=/call_action_list,name=build
         -- actions.build=ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
-        if S.GhostlyStrike:IsCastable() and Target:IsInRange(S.SaberSlash, SSIdentifier) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshableP(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemainsP() < 3 and Target:DebuffRemainsP(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
+        if S.GhostlyStrike:IsCastable(S.SaberSlash) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and not Player:Debuff(S.CurseoftheDreadblades) and (Target:DebuffRefreshableP(S.GhostlyStrike, 4.5) or (AR.CDsON() and S.CurseoftheDreadblades:IsAvailable() and S.CurseoftheDreadblades:CooldownRemainsP() < 3 and Target:DebuffRemainsP(S.GhostlyStrike) < 14)) and (Player:ComboPoints() >= 3 or (RtB_Reroll() and AC.CombatTime() >= 10)) then
           if AR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
         end
         -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
-        if (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and Target:IsInRange(20) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
+        if (S.PistolShot:IsCastable(20) or S.Blunderbuss:IsCastable(20)) and Player:ComboPointsDeficit() >= 1+(Player:Buff(S.Broadsides) and 1 or 0) and Player:Buff(S.Opportunity) and (Player:EnergyTimeToMax() > 2-(S.QuickDraw:IsAvailable() and 1 or 0) or (S.Blunderbuss:IsCastable() and Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
           if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
         end
         -- actions.build+=/saber_slash,if=variable.ss_useable
-        if Target:IsInRange(S.SaberSlash, SSIdentifier) and S.SaberSlash:IsCastable() and SS_Useable() then
+        if S.SaberSlash:IsCastable(S.SaberSlash) and SS_Useable() then
           if AR.Cast(S.SaberSlash) then return "Cast Saber Slash"; end
         end
       -- actions+=/call_action_list,name=finish,if=!variable.ss_useable
       if not SS_Useable() then
         -- actions.finish=between_the_eyes,if=(mantle_duration>=0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
-        if S.BetweentheEyes:IsCastable() and Target:IsInRange(20) and ((Rogue.MantleDuration() >= 0.2 and not I.ThraxisTricksyTreads:IsEquipped()) or (I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
+        if S.BetweentheEyes:IsCastable(20) and ((Rogue.MantleDuration() >= 0.2 and not I.ThraxisTricksyTreads:IsEquipped()) or (I.GreenskinsWaterloggedWristcuffs:IsEquipped() and not Player:Buff(S.GreenskinsWaterloggedWristcuffs))) then
           if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
         end
         -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
-        if S.RunThrough:IsCastable() and Target:IsInRange(S.RunThrough, RTIdentifier) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemainsP() + 3.5) then
+        if S.RunThrough:IsCastable(S.RunThrough) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemainsP() + 3.5) then
           if AR.Cast(S.RunThrough) then return "Cast Run Through"; end
         end
         -- OutofRange BtE
-        if S.BetweentheEyes:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(20) then
+        if S.BetweentheEyes:IsCastable(20) and not Target:IsInRange(10) then
           if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OoR)"; end
         end
       end
       -- # Gouge is used as a CP Generator while nothing else is available and you have Dirty Tricks talent. It's unlikely that you'll be able to do this optimally in-game since it requires to move in front of the target, but it's here so you can quantifiy its value.
       -- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
-      if S.Gouge:IsCastable() and Target:IsInRange(S.SaberSlash, SSIdentifier) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
+      if S.Gouge:IsCastable(S.SaberSlash) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
         if AR.Cast(S.Gouge) then return "Cast Gouge"; end
       end
       -- OutofRange Pistol Shot
-      if not Target:IsInRange(10) and Target:IsInRange(20) and (S.PistolShot:IsCastable() or S.Blunderbuss:IsCastable()) and not Player:IsStealthed(true, true) and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
+      if not Target:IsInRange(10) and (S.PistolShot:IsCastable(20) or S.Blunderbuss:IsCastable(20)) and not Player:IsStealthed(true, true) and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if S.Blunderbuss:IsCastable() then
           if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
         else
