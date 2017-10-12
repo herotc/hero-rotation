@@ -164,6 +164,16 @@
     return false
   end
   
+  local function NbAffected(SpellAffected)
+    local nbaff=0
+    for Key, Value in pairs(Cache.Enemies[range]) do
+      if Value:Debuff(SpellAffected) then
+        nbaff = nbaff + 1;
+      end
+    end
+    return nbaff;
+  end
+  
   local function FutureShard()
     local Shard=Player:SoulShards()
     if not Player:IsCasting() then
@@ -287,14 +297,13 @@
     
     -- actions.mg+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
     -- actions.mg+=/agony,cycle_targets=1,max_cycle_targets=4,if=remains<=(tick_time+gcd)
-    --todo : add max cycle ?
     if Target:DebuffRemains(S.Agony)<=(Player:GCD()+S.Agony:TickTime()) then
       if AR.Cast(S.Agony) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
-        if S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains()<Player:GCD()*6 and Value:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD and Value:TimeToDie()>S.Agony:TickTime()*3 then
+        if S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains()<Player:GCD()*6 and Value:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD and Value:TimeToDie()>S.Agony:TickTime()*3 and NbAffected(S.Agony)<=5 then
           BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
         end
       end
@@ -366,9 +375,19 @@
     end
     
     -- actions.mg+=/siphon_life,cycle_targets=1,if=remains<=(tick_time+gcd)&target.time_to_die>tick_time*3
-    --todo : aoe
     if S.SiphonLife:IsAvailable() and Target:DebuffRemains(S.SiphonLife)<=(S.SiphonLife:TickTime()+Player:GCD()) and Target:TimeToDie()>S.SiphonLife:TickTime()*3 then
         if AR.Cast(S.SiphonLife) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if S.SiphonLife:IsAvailable() and Value:DebuffRemains(S.SiphonLife)<=(S.SiphonLife:TickTime()+Player:GCD()) and Value:TimeToDie()>S.SiphonLife:TickTime()*3 and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
     end
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(tick_time+gcd)&target.time_to_die>tick_time*3
@@ -404,15 +423,35 @@
     --TODO : trinket & potion
     
     -- actions.mg+=/agony,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.agony)
-    --todo : aoe
     if Target:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Target:TimeToDie() >= Player:BuffRemains(S.Agony) and (ActiveUAs()==0 or Player:PrevGCD(1,S.Agony)) then
       if AR.Cast(S.Agony) then return "Cast"; end
     end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Value:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Value:TimeToDie() >= Player:BuffRemains(S.Agony) and (ActiveUAs()==0 or Player:PrevGCD(1,S.Agony)) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
     
     -- actions.mg+=/siphon_life,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.siphon_life)
-    --todo : aoe
     if S.SiphonLife:IsAvailable() and Target:DebuffRemains(S.SiphonLife)<=Consts.SiphonLifeBaseDuration*0.3 and Target:TimeToDie() >= Player:BuffRemains(S.SiphonLife) and (ActiveUAs()==0 or Player:PrevGCD(1,S.SiphonLife)) then
         if AR.Cast(S.SiphonLife) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if S.SiphonLife:IsAvailable() and Value:DebuffRemains(S.SiphonLife)<=Consts.SiphonLifeBaseDuration*0.3 and Value:TimeToDie() >= Player:BuffRemains(S.SiphonLife) and (ActiveUAs()==0 or Player:PrevGCD(1,S.SiphonLife)) and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
     end
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.corruption)
@@ -489,15 +528,35 @@
     end
     
     -- actions.mg+=/siphon_life,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
-    --todo : aoe
     if S.SiphonLife:IsAvailable() and Player:IsMoving() and Target:DebuffRemains(S.SiphonLife) <= Consts.SiphonLifeBaseDuration - (3 * S.SiphonLife:TickTime()) then
       if AR.Cast(S.SiphonLife) then return "Cast"; end
     end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if S.SiphonLife:IsAvailable() and Player:IsMoving() and Value:DebuffRemains(S.SiphonLife) <= Consts.SiphonLifeBaseDuration - (3 * S.SiphonLife:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
     
     -- actions.mg+=/corruption,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
-    --todo : aoe
     if Player:IsMoving() and Target:DebuffRemains(S.CorruptionDebuff) <= Consts.AgonyBaseDuration - (3 * S.CorruptionDebuff:TickTime()) then
       if AR.Cast(S.Agony) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Player:IsMoving() and Value:DebuffRemains(S.CorruptionDebuff) <= Consts.AgonyBaseDuration - (3 * S.CorruptionDebuff:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
     end
     
     -- actions.mg+=/life_tap,moving=0
