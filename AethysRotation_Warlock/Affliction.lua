@@ -42,8 +42,8 @@
 	SummonDoomGuardSuppremacy = Spell(157757),
 	SummonInfernal 		= Spell(1122),
 	SummonInfernalSuppremacy = Spell(157898),
-	SummonImp 				= Spell(688),
-	GrimoireImp 			= Spell(111859),
+	SummonFelhunter 	= Spell(691),
+	GrimoireFelhunter = Spell(111897),
 	
 	-- Pet abilities
 	CauterizeMaster		= Spell(119905),--imp
@@ -338,8 +338,8 @@
     end
     
     -- actions.mg+=/service_pet,if=dot.corruption.remains&dot.agony.remains
-    if S.GrimoireImp:IsAvailable() and S.GrimoireImp:IsCastable() and FutureShard()>=1 and Target:Debuff(S.Agony) and Target:Debuff(S.Corruption) then
-        if AR.Cast(S.GrimoireImp, Settings.Commons.GCDasOffGCD.GrimoireImp) then return "Cast"; end
+    if S.GrimoireFelhunter:IsAvailable() and S.GrimoireFelhunter:IsCastable() and FutureShard()>=1 and Target:Debuff(S.Agony) and Target:Debuff(S.Corruption) then
+        if AR.Cast(S.GrimoireFelhunter, Settings.Affliction.GCDasOffGCD.GrimoireFelhunter) then return "Cast"; end
       end
     
     -- actions.mg+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
@@ -590,8 +590,8 @@
     -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
     -- actions.precombat+=/potion,name=prolonged_power
     -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-    if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or not Player:Buff(S.DemonicPower)) and Player:SoulShards ()>=1 then
-      if AR.Cast(S.SummonImp, Settings.Commons.GCDasOffGCD.SummonImp) then return "Cast"; end
+    if S.SummonFelhunter:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or not Player:Buff(S.DemonicPower)) and Player:SoulShards ()>=1 then
+      if AR.Cast(S.SummonFelhunter, Settings.Affliction.GCDasOffGCD.SummonFelhunter) then return "Cast"; end
     end
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1

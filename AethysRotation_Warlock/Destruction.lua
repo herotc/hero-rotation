@@ -220,7 +220,7 @@
     --Precombat
     -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
     if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or not Player:Buff(S.DemonicPower)) and FutureShard()>=1 then
-      if AR.Cast(S.SummonImp, Settings.Commons.GCDasOffGCD.SummonImp) then return "Cast"; end
+      if AR.Cast(S.SummonImp, Settings.Destruction.GCDasOffGCD.SummonImp) then return "Cast"; end
     end
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
@@ -357,7 +357,7 @@
       
       -- actions+=/service_pet
       if S.GrimoireImp:IsAvailable() and S.GrimoireImp:IsCastable() and FutureShard()>=1 then
-        if AR.Cast(S.GrimoireImp, Settings.Commons.GCDasOffGCD.GrimoireImp) then return "Cast"; end
+        if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return "Cast"; end
       end
       
       -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
