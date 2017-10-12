@@ -93,6 +93,7 @@ local tostring = tostring;
   local I = Item.Rogue.Outlaw;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
+  local RTIdentifier, SSIdentifier = tostring(S.RunThrough:ID()), tostring(S.SaberSlash:ID());  
   local BFTimer, BFReset = 0, nil; -- Blade Flurry Expiration Offset
 -- GUI Settings
   local Settings = {
