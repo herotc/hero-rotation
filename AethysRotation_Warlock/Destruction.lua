@@ -259,7 +259,7 @@
       if AR.AoEON() and Cache.EnemiesCount[range]==2 and S.RoaringBlaze:IsAvailable() and not S.Havoc:IsCastable() then
         BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = nil, Player:GCD()*2, nil, Consts.ImmolateMaxDuration;
         for _, Value in pairs(Cache.Enemies[range]) do
-          if Value:DebuffRemains(S.ImmolateDebuff)<= S.Havoc:CooldownRemains() and Target:DebuffRemains(S.ImmolateDebuff) < DebuffRemains then
+          if Value:DebuffRemains(S.ImmolateDebuff)<= S.Havoc:CooldownRemainsP() and Target:DebuffRemains(S.ImmolateDebuff) < DebuffRemains then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = Value, Value:TimeToDie(), CastImmolate, Target:DebuffRemains(S.ImmolateDebuff);
           end	
         end
@@ -297,7 +297,7 @@
       end
       
       -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&active_enemies>1&remains<=tick_time&(!talent.roaring_blaze.enabled|(!debuff.roaring_blaze.remains&action.conflagrate.charges<2+set_bonus.tier19_4pc))
-      if AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains()>= S.Immolate:CastTime()*Cache.EnemiesCount[range]) and Cache.EnemiesCount[range]>1 then
+      if AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>= S.Immolate:CastTime()*Cache.EnemiesCount[range]) and Cache.EnemiesCount[range]>1 then
         BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = nil, Player:GCD()*2, nil,Consts.ImmolateMaxDuration;
         for _, Value in pairs(Cache.Enemies[range]) do
           if Value:DebuffRemains(S.ImmolateDebuff)<Player:GCD() and (not S.RoaringBlaze:IsAvailable() or (S.RoaringBlaze:IsAvailable() and (GetImmolateStack(Value)==0 or GetImmolateStack(Value)==nil) and S.Conflagrate:Charges()<2+(T194P and 1 or 0))) and Value:DebuffRemains(S.ImmolateDebuff) < DebuffRemains and not Value:Debuff(S.Havoc) then
@@ -396,7 +396,7 @@
       end
       
       -- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|((!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
-      if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and (Target:TimeToDie()<=32 or not I.LessonsOfSpaceTime:IsEquipped(3) or S.DimensionalRift:Charges()>1 or ((not S.GrimoireOfService:IsAvailable() or S.DimensionalRift:Recharge()<S.GrimoireImp:CooldownRemains()) and (not S.SoulHarvest:IsAvailable() or S.DimensionalRift:Recharge()<S.SoulHarvest:CooldownRemains()))) then
+      if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and (Target:TimeToDie()<=32 or not I.LessonsOfSpaceTime:IsEquipped(3) or S.DimensionalRift:Charges()>1 or ((not S.GrimoireOfService:IsAvailable() or S.DimensionalRift:Recharge()<S.GrimoireImp:CooldownRemainsP()) and (not S.SoulHarvest:IsAvailable() or S.DimensionalRift:Recharge()<S.SoulHarvest:CooldownRemainsP()))) then
         if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return "Cast"; end
       end
       
@@ -411,12 +411,12 @@
       end
       
       -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)&(soul_shard>=5-spell_targets.infernal_awakening*0.5|buff.soul_harvest.remains>cast_time|buff.concordance_of_the_legionfall.remains>cast_time)
-      if S.ChaosBolt:IsCastable() and FutureShard()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:CooldownRemains()>12 or Cache.EnemiesCount[range]==1 or FutureShard()>=5-(Cache.EnemiesCount[range]*0.5)) and (FutureShard()>=5-(Cache.EnemiesCount[range]*0.5) or Player:BuffRemains(S.SoulHarvest)>S.ChaosBolt:CastTime() or Player:BuffRemains(S.Concordance)>S.ChaosBolt:CastTime()) then
+      if S.ChaosBolt:IsCastable() and FutureShard()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:CooldownRemainsP()>12 or Cache.EnemiesCount[range]==1 or FutureShard()>=5-(Cache.EnemiesCount[range]*0.5)) and (FutureShard()>=5-(Cache.EnemiesCount[range]*0.5) or Player:BuffRemains(S.SoulHarvest)>S.ChaosBolt:CastTime() or Player:BuffRemains(S.Concordance)>S.ChaosBolt:CastTime()) then
         if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       
       -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)
-      if S.ChaosBolt:IsCastable() and FutureShard()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:CooldownRemains()>12 or Cache.EnemiesCount[range]==1 or FutureShard()>=5-(Cache.EnemiesCount[range]*0.5)) then
+      if S.ChaosBolt:IsCastable() and FutureShard()>=2 and Cache.EnemiesCount[range]<3 and (S.Havoc:CooldownRemainsP()>12 or Cache.EnemiesCount[range]==1 or FutureShard()>=5-(Cache.EnemiesCount[range]*0.5)) then
         if AR.Cast(S.ChaosBolt) then return "Cast"; end
       end
       
@@ -431,7 +431,7 @@
       end
       
       -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
-      if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
+      if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
         if AR.Cast(CastImmolate) then return "Cast"; end
       end
       
