@@ -495,7 +495,7 @@
     end
     
     -- actions.mg+=/reap_souls,if=buff.deadwind_harvester.remains<dot.unstable_affliction_1.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_2.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_3.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_4.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_5.remains&buff.active_uas.stack>1
-    if CheckDeadwindHarvester() and ActiveUAs()>1 then 
+    if CheckDeadwindHarvester() and ActiveUAs()>1 and Player:Buff(S.DeadwindHarvester) then 
       if AR.Cast(S.ReapSouls) then return "Cast"; end
     end
     
