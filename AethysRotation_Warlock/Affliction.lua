@@ -76,7 +76,6 @@
 	
     -- Artifact
 	ReapSouls         = Spell(216698),
-	
 	WrathOfConsumption= Spell(199472),
 	RendSoul          = Spell(238144),
     -- Defensive	
@@ -492,13 +491,13 @@
     
     -- actions.mg+=/unstable_affliction,if=target=sim.target&(buff.active_uas.stack=0|(!prev_gcd.3.unstable_affliction&prev_gcd.1.unstable_affliction))&dot.agony.remains>cast_time+(6.5*spell_haste)
     --todo : check spell_haste
-    if (ActiveUAs()==0 or (Player:PrevGCD(3,S.UnstableAffliction) and Player:PrevGCD(1,S.UnstableAffliction))) or (Target:DebuffRemains(S.Agony)>S.UnstableAffliction:CastTime()+(6.5*Player:HastePct())) then
+    if FutureShard()>=1 and (ActiveUAs()==0 or (not Player:PrevGCD(3,S.UnstableAffliction) and Player:PrevGCD(1,S.UnstableAffliction))) and (Target:DebuffRemains(S.Agony)>S.UnstableAffliction:CastTime()+(6.5*Player:SpellHaste())) then
       if AR.Cast(S.UnstableAffliction) then return "Cast"; end
     end
     
     -- actions.mg+=/reap_souls,if=buff.deadwind_harvester.remains<dot.unstable_affliction_1.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_2.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_3.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_4.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_5.remains&buff.active_uas.stack>1
-    if CheckDeadwindHarvester() and ActiveUAs()>1 then
-        if AR.Cast(S.RendSoul) then return "Cast"; end
+    if CheckDeadwindHarvester() and ActiveUAs()>1 then 
+      if AR.Cast(S.ReapSouls) then return "Cast"; end
     end
     
     -- actions.mg+=/life_tap,if=mana.pct<=10
