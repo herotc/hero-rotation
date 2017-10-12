@@ -209,8 +209,8 @@
       end
     end
   end
-  
-  local function GetFutureShard()
+
+  local function FutureShard()
     local Shard=Player:SoulShards()
     if not Player:IsCasting() then
       return Shard
@@ -243,15 +243,12 @@
   
   local function UpdateVars()
     -- local var_3min, var_no_de1, var_no_de2
-	-- actions+=/variable,name=3min,value=doomguard_no_de>0|infernal_no_de>0
-	var_3min = (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) or (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0)
-	-- actions+=/variable,name=no_de1,value=dreadstalker_no_de>0|darkglare_no_de>0|doomguard_no_de>0|infernal_no_de>0|service_no_de>0
-  -- print(BuffCount["DarkGlare"][1],BuffCount["DarkGlare"][2],BuffCount["DarkGlare"][3])
-  -- print ((BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0) , (BuffCount["DarkGlare"][3]>0 and BuffCount["DarkGlare"][2]>0) , (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) , (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0) , (IsPetInvoked() and DemonicEmpowermentDuration()==0))
-	var_no_de1 = (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0) or (BuffCount["DarkGlare"][3]>0 and BuffCount["DarkGlare"][2]>0) or (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) or (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0) or (IsPetInvoked() and DemonicEmpowermentDuration()==0)
-	-- print(var_no_de1)
-  -- actions+=/variable,name=no_de2,value=(variable.3min&service_no_de>0)|(variable.3min&wild_imp_no_de>0)|(variable.3min&dreadstalker_no_de>0)|(service_no_de>0&dreadstalker_no_de>0)|(service_no_de>0&wild_imp_no_de>0)|(dreadstalker_no_de>0&wild_imp_no_de>0)|(prev_gcd.1.hand_of_guldan&variable.no_de1)
-	var_no_de2 = (var_3min and (IsPetInvoked() and DemonicEmpowermentDuration()==0)) or (var_3min and (BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0)) or (var_3min and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and (BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0)) or ((BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0) and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or (Player:PrevGCD(1,S.HandOfGuldan) and var_no_de1) 
+    -- actions+=/variable,name=3min,value=doomguard_no_de>0|infernal_no_de>0
+    var_3min = (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) or (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0)
+    -- actions+=/variable,name=no_de1,value=dreadstalker_no_de>0|darkglare_no_de>0|doomguard_no_de>0|infernal_no_de>0|service_no_de>0
+    var_no_de1 = (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0) or (BuffCount["DarkGlare"][3]>0 and BuffCount["DarkGlare"][2]>0) or (BuffCount["Doomguard"][3]>0 and BuffCount["Doomguard"][2]>0) or (BuffCount["Infernal"][3]>0 and BuffCount["Infernal"][2]>0) or (IsPetInvoked() and DemonicEmpowermentDuration()==0)
+    -- actions+=/variable,name=no_de2,value=(variable.3min&service_no_de>0)|(variable.3min&wild_imp_no_de>0)|(variable.3min&dreadstalker_no_de>0)|(service_no_de>0&dreadstalker_no_de>0)|(service_no_de>0&wild_imp_no_de>0)|(dreadstalker_no_de>0&wild_imp_no_de>0)|(prev_gcd.1.hand_of_guldan&variable.no_de1)
+    var_no_de2 = (var_3min and (IsPetInvoked() and DemonicEmpowermentDuration()==0)) or (var_3min and (BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0)) or (var_3min and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or ((IsPetInvoked() and DemonicEmpowermentDuration()==0) and (BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0)) or ((BuffCount["Wild Imp"][3]>0 and BuffCount["Wild Imp"][2]>0) and (BuffCount["Dreadstalker"][3]>0 and BuffCount["Dreadstalker"][2]>0)) or (Player:PrevGCD(1,S.HandOfGuldan) and var_no_de1) 
   end
 
 --- ======= MAIN =======
@@ -263,13 +260,6 @@
     GetAllPetBuffed()
     UpdateVars()
     
-    -- print("All : ".. BuffCount["All"][1].."/"..(BuffCount["All"][3]))
-    -- print(Consts.PetList[55659].." : ".. BuffCount[Consts.PetList[55659]][1].."/"..(BuffCount[Consts.PetList[55659]][3]))
-    -- print(Consts.PetList[98035].." : ".. BuffCount[Consts.PetList[98035]][1].."/"..(BuffCount[Consts.PetList[98035]][3]))
-    -- print(Consts.PetList[11859].." : ".. BuffCount[Consts.PetList[11859]][1].."/"..(BuffCount[Consts.PetList[11859]][3]))
-    -- print(Consts.PetList[89].." : ".. BuffCount[Consts.PetList[89]][1].."/"..(BuffCount[Consts.PetList[89]][3]))
-    -- print(Consts.PetList[103673].." : ".. BuffCount[Consts.PetList[103673]][1].."/"..(BuffCount[Consts.PetList[103673]][3]))
-    -- print(GetPetRemains(Consts.PetList[55659]))
     -- Defensives
     
     --Precombat
@@ -302,11 +292,11 @@
         -- actions.precombat+=/demonbolt,if=equipped.132369
         -- actions.precombat+=/shadow_bolt,if=equipped.132369
         if not (I.WilfredsSigil:IsEquipped(11) or I.WilfredsSigil:IsEquipped(12)) then
-          if S.CallDreadStalkers:IsCastable() and GetFutureShard()>=2 then
+          if S.CallDreadStalkers:IsCastable() and FutureShard()>=2 then
             if AR.Cast(S.CallDreadStalkers) then return "Cast"; end
-          elseif GetFutureShard() < 2 and S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
+          elseif FutureShard() < 2 and S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
             if AR.Cast(S.Demonbolt) then return "Cast"; end
-          elseif GetFutureShard() < 2 then
+          elseif FutureShard() < 2 then
             if AR.Cast(S.ShadowBolt) then return "Cast"; end
           end
         else
@@ -340,19 +330,19 @@
 		
 		-- actions+=/summon_infernal,if=(!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2)&equipped.132369
 		if AR.CDsON() and S.SummonInfernal:IsCastable() and AR.AoEON() and Cache.EnemiesCount[range]>2 and not S.GrimoireOfSupremacy:IsAvailable() and (I.WilfredsSigil:IsEquipped(11) or I.WilfredsSigil:IsEquipped(12)) 
-			and GetFutureShard()>=1 then
+			and FutureShard()>=1 then
 		  if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&equipped.132369
 		if AR.CDsON() and S.SummonDoomGuard:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range]<=2)) 
-			and(I.WilfredsSigil:IsEquipped(11) or I.WilfredsSigil:IsEquipped(12)) and GetFutureShard()>=1 then
+			and(I.WilfredsSigil:IsEquipped(11) or I.WilfredsSigil:IsEquipped(12)) and FutureShard()>=1 then
 		  if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
 		end
 
 		-- actions+=/call_dreadstalkers,if=((!talent.summon_darkglare.enabled|talent.power_trip.enabled)&(spell_targets.implosion<3|!talent.implosion.enabled))&!(soul_shard=5&buff.demonic_calling.remains)
 		if S.CallDreadStalkers:IsCastable() and ((not S.SummonDarkGlare:IsAvailable() or not S.PowerTrip:IsAvailable()) and (Cache.EnemiesCount[range]<3 or not S.Implosion:IsAvailable())) 
-			and not (GetFutureShard()==5 and Player:Buff(S.DemonicCallingBuff)) and GetFutureShard()>=2 then
+			and not (FutureShard()==5 and Player:Buff(S.DemonicCallingBuff)) and FutureShard()>=2 then
 			if AR.Cast(S.CallDreadStalkers) then return "Cast"; end
 		end
 		
@@ -376,18 +366,18 @@
 		end
 		
 		-- actions+=/shadowflame,if=(charges=2&soul_shard<5)&spell_targets.demonwrath<5&!variable.no_de1
-		if S.ShadowFlame:IsAvailable() and S.ShadowFlame:Charges()==2 and GetFutureShard()<5 and Cache.EnemiesCount[range]<5 and not var_no_de1 then
+		if S.ShadowFlame:IsAvailable() and S.ShadowFlame:Charges()==2 and FutureShard()<5 and Cache.EnemiesCount[range]<5 and not var_no_de1 then
 			if AR.Cast(S.ShadowFlame) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
 		if AR.CDsON() and S.SummonDoomGuard:IsCastable() and not S.GrimoireOfSupremacy:IsAvailable() and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range]<=2)) 
-			and (Target:TimeToDie()>180 or Target:HealthPercentage()<=20 or Target:TimeToDie()<30) and GetFutureShard()>=1 then
+			and (Target:TimeToDie()>180 or Target:HealthPercentage()<=20 or Target:TimeToDie()<30) and FutureShard()>=1 then
 				if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-		if AR.CDsON() and S.SummonInfernal:IsCastable() and AR.AoEON() and Cache.EnemiesCount[range]>2 and not S.GrimoireOfSupremacy:IsAvailable() and GetFutureShard()>=1 then
+		if AR.CDsON() and S.SummonInfernal:IsCastable() and AR.AoEON() and Cache.EnemiesCount[range]>2 and not S.GrimoireOfSupremacy:IsAvailable() and FutureShard()>=1 then
 		  if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
 		end
 		
@@ -398,43 +388,43 @@
 		--todo
 		
 		-- actions+=/shadow_bolt,if=buff.shadowy_inspiration.remains&soul_shard<5&!prev_gcd.1.doom&!variable.no_de2
-		if S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspirationBuff) and GetFutureShard()<5 and not Player:PrevGCD(1,S.Doom) and not var_no_de2 then
+		if S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspirationBuff) and FutureShard()<5 and not Player:PrevGCD(1,S.Doom) and not var_no_de2 then
 			if AR.Cast(S.ShadowBolt) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_darkglare,if=prev_gcd.1.hand_of_guldan|prev_gcd.1.call_dreadstalkers|talent.power_trip.enabled
-		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and GetFutureShard()>=1 and (Player:PrevGCD(1,S.HandOfGuldan) or Player:PrevGCD(1,S.CallDreadStalkers) or S.PowerTrip:IsAvailable()) then
+		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and (Player:PrevGCD(1,S.HandOfGuldan) or Player:PrevGCD(1,S.CallDreadStalkers) or S.PowerTrip:IsAvailable()) then
 			if AR.Cast(S.SummonDarkGlare) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_darkglare,if=cooldown.call_dreadstalkers.remains>5&soul_shard<3
-		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and GetFutureShard()>=1 and S.CallDreadStalkers:CooldownRemains()>5 and GetFutureShard()<3 then
+		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and S.CallDreadStalkers:CooldownRemains()>5 and FutureShard()<3 then
 			if AR.Cast(S.SummonDarkGlare) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_darkglare,if=cooldown.call_dreadstalkers.remains<=action.summon_darkglare.cast_time&(soul_shard>=3|soul_shard>=1&buff.demonic_calling.react)
-		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and GetFutureShard()>=1 and S.CallDreadStalkers:CooldownRemains()<S.SummonDarkGlare:CastTime() 
-			and (GetFutureShard()>=3 or (GetFutureShard()>=1) and Player:Buff(S.DemonicCallingBuff)) then
+		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and S.CallDreadStalkers:CooldownRemains()<S.SummonDarkGlare:CastTime() 
+			and (FutureShard()>=3 or (FutureShard()>=1) and Player:Buff(S.DemonicCallingBuff)) then
 				if AR.Cast(S.SummonDarkGlare) then return "Cast"; end
 		end
 		
 		-- actions+=/call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&(cooldown.summon_darkglare.remains>2|prev_gcd.1.summon_darkglare|cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=3|cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=1&buff.demonic_calling.react)
-		if S.CallDreadStalkers:IsCastable() and GetFutureShard()>=2 and S.SummonDarkGlare:IsAvailable() 
+		if S.CallDreadStalkers:IsCastable() and FutureShard()>=2 and S.SummonDarkGlare:IsAvailable() 
 			and (Cache.EnemiesCount[range]<3 or not S.Implosion:IsAvailable() or not AR.AoEON()) 
-			and (S.SummonDarkGlare:CooldownRemains()>2 or Player:PrevGCD(1,S.SummonDarkGlare) or (S.SummonDarkGlare:CooldownRemains()<=S.CallDreadStalkers:CastTime() and GetFutureShard()>=3) or (S.SummonDarkGlare:CooldownRemains()<=S.CallDreadStalkers:CastTime() and GetFutureShard()>=1 and Player:Buff(S.DemonicCallingBuff))) then
+			and (S.SummonDarkGlare:CooldownRemains()>2 or Player:PrevGCD(1,S.SummonDarkGlare) or (S.SummonDarkGlare:CooldownRemains()<=S.CallDreadStalkers:CastTime() and FutureShard()>=3) or (S.SummonDarkGlare:CooldownRemains()<=S.CallDreadStalkers:CastTime() and FutureShard()>=1 and Player:Buff(S.DemonicCallingBuff))) then
 				if AR.Cast(S.CallDreadStalkers) then return "Cast"; end
 		end
 		
 
 		-- actions+=/hand_of_guldan,if=soul_shard>=4&(((!(variable.no_de1|prev_gcd.1.hand_of_guldan)&(pet_count>=13&!talent.shadowy_inspiration.enabled|pet_count>=6&talent.shadowy_inspiration.enabled))|!variable.no_de2|soul_shard=5)&talent.power_trip.enabled)
-		if S.HandOfGuldan:IsCastable() and GetFutureShard()>=4 
-			and (((not (var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) and ((AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets>12 and not S.ShadowyInspiration:IsAvailable()) or (AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets>5 and S.ShadowyInspiration:IsAvailable()))) or not var_no_de2 or GetFutureShard()==5 ) and S.PowerTrip:IsAvailable()) then
+		if S.HandOfGuldan:IsCastable() and FutureShard()>=4 
+			and (((not (var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) and ((AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets>12 and not S.ShadowyInspiration:IsAvailable()) or (AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets>5 and S.ShadowyInspiration:IsAvailable()))) or not var_no_de2 or FutureShard()==5 ) and S.PowerTrip:IsAvailable()) then
 				if AR.Cast(S.HandOfGuldan) then return "Cast"; end
 		end
 		
 		-- actions+=/hand_of_guldan,if=(soul_shard>=3&prev_gcd.1.call_dreadstalkers&!artifact.thalkiels_ascendance.rank)|soul_shard>=5|(soul_shard>=4&cooldown.summon_darkglare.remains>2)
     if S.HandOfGuldan:IsCastable() and 
-			((GetFutureShard()>=3 and Player:PrevGCD(1,S.CallDreadStalkers) and not (S.ThalkielsAscendance:ArtifactRank() or 0)==0) or GetFutureShard()==5 or (GetFutureShard()>=4 and S.SummonDarkGlare:CooldownRemains()>2) ) then
+			((FutureShard()>=3 and Player:PrevGCD(1,S.CallDreadStalkers) and not (S.ThalkielsAscendance:ArtifactRank() or 0)==0) or FutureShard()==5 or (FutureShard()>=4 and S.SummonDarkGlare:CooldownRemains()>2) ) then
 			if AR.Cast(S.HandOfGuldan) then return "Cast"; end
 		end
 		
@@ -465,7 +455,7 @@
 		end
 		
 		-- actions+=/life_tap,if=mana.pct<=15|(mana.pct<=65&((cooldown.call_dreadstalkers.remains<=0.75&soul_shard>=2)|((cooldown.call_dreadstalkers.remains<gcd*2)&(cooldown.summon_doomguard.remains<=0.75|cooldown.service_pet.remains<=0.75)&soul_shard>=3)))
-		if Player:ManaPercentage()<=15 or (Player:ManaPercentage()<=65 and ( (S.CallDreadStalkers:CooldownRemains()<=0.75 and GetFutureShard()>=2) or (S.CallDreadStalkers:CooldownRemains()<=(Player:GCD()*2) and (S.SummonDoomGuard:CooldownRemains()<=0.75 or S.GrimoireFelguard:CooldownRemains()<=0.75) and GetFutureShard()>=3)))then
+		if Player:ManaPercentage()<=15 or (Player:ManaPercentage()<=65 and ( (S.CallDreadStalkers:CooldownRemains()<=0.75 and FutureShard()>=2) or (S.CallDreadStalkers:CooldownRemains()<=(Player:GCD()*2) and (S.SummonDoomGuard:CooldownRemains()<=0.75 or S.GrimoireFelguard:CooldownRemains()<=0.75) and FutureShard()>=3)))then
 			if AR.Cast(S.LifeTap) then return "Cast"; end
 		end
 		
