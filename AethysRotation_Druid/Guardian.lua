@@ -117,7 +117,18 @@
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(8); -- Thrash & Swipe (TODO: Balance Affinity, see Outlaw)
+    local MeleeRange, AoERadius, RangedRange;
+    if S.BalanceAffinity:IsAvailable() then
+      -- Have to use the spell itself since Balance Affinity is a special range increase
+      MeleeRange = S.Mangle;
+      AoERadius = I.LuffaWrappings:IsEquipped() and 16.25 or 13;
+      RangedRange = 45;
+    else
+      MeleeRange = "Melee";
+      AoERadius = I.LuffaWrappings:IsEquipped() and 10 or 8;
+      RangedRange = 40;
+    end
+    AC.GetEnemies(AoERadius, true); -- Thrash & Swipe
     Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
     -- Out of Combat
@@ -130,23 +141,23 @@
       if Everyone.TargetIsValid() then
         if Player:Buff(S.CatForm) then
           -- Shred
-          if S.Shred:IsCastable(5) then
+          if S.Shred:IsCastable(MeleeRange) then
               if AR.Cast(S.Shred) then return "Cast"; end
           end
           return;
         end
         if Player:Buff(S.BearForm) then
-          if S.Mangle:IsCastable(5) then
+          if S.Mangle:IsCastable(MeleeRange) then
             if AR.Cast(S.Mangle) then return ""; end
           end
-          if S.ThrashBear:IsCastable(8) then
+          if S.ThrashBear:IsCastable(AoERadius, true) then
             if AR.Cast(S.ThrashBear) then return ""; end
           end
-          if S.SwipeBear:IsCastable(8) then
+          if S.SwipeBear:IsCastable(AoERadius, true) then
             if AR.Cast(S.SwipeBear) then return ""; end
           end
         end
-        if S.Moonfire:IsCastable(40) then
+        if S.Moonfire:IsCastable(RangedRange) then
           if AR.Cast(S.Moonfire) then return ""; end
         end
       end
@@ -154,45 +165,32 @@
     end
     -- In Combat
     if Everyone.TargetIsValid() then
-      local MeleeRange, AoERadius, RangedRange;
-      if S.BalanceAffinity:IsAvailable() then
-        -- Have to use the spell itself since Balance Affinity is a special range increase
-        MeleeRange = S.Mangle;
-        -- Tooltip Range: 16.25 - 13
-        -- RealRange: 14.75 - 11.5
-        AoERadius = I.LuffaWrappings:IsEquipped() and 15 or 10;
-      else
-        MeleeRange = "Melee";
-        -- Tooltip Range: 10 - 8
-        -- RealRange: 8.5 - 6.5
-        AoERadius = I.LuffaWrappings:IsEquipped() and 8 or 6;
-      end
       if Player:Buff(S.CatForm) then
         -- Thrash
         -- Note: Due to an in-game bug, you cannot apply a new thrash if there is the bear one.
-        if S.ThrashCat:IsCastable() and Cache.EnemiesCount[8] >= 1 and Target:DebuffRefreshable(S.ThrashCat, 4.5) and not Target:Debuff(S.ThrashBearDebuff) then
+        if S.ThrashCat:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 and Target:DebuffRefreshable(S.ThrashCat, 4.5) and not Target:Debuff(S.ThrashBearDebuff) then
           if AR.Cast(S.ThrashCat) then return "Cast"; end
         end
         -- Rip
-        if S.Rip:IsCastable(5) and Player:ComboPoints() >= 5 and Target:DebuffRefreshable(S.Rip, 7.2) then
+        if S.Rip:IsCastable(MeleeRange) and Player:ComboPoints() >= 5 and Target:DebuffRefreshable(S.Rip, 7.2) then
           if AR.Cast(S.Rip) then return "Cast"; end
         end
         -- Rake
-        if S.Rake:IsCastable(5) and Target:DebuffRefreshable(S.RakeDebuff, 4.5) then
+        if S.Rake:IsCastable(MeleeRange) and Target:DebuffRefreshable(S.RakeDebuff, 4.5) then
           if AR.Cast(S.Rake) then return "Cast"; end
         end
         -- Swipe
-        if S.SwipeCat:IsCastable() and Cache.EnemiesCount[8] >= 2 then
+        if S.SwipeCat:IsCastable() and Cache.EnemiesCount[AoERadius] >= 2 then
           if AR.Cast(S.SwipeCat) then return "Cast"; end
         end
         -- Shred
-        if S.Shred:IsCastable(5) then
+        if S.Shred:IsCastable(MeleeRange) then
             if AR.Cast(S.Shred) then return "Cast"; end
         end
         return;
       end
       if Player:Buff(S.BearForm) then
-        local UseMaul = not AR.CDsON() and Cache.EnemiesCount[8] < 5;
+        local UseMaul = not AR.CDsON() and Cache.EnemiesCount[AoERadius] < 5;
         -- # Executed every time the actor is available.
         -- actions=auto_attack
         -- actions+=/blood_fury
@@ -210,10 +208,10 @@
         if not UseMaul and S.Ironfur:IsCastable() and Player:Rage() >= S.Ironfur:Cost() + 1 and (not Player:Buff(S.Ironfur) or Player:Buff(S.GoryFur) or Player:Rage() >= 80) then
           if AR.Cast(S.Ironfur, {true, false}) then return ""; end
         end
-        if S.Moonfire:IsCastable(40) and Player:Buff(S.Incarnation) and Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8) then
+        if S.Moonfire:IsCastable(RangedRange) and Player:Buff(S.Incarnation) and Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8) then
           if AR.Cast(S.Moonfire) then return ""; end
         end
-        if UseMaul and S.Maul:IsCastable(5) and Player:Rage() >= 85 then
+        if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 85 then
           if AR.Cast(S.Maul) then return ""; end
         end
 
@@ -224,7 +222,7 @@
           tableinsert(UnitGroupRolesAssigned(ThisUnit.UnitID) == "TANK" and Tanks or Others, ThisUnit);
         end
         local UnitsNotTankedCount = 0;
-        for _, ThisUnit in pairs(Cache.Enemies[8]) do
+        for _, ThisUnit in pairs(Cache.Enemies[AoERadius]) do
           for _, ThisPlayer in pairs(Others) do
             if ThisPlayer:IsTanking(ThisUnit) then
               UnitsNotTankedCount = UnitsNotTankedCount + 1;
@@ -241,32 +239,32 @@
         end
 
 
-        if S.ThrashBear:IsCastable(8) and Cache.EnemiesCount[8] >= 2 then
+        if S.ThrashBear:IsCastable(AoERadius, true) and Cache.EnemiesCount[AoERadius] >= 2 then
           if AR.Cast(S.ThrashBear) then return ""; end
         end
-        if S.Mangle:IsCastable(5) then
+        if S.Mangle:IsCastable(MeleeRange) then
           if AR.Cast(S.Mangle) then return ""; end
         end
-        if S.ThrashBear:IsCastable(8) then
+        if S.ThrashBear:IsCastable(AoERadius, true) then
           if AR.Cast(S.ThrashBear) then return ""; end
         end
         -- actions+=/pulverize,if=buff.pulverize.up=0|buff.pulverize.remains<=6
-        if S.Pulverize:IsCastable(5) and Target:DebuffStack(S.ThrashBearDebuff) >= 2 and Player:BuffRefreshableP(S.PulverizeBuff, 6) then
+        if S.Pulverize:IsCastable(MeleeRange) and Target:DebuffStack(S.ThrashBearDebuff) >= 2 and Player:BuffRefreshableP(S.PulverizeBuff, 6) then
           if AR.Cast(S.Pulverize) then return ""; end
         end
-        if S.Moonfire:IsCastable(40) and (Player:Buff(S.GalacticGuardianBuff) or Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8)) then
+        if S.Moonfire:IsCastable(RangedRange) and (Player:Buff(S.GalacticGuardianBuff) or Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8)) then
           if AR.Cast(S.Moonfire) then return ""; end
         end
-        if S.ThrashBear:IsCastable() and Cache.EnemiesCount[8] >= 1 then
+        if S.ThrashBear:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 then
           if AR.Cast(S.ThrashBear) then return ""; end
         end
-        if UseMaul and S.Maul:IsCastable(5) and Player:Rage() >= 70 then
+        if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 70 then
           if AR.Cast(S.Maul) then return ""; end
         end
-        if S.SwipeBear:IsCastable() and Cache.EnemiesCount[8] >= 1 then
+        if S.SwipeBear:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 then
           if AR.Cast(S.SwipeBear) then return ""; end
         end
-        if S.Moonfire:IsCastable(40) then
+        if S.Moonfire:IsCastable(RangedRange) then
           if AR.Cast(S.Moonfire) then return ""; end
         end
         return;
