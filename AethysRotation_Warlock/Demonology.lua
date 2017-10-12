@@ -398,12 +398,12 @@
 		end
 		
 		-- actions+=/summon_darkglare,if=cooldown.call_dreadstalkers.remains>5&soul_shard<3
-		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and S.CallDreadStalkers:CooldownRemains()>5 and FutureShard()<3 then
+		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and S.CallDreadStalkers:CooldownRemainsP()>5 and FutureShard()<3 then
 			if AR.Cast(S.SummonDarkGlare) then return "Cast"; end
 		end
 		
 		-- actions+=/summon_darkglare,if=cooldown.call_dreadstalkers.remains<=action.summon_darkglare.cast_time&(soul_shard>=3|soul_shard>=1&buff.demonic_calling.react)
-		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and S.CallDreadStalkers:CooldownRemains()<S.SummonDarkGlare:CastTime() 
+		if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:IsCastable() and FutureShard()>=1 and S.CallDreadStalkers:CooldownRemainsP()<S.SummonDarkGlare:CastTime() 
 			and (FutureShard()>=3 or (FutureShard()>=1) and Player:Buff(S.DemonicCallingBuff)) then
 				if AR.Cast(S.SummonDarkGlare) then return "Cast"; end
 		end
@@ -411,7 +411,7 @@
 		-- actions+=/call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&(cooldown.summon_darkglare.remains>2|prev_gcd.1.summon_darkglare|cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=3|cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=1&buff.demonic_calling.react)
 		if S.CallDreadStalkers:IsCastable() and FutureShard()>=2 and S.SummonDarkGlare:IsAvailable() 
 			and (Cache.EnemiesCount[range]<3 or not S.Implosion:IsAvailable() or not AR.AoEON()) 
-			and (S.SummonDarkGlare:CooldownRemains()>2 or Player:PrevGCD(1,S.SummonDarkGlare) or (S.SummonDarkGlare:CooldownRemains()<=S.CallDreadStalkers:CastTime() and FutureShard()>=3) or (S.SummonDarkGlare:CooldownRemains()<=S.CallDreadStalkers:CastTime() and FutureShard()>=1 and Player:Buff(S.DemonicCallingBuff))) then
+			and (S.SummonDarkGlare:CooldownRemainsP()>2 or Player:PrevGCD(1,S.SummonDarkGlare) or (S.SummonDarkGlare:CooldownRemainsP()<=S.CallDreadStalkers:CastTime() and FutureShard()>=3) or (S.SummonDarkGlare:CooldownRemainsP()<=S.CallDreadStalkers:CastTime() and FutureShard()>=1 and Player:Buff(S.DemonicCallingBuff))) then
 				if AR.Cast(S.CallDreadStalkers) then return "Cast"; end
 		end
 		
@@ -424,7 +424,7 @@
 		
 		-- actions+=/hand_of_guldan,if=(soul_shard>=3&prev_gcd.1.call_dreadstalkers&!artifact.thalkiels_ascendance.rank)|soul_shard>=5|(soul_shard>=4&cooldown.summon_darkglare.remains>2)
     if S.HandOfGuldan:IsCastable() and 
-			((FutureShard()>=3 and Player:PrevGCD(1,S.CallDreadStalkers) and not (S.ThalkielsAscendance:ArtifactRank() or 0)==0) or FutureShard()==5 or (FutureShard()>=4 and S.SummonDarkGlare:CooldownRemains()>2) ) then
+			((FutureShard()>=3 and Player:PrevGCD(1,S.CallDreadStalkers) and not (S.ThalkielsAscendance:ArtifactRank() or 0)==0) or FutureShard()==5 or (FutureShard()>=4 and S.SummonDarkGlare:CooldownRemainsP()>2) ) then
 			if AR.Cast(S.HandOfGuldan) then return "Cast"; end
 		end
 		
@@ -455,7 +455,7 @@
 		end
 		
 		-- actions+=/life_tap,if=mana.pct<=15|(mana.pct<=65&((cooldown.call_dreadstalkers.remains<=0.75&soul_shard>=2)|((cooldown.call_dreadstalkers.remains<gcd*2)&(cooldown.summon_doomguard.remains<=0.75|cooldown.service_pet.remains<=0.75)&soul_shard>=3)))
-		if Player:ManaPercentage()<=15 or (Player:ManaPercentage()<=65 and ( (S.CallDreadStalkers:CooldownRemains()<=0.75 and FutureShard()>=2) or (S.CallDreadStalkers:CooldownRemains()<=(Player:GCD()*2) and (S.SummonDoomGuard:CooldownRemains()<=0.75 or S.GrimoireFelguard:CooldownRemains()<=0.75) and FutureShard()>=3)))then
+		if Player:ManaPercentage()<=15 or (Player:ManaPercentage()<=65 and ( (S.CallDreadStalkers:CooldownRemainsP()<=0.75 and FutureShard()>=2) or (S.CallDreadStalkers:CooldownRemainsP()<=(Player:GCD()*2) and (S.SummonDoomGuard:CooldownRemainsP()<=0.75 or S.GrimoireFelguard:CooldownRemainsP()<=0.75) and FutureShard()>=3)))then
 			if AR.Cast(S.LifeTap) then return "Cast"; end
 		end
 		
