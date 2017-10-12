@@ -490,7 +490,6 @@
     end
     
     -- actions.mg+=/unstable_affliction,if=target=sim.target&(buff.active_uas.stack=0|(!prev_gcd.3.unstable_affliction&prev_gcd.1.unstable_affliction))&dot.agony.remains>cast_time+(6.5*spell_haste)
-    --todo : check spell_haste
     if FutureShard()>=1 and (ActiveUAs()==0 or (not Player:PrevGCD(3,S.UnstableAffliction) and Player:PrevGCD(1,S.UnstableAffliction))) and (Target:DebuffRemains(S.Agony)>S.UnstableAffliction:CastTime()+(6.5*Player:SpellHaste())) then
       if AR.Cast(S.UnstableAffliction) then return "Cast"; end
     end
@@ -521,9 +520,19 @@
     end
     
     -- actions.mg+=/agony,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
-    --todo : aoe
     if Player:IsMoving() and Target:DebuffRemains(S.Agony) <= Consts.AgonyBaseDuration - (3 * S.Agony:TickTime()) then
       if AR.Cast(S.Agony) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Player:IsMoving() and Value:DebuffRemains(S.Agony) <= Consts.AgonyBaseDuration - (3 * S.Agony:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
     end
     
     -- actions.mg+=/siphon_life,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
