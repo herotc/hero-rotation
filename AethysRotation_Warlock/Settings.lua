@@ -89,7 +89,7 @@
   -- Child Panels
   local ARPanel = AR.GUI.Panel;
   local CP_Warlock = CreateChildPanel(ARPanel, "Warlock");
-  -- local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction");
+  local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction");
   local CP_Demonology = CreateChildPanel(CP_Warlock, "Demonology");
   local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction");
   
@@ -110,3 +110,5 @@
   CreateARPanelOption("GCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.GCDasOffGCD.GrimoireOfSacrifice", "Grimoire Of Sacrifice");
   CreateARPanelOption("GCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.GCDasOffGCD.DimensionalRift", "Dimensional Rift");
   CreateARPanelOption("OffGCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
+
+  CreateARPanelOption("OffGCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
