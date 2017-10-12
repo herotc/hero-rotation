@@ -120,7 +120,7 @@
       if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
     end
     -- actions.cooldowns+=/variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
-    if TrueshotCooldown == 0 and AC.CombatTime() > 15 and not S.TrueShot:CooldownDown() then
+    if TrueshotCooldown == 0 and AC.CombatTime() > 15 and S.TrueShot:CooldownUp() then
       TrueshotCooldown = AC.CombatTime() * 1.1;
     end
     -- actions.cooldowns+=/trueshot,if=variable.trueshot_cooldown=0|buff.bloodlust.up|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16

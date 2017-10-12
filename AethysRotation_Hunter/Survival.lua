@@ -123,7 +123,7 @@
         if AR.Cast(S.Butchery) then return ""; end
       end
       -- actions.aoe+=/caltrops,if=!dot.caltrops.ticking
-      if S.Caltrops:IsCastable() and not S.CaltropsTalent:CooldownDown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
+      if S.Caltrops:IsCastable() and S.CaltropsTalent:CooldownUp() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
       end
       -- actions.aoe+=/explosive_trap
@@ -162,7 +162,7 @@
       if AR.Cast(S.RaptorStrike) then return ""; end
     end
     -- actions.biteFill+=/steel_trap
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:CooldownDown() and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and S.SteelTrapTalent:CooldownUp() and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.biteFill+=/a_murder_of_crows
@@ -178,7 +178,7 @@
       if AR.Cast(S.ExplosiveTrap) then return ""; end
     end
     -- actions.biteFill+=/caltrops,if=!dot.caltrops.ticking
-    if S.Caltrops:IsCastable() and not S.CaltropsTalent:CooldownDown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and S.CaltropsTalent:CooldownUp() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
     end
   end
@@ -256,7 +256,7 @@
       if AR.Cast(S.RaptorStrike) then return ""; end
     end
     -- actions.preBitePhase+=/steel_trap
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:CooldownDown() and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and S.SteelTrapTalent:CooldownUp() and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.preBitePhase+=/a_murder_of_crows
@@ -272,7 +272,7 @@
       if AR.Cast(S.ExplosiveTrap) then return ""; end
     end
     -- actions.preBitePhase+=/caltrops,if=!dot.caltrops.ticking
-    if S.Caltrops:IsCastable() and not S.CaltropsTalent:CooldownDown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and S.CaltropsTalent:CooldownUp() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.preBitePhase+=/butchery,if=equipped.frizzos_fingertrap&dot.lacerate.remains<3.6

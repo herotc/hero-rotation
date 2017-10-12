@@ -347,7 +347,7 @@ local function APL()
     if AR.Cast(S.SummonPet) then return ""; end
     end
   --army suggestion at pull
-    if Everyone.TargetIsValid() and Target:IsInRange(30) and not S.ArmyOfDead:CooldownDown() then
+    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() then
           if AR.Cast(S.ArmyOfDead) then return ""; end
     end
   -- outbreak if virulent_plague is not  the target and we are not in combat
