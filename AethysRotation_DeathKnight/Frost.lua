@@ -440,6 +440,7 @@
 --- ======= MAIN =======
 local function APL ()
     -- Unit Update
+    AC.GetEnemies("Melee");
     AC.GetEnemies(8);
     AC.GetEnemies(10);
     Everyone.AoEToggleEnemiesUpdate();
@@ -454,7 +455,7 @@ local function APL ()
       -- PrePot w/ Bossmod Countdown
       -- Volley toggle
       -- Opener
-  if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.FrostFever) then 
+  if	Everyone.TargetIsValid() and (Target:IsInRange(30) and not Target:Debuff(S.FrostFever)) or not Target:IsInRange("Melee") then 
       if AR.Cast(S.HowlingBlast) then return ""; end
       end
     return;
