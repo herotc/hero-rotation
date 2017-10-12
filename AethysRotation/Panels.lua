@@ -4,9 +4,10 @@
   local addonName, AR = ...;
   -- AethysCore
   local AC = AethysCore;
+  local Utils = AC.Utils;
   -- File Locals
   local CreatePanelOption = AC.GUI.CreatePanelOption;
-  local StringToNumberIfPossible = AC.StringToNumberIfPossible;
+  local StringToNumberIfPossible = Utils.StringToNumberIfPossible;
 
 
 --- ============================ CONTENT ============================
