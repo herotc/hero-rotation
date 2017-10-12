@@ -151,7 +151,7 @@ local function APL ()
 
     -- Omit gcd.remains on this offGCD because we can't react quickly enough otherwise (the intention is to cast this before the next GCD ability, but is a OffGCD abiltiy).
     -- actions+=/avatar,if=gcd.remains<0.25&(buff.battle_cry.up|cooldown.battle_cry.remains<15)|target.time_to_die<=20
-    if S.Avatar:IsReady() and AR.CDsON() and ((Player:Buff(S.BattleCryBuff) or S.BattleCry:Cooldown() < 15) or Target:TimeToDie() <= 20) then
+    if S.Avatar:IsReady() and AR.CDsON() and ((Player:Buff(S.BattleCryBuff) or S.BattleCry:CooldownRemains() < 15) or Target:TimeToDie() <= 20) then
       if AR.Cast(S.Avatar, Settings.Arms.OffGCDasOffGCD.Avatar) then return "Cast Avatar" end
     end
 
@@ -309,7 +309,7 @@ local function APL ()
       end
 
       -- actions.execute+=/warbreaker,if=(raid_event.adds.in>90|!raid_event.adds.exists)&cooldown.mortal_strike.remains<=gcd.remains&buff.shattered_defenses.down&buff.executioners_precision.stack=2
-      if S.Warbreaker:IsReady() and (S.MortalStrike:Cooldown() <= Player:GCDRemains() and not Player:Buff(S.ShatteredDefensesBuff) and Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
+      if S.Warbreaker:IsReady() and (S.MortalStrike:CooldownRemains() <= Player:GCDRemains() and not Player:Buff(S.ShatteredDefensesBuff) and Target:DebuffStack(S.ExecutionersPrecisionDebuff) == 2) then
         if Settings.Arms.WarbreakerEnabled then
           if AR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "Cast Warbreaker" end
         end
@@ -326,7 +326,7 @@ local function APL ()
       end
 
       -- actions.execute+=/ravager,if=cooldown.battle_cry.remains<=gcd&debuff.colossus_smash.remains>6
-      if S.Ravager:IsReady() and (S.BattleCry:Cooldown() <= Player:GCD() and Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
+      if S.Ravager:IsReady() and (S.BattleCry:CooldownRemains() <= Player:GCD() and Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
         if AR.Cast(S.Ravager) then return "Cast Ravager" end
       end
 
@@ -381,7 +381,7 @@ local function APL ()
       end
 
       -- actions.single+=/ravager,if=cooldown.battle_cry.remains<=gcd&debuff.colossus_smash.remains>6
-      if S.Ravager:IsReady() and (S.BattleCry:Cooldown() <= Player:GCD() and Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
+      if S.Ravager:IsReady() and (S.BattleCry:CooldownRemains() <= Player:GCD() and Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
         if AR.Cast(S.Ravager) then return "Cast Ravager" end
       end
 

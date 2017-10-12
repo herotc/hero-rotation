@@ -107,7 +107,7 @@
         if AR.Cast(S.SnakeHunter, Settings.Survival.OffGCDasOffGCD.SnakeHunter) then return ""; end
       end
       -- actions.CDs+=/aspect_of_the_eagle,if=(buff.mongoose_fury.remains<=11&buff.mongoose_fury.up)&(cooldown.fury_of_the_eagle.remains>buff.mongoose_fury.remains)
-      if S.AspectoftheEagle:IsCastable() and (Player:BuffRemains(S.MongooseFury) <= 11 and Player:Buff(S.MongooseFury)) and (S.FuryoftheEagle:Cooldown() > Player:BuffRemains(S.MongooseFury)) then
+      if S.AspectoftheEagle:IsCastable() and (Player:BuffRemains(S.MongooseFury) <= 11 and Player:Buff(S.MongooseFury)) and (S.FuryoftheEagle:CooldownRemains() > Player:BuffRemains(S.MongooseFury)) then
         if AR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return ""; end
       end 
       -- actions.CDs+=/aspect_of_the_eagle,if=(buff.mongoose_fury.remains<=7&buff.mongoose_fury.up)
@@ -123,7 +123,7 @@
         if AR.Cast(S.Butchery) then return ""; end
       end
       -- actions.aoe+=/caltrops,if=!dot.caltrops.ticking
-      if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
+      if S.Caltrops:IsCastable() and not S.CaltropsTalent:CooldownDown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
       end
       -- actions.aoe+=/explosive_trap
@@ -162,7 +162,7 @@
       if AR.Cast(S.RaptorStrike) then return ""; end
     end
     -- actions.biteFill+=/steel_trap
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:CooldownDown() and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.biteFill+=/a_murder_of_crows
@@ -178,7 +178,7 @@
       if AR.Cast(S.ExplosiveTrap) then return ""; end
     end
     -- actions.biteFill+=/caltrops,if=!dot.caltrops.ticking
-    if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and not S.CaltropsTalent:CooldownDown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
     end
   end
@@ -189,7 +189,7 @@
       if AR.Cast(S.FuryoftheEagle) then return ""; end
     end
     -- actions.bitePhase+=/mongoose_bite,if=charges>=2&cooldown.mongoose_bite.remains<gcd*2
-    if S.MongooseBite:IsCastable() and S.MongooseBite:Charges() >= 2 and S.MongooseBite:Cooldown() < Player:GCD() * 2 then
+    if S.MongooseBite:IsCastable() and S.MongooseBite:Charges() >= 2 and S.MongooseBite:CooldownRemains() < Player:GCD() * 2 then
       if AR.Cast(S.MongooseBite) then return ""; end
     end
     -- actions.bitePhase+=/flanking_strike,if=((buff.mongoose_fury.remains>(gcd*(cooldown.mongoose_bite.charges+2)))&cooldown.mongoose_bite.charges<=1)&!buff.aspect_of_the_eagle.up
@@ -256,7 +256,7 @@
       if AR.Cast(S.RaptorStrike) then return ""; end
     end
     -- actions.preBitePhase+=/steel_trap
-    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:IsOnCooldown() and not S.CaltropsTalent:IsAvailable() then
+    if S.SteelTrap:IsCastable() and not S.SteelTrapTalent:CooldownDown() and not S.CaltropsTalent:IsAvailable() then
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.preBitePhase+=/a_murder_of_crows
@@ -272,7 +272,7 @@
       if AR.Cast(S.ExplosiveTrap) then return ""; end
     end
     -- actions.preBitePhase+=/caltrops,if=!dot.caltrops.ticking
-    if S.Caltrops:IsCastable() and not S.CaltropsTalent:IsOnCooldown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
+    if S.Caltrops:IsCastable() and not S.CaltropsTalent:CooldownDown() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
     end
     -- actions.preBitePhase+=/butchery,if=equipped.frizzos_fingertrap&dot.lacerate.remains<3.6

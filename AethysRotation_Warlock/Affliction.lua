@@ -294,7 +294,7 @@
     if AR.AoEON() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
-        if S.SoulHarvest:IsAvailable() and S.SoulHarvest:Cooldown()<Player:GCD()*6 and Value:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD and Value:TimeToDie()>S.Agony:TickTime()*3 then
+        if S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains()<Player:GCD()*6 and Value:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD and Value:TimeToDie()>S.Agony:TickTime()*3 then
           BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
         end
       end

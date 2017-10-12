@@ -99,7 +99,7 @@
 --- APL Action Lists (and Variables)
   -- actions+=/variable,name=pooling_for_piercing,value=talent.piercing_shot.enabled&cooldown.piercing_shot.remains<5&lowest_vuln_within.5>0&lowest_vuln_within.5>cooldown.piercing_shot.remains&(buff.trueshot.down|spell_targets=1)
   local function PoolingforPiercing ()
-    return S.PiercingShot:IsAvailable() and S.PiercingShot:Cooldown() < 5 and Target:DebuffRemains(S.Vulnerability) > 0 and Target:DebuffRemains(S.Vulnerability) > S.PiercingShot:Cooldown() and (not Player:Buff(S.TrueShot) or Cache.EnemiesCount[40] == 1);
+    return S.PiercingShot:IsAvailable() and S.PiercingShot:CooldownRemains() < 5 and Target:DebuffRemains(S.Vulnerability) > 0 and Target:DebuffRemains(S.Vulnerability) > S.PiercingShot:CooldownRemains() and (not Player:Buff(S.TrueShot) or Cache.EnemiesCount[40] == 1);
   end
   -- # Cooldowns
   local function CDs ()
@@ -120,7 +120,7 @@
       if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
     end
     -- actions.cooldowns+=/variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
-    if TrueshotCooldown == 0 and AC.CombatTime() > 15 and not S.TrueShot:IsOnCooldown() then
+    if TrueshotCooldown == 0 and AC.CombatTime() > 15 and not S.TrueShot:CooldownDown() then
       TrueshotCooldown = AC.CombatTime() * 1.1;
     end
     -- actions.cooldowns+=/trueshot,if=variable.trueshot_cooldown=0|buff.bloodlust.up|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16

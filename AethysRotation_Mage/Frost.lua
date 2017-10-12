@@ -211,7 +211,7 @@ end
   local function Cooldowns ()
     if AR.CDsON() then
       -- actions.cooldowns=rune_of_power,if=(cooldown.icy_veins.remains<cast_time|(charges_fractional>1.9&cooldown.icy_veins.remains>10)|buff.icy_veins.up|target.time_to_die.remains+5<charges_fractional*10)
-      if S.RuneofPower:IsCastable() and (S.IcyVeins:Cooldown() < S.RuneofPower:CastTime() or (S.RuneofPower:ChargesFractional() > 1.9 and S.IcyVeins:Cooldown() > 10) or Player:Buff(S.IcyVeins) or Target:TimeToDie() + 5 < S.RuneofPower:ChargesFractional() * 10) then
+      if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() < S.RuneofPower:CastTime() or (S.RuneofPower:ChargesFractional() > 1.9 and S.IcyVeins:CooldownRemains() > 10) or Player:Buff(S.IcyVeins) or Target:TimeToDie() + 5 < S.RuneofPower:ChargesFractional() * 10) then
         if AR.Cast(S.RuneofPower) then return ""; end
       end
       -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
@@ -265,7 +265,7 @@ end
 		end
 	end
     -- actions.single+=/ray_of_frost,if=buff.icy_veins.up|(cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down)
-    if S.RayofFrost:IsCastable() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:Cooldown() > S.RayofFrost:Cooldown() and not Player:Buff(S.RuneofPower))) then
+    if S.RayofFrost:IsCastable() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:CooldownRemains() > S.RayofFrost:CooldownRemains() and not Player:Buff(S.RuneofPower))) then
       if AR.Cast(S.RayofFrost) then return ""; end
     end
     --actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(!talent.glacial_spike.enabled&prev_gcd.1.frostbolt|talent.glacial_spike.enabled&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(buff.icicles.stack<=3|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc)))
@@ -297,7 +297,7 @@ end
       if AR.Cast(S.FrostBomb) then return ""; end
     end
     -- actions.single+=/ice_lance,if=variable.fof_react>0&cooldown.icy_veins.remains>10|variable.fof_react>2
-    if S.IceLance:IsCastable() and ((FoFReact() > 0 and S.IcyVeins:Cooldown() > 10) or FoFReact() > 2) then
+    if S.IceLance:IsCastable() and ((FoFReact() > 0 and S.IcyVeins:CooldownRemains() > 10) or FoFReact() > 2) then
       if AR.Cast(S.IceLance) then return ""; end
     end
     -- actions.single+=/ebonbolt
