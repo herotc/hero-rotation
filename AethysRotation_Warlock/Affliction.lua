@@ -291,7 +291,7 @@
     -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&((buff.tormented_souls.react>=4+active_enemies|buff.tormented_souls.react>=9)|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
     if not Player:Buff(S.DeadwindHarvester) and AC.CombatTime()>5 
       and ((SoulsAvailable()>= 4+Cache.EnemiesCount[40] or SoulsAvailable()>=9) or Target:TimeToDie() <= ((SoulsAvailable()*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))) + (Player:BuffRemains(S.DeadwindHarvester)*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))/12*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))))) then
-        if AR.Cast(S.RendSoul) then return "Cast"; end
+        if AR.Cast(S.ReapSouls) then return "Cast"; end
     end
     
     -- actions.mg+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
