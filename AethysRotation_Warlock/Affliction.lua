@@ -78,6 +78,7 @@
 	ReapSouls         = Spell(216698),
 	WrathOfConsumption= Spell(199472),
 	RendSoul          = Spell(238144),
+  Concordance       = Spell(242586),
     -- Defensive	
     
     -- Utility
@@ -163,6 +164,13 @@
     return false
   end
   
+  local function CheckUUnstableAffliction()
+    for _,v in pairs(UnstableAfflictionDebuffs) do
+      if Target:DebuffRemains(v)>v:CastTime() then return false; end
+    end
+    return true
+  end
+  
   local function NbAffected(SpellAffected)
     local nbaff=0
     for Key, Value in pairs(Cache.Enemies[range]) do
@@ -236,60 +244,320 @@
   end
   
   local function WritheAPL()
--- actions.writhe=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
--- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.soul_harvest.remains>=(5+1.5*equipped.144364)&buff.active_uas.stack>1|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react|trinket.proc.spell_power.react|trinket.stacking_proc.spell_power.react)
--- actions.writhe+=/agony,if=remains<=tick_time+gcd
--- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
--- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=3,target_if=sim.target!=target&remains<=tick_time+gcd&time_to_die>tick_time*3
--- actions.writhe+=/unstable_affliction,if=soul_shard=5|(time_to_die<=((duration+cast_time)*soul_shard))
--- actions.writhe+=/drain_soul,cycle_targets=1,if=target.time_to_die<=gcd*2&soul_shard<5
--- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
--- actions.writhe+=/service_pet,if=dot.corruption.remains&dot.agony.remains
--- actions.writhe+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
--- actions.writhe+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
--- actions.writhe+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
--- actions.writhe+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
--- actions.writhe+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
--- actions.writhe+=/blood_fury
--- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
--- actions.writhe+=/use_item,slot=trinket1
--- actions.writhe+=/use_item,slot=trinket2
--- actions.writhe+=/potion,if=target.time_to_die<=70
--- actions.writhe+=/potion,if=(!talent.soul_harvest.enabled|buff.soul_harvest.remains>12)&(trinket.proc.any.react|trinket.stack_proc.any.react|buff.active_uas.stack>=2)
--- actions.writhe+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd&time_to_die>tick_time*2
--- actions.writhe+=/corruption,cycle_targets=1,if=remains<=tick_time+gcd&((spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled)|spell_targets.seed_of_corruption<5)&time_to_die>tick_time*2
--- actions.writhe+=/life_tap,if=mana.pct<40&(buff.active_uas.stack<1|!buff.deadwind_harvester.remains)
--- actions.writhe+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
--- actions.writhe+=/phantom_singularity
--- actions.writhe+=/seed_of_corruption,if=((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)&dot.corruption.remains<=cast_time+travel_time
--- actions.writhe+=/unstable_affliction,if=talent.contagion.enabled&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
--- actions.writhe+=/unstable_affliction,cycle_targets=1,target_if=buff.deadwind_harvester.remains>=duration+cast_time&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
--- actions.writhe+=/unstable_affliction,if=buff.deadwind_harvester.remains>tick_time*2&(!talent.contagion.enabled|soul_shard>1|buff.soul_harvest.remains)&(dot.unstable_affliction_1.ticking+dot.unstable_affliction_2.ticking+dot.unstable_affliction_3.ticking+dot.unstable_affliction_4.ticking+dot.unstable_affliction_5.ticking<5)
--- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&buff.active_uas.stack>1
--- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1
--- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3&(!buff.deadwind_harvester.remains|buff.active_uas.stack<1)
--- actions.writhe+=/agony,if=refreshable&time_to_die>=remains
--- actions.writhe+=/siphon_life,if=refreshable&time_to_die>=remains
--- actions.writhe+=/corruption,if=refreshable&time_to_die>=remains
--- actions.writhe+=/agony,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
--- actions.writhe+=/siphon_life,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
--- actions.writhe+=/corruption,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
--- actions.writhe+=/life_tap,if=mana.pct<=10
--- actions.writhe+=/life_tap,if=prev_gcd.1.life_tap&buff.active_uas.stack=0&mana.pct<50
--- actions.writhe+=/drain_soul,chain=1,interrupt=1
--- actions.writhe+=/life_tap,moving=1,if=mana.pct<80
--- actions.writhe+=/agony,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
--- actions.writhe+=/siphon_life,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
--- actions.writhe+=/corruption,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
--- actions.writhe+=/life_tap,moving=0
+    -- actions.writhe  =reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+    -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.soul_harvest.remains>=(5+1.5*equipped.144364)&buff.active_uas.stack>1|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react|trinket.proc.spell_power.react|trinket.stacking_proc.spell_power.react)
+    if not Player:Buff(S.DeadwindHarvester) and AC.CombatTime()>5 and SoulsAvailable()>1
+      and ((SoulsAvailable()>= 5 or Target:TimeToDie() <= ((SoulsAvailable()*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))) + (Player:BuffRemains(S.DeadwindHarvester)*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))/12*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0)))))
+      or ((Player:BuffRemains(S.SoulHarvest)>=(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0)) and ActiveUAs() > 1) or Player:Buff(S.Concordance) ))then
+        if AR.Cast(S.ReapSouls) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/agony,if=remains<=tick_time+gcd
+    if Target:DebuffRemains(S.Agony)<=(Player:GCD()+S.Agony:TickTime()) then
+      if AR.Cast(S.Agony) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
+    -- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=3,target_if=sim.target!=target&remains<=tick_time+gcd&time_to_die>tick_time*3
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains()<Player:GCD()*6 and Value:DebuffRemains(S.Agony)<=Consts.AgonyBaseDuration*0.3 and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD and Value:TimeToDie()>S.Agony:TickTime()*3 and NbAffected(S.Agony)<=5 then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3&soul_shard=5
+    if S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[40]>=3 and FutureShard()==5 then
+      if AR.Cast(S.SeedOfCorruption) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/unstable_affliction,if=soul_shard=5|(time_to_die<=((duration+cast_time)*soul_shard))
+    if FutureShard() == 5 or Target:TimeToDie() <= (S.UnstableAffliction:CastTime() + S.UnstableAffliction:TickTime()) * FutureShard() then
+      if AR.Cast(S.UnstableAffliction) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/drain_soul,cycle_targets=1,if=target.time_to_die<=gcd*2&soul_shard<5
+    BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 0, nil;
+    for Key, Value in pairs(Cache.Enemies[range]) do
+      if FutureShard()<5 and Value:TimeToDie()<Player:GCD()*2 then
+        BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.DrainSoul;
+      end
+    end
+    if BestUnit then
+      if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
+    if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and (Player:BuffRemains(S.EmpoweredLifeTapBuff)<0.3*Consts.EmpoweredLifeTapBaseDuration) then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/service_pet,if=dot.corruption.remains&dot.agony.remains
+    if S.GrimoireFelhunter:IsAvailable() and S.GrimoireFelhunter:IsCastable() and FutureShard()>=1 and Target:Debuff(S.Agony) and Target:Debuff(S.Corruption) then
+      if AR.Cast(S.GrimoireFelhunter, Settings.Affliction.GCDasOffGCD.GrimoireFelhunter) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
+    if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:IsCastable() and FutureShard()>=1 and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[40]<=2 
+      and (Target:TimeToDie()>180 or Target:HealthPercentage()<=20 or Target:TimeToDie()<30) then
+        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
+    if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and FutureShard()>=1 and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[40]>2 then
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:IsCastable() and FutureShard()>=1 and S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[40]==1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastBuff() >= 180 then
+        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:IsCastable() and FutureShard()>=1 and S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[40]>1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastBuff() >= 180 then
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return "Cast"; end
+    end
+
+    -- actions.writhe+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
+    if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:IsCastable() and (Player:PrevGCD(1,S.UnstableAffliction) or Player:BuffRemains(S.SoulHarvest)>=10)  then
+        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/blood_fury
+    if AR.CDsON() and S.BloodFury:IsAvailable() and S.BloodFury:IsCastable() then
+        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
+    if AR.CDsON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:IsCastable() and (ActiveUAs()>1 or Cache.EnemiesCount[40]>3) and Player:BuffRemains(S.SoulHarvest)<=8 and (not S.DeathsEmbrace:IsAvailable() or Target:TimeToDie()>120 or Target:TimeToDie()<30) then
+        if AR.Cast(S.SoulHarvest, Settings.Affliction.OffGCDasOffGCD.SoulHarvest) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/use_item,slot=trinket1
+    -- actions.writhe+=/use_item,slot=trinket2
+    -- actions.writhe+=/potion,if=target.time_to_die<=70
+    -- actions.writhe+=/potion,if=(!talent.soul_harvest.enabled|buff.soul_harvest.remains>12)&(trinket.proc.any.react|trinket.stack_proc.any.react|buff.active_uas.stack>=2)
+    --TODO : trinket & potion
+
+    
+    -- actions.writhe+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd&time_to_die>tick_time*2
+    if S.SiphonLife:IsAvailable() and Target:DebuffRemains(S.SiphonLife)<=(S.SiphonLife:TickTime()+Player:GCD()) and Target:TimeToDie()>S.SiphonLife:TickTime()*2 then
+        if AR.Cast(S.SiphonLife) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if S.SiphonLife:IsAvailable() and Value:DebuffRemains(S.SiphonLife)<=(S.SiphonLife:TickTime()+Player:GCD()) and Value:TimeToDie()>S.SiphonLife:TickTime()*2 and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/corruption,cycle_targets=1,if=remains<=tick_time+gcd&((spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled)|spell_targets.seed_of_corruption<5)&time_to_die>tick_time*2
+    if Target:DebuffRemains(S.CorruptionDebuff)<=(Player:GCD()+S.CorruptionDebuff:TickTime()) then
+      if AR.Cast(S.Corruption) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if ((Cache.EnemiesCount[40]<3 and S.SowTheSeeds:IsAvailable()) or Cache.EnemiesCount[40]<5) and Value:DebuffRemains(S.CorruptionDebuff)<=Consts.CorruptionBaseDuration*0.3 and Value:TimeToDie()>S.CorruptionDebuff:TickTime()*2 and Value:TimeToDie()-Value:DebuffRemains(S.CorruptionDebuff) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Corruption;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/life_tap,if=mana.pct<40&(buff.active_uas.stack<1|!buff.deadwind_harvester.remains)
+    if S.LifeTap:IsCastable() and Player:ManaPercentage() < 40 and (ActiveUAs()<1 or not Player:Buff(S.DeadwindHarvester)) then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
+    if SoulsAvailable()>1 and (Player:BuffRemains(S.DeadwindHarvester)+ActiveUAs()*(5+(I.ReapAndSow:IsEquipped() and 1 or 0))) >= (12*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))) then 
+      if AR.Cast(S.ReapSouls) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/phantom_singularity
+    if S.PhantomSingularity:IsAvailable() and S.PhantomSingularity:IsCastable()  then
+        if AR.Cast(S.PhantomSingularity) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/seed_of_corruption,if=(talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|(spell_targets.seed_of_corruption>3&dot.corruption.refreshable)
+    if FutureShard()>=1 and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[40]>=3) or (Cache.EnemiesCount[40]>=3 and Target:DebuffRefreshableP(S.CorruptionDebuff,Consts.CorruptionBaseDuration*0.3))) then
+      if AR.Cast(S.SeedOfCorruption) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/unstable_affliction,if=talent.contagion.enabled&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    if FutureShard()>=1  and S.Contagion:IsAvailable() and CheckUUnstableAffliction() then
+      if AR.Cast(S.UnstableAffliction) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/unstable_affliction,cycle_targets=1,target_if=buff.deadwind_harvester.remains>=duration+cast_time&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    if FutureShard()>=1  and Player:BuffRemains(S.DeadwindHarvester) > Consts.UABaseDuration+S.UnstableAffliction:CastTime() and CheckUUnstableAffliction() then
+      if AR.Cast(S.UnstableAffliction) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/unstable_affliction,if=buff.deadwind_harvester.remains>tick_time*2&(!talent.contagion.enabled|soul_shard>1|buff.soul_harvest.remains)&(dot.unstable_affliction_1.ticking+dot.unstable_affliction_2.ticking+dot.unstable_affliction_3.ticking+dot.unstable_affliction_4.ticking+dot.unstable_affliction_5.ticking<5)
+    if FutureShard()>=1  and Player:BuffRemains(S.DeadwindHarvester) > S.UnstableAffliction:TickTime()*2 and (not S.Contagion:IsAvailable() or FutureShard() > 1 or Player:Buff(S.SoulHarvest)) and ActiveUAs()<5 then
+      if AR.Cast(S.UnstableAffliction) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&buff.active_uas.stack>1
+    if not Player:Buff(S.DeadwindHarvester) and ActiveUAs()>1 and SoulsAvailable()>1 then 
+      if AR.Cast(S.ReapSouls) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1
+    if not Player:Buff(S.DeadwindHarvester) and Player:PrevGCD(1,S.UnstableAffliction) and SoulsAvailable()>1 then 
+      if AR.Cast(S.ReapSouls) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3&(!buff.deadwind_harvester.remains|buff.active_uas.stack<1)
+    if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemains(S.EmpoweredLifeTapBuff)<0.3*Consts.EmpoweredLifeTapBaseDuration and (not Player:Buff(S.DeadwindHarvester) or ActiveUAs()<1) then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/agony,if=refreshable&time_to_die>=remains
+    if Target:DebuffRefreshableP(S.Agony,Consts.AgonyBaseDuration*0.3) and Target:TimeToDie() >= Target:DebuffRemains(S.Agony) then
+      if AR.Cast(S.Agony) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/siphon_life,if=refreshable&time_to_die>=remains
+    if S.SiphonLife:IsAvailable() and Target:DebuffRefreshableP(S.SiphonLife,Consts.SiphonLifeBaseDuration*0.3) and Target:TimeToDie() >= Target:DebuffRemains(S.SiphonLife) then
+      if AR.Cast(S.SiphonLife) then return "Cast"; end
+    end
+
+    -- actions.writhe+=/corruption,if=refreshable&time_to_die>=remains
+    if Target:DebuffRefreshableP(S.CorruptionDebuff,Consts.CorruptionBaseDuration*0.3) and Target:TimeToDie() >= Target:DebuffRemains(S.Agony) then
+      if AR.Cast(S.Corruption) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/agony,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Value:TimeToDie()>S.Agony:TickTime()*3 and not Player:Buff(S.DeadwindHarvester) and Target:DebuffRefreshableP(S.Agony,Consts.AgonyBaseDuration*0.3) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/siphon_life,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Value:TimeToDie()>S.SiphonLife:TickTime()*3 and not Player:Buff(S.DeadwindHarvester) and Target:DebuffRefreshableP(S.SiphonLife,Consts.SiphonLifeBaseDuration*0.3) and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/corruption,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Value:TimeToDie()>S.CorruptionDebuff:TickTime()*3 and not Player:Buff(S.DeadwindHarvester) and Target:DebuffRefreshableP(S.CorruptionDebuff,Consts.CorruptionBaseDuration*0.3) and Value:TimeToDie()-Value:DebuffRemains(S.CorruptionDebuff) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Corruption;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/life_tap,if=mana.pct<=10
+    if S.LifeTap:IsCastable() and Player:ManaPercentage() < 10 then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/life_tap,if=prev_gcd.1.life_tap&buff.active_uas.stack=0&mana.pct<50
+    if S.LifeTap:IsCastable() and ActiveUAs()==0 and Player:PrevGCD(1,S.LifeTap) and Player:ManaPercentage() < 50 then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/drain_soul,chain=1,interrupt=1
+    if S.DrainSoul:IsCastable() then
+      if AR.Cast(S.DrainSoul) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/life_tap,moving=1,if=mana.pct<80
+    if S.LifeTap:IsCastable() and Player:IsMoving() and Player:ManaPercentage() < 80 then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
+    
+    -- actions.writhe+=/agony,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
+    if Player:IsMoving() and Target:DebuffRemains(S.Agony) <= Consts.AgonyBaseDuration - (3 * S.Agony:TickTime()) then
+      if AR.Cast(S.Agony) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Player:IsMoving() and Value:DebuffRemains(S.Agony) <= Consts.AgonyBaseDuration - (3 * S.Agony:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/siphon_life,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
+    if S.SiphonLife:IsAvailable() and Player:IsMoving() and Target:DebuffRemains(S.SiphonLife) <= Consts.SiphonLifeBaseDuration - (3 * S.SiphonLife:TickTime()) then
+      if AR.Cast(S.SiphonLife) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if S.SiphonLife:IsAvailable() and Player:IsMoving() and Value:DebuffRemains(S.SiphonLife) <= Consts.SiphonLifeBaseDuration - (3 * S.SiphonLife:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/corruption,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
+    if Player:IsMoving() and Target:DebuffRemains(S.CorruptionDebuff) <= Consts.AgonyBaseDuration - (3 * S.CorruptionDebuff:TickTime()) then
+      if AR.Cast(S.Agony) then return "Cast"; end
+    end
+    if AR.AoEON() then
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      for Key, Value in pairs(Cache.Enemies[range]) do
+        if Player:IsMoving() and Value:DebuffRemains(S.CorruptionDebuff) <= Consts.AgonyBaseDuration - (3 * S.CorruptionDebuff:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+      end
+    end
+    
+    -- actions.writhe+=/life_tap,moving=0
+    if S.LifeTap:IsCastable() then
+      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return "Cast"; end
+    end
   end
   
   local function MGAPL()
-    -- print("souls"..SoulsAvailable())
-    -- print("ua"..ActiveUAs())
-	
     -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&((buff.tormented_souls.react>=4+active_enemies|buff.tormented_souls.react>=9)|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
-    if not Player:Buff(S.DeadwindHarvester) and AC.CombatTime()>5 
+    if not Player:Buff(S.DeadwindHarvester) and AC.CombatTime()>5 and SoulsAvailable()>1
       and ((SoulsAvailable()>= 4+Cache.EnemiesCount[40] or SoulsAvailable()>=9) or Target:TimeToDie() <= ((SoulsAvailable()*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))) + (Player:BuffRemains(S.DeadwindHarvester)*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))/12*(5+1.5*(I.ReapAndSow:IsEquipped() and 1 or 0))))) then
         if AR.Cast(S.ReapSouls) then return "Cast"; end
     end
@@ -338,9 +606,9 @@
     end
     
     -- actions.mg+=/service_pet,if=dot.corruption.remains&dot.agony.remains
-    if S.GrimoireFelhunter:IsAvailable() and S.GrimoireFelhunter:IsCastable() and FutureShard()>=1 and Target:Debuff(S.Agony) and Target:Debuff(S.Corruption) then
-        if AR.Cast(S.GrimoireFelhunter, Settings.Affliction.GCDasOffGCD.GrimoireFelhunter) then return "Cast"; end
-      end
+    if S.GrimoireFelhunter:IsAvailable() and S.GrimoireFelhunter:IsCastable() and FutureShard()>=1 and Target:Debuff(S.Agony) and Target:Debuff(S.CorruptionDebuff) then
+      if AR.Cast(S.GrimoireFelhunter, Settings.Affliction.GCDasOffGCD.GrimoireFelhunter) then return "Cast"; end
+    end
     
     -- actions.mg+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
     if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:IsCastable() and FutureShard()>=1 and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[40]<=2 
@@ -390,7 +658,7 @@
     end
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(tick_time+gcd)&target.time_to_die>tick_time*3
-    if Target:DebuffRemains(S.CorruptionDebuff)<=(Player:GCD()+S.Corruption:TickTime()) then
+    if Target:DebuffRemains(S.CorruptionDebuff)<=(Player:GCD()+S.CorruptionDebuff:TickTime()) then
       if AR.Cast(S.Corruption) then return "Cast"; end
     end
     if AR.AoEON() then
@@ -454,7 +722,7 @@
     end
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.corruption)
-    if Target:DebuffRemains(S.CorruptionDebuff)<=(Player:GCD()+S.Corruption:TickTime()) and (ActiveUAs()==0 or Player:PrevGCD(1,S.Corruption)) then
+    if Target:DebuffRemains(S.CorruptionDebuff)<=(Player:GCD()+S.CorruptionDebuff:TickTime()) and (ActiveUAs()==0 or Player:PrevGCD(1,S.Corruption)) then
       if AR.Cast(S.Corruption) then return "Cast"; end
     end
     if AR.AoEON() then
@@ -495,7 +763,7 @@
     end
     
     -- actions.mg+=/reap_souls,if=buff.deadwind_harvester.remains<dot.unstable_affliction_1.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_2.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_3.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_4.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_5.remains&buff.active_uas.stack>1
-    if CheckDeadwindHarvester() and ActiveUAs()>1 and Player:Buff(S.DeadwindHarvester) then 
+    if CheckDeadwindHarvester() and ActiveUAs()>1 and SoulsAvailable()>1 then 
       if AR.Cast(S.ReapSouls) then return "Cast"; end
     end
     
@@ -553,13 +821,13 @@
     
     -- actions.mg+=/corruption,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
     if Player:IsMoving() and Target:DebuffRemains(S.CorruptionDebuff) <= Consts.AgonyBaseDuration - (3 * S.CorruptionDebuff:TickTime()) then
-      if AR.Cast(S.Agony) then return "Cast"; end
+      if AR.Cast(S.Corruption) then return "Cast"; end
     end
     if AR.AoEON() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Player:IsMoving() and Value:DebuffRemains(S.CorruptionDebuff) <= Consts.AgonyBaseDuration - (3 * S.CorruptionDebuff:TickTime()) and Value:TimeToDie()-Value:DebuffRemains(S.Agony) > BestUnitTTD then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Agony;
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Corruption;
         end
       end
       if BestUnit then
@@ -578,6 +846,7 @@
     -- Unit Update
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
+    --TODO : change to DeBuffRefreshable
     
     -- Defensives
     
@@ -751,7 +1020,7 @@
 -- actions.mg+=/corruption,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
 -- actions.mg+=/life_tap,moving=0
 
--- actions.writhe=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+-- actions.writhe=  reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
 -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.soul_harvest.remains>=(5+1.5*equipped.144364)&buff.active_uas.stack>1|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react|trinket.proc.spell_power.react|trinket.stacking_proc.spell_power.react)
 -- actions.writhe+=/agony,if=remains<=tick_time+gcd
 -- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
