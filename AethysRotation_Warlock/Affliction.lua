@@ -459,7 +459,7 @@
     if AR.AoEON() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
-        if Value:TimeToDie()>S.SiphonLife:TickTime()*3 and not Player:Buff(S.DeadwindHarvester) and Target:DebuffRefreshableP(S.SiphonLife,Consts.SiphonLifeBaseDuration*0.3) and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
+        if S.SiphonLife:IsAvailable() and Value:TimeToDie()>S.SiphonLife:TickTime()*3 and not Player:Buff(S.DeadwindHarvester) and Target:DebuffRefreshableP(S.SiphonLife,Consts.SiphonLifeBaseDuration*0.3) and Value:TimeToDie()-Value:DebuffRemains(S.SiphonLife) > BestUnitTTD then
           BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SiphonLife;
         end
       end
