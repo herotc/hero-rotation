@@ -111,9 +111,6 @@
   local T202P,T204P = AC.HasTier("T20")
   local T212P,T214P = AC.HasTier("T21")
 
-  if S.Obliteration:IsAvailable() or S.HungeringRuneWeapon:IsAvailable () then
-  AR.Print("|cffff0000Frost DeathKnight 7.3|r - |cFF00FF96Hungering Rune Weapon and Obliteration APL's are on BETA|r - Please report any bugs or optimizations on GitHub or Discord.");
-  end
   -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
