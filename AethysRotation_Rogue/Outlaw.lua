@@ -448,11 +448,7 @@ local function APL ()
       end
       -- OutofRange Pistol Shot
       if not Target:IsInRange(10) and (S.PistolShot:IsCastable(20) or S.Blunderbuss:IsCastable(20)) and not Player:IsStealthed(true, true) and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
-        if S.Blunderbuss:IsCastable() then
-          if AR.Cast(S.Blunderbuss) then return "Cast Blunderbuss"; end
-        else
-          if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
-        end
+        if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
       end
     end
 end
