@@ -41,9 +41,11 @@ local tableinsert = table.insert;
     ShurikenStorm                 = Spell(197835),
     ShurikenToss                  = Spell(114014),
     Stealth                       = Spell(1784),
+    Stealth2                      = Spell(115191), -- w/ Subterfuge Talent
     SymbolsofDeath                = Spell(212283),
     Vanish                        = Spell(1856),
     VanishBuff                    = Spell(11327),
+    VanishBuff2                   = Spell(115193), -- w/ Subterfuge Talent
     -- Talents
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
@@ -143,8 +145,7 @@ local tableinsert = table.insert;
   local I = Item.Rogue.Subtlety;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local BestUnit, BestUnitTTD; -- Used for cycling
-  local NightbladeThreshold; -- Used to compute the NB threshold (Cycling Performance)
+  local Stealth, VanishBuff;
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -186,9 +187,8 @@ end
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:Buff(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
-
   if S.Nightblade:IsCastable() then
-    NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
+    local NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
     -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff)
       and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Nightblade)) or Target:TimeToDieIsNotValid())
@@ -205,7 +205,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
     -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff) and Rogue.MantleDuration() == 0 then
-      BestUnit, BestUnitTTD = nil, 12;
+      local BestUnit, BestUnitTTD = nil, 12;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Nightblade))
           and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
@@ -262,11 +262,10 @@ end
 -- # Stealthed Rotation
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Stealthed (ReturnSpellOnly, StealthSpell)
-  StealthBuff = Player:Buff(S.Stealth) or (StealthSpell and StealthSpell:ID() == S.Stealth:ID())
-
+  local StealthBuff = Player:Buff(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
   -- actions.stealthed=shadowstrike,if=buff.stealth.up
-  if S.Shadowstrike:IsCastable() and IsInMeleeRange() and StealthBuff then
+  if StealthBuff and S.Shadowstrike:IsCastable() and IsInMeleeRange() then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -305,9 +304,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
 end
 -- # Stealth Macros
 -- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
-local MacroTable;
 local function StealthMacro (StealthSpell)
-  MacroTable = {StealthSpell};
+  local MacroTable = {StealthSpell};
 
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
@@ -349,7 +347,6 @@ local function Build ()
   return false;
 end
 -- # Cooldowns
-local TrinketSuggested;
 local function CDs ()
   if IsInMeleeRange() then
     if AR.CDsON() then
@@ -357,7 +354,7 @@ local function CDs ()
       -- TODO: Add Potion Suggestion
 
       -- Trinkets
-      TrinketSuggested = false;
+      local TrinketSuggested = false;
       if not TrinketSuggested and I.SpecterofBetrayal:IsEquipped() and I.SpecterofBetrayal:IsReady() then
         if S.DarkShadow:IsAvailable() then
           -- if=talent.dark_shadow.enabled&buff.shadow_dance.up&(!set_bonus.tier20_4pc|buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=43)))
@@ -367,7 +364,7 @@ local function CDs ()
           end
         else
           -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
-          if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish)
+          if not Player:IsStealthed(true, true) and not Player:Buff(Stealth) and not Player:Buff(S.Vanish)
             and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
               if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end
           end
@@ -376,13 +373,13 @@ local function CDs ()
       if not TrinketSuggested and I.UmbralMoonglaives:IsEquipped() and I.UmbralMoonglaives:IsReady() then
         if S.DarkShadow:IsAvailable() then
           -- if=talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&buff.shadow_dance.up&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)))
-          if not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) and Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or
+          if not Player:Buff(Stealth) and not Player:Buff(S.Vanish) and Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or
             (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()))) then
               if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
           end
         else
           -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
-          if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish)
+          if not Player:IsStealthed(true, true) and not Player:Buff(Stealth) and not Player:Buff(S.Vanish)
             and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
               if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
           end
@@ -455,7 +452,7 @@ local function CDs ()
       -- Removed the TTD part for now.
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
         and Rogue.MantleDuration() == 0 and DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
-          and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
+          and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(Stealth)
           and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 6
             or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemainsP(S.Nightblade)) or not Target:TimeToDieIsNotValid())
           and S.DeathfromAbove:CooldownRemainsP() <= 1 then
@@ -528,23 +525,28 @@ local function Stealth_ALS ()
   end
   return false;
 end
-local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sappel Soul)", function () return IsInMeleeRange; end},
-  {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
-  {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
-};
-local function MythicDungeon ()
-  -- Sapped Soul
-  if AC.MythicDungeon() == "Sapped Soul" then
-    for i = 1, #SappedSoulSpells do
-      if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
-        AR.ChangePulseTimer(1);
-        AR.Cast(SappedSoulSpells[i][1]);
-        return SappedSoulSpells[i][2];
+
+local MythicDungeon;
+do
+  local SappedSoulSpells = {
+    {S.Kick, "Cast Kick (Sappel Soul)", function () return IsInMeleeRange; end},
+    {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
+    {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
+  };
+  MythicDungeon = function ()
+    -- Sapped Soul
+    if AC.MythicDungeon() == "Sapped Soul" then
+      for i = 1, #SappedSoulSpells do
+        local Spell = SappedSoulSpells[i];
+        if Spell[1]:IsCastable() and Spell[3]() then
+          AR.ChangePulseTimer(1);
+          AR.Cast(Spell[1]);
+          return Spell[2];
+        end
       end
     end
+    return false;
   end
-  return false;
 end
 local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
@@ -555,12 +557,22 @@ local function TrainingScenario ()
   end
   return false;
 end
+local Interrupts = {
+  {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
+  {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
+  {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
+};
 
 -- APL Main
 local function APL ()
   -- Spell ID Changes check
-  S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
-  S.VanishBuff = S.Subterfuge:IsAvailable() and Spell(115193) or Spell(11327); -- w/ or w/o Subterfuge Talent
+  if S.Subterfuge:IsAvailable() then
+    Stealth = S.Stealth2;
+    VanishBuff = S.VanishBuff2;
+  else
+    Stealth = S.Stealth;
+    VanishBuff = S.VanishBuff;
+  end
   -- Unit Update
   AC.GetEnemies(10, true); -- Shuriken Storm & Death from Above
   AC.GetEnemies("Melee"); -- Melee
@@ -576,8 +588,8 @@ local function APL ()
     if not Player:AffectingCombat() then
       -- Stealth
     -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
-      if not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.VanishBuff) then
-        ShouldReturn = Rogue.Stealth(S.Stealth);
+      if not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(VanishBuff) then
+        ShouldReturn = Rogue.Stealth(Stealth);
         if ShouldReturn then return ShouldReturn; end
       end
       -- Flask
@@ -614,11 +626,7 @@ local function APL ()
       ShouldReturn = TrainingScenario();
       if ShouldReturn then return ShouldReturn; end
       -- Interrupts
-      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
-        {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
-        {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
-        {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
-      });
+      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
       -- # This let us to use Shadow Dance right before the 2nd part of DfA lands. Only with Dark Shadow.
       -- actions+=/shadow_dance,if=talent.dark_shadow.enabled&(!stealthed.all|buff.subterfuge.up)&buff.death_from_above.up&buff.death_from_above.remains<=0.15
       -- Note: DfA execute time is 1.475s, the buff is modeled to lasts 1.475s on SimC, while it's 1s in-game. So we retrieve it from TimeSinceLastCast.

@@ -36,6 +36,7 @@ local pairs = pairs;
     PoisonedKnife         = Spell(185565),
     Rupture               = Spell(1943),
     Stealth               = Spell(1784),
+    Stealth2              = Spell(115191), -- w/ Subterfuge Talent
     Vanish                = Spell(1856),
     Vendetta              = Spell(79140),
     -- Talents
@@ -165,10 +166,10 @@ local pairs = pairs;
   );
 -- Rotation Var
   local ShouldReturn, ShouldReturn2; -- Used to get the return string
-  local BestUnit, BestUnitTTD; -- Used for cycling
-  local RuptureThreshold; -- Used to compute the Rupture threshold (Cycling Performance)
   local BleedTickTime, ExsanguinatedBleedTickTime = 2, 1;
-  local RuptureDMGThreshold, GarroteDMGThreshold;
+  local Stealth;
+  local RuptureThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
+  local Energy_Regen_Combined, Energy_Time_To_Max_Combined;
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -186,7 +187,7 @@ local function Build ()
     end
     -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
     if AR.AoEON() and Cache.EnemiesCount[10] < 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
-      BestUnit, BestUnitTTD = nil, 0;
+      local BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
           and Unit:DebuffRefreshableP(S.Hemorrhage, 6) and Unit:Debuff(S.Rupture) then
@@ -208,7 +209,7 @@ local function Build ()
       if AR.Cast(S.Mutilate) then return "Cast"; end
     end
     if AR.AoEON() then
-      BestUnit, BestUnitTTD = nil, 0;
+      local BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
           and Unit:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4) then
@@ -368,7 +369,7 @@ local function Maintain ()
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
-        BestUnit, BestUnitTTD = nil, 2;
+        local BestUnit, BestUnitTTD = nil, 2;
         for _, Unit in pairs(Cache.Enemies["Melee"]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
             and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
@@ -390,7 +391,7 @@ local function Maintain ()
         if AR.Cast(S.Garrote) then return "Cast"; end
       end
       if AR.AoEON() then
-        BestUnit, BestUnitTTD = nil, 2;
+        local BestUnit, BestUnitTTD = nil, 2;
         for _, Unit in pairs(Cache.Enemies["Melee"]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
             and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
@@ -427,7 +428,7 @@ local function Maintain ()
       if AR.Cast(S.Rupture) then return "Cast"; end
     end
     if AR.AoEON() then
-      BestUnit, BestUnitTTD = nil, 6;
+      local BestUnit, BestUnitTTD = nil, 6;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Rupture))
           and Rogue.CanDoTUnit(Unit, RuptureDMGThreshold)
@@ -459,7 +460,7 @@ local function Maintain ()
       if AR.Cast(S.Garrote) then return "Cast"; end
     end
     if AR.AoEON() then
-      BestUnit, BestUnitTTD = nil, 4;
+      local BestUnit, BestUnitTTD = nil, 4;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
           and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
@@ -483,23 +484,27 @@ local function Maintain ()
   end
   return false;
 end
-local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sappel Soul)", function () return Target:IsInRange("Melee"); end},
-  {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
-  {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
-};
-local function MythicDungeon ()
-  -- Sapped Soul
-  if AC.MythicDungeon() == "Sapped Soul" then
-    for i = 1, #SappedSoulSpells do
-      if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
-        AR.ChangePulseTimer(1);
-        AR.Cast(SappedSoulSpells[i][1]);
-        return SappedSoulSpells[i][2];
+local MythicDungeon;
+do
+  local SappedSoulSpells = {
+    {S.Kick, "Cast Kick (Sappel Soul)", function () return IsInMeleeRange; end},
+    {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
+    {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
+  };
+  MythicDungeon = function ()
+    -- Sapped Soul
+    if AC.MythicDungeon() == "Sapped Soul" then
+      for i = 1, #SappedSoulSpells do
+        local Spell = SappedSoulSpells[i];
+        if Spell[1]:IsCastable() and Spell[3]() then
+          AR.ChangePulseTimer(1);
+          AR.Cast(Spell[1]);
+          return Spell[2];
+        end
       end
     end
+    return false;
   end
-  return false;
 end
 local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
@@ -510,11 +515,15 @@ local function TrainingScenario ()
   end
   return false;
 end
+local Interrupts = {
+  {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
+  {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end}
+}
 
 -- APL Main
 local function APL ()
   -- Spell ID Changes check
-  S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
+  Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
   -- Unit Update
   AC.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
   AC.GetEnemies(10, true); -- Fan of Knives & Death from Above
@@ -549,7 +558,7 @@ local function APL ()
   -- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-      ShouldReturn = Rogue.Stealth(S.Stealth);
+      ShouldReturn = Rogue.Stealth(Stealth);
       if ShouldReturn then return ShouldReturn; end
       -- Flask
       -- Food
@@ -586,14 +595,11 @@ local function APL ()
       ShouldReturn = TrainingScenario();
       if ShouldReturn then return ShouldReturn; end
       -- Interrupts
-      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
-        {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
-        {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end}
-      });
+      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
       -- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*(7+talent.venom_rush.enabled*3)%2
-      local Energy_Regen_Combined = Player:EnergyRegen() + Rogue.PoisonedBleeds() * (7 + (S.VenomRush:IsAvailable() and 3 or 0)) / 2;
+      Energy_Regen_Combined = Player:EnergyRegen() + Rogue.PoisonedBleeds() * (7 + (S.VenomRush:IsAvailable() and 3 or 0)) / 2;
       -- actions+=/variable,name=energy_time_to_max_combined,value=energy.deficit%variable.energy_regen_combined
-      local Energy_Time_To_Max_Combined = Player:EnergyDeficit() / Energy_Regen_Combined;
+      Energy_Time_To_Max_Combined = Player:EnergyDeficit() / Energy_Regen_Combined;
       -- actions+=/call_action_list,name=cds
       if AR.CDsON() then
         ShouldReturn = CDs();
