@@ -248,30 +248,3 @@
       , "UNIT_DIED"
       , "UNIT_DESTROYED"
     );
-
-  --- Just Stealthed
-    -- TODO: Add Assassination Spells when it'll be done
-    -- TODO: Make a for loop with a table, more easy to maintain
-    AC:RegisterForSelfCombatEvent(
-      function (...)
-          SpellID = select(12, ...);
-
-          -- Shadow Dance
-          if SpellID == Spell.Rogue.Subtlety.ShadowDance:ID() then
-            Spell.Rogue.Subtlety.ShadowDance.LastCastTime = AC.GetTime();
-          -- Shadowmeld
-          elseif SpellID == Spell.Rogue.Subtlety.Shadowmeld:ID() then
-            Spell.Rogue.Outlaw.Shadowmeld.LastCastTime = AC.GetTime();
-            Spell.Rogue.Subtlety.Shadowmeld.LastCastTime = AC.GetTime();
-          -- Vanish
-          elseif SpellID == Spell.Rogue.Subtlety.Vanish:ID() then
-            Spell.Rogue.Outlaw.Vanish.LastCastTime = AC.GetTime();
-            Spell.Rogue.Subtlety.Vanish.LastCastTime = AC.GetTime();
-          -- Death from Above
-          elseif SpellID == Spell.Rogue.Subtlety.DeathfromAbove:ID() then
-            Spell.Rogue.Outlaw.DeathfromAbove.LastCastTime = AC.GetTime();
-            Spell.Rogue.Subtlety.DeathfromAbove.LastCastTime = AC.GetTime();
-          end
-      end
-      , "SPELL_CAST_SUCCESS"
-    );
