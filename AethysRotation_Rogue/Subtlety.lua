@@ -126,6 +126,12 @@ local tableinsert = table.insert;
         (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
     end
   );
+  -- TODO: Add Nightstalker
+  S.Nightblade:RegisterPMultiplier(
+    {S.FinalityNightblade, function ()
+      return Player:Buff(S.FinalityNightblade, 17) and 1 + Player:Buff(S.FinalityNightblade, 17)/100 or 1;
+    end}
+  );
 -- Items
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Subtlety = {
