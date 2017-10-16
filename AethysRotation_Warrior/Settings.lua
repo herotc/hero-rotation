@@ -20,6 +20,8 @@
       OffGCDasOffGCD = {
         Pummel = {true, false},
         Racials = {true, false},
+        Avatar = {true, false},
+        BattleCry = {true, false},
       }
     },
 
@@ -32,8 +34,6 @@
       },
       OffGCDasOffGCD = {
         -- Abilities
-        Avatar = {true, false},
-        BattleCry = {true, false},
         FocusedRage = {true, false},
         -- Items
       },
@@ -50,8 +50,6 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        Avatar = {true, false},
-        BattleCry = {true, false},
         Bloodbath = {true, false},
         -- Items
         PotionoftheOldWar = {true, false},
@@ -72,17 +70,15 @@
   -- Shared Warrior settings
   CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.Pummel", "Pummel");
   CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.Racials", "Racials");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.Avatar", "Avatar");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.BattleCry", "Battle Cry");
 
   -- Arms settings
-  CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.Avatar", "Avatar");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.BattleCry", "Battle Cry");
   CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.FocusedRage", "Focused Rage");
   CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.WarbreakerEnabled", "Enable Warbreaker", "Disable this if you want to omit Warbreaker from the rotation.");
   CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Warbreaker", "Warbreaker");
 
   -- Fury settings
-  CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.Avatar", "Avatar");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.BattleCry", "Battle Cry");
   CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.Bloodbath", "Bloodbath");
   CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.UmbralMoonglaives", "Umbral Moonglaives");
   CreateARPanelOption("GCDasOffGCD", CP_Fury, "APL.Warrior.Fury.GCDasOffGCD.DragonRoar", "Dragon Roar");

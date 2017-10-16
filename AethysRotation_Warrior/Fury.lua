@@ -324,7 +324,7 @@ local function APL ()
   if AR.CDsON() then
     -- actions+=/avatar,if=buff.battle_cry.remains>6|cooldown.battle_cry.remains<10|(target.time_to_die<(cooldown.battle_cry.remains+10))
     if S.Avatar:IsCastable() and (Player:BuffRemains(S.BattleCry) > 6 or S.BattleCry:CooldownRemainsP() < 10 or (Target:TimeToDie() < (S.BattleCry:CooldownRemainsP() + 10))) then
-      if AR.Cast(S.Avatar, Settings.Fury.OffGCDasOffGCD.Avatar) then return ""; end
+      if AR.Cast(S.Avatar, Settings.Commons.OffGCDasOffGCD.Avatar) then return ""; end
     end
     -- actions+=/use_item,name=umbral_moonglaives,if=equipped.umbral_moonglaives&(cooldown.battle_cry.remains>gcd&cooldown.battle_cry.remains<2|cooldown.battle_cry.remains=0)
     if I.UmbralMoonglaives:IsReady() and I.UmbralMoonglaives:IsEquipped() and (S.BattleCry:CooldownRemainsP() > Player:GCD() and S.BattleCry:CooldownRemainsP() < 2 or S.BattleCry:CooldownRemainsP() == 0) then
@@ -332,15 +332,15 @@ local function APL ()
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.reckless_abandon.enabled&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
     if S.BattleCry:IsCastable() and S.RecklessAbandon:IsAvailable() then
-      if AR.Cast(S.BattleCry, Settings.Fury.OffGCDasOffGCD.BattleCry) then return ""; end
+      if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.bladestorm.enabled&(raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)
     if S.BattleCry:IsCastable() and S.Bladestorm:IsAvailable() then
-      if AR.Cast(S.BattleCry, Settings.Fury.OffGCDasOffGCD.BattleCry) then return ""; end
+      if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&buff.dragon_roar.up&(cooldown.bloodthirst.remains=0|buff.enrage.remains>cooldown.bloodthirst.remains)
     if S.BattleCry:IsCastable() and Player:Buff(S.DragonRoar) and (S.Bloodthirst:CooldownRemainsP() == 0 or Player:BuffRemains(S.Enrage) > S.Bloodthirst:CooldownRemainsP()) then
-      if AR.Cast(S.BattleCry, Settings.Fury.OffGCDasOffGCD.BattleCry) then return ""; end
+      if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
     -- actions+=/use_item,name=umbral_moonglaives,if=!equipped.umbral_moonglaives&buff.battle_cry.up&buff.enrage.up
     -- actions+=/bloodbath,if=buff.dragon_roar.up|!talent.dragon_roar.enabled&buff.battle_cry.up

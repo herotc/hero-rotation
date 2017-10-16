@@ -151,13 +151,13 @@ local function APL ()
     -- Omit gcd.remains on this offGCD because we can't react quickly enough otherwise (the intention is to cast this before the next GCD ability, but is a OffGCD abiltiy).
     -- actions+=/avatar,if=gcd.remains<0.25&(buff.battle_cry.up|cooldown.battle_cry.remains<15)|target.time_to_die<=20
     if S.Avatar:IsReady() and AR.CDsON() and ((Player:Buff(S.BattleCryBuff) or S.BattleCry:CooldownRemainsP() < 15) or Target:TimeToDie() <= 20) then
-      if AR.Cast(S.Avatar, Settings.Arms.OffGCDasOffGCD.Avatar) then return "Cast Avatar" end
+      if AR.Cast(S.Avatar, Settings.Commons.OffGCDasOffGCD.Avatar) then return "Cast Avatar" end
     end
 
     -- Omit gcd.remains on this offGCD because we can't react quickly enough otherwise (the intention is to cast this before the next GCD ability, but is a OffGCD abiltiy).
     -- actions+=/battle_cry,if=target.time_to_die<=6|(gcd.remains<=0.5&prev_gcd.1.ravager)|!talent.ravager.enabled&!gcd.remains&target.debuff.colossus_smash.remains>=5&(!cooldown.bladestorm.remains|!set_bonus.tier20_4pc)&(!talent.rend.enabled|dot.rend.remains>4)
     if S.BattleCry:IsReady() and AR.CDsON() and (Target:TimeToDie() <= 6 or (Player:PrevGCD(1, S.Ravager)) or not S.Ravager:IsAvailable() and Target:DebuffRemainsP(S.ColossusSmashDebuff) >= 5 and (S.Bladestorm:CooldownRemainsP() == 0 or not AC.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemainsP(S.RendDebuff) > 4)) then
-      if AR.Cast(S.BattleCry, Settings.Arms.OffGCDasOffGCD.BattleCry) then return "Cast BattleCry" end
+      if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return "Cast BattleCry" end
     end
 
     -- actions+=/run_action_list,name=cleave,if=spell_targets.whirlwind>=2&talent.sweeping_strikes.enabled
