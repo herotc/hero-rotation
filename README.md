@@ -38,6 +38,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Death Knight Unholy ([chrislopez24](https://github.com/chrislopez24))
 - Demon Hunter Vengeance **[Outdated]**
 - Druid Balance ([KutiKuti](https://github.com/Kutikuti)) **[WIP]**
+- Druid Guardian ([Aethys](https://github.com/Aethys256))
 - Hunter BeastMastery ([Nia](https://github.com/Nianel))
 - Hunter Marskmanship ([Nia](https://github.com/Nianel))
 - Hunter Survival ([Nia](https://github.com/Nianel))
@@ -48,7 +49,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Priest Shadow ([KutiKuti](https://github.com/Kutikuti))
 - Rogue Assassination ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
 - Rogue Outlaw ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
-- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
+- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler) & [Kojiyama](https://github.com/EvanMichaels))
 - Shaman Elemental ([lithium720](https://github.com/lithium720)) **[WIP]**
 - Shaman Enhancement ([lithium720](https://github.com/lithium720) & [Tael](https://github.com/Tae-l))
 - Warlock Affliction ([KutiKuti](https://github.com/Kutikuti)) **[WIP]**
