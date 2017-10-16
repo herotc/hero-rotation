@@ -159,11 +159,11 @@
         if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
       end
       -- actions+=/a_murder_of_crows,if=cooldown.bestial_wrath.remains<3|cooldown.bestial_wrath.remains>30|target.time_to_die<16
-      if AR.CDsON() and Target:IsInRange(40) and S.AMurderofCrows:IsCastable() and (S.BestialWrath:Cooldown() < 3 or S.BestialWrath:Cooldown() > 30 or Target:TimeToDie() < 16) then
+      if AR.CDsON() and Target:IsInRange(40) and S.AMurderofCrows:IsCastable() and (S.BestialWrath:CooldownRemains() < 3 or S.BestialWrath:CooldownRemains() > 30 or Target:TimeToDie() < 16) then
         if AR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return ""; end
       end
       -- actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
-      if AR.CDsON() and S.Stampede:IsCastable() and (Player:HasHeroism() or Player:Buff(S.BestialWrath) or ((S.BestialWrath:Cooldown() <= 2 or not AR.CDsON()) or (Target:TimeToDie() <= 14))) then
+      if AR.CDsON() and S.Stampede:IsCastable() and (Player:HasHeroism() or Player:Buff(S.BestialWrath) or ((S.BestialWrath:CooldownRemains() <= 2 or not AR.CDsON()) or (Target:TimeToDie() <= 14))) then
         if AR.Cast(S.Stampede) then return ""; end
       end
       -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
@@ -197,7 +197,7 @@
       -- # Hold charges of Dire Beast as long as possible to take advantage of T20 2pc unless T19 2pc is on. With Qa'pla, also try not to waste Kill Command cdr if it is just about to come off cooldown.
       -- NOTE : Change cooldown.kill_command.remains>=1 to cooldown.kill_command.remains>=gcd.max
       -- actions+=/dire_beast,if=((!equipped.qapla_eredun_war_order|cooldown.kill_command.remains>=1)&(set_bonus.tier19_2pc|!buff.bestial_wrath.up))|full_recharge_time<gcd.max|cooldown.titans_thunder.up|spell_targets>1
-      if S.DireBeast:IsCastable() and (((not I.QaplaEredunWarOrder:IsEquipped() or S.KillCommand:Cooldown() >= Player:GCD()) and (AC.Tier19_2Pc or not Player:Buff(S.BestialWrath))) or S.DireBeast:FullRechargeTime() < Player:GCD() or S.TitansThunder:CooldownUp() or Cache.EnemiesCount[40] > 1) then
+      if S.DireBeast:IsCastable() and (((not I.QaplaEredunWarOrder:IsEquipped() or S.KillCommand:CooldownRemains() >= Player:GCD()) and (AC.Tier19_2Pc or not Player:Buff(S.BestialWrath))) or S.DireBeast:FullRechargeTime() < Player:GCD() or S.TitansThunder:CooldownUp() or Cache.EnemiesCount[40] > 1) then
         if AR.Cast(S.DireBeast) then return ""; end
       end
       -- actions+=/dire_frenzy,if=(pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2)|full_recharge_time<gcd.max|target.time_to_die<9
@@ -209,7 +209,7 @@
         AR.CastSuggested(S.Barrage);
       end
       -- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&(buff.bestial_wrath.up|cooldown.bestial_wrath.remains>35))|buff.bestial_wrath.up
-      if AR.CDsON() and S.TitansThunder:IsCastable() and ((S.DireFrenzy:IsAvailable() and (Player:Buff(S.BestialWrath) or S.BestialWrath:Cooldown() > 35)) or Player:Buff(S.BestialWrath)) then
+      if AR.CDsON() and S.TitansThunder:IsCastable() and ((S.DireFrenzy:IsAvailable() and (Player:Buff(S.BestialWrath) or S.BestialWrath:CooldownRemains() > 35)) or Player:Buff(S.BestialWrath)) then
         if AR.Cast(S.TitansThunder, Settings.BeastMastery.OffGCDasOffGCD.TitansThunder) then return ""; end
       end
       -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
@@ -229,7 +229,7 @@
         if AR.Cast(S.ChimaeraShot) then return ""; end
       end
       -- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&(spell_targets.multishot=1|focus.regen*cooldown.kill_command.remains>action.kill_command.cost))|target.time_to_die<cooldown.kill_command.remains|(equipped.parsels_tongue&buff.parsels_tongue.remains<=gcd.max*2)
-      if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:Cooldown() > Player:FocusTimeToMax() and (S.BestialWrath:Cooldown() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BestialWrath) and (Player:FocusRegen()*S.KillCommand:Cooldown() > S.KillCommand:Cost())) or Target:TimeToDie() < S.KillCommand:Cooldown() or (I.ParselsTongue:IsEquipped() and Player:BuffRemains(S.ParselsTongueBuff) <= Player:GCD() * 2)) then
+      if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:CooldownRemains() > Player:FocusTimeToMax() and (S.BestialWrath:CooldownRemains() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BestialWrath) and (Player:FocusRegen()*S.KillCommand:CooldownRemains() > S.KillCommand:Cost())) or Target:TimeToDie() < S.KillCommand:CooldownRemains() or (I.ParselsTongue:IsEquipped() and Player:BuffRemains(S.ParselsTongueBuff) <= Player:GCD() * 2)) then
         if AR.Cast(S.CobraShot) then return ""; end
       end
       -- actions+=/dire_beast,if=buff.bestial_wrath.up

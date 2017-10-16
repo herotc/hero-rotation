@@ -100,7 +100,7 @@
     -- end
     -- actions.cooldown+=/use_item,slot=trinket2,if=!buff.metamorphosis.up&(!talent.first_blood.enabled|!cooldown.blade_dance.ready)&(!talent.nemesis.enabled|cooldown.nemesis.remains>30|target.time_to_die<cooldown.nemesis.remains+3)
     -- actions.cooldown+=/metamorphosis,if=!variable.pooling_for_meta&(!talent.demonic.enabled|!cooldown.eye_beam.ready)
-    if S.Metamorphosis:IsCastable() and not Pooling_for_Meta () and (not S.Demonic:IsAvailable() and not S.EyeBeam:Cooldown()) then
+    if S.Metamorphosis:IsCastable() and not Pooling_for_Meta () and (not S.Demonic:IsAvailable() and not S.EyeBeam:CooldownRemains()) then
       if AR.Cast(S.Metamorphosis) then return ""; end
     end
     -- actions.cooldown+=/potion,name=old_war,if=buff.metamorphosis.remains>25|target.time_to_die<30
@@ -108,7 +108,7 @@
   -- # "Getting ready to use meta" conditions, this is used in a few places.
   -- actions+=/variable,name=pooling_for_meta,value=cooldown.metamorphosis.remains<6&fury.deficit>30&!talent.demonic.enabled
   local function Pooling_for_Meta ()
-    return S.Metamorphosis:Cooldown() < 6 and Player:FuryDeficit() > 30 and not S.Demonic:IsAvailable();
+    return S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30 and not S.Demonic:IsAvailable();
   end
   -- # Blade Dance conditions. Always if First Blood is talented, otherwise 5+ targets with Chaos Cleave or 3+ targets without.
   -- actions+=/variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=3+(talent.chaos_cleave.enabled*2)
@@ -183,7 +183,7 @@
         if AR.Cast(S.ThrowGlaive) then return ""; end
       end
       -- actions+=/felblade,if=fury<15&(cooldown.death_sweep.remains<2*gcd|cooldown.blade_dance.remains<2*gcd)
-      if S.FelBlade:IsCastable() and Player:Fury() < 15 and (S.DeathSweep:Cooldown() < 2 * Player:GCD() or S.BladeDance:Cooldown() < 2 * Player:GCD()) then
+      if S.FelBlade:IsCastable() and Player:Fury() < 15 and (S.DeathSweep:CooldownRemains() < 2 * Player:GCD() or S.BladeDance:CooldownRemains() < 2 * Player:GCD()) then
         if AR.Cast(S.FelBlade) then return ""; end
       end
       -- actions+=/death_sweep,if=variable.blade_dance
@@ -204,7 +204,7 @@
         -- if AR.Cast(S.EyeBeam) then return ""; end
       -- end
       -- actions+=/blade_dance,if=variable.blade_dance&(!talent.demonic.enabled|cooldown.eye_beam.remains>5)&(!cooldown.metamorphosis.ready)
-      if S.BladeDance:IsCastable() and Blade_Dance () and (not S.Demonic:IsAvailable() or S.EyeBeam:Cooldown() > 5) and (not S.Metamorphosis:Cooldown()) then
+      if S.BladeDance:IsCastable() and Blade_Dance () and (not S.Demonic:IsAvailable() or S.EyeBeam:CooldownRemains() > 5) and (not S.Metamorphosis:CooldownRemains()) then
         if AR.Cast(S.BladeDance) then return ""; end
       end
       -- actions+=/throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
@@ -233,11 +233,11 @@
       -- end
       -- # If Demonic is talented, pool fury as Eye Beam is coming off cooldown.
       -- actions+=/demons_bite,if=talent.demonic.enabled&!talent.blind_fury.enabled&buff.metamorphosis.down&cooldown.eye_beam.remains<gcd&fury.deficit>=20
-      if S.DemonsBite:IsCastable() and S.Demonic:IsAvailable() and not S.BlindFury:IsAvailable() and not Player:Buff(S.Metamorphosis) and S.EyeBeam:Cooldown() < Player:GCD() and Player:FuryDeficit() >= 20 then
+      if S.DemonsBite:IsCastable() and S.Demonic:IsAvailable() and not S.BlindFury:IsAvailable() and not Player:Buff(S.Metamorphosis) and S.EyeBeam:CooldownRemains() < Player:GCD() and Player:FuryDeficit() >= 20 then
         if AR.Cast(S.DemonsBite) then return ""; end
       end
       -- actions+=/demons_bite,if=talent.demonic.enabled&!talent.blind_fury.enabled&buff.metamorphosis.down&cooldown.eye_beam.remains<2*gcd&fury.deficit>=45
-      if S.DemonsBite:IsCastable() and S.Demonic:IsAvailable() and not S.BlindFury:IsAvailable() and not Player:Buff(S.Metamorphosis) and S.EyeBeam:Cooldown() < 2 * Player:GCD() and Player:FuryDeficit() >= 45 then
+      if S.DemonsBite:IsCastable() and S.Demonic:IsAvailable() and not S.BlindFury:IsAvailable() and not Player:Buff(S.Metamorphosis) and S.EyeBeam:CooldownRemains() < 2 * Player:GCD() and Player:FuryDeficit() >= 45 then
         if AR.Cast(S.DemonsBite) then return ""; end
       end
       -- actions+=/throw_glaive,if=buff.metamorphosis.down&spell_targets>=2
@@ -245,7 +245,7 @@
         if AR.Cast(S.ThrowGlaive) then return ""; end
       end
       -- actions+=/chaos_strike,if=(talent.demon_blades.enabled|!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_chaos_strike&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&(!talent.demonic.enabled|!cooldown.eye_beam.ready|(talent.blind_fury.enabled&fury.deficit<35))
-      if S.ChaosStrike:IsCastable() and (S.DemonBlades:IsAvailable() or not S.Momentum:IsAvailable() or Player:Buff(S.Momentum) or Player:FuryDeficit() < 30 + Player:Buff(S.Prepared) * 8) and not Pooling_for_Chaos_Strike () and not Pooling_for_Meta () and not Pooling_for_Blade_Dance () and (not S.Demonic:IsAvailable() or S.EyeBeam:Cooldown() or (S.BlindFury:IsAvailable() and Player:FuryDeficit() < 35)) then
+      if S.ChaosStrike:IsCastable() and (S.DemonBlades:IsAvailable() or not S.Momentum:IsAvailable() or Player:Buff(S.Momentum) or Player:FuryDeficit() < 30 + Player:Buff(S.Prepared) * 8) and not Pooling_for_Chaos_Strike () and not Pooling_for_Meta () and not Pooling_for_Blade_Dance () and (not S.Demonic:IsAvailable() or S.EyeBeam:CooldownRemains() or (S.BlindFury:IsAvailable() and Player:FuryDeficit() < 35)) then
         if AR.Cast(S.ChaosStrike) then return ""; end
       end
       -- # Use Fel Barrage if its nearing max charges, saving it for Momentum and adds if possible.

@@ -66,7 +66,7 @@ local function APL ()
   --- Out of Combat
     if not Player:AffectingCombat() then
         -- Prowl
-      if not InCombatLockdown() and not S.Prowl:IsOnCooldown() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and AC.OutOfCombatTime() > 1 then
+      if not InCombatLockdown() and S.Prowl:CooldownUp() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and AC.OutOfCombatTime() > 1 then
         if AR.Cast(S.Prowl) then return "Cast"; end
       end
       -- Flask

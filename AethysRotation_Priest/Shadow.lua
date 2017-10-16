@@ -316,7 +316,7 @@ end
 --S2M rotation
 local function s2m()
   --Void Torrent prediction
-	if Player:CastID() == S.VoidEruption:ID() and (S.VoidTorrent:IsCastable() or (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidTorrent:Cooldown())) then
+	if Player:CastID() == S.VoidEruption:ID() and (S.VoidTorrent:IsCastable() or (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidTorrent:CooldownRemains())) then
 		if AR.Cast(S.VoidTorrent) then return "Cast"; end
 	end
 
@@ -327,7 +327,7 @@ local function s2m()
   end
   
   -- actions.s2m+=/void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
-  if (S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName() == S.VoidTorrent:Name()))  and (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidBolt:Cooldown())) or (not Player:IsCasting() and not Player:IsChanneling() and S.VoidBolt:Cooldown() < Player:GCD() * 0.28))
+  if (S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName() == S.VoidTorrent:Name()))  and (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidBolt:CooldownRemains())) or (not Player:IsCasting() and not Player:IsChanneling() and S.VoidBolt:CooldownRemains() < Player:GCD() * 0.28))
     and CurrentInsanityDrain() < 6 and (T194P and true or false) then
       if AR.Cast(S.VoidBolt) then return "Cast"; end
   end 
@@ -339,13 +339,13 @@ local function s2m()
   -- end
   
   -- actions.s2m+=/shadow_crash,if=talent.shadow_crash.enabled
-  if S.ShadowCrash:IsAvailable() and (S.ShadowCrash:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowCrash:Cooldown() + Player:GCD())) then
+  if S.ShadowCrash:IsAvailable() and (S.ShadowCrash:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowCrash:CooldownRemains() + Player:GCD())) then
     if AR.Cast(S.ShadowCrash) then return "Cast"; end
   end
   
   -- actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up|buff.voidform.stack<5
   if S.VoidTorrent:IsAvailable() 
-    and (S.VoidTorrent:IsCastable() or (Player:IsCasting() and Player:CastRemains()  >= S.VoidTorrent:Cooldown()))
+    and (S.VoidTorrent:IsCastable() or (Player:IsCasting() and Player:CastRemains()  >= S.VoidTorrent:CooldownRemains()))
     and Target:DebuffRemains(S.ShadowWordPain) > 5.5 
     and Target:DebuffRemains(S.VampiricTouch) > 5.5
     and (not Player:Buff(S.PowerInfusion) or Player:BuffStack(S.VoidForm) < 5)
@@ -365,7 +365,7 @@ local function s2m()
   
   -- actions.s2m+=/void_bolt
   -- actions.s2m+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
-  if S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName()==S.VoidTorrent:Name()))  and (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidBolt:Cooldown())) or (not Player:IsCasting() and not Player:IsChanneling() and S.VoidBolt:Cooldown() < Player:GCD() * 0.28) then
+  if S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName()==S.VoidTorrent:Name()))  and (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidBolt:CooldownRemains())) or (not Player:IsCasting() and not Player:IsChanneling() and S.VoidBolt:CooldownRemains() < Player:GCD() * 0.28) then
     if AR.Cast(S.VoidBolt) then return "Cast"; end
   end 
   
@@ -386,7 +386,7 @@ local function s2m()
   
   -- actions.s2m+=/mind_blast,if=active_enemies<=5
   -- actions.s2m+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=5
-  if (S.MindBlast:IsCastable() or (Player:IsCasting() and ((Player:CastRemains() + Player:GCD() * 0.28) >= S.MindBlast:Cooldown()))) 
+  if (S.MindBlast:IsCastable() or (Player:IsCasting() and ((Player:CastRemains() + Player:GCD() * 0.28) >= S.MindBlast:CooldownRemains()))) 
     and (not (Player:CastID() == S.MindBlast:ID()) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) 
     and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 5)) then 
     if AR.Cast(S.MindBlast) then return "Cast"; end
@@ -400,7 +400,7 @@ local function s2m()
   
   -- actions.s2m+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+50)<100
   if S.ShadowWordVoid:IsAvailable() 
-    and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() >= S.ShadowWordVoid:Cooldown()))
+    and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() >= S.ShadowWordVoid:CooldownRemains()))
     and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + 50) < 100 then
     if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
   end
@@ -464,7 +464,7 @@ end
 --Classic VoidForm rotation
 local function VoidForm()
 	--Void Torrent prediction
-	if Player:CastID() == S.VoidEruption:ID() and (S.VoidTorrent:IsCastable() or (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidTorrent:Cooldown())) then
+	if Player:CastID() == S.VoidEruption:ID() and (S.VoidTorrent:IsCastable() or (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidTorrent:CooldownRemains())) then
 		if AR.Cast(S.VoidTorrent) then return "Cast"; end
 	end
 	
@@ -484,19 +484,19 @@ local function VoidForm()
     
 		--actions.vf+=/void_bolt
     --actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
-		if S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName()==S.VoidTorrent:Name()))  and (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidBolt:Cooldown())) or (not Player:IsCasting() and not Player:IsChanneling() and S.VoidBolt:Cooldown() < Player:GCD() * 0.28) then
+		if S.VoidBolt:IsCastable() or ((Player:IsCasting() or (Player:IsChanneling() and Player:ChannelName()==S.VoidTorrent:Name()))  and (Player:CastRemains() + Player:GCD() * 0.28 >= S.VoidBolt:CooldownRemains())) or (not Player:IsCasting() and not Player:IsChanneling() and S.VoidBolt:CooldownRemains() < Player:GCD() * 0.28) then
 			if AR.Cast(S.VoidBolt) then return "Cast"; end
 		end 
     
 		--actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
-		if S.ShadowCrash:IsAvailable() and (S.ShadowCrash:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowCrash:Cooldown() + Player:GCD())) then
+		if S.ShadowCrash:IsAvailable() and (S.ShadowCrash:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowCrash:CooldownRemains() + Player:GCD())) then
       if AR.Cast(S.ShadowCrash) then return "Cast"; end
     end
 		
 		if not Player:IsMoving() then
 			--actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
 			if S.VoidTorrent:IsAvailable() 
-				and (S.VoidTorrent:IsCastable() or (Player:IsCasting() and Player:CastRemains()  >= S.VoidTorrent:Cooldown()))
+				and (S.VoidTorrent:IsCastable() or (Player:IsCasting() and Player:CastRemains()  >= S.VoidTorrent:CooldownRemains()))
 				and Target:DebuffRemains(S.ShadowWordPain) > 5.5 
 				and Target:DebuffRemains(S.VampiricTouch) > 5.5
         and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 60))
@@ -517,7 +517,7 @@ local function VoidForm()
 			
 			--actions.vf+=/mind_blast,if=active_enemies<=4
 			--actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
-			if (S.MindBlast:IsCastable() or (Player:IsCasting() and ((Player:CastRemains() + Player:GCD() * 0.28) >= S.MindBlast:Cooldown()))) 
+			if (S.MindBlast:IsCastable() or (Player:IsCasting() and ((Player:CastRemains() + Player:GCD() * 0.28) >= S.MindBlast:CooldownRemains()))) 
 				and (not (Player:CastID() == S.MindBlast:ID()) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) 
 				and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 4)) then 
 				if AR.Cast(S.MindBlast) then return "Cast"; end
@@ -531,7 +531,7 @@ local function VoidForm()
 
 			--actions.vf+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+25)<100
 			if S.ShadowWordVoid:IsAvailable() 
-				and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() >= S.ShadowWordVoid:Cooldown()))
+				and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() >= S.ShadowWordVoid:CooldownRemains()))
 				and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + 25) < 100 then
 				if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
 			end
@@ -786,7 +786,7 @@ local function APL ()
 				end
 				
 				--actions.main+=/shadow_crash,if=talent.shadow_crash.enabled
-				if S.ShadowCrash:IsAvailable() and (S.ShadowCrash:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowCrash:Cooldown() + Player:GCD())) then
+				if S.ShadowCrash:IsAvailable() and (S.ShadowCrash:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowCrash:CooldownRemains() + Player:GCD())) then
 					if AR.Cast(S.ShadowCrash) then return "Cast"; end
 				end
         
@@ -811,7 +811,7 @@ local function APL ()
         
 				--actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
 				--actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
-				if (S.MindBlast:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.MindBlast:Cooldown() + Player:GCD())) 
+				if (S.MindBlast:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.MindBlast:CooldownRemains() + Player:GCD())) 
 					and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 4)) 
 					and FutureInsanity() < InsanityThreshold() 
 					and (not (Player:CastID() == S.MindBlast:ID()) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then
@@ -842,7 +842,7 @@ local function APL ()
 				end
         
 				--actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=70&talent.legacy_of_the_void.enabled)|(insanity<=85&!talent.legacy_of_the_void.enabled)
-				if S.ShadowWordVoid:IsAvailable() and FutureInsanity() < InsanityThreshold() and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowWordVoid:Cooldown() + Player:GCD())) then
+				if S.ShadowWordVoid:IsAvailable() and FutureInsanity() < InsanityThreshold() and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowWordVoid:CooldownRemains() + Player:GCD())) then
 					if AR.Cast(S.ShadowWordVoid) then return "Cast"; end
 				end
 				

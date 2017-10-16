@@ -97,7 +97,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ DBM Count
       -- Opener
-      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(5) then
+      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange("Melee") then
         if S.Judgment:IsCastable() then
           if AR.Cast(S.Judgment) then return "Cast Judgment"; end
         elseif S.Zeal:IsCastable() then
@@ -110,7 +110,7 @@ local function APL ()
     end
   -- In Combat
     -- Unit Update
-    AC.GetEnemies(8); -- Divine Storm
+    AC.GetEnemies(8, true); -- Divine Storm
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       --[[ Disabled since not coded for Retribution yet
       -- Mythic Dungeon
@@ -124,10 +124,10 @@ local function APL ()
       ]]
       -- Interrupts
       if Settings.General.InterruptEnabled and Target:IsInterruptible()  then
-        if S.Rebuke:IsCastable() and Target:IsInRange(5) then
+        if S.Rebuke:IsCastable("Melee") then
           if AR.Cast(S.Rebuke) then return "Cast"; end
-        elseif Settings.General.InterruptWithStun and Target:IsInRange(10) and Target:CanBeStunned() then
-          if S.HammerofJustice:IsCastable() then
+        elseif Settings.General.InterruptWithStun and Target:CanBeStunned() then
+          if S.HammerofJustice:IsCastable(10) then
             if AR.Cast(S.HammerofJustice) then return "Cast"; end
           end
         end
@@ -139,30 +139,30 @@ local function APL ()
         -- actions.opener+=/berserking
           -- Not available for Paladin :P
         -- actions.opener+=/arcane_torrent
-        if S.ArcaneTorrent:IsCastable() and Target:IsInRange(5) then
+        if S.ArcaneTorrent:IsCastable("Melee") then
           if AR.Cast(S.ArcaneTorrent, Settings.Retribution.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
         end
         -- actions.opener+=/judgment
-        if S.Judgment:IsCastable() and Target:IsInRange(30) then
+        if S.Judgment:IsCastable(30) then
           if AR.Cast(S.Judgment) then return "Cast Judgment"; end
         end
         if (I.LiadrinsFuryUnleashed:IsEquipped() or Player:Race() == "BloodElf" or not S.WakeofAshes:CooldownUp()) then
           -- actions.opener+=/blade_of_justice,if=equipped.137048|race.blood_elf|!cooldown.wake_of_ashes.up
-          if S.BladeofJustice:IsCastable()  and Target:IsInRange(10) then
+          if S.BladeofJustice:IsCastable(S.BladeofJustice) then
             if AR.Cast(S.BladeofJustice) then return "Cast Blade of Justice"; end
           end
           -- actions.opener+=/divine_hammer,if=equipped.137048|race.blood_elf|!cooldown.wake_of_ashes.up
-          if S.DivineHammer:IsCastable() and Target:IsInRange(8) then
+          if S.DivineHammer:IsCastable(8, true) then
             if AR.Cast(S.DivineHammer) then return "Cast Divine Hammer"; end
           end
         end
         -- actions.opener+=/wake_of_ashes
-        if S.WakeofAshes:IsCastable() and Target:IsInRange(5) then
+        if S.WakeofAshes:IsCastable(S.BladeofJustice) then
           if AR.Cast(S.WakeofAshes) then return "Cast Wake of Ashes"; end
         end
       end
       -- actions+=/call_action_list,name=cooldowns
-      if Target:IsInRange(5) then
+      if Target:IsInRange("Melee") then
         -- actions.cooldowns+=/use_item
           -- TODO
         -- actions.cooldowns+=/potion,name=old_war,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25|target.time_to_die<=40)
@@ -189,7 +189,7 @@ local function APL ()
         end
       end
       -- SoloMode : Justicar's Vengeance
-      if Settings.General.SoloMode and S.JusticarsVengeance:IsReady() and Target:IsInRange(5) then
+      if Settings.General.SoloMode and S.JusticarsVengeance:IsReady() and Target:IsInRange("Melee") then
         -- Divine Purpose 
         if Player:HealthPercentage() <= Settings.Retribution.SoloJusticarDP and Player:Buff(S.DivinePurposeBuff) then
           if AR.Cast(S.JusticarsVengeance) then return "Cast Justicars Vengeance"; end
@@ -201,7 +201,7 @@ local function APL ()
       end
       -- actions+=/call_action_list,name=priority
         -- actions.priority=execution_sentence,if=spell_targets.divine_storm<=3&(cooldown.judgment.remains<gcd*4.5|debuff.judgment.remains>gcd*4.5)
-        if S.ExecutionSentence:IsReady() and Target:IsInRange(20) and Cache.EnemiesCount[8] <= 3 and (S.Judgment:Cooldown() < Player:GCD()*4.5 or Target:DebuffRemains(S.Judgment) > Player:GCD()*4.5) then
+        if S.ExecutionSentence:IsReady() and Target:IsInRange(20) and Cache.EnemiesCount[8] <= 3 and (S.Judgment:CooldownRemains() < Player:GCD()*4.5 or Target:DebuffRemains(S.Judgment) > Player:GCD()*4.5) then
           if AR.Cast(S.ExecutionSentence) then return "Cast Execution Sentence"; end
         end
         -- actions.priority+=/variable,name=ds_castable,value=spell_targets.divine_storm>=2|(buff.scarlet_inquisitors_expurgation.stack>=29&(buff.avenging_wrath.up|(buff.crusade.up&buff.crusade.stack>=15)|(cooldown.crusade.remains>15&!buff.crusade.up)|cooldown.avenging_wrath.remains>15))
@@ -229,7 +229,7 @@ local function APL ()
               if AR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
             end
           end
-          if Target:IsInRange(5) then
+          if Target:IsInRange("Melee") then
             if S.JusticarsVengeance:IsReady() and Player:Buff(S.DivinePurposeBuff) and not I.WhisperoftheNathrezim:IsEquipped() then
               -- actions.priority+=/justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2&!equipped.137020
               if Player:BuffRemains(S.DivinePurposeBuff) < Player:GCD()*2 then
@@ -259,12 +259,12 @@ local function APL ()
           end
           if Var_Crusade then
             -- actions.priority+=/templars_verdict,if=debuff.judgment.up&holy_power>=5&variable.crusade
-            if S.TemplarsVerdict:IsReady() and Target:IsInRange(5) and Player:HolyPower() >= 5 then
+            if S.TemplarsVerdict:IsReady() and Target:IsInRange("Melee") and Player:HolyPower() >= 5 then
               if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
             end
             if Var_DS_Castable and S.DivineStorm:IsReady() then
               -- actions.priority+=/divine_storm,if=debuff.judgment.up&variable.ds_castable&artifact.wake_of_ashes.enabled&cooldown.wake_of_ashes.remains<gcd*2&variable.crusade
-              if S.WakeofAshes:IsAvailable() and S.WakeofAshes:Cooldown() < Player:GCD()*2 then
+              if S.WakeofAshes:IsAvailable() and S.WakeofAshes:CooldownRemains() < Player:GCD()*2 then
                 if AR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
               end
               -- actions.priority+=/divine_storm,if=debuff.judgment.up&variable.ds_castable&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd*1.5&variable.crusade
@@ -274,9 +274,9 @@ local function APL ()
             end
           end
         end
-        if Var_Crusade and S.TemplarsVerdict:IsReady() and Target:IsInRange(5) then
+        if Var_Crusade and S.TemplarsVerdict:IsReady() and Target:IsInRange("Melee") then
           -- actions.priority+=/templars_verdict,if=(equipped.137020|debuff.judgment.up)&artifact.wake_of_ashes.enabled&cooldown.wake_of_ashes.remains<gcd*2&variable.crusade
-          if (I.WhisperoftheNathrezim:IsEquipped() or Judged()) and S.WakeofAshes:IsAvailable() and S.WakeofAshes:Cooldown() < Player:GCD()*2 then
+          if (I.WhisperoftheNathrezim:IsEquipped() or Judged()) and S.WakeofAshes:IsAvailable() and S.WakeofAshes:CooldownRemains() < Player:GCD()*2 then
             if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
           end
           -- actions.priority+=/templars_verdict,if=debuff.judgment.up&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd*1.5&variable.crusade
@@ -285,36 +285,36 @@ local function APL ()
           end
         end
         -- actions.priority+=/judgment,if=dot.execution_sentence.ticking&dot.execution_sentence.remains<gcd*2&debuff.judgment.remains<gcd*2
-        if S.Judgment:IsCastable() and Target:IsInRange(30) and Target:Debuff(S.ExecutionSentence) and Target:DebuffRemains(S.ExecutionSentence) < Player:GCD() * 2 and Target:DebuffRemains(S.JudgmentDebuff) < Player:GCD() * 2 then
+        if S.Judgment:IsCastable(30) and Target:Debuff(S.ExecutionSentence) and Target:DebuffRemains(S.ExecutionSentence) < Player:GCD() * 2 and Target:DebuffRemains(S.JudgmentDebuff) < Player:GCD() * 2 then
           if AR.Cast(S.Judgment) then return "Cast Judgment"; end
         end
         -- actions.priority+=/consecration,if=(cooldown.blade_of_justice.remains>gcd*2|cooldown.divine_hammer.remains>gcd*2)
-        if AR.AoEON() and S.Consecration:IsCastable() and Target:IsInRange(8) and (S.BladeofJustice:Cooldown() > Player:GCD() * 2 or S.DivineHammer:Cooldown() > Player:GCD() * 2) then
+        if AR.AoEON() and S.Consecration:IsCastable(10, true) and (S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 or S.DivineHammer:CooldownRemains() > Player:GCD() * 2) then
           if AR.Cast(S.Consecration) then return "Cast Consecration"; end
         end
         -- actions.priority+=/wake_of_ashes,if=(!raid_event.adds.exists|raid_event.adds.in>15)&(holy_power<=0|holy_power=1&(cooldown.blade_of_justice.remains>gcd|cooldown.divine_hammer.remains>gcd)|holy_power=2&((cooldown.zeal.charges_fractional<=0.65|cooldown.crusader_strike.charges_fractional<=0.65)))
-        if S.WakeofAshes:IsCastable() and Target:IsInRange(10) and (Player:HolyPower() == 0 or (Player:HolyPower() == 1 and (S.BladeofJustice:Cooldown() > Player:GCD() or S.DivineHammer:Cooldown() > Player:GCD())) or (Player:HolyPower() == 2 and (S.Zeal:ChargesFractional() <= 0.65 or S.CrusaderStrike:ChargesFractional() <= 0.65))) then
+        if S.WakeofAshes:IsCastable(S.BladeofJustice) and (Player:HolyPower() == 0 or (Player:HolyPower() == 1 and (S.BladeofJustice:CooldownRemains() > Player:GCD() or S.DivineHammer:CooldownRemains() > Player:GCD())) or (Player:HolyPower() == 2 and (S.Zeal:ChargesFractional() <= 0.65 or S.CrusaderStrike:ChargesFractional() <= 0.65))) then
           if AR.Cast(S.WakeofAshes) then return "Cast Wake of Ashes"; end
         end
         if Player:HolyPower() <= 3 - (AC.Tier20_2Pc and 1 or 0) then
           -- actions.priority+=/blade_of_justice,if=holy_power<=3-set_bonus.tier20_2pc
-          if S.BladeofJustice:IsCastable() and Target:IsInRange(10) then
+          if S.BladeofJustice:IsCastable(S.BladeofJustice) then
             if AR.Cast(S.BladeofJustice) then return "Cast Blade of Justice"; end
           end
           -- actions.priority+=/divine_hammer,if=holy_power<=3-set_bonus.tier20_2pc
-          if S.DivineHammer:IsCastable() and Target:IsInRange(8) then
+          if S.DivineHammer:IsCastable(8, true) then
             if AR.Cast(S.DivineHammer) then return "Cast Divine Hammer"; end
           end
         end
         -- actions.priority+=/hammer_of_justice,if=equipped.137065&target.health.pct>=75&holy_power<=4
-        if S.HammerofJustice:IsCastable() and Target:IsInRange(10) and I.JusticeGaze:IsEquipped() and Target:HealthPercentage() >= 75 and Player:HolyPower() <= 4 then
+        if S.HammerofJustice:IsCastable(10) and I.JusticeGaze:IsEquipped() and Target:HealthPercentage() >= 75 and Player:HolyPower() <= 4 then
           if AR.Cast(S.HammerofJustice) then return "Cast Hammer of Justice"; end
         end
         -- actions.priority+=/judgment
-        if S.Judgment:IsCastable() and Target:IsInRange(30)then
+        if S.Judgment:IsCastable(30) then
           if AR.Cast(S.Judgment) then return "Cast Judgment"; end
         end
-        if Target:IsInRange(5) and Player:HolyPower() <= 4 and (S.BladeofJustice:Cooldown() > Player:GCD() * 2 or S.DivineHammer:Cooldown() > Player:GCD() * 2) and Target:DebuffRemains(S.JudgmentDebuff) < Player:GCD() * 2 then
+        if Target:IsInRange("Melee") and Player:HolyPower() <= 4 and (S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 or S.DivineHammer:CooldownRemains() > Player:GCD() * 2) and Target:DebuffRemains(S.JudgmentDebuff) < Player:GCD() * 2 then
           -- actions.priority+=/zeal,if=cooldown.zeal.charges_fractional>=1.65&holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|cooldown.divine_hammer.remains>gcd*2)&debuff.judgment.remains>gcd
           if S.Zeal:IsCastable() and S.Zeal:ChargesFractional() >= 1.65 then
             if AR.Cast(S.Zeal) then return "Cast Zeal"; end
@@ -325,7 +325,7 @@ local function APL ()
           end
         end
         -- actions.priority+=/consecration
-        if AR.AoEON() and S.Consecration:IsCastable() and Target:IsInRange(8) then
+        if AR.AoEON() and S.Consecration:IsCastable(10, true) then
           if AR.Cast(S.Consecration) then return "Cast Consecration"; end
         end
         if Judged() then
@@ -343,7 +343,7 @@ local function APL ()
               if AR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
             end
           end
-          if Target:IsInRange(5) then
+          if Target:IsInRange("Melee") then
             -- actions.priority+=/justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.react&!equipped.137020
             if S.JusticarsVengeance:IsReady() and Player:Buff(S.DivinePurposeBuff) and not I.WhisperoftheNathrezim:IsEquipped() then
               if AR.Cast(S.JusticarsVengeance) then return "Cast Justicars Vengeance"; end
@@ -359,14 +359,14 @@ local function APL ()
                   if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
                 end
                 -- actions.priority+=/templars_verdict,if=debuff.judgment.up&variable.crusade&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*2)
-                if not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:Cooldown() > Player:GCD() * 2 then
+                if not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 2 then
                   if AR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict"; end
                 end
               end
             end
           end
         end
-        if Target:IsInRange(5) and Player:HolyPower() <= 4 then
+        if Target:IsInRange("Melee") and Player:HolyPower() <= 4 then
           -- actions+=/zeal,if=holy_power<=4
           if S.Zeal:IsCastable() then
             if AR.Cast(S.Zeal) then return "Cast Zeal"; end

@@ -37,13 +37,15 @@ local tableinsert = table.insert;
     ShadowDance                   = Spell(185313),
     ShadowDanceBuff               = Spell(185422),
     Shadowstrike                  = Spell(185438),
+    ShurikenComboBuff             = Spell(245640),
     ShurikenStorm                 = Spell(197835),
     ShurikenToss                  = Spell(114014),
     Stealth                       = Spell(1784),
+    Stealth2                      = Spell(115191), -- w/ Subterfuge Talent
     SymbolsofDeath                = Spell(212283),
     Vanish                        = Spell(1856),
     VanishBuff                    = Spell(11327),
-    ShurikenComboBuff             = Spell(245640),
+    VanishBuff2                   = Spell(115193), -- w/ Subterfuge Talent
     -- Talents
     Alacrity                      = Spell(193539),
     AlacrityBuff                  = Spell(193538),
@@ -58,11 +60,11 @@ local tableinsert = table.insert;
     MasterofShadowsBuff           = Spell(196980),
     MasterOfSubtlety              = Spell(31223),
     MasterOfSubtletyBuff          = Spell(31665),
+    Nightstalker                  = Spell(14062),
     ShadowFocus                   = Spell(108209),
     Subterfuge                    = Spell(108208),
     Vigor                         = Spell(14983),
     -- Artifact
-    WeakPoint                     = Spell(238068),
     FeedingFrenzy                 = Spell(242705),
     FinalityEviscerate            = Spell(197496),
     FinalityNightblade            = Spell(197498),
@@ -71,6 +73,7 @@ local tableinsert = table.insert;
     LegionBlade                   = Spell(214930),
     ShadowFangs                   = Spell(221856),
     ShadowsoftheUncrowned         = Spell(241154),
+    WeakPoint                     = Spell(238068),
     -- Defensive
     CrimsonVial                   = Spell(185311),
     Feint                         = Spell(1966),
@@ -101,7 +104,7 @@ local tableinsert = table.insert;
         -- Eviscerate R2 Multiplier
         1.5 *
         -- Aura Multiplier (SpellID: 137035)
-        1.25 *
+        1.27 *
         -- Finality: Eviscerate Multiplier
         (Player:Buff(S.FinalityEviscerate) and 1 + Player:Buff(S.FinalityEviscerate, 17) / 100 or 1) *
         -- Shadow Fangs Multiplier
@@ -124,6 +127,14 @@ local tableinsert = table.insert;
         (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
     end
   );
+  S.Nightblade:RegisterPMultiplier(
+    {S.FinalityNightblade, function ()
+      return Player:Buff(S.FinalityNightblade) and 1 + Player:Buff(S.FinalityNightblade, 17)/100 or 1;
+    end},
+    {function ()
+      return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.12 or 1;
+    end}
+  );
 -- Items
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Subtlety = {
@@ -143,8 +154,7 @@ local tableinsert = table.insert;
   local I = Item.Rogue.Subtlety;
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local BestUnit, BestUnitTTD; -- Used for cycling
-  local NightbladeThreshold; -- Used to compute the NB threshold (Cycling Performance)
+  local Stealth, VanishBuff;
 -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -154,7 +164,7 @@ local tableinsert = table.insert;
 
 -- Melee Is In Range w/ DfA Handler
 local function IsInMeleeRange ()
-  return (Target:IsInRange(5) or S.DeathfromAbove:TimeSinceLastCast() <= 1.5) and true or false;
+  return (Target:IsInRange("Melee") or S.DeathfromAbove:TimeSinceLastCast() <= 1.5) and true or false;
 end
 -- Shadow Satry's Walk Bug
 local ExtraSSWRefundTable = {
@@ -180,15 +190,14 @@ local function ShD_Fractional ()
 end
 -- actions=variable,name=dsh_dfa,value=talent.death_from_above.enabled&talent.dark_shadow.enabled&spell_targets.death_from_above<4
 local function DSh_DfA ()
-  return S.DeathfromAbove:IsAvailable() and S.DarkShadow:IsAvailable() and Cache.EnemiesCount[8] < 4;
+  return S.DeathfromAbove:IsAvailable() and S.DarkShadow:IsAvailable() and Cache.EnemiesCount[10] < 4;
 end
 -- # Finishers
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:Buff(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
-  
   if S.Nightblade:IsCastable() then
-    NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
+    local NightbladeThreshold = (6+Rogue.CPSpend()*(2+(AC.Tier19_2Pc and 2 or 0)))*0.3;
     -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff)
       and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Nightblade)) or Target:TimeToDieIsNotValid())
@@ -196,7 +205,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       and (Rogue.MantleDuration() == 0 or Target:DebuffRemainsP(S.Nightblade) <= Rogue.MantleDuration())
       and ((Target:DebuffRefreshableP(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Target) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
         or Target:DebuffRemainsP(S.Nightblade) < 4)
-      and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
+      and (Cache.EnemiesCount[10] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
       if ReturnSpellOnly then
         return S.Nightblade;
       else
@@ -205,13 +214,13 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
     -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
     if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff) and Rogue.MantleDuration() == 0 then
-      BestUnit, BestUnitTTD = nil, 12;
-      for _, Unit in pairs(Cache.Enemies[5]) do
+      local BestUnit, BestUnitTTD = nil, 12;
+      for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Nightblade))
           and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
           and ((Unit:DebuffRefreshableP(S.Nightblade, NightbladeThreshold) and (not AC.Finality(Unit) or Player:Buff(S.FinalityNightblade) or DSh_DfA()))
             or Unit:DebuffRemainsP(S.Nightblade) < 4)
-          and (Cache.EnemiesCount[8] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
+          and (Cache.EnemiesCount[10] < 4 and not DSh_DfA() or not Player:Buff(S.SymbolsofDeath)) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -220,7 +229,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
     -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
-    if IsInMeleeRange() and Target:DebuffRemainsP(S.Nightblade) < S.SymbolsofDeath:CooldownRemainsP() + 10 
+    if IsInMeleeRange() and Target:DebuffRemainsP(S.Nightblade) < S.SymbolsofDeath:CooldownRemainsP() + 10
     and S.SymbolsofDeath:CooldownRemainsP() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
     and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemainsP(), -Target:DebuffRemainsP(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
       if ReturnSpellOnly then
@@ -231,12 +240,12 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|(!buff.shadow_dance.up|spell_targets>=4)&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)&buff.the_first_of_the_dead.remains<1&(buff.finality_eviscerate.up|spell_targets.shuriken_storm<4)
-  if S.DeathfromAbove:IsCastable() and Target:IsInRange(15)
+  if S.DeathfromAbove:IsCastable(15)
     and (not S.DarkShadow:IsAvailable()
-      or (not ShadowDanceBuff or Cache.EnemiesCount[8] >= 4)
+      or (not ShadowDanceBuff or Cache.EnemiesCount[10] >= 4)
         and (Player:Buff(S.SymbolsofDeath) or S.SymbolsofDeath:CooldownRemainsP() >= 10 + (AC.Tier20_4Pc and 5 or 0))
         and Player:BuffRemainsP(S.TheFirstoftheDead) < 1
-        and (Player:Buff(S.FinalityEviscerate) or Cache.EnemiesCount[8] < 4)) then
+        and (Player:Buff(S.FinalityEviscerate) or Cache.EnemiesCount[10] < 4)) then
     if ReturnSpellOnly then
       return S.DeathfromAbove;
     else
@@ -262,11 +271,10 @@ end
 -- # Stealthed Rotation
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Stealthed (ReturnSpellOnly, StealthSpell)
-  StealthBuff = Player:Buff(S.Stealth) or (StealthSpell and StealthSpell:ID() == S.Stealth:ID())
-  
+  local StealthBuff = Player:Buff(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
   -- actions.stealthed=shadowstrike,if=buff.stealth.up
-  if S.Shadowstrike:IsCastable() and IsInMeleeRange() and StealthBuff then
+  if StealthBuff and S.Shadowstrike:IsCastable() and IsInMeleeRange() then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -274,13 +282,13 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points>=5&(spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk|(mantle_duration<=1.3&mantle_duration>=0.3))
-  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0)
+  if Player:ComboPoints() >= 5 and (Cache.EnemiesCount[10] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0)
       or (Rogue.MantleDuration() <= 1.3 and Rogue.MantleDuration() >= 0.3)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/shuriken_storm,if=buff.shadowmeld.down&((combo_points.deficit>=2+equipped.insignia_of_ravenholdt&spell_targets.shuriken_storm>=3+equipped.shadow_satyrs_walk)|(combo_points.deficit>=1&buff.the_dreadlords_deceit.stack>=29))
   if S.ShurikenStorm:IsCastable() and not Player:Buff(S.Shadowmeld)
-      and ((Player:ComboPointsDeficit() >= 2 + (I.InsigniaOfRavenholdt:IsEquipped() and 1 or 0) and Cache.EnemiesCount[8] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
+      and ((Player:ComboPointsDeficit() >= 2 + (I.InsigniaOfRavenholdt:IsEquipped() and 1 or 0) and Cache.EnemiesCount[10] >= 3 + (I.ShadowSatyrsWalk:IsEquipped() and 1 or 0))
         or (AR.AoEON() and IsInMeleeRange() and Player:ComboPointsDeficit() >= 1 and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
     if ReturnSpellOnly then
       return S.ShurikenStorm
@@ -305,9 +313,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
 end
 -- # Stealth Macros
 -- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
-local MacroTable;
 local function StealthMacro (StealthSpell)
-  MacroTable = {StealthSpell};
+  local MacroTable = {StealthSpell};
 
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
@@ -321,9 +328,9 @@ local function StealthMacro (StealthSpell)
     if AR.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return ""; end
     return false;
   end
-  
+
   tableinsert(MacroTable, Stealthed(true, StealthSpell))
-  
+
    -- Note: In case DfA is adviced (which can only be a combo for ShD), we swap them to let understand it's DfA then ShD during DfA (DfA - ShD bug)
   if MacroTable[1] == S.ShadowDance and MacroTable[2] == S.DeathfromAbove then
     return AR.CastQueue(MacroTable[2], MacroTable[1]);
@@ -334,7 +341,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2+buff.the_first_of_the_dead.up
-  if Cache.EnemiesCount[8] >= 2 + (Player:Buff(S.TheFirstoftheDead) and 1 or 0) and S.ShurikenStorm:IsCastable() then
+  if Cache.EnemiesCount[10] >= 2 + (Player:Buff(S.TheFirstoftheDead) and 1 or 0) and S.ShurikenStorm:IsCastable() then
     if AR.Cast(S.ShurikenStorm) then return ""; end
   end
   if IsInMeleeRange() then
@@ -349,7 +356,6 @@ local function Build ()
   return false;
 end
 -- # Cooldowns
-local TrinketSuggested;
 local function CDs ()
   if IsInMeleeRange() then
     if AR.CDsON() then
@@ -357,17 +363,17 @@ local function CDs ()
       -- TODO: Add Potion Suggestion
 
       -- Trinkets
-      TrinketSuggested = false;
+      local TrinketSuggested = false;
       if not TrinketSuggested and I.SpecterofBetrayal:IsEquipped() and I.SpecterofBetrayal:IsReady() then
         if S.DarkShadow:IsAvailable() then
           -- if=talent.dark_shadow.enabled&buff.shadow_dance.up&(!set_bonus.tier20_4pc|buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=43)))
-          if Player:Buff(S.ShadowDanceBuff) and (not AC.Tier20_4Pc or Player:Buff(S.SymbolsofDeath) or 
-            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemainsP() >= 43))) then 
-              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end 
+          if Player:Buff(S.ShadowDanceBuff) and (not AC.Tier20_4Pc or Player:Buff(S.SymbolsofDeath) or
+            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemainsP() >= 43))) then
+              if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end
           end
-        else 
+        else
           -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
-          if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) 
+          if not Player:IsStealthed(true, true) and not Player:Buff(Stealth) and not Player:Buff(S.Vanish)
             and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
               if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end
           end
@@ -376,13 +382,13 @@ local function CDs ()
       if not TrinketSuggested and I.UmbralMoonglaives:IsEquipped() and I.UmbralMoonglaives:IsReady() then
         if S.DarkShadow:IsAvailable() then
           -- if=talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&buff.shadow_dance.up&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)))
-          if not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) and Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or 
-            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()))) then 
+          if not Player:Buff(Stealth) and not Player:Buff(S.Vanish) and Player:Buff(S.ShadowDanceBuff) and (Player:Buff(S.SymbolsofDeath) or
+            (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()))) then
               if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
           end
-        else 
+        else
           -- if=!talent.dark_shadow.enabled&!buff.stealth.up&!buff.vanish.up&(mantle_duration>=3|!equipped.mantle_of_the_master_assassin)
-          if not Player:IsStealthed(true, true) and not Player:Buff(S.Stealth) and not Player:Buff(S.Vanish) 
+          if not Player:IsStealthed(true, true) and not Player:Buff(Stealth) and not Player:Buff(S.Vanish)
             and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped()) then
               if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
           end
@@ -390,12 +396,12 @@ local function CDs ()
       end
       if not TrinketSuggested and I.VialofCeaselessToxins:IsEquipped() and I.VialofCeaselessToxins:IsReady() then
         -- if=(!talent.dark_shadow.enabled|buff.shadow_dance.up)&(buff.symbols_of_death.up|(!talent.death_from_above.enabled&((mantle_duration>=3|!equipped.mantle_of_the_master_assassin)|cooldown.vanish.remains>=60)))
-        if (not S.DarkShadow:IsAvailable() or Player:Buff(S.ShadowDanceBuff)) and (Player:Buff(S.SymbolsofDeath) 
+        if (not S.DarkShadow:IsAvailable() or Player:Buff(S.ShadowDanceBuff)) and (Player:Buff(S.SymbolsofDeath)
           or (not S.DeathfromAbove:IsAvailable() and (Rogue.MantleDuration() >= 3 or not I.MantleoftheMasterAssassin:IsEquipped() or S.Vanish:CooldownRemainsP() >= 60))) then
             if AR.CastSuggested(I.VialofCeaselessToxins) then TrinketSuggested = true; end
         end
       end
-    
+
       -- Racials
       if Player:IsStealthed(true, false) then
         -- actions.cds+=/blood_fury,if=stealthed.rogue
@@ -407,7 +413,7 @@ local function CDs ()
           if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
-        if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficit() > 70 then
+        if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 70 then
           if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
       end
@@ -420,8 +426,8 @@ local function CDs ()
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       else
-        -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
-        if S.DeathfromAbove:CooldownRemainsP() <= 3 and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
+        -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=1&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
+        if S.DeathfromAbove:CooldownRemainsP() <= 1 and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       end
@@ -446,7 +452,7 @@ local function CDs ()
       -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.ShD_Fractional&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
       if S.GoremawsBite:IsCastable() and not Player:IsStealthed(true, true) and S.ShadowDance:ChargesFractional() <= ShD_Fractional()
           and ((Player:ComboPointsDeficit() >= 4-(AC.CombatTime() < 10 and 2 or 0)
-              and Player:EnergyDeficit() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
+              and Player:EnergyDeficitPredicted() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
             or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8)) then
         if AR.Cast(S.GoremawsBite) then return ""; end
       end
@@ -455,8 +461,8 @@ local function CDs ()
       -- Removed the TTD part for now.
       if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
         and Rogue.MantleDuration() == 0 and DSh_DfA() and (not I.MantleoftheMasterAssassin:IsEquipped() or Player:Buff(S.SymbolsofDeath))
-          and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.Stealth)
-          and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 6 
+          and S.ShadowDance:ChargesFractional() <= ShD_Fractional() and not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(Stealth)
+          and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 6
             or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemainsP(S.Nightblade)) or not Target:TimeToDieIsNotValid())
           and S.DeathfromAbove:CooldownRemainsP() <= 1 then
         -- actions.cds+=/pool_resource,for_next=1,extra_amount=65-talent.shadow_focus.enabled*10
@@ -493,7 +499,7 @@ local function Stealth_CDs ()
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10+variable.ssw_refund
     if AR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-      and GetUnitSpeed("player") == 0 and Player:EnergyDeficit() > 10+SSW_Refund() then
+      and GetUnitSpeed("player") == 0 and Player:EnergyDeficitPredicted() > 10+SSW_Refund() then
       -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
       if Player:EnergyPredicted() < 40 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
@@ -505,7 +511,7 @@ local function Stealth_CDs ()
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1 and not DSh_DfA()
       and Player:ComboPointsDeficit() >= 2 + (S.Subterfuge:IsAvailable() and 2 or 0)
       and (Player:BuffRemainsP(S.SymbolsofDeath) >= 1.2 or S.SymbolsofDeath:CooldownRemainsP() >= 12 + (S.DarkShadow:IsAvailable() and AC.Tier20_4Pc and 3 or 0) - (not S.DarkShadow:IsAvailable() and AC.Tier20_4Pc and 4 or 0))
-      and (Cache.EnemiesCount[8] >= 4 or not Player:Buff(S.TheFirstoftheDead)) then
+      and (Cache.EnemiesCount[10] >= 4 or not Player:Buff(S.TheFirstoftheDead)) then
       if StealthMacro(S.ShadowDance) then return ""; end
     end
   end
@@ -514,12 +520,12 @@ end
 -- # Stealth Action List Starter
 local function Stealth_ALS ()
   -- actions.stealth_als=call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold-25*(!cooldown.goremaws_bite.up&!buff.feeding_frenzy.up)&(!equipped.shadow_satyrs_walk|cooldown.shadow_dance.charges_fractional>=variable.shd_fractional|energy.deficit>=10)
-  if (Player:EnergyDeficit() <= Stealth_Threshold() - ((not S.GoremawsBite:CooldownUp() and not Player:Buff(S.FeedingFrenzy)) and 25 or 0)
-    and (not I.ShadowSatyrsWalk:IsEquipped() or S.ShadowDance:ChargesFractional() >= ShD_Fractional() or Player:EnergyDeficit() >= 10))
+  if (Player:EnergyDeficitPredicted() <= Stealth_Threshold() - ((not S.GoremawsBite:CooldownUp() and not Player:Buff(S.FeedingFrenzy)) and 25 or 0)
+    and (not I.ShadowSatyrsWalk:IsEquipped() or S.ShadowDance:ChargesFractional() >= ShD_Fractional() or Player:EnergyDeficitPredicted() >= 10))
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=mantle_duration>2.3
     or Rogue.MantleDuration() > 2.3
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=spell_targets.shuriken_storm>=4
-    or Cache.EnemiesCount[8] >= 4
+    or Cache.EnemiesCount[10] >= 4
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
     or (S.Shadowmeld:CooldownUp() and not S.Vanish:CooldownUp() and S.ShadowDance:Charges() <= 1)
   -- actions.stealth_als+=/call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
@@ -528,23 +534,28 @@ local function Stealth_ALS ()
   end
   return false;
 end
-local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sappel Soul)", function () return IsInMeleeRange; end},
-  {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
-  {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
-};
-local function MythicDungeon ()
-  -- Sapped Soul
-  if AC.MythicDungeon() == "Sapped Soul" then
-    for i = 1, #SappedSoulSpells do
-      if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
-        AR.ChangePulseTimer(1);
-        AR.Cast(SappedSoulSpells[i][1]);
-        return SappedSoulSpells[i][2];
+
+local MythicDungeon;
+do
+  local SappedSoulSpells = {
+    {S.Kick, "Cast Kick (Sappel Soul)", function () return IsInMeleeRange; end},
+    {S.Feint, "Cast Feint (Sappel Soul)", function () return true; end},
+    {S.CrimsonVial, "Cast Crimson Vial (Sappel Soul)", function () return true; end}
+  };
+  MythicDungeon = function ()
+    -- Sapped Soul
+    if AC.MythicDungeon() == "Sapped Soul" then
+      for i = 1, #SappedSoulSpells do
+        local Spell = SappedSoulSpells[i];
+        if Spell[1]:IsCastable() and Spell[3]() then
+          AR.ChangePulseTimer(1);
+          AR.Cast(Spell[1]);
+          return Spell[2];
+        end
       end
     end
+    return false;
   end
-  return false;
 end
 local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
@@ -555,15 +566,25 @@ local function TrainingScenario ()
   end
   return false;
 end
+local Interrupts = {
+  {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
+  {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
+  {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
+};
 
 -- APL Main
 local function APL ()
   -- Spell ID Changes check
-  S.Stealth = S.Subterfuge:IsAvailable() and Spell(115191) or Spell(1784); -- w/ or w/o Subterfuge Talent
-  S.VanishBuff = S.Subterfuge:IsAvailable() and Spell(115193) or Spell(11327); -- w/ or w/o Subterfuge Talent
+  if S.Subterfuge:IsAvailable() then
+    Stealth = S.Stealth2;
+    VanishBuff = S.VanishBuff2;
+  else
+    Stealth = S.Stealth;
+    VanishBuff = S.VanishBuff;
+  end
   -- Unit Update
-  AC.GetEnemies(8); -- Shuriken Storm & Death from Above
-  AC.GetEnemies(5); -- Melee
+  AC.GetEnemies(10, true); -- Shuriken Storm & Death from Above
+  AC.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
   --- Defensives
     -- Crimson Vial
@@ -576,8 +597,8 @@ local function APL ()
     if not Player:AffectingCombat() then
       -- Stealth
     -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
-      if not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(S.VanishBuff) then
-        ShouldReturn = Rogue.Stealth(S.Stealth);
+      if not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(VanishBuff) then
+        ShouldReturn = Rogue.Stealth(Stealth);
         if ShouldReturn then return ShouldReturn; end
       end
       -- Flask
@@ -589,7 +610,7 @@ local function APL ()
         if Player:IsStealthed(true, true) then
           ShouldReturn = Stealthed();
           if ShouldReturn then return ShouldReturn .. " (OOC)"; end
-          if Player:Energy() < 30 then -- To avoid pooling icon spam
+          if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
             if AR.Cast(S.PoolEnergy) then return "Stealthed Pooling (OOC)"; end
           else
             return "Stealthed Pooling (OOC)";
@@ -614,11 +635,7 @@ local function APL ()
       ShouldReturn = TrainingScenario();
       if ShouldReturn then return ShouldReturn; end
       -- Interrupts
-      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, {
-        {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
-        {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
-        {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
-      });
+      Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
       -- # This let us to use Shadow Dance right before the 2nd part of DfA lands. Only with Dark Shadow.
       -- actions+=/shadow_dance,if=talent.dark_shadow.enabled&(!stealthed.all|buff.subterfuge.up)&buff.death_from_above.up&buff.death_from_above.remains<=0.15
       -- Note: DfA execute time is 1.475s, the buff is modeled to lasts 1.475s on SimC, while it's 1s in-game. So we retrieve it from TimeSinceLastCast.
@@ -641,7 +658,7 @@ local function APL ()
         ShouldReturn = Stealthed();
         if ShouldReturn then return ShouldReturn; end
         -- run_action_list forces the return
-        if Player:Energy() < 30 then -- To avoid pooling icon spam
+        if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
           if AR.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end
         else
           return "Stealthed Pooling";
@@ -670,24 +687,24 @@ local function APL ()
       -- actions+=/call_action_list,name=finish,if=combo_points>=5+3*(buff.the_first_of_the_dead.up&talent.anticipation.enabled)+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
       if Player:ComboPoints() >= 5 + (Player:Buff(S.TheFirstoftheDead) and S.Anticipation:IsAvailable() and 3 or 0) + (S.DeeperStratagem:IsAvailable() and not Player:Buff(S.ShadowBlades) and (Rogue.MantleDuration() == 0 or AC.Tier20_4Pc)
           and (not Player:Buff(S.TheFirstoftheDead) or DSh_DfA()) and 1 or 0)
-        or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[8] >= 3 and Cache.EnemiesCount[8] <= 4)
+        or (Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 3 and Cache.EnemiesCount[10] <= 4)
         or (Target:FilteredTimeToDie("<=", 1) and Player:ComboPoints() >= 3) then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&cooldown.symbols_of_death.remains<=1&combo_points>=2&equipped.the_first_of_the_dead&spell_targets.shuriken_storm<2
-      if DSh_DfA() and S.SymbolsofDeath:CooldownRemainsP() <= 1 and Player:ComboPoints() >= 2 and I.TheFirstoftheDead:IsEquipped() and Cache.EnemiesCount[8] < 2 then
+      if DSh_DfA() and S.SymbolsofDeath:CooldownRemainsP() <= 1 and Player:ComboPoints() >= 2 and I.TheFirstoftheDead:IsEquipped() and Cache.EnemiesCount[10] < 2 then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-      if Player:EnergyDeficit() <= Stealth_Threshold() then
+      if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
         ShouldReturn = Build();
         if ShouldReturn then return ShouldReturn; end
       end
       -- Shuriken Toss Out of Range
-      if S.ShurikenToss:IsCastable() and not Target:IsInRange(10) and Target:IsInRange(30) and not Player:IsStealthed(true, true) and not Player:Buff(S.Sprint)
-        and Player:EnergyDeficit() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
+      if S.ShurikenToss:IsCastable(30) and not Target:IsInRange(10) and not Player:IsStealthed(true, true) and not Player:Buff(S.Sprint)
+        and Player:EnergyDeficitPredicted() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if AR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end
       -- Trick to take in consideration the Recovery Setting
@@ -699,7 +716,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 09/22/2017
+-- Last Update: 10/15/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -744,7 +761,7 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/berserking,if=stealthed.rogue
 -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
 -- actions.cds+=/symbols_of_death,if=!talent.death_from_above.enabled&((time>10&energy.deficit>=40-stealthed.all*30)|(time<10&dot.nightblade.ticking))
--- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=3&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
+-- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=1&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>40&!stealthed.all&combo_points.deficit>=cp_max_spend
 -- actions.cds+=/shadow_blades,if=(time>10&combo_points.deficit>=2+stealthed.all-equipped.mantle_of_the_master_assassin)|(time<10&(!talent.marked_for_death.enabled|combo_points.deficit>=3|dot.nightblade.ticking))

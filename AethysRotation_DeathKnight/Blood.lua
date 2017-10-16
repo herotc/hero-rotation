@@ -116,9 +116,6 @@ local function SingleTarget()
 
 end
 local function IcyVeinsRotation()
-	if S.BloodDrinker:IsCastable() and S.BloodDrinker:IsAvailable() and not Player:Buff(S.DancingRuneWeaponBuff) then
-		if AR.Cast(S.BloodDrinker) then return ""; end
-	end
 
 	if S.DancingRuneWeapon:IsCastable() then
 		if AR.Cast(S.DancingRuneWeapon) then return ""; end
@@ -136,11 +133,15 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
-	if S.DeathStrike:IsUsable() and Player:RunicPowerDeficit() >= 10 then
+	if S.DeathStrike:IsUsable() and Player:RunicPowerDeficit() <= 20 then
 		if AR.Cast(S.DeathStrike) then return ""; end
 	end
 
-	if S.Marrowrend:IsCastable() and (Player:BuffStack(S.BoneShield) < 5 and S.Ossuary:IsAvailable()) or Player:BuffStack(S.BoneShield) <= 6 then
+	if S.BloodDrinker:IsCastable() and S.BloodDrinker:IsAvailable() and not Player:Buff(S.DancingRuneWeaponBuff) then
+		if AR.Cast(S.BloodDrinker) then return ""; end
+	end
+
+	if S.Marrowrend:IsCastable() and (Player:BuffStack(S.BoneShield) < 5 and S.Ossuary:IsAvailable()) or (Player:BuffStack(S.BoneShield) <= 6) then
 		if AR.Cast(S.Marrowrend) then return ""; end
 	end
 
@@ -148,10 +149,10 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
-	if S.DeathStrike:IsUsable() and ((Player:RunicPower() > (80 or (90 and S.Ossuary:IsAvailable()))  and S.BoneStorm:IsAvailable() and not Player:Buff(S.BoneStorm) and (S.BoneStorm:CooldownRemains() > 15 or ((Player:Runes() > 3 and Player:RunicPowerDeficit() < 15) and S.BoneStorm:CooldownRemains() > 5))) or not S.BoneStorm:IsAvailable()) 
+	--[[if S.DeathStrike:IsUsable() and ((Player:RunicPower() > (80 or (90 and S.Ossuary:IsAvailable()))  and S.BoneStorm:IsAvailable() and not Player:Buff(S.BoneStorm) and (S.BoneStorm:CooldownRemains() > 15 or ((Player:Runes() > 3 and Player:RunicPowerDeficit() < 15) and S.BoneStorm:CooldownRemains() > 5))) or not S.BoneStorm:IsAvailable()) 
 		and (not S.Ossuary:IsAvailable() or Player:BuffStack(S.BoneShield) > 5 or Player:Runes() >= 3 and Player:RunicPowerDeficit() < 10) then
 		if AR.Cast(S.DeathStrike) then return ""; end
-	end
+	end--]]
 
 	if S.HeartStrike:IsCastable() and (Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3 then
 		if AR.Cast(S.HeartStrike) then return ""; end

@@ -101,7 +101,6 @@ local AR = AethysRotation;
   local ShouldReturn; -- Used to get the return string
   local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
   local nextMoon;
-  local currentGeneration=0;
   local moons={[S.NewMoon:ID()]=true, [S.HalfMoon:ID()]=true, [S.FullMoon:ID()]=true}
 -- GUI Settings
   local Settings = {
@@ -109,52 +108,83 @@ local AR = AethysRotation;
     Balance = AR.GUISettings.APL.Druid.Balance
   };
 
+local function nextMoonCalculation()
+	if Player:IsCasting() then
+		if Player:CastID()== S.NewMoon:ID() then return S.HalfMoon end
+		if Player:CastID()== S.HalfMoon:ID() then return S.FullMoon end
+		if Player:CastID()== S.FullMoon:ID() then return S.NewMoon end
+	end
+	if S.NewMoon:IsCastable() then return S.NewMoon end
+	if S.HalfMoon:IsCastable() then return S.HalfMoon end
+	if S.FullMoon:IsCastable() then return S.FullMoon end
+end
+
+local function FuturAstralPower()
+    local AstralPower=Player:AstralPower()
+    if not Player:IsCasting() then
+      return AstralPower
+    else
+      if Player:CastID()==S.NewMoonID() then
+        return AstralPower+10
+      elseif Player:CastID()==S.HalfMoon() then
+        return AstralPower+20
+      elseif Player:CastID()==S.FullMoon() then
+        return AstralPower+40
+      elseif Player:CastID()==S.SolarWrath() then
+        return AstralPower+(Player:Buff(S.BlessingofElune) and 10 or 8)
+      elseif Player:CastID()==S.LunarStrike() then
+        return AstralPower+(Player:Buff(S.BlessingofElune) and 15 or 10)
+      else
+        return AstralPower
+      end
+    end
+end
   
 local function FuryOfElune ()
 	-- actions.fury_of_elune=incarnation,if=astral_power>=95&cooldown.fury_of_elune.remains<=gcd
 	-- actions+=/incarnation,if=astral_power>=40
-	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=(95-currentGeneration) and S.FuryofElune:Cooldown()<Player:CastRemains()+Player:GCD() then
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and FuturAstralPower()>=95 and S.FuryofElune:CooldownRemains()<Player:CastRemains()+Player:GCD() then
 		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/fury_of_elune,if=astral_power>=95
-	if Player:AstralPower()>=(95-currentGeneration) and S.FuryofElune:Cooldown()<Player:CastRemains()+Player:GCD() then
+	if FuturAstralPower()>=95 and S.FuryofElune:CooldownRemains()<Player:CastRemains()+Player:GCD() then
 		if AR.Cast(S.FuryofElune) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/new_moon,if=((charges=2&recharge_time<5)|charges=3) && (buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=90))
 	if S.NewMoon:IsCastable() 
 		and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()] ) 
 		or (S.NewMoon:Charges()==3 and not moons[Player:CastID()]))
-		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:Cooldown()<Player:GCD()*3 and Player:AstralPower()<=(90-currentGeneration)))	then
+		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:CooldownRemains()<Player:GCD()*3 and FuturAstralPower()<=90))	then
 		if AR.Cast(S.NewMoon) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/half_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=80))
 	if S.HalfMoon:IsCastable() 
 		and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])) 
-		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:Cooldown()<Player:GCD()*3 and Player:AstralPower()<=(80-currentGeneration))) then
+		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:CooldownRemains()<Player:GCD()*3 and FuturAstralPower()<=80)) then
 		if AR.Cast(S.HalfMoon) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))
 	if S.FullMoon:IsCastable() 
 		and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])) 
-		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:Cooldown()<Player:GCD()*3 and Player:AstralPower()<=(60-currentGeneration))) then
+		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:CooldownRemains()<Player:GCD()*3 and FuturAstralPower()<=60)) then
 		if AR.Cast(S.FullMoon) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune_up.up&astral_power<=25
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) then
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and FuturAstralPower()>=75 then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/warrior_of_elune,if=buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
 	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune)
-		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:Cooldown()>=35 and Player:Buff(S.LunarEmpowerment)))then
+		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:CooldownRemains()>=35 and Player:Buff(S.LunarEmpowerment)))then
 		if AR.Cast(S.WarriorofElune) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/lunar_strike,if=buff.warrior_of_elune.up&(astral_power<=90|(astral_power<=85&buff.incarnation.up))
 	if S.LunarStrike:IsCastable() and Player:Buff(S.WarriorofElune) 
 		and not (Player:CastID()==S.LunarStrike:ID() and Player:BuffStack(S.WarriorofElune)==1)
-		and ((not Player:Buff(IncarnationChosenOfElune) and Player:AstralPower()<=(85-currentGeneration)) 
-			or (Player:Buff(IncarnationChosenOfElune) and Player:AstralPower()<=(90-currentGeneration))) then
+		and ((not Player:Buff(IncarnationChosenOfElune) and FuturAstralPower()<=85) 
+			or (Player:Buff(IncarnationChosenOfElune) and FuturAstralPower()<=90)) then
 		if AR.Cast(S.LunarStrike) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/new_moon,if=astral_power<=90&buff.fury_of_elune_up.up
@@ -162,7 +192,7 @@ local function FuryOfElune ()
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.NewMoon)
 		or (S.NewMoon:Charges()==1 and nextMoon==S.NewMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.NewMoon))  
-		and Player:AstralPower()<=(90-currentGeneration) 
+		and FuturAstralPower()<=90 
 		and Player:Buff(S.FuryofElune) then
 			if AR.Cast(S.NewMoon) then return "Cast"; end
 	end
@@ -171,7 +201,7 @@ local function FuryOfElune ()
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.HalfMoon)
 		or (S.NewMoon:Charges()==1 and nextMoon==S.HalfMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.HalfMoon))
-		and Player:AstralPower()<=(80-currentGeneration)
+		and FuturAstralPower()<=80
 		and Player:Buff(S.FuryofElune)  then	
 			if AR.Cast(S.HalfMoon) then return "Cast"; end
 	end
@@ -180,7 +210,7 @@ local function FuryOfElune ()
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.FullMoon)
 		or (S.NewMoon:Charges()==1 and nextMoon==S.FullMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.FullMoon)) 
-		and Player:AstralPower()<=(60-currentGeneration)
+		and FuturAstralPower()<=60
 		and Player:Buff(S.FuryofElune)  then
 			if AR.Cast(S.FullMoon) then return "Cast"; end
 	end
@@ -193,23 +223,23 @@ local function FuryOfElune ()
 		if AR.Cast(S.SunFire) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/stellar_flare,if=remains<7.2&active_enemies=1
-	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]==1 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
+	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]==1 and FuturAstralPower()>=15 and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
 		if AR.Cast(S.StellarFlare) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/starfall,if=(active_enemies>=2&talent.stellar_flare.enabled|active_enemies>=3)&buff.fury_of_elune_up.down&cooldown.fury_of_elune.remains>10
 	if AR.AoEON() and ((Cache.EnemiesCount[45]>=2 and S.StellarFlare:IsAvailable()) or (Cache.EnemiesCount[45]>=3 and not S.StellarFlare:IsAvailable()))
-		and not Player:Buff(S.FuryofElune) and S.FuryofElune:Cooldown()>10 then
+		and not Player:Buff(S.FuryofElune) and S.FuryofElune:CooldownRemains()>10 then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/starsurge,if=active_enemies<=2&buff.fury_of_elune_up.down&cooldown.fury_of_elune.remains>7
-	if S.Starsurge:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
-		and Cache.EnemiesCount[45]<=2 and not Player:Buff(S.FuryofElune) and S.FuryofElune:Cooldown()>7 then
+	if S.Starsurge:IsCastable() and FuturAstralPower()>=40
+		and Cache.EnemiesCount[45]<=2 and not Player:Buff(S.FuryofElune) and S.FuryofElune:CooldownRemains()>7 then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune_up.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
 	if S.Starsurge:IsCastable() and not Player:Buff(S.FuryofElune) 
-	and ((Player:AstralPower()>=(92-currentGeneration) and S.FuryofElune:Cooldown()>Player:GCD()*3) 
-		or (S.WarriorofElune:Cooldown()<=5 and S.FuryofElune:Cooldown()>=35  and Player:BuffStack(S.WarriorofElune)<2)) then
+	and ((FuturAstralPower()>=92 and S.FuryofElune:CooldownRemains()>Player:GCD()*3) 
+		or (S.WarriorofElune:CooldownRemains()<=5 and S.FuryofElune:CooldownRemains()>=35  and Player:BuffStack(S.WarriorofElune)<2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.fury_of_elune+=/solar_wrath,if=buff.solar_empowerment.up
@@ -230,17 +260,17 @@ end
   
 local function DreamcatcherUsage ()
 	-- actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) then
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and FuturAstralPower()>=75 then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
 	end
 	-- actions.ed+=/incarnation,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up|buff.bloodlust.up
 	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() 
-		and ((Player:AstralPower()>=(85-currentGeneration) and not Player:Buff(S.EmeraldDreamcatcher)) or Player:HasHeroism() )then
+		and ((FuturAstralPower()>=85 and not Player:Buff(S.EmeraldDreamcatcher)) or Player:HasHeroism() )then
 		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
 	end
 	-- actions.ed+=/celestial_alignment,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up
 	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() 
-		and Player:AstralPower()>=(85-currentGeneration) and not Player:Buff(S.EmeraldDreamcatcher) then
+		and FuturAstralPower()>=85 and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return "Cast"; end
 	end
 	-- actions.ed+=/starsurge,if=(buff.celestial_alignment.up&buff.celestial_alignment.remains<(10))|(buff.incarnation.up&buff.incarnation.remains<(3*execute_time)&astral_power>78)|(buff.incarnation.up&buff.incarnation.remains<(2*execute_time)&astral_power>52)|(buff.incarnation.up&buff.incarnation.remains<execute_time&astral_power>26)
@@ -249,14 +279,14 @@ local function DreamcatcherUsage ()
 	-- (buff.incarnation.up&buff.incarnation.remains<(2*execute_time)&astral_power>52)|
 	-- (buff.incarnation.up&buff.incarnation.remains<execute_time&astral_power>26)
 	if S.Starsurge:IsCastable() 
-		and ((Player:AstralPower()>=(40-currentGeneration) and Player:Buff(S.CelestialAlignment) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<10)
-		or (Player:AstralPower()>(78-currentGeneration) and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<(3*Player:GCD()))
-		or (Player:AstralPower()>(52-currentGeneration) and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<(2*Player:GCD()))
-		or (Player:AstralPower()>=(26-currentGeneration) and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<Player:GCD())) then
+		and ((FuturAstralPower()>=40 and Player:Buff(S.CelestialAlignment) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<10)
+		or (FuturAstralPower()>78 and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<(3*Player:GCD()))
+		or (FuturAstralPower()>52 and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<(2*Player:GCD()))
+		or (FuturAstralPower()>=26 and Player:Buff(S.IncarnationChosenOfElune) and Player:BuffRemains(S.CelestialAlignment)+Player:CastRemains()<Player:GCD())) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
 	-- actions.ed+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
-	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
+	if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and FuturAstralPower()>=15 and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
 		if AR.Cast(S.StellarFlare) then return "Cast"; end
 	end
 	--multidoting Stellar Flare
@@ -322,12 +352,12 @@ end
 
 local function CelestialAlignmentPhase ()
 	-- actions.celestial_alignment_phase=starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
-	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) 
+	if AR.AoEON() and S.Starfall:IsCastable() and  FuturAstralPower()>=60
 		and ((Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
-	if S.Starsurge:IsCastable() and  Player:AstralPower()>=(40-currentGeneration) 
+	if S.Starsurge:IsCastable() and  FuturAstralPower()>=40
 		and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
@@ -369,7 +399,7 @@ local function SingleTarget ()
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.NewMoon)
 		or (S.NewMoon:Charges()==1 and nextMoon==S.NewMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.NewMoon))  
-		and Player:AstralPower()<=(90-currentGeneration) then
+		and FuturAstralPower()<=90 then
 			if AR.Cast(S.NewMoon) then return "Cast"; end
 	end
 	-- actions.single_target+=/half_moon,if=astral_power<=80
@@ -377,7 +407,7 @@ local function SingleTarget ()
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.HalfMoon)
 		or (S.NewMoon:Charges()==1 and nextMoon==S.HalfMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.HalfMoon))
-		and Player:AstralPower()<=(80-currentGeneration) then	
+		and FuturAstralPower()<=80 then	
 			if AR.Cast(S.HalfMoon) then return "Cast"; end
 	end
 	-- actions.single_target+=/full_moon,if=astral_power<=60 
@@ -385,16 +415,16 @@ local function SingleTarget ()
 		and ((S.NewMoon:Charges()>1 and nextMoon==S.FullMoon)
 		or (S.NewMoon:Charges()==1 and nextMoon==S.FullMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==0 and S.NewMoon:Recharge()<Player:CastRemains()+Player:GCD() and nextMoon==S.FullMoon)) 
-		and Player:AstralPower()<=(60-currentGeneration) then
+		and FuturAstralPower()<=60 then
 			if AR.Cast(S.FullMoon) then return "Cast"; end
 	end
 	-- actions.single_target+=/starfall,if=((active_enemies>=2&talent.stellar_drift.enabled)|active_enemies>=3)
-	if AR.AoEON() and S.Starfall:IsCastable() and  Player:AstralPower()>=(60-currentGeneration) 
+	if AR.AoEON() and S.Starfall:IsCastable() and  FuturAstralPower()>=60
 		and ( (Cache.EnemiesCount[45]==2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[45]>=3) then
 		if AR.Cast(S.Starfall) then return "Cast"; end
 	end
 	-- actions.single_target+=/starsurge,if=active_enemies<=2
-	if S.Starsurge:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
+	if S.Starsurge:IsCastable() and FuturAstralPower()>=40
 		and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
 		if AR.Cast(S.Starsurge) then return "Cast"; end
 	end
@@ -444,44 +474,22 @@ local function CDs ()
 		if AR.Cast(S.ArcaneTorrent, Settings.Balance.OffGCDasOffGCD.ArcaneTorrent) then return "Cast"; end
 	end
 	-- actions+=/incarnation,if=astral_power>=40
-	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and FuturAstralPower()>=40
 		and not S.FuryofElune:IsAvailable() and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return "Cast"; end
 	end
 	-- actions+=/celestial_alignment,if=astral_power>=40
-	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and Player:AstralPower()>=(40-currentGeneration) 
+	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and FuturAstralPower()>=40 
 		and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return "Cast"; end
 	end
 	-- actions+=/astral_communion,if=astral_power.deficit>=75
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit()>=(75+currentGeneration) 
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and FuturAstralPower()>=75
 		and not Player:Buff(S.EmeraldDreamcatcher) then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return "Cast"; end
 	end
 end
 
-local function nextMoonCalculation()
-	-- if not S.NewMoon:IsAvailable() then return nil; end
-	if Player:IsCasting() then
-		if Player:CastID()== S.NewMoon:ID() then return S.HalfMoon end
-		if Player:CastID()== S.HalfMoon:ID() then return S.FullMoon end
-		if Player:CastID()== S.FullMoon:ID() then return S.NewMoon end
-	end
-	if S.NewMoon:IsCastable() then return S.NewMoon end
-	if S.HalfMoon:IsCastable() then return S.HalfMoon end
-	if S.FullMoon:IsCastable() then return S.FullMoon end
-end
-
-local function currentGenerationCalculation()
-	if not Player:IsCasting() then return 0; end
-	if Player:CastID()==S.NewMoon:ID() then return 10; end
-	if Player:CastID()==S.HalfMoon:ID() then return 20; end
-	if Player:CastID()==S.FullMoon:ID() then return 40; end
-	if Player:CastID()==S.SolarWrath:ID() then return (Player:Buff(S.BlessingofElune) and 10 or 8); end
-	if Player:CastID()==S.LunarStrike:ID() then return (Player:Buff(S.BlessingofElune) and 15 or 10); end
-  return 0
-end
-  
 -- APL Main
 local function APL ()
 	-- Unit Update
@@ -492,7 +500,6 @@ local function APL ()
 		if AR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "Cast"; end
 	end
 	nextMoon = nextMoonCalculation()
-	currentGeneration = currentGenerationCalculation()
 	-- Out of Combat
     if not Player:AffectingCombat() then
 		if (Cache.EnemiesCount[45]<=2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and Player:BuffRemains(S.BlessingofElune)==0 then
@@ -511,7 +518,7 @@ local function APL ()
 			if S.NewMoon:IsAvailable() and nextMoon:IsCastable() then
 				if AR.Cast(nextMoon) then return "Cast"; end
 			end
-			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) then
+			if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and FuturAstralPower()>=15 then
 				if AR.Cast(S.StellarFlare) then return "Cast"; end
 			end
 			if AR.Cast(S.MoonFire) then return "Cast"; end
@@ -541,7 +548,7 @@ local function APL ()
 			end
 			
 			-- actions+=/call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elue.remains<target.time_to_die
-			if S.FuryofElune:IsAvailable() and S.FuryofElune:Cooldown()<Target:TimeToDie() then
+			if S.FuryofElune:IsAvailable() and S.FuryofElune:CooldownRemains()<Target:TimeToDie() then
 				ShouldReturn = FuryOfElune();
 				if ShouldReturn then return ShouldReturn; end
 			end
@@ -579,7 +586,7 @@ local function APL ()
 				end
 				
 				-- actions+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
-				if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and Player:AstralPower()>=(15-currentGeneration) and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
+				if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[45]<4 and FuturAstralPower()>=15 and Target:DebuffRemains(S.StellarFlare)+Player:CastRemains() < 7.2 then
 					if AR.Cast(S.StellarFlare) then return "Cast"; end
 				end
 				--multidoting Stellar Flare
@@ -687,7 +694,7 @@ local function APL ()
 					if AR.Cast(S.Starfall) then return "Cast"; end
 				end
 				-- actions.celestial_alignment_phase+=/starsurge,if=active_enemies<=2
-				if S.Starsurge:IsCastable() and  Player:AstralPower()>=(40-currentGeneration) 
+				if S.Starsurge:IsCastable() and  FuturAstralPower()>=40
 					and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[45]<=2)) then
 					if AR.Cast(S.Starsurge) then return "Cast"; end
 				end

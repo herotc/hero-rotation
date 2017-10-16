@@ -34,27 +34,29 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Solo Mode to prioritize survivability over DPS. (If implemented in the rotation)
 
 ## Supported Rotations
-- Death Knight Frost ([chrislopez24](https://github.com/chrislopez24) & [3L00DStrike](https://github.com/3L00DStrike))
-- Death Knight Unholy ([chrislopez24](https://github.com/chrislopez24))
-- Demon Hunter Vengeance **[Outdated]**
+- Death Knight Frost ([Krich](https://github.com/chrislopez24) & [3L00DStrike](https://github.com/3L00DStrike))
+- Death Knight Unholy ([Krich](https://github.com/chrislopez24))
+- Demon Hunter Vengeance ([Aethys](https://github.com/Aethys256)) **[Outdated]**
 - Druid Balance ([KutiKuti](https://github.com/Kutikuti)) **[WIP]**
+- Druid Guardian ([Aethys](https://github.com/Aethys256))
 - Hunter BeastMastery ([Nia](https://github.com/Nianel))
 - Hunter Marskmanship ([Nia](https://github.com/Nianel))
 - Hunter Survival ([Nia](https://github.com/Nianel))
 - Mage Frost ([Glynny](https://github.com/Glynnyx) & [Zulandia](https://github.com/AlexanderKenny) & [Nia](https://github.com/Nianel))
-- Monk Windwalker ([Lockem90](https://github.com/Lockem90))
-- Paladin Protection ([Aethys](https://github.com/Aethys256) & [chrislopez24](https://github.com/chrislopez24))
+- Monk Windwalker ([Locke](https://github.com/Lockem90))
+- Paladin Protection ([Aethys](https://github.com/Aethys256) & [Krich](https://github.com/chrislopez24))
 - Paladin Retribution ([Aethys](https://github.com/Aethys256))
 - Priest Shadow ([KutiKuti](https://github.com/Kutikuti))
 - Rogue Assassination ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
 - Rogue Outlaw ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
-- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler))
-- Shaman Elemental ([lithium720](https://github.com/lithium720)) **[WIP]**
-- Shaman Enhancement ([lithium720](https://github.com/lithium720) & [Tael](https://github.com/Tae-l))
+- Rogue Subtlety ([Aethys](https://github.com/Aethys256) & [Mystler](https://github.com/Mystler) & [Kojiyama](https://github.com/EvanMichaels))
+- Shaman Elemental ([Lithium](https://github.com/lithium720)) **[WIP]**
+- Shaman Enhancement ([Lithium](https://github.com/lithium720) & [Tael](https://github.com/Tae-l))
+- Warlock Affliction ([KutiKuti](https://github.com/Kutikuti)) **[WIP]**
 - Warlock Demonology ([KutiKuti](https://github.com/Kutikuti))
 - Warlock Destruction ([KutiKuti](https://github.com/Kutikuti))
-- Warrior Arms ([lithium720](https://github.com/lithium720))
-- Warrior Fury ([Lockem90](https://github.com/Lockem90) & [Nia](https://github.com/Nianel))
+- Warrior Arms ([Lithium](https://github.com/lithium720))
+- Warrior Fury ([Locke](https://github.com/Lockem90) & [Nia](https://github.com/Nianel))
 
 ## Special Mention About SimC APL
 As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
@@ -69,7 +71,7 @@ I (Aethys) am one of the main Rogue theorycrafter and contributor to the Simulat
 - [Skasch](https://github.com/skasch) for what we built together and the motivation he gave to me.
 - [Riff](https://github.com/tombell) for his great feedback and UI tweaks.
 - [Mystler](https://github.com/Mystler) for his help on everything related to rogues that frees me a lot of time.
-- [lithium720](https://github.com/lithium720), [Lockem90](https://github.com/Lockem90), [3L00DStrike](https://github.com/3L00DStrike), [chrislopez24](https://github.com/chrislopez24), [Zulandia](https://github.com/AlexanderKenny), [Glynny](https://github.com/orgs/SimCMinMax/people/Glynnyx) for the daily maintenance of rotations.
+- [Lithium](https://github.com/lithium720), [Locke](https://github.com/Lockem90), [3L00DStrike](https://github.com/3L00DStrike), [Krich](https://github.com/chrislopez24), [Zulandia](https://github.com/AlexanderKenny), [Glynny](https://github.com/orgs/SimCMinMax/people/Glynnyx) for the daily maintenance of rotations.
 - [Tael](https://github.com/Tae-l) for his past contributions.
 
 ## Advanced Users / Developper Notes
