@@ -70,7 +70,7 @@ Spell.Shaman.Enhancement = {
   SpecterOfBetrayal     = Spell(246461),
 
   -- Misc
-  PoolFocus             = Spell(9999000010)
+  PoolFocus             = Spell(9999000010),
 }
 local S = Spell.Shaman.Enhancement
 
@@ -86,14 +86,14 @@ Item.Shaman.Enhancement = {
 
   -- Misc
   PoPP                      = Item(142117),
-  Healthstone               = Item(5512)
+  Healthstone               = Item(5512),
 }
 local I = Item.Shaman.Enhancement
 
 -- GUI Settings
 local Settings = {
   General = AR.GUISettings.General,
-  Shaman = AR.GUISettings.APL.Shaman
+  Shaman = AR.GUISettings.APL.Shaman,
 }
 
 --- APL Variables

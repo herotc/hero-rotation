@@ -97,7 +97,7 @@ Item.Shaman.Elemental = {
 
   -- Misc
   PoPP                      = Item(142117),
-  Healthstone               = Item(5512)
+  Healthstone               = Item(5512),
 }
 local I = Item.Shaman.Elemental
 
@@ -116,22 +116,18 @@ local function APL ()
   if not Player:AffectingCombat() then
     -- Opener
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
-      if S.LavaBurst:IsCastable() then
-        if not Player:Buff(S.ResonanceTotemBuff) then
-          if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
-        elseif Target:IsInRange(40) then
-          if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
-        end
+      if not Player:Buff(S.ResonanceTotemBuff) then
+        if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
+      elseif S.LightningBolt:IsCastable(40) then
+        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
     end
     return
   end
 
   -- Interrupts
-  if S.WindShear:IsCastable() and Target:IsInterruptible() and Settings.General.InterruptEnabled then
-    if Target:IsInRange(30) then
-      if AR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
-    end
+  if S.WindShear:IsCastable(30) and Target:IsInterruptible() and Settings.General.InterruptEnabled then
+    if AR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
   end
 
   -- In Combat
