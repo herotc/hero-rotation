@@ -4,6 +4,13 @@
   local addonName, addonTable = ...;
   -- AethysRotation
   local AR = AethysRotation;
+    -- AethysCore
+  local AC = AethysCore;
+  -- File Locals
+  local GUI = AC.GUI;
+  local CreateChildPanel = GUI.CreateChildPanel;
+  local CreatePanelOption = GUI.CreatePanelOption;
+  local CreateARPanelOption = AR.GUI.CreateARPanelOption;
 
 
 --- ============================ CONTENT ============================
