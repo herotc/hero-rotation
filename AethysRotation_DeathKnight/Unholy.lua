@@ -116,7 +116,7 @@
   end]]
  --actions.generic=dark_arbiter,if=!equipped.137075&runic_power.deficit<30
   if AR.CDsON() and S.DarkArbiter:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 then
-    if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return ; end
+    if AR.Cast(S.DarkArbiter, Settings.Unholy.GCDasOffGCD.DarkArbiter) then return ; end
   end
  --generic apocalypse if=equipped.137075&debuff.festering_wound.stack>=6&talent.dark_arbiter.
   if S.Apocalypse:IsCastable() and I.Taktheritrixs:IsEquipped() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.DarkArbiter:IsAvailable() then
@@ -124,19 +124,19 @@
   end
  --actions.generic+=/dark_arbiter,if=equipped.137075&runic_power.deficit<30&cooldown.dark_transformation.remains<2
   if AR.CDsON() and S.DarkArbiter:IsCastable() and I.Taktheritrixs:IsEquipped() and Player:RunicPowerDeficit() < 30 and S.DarkTransformation:CooldownRemainsP() < 2 then
-    if AR.Cast(S.DarkArbiter, Settings.Unholy.OffGCDasOffGCD.DarkArbiter) then return "" ; end
+    if AR.Cast(S.DarkArbiter, Settings.Unholy.GCDasOffGCD.DarkArbiter) then return "" ; end
   end
   --actions.generic+=/summon_gargoyle,if=!equipped.137075,if=rune<=3
   if AR.CDsON() and S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and not I.Taktheritrixs:IsEquipped() and Player:Runes() <= 3 then
-    if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return "" ; end
+    if AR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "" ; end
   end
   --actions.generic+=/summon_gargoyle,if=equipped.137075&cooldown.dark_transformation.remains<10&rune<=3
   if AR.CDsON() and S.SummonGargoyle:IsCastable() and not S.DarkArbiter:IsAvailable() and I.Taktheritrixs:IsEquipped() and S.DarkTransformation:CooldownRemainsP() < 10 and Player:Runes() <= 3 then
-    if AR.Cast(S.SummonGargoyle, Settings.Unholy.OffGCDasOffGCD.SummonGargoyle) then return "" ; end
+    if AR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return "" ; end
   end
  -- t20 gameplay
   if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
-    if AR.Cast(S.ArmyOfDead, Settings.Unholy.OffGCDasOffGCD.ArmyOfDead) then return ""; end
+    if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
   elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:CooldownRemainsP() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 then
     if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
   end

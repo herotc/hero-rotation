@@ -150,7 +150,7 @@
     end
     --actions.standard+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
     if S.SindragosasFury:IsCastable() and (I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 then
-      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury) then return ""; end
+      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.GCDasOffGCD.SindragosasFury) then return ""; end
     end
 
     --actions.standard+=/frost_strike,if=runic_power.deficit<10&!buff.hungering_rune_weapon.up
@@ -187,7 +187,7 @@
     end
     --actions.standard+=/horn_of_winter,if=!buff.hungering_rune_weapon.up&(rune.time_to_2>gcd|!talent.frozen_pulse.enabled)
     if S.HornOfWinter:IsCastable() and not Player:Buff(S.HungeringRuneWeapon) and (Player:RuneTimeToX(2) > Player:GCD() or not S.FrozenPulse:IsAvailable()) then
-      if AR.Cast(S.HornOfWinter, Settings.DeathKnight.Frost.OffGCDasOffGCD.HornOfWinter) then return ""; end
+      if AR.Cast(S.HornOfWinter, Settings.DeathKnight.Frost.GCDasOffGCD.HornOfWinter) then return ""; end
     end
     --actions.standard+=/frost_strike,if=!(runic_power<50&talent.obliteration.enabled&cooldown.obliteration.remains<=gcd)
     if S.FrostStrike:IsUsable() and not (Player:RunicPower() < 50 and S.Obliteration:IsAvailable() and S.Obliteration:CooldownRemainsP() <= Player:GCD())  then
@@ -235,7 +235,7 @@
     end
     --actions.bos_pooling+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
     if S.SindragosasFury:IsCastable() and (I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) ==5 then
-      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury) then return ""; end
+      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.GCDasOffGCD.SindragosasFury) then return ""; end
     end
     --actions.bos_pooling+=/frost_strike,if=runic_power.deficit<=30&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>rune.time_to_4)
     if S.FrostStrike:IsUsable() and Player:RunicPowerDeficit() <= 30 and (not S.ShatteringStrikes:IsAvailable() or Target:DebuffStack(S.RazorIce) < 5 or S.BreathofSindragosa:CooldownRemainsP() > Player:RuneTimeToX(4)) then
@@ -295,11 +295,11 @@
     end
     --actions.bos_ticking+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
     if S.SindragosasFury:IsCastable() and (I.ConsortsColdCore:IsEquipped() or Player:Buff(S.PillarOfFrost)) and Player:Buff(S.UnholyStrength) and Target:DebuffStack(S.RazorIce) == 5 then
-      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.OffGCDasOffGCD.SindragosasFury) then return ""; end
+      if AR.Cast(S.SindragosasFury, Settings.DeathKnight.Frost.GCDasOffGCD.SindragosasFury) then return ""; end
     end
     --actions.bos_ticking+=/horn_of_winter,if=runic_power.deficit>=30&rune.time_to_3>gcd
     if S.HornOfWinter:IsCastable() and Player:RunicPowerDeficit() >= 30 and Player:RuneTimeToX(3) > Player:GCD() then
-      if AR.Cast(S.HornOfWinter, Settings.DeathKnight.Frost.OffGCDasOffGCD.HornOfWinter) then return ""; end
+      if AR.Cast(S.HornOfWinter, Settings.DeathKnight.Frost.GCDasOffGCD.HornOfWinter) then return ""; end
     end
     --actions.bos_ticking+=/frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|talent.gathering_storm.enabled|spell_targets.frostscythe>=2)
     if S.FrostScythe:IsCastable() and Player:Buff(S.KillingMachine) and (not I.KoltirasNewfoundWill:IsEquipped() or S.GatheringStorm:IsAvailable() or Cache.EnemiesCount[8] >= 2) then
@@ -423,7 +423,7 @@
     --[[END OF COLD HEART APL]]--
     --actions.cds+=/obliteration,if=rune>=1&runic_power>=20&(!talent.frozen_pulse.enabled|rune<2|buff.pillar_of_frost.remains<=12)&(!talent.gathering_storm.enabled|!cooldown.remorseless_winter.ready)&(buff.pillar_of_frost.up|!talent.icecap.enabled)
     if S.Obliteration:IsCastable() and Player:Runes() >= 1 and Player:RunicPower() >= 20 and (not S.FrozenPulse:IsAvailable() or Player:Runes() < 2 or Player:BuffRemainsP(S.PillarOfFrost) <= 12) and (not S.GatheringStorm:IsAvailable() or not S.RemorselessWinter:IsReady()) and (Player:Buff(S.PillarOfFrost) or not S.Icecap:IsAvailable()) then
-      if AR.Cast(S.Obliteration, Settings.DeathKnight.Frost.OffGCDasOffGCD.Obliteration) then return ""; end
+      if AR.Cast(S.Obliteration, Settings.DeathKnight.Frost.GCDasOffGCD.Obliteration) then return ""; end
     end
     --actions.cds+=/hungering_rune_weapon,if=!buff.hungering_rune_weapon.up&rune.time_to_2>gcd&runic_power<40
     if S.HungeringRuneWeapon:IsCastable() and not Player:Buff(S.HungeringRuneWeapon) and Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 40 then
