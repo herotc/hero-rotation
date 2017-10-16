@@ -201,7 +201,7 @@ local function APL ()
 
       -- actions.cleave+=/bladestorm
       if S.Bladestorm:IsReady() then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+        if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
       -- actions.cleave+=/cleave
@@ -236,7 +236,7 @@ local function APL ()
 
       -- actions.aoe+=/bladestorm,if=buff.battle_cry.up&(set_bonus.tier20_4pc|equipped.the_great_storms_eye)
       if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (AC.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+        if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
       -- actions.aoe+=/colossus_smash,if=buff.in_for_the_kill.down&talent.in_for_the_kill.enabled
@@ -299,7 +299,7 @@ local function APL ()
     if Target:HealthPercentage() <= 20 and Cache.EnemiesCount[8] < 5 then
       -- actions.execute=bladestorm,if=buff.battle_cry.up&(set_bonus.tier20_4pc|equipped.the_great_storms_eye)
       if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (AC.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+        if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
       -- actions.execute+=/colossus_smash,if=buff.shattered_defenses.down&(buff.battle_cry.down|buff.battle_cry.remains>gcd.max)
@@ -326,7 +326,7 @@ local function APL ()
 
       -- actions.execute+=/ravager,if=cooldown.battle_cry.remains<=gcd&debuff.colossus_smash.remains>6
       if S.Ravager:IsReady() and (S.BattleCry:CooldownRemainsP() <= Player:GCD() and Target:DebuffRemainsP(S.ColossusSmashDebuff) > 6) then
-        if AR.Cast(S.Ravager) then return "Cast Ravager" end
+        if AR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "Cast Ravager" end
       end
 
       -- actions.execute+=/mortal_strike,if=buff.executioners_precision.stack=2&buff.shattered_defenses.up
@@ -346,7 +346,7 @@ local function APL ()
 
       -- actions.execute+=/bladestorm,interrupt=1,if=(raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)&!set_bonus.tier20_4pc
       if S.Bladestorm:IsReady() and (Cache.EnemiesCount[8] > 1 and not AC.Tier20_4Pc) then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+        if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
     end
 
@@ -354,7 +354,7 @@ local function APL ()
     if Target:HealthPercentage() > 20 then
       -- actions.single=bladestorm,if=buff.battle_cry.up&set_bonus.tier20_4pc
       if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and AC.Tier20_4Pc) then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+        if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
       -- actions.single+=/colossus_smash,if=buff.shattered_defenses.down
@@ -381,7 +381,7 @@ local function APL ()
 
       -- actions.single+=/ravager,if=cooldown.battle_cry.remains<=gcd&debuff.colossus_smash.remains>6
       if S.Ravager:IsReady() and (S.BattleCry:CooldownRemainsP() <= Player:GCD() and Target:DebuffRemainsP(S.ColossusSmashDebuff) > 6) then
-        if AR.Cast(S.Ravager) then return "Cast Ravager" end
+        if AR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "Cast Ravager" end
       end
 
       -- actions.single+=/execute,if=buff.stone_heart.react
@@ -421,7 +421,7 @@ local function APL ()
 
       -- actions.single+=/bladestorm,if=(raid_event.adds.in>90|!raid_event.adds.exists)&!set_bonus.tier20_4pc
       if S.Bladestorm:IsReady() and (not AC.Tier20_4Pc) then
-        if AR.Cast(S.Bladestorm) then return "Cast Bladestorm" end
+        if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
     end
     if AR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
