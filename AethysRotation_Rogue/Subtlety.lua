@@ -60,6 +60,7 @@ local tableinsert = table.insert;
     MasterofShadowsBuff           = Spell(196980),
     MasterOfSubtlety              = Spell(31223),
     MasterOfSubtletyBuff          = Spell(31665),
+    Nightstalker                  = Spell(14062),
     ShadowFocus                   = Spell(108209),
     Subterfuge                    = Spell(108208),
     Vigor                         = Spell(14983),
@@ -126,10 +127,12 @@ local tableinsert = table.insert;
         (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
     end
   );
-  -- TODO: Add Nightstalker
   S.Nightblade:RegisterPMultiplier(
     {S.FinalityNightblade, function ()
-      return Player:Buff(S.FinalityNightblade, 17) and 1 + Player:Buff(S.FinalityNightblade, 17)/100 or 1;
+      return Player:Buff(S.FinalityNightblade) and 1 + Player:Buff(S.FinalityNightblade, 17)/100 or 1;
+    end},
+    {function ()
+      return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.12 or 1;
     end}
   );
 -- Items
