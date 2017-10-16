@@ -104,7 +104,7 @@ local tableinsert = table.insert;
         -- Eviscerate R2 Multiplier
         1.5 *
         -- Aura Multiplier (SpellID: 137035)
-        1.25 *
+        1.27 *
         -- Finality: Eviscerate Multiplier
         (Player:Buff(S.FinalityEviscerate) and 1 + Player:Buff(S.FinalityEviscerate, 17) / 100 or 1) *
         -- Shadow Fangs Multiplier
