@@ -138,12 +138,12 @@ local function APL ()
   if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
     -- Potion of Prolonged Power
     if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
-      if AR.CastLeft(I.PoPP) then return "Use PoPP" end
+      if AR.CastSuggested(I.PoPP) then return "Use PoPP" end
     end
 
     -- Use healthstone if we have it and our health is low.
     if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 60) then
-      if AR.CastLeft(I.Healthstone) then return "Use Healthstone" end
+      if AR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
     end
 
     -- Heal when we have less than the set health threshold (instant casts only)!

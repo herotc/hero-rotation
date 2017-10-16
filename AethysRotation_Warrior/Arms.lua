@@ -134,7 +134,7 @@ local function APL ()
   if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange("Melee") and not Target:IsDeadOrGhost() then
     -- Potion of Prolonged Power
     if Settings.Arms.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 90 or Target:HealthPercentage() < 35 or Player:Buff(S.BattleCryBuff))) then
-      if AR.CastLeft(I.PoPP) then return "Use PoPP" end
+      if AR.CastSuggested(I.PoPP) then return "Use PoPP" end
     end
 
     -- Racial
