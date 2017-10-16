@@ -164,9 +164,21 @@ local pairs = pairs;
         (I.InsigniaofRavenholdt:IsEquipped() and 1.3 or 1);
     end
   );
+  local function NighstalkerMultiplier ()
+    return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.5 or 1;
+  end
+  S.Garrote:RegisterPMultiplier(
+    {NighstalkerMultiplier},
+    {function ()
+      return S.Subterfuge:IsAvailable() and Player:IsStealthed(true, false) and 2.25 or 1;
+    end}
+  );
+  S.Rupture:RegisterPMultiplier(
+    {NighstalkerMultiplier}
+  );
 -- Rotation Var
   local ShouldReturn, ShouldReturn2; -- Used to get the return string
-  local BleedTickTime, ExsanguinatedBleedTickTime = 2, 1;
+  local BleedTickTime, ExsanguinatedBleedTickTime = 2, 2/(1+1.5);
   local Stealth;
   local RuptureThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
   local Energy_Regen_Combined, Energy_Time_To_Max_Combined;
@@ -383,9 +395,8 @@ local function Maintain ()
       end
     end
     -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
-    -- TODO: pmultiplier (core handler rather than rogue specific)
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
-      if Target:IsInRange("Melee") and Target:DebuffRemainsP(S.Garrote) <= 10 and not AC.Exsanguinated(Target, "Garrote")
+      if Target:IsInRange("Melee") and Target:DebuffRemainsP(S.Garrote) <= 10 and Target:PMultiplier(S.Garrote) <= 1 and not AC.Exsanguinated(Target, "Garrote")
         and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
         if AR.Cast(S.Garrote) then return "Cast"; end
@@ -395,7 +406,7 @@ local function Maintain ()
         for _, Unit in pairs(Cache.Enemies["Melee"]) do
           if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
             and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
-            and Unit:DebuffRemainsP(S.Garrote) <= 10 and not AC.Exsanguinated(Unit, "Garrote") then
+            and Unit:DebuffRemainsP(S.Garrote) <= 10 and Unit:PMultiplier(S.Garrote) <= 1 and not AC.Exsanguinated(Unit, "Garrote") then
               BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
           end
         end
@@ -420,9 +431,10 @@ local function Maintain ()
     if AR.Cast(S.Rupture) then return "Cast"; end
   end
   -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>6
-  -- TODO: pmultiplier (core handler rather than rogue specific)
   if Player:ComboPoints() >= 4 then
-    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemainsP(S.Rupture) <= 1.5)
+    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Rupture, RuptureThreshold)
+      and (Target:PMultiplier(S.Rupture) <= 1 or Target:DebuffRemainsP(S.Rupture) <= (AC.Exsanguinated(Target, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
+      and (not AC.Exsanguinated(Target, "Rupture") or Target:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2)
       and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if AR.Cast(S.Rupture) then return "Cast"; end
@@ -432,7 +444,9 @@ local function Maintain ()
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Rupture))
           and Rogue.CanDoTUnit(Unit, RuptureDMGThreshold)
-          and Unit:DebuffRefreshableP(S.Rupture, RuptureThreshold) and (not AC.Exsanguinated(Unit, "Rupture") or Unit:DebuffRemainsP(S.Rupture) <= 1.5) then
+          and Unit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
+          and (Unit:PMultiplier(S.Rupture) <= 1 or Unit:DebuffRemainsP(S.Rupture) <= (AC.Exsanguinated(Unit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
+          and (not AC.Exsanguinated(Unit, "Rupture") or Unit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -448,11 +462,12 @@ local function Maintain ()
     if ShouldReturn2 then return ShouldReturn2; end
   end
   -- actions.maintain+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
-  -- TODO: pmultiplier (core handler rather than rogue specific)
   if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and Player:ComboPointsDeficit() >= 1 then
-    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemainsP(S.Garrote) <= 1.5)
-        and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
-        and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
+    if Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.Garrote, 5.4)
+      and (Target:PMultiplier(S.Garrote) <= 1 or Target:DebuffRemainsP(S.Garrote) <= (AC.Exsanguinated(Target, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
+      and (not AC.Exsanguinated(Target, "Garrote") or Target:DebuffRemainsP(S.Garrote) <= 1.5)
+      and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid())
+      and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
       -- actions.maintain+=/pool_resource,for_next=1
       if Player:EnergyPredicted() < 45 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
@@ -464,7 +479,9 @@ local function Maintain ()
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Garrote))
           and Rogue.CanDoTUnit(Unit, GarroteDMGThreshold)
-          and Unit:DebuffRefreshableP(S.Garrote, 5.4) and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemainsP(S.Garrote) <= 1.5) then
+          and Unit:DebuffRefreshableP(S.Garrote, 5.4)
+          and (Unit:PMultiplier(S.Garrote) <= 1 or Unit:DebuffRemainsP(S.Garrote) <= (AC.Exsanguinated(Unit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
+          and (not AC.Exsanguinated(Unit, "Garrote") or Unit:DebuffRemainsP(S.Garrote) <= 1.5) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -640,8 +657,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 10/08/2017
--- Note: Some Exsang changes not synced yet, mostly due to missing pmultiplier.
+-- Last Update: 16/10/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
