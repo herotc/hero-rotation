@@ -89,6 +89,8 @@ if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
   -- Legendaries
   TheGreatStormsEye = Item(151823, {1}),
+  -- Misc
+  PoPP                      = Item(142117),
 };
 local I = Item.Warrior.Arms;
 
@@ -130,6 +132,11 @@ local function APL ()
 
   -- In Combat
   if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange("Melee") and not Target:IsDeadOrGhost() then
+    -- Potion of Prolonged Power
+    if Settings.Arms.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 90 or Target:HealthPercentage() < 35 or Player:Buff(S.BattleCryBuff))) then
+      if AR.CastLeft(I.PoPP) then return "Use PoPP" end
+    end
+
     -- Racial
     -- actions+=/blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
     if S.BloodFury:IsReady() and AR.CDsON() and (Player:Buff(S.BattleCryBuff) or Target:TimeToDie() <= 16) then

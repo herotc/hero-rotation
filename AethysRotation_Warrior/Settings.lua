@@ -26,6 +26,7 @@
     },
 
     Arms = {
+      ShowPoPP = false,
       WarbreakerEnabled = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -81,6 +82,7 @@
   CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Warbreaker", "Warbreaker");
   CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Bladestorm", "Bladestorm");
   CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Ravager", "Ravager");
+  CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
 
   -- Fury settings
   CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.Bloodbath", "Bloodbath");
