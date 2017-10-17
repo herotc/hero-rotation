@@ -237,7 +237,7 @@
         if AR.Cast(S.DireBeast) then return ""; end
       end
       -- Proc Sephuz
-      if S.CounterShot:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastBuff()>=30 then
+      if S.CounterShot:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 then
         if AR.CastSuggested(S.CounterShot) then return ""; end
       end
       -- Pool
