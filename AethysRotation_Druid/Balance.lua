@@ -217,7 +217,7 @@ local function FuryOfElune ()
 	if S.HalfMoon:IsCastable() 
 		and ((S.NewMoon:Charges() == 2 and S.NewMoon:Recharge() < 5 and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges() == 3 and not moons[Player:CastID()])
-    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:Recharge() < 5 and nextMoon == S.HalfMoon))) 
+    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:Recharge() < 5 and nextMoon == S.HalfMoon)) 
 		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 80)) then
 		if AR.Cast(S.HalfMoon) then return ""; end
 	end
@@ -226,7 +226,7 @@ local function FuryOfElune ()
 	if S.FullMoon:IsCastable() 
 		and ((S.NewMoon:Charges()==2 and S.NewMoon:Recharge()<5 and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])
-    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:Recharge() < 5 and nextMoon == S.FullMoon))) 
+    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:Recharge() < 5 and nextMoon == S.FullMoon)) 
 		and (Player:Buff(S.FuryofElune) or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 60)) then
 		if AR.Cast(S.FullMoon) then return ""; end
 	end
@@ -264,7 +264,7 @@ local function FuryOfElune ()
 		and ((S.NewMoon:Charges() > 1 and nextMoon == S.HalfMoon)
 		or (S.NewMoon:Charges() == 1 and nextMoon == S.HalfMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges() == 0 and S.NewMoon:Recharge() < Player:CastRemains() + Player:GCD() and nextMoon == S.HalfMoon))
-		and FuturAstralPower() > S.HalfMoon:CastTime * 12
+		and FuturAstralPower() > S.HalfMoon:CastTime() * 12
     and FuturAstralPower() <= 80
 		and Player:Buff(S.FuryofElune)  then	
 			if AR.Cast(S.HalfMoon) then return ""; end
@@ -275,7 +275,7 @@ local function FuryOfElune ()
 		and ((S.NewMoon:Charges() > 1 and nextMoon == S.FullMoon)
 		or (S.NewMoon:Charges() == 1 and nextMoon == S.FullMoon and not moons[Player:CastID()]) 
 		or (S.NewMoon:Charges() == 0 and S.NewMoon:Recharge() < Player:CastRemains() + Player:GCD() and nextMoon == S.FullMoon)) 
-    and FuturAstralPower() > S.FullMoon:CastTime * 12
+    and FuturAstralPower() > S.FullMoon:CastTime() * 12
 		and FuturAstralPower() <= 60
 		and Player:Buff(S.FuryofElune) then
 			if AR.Cast(S.FullMoon) then return ""; end
