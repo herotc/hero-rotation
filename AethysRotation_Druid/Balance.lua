@@ -752,7 +752,7 @@ local function APL ()
 			end
       
       -- Sephuz usage
-			if I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastBuff() >= 30 then
+			if I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer() >= 30 then
 				ShouldReturn = Sephuz();
 				if ShouldReturn then return ShouldReturn; end
 			end
