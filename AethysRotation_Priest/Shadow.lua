@@ -322,7 +322,7 @@ local function s2m()
 
   -- actions.s2m=silence, if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
   -- TODO : multitarget
-  if S.Silence:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastBuff() >= 30 then
+  if S.Silence:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer() >= 30 then
     if AR.CastSuggested(S.Silence) then return "Cast"; end
   end
   
@@ -334,7 +334,7 @@ local function s2m()
   
   -- actions.s2m+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
   --TODO : when isStunnable is available
-  -- if S.MindBomb:IsAvailable() and S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastBuff()>=30 and CurrentInsanityDrain()>10 then
+  -- if S.MindBomb:IsAvailable() and S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and CurrentInsanityDrain()>10 then
     -- if AR.CastSuggested(S.MindBomb) then return "Cast"; end
   -- end
   
@@ -471,14 +471,14 @@ local function VoidForm()
 	if Target:IsInRange(range) then --in range
     -- actions.vf+=/silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
     -- TODO : multitarget
-    if S.Silence:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastBuff() >= 30 and CurrentInsanityDrain() > 10 then
+    if S.Silence:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer() >= 30 and CurrentInsanityDrain() > 10 then
     	if AR.CastSuggested(S.Silence) then return "Cast"; end
     end
     
-    -- print(S.MindBomb:IsCastable(),SephuzEquipped(),S.SephuzBuff:TimeSinceLastBuff(),CurrentInsanityDrain())
+    -- print(S.MindBomb:IsCastable(),SephuzEquipped(),S.SephuzBuff:TimeSinceLastAppliedOnPlayer(),CurrentInsanityDrain())
     -- actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
     --TODO : when isStunnable is available
-    -- if S.MindBomb:IsAvailable() and S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastBuff()>=30 and CurrentInsanityDrain()>10 then
+    -- if S.MindBomb:IsAvailable() and S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and CurrentInsanityDrain()>10 then
     	-- if AR.CastSuggested(S.MindBomb) then return "Cast"; end
     -- end
     
