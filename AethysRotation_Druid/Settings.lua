@@ -35,11 +35,11 @@
       ShowPoPP = false,
       Sephuz = {
         SolarBeam = false,
-        Typhoon = false
+        Typhoon = false,
         MightyBash = false,
         MassEntanglement = false,
         EntanglingRoots = false,
-      }
+      },
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
