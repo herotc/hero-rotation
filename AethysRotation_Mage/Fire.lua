@@ -77,7 +77,7 @@
       -- Legendary Procs
       KaelthassUltimateAbility      = Spell(209455),  -- Fire Mage Bracer Procs
       ContainedInfernalCoreBuff     = Spell(248146),  -- Fire Shoulders Buff
-	  EruptingInfernalCore          = Spell(248147)   -- Fire Shoulder Stacks
+	    EruptingInfernalCore          = Spell(248147)   -- Fire Shoulder Stacks
 
 
 };
@@ -86,7 +86,7 @@ local S = Spell.Mage.Fire;
 -- Items
 if not Item.Mage then Item.Mage = {}; end
 Item.Mage.Fire = {
- PotionofProlongedPower   = Spell(142117),
+ PotionofProlongedPower   = Spell(142117)
 
 local I = Item.Mage.Fire;
 -- Rotation Var
@@ -110,8 +110,8 @@ end
 --actions+=/rune_of_power,if=firestarter.active&action.rune_of_power.charges=2|cooldown.combustion.remains>40&buff.combustion.down&!talent.kindling.enabled|target.time_to_die.remains<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
   if S.RuneOfPower:IsCastable and Target:HealthPercentage > 90 and S.RuneOfPower:Charges() = 2
        or S.Combustion:Cooldown() > 40 and not Player:Buff(S.Combustion) and not S.Kindling:IsAvailable()
-	   or Target:TimeToDie() < 11 
-	   or S.Kindling:IsAvailable() & S.RuneOfPower:ChargesFractional() > 1.8 
+	   or Target:TimeToDie() < 11
+	   or S.Kindling:IsAvailable() & S.RuneOfPower:ChargesFractional() > 1.8
 	   or AC.CombatTime() < 40 and S.Combustion:CooldownRemains() > 40 then
 	   if AR.Cast(S.RuneOfPower) then return "";
 end
@@ -120,14 +120,14 @@ end
   if S.RuneOfPower:IsCastable and Player:Buff(S.KaelthassUltimateAbility) and S.Combustion:Cooldown() > 40
        or S.RuneOfPower:IsCastable Player:Buff(S.EruptingInfernalCore) and S.Combustion:Cooldown() > 40
        or S.RunOfPower:Charges() > 1 then
-      if AR.Cast(S.RuneOfPower) then return ""; 
+      if AR.Cast(S.RuneOfPower) then return "";
 end
 
 --actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.upactive_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
 local function Combustion_Phase ()
   return (
     S.Combustion:CooldownRemains() <= (S.RuneofPower:CastTime
-      + ((not S.Firestarter:IsAvailable() 
+      + ((not S.Firestarter:IsAvailable()
           or Target:HealthPercentage() > 90
           or Cache.EnemiesCount[8] >= (S.FlamePatch:IsAvailable() and 2 or 4))
         and (not S.Kindling:IsAvailable() and Player:GCD() or 0))
@@ -137,7 +137,7 @@ end
 
 --actions+=/call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
 local function rop_phase
-   return Player:Buff(S.RuneOfPower) and not Player:Buff(S.Combustion)
+   return Player:Buff(S.RuneOfPower) and not Player:Buff(S.Combustion);
 end
 
 -- Start of Combustion_Phase actions.
@@ -146,7 +146,7 @@ local function combustion_phase ()
 --actions.combustion_phase=rune_of_power,if=buff.combustion.down
 if S.RuneOfPower:IsCastable() and not Player:Buff(S.Combustion) then
    if AR.Cast(S.RuneOfPower) then return "";
-end   
+end
 --actions.combustion_phase+=/call_action_list,name=active_talents
 --actions.combustion_phase+=/combustion
 if S.Combustion:IsCastable() then
@@ -154,15 +154,15 @@ if S.Combustion:IsCastable() then
 end
 --actions.combustion_phase+=/potion
 if I.PotionofProlongedPower:IsUsable()then
-   if AR.CastSuggested(I.PotionofProlongedPower) then return ""; 
+   if AR.CastSuggested(I.PotionofProlongedPower) then return "";
 end
 --actions.combustion_phase+=/blood_fury
 if S.BloodFury:IsCastable() then
-   if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+   if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "";
 end
 -- actions.cooldowns+=/berserking
 if S.Berserking:IsCastable() then
-   if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+   if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "";
 end
 --actions.combustion_phase+=/arcane_torrent
 
@@ -170,14 +170,14 @@ end
 -- //TODO: Add when Aethys add global functionality.
 
 --actions.combustion_phase+=/flamestrike,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>4)&buff.hot_streak.up
-if S.Flamestrike:IsCastable() and Player:Buff(S.HotStreak) 
+if S.Flamestrike:IsCastable() and Player:Buff(S.HotStreak)
    and (Cache.EnemiesCount[8] > 2 and S.FlamePatch:IsAvailable()
    or   Cache.EnemiesCount[8] > 4)  then
    if AR.Cast(S.Flamestrike) then return "";
 end
-   
+
 --actions.combustion_phase+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&buff.combustion.remains>execute_time
-if S.Pyroblast:IsCastable() and Player:Buff(S.KaelthassUltimateAbility) and Player:Buff(Combustion) > (S.Pyroblast:ExecuteTime() then
+if S.Pyroblast:IsCastable() and Player:Buff(S.KaelthassUltimateAbility) and Player:Buff(Combustion) > S.Pyroblast:ExecuteTime() then
    if AR.Cast(S.Pyroblast) then return "";
 end
 
@@ -187,11 +187,20 @@ if S.Pyroblast:IsCastable() and Player:Buff(S.HotStreak) then
 end
 
 --actions.combustion_phase+=/fire_blast,if=buff.heating_up.up
-if  S.Fireblast:IsCastable() and Player:Buff(S.HotStreak) and (
-    Player:CastID(S.Fireball) 
- or Player:CastID(S.Pyroblast) )
+if  S.Fireblast:IsCastable() and Player:Buff(S.HotStreak) then
+    if.AR.Cast(S.Fireblast) then return "";
+end
+
 --actions.combustion_phase+=/phoenixs_flames
+if S.PheonixFlames:IsCastable() then
+   if.AR.Cast(S.PheonixFlames) then return "";
+end
+
 --actions.combustion_phase+=/scorch,if=buff.combustion.remains>cast_time
+if.S.Scorch:IsCastable() and Player:Buff(Combustion) > S.Scorch:ExecuteTime() then
+   if.AR.Cast(S.Fireblast) then return "";
+end
+
 --actions.combustion_phase+=/dragons_breath,if=buff.hot_streak.down&action.fire_blast.charges<1&action.phoenixs_flames.charges<1
 --actions.combustion_phase+=/scorch,if=target.health.pct<=30&equipped.132454
 
