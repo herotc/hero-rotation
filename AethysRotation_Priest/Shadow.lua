@@ -75,10 +75,10 @@
     Silence           = Spell(15487),
     -- Legendaries
 		ZeksExterminatus	= Spell(236546),
+    SephuzBuff			  = Spell(208052),
     -- Misc
 		Shadowform				= Spell(232698),
 		VoidForm				  = Spell(194249),
-    SephuzBuff			  = Spell(208052),
     PotionOfProlongedPowerBuff = Spell(229206)
     -- Macros
     

@@ -76,7 +76,7 @@ local AR = AethysRotation;
 		HalfMoon 				  = Spell(202768),
 		FullMoon 				  = Spell(202771),
     -- Defensive
-		Barskin 				  = Spell(22812),
+		Barkskin 				  = Spell(22812),
 		FrenziedRegeneration = Spell(22842),
 		Ironfur 				  = Spell(192081),
 		Regrowth 				  = Spell(8936),
@@ -91,12 +91,14 @@ local AR = AethysRotation;
 		OnethsIntuition		= Spell(209405),
     OnethsOverconfidence = Spell(209407),
 		EmeraldDreamcatcher	= Spell(208190),
+    SephuzBuff        = Spell(208052),
     -- Misc
 		SolarEmpowerment	= Spell(164545),
 		LunarEmpowerment	= Spell(164547),
 		StellarEmpowerment = Spell(197637),
     SolarSolstice	    = Spell(252767),
-    AstralAcceleration= Spell(242232)
+    AstralAcceleration= Spell(242232),
+    PotionOfProlongedPowerBuff = Spell(229206)
   };
   local S = Spell.Druid.Balance;
   
@@ -109,6 +111,7 @@ local AR = AethysRotation;
     OnethsIntuition         = Item(137092, {9}), 
     SephuzSecret 			      = Item(132452, {11,12}),
     RadiantMoonlight        = Item(151800, {15}), 
+    -- Potion
     PotionOfProlongedPower  = Item(142117)
   };
   local I = Item.Druid.Balance;
@@ -610,9 +613,47 @@ local function AoE ()
   if AR.Cast(S.SolarWrath) then return ""; end
 end
 
+local function Sephuz()
+  -- EntanglingRoots
+  --TODO : change level when iscontrollable is here
+  if S.EntanglingRoots:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.EntanglingRoots then
+    if AR.CastSuggested(S.EntanglingRoots) then return "Cast"; end
+  end
+  
+  -- MightyBash
+  --TODO : change level when iscontrollable is here
+
+  if S.MightyBash:IsAvailable() and S.MightyBash:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.MightyBash then
+    if AR.CastSuggested(S.MightyBash) then return "Cast"; end
+  end
+  
+  -- MassEntanglement
+  --TODO : change level when iscontrollable is here
+
+  if S.MassEntanglement:IsAvailable() and S.MassEntanglement:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.MassEntanglement then
+    if AR.CastSuggested(S.MassEntanglement) then return "Cast"; end
+  end
+  
+  -- Typhoon 
+  --TODO : change level when iscontrollable is here
+  if S.Typhoon:IsAvailable() and S.Typhoon:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.Typhoon then
+    if AR.CastSuggested(S.Typhoon) then return "Cast"; end
+  end
+  
+  -- SolarBeam
+  if S.SolarBeam:IsCastable() and Target:IsCasting() and Target:IsInterruptible() and Settings.Balance.Sephuz.SolarBeam then
+    if AR.CastSuggested(S.SolarBeam) then return "Cast"; end
+  end
+end
+
 -- CD Usage
 local function CDs ()
-    -- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
+  -- actions=potion,name=potion_of_prolonged_power,if=buff.celestial_alignment.up|buff.incarnation.up
+  if Settings.Balance.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:Buff(S.IncarnationChosenOfElune) or Player:Buff(S.CelestialAlignment)) or Target:FilteredTimeToDie("<=", 60) then
+    if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
+  end
+
+  -- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
   if (Cache.EnemiesCount[range] <= 2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
     if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
   end
@@ -661,7 +702,12 @@ local function APL ()
   Everyone.AoEToggleEnemiesUpdate();
   nextMoonCalculation()
     
-	--Buffs
+  -- Defensives
+  if S.Barkskin:IsCastable() and Player:HealthPercentage() <= Settings.Balance.BarkSkinHP then
+		if AR.Cast(S.Barkskin, Settings.Balance.OffGCDasOffGCD.BarkSkin) then return "Cast"; end
+	end  
+    
+	-- Buffs
 	if not Player:Buff(S.MoonkinForm) and not Player:AffectingCombat() then
 		if AR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return ""; end
 	end
@@ -699,9 +745,15 @@ local function APL ()
 			if AR.Cast(S.MoonkinForm) then return ""; end
 		end
 		if Target:IsInRange(range) then --in range
-			--CD usage
+			-- CD usage
 			if AR.CDsON() then
 				ShouldReturn = CDs();
+				if ShouldReturn then return ShouldReturn; end
+			end
+      
+      -- Sephuz usage
+			if I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastBuff() >= 30 then
+				ShouldReturn = Sephuz();
 				if ShouldReturn then return ShouldReturn; end
 			end
       
