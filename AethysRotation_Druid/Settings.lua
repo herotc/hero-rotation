@@ -75,3 +75,11 @@
   -- local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian");
 
   CreateARPanelOption("OffGCDasOffGCD", CP_Druid, "APL.Druid.Commons.OffGCDasOffGCD.Racials", "Racials");
+ 
+  CreateARPanelOption("GCDasOffGCD", CP_Balance, "APL.Druid.Balance.GCDasOffGCD.MoonkinForm", "Moonkin Form");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.BlessingofElune", "Blessing Of Elune");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.BlessingofAnshe", "Blessing Of Anshe");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.AstralCommunion", "Astral Communion");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.IncarnationChosenOfElune", "Incarnation Chosen Of Elune");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.CelestialAlignment", "Celestial Alignment");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.WarriorofElune", "Warrior Of Elune");
