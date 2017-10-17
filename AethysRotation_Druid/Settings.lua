@@ -31,6 +31,15 @@
       }
     },
     Balance = {
+      BarkSkinHP = 10,
+      ShowPoPP = false,
+      Sephuz = {
+        SolarBeam = false,
+        Typhoon = false
+        MightyBash = false,
+        MassEntanglement = false,
+        EntanglingRoots = false,
+      }
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -76,6 +85,7 @@
 
   CreateARPanelOption("OffGCDasOffGCD", CP_Druid, "APL.Druid.Commons.OffGCDasOffGCD.Racials", "Racials");
  
+  -- CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkSkinHP", {0, 100, 1}, "BarkSkin HP", "Set the BarkSkin HP threshold.");
   CreateARPanelOption("GCDasOffGCD", CP_Balance, "APL.Druid.Balance.GCDasOffGCD.MoonkinForm", "Moonkin Form");
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.BlessingofElune", "Blessing Of Elune");
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.BlessingofAnshe", "Blessing Of Anshe");
@@ -83,3 +93,10 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.IncarnationChosenOfElune", "Incarnation Chosen Of Elune");
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.CelestialAlignment", "Celestial Alignment");
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.WarriorofElune", "Warrior Of Elune");
+  -- CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+  -- CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.SolarBeam", "Sephuz: Show Solar Beam", "Enable this if you want it to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.EntanglingRoots", "Sephuz: Show Entangling Roots", "Enable this if you want it to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.MightyBash", "Sephuz: Show Mighty Bash", "Enable this if you want it to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.MassEntanglement", "Sephuz: Show Mass Entanglement", "Enable this if you want it to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.Typhoon", "Sephuz: Show Typhoon", "Enable this if you want it to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
+
