@@ -141,7 +141,7 @@ local function rop_phase
 end
 
 local function standard_rotation
-  return not Player:Buff(S.RuneOfPower) and not Player:Buff(S.Combustion);
+
 end
 
 -- Start of Combustion_Phase actions.
@@ -215,7 +215,7 @@ if S.DragonsBreath:IsCastable() and not Player:Buff(HotStreak) and S.Fireblast:C
 end
 
 --actions.combustion_phase+=/scorch,if=target.health.pct<=30&equipped.132454
-if S.Scorch:IsCastable() and Target:HealthPercentage() < 30 and I.KoralonsBurningTouch:IsEquipped() then
+if S.Scorch:IsCastable() and Target:HealthPercentage() <= 30 and I.KoralonsBurningTouch:IsEquipped() then
    if AR.Cast(S.Scorch) then return "";
 end
 

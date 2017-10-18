@@ -67,16 +67,17 @@
      },
 
      Blood = {
-     --Use the IcyVeins Rotation for blood instead of simc
-      useIcyVeinsRotation = false,
+     --Choose the rotation to follow (Default: Icy Veins)
+      RotationToFollow = "Icy Veins",
      -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-      
+        BloodDrinker = {true, false},
+	      BoneStorm = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-
+        DancingRuneWeapon = {true, false},
        }
    },  
   
@@ -107,4 +108,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.HungeringRuneWeapon", "Hungering Rune Weapon", "Enable if you want to put Hungering Rune Weapon shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
   --Blood Panels
-  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.useIcyVeinsRotation", "Show the IcyVeins Rotation instead of the one from Simulationcraft");
+  CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.RotationToFollow", {"Icy Veins","SimC"}, "Rotation:", "Define the rotation to follow.(Simc module needs development)");
+  CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BloodDrinker", "Blooddrinker", "Enable if you want to put Blooddrinker shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BoneStorm", "Bonestorm", "Enable if you want to put Bonestorm shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.DancingRuneWeapon", "Dancing Rune Weapon", "Enable if you want to put Dancing Rune Weapon shown as Off GCD (top icons) instead of Main.");

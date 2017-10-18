@@ -41,7 +41,8 @@
   RapidDecomposition			= Spell(194662),
   Ossuary						= Spell(219786),
   HeartStrike					= Spell(206930),
-  BloodBoil						= Spell(50842)
+  BloodBoil						= Spell(50842),
+  HeartBreaker                  = Spell(221536),
 
 };
   local S = Spell.DeathKnight.Blood;
@@ -49,7 +50,8 @@
   -- GUI Settings
   local Settings = {
    General = AR.GUISettings.General,
-   DeathKnight = AR.GUISettings.APL.DeathKnight
+    Commons = AR.GUISettings.APL.DeathKnight.Commons,
+    Blood = AR.GUISettings.APL.DeathKnight.Blood
  };
 
 
@@ -108,7 +110,7 @@ local function SingleTarget()
 		if AR.Cast(S.HeartStrike) then return ""; end
 	end
 
-	if S.BloodBoil:IsCastable() then
+  if S.BloodBoil:IsCastable() then
 		if AR.Cast(S.BloodBoil) then return ""; end
 	end
 
@@ -117,11 +119,11 @@ local function SingleTarget()
 end
 local function IcyVeinsRotation()
 
-	if S.DancingRuneWeapon:IsCastable() then
-		if AR.Cast(S.DancingRuneWeapon) then return ""; end
+	if AR.CDsON() and S.DancingRuneWeapon:IsCastable() then
+		if AR.Cast(S.DancingRuneWeapon, Settings.Blood.OffGCDasOffGCD.DancingRuneWeapon) then return ""; end
 	end
 
-	if S.Marrowrend:IsCastable() and Player:BuffRemains(S.BoneShield) <= 3 then
+	if S.Marrowrend:IsCastable() and Player:BuffRemains(S.BoneShield) <= (Player:GCD() * 2) then
 		if AR.Cast(S.Marrowrend) then return ""; end
 	end
 
@@ -129,23 +131,31 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.BloodBoil) then return ""; end
 	end
 
+	if AR.CDsON() and S.BoneStorm:IsCastable() and Cache.EnemiesCount[10] >= 1 and Player:RunicPower() >= 100 then
+	    if AR.Cast(S.BoneStorm, Settings.Blood.GCDasOffGCD.BoneStorm) then return ""; end
+	end
+	
 	if S.DeathandDecay:IsUsable() and (Cache.EnemiesCount[10] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.CrimsonScourge)) then
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
-	if S.DeathStrike:IsUsable() and Player:RunicPowerDeficit() <= 20 then
-		if AR.Cast(S.DeathStrike) then return ""; end
+	if S.BloodDrinker:IsCastable() and S.BloodDrinker:IsLearned() and not Player:Buff(S.DancingRuneWeaponBuff) and Player:RunicPowerDeficit() >= 10 then
+		if AR.Cast(S.BloodDrinker, Settings.Blood.GCDasOffGCD.BloodDrinker) then return ""; end
 	end
+	
+	if S.DeathStrike:IsUsable() and S.BloodDrinker:IsCastable() and (S.BloodDrinker:IsAvailable() or S.BloodDrinker:CooldownRemains() <= Player:GCD()) and not Player:Buff(S.DancingRuneWeaponBuff) and ((Player:RuneTimeToX(1) <= Player:GCD()) or Player:Runes() >= 1) then
+	    if AR.Cast(S.DeathStrike) then return ""; end
+    end
 
-	if S.BloodDrinker:IsCastable() and S.BloodDrinker:IsAvailable() and not Player:Buff(S.DancingRuneWeaponBuff) then
-		if AR.Cast(S.BloodDrinker) then return ""; end
-	end
-
-	if S.Marrowrend:IsCastable() and (Player:BuffStack(S.BoneShield) < 5 and S.Ossuary:IsAvailable()) or (Player:BuffStack(S.BoneShield) <= 6) then
+	if S.Marrowrend:IsCastable() and Player:BuffStack(S.BoneShield) <= 6 and Player:RunicPowerDeficit() >= 20 then
 		if AR.Cast(S.Marrowrend) then return ""; end
 	end
+	
+	if S.DeathStrike:IsUsable() and S.Marrowrend:IsCastable() and Player:BuffStack(S.BoneShield) <= 6 then
+	    if AR.Cast(S.DeathStrike) then return ""; end
+	end
 
-	if S.DeathandDecay:IsUsable() and (Cache.EnemiesCount[10] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable() and S.DeathandDecay:CooldownRemains() == 0)  or (Cache.EnemiesCount[10] >= 3 and S.DeathandDecay:CooldownRemains() == 0) then
+	if S.DeathandDecay:IsUsable() and ((Cache.EnemiesCount[10] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable() and S.DeathandDecay:CooldownRemains() == 0)  or (Cache.EnemiesCount[10] >= 3 and S.DeathandDecay:CooldownRemains() == 0)) and Player:RunicPowerDeficit() >= 10 then
 		if AR.Cast(S.DeathandDecay) then return ""; end
 	end
 
@@ -154,8 +164,13 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.DeathStrike) then return ""; end
 	end--]]
 
-	if S.HeartStrike:IsCastable() and (Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3 then
+  if S.HeartStrike:IsCastable() and ((Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3) and (Player:RunicPowerDeficit()>= 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() >= (15 + math.min(Cache.EnemiesCount["Melee"],5) * 2))) then
 		if AR.Cast(S.HeartStrike) then return ""; end
+	end
+
+	--- Move this below builders and replace the RunicPowerDeficit conditional with one that says 3+ runes available.
+	if S.DeathStrike:IsUsable() and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Runes() >= 3) then
+		if AR.Cast(S.DeathStrike) then return ""; end
 	end
 
 	if S.DeathandDecay:IsUsable() and Player:Buff(S.CrimsonScourge) and not S.RapidDecomposition:IsAvailable() then
@@ -176,12 +191,13 @@ end
 --- ======= MAIN =======
 local function APL ()
     -- Unit Update
-    AC.GetEnemies(10);
-    AC.GetEnemies(20);
+    AC.GetEnemies("Melee");
+    AC.GetEnemies(10,true);
+    AC.GetEnemies(20,true);
 
    -- In Combat
     if Everyone.TargetIsValid() and Target:IsInRange(20) then
-    	if Settings.DeathKnight.Blood.useIcyVeinsRotation then
+    	if Settings.Blood.RotationToFollow == "Icy Veins" then
 			ShouldReturn = IcyVeinsRotation();
 		else 
 			ShouldReturn = SingleTarget();
