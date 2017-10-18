@@ -110,7 +110,7 @@ local function SingleTarget()
 		if AR.Cast(S.HeartStrike) then return ""; end
 	end
 
-	if S.BloodBoil:IsCastable() then
+  if S.BloodBoil:IsCastable() then
 		if AR.Cast(S.BloodBoil) then return ""; end
 	end
 
@@ -164,7 +164,7 @@ local function IcyVeinsRotation()
 		if AR.Cast(S.DeathStrike) then return ""; end
 	end--]]
 
-	if S.HeartStrike:IsCastable() and ((Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3) and (S.HeartBreaker:IsAvailable() and Player:RunicPowerDeficit() >= 15 or Player:RunicPowerDeficit() >= (15 + 2 * math.min(Cache.EnemiesCount[10], 5))) then
+  if S.HeartStrike:IsCastable() and ((Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3) and (Player:RunicPowerDeficit()>= 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() >= (15 + math.min(Cache.EnemiesCount["Melee"],5) * 2))) then
 		if AR.Cast(S.HeartStrike) then return ""; end
 	end
 
@@ -191,8 +191,9 @@ end
 --- ======= MAIN =======
 local function APL ()
     -- Unit Update
-    AC.GetEnemies(10);
-    AC.GetEnemies(20)
+    AC.GetEnemies("Melee");
+    AC.GetEnemies(10,true);
+    AC.GetEnemies(20,true);
 
    -- In Combat
     if Everyone.TargetIsValid() and Target:IsInRange(20) then
