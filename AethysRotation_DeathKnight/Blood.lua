@@ -196,7 +196,7 @@ local function APL ()
 
    -- In Combat
     if Everyone.TargetIsValid() and Target:IsInRange(20) then
-    	if Settings.Blood.useIcyVeinsRotation then
+    	if Settings.Blood.RotationToFollow == "Icy Veins" then
 			ShouldReturn = IcyVeinsRotation();
 		else 
 			ShouldReturn = SingleTarget();
