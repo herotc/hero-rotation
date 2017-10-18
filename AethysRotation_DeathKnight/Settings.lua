@@ -72,11 +72,12 @@
      -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-      
+        BloodDrinker = {true, false},
+	    BoneStorm = {true, false},
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-
+        DancingRuneWeapon = {true, false},
        }
    },  
   
@@ -108,3 +109,6 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
   --Blood Panels
   CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.useIcyVeinsRotation", "Show the IcyVeins Rotation instead of the one from Simulationcraft");
+  CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BloodDrinker", "Blooddrinker", "Enable if you want to put Blooddrinker shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BoneStorm", "Bonestorm", "Enable if you want to put Bonestorm shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.DancingRuneWeapon", "Dancing Rune Weapon", "Enable if you want to put Dancing Rune Weapon shown as Off GCD (top icons) instead of Main.");
