@@ -811,13 +811,13 @@ local function APL ()
 				end
 				
         -- actions+=/moonfire,cycle_targets=1,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&astral_power.deficit>7
-        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < 3 + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0)) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
+        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					if AR.Cast(S.MoonFire) then return ""; end
 				end
         if AR.AoEON() and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 					for Key, Value in pairs(Cache.Enemies[range]) do
-						if Value:TimeToDie()-Value:DebuffRemainsP(S.MoonFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < 3 + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0)) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
+						if Value:TimeToDie()-Value:DebuffRemainsP(S.MoonFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
 						end					
 					end
@@ -827,13 +827,13 @@ local function APL ()
 				end
 				
         -- actions+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&astral_power.deficit>7
-        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < 3 + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0)) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
+        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					if AR.Cast(S.SunFire) then return ""; end
 				end
 				if AR.AoEON() and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 					for Key, Value in pairs(Cache.Enemies[range]) do
-						if Value:TimeToDie()-Value:DebuffRemainsP(S.SunFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < 3 + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0)) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
+						if Value:TimeToDie()-Value:DebuffRemainsP(S.SunFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
 						end					
 					end
@@ -874,13 +874,13 @@ local function APL ()
 			
 			else --moving
 				-- actions+=/moonfire,cycle_targets=1,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&astral_power.deficit>7
-        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < 3 + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0)) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
+        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					if AR.Cast(S.MoonFire) then return ""; end
 				end
         if AR.AoEON() and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 					for Key, Value in pairs(Cache.Enemies[range]) do
-						if Value:TimeToDie()-Value:DebuffRemainsP(S.MoonFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < 3 + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0)) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
+						if Value:TimeToDie()-Value:DebuffRemainsP(S.MoonFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) + ((Player:CastID() == S.LunarStrike:ID()) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
 						end					
 					end
@@ -889,13 +889,13 @@ local function APL ()
 					end
 				end
 				-- actions+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&astral_power.deficit>7
-        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < 3 + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0)) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
+        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					if AR.Cast(S.SunFire) then return ""; end
 				end
 				if AR.AoEON() and Player:AstralPowerDeficit(FuturAstralPower()) > 7 then
 					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 					for Key, Value in pairs(Cache.Enemies[range]) do
-						if Value:TimeToDie()-Value:DebuffRemainsP(S.SunFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < 3 + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0)) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
+						if Value:TimeToDie()-Value:DebuffRemainsP(S.SunFireDebuff) > BestUnitTTD and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) + ((Player:CastID() == S.SolarWrath:ID()) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
 						end					
 					end
