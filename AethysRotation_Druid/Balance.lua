@@ -167,9 +167,9 @@ local function FuturAstralPower ()
       elseif Player:CastID() == S.FullMoon:ID() then
         return AstralPower + 40
       elseif Player:CastID() == S.SolarWrath:ID() then
-        return AstralPower + (Player:Buff(S.BlessingofElune) and 10 or 8)
+        return AstralPower + (Player:Buff(S.BlessingofElune) and 10 or 8) * ((Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0) and 2 or 1)
       elseif Player:CastID() == S.LunarStrike:ID() then
-        return AstralPower + (Player:Buff(S.BlessingofElune) and 15 or 10)
+        return AstralPower + (Player:Buff(S.BlessingofElune) and 15 or 10) * ((Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0) and 2 or 1)
       else
         return AstralPower
       end
