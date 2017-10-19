@@ -328,7 +328,7 @@ local function APL ()
     end
     -- actions+=/use_item,name=umbral_moonglaives,if=equipped.umbral_moonglaives&(cooldown.battle_cry.remains>gcd&cooldown.battle_cry.remains<2|cooldown.battle_cry.remains=0)
     if I.UmbralMoonglaives:IsReady() and I.UmbralMoonglaives:IsEquipped() and (S.BattleCry:CooldownRemainsP() > Player:GCD() and S.BattleCry:CooldownRemainsP() < 2 or S.BattleCry:CooldownRemainsP() == 0) then
-      if AR.Cast(S.UmbralMoonglaives, Settings.Fury.OffGCDasOffGCD.UmbralMoonglaives) then return ""; end
+      if AR.Cast(I.UmbralMoonglaives, Settings.Fury.OffGCDasOffGCD.UmbralMoonglaives) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.reckless_abandon.enabled&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
     if S.BattleCry:IsCastable() and S.RecklessAbandon:IsAvailable() then
