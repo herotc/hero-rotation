@@ -351,7 +351,7 @@ local function EmeraldDreamcatcherRotation ()
 	end
   
   -- actions.ed+=/starsurge,if=(gcd.max*astral_power%26)>target.time_to_die
-  if FuturAstralPower()>=40 and Target:FilteredTimeToDie("<", Player:GCD() * FuturAstralPower() / 26) then
+  if FuturAstralPower() >= (40 - (5 * Player:BuffStack(S.EmeraldDreamcatcher))) and Target:FilteredTimeToDie("<", Player:GCD() * FuturAstralPower() / 26) then
 		if AR.Cast(S.Starsurge) then return ""; end
 	end
   
@@ -442,7 +442,7 @@ local function EmeraldDreamcatcherRotation ()
 	end	
   
   -- actions.ed+=/starsurge,if=(buff.the_emerald_dreamcatcher.up&buff.the_emerald_dreamcatcher.remains<gcd.max)|astral_power>85|((buff.celestial_alignment.up|buff.incarnation.up)&astral_power>30)
-  if FuturAstralPower() >= 40 
+  if FuturAstralPower() >= (40 - (5 * Player:BuffStack(S.EmeraldDreamcatcher)))
     and (Player:BuffRemainsP(S.EmeraldDreamcatcher) < Player:GCD() or FuturAstralPower() > 85 or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) and FuturAstralPower() > 30)) then
       if AR.Cast(S.Starsurge) then return ""; end
 	end
