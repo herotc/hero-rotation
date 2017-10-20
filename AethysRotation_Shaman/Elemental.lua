@@ -269,7 +269,7 @@ local function APL ()
       end
 
       -- actions.single_asc+=/flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
-      if S.FlameShock:IsCastable() and (not Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCD()) then
+      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) or (Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains())) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
@@ -377,7 +377,7 @@ local function APL ()
     -- actions+=/run_action_list,name=single_if,if=talent.icefury.enabled
     if S.Icefury:IsAvailable() then
       -- actions.single_if=flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
-      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) or Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCD()) then
+      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) or Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
@@ -501,7 +501,7 @@ local function APL ()
     -- actions+=/run_action_list,name=single_lr,if=talent.lightning_rod.enabled
     if S.LightningRod:IsAvailable() then
       -- actions.single_lr=flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
-      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) and Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCD()) then
+      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) and Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
