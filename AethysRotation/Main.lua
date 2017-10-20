@@ -141,7 +141,7 @@
           AR.GUI.LoadSettingsRecursively(AR.GUISettings);
           AR.GUI.CorePanelSettingsInit();
           -- UI
-          if AethysRotationDB and AethysRotationDB.IconFramePos then
+          if AethysRotationDB and type(AethysRotationDB.IconFramePos) == "table" and #AethysRotationDB.IconFramePos == 5 then
             AR.MainFrame:SetPoint(AethysRotationDB.IconFramePos[1], _G[AethysRotationDB.IconFramePos[2]], AethysRotationDB.IconFramePos[3], AethysRotationDB.IconFramePos[4], AethysRotationDB.IconFramePos[5]);
           else
             AR.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
