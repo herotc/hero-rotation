@@ -220,7 +220,7 @@ end
       end
       -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
       if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
-        if AR.Cast(S.IcyVeins, Settings.Frost.OffGCDasOffGCD.IcyVeins) then return "" end;
+        if AR.Cast(S.IcyVeins, Settings.Frost.OffGCDasOffGCD.IcyVeins) then return ""; end
       end
       -- actions.cooldowns+=/mirror_image
       if S.MirrorImage:IsCastable() then
