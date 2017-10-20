@@ -333,7 +333,7 @@ local function APL ()
 
       -- actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
       if S.TotemMastery:IsCastable() and (Player:BuffRemains(S.ResonanceTotemBuff) < 10 or (Player:BuffRemains(S.ResonanceTotemBuff) < (Player:BuffRemains(S.AscendanceBuff) + S.Ascendance:CooldownRemains()) and S.Ascendance:CooldownRemains() < 15)) then
-        if AR.Cast(TotemMastery) then return "Cast TotemMastery" end
+        if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
       -- actions.single_asc+=/lava_beam,if=active_enemies>1&spell_targets.lava_beam>1
@@ -370,7 +370,7 @@ local function APL ()
 
       -- actions.single_asc+=/flame_shock,moving=1,if=movement.distance>6
       if S.FlameShock:IsCastable() and Player:IsMoving() then
-        if AR.Cast(FlameShock) then return "Cast FlameShock" end
+        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
 
