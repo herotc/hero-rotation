@@ -427,7 +427,11 @@ local function CDs ()
         end
       else
         -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=1&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
-        if S.DeathfromAbove:CooldownRemainsP() <= 1 and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
+        if (S.DeathfromAbove:CooldownRemainsP() <= 1
+            and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 3
+              or Target:FilteredTimeToDie("<=", 6))
+            and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()))
+          or Target:FilteredTimeToDie("<=", 10) then
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       end
