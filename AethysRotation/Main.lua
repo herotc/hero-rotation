@@ -197,7 +197,7 @@
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
     -- Druid
       [102]   = "AethysRotation_Druid",         -- Balance
-      [103]   = false,                          -- Feral
+      [103]   = "AethysRotation_Druid",         -- Feral
       [104]   = "AethysRotation_Druid",         -- Guardian
       [105]   = false,                          -- Restoration
     -- Hunter
