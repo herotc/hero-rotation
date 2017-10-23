@@ -34,6 +34,8 @@
       }
     },
     Destruction = {
+      UnendingResolveHP = 20,
+      ShowPoPP = false,
       SpellType="Auto",--Green fire override {"Auto","Orange","Green"}
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -46,13 +48,13 @@
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        -- Racials
-        
+        UnendingResolve = {true, false},
         -- Abilities
         SoulHarvest = {true, false}
       }
     },
     Demonology = {
+      ShowPoPP = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -62,13 +64,12 @@
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        -- Racials
-        
         -- Abilities
         SoulHarvest = {true, false}
       }
     },
     Affliction = {
+      ShowPoPP = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -78,8 +79,6 @@
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        -- Racials
-        
         -- Abilities
         SoulHarvest = {true, false}
       }
@@ -102,6 +101,7 @@
   CreateARPanelOption("GCDasOffGCD", CP_Warlock, "APL.Warlock.Commons.GCDasOffGCD.SummonInfernal", "Summon Infernal");
   CreateARPanelOption("GCDasOffGCD", CP_Warlock, "APL.Warlock.Commons.GCDasOffGCD.LifeTap", "Life Tap");
  
+  CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
   CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType", {"Auto","Orange","Green"}, "Spell icons", "Define what icons you want to appear.");
   CreateARPanelOption("GCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.GCDasOffGCD.DemonicPower", "Demonic Power");
   CreateARPanelOption("GCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.GCDasOffGCD.GrimoireOfSacrifice", "Grimoire Of Sacrifice");
@@ -109,13 +109,19 @@
   CreateARPanelOption("GCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.GCDasOffGCD.SummonImp", "Summon Imp");
   CreateARPanelOption("GCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.GCDasOffGCD.GrimoireImp", "Grimoire Imp");
   CreateARPanelOption("OffGCDasOffGCD", CP_Destruction, "APL.Warlock.Destruction.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
+  CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+
  
   CreateARPanelOption("GCDasOffGCD", CP_Demonology, "APL.Warlock.Demonology.GCDasOffGCD.SummonFelguard", "Summon Felguard");
   CreateARPanelOption("GCDasOffGCD", CP_Demonology, "APL.Warlock.Demonology.GCDasOffGCD.GrimoireFelguard", "Grimoire Felguard");
   CreateARPanelOption("GCDasOffGCD", CP_Demonology, "APL.Warlock.Demonology.GCDasOffGCD.DemonicEmpowerment", "Demonic Empowerment");
   CreateARPanelOption("OffGCDasOffGCD", CP_Demonology, "APL.Warlock.Demonology.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
+  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+
 
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.SummonFelhunter", "Summon Felhunter");
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.GrimoireFelhunter", "Grimoire Felhunter");
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.GrimoireOfSacrifice", "Grimoire Of Sacrifice");
   CreateARPanelOption("OffGCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
+  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+
