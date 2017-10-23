@@ -120,8 +120,8 @@
   if not Item.Warlock then Item.Warlock = {}; end
   Item.Warlock.Destruction = {
     -- Legendaries
-    LessonsOfSpaceTime= Item(144369), --3
-    SindoreiSpite= Item(132379), --9
+    LessonsOfSpaceTime= Item(144369, {3}), --3
+    SindoreiSpite= Item(132379, {9}), --9
   };
   local I = Item.Warlock.Destruction;
   -- Rotation Var
@@ -256,10 +256,13 @@
     -- In Combat
     if Everyone.TargetIsValid() then
       -- actions=immolate,cycle_targets=1,if=active_enemies=2&talent.roaring_blaze.enabled&!cooldown.havoc.remains&dot.immolate.remains<=buff.active_havoc.duration
+      if Cache.EnemiesCount[range]==2 and S.RoaringBlaze:IsAvailable() and not S.Havoc:IsCastable() then
+        if AR.Cast(CastImmolate) then return "Cast"; end
+      end
       if AR.AoEON() and Cache.EnemiesCount[range]==2 and S.RoaringBlaze:IsAvailable() and not S.Havoc:IsCastable() then
         BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = nil, Player:GCD()*2, nil, Consts.ImmolateMaxDuration;
         for _, Value in pairs(Cache.Enemies[range]) do
-          if Value:DebuffRemains(S.ImmolateDebuff)<= S.Havoc:CooldownRemainsP() and Target:DebuffRemains(S.ImmolateDebuff) < DebuffRemains then
+          if Value:DebuffRemains(S.ImmolateDebuff) <= S.Havoc:CooldownRemainsP() and Target:DebuffRemains(S.ImmolateDebuff) < DebuffRemains then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = Value, Value:TimeToDie(), CastImmolate, Target:DebuffRemains(S.ImmolateDebuff);
           end	
         end
@@ -351,7 +354,7 @@
       end
       
       -- actions+=/dimensional_rift,if=equipped.144369&!buff.lessons_of_spacetime.remains&((!talent.grimoire_of_supremacy.enabled&!cooldown.summon_doomguard.remains)|(talent.grimoire_of_service.enabled&!cooldown.service_pet.remains)|(talent.soul_harvest.enabled&!cooldown.soul_harvest.remains))
-      if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and I.LessonsOfSpaceTime:IsEquipped(3) and not Player:Buff(S.LessonsOfSpaceTimeBuff) and ((not S.GrimoireOfSupremacy:IsAvailable() and not S.SummonDoomGuard:CooldownUp()) or(S.GrimoireOfService:IsAvailable() and not S.GrimoireImp:IsAvailable()) or (S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownUp())) then
+      if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and I.LessonsOfSpaceTime:IsEquipped() and not Player:Buff(S.LessonsOfSpaceTimeBuff) and ((not S.GrimoireOfSupremacy:IsAvailable() and not S.SummonDoomGuard:CooldownUp()) or(S.GrimoireOfService:IsAvailable() and not S.GrimoireImp:IsAvailable()) or (S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownUp())) then
         if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return "Cast"; end
       end
       
@@ -395,8 +398,8 @@
         if AR.Cast(CastRainOfFire) then return "Cast"; end
       end
       
-      -- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|((!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
-      if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and (Target:TimeToDie()<=32 or not I.LessonsOfSpaceTime:IsEquipped(3) or S.DimensionalRift:Charges()>1 or ((not S.GrimoireOfService:IsAvailable() or S.DimensionalRift:Recharge()<S.GrimoireImp:CooldownRemainsP()) and (not S.SoulHarvest:IsAvailable() or S.DimensionalRift:Recharge()<S.SoulHarvest:CooldownRemainsP()))) then
+      -- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|(!equipped.144369&(!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
+      if S.DimensionalRift:IsCastable() and S.DimensionalRift:Charges()>0 and (Target:TimeToDie()<=32 or not I.LessonsOfSpaceTime:IsEquipped() or S.DimensionalRift:Charges()>1 or (not I.LessonsOfSpaceTime:IsEquipped() and (not S.GrimoireOfService:IsAvailable() or S.DimensionalRift:Recharge()<S.GrimoireImp:CooldownRemainsP()) and (not S.SoulHarvest:IsAvailable() or S.DimensionalRift:Recharge()<S.SoulHarvest:CooldownRemainsP()))) then
         if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return "Cast"; end
       end
       
@@ -430,9 +433,22 @@
         if AR.Cast(CastConflagrate) then return "Cast"; end
       end
       
-      -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
+      -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
       if S.Immolate:IsCastable() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.ImmolateDebuff)<=Consts.ImmolateBaseDuration*0.3 and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
         if AR.Cast(CastImmolate) then return "Cast"; end
+      end
+      if AR.AoEON() and (Cache.EnemiesCount[range]<5 or not S.FireAndBrimstone:IsAvailable()) 
+        and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>=S.Immolate:CastTime()*Cache.EnemiesCount[range]) 
+        and not S.RoaringBlaze:IsAvailable() and not (Player:IsCasting() and (Player:CastID()==S.Immolate:ID() or Player:CastID()==S.Cataclysm:ID())) then
+          BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = nil, Player:GCD()*2, nil, Consts.ImmolateMaxDuration;
+          for _, Value in pairs(Cache.Enemies[range]) do
+            if Value:DebuffRemains(S.ImmolateDebuff) <= Consts.ImmolateBaseDuration * 0.3 then
+              BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains = Value, Value:TimeToDie(), CastImmolate, Target:DebuffRemains(S.ImmolateDebuff);
+            end	
+          end
+          if BestUnit then
+            if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return "Cast"; end
+          end
       end
       
       -- actions+=/incinerate
@@ -451,19 +467,19 @@
 
 
 --- ======= SIMC =======
---- Last Update: 12/06/2017
+--- Last Update: 09/06/2017
 
--- actions.precombat=flask,type=whispered_pact
--- actions.precombat+=/food,type=azshari_salad
+-- actions.precombat=flask
+-- actions.precombat+=/food
+-- actions.precombat+=/augmentation
 -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
 -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
 -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
 -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
--- actions.precombat+=/augmentation,type=defiled
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
--- actions.precombat+=/potion,name=prolonged_power
+-- actions.precombat+=/potion
 -- actions.precombat+=/chaos_bolt
 
 -- # Executed every time the actor is available.
@@ -498,7 +514,7 @@
 -- actions+=/channel_demonfire,if=dot.immolate.remains>cast_time&(active_enemies=1|buff.active_havoc.remains<action.chaos_bolt.cast_time)
 -- actions+=/rain_of_fire,if=active_enemies>=3
 -- actions+=/rain_of_fire,if=active_enemies>=6&talent.wreak_havoc.enabled
--- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|((!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
+-- actions+=/dimensional_rift,if=target.time_to_die<=32|!equipped.144369|charges>1|(!equipped.144369&(!talent.grimoire_of_service.enabled|recharge_time<cooldown.service_pet.remains)&(!talent.soul_harvest.enabled|recharge_time<cooldown.soul_harvest.remains)&(!talent.grimoire_of_supremacy.enabled|recharge_time<cooldown.summon_doomguard.remains))
 -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3
 -- actions+=/cataclysm
 -- actions+=/chaos_bolt,if=active_enemies<3&target.time_to_die<=10
@@ -507,6 +523,6 @@
 -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)&(trinket.stacking_proc.mastery.react&trinket.stacking_proc.mastery.remains>cast_time|trinket.stacking_proc.crit.react&trinket.stacking_proc.crit.remains>cast_time|trinket.stacking_proc.versatility.react&trinket.stacking_proc.versatility.remains>cast_time|trinket.stacking_proc.intellect.react&trinket.stacking_proc.intellect.remains>cast_time|trinket.stacking_proc.spell_power.react&trinket.stacking_proc.spell_power.remains>cast_time)
 -- actions+=/shadowburn
 -- actions+=/conflagrate,if=!talent.roaring_blaze.enabled&buff.backdraft.stack<3
--- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
+-- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
 -- actions+=/incinerate
 -- actions+=/life_tap
