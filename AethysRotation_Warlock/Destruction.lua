@@ -266,26 +266,22 @@
     --Precombat
     -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
     if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or Player:BuffRemainsP(S.DemonicPower) < 600) and FutureShard() >= 1 and Player:CastID() ~= S.SummonImp:ID() then
-      print("1")
       if AR.Cast(S.SummonImp, Settings.Destruction.GCDasOffGCD.SummonImp) then return ""; end
     end
     
     -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
     if S.GrimoireOfSacrifice:IsAvailable() and S.GrimoireOfSacrifice:CooldownRemainsP() == 0 and (IsPetInvoked() or Player:CastID() == S.SummonImp:ID()) then
-      print("2")
       if AR.Cast(S.GrimoireOfSacrifice, Settings.Destruction.GCDasOffGCD.GrimoireOfSacrifice) then return ""; end
     end
     
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
     if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:CoooldownRemainsP() == 0 and not S.MeteorStrike:IsLearned() and  ((S.LordOfFlames:ArtifactRank() > 0) or (AR.AoEON() and Cache.EnemiesCount[range] > 1)) and FutureShard() >= 1 then
-      print("3")
       if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
     
     -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
     if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:CoooldownRemainsP() == 0 and not S.ShadowLock:IsLearned() and not S.LordOfFlames:ArtifactRank() == 0 and (not AR.AoEON() or Cache.EnemiesCount[range] == 1) and FutureShard() >= 1 then
-      print("4")
       if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
     end
     
