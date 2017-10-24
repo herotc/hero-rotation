@@ -97,6 +97,13 @@
     self:SetPoint("BOTTOMRIGHT", AR.MainFrame, "BOTTOMRIGHT", 0, 0);
     self.CooldownFrame:SetAllPoints(self);
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
+	self.text = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+	self.text:SetAllPoints(true);
+	self.text:SetJustifyH("CENTER");
+	self.text:SetJustifyV("CENTER");
+	self.text:SetPoint("CENTER");
+	self.text:SetTextColor(1,1,1,1);
+	self.text:SetText("");
     if AR.GUISettings.General.BlackBorderIcon then
       self.TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
@@ -106,10 +113,15 @@
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.MainIconFrame:ChangeIcon (Texture)
+    self.text:SetText("");
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
     if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
+  end
+  -- Set text on frame
+  function AR.MainIconFrame:OverlayText(Text)
+	self.text:SetText(Text);
   end
   -- Set a Cooldown Frame
   function AR.MainIconFrame:SetCooldown (Start, Duration)
@@ -308,6 +320,7 @@
     end
     if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
+
   -- Hide Icon
   function AR.SuggestedIconFrame:HideIcon ()
     AR.SuggestedIconFrame:Hide();

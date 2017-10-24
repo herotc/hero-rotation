@@ -85,6 +85,15 @@
     end
     return false;
   end
+  -- Overload for Main Cast (with text)
+  function AR.CastAnnotated(Object, OffGCD, Text)
+	result = AR.Cast(Object, OffGCD);
+	-- todo: handle small icon frame if OffGCD is true
+	if not OffGCD then
+		AR.MainIconFrame:OverlayText(Text);
+	end
+	return result;
+  end
   -- Main Cast Queue
   local QueueSpellTable, QueueLength, QueueTextureTable;
   AR.MaxQueuedCasts = 3;
