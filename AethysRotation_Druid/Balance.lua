@@ -26,11 +26,13 @@ local AR = AethysRotation;
 		BloodFury				  = Spell(20572),
 		GiftoftheNaaru		= Spell(59547),
 		Shadowmeld        = Spell(58984),
+    
     -- Forms
 		MoonkinForm 			= Spell(24858),
 		BearForm 				  = Spell(5487),
 		CatForm 				  = Spell(768),
 		TravelForm 				= Spell(783),
+    
     -- Abilities
 		CelestialAlignment= Spell(194223),
 		LunarStrike 			= Spell(194153),
@@ -41,6 +43,7 @@ local AR = AethysRotation;
 		SunFireDebuff 		= Spell(164815),
 		Starsurge 				= Spell(78674),
 		Starfall 				  = Spell(191034),
+    
     -- Talents
 		ForceofNature  		= Spell(205636),
 		WarriorofElune  	= Spell(202425),
@@ -71,10 +74,12 @@ local AR = AethysRotation;
 		FuryofElune  			= Spell(202770),
 		StellarDrift  		= Spell(202354),
 		NaturesBalance  	= Spell(202430),
+    
     -- Artifact
 		NewMoon 				  = Spell(202767),
 		HalfMoon 				  = Spell(202768),
 		FullMoon 				  = Spell(202771),
+    
     -- Defensive
 		Barkskin 				  = Spell(22812),
 		FrenziedRegeneration = Spell(22842),
@@ -83,15 +88,18 @@ local AR = AethysRotation;
 		Rejuvenation 			= Spell(774),
 		Swiftmend 				= Spell(18562),
 		HealingTouch 			= Spell(5185),
+    
     -- Utility
 		Innervate 				= Spell(29166),
 		SolarBeam 				= Spell(78675),
     EntanglingRoots   = Spell(339),
+    
     -- Legendaries
 		OnethsIntuition		= Spell(209406),
     OnethsOverconfidence = Spell(209407),
 		EmeraldDreamcatcher	= Spell(208190),
     SephuzBuff        = Spell(208052),
+    
     -- Misc
 		SolarEmpowerment	= Spell(164545),
 		LunarEmpowerment	= Spell(164547),
@@ -111,6 +119,7 @@ local AR = AethysRotation;
     OnethsIntuition         = Item(137092, {9}), 
     SephuzSecret 			      = Item(132452, {11,12}),
     RadiantMoonlight        = Item(151800, {15}), 
+    
     -- Potion
     PotionOfProlongedPower  = Item(142117)
   };
@@ -135,12 +144,13 @@ local AR = AethysRotation;
 
 -- Prediction for the next Moon
 local function nextMoonCalculation ()
+  
 	if Player:IsCasting() then
-		if Player:CastID()== S.NewMoon:ID() then 
+		if Player:CastID() == S.NewMoon:ID() then 
       nextMoon = S.HalfMoon
-		elseif Player:CastID()== S.HalfMoon:ID() then 
+		elseif Player:CastID() == S.HalfMoon:ID() then 
       nextMoon = S.FullMoon
-		elseif Player:CastID()== S.FullMoon:ID() then --TODO : manage RadiantMoonlight
+		elseif Player:CastID() == S.FullMoon:ID() then --TODO : manage RadiantMoonlight
       nextMoon = S.NewMoon 
     end
   else
@@ -186,14 +196,12 @@ end
 
 -- Overrides the max duration from spell because of spec aura
 local function MaxDurationBalance (Spell)
-  local SpellBaseDuration = BaseDurationBalance(Spell)
-  return SpellBaseDuration * 1.3
+  return BaseDurationBalance(Spell) * 1.3
 end
 
 -- Overrides the pandemic Threshold from spell because of spec aura
 local function PandemicThresholdBalance (Spell)
-  local SpellBaseDuration = BaseDurationBalance(Spell)
-  return SpellBaseDuration * 0.3
+  return BaseDurationBalance(Spell) * 0.3
 end
   
 local function FuryOfElune ()
@@ -208,30 +216,24 @@ local function FuryOfElune ()
 	end
   
   -- actions.fury_of_elune+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=90))
-	if S.NewMoon:IsCastable() 
-		and ((S.NewMoon:Charges() == 2 and S.NewMoon:RechargeP() < 5 and not moons[Player:CastID()] ) 
-		or (S.NewMoon:Charges() == 3 and not moons[Player:CastID()])
-    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:RechargeP() < 5 and nextMoon == S.NewMoon))
+	if S.NewMoon:IsCastable() and nextMoon == S.NewMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3)
 		and (Player:BuffRemainsP(S.FuryofElune) > S.NewMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 90))	then
 		if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.fury_of_elune+=/half_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=80))
-	if S.HalfMoon:IsCastable() 
-		and ((S.NewMoon:Charges() == 2 and S.NewMoon:RechargeP() < 5 and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 3 and not moons[Player:CastID()])
-    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:RechargeP() < 5 and nextMoon == S.HalfMoon)) 
+	if S.HalfMoon:IsCastable() and nextMoon == S.HalfMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3) 
 		and (Player:BuffRemainsP(S.FuryofElune) > S.HalfMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 80)) then
 		if AR.Cast(S.HalfMoon) then return ""; end
 	end
 
   -- actions.fury_of_elune+=/full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))  
-	if S.FullMoon:IsCastable() 
-		and ((S.NewMoon:Charges()==2 and S.NewMoon:RechargeP()<5 and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges()==3 and not moons[Player:CastID()])
-    or (S.NewMoon:Charges() == 3 and moons[Player:CastID()] and S.NewMoon:RechargeP() < 5 and nextMoon == S.FullMoon)) 
+	if S.FullMoon:IsCastable() and nextMoon == S.FullMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3) 
 		and (Player:BuffRemainsP(S.FuryofElune) > S.FullMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 60)) then
-		if AR.Cast(S.FullMoon) then return ""; end
+    if AR.Cast(S.FullMoon) then return ""; end
 	end
   
 	-- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune_up.up&astral_power<=25
@@ -253,20 +255,16 @@ local function FuryOfElune ()
 	end
   
   -- actions.fury_of_elune+=/new_moon,if=astral_power<=90&buff.fury_of_elune_up.up
-	if S.NewMoon:IsAvailable() 
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.NewMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon==S.NewMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.NewMoon))  
+	if S.NewMoon:IsAvailable()  and nextMoon == S.NewMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1)  
 		and FuturAstralPower() <= 90 
 		and Player:BuffRemainsP(S.FuryofElune) > S.NewMoon:CastTime() then
 			if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.fury_of_elune+=/half_moon,if=astral_power<=80&buff.fury_of_elune_up.up&astral_power>cast_time*12
-	if S.NewMoon:IsAvailable() 
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.HalfMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.HalfMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.HalfMoon))
+	if S.NewMoon:IsAvailable()  and nextMoon == S.HalfMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1)
 		and FuturAstralPower() > S.HalfMoon:CastTime() * 12
     and FuturAstralPower() <= 80
 		and Player:BuffRemainsP(S.FuryofElune) > S.HalfMoon:CastTime() then	
@@ -274,10 +272,8 @@ local function FuryOfElune ()
 	end
   
 	-- actions.fury_of_elune+=/full_moon,if=astral_power<=60&buff.fury_of_elune_up.up&astral_power>cast_time*12
-	if S.NewMoon:IsAvailable() 
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.FullMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.FullMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.FullMoon)) 
+	if S.NewMoon:IsAvailable() and nextMoon == S.FullMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) 
     and FuturAstralPower() > S.FullMoon:CastTime() * 12
 		and FuturAstralPower() <= 60
 		and Player:BuffRemainsP(S.FuryofElune) > S.FullMoon:CastTime() then
@@ -389,27 +385,21 @@ local function EmeraldDreamcatcherRotation ()
 	end
   
   -- actions.ed+=/new_moon,if=astral_power.deficit>=10&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 10 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.NewMoon:CastTime() and FuturAstralPower() >= 16
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.NewMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.NewMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.NewMoon)) then
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 10 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.NewMoon:CastTime() and FuturAstralPower() >= 16 and nextMoon == S.NewMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.ed+=/half_moon,if=astral_power.deficit>=20&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=6
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 20 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.HalfMoon:CastTime() and FuturAstralPower() >= 6
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.HalfMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.HalfMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.HalfMoon)) then	
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 20 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.HalfMoon:CastTime() and FuturAstralPower() >= 6 and nextMoon == S.HalfMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then	
 			if AR.Cast(S.HalfMoon) then return ""; end
 	end
   
   -- actions.ed+=/full_moon,if=astral_power.deficit>=40&buff.the_emerald_dreamcatcher.remains>execute_time
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.FullMoon:CastTime()
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.FullMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.FullMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.FullMoon)) then
-			if AR.Cast(S.FullMoon) then return ""; end
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.FullMoon:CastTime() and nextMoon == S.FullMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
+      if AR.Cast(S.FullMoon) then return ""; end
 	end
   
   -- actions.ed+=/lunar_strike,if=(buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5))&spell_haste<0.4
@@ -453,26 +443,20 @@ local function EmeraldDreamcatcherRotation ()
   end
   
   -- actions.ed+=/new_moon,if=astral_power.deficit>=10
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 10
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.NewMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.NewMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.NewMoon)) then
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 10 and nextMoon == S.NewMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.ed+=/half_moon,if=astral_power.deficit>=20
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 20
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.HalfMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.HalfMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.HalfMoon)) then	
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 20 and nextMoon == S.HalfMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then	
 			if AR.Cast(S.HalfMoon) then return ""; end
 	end
   
   -- actions.ed+=/full_moon,if=astral_power.deficit>=40
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 40
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.FullMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.FullMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.FullMoon)) then
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 40 and nextMoon == S.FullMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.FullMoon) then return ""; end
 	end
   
@@ -497,27 +481,21 @@ local function SingleTarget ()
 	end
 
   -- actions.single_target+=/new_moon,if=astral_power.deficit>14&!(buff.celestial_alignment.up|buff.incarnation.up)
-	if Player:AstralPowerDeficit(FuturAstralPower()) > 14 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.NewMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.NewMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.NewMoon)) then
+	if Player:AstralPowerDeficit(FuturAstralPower()) > 14 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and nextMoon == S.NewMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.single_target+=/half_moon,if=astral_power.deficit>24&!(buff.celestial_alignment.up|buff.incarnation.up)
-	if Player:AstralPowerDeficit(FuturAstralPower()) > 24 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.HalfMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.HalfMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.HalfMoon)) then	
+	if Player:AstralPowerDeficit(FuturAstralPower()) > 24 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and nextMoon == S.HalfMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then	
 			if AR.Cast(S.HalfMoon) then return ""; end
 	end
   
   -- actions.single_target+=/full_moon,if=astral_power.deficit>44
-	if Player:AstralPowerDeficit(FuturAstralPower()) > 44
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.FullMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.FullMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.FullMoon)) then
-			if AR.Cast(S.FullMoon) then return ""; end
+	if Player:AstralPowerDeficit(FuturAstralPower()) > 44 and nextMoon == S.FullMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
+      if AR.Cast(S.FullMoon) then return ""; end
 	end
 	
 	-- actions.single_target+=/warrior_of_elune
@@ -554,28 +532,21 @@ local function AoE ()
   if FuturAstralPower() > 60 and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FuturAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
     if AR.Cast(S.Starfall) then return ""; end
   end
-  
   -- actions.AoE+=/new_moon,if=astral_power.deficit>14
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 14
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.NewMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.NewMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.NewMoon)) then
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 14 and nextMoon == S.NewMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.AoE+=/half_moon,if=astral_power.deficit>24
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 24
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.HalfMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.HalfMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.HalfMoon)) then	
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 24 and nextMoon == S.HalfMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then	
 			if AR.Cast(S.HalfMoon) then return ""; end
 	end
   
   -- actions.AoE+=/full_moon,if=astral_power.deficit>44
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 44
-		and ((S.NewMoon:Charges() > 1 and nextMoon == S.FullMoon)
-		or (S.NewMoon:Charges() == 1 and nextMoon == S.FullMoon and not moons[Player:CastID()]) 
-		or (S.NewMoon:Charges() == 0 and S.NewMoon:RechargeP() <= 0 and nextMoon == S.FullMoon)) then
+  if Player:AstralPowerDeficit(FuturAstralPower()) > 44 and nextMoon == S.FullMoon
+		and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.FullMoon) then return ""; end
 	end
   
@@ -706,7 +677,7 @@ local function APL ()
   if S.Barkskin:IsCastable() and Player:HealthPercentage() <= Settings.Balance.BarkSkinHP then
 		if AR.Cast(S.Barkskin, Settings.Balance.OffGCDasOffGCD.BarkSkin) then return "Cast"; end
 	end  
-    
+      
 	-- Buffs
 	if not Player:Buff(S.MoonkinForm) and not Player:AffectingCombat() then
 		if AR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return ""; end
@@ -772,24 +743,21 @@ local function APL ()
 			--Movement
 			if not Player:IsMoving() then	--static
         -- actions+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&astral_power.deficit>14
-				if S.NewMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 14 
-					and ((S.NewMoon:Charges() == 2 and S.NewMoon:RechargeP() < 5 and not moons[Player:CastID()] ) 
-					or (S.NewMoon:Charges() == 3 and not moons[Player:CastID()])) then
+				if S.NewMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 14  and nextMoon == S.NewMoon
+					and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3) then
             if AR.Cast(S.NewMoon) then return ""; end
 				end
 				
         -- actions+=/half_moon,if=((charges=2&recharge_time<5)|charges=3|(target.time_to_die<15&charges=2))&astral_power.deficit>24
-				if S.HalfMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 24
-					and ((S.NewMoon:Charges() == 2 and S.NewMoon:RechargeP() < 5 and not moons[Player:CastID()]) 
-					or (S.NewMoon:Charges() == 3 and not moons[Player:CastID()]) 
+				if S.HalfMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 24  and nextMoon == S.HalfMoon
+					and ((S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3) 
 					or (S.NewMoon:Charges() == 2 and Target:FilteredTimeToDie("<", 15))) then
 					if AR.Cast(S.HalfMoon) then return ""; end
 				end
         
 				-- actions+=/full_moon,if=((charges=2&recharge_time<5)|charges=3|target.time_to_die<15)&astral_power.deficit>44
-				if S.FullMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 44 
-					and ((S.NewMoon:Charges() == 2 and S.NewMoon:RechargeP() < 5 and not moons[Player:CastID()]) 
-					or (S.NewMoon:Charges() == 3 and not moons[Player:CastID()]) 
+				if S.FullMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 44 and nextMoon == S.FullMoon
+					and ((S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3)
 					or Target:FilteredTimeToDie("<", 15)) then
 					if AR.Cast(S.FullMoon) then return ""; end
 				end
