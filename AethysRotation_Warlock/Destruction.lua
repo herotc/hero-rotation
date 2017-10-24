@@ -208,6 +208,73 @@
     end
   end  
   
+  local function CDs()
+    -- actions+=/berserking
+    if S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 then
+      if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
+    
+    -- actions+=/blood_fury
+    if S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 then
+      if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
+    
+    -- actions+=/use_items
+    
+    -- actions+=/potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
+    if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:BuffRemainsP(S.SoulHarvest) > 0  or Target:FilteredTimeToDie("<=", 60) then
+      if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
+    end
+    
+    -- actions+=/service_pet
+    if S.GrimoireImp:IsAvailable() and S.GrimoireImp:CooldownRemainsP() == 0 and FutureShard() >= 1 then
+      if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return ""; end
+    end
+    
+    -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
+    if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
+      and S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0 and FutureShard() >= 1 then
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
+    end
+    
+    -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
+    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
+      and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] <= 2
+      and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
+        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
+    end
+    
+    -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
+    if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
+      and S.LordOfFlames:ArtifactRank() == 0 and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] > 2 and FutureShard() >= 1 then
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
+    end
+    
+    -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&artifact.lord_of_flames.rank>0&buff.lord_of_flames.remains&!pet.doomguard.active
+    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
+      and Cache.EnemiesCount[range] == 1 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0 and FutureShard() >= 1 and not IsPetInvoked(true) then
+        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
+    end
+
+    -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
+      and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
+        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
+    end
+    
+    -- actions+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
+      and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
+        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
+    end
+    
+    -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
+    if S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.SoulHarvest) == 0 then
+      if AR.Cast(S.SoulHarvest, Settings.Destruction.OffGCDasOffGCD.SoulHarvest) then return ""; end
+    end
+
+  end
+  
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
@@ -268,6 +335,11 @@
     -- In Combat
     if Everyone.TargetIsValid() then
       if Target:IsInRange(range) then
+        if AR.CDsON() then
+          ShouldReturn = CDs();
+          if ShouldReturn then return ShouldReturn; end
+        end
+      
         --Movement
         if not Player:IsMoving() then	--static
           -- actions=immolate,cycle_targets=1,if=active_enemies=2&talent.roaring_blaze.enabled&!cooldown.havoc.remains&dot.immolate.remains<=buff.active_havoc.duration
@@ -337,23 +409,6 @@
             if AR.Cast(CastImmolate) then return ""; end
           end
           
-          -- actions+=/berserking
-          if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 then
-            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/blood_fury
-          if AR.CDsON() and S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 then
-            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/use_items
-          
-          -- actions+=/potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
-          if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:BuffRemainsP(S.SoulHarvest) > 0  or Target:FilteredTimeToDie("<=", 60) then
-            if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
-          end
-          
           -- actions+=/shadowburn,if=buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
           if S.Shadowburn:IsAvailable() and S.Shadowburn:IsCastable() and S.Shadowburn:ChargesP() >= 1 and Player:BuffRemainsP(S.ConflagrationOfChaosDebuff) <= S.ChaosBolt:CastTime() then
             if AR.Cast(S.Shadowburn) then return ""; end
@@ -395,53 +450,6 @@
               or (S.GrimoireOfService:IsAvailable() and not S.GrimoireImp:IsAvailable()) 
               or (S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0)) then
                 if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return ""; end
-          end
-          
-          -- actions+=/service_pet
-          if S.GrimoireImp:IsAvailable() and S.GrimoireImp:CooldownRemainsP() == 0 and FutureShard() >= 1 then
-            if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0 and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and not S.GrimoireOfSupremacy:IsAvailable() and ((AR.AoEON() and Cache.EnemiesCount[range] <= 2) or not AR.AoEON()) 
-            and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() == 0 and not S.GrimoireOfSupremacy:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range] > 2) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&artifact.lord_of_flames.rank>0&buff.lord_of_flames.remains&!pet.doomguard.active
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0 and FutureShard() >= 1 and not IsPetInvoked(true) then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
-          if AR.CDsON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.SoulHarvest) == 0 then
-            if AR.Cast(S.SoulHarvest, Settings.Destruction.OffGCDasOffGCD.SoulHarvest) then return ""; end
           end
 
           -- actions+=/chaos_bolt,if=active_enemies<4&buff.active_havoc.remains>cast_time
@@ -552,23 +560,6 @@
             if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return ""; end
           end
           
-          -- actions+=/berserking
-          if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 then
-            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/blood_fury
-          if AR.CDsON() and S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 then
-            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/use_items
-          
-          -- actions+=/potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
-          if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:BuffRemainsP(S.SoulHarvest) > 0  or Target:FilteredTimeToDie("<=", 60) then
-            if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
-          end
-          
           -- actions+=/shadowburn,if=buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
           if S.Shadowburn:IsAvailable() and S.Shadowburn:IsCastable() and S.Shadowburn:ChargesP() >= 1 and Player:BuffRemainsP(S.ConflagrationOfChaosDebuff) <= S.ChaosBolt:CastTime() then
             if AR.Cast(S.Shadowburn) then return ""; end
@@ -610,53 +601,6 @@
               or (S.GrimoireOfService:IsAvailable() and not S.GrimoireImp:IsAvailable()) 
               or (S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0)) then
                 if AR.Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift) then return ""; end
-          end
-          
-          -- actions+=/service_pet
-          if S.GrimoireImp:IsAvailable() and S.GrimoireImp:CooldownRemainsP() == 0 and FutureShard() >= 1 then
-            if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0 and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and not S.GrimoireOfSupremacy:IsAvailable() and ((AR.AoEON() and Cache.EnemiesCount[range] <= 2) or not AR.AoEON()) 
-            and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() == 0 and not S.GrimoireOfSupremacy:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range] > 2) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&artifact.lord_of_flames.rank>0&buff.lord_of_flames.remains&!pet.doomguard.active
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0 and FutureShard() >= 1 and not IsPetInvoked(true) then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
-          if AR.CDsON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.SoulHarvest) == 0 then
-            if AR.Cast(S.SoulHarvest, Settings.Destruction.OffGCDasOffGCD.SoulHarvest) then return ""; end
           end
           
           -- actions+=/rain_of_fire,if=active_enemies>=3
@@ -740,73 +684,9 @@
             end
           end
           
-          -- actions+=/berserking
-          if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 then
-            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/blood_fury
-          if AR.CDsON() and S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 then
-            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/use_items
-          
-          -- actions+=/potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
-          if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:BuffRemainsP(S.SoulHarvest) > 0  or Target:FilteredTimeToDie("<=", 60) then
-            if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
-          end
-          
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
           if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
-          end
-          
-          -- actions+=/service_pet
-          if S.GrimoireImp:IsAvailable() and S.GrimoireImp:CooldownRemainsP() == 0 and FutureShard() >= 1 then
-            if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0 and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and not S.GrimoireOfSupremacy:IsAvailable() and ((AR.AoEON() and Cache.EnemiesCount[range] <= 2) or not AR.AoEON()) 
-            and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() == 0 and not S.GrimoireOfSupremacy:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range] > 2) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&artifact.lord_of_flames.rank>0&buff.lord_of_flames.remains&!pet.doomguard.active
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0 and FutureShard() >= 1 and not IsPetInvoked(true) then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
-          if AR.CDsON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.SoulHarvest) == 0 then
-            if AR.Cast(S.SoulHarvest, Settings.Destruction.OffGCDasOffGCD.SoulHarvest) then return ""; end
           end
           
           -- actions+=/rain_of_fire,if=active_enemies>=3
@@ -857,73 +737,9 @@
             end
           end
           
-          -- actions+=/berserking
-          if AR.CDsON() and S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 then
-            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/blood_fury
-          if AR.CDsON() and S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 then
-            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-          end
-          
-          -- actions+=/use_items
-          
-          -- actions+=/potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
-          if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:BuffRemainsP(S.SoulHarvest) > 0  or Target:FilteredTimeToDie("<=", 60) then
-            if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
-          end
-          
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
           if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
-          end
-          
-          -- actions+=/service_pet
-          if S.GrimoireImp:IsAvailable() and S.GrimoireImp:CooldownRemainsP() == 0 and FutureShard() >= 1 then
-            if AR.Cast(S.GrimoireImp, Settings.Destruction.GCDasOffGCD.GrimoireImp) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0 and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and not S.GrimoireOfSupremacy:IsAvailable() and ((AR.AoEON() and Cache.EnemiesCount[range] <= 2) or not AR.AoEON()) 
-            and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and S.LordOfFlames:ArtifactRank() == 0 and not S.GrimoireOfSupremacy:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range] > 2) and FutureShard() >= 1 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&artifact.lord_of_flames.rank>0&buff.lord_of_flames.remains&!pet.doomguard.active
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0 and FutureShard() >= 1 and not IsPetInvoked(true) then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-
-          -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-          end
-          
-          -- actions+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-          if AR.CDsON() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-            and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-              if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-          end
-          
-          -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
-          if AR.CDsON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.SoulHarvest) == 0 then
-            if AR.Cast(S.SoulHarvest, Settings.Destruction.OffGCDasOffGCD.SoulHarvest) then return ""; end
           end
           
           -- actions+=/rain_of_fire,if=active_enemies>=3
