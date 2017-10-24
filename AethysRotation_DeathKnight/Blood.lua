@@ -151,6 +151,10 @@ end
 end
 local function IcyVeinsRotation()
   if Target:IsInRange("Melee") then
+    --Interrupt
+  if Settings.General.InterruptEnabled and Target:IsInterruptible() and S.MindFreeze:IsCastable("Melee") then
+    if AR.CastAnnotated(S.MindFreeze, false, "Interrupt") then return ""; end
+  end  
   if AR.CDsON() and S.DancingRuneWeapon:IsCastable() then
 		if AR.Cast(S.DancingRuneWeapon, Settings.Blood.OffGCDasOffGCD.DancingRuneWeapon) then return ""; end
 	end
