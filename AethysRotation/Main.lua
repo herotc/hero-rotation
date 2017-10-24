@@ -146,6 +146,7 @@
           else
             AR.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
           end
+          AR.MainFrame:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
           AR.MainFrame:Show();
           AR.MainIconFrame:Init();
           AR.SmallIconFrame:Init();
