@@ -239,7 +239,7 @@
     
     -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
     if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-      and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] <= 2
+      and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] <= 2 and (S.LordOfFlames:ArtifactRank() == 0 or Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0)
       and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
         if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
     end
