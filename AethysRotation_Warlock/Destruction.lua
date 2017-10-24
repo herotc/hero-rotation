@@ -233,39 +233,15 @@
     
     -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
     if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-      and S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0 and FutureShard() >= 1 then
+      and ((S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0) or Cache.EnemiesCount[range] > 2) and FutureShard() >= 1 then
         if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
     
     -- actions+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
+    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 and FutureShard() >= 1
       and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] <= 2 and (S.LordOfFlames:ArtifactRank() == 0 or Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0)
-      and (Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) and FutureShard() >= 1 then
+      and ((Target:FilteredTimeToDie(">", 180) or Target:HealthPercentage() <= 20 or Target:FilteredTimeToDie("<", 30)) or (I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180))  then
         if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-    end
-    
-    -- actions+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2
-    if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-      and S.LordOfFlames:ArtifactRank() == 0 and not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] > 2 and FutureShard() >= 1 then
-        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-    end
-    
-    -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&artifact.lord_of_flames.rank>0&buff.lord_of_flames.remains&!pet.doomguard.active
-    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-      and Cache.EnemiesCount[range] == 1 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) > 0 and FutureShard() >= 1 and not IsPetInvoked(true) then
-        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-    end
-
-    -- actions+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-    if S.SummonDoomGuard:IsAvailable() and S.SummonDoomGuard:CooldownRemainsP() == 0 
-      and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-    end
-    
-    -- actions+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-    if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
-      and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 and I.SindoreiSpite:IsEquipped() and S.SindoreiSpiteBuff:TimeSinceLastAppliedOnPlayer() >= 180 then
-        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
     
     -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
@@ -281,36 +257,40 @@
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
     handleSettings()
+        
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Destruction.UnendingResolveHP then
       if AR.Cast(S.UnendingResolve, Settings.Destruction.OffGCDasOffGCD.UnendingResolve) then return ""; end
     end
+    
     --Precombat
+    -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+    if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or Player:BuffRemainsP(S.DemonicPower) < 600) and FutureShard() >= 1 and Player:CastID() ~= S.SummonImp:ID() then
+      print("1")
+      if AR.Cast(S.SummonImp, Settings.Destruction.GCDasOffGCD.SummonImp) then return ""; end
+    end
+    
+    -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+    if S.GrimoireOfSacrifice:IsAvailable() and S.GrimoireOfSacrifice:CooldownRemainsP() == 0 and (IsPetInvoked() or Player:CastID() == S.SummonImp:ID()) then
+      print("2")
+      if AR.Cast(S.GrimoireOfSacrifice, Settings.Destruction.GCDasOffGCD.GrimoireOfSacrifice) then return ""; end
+    end
+    
+    -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
+    -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:CoooldownRemainsP() == 0 and not S.MeteorStrike:IsLearned() and  ((S.LordOfFlames:ArtifactRank() > 0) or (AR.AoEON() and Cache.EnemiesCount[range] > 1)) and FutureShard() >= 1 then
+      print("3")
+      if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
+    end
+    
+    -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:CoooldownRemainsP() == 0 and not S.ShadowLock:IsLearned() and not S.LordOfFlames:ArtifactRank() == 0 and (not AR.AoEON() or Cache.EnemiesCount[range] == 1) and FutureShard() >= 1 then
+      print("4")
+      if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
+    end
     
     -- Out of Combat
     if not Player:AffectingCombat() then
-        
-      -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-      if S.SummonImp:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or Player:BuffRemainsP(S.DemonicPower) < 600) and FutureShard() >= 1 and Player:CastID() ~= S.SummonImp:ID() then
-        if AR.Cast(S.SummonImp, Settings.Destruction.GCDasOffGCD.SummonImp) then return ""; end
-      end
-      
-      -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
-      -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
-      if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:CoooldownRemainsP() == 0 and not S.MeteorStrike:IsLearned() and  ((S.LordOfFlames:ArtifactRank() > 0) or (AR.AoEON() and Cache.EnemiesCount[range] > 1)) and FutureShard() >= 1 then
-        if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
-      end
-      
-      -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
-      if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:CoooldownRemainsP() == 0 and not S.ShadowLock:IsLearned() and not S.LordOfFlames:ArtifactRank() == 0 and (not AR.AoEON() or Cache.EnemiesCount[range] == 1) and FutureShard() >= 1 then
-        if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
-      end
-      
-      -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-      if S.GrimoireOfSacrifice:IsAvailable() and S.GrimoireOfSacrifice:CooldownRemainsP() == 0 and (IsPetInvoked() or Player:CastID() == S.SummonImp:ID()) then
-        if AR.Cast(S.GrimoireOfSacrifice, Settings.Destruction.GCDasOffGCD.GrimoireOfSacrifice) then return ""; end
-      end
-      
       -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
       if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
         if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
