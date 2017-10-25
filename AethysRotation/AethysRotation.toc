@@ -10,6 +10,7 @@
 ## Dependencies: AethysCore
 ## OptionalDeps: AethysTools
 ## SavedVariables: AethysRotationDB
+## SavedVariablesPerCharacter: AethysRotationCharDB
 
 # GUI
 Panels.lua

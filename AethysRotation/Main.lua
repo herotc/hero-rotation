@@ -147,8 +147,14 @@
           if type(AethysRotationDB) ~= "table" then
             AethysRotationDB = {};
           end
+          if type(AethysRotationCharDB) ~= "table" then
+            AethysRotationCharDB = {};
+          end
           if type(AethysRotationDB.GUISettings) ~= "table" then
             AethysRotationDB.GUISettings = {};
+          end
+          if type(AethysRotationCharDB.GUISettings) ~= "table" then
+            AethysRotationCharDB.GUISettings = {};
           end
           AR.GUI.LoadSettingsRecursively(AR.GUISettings);
           AR.GUI.CorePanelSettingsInit();

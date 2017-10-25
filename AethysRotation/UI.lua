@@ -434,14 +434,14 @@
     self.Button[i]:SetPushedTexture(pushedTexture);
 
     -- Button Setting
-    if type(AethysRotationDB) ~= "table" then
-      AethysRotationDB = {};
+    if type(AethysRotationCharDB) ~= "table" then
+      AethysRotationCharDB = {};
     end
-    if type(AethysRotationDB.Toggles) ~= "table" then
-      AethysRotationDB.Toggles = {};
+    if type(AethysRotationCharDB.Toggles) ~= "table" then
+      AethysRotationCharDB.Toggles = {};
     end
-    if type(AethysRotationDB.Toggles[i]) ~= "boolean" then
-      AethysRotationDB.Toggles[i] = true;
+    if type(AethysRotationCharDB.Toggles[i]) ~= "boolean" then
+      AethysRotationCharDB.Toggles[i] = true;
     end
 
     -- OnClick Callback
@@ -457,7 +457,7 @@
   end
   -- Update a button text
   function AR.ToggleIconFrame:UpdateButtonText (i)
-    if AethysRotationDB.Toggles[i] then
+    if AethysRotationCharDB.Toggles[i] then
       self.Button[i]:SetFormattedText("|cff00ff00%s|r", self.Button[i].text);
     else
       self.Button[i]:SetFormattedText("|cffff0000%s|r", self.Button[i].text);
