@@ -58,7 +58,7 @@
 		AR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
 	  end
       AR.SuggestedIconFrame:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
-      AethysRotationDB.ScaleUI = Multiplier;
+      AethysRotationDB.GUISettings["General.ScaleUI"] = Multiplier;
     end
     function AR.MainFrame:ResizeButtons (Multiplier)
       local FramesToResize = {
@@ -75,7 +75,7 @@
       for i = 1, 3 do
         AR.ToggleIconFrame.Button[i]:SetPoint("LEFT", AR.ToggleIconFrame, "LEFT", AR.ToggleIconFrame.Button[i]:GetWidth()*(i-1)+i, 0);
       end
-      AethysRotationDB.ScaleButtons = Multiplier;
+      AethysRotationDB.GUISettings["General.ScaleButtons"] = Multiplier;
     end
     -- Lock/Unlock
     local LockSpell = Spell(9999000001);
@@ -165,11 +165,11 @@
           AR.LeftIconFrame:Init();
           AR.SuggestedIconFrame:Init();
           AR.ToggleIconFrame:Init();
-          if AethysRotationDB.ScaleUI then
-            AR.MainFrame:ResizeUI(AethysRotationDB.ScaleUI);
+          if AethysRotationDB.GUISettings["General.ScaleUI"] then
+            AR.MainFrame:ResizeUI(AethysRotationDB.GUISettings["General.ScaleUI"]);
           end
-          if AethysRotationDB.ScaleButtons then
-            AR.MainFrame:ResizeButtons(AethysRotationDB.ScaleButtons);
+          if AethysRotationDB.GUISettings["General.ScaleButtons"] then
+            AR.MainFrame:ResizeButtons(AethysRotationDB.GUISettings["General.ScaleButtons"]);
           end
           UIFrames = {
             AR.MainFrame,
@@ -184,9 +184,14 @@
             AR.SuggestedIconFrame,
             AR.ToggleIconFrame
           };
+          
+          -- Load additionnal settings
           local CP_General = GUI.GetPanelByName("General")
           if CP_General then
-            CreatePanelOption("Button", CP_General , "", "Lock/Unlock", "Enable the moving of the frames.", function() AR.MainFrame:ToggleLock(); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0, 10, 0.5}, "UI Scale", "Scale of the Icons.", function(value) AR.MainFrame:ResizeUI(value); end,{ReloadRequired = true});
+            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0, 10, 0.5}, "Buttons Scale", "Scale of the Buttons.", function(value) AR.MainFrame:ResizeUI(value); end, {ReloadRequired = true});
+            CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() AR.MainFrame:ToggleLock(); end);
+            CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() AR.ToggleIconFrame:ResetAnchor(); end);
           end
           
           -- Modules
