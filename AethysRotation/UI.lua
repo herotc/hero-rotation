@@ -147,7 +147,7 @@
   local QueuedCasts, FrameWidth;
   function AR.MainIconFrame:SetupParts (Textures)
     QueuedCasts = #Textures;
-	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.ScaleUI or 1)
+	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
     for i = 1, QueuedCasts do
       self.Part[i]:SetWidth(FrameWidth);
       self.Part[i]:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
