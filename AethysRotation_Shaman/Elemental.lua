@@ -36,6 +36,8 @@ Spell.Shaman.Elemental = {
   ResonanceTotemBuff    = Spell(202192),
   StormTotemBuff        = Spell(210652),
 
+  HealingSurge          = Spell(188070),
+
   EarthShock            = Spell(8042),
   LavaBurst             = Spell(51505),
   FireElemental         = Spell(198067),
