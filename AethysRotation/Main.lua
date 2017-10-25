@@ -10,6 +10,9 @@
   local Target = Unit.Target;
   local Spell = AC.Spell;
   local Item = AC.Item;
+  local GUI = AC.GUI;
+  local CreatePanelOption = GUI.CreatePanelOption;
+
   -- Lua
   local mathmax = math.max;
   local mathmin = math.min;
@@ -100,6 +103,15 @@
       AR.ToggleIconFrame:SetMovable(false);
       AethysRotationDB.Locked = true;
     end
+    function AR.MainFrame:ToggleLock ()
+      if AethysRotationDB.Locked then
+        AR.MainFrame:Unlock ();
+        AR.Print("AethysRotation UI is now |cff00ff00unlocked|r.");
+      else
+        AR.MainFrame:Lock ();
+        AR.Print("AethysRotation UI is now |cffff0000locked|r.");
+      end
+    end
     -- Start Move
     local function StartMove (self)
       self:StartMoving();
@@ -172,6 +184,11 @@
             AR.SuggestedIconFrame,
             AR.ToggleIconFrame
           };
+          local CP_General = GUI.GetPanelByName("General")
+          if CP_General then
+            CreatePanelOption("Button", CP_General , "", "Lock/Unlock", "Enable the moving of the frames.", function() AR.MainFrame:ToggleLock(); end);
+          end
+          
           -- Modules
           C_Timer.After(2, function ()
               AR.MainFrame:UnregisterEvent("ADDON_LOADED");
