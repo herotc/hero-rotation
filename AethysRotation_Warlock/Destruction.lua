@@ -23,104 +23,104 @@
   -- Spells
   if not Spell.Warlock then Spell.Warlock = {}; end
   Spell.Warlock.Destruction = {
-  -- Racials
-	ArcaneTorrent			= Spell(25046),
-	Berserking				= Spell(26297),
-	BloodFury				  = Spell(20572),
-	GiftoftheNaaru		= Spell(59547),
-	Shadowmeld        = Spell(58984),
+    -- Racials
+    ArcaneTorrent			= Spell(25046),
+    Berserking				= Spell(26297),
+    BloodFury				  = Spell(20572),
+    GiftoftheNaaru		= Spell(59547),
+    Shadowmeld        = Spell(58984),
+      
+    -- Abilities
+    Incinerate 				= Spell(29722),
+    IncinerateAuto		= Spell(29722),
+    IncinerateOrange 	= Spell(40239),
+    IncinerateGreen 	= Spell(124472),
+    Immolate 				  = Spell(348),
+    ImmolateAuto 		  = Spell(348),
+    ImmolateOrange 		= Spell(118297),
+    ImmolateGreen 		= Spell(124470),
+    ImmolateDebuff 		= Spell(157736),
+    Conflagrate 			= Spell(17962),
+    ConflagrateAuto		= Spell(17962),
+    ConflagrateOrange = Spell(156960),
+    ConflagrateGreen 	= Spell(124480),
+    ChaosBolt 				= Spell(116858),
+    DrainLife 				= Spell(234153),
+    RainOfFire 				= Spell(5740),
+    RainOfFireAuto 		= Spell(5740),
+    RainOfFireOrange 	= Spell(42023),
+    RainOfFireGreen 	= Spell(173561),
+    Havoc 					  = Spell(80240),
+    LifeTap 				  = Spell(1454),
+    SummonDoomGuard		= Spell(18540),
+    SummonDoomGuardSuppremacy = Spell(157757),
+    SummonInfernal 		= Spell(1122),
+    SummonInfernalSuppremacy = Spell(157898),
+    SummonImp 				= Spell(688),
+    GrimoireImp 			= Spell(111859),
+    Fear 			        = Spell(5782),
     
-  -- Abilities
-  Incinerate 				= Spell(29722),
-  IncinerateAuto		= Spell(29722),
-  IncinerateOrange 	= Spell(40239),
-  IncinerateGreen 	= Spell(124472),
-	Immolate 				  = Spell(348),
-	ImmolateAuto 		  = Spell(348),
-	ImmolateOrange 		= Spell(118297),
-	ImmolateGreen 		= Spell(124470),
-	ImmolateDebuff 		= Spell(157736),
-	Conflagrate 			= Spell(17962),
-	ConflagrateAuto		= Spell(17962),
-	ConflagrateOrange = Spell(156960),
-	ConflagrateGreen 	= Spell(124480),
-	ChaosBolt 				= Spell(116858),
-	DrainLife 				= Spell(234153),
-	RainOfFire 				= Spell(5740),
-	RainOfFireAuto 		= Spell(5740),
-	RainOfFireOrange 	= Spell(42023),
-	RainOfFireGreen 	= Spell(173561),
-	Havoc 					  = Spell(80240),
-	LifeTap 				  = Spell(1454),
-	SummonDoomGuard		= Spell(18540),
-	SummonDoomGuardSuppremacy = Spell(157757),
-	SummonInfernal 		= Spell(1122),
-	SummonInfernalSuppremacy = Spell(157898),
-	SummonImp 				= Spell(688),
-	GrimoireImp 			= Spell(111859),
-  Fear 			        = Spell(5782),
-	
-	-- Pet abilities
-	CauterizeMaster		= Spell(119905),--imp
-	Suffering				  = Spell(119907),--voidwalker
-	SpellLock				  = Spell(119910),--Dogi
-	Whiplash				  = Spell(119909),--Bitch
-	ShadowLock				= Spell(171140),--doomguard
-	MeteorStrike			= Spell(171152),--infernal
-	SingeMagic			  = Spell(89808),--imp
-	SpellLock			    = Spell(19647),--felhunter
-	
-  -- Talents
-  Backdraft 				= Spell(196406),
-	RoaringBlaze 			= Spell(205184),
-	Shadowburn				= Spell(17877),
-	
-	ReverseEntropy		= Spell(205148),
-	Eradication 			= Spell(196412),
-	EmpoweredLifeTap 	= Spell(235157),
-  
-  DemonicCircle 		= Spell(48018),
-  MortalCoil 			  = Spell(6789),
-  ShadowFury 			  = Spell(30283),
-	
-	Cataclysm 				= Spell(152108),
-	FireAndBrimstone 	= Spell(196408),
-	SoulHarvest 			= Spell(196098),
-	
-	GrimoireOfSupremacy 	= Spell(152107),
-	GrimoireOfService 		= Spell(108501),
-	GrimoireOfSacrifice 	= Spell(108503),
-	
-	WreakHavoc				= Spell(196410),
-	ChannelDemonfire 	= Spell(196447),
-	SoulConduit 			= Spell(215941),
-	
-  -- Artifact
-  DimensionalRift   = Spell(196586),
-	LordOfFlames 			= Spell(224103),
-	
-	ConflagrationOfChaos 	= Spell(219195),
-	ConflagrationOfChaosDebuff 	= Spell(196546),
-	DimensionRipper 	= Spell(219415),
-  
-  -- Defensive	
-  UnendingResolve 	= Spell(104773),
+    -- Pet abilities
+    CauterizeMaster		= Spell(119905),--imp
+    Suffering				  = Spell(119907),--voidwalker
+    SpellLock				  = Spell(119910),--Dogi
+    Whiplash				  = Spell(119909),--Bitch
+    ShadowLock				= Spell(171140),--doomguard
+    MeteorStrike			= Spell(171152),--infernal
+    SingeMagic			  = Spell(89808),--imp
+    SpellLock			    = Spell(19647),--felhunter
     
-  -- Legendaries
-  LessonsOfSpaceTimeBuff = Spell(236176),
-  SindoreiSpiteBuff = Spell(208868),
-  SephuzBuff        = Spell(208052),
+    -- Talents
+    Backdraft 				= Spell(196406),
+    RoaringBlaze 			= Spell(205184),
+    Shadowburn				= Spell(17877),
     
-  -- Misc
-	DemonicPower 			    = Spell(196099),
-	EmpoweredLifeTapBuff	= Spell(235156),
-  LordOfFlamesDebuff = Spell(226802),
-  BackdraftBuff     = Spell(117828),
-  Concordance       = Spell(242586),
+    ReverseEntropy		= Spell(205148),
+    Eradication 			= Spell(196412),
+    EmpoweredLifeTap 	= Spell(235157),
+    
+    DemonicCircle 		= Spell(48018),
+    MortalCoil 			  = Spell(6789),
+    ShadowFury 			  = Spell(30283),
+    
+    Cataclysm 				= Spell(152108),
+    FireAndBrimstone 	= Spell(196408),
+    SoulHarvest 			= Spell(196098),
+    
+    GrimoireOfSupremacy 	= Spell(152107),
+    GrimoireOfService 		= Spell(108501),
+    GrimoireOfSacrifice 	= Spell(108503),
+    
+    WreakHavoc				= Spell(196410),
+    ChannelDemonfire 	= Spell(196447),
+    SoulConduit 			= Spell(215941),
+    
+    -- Artifact
+    DimensionalRift   = Spell(196586),
+    LordOfFlames 			= Spell(224103),
+    
+    ConflagrationOfChaos 	= Spell(219195),
+    ConflagrationOfChaosDebuff 	= Spell(196546),
+    DimensionRipper 	    = Spell(219415),
+    
+    -- Defensive	
+    UnendingResolve 	= Spell(104773),
+      
+    -- Legendaries
+    LessonsOfSpaceTimeBuff = Spell(236176),
+    SindoreiSpiteBuff = Spell(208868),
+    SephuzBuff        = Spell(208052),
+      
+    -- Misc
+    DemonicPower 			    = Spell(196099),
+    EmpoweredLifeTapBuff	= Spell(235156),
+    LordOfFlamesDebuff    = Spell(226802),
+    BackdraftBuff         = Spell(117828),
+    Concordance           = Spell(242586)
   };
   local S = Spell.Warlock.Destruction;
   
-  local PetSpells={[S.Suffering:ID()]=true, [S.SpellLock:ID()]=true, [S.Whiplash:ID()]=true, [S.CauterizeMaster:ID()]=true }
+  local PetSpells={[S.Suffering:ID()] = true, [S.SpellLock:ID()] = true, [S.Whiplash:ID()] = true, [S.CauterizeMaster:ID()] = true }
   
   -- Items
   if not Item.Warlock then Item.Warlock = {}; end
@@ -152,7 +152,7 @@
   local PetSpells={[S.Suffering:ID()] = true, [S.SpellLock:ID()] = true, [S.Whiplash:ID()] = true, [S.CauterizeMaster:ID()] = true }
 
 --- ======= ACTION LISTS =======
-  local function IsPetInvoked(testBigPets)
+  local function IsPetInvoked (testBigPets)
 		testBigPets = testBigPets or false
 		return S.Suffering:IsLearned() or S.SpellLock:IsLearned() or S.Whiplash:IsLearned() or S.CauterizeMaster:IsLearned() or (testBigPets and (S.ShadowLock:IsLearned() or S.MeteorStrike:IsLearned()))
   end
@@ -167,7 +167,7 @@
     return AC.ImmolationTable.Destruction.ImmolationDebuff[target:GUID()] or 0;
   end
   
-  local function EnemyHasHavoc()
+  local function EnemyHasHavoc ()
     for _, Value in pairs(Cache.Enemies[range]) do
       if Value:Debuff(S.Havoc) then
         return Value:DebuffRemainsP(S.Havoc)
@@ -176,26 +176,26 @@
     return 0
   end
 
-  local function handleSettings()
-    if Settings.Destruction.SpellType=="Auto" then --auto
-      CastIncinerate=S.IncinerateAuto
-      CastImmolate=S.ImmolateAuto
-      CastConflagrate=S.ConflagrateAuto
-      CastRainOfFire=S.RainOfFireAuto
-    elseif Settings.Destruction.SpellType=="Green" then --green
-      CastIncinerate=S.IncinerateGreen
-      CastImmolate=S.ImmolateGreen
-      CastConflagrate=S.ConflagrateGreen
-      CastRainOfFire=S.RainOfFireGreen
+  local function handleSettings ()
+    if Settings.Destruction.SpellType == "Auto" then --auto
+      CastIncinerate = S.IncinerateAuto
+      CastImmolate = S.ImmolateAuto
+      CastConflagrate = S.ConflagrateAuto
+      CastRainOfFire = S.RainOfFireAuto
+    elseif Settings.Destruction.SpellType == "Green" then --green
+      CastIncinerate = S.IncinerateGreen
+      CastImmolate = S.ImmolateGreen
+      CastConflagrate = S.ConflagrateGreen
+      CastRainOfFire = S.RainOfFireGreen
     else --orange
-      CastIncinerate=S.IncinerateOrange
-      CastImmolate=S.ImmolateOrange
-      CastConflagrate=S.ConflagrateOrange
-      CastRainOfFire=S.RainOfFireOrange
+      CastIncinerate = S.IncinerateOrange
+      CastImmolate = S.ImmolateOrange
+      CastConflagrate = S.ConflagrateOrange
+      CastRainOfFire = S.RainOfFireOrange
     end
   end
 
-  local function FutureShard()
+  local function FutureShard ()
     local Shard = Player:SoulShards()
     if not Player:IsCasting() then
       return Shard
@@ -212,7 +212,7 @@
     end
   end  
   
-  local function CDs()
+  local function CDs ()
     -- actions+=/berserking
     if S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 then
       if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
@@ -255,7 +255,7 @@
 
   end
   
-  local function Sephuz()
+  local function Sephuz ()
     -- ShadowFury
     --TODO : change level when iscontrollable is here
     if S.ShadowFury:IsCastable() and S.ShadowFury:IsCastable() and Target:Level() < 103 and Settings.Destruction.Sephuz.ShadowFury then
@@ -352,6 +352,7 @@
     -- In Combat
     if Everyone.TargetIsValid() then
       if Target:IsInRange(range) then
+        -- Cds Usage
         if AR.CDsON() then
           ShouldReturn = CDs();
           if ShouldReturn then return ShouldReturn; end
