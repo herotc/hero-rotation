@@ -23,14 +23,14 @@
   -- Spells
   if not Spell.Warlock then Spell.Warlock = {}; end
   Spell.Warlock.Destruction = {
-    -- Racials
+  -- Racials
 	ArcaneTorrent			= Spell(25046),
 	Berserking				= Spell(26297),
 	BloodFury				  = Spell(20572),
 	GiftoftheNaaru		= Spell(59547),
 	Shadowmeld        = Spell(58984),
     
-    -- Abilities
+  -- Abilities
   Incinerate 				= Spell(29722),
   IncinerateAuto		= Spell(29722),
   IncinerateOrange 	= Spell(40239),
@@ -58,6 +58,7 @@
 	SummonInfernalSuppremacy = Spell(157898),
 	SummonImp 				= Spell(688),
 	GrimoireImp 			= Spell(111859),
+  Fear 			        = Spell(5782),
 	
 	-- Pet abilities
 	CauterizeMaster		= Spell(119905),--imp
@@ -66,8 +67,10 @@
 	Whiplash				  = Spell(119909),--Bitch
 	ShadowLock				= Spell(171140),--doomguard
 	MeteorStrike			= Spell(171152),--infernal
+	SingeMagic			  = Spell(89808),--imp
+	SpellLock			    = Spell(19647),--felhunter
 	
-    -- Talents
+  -- Talents
   Backdraft 				= Spell(196406),
 	RoaringBlaze 			= Spell(205184),
 	Shadowburn				= Spell(17877),
@@ -75,6 +78,10 @@
 	ReverseEntropy		= Spell(205148),
 	Eradication 			= Spell(196412),
 	EmpoweredLifeTap 	= Spell(235157),
+  
+  DemonicCircle 		= Spell(48018),
+  MortalCoil 			  = Spell(6789),
+  ShadowFury 			  = Spell(30283),
 	
 	Cataclysm 				= Spell(152108),
 	FireAndBrimstone 	= Spell(196408),
@@ -88,7 +95,7 @@
 	ChannelDemonfire 	= Spell(196447),
 	SoulConduit 			= Spell(215941),
 	
-    -- Artifact
+  -- Artifact
   DimensionalRift   = Spell(196586),
 	LordOfFlames 			= Spell(224103),
 	
@@ -96,14 +103,15 @@
 	ConflagrationOfChaosDebuff 	= Spell(196546),
 	DimensionRipper 	= Spell(219415),
   
-    -- Defensive	
+  -- Defensive	
   UnendingResolve 	= Spell(104773),
     
-    -- Legendaries
+  -- Legendaries
   LessonsOfSpaceTimeBuff = Spell(236176),
   SindoreiSpiteBuff = Spell(208868),
+  SephuzBuff        = Spell(208052),
     
-    -- Misc
+  -- Misc
 	DemonicPower 			    = Spell(196099),
 	EmpoweredLifeTapBuff	= Spell(235156),
   LordOfFlamesDebuff = Spell(226802),
@@ -118,8 +126,10 @@
   if not Item.Warlock then Item.Warlock = {}; end
   Item.Warlock.Destruction = {
     -- Legendaries
-    LessonsOfSpaceTime= Item(144369, {3}), --3
-    SindoreiSpite= Item(132379, {9}), --9
+    LessonsOfSpaceTime  = Item(144369, {3}),
+    SindoreiSpite       = Item(132379, {9}),
+    SephuzSecret 			  = Item(132452, {11,12}),
+    
     -- Potion
     PotionOfProlongedPower  = Item(142117)
   };
@@ -131,12 +141,6 @@
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range = 40
   local CastIncinerate,CastImmolate,CastConflagrate,CastRainOfFire
-  
-  local Consts={
-    ImmolateBaseDuration = 18,
-    ImmolateMaxDuration = 27,
-    EmpoweredLifeTapBaseDuration = 20
-  }
   
   -- GUI Settings
   local Settings = {
@@ -222,7 +226,7 @@
     -- actions+=/use_items
     
     -- actions+=/potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
-    if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:BuffRemainsP(S.SoulHarvest) > 0  or Target:FilteredTimeToDie("<=", 60) then
+    if Settings.Destruction.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:BuffRemainsP(S.SoulHarvest) > 0 or Target:FilteredTimeToDie("<=", 60)) then
       if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
     end
     
@@ -251,12 +255,49 @@
 
   end
   
+  local function Sephuz()
+    -- ShadowFury
+    --TODO : change level when iscontrollable is here
+    if S.ShadowFury:IsCastable() and S.ShadowFury:IsCastable() and Target:Level() < 103 and Settings.Destruction.Sephuz.ShadowFury then
+      if AR.CastSuggested(S.ShadowFury) then return "Cast"; end
+    end
+    
+    -- MortalCoil
+    --TODO : change level when iscontrollable is here
+    if S.MortalCoil:IsAvailable() and S.MortalCoil:IsCastable() and Target:Level() < 103 and Settings.Destruction.Sephuz.MortalCoil then
+      if AR.CastSuggested(S.MortalCoil) then return "Cast"; end
+    end
+    
+    -- Fear
+    --TODO : change level when iscontrollable is here
+    if S.Fear:IsAvailable() and S.Fear:IsCastable() and Target:Level() < 103 and Settings.Destruction.Sephuz.Fear then
+      if AR.CastSuggested(S.Fear) then return "Cast"; end
+    end
+    
+    -- SingeMagic 
+    --TODO : add if a debuff is removable
+    -- if S.SingeMagic:IsAvailable() and S.SingeMagic:IsCastable() and Settings.Destruction.Sephuz.SingeMagic then
+      -- if AR.CastSuggested(S.SingeMagic) then return "Cast"; end
+    -- end
+    
+    -- SpellLock
+    if S.SpellLock:IsAvailable() and S.SpellLock:IsCastable() and Target:IsCasting() and Target:IsInterruptible() and Settings.Destruction.Sephuz.SpellLock then
+      if AR.CastSuggested(S.SpellLock) then return "Cast"; end
+    end
+  end
+  
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
     handleSettings()
+    
+    --TODO : add the possibility to choose a pet
+    --TODO : Sephuz - SingMagic : add if a debuff is removable
+    --TODO : Sephuz : IsStunnable etc
+    --TODO : buff listener for chaos bolt
+
         
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Destruction.UnendingResolveHP then
@@ -313,6 +354,12 @@
       if Target:IsInRange(range) then
         if AR.CDsON() then
           ShouldReturn = CDs();
+          if ShouldReturn then return ShouldReturn; end
+        end
+        
+        -- Sephuz usage
+        if I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer() >= 30 then
+          ShouldReturn = Sephuz();
           if ShouldReturn then return ShouldReturn; end
         end
       
@@ -467,7 +514,6 @@
           end
           
           -- actions+=/chaos_bolt,if=active_enemies<3&target.time_to_die<=10
-          --todo : buff listener ?
           if S.ChaosBolt:IsCastable() and FutureShard() >= 2 and Cache.EnemiesCount[range] < 3 then
             if AR.Cast(S.ChaosBolt) then return ""; end
           end
@@ -475,7 +521,6 @@
           -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)&(soul_shard>=5-spell_targets.infernal_awakening*0.5|buff.soul_harvest.remains>cast_time|buff.concordance_of_the_legionfall.remains>cast_time)
           -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)&(trinket.proc.mastery.react&trinket.proc.mastery.remains>cast_time|trinket.proc.crit.react&trinket.proc.crit.remains>cast_time|trinket.proc.versatility.react&trinket.proc.versatility.remains>cast_time|trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time|trinket.proc.spell_power.react&trinket.proc.spell_power.remains>cast_time)
           -- actions+=/chaos_bolt,if=active_enemies<3&(cooldown.havoc.remains>12&cooldown.havoc.remains|active_enemies=1|soul_shard>=5-spell_targets.infernal_awakening*0.5)&(trinket.stacking_proc.mastery.react&trinket.stacking_proc.mastery.remains>cast_time|trinket.stacking_proc.crit.react&trinket.stacking_proc.crit.remains>cast_time|trinket.stacking_proc.versatility.react&trinket.stacking_proc.versatility.remains>cast_time|trinket.stacking_proc.intellect.react&trinket.stacking_proc.intellect.remains>cast_time|trinket.stacking_proc.spell_power.react&trinket.stacking_proc.spell_power.remains>cast_time)
-          -- todo : buff listener ?
           if S.ChaosBolt:IsCastable() and FutureShard() >= 2 and Cache.EnemiesCount[range] < 3 and (S.Havoc:CooldownRemainsP() > 12 or Cache.EnemiesCount[range] == 1 or FutureShard() >= 5 - (Cache.EnemiesCount[range] * 0.5)) then
             if AR.Cast(S.ChaosBolt) then return ""; end
           end
