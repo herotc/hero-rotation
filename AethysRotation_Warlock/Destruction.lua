@@ -236,7 +236,7 @@
     end
     
     -- actions+=/summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-    if S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
+    if not S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernal:IsAvailable() and S.SummonInfernal:CooldownRemainsP() == 0 
       and ((S.LordOfFlames:ArtifactRank() > 0 and Player:DebuffRemainsP(S.LordOfFlamesDebuff) == 0) or Cache.EnemiesCount[range] > 2) and FutureShard() >= 1 then
         if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
