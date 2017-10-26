@@ -591,7 +591,7 @@
     -- actions.mg+=/drain_soul,cycle_targets=1,if=target.time_to_die<gcd*2&soul_shard<5
     BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 0, nil;
     for Key, Value in pairs(Cache.Enemies[range]) do
-      if FutureShard()<5 and Value:TimeToDie()<Player:GCD()*2 then
+      if FutureShard()<5 and Value:TimeToDie()<Player:GCD()*2 and not Value:IsUnit(Target) then
         BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.DrainSoul;
       end
     end
