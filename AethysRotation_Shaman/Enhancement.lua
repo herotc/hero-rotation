@@ -27,6 +27,7 @@ Spell.Shaman.Enhancement = {
   -- Abilities
   CrashLightning        = Spell(187874),
   CrashLightningBuff    = Spell(187878),
+  LightningCrashBuff    = Spell(242284),
   Flametongue           = Spell(193796),
   FlametongueBuff       = Spell(194084),
   Frostbrand            = Spell(196834),
@@ -149,7 +150,7 @@ end
 
 -- actions+=/variable,name=LightningCrashNotUp,value=(!buff.lightning_crash.up&set_bonus.tier20_2pc)
 local function LightningCrashNotUp()
-  return not Player:Buff(S.CrashLightningBuff) and AC.Tier20_2Pc
+  return (not Player:Buff(S.LightningCrashBuff)) and AC.Tier20_2Pc
 end
 
 -- actions+=/variable,name=alphaWolfCheck,value=((pet.frost_wolf.buff.alpha_wolf.remains<2&pet.fiery_wolf.buff.alpha_wolf.remains<2&pet.lightning_wolf.buff.alpha_wolf.remains<2)&feral_spirit.remains>4)
