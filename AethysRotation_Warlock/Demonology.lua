@@ -396,25 +396,12 @@
           if AR.Cast(S.DemonicEmpowerment, Settings.Demonology.GCDasOffGCD.DemonicEmpowerment) then return ""; end
         end
         
-        -- actions.precombat+=/call_dreadstalkers,if=!equipped.132369
-        -- actions.precombat+=/demonbolt,if=equipped.132369
-        -- actions.precombat+=/shadow_bolt,if=equipped.132369
-        if not I.WilfredsSigil:IsEquipped() then
-          if Player:CastID() == S.CallDreadStalkers:ID() then
-            if AR.Cast(S.DemonicEmpowerment) then return ""; end
-          elseif S.CallDreadStalkers:IsCastable() and FutureShard() >= 2 then
-            if AR.Cast(S.CallDreadStalkers) then return ""; end
-          elseif FutureShard() < 2 and S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
-            if AR.Cast(S.Demonbolt) then return ""; end
-          elseif FutureShard() < 2 then
-            if AR.Cast(S.ShadowBolt) then return ""; end
-          end
+        -- actions.precombat+=/demonbolt
+        -- actions.precombat+=/shadow_bolt
+        if S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
+          if AR.Cast(S.Demonbolt) then return ""; end
         else
-          if S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
-            if AR.Cast(S.Demonbolt) then return ""; end
-          else
-            if AR.Cast(S.ShadowBolt) then return ""; end
-          end
+          if AR.Cast(S.ShadowBolt) then return ""; end
         end
       end
       return;
@@ -742,22 +729,21 @@
 
 
 --- ======= SIMC =======
---- Last Update: 12/06/2017
+--- Last Update: 24/10/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
--- actions.precombat=flask,type=whispered_pact
--- actions.precombat+=/food,type=azshari_salad
+-- actions.precombat=flask
+-- actions.precombat+=/food
+-- actions.precombat+=/augmentation
 -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
 -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
 -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
 -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
--- actions.precombat+=/augmentation,type=defiled
 -- actions.precombat+=/snapshot_stats
--- actions.precombat+=/potion,name=prolonged_power
+-- actions.precombat+=/potion
 -- actions.precombat+=/demonic_empowerment
--- actions.precombat+=/call_dreadstalkers,if=!equipped.132369
--- actions.precombat+=/demonbolt,if=equipped.132369
--- actions.precombat+=/shadow_bolt,if=equipped.132369
+-- actions.precombat+=/demonbolt
+-- actions.precombat+=/shadow_bolt
 
 -- # Executed every time the actor is available.
 -- actions=implosion,if=wild_imp_remaining_duration<=action.shadow_bolt.execute_time&(buff.demonic_synergy.remains|talent.soul_conduit.enabled|(!talent.soul_conduit.enabled&spell_targets.implosion>1)|wild_imp_count<=4)
