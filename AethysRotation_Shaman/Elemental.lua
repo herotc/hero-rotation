@@ -157,6 +157,7 @@ local function APL ()
     end
 
     -- actions+=/totem_mastery,if=buff.resonance_totem.remains<2
+    -- TODO: Handle this as per the APL.
     if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
       if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
     end
@@ -332,7 +333,8 @@ local function APL ()
       end
 
       -- actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-      if S.TotemMastery:IsCastable() and (Player:BuffRemains(S.ResonanceTotemBuff) < 10 or (Player:BuffRemains(S.ResonanceTotemBuff) < (Player:BuffRemains(S.AscendanceBuff) + S.Ascendance:CooldownRemains()) and S.Ascendance:CooldownRemains() < 15)) then
+      -- TODO: Handle this as per the APL.
+      if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
@@ -450,7 +452,8 @@ local function APL ()
       end
 
       -- actions.single_if+=/totem_mastery,if=buff.resonance_totem.remains<10
-      if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff)) then
+      -- TODO: Handle this as per the APL.
+      if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
@@ -548,7 +551,8 @@ local function APL ()
       end
 
       -- actions.single_lr+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-      if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff)) then
+      -- TODO: Handle this as per the APL.
+      if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
