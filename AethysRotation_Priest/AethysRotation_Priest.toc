@@ -9,4 +9,5 @@
 ## Dependencies: AethysRotation
 
 Settings.lua
+Events.lua
 Shadow.lua
