@@ -400,7 +400,7 @@
 		end
       else
 		if S.CatForm:IsCastable() then
-			if AR.Cast(S.CatForm, Settings.Feral.OffGCDasOffGCD.CatForm) then return "Cast"; end
+			if AR.Cast(S.CatForm, Settings.Feral.GCDasOffGCD.CatForm) then return "Cast"; end
 		end
       end
 	  return;
