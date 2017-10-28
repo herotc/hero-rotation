@@ -333,7 +333,7 @@
   local function Sephuz()
     -- ShadowFury
     --TODO : change level when iscontrollable is here
-    if S.ShadowFury:IsCastable() and S.ShadowFury:IsCastable() and Target:Level() < 103 and Settings.Demonology.Sephuz.ShadowFury then
+    if S.ShadowFury:IsAvailable() and S.ShadowFury:IsCastable() and Target:Level() < 103 and Settings.Demonology.Sephuz.ShadowFury then
       if AR.CastSuggested(S.ShadowFury) then return "Cast"; end
     end
     
