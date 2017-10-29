@@ -329,7 +329,7 @@
     -- Out of Combat
     if not Player:AffectingCombat() then
       -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
-      if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
+      if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
         if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
       end
       
@@ -464,7 +464,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -505,7 +505,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRefreshableCP() then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -613,7 +613,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -644,7 +644,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRefreshableCP() then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -707,7 +707,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -722,7 +722,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRefreshableCP() then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -760,7 +760,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRemainsP() == 0 then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
@@ -775,7 +775,7 @@
           end
           
           -- actions+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3
-          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and S.EmpoweredLifeTapBuff:BuffRefreshableCP() then
+          if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) then
             if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
           end
           
