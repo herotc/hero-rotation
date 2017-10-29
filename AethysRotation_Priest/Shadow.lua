@@ -76,6 +76,7 @@
     -- Legendaries
 		ZeksExterminatus	= Spell(236546),
     SephuzBuff			  = Spell(208052),
+    NorgannonsBuff    = Spell(236431),
     -- Misc
 		Shadowform				= Spell(232698),
 		VoidForm				  = Spell(194249),
@@ -520,7 +521,7 @@ local function VoidForm()
       if AR.Cast(S.ShadowCrash) then return ""; end
     end
 		
-		if not Player:IsMoving() then
+		if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then
 			--actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60))
 			if S.VoidTorrent:IsAvailable() 
 				and S.VoidTorrent:CooldownRemainsP() == 0
@@ -674,7 +675,7 @@ local function VoidForm()
             break
         end	
         
-        if not Player:IsMoving() then --static
+        if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then --static
           if S.Misery:IsAvailable() then
             if Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD
               or Value:DebuffRefreshableCP(S.VampiricTouch) or Value:DebuffRefreshableCP(S.ShadowWordPain) then
@@ -777,7 +778,7 @@ local function APL ()
 			end
 			
 			--static
-			if not Player:IsMoving() then
+			if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then
         -- actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
         if S.Misery:IsAvailable() and (Target:DebuffRefreshableCP(S.VampiricTouch) or Target:DebuffRefreshableCP(S.ShadowWordPain)) and not (Player:CastID() == S.VampiricTouch:ID()) then
           if AR.Cast(S.VampiricTouch) then return ""; end
@@ -927,7 +928,7 @@ local function APL ()
               break
           end	
           
-          if not Player:IsMoving() then --static
+          if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then --static
             if S.Misery:IsAvailable() then
               if Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD
                 or Value:DebuffRefreshableCP(S.VampiricTouch) or Value:DebuffRefreshableCP(S.ShadowWordPain) then
