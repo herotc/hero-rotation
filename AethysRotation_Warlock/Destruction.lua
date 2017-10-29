@@ -110,6 +110,7 @@
     LessonsOfSpaceTimeBuff = Spell(236176),
     SindoreiSpiteBuff = Spell(208868),
     SephuzBuff        = Spell(208052),
+    NorgannonsBuff    = Spell(236431),
       
     -- Misc
     DemonicPower 			    = Spell(196099),
@@ -365,7 +366,7 @@
         end
       
         --Movement
-        if not Player:IsMoving() then	--static
+        if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
           -- actions=immolate,cycle_targets=1,if=active_enemies=2&talent.roaring_blaze.enabled&!cooldown.havoc.remains&dot.immolate.remains<=buff.active_havoc.duration
           if Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 and Target:DebuffRemainsP(S.ImmolateDebuff) <= EnemyHasHavoc() and not(not S.RoaringBlaze:IsAvailable() and Player:CastID() == S.Immolate) then
             if AR.Cast(CastImmolate) then return ""; end
@@ -666,7 +667,7 @@
         end
       else --not in range
         --Movement
-        if not Player:IsMoving() then	--static
+        if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
           -- actions=immolate,cycle_targets=1,if=active_enemies=2&talent.roaring_blaze.enabled&!cooldown.havoc.remains&dot.immolate.remains<=buff.active_havoc.duration
           if AR.AoEON() and Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
