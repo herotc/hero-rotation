@@ -97,6 +97,7 @@
     
     -- Legendaries
     SephuzBuff        = Spell(208052),
+    NorgannonsBuff    = Spell(236431),
     
     -- Misc
     Concordance             = Spell(242586),
@@ -422,7 +423,7 @@
           end
           
           --Movement
-          if not Player:IsMoving() then	--static
+          if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
             -- actions=implosion,if=wild_imp_remaining_duration<=action.shadow_bolt.execute_time&(buff.demonic_synergy.remains|talent.soul_conduit.enabled|(!talent.soul_conduit.enabled&spell_targets.implosion>1)|wild_imp_count<=4)
             if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and GetNbTotal("Wild Imp") > 0 and GetPetRemains("Wild Imp") <= S.ShadowBolt:ExecuteTime() and (Player:Buff(S.GrimoireOfSynergyBuff) or S.SoulConduit:IsAvailable() or (not S.SoulConduit:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range] > 1)) or GetNbTotal("Wild Imp") <= 4) then
               if AR.Cast(S.Implosion) then return ""; end
@@ -640,7 +641,7 @@
           end
         else --not in range
           --Movement
-          if not Player:IsMoving() then	--static
+          if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
             -- actions=implosion,if=wild_imp_remaining_duration<=action.shadow_bolt.execute_time&(buff.demonic_synergy.remains|talent.soul_conduit.enabled|(!talent.soul_conduit.enabled&spell_targets.implosion>1)|wild_imp_count<=4)
             if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and GetNbTotal("Wild Imp") > 0 and GetPetRemains("Wild Imp") <= S.ShadowBolt:ExecuteTime() and (Player:Buff(S.GrimoireOfSynergyBuff) or S.SoulConduit:IsAvailable() or (not S.SoulConduit:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[range] > 1)) or GetNbTotal("Wild Imp") <= 4) then
               if AR.Cast(S.Implosion) then return ""; end
