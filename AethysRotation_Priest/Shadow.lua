@@ -174,8 +174,8 @@ local function Var_S2MCheck()
 end
 
 local function Var_CdTime()
--- actions.precombat+=/variable,name=cd_time,op=set,value=(10+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(3-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
-  v_cdtime = 10 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (T192P and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (T204P and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
+  -- actions.precombat+=/variable,name=cd_time,op=set,value=(12+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(1-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
+  v_cdtime = 12 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (T192P and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (T204P and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
 end
 
 local function Var_DotSWPDPGCD()
@@ -962,14 +962,14 @@ end
 
 AR.SetAPL(258, APL);
 
---[[ 12/09/2017 generation
+--[[ 28/10/2017 generation
 # Executed before combat begins. Accepts non-harmful actions only.
 actions.precombat=flask,type=flask_of_the_whispered_pact
 actions.precombat+=/food,type=azshari_salad
 actions.precombat+=/augmentation,type=defiled
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
-actions.precombat+=/variable,name=cd_time,op=set,value=(10+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(3-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
+actions.precombat+=/variable,name=cd_time,op=set,value=(12+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(1-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
 actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
 actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
 actions.precombat+=/variable,name=sear_dpgcd,op=set,value=80*(1+0.05*artifact.void_corruption.rank)
