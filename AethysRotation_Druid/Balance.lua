@@ -99,6 +99,7 @@ local AR = AethysRotation;
     OnethsOverconfidence = Spell(209407),
 		EmeraldDreamcatcher	= Spell(208190),
     SephuzBuff        = Spell(208052),
+    NorgannonsBuff    = Spell(236431),
     
     -- Misc
 		SolarEmpowerment	= Spell(164545),
@@ -741,7 +742,7 @@ local function APL ()
 			end
 			
 			--Movement
-			if not Player:IsMoving() then	--static
+			if not Player:IsMoving() or (S.StellarDrift:IsAvailable() and Player:Buff(S.StellarDrift) and Player:BuffRemainsP(S.Starfall) > 0) or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
         -- actions+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&astral_power.deficit>14
 				if S.NewMoon:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) > 14  and nextMoon == S.NewMoon
 					and (S.NewMoon:ChargesP() - (moons[Player:CastID()] and 1 or 0) == 3) then
