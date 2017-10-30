@@ -51,6 +51,7 @@ local AR = AethysRotation;
     FrothingBerserker             = Spell(215571),
     InnerRage                     = Spell(215573),
     Massacre                      = Spell(206315),
+    MassacreBuff                  = Spell(206316),
     Outburst                      = Spell(206320),
     RecklessAbandon               = Spell(202751),
     WreckingBall                  = Spell(215570),
@@ -107,7 +108,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Whirlwind) then return ""; end
     end
     -- actions.aoe+=/rampage,if=buff.meat_cleaver.up&(buff.enrage.down&!talent.frothing_berserker.enabled|buff.massacre.react|rage>=100)
-    if S.Rampage:IsReady() and Player:Buff(S.MeatCleaver) and (not Player:Buff(S.Enrage) and not S.FrothingBerserker:IsAvailable() or Player:Buff(S.Massacre) or Player:Rage() >= 100) then
+    if S.Rampage:IsReady() and Player:Buff(S.MeatCleaver) and (not Player:Buff(S.Enrage) and not S.FrothingBerserker:IsAvailable() or Player:Buff(S.MassacreBuff) or Player:Rage() >= 100) then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.aoe+=/bloodthirst
@@ -123,7 +124,7 @@ local AR = AethysRotation;
   -- # CDs
   local function CDs ()
     -- actions.cooldowns+=/rampage,if=talent.massacre.enabled&buff.massacre.react&buff.enrage.remains<1
-    if S.Rampage:IsReady() and S.Massacre:IsAvailable() and Player:Buff(S.Massacre) and Player:BuffRemains(S.Enrage) < Player:GCD() then
+    if S.Rampage:IsReady() and S.Massacre:IsAvailable() and Player:Buff(S.MassacreBuff) and Player:BuffRemains(S.Enrage) < Player:GCD() then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.cooldowns+=/bloodthirst,if=target.health.pct<20&buff.enrage.remains<1
@@ -186,7 +187,7 @@ local AR = AethysRotation;
     end
     -- actions.three_targets+=/rampage,if=buff.meat_cleaver.up&((buff.enrage.down&!talent.frothing_berserker.enabled)|(rage>=100&talent.frothing_berserker.enabled))|buff.massacre.react
     if S.Rampage:IsReady() and Player:Buff(S.MeatCleaver) and ((not Player:Buff(S.Enrage) and not S.FrothingBerserker:IsAvailable()) or
-    (Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable())) or Player:Buff(S.Massacre) then
+    (Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable())) or Player:Buff(S.MassacreBuff) then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.three_targets+=/raging_blow,if=talent.inner_rage.enabled&(spell_targets.whirlwind=2|(spell_targets.whirlwind=3&!equipped.najentuss_vertebrae))
@@ -221,7 +222,7 @@ local AR = AethysRotation;
       if AR.Cast(S.FuriousSlash) then return ""; end
     end
     -- actions.execute+=/rampage,if=buff.massacre.react&buff.enrage.remains<1
-    if S.Rampage:IsReady() and (Player:Buff(S.Massacre) and Player:BuffRemains(S.Enrage) < Player:GCD()) then
+    if S.Rampage:IsReady() and (Player:Buff(S.MassacreBuff) and Player:BuffRemains(S.Enrage) < Player:GCD()) then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.execute+=/execute
@@ -266,7 +267,7 @@ local AR = AethysRotation;
       if AR.Cast(S.RagingBlow) then return ""; end
     end
     -- actions.single_target+=/rampage,if=(buff.enrage.down&!talent.frothing_berserker.enabled)|buff.massacre.react|rage>=100
-    if S.Rampage:IsReady() and (not Player:Buff(S.Enrage) and not S.FrothingBerserker:IsAvailable()) or Player:Buff(S.Massacre) or Player:Rage() >= 100 then
+    if S.Rampage:IsReady() and (not Player:Buff(S.Enrage) and not S.FrothingBerserker:IsAvailable()) or Player:Buff(S.MassacreBuff) or Player:Rage() >= 100 then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.single_target+=/execute,if=buff.stone_heart.react&((talent.inner_rage.enabled&cooldown.raging_blow.remains>1)|buff.enrage.up)
