@@ -25,6 +25,7 @@
 		BloodFury				  = Spell(20572),
 		GiftoftheNaaru		= Spell(59547),
 		Shadowmeld        = Spell(58984),
+    
     -- Abilities
 		MindBlast				  = Spell(8092),
 		MindFlay				  = Spell(15407),
@@ -34,6 +35,7 @@
 		ShadowWordPain		= Spell(589),
 		VampiricTouch			= Spell(34914),
 		Shadowfiend				= Spell(34433),
+    
     -- Talents
 		TwistOfFate				= Spell(109142),
 		FortressOfTheMind	= Spell(193195),
@@ -56,6 +58,7 @@
 		LegacyOfTheVoid		= Spell(193225),
 		ShadowCrash				= Spell(205385),
 		SurrenderToMadness= Spell(193223),
+    
     -- Artifact
 		VoidTorrent				= Spell(205065),
 		MassHysteria			= Spell(194378),
@@ -66,21 +69,26 @@
     ToThePain         = Spell(193644),
     TouchOfDarkness   = Spell(194007),
     VoidCorruption    = Spell(194016),
+    
     -- Defensive
 		Dispersion				= Spell(47585),
 		Fade					    = Spell(586),
 		PowerWordShield		= Spell(17),
+    
     -- Utility
 		VampiricEmbrace 	= Spell(15286),
     Silence           = Spell(15487),
+    
     -- Legendaries
 		ZeksExterminatus	= Spell(236546),
     SephuzBuff			  = Spell(208052),
     NorgannonsBuff    = Spell(236431),
+    
     -- Misc
 		Shadowform				= Spell(232698),
 		VoidForm				  = Spell(194249),
     PotionOfProlongedPowerBuff = Spell(229206)
+    
     -- Macros
     
   };
@@ -95,6 +103,8 @@
     MangazasMadness 			  = Item(132864, {6}), --6
     ZeksExterminatus 			  = Item(137100, {15}), --15
     SephuzSecret 			      = Item(132452, {11,12}), --11/12
+    
+    -- Potion
     PotionOfProlongedPower  = Item(142117)
   };
   local I = Item.Priest.Shadow;
@@ -105,8 +115,7 @@
   local T202P,T204P = AC.HasTier("T20")
   local T212P,T214P = AC.HasTier("T21")
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb; -- Used for cycling
-  local v_cdtime,v_dotswpdpgcd,v_dotvtdpgcd,v_seardpgcd,v_s2msetuptime
-  local v_actorsFightTimeMod,v_s2mcheck
+  local v_cdtime, v_dotswpdpgcd, v_dotvtdpgcd, v_seardpgcd, v_s2msetuptime, v_actorsFightTimeMod, v_s2mcheck
   local var_init = false
   local var_calcCombat = false
   local range = 40
@@ -120,25 +129,25 @@
   };
 
 --- APL Action Lists (and Variables)
-local function ExecuteRange()
+local function ExecuteRange ()
 	if Player:Buff(S.ZeksExterminatus) then return 101; end
 	return S.ReaperOfSouls:IsAvailable() and 35 or 20;
 end
 
-local function InsanityThreshold()
+local function InsanityThreshold ()
 	return S.LegacyOfTheVoid:IsAvailable() and 65 or 100;
 end
 
-local function FutureInsanity()
+local function FutureInsanity ()
   local Insanity = Player:Insanity()
   if not Player:IsCasting() then
     return Insanity
   else
-    if Player:CastID() == S.MindBlast:ID() then
+    if Player:IsCasting(S.MindBlast) then
       return Insanity + (15 * (Player:Buff(S.PowerInfusion) and 1.25 or 1.0) * (S.FortressOfTheMind:IsAvailable() and 1.2 or 1.0))
-    elseif Player:CastID() == S.VampiricTouch:ID() then
+    elseif Player:IsCasting(S.VampiricTouch) then
       return Insanity + (6 * (Player:Buff(S.PowerInfusion) and 1.25 or 1.0))
-    elseif Player:CastID() ==S.ShadowWordVoid:ID() then
+    elseif Player:IsCasting(S.ShadowWordVoid) then
       return Insanity + (25 * (Player:Buff(S.PowerInfusion) and 1.25 or 1.0))
     else
       return Insanity
@@ -146,12 +155,12 @@ local function FutureInsanity()
   end 
 end
 
-local function CurrentInsanityDrain()
+local function CurrentInsanityDrain ()
 	if not Player:Buff(S.VoidForm) then return 0.0; end
 	return 6 + 0.67 * (Player:BuffStack(S.VoidForm) - (2 * (I.MotherShahrazsSeduction:IsEquipped() and 1 or 0)) - 4 * (VTUsed and 1 or 0))
 end
 
-local function Var_ActorsFightTimeMod()
+local function Var_ActorsFightTimeMod ()
   -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
   -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
 	if (AC.CombatTime() + Target:TimeToDie()) > 450 and (AC.CombatTime() + Target:TimeToDie()) < 600 then
@@ -163,7 +172,7 @@ local function Var_ActorsFightTimeMod()
 	end
 end
 
-local function Var_S2MCheck()
+local function Var_S2MCheck ()
   -- actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
   -- actions.check+=/variable,op=min,name=s2mcheck,value=180
   v_s2mcheck = v_s2msetuptime - (v_actorsFightTimeMod)
@@ -173,27 +182,27 @@ local function Var_S2MCheck()
   return v_s2mcheck;
 end
 
-local function Var_CdTime()
+local function Var_CdTime ()
   -- actions.precombat+=/variable,name=cd_time,op=set,value=(12+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(1-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
   v_cdtime = 12 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (T192P and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (T204P and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
 end
 
-local function Var_DotSWPDPGCD()
+local function Var_DotSWPDPGCD ()
 -- actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
   v_dotswpdpgcd = 38 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() / 16000)) * 0.75
 end
 
-local function Var_DotVTDPGCD()
+local function Var_DotVTDPGCD ()
 -- actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
   v_dotvtdpgcd = 71 * 1.2 * (1 + 0.2 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (1 + 0.05 * (S.TouchOfDarkness:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() / 16000)) * 0.5
 end
 
-local function Var_SearDPGCD()
+local function Var_SearDPGCD ()
 -- actions.precombat+=/variable,name=sear_dpgcd,op=set,value=80*(1+0.05*artifact.void_corruption.rank)
   v_seardpgcd = 80 * (1 + 0.05 + (S.VoidCorruption:ArtifactRank() or 0))
 end
 
-local function Var_S2MSetupTime()
+local function Var_S2MSetupTime ()
 -- actions.precombat+=/variable,name=s2msetup_time,op=set,value=(0.8*(83+(20+20*talent.fortress_of_the_mind.enabled)*set_bonus.tier20_4pc-(5*talent.sanlayn.enabled)+(30+42*(desired_targets>1)+10*talent.lingering_insanity.enabled)*set_bonus.tier21_4pc*talent.auspicious_spirits.enabled+((33-13*set_bonus.tier20_4pc)*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*equipped.mangazas_madness+(raw_haste_pct*10*(1+0.7*set_bonus.tier20_4pc))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled)))),if=talent.surrender_to_madness.enabled
   if (S.SurrenderToMadness:IsAvailable()) then
     v_s2msetuptime = 0.8 * (83 
@@ -210,7 +219,7 @@ local function Var_S2MSetupTime()
 end
 
 --One time cal vars
-local function VarInit()
+local function VarInit ()
   if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
     Var_CdTime()
     Var_DotSWPDPGCD()
@@ -223,7 +232,7 @@ local function VarInit()
 end
 
 --When to S2M calc
-local function VarCalc()
+local function VarCalc ()
   if (S.SurrenderToMadness:IsAvailable() and not Player:Buff(S.SurrenderToMadness)) then
     Var_ActorsFightTimeMod()
     Var_S2MCheck()
@@ -313,9 +322,9 @@ local function CDs ()
 end
 
 --S2M rotation
-local function s2m()
+local function s2m ()
   --Void Torrent prediction
-	if Player:CastID() == S.VoidEruption:ID() and S.VoidTorrent:CooldownRemainsP() == 0 then
+	if Player:IsCasting(S.VoidEruption) and S.VoidTorrent:CooldownRemainsP() == 0 then
 		if AR.Cast(S.VoidTorrent) then return ""; end
 	end
 
@@ -354,7 +363,7 @@ local function s2m()
     and not Target:DebuffRefreshableCP(S.VampiricTouch)
     and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 60))
     and (Player:BuffRemainsP(S.PowerInfusion) == 0 or Player:BuffStack(S.VoidForm) < 5)
-    and not (Player:CastID() == S.VoidTorrent:ID())	then
+    and not Player:IsCasting(S.VoidTorrent)	then
     VTUsed=true
       if AR.Cast(S.VoidTorrent) then return ""; end
   end
@@ -395,7 +404,7 @@ local function s2m()
   -- actions.s2m+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=5
   if S.MindBlast:CooldownRemainsP() <= Player:GCD() * 0.28 
     and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 5)) 
-    and (not (Player:CastID() == S.MindBlast:ID()) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then 
+    and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then 
     if AR.Cast(S.MindBlast) then return ""; end
   end 
 
@@ -437,7 +446,7 @@ local function s2m()
   if Target:DebuffRemainsP(S.ShadowWordPain) < Player:GCD() then
     if AR.Cast(S.ShadowWordPain) then return ""; end
   end
-  if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD()  or (S.Misery:IsAvailable() and  Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not (Player:CastID() == S.VampiricTouch:ID()) then
+  if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD()  or (S.Misery:IsAvailable() and  Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not Player:IsCasting(S.VampiricTouch) then
     if AR.Cast(S.VampiricTouch) then return ""; end
   end
   if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
@@ -478,9 +487,9 @@ local function s2m()
 end
 
 --Classic VoidForm rotation
-local function VoidForm()
+local function VoidForm ()
 	--Void Torrent prediction
-	if Player:CastID() == S.VoidEruption:ID() and S.VoidTorrent:CooldownRemainsP() == 0 then
+	if Player:IsCasting(S.VoidEruption) and S.VoidTorrent:CooldownRemainsP() == 0 then
 		if AR.Cast(S.VoidTorrent) then return ""; end
 	end
 	
@@ -502,9 +511,9 @@ local function VoidForm()
       end
     end
     
-    -- print(S.MindBomb:IsCastable(),SephuzEquipped(),S.SephuzBuff:TimeSinceLastAppliedOnPlayer(),CurrentInsanityDrain())
     -- actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
     --TODO : when isStunnable is available
+    --TODO : closer range
     -- if S.MindBomb:IsAvailable() and S.MindBomb:IsCastable() and I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and CurrentInsanityDrain()>10 then
     	-- if AR.CastSuggested(S.MindBomb) then return ""; end
     -- end
@@ -512,7 +521,6 @@ local function VoidForm()
 		--actions.vf+=/void_bolt
     --actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
 		if S.VoidBolt:CooldownRemainsP() <= Player:GCD() * 0.28 then
-      -- print("Voidbolt:", S.VoidBolt:CooldownRemainsP(), Player:GCD() * 0.28, S.VoidBolt:CooldownRemains(), Player:GCDRemains(), Player:CastRemains(),GetSpellCooldown(S.VoidBolt:ID()))
 			if AR.Cast(S.VoidBolt) then return ""; end
 		end 
     
@@ -528,7 +536,7 @@ local function VoidForm()
 				and not Target:DebuffRefreshableCP(S.ShadowWordPain) 
 				and not Target:DebuffRefreshableCP(S.VampiricTouch)
         and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 60))
-				and not (Player:CastID() == S.VoidTorrent:ID())	then
+				and not Player:IsCasting(S.VoidTorrent)	then
 				VTUsed=true
           if AR.Cast(S.VoidTorrent) then return ""; end
 			end
@@ -547,8 +555,7 @@ local function VoidForm()
 			--actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
 			if S.MindBlast:CooldownRemainsP() <= Player:GCD() * 0.28
         and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 4)) 
-				and (not (Player:CastID() == S.MindBlast:ID()) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then 
-          -- print("MindBlast", S.VoidBolt:CooldownRemainsP(), Player:GCD() * 0.28, S.VoidBolt:CooldownRemains(), Player:GCDRemains(), Player:CastRemains(),GetSpellCooldown(S.VoidBolt:ID()))
+				and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then 
           if AR.Cast(S.MindBlast) then return ""; end
 			end 
 
@@ -589,7 +596,7 @@ local function VoidForm()
       if Target:DebuffRemainsP(S.ShadowWordPain) < Player:GCD() then
         if AR.Cast(S.ShadowWordPain) then return ""; end
       end
-      if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD()  or (S.Misery:IsAvailable() and  Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not (Player:CastID() == S.VampiricTouch:ID()) then
+      if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD()  or (S.Misery:IsAvailable() and  Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not Player:IsCasting(S.VampiricTouch) then
         if AR.Cast(S.VampiricTouch) then return ""; end
       end
       if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
@@ -741,7 +748,7 @@ local function APL ()
         
 		--precast
     if Everyone.TargetIsValid() and Target:IsInRange(range) then
-      if not Player:IsCasting() or Player:CastID()~=S.MindBlast:ID() then
+      if not Player:IsCasting() or not Player:IsCasting(S.MindBlast) then
         if AR.Cast(S.MindBlast) then return ""; end
       elseif S.Misery:IsAvailable() then
         if AR.Cast(S.VampiricTouch) then return ""; end
@@ -764,7 +771,7 @@ local function APL ()
 			end
 						
 			--Specific APL for Voidform and Surrender
-			if Player:Buff(S.VoidForm) or (Player:CastID() == S.VoidEruption:ID()) then
+			if Player:Buff(S.VoidForm) or Player:IsCasting(S.VoidEruption) then
 				--actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 				if Player:Buff(S.SurrenderToMadness) then
 					ShouldReturn = s2m();
@@ -780,7 +787,7 @@ local function APL ()
 			--static
 			if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then
         -- actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
-        if S.Misery:IsAvailable() and (Target:DebuffRefreshableCP(S.VampiricTouch) or Target:DebuffRefreshableCP(S.ShadowWordPain)) and not (Player:CastID() == S.VampiricTouch:ID()) then
+        if S.Misery:IsAvailable() and (Target:DebuffRefreshableCP(S.VampiricTouch) or Target:DebuffRefreshableCP(S.ShadowWordPain)) and not Player:IsCasting(S.VampiricTouch) then
           if AR.Cast(S.VampiricTouch) then return ""; end
         end
         if AR.AoEON() and Cache.EnemiesCount[range] > 1 and S.Misery:IsAvailable() then
@@ -802,7 +809,7 @@ local function APL ()
           if Target:DebuffRefreshableCP(S.ShadowWordPain) then
             if AR.Cast(S.ShadowWordPain) then return ""; end
           end
-          if Target:DebuffRefreshableCP(S.VampiricTouch) and not(Player:CastID() == S.VampiricTouch:ID()) then
+          if Target:DebuffRefreshableCP(S.VampiricTouch) and not Player:IsCasting(S.VampiricTouch) then
             if AR.Cast(S.VampiricTouch) then return ""; end
           end
         end
@@ -843,7 +850,7 @@ local function APL ()
 				if S.MindBlast:CooldownRemainsP() == 0
 					and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 4)) 
 					and FutureInsanity() < InsanityThreshold() 
-					and (not (Player:CastID() == S.MindBlast:ID()) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then
+					and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then
 						if AR.Cast(S.MindBlast) then return ""; end
 				end
         
@@ -962,104 +969,106 @@ end
 
 AR.SetAPL(258, APL);
 
---[[ 28/10/2017 generation
-# Executed before combat begins. Accepts non-harmful actions only.
-actions.precombat=flask,type=flask_of_the_whispered_pact
-actions.precombat+=/food,type=azshari_salad
-actions.precombat+=/augmentation,type=defiled
-# Snapshot raid buffed stats before combat begins and pre-potting is done.
-actions.precombat+=/snapshot_stats
-actions.precombat+=/variable,name=cd_time,op=set,value=(12+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(1-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
-actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
-actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
-actions.precombat+=/variable,name=sear_dpgcd,op=set,value=80*(1+0.05*artifact.void_corruption.rank)
-actions.precombat+=/variable,name=s2msetup_time,op=set,value=(0.8*(83+(20+20*talent.fortress_of_the_mind.enabled)*set_bonus.tier20_4pc-(5*talent.sanlayn.enabled)+((33-13*set_bonus.tier20_4pc)*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*equipped.mangazas_madness+(raw_haste_pct*10*(1+0.7*set_bonus.tier20_4pc))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled)))),if=talent.surrender_to_madness.enabled
-actions.precombat+=/potion,name=prolonged_power
-actions.precombat+=/shadowform,if=!buff.shadowform.up
-actions.precombat+=/mind_blast
+--- ======= SIMC =======
+--- Last Update: 28/10/2017
 
-# Executed every time the actor is available.
-actions=use_item,slot=trinket1
-actions+=/potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
-actions+=/call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
-actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
-actions+=/run_action_list,name=vf,if=buff.voidform.up
-actions+=/run_action_list,name=main
+-- # Executed before combat begins. Accepts non-harmful actions only.
+-- actions.precombat=flask,type=flask_of_the_whispered_pact
+-- actions.precombat+=/food,type=azshari_salad
+-- actions.precombat+=/augmentation,type=defiled
+-- # Snapshot raid buffed stats before combat begins and pre-potting is done.
+-- actions.precombat+=/snapshot_stats
+-- actions.precombat+=/variable,name=cd_time,op=set,value=(12+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(1-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
+-- actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=38*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
+-- actions.precombat+=/variable,name=dot_vt_dpgcd,op=set,value=71*1.2*(1+0.2*talent.sanlayn.enabled)*(1+0.05*artifact.touch_of_darkness.rank)*(1+0.2+stat.mastery_rating%16000)*0.5
+-- actions.precombat+=/variable,name=sear_dpgcd,op=set,value=80*(1+0.05*artifact.void_corruption.rank)
+-- actions.precombat+=/variable,name=s2msetup_time,op=set,value=(0.8*(83+(20+20*talent.fortress_of_the_mind.enabled)*set_bonus.tier20_4pc-(5*talent.sanlayn.enabled)+((33-13*set_bonus.tier20_4pc)*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*equipped.mangazas_madness+(raw_haste_pct*10*(1+0.7*set_bonus.tier20_4pc))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled)))),if=talent.surrender_to_madness.enabled
+-- actions.precombat+=/potion,name=prolonged_power
+-- actions.precombat+=/shadowform,if=!buff.shadowform.up
+-- actions.precombat+=/mind_blast
 
-actions.check=variable,op=set,name=actors_fight_time_mod,value=0
-actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
-actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
-actions.check+=/variable,op=min,name=s2mcheck,value=180
+-- # Executed every time the actor is available.
+-- actions=use_item,slot=trinket1
+-- actions+=/potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
+-- actions+=/call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
+-- actions+=/run_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
+-- actions+=/run_action_list,name=vf,if=buff.voidform.up
+-- actions+=/run_action_list,name=main
 
-actions.main=surrender_to_madness,if=talent.surrender_to_madness.enabled&target.time_to_die<=variable.s2mcheck
-actions.main+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd.max,moving=1,cycle_targets=1
-actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
-actions.main+=/shadow_word_pain,if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
-actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
-actions.main+=/void_eruption
-actions.main+=/shadow_crash,if=talent.shadow_crash.enabled
-actions.main+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(85-15*talent.reaper_of_souls.enabled)
-actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
-actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
-actions.main+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
-actions.main+=/vampiric_touch,if=active_enemies>1&!talent.misery.enabled&!ticking&(variable.dot_vt_dpgcd*target.time_to_die%(gcd.max*(156+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
-actions.main+=/shadow_word_pain,if=active_enemies>1&!talent.misery.enabled&!ticking&(variable.dot_swp_dpgcd*target.time_to_die%(gcd.max*(118+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
-actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=75-10*talent.legacy_of_the_void.enabled)
-actions.main+=/mind_flay,interrupt=1,chain=1
-actions.main+=/shadow_word_pain
+-- actions.check=variable,op=set,name=actors_fight_time_mod,value=0
+-- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
+-- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
+-- actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+-- actions.check+=/variable,op=min,name=s2mcheck,value=180
 
-actions.s2m=silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up,cycle_targets=1
-actions.s2m+=/void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
-actions.s2m+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
-actions.s2m+=/shadow_crash,if=talent.shadow_crash.enabled
-actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
-actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up|buff.voidform.stack<5
-actions.s2m+=/berserking,if=buff.voidform.stack>=65
-actions.s2m+=/shadow_word_death,if=current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled)<100)
-actions.s2m+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=65&(insanity-(current_insanity_drain*gcd.max)+30)<100
-actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
-actions.s2m+=/void_bolt
-actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled))<100
-actions.s2m+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
-actions.s2m+=/dispersion,if=current_insanity_drain*gcd.max>insanity&!buff.power_infusion.up|(buff.voidform.stack>76&cooldown.shadow_word_death.charges=0&current_insanity_drain*gcd.max>insanity)
-actions.s2m+=/mind_blast,if=active_enemies<=5
-actions.s2m+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=5
-actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
-actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled&buff.voidform.stack>15
-actions.s2m+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+50)<100
-actions.s2m+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
-actions.s2m+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
-actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
-actions.s2m+=/vampiric_touch,if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
-actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
-actions.s2m+=/vampiric_touch,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
-actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
-actions.s2m+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+60)<100&cooldown.shadow_word_death.charges>=1))
+-- actions.main=surrender_to_madness,if=talent.surrender_to_madness.enabled&target.time_to_die<=variable.s2mcheck
+-- actions.main+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd.max,moving=1,cycle_targets=1
+-- actions.main+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
+-- actions.main+=/shadow_word_pain,if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
+-- actions.main+=/vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
+-- actions.main+=/void_eruption
+-- actions.main+=/shadow_crash,if=talent.shadow_crash.enabled
+-- actions.main+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(85-15*talent.reaper_of_souls.enabled)
+-- actions.main+=/mind_blast,if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
+-- actions.main+=/mind_blast,if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
+-- actions.main+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
+-- actions.main+=/vampiric_touch,if=active_enemies>1&!talent.misery.enabled&!ticking&(variable.dot_vt_dpgcd*target.time_to_die%(gcd.max*(156+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
+-- actions.main+=/shadow_word_pain,if=active_enemies>1&!talent.misery.enabled&!ticking&(variable.dot_swp_dpgcd*target.time_to_die%(gcd.max*(118+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
+-- actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=75-10*talent.legacy_of_the_void.enabled)
+-- actions.main+=/mind_flay,interrupt=1,chain=1
+-- actions.main+=/shadow_word_pain
 
-actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.value)
-actions.vf+=/silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
-actions.vf+=/void_bolt
-actions.vf+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=20&(insanity-(current_insanity_drain*gcd.max)+15)<100
-actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
-actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
-actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+60))
-actions.vf+=/mindbender,if=buff.insanity_drain_stacks.value>=(variable.cd_time-(3*set_bonus.tier20_4pc*(raid_event.movement.in<15)*((active_enemies-(raid_event.adds.count*(raid_event.adds.remains>0)))=1))+(5-3*set_bonus.tier20_4pc)*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled*set_bonus.tier20_4pc)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
-actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(variable.cd_time+5*buff.bloodlust.up*(1+1*set_bonus.tier20_4pc))&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+61))
-actions.vf+=/berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.value<=20&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+60))
-actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(15+15*talent.reaper_of_souls.enabled))<100
-actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
-actions.vf+=/mind_blast,if=active_enemies<=4
-actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
-actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
-actions.vf+=/shadowfiend,if=!talent.mindbender.enabled&buff.voidform.stack>15
-actions.vf+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+25)<100
-actions.vf+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
-actions.vf+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max)&target.time_to_die>5*gcd.max,cycle_targets=1
-actions.vf+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
-actions.vf+=/vampiric_touch,if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
-actions.vf+=/vampiric_touch,if=active_enemies>1&!talent.misery.enabled&!ticking&((1+0.02*buff.voidform.stack)*variable.dot_vt_dpgcd*target.time_to_die%(gcd.max*(156+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
-actions.vf+=/shadow_word_pain,if=active_enemies>1&!talent.misery.enabled&!ticking&((1+0.02*buff.voidform.stack)*variable.dot_swp_dpgcd*target.time_to_die%(gcd.max*(118+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
-actions.vf+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
-actions.vf+=/shadow_word_pain
-]]--
+-- actions.s2m=silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up,cycle_targets=1
+-- actions.s2m+=/void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
+-- actions.s2m+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up,cycle_targets=1
+-- actions.s2m+=/shadow_crash,if=talent.shadow_crash.enabled
+-- actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
+-- actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up|buff.voidform.stack<5
+-- actions.s2m+=/berserking,if=buff.voidform.stack>=65
+-- actions.s2m+=/shadow_word_death,if=current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled)<100)
+-- actions.s2m+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=65&(insanity-(current_insanity_drain*gcd.max)+30)<100
+-- actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
+-- actions.s2m+=/void_bolt
+-- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled))<100
+-- actions.s2m+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+-- actions.s2m+=/dispersion,if=current_insanity_drain*gcd.max>insanity&!buff.power_infusion.up|(buff.voidform.stack>76&cooldown.shadow_word_death.charges=0&current_insanity_drain*gcd.max>insanity)
+-- actions.s2m+=/mind_blast,if=active_enemies<=5
+-- actions.s2m+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=5
+-- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
+-- actions.s2m+=/shadowfiend,if=!talent.mindbender.enabled&buff.voidform.stack>15
+-- actions.s2m+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+50)<100
+-- actions.s2m+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
+-- actions.s2m+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max),cycle_targets=1
+-- actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
+-- actions.s2m+=/vampiric_touch,if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
+-- actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
+-- actions.s2m+=/vampiric_touch,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
+-- actions.s2m+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
+-- actions.s2m+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+60)<100&cooldown.shadow_word_death.charges>=1))
+
+-- actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.value)
+-- actions.vf+=/silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
+-- actions.vf+=/void_bolt
+-- actions.vf+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=20&(insanity-(current_insanity_drain*gcd.max)+15)<100
+-- actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
+-- actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
+-- actions.vf+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+60))
+-- actions.vf+=/mindbender,if=buff.insanity_drain_stacks.value>=(variable.cd_time-(3*set_bonus.tier20_4pc*(raid_event.movement.in<15)*((active_enemies-(raid_event.adds.count*(raid_event.adds.remains>0)))=1))+(5-3*set_bonus.tier20_4pc)*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled*set_bonus.tier20_4pc)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
+-- actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(variable.cd_time+5*buff.bloodlust.up*(1+1*set_bonus.tier20_4pc))&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+61))
+-- actions.vf+=/berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.value<=20&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.value)+60))
+-- actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(15+15*talent.reaper_of_souls.enabled))<100
+-- actions.vf+=/wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+-- actions.vf+=/mind_blast,if=active_enemies<=4
+-- actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
+-- actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
+-- actions.vf+=/shadowfiend,if=!talent.mindbender.enabled&buff.voidform.stack>15
+-- actions.vf+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+25)<100
+-- actions.vf+=/shadow_word_pain,if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
+-- actions.vf+=/vampiric_touch,if=talent.misery.enabled&(dot.vampiric_touch.remains<3*gcd.max|dot.shadow_word_pain.remains<3*gcd.max)&target.time_to_die>5*gcd.max,cycle_targets=1
+-- actions.vf+=/shadow_word_pain,if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
+-- actions.vf+=/vampiric_touch,if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
+-- actions.vf+=/vampiric_touch,if=active_enemies>1&!talent.misery.enabled&!ticking&((1+0.02*buff.voidform.stack)*variable.dot_vt_dpgcd*target.time_to_die%(gcd.max*(156+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
+-- actions.vf+=/shadow_word_pain,if=active_enemies>1&!talent.misery.enabled&!ticking&((1+0.02*buff.voidform.stack)*variable.dot_swp_dpgcd*target.time_to_die%(gcd.max*(118+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
+-- actions.vf+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
+-- actions.vf+=/shadow_word_pain
+
