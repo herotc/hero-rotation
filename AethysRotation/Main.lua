@@ -271,6 +271,7 @@
     local Spec = GetSpecialization();
     -- Delay by 1 second until the WoW API returns a valid value.
     if Spec == nil then
+      AC.PulseInitialized = false;
       C_Timer.After(1, function ()
           AR.PulseInit();
         end
@@ -281,38 +282,47 @@
       Cache.Persistent.Player.Spec = {GetSpecializationInfo(Spec)};
       local SpecID = Cache.Persistent.Player.Spec[1];
 
-      -- Load the Class Module if it's possible and not already loaded
-      if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
-        LoadAddOn(EnabledRotation[SpecID]);
-      end
-
-      -- Check if there is a Rotation for this Spec
-      if LatestSpecIDChecked ~= SpecID then
-        if EnabledRotation[SpecID] and AR.APLs[SpecID] then
-          for Key, Value in pairs(UIFrames) do
-            Value:Show();
+      -- Delay by 1 second until the WoW API returns a valid value.
+      if SpecID == nil then
+        AC.PulseInitialized = false;
+        C_Timer.After(1, function ()
+            AR.PulseInit();
           end
-          AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
-          -- Spec Registers
-            -- Spells
-            Player:RegisterListenedSpells(SpecID);
-            -- Enums Filters
-            Player:FilterTriggerGCD(SpecID);
-            Spell:FilterProjectileSpeed(SpecID);
-          -- Special Checks
-          if GetCVar("nameplateShowEnemies") ~= "1" then
-            AR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
-          end
-        else
-          AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
-          for Key, Value in pairs(UIFrames) do
-            Value:Hide();
-          end
-          AR.MainFrame:SetScript("OnUpdate", nil);
+        );
+      else
+        -- Load the Class Module if it's possible and not already loaded
+        if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
+          LoadAddOn(EnabledRotation[SpecID]);
         end
-        LatestSpecIDChecked = SpecID;
+
+        -- Check if there is a Rotation for this Spec
+        if LatestSpecIDChecked ~= SpecID then
+          if EnabledRotation[SpecID] and AR.APLs[SpecID] then
+            for Key, Value in pairs(UIFrames) do
+              Value:Show();
+            end
+            AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
+            -- Spec Registers
+              -- Spells
+              Player:RegisterListenedSpells(SpecID);
+              -- Enums Filters
+              Player:FilterTriggerGCD(SpecID);
+              Spell:FilterProjectileSpeed(SpecID);
+            -- Special Checks
+            if GetCVar("nameplateShowEnemies") ~= "1" then
+              AR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
+            end
+          else
+            AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
+            for Key, Value in pairs(UIFrames) do
+              Value:Hide();
+            end
+            AR.MainFrame:SetScript("OnUpdate", nil);
+          end
+          LatestSpecIDChecked = SpecID;
+        end
+        if not AC.PulseInitialized then AC.PulseInitialized = true; end
       end
-      if not AC.PulseInitialized then AC.PulseInitialized = true; end
     end
   end
 
