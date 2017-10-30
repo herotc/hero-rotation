@@ -104,9 +104,6 @@
     DemonicCallingBuff      = Spell(205146),
     GrimoireOfSynergyBuff   = Spell(171982),
     ShadowyInspirationBuff  = Spell(196606)
-    
-    -- Macros
-    
   };
   local S = Spell.Warlock.Demonology;
   
@@ -125,8 +122,9 @@
   
   -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local T192P,T194P = AC.HasTier("T19")
-  local T202P,T204P = AC.HasTier("T20")
+  local T192P, T194P = AC.HasTier("T19")
+  local T202P, T204P = AC.HasTier("T20")
+  local T212P, T214P = AC.HasTier("T21");
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range = 40
 	-- BuffCount[x] = {nbBuffed, nbNotBuffed, nbBuffed+nbNotBuffed}
@@ -255,13 +253,13 @@
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:CastID() == S.CallDreadStalkers:ID() then
+      if Player:IsCasting(S.CallDreadStalkers) then
         return Shard - 2
-      elseif Player:CastID() == S.HandOfGuldan:ID() then
+      elseif Player:IsCasting(S.HandOfGuldan) then
         return 0
-      elseif Player:CastID() == S.SummonDoomGuard:ID() or Player:CastID() == S.SummonDoomGuardSuppremacy:ID() or Player:CastID() == S.SummonInfernal:ID() or Player:CastID() == S.SummonInfernalSuppremacy:ID() or Player:CastID() == S.GrimoireFelguard:ID() or Player:CastID() == S.SummonFelguard:ID() then
+      elseif Player:IsCasting(S.SummonDoomGuard) or Player:IsCasting(S.SummonDoomGuardSuppremacy) or Player:IsCasting(S.SummonInfernal) or Player:IsCasting(S.SummonInfernalSuppremacy) or Player:IsCasting(S.GrimoireFelguard) or Player:IsCasting(S.SummonFelguard) then
         return Shard - 1
-      elseif Player:CastID() == S.ShadowBolt:ID() or Player:CastID() == S.Demonbolt:ID() then
+      elseif Player:IsCasting(S.ShadowBolt) or Player:IsCasting(S.Demonbolt) then
         if Shard == 5 then
           return Shard
         else
@@ -275,7 +273,7 @@
   
   -- Is the player casting and abylity that generates pets ?
   local function IsCastingPet ()
-    return Player:CastID() == S.CallDreadStalkers:ID() or Player:CastID() == S.HandOfGuldan:ID() or Player:CastID() == S.SummonDoomGuard:ID() or Player:CastID() == S.SummonInfernal:ID()
+    return Player:IsCasting(S.CallDreadStalkers) or Player:IsCasting(S.HandOfGuldan) or Player:IsCasting(S.SummonDoomGuard) or Player:IsCasting(S.SummonInfernal)
   end
   
   local function UpdateVars ()
@@ -284,10 +282,15 @@
     -- actions+=/variable,name=no_de1,value=dreadstalker_no_de>0|darkglare_no_de>0|doomguard_no_de>0|infernal_no_de>0|service_no_de>0
     var_no_de1 = IsNonBuffed("Dreadstalker") or IsNonBuffed("DarkGlare") or IsNonBuffed("Doomguard") or IsNonBuffed("Infernal") or (IsPetInvoked() and DemonicEmpowermentDuration() == 0)
     -- actions+=/variable,name=no_de2,value=(variable.3min&service_no_de>0)|(variable.3min&wild_imp_no_de>0)|(variable.3min&dreadstalker_no_de>0)|(service_no_de>0&dreadstalker_no_de>0)|(service_no_de>0&wild_imp_no_de>0)|(dreadstalker_no_de>0&wild_imp_no_de>0)|(prev_gcd.1.hand_of_guldan&variable.no_de1)
-    var_no_de2 = (var_3min and (IsPetInvoked() and DemonicEmpowermentDuration() == 0)) or (var_3min and IsNonBuffed("Wild Imp")) or (var_3min and IsNonBuffed("Dreadstalker")) or ((IsPetInvoked() and DemonicEmpowermentDuration() == 0) and IsNonBuffed("Dreadstalker")) or ((IsPetInvoked() and DemonicEmpowermentDuration() == 0) and IsNonBuffed("Wild Imp")) or (IsNonBuffed("Wild Imp") and IsNonBuffed("Dreadstalker")) or (Player:PrevGCD(1,S.HandOfGuldan) and var_no_de1) 
+    var_no_de2 = (var_3min and (IsPetInvoked() and DemonicEmpowermentDuration() == 0)) or (var_3min and IsNonBuffed("Wild Imp")) or (var_3min and IsNonBuffed("Dreadstalker")) or ((IsPetInvoked() and DemonicEmpowermentDuration() == 0) and IsNonBuffed("Dreadstalker")) or ((IsPetInvoked() and DemonicEmpowermentDuration() == 0) and IsNonBuffed("Wild Imp")) or (IsNonBuffed("Wild Imp") and IsNonBuffed("Dreadstalker")) or ((Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and var_no_de1) 
   end
   
-  local function CDs()
+  local function CDs ()
+    -- actions+=/service_pet
+    if S.GrimoireFelguard:IsAvailable() and S.GrimoireFelguard:CooldownRemainsP() == 0 and FutureShard() >= 1 then
+      if AR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return ""; end
+    end
+    
     -- actions+=/summon_infernal,if=(!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>2)&equipped.132369
     if S.SummonInfernal:CooldownRemainsP() == 0 and AR.AoEON() and Cache.EnemiesCount[range] > 2 and not S.GrimoireOfSupremacy:IsAvailable() and I.WilfredsSigil:IsEquipped() and FutureShard() >= 1 then
       if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
@@ -327,11 +330,16 @@
     
     -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
     if S.SoulHarvest:IsAvailable() and S.SoulHarvest:IsCastable() and Player:BuffRemainsP(S.SoulHarvest) == 0 then
-      if AR.Cast(S.SoulHarvest, Settings.Destruction.OffGCDasOffGCD.SoulHarvest) then return ""; end
+      if AR.Cast(S.SoulHarvest, Settings.Demonology.OffGCDasOffGCD.SoulHarvest) then return ""; end
+    end
+    
+    -- actions+=/potion,name=prolonged_power,if=buff.soul_harvest.remains|target.time_to_die<=70|trinket.proc.any.react
+    if Settings.Demonology.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:BuffRemainsP(S.SoulHarvest) > 0 or Target:FilteredTimeToDie("<=", 60)) then
+      if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
     end
   end
   
-  local function Sephuz()
+  local function Sephuz ()
     -- ShadowFury
     --TODO : change level when iscontrollable is here
     if S.ShadowFury:IsAvailable() and S.ShadowFury:IsCastable() and Target:Level() < 103 and Settings.Demonology.Sephuz.ShadowFury then
@@ -364,6 +372,9 @@
     RefreshPetsTimers()
     GetAllPetBuffed()
     UpdateVars()
+    
+    -- TODO : prepot
+    -- TODO : revoir opener
         
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Demonology.UnendingResolveHP then
@@ -430,7 +441,7 @@
             end
             
             -- actions+=/implosion,if=prev_gcd.1.hand_of_guldan&((wild_imp_remaining_duration<=3&buff.demonic_synergy.remains)|(wild_imp_remaining_duration<=4&spell_targets.implosion>2))
-            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and Player:PrevGCD(1, S.HandOfGuldan) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
+            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
               if AR.Cast(S.Implosion) then return ""; end
             end
             
@@ -441,20 +452,20 @@
 
             -- actions+=/call_dreadstalkers,if=((!talent.summon_darkglare.enabled|talent.power_trip.enabled)&(spell_targets.implosion<3|!talent.implosion.enabled))&!(soul_shard=5&buff.demonic_calling.remains)
             if S.CallDreadStalkers:CooldownRemainsP() == 0 and ((not S.SummonDarkGlare:IsAvailable() or not S.PowerTrip:IsAvailable()) and (Cache.EnemiesCount[range] < 3 or not S.Implosion:IsAvailable())) 
-              and not (FutureShard() == 5 and Player:BuffRemainsP(S.DemonicCallingBuff) >= 0) and FutureShard() >= 2 and Player:CastID() ~= S.CallDreadStalkers:ID() then
+              and not (FutureShard() == 5 and Player:BuffRemainsP(S.DemonicCallingBuff) >= 0) and FutureShard() >= 2 and not Player:IsCasting(S.CallDreadStalkers) then
               if AR.Cast(S.CallDreadStalkers) then return ""; end
             end
             
             -- actions+=/doom,cycle_targets=1,if=(!talent.hand_of_doom.enabled&target.time_to_die>duration&(!ticking|remains<duration*0.3))&!(variable.no_de1|prev_gcd.1.hand_of_guldan)
             -- print((not S.HandOfDoom:IsAvailable() and Target:TimeToDie() > S.Doom:BaseDuration() and Target:DebuffRefreshableCP(S.Doom)),not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)))
             if (not S.HandOfDoom:IsAvailable() and Target:TimeToDie() > S.Doom:BaseDuration() and Target:DebuffRefreshableCP(S.Doom))
-              and not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) then
+              and not(var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) then
                 if AR.Cast(S.Doom) then return ""; end
             end
             if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
               for _, Value in pairs(Cache.Enemies[range]) do
-                if (not S.HandOfDoom:IsAvailable() and Value:TimeToDie() > S.Doom:BaseDuration() and Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
+                if (not S.HandOfDoom:IsAvailable() and Value:TimeToDie() > S.Doom:BaseDuration() and Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
                   BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Doom;
                 end	
               end
@@ -469,12 +480,12 @@
             end
             
             -- actions+=/shadow_bolt,if=buff.shadowy_inspiration.remains&soul_shard<5&!prev_gcd.1.doom&!variable.no_de2
-            if S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspirationBuff) and FutureShard() < 5 and not Player:PrevGCD(1,S.Doom) and not var_no_de2 then
+            if S.ShadowBolt:IsCastable() and Player:Buff(S.ShadowyInspirationBuff) and FutureShard() < 5 and not Player:PrevGCD(1, S.Doom) and not var_no_de2 then
               if AR.Cast(S.ShadowBolt) then return ""; end
             end
             
             -- actions+=/summon_darkglare,if=prev_gcd.1.hand_of_guldan|prev_gcd.1.call_dreadstalkers|talent.power_trip.enabled
-            if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:CooldownRemainsP() == 0 and FutureShard() >= 1 and (Player:PrevGCD(1, S.HandOfGuldan) or Player:PrevGCD(1, S.CallDreadStalkers) or S.PowerTrip:IsAvailable()) then
+            if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:CooldownRemainsP() == 0 and FutureShard() >= 1 and ((Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) or (Player:PrevGCD(1, S.CallDreadStalkers) or Player:IsCasting(S.CallDreadStalkers)) or S.PowerTrip:IsAvailable()) then
               if AR.Cast(S.SummonDarkGlare) then return ""; end
             end
             
@@ -492,29 +503,29 @@
             -- actions+=/call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&(cooldown.summon_darkglare.remains>2|prev_gcd.1.summon_darkglare|cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=3|cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=1&buff.demonic_calling.react)
             if S.CallDreadStalkers:IsCastable() and FutureShard() >= 2 and S.SummonDarkGlare:IsAvailable() 
               and (Cache.EnemiesCount[range] < 3 or not S.Implosion:IsAvailable() or not AR.AoEON()) 
-              and (S.SummonDarkGlare:CooldownRemainsP() > 2 or Player:PrevGCD(1, S.SummonDarkGlare) or (S.SummonDarkGlare:CooldownRemainsP() <= S.CallDreadStalkers:CastTime() and FutureShard() >= 3) or (S.SummonDarkGlare:CooldownRemainsP() <= S.CallDreadStalkers:CastTime() and FutureShard() >= 1 and Player:BuffRemainsP(S.DemonicCallingBuff) >= 0)) and Player:CastID() ~= S.CallDreadStalkers:ID() then
+              and (S.SummonDarkGlare:CooldownRemainsP() > 2 or (Player:PrevGCD(1, S.SummonDarkGlare) or Player:IsCasting(S.SummonDarkGlare)) or (S.SummonDarkGlare:CooldownRemainsP() <= S.CallDreadStalkers:CastTime() and FutureShard() >= 3) or (S.SummonDarkGlare:CooldownRemainsP() <= S.CallDreadStalkers:CastTime() and FutureShard() >= 1 and Player:BuffRemainsP(S.DemonicCallingBuff) >= 0)) and Player:IsCasting(S.CallDreadStalkers) then
                 if AR.Cast(S.CallDreadStalkers) then return ""; end
             end
             
             -- actions+=/hand_of_guldan,if=soul_shard>=4&(((!(variable.no_de1|prev_gcd.1.hand_of_guldan)&(pet_count>=13&!talent.shadowy_inspiration.enabled|pet_count>=6&talent.shadowy_inspiration.enabled))|!variable.no_de2|soul_shard=5)&talent.power_trip.enabled)
             if S.HandOfGuldan:IsCastable() and FutureShard() >= 4 
-              and (((not (var_no_de1 or Player:PrevGCD(1, S.HandOfGuldan)) and ((AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets > 12 and not S.ShadowyInspiration:IsAvailable()) or (AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets > 5 and S.ShadowyInspiration:IsAvailable()))) or not var_no_de2 or FutureShard() == 5 ) and S.PowerTrip:IsAvailable()) then
+              and (((not (var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) and ((AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets > 12 and not S.ShadowyInspiration:IsAvailable()) or (AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets > 5 and S.ShadowyInspiration:IsAvailable()))) or not var_no_de2 or FutureShard() == 5 ) and S.PowerTrip:IsAvailable()) then
                 if AR.Cast(S.HandOfGuldan) then return ""; end
             end
             
             -- actions+=/hand_of_guldan,if=(soul_shard>=3&prev_gcd.1.call_dreadstalkers&!artifact.thalkiels_ascendance.rank)|soul_shard>=5|(soul_shard>=4&cooldown.summon_darkglare.remains>2)
-            if S.HandOfGuldan:IsCastable() and (FutureShard() >= 3 and Player:PrevGCD(1, S.CallDreadStalkers) and not(S.ThalkielsAscendance:ArtifactRank() or 0) == 0 or FutureShard() == 5 or (FutureShard() >= 4 and S.SummonDarkGlare:CooldownRemainsP() > 2)) then
+            if S.HandOfGuldan:IsCastable() and (FutureShard() >= 3 and (Player:PrevGCD(1, S.CallDreadStalkers) or Player:IsCasting(S.CallDreadStalkers)) and not(S.ThalkielsAscendance:ArtifactRank() or 0) == 0 or FutureShard() == 5 or (FutureShard() >= 4 and S.SummonDarkGlare:CooldownRemainsP() > 2)) then
               if AR.Cast(S.HandOfGuldan) then return ""; end
             end
             
             -- actions+=/demonic_empowerment,if=(((talent.power_trip.enabled&(!talent.implosion.enabled|spell_targets.demonwrath<=1))|!talent.implosion.enabled|(talent.implosion.enabled&!talent.soul_conduit.enabled&spell_targets.demonwrath<=3))&(wild_imp_no_de>3|prev_gcd.1.hand_of_guldan))|(prev_gcd.1.hand_of_guldan&wild_imp_no_de=0&wild_imp_remaining_duration<=0)|(prev_gcd.1.implosion&wild_imp_no_de>0)
             -- actions+=/demonic_empowerment,if=variable.no_de1|prev_gcd.1.hand_of_guldan
-            if S.DemonicEmpowerment:IsCastable() and Player:CastID() ~= S.DemonicEmpowerment:ID() 
+            if S.DemonicEmpowerment:IsCastable() and not Player:IsCasting(S.DemonicEmpowerment)
               and (((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range] <= 1)) 
                   or not S.Implosion:IsAvailable() or (S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range] <= 3)) 
-                  and (GetNbNotBuffed("Wild Imp") >  3 or Player:PrevGCD(1, S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and GetNbTotal("Wild Imp") == 0) 
+                  and (GetNbNotBuffed("Wild Imp") >  3 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)))) or ((Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and GetNbTotal("Wild Imp") == 0) 
                   or (Player:PrevGCD(1, S.Implosion) and GetNbNotBuffed("Wild Imp") == 0)) 
-                or (var_no_de1 or Player:PrevGCD(1, S.HandOfGuldan)) 
+                or (var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) 
                 or ((S.ThalkielsAscendance:ArtifactRank() or 0) > 0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) 
                 or IsCastingPet()) then
               if AR.Cast(S.DemonicEmpowerment) then return ""; end
@@ -526,7 +537,7 @@
             end
             
             -- actions+=/thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time | talent.implosion.enabled & spell_targets.implosion>=3) & wild_imp_count>3 & wild_imp_remaining_duration>execute_time
-            if S.TalkielConsumption:IsAvailable() and S.TalkielConsumption:CooldownRemainsP() == 0 and not (Player:CastID() == S.TalkielConsumption:ID()) and (GetPetRemains("Dreadstalker") > S.TalkielConsumption:ExecuteTime() or (S.Implosion:IsAvailable() and Cache.EnemiesCount[range] >= 3)) and  GetNbTotal("Wild Imp") > 3 and GetPetRemains("Wild Imp") > S.TalkielConsumption:ExecuteTime() then
+            if S.TalkielConsumption:IsAvailable() and S.TalkielConsumption:CooldownRemainsP() == 0 and not Player:IsCasting(S.TalkielConsumption) and (GetPetRemains("Dreadstalker") > S.TalkielConsumption:ExecuteTime() or (S.Implosion:IsAvailable() and Cache.EnemiesCount[range] >= 3)) and  GetNbTotal("Wild Imp") > 3 and GetPetRemains("Wild Imp") > S.TalkielConsumption:ExecuteTime() then
               if AR.Cast(S.TalkielConsumption) then return ""; end
             end
             
@@ -551,7 +562,7 @@
             end
 
             -- actions+=/demonic_empowerment,if=artifact.thalkiels_ascendance.rank&talent.power_trip.enabled&!talent.demonbolt.enabled&talent.shadowy_inspiration.enabled
-            if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not(Player:CastID() == S.DemonicEmpowerment:ID()) then
+            if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not Player:IsCasting(S.DemonicEmpowerment) then
               if AR.Cast(S.DemonicEmpowerment) then return ""; end
             end
             
@@ -569,7 +580,7 @@
             end
             
             -- actions+=/implosion,if=prev_gcd.1.hand_of_guldan&((wild_imp_remaining_duration<=3&buff.demonic_synergy.remains)|(wild_imp_remaining_duration<=4&spell_targets.implosion>2))
-            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and Player:PrevGCD(1, S.HandOfGuldan) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
+            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
               if AR.Cast(S.Implosion) then return ""; end
             end
             
@@ -580,13 +591,13 @@
             
             -- actions+=/doom,cycle_targets=1,if=(!talent.hand_of_doom.enabled&target.time_to_die>duration&(!ticking|remains<duration*0.3))&!(variable.no_de1|prev_gcd.1.hand_of_guldan)
             if not AR.AoEON() and (not S.HandOfDoom:IsAvailable() and Target:TimeToDie() > S.Doom:BaseDuration() and Target:DebuffRefreshableCP(S.Doom))
-              and not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) then
+              and not(var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) then
                 if AR.Cast(S.Doom) then return ""; end
             end
             if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
               for _, Value in pairs(Cache.Enemies[range]) do
-                if (not S.HandOfDoom:IsAvailable() and not Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
+                if (not S.HandOfDoom:IsAvailable() and not Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
                   BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Doom;
                 end	
               end
@@ -601,7 +612,7 @@
             end
             
             -- actions+=/summon_darkglare,if=prev_gcd.1.hand_of_guldan|prev_gcd.1.call_dreadstalkers|talent.power_trip.enabled
-            if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:CooldownRemainsP() == 0 and FutureShard() >= 1 and (Player:PrevGCD(1, S.HandOfGuldan) or Player:PrevGCD(1, S.CallDreadStalkers) or S.PowerTrip:IsAvailable()) then
+            if S.SummonDarkGlare:IsAvailable() and S.SummonDarkGlare:CooldownRemainsP() == 0 and FutureShard() >= 1 and ((Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) or (Player:PrevGCD(1, S.CallDreadStalkers) or Player:IsCasting(S.CallDreadStalkers)) or S.PowerTrip:IsAvailable()) then
               if AR.Cast(S.SummonDarkGlare) then return ""; end
             end
             
@@ -632,7 +643,7 @@
             end
 
             -- actions+=/demonic_empowerment,if=artifact.thalkiels_ascendance.rank&talent.power_trip.enabled&!talent.demonbolt.enabled&talent.shadowy_inspiration.enabled
-            if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not(Player:CastID() == S.DemonicEmpowerment:ID()) then
+            if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not Player:IsCasting(S.DemonicEmpowerment) then
               if AR.Cast(S.DemonicEmpowerment) then return ""; end
             end
             
@@ -648,7 +659,7 @@
             end
             
             -- actions+=/implosion,if=prev_gcd.1.hand_of_guldan&((wild_imp_remaining_duration<=3&buff.demonic_synergy.remains)|(wild_imp_remaining_duration<=4&spell_targets.implosion>2))
-            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and Player:PrevGCD(1, S.HandOfGuldan) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
+            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
               if AR.Cast(S.Implosion) then return ""; end
             end
             
@@ -656,7 +667,7 @@
             if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
               for _, Value in pairs(Cache.Enemies[range]) do
-                if (not S.HandOfDoom:IsAvailable() and not Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
+                if (not S.HandOfDoom:IsAvailable() and not Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
                   BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Doom;
                 end	
               end
@@ -667,11 +678,11 @@
             
             -- actions+=/demonic_empowerment,if=(((talent.power_trip.enabled&(!talent.implosion.enabled|spell_targets.demonwrath<=1))|!talent.implosion.enabled|(talent.implosion.enabled&!talent.soul_conduit.enabled&spell_targets.demonwrath<=3))&(wild_imp_no_de>3|prev_gcd.1.hand_of_guldan))|(prev_gcd.1.hand_of_guldan&wild_imp_no_de=0&wild_imp_remaining_duration<=0)|(prev_gcd.1.implosion&wild_imp_no_de>0)
             -- actions+=/demonic_empowerment,if=variable.no_de1|prev_gcd.1.hand_of_guldan
-            if S.DemonicEmpowerment:IsCastable() and not Player:CastID() == S.DemonicEmpowerment:ID() 
+            if S.DemonicEmpowerment:IsCastable() and not Player:IsCasting(S.DemonicEmpowerment)
               and (((((S.PowerTrip:IsAvailable() and (S.Implosion:IsAvailable() or Cache.EnemiesCount[range] <= 1)) 
                 or not S.Implosion:IsAvailable() or (S.Implosion:IsAvailable() and not S.SoulConduit:IsAvailable() and Cache.EnemiesCount[range] <= 3)) 
-                and (GetNbNotBuffed("Wild Imp") >  3 or Player:PrevGCD(1, S.HandOfGuldan))) or (Player:PrevGCD(1,S.HandOfGuldan) and GetNbTotal("Wild Imp") == 0) 
-                or (Player:PrevGCD(1, S.Implosion) and GetNbNotBuffed("Wild Imp") == 0)) or (var_no_de1 or Player:PrevGCD(1, S.HandOfGuldan)) 
+                and (GetNbNotBuffed("Wild Imp") >  3 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)))) or ((Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and GetNbTotal("Wild Imp") == 0) 
+                or (Player:PrevGCD(1, S.Implosion) and GetNbNotBuffed("Wild Imp") == 0)) or (var_no_de1 or Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) 
                 or ((S.ThalkielsAscendance:ArtifactRank() or 0) > 0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) 
                 or IsCastingPet()) then
               if AR.Cast(S.DemonicEmpowerment) then return ""; end
@@ -683,7 +694,7 @@
             end
 
             -- actions+=/demonic_empowerment,if=artifact.thalkiels_ascendance.rank&talent.power_trip.enabled&!talent.demonbolt.enabled&talent.shadowy_inspiration.enabled
-            if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not(Player:CastID() == S.DemonicEmpowerment:ID()) then
+            if S.DemonicEmpowerment:IsCastable() and ((S.ThalkielsAscendance:ArtifactRank() or 0)>0 and S.PowerTrip:IsAvailable() and not S.Demonbolt:IsAvailable() and S.ShadowyInspiration:IsAvailable()) and not Player:IsCasting(S.DemonicEmpowerment) then
               if AR.Cast(S.DemonicEmpowerment) then return ""; end
             end
             
@@ -696,7 +707,7 @@
             end
             
             -- actions+=/implosion,if=prev_gcd.1.hand_of_guldan&((wild_imp_remaining_duration<=3&buff.demonic_synergy.remains)|(wild_imp_remaining_duration<=4&spell_targets.implosion>2))
-            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and Player:PrevGCD(1, S.HandOfGuldan) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
+            if S.Implosion:IsAvailable() and S.Implosion:IsCastable() and (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan)) and ((GetPetRemains("Wild Imp") <= 3 and Player:Buff(S.GrimoireOfSynergyBuff)) or (GetPetRemains("Wild Imp") <= 4 and Cache.EnemiesCount[range]>2)) then
               if AR.Cast(S.Implosion) then return ""; end
             end
             
@@ -704,7 +715,7 @@
             if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
               for _, Value in pairs(Cache.Enemies[range]) do
-                if (not S.HandOfDoom:IsAvailable() and not Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or Player:PrevGCD(1,S.HandOfGuldan)) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
+                if (not S.HandOfDoom:IsAvailable() and not Value:DebuffRefreshableCP(S.Doom)) and not(var_no_de1 or (Player:PrevGCD(1, S.HandOfGuldan) or Player:IsCasting(S.HandOfGuldan))) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Doom)) then
                   BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.Doom;
                 end	
               end
