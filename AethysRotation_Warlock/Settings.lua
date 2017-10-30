@@ -51,8 +51,7 @@
         GrimoireOfSacrifice = {true, false},
         DimensionalRift = {true, false},
         SummonImp = {true, false},
-        GrimoireImp = {true, false},
-        Sephuz = {true, false}
+        GrimoireImp = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -85,7 +84,15 @@
       }
     },
     Affliction = {
+      UnendingResolveHP = 20,
       ShowPoPP = false,
+      Sephuz = {
+        HowlOfTerror = false,
+        MortalCoil = false,
+        Fear = false,
+        SingeMagic = false,
+        SpellLock = false
+      },
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -96,6 +103,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
+        UnendingResolve = {true, false},
         SoulHarvest = {true, false}
       }
     }
@@ -141,10 +149,13 @@
   CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.Fear", "Sephuz: Show Fear", "Enable this if you want it to show you when to use Fear to proc Sephuz's Secret (only when equipped).");
   CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.AxeToss", "Sephuz: Show Axe Toss", "Enable this if you want it to show you when to use Axe Toss (Felguard spell) to proc Sephuz's Secret (only when equipped).");
 
-
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.SummonFelhunter", "Summon Felhunter");
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.GrimoireFelhunter", "Grimoire Felhunter");
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.GrimoireOfSacrifice", "Grimoire Of Sacrifice");
   CreateARPanelOption("OffGCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
   CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
+  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
+  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.SingeMagic", "Sephuz: Show Singe Magic", "Enable this if you want it to show you when to use Singe Magic (Imp spell) to proc Sephuz's Secret (only when equipped).");
+  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.SpellLock", "Sephuz: Show Spell Lock", "Enable this if you want it to show you when to use Spell Lock (Felhunter spell) to proc Sephuz's Secret (only when equipped).");
 
