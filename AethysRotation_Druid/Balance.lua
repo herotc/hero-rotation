@@ -571,7 +571,7 @@ local function AoE ()
 	end
   
   -- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&active_enemies=2&spell_haste>0.4&!(buff.celestial_alignment.up|buff.incarnation.up)
-  if I.LadyAndTheChild:IsEquipped() and Cache.EnemiesCount[range] == 2 and Player:SpellHaste() > 0.4 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 then
+  if I.LadyAndTheChild:IsEquipped() and Cache.EnemiesCount[range] == 2 and Player:SpellHaste() > 0.4 and Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 then
     if AR.Cast(S.MoonFire) then return ""; end
   end
   
@@ -620,7 +620,7 @@ end
 -- CD Usage
 local function CDs ()
   -- actions=potion,name=potion_of_prolonged_power,if=buff.celestial_alignment.up|buff.incarnation.up
-  if Settings.Balance.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 and Player:BuffRemainsP(S.CelestialAlignment) > 0) or Target:FilteredTimeToDie("<=", 60) then
+  if Settings.Balance.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0 or Target:FilteredTimeToDie("<=", 60)) then
     if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
   end
 
