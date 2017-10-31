@@ -277,6 +277,7 @@
   end
   
   local function UpdateVars ()
+    GetAllPetBuffed ()
     -- actions+=/variable,name=3min,value=doomguard_no_de>0|infernal_no_de>0
     var_3min = IsNonBuffed("Doomguard") or IsNonBuffed("Infernal")
     -- actions+=/variable,name=no_de1,value=dreadstalker_no_de>0|darkglare_no_de>0|doomguard_no_de>0|infernal_no_de>0|service_no_de>0
@@ -370,12 +371,13 @@
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
     RefreshPetsTimers()
-    GetAllPetBuffed()
+    
+    -- Var update
     UpdateVars()
     
+    -- TODO : add the possibility to choose a pet
     -- TODO : prepot
-    -- TODO : revoir opener
-        
+    
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Demonology.UnendingResolveHP then
       if AR.Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return ""; end
@@ -410,10 +412,14 @@
         
         -- actions.precombat+=/demonbolt
         -- actions.precombat+=/shadow_bolt
-        if S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
-          if AR.Cast(S.Demonbolt) then return ""; end
+        if Player:IsCasting(S.Demonbolt) or Player:IsCasting(S.ShadowBolt) then
+          if AR.Cast(S.CallDreadStalkers) then return ""; end
         else
-          if AR.Cast(S.ShadowBolt) then return ""; end
+          if S.Demonbolt:IsAvailable() and S.Demonbolt:IsCastable() then
+            if AR.Cast(S.Demonbolt) then return ""; end
+          else
+            if AR.Cast(S.ShadowBolt) then return ""; end
+          end
         end
       end
       return;
