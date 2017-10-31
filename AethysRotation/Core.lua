@@ -45,6 +45,8 @@
         -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
         if Object.SpellID >= 9999000000 then
           Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
+        elseif Object.TextureSpellID then
+          Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.TextureSpellID);
         else
           Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
         end
