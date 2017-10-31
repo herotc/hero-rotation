@@ -153,6 +153,7 @@ local function nextMoonCalculation ()
       nextMoon = S.FullMoon
 		elseif Player:IsCasting(S.FullMoon) then --TODO : manage RadiantMoonlight
       nextMoon = S.NewMoon 
+      nextMoon.TextureSpellID = 218838 -- force new moon texture
     end
   else
     if S.NewMoon:IsCastable() then 
