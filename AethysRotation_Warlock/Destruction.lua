@@ -294,12 +294,11 @@
     Everyone.AoEToggleEnemiesUpdate();
     handleSettings()
     
-    --TODO : add the possibility to choose a pet
-    --TODO : Sephuz - SingMagic : add if a debuff is removable
-    --TODO : Sephuz : IsStunnable etc
-    --TODO : buff listener for chaos bolt
-    --TODO : Add prepot
-        
+    -- TODO : add the possibility to choose a pet
+    -- TODO : Sephuz - SingMagic : add if a debuff is removable
+    -- TODO : buff listener for chaos bolt
+    -- TODO : Add prepot
+    
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Destruction.UnendingResolveHP then
       if AR.Cast(S.UnendingResolve, Settings.Destruction.OffGCDasOffGCD.UnendingResolve) then return ""; end
@@ -368,10 +367,10 @@
         --Movement
         if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
           -- actions=immolate,cycle_targets=1,if=active_enemies=2&talent.roaring_blaze.enabled&!cooldown.havoc.remains&dot.immolate.remains<=buff.active_havoc.duration
-          if Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 and Target:DebuffRemainsP(S.ImmolateDebuff) <= EnemyHasHavoc() and not(not S.RoaringBlaze:IsAvailable() and Player:IsCasting(S.Immolate)) then
+          if Player:ManaP() >= S.Immolate:Cost() and Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 and Target:DebuffRemainsP(S.ImmolateDebuff) <= EnemyHasHavoc() and not(not S.RoaringBlaze:IsAvailable() and Player:IsCasting(S.Immolate)) then
             if AR.Cast(CastImmolate) then return ""; end
           end
-          if AR.AoEON() and Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 then
+          if AR.AoEON() and Player:ManaP() >= S.Immolate:Cost() and Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.ImmolateDebuff) <= EnemyHasHavoc() and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) then
@@ -384,7 +383,7 @@
           end
           
           -- actions+=/havoc,target=2,if=active_enemies>1&(active_enemies<4|talent.wreak_havoc.enabled&active_enemies<6)&!debuff.havoc.remains
-          if AR.AoEON() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
+          if AR.AoEON() and Player:ManaP() >= S.Havoc:Cost() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.Havoc) == 0 and not Value:IsUnit(Target) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) then
@@ -407,16 +406,16 @@
           end
           
           -- actions+=/immolate,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&remains<=tick_time
-          if (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:TickTime() and not (Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) then
+          if Player:ManaP() >= S.Immolate:Cost() and (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()))) and Target:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:TickTime() and not (Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) then
             if AR.Cast(CastImmolate) then return ""; end
           end
           
           -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&active_enemies>1&remains<=tick_time&(!talent.roaring_blaze.enabled|(!debuff.roaring_blaze.remains&action.conflagrate.charges<2+set_bonus.tier19_4pc))
-          if (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP() >= S.Immolate:CastTime() * Cache.EnemiesCount[range]) and Cache.EnemiesCount[range] > 1 
+          if Player:ManaP() >= S.Immolate:Cost() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP() >= S.Immolate:CastTime() * Cache.EnemiesCount[range]) and Cache.EnemiesCount[range] > 1 
             and Target:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:TickTime() and (not S.RoaringBlaze:IsAvailable() or (S.RoaringBlaze:IsAvailable() and GetImmolateStack(Target) == 0 and S.Conflagrate:ChargesP() < 2 + (T194P and 1 or 0))) and not(not S.RoaringBlaze:IsAvailable() and not Player:IsCasting(S.Immolate)) then
             if AR.Cast(CastImmolate) then return ""; end
           end
-          if AR.AoEON() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>= S.Immolate:CastTime()*Cache.EnemiesCount[range]) and Cache.EnemiesCount[range]>1 then
+          if AR.AoEON() and Player:ManaP() >= S.Immolate:Cost() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>= S.Immolate:CastTime()*Cache.EnemiesCount[range]) and Cache.EnemiesCount[range]>1 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:TickTime() and (not S.RoaringBlaze:IsAvailable() or (S.RoaringBlaze:IsAvailable() and GetImmolateStack(Value) == 0 and S.Conflagrate:ChargesP() < 2 + (T194P and 1 or 0))) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) and not Value:DebuffRemainsP(S.Havoc) == 0 then
@@ -429,7 +428,7 @@
           end
           
           -- actions+=/immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2+set_bonus.tier19_4pc|(action.conflagrate.charges>=1+set_bonus.tier19_4pc&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
-          if S.RoaringBlaze:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:BaseDuration() and GetImmolateStack(Target) == 0 and Target:FilteredTimeToDie(">", 10)
+          if Player:ManaP() >= S.Immolate:Cost() and S.RoaringBlaze:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:BaseDuration() and GetImmolateStack(Target) == 0 and Target:FilteredTimeToDie(">", 10)
             and (S.Conflagrate:ChargesP() == 2 + (T194P and 1 or 0) or Target:FilteredTimeToDie("<", 24)) and not(Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) and not(not S.RoaringBlaze:IsAvailable() and Player:IsCasting(S.Immolate)) then
             if AR.Cast(CastImmolate) then return ""; end
           end
@@ -483,7 +482,7 @@
           end
 
           -- actions+=/channel_demonfire,if=dot.immolate.remains>cast_time&(active_enemies=1|buff.active_havoc.remains<action.chaos_bolt.cast_time)
-          if S.ChannelDemonfire:IsCastable() and S.ChannelDemonfire:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime() and (Cache.EnemiesCount[range] == 1 or EnemyHasHavoc() < S.ChaosBolt:CastTime()) and not (Player:IsChanneling() and Player:ChannelName()==S.ChannelDemonfire:Name()) then
+          if S.ChannelDemonfire:IsCastable() and Player:ManaP() >= S.ChannelDemonfire:Cost() and S.ChannelDemonfire:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime() and (Cache.EnemiesCount[range] == 1 or EnemyHasHavoc() < S.ChaosBolt:CastTime()) and not (Player:IsChanneling() and Player:ChannelName()==S.ChannelDemonfire:Name()) then
             if AR.Cast(S.ChannelDemonfire) then return ""; end
           end
           
@@ -537,10 +536,10 @@
             if AR.Cast(CastConflagrate) then return ""; end
           end
           -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
-          if S.Immolate:IsCastable() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP() >= S.Immolate:CastTime() * Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRefreshableCP(S.ImmolateDebuff) and not(Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) and not(not S.RoaringBlaze:IsAvailable() and Player:IsCasting(S.Immolate)) then
+          if Player:ManaP() >= S.Immolate:Cost() and S.Immolate:IsCastable() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP() >= S.Immolate:CastTime() * Cache.EnemiesCount[range]) and not S.RoaringBlaze:IsAvailable() and Target:DebuffRefreshableCP(S.ImmolateDebuff) and not(Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) and not(not S.RoaringBlaze:IsAvailable() and Player:IsCasting(S.Immolate)) then
             if AR.Cast(CastImmolate) then return ""; end
           end
-          if AR.AoEON() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) 
+          if AR.AoEON() and Player:ManaP() >= S.Immolate:Cost() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) 
             and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP() >= S.Immolate:CastTime() * Cache.EnemiesCount[range]) 
             and not S.RoaringBlaze:IsAvailable() and not(Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
@@ -555,7 +554,7 @@
           end
           
           -- actions+=/incinerate
-          if S.Incinerate:IsCastable() and (S.Incinerate:Cost() <= Player:Mana()) then
+          if S.Incinerate:IsCastable() and Player:ManaP() >= S.Incinerate:Cost() then
             if AR.Cast(CastIncinerate) then return""; end
           end
           
@@ -566,7 +565,7 @@
         
         else --moving
           -- actions+=/havoc,target=2,if=active_enemies>1&(active_enemies<4|talent.wreak_havoc.enabled&active_enemies<6)&!debuff.havoc.remains
-          if AR.AoEON() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
+          if AR.AoEON() and Player:ManaP() >= S.Havoc:Cost() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.Havoc) == 0 and not Value:IsUnit(Target) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) then
@@ -669,7 +668,7 @@
         --Movement
         if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
           -- actions=immolate,cycle_targets=1,if=active_enemies=2&talent.roaring_blaze.enabled&!cooldown.havoc.remains&dot.immolate.remains<=buff.active_havoc.duration
-          if AR.AoEON() and Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 then
+          if AR.AoEON() and Player:ManaP() >= S.Immolate:Cost() and Cache.EnemiesCount[range] == 2 and S.RoaringBlaze:IsAvailable() and S.Havoc:CooldownRemainsP() > 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.ImmolateDebuff) <= EnemyHasHavoc() and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) then
@@ -682,7 +681,7 @@
           end
           
           -- actions+=/havoc,target=2,if=active_enemies>1&(active_enemies<4|talent.wreak_havoc.enabled&active_enemies<6)&!debuff.havoc.remains
-          if AR.AoEON() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
+          if AR.AoEON() and Player:ManaP() >= S.Havoc:Cost() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.Havoc) == 0 and not Value:IsUnit(Target) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) then
@@ -695,7 +694,7 @@
           end
           
           -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&active_enemies>1&remains<=tick_time&(!talent.roaring_blaze.enabled|(!debuff.roaring_blaze.remains&action.conflagrate.charges<2+set_bonus.tier19_4pc))
-          if AR.AoEON() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>= S.Immolate:CastTime()*Cache.EnemiesCount[range]) and Cache.EnemiesCount[range]>1 then
+          if AR.AoEON() and Player:ManaP() >= S.Immolate:Cost() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP()>= S.Immolate:CastTime()*Cache.EnemiesCount[range]) and Cache.EnemiesCount[range]>1 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.ImmolateDebuff) <= S.ImmolateDebuff:TickTime() and (not S.RoaringBlaze:IsAvailable() or (S.RoaringBlaze:IsAvailable() and GetImmolateStack(Value) == 0 and S.Conflagrate:ChargesP() < 2 + (T194P and 1 or 0))) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) and not Value:DebuffRemainsP(S.Havoc) == 0 then
@@ -728,7 +727,7 @@
           end
           
           -- actions+=/immolate,cycle_targets=1,if=(active_enemies<5|!talent.fire_and_brimstone.enabled)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>=action.immolate.cast_time*active_enemies)&!talent.roaring_blaze.enabled&remains<=duration*0.3
-          if AR.AoEON() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) 
+          if AR.AoEON() and Player:ManaP() >= S.Immolate:Cost() and (Cache.EnemiesCount[range] < 5 or not S.FireAndBrimstone:IsAvailable()) 
             and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemainsP() >= S.Immolate:CastTime() * Cache.EnemiesCount[range]) 
             and not S.RoaringBlaze:IsAvailable() and not(Player:IsCasting(S.Immolate) or Player:IsCasting(S.Cataclysm)) then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
@@ -748,7 +747,7 @@
           return;
         else --moving
           -- actions+=/havoc,target=2,if=active_enemies>1&(active_enemies<4|talent.wreak_havoc.enabled&active_enemies<6)&!debuff.havoc.remains
-          if AR.AoEON() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
+          if AR.AoEON() and Player:ManaP() >= S.Havoc:Cost() and Cache.EnemiesCount[range] > 1 and (Cache.EnemiesCount[range] < 4 or (S.WreakHavoc:IsAvailable() and Cache.EnemiesCount[range] < 6)) and S.Havoc:CooldownRemainsP() == 0 then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for _, Value in pairs(Cache.Enemies[range]) do
               if Value:DebuffRemainsP(S.Havoc) == 0 and not Value:IsUnit(Target) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Havoc)) then

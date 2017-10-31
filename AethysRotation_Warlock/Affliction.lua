@@ -284,16 +284,16 @@
     end
     
     -- actions.writhe+=/agony,if=remains<=tick_time+gcd
-    if Target:DebuffRemainsP(S.Agony) <= (Player:GCD() + S.Agony:TickTime()) then
+    if Target:DebuffRemainsP(S.Agony) <= (Player:GCD() + S.Agony:TickTime()) and Player:ManaP() >= S.Agony:Cost() then
       if AR.Cast(S.Agony) then return ""; end
     end
     
     -- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
     -- actions.writhe+=/agony,cycle_targets=1,max_cycle_targets=3,target_if=sim.target!=target&remains<=tick_time+gcd&time_to_die>tick_time*3
-    if Target:DebuffRemainsP(S.Agony) <= (Player:GCD() + S.Agony:TickTime()) then
+    if Target:DebuffRemainsP(S.Agony) <= (Player:GCD() + S.Agony:TickTime()) and Player:ManaP() >= S.Agony:Cost() then
       if AR.Cast(S.Agony) then return ""; end
     end
-    if AR.AoEON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains() < Player:GCD() * 6 and NbAffected(S.Agony) <= 5 then
+    if AR.AoEON() and Player:ManaP() >= S.Agony:Cost() and ((S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains() < Player:GCD() * 6 and NbAffected(S.Agony) <= 5) or NbAffected(S.Agony) <= 3) then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.Agony:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:DebuffRefreshableCP(S.Agony) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Agony)) then
@@ -316,7 +316,7 @@
     end
     
     -- actions.writhe+=/drain_soul,cycle_targets=1,if=target.time_to_die<=gcd*2&soul_shard<5
-    if FutureShard() < 5 then
+    if FutureShard() < 5 and Player:ManaP() >= S.DrainSoul:Cost() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 0, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:FilteredTimeToDie(">", BestUnitTTD) and Value:FilteredTimeToDie("<=", Player:GCD() * 2) and not Value:IsUnit(Target) then
@@ -402,11 +402,11 @@
     end
     
     -- actions.writhe+=/corruption,cycle_targets=1,if=remains<=tick_time+gcd&((spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled)|spell_targets.seed_of_corruption<5)&time_to_die>tick_time*2
-    if (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemainsP(S.CorruptionDebuff)<=(Player:GCD() + S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))
+    if Player:ManaP() >= S.Corruption:Cost() and (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemainsP(S.CorruptionDebuff)<=(Player:GCD() + S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))
       and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] < 3) or Cache.EnemiesCount[range] < 5) and Target:FilteredTimeToDie(">", S.CorruptionDebuff:TickTime() * 2) then
       if AR.Cast(S.Corruption) then return ""; end
     end
-    if AR.AoEON() and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] < 3) or Cache.EnemiesCount[range] < 5) then
+    if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] < 3) or Cache.EnemiesCount[range] < 5) then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.CorruptionDebuff:TickTime() * 2, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if ((not S.AbsoluteCorruption:IsAvailable() and Value:DebuffRemainsP(S.CorruptionDebuff)<=(Player:GCD() + S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Value:Debuff(S.CorruptionDebuff))) 
@@ -474,7 +474,7 @@
     end
 
     -- actions.writhe+=/agony,if=refreshable&time_to_die>=remains
-    if Target:DebuffRefreshableCP(S.Agony) and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) then
+    if Target:DebuffRefreshableCP(S.Agony) and Player:ManaP() >= S.Agony:Cost() and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) then
       if AR.Cast(S.Agony) then return ""; end
     end
     
@@ -484,12 +484,12 @@
     end
 
     -- actions.writhe+=/corruption,if=refreshable&time_to_die>=remains
-    if ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRefreshableCP(S.CorruptionDebuff)) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) then
+    if Player:ManaP() >= S.Corruption:Cost() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRefreshableCP(S.CorruptionDebuff)) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) then
       if AR.Cast(S.Corruption) then return ""; end
     end
     
     -- actions.writhe+=/agony,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
-    if AR.AoEON() and Player:BuffRemainsP(S.DeadwindHarvester) == 0 then
+    if AR.AoEON() and Player:BuffRemainsP(S.DeadwindHarvester) == 0 and Player:ManaP() >= S.Agony:Cost() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.Agony:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:DebuffRefreshableCP(S.Agony) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Agony)) then
@@ -515,7 +515,7 @@
     end
     
     -- actions.writhe+=/corruption,cycle_targets=1,target_if=sim.target!=target&time_to_die>tick_time*3&!buff.deadwind_harvester.remains&refreshable&time_to_die>tick_time*3
-    if AR.AoEON() and Player:BuffRemainsP(S.DeadwindHarvester) == 0 then
+    if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and Player:BuffRemainsP(S.DeadwindHarvester) == 0 then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.CorruptionDebuff:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if ((not S.AbsoluteCorruption:IsAvailable() and Value:DebuffRefreshableCP(S.CorruptionDebuff)) or (S.AbsoluteCorruption:IsAvailable() and not Value:Debuff(S.CorruptionDebuff))) and Value:FilteredTimeToDie(">=", Value:DebuffRemainsP(S.CorruptionDebuff)) then
@@ -528,15 +528,15 @@
     end
     
     -- actions.writhe+=/drain_soul,chain=1,interrupt=1
-    if S.DrainSoul:IsCastable() then
+    if S.DrainSoul:IsCastable() and Player:ManaP() >= S.DrainSoul:Cost() then
       if AR.Cast(S.DrainSoul) then return ""; end
     end
 
     -- actions.writhe+=/agony,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
-    if Player:IsMoving() and Target:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime()) then
+    if Player:IsMoving() and Player:ManaP() >= S.Agony:Cost() and Target:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime()) then
       if AR.Cast(S.Agony) then return ""; end
     end
-    if AR.AoEON() then
+    if AR.AoEON() and Player:ManaP() >= S.Agony:Cost() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.Agony:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Player:IsMoving() and Value:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime()) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Agony)) then
@@ -564,10 +564,10 @@
       end
     end
     -- actions.writhe+=/corruption,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
-    if Player:IsMoving() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) then
+    if Player:IsMoving() and Player:ManaP() >= S.Corruption:Cost() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) then
       if AR.Cast(S.Corruption) then return ""; end
     end
-    if AR.AoEON() and Player:IsMoving() then
+    if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and Player:IsMoving() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.CorruptionDebuff:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if ((not S.AbsoluteCorruption:IsAvailable() and Value:DebuffRemains(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Value:Debuff(S.CorruptionDebuff))) and Value:FilteredTimeToDie(">=", Value:DebuffRemainsP(S.CorruptionDebuff)) then
@@ -594,10 +594,10 @@
     
     -- actions.mg+=/agony,cycle_targets=1,max_cycle_targets=5,target_if=sim.target!=target&talent.soul_harvest.enabled&cooldown.soul_harvest.remains<cast_time*6&remains<=duration*0.3&target.time_to_die>=remains&time_to_die>tick_time*3
     -- actions.mg+=/agony,cycle_targets=1,max_cycle_targets=4,if=remains<=(tick_time+gcd)
-    if Target:DebuffRemainsP(S.Agony) <= (Player:GCD() + S.Agony:TickTime()) then
+    if Target:DebuffRemainsP(S.Agony) <= (Player:GCD() + S.Agony:TickTime()) and Player:ManaP() >= S.Agony:Cost()  then
       if AR.Cast(S.Agony) then return ""; end
     end
-    if AR.AoEON() and S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains() < Player:GCD() * 6 and NbAffected(S.Agony) <= 5 then
+    if AR.AoEON() and Player:ManaP() >= S.Agony:Cost() and ((S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemains() < Player:GCD() * 6 and NbAffected(S.Agony) <= 5) or NbAffected(S.Agony) <= 4) then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.Agony:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:DebuffRefreshableCP(S.Agony) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Agony)) then
@@ -620,7 +620,7 @@
     end
     
     -- actions.mg+=/drain_soul,cycle_targets=1,if=target.time_to_die<gcd*2&soul_shard<5
-    if FutureShard() < 5 then
+    if FutureShard() < 5 and Player:ManaP() >= S.DrainSoul:Cost() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 0, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:FilteredTimeToDie(">", BestUnitTTD) and Value:FilteredTimeToDie("<=", Player:GCD() * 2) and not Value:IsUnit(Target) then
@@ -716,11 +716,11 @@
     end
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(tick_time+gcd)&target.time_to_die>tick_time*3
-    if (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemainsP(S.CorruptionDebuff) <= (Player:GCD() + S.CorruptionDebuff:TickTime())) 
+    if Player:ManaP() >= S.Corruption:Cost() and (not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemainsP(S.CorruptionDebuff) <= (Player:GCD() + S.CorruptionDebuff:TickTime())) 
       or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff)) then
       if AR.Cast(S.Corruption) then return ""; end
     end
-    if AR.AoEON() and ((Cache.EnemiesCount[range]<3 and S.SowTheSeeds:IsAvailable()) or Cache.EnemiesCount[range]<5)then
+    if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and ((Cache.EnemiesCount[range]<3 and S.SowTheSeeds:IsAvailable()) or Cache.EnemiesCount[range]<5)then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.CorruptionDebuff:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if ((not S.AbsoluteCorruption:IsAvailable() and Value:DebuffRemainsP(S.CorruptionDebuff) <= (Player:GCD() + S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Value:Debuff(S.CorruptionDebuff))) 
@@ -739,10 +739,10 @@
     end
     
     -- actions.mg+=/agony,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.agony)
-    if Target:DebuffRefreshableCP(S.Agony) and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) and (ActiveUAs() == 0 or Player:PrevGCD(1,S.Agony) or Player:IsCasting(S.Agony)) then
+    if Target:DebuffRefreshableCP(S.Agony) and Player:ManaP() >= S.Agony:Cost() and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) and (ActiveUAs() == 0 or Player:PrevGCD(1,S.Agony) or Player:IsCasting(S.Agony)) then
       if AR.Cast(S.Agony) then return ""; end
     end
-    if AR.AoEON() and ActiveUAs() == 0 then
+    if AR.AoEON() and ActiveUAs() == 0 and Player:ManaP() >= S.Agony:Cost() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.Agony:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:DebuffRefreshableCP(S.Agony) and Value:FilteredTimeToDie(">=", Value:DebuffRemainsP(S.Agony)) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Agony)) then
@@ -771,11 +771,11 @@
     end
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.corruption)
-    if ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRefreshableCP(S.CorruptionDebuff)) 
+    if Player:ManaP() >= S.Corruption:Cost() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRefreshableCP(S.CorruptionDebuff)) 
       or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) and (ActiveUAs() == 0 or Player:PrevGCD(1, S.Corruption) or Player:IsCasting(S.Corruption)) then
       if AR.Cast(S.Corruption) then return ""; end
     end
-    if AR.AoEON() and ((Cache.EnemiesCount[range] < 3 and S.SowTheSeeds:IsAvailable()) or Cache.EnemiesCount[range] < 5) and ActiveUAs() == 0 then
+    if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and ((Cache.EnemiesCount[range] < 3 and S.SowTheSeeds:IsAvailable()) or Cache.EnemiesCount[range] < 5) and ActiveUAs() == 0 then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.CorruptionDebuff:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if ((not S.AbsoluteCorruption:IsAvailable() and Value:DebuffRefreshableCP(S.CorruptionDebuff)) or (S.AbsoluteCorruption:IsAvailable() and not Value:Debuff(S.CorruptionDebuff))) 
@@ -815,15 +815,15 @@
     end
 
     -- actions.mg+=/drain_soul,chain=1,interrupt=1
-    if S.DrainSoul:IsCastable() then
+    if S.DrainSoul:IsCastable() and Player:ManaP() >= S.DrainSoul:Cost() then
       if AR.Cast(S.DrainSoul) then return ""; end
     end
     
     -- actions.mg+=/agony,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
-    if Player:IsMoving() and Target:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime()) then
+    if Player:IsMoving() and Player:ManaP() >= S.Agony:Cost() and Target:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime()) then
       if AR.Cast(S.Agony) then return ""; end
     end
-    if AR.AoEON() and Player:IsMoving() then
+    if AR.AoEON() and Player:IsMoving() and Player:ManaP() >= S.Agony:Cost() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.Agony:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime()) and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.Agony)) then
@@ -852,10 +852,10 @@
     end
     
     -- actions.mg+=/corruption,moving=1,cycle_targets=1,if=remains<duration-(3*tick_time)
-    if Player:IsMoving() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemainsP(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) then
+    if Player:ManaP() >= S.Corruption:Cost() and Player:IsMoving() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemainsP(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) then
       if AR.Cast(S.Corruption) then return ""; end
     end
-    if AR.AoEON() and Player:IsMoving() then
+    if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and Player:IsMoving() then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.CorruptionDebuff:TickTime() * 3, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if ((not S.AbsoluteCorruption:IsAvailable() and Value:DebuffRemains(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) or (S.AbsoluteCorruption:IsAvailable() and not Value:Debuff(S.CorruptionDebuff))) 
@@ -879,9 +879,14 @@
     -- Unit Update
     AC.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
-    -- TODO : mvt and range
-    -- TODO : trinket
-            
+    
+    -- TODO : Mvt and range rotation change
+    -- TODO : Haunt rotation
+    -- TODO : add the possibility to choose a pet
+    -- TODO : Sephuz - SingMagic : add if a debuff is removable
+    -- TODO : buff listener
+    -- TODO : Add prepot
+    
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Affliction.UnendingResolveHP then
       if AR.Cast(S.UnendingResolve, Settings.Affliction.OffGCDasOffGCD.UnendingResolve) then return ""; end
