@@ -81,6 +81,8 @@ local tostring = tostring;
     GreenskinsWaterloggedWristcuffs = Spell(209423)
   };
   local S = Spell.Rogue.Outlaw;
+  -- Choose a persistent PistolShot icon to avoid Blunderbuss icon
+  S.PistolShot.TextureSpellID = 242277;
 -- Items
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Outlaw = {
