@@ -309,8 +309,8 @@ local function FuryOfElune ()
 	end
   
 	-- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune_up.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
-	if FuturAstralPower()>=40 and Player:BuffRemainsP(S.FuryofElune) == 0
-	and ((FuturAstralPower()>=92 and S.FuryofElune:CooldownRemainsP() > Player:GCD() * 3) 
+	if FuturAstralPower() >= 40 and Player:BuffRemainsP(S.FuryofElune) == 0
+	and ((FuturAstralPower() >= 92 and S.FuryofElune:CooldownRemainsP() > Player:GCD() * 3) 
 		or (S.WarriorofElune:CooldownRemainsP() <= 5 and S.FuryofElune:CooldownRemainsP() >= 35  and Player:BuffStack(S.WarriorofElune) < 2)) then
 		if AR.Cast(S.Starsurge) then return ""; end
 	end
@@ -478,7 +478,7 @@ end
 
 local function SingleTarget ()
   -- actions.single_target=starsurge,if=astral_power.deficit<44|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-	if FuturAstralPower() > 40 and (Player:AstralPowerDeficit(FuturAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FuturAstralPower() / 40)) then
+	if FuturAstralPower() >= 40 and (Player:AstralPowerDeficit(FuturAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FuturAstralPower() / 40)) then
 		if AR.Cast(S.Starsurge) then return ""; end
 	end
 
