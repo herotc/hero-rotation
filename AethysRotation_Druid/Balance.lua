@@ -207,12 +207,12 @@ end
   
 local function FuryOfElune ()
   -- actions.fury_of_elune=incarnation,if=astral_power>=95&cooldown.fury_of_elune.remains<=gcd
-	if S.IncarnationChosenOfElune:IsAvailable() and FuturAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() <= 0 then
+	if S.IncarnationChosenOfElune:IsAvailable() and FuturAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() == 0 then
 		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
 	end
   
 	-- actions.fury_of_elune+=/fury_of_elune,if=astral_power>=95
-	if FuturAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() <= 0 then
+	if FuturAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() == 0 then
 		if AR.Cast(S.FuryofElune) then return ""; end
 	end
   
@@ -238,12 +238,12 @@ local function FuryOfElune ()
 	end
   
 	-- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune_up.up&astral_power<=25
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and FuturAstralPower() <= 75 then
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemainsP() == 0 and FuturAstralPower() <= 75 then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return ""; end
 	end
   
 	-- actions.fury_of_elune+=/warrior_of_elune,if=buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
-	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune)
+	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:CooldownRemainsP() == 0 and not Player:Buff(S.WarriorofElune)
 		and (Player:BuffRemainsP(S.FuryofElune) > 0 or (S.FuryofElune:CooldownRemainsP() >= 35 and Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1)))then
       if AR.Cast(S.WarriorofElune) then return ""; end
 	end
@@ -370,13 +370,13 @@ local function EmeraldDreamcatcherRotation ()
   
 	-- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)			
 	if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRefreshableCP(S.MoonFireDebuff)))
-		and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > 0 or Player:BuffRemainsP(S.EmeraldDreamcatcher)==0) then
+		and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() or Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0) then
       if AR.Cast(S.MoonFire) then return ""; end
 	end
   
   -- actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
 	if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRefreshableCP(S.SunFireDebuff)))
-		and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > 0 or Player:BuffRemainsP(S.EmeraldDreamcatcher)==0) then
+		and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() or Player:BuffRemainsP(S.EmeraldDreamcatcher)==0) then
       if AR.Cast(S.SunFire) then return ""; end
 	end
   
@@ -405,7 +405,7 @@ local function EmeraldDreamcatcherRotation ()
   
   -- actions.ed+=/lunar_strike,if=(buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5))&spell_haste<0.4
   if Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.LunarStrike:CastTime() and Player:SpellHaste() < 0.4
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 15) 
+    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 15) 
     or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.LunarStrike:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.LunarStrike:CastTime()) and Player:AstralPowerDeficit(FuturAstralPower()) >= 22.5))  then
       if AR.Cast(S.LunarStrike) then return ""; end
 	end
@@ -413,28 +413,28 @@ local function EmeraldDreamcatcherRotation ()
   -- actions.ed+=/solar_wrath,if=buff.solar_empowerment.stack>1&buff.the_emerald_dreamcatcher.remains>2*execute_time&astral_power>=6&(dot.moonfire.remains>5|(dot.sunfire.remains<5.4&dot.moonfire.remains>6.6))&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=10|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15)
   if Player:BuffStack(S.SolarEmpowerment) > 1 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.SolarWrath:CastTime() * 2 and FuturAstralPower() >= 6 
     and (Target:DebuffRemainsP(S.MoonFireDebuff) > 5 or (Target:DebuffRemainsP(S.SunFireDebuff) <= PandemicThresholdBalance(S.SunFireDebuff) and Target:DebuffRemainsP(S.MoonFireDebuff) <= PandemicThresholdBalance(S.MoonFireDebuff))) 
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 10) 
+    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 10) 
     or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.SolarWrath:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.SolarWrath:CastTime()) and Player:AstralPowerDeficit(FuturAstralPower()) >= 15)) then
       if AR.Cast(S.SolarWrath) then return ""; end
 	end	
   
   -- actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=11&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5)
   if Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.LunarStrike:CastTime() and FuturAstralPower() >= 11
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 15) 
+    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 15) 
     or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.LunarStrike:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.LunarStrike:CastTime()) and Player:AstralPowerDeficit(FuturAstralPower()) >= 22.5)) then
       if AR.Cast(S.LunarStrike) then return ""; end
 	end
   
   -- actions.ed+=/solar_wrath,if=buff.solar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=10|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15)
   if Player:BuffStack(S.SolarEmpowerment) > 1 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > 0 and FuturAstralPower() >= 16 
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 10) 
+    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 10) 
     or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.SolarWrath:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.SolarWrath:CastTime()) and Player:AstralPowerDeficit(FuturAstralPower()) >= 15)) then
       if AR.Cast(S.SolarWrath) then return ""; end
 	end	
   
   -- actions.ed+=/starsurge,if=(buff.the_emerald_dreamcatcher.up&buff.the_emerald_dreamcatcher.remains<gcd.max)|astral_power>85|((buff.celestial_alignment.up|buff.incarnation.up)&astral_power>30)
   if FuturAstralPower() >= (40 - (5 * Player:BuffStack(S.EmeraldDreamcatcher)))
-    and (Player:BuffRemainsP(S.EmeraldDreamcatcher) < Player:GCD() or FuturAstralPower() > 85 or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) and FuturAstralPower() > 30)) then
+    and (Player:BuffRemainsP(S.EmeraldDreamcatcher) < Player:GCD() or FuturAstralPower() > 85 or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD()) and FuturAstralPower() > 30)) then
       if AR.Cast(S.Starsurge) then return ""; end
 	end
   
@@ -477,18 +477,18 @@ end
 
 local function SingleTarget ()
   -- actions.single_target=starsurge,if=astral_power.deficit<44|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-	if FuturAstralPower() >= 40 and (Player:AstralPowerDeficit(FuturAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FuturAstralPower() / 40)) then
+	if FuturAstralPower() >= 40 and (Player:AstralPowerDeficit(FuturAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FuturAstralPower() / 40)) then
 		if AR.Cast(S.Starsurge) then return ""; end
 	end
 
   -- actions.single_target+=/new_moon,if=astral_power.deficit>14&!(buff.celestial_alignment.up|buff.incarnation.up)
-	if Player:AstralPowerDeficit(FuturAstralPower()) > 14 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and NextMoon == S.NewMoon
+	if Player:AstralPowerDeficit(FuturAstralPower()) > 14 and Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and NextMoon == S.NewMoon
 		and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
 			if AR.Cast(S.NewMoon) then return ""; end
 	end
   
   -- actions.single_target+=/half_moon,if=astral_power.deficit>24&!(buff.celestial_alignment.up|buff.incarnation.up)
-	if Player:AstralPowerDeficit(FuturAstralPower()) > 24 and Player:BuffRemainsP(S.IncarnationChosenOfElune) <= 0 and Player:BuffRemainsP(S.CelestialAlignment) <= 0 and NextMoon == S.HalfMoon
+	if Player:AstralPowerDeficit(FuturAstralPower()) > 24 and Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and NextMoon == S.HalfMoon
 		and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then	
 			if AR.Cast(S.HalfMoon) then return ""; end
 	end
@@ -500,7 +500,7 @@ local function SingleTarget ()
 	end
 	
 	-- actions.single_target+=/warrior_of_elune
-	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune) then
+	if S.WarriorofElune:IsAvailable() and S.WarriorofElune:CooldownRemainsP() == 0 and not Player:Buff(S.WarriorofElune) then
 		if AR.Cast(S.WarriorofElune, Settings.Balance.OffGCDasOffGCD.WarriorofElune) then return ""; end
 	end
   
@@ -552,7 +552,7 @@ local function AoE ()
 	end
   
   -- actions.AoE+=/warrior_of_elune
-  if S.WarriorofElune:IsAvailable() and S.WarriorofElune:IsCastable() and not Player:Buff(S.WarriorofElune) then
+  if S.WarriorofElune:IsAvailable() and S.WarriorofElune:CooldownRemainsP() == 0 and not Player:Buff(S.WarriorofElune) then
 		if AR.Cast(S.WarriorofElune, Settings.Balance.OffGCDasOffGCD.WarriorofElune) then return ""; end
 	end
   
@@ -626,43 +626,43 @@ local function CDs ()
   end
 
   -- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
-  if (Cache.EnemiesCount[Range] <= 2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
+  if (Cache.EnemiesCount[Range] <= 2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:CooldownRemainsP() == 0 and not Player:Buff(S.BlessingofElune) then
     if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
   end
   
   -- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
-  if AR.AoEON() and Cache.EnemiesCount[Range] >= 3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe) then
+  if AR.AoEON() and Cache.EnemiesCount[Range] >= 3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:CooldownRemainsP() == 0 and not Player:Buff(S.BlessingofAnshe) then
     if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
   end
 
   -- actions+=/blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
-	if S.BloodFury:IsAvailable() and S.BloodFury:IsCastable() and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
+	if S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
 		if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
 	end
   
 	-- actions+=/berserking,if=buff.celestial_alignment.up|buff.incarnation.up
-	if S.Berserking:IsAvailable() and S.Berserking:IsCastable() and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
+	if S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
 		if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
 	end
   
 	-- actions+=/arcane_torrent,if=buff.celestial_alignment.up|buff.incarnation.up
-	if S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:IsCastable() and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
+	if S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
 		if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
 	end
   
  -- actions+=/astral_communion,if=astral_power.deficit>=75
-	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:IsCastable() and Player:AstralPowerDeficit(FuturAstralPower()) >= 75 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
+	if S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemainsP() == 0 and Player:AstralPowerDeficit(FuturAstralPower()) >= 75 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
 		if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return ""; end
 	end
   
 	-- actions+=/incarnation,if=astral_power>=40
-	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:IsCastable() and FuturAstralPower() >= 40
+	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:CooldownRemainsP() == 0 and FuturAstralPower() >= 40
 		and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
       if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
 	end
   
 	-- actions+=/celestial_alignment,if=astral_power>=40
-	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:IsCastable() and FuturAstralPower() >= 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
+	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FuturAstralPower() >= 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
 		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
 	end
 end
