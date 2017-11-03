@@ -249,9 +249,10 @@
   };
   -- Add the Icon on Nameplates
   function AR.Nameplate.AddIcon (ThisUnit, Object)
+    local ElvUINameplates = ElvUI and ElvUI[1].NamePlates; -- check if user is using Elvui
     Token = stringlower(ThisUnit.UnitID);
     Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
-    if Nameplate then
+    if Nameplate or ElvUINameplates then
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
@@ -275,8 +276,13 @@
       AR.NameplateIconFrame.TempTexture:SetAllPoints(AR.NameplateIconFrame);
       AR.NameplateIconFrame.texture = AR.NameplateIconFrame.TempTexture;
       if not AR.NameplateIconFrame:IsVisible() then
-        AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.UnitFrame.healthBar, "CENTER", 0, 0);
-        AR.NameplateIconFrame:Show();
+        if ElvUINameplates then 
+          AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.unitFrame.HealthBar, "CENTER", 0, 0);
+          AR.NameplateIconFrame:Show();
+        else
+          AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.UnitFrame.healthBar, "CENTER", 0, 0);
+          AR.NameplateIconFrame:Show();
+        end
       end
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
