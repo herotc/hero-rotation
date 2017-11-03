@@ -25,7 +25,7 @@
 --- ============================ CONTENT ============================
   -- Stealth
   function Commons.Stealth (Stealth, Setting)
-    if Stealth:IsCastable() and not Player:IsStealthed() then
+    if Settings.StealthOOC and Stealth:IsCastable() and not Player:IsStealthed() then
       if AR.Cast(Stealth, Settings.OffGCDasOffGCD.Stealth) then return "Cast Stealth (OOC)"; end
     end
     return false;
