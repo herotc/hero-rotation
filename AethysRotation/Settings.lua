@@ -25,7 +25,9 @@
       -- SoloMode try to maximize survivability at the cost of dps
       SoloMode = false,
       -- Remove the toggle icon buttons.
-      HideToggleIcons = false
+      HideToggleIcons = false,
+      ScaleUI = 1,
+      ScaleButtons = 1
     },
     APL = {}
   };

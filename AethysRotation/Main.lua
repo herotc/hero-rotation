@@ -10,6 +10,9 @@
   local Target = Unit.Target;
   local Spell = AC.Spell;
   local Item = AC.Item;
+  local GUI = AC.GUI;
+  local CreatePanelOption = GUI.CreatePanelOption;
+
   -- Lua
   local mathmax = math.max;
   local mathmin = math.min;
@@ -55,7 +58,7 @@
 		AR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
 	  end
       AR.SuggestedIconFrame:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
-      AethysRotationDB.ScaleUI = Multiplier;
+      AethysRotationDB.GUISettings["General.ScaleUI"] = Multiplier;
     end
     function AR.MainFrame:ResizeButtons (Multiplier)
       local FramesToResize = {
@@ -72,7 +75,7 @@
       for i = 1, 3 do
         AR.ToggleIconFrame.Button[i]:SetPoint("LEFT", AR.ToggleIconFrame, "LEFT", AR.ToggleIconFrame.Button[i]:GetWidth()*(i-1)+i, 0);
       end
-      AethysRotationDB.ScaleButtons = Multiplier;
+      AethysRotationDB.GUISettings["General.ScaleButtons"] = Multiplier;
     end
     -- Lock/Unlock
     local LockSpell = Spell(9999000001);
@@ -99,6 +102,15 @@
       AR.MainFrame:SetMovable(false);
       AR.ToggleIconFrame:SetMovable(false);
       AethysRotationDB.Locked = true;
+    end
+    function AR.MainFrame:ToggleLock ()
+      if AethysRotationDB.Locked then
+        AR.MainFrame:Unlock ();
+        AR.Print("AethysRotation UI is now |cff00ff00unlocked|r.");
+      else
+        AR.MainFrame:Lock ();
+        AR.Print("AethysRotation UI is now |cffff0000locked|r.");
+      end
     end
     -- Start Move
     local function StartMove (self)
@@ -135,28 +147,35 @@
           if type(AethysRotationDB) ~= "table" then
             AethysRotationDB = {};
           end
+          if type(AethysRotationCharDB) ~= "table" then
+            AethysRotationCharDB = {};
+          end
           if type(AethysRotationDB.GUISettings) ~= "table" then
             AethysRotationDB.GUISettings = {};
+          end
+          if type(AethysRotationCharDB.GUISettings) ~= "table" then
+            AethysRotationCharDB.GUISettings = {};
           end
           AR.GUI.LoadSettingsRecursively(AR.GUISettings);
           AR.GUI.CorePanelSettingsInit();
           -- UI
-          if AethysRotationDB and AethysRotationDB.IconFramePos then
+          if AethysRotationDB and type(AethysRotationDB.IconFramePos) == "table" and #AethysRotationDB.IconFramePos == 5 then
             AR.MainFrame:SetPoint(AethysRotationDB.IconFramePos[1], _G[AethysRotationDB.IconFramePos[2]], AethysRotationDB.IconFramePos[3], AethysRotationDB.IconFramePos[4], AethysRotationDB.IconFramePos[5]);
           else
             AR.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
           end
+          AR.MainFrame:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
           AR.MainFrame:Show();
           AR.MainIconFrame:Init();
           AR.SmallIconFrame:Init();
           AR.LeftIconFrame:Init();
           AR.SuggestedIconFrame:Init();
           AR.ToggleIconFrame:Init();
-          if AethysRotationDB.ScaleUI then
-            AR.MainFrame:ResizeUI(AethysRotationDB.ScaleUI);
+          if AethysRotationDB.GUISettings["General.ScaleUI"] then
+            AR.MainFrame:ResizeUI(AethysRotationDB.GUISettings["General.ScaleUI"]);
           end
-          if AethysRotationDB.ScaleButtons then
-            AR.MainFrame:ResizeButtons(AethysRotationDB.ScaleButtons);
+          if AethysRotationDB.GUISettings["General.ScaleButtons"] then
+            AR.MainFrame:ResizeButtons(AethysRotationDB.GUISettings["General.ScaleButtons"]);
           end
           UIFrames = {
             AR.MainFrame,
@@ -171,6 +190,16 @@
             AR.SuggestedIconFrame,
             AR.ToggleIconFrame
           };
+          
+          -- Load additionnal settings
+          local CP_General = GUI.GetPanelByName("General")
+          if CP_General then
+            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0, 10, 0.5}, "UI Scale", "Scale of the Icons.", function(value) AR.MainFrame:ResizeUI(value); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0, 10, 0.5}, "Buttons Scale", "Scale of the Buttons.", function(value) AR.MainFrame:ResizeButtons(value); end);
+            CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() AR.MainFrame:ToggleLock(); end);
+            CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() AR.ToggleIconFrame:ResetAnchor(); end);
+          end
+          
           -- Modules
           C_Timer.After(2, function ()
               AR.MainFrame:UnregisterEvent("ADDON_LOADED");
@@ -197,7 +226,7 @@
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
     -- Druid
       [102]   = "AethysRotation_Druid",         -- Balance
-      [103]   = false,                          -- Feral
+      [103]   = "AethysRotation_Druid",         -- Feral
       [104]   = "AethysRotation_Druid",         -- Guardian
       [105]   = false,                          -- Restoration
     -- Hunter
@@ -239,49 +268,62 @@
   };
   local LatestSpecIDChecked = 0;
   function AR.PulseInit ()
-    -- Force a refresh from the Core
-    -- TODO: Make it a function instead of copy/paste from Core Events.lua
-    Cache.Persistent.Player.Spec = {GetSpecializationInfo(GetSpecialization())};
-
-    local SpecID = Cache.Persistent.Player.Spec[1];
-
-    -- Note: Prevent the UI to disappear if the spec isn't yet known by the WoW API.
-    if EnabledRotation[SpecID] == nil then
-      return "Invalid SpecID";
-    end
-
-    -- Load the Class Module if it's possible and not already loaded
-    if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
-      LoadAddOn(EnabledRotation[SpecID]);
-    end
-
-    -- Check if there is a Rotation for this Spec
-    if LatestSpecIDChecked ~= SpecID then
-      if EnabledRotation[SpecID] and AR.APLs[SpecID] then
-        for Key, Value in pairs(UIFrames) do
-          Value:Show();
+    local Spec = GetSpecialization();
+    -- Delay by 1 second until the WoW API returns a valid value.
+    if Spec == nil then
+      AC.PulseInitialized = false;
+      C_Timer.After(1, function ()
+          AR.PulseInit();
         end
-        AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
-        -- Spec Registers
-          -- Spells
-          Player:RegisterListenedSpells(SpecID);
-          -- Enums Filters
-          Player:FilterTriggerGCD(SpecID);
-          Spell:FilterProjectileSpeed(SpecID);
-        -- Special Checks
-        if GetCVar("nameplateShowEnemies") ~= "1" then
-          AR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
-        end
+      );
+    else
+      -- Force a refresh from the Core
+      -- TODO: Make it a function instead of copy/paste from Core Events.lua
+      Cache.Persistent.Player.Spec = {GetSpecializationInfo(Spec)};
+      local SpecID = Cache.Persistent.Player.Spec[1];
+
+      -- Delay by 1 second until the WoW API returns a valid value.
+      if SpecID == nil then
+        AC.PulseInitialized = false;
+        C_Timer.After(1, function ()
+            AR.PulseInit();
+          end
+        );
       else
-        AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
-        for Key, Value in pairs(UIFrames) do
-          Value:Hide();
+        -- Load the Class Module if it's possible and not already loaded
+        if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
+          LoadAddOn(EnabledRotation[SpecID]);
         end
-        AR.MainFrame:SetScript("OnUpdate", nil);
+
+        -- Check if there is a Rotation for this Spec
+        if LatestSpecIDChecked ~= SpecID then
+          if EnabledRotation[SpecID] and AR.APLs[SpecID] then
+            for Key, Value in pairs(UIFrames) do
+              Value:Show();
+            end
+            AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
+            -- Spec Registers
+              -- Spells
+              Player:RegisterListenedSpells(SpecID);
+              -- Enums Filters
+              Player:FilterTriggerGCD(SpecID);
+              Spell:FilterProjectileSpeed(SpecID);
+            -- Special Checks
+            if GetCVar("nameplateShowEnemies") ~= "1" then
+              AR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
+            end
+          else
+            AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
+            for Key, Value in pairs(UIFrames) do
+              Value:Hide();
+            end
+            AR.MainFrame:SetScript("OnUpdate", nil);
+          end
+          LatestSpecIDChecked = SpecID;
+        end
+        if not AC.PulseInitialized then AC.PulseInitialized = true; end
       end
-      LatestSpecIDChecked = SpecID;
     end
-    if not AC.PulseInitialized then AC.PulseInitialized = true; end
   end
 
   AR.Timer = {

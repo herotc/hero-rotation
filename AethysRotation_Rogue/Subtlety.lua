@@ -127,6 +127,57 @@ local tableinsert = table.insert;
         (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
     end
   );
+  Player.RSOffset = 0;
+  Player.RSOffsetvote = 0;
+  Player.RSOverride = false;
+  function Player:EnergyPredictedWithRS()
+    if (Player.RSOverride and Player.RSOffset == 0) then
+      return math.floor(UnitPower("player", Enum.PowerType.Energy) + 0.5) + math.floor(Player:EnergyRemainingCastRegen() + 0.5);
+    elseif (Player.RSOffset > 0) then
+      return math.floor(UnitPower("player", Enum.PowerType.Energy) + 0.5) + math.floor(Player:EnergyRemainingCastRegen() + 0.5) + Player.RSOffset;
+    else
+      return (math.floor(Player:EnergyPredicted() + 0.5));
+    end
+  end
+  function Player:EnergyDeficitPredictedWithRS()
+    if (Player.RSOverride and Player.RSOffset == 0) then
+      return (Player:EnergyMax() - math.floor(UnitPower("player", Enum.PowerType.Energy) + 0.5) - math.floor(Player:EnergyRemainingCastRegen() + 0.5));
+    elseif (Player.RSOffset > 0) then
+      return (Player:EnergyMax() - math.floor(UnitPower("player", Enum.PowerType.Energy) + 0.5) - math.floor(Player:EnergyRemainingCastRegen() + 0.5) - Player.RSOffset);
+    else
+      return (math.floor(Player:EnergyDeficitPredicted() + 0.5));
+    end
+  end
+  AC:RegisterForSelfCombatEvent(
+    function (...)
+      if (select(12, ...) == 98440) then
+        if (Player.RSOffset > 0) then
+          Player.RSOffset = 0;
+          Player.RSOverride = true;
+        end
+      end
+    end
+    , "SPELL_ENERGIZE"
+  );
+  AC:RegisterForEvent(
+    function (...)
+      local type = select(3, ...)
+      if (type == "COMBO_POINTS") and (UnitPower("player", Enum.PowerType.ComboPoints) > 0) then
+        Player.RSOffsetvote = UnitPower("player", Enum.PowerType.ComboPoints)*6;
+      end
+    end
+    , "UNIT_POWER"
+  );
+  AC:RegisterForSelfCombatEvent(
+    function (...)
+      local spellID = select(12, ...)
+      -- Evis & Nightblade & DfA spellIDs
+      if (spellID == 196819 or spellID == 195452 or spellID == 152150) then
+        Player.RSOffset = Player.RSOffsetvote;
+      end
+    end
+    , "SPELL_CAST_SUCCESS"
+  );
   S.Nightblade:RegisterPMultiplier(
     {S.FinalityNightblade, function ()
       return Player:Buff(S.FinalityNightblade) and 1 + Player:Buff(S.FinalityNightblade, 17)/100 or 1;
@@ -427,7 +478,11 @@ local function CDs ()
         end
       else
         -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=1&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
-        if S.DeathfromAbove:CooldownRemainsP() <= 1 and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 3 or Target:FilteredTimeToDie("<=", 6) or not Target:TimeToDieIsNotValid()) and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()) or Target:FilteredTimeToDie("<=", 10) or Target:TimeToDieIsNotValid() then
+        if (S.DeathfromAbove:CooldownRemainsP() <= 1
+            and (Target:DebuffRemainsP(S.Nightblade) >= S.DeathfromAbove:CooldownRemainsP() + 3
+              or Target:FilteredTimeToDie("<=", 6))
+            and (AC.CombatTime() >= 3 or AC.Tier20_4Pc or I.TheFirstoftheDead:IsEquipped()))
+          or Target:FilteredTimeToDie("<=", 10) then
           if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
         end
       end
@@ -452,7 +507,7 @@ local function CDs ()
       -- actions.cds+=/goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=variable.ShD_Fractional&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|(combo_points.deficit>=1&target.time_to_die<8))
       if S.GoremawsBite:IsCastable() and not Player:IsStealthed(true, true) and S.ShadowDance:ChargesFractional() <= ShD_Fractional()
           and ((Player:ComboPointsDeficit() >= 4-(AC.CombatTime() < 10 and 2 or 0)
-              and Player:EnergyDeficitPredicted() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
+              and Player:EnergyDeficitPredictedWithRS() > 50+(S.Vigor:IsAvailable() and 25 or 0)-(AC.CombatTime() >= 10 and 15 or 0))
             or (Player:ComboPointsDeficit() >= 1 and Target:TimeToDie(10) < 8)) then
         if AR.Cast(S.GoremawsBite) then return ""; end
       end
@@ -712,6 +767,9 @@ local function APL ()
         if AR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
       end
     end
+  if (Player.RSOverride) then
+    Player.RSOverride = false;
+  end
 end
 
 AR.SetAPL(261, APL);

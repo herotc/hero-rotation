@@ -78,6 +78,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         DancingRuneWeapon = {true, false},
+        ArcaneTorrent = {true, false},
        }
    },  
   
@@ -112,3 +113,4 @@
   CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BloodDrinker", "Blooddrinker", "Enable if you want to put Blooddrinker shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BoneStorm", "Bonestorm", "Enable if you want to put Bonestorm shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.DancingRuneWeapon", "Dancing Rune Weapon", "Enable if you want to put Dancing Rune Weapon shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put Arcane Torrent shown as Off GCD (top icons) instead of Main.");

@@ -45,6 +45,8 @@
         -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
         if Object.SpellID >= 9999000000 then
           Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
+        elseif Object.TextureSpellID then
+          Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.TextureSpellID);
         else
           Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
         end
@@ -84,6 +86,15 @@
       return "Should Return";
     end
     return false;
+  end
+  -- Overload for Main Cast (with text)
+  function AR.CastAnnotated(Object, OffGCD, Text)
+    result = AR.Cast(Object, OffGCD);
+    -- todo: handle small icon frame if OffGCD is true
+    if not OffGCD then
+      AR.MainIconFrame:OverlayText(Text);
+    end
+    return result;
   end
   -- Main Cast Queue
   local QueueSpellTable, QueueLength, QueueTextureTable;
@@ -138,17 +149,17 @@
   function AR.CmdHandler (Message)
     Argument1, Argument2, Argument3 = strsplit(" ", stringlower(Message));
     if Argument1 == "cds" then
-      AethysRotationDB.Toggles[1] = not AethysRotationDB.Toggles[1];
+      AethysRotationCharDB.Toggles[1] = not AethysRotationCharDB.Toggles[1];
       AR.ToggleIconFrame:UpdateButtonText(1);
-      AR.Print("CDs are now "..(AethysRotationDB.Toggles[1] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
+      AR.Print("CDs are now "..(AethysRotationCharDB.Toggles[1] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "aoe" then
-      AethysRotationDB.Toggles[2] = not AethysRotationDB.Toggles[2];
+      AethysRotationCharDB.Toggles[2] = not AethysRotationCharDB.Toggles[2];
       AR.ToggleIconFrame:UpdateButtonText(2);
-      AR.Print("AoE is now "..(AethysRotationDB.Toggles[2] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
+      AR.Print("AoE is now "..(AethysRotationCharDB.Toggles[2] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "toggle" then
-      AethysRotationDB.Toggles[3] = not AethysRotationDB.Toggles[3];
+      AethysRotationCharDB.Toggles[3] = not AethysRotationCharDB.Toggles[3];
       AR.ToggleIconFrame:UpdateButtonText(3);
-      AR.Print("AethysRotation is now "..(AethysRotationDB.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
+      AR.Print("AethysRotation is now "..(AethysRotationCharDB.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "unlock" then
       AR.MainFrame:Unlock();
       AR.Print("AethysRotation UI is now |cff00ff00unlocked|r.");
@@ -207,17 +218,17 @@
 
   -- Get if the CDs are enabled.
   function AR.CDsON ()
-    return AethysRotationDB.Toggles[1];
+    return AethysRotationCharDB.Toggles[1];
   end
 
   -- Get if the AoE is enabled.
   function AR.AoEON ()
-    return AethysRotationDB.Toggles[2];
+    return AethysRotationCharDB.Toggles[2];
   end
 
   -- Get if the main toggle is on.
   function AR.ON ()
-    return AethysRotationDB.Toggles[3];
+    return AethysRotationCharDB.Toggles[3];
   end
 
   -- Get if the UI is locked.

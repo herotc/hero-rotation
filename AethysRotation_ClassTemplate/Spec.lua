@@ -20,6 +20,7 @@
 --- ======= APL LOCALS =======
   local Everyone = AR.Commons.Everyone;
   local Class = AR.Commons.Class;
+
   -- Spells
   if not Spell.Class then Spell.Class = {}; end
   Spell.Class.Spec = {
@@ -43,6 +44,7 @@
     
   };
   local S = Spell.Class.Spec;
+
   -- Items
   if not Item.Class then Item.Class = {}; end
   Item.Class.Spec = {
@@ -50,8 +52,10 @@
     
   };
   local I = Item.Class.Spec;
+
   -- Rotation Var
   
+
   -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -61,16 +65,23 @@
 
 
 --- ======= ACTION LISTS =======
+-- Put here acti lists only if they are called multiple times in the APL
+-- If it's only put one time, it's doing a closure call for nothing.
   
 
 
 --- ======= MAIN =======
   local function APL ()
+    -- Local Update
+    
+
     -- Unit Update
     
     Everyone.AoEToggleEnemiesUpdate();
+
     -- Defensives
     
+
     -- Out of Combat
     if not Player:AffectingCombat() then
       -- Flask
@@ -83,6 +94,7 @@
       end
       return;
     end
+
     -- In Combat
     if Everyone.TargetIsValid() then
       

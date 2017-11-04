@@ -97,6 +97,13 @@
     self:SetPoint("BOTTOMRIGHT", AR.MainFrame, "BOTTOMRIGHT", 0, 0);
     self.CooldownFrame:SetAllPoints(self);
     self.TempTexture = self:CreateTexture(nil, "BACKGROUND");
+    self.text = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    self.text:SetAllPoints(true);
+    self.text:SetJustifyH("CENTER");
+    self.text:SetJustifyV("CENTER");
+    self.text:SetPoint("CENTER");
+    self.text:SetTextColor(1,1,1,1);
+    self.text:SetText("");
     if AR.GUISettings.General.BlackBorderIcon then
       self.TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
@@ -106,10 +113,15 @@
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.MainIconFrame:ChangeIcon (Texture)
+    self.text:SetText("");
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
     if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
+  end
+  -- Set text on frame
+  function AR.MainIconFrame:OverlayText(Text)
+    self.text:SetText(Text);
   end
   -- Set a Cooldown Frame
   function AR.MainIconFrame:SetCooldown (Start, Duration)
@@ -135,7 +147,7 @@
   local QueuedCasts, FrameWidth;
   function AR.MainIconFrame:SetupParts (Textures)
     QueuedCasts = #Textures;
-	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.ScaleUI or 1)
+	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
     for i = 1, QueuedCasts do
       self.Part[i]:SetWidth(FrameWidth);
       self.Part[i]:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
@@ -237,9 +249,10 @@
   };
   -- Add the Icon on Nameplates
   function AR.Nameplate.AddIcon (ThisUnit, Object)
+    local ElvUINameplates = ElvUI and ElvUI[1].NamePlates; -- check if user is using Elvui
     Token = stringlower(ThisUnit.UnitID);
     Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
-    if Nameplate then
+    if Nameplate or ElvUINameplates then
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
@@ -263,8 +276,13 @@
       AR.NameplateIconFrame.TempTexture:SetAllPoints(AR.NameplateIconFrame);
       AR.NameplateIconFrame.texture = AR.NameplateIconFrame.TempTexture;
       if not AR.NameplateIconFrame:IsVisible() then
-        AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.UnitFrame.healthBar, "CENTER", 0, 0);
-        AR.NameplateIconFrame:Show();
+        if ElvUINameplates then 
+          AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.unitFrame.HealthBar, "CENTER", 0, 0);
+          AR.NameplateIconFrame:Show();
+        else
+          AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.UnitFrame.healthBar, "CENTER", 0, 0);
+          AR.NameplateIconFrame:Show();
+        end
       end
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
@@ -422,14 +440,14 @@
     self.Button[i]:SetPushedTexture(pushedTexture);
 
     -- Button Setting
-    if type(AethysRotationDB) ~= "table" then
-      AethysRotationDB = {};
+    if type(AethysRotationCharDB) ~= "table" then
+      AethysRotationCharDB = {};
     end
-    if type(AethysRotationDB.Toggles) ~= "table" then
-      AethysRotationDB.Toggles = {};
+    if type(AethysRotationCharDB.Toggles) ~= "table" then
+      AethysRotationCharDB.Toggles = {};
     end
-    if type(AethysRotationDB.Toggles[i]) ~= "boolean" then
-      AethysRotationDB.Toggles[i] = true;
+    if type(AethysRotationCharDB.Toggles[i]) ~= "boolean" then
+      AethysRotationCharDB.Toggles[i] = true;
     end
 
     -- OnClick Callback
@@ -445,7 +463,7 @@
   end
   -- Update a button text
   function AR.ToggleIconFrame:UpdateButtonText (i)
-    if AethysRotationDB.Toggles[i] then
+    if AethysRotationCharDB.Toggles[i] then
       self.Button[i]:SetFormattedText("|cff00ff00%s|r", self.Button[i].text);
     else
       self.Button[i]:SetFormattedText("|cffff0000%s|r", self.Button[i].text);

@@ -22,6 +22,7 @@
       FeintHP = 0,
       -- Evisc/Env Mantle Damage Offset Multiplier
       EDMGMantleOffset = 2,
+      StealthOOC = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         CrimsonVial = {true, false},
@@ -113,6 +114,7 @@
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.");
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, "Feint HP", "Set the Feint HP threshold.");
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.EDMGMantleOffset", {1, 5, 0.25}, "Mantle Damage Offset", "Set the Evisc/Env Mantle Damage Offset.");
+  CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.");
   CreateARPanelOption("GCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.CrimsonVial", "Crimson Vial");
   CreateARPanelOption("GCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Feint", "Feint");
   CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Racials", "Racials");
