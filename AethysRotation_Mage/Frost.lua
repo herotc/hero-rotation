@@ -268,7 +268,7 @@ end
     if S.RayofFrost:IsCastable() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:CooldownRemains() > S.RayofFrost:CooldownRemains() and not Player:Buff(S.RuneofPower))) then
       if AR.Cast(S.RayofFrost) then return ""; end
     end
-    --actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(!talent.glacial_spike.enabled&prev_gcd.1.frostbolt|talent.glacial_spike.enabled&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(buff.icicles.stack<=3|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc)))
+    --actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(!talent.glacial_spike.enabled&prev_gcd.1.frostbolt|talent.glacial_spike.enabled&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(buff.icicles.stack<=4|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc)))
     if S.Flurry:IsCastable() and
       (
         Player:CastID() == S.Ebonbolt:ID() or
