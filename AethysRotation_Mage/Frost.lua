@@ -296,8 +296,8 @@ end
     if S.FrostBomb:IsCastable() and Target:DebuffRemains(S.FrostBomb) < S.IceLance:TravelTime() and FoFReact() > 0 then
       if AR.Cast(S.FrostBomb) then return ""; end
     end
-    -- actions.single+=/ice_lance,if=variable.fof_react>0&cooldown.icy_veins.remains>10|variable.fof_react>2
-    if S.IceLance:IsCastable() and ((FoFReact() > 0 and S.IcyVeins:CooldownRemains() > 10) or FoFReact() > 2) then
+    -- actions.single+=/ice_lance,if=variable.fof_react
+    if S.IceLance:IsCastable() and FoFReact() > 0 then
       if AR.Cast(S.IceLance) then return ""; end
     end
     -- actions.single+=/ebonbolt
