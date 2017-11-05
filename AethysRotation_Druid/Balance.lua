@@ -208,7 +208,7 @@ end
 local function FuryOfElune ()
   -- actions.fury_of_elune=incarnation,if=astral_power>=95&cooldown.fury_of_elune.remains<=gcd
 	if S.IncarnationChosenOfElune:IsAvailable() and FuturAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() == 0 then
-		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
+    if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
 	end
   
 	-- actions.fury_of_elune+=/fury_of_elune,if=astral_power>=95
@@ -339,12 +339,12 @@ local function EmeraldDreamcatcherRotation ()
   
   -- actions.ed+=/incarnation,if=astral_power>=60|buff.bloodlust.up
 	if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:CooldownRemainsP() == 0 and (FuturAstralPower() >= 60  or Player:HasHeroism())then
-		if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
+    if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
 	end
   
   -- actions.ed+=/celestial_alignment,if=astral_power>=60&!buff.the_emerald_dreamcatcher.up
-	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FuturAstralPower() >= 60 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
+	if S.CelestialAlignment:IsAvailable()and not S.IncarnationChosenOfElune:IsAvailable()  and S.CelestialAlignment:CooldownRemainsP() == 0 and FuturAstralPower() >= 60 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
+    if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
 	end
   
   -- actions.ed+=/starsurge,if=(gcd.max*astral_power%26)>target.time_to_die
@@ -662,8 +662,8 @@ local function CDs ()
 	end
   
 	-- actions+=/celestial_alignment,if=astral_power>=40
-	if S.CelestialAlignment:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FuturAstralPower() >= 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-		if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
+	if S.CelestialAlignment:IsAvailable() and not S.IncarnationChosenOfElune:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FuturAstralPower() >= 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
+    if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
 	end
 end
 
