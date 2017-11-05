@@ -118,7 +118,7 @@ Item.Druid.Balance = {
   EmeraldDreamcatcher		  = Item(137062, {1}),
   LadyAndTheChild         = Item(144295, {3}), 
   OnethsIntuition         = Item(137092, {9}), 
-  SephuzSecret 			      = Item(132452, {11,12}),
+  SephuzSecret 			      = Item(132452, {11, 12}),
   RadiantMoonlight        = Item(151800, {15}), 
   
   -- Potion
@@ -680,7 +680,7 @@ local function APL ()
 	end  
       
 	-- Buffs
-	if not Player:Buff(S.MoonkinForm) and not Player:AffectingCombat() then
+	if not Player:Buff(S.MoonkinForm) and not Player:AffectingCombat() and Settings.Balance.ShowMFOOP then
 		if AR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return ""; end
 	end
 	  
