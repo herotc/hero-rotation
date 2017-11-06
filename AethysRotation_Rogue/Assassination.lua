@@ -94,11 +94,17 @@ local pairs = pairs;
   if not Item.Rogue then Item.Rogue = {}; end
   Item.Rogue.Assassination = {
     -- Legendaries
-    ConvergenceofFates            = Item(140806, {13, 14}),
     DuskwalkersFootpads           = Item(137030, {8}),
     DraughtofSouls                = Item(140808, {13, 14}),
     InsigniaofRavenholdt          = Item(137049, {11, 12}),
-    MantleoftheMasterAssassin     = Item(144236, {3})
+    MantleoftheMasterAssassin     = Item(144236, {3}),
+    -- Trinkets
+    ConvergenceofFates            = Item(140806, {13, 14}),
+    DraughtofSouls                = Item(140808, {13, 14}),
+    KiljaedensBurningWish         = Item(144259, {13, 14}),
+    SpecterofBetrayal             = Item(151190, {13, 14}),
+    UmbralMoonglaives             = Item(147012, {13, 14}),
+    VialofCeaselessToxins         = Item(147011, {13, 14}),
   };
   local I = Item.Rogue.Assassination;
 -- Spells Damage
@@ -243,10 +249,23 @@ end
 local function CDs ()
   if Target:IsInRange("Melee") then
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
-    -- actions.cds+=/use_item,name=draught_of_souls,if=energy.deficit>=35+variable.energy_regen_combined*2&(!equipped.mantle_of_the_master_assassin|cooldown.vanish.remains>8)
-    -- TODO: DoS 1
-    -- actions.cds+=/use_item,name=draught_of_souls,if=mantle_duration>0&mantle_duration<3.5&dot.kingsbane.ticking
-    -- TODO: DoS 2
+    
+    -- Trinkets
+    local TrinketSuggested = false;
+    if not TrinketSuggested and I.SpecterofBetrayal:IsEquipped() and I.SpecterofBetrayal:IsReady() then
+      if AR.CastSuggested(I.SpecterofBetrayal) then TrinketSuggested = true; end
+    end
+    if not TrinketSuggested and I.UmbralMoonglaives:IsEquipped() and I.UmbralMoonglaives:IsReady() then
+      if AR.CastSuggested(I.UmbralMoonglaives) then TrinketSuggested = true; end
+    end
+    if not TrinketSuggested and I.VialofCeaselessToxins:IsEquipped() and I.VialofCeaselessToxins:IsReady() then
+      if AR.CastSuggested(I.VialofCeaselessToxins) then TrinketSuggested = true; end
+    end
+    if not TrinketSuggested and I.KiljaedensBurningWish:IsEquipped() and I.KiljaedensBurningWish:IsReady() then
+      if AR.CastSuggested(I.KiljaedensBurningWish) then TrinketSuggested = true; end
+    end
+
+    -- Racials
     if Target:Debuff(S.Vendetta) then
       -- actions.cds+=/blood_fury,if=debuff.vendetta.up
       if S.BloodFury:IsCastable() then
@@ -262,6 +281,7 @@ local function CDs ()
         if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
       end
     end
+
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
     if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
       AR.CastSuggested(S.MarkedforDeath);
