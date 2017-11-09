@@ -248,3 +248,70 @@
       , "UNIT_DIED"
       , "UNIT_DESTROYED"
     );
+  --- Relentless Strikes Energy Prediction
+    -- Variables
+    Player.RSOffset = {
+      Offset = 0;
+      FinishDestGUID = nil;
+      FinishCount = 0;
+    };
+    -- Return RS adjusted Energy Predicted
+    function Player:EnergyPredictedWithRS()
+        return Player:EnergyPredicted() + Player.RSOffset.Offset;
+    end
+    -- Return RS adjusted Energy Deficit Predicted
+    function Player:EnergyDeficitPredictedWithRS()
+        return Player:EnergyDeficitPredicted() - Player.RSOffset.Offset;
+    end
+    -- Zero RSOffset after receiving relentless strikes energize
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        local rsspellid = select(12, ...)
+        if (rsspellid == 98440) then
+          Player.RSOffset.Offset = 0;
+        end
+      end
+      , "SPELL_ENERGIZE"
+    );
+    -- Running Combo Point tally to access after casting finisher
+    AC:RegisterForEvent(
+      function (...)
+        local type = select(3, ...)
+        if (type == "COMBO_POINTS") and (Player:ComboPoints() > 0) then
+          Player.RSOffset.Offsetvote = Player:ComboPoints()*6.0;
+        end
+      end
+      , "UNIT_POWER"
+    );
+    -- Set RSOffset when casting a finisher
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        local spellID = select(12, ...)
+        -- Evis & Nightblade & DfA spellIDs
+        if (spellID == 196819 or spellID == 195452 or spellID == 152150) then
+          Player.RSOffset.FinishDestGUID = select(8, ...);
+          Player.RSOffset.FinishCount = Player.RSOffset.FinishCount + 1;
+          Player.RSOffset.Offset = Player.RSOffset.Offsetvote;
+          -- Backup clear
+          C_Timer.After(2, function ()
+              if Player.RSOffset.FinishCount == 1 then
+                Player.RSOffset.Offset = 0;
+              end
+              Player.RSOffset.FinishCount = Player.RSOffset.FinishCount - 1;
+            end
+          );
+        end
+      end
+      , "SPELL_CAST_SUCCESS"
+    );
+    -- Prevent RSOffset getting stuck when target dies mid-finisher (mostly DfA)
+    AC:RegisterForCombatEvent(
+      function (...)
+        local DestGUID = select(8, ...);
+        if Player.RSOffset.FinishDestGUID == DestGUID then
+          Player.RSOffset.Offset = 0;
+        end
+      end
+      , "UNIT_DIED"
+      , "UNIT_DESTROYED"
+    );
