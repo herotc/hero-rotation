@@ -17,6 +17,7 @@ local AR = AethysRotation;
 -- APL from Warrior_Arms_T20M on 9/1/2017
 
 -- APL Local Vars
+local Everyone = AR.Commons.Everyone;
 -- Spells
 if not Spell.Warrior then Spell.Warrior = {}; end
 Spell.Warrior.Arms = {
@@ -111,11 +112,11 @@ end
 local function APL ()
   -- Unit Update
   AC.GetEnemies(8);  -- WhirlWind
-
+  Everyone.AoEToggleEnemiesUpdate();
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Opener
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if Everyone.TargetIsValid() then
       if S.Charge:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(25)) then
         if AR.Cast(S.Charge) then return "Cast Charge" end
       end
@@ -131,7 +132,7 @@ local function APL ()
   end
 
   -- In Combat
-  if Target:Exists() and Player:CanAttack(Target) and Target:IsInRange("Melee") and not Target:IsDeadOrGhost() then
+  if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
     -- Potion of Prolonged Power
     if Settings.Arms.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 90 or Target:HealthPercentage() < 35 or Player:Buff(S.BattleCryBuff))) then
       if AR.CastSuggested(I.PoPP) then return "Use PoPP" end
@@ -168,7 +169,7 @@ local function APL ()
     end
 
     -- actions+=/run_action_list,name=cleave,if=spell_targets.whirlwind>=2&talent.sweeping_strikes.enabled
-    if AR.AoEON() and Cache.EnemiesCount[8] >= 2 and S.SweepingStrikes:IsAvailable() then
+    if Cache.EnemiesCount[8] >= 2 and S.SweepingStrikes:IsAvailable() then
       -- actions.cleave=mortal_strike
       if S.MortalStrike:IsReady() then
         if AR.Cast(S.MortalStrike) then return "Cast MortalStrike" end
@@ -233,7 +234,7 @@ local function APL ()
     end
 
     -- actions+=/run_action_list,name=aoe,if=spell_targets.whirlwind>=5&!talent.sweeping_strikes.enabled
-    if AR.AoEON() and (Cache.EnemiesCount[8] >= 5 and not S.SweepingStrikes:IsAvailable()) then
+    if Cache.EnemiesCount[8] >= 5 and not S.SweepingStrikes:IsAvailable() then
       -- actions.aoe=warbreaker,if=(cooldown.bladestorm.up|cooldown.bladestorm.remains<=gcd)&(cooldown.battle_cry.up|cooldown.battle_cry.remains<=gcd)
       if S.Warbreaker:IsReady() and ((S.Bladestorm:CooldownRemainsP() == 0 or S.Bladestorm:CooldownRemainsP() <= Player:GCD()) and (S.BattleCry:CooldownRemainsP() == 0 or S.BattleCry:CooldownRemainsP() <= Player:GCD())) then
         if Settings.Arms.WarbreakerEnabled then
