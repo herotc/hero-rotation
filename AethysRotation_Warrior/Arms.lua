@@ -168,7 +168,7 @@ local function APL ()
     end
 
     -- actions+=/run_action_list,name=cleave,if=spell_targets.whirlwind>=2&talent.sweeping_strikes.enabled
-    if Cache.EnemiesCount[8] >= 2 and S.SweepingStrikes:IsAvailable() then
+    if AR.AoEON() and Cache.EnemiesCount[8] >= 2 and S.SweepingStrikes:IsAvailable() then
       -- actions.cleave=mortal_strike
       if S.MortalStrike:IsReady() then
         if AR.Cast(S.MortalStrike) then return "Cast MortalStrike" end
