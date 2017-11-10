@@ -77,7 +77,7 @@
       -- Legendary Procs
       KaelthassUltimateAbility      = Spell(209455),  -- Fire Mage Bracer Procs
       ContainedInfernalCoreBuff     = Spell(248146),  -- Fire Shoulders Buff
-	    EruptingInfernalCore          = Spell(248147)   -- Fire Shoulder Stacks
+	  EruptingInfernalCore          = Spell(248147)   -- Fire Shoulder Stacks
 
 
 };
@@ -332,7 +332,7 @@ end
 if S.Fireblast:IsCastable() and not S.Kindling:NotAvailable() 
    and Player:Buff(S.HeatingUp) 
    and (not S.RuneOfPower:IsAvailable 
-      or  S.FireBlast:ChargesFractional > 1.4
+      or S.FireBlast:ChargesFractional > 1.4
       or S.Combustion:Cooldown < 40)
    and (S.FireBlast:ChargesFractional -3) * (12 * Player:SpellHaste) < S.Combustion:CooldownRemains + 3 
       or Target:TimeToDie < 4)
@@ -340,6 +340,14 @@ if S.Fireblast:IsCastable() and not S.Kindling:NotAvailable()
 end
 --actions.standard_rotation+=/fire_blast,if=talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
 
+if S.Fireblast:IsCastable() and not S.Kindling:IsAvailable and Player:Buff(S.HeatingUp)
+    and (not S.RuneOfPower:NotAvailable()
+	   or S.FireBlast:ChargesFractional > 1.5
+	   or S.Combustion:Cooldown < 40)
+	and (S.FireBlast:ChargesFractional -3) * (18 * Player:SpellHaste) < S.Combustion:CooldownRemains + 3  
+	   or Target:TimeToDie < 4)
+   then if AR.Cast(S.FireBlast) then return "" end
+end
 --actions.standard_rotation+=/phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&artifact.phoenix_reborn.enabled&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die.remains<10
 
 --actions.standard_rotation+=/phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up)&(4-charges_fractional)*30<cooldown.combustion.remains+5
