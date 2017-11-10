@@ -329,6 +329,15 @@ end
 
 --actions.standard_rotation+=/fire_blast,if=!talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.4|cooldown.combustion.remains<40)&(3-charges_fractional)*(12*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
 
+if AR.S.Fireblast:IsCastable() and not S.Kindling:NotAvailable() 
+   and Player:Buff(S.HeatingUp) 
+   and (not S.RuneOfPower:IsAvailable 
+      or  S.FireBlast:ChargesFractional > 1.4
+      or S.Combustion:Cooldown < 40)
+   and (S.FireBlast:ChargesFractional -3) * (12 * Player:SpellHaste) < S.Combustion:CooldownRemains + 3 
+      or Target:TimeToDie < 4)
+   then if AR.Cast:FireBlast then return "" end
+end
 --actions.standard_rotation+=/fire_blast,if=talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
 
 --actions.standard_rotation+=/phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&artifact.phoenix_reborn.enabled&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die.remains<10
