@@ -328,7 +328,6 @@ end
 --actions.standard_rotation+=/call_action_list,name=active_talents
 
 --actions.standard_rotation+=/fire_blast,if=!talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.4|cooldown.combustion.remains<40)&(3-charges_fractional)*(12*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
-
 if S.Fireblast:IsCastable() and not S.Kindling:NotAvailable() 
    and Player:Buff(S.HeatingUp) 
    and (not S.RuneOfPower:IsAvailable 
@@ -338,8 +337,8 @@ if S.Fireblast:IsCastable() and not S.Kindling:NotAvailable()
       or Target:TimeToDie < 4)
    then if AR.Cast(S.FireBlast) then return "" end
 end
---actions.standard_rotation+=/fire_blast,if=talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
 
+--actions.standard_rotation+=/fire_blast,if=talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
 if S.Fireblast:IsCastable() and not S.Kindling:IsAvailable and Player:Buff(S.HeatingUp)
     and (not S.RuneOfPower:NotAvailable()
 	   or S.FireBlast:ChargesFractional > 1.5
@@ -348,14 +347,31 @@ if S.Fireblast:IsCastable() and not S.Kindling:IsAvailable and Player:Buff(S.Hea
 	   or Target:TimeToDie < 4)
    then if AR.Cast(S.FireBlast) then return "" end
 end
+
 --actions.standard_rotation+=/phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&artifact.phoenix_reborn.enabled&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die.remains<10
+if S.PheonixFlames:IsCastable and 
+  (     Player:Buff(S.Combustion)
+     or Player:Buff(S.RuneOfPower)
+	 or Player:BuffStack > 3
+	 or S.MirrorImage:IsAvailable)
+  and (S.PheonixFlame:ChargesFractional - 4) * 13 < S.Combustion:CooldownRemains + 5
+    or Target:TimeToDie < 4
+   then if AR.Cast(S.PheonixFlames) then return "" end
+end
 
 --actions.standard_rotation+=/phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up)&(4-charges_fractional)*30<cooldown.combustion.remains+5
+if S.PheonixFlames:IsCastable and 
+  (     Player:Buff(S.Combustion)
+     or Player:Buff(S.RuneOfPower))
+  and (S.PheonixFlames:ChargesFractional - 4) * 30 < S.Combustion:CooldownRemains + 5
+   then if AR.Cast(S.PheonixFlames) then return "" end
+end 
 
 --actions.standard_rotation+=/phoenixs_flames,if=charges_fractional>2.5&cooldown.combustion.remains>23
 if S.PheonixFlames:IsCastable() and S.PheonixFlames:ChargesFractional() > 2.5 and S.Combustion:CooldownRemains() > 23 then
    if AR.Cast(S.PheonixFlames) then return "";
 end
+
 --actions.standard_rotation+=/flamestrike,if=(talent.flame_patch.enabled&active_enemies>3)|active_enemies>5
 if S.Flamestrike:IsCastable() and
    and (Cache.EnemiesCount[8] > 3 and S.FlamePatch:IsAvailable()
