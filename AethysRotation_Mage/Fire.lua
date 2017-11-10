@@ -108,7 +108,7 @@ local Settings = {
 end
 
 --actions+=/rune_of_power,if=firestarter.active&action.rune_of_power.charges=2|cooldown.combustion.remains>40&buff.combustion.down&!talent.kindling.enabled|target.time_to_die.remains<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
-  if S.RuneOfPower:IsCastable and Target:HealthPercentage > 90 and S.RuneOfPower:Charges() = 2
+  if S.RuneOfPower:IsCastable() and Target:HealthPercentage() > 90 and S.RuneOfPower:Charges() = 2
        or S.Combustion:Cooldown() > 40 and not Player:Buff(S.Combustion) and not S.Kindling:IsAvailable()
 	   or Target:TimeToDie() < 11
 	   or S.Kindling:IsAvailable() & S.RuneOfPower:ChargesFractional() > 1.8
@@ -117,7 +117,7 @@ end
 end
 
 --actions+=/rune_of_power,if=(buff.kaelthas_ultimate_ability.react&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))|(buff.erupting_infernal_core.up&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))
-  if S.RuneOfPower:IsCastable and Player:Buff(S.KaelthassUltimateAbility) and S.Combustion:Cooldown() > 40
+  if S.RuneOfPower:IsCastable() and Player:Buff(S.KaelthassUltimateAbility) and S.Combustion:Cooldown() > 40
        or S.RuneOfPower:IsCastable Player:Buff(S.EruptingInfernalCore) and S.Combustion:Cooldown() > 40
        or S.RunOfPower:Charges() > 1 then
       if AR.Cast(S.RuneOfPower) then return "";
@@ -126,7 +126,7 @@ end
 --actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.upactive_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
 local function Combustion_Phase ()
   return (
-    S.Combustion:CooldownRemains() <= (S.RuneofPower:CastTime
+    S.Combustion:CooldownRemains() <= (S.RuneofPower:CastTime)
       + ((not S.Firestarter:IsAvailable()
           or Target:HealthPercentage() > 90 and S.Firestarter:IsAvailable()
           or Cache.EnemiesCount[8] >= (S.FlamePatch:IsAvailable() and 2 or 4))
