@@ -329,7 +329,7 @@ end
 
 --actions.standard_rotation+=/fire_blast,if=!talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.4|cooldown.combustion.remains<40)&(3-charges_fractional)*(12*spell_haste)<cooldown.combustion.remains+3|target.time_to_die.remains<4
 
-if AR.S.Fireblast:IsCastable() and not S.Kindling:NotAvailable() 
+if S.Fireblast:IsCastable() and not S.Kindling:NotAvailable() 
    and Player:Buff(S.HeatingUp) 
    and (not S.RuneOfPower:IsAvailable 
       or  S.FireBlast:ChargesFractional > 1.4
