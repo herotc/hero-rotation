@@ -118,7 +118,7 @@ end
 
 --actions+=/rune_of_power,if=(buff.kaelthas_ultimate_ability.react&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))|(buff.erupting_infernal_core.up&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))
   if S.RuneOfPower:IsCastable() and Player:Buff(S.KaelthassUltimateAbility) and S.Combustion:Cooldown() > 40
-       or S.RuneOfPower:IsCastable Player:Buff(S.EruptingInfernalCore) and S.Combustion:Cooldown() > 40
+       or S.RuneOfPower:IsCastable and Player:Buff(S.EruptingInfernalCore) and S.Combustion:Cooldown() > 40
        or S.RunOfPower:Charges() > 1 then
       if AR.Cast(S.RuneOfPower) then return "";
 end
