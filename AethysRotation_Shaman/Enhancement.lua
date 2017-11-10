@@ -74,6 +74,7 @@ Spell.Shaman.Enhancement = {
   PoolFocus             = Spell(9999000010),
 }
 local S = Spell.Shaman.Enhancement
+local Everyone = AR.Commons.Everyone;
 
 -- Items
 if not Item.Shaman then Item.Shaman = {} end
@@ -165,12 +166,13 @@ local function APL ()
   AC.GetEnemies(30);  -- Purge / Wind Shear
   AC.GetEnemies(10);  -- ES / FB / FT / RB / WS /
   AC.GetEnemies(8);   -- FOA / CL / Sundering
+  Everyone.AoEToggleEnemiesUpdate()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Opener
     -- actions+=/call_action_list,name=opener
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if Everyone.TargetIsValid() then
       -- actions.opener=rockbiter,if=maelstrom<15&time<gcd
       if S.Rockbiter:IsCastable(10) and Player:Maelstrom() < 15 then
         if AR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
@@ -185,7 +187,7 @@ local function APL ()
   end
 
   -- In Combat
-  if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+  if Everyone.TargetIsValid() then
     -- Potion of Prolonged Power
     if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
       if AR.CastSuggested(I.PoPP) then return "Use PoPP" end

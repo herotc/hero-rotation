@@ -83,6 +83,7 @@ Spell.Shaman.Elemental = {
   PoolFocus             = Spell(9999000010)
 }
 local S = Spell.Shaman.Elemental
+local Everyone = AR.Commons.Everyone;
 
 -- Items
 if not Item.Shaman then Item.Shaman = {} end
@@ -112,12 +113,13 @@ local Settings = {
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(40);  -- General casting range
+  AC.GetEnemies(40)  -- General casting range
+  Everyone.AoEToggleEnemiesUpdate()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Opener
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if Everyone.TargetIsValid() then
       if ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       elseif S.LightningBolt:IsCastable(40) then
@@ -133,7 +135,7 @@ local function APL ()
   end
 
   -- In Combat
-  if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+  if Everyone.TargetIsValid() then
     -- Potion of Prolonged Power
     if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
       if AR.CastSuggested(I.PoPP) then return "Use PoPP" end
