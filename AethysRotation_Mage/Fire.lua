@@ -31,7 +31,7 @@
       Shadowmeld                    = Spell(58984),
       -- Abilities
       Fireball                      = Spell(133),
-      Pyroblast                     = Spell(147720),
+      Pyroblast                     = Spell(11366),
       CriticalMass                  = Spell(117216),
       Fireblast                     = Spell(108853),
       HotStreak                     = Spell(48108),
@@ -146,7 +146,7 @@ local function combustion_phase ()
   end
   --actions.combustion_phase+=/scorch,if=buff.combustion.remains>cast_time
   if S.Scorch:IsCastable() and Player:BuffRemains(S.Combustion) > S.Scorch:ExecuteTime() then
-    if AR.Cast(S.Fireblast) then return ""; end
+    if AR.Cast(S.Scorch) then return ""; end
   end
   --actions.combustion_phase+=/dragons_breath,if=buff.hot_streak.down&action.fire_blast.charges<1&action.phoenixs_flames.charges<1
   if S.DragonsBreath:IsCastable() and not Player:Buff(S.HotStreak) and S.Fireblast:Charges() < 1 and S.PhoenixFlames:Charges() < 1 then
