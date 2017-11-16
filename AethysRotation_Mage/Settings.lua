@@ -36,5 +36,17 @@
         -- Abilities
 
       }
+    },
+    Fire = {
+      -- {Display GCD as OffGCD, ForceReturn}
+      GCDasOffGCD = {
+        -- Abilities
+      },
+      -- {Display OffGCD as OffGCD, ForceReturn}
+      OffGCDasOffGCD = {
+        -- Racials
+        -- Abilities
+        Combustion = {true, false},
+      }
     }
   };

@@ -11,4 +11,5 @@
 Settings.lua
 Mage.lua
 Frost.lua
+Fire.lua
 Events.lua

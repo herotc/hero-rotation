@@ -235,7 +235,7 @@
       [255]   = "AethysRotation_Hunter",        -- Survival
     -- Mage
       [62]    = false,                          -- Arcane
-      [63]    = false,                          -- Fire
+      [63]    = "AethysRotation_Mage",          -- Fire
       [64]    = "AethysRotation_Mage",          -- Frost
     -- Monk
       [268]   = false,                          -- Brewmaster
