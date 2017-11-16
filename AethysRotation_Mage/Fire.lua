@@ -34,7 +34,7 @@
       Pyroblast                     = Spell(147720),
       CriticalMass                  = Spell(117216),
       Fireblast                     = Spell(108853),
-      HotStreak                     = Spell(195283),
+      HotStreak                     = Spell(48108),
       EnchancedPyrotechnics         = Spell(157642),
       DragonsBreath                 = Spell(31661),
       Combustion                    = Spell(190319),
