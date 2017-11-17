@@ -452,7 +452,7 @@ local function APL ()
       -- PrePot w/ Bossmod Countdown
       -- Volley toggle
       -- Opener
-  if	Everyone.TargetIsValid() and (Target:IsInRange(30) and not Target:Debuff(S.FrostFever)) or not Target:IsInRange("Melee") then 
+    if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.FrostFever) then 
       if AR.Cast(S.HowlingBlast) then return ""; end
       end
     return;
