@@ -427,7 +427,7 @@ local function s2m ()
   end
   if AR.AoEON() and Cache.EnemiesCount[range] > 1
     and S.ShadowWordDeath:ChargesP() == 2 then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:HealthPercentage() <= ExecuteRange() then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
@@ -460,7 +460,7 @@ local function s2m ()
     if AR.Cast(S.VampiricTouch) then return ""; end
   end
   if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
-    BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, 10, nil, 99;
+    BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, S.VampiricTouch:BaseDuration() / 3, nil, 99;
     for Key, Value in pairs(Cache.Enemies[range]) do
       if S.Misery:IsAvailable() then
         if Value:DebuffRemainsP(S.ShadowWordPain) == 0
@@ -580,7 +580,7 @@ local function VoidForm ()
           if AR.Cast(S.ShadowWordDeath) then return ""; end
 			end
       if AR.AoEON() and Cache.EnemiesCount[range] > 1 and S.ShadowWordDeath:ChargesP() == 2 then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
           for Key, Value in pairs(Cache.Enemies[range]) do
             if Value:HealthPercentage() <= ExecuteRange() then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
@@ -612,7 +612,7 @@ local function VoidForm ()
         if AR.Cast(S.VampiricTouch) then return ""; end
       end
       if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
-        BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, 10, nil, 99;
+        BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, S.VampiricTouch:BaseDuration() / 3, nil, 99;
         for Key, Value in pairs(Cache.Enemies[range]) do
           if S.Misery:IsAvailable() then
             if Value:DebuffRemainsP(S.ShadowWordPain) == 0
@@ -639,7 +639,6 @@ local function VoidForm ()
 			
 			--actions.vf+=/mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
 			if S.MindFlay:IsCastable() then
-        -- print("MindFlay", S.VoidBolt:CooldownRemainsP(), Player:GCD() * 0.28, S.VoidBolt:CooldownRemains(), Player:GCDRemains(), Player:CastRemains(),GetSpellCooldown(205448))
 				if AR.Cast(S.MindFlay) then return ""; end
 			end      
 		else--moving
@@ -654,7 +653,7 @@ local function VoidForm ()
       
       --SWP on other targets if worth
       if AR.AoEON() then
-        BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+        BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
         for Key, Value in pairs(Cache.Enemies[range]) do
           if S.ShadowWordDeath:ChargesP() > 0 
             and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
@@ -680,7 +679,7 @@ local function VoidForm ()
 		end
 	else -- not in range
     if AR.AoEON() and Cache.EnemiesCount[range] > 0 then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if S.VoidBolt:CooldownRemainsP() <= Player:GCD() * 0.28 then
           BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.VoidBolt;
@@ -753,7 +752,6 @@ local function APL ()
 	  -- Opener
     
     --TODO : precast potion
-    --TODO : manage SWV charges * 2
     --TODO : MindBomb when isStunnable is available
         
 		--precast
@@ -806,7 +804,7 @@ local function APL ()
           if AR.Cast(S.VampiricTouch) then return ""; end
         end
         if AR.AoEON() and Cache.EnemiesCount[range] > 1 and S.Misery:IsAvailable() then
-					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, S.VampiricTouch:BaseDuration() / 3, nil;
 					for Key, Value in pairs(Cache.Enemies[range]) do
 						if  Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch))
               and (Target:DebuffRefreshableCP(S.VampiricTouch) or Target:DebuffRefreshableCP(S.ShadowWordPain)) then
@@ -847,7 +845,7 @@ local function APL ()
         if AR.AoEON() and Cache.EnemiesCount[range] > 1
           and S.ShadowWordDeath:ChargesP() > 0
           and (FutureInsanity()<InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2) then
-            BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+            BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
             for Key, Value in pairs(Cache.Enemies[range]) do
               if Value:HealthPercentage() <= ExecuteRange() then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
@@ -872,7 +870,7 @@ local function APL ()
         --actions.main+=/vampiric_touch,if=active_enemies>1&!talent.misery.enabled&!ticking&(variable.dot_vt_dpgcd*target.time_to_die%(gcd.max*(156+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
         --actions.main+=/shadow_word_pain,if=active_enemies>1&!talent.misery.enabled&!ticking&(variable.dot_swp_dpgcd*target.time_to_die%(gcd.max*(118+variable.sear_dpgcd*(active_enemies-1))))>1,cycle_targets=1
 				if AR.AoEON() and Cache.EnemiesCount[range] > 1 and not S.Misery:IsAvailable() then
-					BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, 10, nil, 99;
+					BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, S.VampiricTouch:BaseDuration() / 3, nil, 99;
 					for Key, Value in pairs(Cache.Enemies[range]) do
             if Value:DebuffRefreshableCP(S.ShadowWordPain) and Cache.EnemiesCount[range] < 5 and not S.Sanlayn:IsAvailable() 
             and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) or not(BestUnitSpellToCastNb <= 1)) then
@@ -916,7 +914,7 @@ local function APL ()
         
         --SWP on other targets if worth
         if AR.AoEON() then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+          BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
           for Key, Value in pairs(Cache.Enemies[range]) do
             if S.ShadowWordDeath:ChargesP() > 0
               and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
@@ -941,7 +939,7 @@ local function APL ()
       
 		else--not in range, doting other targets
       if AR.AoEON() and Cache.EnemiesCount[range] > 0 then
-        BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
+        BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, Player:GCD(), nil;
         for Key, Value in pairs(Cache.Enemies[range]) do
           if (S.ShadowWordDeath:ChargesP() > 0 or Player:Buff(S.ZeksExterminatus)) 
             and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
