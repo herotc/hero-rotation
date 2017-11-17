@@ -457,7 +457,7 @@ local function s2m ()
   if Target:DebuffRemainsP(S.ShadowWordPain) < Player:GCD() then
     if AR.Cast(S.ShadowWordPain) then return ""; end
   end
-  if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD()  or (S.Misery:IsAvailable() and  Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not Player:IsCasting(S.VampiricTouch) then
+  if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD() or (S.Misery:IsAvailable() and Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not Player:IsCasting(S.VampiricTouch) then
     if AR.Cast(S.VampiricTouch) then return ""; end
   end
   if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
@@ -465,21 +465,21 @@ local function s2m ()
     for Key, Value in pairs(Cache.Enemies[range]) do
       if S.Misery:IsAvailable() then
         if Value:DebuffRemainsP(S.ShadowWordPain) == 0
-            and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 1)) then
+            and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 1)) then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 1;
         elseif (Value:DebuffRefreshableCP(S.VampiricTouch) or Value:DebuffRefreshableCP(S.ShadowWordPain))
-            and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 2)) then
+            and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 2)) then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.VampiricTouch, 2;
         end
       else
-        if Value:DebuffRemainsP(S.ShadowWordPain) == 0 and Value:TimeToDie() > 10 and Cache.EnemiesCount[range] < 5 and (S.AuspiciousSpirit:IsAvailable() or S.ShadowInsight:IsAvailable())
-          and (Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD or not(BestUnitSpellToCastNb <= 1)) then
+        if Value:DebuffRemainsP(S.ShadowWordPain) == 0 and Value:FilteredTimeToDie(">", 10) and Cache.EnemiesCount[range] < 5 and (S.AuspiciousSpirit:IsAvailable() or S.ShadowInsight:IsAvailable())
+          and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) or not(BestUnitSpellToCastNb <= 1)) then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 1;
-        elseif Value:DebuffRemainsP(S.VampiricTouch) == 0 and Value:TimeToDie() > 10 and (Cache.EnemiesCount[range] < 4 or S.Sanlayn:IsAvailable() or (S.AuspiciousSpirit:IsAvailable() and S.UnleashTheShadows:ArtifactRank() > 0))
-          and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 2)) then
+        elseif Value:DebuffRemainsP(S.VampiricTouch) == 0 and Value:FilteredTimeToDie(">", 10) and (Cache.EnemiesCount[range] < 4 or S.Sanlayn:IsAvailable() or (S.AuspiciousSpirit:IsAvailable() and S.UnleashTheShadows:ArtifactRank() > 0))
+          and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 2)) then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.VampiricTouch, 2;
-        elseif  Value:DebuffRefreshableCP(S.ShadowWordPain) and Value:TimeToDie() > 10 and Cache.EnemiesCount[range] < 5 and S.SphereOfInsanity:ArtifactRank() > 0
-          and (Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD or not(BestUnitSpellToCastNb <= 3)) then
+        elseif Value:DebuffRefreshableCP(S.ShadowWordPain) and Value:FilteredTimeToDie(">", 10) and Cache.EnemiesCount[range] < 5 and S.SphereOfInsanity:ArtifactRank() > 0
+          and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) or not(BestUnitSpellToCastNb <= 3)) then
             BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 3;
         end
       end
@@ -611,7 +611,7 @@ local function VoidForm ()
       if Target:DebuffRemainsP(S.ShadowWordPain) < Player:GCD() then
         if AR.Cast(S.ShadowWordPain) then return ""; end
       end
-      if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD()  or (S.Misery:IsAvailable() and  Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not Player:IsCasting(S.VampiricTouch) then
+      if (Target:DebuffRemainsP(S.VampiricTouch) < 3 * Player:GCD() or (S.Misery:IsAvailable() and Target:DebuffRemainsP(S.ShadowWordPain) < 3 * Player:GCD())) and not Player:IsCasting(S.VampiricTouch) then
         if AR.Cast(S.VampiricTouch) then return ""; end
       end
       if AR.AoEON() and Cache.EnemiesCount[range] > 1 then
@@ -619,18 +619,18 @@ local function VoidForm ()
         for Key, Value in pairs(Cache.Enemies[range]) do
           if S.Misery:IsAvailable() then
             if Value:DebuffRemainsP(S.ShadowWordPain) == 0
-                and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 1)) then
+                and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 1)) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 1;
 						elseif (Value:DebuffRefreshableCP(S.VampiricTouch) or Value:DebuffRefreshableCP(S.ShadowWordPain))
-                and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 2)) then
+                and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 2)) then
 								BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.VampiricTouch, 2;
 						end
 					else
             if Value:DebuffRemainsP(S.VampiricTouch) == 0 and ((1 + 0.02 * Player:BuffStack(S.VoidForm)) * v_dotvtdpgcd * Value:TimeToDie() / (Player:GCD() * (156 + v_seardpgcd * ((Cache.EnemiesCount[range] - 1) - 1)))) > 1
-              and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 1)) then
+              and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 1)) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.VampiricTouch, 1;
             elseif  Value:DebuffRefreshableCP(S.ShadowWordPain) and ((1 + 0.02 * Player:BuffStack(S.VoidForm)) * v_dotvtdpgcd * Value:TimeToDie() / (Player:GCD() * (118 + v_seardpgcd * (Cache.EnemiesCount[range] - 1)))) > 1
-              and (Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD or not(BestUnitSpellToCastNb <= 2)) then
+              and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) or not(BestUnitSpellToCastNb <= 2)) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 2;
             end
           end
@@ -666,7 +666,7 @@ local function VoidForm ()
               break
           end	
           
-          if Value:TimeToDie() - Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD and Value:DebuffRefreshableCP(S.ShadowWordPain) then
+          if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) and Value:DebuffRefreshableCP(S.ShadowWordPain) then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
           end
         end
@@ -699,21 +699,21 @@ local function VoidForm ()
         
         if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then --static
           if S.Misery:IsAvailable() then
-            if Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD
+            if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch))
               or Value:DebuffRefreshableCP(S.VampiricTouch) or Value:DebuffRefreshableCP(S.ShadowWordPain) then
-                BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
+                BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
             end
           else
-            if Value:TimeToDie() - Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
+            if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain))
               or Value:DebuffRefreshableCP(S.ShadowWordPain) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
-            elseif Value:TimeToDie() - Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
+            elseif Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch))
               or Value:DebuffRefreshableCP(S.VampiricTouch) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
             end
           end
         else--moving
-          if Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD
+          if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain))
             or Value:DebuffRefreshableCP(S.ShadowWordPain) then
               BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
           end
@@ -812,7 +812,7 @@ local function APL ()
         if AR.AoEON() and Cache.EnemiesCount[range] > 1 and S.Misery:IsAvailable() then
 					BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
 					for Key, Value in pairs(Cache.Enemies[range]) do
-						if Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD
+						if  Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch))
               and (Target:DebuffRefreshableCP(S.VampiricTouch) or Target:DebuffRefreshableCP(S.ShadowWordPain)) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
 						end
@@ -879,13 +879,13 @@ local function APL ()
 					BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = nil, 10, nil, 99;
 					for Key, Value in pairs(Cache.Enemies[range]) do
             if Value:DebuffRefreshableCP(S.ShadowWordPain) and Cache.EnemiesCount[range] < 5 and not S.Sanlayn:IsAvailable() 
-            and (Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD or not(BestUnitSpellToCastNb <= 1)) then
+            and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) or not(BestUnitSpellToCastNb <= 1)) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 1;
             elseif Value:DebuffRefreshableCP(S.VampiricTouch) and (v_dotvtdpgcd * Value:TimeToDie() / (Player:GCD() * (156 + v_seardpgcd * (Cache.EnemiesCount[range] - 1)))) > 1
-              and (Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD or not(BestUnitSpellToCastNb <= 2)) then
+              and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch)) or not(BestUnitSpellToCastNb <= 2)) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.VampiricTouch, 2;
             elseif  Value:DebuffRefreshableCP(S.ShadowWordPain) and (v_dotswpdpgcd * Value:TimeToDie() / (Player:GCD() * (118 + v_seardpgcd * (Cache.EnemiesCount[range] - 1)))) > 1
-              and (Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD or not(BestUnitSpellToCastNb <= 3)) then
+              and (Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) or not(BestUnitSpellToCastNb <= 3)) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast, BestUnitSpellToCastNb = Value, Value:TimeToDie(), S.ShadowWordPain, 3;
             end
 					end
@@ -930,7 +930,7 @@ local function APL ()
                 break
             end	
             
-            if Value:TimeToDie() - Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD and Value:DebuffRefreshableCP(S.ShadowWordPain) then
+            if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain)) and Value:DebuffRefreshableCP(S.ShadowWordPain) then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
             end
           end
@@ -957,21 +957,21 @@ local function APL ()
           
           if not Player:IsMoving() or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then --static
             if S.Misery:IsAvailable() then
-              if Value:TimeToDie() - Value:DebuffRemainsP(S.VampiricTouch) > BestUnitTTD
+              if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch))
                 or Value:DebuffRefreshableCP(S.VampiricTouch) or Value:DebuffRefreshableCP(S.ShadowWordPain) then
-                  BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
+                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
               end
             else
-              if Value:TimeToDie() - Value:DebuffRemains(S.VampiricTouch) > BestUnitTTD
+              if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.VampiricTouch))
                 or Value:DebuffRefreshableCP(S.VampiricTouch) then
                   BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.VampiricTouch;
-              elseif Value:TimeToDie() - Value:DebuffRemains(S.ShadowWordPain) > BestUnitTTD
+              elseif Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain))
                 or Value:DebuffRefreshableCP(S.ShadowWordPain) then
                   BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
               end
             end
           else--moving
-            if Value:TimeToDie() - Value:DebuffRemainsP(S.ShadowWordPain) > BestUnitTTD
+            if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.ShadowWordPain))
               or Value:DebuffRefreshableCP(S.ShadowWordPain) then
                 BestUnit, BestUnitTTD,BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordPain;
             end
