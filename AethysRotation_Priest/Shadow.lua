@@ -440,9 +440,8 @@ local function s2m ()
   end
   
   -- actions.s2m+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+50)<100
-  -- todo : manage charges
   if S.ShadowWordVoid:IsAvailable() 
-    and S.ShadowWordVoid:CooldownRemains() <= 0
+    and S.ShadowWordVoid:ChargesP() > 0
     and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + 25) < 100 then
     if AR.Cast(S.ShadowWordVoid) then return ""; end
   end
@@ -595,9 +594,8 @@ local function VoidForm ()
       end
 
 			--actions.vf+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity-(current_insanity_drain*gcd.max)+25)<100
-      -- todo : manage charges
 			if S.ShadowWordVoid:IsAvailable() 
-				and S.ShadowWordVoid:CooldownRemains() <= 0
+				and S.ShadowWordVoid:ChargesP() > 0
 				and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + 25) < 100 then
 				if AR.Cast(S.ShadowWordVoid) then return ""; end
 			end
@@ -756,7 +754,6 @@ local function APL ()
 	  -- Opener
     
     --TODO : precast potion
-    --TODO : used filtered time to die
     --TODO : manage SWV charges * 2
     --TODO : MindBomb when isStunnable is available
         
@@ -895,8 +892,7 @@ local function APL ()
 				end
         
 				--actions.main+=/shadow_word_void,if=talent.shadow_word_void.enabled&(insanity<=70&talent.legacy_of_the_void.enabled)|(insanity<=85&!talent.legacy_of_the_void.enabled)
-				-- todo : manage charges
-        if S.ShadowWordVoid:IsAvailable() and FutureInsanity() < InsanityThreshold() and (S.ShadowWordVoid:IsCastable() or (Player:IsCasting() and Player:CastRemains() > S.ShadowWordVoid:CooldownRemains() + Player:GCD())) then
+        if S.ShadowWordVoid:IsAvailable() and FutureInsanity() < InsanityThreshold() and S.ShadowWordVoid:ChargesP() > 0 then
 					if AR.Cast(S.ShadowWordVoid) then return ""; end
 				end
 				
