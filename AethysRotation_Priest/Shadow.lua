@@ -119,7 +119,6 @@
   local var_init = false
   local var_calcCombat = false
   local range = 40
-  local VTUsed
   
   -- GUI Settings
   local Settings = {
@@ -157,7 +156,7 @@ end
 
 local function CurrentInsanityDrain ()
 	if not Player:Buff(S.VoidForm) then return 0.0; end
-	return 6 + 0.67 * (Player:BuffStack(S.VoidForm) - (2 * (I.MotherShahrazsSeduction:IsEquipped() and 1 or 0)) - 4 * (VTUsed and 1 or 0))
+	return 6 + 0.67 * (Player:BuffStack(S.VoidForm) - (2 * (I.MotherShahrazsSeduction:IsEquipped() and 1 or 0)) - AC.VTTime)
 end
 
 local function Var_ActorsFightTimeMod ()
@@ -377,7 +376,6 @@ local function s2m ()
     and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 60))
     and (Player:BuffRemainsP(S.PowerInfusion) == 0 or Player:BuffStack(S.VoidForm) < 5)
     and not Player:IsCasting(S.VoidTorrent)	then
-    VTUsed=true
       if AR.Cast(S.VoidTorrent) then return ""; end
   end
   
@@ -555,7 +553,6 @@ local function VoidForm ()
 				and not Target:DebuffRefreshableCP(S.VampiricTouch)
         and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 60))
 				and not Player:IsCasting(S.VoidTorrent)	then
-				VTUsed=true
           if AR.Cast(S.VoidTorrent) then return ""; end
 			end
       
@@ -758,7 +755,6 @@ local function APL ()
 	  -- PrePot w/ Bossmod Countdown
 	  -- Opener
     
-    --TODO : rework VTUsed with events
     --TODO : precast potion
     --TODO : used filtered time to die
     --TODO : manage SWV charges * 2
@@ -839,7 +835,6 @@ local function APL ()
         
 				-- actions.main+=/void_eruption,if=(talent.mindbender.enabled&cooldown.mindbender.remains<(26+1*talent.fortress_of_the_mind.enabled+variable.haste_eval*1.5+gcd.max*4%3))|!talent.mindbender.enabled|set_bonus.tier20_4pc
 				if FutureInsanity() >= InsanityThreshold() and ((S.Mindbender:IsAvailable() and S.Mindbender:CooldownRemainsP() < (26 + 1 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) + v_hasteEval * 1.5)) or not S.Mindbender:IsAvailable() or not T204P) then
-						VTUsed=false
 						if AR.Cast(S.VoidEruption) then return ""; end
 				end
 				

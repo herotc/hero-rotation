@@ -91,56 +91,45 @@
 
   -- Arguments Variables
   
-  AC.SpellToTrack = {
-      [8092]="MindBlast",
-      [15407]="MindFlay",
-      [205448]="VoidBolt"
-    };
-  
-  
     --------------------------
     ----- Shadow --------
     --------------------------
-    -- Tracker
-    -- AC:RegisterForSelfCombatEvent(
-      -- function (...)
-        -- DestGUID, _, _, _, SpellID = select(8, ...);
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        DestGUID, _, _, _, SpellID = select(8, ...);
+		
+		if SpellID == 228260 then --void erruption
+			-- print("reset")
+			AC.VTTime = 0
+			AC.VTApplied = 0
+		end
 
-        -- if AC.SpellToTrack[SpellID] then
-          -- print("SPELL_CAST_SUCCESS:",AC.SpellToTrack[SpellID])
-        -- end
-      -- end
-      -- , "SPELL_CAST_SUCCESS"
-    -- );
-    -- AC:RegisterForSelfCombatEvent(
-      -- function (...)
-        -- DestGUID, _, _, _, SpellID = select(8, ...);
+      end
+      , "SPELL_CAST_SUCCESS"
+    );
+	
+	AC:RegisterForSelfCombatEvent(
+      function (...)
+		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
+		if SpellID == 205065 and AC.VTApplied == 0 and Player:GUID() == DestGUID then --void erruption
+			AC.VTApplied = dateEvent
+			-- print("applied : "..AC.VTApplied)
+		end
 
-        -- if AC.SpellToTrack[SpellID] then
-          -- print("SPELL_CAST_START:",AC.SpellToTrack[SpellID])
-        -- end
-      -- end
-      -- , "SPELL_CAST_START"
-    -- );
-    -- AC:RegisterForSelfCombatEvent(
-      -- function (...)
-        -- DestGUID, _, _, _, SpellID = select(8, ...);
+      end
+      , "SPELL_AURA_APPLIED"
+    );
+	
+	AC:RegisterForSelfCombatEvent(
+      function (...)
+		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
+		if SpellID == 205065 and Player:GUID() == DestGUID then --void erruption
+			AC.VTTime = dateEvent - AC.VTApplied
+			-- print("time : "..AC.VTTime)
+		end
 
-        -- if AC.SpellToTrack[SpellID] then
-          -- print("SPELL_AURA_APPLIED:",AC.SpellToTrack[SpellID])
-        -- end
-      -- end
-      -- , "SPELL_AURA_APPLIED"
-    -- );
-    -- AC:RegisterForSelfCombatEvent(
-      -- function (...)
-        -- DestGUID, _, _, _, SpellID = select(8, ...);
-
-        -- if AC.SpellToTrack[SpellID] then
-          -- print("SPELL_AURA_APPLIED:",AC.SpellToTrack[SpellID])
-        -- end
-      -- end
-      -- , "SPELL_AURA_REMOVED"
-    -- );
-    
+      end
+      , "SPELL_AURA_REMOVED"
+    );
+	
     
