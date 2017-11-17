@@ -261,7 +261,7 @@ local function CDs ()
 	end
   -- actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
   if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and Player:Buff(S.SurrenderToMadness)
-    and ((S.ShadowWordDeath:Charges() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0))) or Target:TimeToDie() <= 30) then
+    and ((S.ShadowWordDeath:ChargesP() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0))) or Target:TimeToDie() <= 30) then
       if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return ""; end
   end 
 
@@ -283,7 +283,7 @@ local function CDs ()
   end
   -- actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
   if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and Player:Buff(S.SurrenderToMadness)
-    and S.ShadowWordDeath:Charges() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0) + Settings.Shadow.MindbenderUsage) then
+    and S.ShadowWordDeath:ChargesP() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (T204P and 1 or 0) + Settings.Shadow.MindbenderUsage) then
       if AR.Cast(S.Mindbender, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return ""; end
   end 
 
@@ -381,7 +381,7 @@ local function s2m ()
   
   -- actions.s2m+=/shadow_word_death,if=current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled)<100)
   if Target:HealthPercentage() < ExecuteRange() 
-    and (((S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0)
+    and ((S.ShadowWordDeath:ChargesP() > 0
       and CurrentInsanityDrain() * Player:GCD() > FutureInsanity() 
       and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + (30 + 30 * (S.ReaperOfSouls:IsAvailable() and 1 or 0))) < 100 )
     or Player:Buff(S.ZeksExterminatus)) then
@@ -396,7 +396,7 @@ local function s2m ()
   
   -- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled))<100
   if Target:HealthPercentage() < ExecuteRange() 
-    and ((S.ShadowWordDeath:Charges() > 0 or (S.ShadowWordDeath:Charges() == 0 and Player:IsCasting() and Player:CastRemains() >= S.ShadowWordDeath:Recharge()))
+    and (S.ShadowWordDeath:ChargesP() > 0
       and (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range] <= 4) or (S.ReaperOfSouls:IsAvailable() and Cache.EnemiesCount[range] <= 2)))
       and CurrentInsanityDrain() * Player:GCD() > FutureInsanity() 
       and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + (30 + 30 * (S.ReaperOfSouls:IsAvailable() and 1 or 0))) < 100) 
@@ -407,7 +407,7 @@ local function s2m ()
   -- actions.s2m+=/dispersion,if=current_insanity_drain*gcd.max>insanity & !buff.power_infusion.up | (buff.voidform.stack>76&cooldown.shadow_word_death.charges=0&current_insanity_drain*gcd.max>insanity)
   if S.Dispersion:CooldownRemainsP() == 0 and CurrentInsanityDrain() * Player:GCD() > FutureInsanity() 
     and (Player:BuffRemainsP(S.PowerInfusion) == 0 
-      or (Player:BuffStack(S.VoidForm) >76 and S.ShadowWordDeath:Charges() == 0 and CurrentInsanityDrain() * Player:GCD() > FutureInsanity())) then
+      or (Player:BuffStack(S.VoidForm) >76 and S.ShadowWordDeath:ChargesP() == 0 and CurrentInsanityDrain() * Player:GCD() > FutureInsanity())) then
 		if AR.Cast(S.Dispersion, Settings.Shadow.OffGCDasOffGCD.Dispersion) then return ""; end
 	end
   
@@ -415,18 +415,18 @@ local function s2m ()
   -- actions.s2m+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=5
   if S.MindBlast:CooldownRemainsP() <= Player:GCD() * 0.28 
     and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 5)) 
-    and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then 
+    and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:ChargesP() > 1)) then 
     if AR.Cast(S.MindBlast) then return ""; end
   end 
 
   -- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
   if Target:HealthPercentage() < ExecuteRange()
-    and (S.ShadowWordDeath:Charges() == 2 or (S.ShadowWordDeath:Charges() == 1 and S.ShadowWordDeath:RechargeP() == 0)) 
+    and S.ShadowWordDeath:ChargesP() == 2 
     and (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range] <= 4) or (S.ReaperOfSouls:IsAvailable() and Cache.EnemiesCount[range] <= 2))) then
       if AR.Cast(S.ShadowWordDeath) then return ""; end
   end
   if AR.AoEON() and Cache.EnemiesCount[range] > 1
-    and (S.ShadowWordDeath:Charges() == 2 or (S.ShadowWordDeath:Charges() == 1 and S.ShadowWordDeath:RechargeP() == 0)) then
+    and S.ShadowWordDeath:ChargesP() == 2 then
       BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
       for Key, Value in pairs(Cache.Enemies[range]) do
         if Value:HealthPercentage() <= ExecuteRange() then
@@ -557,7 +557,7 @@ local function VoidForm ()
       
 			--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(15+15*talent.reaper_of_souls.enabled))<100
 			if Target:HealthPercentage() < ExecuteRange() 
-				and (((S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0)
+				and ((S.ShadowWordDeath:ChargesP() > 0
           and (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range] <= 4) or (S.ReaperOfSouls:IsAvailable() and Cache.EnemiesCount[range] <= 2)))
 					and CurrentInsanityDrain() * Player:GCD() > FutureInsanity() 
 					and (FutureInsanity() - (CurrentInsanityDrain() * Player:GCD()) + (15 + 15 * (S.ReaperOfSouls:IsAvailable() and 1 or 0))) < 100 )
@@ -569,18 +569,17 @@ local function VoidForm ()
 			--actions.vf+=/wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
 			if S.MindBlast:CooldownRemainsP() <= Player:GCD() * 0.28
         and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 4)) 
-				and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then 
+				and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:ChargesP() > 1)) then 
           if AR.Cast(S.MindBlast) then return ""; end
 			end 
 
 			--actions.vf+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
 			if Target:HealthPercentage() < ExecuteRange()
-        and (S.ShadowWordDeath:Charges() == 2 or (S.ShadowWordDeath:Charges() == 1 and S.ShadowWordDeath:RechargeP() == 0)) 
+        and S.ShadowWordDeath:ChargesP() == 2 
 				and (not AR.AoEON() or (AR.AoEON() and (Cache.EnemiesCount[range] <= 4) or (S.ReaperOfSouls:IsAvailable() and Cache.EnemiesCount[range] <= 2))) then
           if AR.Cast(S.ShadowWordDeath) then return ""; end
 			end
-      if AR.AoEON() and Cache.EnemiesCount[range] > 1
-        and (S.ShadowWordDeath:Charges() == 2 or (S.ShadowWordDeath:Charges() == 1 and S.ShadowWordDeath:RechargeP() == 0)) then
+      if AR.AoEON() and Cache.EnemiesCount[range] > 1 and S.ShadowWordDeath:ChargesP() == 2 then
           BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
           for Key, Value in pairs(Cache.Enemies[range]) do
             if Value:HealthPercentage() <= ExecuteRange() then
@@ -647,8 +646,8 @@ local function VoidForm ()
       if Target:DebuffRefreshableCP(S.ShadowWordPain) then
         if AR.Cast(S.ShadowWordPain) then return ""; end
       end
-      if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) 
-        and (FutureInsanity() < InsanityThreshold() or S.ShadowWordDeath:Charges() == 2) 
+      if S.ShadowWordDeath:ChargesP() > 0 
+        and (FutureInsanity() < InsanityThreshold() or S.ShadowWordDeath:ChargesP() == 2) 
         and Target:HealthPercentage() <= ExecuteRange() then
           if AR.Cast(S.ShadowWordDeath) then return ""; end
       end
@@ -657,8 +656,8 @@ local function VoidForm ()
       if AR.AoEON() then
         BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
         for Key, Value in pairs(Cache.Enemies[range]) do
-          if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) 
-            and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+          if S.ShadowWordDeath:ChargesP() > 0 
+            and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
             and Value:HealthPercentage() <= ExecuteRange() then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
               break
@@ -688,8 +687,8 @@ local function VoidForm ()
           break
         end 
         
-        if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) 
-          and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+        if S.ShadowWordDeath:ChargesP() > 0 
+          and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
           and Value:HealthPercentage() <= ExecuteRange() then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
             break
@@ -841,13 +840,13 @@ local function APL ()
 				end
         
         --actions.main+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(85-15*talent.reaper_of_souls.enabled)
-				if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) and (FutureInsanity() < InsanityThreshold() or S.ShadowWordDeath:Charges() == 2) and Target:HealthPercentage() <= ExecuteRange() then
+				if S.ShadowWordDeath:ChargesP() > 0 and (FutureInsanity() < InsanityThreshold() or S.ShadowWordDeath:ChargesP() == 2) and Target:HealthPercentage() <= ExecuteRange() then
 					if AR.Cast(S.ShadowWordDeath) then return ""; end
 				end
         -- find other targets
         if AR.AoEON() and Cache.EnemiesCount[range] > 1
-          and (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) 
-          and (FutureInsanity()<InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2) then
+          and S.ShadowWordDeath:ChargesP() > 0
+          and (FutureInsanity()<InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2) then
             BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
             for Key, Value in pairs(Cache.Enemies[range]) do
               if Value:HealthPercentage() <= ExecuteRange() then
@@ -865,7 +864,7 @@ local function APL ()
 				if S.MindBlast:CooldownRemainsP() == 0
 					and (not AR.AoEON() or (AR.AoEON() and Cache.EnemiesCount[range] <= 4)) 
 					and FutureInsanity() < InsanityThreshold() 
-					and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:Charges() > 1)) then
+					and (not Player:IsCasting(S.MindBlast) or (I.MangazasMadness:IsEquipped() and S.MindBlast:ChargesP() > 1)) then
 						if AR.Cast(S.MindBlast) then return ""; end
 				end
         
@@ -909,8 +908,8 @@ local function APL ()
         if Target:DebuffRefreshableCP(S.ShadowWordPain) then
           if AR.Cast(S.ShadowWordPain) then return ""; end
         end
-        if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) 
-          and (FutureInsanity() < InsanityThreshold() or S.ShadowWordDeath:Charges() == 2) 
+        if S.ShadowWordDeath:ChargesP() > 0 
+          and (FutureInsanity() < InsanityThreshold() or S.ShadowWordDeath:ChargesP() == 2) 
           and Target:HealthPercentage() <= ExecuteRange() then
             if AR.Cast(S.ShadowWordDeath) then return ""; end
         end
@@ -919,8 +918,8 @@ local function APL ()
         if AR.AoEON() then
           BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
           for Key, Value in pairs(Cache.Enemies[range]) do
-            if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0) 
-              and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+            if S.ShadowWordDeath:ChargesP() > 0
+              and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
               and Value:HealthPercentage() <= ExecuteRange() then
                 BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
                 break
@@ -944,8 +943,8 @@ local function APL ()
       if AR.AoEON() and Cache.EnemiesCount[range] > 0 then
         BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
         for Key, Value in pairs(Cache.Enemies[range]) do
-          if (S.ShadowWordDeath:Charges() > 0 or S.ShadowWordDeath:RechargeP() == 0 or Player:Buff(S.ZeksExterminatus)) 
-            and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:Charges() == 2)
+          if (S.ShadowWordDeath:ChargesP() > 0 or Player:Buff(S.ZeksExterminatus)) 
+            and (FutureInsanity() < InsanityThreshold() or (not Player:Buff(S.TwistOfFate) and S.TwistOfFate:IsAvailable()) or S.ShadowWordDeath:ChargesP() == 2)
             and Value:HealthPercentage() <= ExecuteRange() then
               BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.ShadowWordDeath;
               break
