@@ -35,6 +35,7 @@
       CriticalMass                  = Spell(117216),
       Fireblast                     = Spell(108853),
       HotStreak                     = Spell(48108),
+      HeatingUp                     = Spell(48107),
       EnchancedPyrotechnics         = Spell(157642),
       DragonsBreath                 = Spell(31661),
       Combustion                    = Spell(190319),
@@ -309,6 +310,22 @@ end
 local function APL ()
   AC.GetEnemies(40);
   Everyone.AoEToggleEnemiesUpdate();
+  
+-- Out of Combat
+    if not Player:AffectingCombat() then
+      -- Flask
+      -- Food
+      -- Rune
+      -- PrePot w/ Bossmod Countdown
+      -- Opener
+      if Everyone.TargetIsValid() and Target:IsInRange(40) then
+        if S.Pyroblast:IsCastable() then
+          if AR.Cast(S.Pyroblast) then return; end
+        end
+      end
+      return;
+    end
+    -- In Combat    
   if Everyone.TargetIsValid() then
     --actions+=/mirror_image,if=buff.combustion.down
     if S.MirrorImage:IsCastable() and not Player:Buff(S.Combustion) then
@@ -331,12 +348,22 @@ local function APL ()
       if AR.Cast(S.RuneOfPower) then return ""; end
     end
     --actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.upactive_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
-    if S.Combustion:CooldownRemains() <= (S.RuneOfPower:CastTime())
-      + ((not S.Firestarter:IsAvailable()
-          or Target:HealthPercentage() > 90 and S.Firestarter:IsAvailable()
-          or Cache.EnemiesCount[40] >= (S.FlamePatch:IsAvailable() and 2 or 4))
-        and (not S.Kindling:IsAvailable() and Player:GCD() or 0))
-      or Player:Buff(S.Combustion) then
+    -- if S.Combustion:CooldownRemains() <= (S.RuneOfPower:CastTime())
+      -- + (((not S.Firestarter:IsAvailable()
+          -- or not (Target:HealthPercentage() > 90 and S.Firestarter:IsAvailable())
+          -- or Cache.EnemiesCount[40] >= (S.FlamePatch:IsAvailable() and 2 or 4))
+        -- and ((not S.Kindling:IsAvailable() and 1 or 0)) * Player:GCD()) and 1 or 0)
+      -- or Player:Buff(S.Combustion) then
+      -- local ShouldReturn = combustion_phase();
+      -- if ShouldReturn then return ShouldReturn; end
+    if S.Combustion:CooldownRemains() <= (S.RuneOfPower:CastTime()) + ((not S.Kindling:IsAvailable() and 1 or 0) * Player:GCD())
+      and (
+        not S.Firestarter:IsAvailable()
+        or not (Target:HealthPercentage() > 90 and S.Firestarter:IsAvailable())
+        or Cache.EnemiesCount[40] >= 4
+        or (Cache.EnemiesCount[40] >= 2 and S.FlamePatch:IsAvailable())
+        or Player:Buff(S.Combustion)
+      ) then 
       local ShouldReturn = combustion_phase();
       if ShouldReturn then return ShouldReturn; end
     end
