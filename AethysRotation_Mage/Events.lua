@@ -73,4 +73,56 @@
   --- End Combat Log Arguments
 
   -- Arguments Variables
-  
+
+  Player.MageInflight = {
+    Tracked = {
+      --Phoenix
+      [194466] = {Inflight = false, DestGUID = nil, Count = 0},
+      --Pyroblast
+      [11366] = {Inflight = false, DestGUID = nil, Count = 0}
+    };
+  };
+  AC:RegisterForSelfCombatEvent(
+    function (...)
+      local spellID = select(12, ...)
+      -- Phoenix Flames spellID
+      if Player.MageInflight.Tracked[spellID] then
+        Player.MageInflight.Tracked[spellID].DestGUID = select(8, ...);
+        Player.MageInflight.Tracked[spellID].Count = Player.MageInflight.Tracked[spellID].Count + 1;
+        Player.MageInflight.Tracked[spellID].Inflight = true;
+        -- Backup clear
+        C_Timer.After(2, function ()
+            if Player.MageInflight.Tracked[spellID].Count == 1 then
+              Player.MageInflight.Tracked[spellID].Inflight = false;
+            end
+            Player.MageInflight.Tracked[spellID].Count = Player.MageInflight.Tracked[spellID].Count - 1;
+          end
+        );
+      end
+    end
+    , "SPELL_CAST_SUCCESS"
+  );
+  AC:RegisterForSelfCombatEvent(
+    function (...)
+      local DestGUID, _, _, _, spellID = select(8, ...)
+      -- Phoenix Flames spellID
+      if Player.MageInflight.Tracked[spellID] and DestGUID == Player.MageInflight.Tracked[spellID].DestGUID then
+        Player.MageInflight.Tracked[spellID].Inflight = false;
+      end
+    end
+    , "SPELL_DAMAGE"
+    , "SPELL_MISSED"
+  );
+  -- Prevent Inflight getting stuck when target dies mid-flight
+  AC:RegisterForCombatEvent(
+    function (...)
+      local DestGUID = select(8, ...);
+      for spellID, _ in pairs(Player.MageInflight.Tracked) do
+        if Player.MageInflight.Tracked[spellID].DestGUID == DestGUID then
+          Player.MageInflight.Tracked[spellID].Inflight = false;
+        end
+      end
+    end
+    , "UNIT_DIED"
+    , "UNIT_DESTROYED"
+  );
