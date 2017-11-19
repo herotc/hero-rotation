@@ -262,7 +262,7 @@ local function APL()
     end
     -- fel_rush,if=!talent.momentum.enabled&(buff.metamorphosis.down|talent.demon_blades.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
     if S.FelRush:IsCastable(20, true) and (not S.Momentum:IsAvailable() and (Player:BuffDownP(S.MetamorphosisBuff) or S.DemonBlades:IsAvailable())) then
-      if AR.Cast(S.FelRush) then return ""; end
+      if AR.CastSuggested(S.FelRush) then return ""; end
     end
     -- demons_bite
     if InMeleeRange and S.DemonsBite:IsCastable() then
@@ -274,7 +274,7 @@ local function APL()
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
     if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) then
-      if AR.Cast(S.FelRush) then return ""; end
+      if AR.CastSuggested(S.FelRush) then return ""; end
     end
   end
 
@@ -313,7 +313,7 @@ local function APL()
     -- fel_rush,if=charges=2&!talent.momentum.enabled&!talent.fel_mastery.enabled&!buff.metamorphosis.up
     if S.FelRush:IsCastable(20, true)
       and (S.FelRush:ChargesP() == 2 and not S.Momentum:IsAvailable() and not S.FelMastery:IsAvailable() and not Player:BuffP(S.MetamorphosisBuff)) then
-      if AR.Cast(S.FelRush) then return "FR Capped"; end
+      if AR.CastSuggested(S.FelRush) then return "FR Capped"; end
     end
     -- fel_eruption
     if S.FelEruption:IsCastable(20) and Player:Fury() > S.FelEruption:Cost() then
@@ -369,7 +369,7 @@ local function APL()
     end
     -- fel_rush,if=!talent.momentum.enabled&raid_event.movement.in>charges*10&(talent.demon_blades.enabled|buff.metamorphosis.down)
     if S.FelRush:IsCastable(20, true) and (not S.Momentum:IsAvailable() and (S.DemonBlades:IsAvailable() or Player:BuffDownP(S.MetamorphosisBuff))) then
-      if AR.Cast(S.FelRush) then return "FR Filler"; end
+      if AR.CastSuggested(S.FelRush) then return "FR Filler"; end
     end
     -- demons_bite
     if InMeleeRange and S.DemonsBite:IsCastable() then
@@ -385,7 +385,7 @@ local function APL()
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
     if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) then
-      if AR.Cast(S.FelRush) then return "FR OOR"; end
+      if AR.CastSuggested(S.FelRush) then return "FR OOR"; end
     end
     -- throw_glaive,if=!talent.bloodlet.enabled
     if S.ThrowGlaive:IsCastable(30) and (not S.Bloodlet:IsAvailable()) then
