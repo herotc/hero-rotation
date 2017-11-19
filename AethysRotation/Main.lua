@@ -222,7 +222,7 @@
       [251]   = "AethysRotation_DeathKnight",   -- Frost
       [252]   = "AethysRotation_DeathKnight",   -- Unholy
     -- Demon Hunter
-      [577]   = false,                          -- Havoc
+      [577]   = "AethysRotation_DemonHunter",   -- Havoc
       [581]   = "AethysRotation_DemonHunter",   -- Vengeance
     -- Druid
       [102]   = "AethysRotation_Druid",         -- Balance

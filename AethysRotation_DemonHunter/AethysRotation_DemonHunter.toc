@@ -1,7 +1,7 @@
 ## Interface: 70300
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FDemon Hunter|r]
-## Author: Aethys
+## Author: Aethys, Kojiyama
 ## Notes: Aethys Rotation - Demon Hunter Module.
 
 ## DefaultState: Enabled
@@ -9,4 +9,5 @@
 ## Dependencies: AethysRotation
 
 Settings.lua
+Havoc.lua
 Vengeance.lua
