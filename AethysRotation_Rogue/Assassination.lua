@@ -73,6 +73,7 @@ local pairs = pairs;
     CrimsonVial           = Spell(185311),
     Feint                 = Spell(1966),
     -- Utility
+    Blind                 = Spell(2094),
     Kick                  = Spell(1766),
     Sprint                = Spell(2983),
     -- Poisons
