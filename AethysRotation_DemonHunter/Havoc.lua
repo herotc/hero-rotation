@@ -411,8 +411,6 @@ local function APL()
       ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
 
-    AR.Print(S.ThrowGlaive:IsCastable());
-
     -- run_action_list,name=demonic,if=talent.demonic.enabled
     -- run_action_list,name=normal
     if (S.Demonic:IsAvailable()) then
