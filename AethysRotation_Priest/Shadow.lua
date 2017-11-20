@@ -222,7 +222,7 @@ local function Var_HasteEval ()
 -- actions.precombat+=/variable,name=haste_eval,op=max,value=0
   v_hasteEval = (Player:HastePct() - 0.3) * (10 + 10 * (I.MangazasMadness:IsEquipped() and 1 or 0) + 5 * (S.FortressOfTheMind:IsAvailable() and 1 or 0))
   
-  if v_hasteEval > 0 then
+  if 0 > v_hasteEval then
     v_hasteEval = 0
   end
 end
