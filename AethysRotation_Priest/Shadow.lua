@@ -174,8 +174,8 @@ end
 local function Var_S2MCheck ()
   -- actions.check+=/variable,op=set,name=s2mcheck,value=variable.s2msetup_time-(variable.actors_fight_time_mod*nonexecute_actors_pct)
   -- actions.check+=/variable,op=min,name=s2mcheck,value=180
-  v_s2mcheck = v_s2msetuptime - (v_actorsFightTimeMod)
-  if v_s2mcheck < 180 then
+  v_s2mcheck = v_s2msetuptime - v_actorsFightTimeMod
+  if  180 < v_s2mcheck then
     v_s2mcheck = 180
   end
   return v_s2mcheck;
