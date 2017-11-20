@@ -224,10 +224,6 @@ local function CombustionPhase ()
 end
 
 local function RopPhase ()
-  --actions.rop_phase=fire_blast,if=buff.heating_up.down&buff.hot_streak.down
-  if S.Fireblast:IsCastable() and not BuffP(S.HeatingUp) and not BuffP(S.HotStreak) then
-    if AR.Cast(S.Fireblast) then return ""; end
-  end
   --actions.rop_phase+=/flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>3)&buff.hot_streak.up
   if S.Flamestrike:IsCastable() and BuffP(S.HotStreak)
     and (
