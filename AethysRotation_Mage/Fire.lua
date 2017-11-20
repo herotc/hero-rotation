@@ -194,7 +194,7 @@ local function CombustionPhase ()
     if AR.Cast(S.Flamestrike) then return ""; end
   end
   --actions.combustion_phase+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&buff.combustion.remains>execute_time
-  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and BuffP(S.Combustion) > S.Pyroblast:ExecuteTime() then
+  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and BuffRemainsP(S.Combustion) > S.Pyroblast:ExecuteTime() then
     if AR.Cast(S.Pyroblast) then return ""; end
   end
   --actions.combustion_phase+=/pyroblast,if=buff.hot_streak.up
