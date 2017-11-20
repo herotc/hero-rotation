@@ -12,4 +12,5 @@ Settings.lua
 Mage.lua
 Frost.lua
 Fire.lua
+Arcane.lua
 Events.lua
