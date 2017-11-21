@@ -464,7 +464,7 @@
             
             -- actions+=/doom,cycle_targets=1,if=(!talent.hand_of_doom.enabled&target.time_to_die>duration&(!ticking|remains<duration*0.3))&!(variable.no_de1|prev_gcd.1.hand_of_guldan)
             if Player:ManaP() >= S.Doom:Cost() and (not S.HandOfDoom:IsAvailable() and Target:TimeToDie() > S.Doom:BaseDuration() and Target:DebuffRefreshableCP(S.Doom))
-              and not(var_no_de1 or Player:PrevGCDP(1, S.HandOfGuldan))) then
+              and not(var_no_de1 or Player:PrevGCDP(1, S.HandOfGuldan)) then
                 if AR.Cast(S.Doom) then return ""; end
             end
             if AR.AoEON() and Cache.EnemiesCount[range] > 1 and Player:ManaP() >= S.Doom:Cost() then
