@@ -427,7 +427,7 @@
     if S.LifeTap:IsCastable() and (Player:ManaPercentage() < 40 and (ActiveUAs() < 1 or Player:BuffRemainsP(S.DeadwindHarvester) == 0)
       or (S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) and (Player:BuffRemainsP(S.DeadwindHarvester) == 0 or ActiveUAs() < 1))
       or Player:ManaPercentage() < 10
-      or (ActiveUAs() == 0 and Player:PrevGCD(1, S.LifeTap) and Player:ManaPercentage() < 50)
+      or (ActiveUAs() == 0 and Player:PrevGCDP(1, S.LifeTap) and Player:ManaPercentage() < 50)
       or (Player:IsMoving() and Player:ManaPercentage() < 80)) then
         if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
     end
@@ -469,7 +469,7 @@
     end
     
     -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1
-    if Player:BuffRemainsP(S.DeadwindHarvester) == 0 and (Player:PrevGCD(1, S.UnstableAffliction) or Player:IsCasting(S.UnstableAffliction)) and SoulsAvailable() >= 1 then 
+    if Player:BuffRemainsP(S.DeadwindHarvester) == 0 and Player:PrevGCDP(1, S.UnstableAffliction) and SoulsAvailable() >= 1 then 
       if AR.Cast(S.ReapSouls) then return ""; end
     end
 
@@ -694,7 +694,7 @@
     -- actions.mg+=/life_tap,if=prev_gcd.1.life_tap&buff.active_uas.stack=0&mana.pct<50
     -- actions.mg+=/life_tap,moving=1,if=mana.pct<80
     if S.LifeTap:IsCastable() and (Player:ManaPercentage() < 10 
-      or (ActiveUAs() == 0 and Player:PrevGCD(1, S.LifeTap) and Player:ManaPercentage() < 50)
+      or (ActiveUAs() == 0 and Player:PrevGCDP(1, S.LifeTap) and Player:ManaPercentage() < 50)
       or (Player:IsMoving() and Player:ManaPercentage() < 80)) then
         if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
     end
@@ -739,7 +739,7 @@
     end
     
     -- actions.mg+=/agony,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.agony)
-    if Target:DebuffRefreshableCP(S.Agony) and Player:ManaP() >= S.Agony:Cost() and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) and (ActiveUAs() == 0 or Player:PrevGCD(1,S.Agony) or Player:IsCasting(S.Agony)) then
+    if Target:DebuffRefreshableCP(S.Agony) and Player:ManaP() >= S.Agony:Cost() and Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.Agony)) and (ActiveUAs() == 0 or Player:PrevGCDP(1,S.Agony)) then
       if AR.Cast(S.Agony) then return ""; end
     end
     if AR.AoEON() and ActiveUAs() == 0 and Player:ManaP() >= S.Agony:Cost() then
@@ -755,7 +755,7 @@
     end
     
     -- actions.mg+=/siphon_life,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.siphon_life)
-    if S.SiphonLife:IsAvailable() and Target:DebuffRefreshableCP(S.SiphonLife) and  Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.SiphonLife)) and (ActiveUAs() == 0 or Player:PrevGCD(1, S.SiphonLife) or Player:IsCasting(S.SiphonLife)) then
+    if S.SiphonLife:IsAvailable() and Target:DebuffRefreshableCP(S.SiphonLife) and  Target:FilteredTimeToDie(">=", Target:DebuffRemainsP(S.SiphonLife)) and (ActiveUAs() == 0 or Player:PrevGCDP(1, S.SiphonLife)) then
         if AR.Cast(S.SiphonLife) then return ""; end
     end
     if AR.AoEON() and S.SiphonLife:IsAvailable() and ActiveUAs() == 0  then
@@ -772,7 +772,7 @@
     
     -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.corruption)
     if Player:ManaP() >= S.Corruption:Cost() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRefreshableCP(S.CorruptionDebuff)) 
-      or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) and (ActiveUAs() == 0 or Player:PrevGCD(1, S.Corruption) or Player:IsCasting(S.Corruption)) then
+      or (S.AbsoluteCorruption:IsAvailable() and not Target:Debuff(S.CorruptionDebuff))) and (ActiveUAs() == 0 or Player:PrevGCDP(1, S.Corruption)) then
       if AR.Cast(S.Corruption) then return ""; end
     end
     if AR.AoEON() and Player:ManaP() >= S.Corruption:Cost() and ((Cache.EnemiesCount[range] < 3 and S.SowTheSeeds:IsAvailable()) or Cache.EnemiesCount[range] < 5) and ActiveUAs() == 0 then
@@ -804,7 +804,7 @@
     end
     
     -- actions.mg+=/unstable_affliction,if=target=sim.target&(buff.active_uas.stack=0|(!prev_gcd.3.unstable_affliction&prev_gcd.1.unstable_affliction))&dot.agony.remains>cast_time+(6.5*spell_haste)
-    if FutureShard() >= 1 and (ActiveUAs() == 0 or (not Player:PrevGCD(3, S.UnstableAffliction) and (Player:PrevGCD(1, S.UnstableAffliction) or Player:IsCasting(S.UnstableAffliction)))) 
+    if FutureShard() >= 1 and (ActiveUAs() == 0 or (not Player:PrevGCDP(3, S.UnstableAffliction) and Player:PrevGCDP(1, S.UnstableAffliction))) 
       and (Target:DebuffRemainsP(S.Agony) > S.UnstableAffliction:CastTime() + (6.5 * Player:SpellHaste())) then
       if AR.Cast(S.UnstableAffliction) then return ""; end
     end
