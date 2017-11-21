@@ -277,7 +277,6 @@ local function CDs ()
   -- actions.vf+=/mindbender,if=buff.insanity_drain_stacks.value>=(variable.cd_time+(variable.haste_eval*!set_bonus.tier20_4pc)-(3*set_bonus.tier20_4pc*(raid_event.movement.in<15)*((active_enemies-(raid_event.adds.count*(raid_event.adds.remains>0)))=1))+(5-3*set_bonus.tier20_4pc)*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled*set_bonus.tier20_4pc)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
   if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and not Player:Buff(S.SurrenderToMadness)
     and CurrentInsanityDrain() >= (v_cdtime + (v_hasteEval * (T204P and 0 or 1)) - (3 * (T204P and 1 or 0) + (5 - 3 * (T204P and 1 or 0)) * (Player:HasHeroism() and 1 or 0) + 2 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) + Settings.Shadow.MindbenderUsage)
-    and CurrentInsanityDrain() >= (v_cdtime - (3 * (T204P and 1 or 0) + (5 - 3 * (T204P and 1 or 0)) * (Player:HasHeroism() and 1 or 0) + 2 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) * (T204P and 1 or 0)) + Settings.Shadow.MindbenderUsage)
     and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain())) then 
       if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return ""; end
   end
