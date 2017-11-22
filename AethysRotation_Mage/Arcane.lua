@@ -41,7 +41,9 @@
     Evocation             = Spell(12051),
     PresenceofMind        = Spell(205025),
 	  ExpandingMind					= Spell(253262),
-    Counterspell          = Spell(30449),
+    Counterspell          = Spell(2139),
+    SpellSteal            = Spell(30449),
+    Polymorph             = Spell(118),
     
       -- Talents
     ArcaneFamiliar        = Spell(205022),
@@ -247,17 +249,17 @@ local function Burn ()
     if AR.Cast(S.ArcanePower) then return ""; end
   end
   -- blood_fury
-  -- if S.BloodFury:IsCastableP() then
-    -- if AR.Cast(S.BloodFury, Settings.Arcane.OffGCDasOffGCD.BloodFury) then return ""; end
-  -- end
+  if S.BloodFury:IsCastableP() then
+    if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
   -- berserking
-  -- if S.Berserking:IsCastableP() then
-    -- if AR.Cast(S.Berserking, Settings.Arcane.OffGCDasOffGCD.Berserking) then return ""; end
-  -- end
+  if S.Berserking:IsCastableP() then
+    if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
   -- arcane_torrent
-  -- if S.ArcaneTorrent:IsCastableP() then
-    -- if AR.Cast(S.ArcaneTorrent, Settings.Arcane.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
-  -- end
+  if S.ArcaneTorrent:IsCastableP() then
+    if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
   -- potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
   -- if I.PotionOfDeadlyGrace:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePower) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:Race()=="Troll" or Player:Race()=="Orc"))) then
     -- if AR.CastSuggested(I.PotionOfDeadlyGrace) then return ""; end
@@ -372,6 +374,14 @@ local function Conserve ()
 end
 
 local function APL ()
+  --todo :
+  -- mana management
+  -- strict sequence
+  -- opener
+  -- evocation
+  -- BL (with settings)
+  -- counterspell
+
   -- Unit Update
   AC.GetEnemies(40);
 	AC.GetEnemies(10);
