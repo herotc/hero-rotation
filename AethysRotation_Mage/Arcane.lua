@@ -88,7 +88,7 @@ local S = Spell.Mage.Arcane;
 if not Item.Mage then Item.Mage = {}; end
 Item.Mage.Arcane = {
  PotionOfDeadlyGrace   = Spell(188027)
-
+};
 local I = Item.Mage.Arcane;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
