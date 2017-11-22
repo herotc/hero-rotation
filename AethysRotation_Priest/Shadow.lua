@@ -217,9 +217,9 @@ end
 local function Var_HasteEval ()
 -- actions.precombat+=/variable,name=haste_eval,op=set,value=(raw_haste_pct-0.3)*(10+10*equipped.mangazas_madness+5*talent.fortress_of_the_mind.enabled)
 -- actions.precombat+=/variable,name=haste_eval,op=max,value=0
-  v_hasteEval = (Player:HastePct() - 0.3) * (10 + 10 * (I.MangazasMadness:IsEquipped() and 1 or 0) + 5 * (S.FortressOfTheMind:IsAvailable() and 1 or 0))
+  v_hasteEval = ((Player:HastePct() / 100) - 0.3) * (10 + 10 * (I.MangazasMadness:IsEquipped() and 1 or 0) + 5 * (S.FortressOfTheMind:IsAvailable() and 1 or 0))
   
-  if 0 > v_hasteEval then
+  if v_hasteEval < 0 then
     v_hasteEval = 0
   end
 end
@@ -232,6 +232,7 @@ local function VarInit ()
     Var_DotVTDPGCD()
     Var_SearDPGCD()
     Var_S2MSetupTime()
+    Var_HasteEval()
     var_init=true
     var_calcCombat=true
   end
@@ -243,8 +244,6 @@ local function VarCalc ()
     Var_ActorsFightTimeMod()
     Var_S2MCheck()
   end
-  
-  Var_HasteEval()
 end
 
 --Calls to cooldown
