@@ -234,7 +234,7 @@
       [254]   = "AethysRotation_Hunter",        -- Marksmanship
       [255]   = "AethysRotation_Hunter",        -- Survival
     -- Mage
-      [62]    = false,                          -- Arcane
+      [62]    = "AethysRotation_Mage",          -- Arcane
       [63]    = "AethysRotation_Mage",          -- Fire
       [64]    = "AethysRotation_Mage",          -- Frost
     -- Monk
