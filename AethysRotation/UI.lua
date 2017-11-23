@@ -206,7 +206,7 @@
       self.Icon[Index].TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self.Icon[Index]);
     end
-    self.Icon[Index].keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Icon[Index].keybind = self.Icon[Index]:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
     self.Icon[Index].keybind:SetAllPoints(true);
     self.Icon[Index].keybind:SetJustifyH("RIGHT");
     self.Icon[Index].keybind:SetJustifyV("TOP");
