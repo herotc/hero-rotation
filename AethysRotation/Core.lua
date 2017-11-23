@@ -72,9 +72,9 @@
   -- Main Cast
   AR.CastOffGCDOffset = 1;
   function AR.Cast (Object, OffGCD)
+    Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
     if OffGCD and OffGCD[1] then
       if AR.CastOffGCDOffset <= 2 then
-        Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
         AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
         AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = AC.GetTime();
