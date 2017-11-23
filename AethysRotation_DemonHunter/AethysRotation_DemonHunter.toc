@@ -11,3 +11,4 @@
 Settings.lua
 Havoc.lua
 Vengeance.lua
+Events.lua
