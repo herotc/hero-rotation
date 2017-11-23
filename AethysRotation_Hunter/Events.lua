@@ -20,21 +20,21 @@
   local GetTime = AC.GetTime;
   
   -- File Locals
-
+  
   AC.RangeTracker = {
   
 	AbilityTimeout = 1,
 	NucleusAbilities = {
 		[2643]   = {
 			Range=8, 
-			Spell = Spell.Hunter.Marksmanship.MultiShot, 
+			--Spell = Spell.Hunter.Marksmanship and Spell.Hunter.Marksmanship.MultiShot or Spell.Hunter.BeastMastery.Multishot, 
 			LastDamageTime=0,
 			LastDamaged={},
 			Timeout=4
 		},
 		[194392] = {
 			Range=8, 
-			Spell = Spell.Hunter.Marksmanship.Volley, 
+			--Spell = Spell.Hunter.Marksmanship and Spell.Hunter.Marksmanship.Volley or Spell.Hunter.BeastMastery.Volley, 
 			LastDamageTime=0,
 			LastDamaged={},
 			Timeout=4
@@ -94,6 +94,9 @@
    , "UNIT_DESTROYED"
    ); 
 
+
+   
+   
    local function NumericRange(range)
 	  return range == "Melee" and 5 or range;
    end   
@@ -139,7 +142,6 @@
 		
 		local CurrentCount = 0
 		local Enemies = Cache.Enemies[MaxRange]
-		local ValidAbility = false
 		
 		for i, Enemy in pairs(Enemies) do
 			--Units that are outside of the parameters or havent been seen lately get removed			
@@ -164,8 +166,16 @@
 		--We subtract all the impossible units 
 		local Count = math.max(CacheCount and (CacheCount-RT.NonSplashableCount[EffectiveRange]) or 1,1)
 		
-		print(Count)
+		print(Count,Hunter.ValidateSplashCache())
 		
 		return Count
    end
+ 
+   function Hunter.ValidateSplashCache()
+		for SpellID, Ability in pairs(RT.NucleusAbilities) do
+			if Ability.LastDamageTime+Ability.Timeout > GetTime() then return true; end
+		end			
+		
+		return false;
+   end 
  

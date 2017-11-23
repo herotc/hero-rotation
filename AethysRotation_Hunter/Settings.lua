@@ -16,6 +16,7 @@
   -- All settings here should be moved into the GUI someday.
   AR.GUISettings.APL.Hunter = {
     Commons = {
+	  MultiShotInMain = "Never",
       -- SoloMode Settings
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -103,6 +104,7 @@
   local CP_Marksmanship = CreateChildPanel(CP_Hunter, "Marksmanship");
   local CP_Survival = CreateChildPanel(CP_Hunter, "Survival");
   -- Hunter
+  CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.MultiShotInMain", {"Never", "Only with Splash Data", "Always"}, "Multishot in the Main Icon", "When to show Multishot in the main icon or as a suggestion");
   -- Beast Mastery
   CreatePanelOption("Slider", CP_BeastMastery, "APL.Hunter.BeastMastery.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOption("GCDasOffGCD", CP_BeastMastery, "APL.Hunter.BeastMastery.GCDasOffGCD.AMurderofCrows", "AMurderofCrows");

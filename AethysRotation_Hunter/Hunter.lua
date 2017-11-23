@@ -19,5 +19,13 @@
   local Settings = AR.GUISettings.APL.Hunter.Commons;
   local Hunter = AR.Commons.Hunter;
 
+  --- Commons Functions
+  
+  function Hunter.MultishotInMain()
+	if Settings.MultiShotInMain == "Always" then return true; end
+	if Settings.MultiShotInMain == "Never" then return false; end 
+	
+	return Hunter.ValidateSplashCache()
+  end
 
---- Commons Functions
+
