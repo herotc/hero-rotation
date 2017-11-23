@@ -256,7 +256,7 @@ local function APL()
     end
     -- chaos_strike,if=(!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_chaos_strike&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
     if InMeleeRange and S.ChaosStrike:IsCastable() and Player:Fury() > S.ChaosStrike:Cost()
-      and ((not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff) or Player:FuryDeficit() < 30 + Player:BuffP(S.PreparedBuff) * 8)
+      and ((not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff) or Player:FuryDeficit() < 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0))
         and not PoolingForChaosStrike() and not PoolingForMeta() and not PoolingForBladeDance()) then
       if AR.Cast(S.ChaosStrike) then return ""; end
     end
