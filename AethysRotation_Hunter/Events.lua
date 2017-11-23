@@ -166,7 +166,7 @@
 		--We subtract all the impossible units 
 		local Count = math.max(CacheCount and (CacheCount-RT.NonSplashableCount[EffectiveRange]) or 1,1)
 		
-		print(Count,Hunter.ValidateSplashCache())
+		--print(Count,Hunter.ValidateSplashCache())
 		
 		return Count
    end
