@@ -74,13 +74,14 @@
   function AR.Cast (Object, OffGCD)
     if OffGCD and OffGCD[1] then
       if AR.CastOffGCDOffset <= 2 then
-        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object));
+        Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
+        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
         AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = AC.GetTime();
         return OffGCD[2] and "Should Return" or false;
       end
     else
-      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
+      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";

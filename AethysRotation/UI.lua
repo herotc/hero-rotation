@@ -104,6 +104,13 @@
     self.text:SetPoint("CENTER");
     self.text:SetTextColor(1,1,1,1);
     self.text:SetText("");
+    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+    self.keybind:SetAllPoints(true);
+    self.keybind:SetJustifyH("RIGHT");
+    self.keybind:SetJustifyV("TOP");
+    self.keybind:SetPoint("TOPRIGHT");
+    self.keybind:SetTextColor(1,1,1,0.7);
+    self.keybind:SetText("");
     if AR.GUISettings.General.BlackBorderIcon then
       self.TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
@@ -112,11 +119,12 @@
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.MainIconFrame:ChangeIcon (Texture)
+  function AR.MainIconFrame:ChangeIcon (Texture, Keybind)
     self.text:SetText("");
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
+    if Keybind then self.keybind:SetText(Keybind); end
     if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
   -- Set text on frame
@@ -196,14 +204,22 @@
       self.Icon[Index].TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self.Icon[Index]);
     end
+    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+    self.keybind:SetAllPoints(true);
+    self.keybind:SetJustifyH("RIGHT");
+    self.keybind:SetJustifyV("TOP");
+    self.keybind:SetPoint("TOPRIGHT");
+    self.keybind:SetTextColor(1,1,1,0.7);
+    self.keybind:SetText("");
     self.Icon[Index]:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.SmallIconFrame:ChangeIcon (FrameID, Texture)
+  function AR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind)
     -- Icon
     self.Icon[FrameID].TempTexture:SetTexture(Texture);
     self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
     self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
+    if Keybind then self.keybind:SetText(Keybind); end
 
     if not self.Icon[FrameID]:IsVisible() then
       self.Icon[FrameID]:Show();
