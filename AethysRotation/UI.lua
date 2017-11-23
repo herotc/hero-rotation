@@ -104,7 +104,7 @@
     self.text:SetPoint("CENTER");
     self.text:SetTextColor(1,1,1,1);
     self.text:SetText("");
-    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
     self.keybind:SetAllPoints(true);
     self.keybind:SetJustifyH("RIGHT");
     self.keybind:SetJustifyV("TOP");
@@ -121,6 +121,7 @@
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.MainIconFrame:ChangeIcon (Texture, Keybind)
     self.text:SetText("");
+    self.keybind:SetText("");
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
@@ -204,7 +205,7 @@
       self.Icon[Index].TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self.Icon[Index]);
     end
-    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
     self.keybind:SetAllPoints(true);
     self.keybind:SetJustifyH("RIGHT");
     self.keybind:SetJustifyV("TOP");
@@ -230,6 +231,7 @@
     for i = 1, #self.Icon do
       -- Icon
       self.Icon[i]:Hide();
+      self.keybind:SetText("");
     end
   end
 
