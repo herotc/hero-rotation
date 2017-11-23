@@ -44,6 +44,7 @@
     Counterspell          = Spell(2139),
     SpellSteal            = Spell(30449),
     Polymorph             = Spell(118),
+    TimeWarp              = Spell(80353),
     
       -- Talents
     ArcaneFamiliar        = Spell(205022),
@@ -375,12 +376,10 @@ end
 
 local function APL ()
   --todo :
-  -- mana management
   -- strict sequence
-  -- opener
   -- evocation
-  -- BL (with settings)
   -- counterspell
+  -- cancelBuff
 
   -- Unit Update
   AC.GetEnemies(40);
@@ -402,8 +401,10 @@ local function APL ()
     
 		--precast
     -- arcane_blast
-    if S.ArcaneBlast:IsCastable() then
-      if AR.Cast(S.ArcaneBlast) then return ""; end
+    if Everyone.TargetIsValid() and Target:IsInRange(range) then
+      if S.ArcaneBlast:IsCastable() then
+        if AR.Cast(S.ArcaneBlast) then return ""; end
+      end
     end
     
 		return
@@ -417,22 +418,25 @@ local function APL ()
     -- end
     
     -- time_warp,if=buff.bloodlust.down&(time=0|(buff.arcane_power.up&(buff.potion.up|!action.potion.usable))|target.time_to_die<=buff.bloodlust.duration)
-    -- if AR.CDsON() and S.TimeWarp:IsCastable(S.TimeWarp) and (Player:BuffDown(S.BloodlustBuff) and (time == 0 or (Player:Buff(S.ArcanePower) and (Player:Buff(S.PotionBuff) or not action.potion.usable)) or Target:TimeToDie() <= buff.bloodlust.duration)) then
-      -- if AR.Cast(S.TimeWarp) then return ""; end
-    -- end
+    if AR.CDsON() and Settings.Commons.UseTimeWarp and S.TimeWarp:IsCastable() and (not Player:HasHeroism() and (AC.CombatTime() < 3 or (Player:BuffRemainsP(S.ArcanePower) > 0 and (Player:BuffRemainsP(S.PotionOfDeadlyGrace) > 0 or not I.PotionOfDeadlyGrace:IsReady())) or Target:TimeToDie() <= S.TimeWarp:BaseDuration())) then
+      if AR.Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return ""; end
+    end
     
     -- cancel_buff,name=presence_of_mind,if=active_enemies>1&set_bonus.tier20_2pc
     -- if S.CancelBuff:IsCastable(S.CancelBuff) and (active_enemies > 1 and set_bonus.tier20_2pc) then
       -- if AR.Cast(S.CancelBuff) then return ""; end
     -- end
+    
     -- call_action_list,name=build,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&!burn_phase
     if (FuturArcaneCharges() < Player:ArcaneChargesMax() and not v_burnPhase) then
       local ShouldReturn = Build(); if ShouldReturn then return ShouldReturn; end
     end
+    
     -- call_action_list,name=burn,if=(buff.arcane_charge.stack=buff.arcane_charge.max_stack&variable.time_until_burn=0)|burn_phase
     if ((FuturArcaneCharges() == Player:ArcaneChargesMax() and v_timeUntilBurn == 0) or v_burnPhase) then
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
     end
+    
     -- call_action_list,name=conserve
     local ShouldReturn = Conserve(); 
     if ShouldReturn then return ShouldReturn; end
