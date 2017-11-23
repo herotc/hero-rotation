@@ -218,7 +218,7 @@
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
   function AR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind)
     -- Icon
-    self.Icon[FrameID].keybind[FrameID]:SetText("");
+    self.Icon[FrameID].keybind:SetText("");
     self.Icon[FrameID].TempTexture:SetTexture(Texture);
     self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
     self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
@@ -233,7 +233,7 @@
     for i = 1, #self.Icon do
       -- Icon
       self.Icon[i]:Hide();
-      self.Icon[i].keybind[i]:SetText("");
+      self.Icon[i].keybind:SetText("");
     end
   end
 
