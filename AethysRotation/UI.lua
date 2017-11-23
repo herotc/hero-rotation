@@ -205,13 +205,13 @@
       self.Icon[Index].TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self.Icon[Index]);
     end
-    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
-    self.keybind:SetAllPoints(true);
-    self.keybind:SetJustifyH("RIGHT");
-    self.keybind:SetJustifyV("TOP");
-    self.keybind:SetPoint("TOPRIGHT");
-    self.keybind:SetTextColor(1,1,1,0.7);
-    self.keybind:SetText("");
+    self.keybind[Index] = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.keybind[Index]:SetAllPoints(true);
+    self.keybind[Index]:SetJustifyH("RIGHT");
+    self.keybind[Index]:SetJustifyV("TOP");
+    self.keybind[Index]:SetPoint("TOPRIGHT", (Index - 2) * 32, 0);
+    self.keybind[Index]:SetTextColor(1,1,1,0.7);
+    self.keybind[Index]:SetText("");
     self.Icon[Index]:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
@@ -221,7 +221,7 @@
     self.Icon[FrameID].TempTexture:SetTexture(Texture);
     self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
     self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
-    if Keybind then self.keybind:SetText(Keybind); end
+    if Keybind then self.keybind[FrameID]:SetText(Keybind); end
 
     if not self.Icon[FrameID]:IsVisible() then
       self.Icon[FrameID]:Show();
