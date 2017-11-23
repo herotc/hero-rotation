@@ -26,6 +26,7 @@ Spell.DemonHunter.Havoc = {
   -- Abilities
   Annihilation                  = Spell(201427),
   BladeDance                    = Spell(188499),
+  ConsumeMagic                  = Spell(183752),
   ChaosStrike                   = Spell(162794),
   ChaosNova                     = Spell(179057),
   DeathSweep                    = Spell(210152),
@@ -78,6 +79,7 @@ local I = Item.DemonHunter.Havoc;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local CleaveRangeID = tostring(S.ConsumeMagic:ID()); -- 20y range
 
 -- GUI Settings
 local Everyone = AR.Commons.Everyone;
@@ -96,10 +98,10 @@ local StunInterrupts = {
 
 -- Melee Is In Range w/ Movement Handlers
 local function IsInMeleeRange ()
-  if S.Felblade:TimeSinceLastCast() <= Player:GCD() then
+  if S.Felblade:TimeSinceLastCast() < Player:GCD() then
     return true;
-  elseif S.VengefulRetreat:TimeSinceLastCast() < 1.0 then
-    return false;
+  elseif S.Metamorphosis:TimeSinceLastCast() < Player:GCD() then
+    return true;
   end
 
   return Target:IsInRange("Melee");
@@ -193,30 +195,44 @@ local function APL()
     end
   end
 
+  local function CastFelRush()
+    if Settings.Havoc.FelRushDisplayStyle == "Suggested" then
+      return AR.CastSuggested(S.FelRush);
+    elseif Settings.Havoc.FelRushDisplayStyle == "Cooldown" then
+      if S.FelRush:TimeSinceLastDisplay() ~= 0 then
+        return AR.Cast(S.FelRush, { true, false } );
+      else
+        return false;
+      end
+    end
+
+    return AR.Cast(S.FelRush);
+  end
+
   local function Demonic()
     local InMeleeRange = IsInMeleeRange()
 
     -- vengeful_retreat,if=(talent.prepared.enabled|talent.momentum.enabled)&buff.prepared.down&buff.momentum.down
-    if S.VengefulRetreat:IsCastable(5, true)
+    if S.VengefulRetreat:IsCastable("Melee", true)
       and ((S.Prepared:IsAvailable() or S.Momentum:IsAvailable()) and Player:BuffDownP(S.PreparedBuff) and Player:BuffDownP(S.MomentumBuff)) then
       if AR.Cast(S.VengefulRetreat) then return ""; end
     end
     -- fel_rush,if=(talent.momentum.enabled|talent.fel_mastery.enabled)&(!talent.momentum.enabled|(charges=2|cooldown.vengeful_retreat.remains>4)&buff.momentum.down)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
     if S.FelRush:IsCastable(20, true) and ((S.Momentum:IsAvailable() or S.FelMastery:IsAvailable())
       and (not S.Momentum:IsAvailable() or (S.FelRush:ChargesP() == 2 or S.VengefulRetreat:CooldownRemainsP() > 4) and Player:BuffDownP(S.MomentumBuff))) then
-      if AR.Cast(S.FelRush) then return ""; end
+      if CastFelRush() then return ""; end
     end
     -- throw_glaive,if=talent.bloodlet.enabled&(!talent.momentum.enabled|buff.momentum.up)&charges=2
-    if S.ThrowGlaive:IsCastable(30)
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive)
       and (S.Bloodlet:IsAvailable() and (not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff)) and S.ThrowGlaive:ChargesP() == 2) then
       if AR.Cast(S.ThrowGlaive) then return ""; end
     end
     -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsCastable(8, true) and Player:Fury() > S.DeathSweep:Cost() and (BladeDance()) then
+    if S.DeathSweep:IsReady(8, true) and (BladeDance()) then
       if AR.Cast(S.DeathSweep) then return ""; end
     end
     -- fel_eruption
-    if S.FelEruption:IsCastable(20) and Player:Fury() > S.FelEruption:Cost() then
+    if S.FelEruption:IsReady(S.FelEruption) then
       if AR.Cast(S.FelEruption) then return ""; end
     end
     -- fury_of_the_illidari,if=(active_enemies>desired_targets)|(raid_event.adds.in>55&(!talent.momentum.enabled|buff.momentum.up))
@@ -225,56 +241,56 @@ local function APL()
       if AR.Cast(S.FuryOfTheIllidari) then return ""; end
     end
     -- blade_dance,if=variable.blade_dance&cooldown.eye_beam.remains>5&!cooldown.metamorphosis.ready
-    if S.BladeDance:IsCastable(8, true) and Player:Fury() > S.BladeDance:Cost()
+    if S.BladeDance:IsReady(8, true)
       and (BladeDance() and S.EyeBeam:CooldownRemainsP() > 5 and not S.Metamorphosis:IsReady()) then
       if AR.Cast(S.BladeDance) then return ""; end
     end
     -- throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
-    if S.ThrowGlaive:IsCastable(30) and (S.Bloodlet:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[30] >= 2) and
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (S.Bloodlet:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[CleaveRangeID] >= 2) and
       (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return ""; end
     end
     -- felblade,if=fury.deficit>=30
-    if S.Felblade:IsCastable(15) and (Player:FuryDeficit() >= 30) then
+    if S.Felblade:IsCastable(S.Felblade) and (Player:FuryDeficit() >= 30) then
       if AR.Cast(S.Felblade) then return ""; end
     end
     -- eye_beam,if=spell_targets.eye_beam_tick>desired_targets|!buff.metamorphosis.extended_by_demonic|(set_bonus.tier21_4pc&buff.metamorphosis.remains>8)
-    if S.EyeBeam:IsCastable(20, true) and Player:Fury() > S.EyeBeam:Cost() and ((AR.AoEON() and Cache.EnemiesCount[20] > 1)
+    if S.EyeBeam:IsReady(20, true) and ((AR.AoEON() and Cache.EnemiesCount[CleaveRangeID] > 1)
       or not IsMetaExtendedByDemonic() or (AC.Tier21_4Pc and Player:BuffRemainsP(S.MetamorphosisBuff) > 8)) then
       if AR.Cast(S.EyeBeam) then return ""; end
     end
     -- annihilation,if=(!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
-    if InMeleeRange and S.Annihilation:IsCastable() and Player:Fury() > S.Annihilation:Cost()
+    if InMeleeRange and S.Annihilation:IsReady()
       and ((not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff) or Player:FuryDeficit() < 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0)
         or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not PoolingForBladeDance()) then
       if AR.Cast(S.Annihilation) then return ""; end
     end
     -- throw_glaive,if=talent.bloodlet.enabled&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&raid_event.adds.in>recharge_time+cooldown
-    if S.ThrowGlaive:IsCastable(30)
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive)
       and (S.Bloodlet:IsAvailable() and (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return ""; end
     end
     -- chaos_strike,if=(!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_chaos_strike&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
-    if InMeleeRange and S.ChaosStrike:IsCastable() and Player:Fury() > S.ChaosStrike:Cost()
+    if InMeleeRange and S.ChaosStrike:IsReady()
       and ((not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff) or Player:FuryDeficit() < 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0))
         and not PoolingForChaosStrike() and not PoolingForMeta() and not PoolingForBladeDance()) then
       if AR.Cast(S.ChaosStrike) then return ""; end
     end
     -- fel_rush,if=!talent.momentum.enabled&(buff.metamorphosis.down|talent.demon_blades.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
     if S.FelRush:IsCastable(20, true) and (not S.Momentum:IsAvailable() and (Player:BuffDownP(S.MetamorphosisBuff) or S.DemonBlades:IsAvailable())) then
-      if AR.CastSuggested(S.FelRush) then return ""; end
+      if CastFelRush() then return ""; end
     end
     -- demons_bite
     if InMeleeRange and S.DemonsBite:IsCastable() then
       if AR.Cast(S.DemonsBite) then return ""; end
     end
     -- throw_glaive,if=buff.out_of_range.up|!talent.bloodlet.enabled
-    if S.ThrowGlaive:IsCastable(30) and (not IsInMeleeRange() or not S.Bloodlet:IsAvailable()) then
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (not IsInMeleeRange() or not S.Bloodlet:IsAvailable()) then
       if AR.Cast(S.ThrowGlaive) then return ""; end
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
     if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) then
-      if AR.CastSuggested(S.FelRush) then return ""; end
+      if CastFelRush() then return ""; end
     end
   end
 
@@ -282,7 +298,7 @@ local function APL()
     local InMeleeRange = IsInMeleeRange()
 
     -- vengeful_retreat,if=(talent.prepared.enabled|talent.momentum.enabled)&buff.prepared.down&buff.momentum.down
-    if S.VengefulRetreat:IsCastable(5, true)
+    if S.VengefulRetreat:IsCastable("Melee", true)
       and ((S.Prepared:IsAvailable() or S.Momentum:IsAvailable()) and Player:BuffDownP(S.PreparedBuff) and Player:BuffDownP(S.MomentumBuff)) then
       if AR.Cast(S.VengefulRetreat) then return "VR Momo"; end
     end
@@ -290,33 +306,33 @@ local function APL()
     if S.FelRush:IsCastable(20, true) and ((S.Momentum:IsAvailable() or S.FelMastery:IsAvailable())
       and (not S.Momentum:IsAvailable() or (S.FelRush:ChargesP() == 2 or S.VengefulRetreat:CooldownRemainsP() > 4) and Player:BuffDownP(S.MomentumBuff))
       and (not S.FelMastery:IsAvailable() or Player:FuryDeficit() >= 25)) then
-      if AR.Cast(S.FelRush) then return "FR Momo"; end
+      if CastFelRush() then return "FR Momo"; end
     end
     -- fel_barrage,if=(buff.momentum.up|!talent.momentum.enabled)&(active_enemies>desired_targets|raid_event.adds.in>30)
-    if S.FelBarrage:IsCastable(30) and ((Player:BuffP(S.MomentumBuff) or not S.Momentum:IsAvailable())) then
+    if S.FelBarrage:IsCastable(S.FelBarrage) and ((Player:BuffP(S.MomentumBuff) or not S.Momentum:IsAvailable())) then
       if AR.Cast(S.FelBarrage) then return "FBarr"; end
     end
     -- throw_glaive,if=talent.bloodlet.enabled&(!talent.momentum.enabled|buff.momentum.up)&charges=2
-    if S.ThrowGlaive:IsCastable(30)
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive)
       and (S.Bloodlet:IsAvailable() and (not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff)) and S.ThrowGlaive:ChargesP() == 2) then
       if AR.Cast(S.ThrowGlaive) then return "TG Capped"; end
     end
     -- felblade,if=fury<15&(cooldown.death_sweep.remains<2*gcd|cooldown.blade_dance.remains<2*gcd)
-    if S.Felblade:IsCastable(15)
+    if S.Felblade:IsCastable(S.Felblade)
       and (Player:Fury() < 15 and (S.DeathSweep:CooldownRemainsP() < 2 * Player:GCD() or S.BladeDance:CooldownRemainsP() < 2 * Player:GCD())) then
       if AR.Cast(S.Felblade) then return "FB Low Fury"; end
     end
     -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsCastable(8, true) and Player:Fury() > S.DeathSweep:Cost() and (BladeDance()) then
+    if S.DeathSweep:IsReady(8, true) and (BladeDance()) then
       if AR.Cast(S.DeathSweep) then return "DS"; end
     end
     -- fel_rush,if=charges=2&!talent.momentum.enabled&!talent.fel_mastery.enabled&!buff.metamorphosis.up
     if S.FelRush:IsCastable(20, true)
       and (S.FelRush:ChargesP() == 2 and not S.Momentum:IsAvailable() and not S.FelMastery:IsAvailable() and not Player:BuffP(S.MetamorphosisBuff)) then
-      if AR.CastSuggested(S.FelRush) then return "FR Capped"; end
+      if CastFelRush() then return "FR Capped"; end
     end
     -- fel_eruption
-    if S.FelEruption:IsCastable(20) and Player:Fury() > S.FelEruption:Cost() then
+    if S.FelEruption:IsReady(S.FelEruption) then
       if AR.Cast(S.FelEruption) then return "FE"; end
     end
     -- fury_of_the_illidari,if=(active_enemies>desired_targets)|(raid_event.adds.in>55&(!talent.momentum.enabled|buff.momentum.up)&(!talent.chaos_blades.enabled|buff.chaos_blades.up|cooldown.chaos_blades.remains>30|target.time_to_die<cooldown.chaos_blades.remains))
@@ -326,42 +342,42 @@ local function APL()
       if AR.Cast(S.FuryOfTheIllidari) then return "FotI"; end
     end
     -- blade_dance,if=variable.blade_dance
-    if S.BladeDance:IsCastable(8, true) and Player:Fury() > S.BladeDance:Cost() and (BladeDance()) then
+    if S.BladeDance:IsReady(8, true) and (BladeDance()) then
       if AR.Cast(S.BladeDance) then return "BD"; end
     end
     -- throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
-    if AR.AoEON() and S.ThrowGlaive:IsCastable(30) and (S.Bloodlet:IsAvailable() and Cache.EnemiesCount[30] >= 2
+    if AR.AoEON() and S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (S.Bloodlet:IsAvailable() and Cache.EnemiesCount[CleaveRangeID] >= 2
       and (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return "TG"; end
     end
     -- felblade,if=fury.deficit>=30+buff.prepared.up*8
-    if S.Felblade:IsCastable(15) and (Player:FuryDeficit() >= 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0)) then
+    if S.Felblade:IsCastable(S.Felblade) and (Player:FuryDeficit() >= 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0)) then
       if AR.Cast(S.Felblade) then return "FB"; end
     end
     -- eye_beam,if=spell_targets.eye_beam_tick>desired_targets|(spell_targets.eye_beam_tick>=3&raid_event.adds.in>cooldown)|(talent.blind_fury.enabled&fury.deficit>=35)|set_bonus.tier21_2pc
-    if S.EyeBeam:IsCastable(20, true) and Player:Fury() > S.EyeBeam:Cost()
-      and ((AR.AoEON() and Cache.EnemiesCount[20] > 1) or (S.BlindFury:IsAvailable() and Player:FuryDeficit() >= 35) or AC.Tier21_2Pc) then
+    if S.EyeBeam:IsReady(20, true)
+      and ((AR.AoEON() and Cache.EnemiesCount[CleaveRangeID] > 1) or (S.BlindFury:IsAvailable() and Player:FuryDeficit() >= 35) or AC.Tier21_2Pc) then
       if AR.Cast(S.EyeBeam) then return "EB"; end
     end
     -- annihilation,if=(talent.demon_blades.enabled|!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
-    if InMeleeRange and S.Annihilation:IsCastable() and Player:Fury() > S.Annihilation:Cost()
+    if InMeleeRange and S.Annihilation:IsReady()
       and ((S.DemonBlades:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff)
         or Player:FuryDeficit() < 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0) or Player:BuffRemainsP(S.MetamorphosisBuff) < 5)
       and not PoolingForBladeDance()) then
       if AR.Cast(S.Annihilation) then return "AN"; end
     end
     -- throw_glaive,if=talent.bloodlet.enabled&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&raid_event.adds.in>recharge_time+cooldown
-    if S.ThrowGlaive:IsCastable(30)
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive)
       and (S.Bloodlet:IsAvailable() and (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return "TG Bloodlet"; end
     end
     -- throw_glaive,if=!talent.bloodlet.enabled&buff.metamorphosis.down&spell_targets>=3
-    if AR.AoEON() and S.ThrowGlaive:IsCastable(30)
-      and (not S.Bloodlet:IsAvailable() and Player:BuffDownP(S.MetamorphosisBuff) and Cache.EnemiesCount[30] >= 3) then
+    if AR.AoEON() and S.ThrowGlaive:IsCastable(S.ThrowGlaive)
+      and (not S.Bloodlet:IsAvailable() and Player:BuffDownP(S.MetamorphosisBuff) and Cache.EnemiesCount[CleaveRangeID] >= 3) then
       if AR.Cast(S.ThrowGlaive) then return "TG Cleave"; end
     end
     -- chaos_strike,if=(talent.demon_blades.enabled|!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_chaos_strike&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
-    if InMeleeRange and S.ChaosStrike:IsCastable() and Player:Fury() > S.ChaosStrike:Cost()
+    if InMeleeRange and S.ChaosStrike:IsReady()
       and ((S.DemonBlades:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff)
         or Player:FuryDeficit() < 30 + (Player:BuffP(S.PreparedBuff) and 8 or 0))
       and not PoolingForChaosStrike() and not PoolingForMeta() and not PoolingForBladeDance()) then
@@ -369,37 +385,34 @@ local function APL()
     end
     -- fel_rush,if=!talent.momentum.enabled&raid_event.movement.in>charges*10&(talent.demon_blades.enabled|buff.metamorphosis.down)
     if S.FelRush:IsCastable(20, true) and (not S.Momentum:IsAvailable() and (S.DemonBlades:IsAvailable() or Player:BuffDownP(S.MetamorphosisBuff))) then
-      if AR.CastSuggested(S.FelRush) then return "FR Filler"; end
+      if CastFelRush() then return "FR Filler"; end
     end
     -- demons_bite
     if InMeleeRange and S.DemonsBite:IsCastable() then
       if AR.Cast(S.DemonsBite) then return "DB"; end
     end
     -- throw_glaive,if=buff.out_of_range.up
-    if S.ThrowGlaive:IsCastable(30) and (not IsInMeleeRange()) then
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (not IsInMeleeRange()) then
       if AR.Cast(S.ThrowGlaive) then return "TG OOR"; end
     end
     -- felblade,if=movement.distance>15|buff.out_of_range.up
-    if S.Felblade:IsCastable(15) and (not IsInMeleeRange()) then
+    if S.Felblade:IsCastable(S.Felblade) and (not IsInMeleeRange()) then
       if AR.Cast(S.Felblade) then return "FB OOR"; end
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
     if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) then
-      if AR.CastSuggested(S.FelRush) then return "FR OOR"; end
+      if CastFelRush() then return "FR OOR"; end
     end
     -- throw_glaive,if=!talent.bloodlet.enabled
-    if S.ThrowGlaive:IsCastable(30) and (not S.Bloodlet:IsAvailable()) then
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (not S.Bloodlet:IsAvailable()) then
       if AR.Cast(S.ThrowGlaive) then return "TG Filler"; end
     end
   end
 
   -- Unit Update
-  AC.GetEnemies(4, true); -- Fel Barrage
-  AC.GetEnemies(5, true); -- Vengeful Retreat
   AC.GetEnemies(6, true); -- Fury of the Illidari
   AC.GetEnemies(8, true); -- Blade Dance/Chaos Nova
-  AC.GetEnemies(20, true); -- Eye Beam
-  AC.GetEnemies(30, true); -- Throw Glaive, TODO: Figure out something for bounces...
+  AC.GetEnemies(S.ConsumeMagic, true); -- 20y, use for TG Bounce and Eye Beam
   AC.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
 
