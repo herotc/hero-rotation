@@ -146,20 +146,20 @@
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&(talent.trick_shot.enabled|buff.lock_and_load.up)&buff.sentinels_sight.stack=20
-    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > S.AimedShot:Cost() and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() and (S.TrickShot:IsAvailable() or Player:Buff(S.LockandLoad)) and Player:BuffStack(S.SentinelsSight) == 20 then
+    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > S.AimedShot:Cost() and Hunter.GetSplashCount(Target,8) > 1 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() and (S.TrickShot:IsAvailable() or Player:Buff(S.LockandLoad)) and Player:BuffStack(S.SentinelsSight) == 20 then
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&set_bonus.tier20_2pc&!buff.t20_2p_critical_aimed_damage.up&action.aimed_shot.in_flight
-    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > S.AimedShot:Cost() and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() and S.TrickShot:IsAvailable() and AC.Tier20_2Pc and not Player:Buff(S.CriticalAimed) and S.AimedShot:InFlight() then
+    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > S.AimedShot:Cost() and Hunter.GetSplashCount(Target,8) > 1 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:CastTime() and S.TrickShot:IsAvailable() and AC.Tier20_2Pc and not Player:Buff(S.CriticalAimed) and S.AimedShot:InFlight() then
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/marked_shot,if=spell_targets>1
-    if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > S.MarkedShot:Cost() and Target:Debuff(S.HuntersMark) and Cache.EnemiesCount[40] > 1 then
+    if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > S.MarkedShot:Cost() and Target:Debuff(S.HuntersMark) and Hunter.GetSplashCount(Target,8) > 1 then
       if AR.Cast(S.MarkedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/multishot,if=spell_targets>1&(buff.marking_targets.up|buff.trueshot.up)
-    if S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Player:Buff(S.MarkingTargets) or Player:Buff(S.TrueShot)) then
-      AR.CastSuggested(S.MultiShot);
+    if S.MultiShot:IsCastable() and Hunter.GetSplashCount(Target,8) > 1 and (Player:Buff(S.MarkingTargets) or Player:Buff(S.TrueShot)) then
+      if AR.Cast(S.MultiShot) then return "" end
     end
     -- actions.non_patient_sniper+=/sentinel,if=!debuff.hunters_mark.up
     if AR.AoEON() and S.Sentinel:IsCastable() and not Target:Debuff(S.HuntersMark) then
@@ -223,8 +223,8 @@
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/multishot,if=spell_targets.multishot>1&!variable.waiting_for_sentinel
-    if S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and not WaitingForSentinel() then
-      AR.CastSuggested(S.MultiShot);
+    if S.MultiShot:IsCastable() and Hunter.GetSplashCount(Target,8) > 1 and not WaitingForSentinel() then
+      if AR.Cast(S.MultiShot) then return "" end
     end
     -- actions.non_patient_sniper+=/arcane_shot,if=spell_targets.multishot=1&!variable.waiting_for_sentinel
     if S.ArcaneShot:IsCastable() and not WaitingForSentinel() then
@@ -260,7 +260,7 @@
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets>1&lowest_vuln_within.5>0&((!buff.trueshot.up&focus>80&(lowest_vuln_within.5<1|debuff.hunters_mark.up))|(buff.trueshot.up&focus>105&lowest_vuln_within.5<6))
-    if AR.CDsON() and S.PiercingShot:IsAvailable() and S.PiercingShot:CooldownUp() and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > 0 and ((not Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 80 and (Target:DebuffRemains(S.Vulnerability) < 1 or Target:Debuff(S.HuntersMark))) or (Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 105 and Target:DebuffRemains(S.Vulnerability) < 6)) then
+    if AR.CDsON() and S.PiercingShot:IsAvailable() and S.PiercingShot:CooldownUp() and Hunter.GetSplashCount(Target,8) > 1 and Target:DebuffRemains(S.Vulnerability) > 0 and ((not Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 80 and (Target:DebuffRemains(S.Vulnerability) < 1 or Target:Debuff(S.HuntersMark))) or (Player:Buff(S.TrueShot) and Player:FocusPredicted(0.2) > 105 and Target:DebuffRemains(S.Vulnerability) < 6)) then
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/aimed_shot,if=spell_targets>1&talent.trick_shot.enabled&debuff.vulnerability.remains>cast_time&(buff.sentinels_sight.stack>=spell_targets.multishot*5|buff.sentinels_sight.stack+(spell_targets.multishot%2)>20|buff.lock_and_load.up|(set_bonus.tier20_2pc&!buff.t20_2p_critical_aimed_damage.up&action.aimed_shot.in_flight))
@@ -268,12 +268,12 @@
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.patient_sniper+=/marked_shot,if=spell_targets>1
-    if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > S.MarkedShot:Cost() and Target:Debuff(S.HuntersMark) and Cache.EnemiesCount[40] > 1 then
+    if S.MarkedShot:IsCastable() and Player:FocusPredicted(0.2) > S.MarkedShot:Cost() and Target:Debuff(S.HuntersMark) and Hunter.GetSplashCount(Target,8) > 1 then
       if AR.Cast(S.MarkedShot) then return ""; end
     end
     -- actions.patient_sniper+=/multishot,if=spell_targets>1&(buff.marking_targets.up|buff.trueshot.up)
-    if S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Player:Buff(S.MarkingTargets) or Player:Buff(S.TrueShot)) then
-      AR.CastSuggested(S.MultiShot);
+    if S.MultiShot:IsCastable() and Hunter.GetSplashCount(Target,8) > 1 and (Player:Buff(S.MarkingTargets) or Player:Buff(S.TrueShot)) then
+      if AR.Cast(S.MultiShot) then return "" end
     end
     -- actions.patient_sniper+=/windburst,if=variable.vuln_aim_casts<1&!variable.pooling_for_piercing
     if S.Windburst:IsCastable() and Vuln_Aim_Casts < 1 and not PoolingforPiercing() then
@@ -300,13 +300,13 @@
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.patient_sniper+=/aimed_shot,if=spell_targets.multishot>1&debuff.vulnerability.remains>execute_time&(!variable.pooling_for_piercing|(focus>100&lowest_vuln_within.5>(execute_time+gcd.max)))
-    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > S.AimedShot:Cost() and Cache.EnemiesCount[40] > 1 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:ExecuteTime() and (not PoolingforPiercing() or (Player:FocusPredicted(0.2) > 100 and 
+    if S.AimedShot:IsCastable() and Player:FocusPredicted(0.2) > S.AimedShot:Cost() and Hunter.GetSplashCount(Target,8) > 1 and Target:DebuffRemains(S.Vulnerability) > S.AimedShot:ExecuteTime() and (not PoolingforPiercing() or (Player:FocusPredicted(0.2) > 100 and 
     Target:DebuffRemains(S.Vulnerability) > (S.AimedShot:ExecuteTime() + Player:GCD()))) then
       if AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.patient_sniper+=/multishot,if=spell_targets>1&variable.can_gcd&focus+cast_regen+action.aimed_shot.cast_regen<focus.max&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)
-    if S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and Can_GCD and Player:FocusPredicted(0.2) + Player:FocusCastRegen(S.AimedShot:CastTime()) < Player:FocusMax() and (not PoolingforPiercing() or Target:DebuffRemains(S.Vulnerability) > Player:GCD()) then
-      AR.CastSuggested(S.MultiShot);
+    if S.MultiShot:IsCastable() and Hunter.GetSplashCount(Target,8) > 1 and Can_GCD and Player:FocusPredicted(0.2) + Player:FocusCastRegen(S.AimedShot:CastTime()) < Player:FocusMax() and (not PoolingforPiercing() or Target:DebuffRemains(S.Vulnerability) > Player:GCD()) then
+      if AR.Cast(S.MultiShot) then return "" end
     end
     -- actions.patient_sniper+=/arcane_shot,if=spell_targets.multi_shot=1&(!set_bonus.tier20_2pc|!action.aimed_shot.in_flight|buff.t20_2p_critical_aimed_damage.remains>action.aimed_shot.execute_time+gcd)&variable.vuln_aim_casts>0&variable.can_gcd&focus+cast_regen+action.aimed_shot.cast_regen<focus.max&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd)
     if S.ArcaneShot:IsCastable() 
@@ -346,8 +346,8 @@
       if AR.Cast(S.ArcaneShot) then return ""; end
     end
     -- actions.patient_sniper+=/multishot,if=spell_targets>1&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd.max)
-    if S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (not PoolingforPiercing() or Target:DebuffRemains(S.Vulnerability) > Player:GCD()) then
-      AR.CastSuggested(S.MultiShot);
+    if S.MultiShot:IsCastable() and Hunter.GetSplashCount(Target,8) > 1 and (not PoolingforPiercing() or Target:DebuffRemains(S.Vulnerability) > Player:GCD()) then
+      if AR.Cast(S.MultiShot) then return "" end
     end
     return false;
   end
@@ -386,6 +386,7 @@
     -- Unit Update
     AC.GetEnemies(40);
     Everyone.AoEToggleEnemiesUpdate();
+	Hunter.UpdateSplashCount(Target, 8)
     -- Defensives
       -- Exhilaration
       if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.Marksmanship.ExhilarationHP then
