@@ -105,11 +105,12 @@
     self.text:SetTextColor(1,1,1,1);
     self.text:SetText("");
     self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.keybind:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
     self.keybind:SetAllPoints(true);
     self.keybind:SetJustifyH("RIGHT");
     self.keybind:SetJustifyV("TOP");
     self.keybind:SetPoint("TOPRIGHT");
-    self.keybind:SetTextColor(1,1,1,0.7);
+    self.keybind:SetTextColor(0.8,0.8,0.8,1);
     self.keybind:SetText("");
     if AR.GUISettings.General.BlackBorderIcon then
       self.TempTexture:SetTexCoord(.08, .92, .08, .92);
@@ -207,11 +208,12 @@
       AR:CreateBackdrop(self.Icon[Index]);
     end
     self.Icon[Index].keybind = self.Icon[Index]:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Icon[Index].keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE");
     self.Icon[Index].keybind:SetAllPoints(true);
     self.Icon[Index].keybind:SetJustifyH("RIGHT");
     self.Icon[Index].keybind:SetJustifyV("TOP");
     self.Icon[Index].keybind:SetPoint("TOPRIGHT");
-    self.Icon[Index].keybind:SetTextColor(1,1,1,0.7);
+    self.Icon[Index].keybind:SetTextColor(0.8,0.8,0.8,1);
     self.Icon[Index].keybind:SetText("");
     self.Icon[Index]:Show();
   end
