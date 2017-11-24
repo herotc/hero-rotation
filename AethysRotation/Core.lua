@@ -104,11 +104,14 @@
     QueueSpellTable = {...};
     QueueLength = mathmin(#QueueSpellTable, AR.MaxQueuedCasts);
     QueueTextureTable = {};
+    QueueKeybindTable = {};
     for i = 1, QueueLength do
       QueueTextureTable[i] = AR.GetTexture(QueueSpellTable[i]);
       QueueSpellTable[i].LastDisplayTime = AC.GetTime();
+      QueueKeybindTable[i] = not AR.GUISettings.General.HideKeyBinds
+                              and QueueSpellTable[i]:FindKeyBinding();
     end
-    AR.MainIconFrame:SetupParts(QueueTextureTable);
+    AR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
     GCDDisplay();
     return "Should Return";
   end

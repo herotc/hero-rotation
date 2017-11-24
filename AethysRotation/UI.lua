@@ -147,6 +147,14 @@
       self.Part[i]:SetHeight(64);
       self.Part[i]:SetPoint("Left", self, "Left", 0, 0);
       self.Part[i].TempTexture = self.Part[i]:CreateTexture(nil, "BACKGROUND");
+      self.Part[i].keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+      self.Part[i].keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE");
+      self.Part[i].keybind:SetAllPoints(true);
+      self.Part[i].keybind:SetJustifyH("RIGHT");
+      self.Part[i].keybind:SetJustifyV("TOP");
+      self.Part[i].keybind:SetPoint("TOPRIGHT", );
+      self.Part[i].keybind:SetTextColor(0.8,0.8,0.8,1);
+      self.Part[i].keybind:SetText("");
       if AR.GUISettings.General.BlackBorderIcon then
         self.Part[i].TempTexture:SetTexCoord(.08, .92, .08, .92);
         AR:CreateBackdrop(self.Part[i]);
@@ -155,9 +163,9 @@
     end
   end
   local QueuedCasts, FrameWidth;
-  function AR.MainIconFrame:SetupParts (Textures)
+  function AR.MainIconFrame:SetupParts (Textures, Keybinds)
     QueuedCasts = #Textures;
-	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
+	  FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
     for i = 1, QueuedCasts do
       self.Part[i]:SetWidth(FrameWidth);
       self.Part[i]:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
@@ -168,6 +176,7 @@
                                             AR.GUISettings.General.BlackBorderIcon and 0.08 or 0,
                                             AR.GUISettings.General.BlackBorderIcon and 0.92 or 1);
       self.Part[i].texture = self.Part[i].TempTexture;
+      self.Part[i].keybind:SetText(Keybinds[i]);
       if not self.Part[i]:IsVisible() then
         self.Part[i]:Show();
       end
@@ -175,6 +184,7 @@
   end
   function AR.MainIconFrame:HideParts ()
     for i = 1, #self.Part do
+      self.Part[i].keybind:SetText("");
       self.Part[i]:Hide();
     end
   end
