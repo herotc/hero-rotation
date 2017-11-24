@@ -56,6 +56,7 @@
       ExhilarationHP = 30,
       ShowPoPP = false,
       UseSilence = false,
+      EnableMovementRotation = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -124,5 +125,6 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Marksmanship, "APL.Hunter.Marksmanship.OffGCDasOffGCD.TrueShot", "TrueShot");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseCounterShot", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
+  CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.EnableMovementRotation", "Enable Movement Rotation", "Enable this to show a special rotation while Moving. The optimal standing ability will be shown as a suggestion.");
   -- -- Survival
   CreatePanelOption("Slider", CP_Survival, "APL.Hunter.Survival.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
