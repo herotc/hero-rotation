@@ -214,7 +214,6 @@
     if Spell == S.AimedShot then
       return Spell:IsCastable() and PlayerFocusPredicted() > Spell:Cost();
     elseif Spell == S.MarkedShot then
-      --print("MarSCastP: " .. tostring(Spell:IsCastable()) .. " PFP > MS:CST: " .. tostring(S.MarkedShot:Cost()) .. " HM: " .. tostring(TargetDebuffP(S.HuntersMark)))
       return Spell:IsCastable() and PlayerFocusPredicted() > Spell:Cost() and TargetDebuffP(S.HuntersMark);
     elseif Spell == S.Windburst then
       return Spell:IsCastable() and not Player:PrevGCDP(1, S.Windburst, true) and not Player:IsCasting(S.Windburst);
@@ -373,16 +372,12 @@
     end
     -- actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor(variable.vuln_window%action.aimed_shot.execute_time)
     Vuln_Aim_Casts = math.floor(Vuln_Window/S.AimedShot:ExecuteTime());
-    --print("STEP 1: V_W: " .. tostring(Vuln_Window) .. " AISET: " .. tostring(S.AimedShot:ExecuteTime()) .. " Vuln_Aim_Casts: " .. tostring(Vuln_Aim_Casts));
     -- actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor((focus+action.aimed_shot.cast_regen*(variable.vuln_aim_casts-1))%action.aimed_shot.cost),if=variable.vuln_aim_casts>0&variable.vuln_aim_casts>floor((focus+action.aimed_shot.cast_regen*(variable.vuln_aim_casts-1))%action.aimed_shot.cost)
     if Vuln_Aim_Casts > 0 and Vuln_Aim_Casts > math.floor((PlayerFocusPredicted() + Player:FocusCastRegen(S.AimedShot:ExecuteTime()) * (Vuln_Aim_Casts - 1)) / S.AimedShot:Cost()) then
       Vuln_Aim_Casts = math.floor((PlayerFocusPredicted() + Player:FocusCastRegen(S.AimedShot:ExecuteTime()) * (Vuln_Aim_Casts - 1)) / S.AimedShot:Cost());
-      --print("STEP 2: V_A_C: " .. tostring(Vuln_Aim_Casts) .. " PFP: " .. tostring(PlayerFocusPredicted()) .. " FR: " .. tostring(Player:FocusRegen()) .. " AISCT: " .. tostring(S.AimedShot:CastTime()) .. " FCR: " ..
-      --tostring(Player:FocusCastRegen(S.AimedShot:ExecuteTime())) .. " AISCOS: " .. tostring(S.AimedShot:Cost()))
     end
     -- actions.patient_sniper+=/variable,name=can_gcd,value=variable.vuln_window<action.aimed_shot.cast_time|variable.vuln_window>variable.vuln_aim_casts*action.aimed_shot.execute_time+gcd.max+0.1
     Can_GCD = Vuln_Window < S.AimedShot:CastTime() or Vuln_Window > Vuln_Aim_Casts * S.AimedShot:ExecuteTime() + Player:GCD() + 0.1;
-    --print("STEP 3: CGCD: " .. tostring(Vuln_Window) .. " AISCT: " .. tostring(S.AimedShot:CastTime()) .. " V_A_C: " .. tostring(Vuln_Aim_Casts) .. " AISET: " .. tostring(S.AimedShot:ExecuteTime()) .. " GCD: " .. tostring(Player:GCD()));
     -- actions.patient_sniper+=/piercing_shot,if=cooldown.piercing_shot.up&spell_targets=1&lowest_vuln_within.5>0&lowest_vuln_within.5<1
     if AR.CDsON() and S.PiercingShot:IsAvailable() and S.PiercingShot:CooldownUp() and Hunter.GetSplashCount(Target,8) == 1 and TargetDebuffRemainsP(S.Vulnerability) > 0 and TargetDebuffRemainsP(S.Vulnerability) < 1 then
       if AR.Cast(S.PiercingShot) then return ""; end
@@ -455,8 +450,6 @@
     end
     -- actions.patient_sniper+=/marked_shot,if=!talent.sidewinders.enabled&!variable.pooling_for_piercing&!action.windburst.in_flight&(focus>65|buff.trueshot.up|(1%attack_haste)>1.171)
     if IsCastableP(S.MarkedShot) and (not S.Sidewinders:IsAvailable() and not PoolingforPiercing() and not S.Windburst:InFlight() and (PlayerFocusPredicted() > 65 or Player:Buff(S.TrueShot) or (1 / (1 + (Player:HastePct() / 100))) > 1.171)) then
-      --print("m5 - MS: " .. tostring(IsCastableP(S.MarkedShot)) .. " SWA: " .. tostring(S.Sidewinders:IsAvailable()) .. " PFP: " .. tostring(PoolingforPiercing()) .. " WIF: " .. tostring(S.Windburst:InFlight()) .. 
-      --" FCP: " .. tostring(PlayerFocusPredicted() > 65) .. " TS: " .. tostring(Player:Buff(S.TrueShot)) .. " HST1: " .. tostring((1 + (Player:HastePct() / 100))) .. " HST2: " .. tostring((1 / (1 + (Player:HastePct() / 100))) > 1.171))
       if AR.Cast(S.MarkedShot) then return ""; end
     end
     -- actions.patient_sniper+=/marked_shot,if=talent.sidewinders.enabled&(variable.vuln_aim_casts<1|buff.trueshot.up|variable.vuln_window<action.aimed_shot.cast_time)
@@ -518,7 +511,6 @@
     AC.GetEnemies(40);
     Everyone.AoEToggleEnemiesUpdate();
     Hunter.UpdateSplashCount(Target, 8)
-    --print("FP: " .. tostring(PlayerFocusPredicted()) .. " PGCD: " .. tostring(Spell(Player:PrevGCD(1)):Name()) .. " FRCR: " .. tostring(math.floor(Player:FocusRemainingCastRegen() + 0.5)) .. " FLCE: " .. tostring(Player:FocusLossOnCastEnd()) .. " PGCP: " .. tostring(Player:PrevGCDP(1, S.Windburst, true)) .. " FR: " .. tostring(Player:FocusRegen()) .. " GCDR: " .. tostring(Player:GCDRemains()) .. " VAC: " .. tostring(Vuln_Aim_Casts) .. " CANGCD: " .. tostring(Can_GCD) .. " VULNP: " .. tostring(TargetDebuffRemainsP(S.Vulnerability)))
     -- Defensives
       -- Exhilaration
       if IsCastableP(S.Exhilaration) and Player:HealthPercentage() <= Settings.Marksmanship.ExhilarationHP then
