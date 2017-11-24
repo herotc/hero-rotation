@@ -60,6 +60,7 @@
       Meteor                        = Spell(153561),
       -- Artifact
       PhoenixFlames                 = Spell(194466),
+      BigMouth                      = Spell(215796),
       -- Defensive
       IceBarrier                    = Spell(11426),
       IceBlock                      = Spell(45438),
@@ -83,7 +84,7 @@ Item.Mage.Fire = {
   PyrotexIgnitionCloth          = Item(144355),
   SephuzsSecret                 = Item(132452),
   KiljadensBurningWish          = Item(144259),
-  DarckilsDragonfireDiadem      = Item(132863),
+  DarcklisDragonfireDiadem      = Item(132863),
   NorgannonsForesight           = Item(132455),
   BelovirsFinalStand            = Item(133977),
   PrydazXavaricsMagnumOpus      = Item(132444)
@@ -98,6 +99,7 @@ local Settings = {
 -- Register for InFlight tracking
 S.PhoenixFlames:RegisterInFlight();
 S.Pyroblast:RegisterInFlight(S.Combustion);
+DBRange = 12;
 --take into account upcoming crits for rotation smoothness, return 0 = No buff , 1 = Heating Up, 2 = Hot Streak
 local function HeatLevelPredicted ()
   if Player:BuffP(S.HotStreak) then
@@ -146,9 +148,9 @@ local function ActiveTalents ()
     if AR.Cast(S.Cinderstorm) then return ""; end
   end
   -- actions.active_talents+=/dragons_breath,if=equipped.132863|(talent.alexstraszas_fury.enabled&buff.hot_streak.down)
-  if S.DragonsBreath:IsCastable()
+  if S.DragonsBreath:IsCastable() and Cache.EnemiesCount[DBRange] > 0
     and (
-          I.DarckilsDragonfireDiadem:IsEquipped()
+          I.DarcklisDragonfireDiadem:IsEquipped()
       or  S.AlexstraszasFury:IsAvailable() and not BuffP(S.HotStreak)
     ) then
     if AR.Cast(S.DragonsBreath) then return ""; end
@@ -214,7 +216,7 @@ local function CombustionPhase ()
     if AR.Cast(S.Scorch) then return ""; end
   end
   --actions.combustion_phase+=/dragons_breath,if=buff.hot_streak.down&action.fire_blast.charges<1&action.phoenixs_flames.charges<1
-  if S.DragonsBreath:IsCastable() and not BuffP(S.HotStreak) and S.Fireblast:Charges() < 1 and S.PhoenixFlames:Charges() < 1 then
+  if S.DragonsBreath:IsCastable() and Cache.EnemiesCount[DBRange] > 0 and not BuffP(S.HotStreak) and S.Fireblast:Charges() < 1 and S.PhoenixFlames:Charges() < 1 then
     if AR.Cast(S.DragonsBreath) then return ""; end
   end
   --actions.combustion_phase+=/scorch,if=target.health.pct<=30&equipped.132454
@@ -268,7 +270,7 @@ local function RopPhase ()
     if AR.Cast(S.Scorch) then return ""; end
   end
   --actions.rop_phase+=/dragons_breath,if=active_enemies>2
-  if S.DragonsBreath:IsCastable() and Cache.EnemiesCount[40] > 2 then
+  if S.DragonsBreath:IsCastable() and Cache.EnemiesCount[DBRange] > 2 then
     if AR.Cast(S.DragonsBreath) then return ""; end
   end
   --actions.rop_phase+=/flamestrike,if=(talent.flame_patch.enabled&active_enemies>2)|active_enemies>5
@@ -401,6 +403,10 @@ end
 
 local function APL ()
   AC.GetEnemies(40);
+  DBRange = (S.BigMouth:ArtifactEnabled() and 15 or 10) + (I.DarcklisDragonfireDiadem:IsEquipped() and 25 or 0);
+  if DBRange < 40 then
+    AC.GetEnemies(DBRange);
+  end
   Everyone.AoEToggleEnemiesUpdate();
   -- Out of Combat
   if not Player:AffectingCombat() and not Player:IsCasting() then
@@ -411,7 +417,7 @@ local function APL ()
     -- Opener
     if Everyone.TargetIsValid() and Target:IsInRange(40) then
       if S.Pyroblast:IsCastable() then
-        if AR.Cast(S.Pyroblast) then return; end
+        if AR.Cast(S.Pyroblast) then return ""; end
       end
     end
     return;
