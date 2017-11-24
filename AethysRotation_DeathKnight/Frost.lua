@@ -334,7 +334,7 @@
       if AR.Cast(S.FrostScythe) then return ""; end
     end
     --actions.obliteration+=/obliterate,if=(buff.killing_machine.up&(buff.killing_machine.react|prev_gcd.1.frost_strike|prev_gcd.1.howling_blast))|(spell_targets.howling_blast>=3&!buff.rime.up) 
-    if S.Obliterate:IsCastable() and (Player:Buff(S.KillingMachine) and (Player:Buff(S.KillingMachine) or Player:PrevGCD(1, S.FrostStrike) or Player:PrevGCD(1, S.HowlingBlast)) or (Cache.EnemiesCount[10] >= 3 and not Player:Buff(S.Rime)) then
+    if S.Obliterate:IsCastable() and (Player:Buff(S.KillingMachine) and (Player:Buff(S.KillingMachine) or Player:PrevGCD(1, S.FrostStrike) or Player:PrevGCD(1, S.HowlingBlast))) or (Cache.EnemiesCount[10] >= 3 and not Player:Buff(S.Rime)) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.obliteration+=/howling_blast,if=buff.rime.up&spell_targets.howling_blast>1
