@@ -16,7 +16,7 @@
   -- All settings here should be moved into the GUI someday.
   AR.GUISettings.APL.Hunter = {
     Commons = {
-	  MultiShotInMain = "Never",
+      MultiShotInMain = "Never",
       -- SoloMode Settings
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
