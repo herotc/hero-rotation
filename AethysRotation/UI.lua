@@ -152,7 +152,7 @@
       self.Part[i].keybind:SetAllPoints(true);
       self.Part[i].keybind:SetJustifyH("RIGHT");
       self.Part[i].keybind:SetJustifyV("TOP");
-      self.Part[i].keybind:SetPoint("TOPRIGHT", );
+      self.Part[i].keybind:SetPoint("TOPRIGHT");
       self.Part[i].keybind:SetTextColor(0.8,0.8,0.8,1);
       self.Part[i].keybind:SetText("");
       if AR.GUISettings.General.BlackBorderIcon then
