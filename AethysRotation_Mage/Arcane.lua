@@ -230,7 +230,7 @@ local function Burn ()
      v_burnPhase = false
   end
   -- nether_tempest,if=refreshable|!ticking
-  if S.NetherTempest:IsCastableP() and S.NetherTempest:IsAvailable() and Player:ManaP() >= S.NetherTempest:Cost() and (Target:DebuffRefreshableCP(S.NetherTempest) or not Target:DebuffRemainsP(S.NetherTempest) > 0) then
+  if S.NetherTempest:IsCastableP() and S.NetherTempest:IsAvailable() and Player:ManaP() >= S.NetherTempest:Cost() and (Target:DebuffRefreshableCP(S.NetherTempest) or not (Target:DebuffRemainsP(S.NetherTempest) > 0)) then
     if AR.Cast(S.NetherTempest) then return ""; end
   end
   -- mark_of_aluneth
