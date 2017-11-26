@@ -139,8 +139,8 @@ local AR = AethysRotation;
     if S.RagingBlow:IsReady() and S.InnerRage:IsAvailable() and Player:BuffP(S.Enrage) then
       if AR.Cast(S.RagingBlow) then return ""; end
     end
-    -- actions.cooldowns+=/rampage
-    if S.Rampage:IsReady() then
+    -- actions.cooldowns+=/rampage,if=(rage>=100&talent.frothing_berserker.enabled&!set_bonus.tier21_4pc)|set_bonus.tier21_4pc|!talent.frothing_berserker.enabled
+    if S.Rampage:IsReady() and (Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable() and not AC.Tier21_4Pc) or AC.Tier21_4Pc or not S.FrothingBerserker:IsAvailable() then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.cooldowns+=/odyns_fury,if=buff.enrage.up&(cooldown.raging_blow.remains>0|!talent.inner_rage.enabled)
@@ -316,12 +316,15 @@ local function APL ()
     if AR.CastSuggested(I.PotionoftheOldWar) then return ""; end
   end
   -- actions+=/dragon_roar,if=(equipped.convergence_of_fates&cooldown.battle_cry.remains<2)|!equipped.convergence_of_fates&(!cooldown.battle_cry.remains<=10|cooldown.battle_cry.remains<2)|(talent.bloodbath.enabled&(cooldown.bloodbath.remains<1|buff.bloodbath.up))
-  if AR.CDsON() and S.DragonRoar:IsCastable() and ((I.ConvergenceofFates:IsEquipped() and S.BattleCry:CooldownRemainsP() < 2) or not I.ConvergenceofFates:IsEquipped() and (S.BattleCry:CooldownRemainsP() > 10 or S.BattleCry:CooldownRemainsP() < 2) or (not S.Bloodbath:IsAvailable() and (S.Bloodbath:CooldownRemainsP() < 1 or Player:BuffP(S.Bloodbath)))) then
+  if AR.CDsON() and S.DragonRoar:IsCastable() 
+    and ((I.ConvergenceofFates:IsEquipped() and S.BattleCry:CooldownRemainsP() < 2) 
+      or not I.ConvergenceofFates:IsEquipped() and (S.BattleCry:CooldownRemainsP() > 10 or S.BattleCry:CooldownRemainsP() < 2) 
+      or (not S.Bloodbath:IsAvailable() and (S.Bloodbath:CooldownRemainsP() < 1 or Player:BuffP(S.Bloodbath)))) then
     if AR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return ""; end
   end
   -- actions+=/rampage,if=cooldown.battle_cry.remains<1&cooldown.bloodbath.remains<1&target.health.pct>20
   if S.Rampage:IsReady() and S.BattleCry:CooldownRemainsP() < 1 and S.Bloodbath:CooldownRemainsP() < 1 and Target:HealthPercentage() > 20 then
-    if AR.Cast(S.Rampage) then return ""; end
+    if AR.CastQueue(S.Rampage, S.BattleCry) then return ""; end
   end
   -- actions+=/furious_slash,if=talent.frenzy.enabled&(buff.frenzy.stack<3|buff.frenzy.remains<3|(cooldown.battle_cry.remains<1&buff.frenzy.remains<9))
   if S.FuriousSlash:IsCastable() and S.Frenzy:IsAvailable() 
@@ -457,7 +460,7 @@ AR.SetAPL(72, APL);
 -- actions.cooldowns+=/bloodthirst,if=target.health.pct<20&buff.enrage.remains<1
 -- actions.cooldowns+=/execute
 -- actions.cooldowns+=/raging_blow,if=talent.inner_rage.enabled&buff.enrage.up
--- actions.cooldowns+=/rampage
+-- actions.cooldowns+=/rampage,if=(rage>=100&talent.frothing_berserker.enabled&!set_bonus.tier21_4pc)|set_bonus.tier21_4pc|!talent.frothing_berserker.enabled
 -- actions.cooldowns+=/odyns_fury,if=buff.enrage.up&(cooldown.raging_blow.remains>0|!talent.inner_rage.enabled)
 -- actions.cooldowns+=/berserker_rage,if=talent.outburst.enabled&buff.enrage.down&buff.battle_cry.up
 -- actions.cooldowns+=/bloodthirst,if=(buff.enrage.remains<1&!talent.outburst.enabled)|!talent.inner_rage.enabled
