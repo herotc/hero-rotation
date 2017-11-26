@@ -420,11 +420,8 @@ local function CDs ()
     end
     if S.SymbolsofDeath:IsCastable() then
       if not S.DeathfromAbove:IsAvailable() then
-        -- actions.cds+=/symbols_of_death,if=!talent.death_from_above.enabled&((time>10&energy.deficit>=40-stealthed.all*30)|(time<10&dot.nightblade.ticking))
-        -- Note: Using the predicted energy deficit to prevent pop and depop of the icon in the middle of GCD.
-        if (AC.CombatTime() > 10 and Player:EnergyDeficitPredicted() >= 40 - (Player:IsStealthed(true, true) and 30 or 0)) or (AC.CombatTime() < 10 and Target:Debuff(S.Nightblade)) then
-          if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
-        end
+        -- actions.cds+=/symbols_of_death,if=!talent.death_from_above.enabled
+        if AR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return ""; end
       else
         -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=1&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
         if (S.DeathfromAbove:CooldownRemainsP() <= 1
@@ -720,7 +717,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 10/15/2017
+-- Last Update: 11/26/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -764,7 +761,7 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/blood_fury,if=stealthed.rogue
 -- actions.cds+=/berserking,if=stealthed.rogue
 -- actions.cds+=/arcane_torrent,if=stealthed.rogue&energy.deficit>70
--- actions.cds+=/symbols_of_death,if=!talent.death_from_above.enabled&((time>10&energy.deficit>=40-stealthed.all*30)|(time<10&dot.nightblade.ticking))
+-- actions.cds+=/symbols_of_death,if=!talent.death_from_above.enabled
 -- actions.cds+=/symbols_of_death,if=(talent.death_from_above.enabled&cooldown.death_from_above.remains<=1&(dot.nightblade.remains>=cooldown.death_from_above.remains+3|target.time_to_die-dot.nightblade.remains<=6)&(time>=3|set_bonus.tier20_4pc|equipped.the_first_of_the_dead))|target.time_to_die-remains<=10
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>40&!stealthed.all&combo_points.deficit>=cp_max_spend
