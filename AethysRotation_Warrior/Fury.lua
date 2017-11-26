@@ -65,6 +65,7 @@ local AR = AethysRotation;
     FujiedasFury                  = Spell(207775),
     StoneHeart                    = Spell(225947),
     -- Misc
+    UmbralMoonglaives             = Spell(242553),
   };
   local S = Spell.Warrior.Fury;
 -- Items
@@ -350,8 +351,7 @@ local function APL ()
       if AR.Cast(I.UmbralMoonglaives, Settings.Fury.OffGCDasOffGCD.UmbralMoonglaives) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.reckless_abandon.enabled&!talent.bloodbath.enabled&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
-    -- actions+=/battle_cry,if=gcd.remains=0&talent.reckless_abandon.enabled&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
-    if S.BattleCry:IsCastable() and S.RecklessAbandon:IsAvailable() then
+    if S.BattleCry:IsCastable() and (S.RecklessAbandon:IsAvailable() and not S.Bloodbath:IsAvailable() and (I.UmbralMoonglaives:IsEquipped() and (Player:PrevOffGCDP(1, S.UmbralMoonglaives) or (S.UmbralMoonglaives:CooldownRemainsP() > 3 and S.UmbralMoonglaives:CooldownRemainsP() < 90))) or not I.UmbralMoonglaives:IsEquipped()) then
       if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.bladestorm.enabled&(raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)
