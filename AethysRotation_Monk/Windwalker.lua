@@ -76,6 +76,9 @@ Spell.Monk.Windwalker = {
   -- Legendaries
   TheEmperorsCapacitor             = Spell(235054),
 
+  -- Tier Set
+  PressurePoint                    = Spell(247255)
+
 };
 local S = Spell.Monk.Windwalker;
 -- Items
