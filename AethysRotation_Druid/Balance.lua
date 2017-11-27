@@ -95,11 +95,11 @@ Spell.Druid.Balance = {
   EntanglingRoots       = Spell(339),
 
   -- Legendaries
-OnethsIntuition		      = Spell(209406),
-OnethsOverconfidence    = Spell(209407),
-EmeraldDreamcatcher     = Spell(208190),
-SephuzBuff              = Spell(208052),
-NorgannonsBuff          = Spell(236431),
+  OnethsIntuition		      = Spell(209406),
+  OnethsOverconfidence    = Spell(209407),
+  EmeraldDreamcatcher     = Spell(208190),
+  SephuzBuff              = Spell(208052),
+  NorgannonsBuff          = Spell(236431),
 
   -- Misc
   SolarEmpowerment	    = Spell(164545),
@@ -644,14 +644,14 @@ local function AoE ()
   end
 
   -- actions.AoE+=/starsurge,if=buff.oneths_intuition.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
-  if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S:AstralAcceleration) == 0 or Player:BuffRemainsP(S:AstralAcceleration) > 5 or Player:AstralPowerDeficit(FuturAstralPower()) < 44) then
+  if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FuturAstralPower()) < 44) then
     if AR.Cast(S.Starsurge) then return ""; end
   end
 
   -- actions.AoE+=/new_moon,if=astral_power.deficit>14&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
   if Player:AstralPowerDeficit(FuturAstralPower()) > 14 and NextMoon == S.NewMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1)
-    and (not(Player:BuffRemainsP(S:AstralAcceleration) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.NewMoon:CastTime()) or S.NewMoon:ChargesP() == 3) then
+    and (not(Player:BuffRemainsP(S.AstralAcceleration) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.NewMoon:CastTime()) or S.NewMoon:ChargesP() == 3) then
       if AR.Cast(S.NewMoon) then return ""; end
   end
 
@@ -683,7 +683,7 @@ local function AoE ()
   end
 
   -- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&(!buff.incarnation.up|active_enemies>3)
-  if I.LadyandTheChild:IsEquipped() and S.SoulofTheForest:IsAvailable() and 
+  if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and 
     (Cache.EnemiesCount[Range] < 3 or (Cache.EnemiesCount[Range] < 4 and not AC.Tier20_4Pc) or (I.RadiantMoonlight:IsEquipped() and Cache.EnemiesCount[Range] < 7 and not AC.Tier20_4Pc)) 
     and Player:SpellHaste() > 0.4 and not Player:Buff(S.CelestialAlignment) and (not Player:Buff(S.IncarnationChosenOfElune) or Cache.EnemiesCount[Range] > 3) then
       if AR.Cast(S.MoonFire) then return ""; end
@@ -794,7 +794,7 @@ local function CDs ()
       if AR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
   end
   if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 and I.EmeraldDreamcatcher:IsEquipped()
-    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.ForceofNature:ExecuteTime () end
+    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.ForceofNature:ExecuteTime () then
       if AR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
   end
 end
