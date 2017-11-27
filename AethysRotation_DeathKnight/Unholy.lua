@@ -198,7 +198,7 @@ local function DarkArbiter()
  end
  --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<3
  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6  and S.Apocalypse:CooldownRemainsP() < 3 then
-  if AR.CastAnnotated(S.FesteringStrike, false, "FS DA>6") then return ""; end
+  if AR.Cast(S.FesteringStrike) then return ""; end
  end
  --actions.valkyr+=/call_action_list,name=aoe,if=active_enemies>=2
  if Cache.EnemiesCount[10] >= 2 then
@@ -206,7 +206,7 @@ local function DarkArbiter()
  end
  --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=4
  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 4 then
-  if AR.CastAnnotated(S.FesteringStrike, false, "FS DA <= 4") then return ""; end
+  if AR.Cast(S.FesteringStrike) then return ""; end
  end
  --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
  if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) then
