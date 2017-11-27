@@ -44,45 +44,46 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-          MoonkinForm = {true, false}
+        MoonkinForm = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-          BlessingofElune = {true, false},
-          BlessingofAnshe = {true, false},
-          AstralCommunion = {true, false},
-          IncarnationChosenOfElune = {true, false},
-          CelestialAlignment = {true, false},
-          WarriorofElune = {true, false},
-          BarkSkin = {true, false},
-          Sephuz = {true, false}
+        BlessingofElune = {true, false},
+        BlessingofAnshe = {true, false},
+        AstralCommunion = {true, false},
+        IncarnationChosenOfElune = {true, false},
+        CelestialAlignment = {true, false},
+        WarriorofElune = {true, false},
+        ForceofNature = {true, false},
+        BarkSkin = {true, false},
+        Sephuz = {true, false}
       }
     },
     Feral = {
-		RegrowthHP = 0,
-		RenewalHP = 0,
-		SurvivalInstinctsHP = 0,
+      RegrowthHP = 0,
+      RenewalHP = 0,
+      SurvivalInstinctsHP = 0,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
-		CatForm = {true, false},
-		RegrowthHeal = {true, false},
+        CatForm = {true, false},
+        RegrowthHeal = {true, false},
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-		--Abilities
-		Renewal = {true, false},
-		SurvivalInstincts = {true, false},
-		Prowl = {true, false},
-		ElunesGuidance = {true, false},
-		WildCharge = {true, false},
-		TigersFury = {true, false},
-		Berserk = {true, false},
+        --Abilities
+        Renewal = {true, false},
+        SurvivalInstincts = {true, false},
+        Prowl = {true, false},
+        ElunesGuidance = {true, false},
+        WildCharge = {true, false},
+        TigersFury = {true, false},
+        Berserk = {true, false},
       },
-	  StealthMacro = {
+      StealthMacro = {
         -- Abilities
         Shadowmeld = true,
-		}
+      }
     },
     Guardian = {
       -- {Display GCD as OffGCD, ForceReturn}
@@ -128,6 +129,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.IncarnationChosenOfElune", "Incarnation Chosen Of Elune");
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.CelestialAlignment", "Celestial Alignment");
   CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.WarriorofElune", "Warrior Of Elune");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.ForceofNature", "Force Of Nature");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want the addon to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.SolarBeam", "Sephuz: Show Solar Beam", "Enable this if you want the addon to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.EntanglingRoots", "Sephuz: Show Entangling Roots", "Enable this if you want the addon to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
