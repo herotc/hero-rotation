@@ -117,7 +117,7 @@
     if AR.Cast(S.Epidemic) then return ""; end
   end
   --actions.aoe+=/scourge_strike,if=spell_targets.scourge_strike>=2&(death_and_decay.ticking|defile.ticking)
-  if S.ScourgeStrike:IsCastable() and (Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff)) or Target:DebuffStack(S.FesteringWounds) then
+  if S.ScourgeStrike:IsCastable() and (Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff)) or Target:Debuff(S.FesteringWounds) then
     if AR.Cast(S.ScourgeStrike) then return ""; end
   end
   --actions.aoe+=/clawing_shadows,if=spell_targets.clawing_shadows>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
@@ -131,10 +131,6 @@
   return;
 end
  local function Generic()
-  --actions+=/outbreak,target_if=(dot.virulent_plague.tick_time_remains+tick_time<=dot.virulent_plague.remains)&dot.virulent_plague.remains<=gcd
-  if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemainsP(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
-    if AR.Cast(S.Outbreak) then return ""; end
-  end
   --actions.generic=scourge_strike,if=debuff.soul_reaper.up&debuff.festering_wound.up
   if S.ScourgeStrike:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:Debuff(S.FesteringWounds) then
     if AR.Cast(S.ScourgeStrike) then return ""; end
@@ -293,9 +289,6 @@ local function Cooldowns()
   if S.DarkTransformation:IsReady() then
     return DT();
   end
-  if S.DeathAndDecay:IsCastable() and Cache.EnemiesCount[10] >= 2 then
-    if AR.Cast(S.DeathAndDecay) then return ""; end
-  end
   return;
 end
 
@@ -329,6 +322,10 @@ local function APL()
     end
  --InCombat
     if Everyone.TargetIsValid()  then
+      --actions+=/outbreak,target_if=(dot.virulent_plague.tick_time_remains+tick_time<=dot.virulent_plague.remains)&dot.virulent_plague.remains<=gcd
+      if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemainsP(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
+        if AR.Cast(S.Outbreak) then return ""; end
+      end
         ShouldReturn = Cooldowns();
         if ShouldReturn then return ShouldReturn; 
     end
