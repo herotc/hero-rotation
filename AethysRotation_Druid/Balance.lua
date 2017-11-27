@@ -367,7 +367,7 @@ local function EmeraldDreamcatcherRotation ()
     end
   end
 
-  -- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)			
+  -- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
   if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRefreshableCP(S.MoonFireDebuff)))
     and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() or Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0) then
       if AR.Cast(S.MoonFire) then return ""; end
@@ -379,7 +379,7 @@ local function EmeraldDreamcatcherRotation ()
       if AR.Cast(S.SunFire) then return ""; end
   end
 
-  -- actions.ed+=/starfall,if=buff.oneths_overconfidence.up&buff.the_emerald_dreamcatcher.remains>execute_time
+  -- actions.ed+=/starfall,if=buff.oneths_overconfidence.react&buff.the_emerald_dreamcatcher.remains>execute_time
   if Player:Buff(S.OnethsIntuition) and Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() then
     if AR.Cast(S.Starfall) then return ""; end
   end
@@ -443,19 +443,19 @@ local function EmeraldDreamcatcherRotation ()
   end
 
   -- actions.ed+=/new_moon,if=astral_power.deficit>=10
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 10 and NextMoon == S.NewMoon
+  if Player:AstralPowerDeficit(FuturAstralPower()) >= 10 and NextMoon == S.NewMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
       if AR.Cast(S.NewMoon) then return ""; end
   end
 
   -- actions.ed+=/half_moon,if=astral_power.deficit>=20
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 20 and NextMoon == S.HalfMoon
+  if Player:AstralPowerDeficit(FuturAstralPower()) >= 20 and NextMoon == S.HalfMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then	
       if AR.Cast(S.HalfMoon) then return ""; end
   end
 
   -- actions.ed+=/full_moon,if=astral_power.deficit>=40
-  if Player:AstralPowerDeficit(FuturAstralPower()) > 40 and NextMoon == S.FullMoon
+  if Player:AstralPowerDeficit(FuturAstralPower()) >= 40 and NextMoon == S.FullMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
       if AR.Cast(S.FullMoon) then return ""; end
   end
@@ -565,8 +565,8 @@ local function SingleTarget ()
       if AR.Cast(S.FullMoon) then return ""; end
   end
 
-  -- actions.single_target+=/lunar_strike,if=buff.warrior_of_elune.up
-  if Player:Buff(S.WarriorofElune) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.WarriorofElune) == 1) then
+  -- actions.single_target+=/lunar_strike,if=buff.warrior_of_elune.up&buff.lunar_empowerment.up
+  if Player:Buff(S.WarriorofElune) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.WarriorofElune) == 1) and Player:Buff(S.LunarEmpowerment) then
     if AR.Cast(S.LunarStrike) then return ""; end
   end
 
@@ -580,11 +580,6 @@ local function SingleTarget ()
     if AR.Cast(S.LunarStrike) then return ""; end
   end
 
-  -- actions.single_target+=/solar_wrath,if=talent.natures_balance.enabled&dot.sunfire_dmg.remains<5&cast_time<dot.sunfire_dmg.remains
-  if S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < 5 and S.SolarWrath:CastTime() < Target:DebuffRemainsP(S.MoonFireDebuff) then
-    if AR.Cast(S.SolarWrath) then return ""; end
-  end	
-
   -- actions.single_target+=/solar_wrath
   if AR.Cast(S.SolarWrath) then return ""; end
 end
@@ -594,6 +589,7 @@ local function AoE ()
   if FuturAstralPower() >= 60 and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FuturAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
     if AR.Cast(S.Starfall) then return ""; end
   end
+  
   -- actions.AoE+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
   if S.StellarFlare:IsAvailable() and FuturAstralPower() >= 15 and Target:DebuffRefreshableCP(S.StellarFlare) and not Player:IsCasting(S.StellarFlare) and Target:FilteredTimeToDie(">", 10) then
     if AR.Cast(S.StellarFlare) then return ""; end
