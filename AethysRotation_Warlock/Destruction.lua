@@ -792,8 +792,9 @@
 
 
 --- ======= SIMC =======
---- Last Update: 09/06/2017
+--- Last Update: 11/27/2017
 
+-- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
 -- actions.precombat+=/food
 -- actions.precombat+=/augmentation
