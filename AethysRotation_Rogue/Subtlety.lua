@@ -92,39 +92,50 @@ local tableinsert = table.insert;
   local S = Spell.Rogue.Subtlety;
   S.Eviscerate:RegisterDamage(
     -- Eviscerate DMG Formula (Pre-Mitigation):
-    --  AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * F:Evisc_M * ShadowFangs_M * MoS_M * DS_M * SoD_M * ShC_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
+    --- Player Modifier
+      -- AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * F:Evisc_M * ShadowFangs_M * MoS_M * NS_M * DS_M * DSh_M * SoD_M * ShC_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
+    --- Target Modifier
+      -- NB_M
     function ()
       return
-        -- Attack Power
-        Player:AttackPower() *
-        -- Combo Points
-        Rogue.CPSpend() *
-        -- Eviscerate R1 AP Coef
-        0.98130 *
-        -- Eviscerate R2 Multiplier
-        1.5 *
-        -- Aura Multiplier (SpellID: 137035)
-        1.27 *
-        -- Finality: Eviscerate Multiplier
-        (Player:Buff(S.FinalityEviscerate) and 1 + Player:Buff(S.FinalityEviscerate, 17) / 100 or 1) *
-        -- Shadow Fangs Multiplier
-        (S.ShadowFangs:ArtifactEnabled() and 1.04 or 1) *
-        -- Master of Subtlety Multiplier
-        (Player:Buff(S.MasterOfSubtletyBuff) and 1.1 or 1) *
-        -- Deeper Stratagem Multiplier
-        (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
-        -- Symbols of Death Multiplier
-        (Player:Buff(S.SymbolsofDeath) and 1.15+(AC.Tier20_2Pc and 0.1 or 0) or 1) *
-        -- Shuriken Combo Multiplier
-        (Player:Buff(S.ShurikenComboBuff) and 1 + Player:Buff(S.ShurikenComboBuff, 17) / 100 or 1) *
-        -- Mastery Finisher Multiplier
-        (1 + Player:MasteryPct()/100) *
-        -- Versatility Damage Multiplier
-        (1 + Player:VersatilityDmgPct()/100) *
-        -- Legion Blade Multiplier
-        (S.LegionBlade:ArtifactEnabled() and 1.05 or 1) *
-        -- Shadows of the Uncrowned Multiplier
-        (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
+        --- Player Modifier
+          -- Attack Power
+          Player:AttackPower() *
+          -- Combo Points
+          Rogue.CPSpend() *
+          -- Eviscerate R1 AP Coef
+          0.98130 *
+          -- Eviscerate R2 Multiplier
+          1.5 *
+          -- Aura Multiplier (SpellID: 137035)
+          1.27 *
+          -- Finality: Eviscerate Multiplier
+          (Player:Buff(S.FinalityEviscerate) and 1 + Player:Buff(S.FinalityEviscerate, 17) / 100 or 1) *
+          -- Shadow Fangs Multiplier
+          (S.ShadowFangs:ArtifactEnabled() and 1.04 or 1) *
+          -- Master of Subtlety Multiplier
+          (Player:Buff(S.MasterOfSubtletyBuff) and 1.1 or 1) *
+          -- Nightstalker Multiplier
+          (S.Nightstalker:IsAvailable() and Player:IsStealthed(true) and 1.12 or 1) *
+          -- Deeper Stratagem Multiplier
+          (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
+          -- Dark Shadow Multiplier
+          (S.DarkShadow:IsAvailable() and Player:Buff(S.ShadowDanceBuff) and 1.3 or 1) *
+          -- Symbols of Death Multiplier
+          (Player:Buff(S.SymbolsofDeath) and 1.15+(AC.Tier20_2Pc and 0.1 or 0) or 1) *
+          -- Shuriken Combo Multiplier
+          (Player:Buff(S.ShurikenComboBuff) and 1 + Player:Buff(S.ShurikenComboBuff, 17) / 100 or 1) *
+          -- Mastery Finisher Multiplier
+          (1 + Player:MasteryPct()/100) *
+          -- Versatility Damage Multiplier
+          (1 + Player:VersatilityDmgPct()/100) *
+          -- Legion Blade Multiplier
+          (S.LegionBlade:ArtifactEnabled() and 1.05 or 1) *
+          -- Shadows of the Uncrowned Multiplier
+          (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1) *
+        --- Target Modifier
+          -- Nightblade Multiplier
+          (Target:Debuff(S.Nightblade) and 1.15 or 1);
     end
   );
   S.Nightblade:RegisterPMultiplier(
