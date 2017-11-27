@@ -386,15 +386,15 @@
     
     --Precombat
     -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-    if S.SummonFelguard:CooldownRemainsP() == 0 and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and FutureShard() >= 1 then
+    if S.SummonFelguard:CooldownRemainsP() == 0 and (Warlock.PetReminder() and (not IsPetInvoked() or not S.FelStorm:IsLearned()) or not IsPetInvoked()) and not S.GrimoireOfSupremacy:IsAvailable() and FutureShard() >= 1 then
       if AR.Cast(S.SummonFelguard, Settings.Demonology.GCDasOffGCD.SummonFelguard) then return ""; end
     end
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
-    if AR.AoEON() and S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:CooldownRemainsP() == 0 and not S.MeteorStrike:IsLearned() and Cache.EnemiesCount[range] > 1 and FutureShard() >= 1 then
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:CooldownRemainsP() == 0 and (Warlock.PetReminder() and (not IsPetInvoked(true) or not S.MeteorStrike:IsLearned()) or not IsPetInvoked(true)) and Cache.EnemiesCount[range] > 1 and FutureShard() >= 1 then
       if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
     -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
-    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:CooldownRemainsP() == 0 and not S.ShadowLock:IsLearned() and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 then
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:CooldownRemainsP() == 0 and (Warlock.PetReminder() and (not IsPetInvoked(true) or not S.ShadowLock:IsLearned()) or not IsPetInvoked(true)) and Cache.EnemiesCount[range] == 1 and FutureShard() >= 1 then
       if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
     end
     

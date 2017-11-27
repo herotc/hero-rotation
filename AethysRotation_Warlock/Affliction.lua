@@ -137,7 +137,7 @@
   };
   
 --- ======= ACTION LISTS =======
-  local function IsPetInvoked (testBigPets)
+  function IsPetInvoked (testBigPets)
 		testBigPets = testBigPets or false
 		return S.Suffering:IsLearned() or S.SpellLock:IsLearned() or S.Whiplash:IsLearned() or S.CauterizeMaster:IsLearned() or (testBigPets and (S.ShadowLock:IsLearned() or S.MeteorStrike:IsLearned()))
   end
@@ -277,9 +277,9 @@
   local function WritheAPL ()
     -- actions.writhe  =reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
     -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.soul_harvest.remains>=(5+1.5*equipped.144364)&buff.active_uas.stack>1|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react|trinket.proc.spell_power.react|trinket.stacking_proc.spell_power.react)
-    if Player:BuffRemainsP(S.DeadwindHarvester) > 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
+    if S.ReapSouls:IsCastableP() and Player:BuffRemainsP(S.DeadwindHarvester) > 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
       and ((SoulsAvailable() >= 5 or Target:FilteredTimeToDie("<=", ComputeDeadwindHarvesterDuration()))
-      or ((Player:BuffRemainsP(S.SoulHarvest) >= StackDurationCompute and ActiveUAs() > 1) or Player:BuffRemainsP(S.Concordance) > 0))then
+      or ((Player:BuffRemainsP(S.SoulHarvest) >= StackDurationCompute and ActiveUAs() > 1) or Player:BuffRemainsP(S.Concordance) > 0)) then
         if AR.Cast(S.ReapSouls) then return ""; end
     end
     
@@ -433,7 +433,7 @@
     end
 
     -- actions.writhe+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
-    if SoulsAvailable() >= 1 and (Player:BuffRemainsP(S.DeadwindHarvester) + SoulsAvailable() * StackDurationCompute) >= (12 * StackDurationCompute) then 
+    if S.ReapSouls:IsCastableP() and SoulsAvailable() >= 1 and (Player:BuffRemainsP(S.DeadwindHarvester) + SoulsAvailable() * StackDurationCompute) >= (12 * StackDurationCompute) then 
       if AR.Cast(S.ReapSouls) then return ""; end
     end
     
@@ -464,12 +464,12 @@
     end
     
     -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&buff.active_uas.stack>1
-    if Player:BuffRemainsP(S.DeadwindHarvester) == 0 and ActiveUAs() > 1 and SoulsAvailable() >= 1 then 
+    if S.ReapSouls:IsCastableP() and Player:BuffRemainsP(S.DeadwindHarvester) == 0 and ActiveUAs() > 1 and SoulsAvailable() >= 1 then 
       if AR.Cast(S.ReapSouls) then return ""; end
     end
     
     -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1
-    if Player:BuffRemainsP(S.DeadwindHarvester) == 0 and Player:PrevGCDP(1, S.UnstableAffliction) and SoulsAvailable() >= 1 then 
+    if S.ReapSouls:IsCastableP() and Player:BuffRemainsP(S.DeadwindHarvester) == 0 and Player:PrevGCDP(1, S.UnstableAffliction) and SoulsAvailable() >= 1 then 
       if AR.Cast(S.ReapSouls) then return ""; end
     end
 
@@ -587,7 +587,7 @@
   
   local function MGAPL ()
     -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&((buff.tormented_souls.react>=4+active_enemies|buff.tormented_souls.react>=9)|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
-    if not Player:BuffRemainsP(S.DeadwindHarvester) == 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
+    if S.ReapSouls:IsCastableP() and not Player:BuffRemainsP(S.DeadwindHarvester) == 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
       and ((SoulsAvailable() >= 4 + Cache.EnemiesCount[range] or SoulsAvailable() >= 9) or Target:FilteredTimeToDie("<=", ComputeDeadwindHarvesterDuration())) then
         if AR.Cast(S.ReapSouls) then return ""; end
     end
@@ -810,7 +810,7 @@
     end
     
     -- actions.mg+=/reap_souls,if=buff.deadwind_harvester.remains<dot.unstable_affliction_1.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_2.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_3.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_4.remains|buff.deadwind_harvester.remains<dot.unstable_affliction_5.remains&buff.active_uas.stack>1
-    if CheckDeadwindHarvester() and ActiveUAs() > 1 and SoulsAvailable() >= 1 then 
+    if S.ReapSouls:IsCastableP() and CheckDeadwindHarvester() and ActiveUAs() > 1 and SoulsAvailable() >= 1 then 
       if AR.Cast(S.ReapSouls) then return ""; end
     end
 
@@ -901,7 +901,7 @@
     -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
     -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
     -- actions.precombat+=/summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-    if S.SummonFelhunter:IsCastable() and not IsPetInvoked() and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or Player:BuffRemains(S.DemonicPower) < 600) and Player:SoulShards () >= 1 and not Player:IsCasting(S.SummonFelhunter) then
+    if S.SummonFelhunter:IsCastable() and (Warlock.PetReminder() and (not IsPetInvoked() or not S.SpellLock:IsLearned()) or not IsPetInvoked()) and not S.GrimoireOfSupremacy:IsAvailable() and (not S.GrimoireOfSacrifice:IsAvailable() or Player:BuffRemains(S.DemonicPower) < 600) and Player:SoulShards () >= 1 and not Player:IsCasting(S.SummonFelhunter) then
       if AR.Cast(S.SummonFelhunter, Settings.Affliction.GCDasOffGCD.SummonFelhunter) then return ""; end
     end
     -- actions.precombat+=/grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
@@ -910,11 +910,11 @@
     end
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
-    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:IsCastable() and not S.MeteorStrike:IsLearned() and Cache.EnemiesCount[range] > 1 and Player:SoulShards () >= 1 then
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:IsCastable() and (Warlock.PetReminder() and (not IsPetInvoked(true) or not S.MeteorStrike:IsLearned()) or not IsPetInvoked(true)) and Cache.EnemiesCount[range] > 1 and Player:SoulShards () >= 1 then
       if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
     -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
-    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:IsCastable() and not S.ShadowLock:IsLearned() and Cache.EnemiesCount[range] == 1 and Player:SoulShards () >= 1 then
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:IsCastable() and (Warlock.PetReminder() and (not IsPetInvoked(true) or not S.ShadowLock:IsLearned()) or not IsPetInvoked(true)) and Cache.EnemiesCount[range] == 1 and Player:SoulShards () >= 1 then
       if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
     end
     
