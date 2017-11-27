@@ -62,7 +62,7 @@ local AR = AethysRotation;
     -- Defensive
     -- Utility
     -- Legendaries
-    FujiedasFury                  = Spell(207775),
+    FujiedasFury                  = Spell(207776),
     StoneHeart                    = Spell(225947),
     -- Misc
     UmbralMoonglaives             = Spell(242553),
@@ -347,11 +347,19 @@ local function APL ()
       if AR.Cast(S.Avatar, Settings.Commons.OffGCDasOffGCD.Avatar) then return ""; end
     end
     -- actions+=/use_item,name=umbral_moonglaives,if=equipped.umbral_moonglaives&(cooldown.battle_cry.remains>gcd&cooldown.battle_cry.remains<2|cooldown.battle_cry.remains=0)
-    if I.UmbralMoonglaives:IsReady() and I.UmbralMoonglaives:IsEquipped() and (S.BattleCry:CooldownRemainsP() > Player:GCD() and S.BattleCry:CooldownRemainsP() < 2 or S.BattleCry:CooldownRemainsP() == 0) then
+    if I.UmbralMoonglaives:IsReady() and I.UmbralMoonglaives:IsEquipped() 
+      and (S.BattleCry:CooldownRemainsP() > Player:GCD() 
+        and S.BattleCry:CooldownRemainsP() < 2 
+          or S.BattleCry:CooldownRemainsP() == 0) then
       if AR.Cast(I.UmbralMoonglaives, Settings.Fury.OffGCDasOffGCD.UmbralMoonglaives) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.reckless_abandon.enabled&!talent.bloodbath.enabled&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
-    if S.BattleCry:IsCastable() and (S.RecklessAbandon:IsAvailable() and not S.Bloodbath:IsAvailable() and (I.UmbralMoonglaives:IsEquipped() and (Player:PrevOffGCDP(1, S.UmbralMoonglaives) or (S.UmbralMoonglaives:CooldownRemainsP() > 3 and S.UmbralMoonglaives:CooldownRemainsP() < 90))) or not I.UmbralMoonglaives:IsEquipped()) then
+    if S.BattleCry:IsCastable() 
+      and (S.RecklessAbandon:IsAvailable() and not S.Bloodbath:IsAvailable() 
+      and (I.UmbralMoonglaives:IsEquipped() 
+        and (Player:PrevOffGCDP(1, S.UmbralMoonglaives) 
+        or (S.UmbralMoonglaives:CooldownRemainsP() > 3 and S.UmbralMoonglaives:CooldownRemainsP() < 90))) 
+      or not I.UmbralMoonglaives:IsEquipped()) then
       if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
     -- actions+=/battle_cry,if=gcd.remains=0&talent.bladestorm.enabled&(raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)
