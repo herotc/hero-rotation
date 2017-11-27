@@ -36,7 +36,7 @@
   DarkTransformation            = Spell(63560),
   DeathAndDecay                 = Spell(43265),
   DeathCoil                     = Spell(47541),
-  DeathStrike                   = Spell(49958),
+  DeathStrike                   = Spell(49998),
   FesteringStrike               = Spell(85948),
   Outbreak                      = Spell(77575),
   SummonGargoyle                = Spell(49206),
