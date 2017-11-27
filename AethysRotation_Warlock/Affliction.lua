@@ -886,6 +886,7 @@
     -- TODO : Sephuz - SingMagic : add if a debuff is removable
     -- TODO : buff listener
     -- TODO : Add prepot
+    -- TODO : remove aoeon
     
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Affliction.UnendingResolveHP then
@@ -909,7 +910,7 @@
     end
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&artifact.lord_of_flames.rank>0
     -- actions.precombat+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>1
-    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:IsCastable() and not S.MeteorStrike:IsLearned() and  AR.AoEON() and Cache.EnemiesCount[range] > 1 and Player:SoulShards () >= 1 then
+    if S.GrimoireOfSupremacy:IsAvailable() and S.SummonInfernalSuppremacy:IsCastable() and not S.MeteorStrike:IsLearned() and Cache.EnemiesCount[range] > 1 and Player:SoulShards () >= 1 then
       if AR.Cast(S.SummonInfernal, Settings.Commons.GCDasOffGCD.SummonInfernal) then return ""; end
     end
     -- actions.precombat+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0

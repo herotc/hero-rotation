@@ -298,6 +298,7 @@
     -- TODO : Sephuz - SingMagic : add if a debuff is removable
     -- TODO : buff listener for chaos bolt
     -- TODO : Add prepot
+    -- TODO : remove aoeon
     
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Destruction.UnendingResolveHP then

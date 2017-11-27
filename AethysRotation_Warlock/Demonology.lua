@@ -377,6 +377,7 @@
         
     -- TODO : add the possibility to choose a pet
     -- TODO : prepot
+    -- TODO : remove aoeon
     
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Demonology.UnendingResolveHP then
