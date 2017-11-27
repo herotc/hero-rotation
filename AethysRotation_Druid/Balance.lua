@@ -211,38 +211,43 @@ local function FuryOfElune ()
     if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
   end
 
+  -- actions.fury_of_elune+=/force_of_nature,if=!buff.fury_of_elune.up  
+  if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.FuryofElune) == 0 then
+    if AR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
+  end
+  
   -- actions.fury_of_elune+=/fury_of_elune,if=astral_power>=95
   if FuturAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() == 0 then
     if AR.Cast(S.FuryofElune) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=90))
+  -- actions.fury_of_elune+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=90))
   if S.NewMoon:IsCastable() and NextMoon == S.NewMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) == 3)
     and (Player:BuffRemainsP(S.FuryofElune) > S.NewMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 90))	then
       if AR.Cast(S.NewMoon) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/half_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=80))
+  -- actions.fury_of_elune+=/half_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=80))
   if S.HalfMoon:IsCastable() and NextMoon == S.HalfMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) == 3) 
     and (Player:BuffRemainsP(S.FuryofElune) > S.HalfMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 80)) then
       if AR.Cast(S.HalfMoon) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))  
+  -- actions.fury_of_elune+=/full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))
   if S.FullMoon:IsCastable() and NextMoon == S.FullMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) == 3) 
     and (Player:BuffRemainsP(S.FuryofElune) > S.FullMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FuturAstralPower() <= 60)) then
       if AR.Cast(S.FullMoon) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune_up.up&astral_power<=25
+  -- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune.up&astral_power<=25
   if S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemainsP() == 0 and FuturAstralPower() <= 75 then
     if AR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/warrior_of_elune,if=buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
+  -- actions.fury_of_elune+=/warrior_of_elune,if=buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
   if S.WarriorofElune:IsAvailable() and S.WarriorofElune:CooldownRemainsP() == 0 and not Player:Buff(S.WarriorofElune)
     and (Player:BuffRemainsP(S.FuryofElune) > 0 or (S.FuryofElune:CooldownRemainsP() >= 35 and Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1)))then
       if AR.Cast(S.WarriorofElune) then return ""; end
@@ -255,7 +260,7 @@ local function FuryOfElune ()
       if AR.Cast(S.LunarStrike) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/new_moon,if=astral_power<=90&buff.fury_of_elune_up.up
+  -- actions.fury_of_elune+=/new_moon,if=astral_power<=90&buff.fury_of_elune.up
   if S.NewMoon:IsAvailable()  and NextMoon == S.NewMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1)  
     and FuturAstralPower() <= 90 
@@ -263,7 +268,7 @@ local function FuryOfElune ()
       if AR.Cast(S.NewMoon) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/half_moon,if=astral_power<=80&buff.fury_of_elune_up.up&astral_power>cast_time*12
+  -- actions.fury_of_elune+=/half_moon,if=astral_power<=80&buff.fury_of_elune.up&astral_power>cast_time*12
   if S.NewMoon:IsAvailable()  and NextMoon == S.HalfMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1)
     and FuturAstralPower() > S.HalfMoon:CastTime() * 12
@@ -272,7 +277,7 @@ local function FuryOfElune ()
       if AR.Cast(S.HalfMoon) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/full_moon,if=astral_power<=60&buff.fury_of_elune_up.up&astral_power>cast_time*12
+  -- actions.fury_of_elune+=/full_moon,if=astral_power<=60&buff.fury_of_elune.up&astral_power>cast_time*12
   if S.NewMoon:IsAvailable() and NextMoon == S.FullMoon
     and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) 
     and FuturAstralPower() > S.FullMoon:CastTime() * 12
@@ -281,12 +286,12 @@ local function FuryOfElune ()
       if AR.Cast(S.FullMoon) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/moonfire,if=buff.fury_of_elune_up.down&remains<=6.6
+  -- actions.fury_of_elune+=/moonfire,if=buff.fury_of_elune.down&remains<=6.6
   if Player:BuffRemainsP(S.FuryofElune) == 0 and Target:DebuffRemainsP(S.MoonFireDebuff) <= PandemicThresholdBalance(S.MoonFireDebuff)  then
     if AR.Cast(S.MoonFire) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/sunfire,if=buff.fury_of_elune_up.down&remains<5.4
+  -- actions.fury_of_elune+=/sunfire,if=buff.fury_of_elune.down&remains<5.4
   if Player:BuffRemainsP(S.FuryofElune) == 0 and Target:DebuffRemainsP(S.SunFireDebuff) <= PandemicThresholdBalance(S.SunFireDebuff)  then
     if AR.Cast(S.SunFire) then return ""; end
   end
@@ -296,18 +301,18 @@ local function FuryOfElune ()
     if AR.Cast(S.StellarFlare) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/starfall,if=(active_enemies>=2&talent.stellar_flare.enabled|active_enemies>=3)&buff.fury_of_elune_up.down&cooldown.fury_of_elune.remains>10
+  -- actions.fury_of_elune+=/starfall,if=(active_enemies>=2&talent.stellar_flare.enabled|active_enemies>=3)&buff.fury_of_elune.down&cooldown.fury_of_elune.remains>10
   if (AR.AoEON() and ((Cache.EnemiesCount[Range] >= 2 and S.StellarFlare:IsAvailable()) or Cache.EnemiesCount[Range] >= 3)
     and Player:BuffRemainsP(S.FuryofElune) == 0 and S.FuryofElune:CooldownRemainsP() > 10 and FuturAstralPower() >= 60) or Player:Buff(S.OnethsOverconfidence) then
       if AR.Cast(S.Starfall) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/starsurge,if=active_enemies<=2&buff.fury_of_elune_up.down&cooldown.fury_of_elune.remains>7
+  -- actions.fury_of_elune+=/starsurge,if=active_enemies<=2&buff.fury_of_elune.down&cooldown.fury_of_elune.remains>7
   if FuturAstralPower() >= 40 and Cache.EnemiesCount[Range] <= 2 and Player:BuffRemainsP(S.FuryofElune) == 0 and S.FuryofElune:CooldownRemainsP() > 7 then
     if AR.Cast(S.Starsurge) then return ""; end
   end
 
-  -- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune_up.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
+  -- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
   if FuturAstralPower() >= 40 and Player:BuffRemainsP(S.FuryofElune) == 0
     and ((FuturAstralPower() >= 92 and S.FuryofElune:CooldownRemainsP() > Player:GCD() * 3) 
     or (S.WarriorofElune:CooldownRemainsP() <= 5 and S.FuryofElune:CooldownRemainsP() >= 35  and Player:BuffStack(S.WarriorofElune) < 2)) then
@@ -783,14 +788,9 @@ local function CDs ()
   end
 
   -- actions.AoE+=/force_of_nature
-  -- actions.fury_of_elune+=/force_of_nature,if=!buff.fury_of_elune.up
   -- actions.ed+=/force_of_nature,if=buff.the_emerald_dreamcatcher.remains>execute_time
   if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 
     and not S.FuryofElune:IsAvailable() and not I.EmeraldDreamcatcher:IsEquipped() then
-      if AR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
-  end
-  if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 
-    and S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.FuryofElune) == 0 and not I.EmeraldDreamcatcher:IsEquipped() then
       if AR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
   end
   if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 and I.EmeraldDreamcatcher:IsEquipped()
