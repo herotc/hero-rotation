@@ -137,7 +137,7 @@
   };
   
 --- ======= ACTION LISTS =======
-  function IsPetInvoked (testBigPets)
+  local function IsPetInvoked (testBigPets)
 		testBigPets = testBigPets or false
 		return S.Suffering:IsLearned() or S.SpellLock:IsLearned() or S.Whiplash:IsLearned() or S.CauterizeMaster:IsLearned() or (testBigPets and (S.ShadowLock:IsLearned() or S.MeteorStrike:IsLearned()))
   end
