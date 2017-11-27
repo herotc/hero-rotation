@@ -965,7 +965,7 @@
 
 
 --- ======= SIMC =======
---- Last Update: 24/10/2017
+--- Last Update: 11/27/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -998,8 +998,6 @@
 -- actions.haunt+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
 -- actions.haunt+=/blood_fury
 -- actions.haunt+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1
--- actions.haunt+=/use_item,slot=trinket1
--- actions.haunt+=/use_item,slot=trinket2
 -- actions.haunt+=/potion,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
 -- actions.haunt+=/potion,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
 -- actions.haunt+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd
@@ -1048,8 +1046,6 @@
 -- actions.mg+=/corruption,cycle_targets=1,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&remains<=(tick_time+gcd)&target.time_to_die>tick_time*3
 -- actions.mg+=/phantom_singularity
 -- actions.mg+=/soul_harvest,if=buff.active_uas.stack>1&buff.soul_harvest.remains<=8&sim.target=target&(!talent.deaths_embrace.enabled|target.time_to_die>=136|target.time_to_die<=40)
--- actions.mg+=/use_item,slot=trinket1
--- actions.mg+=/use_item,slot=trinket2
 -- actions.mg+=/potion,if=target.time_to_die<=70
 -- actions.mg+=/potion,if=(!talent.soul_harvest.enabled|buff.soul_harvest.remains>12)&buff.active_uas.stack>=2
 -- actions.mg+=/agony,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.agony)
@@ -1087,8 +1083,6 @@
 -- actions.writhe+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
 -- actions.writhe+=/blood_fury
 -- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
--- actions.writhe+=/use_item,slot=trinket1
--- actions.writhe+=/use_item,slot=trinket2
 -- actions.writhe+=/potion,if=target.time_to_die<=70
 -- actions.writhe+=/potion,if=(!talent.soul_harvest.enabled|buff.soul_harvest.remains>12)&(trinket.proc.any.react|trinket.stack_proc.any.react|buff.active_uas.stack>=2)
 -- actions.writhe+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd&time_to_die>tick_time*2
