@@ -540,9 +540,8 @@
             if S.ShadowFlame:IsAvailable() and S.ShadowFlame:ChargesP() == 2 and Cache.EnemiesCount[range] < 5 then
               if AR.Cast(S.ShadowFlame) then return ""; end
             end
-            
-            -- actions+=/thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time | talent.implosion.enabled & spell_targets.implosion>=3) & wild_imp_count>3 & wild_imp_remaining_duration>execute_time
-            if S.TalkielConsumption:IsAvailable() and S.TalkielConsumption:CooldownRemainsP() == 0 and not Player:IsCasting(S.TalkielConsumption) and (GetPetRemains("Dreadstalker") > S.TalkielConsumption:ExecuteTime() or (S.Implosion:IsAvailable() and Cache.EnemiesCount[range] >= 3)) and  GetNbTotal("Wild Imp") > 3 and GetPetRemains("Wild Imp") > S.TalkielConsumption:ExecuteTime() then
+            -- actions+=/thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time|talent.implosion.enabled&spell_targets.implosion>=3)&(wild_imp_count>3&dreadstalker_count<=2|wild_imp_count>5)&wild_imp_remaining_duration>execute_time
+            if S.TalkielConsumption:IsAvailable() and S.TalkielConsumption:CooldownRemainsP() == 0 and not Player:IsCasting(S.TalkielConsumption) and (GetPetRemains("Dreadstalker") > S.TalkielConsumption:ExecuteTime() or (S.Implosion:IsAvailable() and Cache.EnemiesCount[range] >= 3)) and  ((GetNbTotal("Wild Imp") > 3 and GetNbTotal("Dreadstalker") <= 2) or GetNbTotal("Wild Imp") > 5) and GetPetRemains("Wild Imp") > S.TalkielConsumption:ExecuteTime() then
               if AR.Cast(S.TalkielConsumption) then return ""; end
             end
             
@@ -742,7 +741,7 @@
 
 
 --- ======= SIMC =======
---- Last Update: 24/10/2017
+--- Last Update: 11/27/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -790,7 +789,7 @@
 -- actions+=/soul_harvest,if=!buff.soul_harvest.remains
 -- actions+=/potion,name=prolonged_power,if=buff.soul_harvest.remains|target.time_to_die<=70|trinket.proc.any.react
 -- actions+=/shadowflame,if=charges=2&spell_targets.demonwrath<5
--- actions+=/thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time|talent.implosion.enabled&spell_targets.implosion>=3)&wild_imp_count>3&wild_imp_remaining_duration>execute_time
+-- actions+=/thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time|talent.implosion.enabled&spell_targets.implosion>=3)&(wild_imp_count>3&dreadstalker_count<=2|wild_imp_count>5)&wild_imp_remaining_duration>execute_time
 -- actions+=/life_tap,if=mana.pct<=15|(mana.pct<=65&((cooldown.call_dreadstalkers.remains<=0.75&soul_shard>=2)|((cooldown.call_dreadstalkers.remains<gcd*2)&(cooldown.summon_doomguard.remains<=0.75|cooldown.service_pet.remains<=0.75)&soul_shard>=3)))
 -- actions+=/demonwrath,chain=1,interrupt=1,if=spell_targets.demonwrath>=3
 -- actions+=/demonwrath,moving=1,chain=1,interrupt=1
