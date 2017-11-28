@@ -127,7 +127,7 @@ local function Movement ()
 
   -- actions.movement+=/ice_floes,if=buff.ice_floes.down&!buff.fingers_of_frost.react
   if S.IceFloes:IsAvailable() and S.IceFloes:ChargesP() > 0 and not Player:Buff(S.IceFloes) and not Player:Buff(S.FingersofFrost) then
-    if AR.Cast(S.IceFloes) then return ""; end
+    if AR.Cast(S.IceFloes, Settings.Frost.OffGCDasOffGCD.IceFloes) then return ""; end
   end
 end
 
@@ -197,10 +197,10 @@ end
 local function Cooldowns ()
   -- actions.cooldowns=rune_of_power,if=cooldown.icy_veins.remains<cast_time|charges_fractional>1.9&cooldown.icy_veins.remains>10|buff.icy_veins.up|target.time_to_die+5<charges_fractional*10
   if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() < S.RuneofPower:CastTime() or (S.RuneofPower:ChargesFractional() > 1.9 and S.IcyVeins:CooldownRemains() > 10) or Player:Buff(S.IcyVeins) or Target:TimeToDie() + 5 < S.RuneofPower:ChargesFractional() * 10) and not Player:IsCasting(S.RuneofPower) then
-    if AR.Cast(S.RuneofPower) then return ""; end
+    if AR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
   end
   -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1|target.time_to_die<70
-  if I.PotionofProlongedPower:IsUsable() and I.PotionofProlongedPower:CooldownRemains()==0 and (S.IcyVeins:IsCastable() or Player:Buff(S.IcyVeins)) or Target:TimeToDie() < 70 then
+  if I.PotionofProlongedPower:IsUsable() and Settings.Frost.ShowPoPP and I.PotionofProlongedPower:CooldownRemainsP() == 0 and (S.IcyVeins:CooldownRemains() == 0 or Player:BuffRemains(S.IcyVeins) > 0) or Target:TimeToDie() < 70 then
    if AR.CastSuggested(I.PotionofProlongedPower) then return ""; end
   end
   -- actions.cooldowns+=/icy_veins
@@ -209,7 +209,7 @@ local function Cooldowns ()
   end
   -- actions.cooldowns+=/mirror_image
   if S.MirrorImage:IsCastable() then
-    if AR.Cast(S.MirrorImage) then return ""; end
+    if AR.Cast(S.MirrorImage, Settings.Frost.OffGCDasOffGCD.RuneofPower) then return ""; end
   end
   -- actions.cooldowns+=/blood_fury
   if S.BloodFury:IsCastable() then
