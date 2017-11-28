@@ -305,6 +305,7 @@ local function APL()
       -- Army w/ Bossmod Countdown 
       -- Volley toggle
       -- Opener 
+
     if not Player:AffectingCombat() then
     --check if we have our lovely pet with us
     if Pet:IsActive() == false and S.SummonPet:IsCastable() then
@@ -320,12 +321,13 @@ local function APL()
     end
       return;
     end
- --InCombat
-    if Everyone.TargetIsValid()  then
+    --InCombat
       --actions+=/outbreak,target_if=(dot.virulent_plague.tick_time_remains+tick_time<=dot.virulent_plague.remains)&dot.virulent_plague.remains<=gcd
-      if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemainsP(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
-        if AR.Cast(S.Outbreak) then return ""; end
-      end
+    if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemainsP(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
+      if AR.Cast(S.Outbreak) then return ""; end
+    end
+    --Lets call specific APLs
+    if Everyone.TargetIsValid()  then
         ShouldReturn = Cooldowns();
         if ShouldReturn then return ShouldReturn; 
     end
