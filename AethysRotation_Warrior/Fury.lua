@@ -370,7 +370,6 @@ local function APL ()
     if S.BattleCry:IsCastable() and Player:BuffP(S.DragonRoar) and (S.Bloodthirst:CooldownRemainsP() == 0 or Player:BuffRemainsP(S.Enrage) > S.Bloodthirst:CooldownRemainsP()) then
       if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
-    -- actions+=/battle_cry,if=(gcd.remains=0|gcd.remains<=0.4&prev_gcd.1.rampage)&(cooldown.bloodbath.remains=0|buff.bloodbath.up|!talent.bloodbath.enabled|(target.time_to_die<12))
     -- actions+=/battle_cry,if=(gcd.remains=0|gcd.remains<=0.4&prev_gcd.1.rampage)&(cooldown.bloodbath.remains=0|buff.bloodbath.up|!talent.bloodbath.enabled|(target.time_to_die<12))&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
     if S.BattleCry:IsCastable() 
       and (Player:GCDRemains() == 0 or (Player:GCDRemains() <= 0.4 and Player:PrevGCDP(1, S.Rampage))) 
