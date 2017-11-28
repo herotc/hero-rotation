@@ -46,6 +46,8 @@ Spell.Mage.Frost = {
   TimeWarp             = Spell(80353),
   WaterJet             = Spell(135029,"Pet"),
   WintersChill         = Spell(228358),
+  FreezingRain         = Spell(240555),
+  
   
   -- Talents
   RayofFrost           = Spell(205021),
@@ -71,6 +73,7 @@ Spell.Mage.Frost = {
   
   ThermalVoid          = Spell(155149),
   GlacialSpike         = Spell(199786),
+  GlacialSpikeBuff     = Spell(199844),
   CometStorm           = Spell(153595),
   
   -- Artifact
@@ -119,106 +122,89 @@ local Settings = {
 };
 --- ======= ACTION LISTS =======
 
---  Variables placed in Frost APL
+local function Movement ()
+  -- actions.movement=blink,if=movement.distance>10
 
--- actions.variables=variable,name=iv_start,value=time,if=prev_off_gcd.icy_veins
-local function iv_start ()
-  return Player:PrevOffGCD(1, S.IcyVeins);
-end
-
--- actions.variables+=/variable,name=time_until_fof,value=10-(time-variable.iv_start-floor((time-variable.iv_start)%10)*10)
-local function TimeUntilFoF ()
-  return 10 - (AC.CombatTime() - IvStart - math.floor((AC.CombatTime() - IvStart)/10)*10);
-end
-
--- actions+=/variable,name=fof_react,value=buff.fingers_of_frost.react
--- actions.variables+=/variable,name=fof_react,value=buff.fingers_of_frost.stack,if=equipped.lady_vashjs_grasp&buff.icy_veins.up&variable.time_until_fof>9|prev_off_gcd.freeze
---|ground_aoe.frozen_orb.remains>8.5 (NEEDS TO BE ADDED)
--- NOTE: react == stack on simc (react in fact gives you the number of stack based on reaction time)
-local function FoFReact ()
-  return Player:BuffStack(S.FingersofFrost);
+  -- actions.movement+=/ice_floes,if=buff.ice_floes.down&!buff.fingers_of_frost.react
+  if S.IceFloes:IsAvailable() and S.IceFloes:ChargesP() > 0 and not Player:Buff(S.IceFloes) and not Player:Buff(S.FingersofFrost) then
+    if AR.Cast(S.IceFloes) then return ""; end
+  end
 end
 
 -- # Start of AOE APL
 local function AoE ()
   -- actions.aoe=frostbolt,if=prev_off_gcd.water_jet
-  if S.Frostbolt:IsCastable() and Pet:PrevOffGCD(1, S.WaterJet) then
+  if S.Frostbolt:IsCastableP() and Pet:PrevOffGCD(1, S.WaterJet) then
     if AR.Cast(S.Frostbolt) then return ""; end
   end
   -- actions.aoe+=/frozen_orb
-  if S.FrozenOrb:IsCastable() then
+  if S.FrozenOrb:IsCastableP() then
     if AR.Cast(S.FrozenOrb) then return ""; end
   end
   -- actions.aoe+=/blizzard
-  if S.Blizzard:IsCastable() then
+  if S.Blizzard:IsCastableP() then
     if AR.Cast(S.Blizzard) then return ""; end
   end
   -- actions.aoe+=/comet_storm
-  if S.CometStorm:IsCastable() then
+  if S.CometStorm:IsCastableP() then
     if AR.Cast(S.CometStorm) then return ""; end
   end
   -- actions.aoe+=/ice_nova
-  if S.IceNova:IsCastable() then
+  if S.IceNova:IsCastableP() then
     if AR.Cast(S.IceNova) then return ""; end
   end
-  -- actions.aoe+=/water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
-  if S.IcyHand:ArtifactEnabled() then
-    if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 3 and Player:BuffStack(S.BrainFreeze) == 0 then
-      if AR.Cast(S.WaterJet) then return ""; end
-    end
-  else
-    if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 2 and Player:BuffStack(S.BrainFreeze) == 0 then
-      if AR.Cast(S.WaterJet) then return ""; end
-    end
+  -- actions.aoe+=/water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<3&!buff.brain_freeze.react
+  if S.WaterJet:IsCastableP() and Player:PrevGCDP(1, S.Frostbolt) and Player:BuffStack(S.FingersofFrost) < 3 and not Player:Buff(S.BrainFreeze) then
+    if AR.Cast(S.WaterJet) then return ""; end
   end
-  --   actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt)&buff.brain_freeze.react
-  if S.Flurry:IsCastable() and ( Player:CastID() == S.Ebonbolt:ID() or  Player:Buff(S.BrainFreeze) 
-    and ((Player:CastID() == S.Frostbolt:ID() and not S.GlacialSpike:IsAvailable()) or S.GlacialSpike:IsAvailable() 
-    and (Player:CastID() == S.GlacialSpike:ID() or Player:CastID() == S.Frostbolt:ID() and (Player:BuffStack(S.Icicles) <= 3 or  S.FrozenOrb:CooldownRemains() <= 10 and AC.Tier20_2Pc)))) then 
+  -- actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt)
+
+  -- actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt)&buff.brain_freeze.react
+  if S.Flurry:IsCastableP() and (Player:PrevGCDP(1, S.Ebonbolt) or ((Player:PrevGCDP(1, S.GlacialSpike) or Player:PrevGCDP(1, S.Frostbolt)) and Player:Buff(S.BrainFreeze))) then 
       if AR.Cast (S.Flurry) then return ""; end
   end
-  -- actions.aoe+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react>0
-  if S.FrostBomb:IsCastable() and Target:DebuffRemains(S.FrostBomb) < S.IceLance:TravelTime() and FoFReact() > 0 then
+  -- actions.aoe+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&buff.fingers_of_frost.react
+  if S.FrostBomb:IsCastableP() and Target:DebuffRemainsP(S.FrostBomb) < S.IceLance:TravelTime() and Player:BuffStack(S.FingersofFrost) > 0 then
     if AR.Cast(S.FrostBomb) then return ""; end
   end
-  -- actions.aoe+=/ice_lance,if=variable.fof_react>0
-  if S.IceLance:IsCastable() and FoFReact()> 0 then
+  -- actions.aoe+=/ice_lance,if=buff.fingers_of_frost.react
+  if S.IceLance:IsCastableP() and Player:BuffStack(S.FingersofFrost) > 0 then
     if AR.Cast(S.IceLance) then return ""; end
   end
   -- actions.aoe+=/ebonbolt
-  if S.Ebonbolt:IsCastable() then
+  if S.Ebonbolt:IsCastableP() then
     if AR.Cast(S.Ebonbolt) then return ""; end
   end
   -- actions.aoe+=/glacial_spike
-  if S.GlacialSpike:IsCastable() and Player:BuffStack(S.Icicles) == 5 then
+  if Player:Buff(S.GlacialSpikeBuff) or (Player:BuffStack(S.Icicles) == 4 and Player:IsCasting(S.Frostbolt)) and not Player:IsCasting(S.GlacialSpike) then
     if AR.Cast(S.GlacialSpike) then return ""; end
   end
   -- actions.aoe+=/frostbolt
-  if S.Frostbolt:IsCastable() then
+  if S.Frostbolt:IsCastableP() then
     if AR.Cast(S.Frostbolt) then return ""; end
   end
   -- actions.aoe+=/cone_of_cold
-  if S.ConeofCold:IsCastable() then
+  if S.ConeofCold:IsCastableP() then
     if AR.Cast(S.ConeofCold) then return ""; end
   end
   -- actions.aoe+=/iceLance
-  if S.IceLance:IsCastable() then
+  if S.IceLance:IsCastableP() then
     if AR.Cast(S.IceLance) then return ""; end
   end
 end
 
 -- # Start of Cooldown APL
 local function Cooldowns ()
-  -- actions.cooldowns=rune_of_power,if=(cooldown.icy_veins.remains<cast_time|(charges_fractional>1.9&cooldown.icy_veins.remains>10)|buff.icy_veins.up|target.time_to_die.remains+5<charges_fractional*10)
-  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() < S.RuneofPower:CastTime() or (S.RuneofPower:ChargesFractional() > 1.9 and S.IcyVeins:CooldownRemains() > 10) or Player:Buff(S.IcyVeins) or Target:TimeToDie() + 5 < S.RuneofPower:ChargesFractional() * 10) then
+  -- actions.cooldowns=rune_of_power,if=cooldown.icy_veins.remains<cast_time|charges_fractional>1.9&cooldown.icy_veins.remains>10|buff.icy_veins.up|target.time_to_die+5<charges_fractional*10
+  if S.RuneofPower:IsCastable() and (S.IcyVeins:CooldownRemains() < S.RuneofPower:CastTime() or (S.RuneofPower:ChargesFractional() > 1.9 and S.IcyVeins:CooldownRemains() > 10) or Player:Buff(S.IcyVeins) or Target:TimeToDie() + 5 < S.RuneofPower:ChargesFractional() * 10) and not Player:IsCasting(S.RuneofPower) then
     if AR.Cast(S.RuneofPower) then return ""; end
   end
-  -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1
-  if I.PotionofProlongedPower:IsUsable() and I.PotionofProlongedPower:CooldownRemains()==0 and (S.IcyVeins:IsCastable() or Player:Buff(S.IcyVeins)) then
+  -- actions.cooldowns+=/potion,if=cooldown.icy_veins.remains<1|target.time_to_die<70
+  if I.PotionofProlongedPower:IsUsable() and I.PotionofProlongedPower:CooldownRemains()==0 and (S.IcyVeins:IsCastable() or Player:Buff(S.IcyVeins)) or Target:TimeToDie() < 70 then
    if AR.CastSuggested(I.PotionofProlongedPower) then return ""; end
   end
-  -- actions.cooldowns+=/icy_veins,if=buff.icy_veins.down
-  if S.IcyVeins:IsCastable() and not Player:Buff(S.IcyVeins) then
+  -- actions.cooldowns+=/icy_veins
+  if S.IcyVeins:IsCastable() then
     if AR.Cast(S.IcyVeins, Settings.Frost.OffGCDasOffGCD.IcyVeins) then return ""; end
   end
   -- actions.cooldowns+=/mirror_image
@@ -240,85 +226,77 @@ end
 -- # Start of Single APL
 local function Single ()
   -- actions.single=ice_nova,if=debuff.winters_chill.up
-  if S.IceNova:IsCastable() and Target:Debuff(S.WintersChill) then
+  if S.IceNova:IsCastableP() and Target:Debuff(S.WintersChill) then
     if AR.Cast(S.IceNova) then return ""; end
   end
-  -- actions.single+=/frozen_orb,if=set_bonus.tier20_2pc
-  if S.FrozenOrb:IsCastable() and AC.Tier20_2Pc then
-    if AR.Cast(S.FrozenOrb) then return ""; end
-  end
   -- actions.single+=/frostbolt,if=prev_off_gcd.water_jet
-  if S.Frostbolt:IsCastable() and Pet:PrevOffGCD(1, S.WaterJet) and Target:DebuffRemains(S.WaterJet) > (S.Frostbolt:TravelTime() + S.Frostbolt:CastTime()) then
+  if S.Frostbolt:IsCastableP() and Pet:PrevOffGCD(1, S.WaterJet) and Target:DebuffRemainsP(S.WaterJet) > (S.Frostbolt:TravelTime() + S.Frostbolt:CastTime()) then
     if AR.Cast(S.Frostbolt) then return ""; end
   end
-  -- actions.single+=/water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
-  if S.IcyHand:ArtifactEnabled() then
-    if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 3 and Player:BuffStack(S.BrainFreeze) == 0 then
-      if AR.Cast(S.WaterJet) then return ""; end
-    end
-  else
-    if S.WaterJet:IsCastable() and (Player:CastID() == S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 2 and Player:BuffStack(S.BrainFreeze) == 0 then
-      if AR.Cast(S.WaterJet) then return ""; end
-    end
+  -- actions.single+=/water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<3&!buff.brain_freeze.react
+  if S.WaterJet:IsCastableP() and Player:IsCasting(S.Frostbolt:ID()) and Player:BuffStack(S.FingersofFrost) < 3 and not Player:Buff(S.BrainFreeze) then
+    if AR.Cast(S.WaterJet) then return ""; end
   end
-  -- actions.single+=/ray_of_frost,if=buff.icy_veins.up|(cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down)
-  if S.RayofFrost:IsCastable() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:CooldownRemains() > S.RayofFrost:CooldownRemains() and not Player:Buff(S.RuneofPower))) then
+  -- actions.single+=/ray_of_frost,if=buff.icy_veins.up|cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down
+  if S.RayofFrost:IsCastableP() and (Player:Buff(S.IcyVeins) or (S.IcyVeins:CooldownRemainsP() > S.RayofFrost:CooldownRemainsP() and not Player:Buff(S.RuneofPower))) then
     if AR.Cast(S.RayofFrost) then return ""; end
   end
-  --actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(!talent.glacial_spike.enabled&prev_gcd.1.frostbolt|talent.glacial_spike.enabled&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(buff.icicles.stack<=4|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc)))
-  if S.Flurry:IsCastable() and (Player:CastID() == S.Ebonbolt:ID() or Player:Buff(S.BrainFreeze) 
-    and ((Player:CastID() == S.Frostbolt:ID() and not S.GlacialSpike:IsAvailable()) or S.GlacialSpike:IsAvailable() 
-    and (Player:CastID() == S.GlacialSpike:ID() or Player:CastID() == S.Frostbolt:ID() and (Player:BuffStack(S.Icicles) <= 3 or S.FrozenOrb:CooldownRemains() <= 10 and AC.Tier20_2Pc)))) then 
+  -- actions.single+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!talent.glacial_spike.enabled|buff.icicles.stack<=4|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc))
+  if S.Flurry:IsCastable() and (Player:IsCasting(S.Ebonbolt) or Player:Buff(S.BrainFreeze) 
+    and (Player:IsCasting(S.GlacialSpike) or (Player:IsCasting(S.Frostbolt) and (not S.GlacialSpike:IsAvailable() or Player:BuffStack(S.Icicles) <= 4 or (S.FrozenOrb:CooldownRemainsP() <= 10 and AC.Tier20_2Pc))))) then 
       if AR.Cast (S.Flurry) then return ""; end
   end
-  -- actions.single+=/blizzard,if=cast_time=0&active_enemies>1&variable.fof_react<3
-  if S.Blizzard:IsCastable() and S.Blizzard:CastTime() == 0 and Cache.EnemiesCount[Range] > 1 and FoFReact() < 3 then
+  -- actions.single+=/frozen_orb,if=set_bonus.tier20_2pc&buff.fingers_of_frost.react<3
+  if S.FrozenOrb:IsCastableP() and AC.Tier20_2Pc and Player:BuffStack(S.FingersofFrost) < 3 then
+    if AR.Cast(S.FrozenOrb) then return ""; end
+  end
+  -- actions.single+=/blizzard,if=cast_time=0&active_enemies>1&buff.fingers_of_frost.react<3
+  if S.Blizzard:IsCastableP() and Player:BuffRemainsP(S.FreezingRain) > 0 and Cache.EnemiesCount[Range] > 1 and Player:BuffStack(S.FingersofFrost) < 3 then
     if AR.Cast(S.Blizzard) then return ""; end
   end
-  -- actions.single+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react>0
-  if S.FrostBomb:IsCastable() and Target:DebuffRemains(S.FrostBomb) < S.IceLance:TravelTime() and FoFReact() > 0 then
+  -- actions.single+=/frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&buff.fingers_of_frost.react
+  if S.FrostBomb:IsCastableP() and Target:DebuffRemainsP(S.FrostBomb) < S.IceLance:TravelTime() and Player:BuffStack(S.FingersofFrost) > 0 then
     if AR.Cast(S.FrostBomb) then return ""; end
   end
-  -- actions.single+=/ice_lance,if=variable.fof_react
-  if S.IceLance:IsCastable() and FoFReact() > 0 then
+  -- actions.single+=/ice_lance,if=buff.fingers_of_frost.react
+  if S.IceLance:IsCastableP() and Player:BuffStack(S.FingersofFrost) > 0 then
     if AR.Cast(S.IceLance) then return ""; end
   end
   -- actions.single+=/ebonbolt
-  if S.Ebonbolt:IsCastable() then
+  if S.Ebonbolt:IsCastableP() then
     if AR.Cast(S.Ebonbolt) then return ""; end
   end
   -- actions.single+=/frozen_orb
-  if S.FrozenOrb:IsCastable() then
+  if S.FrozenOrb:IsCastableP() then
     if AR.Cast(S.FrozenOrb) then return ""; end
   end
   -- actions.single+=/ice_nova
-  if S.IceNova:IsCastable() then
+  if S.IceNova:IsCastableP() then
     if AR.Cast(S.IceNova) then return ""; end
   end
   -- actions.single+=/comet_storm
-  if S.CometStorm:IsCastable() then
+  if S.CometStorm:IsCastableP() then
     if AR.Cast(S.CometStorm) then return ""; end
   end
-  -- actions.single+=/blizzard,if=active_enemies>2|active_enemies>1&!(talent.glacial_spike.enabled&talent.splitting_ice.enabled)|(buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time)
+  -- actions.single+=/blizzard,if=active_enemies>1|buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time
   -- todo verif
-  if S.Blizzard:IsCastable() and (Cache.EnemiesCount[Range] > 2 or (Cache.EnemiesCount[Range] > 1 and not (S.GlacialSpike:IsAvailable() and S.SplittingIce:IsAvailable())) or (Player:BuffStack(S.ZannesuJourney) == 5 and Player:BuffRemains(S.ZannesuJourney) > S.Blizzard:CastTime())) then
+  if S.Blizzard:IsCastableP() and (Cache.EnemiesCount[Range] > 1 or (Player:BuffStack(S.ZannesuJourney) == 5 and Player:BuffRemainsP(S.ZannesuJourney) > S.Blizzard:CastTime())) then
     if AR.Cast(S.Blizzard) then return ""; end
   end
-  --actions.single+=/frostbolt,if=buff.frozen_mass.remains>execute_time+action.glacial_spike.execute_time+action.glacial_spike.travel_time&buff.brain_freeze.react=0&talent.glacial_spike.enabled
-  if S.GlacialSpike:IsAvailable() and S.GlacialSpike:IsCastable() and Player:Buff(S.BrainFreeze) and Player:BuffRemains(S.FrozenMass) > (S.Frostbolt:ExecuteTime() + S.GlacialSpike:ExecuteTime() + S.GlacialSpike:TravelTime()) then
-    if AR.Cast(S.GlacialSpike) then return ""; end
-  end
-  if S.GlacialSpike:IsAvailable() and S.GlacialSpike:IsCastable() and Player:Buff(S.BrainFreeze) and Player:BuffRemains(S.FrozenMass) > (S.Frostbolt:ExecuteTime() + S.GlacialSpike:ExecuteTime() + S.GlacialSpike:TravelTime()) then
+  -- actions.single+=/frostbolt,if=buff.frozen_mass.remains>execute_time+action.glacial_spike.execute_time+action.glacial_spike.travel_time&!buff.brain_freeze.react&talent.glacial_spike.enabled
+  if S.GlacialSpike:IsAvailable() and Player:BuffRemainsP(S.FrozenMass) > (S.Frostbolt:ExecuteTime() + S.GlacialSpike:ExecuteTime() + S.GlacialSpike:TravelTime()) and not Player:Buff(S.BrainFreeze) and S.GlacialSpike:IsAvailable() then
     if AR.Cast(S.Frostbolt) then return ""; end
   end
-  --actions.single+=/glacial_spike,if=cooldown.frozen_orb.remains>10|!set_bonus.tier20_2pc
-  if S.GlacialSpike:IsCastable() and Player:BuffStack(S.Icicles) == 5 and S.FrozenOrb:CooldownRemains() > 10 and not AC.Tier20_2Pc   then
+  -- actions.single+=/glacial_spike,if=cooldown.frozen_orb.remains>10|!set_bonus.tier20_2pc
+  if S.GlacialSpike:IsAvailable() and (Player:Buff(S.GlacialSpikeBuff) or (Player:BuffStack(S.Icicles) == 4 and Player:IsCasting(S.Frostbolt))) and not Player:IsCasting(S.GlacialSpike) and S.FrozenOrb:CooldownRemainsP() > 10 and not AC.Tier20_2Pc  then
     if AR.Cast(S.GlacialSpike) then return ""; end
   end
   -- actions.single+=/frostbolt
-  if S.Frostbolt:IsCastable() then
+  if S.Frostbolt:IsCastableP() then
     if AR.Cast(S.Frostbolt) then return ""; end
   end
+  -- actions.single+=/blizzard (instant, on the move)
+  -- actions.single+=/ice_lance (on the move)
 end
 
 --- ======= MAIN =======
@@ -336,13 +314,17 @@ local function APL ()
 		-- Rune
 		-- PrePot w/ Bossmod Countdown
 		-- Opener
-		if Pet:IsActive() == false and S.SummonWaterElemental:IsCastable() then
+		if not Pet:IsActive() and S.SummonWaterElemental:IsCastable() then
 			if AR.Cast(S.SummonWaterElemental) then return; end
 		end
 		if Everyone.TargetIsValid() and Target:IsInRange(Range) then
-			if S.Ebonbolt:IsCastable() then
-        if AR.CastQueue(S.Ebonbolt, S.Flurry) then return; end
+			if S.Ebonbolt:IsCastable() and not Player:IsCasting(S.Ebonbolt) then
+        -- if AR.CastQueue(S.Ebonbolt, S.Flurry) then return; end
+        if AR.Cast(S.Ebonbolt) then return; end
 			end
+      if Player:IsCasting(S.Ebonbolt) then
+        if AR.Cast(S.Flurry) then return; end
+      end
 			if S.Frostbolt:IsCastable() then
         if AR.Cast(S.Frostbolt) then return; end
 			end
@@ -355,12 +337,20 @@ local function APL ()
     if AR.Cast(S.SummonWaterElemental) then return ""; end
 	end
 	if Everyone.TargetIsValid() then
-    -- actions+=/ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
-    if S.IceLance:IsCastable() and FoFReact() == 0 and Player:PrevGCD(1, S.Flurry) then
+    -- actions=counterspell
+    
+    -- actions+=/ice_lance,if=!buff.fingers_of_frost.react&prev_gcd.1.flurry
+    if S.IceLance:IsCastable() and not Player:Buff(S.FingersofFrost) and Player:PrevGCDP(1, S.Flurry) then
       if AR.Cast(S.IceLance) then return ""; end
     end
     
-    -- actions+=/time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410&(cooldown.icy_veins.remains<1|target.time_to_die<50))
+    -- actions+=/time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(cooldown.icy_veins.remains<1|target.time_to_die<50)    
+    
+    -- actions+=/call_action_list,name=movement,moving=1
+    if Player:IsMoving() then
+      ShouldReturn = Movement();
+      if ShouldReturn then return ShouldReturn; end
+    end
     
     -- actions+=/call_action_list,name=cooldowns
     if AR.CDsON() then
@@ -368,8 +358,8 @@ local function APL ()
       if ShouldReturn then return ShouldReturn; end
     end
     
-    -- actions+=/call_action_list,name=aoe,if=active_enemies>=4
-    if Cache.EnemiesCount[Range] >= 4 then
+    -- actions+=/call_action_list,name=aoe,if=active_enemies>=3
+    if Cache.EnemiesCount[Range] >= 3 then
       ShouldReturn = AoE();
       if ShouldReturn then return ShouldReturn; end
     end
