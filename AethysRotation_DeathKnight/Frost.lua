@@ -120,6 +120,21 @@
 
 --- ======= ACTION LISTS =======
   local function Standard()
+    --[[if AR.AoEON() and Cache.EnemiesCount[10] > 1 then
+      BestUnit,BestUnitSpellToCast = nil, nil;
+      for Key, Value in pairs(Cache.Enemies[10]) do
+        if S.ShatteringStrikes:IsAvailable() and S.ShatteringStrikes:IsAvailable() then
+          if Value:DebuffStack(S.RazorIce) ~= 5 or not Value:Debuff(S.RazorIce) and not Value:IsUnit(Target) then
+              BestUnit, BestUnitSpellToCast = Value, S.FrostScythe;
+          elseif Value:DebuffStack(S.RazorIce) == 5 and Player:RunicPower() >= S.FrostStrike:Cost() and not Value:IsUnit(Target)  then
+              BestUnit, BestUnitSpellToCast = Value, S.FrostStrike;
+          end
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+      end
+    end--]]
     --actions.standard=/frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<=gcd
     if S.FrostStrike:IsUsable() and S.IcyTalons:IsAvailable() and Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() then
       if AR.Cast(S.FrostStrike) then return ""; end
@@ -181,6 +196,7 @@
     if S.FrostScythe:IsCastable() and Cache.EnemiesCount[8] >= 3 then
       if AR.Cast(S.FrostScythe) then return ""; end
     end
+   
     --actions.standard+=/obliterate
     if S.Obliterate:IsCastable() then
       if AR.Cast(S.Obliterate) then return ""; end
