@@ -372,14 +372,14 @@ local function APL ()
     end
     -- actions+=/battle_cry,if=(gcd.remains=0|gcd.remains<=0.4&prev_gcd.1.rampage)&(cooldown.bloodbath.remains=0|buff.bloodbath.up|!talent.bloodbath.enabled|(target.time_to_die<12))&(equipped.umbral_moonglaives&(prev_off_gcd.umbral_moonglaives|(trinket.cooldown.remains>3&trinket.cooldown.remains<90))|!equipped.umbral_moonglaives)
     if S.BattleCry:IsCastable() 
-      and (Player:GCDRemains() == 0 or (Player:GCDRemains() <= 0.4 and Player:PrevGCDP(1, S.Rampage))) 
+      and ((Player:GCDRemains() == 0 or (Player:GCDRemains() <= 0.4 and Player:PrevGCDP(1, S.Rampage))) 
       and (S.Bloodbath:CooldownRemainsP() == 0 or Player:BuffP(S.Bloodbath) 
         or not S.Bloodbath:IsAvailable() 
         or (Target:TimeToDie() < 12)) 
       and (I.UmbralMoonglaives:IsEquipped() 
         and (Player:PrevOffGCDP(1, S.UmbralMoonglaives) 
         or (S.UmbralMoonglaives:CooldownRemainsP() > 3 and S.UmbralMoonglaives:CooldownRemainsP() < 90))) 
-      or not I.UmbralMoonglaives:IsEquipped() then
+      or not I.UmbralMoonglaives:IsEquipped()) then
       if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return ""; end
     end
     -- actions+=/bloodbath,if=buff.battle_cry.up|(target.time_to_die<14)|(cooldown.battle_cry.remains<2&prev_gcd.1.rampage)
