@@ -682,10 +682,9 @@ local function AoE ()
     if AR.Cast(S.LunarStrike) then return ""; end
   end
 
-  -- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&(!buff.incarnation.up|active_enemies>3)
-  if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and 
-    (Cache.EnemiesCount[Range] < 3 or (Cache.EnemiesCount[Range] < 4 and not AC.Tier20_4Pc) or (I.RadiantMoonlight:IsEquipped() and Cache.EnemiesCount[Range] < 7 and not AC.Tier20_4Pc)) 
-    and Player:SpellHaste() > 0.4 and not Player:Buff(S.CelestialAlignment) and (not Player:Buff(S.IncarnationChosenOfElune) or Cache.EnemiesCount[Range] > 3) then
+-- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&!buff.incarnation.up  if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and 
+  if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and (Cache.EnemiesCount[Range] < 3 or (Cache.EnemiesCount[Range] < 4 and not AC.Tier20_4Pc) or (I.RadiantMoonlight:IsEquipped() and Cache.EnemiesCount[Range] < 7 and not AC.Tier20_4Pc)) 
+    and Player:SpellHaste() > 0.4 and not Player:Buff(S.CelestialAlignment) and not Player:Buff(S.IncarnationChosenOfElune) then
       if AR.Cast(S.MoonFire) then return ""; end
   end
 
@@ -947,7 +946,7 @@ end
 AR.SetAPL(102, APL);
 
 --- ======= SIMC =======
---- Last Update: 11/27/2017
+--- Last Update: 12/01/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -989,7 +988,7 @@ AR.SetAPL(102, APL);
 -- actions.AoE+=/lunar_strike,if=buff.warrior_of_elune.up
 -- actions.AoE+=/solar_wrath,if=buff.solar_empowerment.up
 -- actions.AoE+=/lunar_strike,if=buff.lunar_empowerment.up
--- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&(!buff.incarnation.up|active_enemies>3)
+-- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&!buff.incarnation.up
 -- actions.AoE+=/lunar_strike,if=spell_targets.lunar_strike>=4|spell_haste<0.45
 -- actions.AoE+=/solar_wrath
 
