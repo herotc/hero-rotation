@@ -13,3 +13,4 @@ Hunter.lua
 BeastMastery.lua
 Marksmanship.lua
 Survival.lua
+Events.lua

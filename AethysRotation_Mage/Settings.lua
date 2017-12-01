@@ -30,15 +30,18 @@
       }
     },
     Frost = {
+      ShowPoPP = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-
+        RuneofPower = {true, false},
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        IcyVeins = {true, false}
+        IcyVeins = {true, false},
+        MirrorImage = {true, false},
+        IceFloes = {true, false}
       }
     },
     Fire = {
@@ -98,4 +101,9 @@
   -- Fire
   CreateARPanelOption("OffGCDasOffGCD", CP_Fire, "APL.Mage.Fire.OffGCDasOffGCD.Combustion", "Combustion");
   -- Frost
+    CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Arcane.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want the addon to show you when to use Potion of Prolonged Power");
+
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.Mage.Frost.OffGCDasOffGCD.IcyVeins", "Icy Veins");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.Mage.Frost.GCDasOffGCD.RuneofPower", "Rune of Power");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.Mage.Frost.OffGCDasOffGCD.MirrorImage", "Mirror Image");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.Mage.Frost.OffGCDasOffGCD.IceFloes", "Ice Floes");

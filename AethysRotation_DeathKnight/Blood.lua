@@ -47,7 +47,7 @@
   MindFreeze            = Spell(47528),
   BloodShield           = Spell(77535),
   --Legendary Buff
-  HaemostasisBuff       = Spell(235559),
+  HaemostasisBuff       = Spell(235558),
 
 };
   local S = Spell.DeathKnight.Blood;

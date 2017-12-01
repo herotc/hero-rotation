@@ -120,6 +120,21 @@
 
 --- ======= ACTION LISTS =======
   local function Standard()
+    --[[if AR.AoEON() and Cache.EnemiesCount[10] > 1 then
+      BestUnit,BestUnitSpellToCast = nil, nil;
+      for Key, Value in pairs(Cache.Enemies[10]) do
+        if S.ShatteringStrikes:IsAvailable() and S.ShatteringStrikes:IsAvailable() then
+          if Value:DebuffStack(S.RazorIce) ~= 5 or not Value:Debuff(S.RazorIce) and not Value:IsUnit(Target) then
+              BestUnit, BestUnitSpellToCast = Value, S.FrostScythe;
+          elseif Value:DebuffStack(S.RazorIce) == 5 and Player:RunicPower() >= S.FrostStrike:Cost() and not Value:IsUnit(Target)  then
+              BestUnit, BestUnitSpellToCast = Value, S.FrostStrike;
+          end
+        end
+      end
+      if BestUnit then
+        if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+      end
+    end--]]
     --actions.standard=/frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<=gcd
     if S.FrostStrike:IsUsable() and S.IcyTalons:IsAvailable() and Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() then
       if AR.Cast(S.FrostStrike) then return ""; end
@@ -181,6 +196,7 @@
     if S.FrostScythe:IsCastable() and Cache.EnemiesCount[8] >= 3 then
       if AR.Cast(S.FrostScythe) then return ""; end
     end
+   
     --actions.standard+=/obliterate
     if S.Obliterate:IsCastable() then
       if AR.Cast(S.Obliterate) then return ""; end
@@ -329,12 +345,12 @@
     if S.RemorselessWinter:IsCastable() and S.GatheringStorm:IsAvailable() then
       if AR.Cast(S.RemorselessWinter) then return ""; end
     end
-    --actions.obliteration+=/frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>1
-    if S.FrostScythe:IsCastable() and Player:Buff(S.KillingMachine) and Cache.EnemiesCount[8] > 1 then
+    --actions.obliteration+=/frostscythe,if=(buff.killing_machine.up&(buff.killing_machine.react|prev_gcd.1.frost_strike|prev_gcd.1.howling_blast))&spell_targets.frostscythe>1 
+    if S.FrostScythe:IsCastable() and (Player:Buff(S.KillingMachine) and (Player:Buff(S.KillingMachine) or Player:PrevGCD(1, S.FrostStrike) or Player:PrevGCD(1, S.HowlingBlast))) and Cache.EnemiesCount[8] > 1 then
       if AR.Cast(S.FrostScythe) then return ""; end
     end
-    --actions.obliteration+=/obliterate,if=buff.killing_machine.up|(spell_targets.howling_blast>=3&!buff.rime.up)
-    if S.Obliterate:IsCastable() and Player:Buff(S.KillingMachine) or (Cache.EnemiesCount[10] >= 3 and not Player:Buff(S.Rime)) then
+    --actions.obliteration+=/obliterate,if=(buff.killing_machine.up&(buff.killing_machine.react|prev_gcd.1.frost_strike|prev_gcd.1.howling_blast))|(spell_targets.howling_blast>=3&!buff.rime.up) 
+    if S.Obliterate:IsCastable() and (Player:Buff(S.KillingMachine) and (Player:Buff(S.KillingMachine) or Player:PrevGCD(1, S.FrostStrike) or Player:PrevGCD(1, S.HowlingBlast))) or (Cache.EnemiesCount[10] >= 3 and not Player:Buff(S.Rime)) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.obliteration+=/howling_blast,if=buff.rime.up&spell_targets.howling_blast>1
@@ -400,8 +416,8 @@
     if S.BreathofSindragosa:IsCastable() and Player:Buff(S.PillarOfFrost) then
       if AR.Cast(S.BreathofSindragosa) then return ""; end
     end
-    --actions.cds+=/call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up)|target.time_to_die<=gcd)
-    if I.ColdHeart:IsEquipped() and ((Player:BuffStack(S.ChilledHearth) >= 10 and not Player:Buff(S.Obliteration)) or Target:TimeToDie() <= Player:GCD()) then
+    --actions.cooldowns+=/call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up&debuff.razorice.stack=5)|target.time_to_die<=gcd) 
+    if I.ColdHeart:IsEquipped() and ((Player:BuffStack(S.ChilledHearth) >= 10 and not Player:Buff(S.Obliteration) and Target:DebuffStack(S.RazorIce) == 5) or Target:TimeToDie() <= Player:GCD()) then
     --[[COLD HEART LEGENDARY APL]]--
     --actions.cold_heart=chains_of_ice,if=buff.cold_heart.stack=20&buff.unholy_strength.up&cooldown.pillar_of_frost.remains>6
       if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) == 20 and Player:Buff(S.UnholyStrength) and S.PillarOfFrost:CooldownRemainsP() > 6 then
@@ -411,11 +427,15 @@
       if S.ChainsOfIce:IsCastable() and Player:Buff(S.PillarOfFrost) and Player:BuffRemainsP(S.PillarOfFrost) < Player:GCD() and (Player:BuffStack(S.ChilledHearth) >= 11 or (Player:BuffStack(S.ChilledHearth) >= 10 and T204P)) then
         if AR.Cast(S.ChainsOfIce) then return ""; end
       end
-    --actions.cold_heart+=/chains_of_ice,if=buff.unholy_strength.up&buff.unholy_strength.remains<gcd&buff.cold_heart.stack>16&cooldown.pillar_of_frost.remains>6
-      if S.ChainsOfIce:IsCastable() and Player:Buff(S.UnholyStrength) and Player:BuffRemainsP(S.UnholyStrength) < Player:GCD() and Player:BuffStack(S.ChilledHearth) > 16 and S.PillarOfFrost:CooldownRemainsP() > 6 then
+    --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>16&buff.unholy_strength.react&buff.unholy_strength.remains<gcd&cooldown.pillar_of_frost.remains>6 
+      if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) > 16 and Player:Buff(S.UnholyStrength) and Player:BuffRemainsP(S.UnholyStrength) < Player:GCD() and S.PillarOfFrost:CooldownRemainsP() > 6 then
         if AR.Cast(S.ChainsOfIce) then return ""; end
       end
-    --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>=5&target.time_to_die<=gcd
+    --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>12&buff.unholy_strength.react&talent.shattering_strikes.enabled
+      if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) > 12 and Player:Buff(S.UnholyStrength) and S.ShatteringStrikes:IsAvailable() then
+        if AR.Cast(S.ChainsOfIce) then return ""; end
+      end
+    --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>=4&target.time_to_die<=gcd
       if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ChilledHearth) >= 4 and Target:TimeToDie() <= Player:GCD() then
         if AR.Cast(S.ChainsOfIce) then return ""; end
       end
@@ -495,99 +515,100 @@ local function APL ()
 end
 
   AR.SetAPL(251, APL);
---- ====06/09/2017======
+--- ====23/11/2017======
 --- ======= SIMC ======= 
 --# Executed every time the actor is available.
 --actions=auto_attack
 --actions+=/mind_freeze
---actions+=/call_action_list,name=cds
+--actions+=/call_action_list,name=cooldowns
 --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<15
 --actions+=/run_action_list,name=bos_ticking,if=dot.breath_of_sindragosa.ticking
 --actions+=/run_action_list,name=obliteration,if=buff.obliteration.up
 --actions+=/call_action_list,name=standard
- 
+--# Breath of Sindragosa pooling rotation : starts 15s before the cd becomes available
 --actions.bos_pooling=remorseless_winter,if=talent.gathering_storm.enabled
---actions.bos_pooling+=/howling_blast,if=buff.rime.react&rune.time_to_4<(gcd*2)if=talent.gathering_storm.enabled
+--actions.bos_pooling+=/howling_blast,if=buff.rime.up&rune.time_to_4<(gcd*2)
 --actions.bos_pooling+=/obliterate,if=rune.time_to_6<gcd&!talent.gathering_storm.enabled
---actions.bos_pooling+=/obliterate,if=rune.time_to_4<gcd&(cooldown.breath_of_sindragosa.remains|runic_power<70)
---actions.bos_pooling+=/frost_strike,if=runic_power>=95&set_bonus.tier19_4pc&cooldown.breath_of_sindragosa.remains&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
---actions.bos_pooling+=/remorseless_winter,if=buff.rime.react&equipped.perseverance_of_the_ebon_martyr
---actions.bos_pooling+=/howling_blast,if=buff.rime.react&(buff.remorseless_winter.up|cooldown.remorseless_winter.remains>gcd|(!equipped.perseverance_of_the_ebon_martyr&!talent.gathering_storm.enabled))
---actions.bos_pooling+=/obliterate,if=!buff.rime.react&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>(gcd*2)|rune>4))&rune>3
---actions.bos_pooling+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
---actions.bos_pooling+=/frost_strike,if=runic_power>=70&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>rune.time_to_4)
---actions.bos_pooling+=/frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|spell_targets.frostscythe>=2)
+--actions.bos_pooling+=/obliterate,if=rune.time_to_4<gcd&(cooldown.breath_of_sindragosa.remains|runic_power.deficit>=30)
+--actions.bos_pooling+=/frost_strike,if=runic_power.deficit<5&set_bonus.tier19_4pc&cooldown.breath_of_sindragosa.remains&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
+--actions.bos_pooling+=/remorseless_winter,if=buff.rime.up&equipped.perseverance_of_the_ebon_martyr
+--actions.bos_pooling+=/howling_blast,if=buff.rime.up&(buff.remorseless_winter.up|cooldown.remorseless_winter.remains>gcd|(!equipped.perseverance_of_the_ebon_martyr&!talent.gathering_storm.enabled))
+--actions.bos_pooling+=/obliterate,if=!buff.rime.up&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>(gcd*2)|rune>4))&rune>3
+--actions.bos_pooling+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.react&debuff.razorice.stack=5
+--actions.bos_pooling+=/frost_strike,if=runic_power.deficit<30&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>rune.time_to_4)
+--actions.bos_pooling+=/frostscythe,if=buff.killing_machine.react&(!equipped.koltiras_newfound_will|spell_targets.frostscythe>=2)
 --actions.bos_pooling+=/glacial_advance,if=spell_targets.glacial_advance>=2
 --actions.bos_pooling+=/remorseless_winter,if=spell_targets.remorseless_winter>=2
 --actions.bos_pooling+=/frostscythe,if=spell_targets.frostscythe>=3
 --actions.bos_pooling+=/frost_strike,if=(cooldown.remorseless_winter.remains<(gcd*2)|buff.gathering_storm.stack=10)&cooldown.breath_of_sindragosa.remains>rune.time_to_4&talent.gathering_storm.enabled&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
---actions.bos_pooling+=/obliterate,if=!buff.rime.react&(!talent.gathering_storm.enabled|cooldown.remorseless_winter.remains>gcd)
+--actions.bos_pooling+=/obliterate,if=!buff.rime.up&(!talent.gathering_storm.enabled|cooldown.remorseless_winter.remains>gcd)
 --actions.bos_pooling+=/frost_strike,if=cooldown.breath_of_sindragosa.remains>rune.time_to_4&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
-
+--# Breath of Sindragosa uptime rotation
 --actions.bos_ticking=frost_strike,if=talent.shattering_strikes.enabled&runic_power<40&rune.time_to_2>2&cooldown.empower_rune_weapon.remains&debuff.razorice.stack=5&(cooldown.horn_of_winter.remains|!talent.horn_of_winter.enabled)
---actions.bos_ticking+=/remorseless_winter,,if=(runic_power>=30|buff.hungering_rune_weapon.up)&((buff.rime.react&equipped.perseverance_of_the_ebon_martyr)|(talent.gathering_storm.enabled&(buff.remorseless_winter.remains<=gcd|!buff.remorseless_winter.remains)))
---actions.bos_ticking+=/howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30|buff.hungering_rune_weapon.up)&buff.rime.react
---actions.bos_ticking+=/frost_strike,if=set_bonus.tier20_2pc&runic_power>85&rune<=3&buff.pillar_of_frost.up&!talent.shattering_strikes.enabled
---actions.bos_ticking+=/obliterate,if=runic_power<=45|rune.time_to_5<gcd|buff.hungering_rune_weapon.remains>=2
---actions.bos_ticking+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
---actions.bos_ticking+=/horn_of_winter,if=runic_power<70&rune.time_to_3>gcd
---actions.bos_ticking+=/frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|talent.gathering_storm.enabled|spell_targets.frostscythe>=2)
---actions.bos_ticking+=/glacial_advance,if=spell_targets.remorseless_winter>=2
+--actions.bos_ticking+=/remorseless_winter,if=runic_power>=30&((buff.rime.up&equipped.perseverance_of_the_ebon_martyr)|(talent.gathering_storm.enabled&(buff.remorseless_winter.remains<=gcd|!buff.remorseless_winter.remains)))
+--actions.bos_ticking+=/howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&buff.rime.up
+--actions.bos_ticking+=/frost_strike,if=set_bonus.tier20_2pc&runic_power.deficit<=15&rune<=3&buff.pillar_of_frost.up&!talent.shattering_strikes.enabled
+--actions.bos_ticking+=/obliterate,if=runic_power<=45|rune.time_to_5<gcd
+--actions.bos_ticking+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.react&debuff.razorice.stack=5
+--actions.bos_ticking+=/horn_of_winter,if=runic_power.deficit>=30&rune.time_to_3>gcd
+--actions.bos_ticking+=/frostscythe,if=buff.killing_machine.react&(!equipped.koltiras_newfound_will|talent.gathering_storm.enabled|spell_targets.frostscythe>=2)
+--actions.bos_ticking+=/glacial_advance,if=spell_targets.glacial_advance>=2
 --actions.bos_ticking+=/remorseless_winter,if=spell_targets.remorseless_winter>=2
---actions.bos_ticking+=/obliterate,if=runic_power<=75|rune>3
+--actions.bos_ticking+=/obliterate,if=runic_power.deficit>25|rune>3
 --actions.bos_ticking+=/empower_rune_weapon,if=runic_power<30&rune.time_to_2>gcd
-
---actions.cds=arcane_torrent,if=runic_power<80&!talent.breath_of_sindragosa.enabled
---actions.cds+=/arcane_torrent,if=dot.breath_of_sindragosa.ticking&runic_power<50&rune<2
---actions.cds+=/blood_fury,if=buff.pillar_of_frost.up
---actions.cds+=/berserking,if=buff.pillar_of_frost.up
---actions.cds+=/use_items
---actions.cds+=/use_item,name=ring_of_collapsing_futures,if=(buff.temptation.stack=0&target.time_to_die>60)|target.time_to_die<60
---actions.cds+=/use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
---actions.cds+=/use_item,name=draught_of_souls,if=rune.time_to_5<3&(!dot.breath_of_sindragosa.ticking|runic_power>60)
---actions.cds+=/use_item,name=feloiled_infernal_machine,if=!talent.obliteration.enabled|buff.obliteration.up
---actions.cds+=/potion,if=buff.pillar_of_frost.up&(dot.breath_of_sindragosa.ticking|buff.obliteration.up|talent.hungering_rune_weapon.enabled)
-
---actions.cds+=/pillar_of_frost,if=talent.obliteration.enabled&(cooldown.obliteration.remains>20|cooldown.obliteration.remains<10|!talent.icecap.enabled)
---actions.cds+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.ready&runic_power>50
---actions.cds+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>40
---actions.cds+=/pillar_of_frost,if=talent.hungering_rune_weapon.enabled
---actions.cds+=/breath_of_sindragosa,if=buff.pillar_of_frost.up
---actions.cds+=/call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up)|target.time_to_die<=gcd)
---actions.cds+=/obliteration,if=rune>=1&runic_power>=20&(!talent.frozen_pulse.enabled|rune<2|buff.pillar_of_frost.remains<=12)&(!talent.gathering_storm.enabled|!cooldown.remorseless_winter.ready)&(buff.pillar_of_frost.up|!talent.icecap.enabled)
---actions.cds+=/hungering_rune_weapon,if=!buff.hungering_rune_weapon.up&rune.time_to_2>gcd&runic_power<40
-
---actions.cold_heart=chains_of_ice,if=buff.cold_heart.stack=20&buff.unholy_strength.up&cooldown.pillar_of_frost.remains>6
+--# Cold heart conditions
+--actions.cold_heart=chains_of_ice,if=buff.cold_heart.stack=20&buff.unholy_strength.react&cooldown.pillar_of_frost.remains>6
 --actions.cold_heart+=/chains_of_ice,if=buff.pillar_of_frost.up&buff.pillar_of_frost.remains<gcd&(buff.cold_heart.stack>=11|(buff.cold_heart.stack>=10&set_bonus.tier20_4pc))
---actions.cold_heart+=/chains_of_ice,if=buff.unholy_strength.up&buff.unholy_strength.remains<gcd&buff.cold_heart.stack>16&cooldown.pillar_of_frost.remains>6
+--actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>16&buff.unholy_strength.react&buff.unholy_strength.remains<gcd&cooldown.pillar_of_frost.remains>6
+--actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>12&buff.unholy_strength.react&talent.shattering_strikes.enabled
 --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack>=4&target.time_to_die<=gcd
-
+--actions.cooldowns=arcane_torrent,if=runic_power.deficit>=20&!talent.breath_of_sindragosa.enabled
+--actions.cooldowns+=/arcane_torrent,if=dot.breath_of_sindragosa.ticking&runic_power.deficit>=50&rune<2
+--actions.cooldowns+=/blood_fury,if=buff.pillar_of_frost.up
+--actions.cooldowns+=/berserking,if=buff.pillar_of_frost.up
+--actions.cooldowns+=/use_items
+--actions.cooldowns+=/use_item,name=ring_of_collapsing_futures,if=(buff.temptation.stack=0&target.time_to_die>60)|target.time_to_die<60
+--actions.cooldowns+=/use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
+--actions.cooldowns+=/use_item,name=draught_of_souls,if=rune.time_to_5<3&(!dot.breath_of_sindragosa.ticking|runic_power>60)
+--actions.cooldowns+=/use_item,name=feloiled_infernal_machine,if=!talent.obliteration.enabled|buff.obliteration.up
+--actions.cooldowns+=/potion,if=buff.pillar_of_frost.up&(dot.breath_of_sindragosa.ticking|buff.obliteration.up|talent.hungering_rune_weapon.enabled)
+--# Pillar of frost conditions
+--actions.cooldowns+=/pillar_of_frost,if=talent.obliteration.enabled&(cooldown.obliteration.remains>20|cooldown.obliteration.remains<10|!talent.icecap.enabled)
+--actions.cooldowns+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.ready&runic_power>50
+--actions.cooldowns+=/pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>40
+--actions.cooldowns+=/pillar_of_frost,if=talent.hungering_rune_weapon.enabled
+--actions.cooldowns+=/breath_of_sindragosa,if=buff.pillar_of_frost.up
+--actions.cooldowns+=/call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up&debuff.razorice.stack=5)|target.time_to_die<=gcd)
+--actions.cooldowns+=/obliteration,if=rune>=1&runic_power>=20&(!talent.frozen_pulse.enabled|rune<2|buff.pillar_of_frost.remains<=12)&(!talent.gathering_storm.enabled|!cooldown.remorseless_winter.ready)&(buff.pillar_of_frost.up|!talent.icecap.enabled)
+--actions.cooldowns+=/hungering_rune_weapon,if=!buff.hungering_rune_weapon.up&rune.time_to_2>gcd&runic_power<40
+--# Obliteration rotation
 --actions.obliteration=remorseless_winter,if=talent.gathering_storm.enabled
---actions.obliteration+=/howling_blast,if=buff.rime.up&!buff.killing_machine.up&spell_targets.howling_blast>1
---actions.obliteration+=/howling_blast,if=!buff.rime.up&!buff.killing_machine.up&spell_targets.howling_blast>2&rune>3&talent.freezing_fog.enabled&talent.gathering_storm.enabled
---actions.obliteration+=/frost_strike,if=!buff.killing_machine.up&(!buff.rime.up|rune.time_to_1>=gcd|runic_power>=80)
---actions.obliteration+=/frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>1
---actions.obliteration+=/howling_blast,if=buff.rime.up&!buff.killing_machine.up
---actions.obliteration+=/obliterate,if=buff.killing_machine.up
---actions.obliteration+=/frost_strike,if=!buff.killing_machine.up&rune.time_to_1>=gcd
+--actions.obliteration+=/frostscythe,if=(buff.killing_machine.up&(buff.killing_machine.react|prev_gcd.1.frost_strike|prev_gcd.1.howling_blast))&spell_targets.frostscythe>1
+--actions.obliteration+=/obliterate,if=(buff.killing_machine.up&(buff.killing_machine.react|prev_gcd.1.frost_strike|prev_gcd.1.howling_blast))|(spell_targets.howling_blast>=3&!buff.rime.up)
+--actions.obliteration+=/howling_blast,if=buff.rime.up&spell_targets.howling_blast>1
+--actions.obliteration+=/howling_blast,if=!buff.rime.up&spell_targets.howling_blast>2&rune>3&talent.freezing_fog.enabled&talent.gathering_storm.enabled
+--actions.obliteration+=/frost_strike,if=!buff.rime.up|rune.time_to_1>=gcd|runic_power.deficit<20
+--actions.obliteration+=/howling_blast,if=buff.rime.up
 --actions.obliteration+=/obliterate
-
+-- Standard rotation
 --actions.standard=frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<=gcd
 --actions.standard+=/frost_strike,if=talent.shattering_strikes.enabled&debuff.razorice.stack=5&buff.gathering_storm.stack<2&!buff.rime.up
---actions.standard+=/remorseless_winter,if=(buff.rime.react&equipped.perseverance_of_the_ebon_martyr)|talent.gathering_storm.enabled
+--actions.standard+=/remorseless_winter,if=(buff.rime.up&equipped.perseverance_of_the_ebon_martyr)|talent.gathering_storm.enabled
 --actions.standard+=/obliterate,if=(equipped.koltiras_newfound_will&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1)|rune.time_to_4<gcd&buff.hungering_rune_weapon.up
---actions.standard+=/frost_strike,if=(!talent.shattering_strikes.enabled|debuff.razorice.stack<5)&runic_power>=90
---actions.standard+=/howling_blast,if=buff.rime.react
+--actions.standard+=/frost_strike,if=(!talent.shattering_strikes.enabled|debuff.razorice.stack<5)&runic_power.deficit<10
+--actions.standard+=/howling_blast,if=buff.rime.up
 --actions.standard+=/obliterate,if=(equipped.koltiras_newfound_will&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1)|rune.time_to_5<gcd
---actions.standard+=/sindragosas_fury,,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
---actions.standard+=/frost_strike,if=runic_power>=90&!buff.hungering_rune_weapon.up
---actions.standard+=/frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|spell_targets.frostscythe>=2)
+--actions.standard+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.react&debuff.razorice.stack=5
+--actions.standard+=/frost_strike,if=runic_power.deficit<10&!buff.hungering_rune_weapon.up
+--actions.standard+=/frostscythe,if=buff.killing_machine.react&(!equipped.koltiras_newfound_will|spell_targets.frostscythe>=2)
+--actions.standard+=/obliterate,if=buff.killing_machine.react
+--actions.standard+=/frost_strike,if=runic_power.deficit<20
 --actions.standard+=/remorseless_winter,if=spell_targets.remorseless_winter>=2
 --actions.standard+=/glacial_advance,if=spell_targets.glacial_advance>=2
 --actions.standard+=/frostscythe,if=spell_targets.frostscythe>=3
---actions.standard+=/obliterate,if=buff.killing_machine.react
---actions.standard+=/frost_strike,if=runic_power>=80
---actions.standard+=/obliterate
+--actions.standard+=/obliterate,if=!talent.gathering_storm.enabled|cooldown.remorseless_winter.remains>(gcd*2)
 --actions.standard+=/horn_of_winter,if=!buff.hungering_rune_weapon.up&(rune.time_to_2>gcd|!talent.frozen_pulse.enabled)
 --actions.standard+=/frost_strike,if=!(runic_power<50&talent.obliteration.enabled&cooldown.obliteration.remains<=gcd)
+--actions.standard+=/obliterate,if=!talent.gathering_storm.enabled|talent.icy_talons.enabled
 --actions.standard+=/empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled|target.time_to_die<cooldown.breath_of_sindragosa.remains
+
