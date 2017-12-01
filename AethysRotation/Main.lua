@@ -194,8 +194,9 @@
           -- Load additionnal settings
           local CP_General = GUI.GetPanelByName("General")
           if CP_General then
-            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 10, 0.5}, "UI Scale", "Scale of the Icons.", function(value) AR.MainFrame:ResizeUI(value); end);
-            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 10, 0.5}, "Buttons Scale", "Scale of the Buttons.", function(value) AR.MainFrame:ResizeButtons(value); end);
+            CreatePanelOption("CheckButton", CP_General, "General.HideKeyBinds", "Hide keybinds", "Enable if you want to hide the keybinds on the icons");
+            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 10, 0.5}, "UI Scale", "Scale of the Icons", function(value) AR.MainFrame:ResizeUI(value); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 10, 0.5}, "Buttons Scale", "Scale of the Buttons", function(value) AR.MainFrame:ResizeButtons(value); end);
             CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() AR.MainFrame:ToggleLock(); end);
             CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() AR.ToggleIconFrame:ResetAnchor(); end);
           end
