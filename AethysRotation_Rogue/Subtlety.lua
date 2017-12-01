@@ -706,8 +706,8 @@ local function APL ()
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
-      -- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&buff.the_first_of_the_dead.remains>1&combo_points>=3&spell_targets.shuriken_storm<2
-      if DSh_DfA() and Player:BuffRemainsP(S.TheFirstoftheDead) > 1 and Player:ComboPoints() >= 3 and Cache.EnemiesCount[10] < 2 then
+      -- actions+=/call_action_list,name=finish,if=buff.the_first_of_the_dead.remains>1&combo_points>=3&spell_targets.shuriken_storm<2
+      if Player:BuffRemainsP(S.TheFirstoftheDead) > 1 and Player:ComboPoints() >= 3 and Cache.EnemiesCount[10] < 2 then
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
@@ -759,7 +759,7 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=stealth_als,if=talent.dark_shadow.enabled&combo_points.deficit>=2+buff.shadow_blades.up&(dot.nightblade.remains>4+talent.subterfuge.enabled|cooldown.shadow_dance.charges_fractional>=1.9&(!equipped.denial_of_the_halfgiants|time>10))
 -- actions+=/call_action_list,name=stealth_als,if=!talent.dark_shadow.enabled&(combo_points.deficit>=2+buff.shadow_blades.up|cooldown.shadow_dance.charges_fractional>=1.9+talent.enveloping_shadows.enabled)
 -- actions+=/call_action_list,name=finish,if=combo_points>=5+3*(buff.the_first_of_the_dead.up&talent.anticipation.enabled)+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
--- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&buff.the_first_of_the_dead.remains>1&combo_points>=3&spell_targets.shuriken_storm<2
+-- actions+=/call_action_list,name=finish,if=buff.the_first_of_the_dead.remains>1&combo_points>=3&spell_targets.shuriken_storm<2
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
 -- # Builders
