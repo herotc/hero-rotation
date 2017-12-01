@@ -313,7 +313,7 @@ local function APL()
     end
   --army suggestion at pull
     if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() then
-          if AR.Cast(S.ArmyOfDead) then return ""; end
+          if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
     end
   -- outbreak if virulent_plague is not  the target and we are not in combat
     if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
