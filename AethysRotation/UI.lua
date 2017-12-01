@@ -104,6 +104,14 @@
     self.text:SetPoint("CENTER");
     self.text:SetTextColor(1,1,1,1);
     self.text:SetText("");
+    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.keybind:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
+    self.keybind:SetAllPoints(true);
+    self.keybind:SetJustifyH("RIGHT");
+    self.keybind:SetJustifyV("TOP");
+    self.keybind:SetPoint("TOPRIGHT");
+    self.keybind:SetTextColor(0.8,0.8,0.8,1);
+    self.keybind:SetText("");
     if AR.GUISettings.General.BlackBorderIcon then
       self.TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
@@ -112,11 +120,13 @@
     self:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.MainIconFrame:ChangeIcon (Texture)
+  function AR.MainIconFrame:ChangeIcon (Texture, Keybind)
     self.text:SetText("");
+    self.keybind:SetText("");
     self.TempTexture:SetTexture(Texture);
     self.TempTexture:SetAllPoints(self);
     self.texture = self.TempTexture;
+    if Keybind then self.keybind:SetText(Keybind); end
     if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
   -- Set text on frame
@@ -137,6 +147,14 @@
       self.Part[i]:SetHeight(64);
       self.Part[i]:SetPoint("Left", self, "Left", 0, 0);
       self.Part[i].TempTexture = self.Part[i]:CreateTexture(nil, "BACKGROUND");
+      self.Part[i].keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+      self.Part[i].keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE");
+      self.Part[i].keybind:SetAllPoints(true);
+      self.Part[i].keybind:SetJustifyH("RIGHT");
+      self.Part[i].keybind:SetJustifyV("TOP");
+      self.Part[i].keybind:SetPoint("TOPRIGHT");
+      self.Part[i].keybind:SetTextColor(0.8,0.8,0.8,1);
+      self.Part[i].keybind:SetText("");
       if AR.GUISettings.General.BlackBorderIcon then
         self.Part[i].TempTexture:SetTexCoord(.08, .92, .08, .92);
         AR:CreateBackdrop(self.Part[i]);
@@ -145,9 +163,9 @@
     end
   end
   local QueuedCasts, FrameWidth;
-  function AR.MainIconFrame:SetupParts (Textures)
+  function AR.MainIconFrame:SetupParts (Textures, Keybinds)
     QueuedCasts = #Textures;
-	FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
+	  FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
     for i = 1, QueuedCasts do
       self.Part[i]:SetWidth(FrameWidth);
       self.Part[i]:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
@@ -158,6 +176,7 @@
                                             AR.GUISettings.General.BlackBorderIcon and 0.08 or 0,
                                             AR.GUISettings.General.BlackBorderIcon and 0.92 or 1);
       self.Part[i].texture = self.Part[i].TempTexture;
+      self.Part[i].keybind:SetText(Keybinds[i]);
       if not self.Part[i]:IsVisible() then
         self.Part[i]:Show();
       end
@@ -165,6 +184,7 @@
   end
   function AR.MainIconFrame:HideParts ()
     for i = 1, #self.Part do
+      self.Part[i].keybind:SetText("");
       self.Part[i]:Hide();
     end
   end
@@ -180,6 +200,7 @@
     self:Show();
 
     self.Icon = {};
+    self.keybind = {};
     self:CreateIcons(1, "LEFT");
     self:CreateIcons(2, "RIGHT");
   end
@@ -196,14 +217,24 @@
       self.Icon[Index].TempTexture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self.Icon[Index]);
     end
+    self.Icon[Index].keybind = self.Icon[Index]:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Icon[Index].keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE");
+    self.Icon[Index].keybind:SetAllPoints(true);
+    self.Icon[Index].keybind:SetJustifyH("RIGHT");
+    self.Icon[Index].keybind:SetJustifyV("TOP");
+    self.Icon[Index].keybind:SetPoint("TOPRIGHT");
+    self.Icon[Index].keybind:SetTextColor(0.8,0.8,0.8,1);
+    self.Icon[Index].keybind:SetText("");
     self.Icon[Index]:Show();
   end
   -- Change Texture (1 Arg for Texture, 3 Args for Color)
-  function AR.SmallIconFrame:ChangeIcon (FrameID, Texture)
+  function AR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind)
     -- Icon
+    self.Icon[FrameID].keybind:SetText("");
     self.Icon[FrameID].TempTexture:SetTexture(Texture);
     self.Icon[FrameID].TempTexture:SetAllPoints(self.Icon[FrameID]);
     self.Icon[FrameID].texture = self.Icon[FrameID].TempTexture;
+    if Keybind then self.Icon[FrameID].keybind:SetText(Keybind); end
 
     if not self.Icon[FrameID]:IsVisible() then
       self.Icon[FrameID]:Show();
@@ -214,6 +245,7 @@
     for i = 1, #self.Icon do
       -- Icon
       self.Icon[i]:Hide();
+      self.Icon[i].keybind:SetText("");
     end
   end
 

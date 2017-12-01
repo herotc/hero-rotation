@@ -72,15 +72,16 @@
   -- Main Cast
   AR.CastOffGCDOffset = 1;
   function AR.Cast (Object, OffGCD)
+    local Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
     if OffGCD and OffGCD[1] then
       if AR.CastOffGCDOffset <= 2 then
-        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object));
+        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
         AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = AC.GetTime();
         return OffGCD[2] and "Should Return" or false;
       end
     else
-      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object));
+      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";
@@ -103,11 +104,14 @@
     QueueSpellTable = {...};
     QueueLength = mathmin(#QueueSpellTable, AR.MaxQueuedCasts);
     QueueTextureTable = {};
+    QueueKeybindTable = {};
     for i = 1, QueueLength do
       QueueTextureTable[i] = AR.GetTexture(QueueSpellTable[i]);
       QueueSpellTable[i].LastDisplayTime = AC.GetTime();
+      QueueKeybindTable[i] = not AR.GUISettings.General.HideKeyBinds
+                              and QueueSpellTable[i]:FindKeyBinding();
     end
-    AR.MainIconFrame:SetupParts(QueueTextureTable);
+    AR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
     GCDDisplay();
     return "Should Return";
   end
