@@ -83,6 +83,7 @@
       StealthMacro = {
         -- Abilities
         Shadowmeld = true,
+        JungleStalker = true,
       }
     },
     Guardian = {
@@ -119,6 +120,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.TigersFury", "Tiger's Fury")
   CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.Berserk", "Berserk and Incarnation")
   CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
+  CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");
   --Balance
   CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkSkinHP", {0, 100, 1}, "BarkSkin HP", "Set the BarkSkin HP threshold.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMFOOP", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");

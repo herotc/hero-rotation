@@ -25,6 +25,7 @@
   if not Spell.Druid then Spell.Druid = {}; end
   Spell.Druid.Feral = {
     -- Racials
+    Berserking          = Spell(26297),
     Shadowmeld          = Spell(58984),
     -- Abilities
     Berserk             = Spell(106951),
@@ -34,6 +35,7 @@
     MoonfireDebuff      = Spell(164812),
     PredatorySwiftness  = Spell(69369),
     Prowl               = Spell(5215),
+    ProwlJungleStalker  = Spell(102547),
     Rake                = Spell(1822),
     RakeDebuff          = Spell(155722),
     Rip                 = Spell(1079),
@@ -50,6 +52,7 @@
     ElunesGuidance      = Spell(202060),
     GuardianAffinity    = Spell(217615),
     Incarnation         = Spell(102543),
+    JungleStalker       = Spell(252071),
     JaggedWounds        = Spell(202032),
     LunarInspiration    = Spell(155580),
     RestorationAffinity = Spell(197492),
@@ -70,6 +73,8 @@
     TravelForm          = Spell(783),
     -- Legendaries
     FieryRedMaimers     = Spell(236757),
+    -- Tier Set
+    ApexPredator        = Spell(252752), -- TODO: Verify T21 4-Piece Buff SpellID
     -- Misc
     Clearcasting        = Spell(135700),
     PoolEnergy          = Spell(9999000010)
@@ -114,6 +119,11 @@
     ThrashAura = ComputeDurations(S.Thrash:BaseDuration());
   end
   local MoonfireThreshold = S.MoonfireDebuff:PandemicThreshold();
+
+  function Player:EnergyTimeToXP (Amount, Offset)
+    if self:EnergyRegen() == 0 then return -1; end
+    return Amount > self:EnergyPredicted() and (Amount - self:EnergyPredicted()) / (self:EnergyRegen() * (1 - (Offset or 0))) or 0;
+  end
 
   -- GUI Settings
   local Settings = {
@@ -189,10 +199,8 @@
         if AR.Cast(S.WildCharge, Settings.Feral.OffGCDasOffGCD.WildCharge) then return "Cast"; end
       end
       -- Opener: Rake
-      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange(MeleeRange) then
-        if S.Rake:IsCastable() then
-          if AR.Cast(S.Rake) then return "Cast"; end
-        end
+      if Everyone.TargetIsValid() and S.Rake:IsCastable() then
+        if AR.Cast(S.Rake) then return "Rake Opener"; end
       end
       return;
     end
@@ -220,7 +228,16 @@
             if S.Rake:IsCastable() and (Player:Buff(S.Prowl) or Player:Buff(S.Shadowmeld)) then
               if AR.Cast(S.Rake) then return "Cast"; end
             end
+            -- actions.single_target+=/auto_attack
             -- call_action_list,name=cooldowns
+              -- actions.cooldowns+=/prowl,if=buff.incarnation.remains<0.5&buff.jungle_stalker.up
+              if S.ProwlJungleStalker:IsCastable() and (Player:BuffRemainsP(S.Incarnation) < 0.5) and Player:Buff(S.JungleStalker) then
+                if Settings.Feral.StealthMacro.JungleStalker then
+                  if AR.CastQueue(S.Prowl, S.Rake) then return "Prowl to Rake as Macro"; end
+                else
+                  if AR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "Prowl to Rake"; end
+                end
+              end
               -- berserk,if=energy>=30&(cooldown.tigers_fury.remains>5|buff.tigers_fury.up)
               if AR.CDsON() and S.Berserk:IsCastable() and Player:EnergyPredicted() >= 30 and (S.TigersFury:CooldownRemainsP() > 5 or Player:Buff(S.TigersFury)) then
                 if AR.Cast(S.Berserk, Settings.Feral.OffGCDasOffGCD.Berserk) then return "Cast"; end
@@ -228,7 +245,11 @@
               -- tigers_fury,if=energy.deficit>=60
               if S.TigersFury:IsCastable() and Player:EnergyDeficitPredicted() >= 60 then
                 if AR.Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "Cast"; end
-                end
+              end
+              -- actions.cooldowns+=/berserking
+              if AR.CDsON() and S.Berserking:IsCastable() then
+                if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+              end
               -- elunes_guidance,if=combo_points=0&energy>=50
               if S.ElunesGuidance:IsCastable() and Player:ComboPoints() == 0 and Player:EnergyPredicted() >= 50 then
                 if AR.Cast(S.ElunesGuidance, Settings.Feral.OffGCDasOffGCD.ElunesGuidance) then return "Cast"; end
@@ -254,10 +275,21 @@
                 end
               end
           end
-          -- regrowth,if=combo_points=5&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8|dot.rake.remains<5)
-          if S.Regrowth:IsCastable() and Player:ComboPoints() == 5 and S.Bloodtalons:IsAvailable() and not Player:Buff(S.BloodtalonsBuff)
-            and (not Player:Buff(S.Incarnation) or Target:DebuffRemainsP(S.Rip) < 8 or Target:DebuffRemainsP(S.RakeDebuff) < 5) then
-            if AR.Cast(S.Regrowth) then return "Cast"; end
+          -- actions.single_target+=/ferocious_bite,target_if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>10&(target.health.pct<25|talent.sabertooth.enabled)
+          if S.FerociousBite:IsCastable() and Target:DebuffP(S.Rip) and Target:DebuffRemainsP(S.Rip) < 3 and Target:TimeToDie() > 10 and ((Target:HealthPercentage() < 25) or S.Sabertooth:IsAvailable()) then
+            if AR.Cast(S.FerociousBite) then return ""; end
+          end
+          -- actions.single_target+=/regrowth,if=combo_points=5&buff.predatory_swiftness.up&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8)
+          if S.Regrowth:IsCastable() and Player:ComboPoints() == 5 and Player:BuffP(S.PredatorySwiftness) and S.Bloodtalons:IsAvailable() and Player:BuffDownP(S.BloodtalonsBuff) and (Player:BuffDownP(S.Incarnation) or (Target:DebuffRemainsP(S.Rip) < 8)) then
+            if AR.Cast(S.Regrowth) then return ""; end
+          end
+          -- actions.single_target+=/regrowth,if=combo_points>3&talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.apex_predator.up&buff.incarnation.down
+          if S.Regrowth:IsCastable() and Player:ComboPoints() > 3 and S.Bloodtalons:IsAvailable() and Player:BuffP(S.PredatorySwiftness) and Player:BuffP(S.ApexPredator) and Player:BuffDownP(S.Incarnation) then
+            if AR.Cast(S.Regrowth) then return ""; end
+          end
+          -- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up
+          if S.FerociousBite:IsCastable() and Player:BuffP(S.ApexPredator) then
+            if AR.Cast(S.FerociousBite) then return ""; end
           end
           -- run_action_list,name=st_finishers,if=combo_points>4
           if Player:ComboPoints() > 4 and Target:IsInRange(MeleeRange) then
@@ -306,17 +338,19 @@
                 if AR.Cast(S.Regrowth) then return "Cast"; end
               end
             end
-            if AR.AoEON() then
-              -- brutal_slash,if=spell_targets.brutal_slash>desired_targets
-              -- TODO: desired_targets
-              if S.BrutalSlash:IsCastable() and Cache.EnemiesCount[AoERadius] > 1 then
-                if AR.Cast(S.BrutalSlash) then return "Cast"; end
-              end
-              -- thrash_cat,if=(!ticking|remains<duration*0.3)&(spell_targets.thrash_cat>2)
-              -- Note: TTD check added ?
-              if S.Thrash:IsCastable() and Cache.EnemiesCount[ThrashRadius] >= 3 and Target:FilteredTimeToDie(">=", 6, -Target:DebuffRemainsP(S.Thrash)) and  Target:DebuffRefreshableP(S.Thrash, ThrashThreshold) then
-                if AR.Cast(S.Thrash) then return "Cast"; end
-              end
+            -- brutal_slash,if=spell_targets.brutal_slash>desired_targets
+            -- TODO: desired_targets
+            if S.BrutalSlash:IsCastable() and Cache.EnemiesCount[AoERadius] > 1 then
+              if AR.Cast(S.BrutalSlash) then return "Cast"; end
+            end
+            -- actions.st_generators+=/thrash_cat,if=refreshable&(spell_targets.thrash_cat>2)
+            -- TODO: TTD check?
+            if S.Thrash:IsCastable() and Target:FilteredTimeToDie(">=", 6, -Target:DebuffRemainsP(S.Thrash)) and Target:DebuffRefreshableP(S.Thrash, ThrashThreshold) and (Cache.EnemiesCount[ThrashRadius] > 2) then
+              if AR.Cast(S.Thrash) then return ""; end
+            end
+            -- actions.st_generators+=/thrash_cat,if=spell_targets.thrash_cat>3&equipped.luffa_wrappings&talent.brutal_slash.enabled
+            if S.Thrash:IsCastable() and (Cache.EnemiesCount[ThrashRadius] > 3) and I.LuffaWrappings:IsEquipped() and S.BrutalSlash:IsAvailable() then
+              if AR.Cast(S.Thrash) then return ""; end
             end
             if S.Rake:IsCastable(MeleeRange)
               and (Target:DebuffRefreshableP(S.RakeDebuff, 0)
@@ -332,16 +366,16 @@
             if S.BrutalSlash:IsCastable(AoERadius, true) and Player:Buff(S.TigersFury) then
               if AR.Cast(S.BrutalSlash) then return "Cast"; end
             end
-            -- moonfire_cat,target_if=remains<=duration*0.3
+            -- actions.st_generators+=/moonfire_cat,target_if=refreshable
             if S.LunarInspiration:IsAvailable() and S.Moonfire:IsCastable(RangedRange) and Target:DebuffRefreshableP(S.MoonfireDebuff, MoonfireThreshold) then
               if AR.Cast(S.Moonfire) then return "Cast"; end
             end
             if S.Thrash:IsCastable(ThrashRadius, true) and Target:FilteredTimeToDie(">=", 6, -Target:DebuffRemainsP(S.Thrash)) and Target:DebuffRefreshableP(S.Thrash, ThrashThreshold)
-              -- thrash_cat,if=(!ticking|remains<duration*0.3)&(variable.use_thrash=2|spell_targets.thrash_cat>1)
+              -- thrash_cat,if=refreshable&(variable.use_thrash=2|spell_targets.thrash_cat>1)
               -- Note: variable.use_thrash=2 is used to maintain thrash
               -- TODO: add an option for variable.use_thrash=2: 'Maintain thrash in Single Target'
               and (Cache.EnemiesCount[ThrashRadius] >= 2
-              -- thrash_cat,if=(!ticking|remains<duration*0.3)&variable.use_thrash=1&buff.clearcasting.react
+              -- thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react
                 or I.LuffaWrappings:IsEquipped() and Player:Buff(S.Clearcasting)) then
                 if AR.Cast(S.Thrash) then return "Cast"; end
             end
@@ -349,10 +383,15 @@
             if S.Swipe:IsCastable() and AR.AoEON() and Cache.EnemiesCount[AoERadius] >= 2 then
               if AR.Cast(S.Swipe) then return "Cast"; end
             end
-            -- shred
-            if S.Shred:IsCastable(MeleeRange) then
+            -- actions.st_generators+=/shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
+            if S.Shred:IsCastable() 
+            and (
+              Target:DebuffRemainsP(S.RakeDebuff) > Player:EnergyTimeToXP(S.Shred:Cost() + S.Rake:Cost())
+              or Player:BuffP(S.Clearcasting)
+            ) then
               if AR.Cast(S.Shred) then return "Cast"; end
             end
+            if AR.Cast(S.PoolEnergy) then return "Pooling"; end
         end
         -- rake,if=!ticking|buff.prowl.up
         if S.Rake:IsCastable() and (Target:DebuffRefreshableP(S.RakeDebuff, 0) or Player:IsStealthed()) then
@@ -397,7 +436,7 @@
           if AR.Cast(S.Thrash) then return "Cast"; end
         end
         -- shred
-        if S.Shred:IsCastable(MeleeRange) then
+        if S.Shred:IsCastable() then
           if AR.Cast(S.Shred) then return "Cast"; end
         end
       else
@@ -412,11 +451,11 @@
 
 
 --- ======= SIMC =======
--- Imported Current APL on 2017-10-27, 00:53 CEST (Last APL Update 2017-08-31)
+-- Imported Current APL on 2017-12-02, 07:56 CEST
 -- # Default consumables
--- potion=old_war
+-- potion=potion_of_prolonged_power
 -- flask=seventh_demon
--- food=lavish_suramar_feast
+-- food=lemon_herb_filet
 -- augmentation=defiled
 
 -- # This default action priority list is automatically created based on your character.
@@ -455,8 +494,10 @@
 -- actions+=/shred
 
 -- actions.cooldowns=dash,if=!buff.cat_form.up
+-- actions.cooldowns+=/prowl,if=buff.incarnation.remains<0.5&buff.jungle_stalker.up
 -- actions.cooldowns+=/berserk,if=energy>=30&(cooldown.tigers_fury.remains>5|buff.tigers_fury.up)
 -- actions.cooldowns+=/tigers_fury,if=energy.deficit>=60
+-- actions.cooldowns+=/berserking
 -- actions.cooldowns+=/elunes_guidance,if=combo_points=0&energy>=50
 -- actions.cooldowns+=/incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
 -- actions.cooldowns+=/potion,name=prolonged_power,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
@@ -465,10 +506,13 @@
 -- actions.cooldowns+=/use_items
 
 -- actions.single_target=cat_form,if=!buff.cat_form.up
--- actions.single_target+=/auto_attack
 -- actions.single_target+=/rake,if=buff.prowl.up|buff.shadowmeld.up
+-- actions.single_target+=/auto_attack
 -- actions.single_target+=/call_action_list,name=cooldowns
--- actions.single_target+=/regrowth,if=combo_points=5&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8|dot.rake.remains<5)
+-- actions.single_target+=/ferocious_bite,target_if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>10&(target.health.pct<25|talent.sabertooth.enabled)
+-- actions.single_target+=/regrowth,if=combo_points=5&buff.predatory_swiftness.up&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8)
+-- actions.single_target+=/regrowth,if=combo_points>3&talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.apex_predator.up&buff.incarnation.down
+-- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up
 -- actions.single_target+=/run_action_list,name=st_finishers,if=combo_points>4
 -- actions.single_target+=/run_action_list,name=st_generators
 
@@ -486,17 +530,18 @@
 -- actions.st_generators+=/regrowth,if=equipped.ailuro_pouncers&talent.bloodtalons.enabled&(buff.predatory_swiftness.stack>2|(buff.predatory_swiftness.stack>1&dot.rake.remains<3))&buff.bloodtalons.down
 -- actions.st_generators+=/brutal_slash,if=spell_targets.brutal_slash>desired_targets
 -- actions.st_generators+=/pool_resource,for_next=1
--- actions.st_generators+=/thrash_cat,if=(!ticking|remains<duration*0.3)&(spell_targets.thrash_cat>2)
+-- actions.st_generators+=/thrash_cat,if=refreshable&(spell_targets.thrash_cat>2)
+-- actions.st_generators+=/pool_resource,for_next=1
+-- actions.st_generators+=/thrash_cat,if=spell_targets.thrash_cat>3&equipped.luffa_wrappings&talent.brutal_slash.enabled
 -- actions.st_generators+=/pool_resource,for_next=1
 -- actions.st_generators+=/rake,target_if=!ticking|(!talent.bloodtalons.enabled&remains<duration*0.3)&target.time_to_die>4
 -- actions.st_generators+=/pool_resource,for_next=1
 -- actions.st_generators+=/rake,target_if=talent.bloodtalons.enabled&buff.bloodtalons.up&((remains<=7)&persistent_multiplier>dot.rake.pmultiplier*0.85)&target.time_to_die>4
 -- actions.st_generators+=/brutal_slash,if=(buff.tigers_fury.up&(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time))
--- actions.st_generators+=/moonfire_cat,target_if=remains<=duration*0.3
+-- actions.st_generators+=/moonfire_cat,target_if=refreshable
 -- actions.st_generators+=/pool_resource,for_next=1
--- actions.st_generators+=/thrash_cat,if=(!ticking|remains<duration*0.3)&(variable.use_thrash=2|spell_targets.thrash_cat>1)
--- actions.st_generators+=/thrash_cat,if=(!ticking|remains<duration*0.3)&variable.use_thrash=1&buff.clearcasting.react
+-- actions.st_generators+=/thrash_cat,if=refreshable&(variable.use_thrash=2|spell_targets.thrash_cat>1)
+-- actions.st_generators+=/thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react
 -- actions.st_generators+=/pool_resource,for_next=1
 -- actions.st_generators+=/swipe_cat,if=spell_targets.swipe_cat>1
--- actions.st_generators+=/shred
-
+-- actions.st_generators+=/shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
