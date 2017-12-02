@@ -103,6 +103,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.BlightedRuneWeapon", "Blighted Rune Weapon", "Enable if you want to put Blighted Rune Weapon shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put ArcaneTorrent shown as Off GCD (top icons) instead of Main.");
   --Frost Panels
+  CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa", "Breath of Sindragosa", "Enable if you want to put BoS shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.Obliteration", "Obliteration", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.SindragosasFury", "Sindragosa's Fury", "Enable if you want to put Sindragosa's Fury shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.HornOfWinter", "Horn of Winter", "Enable if you want to put Horn of Winter shown as Off GCD (top icons) instead of Main.");
