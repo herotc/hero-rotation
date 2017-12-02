@@ -32,7 +32,8 @@
         -- Abilities
         HornOfWinter = {true, false},
         Obliteration = {true, false},
-        SindragosasFury = {true, false}
+        SindragosasFury = {true, false},
+        BreathofSindragosa = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
