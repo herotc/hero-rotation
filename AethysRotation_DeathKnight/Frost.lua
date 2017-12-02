@@ -414,7 +414,7 @@
     end
     --actions.cds+=/breath_of_sindragosa,if=buff.pillar_of_frost.up
     if S.BreathofSindragosa:IsCastable() and Player:Buff(S.PillarOfFrost) then
-      if AR.Cast(S.BreathofSindragosa) then return ""; end
+      if AR.Cast(S.BreathofSindragosa, Settings.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa) then return ""; end
     end
     --actions.cooldowns+=/call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up&debuff.razorice.stack=5)|target.time_to_die<=gcd) 
     if I.ColdHeart:IsEquipped() and ((Player:BuffStack(S.ChilledHearth) >= 10 and not Player:Buff(S.Obliteration) and Target:DebuffStack(S.RazorIce) == 5) or Target:TimeToDie() <= Player:GCD()) then
