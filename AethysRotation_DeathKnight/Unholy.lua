@@ -260,8 +260,9 @@ local function ColdHeart()
 end 
 local function Cooldowns()
   --actions.cooldowns=call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart.stack>10&!debuff.soul_reaper.up
-  if I.ColdHeart and Player:BuffStack(S.ColdHeartBuff) > 10 and not Target:Debuff(S.SoulReaperDebuff) then
-    return ColdHeart();
+  if I.ColdHeart and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
+    ShouldReturn = ColdHeart();
+    if ShouldReturn then return ShouldReturn; end
   end
   -- t20 gameplay
   if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
@@ -287,7 +288,8 @@ local function Cooldowns()
   end
   --actions.cooldowns+=/call_action_list,name=dt,if=cooldown.dark_transformation.ready
   if S.DarkTransformation:IsReady() then
-    return DT();
+    ShouldReturn = DT();
+    if ShouldReturn then return ShouldReturn; end
   end
   return;
 end
@@ -308,12 +310,12 @@ local function APL()
 
     if not Player:AffectingCombat() then
     --check if we have our lovely pet with us
-    if Pet:IsActive() == false and S.SummonPet:IsCastable() then
+    if not Pet:IsActive() and S.SummonPet:IsCastable() then
     if AR.Cast(S.SummonPet) then return ""; end
     end
   --army suggestion at pull
     if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() then
-          if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
+          if AR.Cast(S.ArmyOfDead) then return ""; end
     end
   -- outbreak if virulent_plague is not  the target and we are not in combat
     if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
@@ -331,6 +333,7 @@ local function APL()
         ShouldReturn = Cooldowns();
         if ShouldReturn then return ShouldReturn; 
     end
+    
     if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 22) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
