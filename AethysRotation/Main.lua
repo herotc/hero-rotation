@@ -19,7 +19,46 @@
   local pairs = pairs;
   local select = select;
   -- File Locals
+  local Masque; -- , MasqueGroupLeft;
+  local MasqueGroups = {};
   local UIFrames;
+  local MasqueFrameList;
+
+  local function ModMasque(Frame, Disabled)
+    if Disabled then
+      Frame.__MSQ_NormalTexture:Hide();
+      Frame.Texture:SetAllPoints( Frame );
+      if Frame.CooldownFrame then
+        Frame.CooldownFrame:SetAllPoints( Frame );
+      end
+      if Frame.Backdrop then
+        Frame.Backdrop:Show();
+        Frame.Backdrop:SetFrameLevel(mathmin(Frame.Backdrop:GetFrameLevel(), 7));
+      end
+    else
+      if Frame.Backdrop then
+        Frame.Backdrop:Hide();
+      end
+    end
+  end
+  local function MasqueUpdate( Addon, Group, SkinID, Gloss, Backdrop, Colors, Disabled )
+    if Addon==AR and MasqueGroups and MasqueFrameList then
+      local k = MasqueFrameList[Group];
+      if k then
+        if k == AR.MainIconFrame.Part and type(k) == "table" then
+          for _, tblIcon in pairs(k) do
+            ModMasque(tblIcon, Disabled)
+          end
+        elseif type(k.Icon) == "table" then
+          for _, tblIcon in pairs(k.Icon) do
+            ModMasque(tblIcon, Disabled)
+          end
+        else
+          ModMasque(k, Disabled)
+        end
+      end
+    end
+  end
 
 
 --- ============================ CONTENT ============================
@@ -143,6 +182,22 @@
   AR.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
       if Event == "ADDON_LOADED" then
         if Arg1 == "AethysRotation" then
+          MasqueFrameList = {
+            ["Main Icon"] = AR.MainIconFrame,
+            ["Top Icons"] = AR.SmallIconFrame,
+            ["Left Icon"] = AR.LeftIconFrame,
+            ["Suggested Icon"] = AR.SuggestedIconFrame,
+            ["Part Icons"] = AR.MainIconFrame.Part
+          };
+          if not Masque then
+            Masque = LibStub( "Masque", true )
+            if Masque then
+                Masque:Register( "AethysRotation", MasqueUpdate, AR )
+                for FrameName, Frame in pairs(MasqueFrameList) do
+                  MasqueGroups[Frame] = Masque:Group( addonName, FrameName) 
+                end
+            end
+          end
           -- Panels
           if type(AethysRotationDB) ~= "table" then
             AethysRotationDB = {};
@@ -176,6 +231,40 @@
           end
           if AethysRotationDB.GUISettings["General.ScaleButtons"] then
             AR.MainFrame:ResizeButtons(AethysRotationDB.GUISettings["General.ScaleButtons"]);
+          end
+          for k, v in pairs(MasqueFrameList) do
+            if k == "Part Icons" and type(v) == "table" then
+              for _, tblIcon in pairs(v) do
+                tblIcon.GetNormalTexture = function(self) return nil end;
+                tblIcon.SetNormalTexture = function(self, Texture) self.Texture = Texture end;
+              end
+            elseif type(v.Icon) == "table" then
+              for _, tblIcon in pairs(v.Icon) do
+                tblIcon.GetNormalTexture = function(self) return nil end;
+                tblIcon.SetNormalTexture = function(self, Texture) self.Texture = Texture end;
+              end
+            else
+              v.GetNormalTexture = function(self) return nil end;
+              v.SetNormalTexture = function(self, Texture) self.Texture = Texture end;
+            end
+          end
+          if MasqueGroups then
+            for k, v in pairs(MasqueGroups) do
+              if k == AR.MainIconFrame.Part and type(k) == "table" then
+                for _, tblIcon in pairs(k) do
+                  if v then v:AddButton( tblIcon, { Icon = tblIcon.Texture, Cooldown = (tblIcon.CooldownFrame or nil) } ) end;
+                end
+              elseif type(k.Icon) == "table" then
+                for _, tblIcon in pairs(k.Icon) do
+                  if v then v:AddButton( tblIcon, { Icon = tblIcon.Texture, Cooldown = (tblIcon.CooldownFrame or nil) } ) end;
+                end
+              else
+                if v then v:AddButton( k, { Icon = k.Texture, Cooldown = k.CooldownFrame } ) end;
+              end
+            end
+            for k, v in pairs(MasqueGroups) do
+              if v then v:ReSkin() end
+            end
           end
           UIFrames = {
             AR.MainFrame,
@@ -340,6 +429,11 @@
         AC.CacheHasBeenReset = false;
         Cache.Reset();
         AR.APLs[Cache.Persistent.Player.Spec[1]]();
+      end
+      if MasqueGroups then
+        for k, v in pairs(MasqueGroups) do
+          if v then v:ReSkin() end
+        end
       end
     end
   end

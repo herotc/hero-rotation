@@ -8,7 +8,7 @@
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## Dependencies: AethysCore
-## OptionalDeps: AethysTools
+## OptionalDeps: AethysTools, Masque
 ## SavedVariables: AethysRotationDB
 ## SavedVariablesPerCharacter: AethysRotationCharDB
 
