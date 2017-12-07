@@ -196,6 +196,14 @@
     end
   end
   
+  local function num(val)
+    if val then return 1 else return 0 end
+  end
+
+  local function bool(val)
+    return val ~= 0
+  end
+  
   local function Sephuz ()
     -- Howl Of Terror
     --TODO : change level when iscontrollable is here
@@ -228,50 +236,174 @@
   end
 
   local function HauntAPL ()
-    -- actions.haunt=reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
-    -- actions.haunt+=/reap_souls,if=debuff.haunt.remains&!buff.deadwind_harvester.remains
-    -- actions.haunt+=/reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
-    -- actions.haunt+=/agony,cycle_targets=1,if=remains<=tick_time+gcd
-    -- actions.haunt+=/drain_soul,cycle_targets=1,if=target.time_to_die<=gcd*2&soul_shard<5
-    -- actions.haunt+=/service_pet,if=dot.corruption.remains&dot.agony.remains
-    -- actions.haunt+=/summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-    -- actions.haunt+=/summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
-    -- actions.haunt+=/summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-    -- actions.haunt+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
-    -- actions.haunt+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
-    -- actions.haunt+=/blood_fury
-    -- actions.haunt+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1
-    -- actions.haunt+=/use_item,slot=trinket1
-    -- actions.haunt+=/use_item,slot=trinket2
-    -- actions.haunt+=/potion,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
-    -- actions.haunt+=/potion,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
-    -- actions.haunt+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd
-    -- actions.haunt+=/corruption,cycle_targets=1,if=remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<5)
-    -- actions.haunt+=/reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
-    -- actions.haunt+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
-    -- actions.haunt+=/phantom_singularity
-    -- actions.haunt+=/haunt
-    -- actions.haunt+=/agony,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains
-    -- actions.haunt+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3|talent.malefic_grasp.enabled&target.time_to_die>15&mana.pct<10
-    -- actions.haunt+=/siphon_life,if=remains<=duration*0.3&target.time_to_die>=remains
-    -- actions.haunt+=/siphon_life,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*6&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*4
-    -- actions.haunt+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3|spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=3&dot.corruption.remains<=cast_time+travel_time
-    -- actions.haunt+=/corruption,if=remains<=duration*0.3&target.time_to_die>=remains
-    -- actions.haunt+=/corruption,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*6&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*4
-    -- actions.haunt+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&((soul_shard>=4&!talent.contagion.enabled)|soul_shard>=5|target.time_to_die<30)
-    -- actions.haunt+=/unstable_affliction,cycle_targets=1,if=active_enemies>1&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&soul_shard>=4&talent.contagion.enabled&cooldown.haunt.remains<15&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
-    -- actions.haunt+=/unstable_affliction,cycle_targets=1,if=active_enemies>1&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&(equipped.132381|equipped.132457)&cooldown.haunt.remains<15&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
-    -- actions.haunt+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&talent.contagion.enabled&soul_shard>=4&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
-    -- actions.haunt+=/unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*2
-    -- actions.haunt+=/reap_souls,if=!buff.deadwind_harvester.remains&(buff.active_uas.stack>1|(prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1))
-    -- actions.haunt+=/life_tap,if=mana.pct<=10
-    -- actions.haunt+=/life_tap,if=prev_gcd.1.life_tap&buff.active_uas.stack=0&mana.pct<50
-    -- actions.haunt+=/drain_soul,chain=1,interrupt=1
-    -- actions.haunt+=/life_tap,moving=1,if=mana.pct<80
-    -- actions.haunt+=/agony,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
-    -- actions.haunt+=/siphon_life,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
-    -- actions.haunt+=/corruption,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
-    -- actions.haunt+=/life_tap,moving=0  
+  -- reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+    if S.ReapSouls:IsCastableP() and (not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and AC.CombatTime() > 5 and (SoulsAvailable() >= 5 or Target:TimeToDie() <= SoulsAvailable() * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) + (Player:BuffRemainsP(S.DeadwindHarvester) * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) / 12 * (5 + 1.5 * num(I.ReapAndSow:IsEquipped()))))) then
+      if AR.Cast(S.ReapSouls) then return ""; end
+    end
+    -- reap_souls,if=debuff.haunt.remains&!buff.deadwind_harvester.remains
+    if S.ReapSouls:IsCastableP() and (bool(Target:DebuffRemainsP(S.Haunt)) and not bool(Player:BuffRemainsP(S.DeadwindHarvester))) then
+      if AR.Cast(S.ReapSouls) then return ""; end
+    end
+    -- reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
+    if S.ReapSouls:IsCastableP() and (Cache.EnemiesCount[range] > 1 and not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and AC.CombatTime() > 5 and FutureShard() > 0 and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] >= 3) or Cache.EnemiesCount[range] >= 5)) then
+      if AR.Cast(S.ReapSouls) then return ""; end
+    end
+    -- agony,cycle_targets=1,if=remains<=tick_time+gcd
+    if S.Agony:IsCastableP() and (Target:DebuffRemainsP(S.Agony) <= S.Agony:TickTime() + Player:GCD()) then
+      if AR.Cast(S.Agony) then return ""; end
+    end
+    -- drain_soul,cycle_targets=1,if=target.time_to_die<=gcd*2&soul_shard<5
+    if S.DrainSoul:IsCastableP() and (Target:TimeToDie() <= Player:GCD() * 2 and FutureShard() < 5) then
+      if AR.Cast(S.DrainSoul) then return ""; end
+    end
+    -- service_pet,if=dot.corruption.remains&dot.agony.remains
+    if S.GrimoireFelhunter:IsAvailable() and (bool(Target:DebuffRemainsP(S.CorruptionDebuff)) and bool(Target:DebuffRemainsP(S.Agony)))and FutureShard() >= 1 then
+      if AR.Cast(S.GrimoireFelhunter, Settings.Affliction.GCDasOffGCD.GrimoireFelhunter) then return ""; end
+    end
+    -- summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal<=2&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
+    if S.SummonDoomGuard:IsCastableP() and (not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] <= 2 and (Target:TimeToDie() > 180 or Target:HealthPercentage() <= 20 or Target:TimeToDie() < 30)) then
+      if AR.Cast(S.SummonDoomGuard) then return ""; end
+    end
+    -- summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>2
+    if S.SummonInfernal:IsCastableP() and (not S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] > 2) then
+      if AR.Cast(S.SummonInfernal) then return ""; end
+    end
+    -- summon_doomguard,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal=1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    if S.SummonDoomGuard:IsCastableP() and (S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] == 1 and I.SindoreiSpite:IsEquipped() and not bool(S.SindoreiSpiteBuff:CooldownRemainsP())) then
+      if AR.Cast(S.SummonDoomGuard) then return ""; end
+    end
+    -- summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
+    if S.SummonInfernal:IsCastableP() and (S.GrimoireOfSupremacy:IsAvailable() and Cache.EnemiesCount[range] > 1 and I.SindoreiSpite:IsEquipped() and not bool(S.SindoreiSpiteBuff:CooldownRemainsP())) then
+      if AR.Cast(S.SummonInfernal) then return ""; end
+    end
+    -- berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
+    if S.Berserking:IsCastableP() and AR.CDsON() and (Player:PrevGCDP(1, S.UnstableAffliction) or Player:BuffRemainsP(S.SoulHarvest) >= 10) then
+      if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
+    -- blood_fury
+    if S.BloodFury:IsCastableP() and AR.CDsON() then
+      if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
+    -- soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1
+    if S.SoulHarvest:IsCastableP() and (Player:BuffRemainsP(S.SoulHarvest) <= 8 and ActiveUAs() >= 1) then
+      if AR.Cast(S.SoulHarvest) then return ""; end
+    end
+    -- potion,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
+    if I.PotionOfProlongedPower:IsReady() and Settings.Affliction.ShowPoPP and (not S.SoulHarvest:IsAvailable() and (Target:TimeToDie() <= 70 or ActiveUAs() > 2)) then
+      if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
+    end
+    -- potion,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
+    if I.PotionOfProlongedPower:IsReady() and Settings.Affliction.ShowPoPP and (S.SoulHarvest:IsAvailable() and bool(Player:BuffRemainsP(S.SoulHarvest)) and (Target:TimeToDie() <= 70 or not bool(S.Haunt:CooldownRemainsP()) or ActiveUAs() > 2)) then
+      if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
+    end
+    -- siphon_life,cycle_targets=1,if=remains<=tick_time+gcd
+    if S.SiphonLife:IsCastableP() and (Target:DebuffRemainsP(S.SiphonLife) <= S.SiphonLife:TickTime() + Player:GCD()) then
+      if AR.Cast(S.SiphonLife) then return ""; end
+    end
+    -- corruption,cycle_targets=1,if=remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<5)
+    if S.Corruption:IsCastableP() and (Target:DebuffRemainsP(S.CorruptionDebuff) <= S.CorruptionDebuff:TickTime() + Player:GCD() and (Cache.EnemiesCount[range] < 3 and S.SowTheSeeds:IsAvailable() or Cache.EnemiesCount[range] < 5)) then
+      if AR.Cast(S.Corruption) then return ""; end
+    end
+    -- reap_souls,if=(buff.deadwind_harvester.remains+buff.tormented_souls.react*(5+equipped.144364))>=(12*(5+1.5*equipped.144364))
+    if S.ReapSouls:IsCastableP() and ((Player:BuffRemainsP(S.DeadwindHarvester) + SoulsAvailable() * (5 + num(I.ReapAndSow:IsEquipped()))) >= (12 * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())))) then
+      if AR.Cast(S.ReapSouls) then return ""; end
+    end
+    -- life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<=gcd
+    if S.LifeTap:IsCastableP() and (S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) <= Player:GCD()) then
+      if AR.Cast(S.LifeTap) then return ""; end
+    end
+    -- phantom_singularity
+    if S.PhantomSingularity:IsCastableP() then
+      if AR.Cast(S.PhantomSingularity) then return ""; end
+    end
+    -- haunt
+    if S.Haunt:IsCastableP() and not Player:IsCasting(S.Haunt) then
+      if AR.Cast(S.Haunt) then return ""; end
+    end
+    -- agony,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains
+    if S.Agony:IsCastableP() and (Target:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() * 0.3 and Target:TimeToDie() >= Target:DebuffRemainsP(S.Agony)) then
+      if AR.Cast(S.Agony) then return ""; end
+    end
+    -- life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3|talent.malefic_grasp.enabled&target.time_to_die>15&mana.pct<10
+    if S.LifeTap:IsCastableP() and (S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) < S.LifeTap:BaseDuration() * 0.3 or S.MaleficGrasp:IsAvailable() and Target:TimeToDie() > 15 and Player:ManaPercentage() < 10) then
+      if AR.Cast(S.LifeTap) then return ""; end
+    end
+    -- siphon_life,if=remains<=duration*0.3&target.time_to_die>=remains
+    if S.SiphonLife:IsCastableP() and (Target:DebuffRemainsP(S.SiphonLife) <= S.SiphonLife:BaseDuration() * 0.3 and Target:TimeToDie() >= Target:DebuffRemainsP(S.SiphonLife)) then
+      if AR.Cast(S.SiphonLife) then return ""; end
+    end
+    -- siphon_life,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*6&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*4
+    if S.SiphonLife:IsCastableP() and (Target:DebuffRemainsP(S.SiphonLife) <= S.SiphonLife:BaseDuration() * 0.3 and Target:TimeToDie() >= Target:DebuffRemainsP(S.SiphonLife) and Target:DebuffRemainsP(S.Haunt) >= S.UnstableAffliction:TickTime() * 6 and Target:DebuffRemainsP(S.Haunt) >= S.UnstableAffliction:TickTime() * 4) then
+      if AR.Cast(S.SiphonLife) then return ""; end
+    end
+    -- seed_of_corruption,if=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3|spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=3&dot.corruption.remains<=cast_time+travel_time
+    if S.SeedOfCorruption:IsCastableP() and (S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] >= 3 or Cache.EnemiesCount[range] >= 5 or Cache.EnemiesCount[range] >= 3 and Target:DebuffRemainsP(S.CorruptionDebuff) <= S.SeedOfCorruption:CastTime() + S.SeedOfCorruption:TravelTime()) then
+      if AR.Cast(S.SeedOfCorruption) then return ""; end
+    end
+    -- corruption,if=remains<=duration*0.3&target.time_to_die>=remains
+    if S.Corruption:IsCastableP() and (Target:DebuffRemainsP(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() * 0.3 and Target:TimeToDie() >= Target:DebuffRemainsP(S.CorruptionDebuff)) then
+      if AR.Cast(S.Corruption) then return ""; end
+    end
+    -- corruption,cycle_targets=1,if=remains<=duration*0.3&target.time_to_die>=remains&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*6&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*4
+    if S.Corruption:IsCastableP() and (Target:DebuffRemainsP(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() * 0.3 and Target:TimeToDie() >= Target:DebuffRemainsP(S.CorruptionDebuff) and Target:DebuffRemainsP(S.Haunt) >= S.UnstableAffliction:TickTime() * 6 and Target:DebuffRemainsP(S.Haunt) >= S.UnstableAffliction:TickTime() * 4) then
+      if AR.Cast(S.Corruption) then return ""; end
+    end
+    -- unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&((soul_shard>=4&!talent.contagion.enabled)|soul_shard>=5|target.time_to_die<30)
+    if S.UnstableAffliction:IsCastableP() and FutureShard() > 1 and ((not S.SowTheSeeds:IsAvailable() or Cache.EnemiesCount[range] < 3) and Cache.EnemiesCount[range] < 5 and ((FutureShard() >= 4 and not S.Contagion:IsAvailable()) or FutureShard() >= 5 or Target:TimeToDie() < 30)) then
+      if AR.Cast(S.UnstableAffliction) then return ""; end
+    end
+    -- unstable_affliction,cycle_targets=1,if=active_enemies>1&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&soul_shard>=4&talent.contagion.enabled&cooldown.haunt.remains<15&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    if S.UnstableAffliction:IsCastableP() and FutureShard() > 1 and (Cache.EnemiesCount[range] > 1 and (not S.SowTheSeeds:IsAvailable() or Cache.EnemiesCount[range] < 3) and FutureShard() >= 4 and S.Contagion:IsAvailable() and S.Haunt:CooldownRemainsP() < 15 and CheckUnstableAffliction ()) then
+      if AR.Cast(S.UnstableAffliction) then return ""; end
+    end
+    -- unstable_affliction,cycle_targets=1,if=active_enemies>1&(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&(equipped.132381|equipped.132457)&cooldown.haunt.remains<15&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    if S.UnstableAffliction:IsCastableP() and FutureShard() > 1 and (Cache.EnemiesCount[range] > 1 and (not S.SowTheSeeds:IsAvailable() or Cache.EnemiesCount[range] < 3) and (I.StretensSleeplessShackles:IsEquipped() or I.PowerCordofLethtendris:IsEquipped()) and S.Haunt:CooldownRemainsP() < 15 and CheckUnstableAffliction ()) then
+      if AR.Cast(S.UnstableAffliction) then return ""; end
+    end
+    -- unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&talent.contagion.enabled&soul_shard>=4&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+    if S.UnstableAffliction:IsCastableP() and FutureShard() > 1 and ((not S.SowTheSeeds:IsAvailable() or Cache.EnemiesCount[range] < 3) and Cache.EnemiesCount[range] < 5 and S.Contagion:IsAvailable() and FutureShard() >= 4 and CheckUnstableAffliction ()) then
+      if AR.Cast(S.UnstableAffliction) then return ""; end
+    end
+    -- unstable_affliction,if=(!talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<3)&spell_targets.seed_of_corruption<5&debuff.haunt.remains>=action.unstable_affliction_1.tick_time*2
+    if S.UnstableAffliction:IsCastableP() and FutureShard() > 1 and ((not S.SowTheSeeds:IsAvailable() or Cache.EnemiesCount[range] < 3) and Cache.EnemiesCount[range] < 5 and Target:DebuffRemainsP(S.Haunt) >= S.UnstableAffliction:TickTime() * 2) then
+      if AR.Cast(S.UnstableAffliction) then return ""; end
+    end
+    -- reap_souls,if=!buff.deadwind_harvester.remains&(buff.active_uas.stack>1|(prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1))
+    if S.ReapSouls:IsCastableP() and (not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and (ActiveUAs() > 1 or (Player:PrevGCDP(1, S.UnstableAffliction) and SoulsAvailable() > 1))) then
+      if AR.Cast(S.ReapSouls) then return ""; end
+    end
+    -- life_tap,if=mana.pct<=10
+    if S.LifeTap:IsCastableP() and (Player:ManaPercentage() <= 10) then
+      if AR.Cast(S.LifeTap) then return ""; end
+    end
+    -- life_tap,if=prev_gcd.1.life_tap&buff.active_uas.stack=0&mana.pct<50
+    if S.LifeTap:IsCastableP() and (Player:PrevGCDP(1, S.LifeTap) and ActiveUAs() == 0 and Player:ManaPercentage() < 50) then
+      if AR.Cast(S.LifeTap) then return ""; end
+    end
+    -- drain_soul,chain=1,interrupt=1
+    if S.DrainSoul:IsCastableP() then
+      if AR.Cast(S.DrainSoul) then return ""; end
+    end
+    -- life_tap,moving=1,if=mana.pct<80
+    if S.LifeTap:IsCastableP() and (Player:ManaPercentage() < 80) then
+      if AR.Cast(S.LifeTap) then return ""; end
+    end
+    -- agony,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
+    if S.Agony:IsCastableP() and (Target:DebuffRemainsP(S.Agony) <= S.Agony:BaseDuration() - (3 * S.Agony:TickTime())) then
+      if AR.Cast(S.Agony) then return ""; end
+    end
+    -- siphon_life,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
+    if S.SiphonLife:IsCastableP() and (Target:DebuffRemainsP(S.SiphonLife) <= S.SiphonLife:BaseDuration() - (3 * S.SiphonLife:TickTime())) then
+      if AR.Cast(S.SiphonLife) then return ""; end
+    end
+    -- corruption,moving=1,cycle_targets=1,if=remains<=duration-(3*tick_time)
+    if S.Corruption:IsCastableP() and (Target:DebuffRemainsP(S.CorruptionDebuff) <= S.CorruptionDebuff:BaseDuration() - (3 * S.CorruptionDebuff:TickTime())) then
+      if AR.Cast(S.Corruption) then return ""; end
+    end
+    -- life_tap,moving=0
+    if S.LifeTap:IsCastableP() then
+      if AR.Cast(S.LifeTap) then return ""; end
+    end
   end
   
   local function WritheAPL ()
