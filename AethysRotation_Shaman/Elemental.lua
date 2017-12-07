@@ -73,7 +73,7 @@ Spell.Shaman.Elemental = {
   -- Utility
   WindShear             = Spell(57994),
 
-  -- Trinkets
+  -- Tomb Trinkets
   SpecterOfBetrayal     = Spell(246461),
 
   -- Item Buffs
@@ -167,10 +167,10 @@ local function APL ()
     -- actions+=/fire_elemental
     -- actions+=/storm_elemental
     if S.FireElemental:IsCastable() and (S.EarthElemental:TimeSinceLastCast() >= 60) then
-      if AR.Cast(S.FireElemental) then return "Cast FireElemental" end
+      if AR.Cast(S.FireElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast FireElemental" end
     end
     if S.EarthElemental:IsCastable() and (S.FireElemental:TimeSinceLastCast() >= 60) then
-      if AR.Cast(S.EarthElemental) then return "Cast EarthElemental" end
+      if AR.Cast(S.EarthElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast EarthElemental" end
     end
 
     -- actions+=/elemental_mastery
@@ -205,7 +205,7 @@ local function APL ()
       -- actions.aoe+=/ascendance
       if S.Ascendance:IsCastable() then
         if S.Ascendance:IsAvailable() and not Player:Buff(S.AscendanceBuff) then
-          if AR.Cast(S.Ascendance) then return "Cast Ascendance" end
+          if AR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
         end
       end
 
@@ -272,7 +272,7 @@ local function APL ()
     if S.Ascendance:IsAvailable() then
       -- actions.single_asc=ascendance,if=dot.flame_shock.remains>buff.ascendance.duration&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&!buff.stormkeeper.up
       if S.Ascendance:IsCastable() and (Target:DebuffRemains(S.FlameShockDebuff) > Player:BuffRemains(S.AscendanceBuff) and (AC.CombatTime() >= 60 or Player:Buff(S.BloodLustBuff)) and S.LavaBurst:CooldownRemains() > 0 and not Player:Buff(S.StormkeeperBuff)) then
-        if AR.Cast(S.Ascendance) then return "Cast Ascendance" end
+        if AR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
       end
 
       -- actions.single_asc+=/flame_shock,if=!ticking|dot.flame_shock.remains<=gcd

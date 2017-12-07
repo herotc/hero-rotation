@@ -29,6 +29,12 @@
     },
 
     Elemental = {
+      OffGCDasOffGCD = {
+	    Ascendance = {true, false}
+      },
+	  GCDasOffGCD = {
+	    Elementals = {false, false}
+	  }
     },
 
     Enhancement = {
@@ -60,6 +66,8 @@
   CreatePanelOption("Slider", CP_Shaman, "APL.Shaman.Commons.HealingSurgeHPThreshold", {0, 100, 1}, "Healing Surge HP threshold", "Healing Surge health threshold.");
 
   -- Elemental settings
+  CreateARPanelOption("GCDasOffGCD", CP_Elemental, "APL.Shaman.Elemental.GCDasOffGCD.Elementals", "Elementals");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Elemental, "APL.Shaman.Elemental.OffGCDasOffGCD.Ascendance", "Ascendance");
 
   -- Enhancement settings
   CreateARPanelOption("GCDasOffGCD", CP_Enhancement, "APL.Shaman.Enhancement.GCDasOffGCD.FeralSpirit", "Feral Spirit");
