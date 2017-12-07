@@ -14,7 +14,7 @@ local Item = AC.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
--- APL from Shaman_Elemental_T20M on 9/16/2017
+-- APL from T21_Shaman_Elemental on 2017-12-06
 
 -- APL Local Vars
 -- Spells
@@ -69,6 +69,9 @@ Spell.Shaman.Elemental = {
   SwellingMaelstrom     = Spell(238105),
   PowerOfTheMaelstrom   = Spell(191861),
   PowerOfTheMaelstromBuff = Spell(191861),
+
+  -- Tier bonus
+  EarthenStrengthBuff   = Spell(252141),
 
   -- Utility
   WindShear             = Spell(57994),
@@ -285,16 +288,16 @@ local function APL ()
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
-      -- actions.single_asc+=/elemental_blast
-      if S.ElementalBlast:IsCastable() then
-        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
-      end
-
-      -- actions.single_asc+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up&maelstrom>=86
-      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and not Player:Buff(S.AscendanceBuff) and Player:Maelstrom() >= 86) then
+      -- actions.single_asc+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up
+      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and not Player:Buff(S.AscendanceBuff)) then
         if Player:Maelstrom() >= S.EarthQuake:Cost() then
           if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
         end
+      end
+
+      -- actions.single_asc+=/elemental_blast
+      if S.ElementalBlast:IsCastable() then
+        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
       end
 
       -- actions.single_asc+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
@@ -381,18 +384,13 @@ local function APL ()
     -- actions+=/run_action_list,name=single_if,if=talent.icefury.enabled
     if S.Icefury:IsAvailable() then
       -- actions.single_if=flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
-      if S.FlameShock:IsCastable() and (not Target:Debuff(S.FlameShockDebuff) or Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
+      if S.FlameShock:IsCastable() and (Target:DebuffRemains(S.FlameShockDebuff) <= Player:GCDRemains()) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
-      -- actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>=86
-      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and Player:Maelstrom() >= 86) then
+      -- actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up
+      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS) and not Player:Buff(S.AscendanceBuff)) then
         if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
-      end
-
-      -- actions.single_if+=/frost_shock,if=buff.icefury.up&maelstrom>=111&!buff.ascendance.up
-      if S.FrostShock:IsCastable() and (Player:Buff(S.IcefuryBuff) and Player:Maelstrom() >= 111 and not Player:Buff(S.AscendanceBuff)) then
-        if AR.Cast(S.FrostShock) then return "Cast FrostShock" end
       end
 
       -- actions.single_if+=/elemental_blast
@@ -448,8 +446,8 @@ local function APL ()
         if AR.Cast(S.FrostShock) then return "Cast FrostShock" end
       end
 
-      -- actions.single_if+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
-      if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable())) then
+      -- actions.single_if+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled&buff.earthen_strength.up
+      if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable() and Player:Buff(S.EarthenStrengthBuff))) then
         if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
@@ -457,13 +455,6 @@ local function APL ()
       -- TODO: Handle this as per the APL.
       if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
-      end
-
-      -- actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS)) then
-        if Player:Maelstrom() >= S.EarthQuake:Cost() then
-          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
-        end
       end
 
       -- actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
@@ -511,13 +502,6 @@ local function APL ()
       -- actions.single_lr+=/elemental_blast
       if S.ElementalBlast:IsCastable() then
         if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
-      end
-
-      -- actions.single_lr+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-      if S.EarthQuake:IsCastable() and (Player:Buff(S.EOTGS)) then
-        if Player:Maelstrom() >= S.EarthQuake:Cost() then
-          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
-        end
       end
 
       -- actions.single_lr+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
