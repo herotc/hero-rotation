@@ -210,7 +210,7 @@
       if AR.Cast(S.FrostStrike) then return ""; end
     end
     --actions.standard+=/empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled|target.time_to_die<cooldown.breath_of_sindragosa.remains
-    if S.EmpowerRuneWeapon:IsCastable() and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < S.BreathofSindragosa:CooldownRemainsP() then
+    if S.EmpowerRuneWeapon:IsCastable() and S.EmpowerRuneWeapon:Charges() >= 1 and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < S.BreathofSindragosa:CooldownRemainsP() then
       if AR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
     end
     return false;
@@ -446,7 +446,7 @@
       if AR.Cast(S.Obliteration, Settings.DeathKnight.Frost.GCDasOffGCD.Obliteration) then return ""; end
     end
     --actions.cds+=/hungering_rune_weapon,if=!buff.hungering_rune_weapon.up&rune.time_to_2>gcd&runic_power<40
-    if S.HungeringRuneWeapon:IsCastable() and not Player:Buff(S.HungeringRuneWeapon) and Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 40 then
+    if S.HungeringRuneWeapon:IsCastable() and S.HungeringRuneWeapon:Charges() >= 1 and not Player:Buff(S.HungeringRuneWeapon) and Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 40 then
       if AR.Cast(S.HungeringRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.HungeringRuneWeapon) then return ""; end
     end
     return false;
