@@ -713,6 +713,12 @@ local function APL ()
         ShouldReturn = Finish();
         if ShouldReturn then return ShouldReturn; end
       end
+      -- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&equipped.the_first_of_the_dead&dot.nightblade.remains<=(cooldown.symbols_of_death.remains+10)&cooldown.symbols_of_death.remains<=2&combo_points>=2
+      if DSh_DfA() and I.TheFirstoftheDead:IsEquipped() and Target:DebuffRemainsP(S.Nightblade) <= (S.SymbolsofDeath:CooldownRemainsP() + 10)
+        and S.SymbolsofDeath:CooldownRemainsP() <= 2 and Player:ComboPoints() >= 2 then
+        ShouldReturn = Finish();
+        if ShouldReturn then return ShouldReturn; end
+      end
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
       if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
         ShouldReturn = Build();
@@ -732,7 +738,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 12/04/2017
+-- Last Update: 12/11/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -762,6 +768,7 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=stealth_als,if=!talent.dark_shadow.enabled&(combo_points.deficit>=2+buff.shadow_blades.up|cooldown.shadow_dance.charges_fractional>=1.9+talent.enveloping_shadows.enabled)
 -- actions+=/call_action_list,name=finish,if=combo_points>=5+3*(buff.the_first_of_the_dead.up&talent.anticipation.enabled)+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
 -- actions+=/call_action_list,name=finish,if=buff.the_first_of_the_dead.remains>1&combo_points>=3&spell_targets.shuriken_storm<2&!buff.shadow_gestures.up
+-- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&equipped.the_first_of_the_dead&dot.nightblade.remains<=(cooldown.symbols_of_death.remains+10)&cooldown.symbols_of_death.remains<=2&combo_points>=2
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
 -- # Builders
