@@ -285,7 +285,7 @@
     local ElvUINameplates = ElvUI and ElvUI[1].NamePlates; -- check if user is using Elvui
     Token = stringlower(ThisUnit.UnitID);
     Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
-    if Nameplate or ElvUINameplates then
+    if Nameplate and (not ElvUI or ElvUINameplates) then
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
