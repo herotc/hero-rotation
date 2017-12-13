@@ -141,7 +141,7 @@ local AR = AethysRotation;
       if AR.Cast(S.RagingBlow) then return ""; end
     end
     -- actions.cooldowns+=/rampage,if=(rage>=100&talent.frothing_berserker.enabled&!set_bonus.tier21_4pc)|set_bonus.tier21_4pc|!talent.frothing_berserker.enabled
-    if S.Rampage:IsReady() and (Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable() and not AC.Tier21_4Pc) or AC.Tier21_4Pc or not S.FrothingBerserker:IsAvailable() then
+    if S.Rampage:IsReady() and ((Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable() and not AC.Tier21_4Pc) or AC.Tier21_4Pc or not S.FrothingBerserker:IsAvailable()) then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.cooldowns+=/odyns_fury,if=buff.enrage.up&(cooldown.raging_blow.remains>0|!talent.inner_rage.enabled)
