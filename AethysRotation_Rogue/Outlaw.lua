@@ -93,6 +93,10 @@ local tostring = tostring;
     ThraxisTricksyTreads            = Item(137031, {8})
   };
   local I = Item.Rogue.Outlaw;
+-- Spells Damage / PMultiplier
+  local function ImprovedSliceAndDice()
+    return Player:Buff(S.SliceandDice) and Player:Buff(S.SliceandDice, 17) > 125;
+  end
 -- Rotation Var
   local ShouldReturn; -- Used to get the return string
   local RTIdentifier, SSIdentifier = tostring(S.RunThrough:ID()), tostring(S.SaberSlash:ID());
@@ -423,15 +427,18 @@ local function APL ()
       if S.SliceandDice:IsAvailable() and S.SliceandDice:IsCastable() then
         -- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8&!buff.slice_and_dice.improved&!buff.loaded_dice.up
         -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
-        -- TODO: Investigate buff.slice_and_dice.improved behavior
-        if not SS_Useable() and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Player:BuffRemainsP(S.SliceandDice) == 0) 
-          and Player:BuffRemainsP(S.SliceandDice) < (1+Player:ComboPoints())*1.8 --[[&!buff.slice_and_dice.improved&!buff.loaded_dice.up]] then
+        if not SS_Useable() and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Player:BuffRemainsP(S.SliceandDice) == 0)
+          and Player:BuffRemainsP(S.SliceandDice) < (1+Player:ComboPoints())*1.8 and not ImprovedSliceAndDice() and not Player:Buff(S.LoadedDice) --[[&!buff.slice_and_dice.improved&!buff.loaded_dice.up]] then
           if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
         end
         -- actions+=/slice_and_dice,if=buff.loaded_dice.up&combo_points>=cp_max_spend&(!buff.slice_and_dice.improved|buff.slice_and_dice.remains<4)
-        -- TODO
+        if Player:Buff(S.LoadedDice) and Player:ComboPoints() >= Rogue.CPMaxSpend() and (not ImprovedSliceAndDice() or Player:BuffRemainsP(S.SliceandDice) < 4) then
+          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
+        end
         -- actions+=/slice_and_dice,if=buff.slice_and_dice.improved&buff.slice_and_dice.remains<=2&combo_points>=2&!buff.loaded_dice.up
-        -- TODO
+        if ImprovedSliceAndDice() and Player:BuffRemainsP(S.SliceandDice) <= 2 and Player:ComboPoints() >= 2 and not Player:Buff(S.LoadedDice) then
+          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
+        end
       end
       -- actions+=/roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
       -- Note: Added RtB_BuffRemains() == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
