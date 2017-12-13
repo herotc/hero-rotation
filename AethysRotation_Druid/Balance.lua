@@ -168,6 +168,8 @@ end
 -- Compute the futur astral power after the cast
 local function FutureAstralPower ()
   local AstralPower = Player:AstralPower()
+  local CA_mod = ((Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0) and 1.5 or 1)
+  local BoE_mod = (Player:Buff(S.BlessingofElune) and 1.25 or 1)
   if not Player:IsCasting() then
     return AstralPower
   else
@@ -178,9 +180,9 @@ local function FutureAstralPower ()
     elseif Player:IsCasting(S.FullMoon) then
       return AstralPower + 40
     elseif Player:IsCasting(S.SolarWrath) then
-      return AstralPower + (Player:Buff(S.BlessingofElune) and 10 or 8) * ((Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0) and 2 or 1)
+      return AstralPower + 8 * CA_mod * BoE_mod
     elseif Player:IsCasting(S.LunarStrike) then
-      return AstralPower + (Player:Buff(S.BlessingofElune) and 15 or 10) * ((Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0) and 2 or 1)
+      return AstralPower + 12  * CA_mod * BoE_mod
     else
       return AstralPower
     end
