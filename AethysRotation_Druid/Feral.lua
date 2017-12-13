@@ -31,8 +31,7 @@
     Berserk             = Spell(106951),
     FerociousBite       = Spell(22568),
     Maim                = Spell(22570),
-    Moonfire            = Spell(8921),
-    MoonfireDebuff      = Spell(164812),
+    MoonfireCat         = Spell(155625),
     PredatorySwiftness  = Spell(69369),
     Prowl               = Spell(5215),
     ProwlJungleStalker  = Spell(102547),
@@ -118,7 +117,7 @@
     RipAura = ComputeDurations(S.Rip:BaseDuration());
     ThrashAura = ComputeDurations(S.Thrash:BaseDuration());
   end
-  local MoonfireThreshold = S.MoonfireDebuff:PandemicThreshold();
+  local MoonfireThreshold = S.MoonfireCat:PandemicThreshold();
 
   function Player:EnergyTimeToXP (Amount, Offset)
     if self:EnergyRegen() == 0 then return -1; end
@@ -367,8 +366,8 @@
               if AR.Cast(S.BrutalSlash) then return "Cast"; end
             end
             -- actions.st_generators+=/moonfire_cat,target_if=refreshable
-            if S.LunarInspiration:IsAvailable() and S.Moonfire:IsCastable(RangedRange) and Target:DebuffRefreshableP(S.MoonfireDebuff, MoonfireThreshold) then
-              if AR.Cast(S.Moonfire) then return "Cast"; end
+            if S.LunarInspiration:IsAvailable() and S.MoonfireCat:IsCastable(RangedRange) and Target:DebuffRefreshableP(S.MoonfireCat, MoonfireThreshold) then
+              if AR.Cast(S.MoonfireCat) then return "Cast"; end
             end
             if S.Thrash:IsCastable(ThrashRadius, true) and Target:FilteredTimeToDie(">=", 6, -Target:DebuffRemainsP(S.Thrash)) and Target:DebuffRefreshableP(S.Thrash, ThrashThreshold)
               -- thrash_cat,if=refreshable&(variable.use_thrash=2|spell_targets.thrash_cat>1)
@@ -398,8 +397,8 @@
           if AR.Cast(S.Rake) then return "Cast"; end
         end
         -- moonfire_cat,if=talent.lunar_inspiration.enabled&!ticking
-        if S.LunarInspiration:IsAvailable() and S.Moonfire:IsCastable() and Target:DebuffRefreshableP(S.MoonfireDebuff, 0) then
-          if AR.Cast(S.Moonfire) then return "Cast"; end
+        if S.LunarInspiration:IsAvailable() and S.MoonfireCat:IsCastable() and Target:DebuffRefreshableP(S.MoonfireCat, 0) then
+          if AR.Cast(S.MoonfireCat) then return "Cast"; end
         end
         -- savage_roar,if=!buff.savage_roar.up
         if S.SavageRoar:IsCastable() and not Player:Buff(S.SavageRoar) then
