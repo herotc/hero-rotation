@@ -123,7 +123,7 @@ local function APL ()
   if not Player:AffectingCombat() then
     -- Opener
     if Everyone.TargetIsValid() then
-      if ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
+      if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff) and S.TotemMastery:TimeSinceLastCast() >= 5) then
         if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       elseif S.LightningBolt:IsCastable(40) then
         if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
@@ -163,7 +163,7 @@ local function APL ()
 
     -- actions+=/totem_mastery,if=buff.resonance_totem.remains<2
     -- TODO: Handle this as per the APL.
-    if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
+    if S.TotemMastery:IsCastable() and (not Player:Buff(S.ResonanceTotemBuff) and S.TotemMastery:TimeSinceLastCast() >= 5) then
       if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
     end
 
@@ -284,7 +284,7 @@ local function APL ()
       end
 
       -- actions.single_asc+=/flame_shock,if=maelstrom>=20&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
-      if S.FlameShock:IsCastable() and (Player:Maelstrom() >= 20 and Target:DebuffRemains(S.FlameShockDebuff) <= Player:BuffRemains(S.AscendanceBuff) and S.Ascendance:CooldownRemains() + S.Ascendance:Duration() <= S.FlameShockDebuff:Duration()) then
+      if S.FlameShock:IsCastable() and (Player:Maelstrom() >= 20 and Target:DebuffRemains(S.FlameShockDebuff) <= Player:BuffRemains(S.AscendanceBuff) and S.Ascendance:CooldownRemains() + S.Ascendance:BaseDuration() <= S.FlameShockDebuff:BaseDuration()) then
         if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
@@ -335,12 +335,6 @@ local function APL ()
       -- actions.single_asc+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable())) then
         if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
-      end
-
-      -- actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-      -- TODO: Handle this as per the APL.
-      if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
-        if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
       -- actions.single_asc+=/lava_beam,if=active_enemies>1&spell_targets.lava_beam>1
@@ -451,12 +445,6 @@ local function APL ()
         if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
-      -- actions.single_if+=/totem_mastery,if=buff.resonance_totem.remains<10
-      -- TODO: Handle this as per the APL.
-      if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
-        if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
-      end
-
       -- actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
       if S.LightningBolt:IsCastable() and (Player:Buff(S.PowerOfTheMaelstromBuff) and Cache.EnemiesCount[40] < 3) then
         if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
@@ -534,12 +522,6 @@ local function APL ()
       -- actions.single_lr+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastable() and (Player:Maelstrom() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and Player:Maelstrom() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and Player:Maelstrom() > 70 and S.Aftershock:IsAvailable())) then
         if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
-      end
-
-      -- actions.single_lr+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-      -- TODO: Handle this as per the APL.
-      if S.TotemMastery:IsCastable() and ((not Player:Buff(S.ResonanceTotemBuff) or S.TotemMastery:TimeSinceLastCast() >= 118) and S.TotemMastery:TimeSinceLastCast() >= 2) then
-        if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       end
 
       -- actions.single_lr+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3,target_if=debuff.lightning_rod.down
