@@ -282,7 +282,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     else
       -- Display DfA/ShadowDance Macro if we know in advance that we meet the conditions for using ShadowDance mid-air
       if DfAShadowDance() then
-        if AR.CastQueue(S.DeathfromAbove, S.ShadowDance) then return "Cast Death from Above / Shadow Dance" .. (Player:BuffP(S.SymbolsofDeath) and 1 or 0) .. " " .. Player:BuffRemainsP(S.TheFirstoftheDead) .. " " .. (Player:BuffP(S.FinalityEviscerate) and 1 or 0); end
+        if AR.CastQueue(S.DeathfromAbove, S.ShadowDance) then return "Cast Death from Above / Shadow Dance"; end
       else
         if AR.Cast(S.DeathfromAbove) then return "Cast Death from Above"; end
       end
