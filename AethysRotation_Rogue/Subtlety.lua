@@ -309,7 +309,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   local StealthBuff = Player:Buff(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
   -- actions.stealthed=shadowstrike,if=buff.stealth.up
-  if StealthBuff and S.Shadowstrike:IsCastable() and IsInMeleeRange() then
+  if StealthBuff and S.Shadowstrike:IsCastable() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange()) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -337,7 +337,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/shadowstrike
-  if S.Shadowstrike:IsCastable() and IsInMeleeRange() then
+  if S.Shadowstrike:IsCastable() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange()) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -649,7 +649,7 @@ local function APL ()
       -- Rune
       -- PrePot w/ Bossmod Countdown
       -- Opener
-      if Everyone.TargetIsValid() and IsInMeleeRange() then
+      if Everyone.TargetIsValid() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange()) then
         if Player:IsStealthed(true, true) then
           ShouldReturn = Stealthed();
           if ShouldReturn then return ShouldReturn .. " (OOC)"; end
