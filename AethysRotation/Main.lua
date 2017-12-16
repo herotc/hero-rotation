@@ -23,6 +23,7 @@
   local MasqueGroups = {};
   local UIFrames;
   local MasqueFrameList;
+  local PrevResult, CurrResult;
 
   local function ModMasque(Frame, Disabled)
     if Disabled then
@@ -428,7 +429,16 @@
       if AR.ON() and AR.Ready() then
         AC.CacheHasBeenReset = false;
         Cache.Reset();
-        AR.APLs[Cache.Persistent.Player.Spec[1]]();
+        -- Rotational Debug Output
+        if AR.GUISettings.General.RotationDebugOutput then
+          CurrResult = AR.APLs[Cache.Persistent.Player.Spec[1]]();
+          if CurrResult and CurrResult ~= PrevResult then
+            AR.Print(CurrResult);
+            PrevResult = CurrResult;
+          end
+        else
+          AR.APLs[Cache.Persistent.Player.Spec[1]]();
+        end
       end
       if MasqueGroups then
         for k, v in pairs(MasqueGroups) do
