@@ -223,9 +223,16 @@ end
 local function SS_Useable ()
   -- actions+=/variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<5)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
   if not Cache.APLVar.SS_Useable then
-    Cache.APLVar.SS_Useable = ((S.Anticipation:IsAvailable() and Player:ComboPoints() < 5) or (not S.Anticipation:IsAvailable() and ((RtB_Reroll() and Player:ComboPoints() < 4+(S.DeeperStratagem:IsAvailable() and 1 or 0)) or (not RtB_Reroll() and SS_Useable_NoReroll())))) and true or false;
+    Cache.APLVar.SS_Useable = ((S.Anticipation:IsAvailable() and Player:ComboPoints() < 5)
+      or (not S.Anticipation:IsAvailable() and ((RtB_Reroll() and Player:ComboPoints() < 4+(S.DeeperStratagem:IsAvailable() and 1 or 0))
+        or (not RtB_Reroll() and SS_Useable_NoReroll())))) and true or false;
   end
   return Cache.APLVar.SS_Useable;
+end
+
+local function EnergyTimeToMaxRounded()
+  -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
+  return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10;
 end
 
 -- APL Main
@@ -307,16 +314,16 @@ local function APL ()
       if Player:Buff(S.BladeFlurry) then
         -- actions.bf=cancel_buff,name=blade_flurry,if=spell_targets.blade_flurry<2&buff.blade_flurry.up
         if Cache.EnemiesCount[RTIdentifier] < 2 and AC.GetTime() > BFTimer then
-          if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
+          if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cancel Blade Flurry"; end
         end
         -- actions.bf+=/cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2
         if I.ShivarranSymmetry:IsEquipped() and S.BladeFlurry:CooldownUp() and Cache.EnemiesCount[RTIdentifier] >= 2 then
-          if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
+          if AR.Cast(S.BladeFlurry2, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cancel Blade Flurry (Shivarran Symmetry)"; end
         end
       else
         -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
         if S.BladeFlurry:IsCastable() and Cache.EnemiesCount[RTIdentifier] >= 2 then
-          if AR.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast"; end
+          if AR.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast Blade Flurry"; end
         end
       end
       -- actions+=/call_action_list,name=cds
@@ -334,19 +341,19 @@ local function APL ()
         if AR.CDsON() then
           -- actions.cds+=/blood_fury
           if S.BloodFury:IsCastable() then
-            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
+            if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
           end
           -- actions.cds+=/berserking
           if S.Berserking:IsCastable() then
-            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
+            if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
           end
           -- actions.cds+=/arcane_torrent,if=energy.deficit>40
           if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 40 then
-            if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
+            if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
           end
           -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
           if S.AdrenalineRush:IsCastable() and not Player:BuffP(S.AdrenalineRush) and Player:EnergyDeficitPredicted() > 0 then
-            if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast"; end
+            if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush"; end
           end
         end
         -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
@@ -355,7 +362,7 @@ local function APL ()
           if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (Target:FilteredTimeToDie("<", 2) and Player:ComboPointsDeficit() > 0)
             or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemainsP(S.TrueBearing) > 15 - (Player:BuffP(S.AdrenalineRush) and 5 or 0))
               or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
-            if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast"; end
+            if AR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
           elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
             AR.CastSuggested(S.MarkedforDeath);
           end
@@ -374,7 +381,7 @@ local function APL ()
           -- actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(buff.true_bearing.up|buff.adrenaline_rush.up|time_to_die<20)
           if S.CurseoftheDreadblades:IsCastable() and Player:ComboPointsDeficit() >= 4 and
             (Player:BuffP(S.TrueBearing) or Player:BuffP(S.AdrenalineRush) or Target:FilteredTimeToDie("<", 20)) then
-            if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast"; end
+            if AR.Cast(S.CurseoftheDreadblades, Settings.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades) then return "Cast Curse of the Dreadblades"; end
           end
         end
       end
@@ -392,17 +399,17 @@ local function APL ()
             -- actions.stealth+=/vanish,if=(variable.ambush_condition|equipped.mantle_of_the_master_assassin&!variable.rtb_reroll&!variable.ss_useable)&mantle_duration=0
             if S.Vanish:IsCastable() and (Ambush_Condition or (I.MantleoftheMasterAssassin:IsEquipped() and not RtB_Reroll() and not SS_Useable()))
               and Rogue.MantleDuration() == 0 then
-              if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast"; end
+              if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish"; end
             end
             -- actions.stealth+=/shadowmeld,if=variable.ambush_condition
             if S.Shadowmeld:IsCastable() and Ambush_Condition then
-              if AR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast"; end
+              if AR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld"; end
             end
           end
         end
       end
       -- actions+=/death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
-      if S.DeathfromAbove:IsCastable(15) and not SS_Useable_NoReroll() and Player:EnergyTimeToMax() > 2 then
+      if S.DeathfromAbove:IsCastable(15) and not SS_Useable_NoReroll() and EnergyTimeToMaxRounded() > 2 then
         if AR.Cast(S.DeathfromAbove) then return "Cast Death from above"; end
       end
       -- Note: DfA execute time is 1.475s, the buff is modeled to lasts 1.475s on SimC, while it's 1s in-game. So we retrieve it from TimeSinceLastCast.
@@ -420,7 +427,7 @@ local function APL ()
           if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
             -- Set the cooldown on the main frame to be equal to the delay we actually want, not the full GCD duration
             AR.MainIconFrame:SetCooldown(S.DeathfromAbove.LastCastTime, 1.325);
-            return "Cast AdrenalineRush (DfA)";
+            return "Cast Adrenaline Rush (DfA)";
           end
         end
       end
@@ -428,16 +435,17 @@ local function APL ()
         -- actions+=/slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8&!buff.slice_and_dice.improved&!buff.loaded_dice.up
         -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
         if not SS_Useable() and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Player:BuffRemainsP(S.SliceandDice) == 0)
-          and Player:BuffRemainsP(S.SliceandDice) < (1+Player:ComboPoints())*1.8 and not ImprovedSliceAndDice() and not Player:Buff(S.LoadedDice) --[[&!buff.slice_and_dice.improved&!buff.loaded_dice.up]] then
-          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
+          and Player:BuffRemainsP(S.SliceandDice) < (1+Player:ComboPoints())*1.8 and not ImprovedSliceAndDice() and not Player:Buff(S.LoadedDice) then
+          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice 1"; end
         end
         -- actions+=/slice_and_dice,if=buff.loaded_dice.up&combo_points>=cp_max_spend&(!buff.slice_and_dice.improved|buff.slice_and_dice.remains<4)
-        if Player:Buff(S.LoadedDice) and Player:ComboPoints() >= Rogue.CPMaxSpend() and (not ImprovedSliceAndDice() or Player:BuffRemainsP(S.SliceandDice) < 4) then
-          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
+        if Player:Buff(S.LoadedDice) and Player:ComboPoints() >= Rogue.CPMaxSpend()
+          and (not ImprovedSliceAndDice() or Player:BuffRemainsP(S.SliceandDice) < 4) then
+          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice 2"; end
         end
         -- actions+=/slice_and_dice,if=buff.slice_and_dice.improved&buff.slice_and_dice.remains<=2&combo_points>=2&!buff.loaded_dice.up
         if ImprovedSliceAndDice() and Player:BuffRemainsP(S.SliceandDice) <= 2 and Player:ComboPoints() >= 2 and not Player:Buff(S.LoadedDice) then
-          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
+          if AR.Cast(S.SliceandDice) then return "Cast Slice and Dice 3"; end
         end
       end
       -- actions+=/roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
@@ -447,7 +455,7 @@ local function APL ()
         if AR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
       end
       -- actions+=/killing_spree,if=energy.time_to_max>5|energy<15
-      if AR.CDsON() and S.KillingSpree:IsCastable(10) and (Player:EnergyTimeToMax() > 5 or Player:EnergyPredicted() < 15) then
+      if AR.CDsON() and S.KillingSpree:IsCastable(10) and (EnergyTimeToMaxRounded() > 5 or Player:EnergyPredicted() < 15) then
         if AR.Cast(S.KillingSpree) then return "Cast Killing Spree"; end
       end
       -- actions+=/call_action_list,name=build
@@ -459,7 +467,7 @@ local function APL ()
         -- actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up+talent.quick_draw.enabled&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.greenskins_waterlogged_wristcuffs.up&(buff.blunderbuss.up|buff.greenskins_waterlogged_wristcuffs.remains<2)))
         if (S.PistolShot:IsCastable(20) or S.Blunderbuss:IsCastable(20))
           and Player:ComboPointsDeficit() >= (1+(Player:BuffP(S.Broadsides) and 1 or 0)+(S.QuickDraw:IsAvailable() and 1 or 0))
-          and Player:BuffP(S.Opportunity) and (Player:EnergyTimeToMax() > (2-(S.QuickDraw:IsAvailable() and 1 or 0))
+          and Player:BuffP(S.Opportunity) and (EnergyTimeToMaxRounded() > (2-(S.QuickDraw:IsAvailable() and 1 or 0))
             or (Player:BuffP(S.GreenskinsWaterloggedWristcuffs) and (S.Blunderbuss:IsCastable() or Player:BuffRemainsP(S.GreenskinsWaterloggedWristcuffs) < 2))) then
           if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
         end
@@ -475,22 +483,24 @@ local function APL ()
           if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
         end
         -- actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
-        if S.RunThrough:IsCastable(S.RunThrough) and (not S.DeathfromAbove:IsAvailable() or Player:EnergyTimeToMax() < S.DeathfromAbove:CooldownRemainsP() + 3.5) then
+        if S.RunThrough:IsCastable(S.RunThrough) and (not S.DeathfromAbove:IsAvailable()
+          or EnergyTimeToMaxRounded() < S.DeathfromAbove:CooldownRemainsP() + 3.5) then
           if AR.Cast(S.RunThrough) then return "Cast Run Through"; end
         end
         -- OutofRange BtE
         if S.BetweentheEyes:IsCastable(20) and not Target:IsInRange(10) then
-          if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OoR)"; end
+          if AR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OOR)"; end
         end
       end
       -- # Gouge is used as a CP Generator while nothing else is available and you have Dirty Tricks talent. It's unlikely that you'll be able to do this optimally in-game since it requires to move in front of the target, but it's here so you can quantifiy its value.
       -- actions+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
       if S.Gouge:IsCastable(S.SaberSlash) and S.DirtyTricks:IsAvailable() and Player:ComboPointsDeficit() >= 1 then
-        if AR.Cast(S.Gouge) then return "Cast Gouge"; end
+        if AR.Cast(S.Gouge) then return "Cast Gouge (Dirty Tricks)"; end
       end
       -- OutofRange Pistol Shot
-      if not Target:IsInRange(10) and (S.PistolShot:IsCastable(20) or S.Blunderbuss:IsCastable(20)) and not Player:IsStealthed(true, true) and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
-        if AR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
+      if not Target:IsInRange(10) and (S.PistolShot:IsCastable(20) or S.Blunderbuss:IsCastable(20)) and not Player:IsStealthed(true, true)
+        and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or EnergyTimeToMaxRounded() <= 1.2) then
+        if AR.Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)"; end
       end
     end
 end
