@@ -13,7 +13,7 @@
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
-  
+
 
 
 --- APL Local Vars
@@ -96,7 +96,7 @@
 
 
 --- APL Action Lists (and Variables)
-  
+
 
 
 --- APL Main
@@ -214,7 +214,7 @@
       end
       -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
       if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 4 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
-        AR.CastSuggested(S.MultiShot);
+        if Hunter.MultishotInMain() and AR.Cast(S.MultiShot) then return "" else AR.CastSuggested(S.MultiShot) end
       end
       -- actions+=/kill_command
       if S.KillCommand:IsCastable() then
@@ -222,7 +222,7 @@
       end
       -- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
       if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
-        AR.CastSuggested(S.MultiShot);
+        if Hunter.MultishotInMain() and AR.Cast(S.MultiShot) then return "" else AR.CastSuggested(S.MultiShot) end
       end
       -- actions+=/chimaera_shot,if=focus<90
       if S.ChimaeraShot:IsCastable() and Target:IsInRange(40) and Player:Focus() < 90 then
