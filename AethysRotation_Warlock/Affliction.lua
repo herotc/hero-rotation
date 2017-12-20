@@ -1049,12 +1049,7 @@
     if S.GrimoireOfSupremacy:IsAvailable() and S.SummonDoomGuardSuppremacy:IsCastable() and (Warlock.PetReminder() and (not IsPetInvoked(true) or not S.ShadowLock:IsLearned()) or not IsPetInvoked(true)) and Cache.EnemiesCount[range] == 1 and Player:SoulShards () >= 1 then
       if AR.Cast(S.SummonDoomGuard, Settings.Commons.GCDasOffGCD.SummonDoomGuard) then return ""; end
     end
-    
-    -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
-    if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) then
-      if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
-    end
-    
+
     -- Out of Combat
     if not Player:AffectingCombat() then
       -- Flask
@@ -1063,7 +1058,11 @@
       -- PrePot w/ Bossmod Countdown
       
       -- actions.precombat+=/potion,name=prolonged_power
-		
+      -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
+      if AR.CDsON() and S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRefreshableCP(S.EmpoweredLifeTapBuff) then
+        if AR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
+      end
+      
       -- Opener
       if Everyone.TargetIsValid() then
           if AR.Cast(S.Agony) then return ""; end
