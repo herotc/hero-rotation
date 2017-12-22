@@ -40,23 +40,32 @@
 
   -- Get the texture (and cache it until next reload).
   function AR.GetTexture (Object)
-    if Object.SpellID then
-      if not Cache.Persistent.Texture.Spell[Object.SpellID] then
+    -- Spells
+    local SpellID = Object.SpellID;
+    if SpellID then
+      local TextureCache = Cache.Persistent.Texture.Spell;
+      if not TextureCache[SpellID] then
         -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
-        if Object.SpellID >= 9999000000 then
-          Cache.Persistent.Texture.Spell[Object.SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(Object.SpellID);
+        if SpellID >= 9999000000 then
+          TextureCache[SpellID] = "Interface\\Addons\\AethysRotation\\Textures\\"..tostring(SpellID);
         elseif Object.TextureSpellID then
-          Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.TextureSpellID);
+          TextureCache[SpellID] = GetSpellTexture(Object.TextureSpellID);
         else
-          Cache.Persistent.Texture.Spell[Object.SpellID] = GetSpellTexture(Object.SpellID);
+          TextureCache[SpellID] = GetSpellTexture(SpellID);
         end
       end
-      return Cache.Persistent.Texture.Spell[Object.SpellID];
-    elseif Object.ItemID then
-      if not Cache.Persistent.Texture.Item[Object.ItemID] then
-        Cache.Persistent.Texture.Item[Object.ItemID] = ({GetItemInfo(Object.ItemID)})[10];
+      return TextureCache[SpellID];
+    end
+    -- Items
+    local ItemID = Object.ItemID;
+    if ItemID then
+      local TextureCache = Cache.Persistent.Texture.Item;
+      if not TextureCache[ItemID] then
+        -- name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice
+        local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(ItemID);
+        TextureCache[ItemID] = texture;
       end
-      return Cache.Persistent.Texture.Item[Object.ItemID];
+      return TextureCache[ItemID];
     end
   end
 
@@ -90,12 +99,12 @@
   end
   -- Overload for Main Cast (with text)
   function AR.CastAnnotated(Object, OffGCD, Text)
-    result = AR.Cast(Object, OffGCD);
-    -- todo: handle small icon frame if OffGCD is true
+    local Result = AR.Cast(Object, OffGCD);
+    -- TODO: handle small icon frame if OffGCD is true
     if not OffGCD then
       AR.MainIconFrame:OverlayText(Text);
     end
-    return result;
+    return Result;
   end
   -- Main Cast Queue
   local QueueSpellTable, QueueLength, QueueTextureTable;
