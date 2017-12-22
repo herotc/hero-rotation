@@ -15,8 +15,7 @@
   local stringlower = string.lower;
   local tostring = tostring;
   -- File Locals
-  local FrameID, Nameplate;       -- AR.Nameplate.AddIcon
-  local Token;                    -- AR.Nameplate.AddIcon
+  
 
 
 --- ============================ CONTENT ============================
@@ -61,6 +60,7 @@
     if Frame.Backdrop or not AR.GUISettings.General.BlackBorderIcon then return; end
 
     local Backdrop = CreateFrame("Frame", nil, Frame);
+    Frame.Backdrop = Backdrop;
     Backdrop:ClearAllPoints();
     Backdrop:SetPoint("TOPLEFT", Frame, "TOPLEFT", -1, 1);
     Backdrop:SetPoint("BOTTOMRIGHT", Frame, "BOTTOMRIGHT", 1, -1);
@@ -83,58 +83,76 @@
     else
       Backdrop:SetFrameLevel(0);
     end
-
-    Frame.Backdrop = Backdrop;
   end
 
 --- ======= MAIN ICON =======
   -- Init
   function AR.MainIconFrame:Init ()
+    -- Frame Init
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
     self:SetHeight(64);
     self:SetPoint("BOTTOMRIGHT", AR.MainFrame, "BOTTOMRIGHT", 0, 0);
-    self.CooldownFrame:SetAllPoints(self);
+    -- Texture
     self.Texture = self:CreateTexture(nil, "ARTWORK");
     self.Texture:SetAllPoints(self);
-    self.text = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    self.text:SetAllPoints(true);
-    self.text:SetJustifyH("CENTER");
-    self.text:SetJustifyV("CENTER");
-    self.text:SetPoint("CENTER");
-    self.text:SetTextColor(1,1,1,1);
-    self.text:SetText("");
-    self.keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
-    self.keybind:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
-    self.keybind:SetAllPoints(true);
-    self.keybind:SetJustifyH("RIGHT");
-    self.keybind:SetJustifyV("TOP");
-    self.keybind:SetPoint("TOPRIGHT");
-    self.keybind:SetTextColor(0.8,0.8,0.8,1);
-    self.keybind:SetText("");
+    -- Cooldown
+    self.CooldownFrame:SetAllPoints(self);
+    -- Keybind
+    local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    self.Keybind = KeybindFrame;
+    KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE");
+    KeybindFrame:SetAllPoints(true);
+    KeybindFrame:SetJustifyH("RIGHT");
+    KeybindFrame:SetJustifyV("TOP");
+    KeybindFrame:SetPoint("TOPRIGHT");
+    KeybindFrame:SetTextColor(0.8,0.8,0.8,1);
+    KeybindFrame:SetText("");
+    -- Overlay Text
+    local TextFrame = self:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    self.Text = TextFrame;
+    TextFrame:SetAllPoints(true);
+    TextFrame:SetJustifyH("CENTER");
+    TextFrame:SetJustifyV("CENTER");
+    TextFrame:SetPoint("CENTER");
+    TextFrame:SetTextColor(1,1,1,1);
+    TextFrame:SetText("");
+    -- Black Border Icon
     if AR.GUISettings.General.BlackBorderIcon then
       self.Texture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
     end
+    -- Parts
     self:InitParts();
+    -- Display
     self:Show();
   end
-  -- Change Texture (1 Arg for Texture, 3 Args for Color)
+  -- Change Icon
   function AR.MainIconFrame:ChangeIcon (Texture, Keybind)
-    self.text:SetText("");
-    self.keybind:SetText("");
+    -- Texture
     self.Texture:SetTexture(Texture);
+    self.Texture:SetAllPoints(self);
+    -- Keybind
+    if Keybind then
+      self.Keybind:SetText(Keybind);
+    else
+      self.Keybind:SetText("");
+    end
+    -- Overlay Text
+    self.Text:SetText("");
+    -- Black Border Icon
+    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
+      self.Backdrop:Show();
+    end
+    -- Display
     if not self:IsVisible() then
       self:Show();
     end
-    self.Texture:SetAllPoints(self);
-    if Keybind then self.keybind:SetText(Keybind); end
-    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
   -- Set text on frame
   function AR.MainIconFrame:OverlayText(Text)
-    self.text:SetText(Text);
+    self.Text:SetText(Text);
   end
   -- Set a Cooldown Frame
   function AR.MainIconFrame:SetCooldown (Start, Duration)
@@ -142,51 +160,65 @@
   end
   function AR.MainIconFrame:InitParts ()
     for i = 1, AR.MaxQueuedCasts do
-      self.Part[i] = CreateFrame("Frame", "AethysRotation_MainIconPartFrame"..tostring(i), UIParent);
-      self.Part[i]:SetFrameStrata(self:GetFrameStrata());
-      self.Part[i]:SetFrameLevel(self:GetFrameLevel() + 1);
-      self.Part[i]:SetWidth(64);
-      self.Part[i]:SetHeight(64);
-      self.Part[i]:SetPoint("Left", self, "Left", 0, 0);
-      self.Part[i].Texture = self.Part[i]:CreateTexture(nil, "BACKGROUND");
-      self.Part[i].keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
-      self.Part[i].keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE");
-      self.Part[i].keybind:SetAllPoints(true);
-      self.Part[i].keybind:SetJustifyH("RIGHT");
-      self.Part[i].keybind:SetJustifyV("TOP");
-      self.Part[i].keybind:SetPoint("TOPRIGHT");
-      self.Part[i].keybind:SetTextColor(0.8,0.8,0.8,1);
-      self.Part[i].keybind:SetText("");
+      -- Frame Init
+      local PartFrame = CreateFrame("Frame", "AethysRotation_MainIconPartFrame"..tostring(i), UIParent);
+      self.Part[i] = PartFrame;
+      PartFrame:SetFrameStrata(self:GetFrameStrata());
+      PartFrame:SetFrameLevel(self:GetFrameLevel() + 1);
+      PartFrame:SetWidth(64);
+      PartFrame:SetHeight(64);
+      PartFrame:SetPoint("Left", self, "Left", 0, 0);
+      -- Texture
+      PartFrame.Texture = PartFrame:CreateTexture(nil, "BACKGROUND");
+      -- Keybind
+      PartFrame.Keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+      PartFrame.Keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE");
+      PartFrame.Keybind:SetAllPoints(true);
+      PartFrame.Keybind:SetJustifyH("RIGHT");
+      PartFrame.Keybind:SetJustifyV("TOP");
+      PartFrame.Keybind:SetPoint("TOPRIGHT");
+      PartFrame.Keybind:SetTextColor(0.8,0.8,0.8,1);
+      PartFrame.Keybind:SetText("");
+      -- Black Border Icon
       if AR.GUISettings.General.BlackBorderIcon then
-        self.Part[i].Texture:SetTexCoord(.08, .92, .08, .92);
-        AR:CreateBackdrop(self.Part[i]);
+        PartFrame.Texture:SetTexCoord(.08, .92, .08, .92);
+        AR:CreateBackdrop(PartFrame);
       end
-      self.Part[i]:Show();
+      -- Display
+      PartFrame:Show();
     end
   end
   local QueuedCasts, FrameWidth;
   function AR.MainIconFrame:SetupParts (Textures, Keybinds)
     QueuedCasts = #Textures;
-	  FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
+    FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
     for i = 1, QueuedCasts do
-      self.Part[i]:SetWidth(FrameWidth);
-      self.Part[i]:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
-      self.Part[i].Texture:SetTexture(Textures[i]);
-      self.Part[i].Texture:SetAllPoints(self.Part[i]);
-      self.Part[i].Texture:SetTexCoord(i == 1 and (AR.GUISettings.General.BlackBorderIcon and 0.08 or 0) or (i-1)/QueuedCasts,
+      local PartFrame = self.Part[i];
+      -- Size & Position
+      PartFrame:SetWidth(FrameWidth);
+      PartFrame:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
+      -- Texture
+      PartFrame.Texture:SetTexture(Textures[i]);
+      PartFrame.Texture:SetAllPoints(PartFrame);
+      PartFrame.Texture:SetTexCoord(i == 1 and (AR.GUISettings.General.BlackBorderIcon and 0.08 or 0) or (i-1)/QueuedCasts,
                                             i == AR.MaxQueuedCasts and (AR.GUISettings.General.BlackBorderIcon and 0.92 or 1) or i/QueuedCasts,
                                             AR.GUISettings.General.BlackBorderIcon and 0.08 or 0,
                                             AR.GUISettings.General.BlackBorderIcon and 0.92 or 1);
-      self.Part[i].Texture = self.Part[i].Texture;
-      self.Part[i].keybind:SetText(Keybinds[i]);
-      if not self.Part[i]:IsVisible() then
-        self.Part[i]:Show();
+      PartFrame.Keybind:SetText(Keybinds[i]);
+      -- Keybind
+      if Keybind then
+        PartFrame.Keybind:SetText(Keybinds[i]);
+      else
+        PartFrame.Keybind:SetText("");
+      end
+      -- Display
+      if not PartFrame:IsVisible() then
+        PartFrame:Show();
       end
     end
   end
   function AR.MainIconFrame:HideParts ()
     for i = 1, #self.Part do
-      self.Part[i].keybind:SetText("");
       self.Part[i]:Hide();
     end
   end
@@ -194,86 +226,107 @@
 --- ======= SMALL ICONS =======
   -- Init
   function AR.SmallIconFrame:Init ()
+    -- Frame Container
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
     self:SetHeight(32);
     self:SetPoint("BOTTOMLEFT", AR.MainIconFrame, "TOPLEFT", 0, AR.GUISettings.General.BlackBorderIcon and 1 or 0);
-    self:Show();
 
+    -- Frames
     self.Icon = {};
-    self.keybind = {};
     self:CreateIcons(1, "LEFT");
     self:CreateIcons(2, "RIGHT");
+
+    -- Display
+    self:Show();
   end
   -- Create Small Icons Frames
   function AR.SmallIconFrame:CreateIcons (Index, Align)
-    self.Icon[Index] = CreateFrame("Frame", "AethysRotation_SmallIconFrame"..tostring(Index), UIParent);
-    self.Icon[Index]:SetFrameStrata(self:GetFrameStrata());
-    self.Icon[Index]:SetFrameLevel(self:GetFrameLevel() - 1);
-    self.Icon[Index]:SetWidth(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
-    self.Icon[Index]:SetHeight(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
-    self.Icon[Index]:SetPoint(Align, self, Align, 0, 0);
-    self.Icon[Index].Texture = self.Icon[Index]:CreateTexture(nil, "ARTWORK");
+    -- Frame Init
+    local IconFrame = CreateFrame("Frame", "AethysRotation_SmallIconFrame"..tostring(Index), UIParent);
+    self.Icon[Index] = IconFrame;
+    IconFrame:SetFrameStrata(self:GetFrameStrata());
+    IconFrame:SetFrameLevel(self:GetFrameLevel() - 1);
+    IconFrame:SetWidth(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
+    IconFrame:SetHeight(AR.GUISettings.General.BlackBorderIcon and 30 or 32);
+    IconFrame:SetPoint(Align, self, Align, 0, 0);
+    -- Texture
+    IconFrame.Texture = IconFrame:CreateTexture(nil, "ARTWORK");
+    -- Keybind
+    local Keybind = IconFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    IconFrame.Keybind = Keybind;
+    Keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE");
+    Keybind:SetAllPoints(true);
+    Keybind:SetJustifyH("RIGHT");
+    Keybind:SetJustifyV("TOP");
+    Keybind:SetPoint("TOPRIGHT");
+    Keybind:SetTextColor(0.8,0.8,0.8,1);
+    Keybind:SetText("");
+    -- Black Border Icon
     if AR.GUISettings.General.BlackBorderIcon then
-      self.Icon[Index].Texture:SetTexCoord(.08, .92, .08, .92);
-      AR:CreateBackdrop(self.Icon[Index]);
+      IconFrame.Texture:SetTexCoord(.08, .92, .08, .92);
+      AR:CreateBackdrop(IconFrame);
     end
-    self.Icon[Index].keybind = self.Icon[Index]:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
-    self.Icon[Index].keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE");
-    self.Icon[Index].keybind:SetAllPoints(true);
-    self.Icon[Index].keybind:SetJustifyH("RIGHT");
-    self.Icon[Index].keybind:SetJustifyV("TOP");
-    self.Icon[Index].keybind:SetPoint("TOPRIGHT");
-    self.Icon[Index].keybind:SetTextColor(0.8,0.8,0.8,1);
-    self.Icon[Index].keybind:SetText("");
-    self.Icon[Index]:Show();
+    -- Display
+    IconFrame:Show();
   end
-  -- Change Texture (1 Arg for Texture, 3 Args for Color)
+  -- Change Icon
   function AR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind)
-    -- Icon
-    self.Icon[FrameID].keybind:SetText("");
-    self.Icon[FrameID].Texture:SetTexture(Texture);
-    self.Icon[FrameID].Texture:SetAllPoints(self.Icon[FrameID]);
-    if Keybind then self.Icon[FrameID].keybind:SetText(Keybind); end
-
-    if not self.Icon[FrameID]:IsVisible() then
-      self.Icon[FrameID]:Show();
+    local IconFrame = self.Icon[FrameID];
+    -- Texture
+    IconFrame.Texture:SetTexture(Texture);
+    IconFrame.Texture:SetAllPoints(IconFrame);
+    -- Keybind
+    if Keybind then
+      IconFrame.Keybind:SetText(Keybind);
+    else
+      IconFrame.Keybind:SetText("");
+    end
+    -- Display
+    if not IconFrame:IsVisible() then
+      IconFrame:Show();
     end
   end
   -- Hide Small Icons
   function AR.SmallIconFrame:HideIcons ()
     for i = 1, #self.Icon do
-      -- Icon
       self.Icon[i]:Hide();
-      self.Icon[i].keybind:SetText("");
     end
   end
 
 --- ======= LEFT ICON =======
   -- Init LeftIcon
   function AR.LeftIconFrame:Init ()
+    -- Frame Init
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(48);
     self:SetHeight(48);
     self:SetPoint("RIGHT", AR.MainIconFrame, "LEFT", AR.GUISettings.General.BlackBorderIcon and -1 or 0, 0);
+    -- Texture
     self.Texture = self:CreateTexture(nil, "BACKGROUND");
+    -- Black Border Icon
     if AR.GUISettings.General.BlackBorderIcon then
       self.Texture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
     end
+    -- Display
     self:Show();
   end
-  -- Change Texture (1 Arg for Texture, 3 Args for Color)
+  -- Change Icon
   function AR.LeftIconFrame:ChangeIcon (Texture)
+    -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
-    self.Texture = self.Texture;
+    -- Black Border Icon
+    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
+      self.Backdrop:Show();
+    end
+    -- Display
     if not self:IsVisible() then
       self:Show();
     end
-    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
 
 --- ======= NAMEPLATES =======
@@ -282,40 +335,44 @@
   };
   -- Add the Icon on Nameplates
   function AR.Nameplate.AddIcon (ThisUnit, Object)
-    local ElvUINameplates = ElvUI and ElvUI[1].NamePlates; -- check if user is using Elvui
-    Token = stringlower(ThisUnit.UnitID);
-    Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
-    if Nameplate and (not ElvUI or ElvUINameplates) then
+    local Token = stringlower(ThisUnit.UnitID);
+    local Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
+    if Nameplate then
+      -- ElvUI compatibility
+      local ElvUINameplates;
+      if _G.ElvUI then
+        local ElvUIEngine = ElvUI[1];
+        ElvUINameplates = ElvUIEngine.NamePlates;
+      end
+      -- Locals
+      local NameplateUnitFrame = ElvUINameplates and Nameplate.unitFrame or Nameplate.UnitFrame;
+      local IconFrame = AR.NameplateIconFrame;
+
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
-        AR.NameplateIconFrame:SetFrameStrata(Nameplate.UnitFrame:GetFrameStrata());
-        AR.NameplateIconFrame:SetFrameLevel(Nameplate.UnitFrame:GetFrameLevel() + 50);
-        AR.NameplateIconFrame:SetWidth(Nameplate.UnitFrame:GetHeight());
-        AR.NameplateIconFrame:SetHeight(Nameplate.UnitFrame:GetHeight());
+        IconFrame:SetFrameStrata(NameplateUnitFrame:GetFrameStrata());
+        IconFrame:SetFrameLevel(NameplateUnitFrame:GetFrameLevel() + 50);
+        IconFrame:SetWidth(NameplateUnitFrame:GetHeight());
+        IconFrame:SetHeight(NameplateUnitFrame:GetHeight());
         -- Texture
-        AR.NameplateIconFrame.Texture = AR.NameplateIconFrame:CreateTexture(nil, "BACKGROUND");
+        IconFrame.Texture = IconFrame:CreateTexture(nil, "BACKGROUND");
 
         if AR.GUISettings.General.BlackBorderIcon then
-          AR.NameplateIconFrame.Texture:SetTexCoord(.08, .92, .08, .92);
-          AR:CreateBackdrop(AR.NameplateIconFrame);
+          IconFrame.Texture:SetTexCoord(.08, .92, .08, .92);
+          AR:CreateBackdrop(IconFrame);
         end
 
         AR.Nameplate.Initialized = true;
       end
 
       -- Set the Texture
-      AR.NameplateIconFrame.Texture:SetTexture(AR.GetTexture(Object));
-      AR.NameplateIconFrame.Texture:SetAllPoints(AR.NameplateIconFrame);
-      AR.NameplateIconFrame.Texture = AR.NameplateIconFrame.Texture;
-      if not AR.NameplateIconFrame:IsVisible() then
-        if ElvUINameplates then 
-          AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.unitFrame.HealthBar, "CENTER", 0, 0);
-          AR.NameplateIconFrame:Show();
-        else
-          AR.NameplateIconFrame:SetPoint("CENTER", Nameplate.UnitFrame.healthBar, "CENTER", 0, 0);
-          AR.NameplateIconFrame:Show();
-        end
+      IconFrame.Texture:SetTexture(AR.GetTexture(Object));
+      IconFrame.Texture:SetAllPoints(IconFrame);
+      if not IconFrame:IsVisible() then
+        local HealthBar = ElvUINameplates and NameplateUnitFrame.HealthBar or NameplateUnitFrame.healthBar;
+        IconFrame:SetPoint("CENTER", HealthBar, "CENTER", 0, 0);
+        IconFrame:Show();
       end
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
@@ -337,27 +394,35 @@
 --- ======= SUGGESTED ICON =======
   -- Init
   function AR.SuggestedIconFrame:Init ()
+    -- Frame Init
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(32);
     self:SetHeight(32);
     self:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3 or 4));
+    -- Texture
     self.Texture = self:CreateTexture(nil, "BACKGROUND");
+    -- Black Border Icon
     if AR.GUISettings.General.BlackBorderIcon then
       self.Texture:SetTexCoord(.08, .92, .08, .92);
       AR:CreateBackdrop(self);
     end
+    -- Display
     self:Show();
   end
-  -- Change Texture (1 Arg for Texture, 3 Args for Color)
+  -- Change Icon
   function AR.SuggestedIconFrame:ChangeIcon (Texture)
+    -- Texture
     self.Texture:SetTexture(Texture);
     self.Texture:SetAllPoints(self);
-    self.Texture = self.Texture;
+    -- Black Border Icon
+    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
+      self.Backdrop:Show();
+    end
+    -- Display
     if not self:IsVisible() then
       self:Show();
     end
-    if AR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then self.Backdrop:Show(); end
   end
   -- Hide Icon
   function AR.SuggestedIconFrame:HideIcon ()
@@ -367,6 +432,7 @@
 --- ======= TOGGLES =======
   -- Init
   function AR.ToggleIconFrame:Init ()
+    -- Frame Init
     self:SetFrameStrata(AR.MainFrame:GetFrameStrata());
     self:SetFrameLevel(AR.MainFrame:GetFrameLevel() - 1);
     self:SetWidth(64);
@@ -426,17 +492,17 @@
   end
   -- Add a button
   function AR.ToggleIconFrame:AddButton (Text, i, Tooltip, CmdArg)
-    self.Button[i] = CreateFrame("Button", "$parentButton"..tostring(i), self);
-    self.Button[i]:SetFrameStrata(self:GetFrameStrata());
-    self.Button[i]:SetFrameLevel(self:GetFrameLevel() - 1);
-    self.Button[i]:SetWidth(20);
-    self.Button[i]:SetHeight(20);
-    self.Button[i]:SetPoint("LEFT", self, "LEFT", 20*(i-1)+i, 0);
+    local ButtonFrame = CreateFrame("Button", "$parentButton"..tostring(i), self);
+    ButtonFrame:SetFrameStrata(self:GetFrameStrata());
+    ButtonFrame:SetFrameLevel(self:GetFrameLevel() - 1);
+    ButtonFrame:SetWidth(20);
+    ButtonFrame:SetHeight(20);
+    ButtonFrame:SetPoint("LEFT", self, "LEFT", 20*(i-1)+i, 0);
 
     -- Button Tooltip (Optional)
     if Tooltip then
-      self.Button[i]:SetScript("OnEnter",
-        function (self)
+      ButtonFrame:SetScript("OnEnter",
+        function ()
           GameTooltip:SetOwner(AR.ToggleIconFrame, "ANCHOR_BOTTOM", 0, 0);
           GameTooltip:ClearLines();
           GameTooltip:SetBackdropColor(0, 0, 0, 1);
@@ -444,33 +510,33 @@
           GameTooltip:Show();
         end
       );
-      self.Button[i]:SetScript("OnLeave",
-        function (self)
+      ButtonFrame:SetScript("OnLeave",
+        function ()
           GameTooltip:Hide();
         end
       );
     end
 
     -- Button Text
-    self.Button[i]:SetNormalFontObject("GameFontNormalSmall");
-    self.Button[i].text = Text;
+    ButtonFrame:SetNormalFontObject("GameFontNormalSmall");
+    ButtonFrame.text = Text;
 
     -- Button Texture
-    local normalTexture = self.Button[i]:CreateTexture();
-    normalTexture:SetTexture("Interface/Buttons/UI-Silver-Button-Up");
-    normalTexture:SetTexCoord(0, 0.625, 0, 0.7875);
-    normalTexture:SetAllPoints();
-    self.Button[i]:SetNormalTexture(normalTexture);
-    local highlightTexture = self.Button[i]:CreateTexture();
-    highlightTexture:SetTexture("Interface/Buttons/UI-Silver-Button-Highlight");
-    highlightTexture:SetTexCoord(0, 0.625, 0, 0.7875);
-    highlightTexture:SetAllPoints();
-    self.Button[i]:SetHighlightTexture(highlightTexture);
-    local pushedTexture = self.Button[i]:CreateTexture();
-    pushedTexture:SetTexture("Interface/Buttons/UI-Silver-Button-Down");
-    pushedTexture:SetTexCoord(0, 0.625, 0, 0.7875);
-    pushedTexture:SetAllPoints();
-    self.Button[i]:SetPushedTexture(pushedTexture);
+    local NormalTexture = ButtonFrame:CreateTexture();
+    NormalTexture:SetTexture("Interface/Buttons/UI-Silver-Button-Up");
+    NormalTexture:SetTexCoord(0, 0.625, 0, 0.7875);
+    NormalTexture:SetAllPoints();
+    ButtonFrame:SetNormalTexture(NormalTexture);
+    local HighlightTexture = ButtonFrame:CreateTexture();
+    HighlightTexture:SetTexture("Interface/Buttons/UI-Silver-Button-Highlight");
+    HighlightTexture:SetTexCoord(0, 0.625, 0, 0.7875);
+    HighlightTexture:SetAllPoints();
+    ButtonFrame:SetHighlightTexture(HighlightTexture);
+    local PushedTexture = ButtonFrame:CreateTexture();
+    PushedTexture:SetTexture("Interface/Buttons/UI-Silver-Button-Down");
+    PushedTexture:SetTexCoord(0, 0.625, 0, 0.7875);
+    PushedTexture:SetAllPoints();
+    ButtonFrame:SetPushedTexture(PushedTexture);
 
     -- Button Setting
     if type(AethysRotationCharDB) ~= "table" then
@@ -484,15 +550,19 @@
     end
 
     -- OnClick Callback
-    self.Button[i]:SetScript("OnMouseDown",
+    ButtonFrame:SetScript("OnMouseDown",
       function (self, Button)
         if Button == "LeftButton" then
           AR.CmdHandler(CmdArg);
         end
       end
     );
+
+    self.Button[i] = ButtonFrame;
+
     AR.ToggleIconFrame:UpdateButtonText(i);
-    self.Button[i]:Show();
+
+    ButtonFrame:Show();
   end
   -- Update a button text
   function AR.ToggleIconFrame:UpdateButtonText (i)
