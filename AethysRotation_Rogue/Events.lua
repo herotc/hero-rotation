@@ -127,9 +127,9 @@
       , "SPELL_CAST_SUCCESS"
     );
     -- Bleed infos
-    local function GetBleedInfos (GUID, Spell)
+    local function GetBleedInfos (GUID, SpellID)
       -- Core API is not used since we don't want cached informations
-      return select(6, UnitAura(GUID, ({GetSpellInfo(Spell)})[1], nil, "HARMFUL|PLAYER"));
+      return select(6, UnitAura(GUID, GetSpellInfo(SpellID), nil, "HARMFUL|PLAYER"));
     end
     -- Bleed OnApply/OnRefresh Listener
     AC:RegisterForSelfCombatEvent(
