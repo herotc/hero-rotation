@@ -92,11 +92,6 @@ Item.Monk.Windwalker = {
 local I = Item.Monk.Windwalker;
 -- Rotation Var
 
-if S.Serenity:IsAvailable() then
-  AR.Print("|cFF00FF96Windwalker BETA|r - |cffff0000Serenity is currently in beta|r - Please report any bugs or optimizations on GitHub or Discord.");
-  else
-  AR.Print("|cFF00FF96Windwalker BETA|r - Please report any bugs or optimizations on GitHub or Discord.");
-end
 
 local BaseCost = {
   [S.BlackoutKick] = 1,
