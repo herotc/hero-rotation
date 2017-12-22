@@ -29,6 +29,21 @@
 
       }
     },
+    Brewmaster = {
+      -- {Display GCD as OffGCD, ForceReturn}
+      GCDasOffGCD = {
+        -- Abilities
+      },
+      -- {Display OffGCD as OffGCD, ForceReturn}
+      OffGCDasOffGCD = {
+        -- Racials
+
+        -- Abilities
+        BlackOxBrew            = {true, false},
+        InvokeNiuzaotheBlackOx = {true, false},
+        IronskinBrew           = {true, false},
+      }
+    },
     Windwalker = {
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {

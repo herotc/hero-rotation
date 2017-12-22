@@ -10,5 +10,6 @@
 
 Settings.lua
 Monk.lua
+Brewmaster.lua
 Windwalker.lua
 Events.lua
