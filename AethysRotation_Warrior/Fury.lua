@@ -227,7 +227,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.execute+=/odyns_fury
-    if S.OdynsFury:IsCastable() then
+    if AR.CDsON() and S.OdynsFury:IsCastable() then
       if AR.Cast(S.OdynsFury) then return ""; end
     end
     -- actions.execute+=/bloodthirst
@@ -324,7 +324,7 @@ local function APL ()
     if AR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return ""; end
   end
   -- actions+=/rampage,if=cooldown.battle_cry.remains<1&cooldown.bloodbath.remains<1&target.health.pct>20
-  if S.Rampage:IsReady() and S.BattleCry:CooldownRemainsP() < 1 and S.Bloodbath:CooldownRemainsP() < 1 and Target:HealthPercentage() > 20 then
+  if AR.CDsON() and S.Rampage:IsReady() and S.BattleCry:CooldownRemainsP() < 1 and S.Bloodbath:CooldownRemainsP() < 1 and Target:HealthPercentage() > 20 then
     if AR.CastQueue(S.Rampage, S.BattleCry) then return ""; end
   end
   -- actions+=/furious_slash,if=talent.frenzy.enabled&(buff.frenzy.stack<3|buff.frenzy.remains<3|(cooldown.battle_cry.remains<1&buff.frenzy.remains<9))
