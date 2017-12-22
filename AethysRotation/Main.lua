@@ -328,7 +328,7 @@
       [63]    = "AethysRotation_Mage",          -- Fire
       [64]    = "AethysRotation_Mage",          -- Frost
     -- Monk
-      [268]   = false,                          -- Brewmaster
+      [268]   = "AethysRotation_Monk",          -- Brewmaster
       [269]   = "AethysRotation_Monk",          -- Windwalker
       [270]   = false,                          -- Mistweaver
     -- Paladin
