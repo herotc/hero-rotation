@@ -341,29 +341,29 @@
       -- ElvUI compatibility
       local ElvUINameplates;
       if _G.ElvUI then
-        local ElvUIEngine = ElvUI[1];
+        local ElvUIEngine = _G.ElvUI[1];
         ElvUINameplates = ElvUIEngine.NamePlates;
       end
       -- Locals
-      local NameplateUnitFrame = ElvUINameplates and Nameplate.unitFrame or Nameplate.UnitFrame;
+      local NUFrame = ElvUINameplates and Nameplate.unitFrame or Nameplate.UnitFrame;
       local IconFrame = AR.NameplateIconFrame;
 
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
-        IconFrame:SetFrameStrata(NameplateUnitFrame:GetFrameStrata());
-        IconFrame:SetFrameLevel(NameplateUnitFrame:GetFrameLevel() + 50);
+        IconFrame:SetFrameStrata(NUFrame:GetFrameStrata());
+        IconFrame:SetFrameLevel(NUFrame:GetFrameLevel() + 50);
         if AR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
           if ElvUINameplates then
-            IconFrame:SetWidth(NameplateUnitFrame.HealthBar:GetWidth() / 3.5);
-            IconFrame:SetHeight(NameplateUnitFrame.HealthBar:GetWidth() / 3.5);
+            IconFrame:SetWidth(NUFrame.HealthBar:GetWidth() / 3.5);
+            IconFrame:SetHeight(NUFrame.HealthBar:GetWidth() / 3.5);
           else
-            IconFrame:SetWidth(NameplateUnitFrame.healthBar:GetWidth() / 2);
-            IconFrame:SetHeight(NameplateUnitFrame.healthBar:GetWidth() / 2);
+            IconFrame:SetWidth(NUFrame.healthBar:GetWidth() / 2);
+            IconFrame:SetHeight(NUFrame.healthBar:GetWidth() / 2);
           end
         else
-          IconFrame:SetWidth(NameplateUnitFrame:GetHeight());
-          IconFrame:SetHeight(NameplateUnitFrame:GetHeight());
+          IconFrame:SetWidth(NUFrame:GetHeight());
+          IconFrame:SetHeight(NUFrame:GetHeight());
         end
         -- Texture
         IconFrame.Texture = IconFrame:CreateTexture(nil, "BACKGROUND");
@@ -381,13 +381,12 @@
       IconFrame.Texture:SetAllPoints(IconFrame);
       if not IconFrame:IsVisible() then
         if AR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
-          local HealthBar = ElvUINameplates and NameplateUnitFrame.HealthBar or NameplateUnitFrame.healthBar;
+          local HealthBar = ElvUINameplates and NUFrame.HealthBar or NUFrame.healthBar;
           IconFrame:SetPoint("CENTER", HealthBar);
-          IconFrame:Show();
         else
-          IconFrame:SetPoint("CENTER", NameplateUnitFrame);
-          IconFrame:Show();
+          IconFrame:SetPoint("CENTER", NUFrame);
         end
+        IconFrame:Show();
       end
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
