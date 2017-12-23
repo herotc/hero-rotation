@@ -620,11 +620,11 @@ local function APL ()
           elseif S.Envenom:IsCastable() then
             if AR.Cast(S.Envenom) then return "Cast"; end
           end
-        elseif S.FanofKnives:IsCastable() and (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-          if AR.Cast(S.FanofKnives) then return "Cast"; end
-        elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote)
-          and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
+        elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
           if AR.Cast(S.Garrote) then return "Cast"; end
+        elseif S.FanofKnives:IsCastable()
+          and (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+          if AR.Cast(S.FanofKnives) then return "Cast"; end
         elseif S.Mutilate:IsCastable() then
           if AR.Cast(S.Mutilate) then return "Cast"; end
         end
