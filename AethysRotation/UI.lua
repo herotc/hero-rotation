@@ -210,10 +210,11 @@
       PartFrame:SetWidth(FrameWidth);
       PartFrame:SetHeight(FrameWidth*QueuedCasts);
       PartFrame:ClearAllPoints();
+      local _, AnchorPoint = AR.MainIconPartOverlayFrame.Texture:GetPoint();
       if i == AR.MaxQueuedCasts or i == QueuedCasts then
-        PartFrame:SetPoint("Center", select(2, AR.MainIconPartOverlayFrame.Texture:GetPoint()), "Center", FrameWidth/(4-QueuedCasts), 0);
+        PartFrame:SetPoint("Center", AnchorPoint, "Center", FrameWidth/(4-QueuedCasts), 0);
       else
-        PartFrame:SetPoint("Center", select(2, AR.MainIconPartOverlayFrame.Texture:GetPoint()), "Center", (FrameWidth/(4-QueuedCasts))*(i-2), 0);
+        PartFrame:SetPoint("Center", AnchorPoint, "Center", (FrameWidth/(4-QueuedCasts))*(i-2), 0);
       end
       PartFrame.Texture:SetTexture(Textures[i]);
       PartFrame.Texture:SetAllPoints(PartFrame);
