@@ -21,6 +21,7 @@
 --- ============================ CONTENT ============================
 --- ======= MAIN FRAME =======
   AR.MainIconFrame = CreateFrame("Frame", "AethysRotation_MainIconFrame", UIParent);
+  AR.MainIconPartOverlayFrame = CreateFrame("Frame", "AethysRotation_MainIconPartOverlayFrame", UIParent);
   AR.MainIconFrame.Part = {};
   AR.MainIconFrame.CooldownFrame = CreateFrame("Cooldown", "AethysRotation_MainIconCooldownFrame", AR.MainIconFrame, "AR_CooldownFrameTemplate");
   AR.SmallIconFrame = CreateFrame("Frame", "AethysRotation_SmallIconFrame", UIParent);
@@ -36,6 +37,7 @@
     -- Main Icon
     AR.MainIconFrame:Hide();
     if AR.GUISettings.General.BlackBorderIcon then AR.MainIconFrame.Backdrop:Hide(); end
+    AR.MainIconPartOverlayFrame:Hide();
     AR.MainIconFrame:HideParts();
 
     -- Small Icons
@@ -99,6 +101,14 @@
     self.Texture:SetAllPoints(self);
     -- Cooldown
     self.CooldownFrame:SetAllPoints(self);
+
+    AR.MainIconPartOverlayFrame:SetFrameStrata(self:GetFrameStrata());
+    AR.MainIconPartOverlayFrame:SetFrameLevel(self:GetFrameLevel() + 1);
+    AR.MainIconPartOverlayFrame:SetWidth(64);
+    AR.MainIconPartOverlayFrame:SetHeight(64);
+    AR.MainIconPartOverlayFrame:SetPoint("Left", self, "Left", 0, 0);
+    AR.MainIconPartOverlayFrame.Texture = AR.MainIconPartOverlayFrame:CreateTexture(nil, "ARTWORK");
+    AR.MainIconPartOverlayFrame.Texture:SetAllPoints(AR.MainIconPartOverlayFrame);
     -- Keybind
     local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
     self.Keybind = KeybindFrame;
@@ -159,6 +169,7 @@
     self.CooldownFrame:SetCooldown(Start, Duration);
   end
   function AR.MainIconFrame:InitParts ()
+    AR.MainIconPartOverlayFrame:Show();
     for i = 1, AR.MaxQueuedCasts do
       -- Frame Init
       local PartFrame = CreateFrame("Frame", "AethysRotation_MainIconPartFrame"..tostring(i), UIParent);
@@ -191,19 +202,42 @@
   local QueuedCasts, FrameWidth;
   function AR.MainIconFrame:SetupParts (Textures, Keybinds)
     QueuedCasts = #Textures;
-    FrameWidth = (64 / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
+    FrameWidth = (AR.MainIconPartOverlayFrame.Texture:GetWidth() / QueuedCasts) * (AethysRotationDB.GUISettings["General.ScaleUI"] or 1)
+    local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = AR.MainIconPartOverlayFrame.Texture:GetTexCoord();
     for i = 1, QueuedCasts do
       local PartFrame = self.Part[i];
       -- Size & Position
       PartFrame:SetWidth(FrameWidth);
-      PartFrame:SetPoint("Left", self, "Left", FrameWidth*(i-1), 0);
-      -- Texture
+      PartFrame:SetHeight(FrameWidth*QueuedCasts);
+      PartFrame:ClearAllPoints();
+      if i == AR.MaxQueuedCasts or i == QueuedCasts then
+        PartFrame:SetPoint("Center", select(2, AR.MainIconPartOverlayFrame.Texture:GetPoint()), "Center", FrameWidth/(4-QueuedCasts), 0);
+      else
+        PartFrame:SetPoint("Center", select(2, AR.MainIconPartOverlayFrame.Texture:GetPoint()), "Center", (FrameWidth/(4-QueuedCasts))*(i-2), 0);
+      end
       PartFrame.Texture:SetTexture(Textures[i]);
       PartFrame.Texture:SetAllPoints(PartFrame);
-      PartFrame.Texture:SetTexCoord(i == 1 and (AR.GUISettings.General.BlackBorderIcon and 0.08 or 0) or (i-1)/QueuedCasts,
-                                            i == AR.MaxQueuedCasts and (AR.GUISettings.General.BlackBorderIcon and 0.92 or 1) or i/QueuedCasts,
-                                            AR.GUISettings.General.BlackBorderIcon and 0.08 or 0,
-                                            AR.GUISettings.General.BlackBorderIcon and 0.92 or 1);
+      if PartFrame.Backdrop then
+        if AR.MainIconPartOverlayFrame.__MSQ_NormalColor then
+          PartFrame.Backdrop:Hide();
+        else
+          PartFrame.Backdrop:Show();
+        end
+      end
+      local Blackborder = AR.GUISettings.General.BlackBorderIcon and not AR.MainIconPartOverlayFrame.__MSQ_NormalColor;
+      local leftxslice = ((i-1)/QueuedCasts);
+      local rightxslice = (i/QueuedCasts);
+      PartFrame.Texture:SetTexCoord(
+        i == 1 and (Blackborder and ULx + 0.08 or ULx) or (URx * leftxslice),
+        i == 1 and (Blackborder and ULy + 0.08 or ULy) or (Blackborder and URy + 0.08 or URy),
+        i == 1 and (Blackborder and LLx + 0.08 or LLx) or (LRx * leftxslice),
+        i == 1 and (Blackborder and LLy - 0.08 or LLy) or (Blackborder and LRy - 0.08 or LRy),
+        (i == QueuedCasts and Blackborder) and (URx * rightxslice) - 0.08 or URx * rightxslice,
+        Blackborder and URy + 0.08 or URy,
+        (i == QueuedCasts and Blackborder) and (LRx * rightxslice) - 0.08 or LRx * rightxslice,
+        Blackborder and LRy - 0.08 or LRy
+      );
+
       PartFrame.Keybind:SetText(Keybinds[i]);
       -- Keybind
       if Keybind then
@@ -213,11 +247,13 @@
       end
       -- Display
       if not PartFrame:IsVisible() then
+        AR.MainIconPartOverlayFrame:Show();
         PartFrame:Show();
       end
     end
   end
   function AR.MainIconFrame:HideParts ()
+    AR.MainIconPartOverlayFrame:Hide();
     for i = 1, #self.Part do
       self.Part[i]:Hide();
     end

@@ -46,11 +46,7 @@
     if Addon==AR and MasqueGroups and MasqueFrameList then
       local k = MasqueFrameList[Group];
       if k then
-        if k == AR.MainIconFrame.Part and type(k) == "table" then
-          for _, tblIcon in pairs(k) do
-            ModMasque(tblIcon, Disabled)
-          end
-        elseif type(k.Icon) == "table" then
+        if type(k.Icon) == "table" then
           for _, tblIcon in pairs(k.Icon) do
             ModMasque(tblIcon, Disabled)
           end
@@ -188,7 +184,7 @@
             ["Top Icons"] = AR.SmallIconFrame,
             ["Left Icon"] = AR.LeftIconFrame,
             ["Suggested Icon"] = AR.SuggestedIconFrame,
-            ["Part Icons"] = AR.MainIconFrame.Part
+            ["Part Overlay"] = AR.MainIconPartOverlayFrame,
           };
           if not Masque then
             Masque = LibStub( "Masque", true )
@@ -234,12 +230,7 @@
             AR.MainFrame:ResizeButtons(AethysRotationDB.GUISettings["General.ScaleButtons"]);
           end
           for k, v in pairs(MasqueFrameList) do
-            if k == "Part Icons" and type(v) == "table" then
-              for _, tblIcon in pairs(v) do
-                tblIcon.GetNormalTexture = function(self) return nil end;
-                tblIcon.SetNormalTexture = function(self, Texture) self.Texture = Texture end;
-              end
-            elseif type(v.Icon) == "table" then
+            if type(v.Icon) == "table" then
               for _, tblIcon in pairs(v.Icon) do
                 tblIcon.GetNormalTexture = function(self) return nil end;
                 tblIcon.SetNormalTexture = function(self, Texture) self.Texture = Texture end;
@@ -251,11 +242,7 @@
           end
           if MasqueGroups then
             for k, v in pairs(MasqueGroups) do
-              if k == AR.MainIconFrame.Part and type(k) == "table" then
-                for _, tblIcon in pairs(k) do
-                  if v then v:AddButton( tblIcon, { Icon = tblIcon.Texture, Cooldown = (tblIcon.CooldownFrame or nil) } ) end;
-                end
-              elseif type(k.Icon) == "table" then
+              if type(k.Icon) == "table" then
                 for _, tblIcon in pairs(k.Icon) do
                   if v then v:AddButton( tblIcon, { Icon = tblIcon.Texture, Cooldown = (tblIcon.CooldownFrame or nil) } ) end;
                 end
