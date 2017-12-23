@@ -339,22 +339,23 @@
     local Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
     if Nameplate then
       -- ElvUI compatibility
-      local ElvUINameplates;
+      local ElvUINameplates, ElvUINUF;
       if _G.ElvUI then
         local ElvUIEngine = ElvUI[1];
         ElvUINameplates = ElvUIEngine.NamePlates;
+        ElvUINUF = Nameplate.unitFrame;
       end
       -- Locals
-      local NameplateUnitFrame = ElvUINameplates and Nameplate.unitFrame or Nameplate.UnitFrame;
+      local BlizzardNUF = Nameplate.UnitFrame;
       local IconFrame = AR.NameplateIconFrame;
 
       -- Init Frame if not already
       if not AR.Nameplate.Initialized then
         -- Frame
-        IconFrame:SetFrameStrata(NameplateUnitFrame:GetFrameStrata());
-        IconFrame:SetFrameLevel(NameplateUnitFrame:GetFrameLevel() + 50);
-        IconFrame:SetWidth(NameplateUnitFrame:GetHeight());
-        IconFrame:SetHeight(NameplateUnitFrame:GetHeight());
+        IconFrame:SetFrameStrata(BlizzardNUF:GetFrameStrata());
+        IconFrame:SetFrameLevel(BlizzardNUF:GetFrameLevel() + 50);
+        IconFrame:SetWidth(BlizzardNUF:GetHeight());
+        IconFrame:SetHeight(BlizzardNUF:GetHeight());
         -- Texture
         IconFrame.Texture = IconFrame:CreateTexture(nil, "BACKGROUND");
 
@@ -370,7 +371,7 @@
       IconFrame.Texture:SetTexture(AR.GetTexture(Object));
       IconFrame.Texture:SetAllPoints(IconFrame);
       if not IconFrame:IsVisible() then
-        local HealthBar = ElvUINameplates and NameplateUnitFrame.HealthBar or NameplateUnitFrame.healthBar;
+        local HealthBar = ElvUINameplates and ElvUINUF.HealthBar or BlizzardNUF.healthBar;
         IconFrame:SetPoint("CENTER", HealthBar, "CENTER", 0, 0);
         IconFrame:Show();
       end

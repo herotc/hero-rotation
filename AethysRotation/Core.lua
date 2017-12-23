@@ -39,6 +39,8 @@
   end
 
   -- Get the texture (and cache it until next reload).
+  -- TODO: Implements GetTexture as Actions method (Item:GetTexture() / Spell:GetTexture() / Macro:GetTexture())
+  --       So we can simplify this part.
   function AR.GetTexture (Object)
     -- Spells
     local SpellID = Object.SpellID;
@@ -158,9 +160,8 @@
 
 --- ======= COMMANDS =======
   -- Command Handler
-  local Argument1, Argument2, Argument3;
   function AR.CmdHandler (Message)
-    Argument1, Argument2, Argument3 = strsplit(" ", stringlower(Message));
+    local Argument1, Argument2, Argument3 = strsplit(" ", stringlower(Message));
     if Argument1 == "cds" then
       AethysRotationCharDB.Toggles[1] = not AethysRotationCharDB.Toggles[1];
       AR.ToggleIconFrame:UpdateButtonText(1);
