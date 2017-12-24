@@ -412,24 +412,29 @@
 
       AR.ResetIcons();
 
-      -- Check if we are ready to cast something to save FPS.
-      if AR.ON() and AR.Ready() then
-        AC.CacheHasBeenReset = false;
-        Cache.Reset();
-        -- Rotational Debug Output
-        if AR.GUISettings.General.RotationDebugOutput then
-          CurrResult = AR.APLs[Cache.Persistent.Player.Spec[1]]();
-          if CurrResult and CurrResult ~= PrevResult then
-            AR.Print(CurrResult);
-            PrevResult = CurrResult;
+      -- Check if the current spec is available (might not always be the case)
+      -- Especially when switching from area (open world -> instance)
+      local SpecID = Cache.Persistent.Player.Spec[1];
+      if SpecID then
+        -- Check if we are ready to cast something to save FPS.
+        if AR.ON() and AR.Ready() then
+          AC.CacheHasBeenReset = false;
+          Cache.Reset();
+          -- Rotational Debug Output
+          if AR.GUISettings.General.RotationDebugOutput then
+            CurrResult = AR.APLs[SpecID]();
+            if CurrResult and CurrResult ~= PrevResult then
+              AR.Print(CurrResult);
+              PrevResult = CurrResult;
+            end
+          else
+            AR.APLs[SpecID]();
           end
-        else
-          AR.APLs[Cache.Persistent.Player.Spec[1]]();
         end
-      end
-      if MasqueGroups then
-        for k, v in pairs(MasqueGroups) do
-          if v then v:ReSkin() end
+        if MasqueGroups then
+          for k, v in pairs(MasqueGroups) do
+            if v then v:ReSkin() end
+          end
         end
       end
     end
