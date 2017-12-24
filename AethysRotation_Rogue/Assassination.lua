@@ -37,6 +37,7 @@ Spell.Rogue.Assassination = {
   Stealth               = Spell(1784),
   Stealth2              = Spell(115191), -- w/ Subterfuge Talent
   Vanish                = Spell(1856),
+  VanishBuff            = Spell(11327),
   Vendetta              = Spell(79140),
   -- Talents
   Alacrity              = Spell(193539),
@@ -583,6 +584,7 @@ local Interrupts = {
 local function APL ()
   -- Spell ID Changes check
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
+
   -- Unit Update
   AC.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
   AC.GetEnemies(10, true); -- Fan of Knives & Death from Above
@@ -622,8 +624,10 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Stealth
-    ShouldReturn = Rogue.Stealth(Stealth);
-    if ShouldReturn then return ShouldReturn; end
+    if not Player:Buff(S.VanishBuff) then
+      ShouldReturn = Rogue.Stealth(Stealth);
+      if ShouldReturn then return ShouldReturn; end
+    end
     -- Flask
     -- Food
     -- Rune
