@@ -44,8 +44,11 @@
       -- Damage Offsets
       EnvenomDMGOffset = 3,
       MutilateDMGOffset = 3,
-      -- Poison Refresh (in seconds)
+      -- Poison Refresh (in minutes)
       PoisonRefresh = 15,
+      PoisonRefreshCombat = 3,
+      -- FoK Rotation Toggle
+      FoKRotation = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
       },
@@ -126,7 +129,9 @@
   -- Assassination
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
-  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "Poison Refresh", "Set the timer for the Poison Refresh.");
+  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)");
+  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.FoKRotation", "Enable Fan of Knives Rotation", "Allow using Fan of Knives on a single target instead of Mutilate when it is a DPS increase.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Assassination, "APL.Rogue.Assassination.OffGCDasOffGCD.Vendetta", "Vendetta");
   -- Outlaw
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.");

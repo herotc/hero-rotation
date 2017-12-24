@@ -581,7 +581,7 @@ end
 local MythicDungeon;
 do
   local SappedSoulSpells = {
-    {S.Kick, "Cast Kick (Sapped Soul)", function () return IsInMeleeRange; end},
+    {S.Kick, "Cast Kick (Sapped Soul)", function () return IsInMeleeRange(); end},
     {S.Feint, "Cast Feint (Sapped Soul)", function () return true; end},
     {S.CrimsonVial, "Cast Crimson Vial (Sapped Soul)", function () return true; end}
   };
