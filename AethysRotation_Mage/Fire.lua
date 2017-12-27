@@ -196,7 +196,7 @@ local function CombustionPhase ()
     if AR.Cast(S.Flamestrike) then return ""; end
   end
   --actions.combustion_phase+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&buff.combustion.remains>execute_time
-  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and BuffRemainsP(S.Combustion) > S.Pyroblast:ExecuteTime() then
+  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and Player:BuffRemainsP(S.Combustion) > S.Pyroblast:ExecuteTime() then
     if AR.Cast(S.Pyroblast) then return ""; end
   end
   --actions.combustion_phase+=/pyroblast,if=buff.hot_streak.up
@@ -246,7 +246,7 @@ local function RopPhase ()
   local ShouldReturn = ActiveTalents();
   if ShouldReturn then return ShouldReturn; end
   --actions.rop_phase+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains&buff.rune_of_power.remains>cast_time
-  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and S.Pyroblast:ExecuteTime() < BuffRemainsP(S.KaelthassUltimateAbility) and math.min(10 - AC.OffsetRemains(S.RuneOfPowerAura:TimeSinceLastAppliedOnPlayer(), "Auto"), 0) > S.Pyroblast:CastTime() then
+  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and S.Pyroblast:ExecuteTime() < Player:BuffRemainsP(S.KaelthassUltimateAbility) and math.min(10 - AC.OffsetRemains(S.RuneOfPowerAura:TimeSinceLastAppliedOnPlayer(), "Auto"), 0) > S.Pyroblast:CastTime() then
     if AR.Cast(S.Pyroblast) then return ""; end
   end
   --actions.rop_phase+=/fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.up&firestarter.active&charges_fractional>1.7
