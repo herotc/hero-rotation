@@ -190,7 +190,7 @@ local ShouldReturn, ShouldReturn2; -- Used to get the return string
 local BleedTickTime, ExsanguinatedBleedTickTime = 2, 2/(1+1.5);
 local Stealth;
 local RuptureThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
-local Energy_Regen_Combined, Energy_Time_To_Max_Combined;
+local Energy_Regen_Combined, Energy_Time_To_Max_Combined, Use_FoK_Rotation;
 -- GUI Settings
 local Settings = {
   General = AR.GUISettings.General,
@@ -230,8 +230,8 @@ local function Build ()
     if (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange("Melee") and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
       if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
     end
-    -- actions.build+=/fan_of_knives,if=fok_rotation&(artifact.poison_knives.rank>=5|equipped.zoldyck_family_training_shackles&target.health.pct<30)
-    if Settings.Assassination.FoKRotation and (S.PoisonKnives:ArtifactRank() >= 5 or (I.ZoldyckFamilyTrainingShackles:IsEquipped() and Target:HealthPercentage() < 30)) then
+    -- actions.build+=/fan_of_knives,if=variable.use_fok_rotation
+    if Use_FoK_Rotation then
       if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives (Rotational)"; end
     end
   end
@@ -343,7 +343,8 @@ local function CDs ()
           end
         else
           -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!equipped.mantle_of_the_master_assassin&!stealthed.rogue&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
-          if not Player:IsStealthed(true, false) and Target:DebuffRefreshableP(S.Garrote, 5.4) and ((Cache.EnemiesCount[10] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and Player:ComboPointsDeficit() >= 4)) then
+          if not Player:IsStealthed(true, false) and Target:DebuffRefreshableP(S.Garrote, 5.4)
+            and ((Cache.EnemiesCount[10] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and Player:ComboPointsDeficit() >= 4)) then
             if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
           end
         end
@@ -361,6 +362,77 @@ local function CDs ()
   end
   return false;
 end
+-- # Kingsbane
+local function Kingsbane ()
+  -- # Sinister Circulation makes it worth to cast Kingsbane on CD exceot if you're [stealthed w/ Nighstalker and have Mantle & T19_4PC to Envenom] or before vendetta if you have mantle during the opener.
+  -- actions.kb=kingsbane,if=artifact.sinister_circulation.enabled&!(equipped.duskwalkers_footpads&equipped.convergence_of_fates&artifact.master_assassin.rank>=6)&(time>25|!equipped.mantle_of_the_master_assassin|(debuff.vendetta.up&debuff.surge_of_toxins.up))&(talent.subterfuge.enabled|!stealthed.rogue|(talent.nightstalker.enabled&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)))
+  if S.SinisterCirculation:ArtifactEnabled() and not (I.DuskwalkersFootpads:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.MasterAssassin:ArtifactRank() >= 6)
+    and (AC.CombatTime() > 25 or not I.MantleoftheMasterAssassin:IsEquipped() or (Target:DebuffP(S.Vendetta) and Target:DebuffP(S.SurgeofToxins)))
+    and (S.Subterfuge:IsAvailable() or not Player:IsStealthed(true, false)
+      or (S.Nighstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc))) then
+    if AR.Cast(S.Kingsbane) then return "Cast Kingsbane (Sinister Circulation)"; end
+  end
+  -- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
+  if Player:BuffP(S.Envenom) and ((Target:Debuff(S.Vendetta) and Target:DebuffP(S.SurgeofToxins)) or S.Vendetta:CooldownRemainsP() <= 5.8 or S.Vendetta:CooldownRemainsP() >= 10) then
+    if AR.Cast(S.Kingsbane) then return "Cast Kingsbane"; end
+  end
+  return false;
+end
+-- # AoE
+local function AoE ()
+  -- actions.aoe=/envenom,if=!buff.envenom.up&combo_points>=cp_max_spend
+  if S.Envenom:IsCastable("Melee") and not Player:BuffP(S.Envenom) and Player:ComboPoints() >= Rogue.CPMaxSpend() then
+    if AR.Cast(S.Envenom) then return "Cast Envenom (AoE Buff)"; end
+  end
+  -- actions.aoe+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)&(!talent.exsanguinate.enabled|!cooldown.exanguinate.up|time>9)
+  if AR.CDsON() and S.Kingsbane:IsCastable("Melee") and Player:ComboPointsDeficit() >= 1 + (Rogue.MantleDuration() > 0.2 and 1 or 0)
+    and (not S.Exsanguinate:IsAvailable() or not S.Exsanguinate:CooldownUp() or AC.CombatTime() > 9) then
+    ShouldReturn2 = Kingsbane();
+    if ShouldReturn2 then return ShouldReturn2 .. " (AoE)"; end
+  end
+  -- actions.aoe+=/rupture,cycle_targets=1,if=combo_points>=cp_max_spend&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
+  if Player:ComboPoints() >= Rogue.CPMaxSpend() then
+    local function Evaluate_Rupture_Target(TargetUnit)
+      return TargetUnit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
+        and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold)
+        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture) <= (AC.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
+        and (not AC.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2)
+    end
+    if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target)
+      and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
+      if AR.Cast(S.Rupture) then return "Cast Rupture (AoE)"; end
+    end
+    -- Prefer melee cycle units
+    local BestUnit, BestUnitTTD = nil, 4;
+    for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
+      if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(S.Rupture)) and Evaluate_Rupture_Target(CycleUnit) then
+        BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
+      end
+    end
+    if BestUnit then
+      AR.CastLeftNameplate(BestUnit, S.Rupture);
+    else
+      -- Check ranged units next
+      BestUnit, BestUnitTTD = nil, 4;
+      for _, CycleUnit in pairs(Cache.Enemies[10]) do
+        if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(S.Rupture)) and Evaluate_Rupture_Target(CycleUnit) then
+          BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
+        end
+      end
+      if BestUnit then
+        AR.CastLeftNameplate(BestUnit, S.Rupture);
+      end
+    end
+  end
+  -- actions.aoe+=/envenom,if=combo_points>=cp_max_spend
+  if S.Envenom:IsCastable("Melee") and Player:ComboPoints() >= Rogue.CPMaxSpend() then
+    if AR.Cast(S.Envenom) then return "Cast Envenom (AoE)"; end
+  end
+  -- actions.aoe+=/fan_of_knives
+  if S.FanofKnives:IsCastable() then
+    if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives (AoE)"; end
+  end
+end
 -- # Finishers
 local function Finish ()
   -- actions.finish=death_from_above,if=combo_points>=5
@@ -368,32 +440,16 @@ local function Finish ()
     if AR.Cast(S.DeathfromAbove) then return "Cast Death from Above"; end
   end
   if S.Envenom:IsCastable("Melee") then
-    -- actions.finish+=/envenom,if=combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc)&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
-    if Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and not AC.Tier19_4Pc and 1 or 0) and (Target:Debuff(S.Vendetta) or Rogue.MantleDuration() >= 0.2
-      or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined
-      or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
+    -- actions.finish+=/envenom,if=(combo_points>=cp_max_spend|!talent.anticipation.enabled&combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc))&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
+    if (Player:ComboPoints() >= Rogue.CPMaxSpend() or not S.Anticipation:IsAvailable() and Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and not AC.Tier19_4Pc and 1 or 0))
+      and (Target:Debuff(S.Vendetta) or Rogue.MantleDuration() >= 0.2 or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined
+        or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
       if AR.Cast(S.Envenom) then return "Cast Envenom"; end
     end
     -- actions.finish+=/envenom,if=talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.2
     if S.ElaboratePlanning:IsAvailable() and Player:ComboPoints() >= 3+(S.Exsanguinate:IsAvailable() and 0 or 1) and Player:BuffRemainsP(S.ElaboratePlanningBuff) < 0.2 then
       if AR.Cast(S.Envenom) then return "Cast Envenom (Elaborate Planning)"; end
     end
-  end
-  return false;
-end
--- # Kingsbane
-local function Kingsbane ()
-  -- # Sinister Circulation makes it worth to cast Kingsbane on CD exceot if you're [stealthed w/ Nighstalker and have Mantle & T19_4PC to Envenom] or before vendetta if you have mantle during the opener.
-  -- actions.kb=kingsbane,if=artifact.sinister_circulation.enabled&!(equipped.duskwalkers_footpads&equipped.convergence_of_fates&artifact.master_assassin.rank>=6)&(time>25|!equipped.mantle_of_the_master_assassin|(debuff.vendetta.up&debuff.surge_of_toxins.up))&(talent.subterfuge.enabled|!stealthed.rogue|(talent.nightstalker.enabled&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)))
-  if S.SinisterCirculation:ArtifactEnabled() and not (I.DuskwalkersFootpads:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.MasterAssassin:ArtifactRank() >= 6)
-    and (AC.CombatTime() > 25 or not I.MantleoftheMasterAssassin:IsEquipped() or (Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)))
-    and (S.Subterfuge:IsAvailable() or not Player:IsStealthed(true, false)
-      or (S.Nighstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc))) then
-    if AR.Cast(S.Kingsbane) then return "Cast Kingsbane (Sinister Circulation)"; end
-  end
-  -- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
-  if Player:Buff(S.Envenom) and ((Target:Debuff(S.Vendetta) and Target:Debuff(S.SurgeofToxins)) or S.Vendetta:CooldownRemainsP() <= 5.8 or S.Vendetta:CooldownRemainsP() >= 10) then
-    if AR.Cast(S.Kingsbane) then return "Cast Kingsbane"; end
   end
   return false;
 end
@@ -458,6 +514,11 @@ local function Maintain ()
         end
       end
     end
+  end
+  -- actions.maintain+=/envenom,if=!buff.envenom.up&combo_points>=cp_max_spend&spell_targets.fan_of_knives>(2-variable.use_fok_rotation)
+  if S.Envenom:IsCastable("Melee")
+    and not Player:BuffP(S.Envenom) and Player:ComboPoints() >= Rogue.CPMaxSpend() and Cache.EnemiesCount[10] > 2-(Use_FoK_Rotation and 1 or 0) then
+    if AR.Cast(S.Envenom) then return "Cast Envenom (AoE Maintain)"; end
   end
   -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=0.2&target.time_to_die>6
   if S.Rupture:IsCastable("Melee") and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
@@ -637,17 +698,17 @@ local function APL ()
       if Player:ComboPoints() >= 5 then
         if S.Rupture:IsCastable() and not Target:Debuff(S.Rupture)
           and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
-          if AR.Cast(S.Rupture) then return "Cast"; end
+          if AR.Cast(S.Rupture) then return "Cast Rupture (OOC)"; end
         elseif S.Envenom:IsCastable() then
-          if AR.Cast(S.Envenom) then return "Cast"; end
+          if AR.Cast(S.Envenom) then return "Cast Envenom (OOC)"; end
         end
       elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
-        if AR.Cast(S.Garrote) then return "Cast"; end
+        if AR.Cast(S.Garrote) then return "Cast Garrote (OOC)"; end
       elseif S.FanofKnives:IsCastable()
         and (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-        if AR.Cast(S.FanofKnives) then return "Cast"; end
+        if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives (OOC)"; end
       elseif S.Mutilate:IsCastable() then
-        if AR.Cast(S.Mutilate) then return "Cast"; end
+        if AR.Cast(S.Mutilate) then return "Cast Mutilate (OOC)"; end
       end
     end
     return;
@@ -671,11 +732,20 @@ local function APL ()
     Energy_Regen_Combined = Player:EnergyRegen() + Rogue.PoisonedBleeds() * (7 + (S.VenomRush:IsAvailable() and 3 or 0)) / 2;
     -- actions+=/variable,name=energy_time_to_max_combined,value=energy.deficit%variable.energy_regen_combined
     Energy_Time_To_Max_Combined = Player:EnergyDeficit() / Energy_Regen_Combined;
+    -- actions+=/variable,name=use_fok_rotation,value=fok_rotation&(artifact.poison_knives.rank>=5|equipped.zoldyck_family_training_shackles&target.health.pct<30)
+    Use_FoK_Rotation = Settings.Assassination.FoKRotation and (S.PoisonKnives:ArtifactRank() >= 5 or (I.ZoldyckFamilyTrainingShackles:IsEquipped() and Target:HealthPercentage() < 30));
 
     -- actions+=/call_action_list,name=cds
     if AR.CDsON() then
       ShouldReturn = CDs();
       if ShouldReturn then return ShouldReturn; end
+    end
+    -- actions+=/run_action_list,name=aoe,if=spell_targets.fan_of_knives>(3-variable.use_fok_rotation)
+    if AR.AoEON() and Cache.EnemiesCount[10] > 3-(Use_FoK_Rotation and 1 or 0) then
+      ShouldReturn = AoE();
+      if ShouldReturn then return ShouldReturn; end
+      if AR.Cast(S.PoolEnergy) then return "AoE Pooling"; end
+      return;
     end
     -- actions+=/call_action_list,name=maintain
     ShouldReturn = Maintain();
@@ -712,7 +782,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 12/23/2017
+-- Last Update: 12/28/2017
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -728,17 +798,26 @@ AR.SetAPL(259, APL);
 -- # Executed every time the actor is available.
 -- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*(7+talent.venom_rush.enabled*3)%2
 -- actions+=/variable,name=energy_time_to_max_combined,value=energy.deficit%variable.energy_regen_combined
+-- actions+=/variable,name=use_fok_rotation,value=fok_rotation&(artifact.poison_knives.rank>=5|equipped.zoldyck_family_training_shackles&target.health.pct<30)
 -- actions+=/call_action_list,name=cds
+-- actions+=/run_action_list,name=aoe,if=spell_targets.fan_of_knives>(3-variable.use_fok_rotation)
 -- actions+=/call_action_list,name=maintain
 -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
 -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=6)&active_dot.rupture>=spell_targets.rupture
 -- actions+=/call_action_list,name=build,if=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined
 
+-- # AoE
+-- actions.aoe=envenom,if=!buff.envenom.up&combo_points>=cp_max_spend
+-- actions.aoe+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)&(!talent.exsanguinate.enabled|!cooldown.exanguinate.up|time>9)
+-- actions.aoe+=/rupture,cycle_targets=1,if=combo_points>=cp_max_spend&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
+-- actions.aoe+=/envenom,if=combo_points>=cp_max_spend
+-- actions.aoe+=/fan_of_knives
+
 -- # Builders
 -- actions.build=hemorrhage,if=refreshable
 -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
 -- actions.build+=/fan_of_knives,if=spell_targets>=2+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
--- actions.build+=/fan_of_knives,if=fok_rotation&(artifact.poison_knives.rank>=5|equipped.zoldyck_family_training_shackles&target.health.pct<30)
+-- actions.build+=/fan_of_knives,if=variable.use_fok_rotation
 -- actions.build+=/mutilate,cycle_targets=1,if=dot.deadly_poison_dot.refreshable
 -- actions.build+=/mutilate
 
@@ -761,7 +840,7 @@ AR.SetAPL(259, APL);
 
 -- # Finishers
 -- actions.finish=death_from_above,if=combo_points>=5
--- actions.finish+=/envenom,if=combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc)&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
+-- actions.finish+=/envenom,if=(combo_points>=cp_max_spend|!talent.anticipation.enabled&combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc))&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
 -- actions.finish+=/envenom,if=talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.2
 
 -- # Kingsbane
@@ -774,6 +853,7 @@ AR.SetAPL(259, APL);
 -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&set_bonus.tier20_4pc&((dot.garrote.remains<=13&!debuff.toxic_blade.up)|pmultiplier<=1)&!exsanguinated
 -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&!set_bonus.tier20_4pc&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>2
 -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&!set_bonus.tier20_4pc&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
+-- actions.maintain+=/envenom,if=!buff.envenom.up&combo_points>=cp_max_spend&spell_targets.fan_of_knives>(2-variable.use_fok_rotation)
 -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=0.2&target.time_to_die>6
 -- actions.maintain+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled)))
 -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>6
