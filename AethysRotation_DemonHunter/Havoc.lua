@@ -258,7 +258,7 @@ local function APL()
     end
     -- throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
     if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (S.Bloodlet:IsAvailable() and (AR.AoEON() and Cache.EnemiesCount[CleaveRangeID] >= 2) and
-      (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
+      (not S.MasterOfTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (Bloodlet, Cleave)"; end
     end
     -- felblade,if=fury.deficit>=30&(fury<40|buff.metamorphosis.down)
@@ -280,7 +280,7 @@ local function APL()
     end
     -- throw_glaive,if=talent.bloodlet.enabled&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&raid_event.adds.in>recharge_time+cooldown
     if S.ThrowGlaive:IsCastable(S.ThrowGlaive)
-      and (S.Bloodlet:IsAvailable() and (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
+      and (S.Bloodlet:IsAvailable() and (not S.MasterOfTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (Bloodlet)"; end
     end
     -- chaos_strike,if=(!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_chaos_strike&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
@@ -360,7 +360,7 @@ local function APL()
     end
     -- throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
     if AR.AoEON() and S.ThrowGlaive:IsCastable(S.ThrowGlaive) and (S.Bloodlet:IsAvailable() and Cache.EnemiesCount[CleaveRangeID] >= 2
-      and (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
+      and (not S.MasterOfTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (Bloodlet, Cleave)"; end
     end
     -- felblade,if=fury.deficit>=30+buff.prepared.up*8
@@ -382,7 +382,7 @@ local function APL()
     end
     -- throw_glaive,if=talent.bloodlet.enabled&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&raid_event.adds.in>recharge_time+cooldown
     if S.ThrowGlaive:IsCastable(S.ThrowGlaive)
-      and (S.Bloodlet:IsAvailable() and (not S.MasterofTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
+      and (S.Bloodlet:IsAvailable() and (not S.MasterOfTheGlaive:IsAvailable() or not S.Momentum:IsAvailable() or Player:BuffP(S.MomentumBuff))) then
       if AR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (Bloodlet)"; end
     end
     -- throw_glaive,if=!talent.bloodlet.enabled&buff.metamorphosis.down&spell_targets>=3
