@@ -128,7 +128,7 @@ S.Envenom:RegisterDamage(
       -- Aura Multiplier (SpellID: 137037)
       1.28 *
       -- Toxic Blade Multiplier
-      (Target:Debuff(S.ToxicBladeDebuff) and 1.35 or 1) *
+      (Target:DebuffP(S.ToxicBladeDebuff) and 1.35 or 1) *
       -- Toxic Blades Multiplier
       (S.ToxicBlades:ArtifactEnabled() and 1 + S.ToxicBlades:ArtifactRank()*0.03 or 1) *
       -- Tier 19 4PC  Multiplier
@@ -216,7 +216,7 @@ local function Build ()
       local BestUnit, BestUnitTTD = nil, 0;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD)
-          and Unit:DebuffRefreshableP(S.Hemorrhage, 6) and Unit:Debuff(S.Rupture) then
+          and Unit:DebuffRefreshableP(S.Hemorrhage, 6) and Unit:DebuffP(S.Rupture) then
           BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
         end
       end
@@ -301,14 +301,14 @@ local function CDs ()
       AR.CastSuggested(S.MarkedforDeath);
     end
     -- actions.cds+=/vendetta,if=!talent.exsanguinate.enabled|dot.rupture.ticking
-    if S.Vendetta:IsCastable() and (not S.Exsanguinate:IsAvailable() or Target:Debuff(S.Rupture)) then
+    if S.Vendetta:IsCastable() and (not S.Exsanguinate:IsAvailable() or Target:DebuffP(S.Rupture)) then
       if AR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
     end
     if S.Exsanguinate:IsCastable() then
       if not AC.Tier20_4Pc then
         -- actions.cds+=/exsanguinate,if=!set_bonus.tier20_4pc&(prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|dot.garrote.pmultiplier>1&!cooldown.vanish.up&buff.subterfuge.up)
         if Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() and not Player:IsStealthed(true, false)
-          or Target:PMultiplier(S.Garrote) > 1 and not S.Vanish:CooldownUp() and Player:Buff(S.Subterfuge) then
+          or Target:PMultiplier(S.Garrote) > 1 and not S.Vanish:CooldownUp() and Player:BuffP(S.Subterfuge) then
           if AR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
         end
       else
@@ -373,7 +373,7 @@ local function Kingsbane ()
     if AR.Cast(S.Kingsbane) then return "Cast Kingsbane (Sinister Circulation)"; end
   end
   -- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
-  if Player:BuffP(S.Envenom) and ((Target:Debuff(S.Vendetta) and Target:DebuffP(S.SurgeofToxins)) or S.Vendetta:CooldownRemainsP() <= 5.8 or S.Vendetta:CooldownRemainsP() >= 10) then
+  if Player:BuffP(S.Envenom) and ((Target:DebuffP(S.Vendetta) and Target:DebuffP(S.SurgeofToxins)) or S.Vendetta:CooldownRemainsP() <= 5.8 or S.Vendetta:CooldownRemainsP() >= 10) then
     if AR.Cast(S.Kingsbane) then return "Cast Kingsbane"; end
   end
   return false;
@@ -442,7 +442,7 @@ local function Finish ()
   if S.Envenom:IsCastable("Melee") then
     -- actions.finish+=/envenom,if=(combo_points>=cp_max_spend|!talent.anticipation.enabled&combo_points>=4+(talent.deeper_stratagem.enabled&!set_bonus.tier19_4pc))&(debuff.vendetta.up|mantle_duration>=0.2|debuff.surge_of_toxins.remains<0.2|energy.deficit<=25+variable.energy_regen_combined)
     if (Player:ComboPoints() >= Rogue.CPMaxSpend() or not S.Anticipation:IsAvailable() and Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and not AC.Tier19_4Pc and 1 or 0))
-      and (Target:Debuff(S.Vendetta) or Rogue.MantleDuration() >= 0.2 or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined
+      and (Target:DebuffP(S.Vendetta) or Rogue.MantleDuration() >= 0.2 or Target:DebuffRemainsP(S.SurgeofToxins) < 0.2 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined
         or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
       if AR.Cast(S.Envenom) then return "Cast Envenom"; end
     end
@@ -467,7 +467,7 @@ local function Maintain ()
     -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&set_bonus.tier20_4pc&((dot.garrote.remains<=13&!debuff.toxic_blade.up)|pmultiplier<=1)&!exsanguinated
     if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() and Player:ComboPointsDeficit() >= 1 and AC.Tier20_4Pc then
       if Target:IsInRange("Melee") and not AC.Exsanguinated(Target, "Garrote")
-        and (Target:DebuffRemainsP(S.Garrote) <= 13 and not Target:Debuff(S.ToxicBladeDebuff) or Target:PMultiplier(S.Garrote) <= 1)
+        and (Target:DebuffRemainsP(S.Garrote) <= 13 and not Target:DebuffP(S.ToxicBladeDebuff) or Target:PMultiplier(S.Garrote) <= 1)
         and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
         if AR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge, T20)"; end
       end
@@ -522,7 +522,7 @@ local function Maintain ()
   end
   -- actions.maintain+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&mantle_duration<=0.2&target.time_to_die>6
   if S.Rupture:IsCastable("Melee") and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
-    and not Target:Debuff(S.Rupture) and Rogue.MantleDuration() <= 0.2
+    and not Target:DebuffP(S.Rupture) and Rogue.MantleDuration() <= 0.2
     and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
     and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
     if AR.Cast(S.Rupture) then return "Cast Rupture"; end
@@ -531,7 +531,7 @@ local function Maintain ()
   -- TODO: Test 4-5 cp rupture for Exsg
   if AR.CDsON() and S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable()
     and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
-      or (not Target:Debuff(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
+      or (not Target:DebuffP(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2+(S.UrgetoKill:ArtifactEnabled() and 1 or 0))))) then
     if AR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
   -- actions.maintain+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>6
