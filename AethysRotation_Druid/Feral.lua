@@ -287,7 +287,7 @@
             if AR.Cast(S.Regrowth) then return ""; end
           end
           -- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up
-          if S.FerociousBite:IsCastable() and Player:BuffP(S.ApexPredator) then
+          if S.FerociousBite:IsCastable() and Player:ComboPoints() >= 1 and Player:BuffP(S.ApexPredator) then
             if AR.Cast(S.FerociousBite) then return ""; end
           end
           -- run_action_list,name=st_finishers,if=combo_points>4
