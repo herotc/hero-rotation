@@ -1,88 +1,88 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 --- Localize Vars
-  -- Addon
-  local addonName, addonTable = ...;
-  -- AethysCore
-  local AC      = AethysCore;
-  local Cache   = AethysCache;
-  local Unit    = AC.Unit;
-  local Player  = Unit.Player;
-  local Target  = Unit.Target;
-  local Spell   = AC.Spell;
-  local Item    = AC.Item;
-  -- AethysRotation
-  local AR = AethysRotation;
-  -- Lua
+-- Addon
+local addonName, addonTable = ...;
+-- AethysCore
+local AC      = AethysCore;
+local Cache   = AethysCache;
+local Unit    = AC.Unit;
+local Player  = Unit.Player;
+local Target  = Unit.Target;
+local Spell   = AC.Spell;
+local Item    = AC.Item;
+-- AethysRotation
+local AR = AethysRotation;
+-- Lua
 
-  --- ============================ CONTENT ============================
-  --- ======= APL LOCALS =======
-  local Everyone = AR.Commons.Everyone;
-  local Mage = AR.Commons.Mage;
-  -- Spells
-  if not Spell.Mage then Spell.Mage = {}; end
+--- ============================ CONTENT ============================
+--- ======= APL LOCALS =======
+local Everyone = AR.Commons.Everyone;
+local Mage = AR.Commons.Mage;
+-- Spells
+if not Spell.Mage then Spell.Mage = {}; end
 
-  Spell.Mage.Arcane = {
-    -- Racials
-    ArcaneTorrent         = Spell(25046),
-    Berserking            = Spell(26297),
-    BloodFury             = Spell(20572),
-    GiftoftheNaaru        = Spell(59547),
-    Shadowmeld            = Spell(58984),
-    
-    -- Abilities
-	  ArcaneCharges					= Spell(36032),
-    ArcaneBlast           = Spell(30451),
-    ArcaneBarrage         = Spell(44425),
-    ArcaneExplosion       = Spell(1449),
-    ArcaneMissiles        = Spell(5143),
-    ArcaneMissilesProc    = Spell(79683),
-    ArcanePower           = Spell(12042),
-    Evocation             = Spell(12051),
-    PresenceofMind        = Spell(205025),
-	  ExpandingMind					= Spell(253262),
-    Counterspell          = Spell(2139),
-    SpellSteal            = Spell(30449),
-    Polymorph             = Spell(118),
-    TimeWarp              = Spell(80353),
-    
-      -- Talents
-    ArcaneFamiliar        = Spell(205022),
-    Amplification         = Spell(236628),
-    WordsOfPower          = Spell(205035),
-    
-    MirrorImage           = Spell(55342),
-    RuneofPower           = Spell(116011),
-    IncantersFlow         = Spell(1463),
-    
-    Supernova             = Spell(157980),
-    ChargedUp             = Spell(205032),
-    Resonance             = Spell(205028),
-    
-    NetherTempest         = Spell(114923),
-    UnstableMagic         = Spell(157976),
-    Erosion               = Spell(205039),
-    
-    Overpowered           = Spell(155147),
-    TemporalFlux          = Spell(234302),
-    ArcaneOrb             = Spell(153626),
-    
-    -- Artifact
-    MarkofAluneth         = Spell(224968),
-    
-    -- Defensive
-    PrismaticBarrier      = Spell(235450),
-    IceBlock              = Spell(45438),
-    GreaterInvisibility   = Spell(110959),
-    
-    -- Legendaries
-    RhoninsAssaultingArmwrapsProc = Spell(208081),  -- Arcane Mage Bracer Buff
-    
-    -- Misc
-    PotionOfProlongedPowerBuff = Spell(229206),
-    PotionOfDeadlyGraceBuff = Spell(188027),
-    ErosionDebuff         = Spell(210134),
-    RuneofPowerBuff       = Spell(116014)
+Spell.Mage.Arcane = {
+  -- Racials
+  ArcaneTorrent         = Spell(25046),
+  Berserking            = Spell(26297),
+  BloodFury             = Spell(20572),
+  GiftoftheNaaru        = Spell(59547),
+  Shadowmeld            = Spell(58984),
+
+  -- Abilities
+  ArcaneCharges		      = Spell(36032),
+  ArcaneBlast           = Spell(30451),
+  ArcaneBarrage         = Spell(44425),
+  ArcaneExplosion       = Spell(1449),
+  ArcaneMissiles        = Spell(5143),
+  ArcaneMissilesProc    = Spell(79683),
+  ArcanePower           = Spell(12042),
+  Evocation             = Spell(12051),
+  PresenceofMind        = Spell(205025),
+  ExpandingMind	        = Spell(253262),
+  Counterspell          = Spell(2139),
+  SpellSteal            = Spell(30449),
+  Polymorph             = Spell(118),
+  TimeWarp              = Spell(80353),
+
+  -- Talents
+  ArcaneFamiliar        = Spell(205022),
+  Amplification         = Spell(236628),
+  WordsOfPower          = Spell(205035),
+
+  MirrorImage           = Spell(55342),
+  RuneofPower           = Spell(116011),
+  IncantersFlow         = Spell(1463),
+
+  Supernova             = Spell(157980),
+  ChargedUp             = Spell(205032),
+  Resonance             = Spell(205028),
+
+  NetherTempest         = Spell(114923),
+  UnstableMagic         = Spell(157976),
+  Erosion               = Spell(205039),
+
+  Overpowered           = Spell(155147),
+  TemporalFlux          = Spell(234302),
+  ArcaneOrb             = Spell(153626),
+
+  -- Artifact
+  MarkofAluneth         = Spell(224968),
+
+  -- Defensive
+  PrismaticBarrier      = Spell(235450),
+  IceBlock              = Spell(45438),
+  GreaterInvisibility   = Spell(110959),
+
+  -- Legendaries
+  RhoninsAssaultingArmwrapsProc = Spell(208081),  -- Arcane Mage Bracer Buff
+
+  -- Misc
+  PotionOfProlongedPowerBuff  = Spell(229206),
+  PotionOfDeadlyGraceBuff     = Spell(188027),
+  ErosionDebuff               = Spell(210134),
+  RuneofPowerBuff             = Spell(116014)
 };
 
 local S = Spell.Mage.Arcane;
@@ -91,40 +91,43 @@ if not Item.Mage then Item.Mage = {}; end
 Item.Mage.Arcane = {
   PotionOfDeadlyGrace         = Item(127843),
   MysticKiltofTheRuneMaster   = Item(209280, {7}),
-  MantleOfTheFirstKirinTor    = Item(248098, {3})
+  MantleOfTheFirstKirinTor    = Item(248098, {3}),
+  KiljaedensBurningWish       = Item(144259, {13, 14}),
+  TarnishedSentinel			  = Item(147017, {13, 14})
 }
 local I = Item.Mage.Arcane;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local T192P, T194P = AC.HasTier("T19")
-local T202P, T204P = AC.HasTier("T20")
-local T212P, T214P = AC.HasTier("T21")
 local ArcaneMissilesProcMax = 3;
 local PresenceOfMindMax = 2;
 local range = 40
 local var_init = false
 local var_calcCombat = false
+local EnemyRanges = {10, 40}
 local v_timeUntilBurn, v_averageBurnLength, v_totalBurn, v_burnPhase, v_burnPhaseDuration, v_burnPhaseStart
 
 -- GUI Settings
 local Settings = {
-  General = AR.GUISettings.General,
-  Commons = AR.GUISettings.APL.Mage.Commons,
-  Arcane = AR.GUISettings.APL.Mage.Arcane
+General = AR.GUISettings.General,
+Commons = AR.GUISettings.APL.Mage.Commons,
+Arcane = AR.GUISettings.APL.Mage.Arcane
 };
 
 -------- ACTIONS --------
 
-
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    AC.GetEnemies(i);
+  end
+end
+  
 local function Var_TimeUntilBurn ()
   -- variable,name=time_until_burn,op=set,value=cooldown.arcane_power.remains
   v_timeUntilBurn = S.ArcanePower:CooldownRemainsP()
-
   -- variable,name=time_until_burn,op=max,value=cooldown.evocation.remains-variable.average_burn_length
   v_timeUntilBurn = math.max(v_timeUntilBurn, S.Evocation:CooldownRemainsP() - v_averageBurnLength)
-  
   -- variable,name=time_until_burn,op=max,value=cooldown.presence_of_mind.remains,if=set_bonus.tier20_2pc
-  if T202P then
+  if AC.Tier20_2Pc then
     v_timeUntilBurn = math.max(v_timeUntilBurn, S.PresenceofMind:CooldownRemainsP())
   end
   -- variable,name=time_until_burn,op=max,value=action.rune_of_power.usable_in,if=talent.rune_of_power.enabled
@@ -132,7 +135,7 @@ local function Var_TimeUntilBurn ()
     v_timeUntilBurn = math.max(v_timeUntilBurn, S.RuneofPower:UsableInP())
   end
   -- variable,name=time_until_burn,op=max,value=cooldown.charged_up.remains,if=talent.charged_up.enabled&set_bonus.tier21_2pc
-  if (S.ChargedUp:IsAvailable() and T212P) then
+  if (S.ChargedUp:IsAvailable() and AC.Tier21_2Pc) then
     v_timeUntilBurn = math.max(v_timeUntilBurn, S.ChargedUp:CooldownRemainsP())
   end
   -- variable,name=time_until_burn,op=reset,if=target.time_to_die<variable.average_burn_length
@@ -144,8 +147,8 @@ end
 local function Var_BurnPhaseDuration ()
   if v_burnPhase then
     v_burnPhaseDuration = AC.GetTime() - v_burnPhaseStart
-  else
-    v_burnPhaseDuration = 0
+  --else
+  --  v_burnPhaseDuration = 0
   end
 end
 
@@ -157,7 +160,9 @@ end
 local function VarCalc ()
   Var_TimeUntilBurn()
   Var_BurnPhaseDuration()
-  Var_AverageBurnLength()
+  if v_totalBurn > 0 then
+    Var_AverageBurnLength()
+  end
 end
 
 local function VarInit ()
@@ -166,7 +171,7 @@ local function VarInit ()
     v_burnPhase = false
     v_burnPhaseDuration = 0
     v_averageBurnLength = 0
-    
+
     var_init=true
     var_calcCombat=true
   end
@@ -219,6 +224,7 @@ local function Burn ()
   -- variable,name=total_burns,op=add,value=1,if=!burn_phase
   if not v_burnPhase then
     v_totalBurn = v_totalBurn + 1
+    v_burnPhaseDuration = 0
   end
   -- start_burn_phase,if=!burn_phase
   if not v_burnPhase then
@@ -227,7 +233,8 @@ local function Burn ()
   end
   -- stop_burn_phase,if=prev_gcd.1.evocation&cooldown.evocation.charges=0&burn_phase_duration>0
   if Player:PrevGCDP(1, S.Evocation) and S.Evocation:ChargesP() == 0 and v_burnPhaseDuration > 0 then
-     v_burnPhase = false
+  -- AR.Print("Stop burn")
+    v_burnPhase = false
   end
   -- nether_tempest,if=refreshable|!ticking
   if S.NetherTempest:IsCastableP() and S.NetherTempest:IsAvailable() and Player:ManaP() >= S.NetherTempest:Cost() and (Target:DebuffRefreshableCP(S.NetherTempest) or not (Target:DebuffRemainsP(S.NetherTempest) > 0)) then
@@ -263,12 +270,15 @@ local function Burn ()
   end
   -- potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
   -- if I.PotionOfDeadlyGrace:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePower) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:Race()=="Troll" or Player:Race()=="Orc"))) then
-    -- if AR.CastSuggested(I.PotionOfDeadlyGrace) then return ""; end
+  -- if AR.CastSuggested(I.PotionOfDeadlyGrace) then return ""; end
   -- end
   -- use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
-  -- if S.UseItems:IsCastableP() and (Player:BuffP(S.ArcanePower) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
-    -- if AR.Cast(S.UseItems) then return ""; end
-  -- end
+  if I.TarnishedSentinel:IsEquipped() and I.TarnishedSentinel:IsReady() and (Player:BuffP(S.ArcanePower) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+    if AR.Cast(I.TarnishedSentinel) then return ""; end
+  end
+  if I.KiljaedensBurningWish:IsEquipped() and I.KiljaedensBurningWish:IsReady() and (Player:BuffP(S.ArcanePower) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+    if AR.Cast(I.KiljaedensBurningWish) then return ""; end
+  end
   -- arcane_barrage,if=set_bonus.tier21_2pc&((set_bonus.tier20_2pc&cooldown.presence_of_mind.up)|(talent.charged_up.enabled&cooldown.charged_up.up))&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.expanding_mind.down
   if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (AC.Tier21_2Pc and ((AC.Tier20_2Pc and S.PresenceofMind:CooldownUpP()) or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownUpP())) and FuturArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDownP(S.ExpandingMindBuff)) then
     if AR.Cast(S.ArcaneBarrage) then return ""; end
@@ -316,6 +326,7 @@ local function Burn ()
 end
 
 local function Conserve ()
+  -- AR.Print("In Conserve phase")
   -- mirror_image,if=variable.time_until_burn>recharge_time|variable.time_until_burn>target.time_to_die
   if AR.CDsON() and S.MirrorImage:IsCastableP() and Player:ManaP() >= S.MirrorImage:Cost() and (v_timeUntilBurn > S.MirrorImage:RechargeP() or v_timeUntilBurn > Target:TimeToDie()) then
     if AR.Cast(S.MirrorImage) then return ""; end
@@ -325,17 +336,17 @@ local function Conserve ()
     if AR.Cast(S.MarkofAluneth) then return ""; end
   end
   -- strict_sequence,name=miniburn,if=talent.rune_of_power.enabled&set_bonus.tier20_4pc&variable.time_until_burn>30:rune_of_power:arcane_barrage:presence_of_mind
-  -- if S.StrictSequence:IsCastableP() and (S.RuneofPower:IsAvailable() and AC.Tier20_4Pc and v_timeUntilBurn > 30:rune_of_power:arcane_barrage:presence_of_mind) then
-    -- if AR.Cast(S.StrictSequence) then return ""; end
-  -- end
+  if (S.RuneofPower:IsAvailable() and AC.Tier20_4Pc and v_timeUntilBurn > 30) then
+    if AR.CastQueue(S.RuneofPower, S.ArcaneBarrage, S.PresenceofMind) then return; end
+  end
   -- rune_of_power,if=full_recharge_time<=execute_time|prev_gcd.1.mark_of_aluneth
   if AR.CDsON() and S.RuneofPower:IsCastableP() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or Player:PrevGCDP(1, S.MarkofAluneth)) and not Player:IsCasting(S.RuneofPower) then
     if AR.Cast(S.RuneofPower) then return ""; end
   end
   -- strict_sequence,name=abarr_cu_combo,if=talent.charged_up.enabled&cooldown.charged_up.recharge_time<variable.time_until_burn:arcane_barrage:charged_up
-  -- if S.StrictSequence:IsCastableP() and (S.ChargedUp:IsAvailable() and S.ChargedUp:RechargeP() < v_timeUntilBurn:ArcaneBarrage:ChargedUp) then
-    -- if AR.Cast(S.StrictSequence) then return ""; end
-  -- end
+  if (S.ChargedUp:IsAvailable() and S.ChargedUp:RechargeP() < v_timeUntilBurn) then
+    if AR.CastQueue(S.ArcaneBarrage, S.ChargedUp) then return ""; end
+  end
   -- arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
   if S.ArcaneMissiles:IsCastableP() and Player:ManaP() >= S.ArcaneMissiles:Cost() and (Player:BuffStackP(S.ArcaneMissilesProc) == ArcaneMissilesProcMax and Cache.EnemiesCount[range] < 3) then
     if AR.Cast(S.ArcaneMissiles) then return ""; end
@@ -349,11 +360,14 @@ local function Conserve ()
     if AR.Cast(S.NetherTempest) then return ""; end
   end
   -- arcane_explosion,if=active_enemies>1&(mana.pct>=70-(10*equipped.mystic_kilt_of_the_rune_master))
-  if S.ArcaneExplosion:IsCastableP() and Player:ManaP() >= S.ArcaneExplosion:Cost() and (Cache.EnemiesCount[10] > 1 and (Player:ManaPercentage() >= 70 - (10 * (I.MysticKiltofTheRuneMaster:IsEquipped() and 1 or 0)))) then
+  if S.ArcaneExplosion:IsCastableP() and Player:ManaP() >= S.ArcaneExplosion:Cost() and (Cache.EnemiesCount[10] > 1 and (Player:ManaPercentage() >= 70)) then
+    if AR.Cast(S.ArcaneExplosion) then return ""; end
+  end
+  if S.ArcaneExplosion:IsCastableP() and Player:ManaP() >= S.ArcaneExplosion:Cost() and (Cache.EnemiesCount[10] > 1 and (Player:ManaPercentage() >= 60 and I.MysticKiltofTheRuneMaster:IsEquipped())) then
     if AR.Cast(S.ArcaneExplosion) then return ""; end
   end
   -- arcane_blast,if=mana.pct>=90|buff.rhonins_assaulting_armwraps.up|(buff.rune_of_power.remains>=cast_time&equipped.mystic_kilt_of_the_rune_master)
-  if S.ArcaneBlast:IsCastableP() and Player:ManaP() >= S.ArcaneBlast:Cost() and (Player:ManaPercentage() >= 90 or Player:BuffRemainsP(S.RhoninsAssaultingArmwrapsProc) > 0 or (RoPDuration() >= S.ArcaneBlast:CastTime() and I.MysticKiltofTheRuneMaster:IsEquipped())) then
+  if S.ArcaneBlast:IsCastableP() and Player:ManaP() >= S.ArcaneBlast:Cost() and Player:ManaPercentage() >= 90 or Player:BuffRemainsP(S.RhoninsAssaultingArmwrapsProc) > 0 or (RoPDuration() >= S.ArcaneBlast:CastTime() and I.MysticKiltofTheRuneMaster:IsEquipped()) then
     if AR.Cast(S.ArcaneBlast) then return ""; end
   end
   -- arcane_missiles,if=variable.arcane_missiles_procs
@@ -382,71 +396,69 @@ local function APL ()
   -- cancelBuff
 
   -- Unit Update
-  AC.GetEnemies(40);
-	AC.GetEnemies(10);
+  
+  UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate();
   VarInit()
   VarCalc()
-    
+
   -- Defensives
-  
-	-- Out of Combat
-	if not Player:AffectingCombat() then
+
+  -- Out of Combat
+  if not Player:AffectingCombat() then
     if var_calcCombat then var_calcCombat = false end
-	  -- Flask
-	  -- Food
-	  -- Rune
-	  -- PrePot w/ Bossmod Countdown
-	  -- Opener
-    
-		--precast
+    -- Flask
+    -- Food
+    -- Rune
+    -- PrePot w/ Bossmod Countdown
+    -- Opener
+
+    --precast
     -- arcane_blast
     if Everyone.TargetIsValid() and Target:IsInRange(range) then
-      if S.ArcaneBlast:IsCastable() then
-        if AR.Cast(S.ArcaneBlast) then return ""; end
-      end
+      if AR.Cast(S.ArcaneBlast) then return ""; end
     end
-    
-		return
-	end
-   
-	-- In Combat
-	if Everyone.TargetIsValid() then    
+    return
+  end
+
+  -- In Combat
+  if Everyone.TargetIsValid() then    
     -- counterspell,if=target.debuff.casting.react
     -- if S.Counterspell:IsCastable(S.Counterspell) and (target.debuff.casting.react) then
-      -- if AR.Cast(S.Counterspell) then return ""; end
+    -- if AR.Cast(S.Counterspell) then return ""; end
     -- end
-    
+
     -- time_warp,if=buff.bloodlust.down&(time=0|(buff.arcane_power.up&(buff.potion.up|!action.potion.usable))|target.time_to_die<=buff.bloodlust.duration)
     if AR.CDsON() and Settings.Commons.UseTimeWarp and S.TimeWarp:IsCastable() and (not Player:HasHeroism() and (AC.CombatTime() < 3 or (Player:BuffRemainsP(S.ArcanePower) > 0 and (Player:BuffRemainsP(S.PotionOfDeadlyGrace) > 0 or not I.PotionOfDeadlyGrace:IsReady())) or Target:TimeToDie() <= S.TimeWarp:BaseDuration())) then
       if AR.Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return ""; end
     end
-    
+
     -- cancel_buff,name=presence_of_mind,if=active_enemies>1&set_bonus.tier20_2pc
     -- if S.CancelBuff:IsCastable(S.CancelBuff) and (active_enemies > 1 and set_bonus.tier20_2pc) then
-      -- if AR.Cast(S.CancelBuff) then return ""; end
+    -- if AR.Cast(S.CancelBuff) then return ""; end
     -- end
-    
+
     -- call_action_list,name=build,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&!burn_phase
     if (FuturArcaneCharges() < Player:ArcaneChargesMax() and not v_burnPhase) then
       local ShouldReturn = Build(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- call_action_list,name=burn,if=(buff.arcane_charge.stack=buff.arcane_charge.max_stack&variable.time_until_burn=0)|burn_phase
     if ((FuturArcaneCharges() == Player:ArcaneChargesMax() and v_timeUntilBurn == 0) or v_burnPhase) then
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- call_action_list,name=conserve
     local ShouldReturn = Conserve(); 
     if ShouldReturn then return ShouldReturn; end
+  
   end
 end
 
 AR.SetAPL(62, APL);
 
 --- ======= SIMC =======
---- Last Update: 19/11/2017
+--- Last Update: 01/02/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -476,7 +488,7 @@ AR.SetAPL(62, APL);
 
 -- actions.build=arcane_orb
 -- # Use Arcane Missiles at max stacks to avoid munching a proc. Alternatively, we can cast at 3 stacks of Arcane Charge to conserve mana.
--- actions.build+=/arcane_missiles,if=active_enemies<3&(variable.arcane_missiles_procs=buff.arcane_missiles.max_stack|(variable.arcane_missiles_procs&mana.pct<=50&buff.arcane_charge.stack=3))
+-- actions.build+=/arcane_missiles,if=active_enemies<3&(variable.arcane_missiles_procs=buff.arcane_missiles.max_stack|(variable.arcane_missiles_procs&mana.pct<=50&buff.arcane_charge.stack=3)),chain=1
 -- actions.build+=/arcane_explosion,if=active_enemies>1
 -- actions.build+=/arcane_blast
 
@@ -510,11 +522,11 @@ AR.SetAPL(62, APL);
 -- # Arcane Barrage has a good chance of launching an Arcane Orb at max Arcane Charge stacks.
 -- actions.burn+=/arcane_barrage,if=active_enemies>4&equipped.mantle_of_the_first_kirin_tor&buff.arcane_charge.stack=buff.arcane_charge.max_stack
 -- # Arcane Missiles are good, but not when there's multiple targets up.
--- actions.burn+=/arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
+-- actions.burn+=/arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3,chain=1
 -- # Get PoM back on cooldown as soon as possible.
 -- actions.burn+=/arcane_blast,if=buff.presence_of_mind.up
 -- actions.burn+=/arcane_explosion,if=active_enemies>1
--- actions.burn+=/arcane_missiles,if=variable.arcane_missiles_procs
+-- actions.burn+=/arcane_missiles,if=variable.arcane_missiles_procs>1,chain=1
 -- actions.burn+=/arcane_blast
 -- # Now that we're done burning, we can update the average_burn_length with the length of this burn.
 -- actions.burn+=/variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+burn_phase_duration)%variable.total_burns
@@ -529,7 +541,7 @@ AR.SetAPL(62, APL);
 -- # We want Charged Up for our burn phase to refresh 2pt21 buff, but if we have time to let it recharge we can use it during conserve.
 -- actions.conserve+=/strict_sequence,name=abarr_cu_combo,if=talent.charged_up.enabled&cooldown.charged_up.recharge_time<variable.time_until_burn:arcane_barrage:charged_up
 -- # Arcane Missiles are good, but not when there's multiple targets up.
--- actions.conserve+=/arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
+-- actions.conserve+=/arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3,chain=1
 -- actions.conserve+=/supernova
 -- # Use during pandemic refresh window or if the dot is missing.
 -- actions.conserve+=/nether_tempest,if=refreshable|!ticking
@@ -537,7 +549,7 @@ AR.SetAPL(62, APL);
 -- actions.conserve+=/arcane_explosion,if=active_enemies>1&(mana.pct>=70-(10*equipped.mystic_kilt_of_the_rune_master))
 -- # Use Arcane Blast if we have the mana for it or a proc from legendary wrists. With the Kilt we can cast freely.
 -- actions.conserve+=/arcane_blast,if=mana.pct>=90|buff.rhonins_assaulting_armwraps.up|(buff.rune_of_power.remains>=cast_time&equipped.mystic_kilt_of_the_rune_master)
--- actions.conserve+=/arcane_missiles,if=variable.arcane_missiles_procs
+-- actions.conserve+=/arcane_missiles,if=variable.arcane_missiles_procs,chain=1
 -- actions.conserve+=/arcane_barrage
 -- # The following two lines are here in case Arcane Barrage is on cooldown.
 -- actions.conserve+=/arcane_explosion,if=active_enemies>1
