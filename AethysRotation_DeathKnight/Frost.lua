@@ -148,7 +148,7 @@
       if AR.Cast(S.RemorselessWinter) then return ""; end
     end
     --actions.standard+=/obliterate,if=(equipped.koltiras_newfound_will&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1)|rune.time_to_4<gcd&buff.hungering_rune_weapon.up
-    if S.Obliterate:IsCastable() and (I.KoltirasNewfoundWill:IsEquipped() and S.FrozenPulse:IsAvailable() and T192P) or Player:RuneTimeToX(4) < Player:GCD() and Player:Buff(S.HungeringRuneWeapon) then
+    if S.Obliterate:IsCastable() and ((I.KoltirasNewfoundWill:IsEquipped() and S.FrozenPulse:IsAvailable() and T192P) or Player:RuneTimeToX(4) < Player:GCD() and Player:Buff(S.HungeringRuneWeapon)) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.standard+=/frost_strike,if=(!talent.shattering_strikes.enabled|debuff.razorice.stack<5)&runic_power.deficit<10
@@ -160,7 +160,7 @@
       if AR.Cast(S.HowlingBlast) then return ""; end
     end
     --actions.standard+=/obliterate,if=(equipped.koltiras_newfound_will&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1)|rune.time_to_5<gcd
-    if S.Obliterate:IsCastable() and (I.KoltirasNewfoundWill:IsEquipped() and S.FrozenPulse:IsAvailable() and T192P) or Player:RuneTimeToX(5) < Player:GCD() then
+    if S.Obliterate:IsCastable() and ((I.KoltirasNewfoundWill:IsEquipped() and S.FrozenPulse:IsAvailable() and T192P) or Player:RuneTimeToX(5) < Player:GCD()) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.standard+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
@@ -210,7 +210,7 @@
       if AR.Cast(S.FrostStrike) then return ""; end
     end
     --actions.standard+=/empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled|target.time_to_die<cooldown.breath_of_sindragosa.remains
-    if S.EmpowerRuneWeapon:IsCastable() and S.EmpowerRuneWeapon:Charges() >= 1 and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < S.BreathofSindragosa:CooldownRemainsP() then
+    if S.EmpowerRuneWeapon:IsCastable() and (S.EmpowerRuneWeapon:Charges() >= 1 and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < S.BreathofSindragosa:CooldownRemainsP()) then
       if AR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
     end
     return false;
@@ -306,7 +306,7 @@
       if AR.Cast(S.FrostStrike) then return ""; end
     end
     --actions.bos_ticking+=/obliterate,if=runic_power<=45|rune.time_to_5<gcd|buff.hungering_rune_weapon.remains>=2
-    if S.Obliterate:IsCastable() and Player:RunicPower() <= 45 or Player:RuneTimeToX(5) < Player:GCD() or Player:BuffRemainsP(S.HungeringRuneWeapon) >= 2 then
+    if S.Obliterate:IsCastable() and (Player:RunicPower() <= 45 or Player:RuneTimeToX(5) < Player:GCD() or Player:BuffRemainsP(S.HungeringRuneWeapon) >= 2) then
       if AR.Cast(S.Obliterate) then return ""; end 
     end
     --actions.bos_ticking+=/sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
@@ -330,7 +330,7 @@
       if AR.Cast(S.RemorselessWinter) then return ""; end
     end
     --actions.bos_ticking+=/obliterate,if=runic_power>25|rune>3
-    if S.Obliterate:IsCastable() and Player:RunicPowerDeficit() > 25 or Player:Runes() > 3 then
+    if S.Obliterate:IsCastable() and (Player:RunicPowerDeficit() > 25 or Player:Runes() > 3) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.bos_ticking+=/empower_rune_weapon,if=runic_power<30&rune.time_to_2>gcd
@@ -350,7 +350,7 @@
       if AR.Cast(S.FrostScythe) then return ""; end
     end
     --actions.obliteration+=/obliterate,if=(buff.killing_machine.up&(buff.killing_machine.react|prev_gcd.1.frost_strike|prev_gcd.1.howling_blast))|(spell_targets.howling_blast>=3&!buff.rime.up) 
-    if S.Obliterate:IsCastable() and (Player:Buff(S.KillingMachine) and (Player:Buff(S.KillingMachine) or Player:PrevGCD(1, S.FrostStrike) or Player:PrevGCD(1, S.HowlingBlast))) or (Cache.EnemiesCount[10] >= 3 and not Player:Buff(S.Rime)) then
+    if S.Obliterate:IsCastable() and ((Player:Buff(S.KillingMachine) and (Player:Buff(S.KillingMachine) or Player:PrevGCD(1, S.FrostStrike) or Player:PrevGCD(1, S.HowlingBlast))) or (Cache.EnemiesCount[10] >= 3 and not Player:Buff(S.Rime))) then
       if AR.Cast(S.Obliterate) then return ""; end
     end
     --actions.obliteration+=/howling_blast,if=buff.rime.up&spell_targets.howling_blast>1
@@ -362,7 +362,7 @@
       if AR.Cast(S.HowlingBlast) then return ""; end
     end
     --actions.obliteration+=/frost_strike,if=!buff.rime.up|rune.time_to_1>=gcd|runic_power.deficit<20
-    if S.FrostStrike:IsUsable() and not Player:Buff(S.Rime) or Player:RuneTimeToX(1) >= Player:GCD() or Player:RunicPowerDeficit() < 20 then
+    if S.FrostStrike:IsUsable() and (not Player:Buff(S.Rime) or Player:RuneTimeToX(1) >= Player:GCD() or Player:RunicPowerDeficit() < 20) then
       if AR.Cast(S.FrostStrike) then return ""; end
     end
     --actions.obliteration+=/howling_blast,if=buff.rime.up
