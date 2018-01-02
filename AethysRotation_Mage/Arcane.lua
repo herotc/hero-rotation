@@ -296,7 +296,7 @@ local function Burn ()
     if AR.Cast(S.ArcaneOrb) then return ""; end
   end
   -- arcane_barrage,if=active_enemies>4&equipped.mantle_of_the_first_kirin_tor&buff.arcane_charge.stack=buff.arcane_charge.max_stack
-  if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (Cache.EnemiesCount[range] > 4 and I.MantleofTheFirstKirinTor:IsEquipped() and FuturArcaneCharges() == Player:ArcaneChargesMax()) then
+  if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (Cache.EnemiesCount[range] > 4 and I.MantleOfTheFirstKirinTor:IsEquipped() and FuturArcaneCharges() == Player:ArcaneChargesMax()) then
     if AR.Cast(S.ArcaneBarrage) then return ""; end
   end
   -- arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
