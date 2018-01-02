@@ -98,7 +98,8 @@
         -- Abilities
         SummonFelhunter = {true, false},
         GrimoireFelhunter = {true, false},
-        GrimoireOfSacrifice = {true, false}
+        GrimoireOfSacrifice = {true, false},
+        ReapSoul = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -154,6 +155,7 @@
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.GrimoireFelhunter", "Grimoire Felhunter");
   CreateARPanelOption("GCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.GrimoireOfSacrifice", "Grimoire Of Sacrifice");
   CreateARPanelOption("OffGCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.OffGCDasOffGCD.SoulHarvest", "Soul Harvest");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Affliction, "APL.Warlock.Affliction.GCDasOffGCD.ReapSoul", "Reap Soul");
   CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
   CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
