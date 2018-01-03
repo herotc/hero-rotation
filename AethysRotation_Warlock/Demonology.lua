@@ -742,7 +742,7 @@
 
 
 --- ======= SIMC =======
---- Last Update: 11/27/2017
+--- Last Update: 01/03/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
