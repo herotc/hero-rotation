@@ -486,7 +486,7 @@ local function SingleTarget ()
   if S.StellarFlare:IsAvailable() and FutureAstralPower() >= 15 and Target:DebuffRefreshableCP(S.StellarFlare) and Target:FilteredTimeToDie(">", 10) and not Player:IsCasting(S.StellarFlare) then
     if AR.Cast(S.StellarFlare) then return ""; end
   end
-  if AR.AoEON() and FutureAstralPower() >= 15 and S.StellarFlare:IsAvailable()then
+  if AR.AoEON() and FutureAstralPower() >= 15 and S.StellarFlare:IsAvailable() then
     BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
     for Key, Value in pairs(Cache.Enemies[Range]) do
       if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.StellarFlare)) and Value:DebuffRefreshableCP(S.StellarFlare) then
@@ -802,7 +802,6 @@ end
 
 -- APL Main
 local function APL ()
-  -- TODO : remove aoeon
   -- TODO : Mvt and range rotation change
   -- TODO : Add prepot
   -- TODO : change level when iscontrollable is here for sephuz
@@ -824,10 +823,10 @@ local function APL ()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
-    if (Cache.EnemiesCount[Range] <= 2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
+    if Cache.EnemiesCount[Range] <= 2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
       if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
     end
-    if AR.AoEON() and Cache.EnemiesCount[Range] >= 3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe) then
+    if Cache.EnemiesCount[Range] >= 3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe) then
       if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
     end
 
@@ -883,7 +882,7 @@ local function APL ()
       --Movement
       if not Player:IsMoving() or (S.StellarDrift:IsAvailable() and Player:Buff(S.StellarDrift) and Player:BuffRemainsP(S.Starfall) > 0) or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
         -- actions+=/call_action_list,name=AoE,if=(spell_targets.starfall>=2&talent.stellar_drift.enabled)|spell_targets.starfall>=3
-        if AR.AoEON() and ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
+        if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
           ShouldReturn = AoE();
           if ShouldReturn then return ShouldReturn; end
         end
@@ -893,6 +892,15 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
 
       else --moving
+        -- aoe
+        -- if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
+        
+        -- else --st
+        
+        -- end
+
+        
+      
         -- actions+=/moonfire,cycle_targets=1,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&astral_power.deficit>7
         if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
           if AR.Cast(S.MoonFire) then return ""; end
@@ -936,7 +944,7 @@ local function APL ()
         end
 
         --default
-        if AR.AoEON() and Cache.EnemiesCount[Range] >= 2 then
+        if Cache.EnemiesCount[Range] >= 2 then
           if AR.Cast(S.SunFire) then return ""; end
         end
         if AR.Cast(S.MoonFire) then return ""; end
