@@ -14,8 +14,6 @@
   local AR = AethysRotation;
   -- Lua
   
-
-
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
   local Everyone = AR.Commons.Everyone;
@@ -100,6 +98,7 @@
     Concordance           = Spell(242586),
     DeadwindHarvester     = Spell(216708),
     TormentedSouls        = Spell(216695),
+    TormentedAgony        = Spell(252938) --T21 4P
   };
   local S = Spell.Warlock.Affliction;
   
@@ -284,7 +283,7 @@
     if S.BloodFury:IsCastableP() and AR.CDsON() then
       if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
-    -- soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1
+    -- soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1&(raid_event.adds.in>20|active_enemies>1|!raid_event.adds.exists)
     if S.SoulHarvest:IsCastableP() and (Player:BuffRemainsP(S.SoulHarvest) <= 8 and ActiveUAs() >= 1) then
       if AR.Cast(S.SoulHarvest) then return ""; end
     end
@@ -502,7 +501,7 @@
         if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       
-      -- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
+      -- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(raid_event.adds.in>20|active_enemies>1|!raid_event.adds.exists)&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
       if S.SoulHarvest:IsAvailable() and S.SoulHarvest:CooldownRemainsP() == 0 and Player:BuffRemains(S.SoulHarvest) <= 8 and (ActiveUAs() >= 2 or Cache.EnemiesCount[range] > 3) 
         and (not S.DeathsEmbrace:IsAvailable() or Target:FilteredTimeToDie(">", 120) or Target:FilteredTimeToDie("<=", 30)) then
           if AR.Cast(S.SoulHarvest, Settings.Affliction.OffGCDasOffGCD.SoulHarvest) then return ""; end
@@ -585,13 +584,18 @@
       if AR.Cast(S.UnstableAffliction) then return ""; end
     end
     
+    -- actions.writhe+=/unstable_affliction,if=talent.absolute_corruption.enabled&set_bonus.tier21_4pc&debuff.tormented_agony.remains<=cast_time
+    if FutureShard() >= 1 and S.AbsoluteCorruption:IsAvailable() and T214P and Target:DebuffRemainsP(S.TormentedAgony) <= S.UnstableAffliction:CastTime() then
+      if AR.Cast(S.UnstableAffliction) then return ""; end
+    end
+    
     -- actions.writhe+=/unstable_affliction,cycle_targets=1,target_if=buff.deadwind_harvester.remains>=duration+cast_time&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
     if FutureShard() >= 1 and Player:BuffRemainsP(S.DeadwindHarvester) > S.UnstableAffliction:BaseDuration() + S.UnstableAffliction:CastTime() and CheckUnstableAffliction() then
       if AR.Cast(S.UnstableAffliction) then return ""; end
     end
     
-    -- actions.writhe+=/unstable_affliction,if=buff.deadwind_harvester.remains>tick_time*2&(!talent.contagion.enabled|soul_shard>1|buff.soul_harvest.remains)&(dot.unstable_affliction_1.ticking+dot.unstable_affliction_2.ticking+dot.unstable_affliction_3.ticking+dot.unstable_affliction_4.ticking+dot.unstable_affliction_5.ticking<5)
-    if FutureShard() >= 1 and Player:BuffRemainsP(S.DeadwindHarvester) > S.UnstableAffliction:TickTime() * 2 and (not S.Contagion:IsAvailable() or FutureShard() > 1 or Player:BuffRemainsP(S.SoulHarvest) > S.UnstableAffliction:CastTime()) and ActiveUAs() < 5 then
+    -- actions.writhe+=/unstable_affliction,if=buff.deadwind_harvester.remains>tick_time*2&(!set_bonus.tier21_4pc|talent.contagion.enabled|soul_shard>1)&(!talent.contagion.enabled|soul_shard>1|buff.soul_harvest.remains)&(dot.unstable_affliction_1.ticking+dot.unstable_affliction_2.ticking+dot.unstable_affliction_3.ticking+dot.unstable_affliction_4.ticking+dot.unstable_affliction_5.ticking<5)
+    if FutureShard() >= 1 and Player:BuffRemainsP(S.DeadwindHarvester) > S.UnstableAffliction:TickTime() * 2 and (not T214P or S.Contagion:IsAvailable() or FutureShard() > 1) and (not S.Contagion:IsAvailable() or FutureShard() > 1 or Player:BuffRemainsP(S.SoulHarvest) > S.UnstableAffliction:CastTime()) and ActiveUAs() < 5 then
       if AR.Cast(S.UnstableAffliction) then return ""; end
     end
     
@@ -1097,7 +1101,7 @@
 
 
 --- ======= SIMC =======
---- Last Update: 11/27/2017
+--- Last Update: 01/03/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1129,7 +1133,7 @@
 -- actions.haunt+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
 -- actions.haunt+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
 -- actions.haunt+=/blood_fury
--- actions.haunt+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1
+-- actions.haunt+=/soul_harvest,if=buff.soul_harvest.remains<=8&buff.active_uas.stack>=1&(raid_event.adds.in>20|active_enemies>1|!raid_event.adds.exists)
 -- actions.haunt+=/potion,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|buff.active_uas.stack>2)
 -- actions.haunt+=/potion,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
 -- actions.haunt+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd
@@ -1214,7 +1218,7 @@
 -- actions.writhe+=/summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>1&equipped.132379&!cooldown.sindorei_spite_icd.remains
 -- actions.writhe+=/berserking,if=prev_gcd.1.unstable_affliction|buff.soul_harvest.remains>=10
 -- actions.writhe+=/blood_fury
--- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
+-- actions.writhe+=/soul_harvest,if=sim.target=target&buff.soul_harvest.remains<=8&(raid_event.adds.in>20|active_enemies>1|!raid_event.adds.exists)&(buff.active_uas.stack>=2|active_enemies>3)&(!talent.deaths_embrace.enabled|time_to_die>120|time_to_die<30)
 -- actions.writhe+=/potion,if=target.time_to_die<=70
 -- actions.writhe+=/potion,if=(!talent.soul_harvest.enabled|buff.soul_harvest.remains>12)&(trinket.proc.any.react|trinket.stack_proc.any.react|buff.active_uas.stack>=2)
 -- actions.writhe+=/siphon_life,cycle_targets=1,if=remains<=tick_time+gcd&time_to_die>tick_time*2
@@ -1224,8 +1228,9 @@
 -- actions.writhe+=/phantom_singularity
 -- actions.writhe+=/seed_of_corruption,if=(talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|(spell_targets.seed_of_corruption>3&dot.corruption.refreshable)
 -- actions.writhe+=/unstable_affliction,if=talent.contagion.enabled&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
+-- actions.writhe+=/unstable_affliction,if=talent.absolute_corruption.enabled&set_bonus.tier21_4pc&debuff.tormented_agony.remains<=cast_time
 -- actions.writhe+=/unstable_affliction,cycle_targets=1,target_if=buff.deadwind_harvester.remains>=duration+cast_time&dot.unstable_affliction_1.remains<cast_time&dot.unstable_affliction_2.remains<cast_time&dot.unstable_affliction_3.remains<cast_time&dot.unstable_affliction_4.remains<cast_time&dot.unstable_affliction_5.remains<cast_time
--- actions.writhe+=/unstable_affliction,if=buff.deadwind_harvester.remains>tick_time*2&(!talent.contagion.enabled|soul_shard>1|buff.soul_harvest.remains)&(dot.unstable_affliction_1.ticking+dot.unstable_affliction_2.ticking+dot.unstable_affliction_3.ticking+dot.unstable_affliction_4.ticking+dot.unstable_affliction_5.ticking<5)
+-- actions.writhe+=/unstable_affliction,if=buff.deadwind_harvester.remains>tick_time*2&(!set_bonus.tier21_4pc|talent.contagion.enabled|soul_shard>1)&(!talent.contagion.enabled|soul_shard>1|buff.soul_harvest.remains)&(dot.unstable_affliction_1.ticking+dot.unstable_affliction_2.ticking+dot.unstable_affliction_3.ticking+dot.unstable_affliction_4.ticking+dot.unstable_affliction_5.ticking<5)
 -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&buff.active_uas.stack>1
 -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&prev_gcd.1.unstable_affliction&buff.tormented_souls.react>1
 -- actions.writhe+=/life_tap,if=talent.empowered_life_tap.enabled&buff.empowered_life_tap.remains<duration*0.3&(!buff.deadwind_harvester.remains|buff.active_uas.stack<1)
