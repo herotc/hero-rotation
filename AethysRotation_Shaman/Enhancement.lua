@@ -221,7 +221,7 @@ local function APL ()
     end
 
     -- World Trinkets
-    if Settings.Shaman.Commons.OnUseTrinkets and I.HornOfValor:IsEquipped() and Target:IsInRange("Melee") and S.HornOfValor:TimeSinceLastCast() > 115 then
+    if Settings.Shaman.Commons.OnUseTrinkets and I.HornOfValor:IsEquipped() and Target:IsInRange("Melee") and S.HornOfValor:TimeSinceLastCast() > 120 then
       if AR.CastSuggested(I.HornOfValor) then return "Use HornOfValor" end
     end
 
