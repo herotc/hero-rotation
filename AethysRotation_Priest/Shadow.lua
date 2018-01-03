@@ -1,22 +1,21 @@
---- Localize Vars
+
+--- ======= LOCALIZE =======
   -- Addon
   local addonName, addonTable = ...;
   -- AethysCore
-  local AC      = AethysCore;
-  local Cache   = AethysCache;
-  local Unit    = AC.Unit;
-  local Player  = Unit.Player;
-  local Target  = Unit.Target;
-  local Spell   = AC.Spell;
-  local Item    = AC.Item;
+  local AC = AethysCore;
+  local Cache = AethysCache;
+  local Unit = AC.Unit;
+  local Player = Unit.Player;
+  local Target = Unit.Target;
+  local Spell = AC.Spell;
+  local Item = AC.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
-  
 
-
---- APL Local Vars
-  -- Spells
+--- ============================ CONTENT ============================
+--- ======= APL LOCALS =======
   if not Spell.Priest then Spell.Priest = {}; end
   Spell.Priest.Shadow = {
     -- Racials
@@ -183,8 +182,6 @@ local function Var_CdTime ()
   v_cdtime = 12 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (AC.Tier20_4Pc and 1 or 0)) * (AC.Tier19_2Pc and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (AC.Tier20_4Pc and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (AC.Tier20_4Pc and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
 end
 
-
-
 local function Var_DotSWPDPGCD ()
   -- actions.precombat+=/variable,name=dot_swp_dpgcd,op=set,value=36.5*1.2*(1+0.06*artifact.to_the_pain.rank)*(1+0.2+stat.mastery_rating%16000)*0.75
   v_dotswpdpgcd = 36.5 * 1.2 * (1 + 0.06 * (S.ToThePain:ArtifactRank() or 0)) * (1 + 0.2 + (Player:MasteryPct() / 16000)) * 0.75
@@ -217,8 +214,8 @@ local function Var_S2MSetupTime ()
 end
 
 local function Var_HasteEval ()
--- actions.precombat+=/variable,name=haste_eval,op=set,value=(raw_haste_pct-0.3)*(10+10*equipped.mangazas_madness+5*talent.fortress_of_the_mind.enabled)
--- actions.precombat+=/variable,name=haste_eval,op=max,value=0
+  -- actions.precombat+=/variable,name=haste_eval,op=set,value=(raw_haste_pct-0.3)*(10+10*equipped.mangazas_madness+5*talent.fortress_of_the_mind.enabled)
+  -- actions.precombat+=/variable,name=haste_eval,op=max,value=0
   v_hasteEval = ((Player:HastePct() / 100) - 0.3) * (10 + 10 * (I.MangazasMadness:IsEquipped() and 1 or 0) + 5 * (S.FortressOfTheMind:IsAvailable() and 1 or 0))
   
   if v_hasteEval < 0 then
@@ -231,7 +228,7 @@ local function Var_EruptEval ()
   v_eruptEval = 26 + 1 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) - 4 * (S.Sanlayn:IsAvailable() and 1 or 0) - 3 * (S.ShadowInsight:IsAvailable() and 1 or 0) + v_hasteEval * 1.5
 end
 
---One time cal vars
+--One time calc vars
 local function VarInit ()
   if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
     Var_CdTime()
@@ -499,7 +496,7 @@ local function s2m ()
 	return ""
 end
 
---Classic VoidForm rotation
+--VoidForm rotation
 local function VoidForm ()
 	--Void Torrent prediction
 	if Player:IsCasting(S.VoidEruption) and S.VoidTorrent:CooldownRemainsP() == 0 then
@@ -985,7 +982,7 @@ end
 AR.SetAPL(258, APL);
 
 --- ======= SIMC =======
---- Last Update: 28/10/2017
+--- Last Update: 01/03/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1044,7 +1041,6 @@ AR.SetAPL(258, APL);
 -- actions.s2m+=/void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&!buff.power_infusion.up|buff.voidform.stack<5
 -- actions.s2m+=/berserking,if=buff.voidform.stack>=65
 -- actions.s2m+=/shadow_word_death,if=current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled)<100)
--- actions.s2m+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=65&(insanity-(current_insanity_drain*gcd.max)+30)<100
 -- actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
 -- actions.s2m+=/void_bolt
 -- actions.s2m+=/shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(30+30*talent.reaper_of_souls.enabled))<100
@@ -1067,7 +1063,6 @@ AR.SetAPL(258, APL);
 -- actions.vf=surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.value)
 -- actions.vf+=/silence,if=equipped.sephuzs_secret&(target.is_add|target.debuff.casting.react)&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
 -- actions.vf+=/void_bolt
--- actions.vf+=/arcane_torrent,if=buff.insanity_drain_stacks.value>=20&(insanity-(current_insanity_drain*gcd.max)+15)<100
 -- actions.vf+=/shadow_word_death,if=equipped.zeks_exterminatus&equipped.mangazas_madness&buff.zeks_exterminatus.react
 -- actions.vf+=/mind_bomb,if=equipped.sephuzs_secret&target.is_add&cooldown.buff_sephuzs_secret.remains<1&!buff.sephuzs_secret.up&buff.insanity_drain_stacks.value>10,cycle_targets=1
 -- actions.vf+=/shadow_crash,if=talent.shadow_crash.enabled
