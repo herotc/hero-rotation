@@ -802,7 +802,6 @@ end
 
 -- APL Main
 local function APL ()
-  -- TODO : Mvt and range rotation change
   -- TODO : Add prepot
   -- TODO : change level when iscontrollable is here for sephuz
 
@@ -893,61 +892,101 @@ local function APL ()
 
       else --moving
         -- aoe
-        -- if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
-        
-        -- else --st
-        
-        -- end
-
-        
-      
-        -- actions+=/moonfire,cycle_targets=1,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&astral_power.deficit>7
-        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-          if AR.Cast(S.MoonFire) then return ""; end
-        end
-        if AR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-          for Key, Value in pairs(Cache.Enemies[Range]) do
-            if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
-              BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
-            end					
+        if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
+          -- actions.AoE=starfall,if=debuff.stellar_empowerment.remains<gcd.max*2|astral_power.deficit<22.5|(buff.celestial_alignment.remains>8|buff.incarnation.remains>8)|target.time_to_die<8
+          if FutureAstralPower() >= 60 and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
+            if AR.Cast(S.Starfall) then return ""; end
           end
-          if BestUnit then
-            if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+
+          -- actions.AoE+=/sunfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
+          if Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:DebuffRefreshableCP(S.SunFireDebuff) and Target:FilteredTimeToDie(">", 4) then
+            if AR.Cast(S.SunFire) then return ""; end
+            end
+            if AR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
+              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 4, nil;
+              for Key, Value in pairs(Cache.Enemies[Range]) do
+                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff)) and Value:DebuffRefreshableCP(S.SunFireDebuff) then
+                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
+              end					
+            end
+            if BestUnit then
+              if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+            end
+          end
+
+          -- actions.AoE+=/moonfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
+          if Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:DebuffRefreshableCP(S.MoonFireDebuff) and Target:FilteredTimeToDie(">", 4) then
+            if AR.Cast(S.MoonFire) then return ""; end
+            end
+            if AR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
+              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 4, nil;
+              for Key, Value in pairs(Cache.Enemies[Range]) do
+                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) and Value:DebuffRefreshableCP(S.MoonFireDebuff) then
+                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
+              end					
+            end
+            if BestUnit then
+              if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+            end
+          end
+
+          -- actions.AoE+=/starsurge,if=buff.oneths_intuition.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
+          if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) < 44) then
+            if AR.Cast(S.Starsurge) then return ""; end
+          end
+
+          -- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&!buff.incarnation.up  if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and 
+          if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and (Cache.EnemiesCount[Range] < 3 or (Cache.EnemiesCount[Range] < 4 and not AC.Tier20_4Pc) or (I.RadiantMoonlight:IsEquipped() and Cache.EnemiesCount[Range] < 7 and not AC.Tier20_4Pc)) 
+            and Player:SpellHaste() > 0.4 and not Player:Buff(S.CelestialAlignment) and not Player:Buff(S.IncarnationChosenOfElune) then
+              if AR.Cast(S.MoonFire) then return ""; end
+          end
+        else --st
+          -- actions.single_target+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
+          if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
+            if AR.Cast(S.MoonFire) then return ""; end
+            end
+            if AR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
+              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 8, nil;
+              for Key, Value in pairs(Cache.Enemies[Range]) do
+                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) 
+                and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) 
+                or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
+                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
+              end					
+            end
+            if BestUnit then
+              if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+            end
+          end
+
+          -- actions.single_target+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|remains<5.4)&astral_power.deficit>7&target.time_to_die>8
+          if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
+            if AR.Cast(S.SunFire) then return ""; end
+            end
+            if AR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
+              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 8, nil;
+              for Key, Value in pairs(Cache.Enemies[Range]) do
+                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff))
+                  and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) 
+                  or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
+                    BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
+              end					
+            end
+            if BestUnit then
+              if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
+            end
+          end
+
+          -- actions.single_target+=/starfall,if=buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
+          if Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 44) then
+            if AR.Cast(S.Starfall) then return ""; end
+          end
+
+          -- actions.single_target+=/starsurge,if=astral_power.deficit<44|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
+          if FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40)) then
+            if AR.Cast(S.Starsurge) then return ""; end
           end
         end
-        
-        -- actions+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&astral_power.deficit>7
-        if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-          if AR.Cast(S.SunFire) then return ""; end
-        end
-        if AR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-          for Key, Value in pairs(Cache.Enemies[Range]) do
-            if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff)) and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
-              BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
-            end					
-          end
-          if BestUnit then
-            if AR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-          end
-        end
-
-        -- actions+=/starfall,if=buff.oneths_overconfidence.up&(!buff.solar_solstice.up|astral_power.deficit>44|buff.celestial_alignment.up|buff.incarnation.up)
-        if Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.SolarSolstice) == 0 or Player:BuffRemainsP(S.CelestialAlignment) == 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 or Player:AstralPowerDeficit(FutureAstralPower()) > 44) then
-          if AR.Cast(S.Starfall) then return ""; end
-        end
-
-        -- actions+=/starsurge,if=buff.oneths_intuition.up
-        if Player:Buff(S.OnethsIntuition) then
-          if AR.Cast(S.Starsurge) then return ""; end
-        end
-
-        --default
-        if Cache.EnemiesCount[Range] >= 2 then
-          if AR.Cast(S.SunFire) then return ""; end
-        end
-        if AR.Cast(S.MoonFire) then return ""; end
       end
     end
   end
