@@ -239,7 +239,7 @@ local function single_target ()
 		if S.WhirlingDragonPunch:Ready() then
 			if AR.Cast(S.WhirlingDragonPunch) then return ""; end
     end
-    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&chi.max-chi>=1&set_bonus.tier21_4pc&(!set_bonus.tier19_2pc|talent.serenity.enabled|buff.bok_proc.up)
+    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&chi.max-chi>=1&set_bonus.tier21_4pc&(!set_bonus.tier19_2pc|talent.serenity.enabled)
     if S.BlackoutKick:IsReady()
       and (
         not Player:PrevGCD(1, S.BlackoutKick)
@@ -248,7 +248,6 @@ local function single_target ()
         and (
           not AC.tier19_2pc
           or S.Serenity:IsAvailable()
-          or Player:BuffP(S.BlackoutKickBuff)
         )
       ) then
       if AR.Cast(S.BlackoutKick) then return ""; end
@@ -286,7 +285,7 @@ local function single_target ()
 		if S.RushingJadeWind:IsReady() and Player:ChiDeficit() > 1 and not Player:PrevGCD(1, S.RushingJadeWind) then
 		  if AR.Cast(S.RushingJadeWind) then return ""; end
 		end
-		-- target_if=min:debuff.mark_of_the_crane.remains,if=(chi>1|buff.bok_proc.up|(talent.energizing_elixir.enabled&cooldown.energizing_elixir.remains<cooldown.fists_of_fury.remains))&
+		-- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(chi>1|buff.bok_proc.up|(talent.energizing_elixir.enabled&cooldown.energizing_elixir.remains<cooldown.fists_of_fury.remains))&
     -- ((cooldown.rising_sun_kick.remains>1&(!artifact.strike_of_the_windlord.enabled|cooldown.strike_of_the_windlord.remains>1)|chi>4)&
     -- (cooldown.fists_of_fury.remains>1|chi>2)|prev_gcd.1.tiger_palm)&!prev_gcd.1.blackout_kick
 		if S.BlackoutKick:IsReady() and (Player:Chi() > 1 or Player:BuffP(S.BlackoutKickBuff) or
@@ -296,12 +295,12 @@ local function single_target ()
 		  if AR.Cast(S.BlackoutKick) then return ""; end
 		end
     -- actions.st+=/chi_wave,if=chi<=3&(cooldown.rising_sun_kick.remains>=5|cooldown.whirling_dragon_punch.remains>=5)&energy.time_to_max>1
-		if S.ChiWave:IsReady() and not Target:IsInRange(40) and Player:Chi() <= 3 and 
+		if S.ChiWave:IsReady() and Player:Chi() <= 3 and 
     (S.RisingSunKick:CooldownRemainsP() >= 5 or S.WhirlingDragonPunch:CooldownRemainsP() >= 5) then
 			if AR.Cast(S.ChiWave) then return ""; end
 		end
 		-- actions.st+=/chi_burst,if=chi<=3&(cooldown.rising_sun_kick.remains>=5|cooldown.whirling_dragon_punch.remains>=5)&energy.time_to_max>1
-		if S.ChiBurst:IsReady() and not Target:IsInRange(40) and Player:Chi() <= 3 and 
+		if S.ChiBurst:IsReady() and Player:Chi() <= 3 and 
     (S.RisingSunKick:CooldownRemainsP() >= 5 or S.WhirlingDragonPunch:CooldownRemainsP() >= 5) then
 			if AR.Cast(S.ChiBurst) then return ""; end
 		end
@@ -411,11 +410,11 @@ local function APL ()
 	if not Player:AffectingCombat() then
 		if Everyone.TargetIsValid() then
 			-- actions.st+=/chi_wave
-			if S.ChiWave:IsReady() and not Target:IsInRange(40) then
+			if S.ChiWave:IsReady() then
 	      if AR.Cast(S.ChiWave) then return ""; end
 	    end
 	    -- actions.st+=/chi_burst
-	    if S.ChiBurst:IsReady() and not Target:IsInRange(40) then
+	    if S.ChiBurst:IsReady() then
 	      if AR.Cast(S.ChiBurst) then return ""; end
 	    end
 			if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) then
@@ -428,11 +427,11 @@ local function APL ()
 	-- In Combat
 	if Everyone.TargetIsValid() then
 		-- actions.st+=/chi_wave
-		if S.ChiWave:IsReady() and not Target:IsInRange(40) then
+		if S.ChiWave:IsReady() then
 			if AR.Cast(S.ChiWave) then return ""; end
 		end
 		-- actions.st+=/chi_burst
-		if S.ChiBurst:IsReady() and not Target:IsInRange(40) then
+		if S.ChiBurst:IsReady() then
 			if AR.Cast(S.ChiBurst) then return ""; end
 		end
 		-- actions+=/touch_of_death
