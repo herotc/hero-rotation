@@ -248,7 +248,6 @@ local function single_target ()
         and (
           not AC.tier19_2pc
           or S.Serenity:IsAvailable()
-        )
       ) then
       if AR.Cast(S.BlackoutKick) then return ""; end
     end
