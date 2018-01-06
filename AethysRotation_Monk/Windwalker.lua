@@ -170,15 +170,16 @@ end
 
 -- AvoidCap - Used to minimize clashing when about to cap.
 local function AvoidCap()
+  -- actions.st+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&(chi.max-chi>=2|energy.time_to_max<3)
 	return S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and
-	Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2;
+	Player:EnergyTimeToMaxPredicted() < 3 and Player:ChiDeficit() >= 2;
 end
 
 -- Action Lists --
 local function single_target ()
 	-- actions.st=call_action_list,name=cd
-	-- actions.st+=/energizing_elixir,if=chi<=1&(cooldown.rising_sun_kick.remains=0|(artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains=0)|energy<50)
-	if S.EnergizingElixir:Ready() and Player:Chi() <= 1 and Player:EnergyDeficitPredicted() >= 20 and
+	-- actions.st+=/energizing_elixir,if=!prev_gcd.1.tiger_palm&chi<=1&(cooldown.rising_sun_kick.remains=0|(artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains=0)|energy<50)
+	if S.EnergizingElixir:Ready() and not Player:PrevGCD(1, S.TigerPalm) and Player:Chi() <= 1 and Player:EnergyDeficitPredicted() >= 20 and
 	(S.RisingSunKick:CooldownRemainsP() == 0 or (S.StrikeOfTheWindlord:IsAvailable() and S.StrikeOfTheWindlord:CooldownRemainsP() == 0)) then
 		if AR.Cast(S.EnergizingElixir) then return ""; end
 	end
@@ -186,8 +187,19 @@ local function single_target ()
   if S.ArcaneTorrent:Ready() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() >= 0.5 then
     if AR.CastSuggested(S.ArcaneTorrent) then return ""; end
   end
-	-- actions.st+=/tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy.time_to_max<=0.5&chi.max-chi>=2
-  if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0.5 and Player:ChiDeficit() >= 2 then
+  -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&chi.max-chi>=1&set_bonus.tier21_4pc&buff.bok_proc.up
+  if S.BlackoutKick:IsReady()
+    and (
+      not Player:PrevGCD(1, S.BlackoutKick)
+      and Player:ChiDeficit() >= 1
+      and AC.Tier21_4Pc
+      and Player:BuffP(S.BlackoutKickBuff)
+      )
+    ) then
+    if AR.Cast(S.BlackoutKick) then return ""; end
+  end
+	-- actions.st+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy.time_to_max<=1&chi.max-chi>=2
+  if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir) and Player:EnergyTimeToMaxPredicted() <= 1 and Player:ChiDeficit() >= 2 then
     if AR.Cast(S.TigerPalm) then return ""; end
   end
 
@@ -196,7 +208,7 @@ local function single_target ()
 		if S.StrikeOfTheWindlord:IsReady() and (not S.Serenity:IsAvailable() or (S.Serenity:CooldownRemainsP() >= 10)) then
 		  if AR.Cast(S.StrikeOfTheWindlord) then return ""; end
 		end
-		-- actions.st+=/rising_sun_kick,cycle_targets=1,if=((chi>=3&energy>=40)|chi>=5)&(!talent.serenity.enabled|cooldown.serenity.remains>=6)
+		-- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=((chi>=3&energy>=40)|chi>=5)&(!talent.serenity.enabled|cooldown.serenity.remains>=6)
 		if S.RisingSunKick:IsReady() and ((Player:Chi() >= 3 and Player:EnergyPredicted() >= 40) or Player:Chi() == 5) and
 		(not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsP() >= 6) then
 		  if AR.Cast(S.RisingSunKick) then return ""; end
@@ -215,7 +227,11 @@ local function single_target ()
 		if S.FistsOfFury:IsReady() and not S.Serenity:IsAvailable() and Player:EnergyTimeToMaxPredicted() > 2 then
 		  if AR.Cast(S.FistsOfFury) then return ""; end
 		end
-		-- actions.st+=/rising_sun_kick,cycle_targets=1,if=!talent.serenity.enabled|cooldown.serenity.remains>=5
+		-- actions.st+=/fists_of_fury,if=cooldown.rising_sun_kick.remains>=3.5&chi<=5
+		if S.FistsOfFury:IsReady() and S.RisingSunKick:CooldownRemainsP() >= 3.5 and Player:Chi() <= 5 then
+		  if AR.Cast(S.FistsOfFury) then return ""; end
+		end
+		-- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!talent.serenity.enabled|cooldown.serenity.remains>=5
 		if S.RisingSunKick:IsReady() and (not S.Serenity:IsAvailable() or (S.Serenity:CooldownRemainsP() >= 5)) then
 		  if AR.Cast(S.RisingSunKick) then return ""; end
 		end
@@ -223,7 +239,7 @@ local function single_target ()
 		if S.WhirlingDragonPunch:Ready() then
 			if AR.Cast(S.WhirlingDragonPunch) then return ""; end
     end
-    -- actions.st+=/blackout_kick,cycle_targets=1,if=!prev_gcd.1.blackout_kick&chi.max-chi>=1&set_bonus.tier21_4pc&(!set_bonus.tier19_2pc|talent.serenity.enabled|buff.bok_proc.up)
+    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&chi.max-chi>=1&set_bonus.tier21_4pc&(!set_bonus.tier19_2pc|talent.serenity.enabled|buff.bok_proc.up)
     if S.BlackoutKick:IsReady()
       and (
         not Player:PrevGCD(1, S.BlackoutKick)
@@ -270,14 +286,24 @@ local function single_target ()
 		if S.RushingJadeWind:IsReady() and Player:ChiDeficit() > 1 and not Player:PrevGCD(1, S.RushingJadeWind) then
 		  if AR.Cast(S.RushingJadeWind) then return ""; end
 		end
-		-- actions.st+=/blackout_kick,cycle_targets=1,if=(chi>1|buff.bok_proc.up|(talent.energizing_elixir.enabled&cooldown.energizing_elixir.remains<cooldown.fists_of_fury.remains))&
-		-- ((cooldown.rising_sun_kick.remains>1&(!artifact.strike_of_the_windlord.enabled|cooldown.strike_of_the_windlord.remains>1)|chi>2)&
-		-- (cooldown.fists_of_fury.remains>1|chi>3)|prev_gcd.1.tiger_palm)&!prev_gcd.1.blackout_kick
+		-- target_if=min:debuff.mark_of_the_crane.remains,if=(chi>1|buff.bok_proc.up|(talent.energizing_elixir.enabled&cooldown.energizing_elixir.remains<cooldown.fists_of_fury.remains))&
+    -- ((cooldown.rising_sun_kick.remains>1&(!artifact.strike_of_the_windlord.enabled|cooldown.strike_of_the_windlord.remains>1)|chi>4)&
+    -- (cooldown.fists_of_fury.remains>1|chi>2)|prev_gcd.1.tiger_palm)&!prev_gcd.1.blackout_kick
 		if S.BlackoutKick:IsReady() and (Player:Chi() > 1 or Player:BuffP(S.BlackoutKickBuff) or
 		(S.EnergizingElixir:IsAvailable() and S.EnergizingElixir:CooldownRemainsP() < S.FistsOfFury:CooldownRemainsP())) and
-		((S.RisingSunKick:CooldownRemainsP() > 1 and (not S.StrikeOfTheWindlord:IsAvailable() or S.StrikeOfTheWindlord:CooldownRemainsP() > 1) or Player:Chi() > 2) and
-		(S.FistsOfFury:CooldownRemainsP() > 1 or Player:Chi() > 3) or Player:PrevGCD(1, S.TigerPalm)) and not Player:PrevGCD(1, S.BlackoutKick) then
+		((S.RisingSunKick:CooldownRemainsP() > 1 and (not S.StrikeOfTheWindlord:IsAvailable() or S.StrikeOfTheWindlord:CooldownRemainsP() > 1) or Player:Chi() > 4) and
+		(S.FistsOfFury:CooldownRemainsP() > 1 or Player:Chi() > 2) or Player:PrevGCD(1, S.TigerPalm)) and not Player:PrevGCD(1, S.BlackoutKick) then
 		  if AR.Cast(S.BlackoutKick) then return ""; end
+		end
+    -- actions.st+=/chi_wave,if=chi<=3&(cooldown.rising_sun_kick.remains>=5|cooldown.whirling_dragon_punch.remains>=5)&energy.time_to_max>1
+		if S.ChiWave:IsReady() and not Target:IsInRange(40) and Player:Chi() <= 3 and 
+    (S.RisingSunKick:CooldownRemainsP() >= 5 or S.WhirlingDragonPunch:CooldownRemainsP() >= 5) then
+			if AR.Cast(S.ChiWave) then return ""; end
+		end
+		-- actions.st+=/chi_burst,if=chi<=3&(cooldown.rising_sun_kick.remains>=5|cooldown.whirling_dragon_punch.remains>=5)&energy.time_to_max>1
+		if S.ChiBurst:IsReady() and not Target:IsInRange(40) and Player:Chi() <= 3 and 
+    (S.RisingSunKick:CooldownRemainsP() >= 5 or S.WhirlingDragonPunch:CooldownRemainsP() >= 5) then
+			if AR.Cast(S.ChiBurst) then return ""; end
 		end
 		-- downtime_prediction
 		LowestReadyTime()
@@ -287,7 +313,7 @@ end
 
 -- Storm Earth And Fire
 local function sef ()
-  -- actions.sef=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
+  -- actions.sef=tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1
   if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and Player:EnergyTimeToMaxPredicted() <= 0 and Player:Chi() < 1 then
       if AR.Cast(S.TigerPalm) then return ""; end
     end
@@ -307,7 +333,7 @@ end
 
 -- Serenity
 local function serenity ()
-  -- actions.serenity=tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1&!buff.serenity.up
+  -- actions.serenity=tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<1&!buff.serenity.up
   if S.TigerPalm:Ready(2) and Player:EnergyPredicted() >= Player:EnergyMax() and Player:Chi() < 1 and not Player:BuffP(S.Serenity) then
     if AR.Cast(S.TigerPalm) then return ""; end
   end
@@ -315,7 +341,7 @@ local function serenity ()
   if AR.CDsON() and S.Serenity:IsReady() then
     if AR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return ""; end
   end
-  -- actions.serenity+=/rising_sun_kick,cycle_targets=1,if=active_enemies<3
+  -- actions.serenity+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3
   if S.RisingSunKick:IsReady() and Cache.EnemiesCount[8] < 3 then
     if AR.Cast(S.RisingSunKick) then return ""; end
   end
@@ -323,7 +349,7 @@ local function serenity ()
   if S.StrikeOfTheWindlord:IsReady() then
     if AR.Cast(S.StrikeOfTheWindlord) then return ""; end
   end
-  -- actions.serenity+=/blackout_kick,cycle_targets=1,if=(!prev_gcd.1.blackout_kick)&(prev_gcd.1.strike_of_the_windlord|prev_gcd.1.fists_of_fury)&active_enemies<2
+  -- actions.serenity+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(!prev_gcd.1.blackout_kick)&(prev_gcd.1.strike_of_the_windlord|prev_gcd.1.fists_of_fury)&active_enemies<2
   if S.BlackoutKick:IsReady() and not Player:PrevGCD(1, S.BlackoutKick) and (Player:PrevGCD(1,S.StrikeOfTheWindlord) or Player:PrevGCD(1,S.FistsOfFury)) and Cache.EnemiesCount[8] < 2 then
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
@@ -343,7 +369,7 @@ local function serenity ()
   if S.RushingJadeWind:IsReady() and not Player:PrevGCD(1, S.RushingJadeWind) and Player:BuffDownP(S.RushingJadeWind) and Player:BuffRemainsP(S.Serenity) >= 4 then
     if AR.Cast(S.RushingJadeWind) then return ""; end
   end
-  -- actions.serenity+=/rising_sun_kick,cycle_targets=1,if=active_enemies>=3
+  -- actions.serenity+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies>=3
   if S.RisingSunKick:IsReady() and Cache.EnemiesCount[8] >= 3 then
     if AR.Cast(S.RisingSunKick) then return ""; end
   end
@@ -355,7 +381,7 @@ local function serenity ()
   if S.SpinningCraneKick:IsReady() and not Player:PrevGCD(1, S.SpinningCraneKick) then
     if AR.Cast(S.SpinningCraneKick) then return ""; end
   end
-  -- actions.serenity+=/blackout_kick,cycle_targets=1,if=!prev_gcd.1.blackout_kick
+  -- actions.serenity+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick
   if S.BlackoutKick:IsReady() and not Player:PrevGCD(1, S.BlackoutKick) then
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
@@ -385,11 +411,11 @@ local function APL ()
 	if not Player:AffectingCombat() then
 		if Everyone.TargetIsValid() then
 			-- actions.st+=/chi_wave
-			if S.ChiWave:IsReady() and not Target:IsInRange(5) then
+			if S.ChiWave:IsReady() and not Target:IsInRange(40) then
 	      if AR.Cast(S.ChiWave) then return ""; end
 	    end
 	    -- actions.st+=/chi_burst
-	    if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
+	    if S.ChiBurst:IsReady() and not Target:IsInRange(40) then
 	      if AR.Cast(S.ChiBurst) then return ""; end
 	    end
 			if S.TigerPalm:IsReady() and not Player:PrevGCD(1, S.TigerPalm) then
@@ -402,11 +428,11 @@ local function APL ()
 	-- In Combat
 	if Everyone.TargetIsValid() then
 		-- actions.st+=/chi_wave
-		if S.ChiWave:IsReady() and not Target:IsInRange(5) then
+		if S.ChiWave:IsReady() and not Target:IsInRange(40) then
 			if AR.Cast(S.ChiWave) then return ""; end
 		end
 		-- actions.st+=/chi_burst
-		if S.ChiBurst:IsReady() and not Target:IsInRange(5) then
+		if S.ChiBurst:IsReady() and not Target:IsInRange(40) then
 			if AR.Cast(S.ChiBurst) then return ""; end
 		end
 		-- actions+=/touch_of_death
