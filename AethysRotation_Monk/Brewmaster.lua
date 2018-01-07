@@ -47,6 +47,9 @@ Spell.Monk.Brewmaster = {
   PurifyingBrew                         = Spell(119582),
   RushingJadeWind                       = Spell(116847),
   TigerPalm                             = Spell(100780),
+  HeavyStagger                          = Spell(124273),
+  ModerateStagger                       = Spell(124274),
+  LightStagger                          = Spell(124275),
   -- Misc
   PoolEnergy                            = Spell(9999000010)
 };
@@ -90,23 +93,33 @@ local function APL()
   -- Unit Update
   AC.GetEnemies(8, true);
 
+  -- Misc
+  local BrewMaxCharge = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
+  local IronskinDuration = (6 + S.PotentKick:ArtifactRank() * 0.5);
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+
   -- Defensives
-  -- Purifying Brew
-  if S.PurifyingBrew:IsCastableP() and Player:StaggerPercentage() >= Settings.Brewmaster.PurifyThreshold then
+  -- purifying_brew,if=stagger.heavy|(stagger.moderate&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.5&buff.ironskin_brew.remains>=buff.ironskin_brew.duration*2.5)
+  if S.PurifyingBrew:IsCastableP()
+    and (Player:Debuff(S.HeavyStagger)
+      or (Player:Debuff(S.ModerateStagger) and S.Brews:ChargesFractional() >= BrewMaxCharge - 0.5
+        and Player:BuffRemains(S.IronskinBrewBuff) >= IronskinDuration * 2.5 )) then
     if AR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
   end
-  -- ironskin_brew,if=buff.blackout_combo.down&cooldown.brews.charges_fractional>=1.9+talent.light_brewing.enabled&buff.ironskin_brew.remains<=buff.ironskin_brew.duration*3
+  -- ironskin_brew,if=buff.blackout_combo.down&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.1-(1+buff.ironskin_brew.remains<=buff.ironskin_brew.duration*0.5)&buff.ironskin_brew.remains<=buff.ironskin_brew.duration*2
+  -- Note: Extra handling of the charge management only while tanking.
+  --       "- (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)"
   if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
-      and S.Brews:ChargesFractional() >= 1.9 + (S.LightBrewing:IsAvailable() and 1 or 0) - (IsTanking and 1 or 0)
-      and Player:BuffRemains(S.IronskinBrewBuff) <= (6 + S.PotentKick:ArtifactRank() * 0.5) * 2 then
+      and S.Brews:ChargesFractional() >= BrewMaxCharge - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)
+      and Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 2 then
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
   -- BlackoutCombo Stagger Pause w/ Ironskin Brew
-  if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and Player:StaggerPercentage() >= 25 then
+  if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and (Player:Debuff(S.HeavyStagger) or Player:Debuff(S.ModerateStagger)) then
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
-  -- black_ox_brew,if=incoming_damage_1500ms&stagger.moderate&cooldown.brews.charges_fractional<=0.8
-  if S.BlackOxBrew:IsCastableP() and Player:StaggerPercentage() >= 40 and S.Brews:ChargesFractional() <= 0.8 then
+  -- black_ox_brew,if=incoming_damage_1500ms&stagger.heavy&cooldown.brews.charges_fractional<=0.75
+  if S.BlackOxBrew:IsCastableP() and Player:Debuff(S.HeavyStagger) and S.Brews:ChargesFractional() <= 0.75 then
     if AR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
   end
 
@@ -120,7 +133,6 @@ local function APL()
 
   -- In Combat
   if Everyone.TargetIsValid() then
-    local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
     -- black_ox_brew,if=(energy+(energy.regen*(cooldown.keg_smash.remains)))<40&buff.blackout_combo.down&cooldown.keg_smash.up
     if S.BlackOxBrew:IsCastableP() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP()))) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP()) then
       if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then

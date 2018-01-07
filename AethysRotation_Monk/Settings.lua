@@ -30,7 +30,6 @@
       }
     },
     Brewmaster = {
-      PurifyThreshold = 70,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -43,6 +42,7 @@
         BlackOxBrew            = {true, false},
         InvokeNiuzaotheBlackOx = {true, false},
         IronskinBrew           = {true, false},
+        PurifyingBrew          = {true, false},
       }
     },
     Windwalker = {
