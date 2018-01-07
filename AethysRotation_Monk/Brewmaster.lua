@@ -104,6 +104,10 @@ local function APL()
   if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and Player:StaggerPercentage() >= 25 then
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
+  -- black_ox_brew,if=incoming_damage_1500ms&stagger.moderate&cooldown.brews.charges_fractional<=0.8
+  if S.BlackOxBrew:IsCastableP() and Player:StaggerPercentage() >= 40 and S.Brews:ChargesFractional() <= 0.8) then
+    if AR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
+  end
 
   -- Out of Combat
   if not Player:AffectingCombat() then
@@ -159,13 +163,21 @@ local function APL()
     if S.KegSmash:IsCastableP() then
       if AR.Cast(S.KegSmash) then return ""; end
     end
-    -- breath_of_fire,if=buff.bloodlust.down&buff.blackout_combo.down|(buff.bloodlust.up&buff.blackout_combo.down&dot.breath_of_fire_dot.remains<=0)
+    -- breath_of_fire,if=(buff.bloodlust.down&buff.blackout_combo.down)|(buff.bloodlust.up&buff.blackout_combo.down&dot.breath_of_fire_dot.remains<=0)
     if S.BreathofFire:IsCastableP() and (Player:HasNotHeroism() and Player:BuffDownP(S.BlackoutComboBuff) or (Player:HasHeroism() and Player:BuffDownP(S.BlackoutComboBuff) and Target:DebuffRemainsP(S.BreathofFireDotDebuff) <= 0)) then
       if AR.Cast(S.BreathofFire) then return ""; end
     end
     -- rushing_jade_wind
     if S.RushingJadeWind:IsCastableP() then
       if AR.Cast(S.RushingJadeWind) then return ""; end
+    end
+    -- chi_burst
+    if S.ChiBurst:IsCastableP() then
+      if AR.Cast(S.ChiBurst) then return ""; end
+    end
+    -- chi_wave
+    if S.ChiWave:IsCastableP() then
+      if AR.Cast(S.ChiWave) then return ""; end
     end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=55
     if S.TigerPalm:IsCastableP() and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() >= Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP()))) >= 55) then
