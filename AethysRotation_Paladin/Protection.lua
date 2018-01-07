@@ -103,7 +103,7 @@
     if Everyone.TargetIsValid() then
       -- CDs
         -- SotR (HP or (AS on CD and 3 Charges))
-        if S.ShieldoftheRighteous:IsCastable("Melee") and not Player:Buff(S.ShieldoftheRighteousBuff) and (Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then
+        if S.ShieldoftheRighteous:IsCastable("Melee") and Player:BuffRefreshable(S.ShieldoftheRighteousBuff, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then
           if AR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return; end
         end
         -- Avengin Wrath (CDs On)
@@ -116,15 +116,17 @@
         end
       -- Defensives
       if Target:IsInRange(10) then
-        if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP - 35 then
-          if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
-        end
-        -- LotP (HP) / HotP (HP)
-        if S.LightoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP then
-          if AR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return; end
-        end
-        if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP then
-          if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
+        if not Player:HealingAbsorbed() then
+          if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP - 35 then
+            if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
+          end
+          -- LotP (HP) / HotP (HP)
+          if S.LightoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP then
+            if AR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return; end
+          end
+          if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP then
+            if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
+          end
         end
       end
       -- Avenger's Shield
