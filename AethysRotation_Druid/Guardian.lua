@@ -97,6 +97,7 @@
   if not Item.Druid then Item.Druid = {}; end
   Item.Druid.Guardian = {
     -- Legendaries
+    EkowraithCreatorofWorlds = Item(137015, {5}),
     LuffaWrappings = Item(137056, {9})
   };
   local I = Item.Druid.Guardian;
@@ -121,8 +122,12 @@
     if S.BalanceAffinity:IsAvailable() then
       -- Have to use the spell itself since Balance Affinity is a special range increase
       MeleeRange = S.Mangle;
-      AoERadius = I.LuffaWrappings:IsEquipped() and 16.25 or 13;
-      RangedRange = 45;
+      if I.EkowraithCreatorofWorlds:IsEquipped() then
+        AoERadius = I.LuffaWrappings:IsEquipped() and 20.9 or 16.75;
+      else
+        AoERadius = I.LuffaWrappings:IsEquipped() and 16.25 or 13;
+      end
+      RangedRange = S.Moonfire;
     else
       MeleeRange = "Melee";
       AoERadius = I.LuffaWrappings:IsEquipped() and 10 or 8;
@@ -190,7 +195,8 @@
         return;
       end
       if Player:Buff(S.BearForm) then
-        local UseMaul = not AR.CDsON() and Cache.EnemiesCount[AoERadius] < 5;
+        local UseMaul = not AR.CDsON() and Cache.EnemiesCount[AoERadius] < 5 and Player:HealthPercentage() >= 60;
+        local IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target);
         -- # Executed every time the actor is available.
         -- actions=auto_attack
         -- actions+=/blood_fury
@@ -202,17 +208,18 @@
         -- actions+=/lunar_beam
 
         -- actions+=/frenzied_regeneration,if=incoming_damage_5s%health.max>=0.5|health<=health.max*0.4
-        if not UseMaul and S.FrenziedRegeneration:IsCastable() and Player:Rage() > 10 and Player:HealthPercentage() <= 60 and not Player:Buff(S.FrenziedRegeneration) then
+        if not UseMaul and S.FrenziedRegeneration:IsCastable() and Player:Rage() > 10
+          and Player:HealthPercentage() <= 60 and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
           if AR.Cast(S.FrenziedRegeneration, {true, false}) then return ""; end
         end
-        if not UseMaul and S.Ironfur:IsCastable() and Player:Rage() >= S.Ironfur:Cost() + 1 and (not Player:Buff(S.Ironfur) or Player:Buff(S.GoryFur) or Player:Rage() >= 80) then
+        if not UseMaul and S.Ironfur:IsCastable() and Player:Rage() >= S.Ironfur:Cost() + 1
+          and ( ( IsTanking and ( not Player:Buff(S.Ironfur) or ( Player:BuffStack(S.Ironfur) < 2 and ( Player:Buff(S.GoryFur) or Player:BuffRefreshableP(S.Ironfur, 2.4) ) ) ) )
+            or Player:Rage() >= 85 or Player:ActiveMitigationNeeded() ) then
           if AR.Cast(S.Ironfur, {true, false}) then return ""; end
         end
-        if S.Moonfire:IsCastable(RangedRange) and Player:Buff(S.Incarnation) and Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8) then
+
+        if S.Moonfire:IsCastable(RangedRange) and not Target:IsInRange(MeleeRange) and Target:DebuffRefreshableP(S.MoonfireDebuff, 0) then
           if AR.Cast(S.Moonfire) then return ""; end
-        end
-        if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 85 then
-          if AR.Cast(S.Maul) then return ""; end
         end
 
         -- Get aggro on units near
@@ -224,7 +231,7 @@
         local UnitsNotTankedCount = 0;
         for _, ThisUnit in pairs(Cache.Enemies[AoERadius]) do
           for _, ThisPlayer in pairs(Others) do
-            if ThisPlayer:IsTanking(ThisUnit) then
+            if ThisPlayer:IsTanking(ThisUnit, 1) then
               UnitsNotTankedCount = UnitsNotTankedCount + 1;
             end
           end
@@ -238,7 +245,12 @@
           end
         end
 
-
+        if S.Moonfire:IsCastable(RangedRange) and Player:Buff(S.Incarnation) and Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8) then
+          if AR.Cast(S.Moonfire) then return ""; end
+        end
+        if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 85 then
+          if AR.Cast(S.Maul) then return ""; end
+        end
         if S.ThrashBear:IsCastable(AoERadius, true) and Cache.EnemiesCount[AoERadius] >= 2 then
           if AR.Cast(S.ThrashBear) then return ""; end
         end
