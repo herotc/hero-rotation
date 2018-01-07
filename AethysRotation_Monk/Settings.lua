@@ -30,7 +30,7 @@
       }
     },
     Brewmaster = {
-      PurifyThreshold = 80,
+      PurifyThreshold = 70,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities

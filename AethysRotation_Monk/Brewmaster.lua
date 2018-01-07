@@ -97,8 +97,8 @@ local function APL()
   end
   -- ironskin_brew,if=buff.blackout_combo.down&cooldown.brews.charges_fractional>=1.9+talent.light_brewing.enabled&buff.ironskin_brew.remains<=buff.ironskin_brew.duration*3
   if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
-      and S.Brews:ChargesFractionalP() >= 2.9 + (S.LightBrewing:IsAvailable() and 1 or 0) - (IsTanking and 1 or 0)
-      and Player:BuffRemainsP(S.IronskinBrewBuff) <= (6 + S.PotentKick:ArtifactRank() * 0.5) * 3 then
+      and S.Brews:ChargesFractional() >= 1.9 + (S.LightBrewing:IsAvailable() and 1 or 0) - (IsTanking and 1 or 0)
+      and Player:BuffRemains(S.IronskinBrewBuff) <= (6 + S.PotentKick:ArtifactRank() * 0.5) * 2 then
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
   -- BlackoutCombo Stagger Pause w/ Ironskin Brew
