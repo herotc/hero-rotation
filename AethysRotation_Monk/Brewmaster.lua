@@ -105,7 +105,7 @@ local function APL()
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
   -- black_ox_brew,if=incoming_damage_1500ms&stagger.moderate&cooldown.brews.charges_fractional<=0.8
-  if S.BlackOxBrew:IsCastableP() and Player:StaggerPercentage() >= 40 and S.Brews:ChargesFractional() <= 0.8) then
+  if S.BlackOxBrew:IsCastableP() and Player:StaggerPercentage() >= 40 and S.Brews:ChargesFractional() <= 0.8 then
     if AR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
   end
 
