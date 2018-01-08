@@ -929,11 +929,6 @@ local function APL ()
             if AR.Cast(S.Starsurge) then return ""; end
           end
 
-          -- actions.AoE+=/moonfire,if=equipped.lady_and_the_child&talent.soul_of_the_forest.enabled&(active_enemies<3|(active_enemies<4&!set_bonus.tier20_4pc)|(equipped.radiant_moonlight&active_enemies<7&!set_bonus.tier20_4pc))&spell_haste>0.4&!buff.celestial_alignment.up&!buff.incarnation.up  if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and 
-          if I.LadyAndTheChild:IsEquipped() and S.SoulOfTheForest:IsAvailable() and (Cache.EnemiesCount[Range] < 3 or (Cache.EnemiesCount[Range] < 4 and not AC.Tier20_4Pc) or (I.RadiantMoonlight:IsEquipped() and Cache.EnemiesCount[Range] < 7 and not AC.Tier20_4Pc)) 
-            and Player:SpellHaste() > 0.4 and not Player:Buff(S.CelestialAlignment) and not Player:Buff(S.IncarnationChosenOfElune) then
-              if AR.Cast(S.MoonFire) then return ""; end
-          end
         else --st
           -- actions.single_target+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
           if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
