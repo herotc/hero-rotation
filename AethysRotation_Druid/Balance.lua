@@ -928,6 +928,12 @@ local function APL ()
           if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) < 44) then
             if AR.Cast(S.Starsurge) then return ""; end
           end
+          
+          if Target:DebuffRemainsP(S.SunFireDebuff) > Target:DebuffRemainsP(S.MoonFireDebuff) then
+            if AR.Cast(S.MoonFire) then return ""; end
+          else
+            if AR.Cast(S.SunFire) then return ""; end
+          end
 
         else --st
           -- actions.single_target+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
@@ -974,6 +980,12 @@ local function APL ()
           -- actions.single_target+=/starsurge,if=astral_power.deficit<44|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
           if FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40)) then
             if AR.Cast(S.Starsurge) then return ""; end
+          end
+          
+          if Target:DebuffRemainsP(S.SunFireDebuff) > Target:DebuffRemainsP(S.MoonFireDebuff) then
+            if AR.Cast(S.MoonFire) then return ""; end
+          else
+            if AR.Cast(S.SunFire) then return ""; end
           end
         end
       end
