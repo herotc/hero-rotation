@@ -86,6 +86,7 @@
     UnendingResolve 	= Spell(104773),  
     
     -- Utility
+    Fear            	= Spell(5782),
     
     -- Legendaries
     SindoreiSpiteBuff = Spell(208868), 
