@@ -315,3 +315,94 @@
       , "UNIT_DIED"
       , "UNIT_DESTROYED"
     );
+  --- Shadow Techniques Tracking
+    -- Variables
+    Player.ShadowTechniques = {
+      Counter = 0;
+      LastMH = 0;
+      LastOH = 0;
+    };
+    -- Return Time to x-th auto attack since last proc
+    function Player:TimeToSht(hit)
+      local mhSpeed, ohSpeed = UnitAttackSpeed("player");
+      local aaTable = {};
+      for i=1,5 do
+        table.insert(aaTable, Player.ShadowTechniques.LastMH + i * mhSpeed);
+        table.insert(aaTable, Player.ShadowTechniques.LastOH + i * ohSpeed);
+      end
+      table.sort(aaTable);
+      local hitInTable = min(5,max(1, hit - Player.ShadowTechniques.Counter));
+      return aaTable[hitInTable] - GetTime()
+    end
+    -- Reset on entering world
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        Player.ShadowTechniques.Counter = 0;
+        Player.ShadowTechniques.LastMH = GetTime();
+        Player.ShadowTechniques.LastOH = GetTime();
+      end
+      , "PLAYER_ENTERING_WORLD"
+    );
+    -- Reset counter on energize
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        SpellID = select(12, ...);
+        if SpellID == 196911 then
+          Player.ShadowTechniques.Counter = 0;
+        end
+      end
+      , "SPELL_ENERGIZE"
+    );
+    -- Increment counter on cast succcess for Shadow Blades
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        SpellID = select(12, ...);
+        -- Shadow Blade: MH 121473, OH 121474
+        if SpellID == 121473 then
+          Player.ShadowTechniques.LastMH = GetTime();
+          Player.ShadowTechniques.Counter = Player.ShadowTechniques.Counter + 1;
+        elseif SpellID == 121474 then
+          Player.ShadowTechniques.LastOH = GetTime();
+          Player.ShadowTechniques.Counter = Player.ShadowTechniques.Counter + 1;
+        end
+      end
+      , "SPELL_CAST_SUCCESS"
+    );
+    -- Increment counter on successful swings
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        Player.ShadowTechniques.Counter = Player.ShadowTechniques.Counter + 1;
+        local IsOffHand = select(24, ...);
+        if IsOffHand then
+          Player.ShadowTechniques.LastOH = GetTime();
+        else
+          Player.ShadowTechniques.LastMH = GetTime();
+        end
+      end
+      , "SWING_DAMAGE"
+    );
+    -- Remember timers on Shadow Blade fails
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        SpellID = select(12, ...);
+        -- Shadow Blade: MH 121473, OH 121474
+        if SpellID == 121473 then
+          Player.ShadowTechniques.LastMH = GetTime();
+        elseif SpellID == 121474 then
+          Player.ShadowTechniques.LastOH = GetTime();
+        end
+      end
+      , "SPELL_CAST_FAILED"
+    );
+    -- Remember timers on swing misses
+    AC:RegisterForSelfCombatEvent(
+      function (...)
+        local IsOffHand = select(16, ...);
+        if IsOffHand then
+          Player.ShadowTechniques.LastOH = GetTime();
+        else
+          Player.ShadowTechniques.LastMH = GetTime();
+        end
+      end
+      , "SWING_MISSED"
+    );
