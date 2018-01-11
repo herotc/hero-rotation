@@ -199,9 +199,9 @@ local Settings = {
 };
 
 -- Handle CastLeftNameplate Suggestions for DoT Spells
-local function SuggestCycleDoT(DoTSpell, DoTEvaluation)
+local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD)
   -- Prefer melee cycle units
-  local BestUnit, BestUnitTTD = nil, 4;
+  local BestUnit, BestUnitTTD = nil, DoTMinTTD;
   for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
     if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
       BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
@@ -211,7 +211,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation)
     AR.CastLeftNameplate(BestUnit, DoTSpell);
   -- Check ranged units next, if the RangedMultiDoT option is enabled
   elseif Settings.Assassination.RangedMultiDoT then
-    BestUnit, BestUnitTTD = nil, 4;
+    BestUnit, BestUnitTTD = nil, DoTMinTTD;
     for _, CycleUnit in pairs(Cache.Enemies[10]) do
       if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
         BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
@@ -426,7 +426,7 @@ local function AoE ()
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
       if AR.Cast(S.Rupture) then return "Cast Rupture (AoE)"; end
     end
-    SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target);
+    SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4);
   end
   -- actions.aoe+=/envenom,if=combo_points>=cp_max_spend
   if S.Envenom:IsCastable("Melee") and Player:ComboPoints() >= Rogue.CPMaxSpend() then
@@ -488,28 +488,28 @@ local function Maintain ()
         local function Evaluate_Garrote_Target(TargetUnit)
           return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
             and (not AC.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= ExsanguinatedBleedTickTime*2)
-            and (TargetUnit:FilteredTimeToDie(">", 2, -TargetUnit:DebuffRemainsP(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
             and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
         end
-        if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target) then
+        if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target)
+          and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
           if AR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge, Refresh)"; end
         end
         if AR.AoEON() then
-          SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target);
+          SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 2);
         end
       end
       -- actions.maintain+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&stealthed.rogue&combo_points.deficit>=1&!set_bonus.tier20_4pc&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
       if not AC.Tier20_4Pc then
         local function Evaluate_Garrote_Target(TargetUnit)
           return TargetUnit:DebuffRemainsP(S.Garrote) <= 10 and TargetUnit:PMultiplier(S.Garrote) <= 1 and not AC.Exsanguinated(TargetUnit, "Garrote")
-            and (TargetUnit:FilteredTimeToDie(">", 2, -TargetUnit:DebuffRemainsP(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
             and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
         end
-        if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target) then
+        if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target)
+          and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
           if AR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge)"; end
         end
         if AR.AoEON() then
-          SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target);
+          SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 2);
         end
       end
     end
@@ -534,14 +534,14 @@ local function Maintain ()
       return TargetUnit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
         and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture) <= (AC.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
         and (not AC.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2)
-        and (TargetUnit:FilteredTimeToDie(">", 6, -TargetUnit:DebuffRemainsP(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold);
     end
-    if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target) then
+    if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target)
+      and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
       if AR.Cast(S.Rupture) then return "Cast Rupture (Refresh)"; end
     end
     if AR.AoEON() then
-      SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target);
+      SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 6);
     end
   end
   -- actions.maintain+=/call_action_list,name=kb,if=combo_points.deficit>=1+(mantle_duration>=0.2)&(!talent.exsanguinate.enabled|!cooldown.exanguinate.up|time>9)
@@ -556,10 +556,10 @@ local function Maintain ()
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (AC.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
         and (not AC.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5)
-        and (TargetUnit:FilteredTimeToDie(">", 4, -TargetUnit:DebuffRemainsP(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
-    if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target) then
+    if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target)
+      and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
       -- actions.maintain+=/pool_resource,for_next=1
       if Player:EnergyPredicted() < 45 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
@@ -567,7 +567,7 @@ local function Maintain ()
       if AR.Cast(S.Garrote) then return "Cast Garrote (Refresh)"; end
     end
     if AR.AoEON() then
-      SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target);
+      SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 4);
     end
   end
   -- actions.maintain+=/garrote,if=set_bonus.tier20_4pc&talent.exsanguinate.enabled&prev_gcd.1.rupture&cooldown.exsanguinate.remains<1&(!cooldown.vanish.up|time>12)
