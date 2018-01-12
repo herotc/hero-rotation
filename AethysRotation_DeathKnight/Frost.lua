@@ -79,10 +79,10 @@
     KoltirasNewfoundWill          = Spell(208782),
     PerseveranceOfTheEbonMartyre  = Spell(216059),
     SealOfNecrofantasia           = Spell(212216),
-    ToravonsWhiteoutBindings      = Spell(205628)
+    ToravonsWhiteoutBindings      = Spell(205628),
            
     -- Misc
-    
+    GetInRange                   = Spell(9999000010)
     -- Macros
     
   };
@@ -136,6 +136,7 @@
       end
     end--]]
     --actions.standard=/frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<=gcd
+  if Target:IsInRange("Melee") then -- Melee range
     if S.FrostStrike:IsUsable() and S.IcyTalons:IsAvailable() and Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() then
       if AR.Cast(S.FrostStrike) then return ""; end
     end
@@ -196,7 +197,6 @@
     if S.FrostScythe:IsCastable() and Cache.EnemiesCount[8] >= 3 then
       if AR.Cast(S.FrostScythe) then return ""; end
     end
-   
     --actions.standard+=/obliterate
     if S.Obliterate:IsCastable() then
       if AR.Cast(S.Obliterate) then return ""; end
@@ -213,6 +213,15 @@
     if S.EmpowerRuneWeapon:IsCastable() and (S.EmpowerRuneWeapon:Charges() >= 1 and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < S.BreathofSindragosa:CooldownRemainsP()) then
       if AR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
     end
+  else -- OOR
+    if S.FrostStrike:IsUsable() then
+      if AR.Cast(S.FrostStrike) then return ""; end
+    elseif S.HowlingBlast:IsCastable() and Player:Runes() >= 3 then
+      if AR.Cast(S.HowlingBlast) then return ""; end
+    else
+      if AR.CastAnnotated(S.GetInRange, false, "GO MELEE") then return "";end
+    end
+  end
     return false;
   end
 
