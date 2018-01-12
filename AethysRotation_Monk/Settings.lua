@@ -42,6 +42,7 @@
         BlackOxBrew            = {true, false},
         InvokeNiuzaotheBlackOx = {true, false},
         IronskinBrew           = {true, false},
+        PurifyingBrew          = {true, false},
       }
     },
     Windwalker = {

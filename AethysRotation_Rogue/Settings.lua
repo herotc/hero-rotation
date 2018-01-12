@@ -47,6 +47,8 @@
       -- Poison Refresh (in minutes)
       PoisonRefresh = 15,
       PoisonRefreshCombat = 3,
+      -- Suggest Multi-DoT at FoK Range
+      RangedMultiDoT = true,
       -- FoK Rotation Toggle
       FoKRotation = false,
       -- {Display GCD as OffGCD, ForceReturn}
@@ -131,7 +133,8 @@
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
-  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.FoKRotation", "Enable Fan of Knives Rotation", "Allow using Fan of Knives on a single target instead of Mutilate when it is a DPS increase.");
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.FoKRotation", "Enable Fan of Knives Rotation", "Suggest using Fan of Knives on a single target instead of Mutilate.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Assassination, "APL.Rogue.Assassination.OffGCDasOffGCD.Vendetta", "Vendetta");
   -- Outlaw
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.");

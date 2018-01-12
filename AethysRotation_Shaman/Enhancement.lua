@@ -73,6 +73,9 @@ Spell.Shaman.Enhancement = {
   -- ToS Trinkets
   SpecterOfBetrayal     = Spell(246461),
 
+  -- World Trinkets
+  HornOfValor           = Spell(215956),
+
   -- Misc
   PoolFocus             = Spell(9999000010),
 }
@@ -86,8 +89,11 @@ Item.Shaman.Enhancement = {
   SmolderingHeart           = Item(151819, {10}),
   AkainusAbsoluteJustice    = Item(137084, {9}),
 
-  -- Trinkets
+  -- ToS Trinkets
   SpecterOfBetrayal         = Item(151190, {13, 14}),
+
+  -- World Trinkets
+  HornOfValor				= Item(133642, {13, 14}),
 
   -- Misc
   PoPP                      = Item(142117),
@@ -212,6 +218,11 @@ local function APL ()
     -- ToS Trinkets
     if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange("Melee") and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
       if AR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
+    end
+
+    -- World Trinkets
+    if Settings.Shaman.Commons.OnUseTrinkets and I.HornOfValor:IsEquipped() and Target:IsInRange("Melee") and S.HornOfValor:TimeSinceLastCast() > 120 then
+      if AR.CastSuggested(I.HornOfValor) then return "Use HornOfValor" end
     end
 
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up

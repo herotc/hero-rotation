@@ -212,7 +212,7 @@ local function CombustionPhase ()
     if AR.Cast(S.PhoenixFlames) then return ""; end
   end
   --actions.combustion_phase+=/scorch,if=buff.combustion.remains>cast_time
-  if S.Scorch:IsCastable() and Player:BuffRemains(S.Combustion) > S.Scorch:ExecuteTime() then
+  if S.Scorch:IsCastable() and Player:BuffRemainsP(S.Combustion) > S.Scorch:ExecuteTime() then
     if AR.Cast(S.Scorch) then return ""; end
   end
   --actions.combustion_phase+=/dragons_breath,if=buff.hot_streak.down&action.fire_blast.charges<1&action.phoenixs_flames.charges<1
@@ -324,7 +324,7 @@ local function StandardRotation ()
       if AR.Cast(S.Pyroblast)  then return ""; end
   end
   --actions.standard_rotation+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains
-  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and S.Pyroblast:ExecuteTime() < BuffP(S.KaelthassUltimateAbility) then
+  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and S.Pyroblast:ExecuteTime() < Player:BuffRemainsP(S.KaelthassUltimateAbility) then
     if AR.Cast(S.Pyroblast) then return ""; end
   end
   --actions.standard_rotation+=/call_action_list,name=active_talents

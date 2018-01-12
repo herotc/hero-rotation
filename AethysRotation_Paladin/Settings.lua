@@ -14,7 +14,7 @@
       EyeofTyrHP = 60,
       HandoftheProtectorHP = 80,
       LightoftheProtectorHP = 80,
-      ShieldoftheRighteousHP = 70,
+      ShieldoftheRighteousHP = 60,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities

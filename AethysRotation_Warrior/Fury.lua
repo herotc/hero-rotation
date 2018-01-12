@@ -61,6 +61,7 @@ local AR = AethysRotation;
     OdynsFury                     = Spell(205545),
     -- Defensive
     -- Utility
+    Pummel                         = Spell(6552),
     -- Legendaries
     FujiedasFury                  = Spell(207776),
     StoneHeart                    = Spell(225947),
@@ -311,6 +312,12 @@ local function APL ()
   -- actions+=/charge
   if S.Charge:IsCastable() and Target:IsInRange(S.Charge) then
     if AR.Cast(S.Charge) then return ""; end
+  end
+  -- Interrupts
+  if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange("Melee") then
+    if S.Pummel:IsReady() then
+      if AR.Cast(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel) then return "Cast Pummel"; end
+    end
   end
   -- actions+=/potion,name=old_war,if=buff.battle_cry.up&(buff.avatar.up|!talent.avatar.enabled)
   if Settings.Fury.ShowPoOW and I.PotionoftheOldWar:IsReady() and Player:BuffP(S.BattleCry) and (Player:BuffP(S.Avatar) or not S.Avatar:IsAvailable()) then

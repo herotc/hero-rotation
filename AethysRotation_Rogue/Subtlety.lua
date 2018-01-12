@@ -533,10 +533,11 @@ local function Stealth_CDs ()
       if StealthMacro(S.Vanish) then return "Vanish Macro"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractional
-    -- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractional|target.time_to_die<cooldown.symbols_of_death.remains
+    -- actions.stealth_cds+=/shadow_dance,if=dot.nightblade.remains>=5&charges_fractional>=variable.shd_fractional|target.time_to_die<cooldown.symbols_of_death.remains
     if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
       and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and (S.ShadowDance:ChargesFractional() >= ShD_Fractional()
+	  and Target:DebuffRemainsP(S.Nightblade) > 4
         or (Target:IsInBossList() and Target:FilteredTimeToDie("<", Player:BuffRemainsP(S.SymbolsofDeath)))) then
       if StealthMacro(S.ShadowDance) then return "ShadowDance Macro 1"; end
     end
@@ -745,6 +746,10 @@ local function APL ()
         ShouldReturn = Finish();
         if ShouldReturn then return "Finish 3: " .. ShouldReturn; end
       end
+      -- actions+=/wait,sec=time_to_sht.5,if=combo_points=5&time_to_sht.5<=1&energy.deficit>=30&!buff.shadow_blades.up
+      if Player:ComboPoints() == 5 and Player:EnergyDeficitPredicted() >= 30 and not Player:Buff(S.ShadowBlades) and Player:TimeToSht(5) <= 1 then
+        if AR.Cast(S.PoolEnergy) then return "Wait for Shadow Techniques"; end
+      end
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
       if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
         ShouldReturn = Build();
@@ -764,7 +769,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 12/11/2017
+-- Last Update: 01/11/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -795,6 +800,7 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=finish,if=combo_points>=5+3*(buff.the_first_of_the_dead.up&talent.anticipation.enabled)+(talent.deeper_stratagem.enabled&!buff.shadow_blades.up&(mantle_duration=0|set_bonus.tier20_4pc)&(!buff.the_first_of_the_dead.up|variable.dsh_dfa))|(combo_points>=4&combo_points.deficit<=2&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)|(target.time_to_die<=1&combo_points>=3)
 -- actions+=/call_action_list,name=finish,if=buff.the_first_of_the_dead.remains>1&combo_points>=3&spell_targets.shuriken_storm<2&!buff.shadow_gestures.up
 -- actions+=/call_action_list,name=finish,if=variable.dsh_dfa&equipped.the_first_of_the_dead&dot.nightblade.remains<=(cooldown.symbols_of_death.remains+10)&cooldown.symbols_of_death.remains<=2&combo_points>=2
+-- actions+=/wait,sec=time_to_sht.5,if=combo_points=5&time_to_sht.5<=1&energy.deficit>=30&!buff.shadow_blades.up
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
 -- # Builders
@@ -835,7 +841,7 @@ AR.SetAPL(261, APL);
 
 -- # Stealth Cooldowns
 -- actions.stealth_cds=vanish,if=!variable.dsh_dfa&mantle_duration=0&cooldown.shadow_dance.charges_fractional<variable.shd_fractional+(equipped.mantle_of_the_master_assassin&time<30)*0.3&(!equipped.mantle_of_the_master_assassin|buff.symbols_of_death.up)
--- actions.stealth_cds+=/shadow_dance,if=charges_fractional>=variable.shd_fractional|target.time_to_die<cooldown.symbols_of_death.remains
+-- actions.stealth_cds+=/shadow_dance,if=dot.nightblade.remains>=5&charges_fractional>=variable.shd_fractional|target.time_to_die<cooldown.symbols_of_death.remains
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10+variable.ssw_refund
 -- actions.stealth_cds+=/shadow_dance,if=!variable.dsh_dfa&combo_points.deficit>=2+talent.subterfuge.enabled*2&(buff.symbols_of_death.remains>=1.2|cooldown.symbols_of_death.remains>=12+(talent.dark_shadow.enabled&set_bonus.tier20_4pc)*3-(!talent.dark_shadow.enabled&set_bonus.tier20_4pc)*4|mantle_duration>0)&(spell_targets.shuriken_storm>=4|!buff.the_first_of_the_dead.up)
