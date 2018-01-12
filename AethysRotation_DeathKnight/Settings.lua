@@ -110,6 +110,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.PillarOfFrost", "Pillar", "Enable if you want to put Pillar of Frost shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.HungeringRuneWeapon", "Hungering Rune Weapon", "Enable if you want to put Hungering Rune Weapon shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put ArcaneTorrent shown as Off GCD (top icons) instead of Main.");
   --Blood Panels
   CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.RotationToFollow", {"Icy Veins","SimC"}, "Rotation:", "Define the rotation to follow.(Simc module needs development)");
   CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BloodDrinker", "Blooddrinker", "Enable if you want to put Blooddrinker shown as Off GCD (top icons) instead of Main.");
