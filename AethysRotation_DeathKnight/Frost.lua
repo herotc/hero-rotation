@@ -82,7 +82,7 @@
     ToravonsWhiteoutBindings      = Spell(205628),
            
     -- Misc
-    GetInRange                   = Spell(9999000010)
+    PoolRange                   = Spell(9999000010)
     -- Macros
     
   };
@@ -136,7 +136,6 @@
       end
     end--]]
     --actions.standard=/frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<=gcd
-  if Target:IsInRange("Melee") then -- Melee range
     if S.FrostStrike:IsUsable() and S.IcyTalons:IsAvailable() and Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() then
       if AR.Cast(S.FrostStrike) then return ""; end
     end
@@ -212,16 +211,7 @@
     --actions.standard+=/empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled|target.time_to_die<cooldown.breath_of_sindragosa.remains
     if S.EmpowerRuneWeapon:IsCastable() and (S.EmpowerRuneWeapon:Charges() >= 1 and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < S.BreathofSindragosa:CooldownRemainsP()) then
       if AR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
-    end
-  else -- OOR
-    if S.FrostStrike:IsUsable() then
-      if AR.Cast(S.FrostStrike) then return ""; end
-    elseif S.HowlingBlast:IsCastable() and Player:Runes() >= 3 then
-      if AR.Cast(S.HowlingBlast) then return ""; end
-    else
-      if AR.CastAnnotated(S.GetInRange, false, "GO MELEE") then return "";end
-    end
-  end
+    end 
     return false;
   end
 
@@ -488,8 +478,7 @@ local function APL ()
   end
    
   -- In Combat
-    if Everyone.TargetIsValid() then
-  
+    if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
     -- actions+=/call_action_list,name=cooldowns
       ShouldReturn = CDS();
       if ShouldReturn then return ShouldReturn; 
@@ -518,7 +507,15 @@ local function APL ()
         ShouldReturn = Standard();
         if ShouldReturn then return ShouldReturn; end
         end
-
+      if AR.CastAnnotated(S.PoolRange,false,"WAIT") then return "Wait/Pool Resources"; end 
+    else -- OOR
+      if S.FrostStrike:IsUsable() then
+        if AR.Cast(S.FrostStrike) then return ""; end
+      elseif S.HowlingBlast:IsCastable() and Player:Runes() >= 3 then
+        if AR.Cast(S.HowlingBlast) then return ""; end
+      else
+        if AR.CastAnnotated(S.PoolRange, false, "GO MELEE") then return "";end
+      end
       return;
     end
 end
