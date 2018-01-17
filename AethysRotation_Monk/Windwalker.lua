@@ -94,7 +94,7 @@ local I = Item.Monk.Windwalker;
 
 
 local BaseCost = {
-  [S.BlackoutKick] = 1,
+  [S.BlackoutKick] = (Player:Level() < 12 and 3 or (Player:Level() < 22 and 2 or 1)),
   [S.RisingSunKick] = 2,
   [S.FistsOfFury] = (I.KatsuosEclipse:IsEquipped() and 2 or 3),
   [S.SpinningCraneKick] = 3,
@@ -142,14 +142,14 @@ end
 local function LowestReadyTime()
 	local SpellList = {
 
-		TigerPalm							= S.TigerPalm:ReadyTime(2)						+ 0.103,
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime() 			+ 0.102,
-		ChiWave 							= S.ChiWave:ReadyTime() 							+ 0.101,
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime() 			+ 0.053,
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime() 	+ 0.100,
-		FistsOfFury 					= S.FistsOfFury:ReadyTime() 					+ 0.052,
-		RisingSunKick 				= S.RisingSunKick:ReadyTime() 				+ 0.051,
-		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime() 	+ 0.050,
+		TigerPalm							= S.TigerPalm:ReadyTime(2),
+		EnergizingElixir			= S.EnergizingElixir:ReadyTime(),
+		ChiWave 							= S.ChiWave:ReadyTime(),
+		RushingJadeWind 			= S.RushingJadeWind:ReadyTime(),
+		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime(),
+		FistsOfFury 					= S.FistsOfFury:ReadyTime(),
+		RisingSunKick 				= S.RisingSunKick:ReadyTime(),
+		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime(),
 	};
 
 	local SpellName = next(SpellList)
