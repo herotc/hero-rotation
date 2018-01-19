@@ -356,7 +356,7 @@ local function Conserve ()
     if AR.Cast(S.Supernova) then return ""; end
   end
   -- nether_tempest,if=refreshable|!ticking
-  if S.NetherTempest:IsCastableP() and S.NetherTempest:IsAvailable() and Player:ManaP() >= S.NetherTempest:Cost() and (Target:DebuffRefreshableCP(S.NetherTempest) or not Target:DebuffRemainsP(S.NetherTempest) > 0) then
+  if S.NetherTempest:IsCastableP() and S.NetherTempest:IsAvailable() and Player:ManaP() >= S.NetherTempest:Cost() and (Target:DebuffRefreshableCP(S.NetherTempest) or not (Target:DebuffRemainsP(S.NetherTempest) > 0)) then
     if AR.Cast(S.NetherTempest) then return ""; end
   end
   -- arcane_explosion,if=active_enemies>1&(mana.pct>=70-(10*equipped.mystic_kilt_of_the_rune_master))
