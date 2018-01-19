@@ -255,8 +255,8 @@ local function Build ()
     if (Cache.EnemiesCount[10] > 1 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange("Melee") and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
       if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
     end
-    -- actions.build+=/fan_of_knives,if=fok_rotation
-    if Settings.Assassination.FoKRotation then
+    -- actions.build+=/fan_of_knives,if=combo_points>=3+talent.deeper_stratagem.enabled&artifact.poison_knives.rank>=5|fok_rotation
+    if Player:ComboPoints() >= 3 + (S.DeeperStratagem:IsAvailable() and 1 or 0) and S.PoisonKnives:ArtifactRank() >= 5 or Settings.Assassination.FoKRotation then
       if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives (Rotational)"; end
     end
   end
@@ -752,7 +752,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 01/11/2018
+-- Last Update: 01/18/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -786,7 +786,7 @@ AR.SetAPL(259, APL);
 -- actions.build=hemorrhage,if=refreshable
 -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
 -- actions.build+=/fan_of_knives,if=spell_targets>1+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
--- actions.build+=/fan_of_knives,if=fok_rotation
+-- actions.build+=/fan_of_knives,if=combo_points>=3+talent.deeper_stratagem.enabled&artifact.poison_knives.rank>=5|fok_rotation
 -- actions.build+=/mutilate,cycle_targets=1,if=dot.deadly_poison_dot.refreshable
 -- actions.build+=/mutilate
 
