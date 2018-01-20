@@ -6,6 +6,7 @@
 
 ## DefaultState: Enabled
 ## LoadOnDemand: 1
+## OptionalDeps: BrewmasterTools
 ## Dependencies: AethysRotation
 
 Settings.lua

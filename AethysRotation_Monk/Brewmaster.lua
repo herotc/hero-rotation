@@ -75,17 +75,30 @@ local Settings = {
 };
 
 -- Variables
-
-local function num(val)
-  if val then return 1 else return 0 end
+local BrewmasterToolsEnabled = BrewmasterTools and true or false;
+if not BrewmasterToolsEnabled then
+  AR.Print("Purifying disabled. You need Brewmaster Tools to enable it.");
 end
 
-local function bool(val)
-  return val ~= 0
-end
-
-local function HealingDebuffed ()
-  return false;
+local function ShouldPurify ()
+  if not BrewmasterToolsEnabled or not Settings.Brewmaster.Purify.Enabled then
+    return false;
+  end
+  local NormalizedStagger = BrewmasterTools.GetNormalStagger();
+  local NextStaggerTick = BrewmasterTools.GetNextTick();
+  local NStaggerPct = NextStaggerTick > 0 and NextStaggerTick/Player:MaxHealth() or 0;
+  local ProgressPct = NormalizedStagger > 0 and Player:Stagger()/NormalizedStagger or 0;
+  if NStaggerPct > 0.015 and ProgressPct > 0 then
+    if NStaggerPct <= 0.03 then -- Yellow (> 80%)
+      return Settings.Brewmaster.Purify.Low and ProgressPct > 0.8 or false;
+    elseif NStaggerPct <= 0.05 then -- Orange (> 70%)
+      return Settings.Brewmaster.Purify.Medium and ProgressPct > 0.7 or false;
+    elseif NStaggerPct <= 0.1 then -- Red (> 50%)
+      return Settings.Brewmaster.Purify.High and ProgressPct > 0.5 or false;
+    else -- Magenta
+      return true;
+    end
+  end
 end
 
 --- ======= ACTION LISTS =======
@@ -100,10 +113,7 @@ local function APL()
 
   -- Defensives
   -- purifying_brew,if=stagger.heavy|(stagger.moderate&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.5&buff.ironskin_brew.remains>=buff.ironskin_brew.duration*2.5)
-  if S.PurifyingBrew:IsCastableP()
-    and (Player:Debuff(S.HeavyStagger)
-      or (Player:Debuff(S.ModerateStagger) and S.Brews:ChargesFractional() >= BrewMaxCharge - 0.5
-        and Player:BuffRemains(S.IronskinBrewBuff) >= IronskinDuration * 2.5 )) then
+  if S.PurifyingBrew:IsCastableP() and ShouldPurify() then
     if AR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
   end
   -- ironskin_brew,if=buff.blackout_combo.down&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.1-(1+buff.ironskin_brew.remains<=buff.ironskin_brew.duration*0.5)&buff.ironskin_brew.remains<=buff.ironskin_brew.duration*2
@@ -115,11 +125,11 @@ local function APL()
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
   -- BlackoutCombo Stagger Pause w/ Ironskin Brew
-  if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and (Player:Debuff(S.HeavyStagger) or Player:Debuff(S.ModerateStagger)) then
+  if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
     if AR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
   -- black_ox_brew,if=incoming_damage_1500ms&stagger.heavy&cooldown.brews.charges_fractional<=0.75
-  if S.BlackOxBrew:IsCastableP() and Player:Debuff(S.HeavyStagger) and S.Brews:ChargesFractional() <= 0.75 then
+  if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.75 and (ShouldPurify() or Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration) then
     if AR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
   end
 
@@ -134,7 +144,8 @@ local function APL()
   -- In Combat
   if Everyone.TargetIsValid() then
     -- black_ox_brew,if=(energy+(energy.regen*(cooldown.keg_smash.remains)))<40&buff.blackout_combo.down&cooldown.keg_smash.up
-    if S.BlackOxBrew:IsCastableP() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP()))) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP()) then
+    -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
+    if S.BlackOxBrew:IsCastableP() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemainsP())) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
       if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then
         AR.Cast(S.IronskinBrew, ForceOffGCD);
         AR.Cast(S.PurifyingBrew, ForceOffGCD);
@@ -164,20 +175,24 @@ local function APL()
     if AR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
       if AR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
     end
+    -- keg_smash,if=spell_targets>=3
+    if S.KegSmash:IsCastableP(25) and Cache.EnemiesCount[8] >= 3 then
+      if AR.Cast(S.KegSmash) then return ""; end
+    end
     -- tiger_palm,if=buff.blackout_combo.up
     if S.TigerPalm:IsCastableP("Melee") and Player:BuffP(S.BlackoutComboBuff) then
       if AR.Cast(S.TigerPalm) then return ""; end
-    end
-    -- blackout_strike,if=cooldown.keg_smash.remains>0
-    if S.BlackoutStrike:IsCastableP("Melee") and S.KegSmash:CooldownRemainsP() > 0 then
-      if AR.Cast(S.BlackoutStrike) then return ""; end
     end
     -- keg_smash
     if S.KegSmash:IsCastableP(25) then
       if AR.Cast(S.KegSmash) then return ""; end
     end
-    -- breath_of_fire,if=(buff.bloodlust.down&buff.blackout_combo.down)|(buff.bloodlust.up&buff.blackout_combo.down&dot.breath_of_fire_dot.remains<=0)
-    if S.BreathofFire:IsCastableP(10, true) and (Player:HasNotHeroism() and Player:BuffDownP(S.BlackoutComboBuff) or (Player:HasHeroism() and Player:BuffDownP(S.BlackoutComboBuff) and Target:DebuffRemainsP(S.BreathofFireDotDebuff) <= 0)) then
+    -- blackout_strike
+    if S.BlackoutStrike:IsCastableP("Melee") then
+      if AR.Cast(S.BlackoutStrike) then return ""; end
+    end
+    -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
+    if S.BreathofFire:IsCastableP(10, true) and (Player:BuffDownP(S.BlackoutComboBuff) and (Player:HasNotHeroism() or (Player:HasHeroism() and true and Target:DebuffRefreshableCP(S.BreathofFireDotDebuff)))) then
       if AR.Cast(S.BreathofFire) then return ""; end
     end
     -- rushing_jade_wind
@@ -192,8 +207,8 @@ local function APL()
     if S.ChiWave:IsCastableP(25) then
       if AR.Cast(S.ChiWave) then return ""; end
     end
-    -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=55
-    if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() >= Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP()))) >= 55) then
+    -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=55
+    if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 55) then
       if AR.Cast(S.TigerPalm) then return ""; end
     end
     -- Keg Smash coming back during the next GCD

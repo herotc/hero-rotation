@@ -30,6 +30,13 @@
       }
     },
     Brewmaster = {
+      -- Purify
+      Purify = {
+        Enabled = true,
+        Low = false,
+        Medium = true,
+        High = true
+      },
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -39,10 +46,10 @@
         -- Racials
 
         -- Abilities
-        BlackOxBrew            = {true, false},
         InvokeNiuzaotheBlackOx = {true, false},
+        BlackOxBrew            = {true, false},
         IronskinBrew           = {true, false},
-        PurifyingBrew          = {true, false},
+        PurifyingBrew          = {true, false}
       }
     },
     Windwalker = {
@@ -66,8 +73,18 @@
   local ARPanel = AR.GUI.Panel;
   local CP_Monk = CreateChildPanel(ARPanel, "Monk");
   local CP_Windwalker = CreateChildPanel(CP_Monk, "Windwalker");
+  local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster");
   -- Monk
   CreateARPanelOption("OffGCDasOffGCD", CP_Monk, "APL.Monk.Commons.OffGCDasOffGCD.Racials", "Racials");
   -- Windwalker
   CreateARPanelOption("GCDasOffGCD", CP_Windwalker, "APL.Monk.Windwalker.GCDasOffGCD.TouchOfDeath", "Touch of Death");
   CreateARPanelOption("OffGCDasOffGCD", CP_Windwalker, "APL.Monk.Windwalker.OffGCDasOffGCD.Serenity", "Storm, Earth and Fire / Serenity");
+  -- Windwalker
+  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx", "Invoke Niuzao the Black Ox");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.BlackOxBrew", "Black Ox Brew");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.IronskinBrew", "Ironskin Brew");
+  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.PurifyingBrew", "Purifying Brew");
+  CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enabled", "Purify", "Enable or disable Purify recommendations.");
+  CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
+  CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Medium", "Purify: Medium", "Enable or disable Purify recommendations when the stagger is medium.");
+  CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.High", "Purify: High", "Enable or disable Purify recommendations when the stagger is high.");
