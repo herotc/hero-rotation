@@ -105,13 +105,14 @@ end
 local function APL()
   -- Unit Update
   AC.GetEnemies(8, true);
+  Everyone.AoEToggleEnemiesUpdate();
 
   -- Misc
   local BrewMaxCharge = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
   local IronskinDuration = (6 + S.PotentKick:ArtifactRank() * 0.5);
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
-  -- Defensives
+  --- Defensives
   -- purifying_brew,if=stagger.heavy|(stagger.moderate&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.5&buff.ironskin_brew.remains>=buff.ironskin_brew.duration*2.5)
   if S.PurifyingBrew:IsCastableP() and ShouldPurify() then
     if AR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
@@ -133,7 +134,7 @@ local function APL()
     if AR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
   end
 
-  -- Out of Combat
+  --- Out of Combat
   if not Player:AffectingCombat() then
     -- potion
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
@@ -141,7 +142,7 @@ local function APL()
     end
   end
 
-  -- In Combat
+  --- In Combat
   if Everyone.TargetIsValid() then
     -- black_ox_brew,if=(energy+(energy.regen*(cooldown.keg_smash.remains)))<40&buff.blackout_combo.down&cooldown.keg_smash.up
     -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
