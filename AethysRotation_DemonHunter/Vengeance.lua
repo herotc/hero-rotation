@@ -123,15 +123,13 @@ local function APL ()
       if AR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
     end
     if Target:IsInRange("Melee") then
-      if Player:Pain() >= 55 then
-        -- actions+=/fracture,if=pain>=55&soul_fragments<4
-        if S.Fracture:IsCastable() and SoulFragments < 4 then
-          if AR.Cast(S.Fracture) then return "Cast Fracture"; end
-        end
-        -- actions+=/soul_cleave,if=pain>=55
-        if S.SoulCleave:IsCastable() then
-          if AR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
-        end
+      -- actions+=/fracture,if=pain>=60&soul_fragments<4
+      if S.Fracture:IsCastable() and Player:Pain() >= 60 and SoulFragments < 4 then
+        if AR.Cast(S.Fracture) then return "Cast Fracture"; end
+      end
+      -- actions+=/soul_cleave,if=pain>=80
+      if S.SoulCleave:IsCastable() and Player:Pain() >= 80 then
+        if AR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
       end
       -- Infernal Strike Charges Dump
       if S.InfernalStrike:IsCastable() and S.InfernalStrike:Charges() > 1 then
