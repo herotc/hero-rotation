@@ -257,6 +257,7 @@
           UIFrames = {
             AR.MainFrame,
             AR.MainIconFrame,
+            AR.MainIconPartOverlayFrame,
             AR.MainIconFrame.Part[1],
             AR.MainIconFrame.Part[2],
             AR.MainIconFrame.Part[3],
