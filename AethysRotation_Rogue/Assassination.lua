@@ -201,23 +201,25 @@ local Settings = {
 -- Handle CastLeftNameplate Suggestions for DoT Spells
 local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD)
   -- Prefer melee cycle units
-  local BestUnit, BestUnitTTD = nil, DoTMinTTD;
+  local BestUnit, BestUnitTTD = Target, DoTMinTTD;
   for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
     if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
       BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
     end
   end
   if BestUnit then
+    if BestUnit:GUID() == Target:GUID() then return; end;
     AR.CastLeftNameplate(BestUnit, DoTSpell);
   -- Check ranged units next, if the RangedMultiDoT option is enabled
   elseif Settings.Assassination.RangedMultiDoT then
-    BestUnit, BestUnitTTD = nil, DoTMinTTD;
+    BestUnit, BestUnitTTD = Target, DoTMinTTD;
     for _, CycleUnit in pairs(Cache.Enemies[10]) do
       if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
         BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
       end
     end
     if BestUnit then
+      if BestUnit:GUID() == Target:GUID() then return; end;
       AR.CastLeftNameplate(BestUnit, DoTSpell);
     end
   end
@@ -388,16 +390,9 @@ local function CDs ()
 end
 -- # Kingsbane
 local function Kingsbane ()
-  -- # Sinister Circulation makes it worth to cast Kingsbane on CD exceot if you're [stealthed w/ Nightstalker and have Mantle & T19_4PC to Envenom] or before vendetta if you have mantle during the opener.
-  -- actions.kb=kingsbane,if=artifact.sinister_circulation.enabled&!(equipped.duskwalkers_footpads&equipped.convergence_of_fates&artifact.master_assassin.rank>=6)&(time>25|!equipped.mantle_of_the_master_assassin|(debuff.vendetta.up&debuff.surge_of_toxins.up))&(talent.subterfuge.enabled|!stealthed.rogue|(talent.nightstalker.enabled&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)))
-  if S.SinisterCirculation:ArtifactEnabled() and not (I.DuskwalkersFootpads:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.MasterAssassin:ArtifactRank() >= 6)
-    and (AC.CombatTime() > 25 or not I.MantleoftheMasterAssassin:IsEquipped() or (Target:DebuffP(S.Vendetta) and Target:DebuffP(S.SurgeofToxins)))
-    and (S.Subterfuge:IsAvailable() or not Player:IsStealthed(true, false)
-      or (S.Nightstalker:IsAvailable() and (not I.MantleoftheMasterAssassin:IsEquipped() or not AC.Tier19_4Pc))) then
-    if AR.Cast(S.Kingsbane) then return "Cast Kingsbane (Sinister Circulation)"; end
-  end
-  -- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
-  if Player:BuffP(S.Envenom) and ((Target:DebuffP(S.Vendetta) and Target:DebuffP(S.SurgeofToxins)) or S.Vendetta:CooldownRemainsP() <= 5.8 or S.Vendetta:CooldownRemainsP() >= 10) then
+  -- # Sinister Circulation makes it worth to cast Kingsbane on CD except specific cases w/o Nighstalker (if stealthed or as the first opener GCD.)
+  -- actions.kb=kingsbane,if=talent.nightstalker.enabled|(!stealthed.rogue&time>2)
+  if S.Nightstalker:IsAvailable() or (not Player:IsStealthed(true, false) and AC.CombatTime() > 2) then
     if AR.Cast(S.Kingsbane) then return "Cast Kingsbane"; end
   end
   return false;
@@ -665,25 +660,6 @@ local function APL ()
     -- Food
     -- Rune
     -- PrePot w/ Bossmod Countdown
-    -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
-      if Player:ComboPoints() >= 5 then
-        if S.Rupture:IsCastable() and not Target:Debuff(S.Rupture)
-          and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
-          if AR.Cast(S.Rupture) then return "Cast Rupture (OOC)"; end
-        elseif S.Envenom:IsCastable() then
-          if AR.Cast(S.Envenom) then return "Cast Envenom (OOC)"; end
-        end
-      elseif S.Garrote:IsCastable() and not Target:Debuff(S.Garrote) and Rogue.CanDoTUnit(Target, GarroteDMGThreshold) then
-        if AR.Cast(S.Garrote) then return "Cast Garrote (OOC)"; end
-      elseif S.FanofKnives:IsCastable()
-        and (Cache.EnemiesCount[10] >= 2 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
-        if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives (OOC)"; end
-      elseif S.Mutilate:IsCastable() then
-        if AR.Cast(S.Mutilate) then return "Cast Mutilate (OOC)"; end
-      end
-    end
-    return;
   end
 
   -- In Combat
@@ -752,7 +728,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 01/18/2018
+-- Last Update: 01/22/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -813,9 +789,8 @@ AR.SetAPL(259, APL);
 -- actions.finish+=/envenom,if=talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.2
 
 -- # Kingsbane
--- # Sinister Circulation makes it worth to cast Kingsbane on CD except if you're [stealthed w/ Nighstalker and have Mantle & T19_4PC to Envenom] or before vendetta if you have mantle during the opener.
--- actions.kb=kingsbane,if=artifact.sinister_circulation.enabled&!(equipped.duskwalkers_footpads&equipped.convergence_of_fates&artifact.master_assassin.rank>=6)&(time>25|!equipped.mantle_of_the_master_assassin|(debuff.vendetta.up&debuff.surge_of_toxins.up))&(talent.subterfuge.enabled|!stealthed.rogue|(talent.nightstalker.enabled&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)))
--- actions.kb+=/kingsbane,if=buff.envenom.up&((debuff.vendetta.up&debuff.surge_of_toxins.up)|cooldown.vendetta.remains<=5.8|cooldown.vendetta.remains>=10)
+-- # Sinister Circulation makes it worth to cast Kingsbane on CD except specific cases w/o Nighstalker (if stealthed or as the first opener GCD.)
+-- actions.kb=kingsbane,if=talent.nightstalker.enabled|(!stealthed.rogue&time>2)
 
 -- # Maintain
 -- actions.maintain=rupture,if=talent.nightstalker.enabled&stealthed.rogue&!set_bonus.tier21_2pc&(!equipped.mantle_of_the_master_assassin|!set_bonus.tier19_4pc)&(talent.exsanguinate.enabled|target.time_to_die-remains>4)
