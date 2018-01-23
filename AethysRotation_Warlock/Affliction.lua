@@ -236,7 +236,7 @@
   end
 
   local function HauntAPL ()
-  -- reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
+    -- reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
     if S.ReapSouls:IsCastableP() and (not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and AC.CombatTime() > 5 and (SoulsAvailable() >= 5 or Target:TimeToDie() <= SoulsAvailable() * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) + (Player:BuffRemainsP(S.DeadwindHarvester) * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) / 12 * (5 + 1.5 * num(I.ReapAndSow:IsEquipped()))))) then
       if AR.Cast(S.ReapSouls, Settings.Affliction.GCDasOffGCD.ReapSoul) then return ""; end
     end
@@ -314,7 +314,7 @@
     end
     -- phantom_singularity
     if S.PhantomSingularity:IsCastableP() then
-      if AR.Cast(S.PhantomSingularity) then return ""; end
+      if AR.Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity) then return ""; end
     end
     -- haunt
     if S.Haunt:IsCastableP() and not Player:IsCasting(S.Haunt) then
@@ -571,7 +571,7 @@
     
     -- actions.writhe+=/phantom_singularity
     if S.PhantomSingularity:IsAvailable() and S.PhantomSingularity:CooldownRemainsP() == 0  then
-        if AR.Cast(S.PhantomSingularity) then return ""; end
+        if AR.Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity) then return ""; end
     end
     
     -- actions.writhe+=/seed_of_corruption,if=(talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|(spell_targets.seed_of_corruption>3&dot.corruption.refreshable)
@@ -872,7 +872,7 @@
     
     -- actions.mg+=/phantom_singularity
     if S.PhantomSingularity:IsAvailable() and S.PhantomSingularity:IsCastable()  then
-        if AR.Cast(S.PhantomSingularity) then return ""; end
+        if AR.Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity) then return ""; end
     end
     
     -- actions.mg+=/agony,cycle_targets=1,if=remains<=(duration*0.3)&target.time_to_die>=remains&(buff.active_uas.stack=0|prev_gcd.1.agony)
@@ -1018,12 +1018,9 @@
     Everyone.AoEToggleEnemiesUpdate();
     
     -- TODO : Mvt and range rotation change
-    -- TODO : Haunt rotation
     -- TODO : add the possibility to choose a pet
     -- TODO : Sephuz - SingMagic : add if a debuff is removable
-    -- TODO : buff listener
     -- TODO : Add prepot
-    -- TODO : remove aoeon
     
     -- Defensives
     if S.UnendingResolve:IsCastable() and Player:HealthPercentage() <= Settings.Affliction.UnendingResolveHP then
