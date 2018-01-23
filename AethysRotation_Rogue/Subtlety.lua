@@ -186,7 +186,9 @@ end
 -- Shadow Satry's Walk Bug
 local ExtraSSWRefundTable = {
   [101002] = 2, -- Nighthold: Krosus
-  [114537] = 2 -- Trial of Valor: Helya
+  [114537] = 2, -- Trial of Valor: Helya
+  [123371] = 2, -- Antorus: Garothi Worldbreaker
+  [125050] = 2 -- Antorus: Kin'garoth
 };
 local function SSW_RefundOffset ()
   return ExtraSSWRefundTable[Target:NPCID()] or 0;
