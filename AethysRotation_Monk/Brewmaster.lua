@@ -168,8 +168,8 @@ local function APL()
     if S.Berserking:IsCastableP() and AR.CDsON() then
       if AR.Cast(S.Berserking, Settings.Brewmaster.OffGCDasOffGCD.Berserking) then return ""; end
     end
-    -- invoke_niuzao_the_black_ox,if=target.time_to_die>45
-    if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and AR.CDsON() and (Target:TimeToDie() > 45) then
+    -- invoke_niuzao_the_black_ox
+    if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and AR.CDsON() then
       if AR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
     end
     -- arcane_torrent,if=energy<31
