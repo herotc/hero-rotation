@@ -64,7 +64,7 @@ local function APL ()
 
   --- Defensives
   -- Demon Spikes
-  if S.DemonSpikes:IsCastable() and Player:HealthPercentage() <= 70 and Player:Pain() >= 20 and not Player:Buff(S.DemonSpikesBuff) then
+  if S.DemonSpikes:IsCastable("Melee") and Player:Pain() >= 20 and not Player:Buff(S.DemonSpikesBuff) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= 65) then
     if AR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
   end
 
@@ -93,9 +93,13 @@ local function APL ()
     if Settings.General.InterruptEnabled and S.ConsumeMagic:IsCastable(20) and Target:IsInterruptible() then
       if AR.Cast(S.ConsumeMagic, Settings.Vengeance.OffGCDasOffGCD.ConsumeMagic) then return "Cast Consume Magic"; end
     end
+    -- Infernal Strike Charges Dump
+    if S.InfernalStrike:IsCastable("Melee") and S.InfernalStrike:ChargesFractional() > 1.9 then
+      if AR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
+    end
     -- actions+=/spirit_bomb,if=soul_fragments=5|debuff.frailty.down
     -- Note: Looks like the debuff takes time to refresh so we add TimeSinceLastCast to offset that.
-    if S.SpiritBomb:IsCastable() and S.SpiritBomb:TimeSinceLastCast() > Player:GCD() * 2 and Cache.EnemiesCount[8] >= 1 and (SoulFragments >= 5 or (Target:DebuffDownP(S.Frailty) and SoulFragments >= 1)) then
+    if S.SpiritBomb:IsCastable() and S.SpiritBomb:TimeSinceLastCast() > Player:GCD() * 2 and Cache.EnemiesCount[8] >= 1 and (SoulFragments >= 4 or (Target:DebuffDownP(S.Frailty) and SoulFragments >= 1)) then
       if AR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
     end
     -- actions+=/soul_carver
@@ -130,10 +134,6 @@ local function APL ()
       -- actions+=/soul_cleave,if=pain>=80
       if S.SoulCleave:IsCastable() and Player:Pain() >= 80 then
         if AR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
-      end
-      -- Infernal Strike Charges Dump
-      if S.InfernalStrike:IsCastable() and S.InfernalStrike:Charges() > 1 then
-        if AR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
       end
       -- actions+=/sever
       if S.Sever:IsCastable() then
