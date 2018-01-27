@@ -36,7 +36,7 @@
   function Commons.AoEToggleEnemiesUpdate ()
     if not AR.AoEON() or AoEInsensibleUnit[Target:NPCID()] then
       for Key, Value in pairs(Cache.EnemiesCount) do
-        Cache.EnemiesCount[Key] = 1;
+        Cache.EnemiesCount[Key] = math.min(1, Cache.EnemiesCount[Key]);
       end
     end
   end
