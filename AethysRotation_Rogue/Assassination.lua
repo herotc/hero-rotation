@@ -441,7 +441,7 @@ local function Stealthed ()
     end
   end
   -- actions.stealthed+=/rupture,if=talent.exsanguinate.enabled&talent.nightstalker.enabled&target.time_to_die-remains>6
-  if S.Rupture:IsCastable("Melee") and S.Exsanguinate:IsAvailable() and S.Nightstalker:IsAvailable()
+  if S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable() and S.Nightstalker:IsAvailable()
     and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
     if AR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
@@ -598,9 +598,18 @@ local function Build ()
       end
     end
   end
+  -- actions.build+=/fan_of_knives,if=buff.the_dreadlords_deceit.stack>=29
+  if S.FanofKnives:IsCastable("Melee") and Player:BuffStack(S.DreadlordsDeceit) >= 29 then
+    if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives (Dreadlord's Deceit)"; end
+  end
+  -- # Mutilate is worth using over FoK for Exsanguinate builds in some 2T scenarios.
+  -- actions.build+=/mutilate,if=talent.exsanguinate.enabled&(debuff.vendetta.up|combo_points<=2)
+  if S.Mutilate:IsCastable("Melee") and S.Exsanguinate:IsAvailable() and (Target:DebuffP(S.Vendetta) or Player:ComboPoints() <= 2) then
+    if AR.Cast(S.Mutilate) then return "Cast Mutilate (Exsanguinate)"; end
+  end
   if S.FanofKnives:IsCastable() then
-    -- actions.build+=/fan_of_knives,if=spell_targets>=1+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
-    if (Cache.EnemiesCount[10] > 1 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) or (AR.AoEON() and Target:IsInRange("Melee") and Player:BuffStack(S.DreadlordsDeceit) >= 29)) then
+    -- actions.build+=/fan_of_knives,if=spell_targets>1+equipped.insignia_of_ravenholdt
+    if Cache.EnemiesCount[10] > 1 + (I.InsigniaofRavenholdt:IsEquipped() and 1 or 0) then
       if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
     end
     -- actions.build+=/fan_of_knives,if=combo_points>=3+talent.deeper_stratagem.enabled&artifact.poison_knives.rank>=5|fok_rotation
@@ -727,15 +736,8 @@ local function APL ()
     -- actions+=/call_action_list,name=maintain
     ShouldReturn = Maintain();
     if ShouldReturn then return ShouldReturn; end
-    -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
-    -- Note: We disable 'active_dot.rupture>=spell_targets.rupture' in the addon since Multi-Dotting is suggested and not forced (CastLeftNameplate).
-    -- Note: We add 'Rogue.CanDoTUnit(Target, RuptureDMGThreshold)' to account for when Rupture isn't castable
-    -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=6)&active_dot.rupture>=spell_targets.rupture
-    if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() > 2)
-      and (not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) or (AC.Exsanguinated(Target, "Rupture") and Target:DebuffRemainsP(S.Rupture) >= 3.5)
-        or Target:FilteredTimeToDie("<=", 6, -Target:DebuffRemainsP(S.Rupture))
-        or Target:TimeToDieIsNotValid()
-        or not Rogue.CanDoTUnit(Target, RuptureDMGThreshold)) then
+    -- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
+    if (not AR.CDsON() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() > 2) then
       ShouldReturn = Finish();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -759,7 +761,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 01/22/2018
+-- Last Update: 01/29/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -780,7 +782,7 @@ AR.SetAPL(259, APL);
 -- actions+=/run_action_list,name=aoe,if=spell_targets.fan_of_knives>2
 -- actions+=/call_action_list,name=maintain
 -- # The 'active_dot.rupture>=spell_targets.rupture' means that we don't want to envenom as long as we can multi-rupture (i.e. units that don't have rupture yet).
--- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)&(!dot.rupture.refreshable|(dot.rupture.exsanguinated&dot.rupture.remains>=3.5)|target.time_to_die-dot.rupture.remains<=6)&active_dot.rupture>=spell_targets.rupture
+-- actions+=/call_action_list,name=finish,if=(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions+=/call_action_list,name=build,if=combo_points.deficit>1+talent.anticipation.enabled*2|energy.deficit<=25+variable.energy_regen_combined
 
 -- # AoE
@@ -792,7 +794,10 @@ AR.SetAPL(259, APL);
 -- # Builders
 -- actions.build=hemorrhage,if=refreshable
 -- actions.build+=/hemorrhage,cycle_targets=1,if=refreshable&dot.rupture.ticking&spell_targets.fan_of_knives<2+equipped.insignia_of_ravenholdt
--- actions.build+=/fan_of_knives,if=spell_targets>1+equipped.insignia_of_ravenholdt|buff.the_dreadlords_deceit.stack>=29
+-- actions.build+=/fan_of_knives,if=buff.the_dreadlords_deceit.stack>=29
+-- # Mutilate is worth using over FoK for Exsanguinate builds in some 2T scenarios.
+-- actions.build+=/mutilate,if=talent.exsanguinate.enabled&(debuff.vendetta.up|combo_points<=2)
+-- actions.build+=/fan_of_knives,if=spell_targets>1+equipped.insignia_of_ravenholdt
 -- actions.build+=/fan_of_knives,if=combo_points>=3+talent.deeper_stratagem.enabled&artifact.poison_knives.rank>=5|fok_rotation
 -- actions.build+=/mutilate,cycle_targets=1,if=dot.deadly_poison_dot.refreshable
 -- actions.build+=/mutilate
