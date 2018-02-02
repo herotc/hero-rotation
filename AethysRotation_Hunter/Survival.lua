@@ -140,7 +140,6 @@
       -- actions.aoe+=/caltrops,if=!ticking
       if S.Caltrops:IsCastable() and S.CaltropsTalent:CooldownUp() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
         if AR.Cast(S.Caltrops) then return ""; end
-        print("Caltrop3");
       end
       -- actions.aoe+=/explosive_trap
       if S.ExplosiveTrap:IsCastable() then
@@ -189,7 +188,6 @@
     end
     -- actions.bitePhase+=/steel_trap
     if S.SteelTrap:IsCastable() and S.SteelTrapTalent:CooldownUp() and not S.CaltropsTalent:IsAvailable() then
-      print("ST3");
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.bitePhase+=/a_murder_of_crows
@@ -199,7 +197,6 @@
     -- actions.bitePhase+=/caltrops,if=!ticking
     if S.Caltrops:IsCastable() and S.CaltropsTalent:CooldownUp() and not Target:Debuff(S.CaltropsDebuff) and not S.SteelTrapTalent:IsAvailable() then
       if AR.Cast(S.Caltrops) then return ""; end
-      print("Caltrop2");
     end
     -- actions.bitePhase+=/explosive_trap
     if S.ExplosiveTrap:IsCastable() then
@@ -243,13 +240,11 @@
     end
     -- actions.fillers+=/steel_trap,if=refreshable|!ticking
     if S.SteelTrap:IsCastable() and S.SteelTrapTalent:CooldownUp() and not S.CaltropsTalent:IsAvailable() and (Target:DebuffRefreshable(S.SteelTrapDebuff, 3.6) or not Target:Debuff(S.SteelTrapTalent)) then
-      print("ST2");
       if AR.Cast(S.SteelTrap) then return ""; end
     end
     -- actions.fillers+=/caltrops,if=refreshable|!ticking
     if S.Caltrops:IsCastable() and S.CaltropsTalent:CooldownUp() and not S.SteelTrapTalent:IsAvailable() and (Target:DebuffRefreshable(S.CaltropsDebuff, 3.6) or not Target:Debuff(S.CaltropsDebuff)) then
       if AR.Cast(S.Caltrops) then return ""; end
-      print("Caltrop1");
     end
     -- actions.fillers+=/explosive_trap
     if S.ExplosiveTrap:IsCastable() then
