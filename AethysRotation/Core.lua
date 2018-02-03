@@ -92,7 +92,9 @@
         return OffGCD[2] and "Should Return" or false;
       end
     else
-      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind);
+      local poolResource = 9999000010
+      local Usable = Object.SpellID == poolResource or Object:IsUsable();
+      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind, Usable);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
       return "Should Return";
