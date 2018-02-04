@@ -378,7 +378,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2+(buff.the_first_of_the_dead.up|buff.symbols_of_death.up|buff.master_of_subtlety.up)
-  if S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 2 + ((Player:BuffP(S.TheFirstoftheDead) or Player:BuffP(S.SymbolsofDeathBuff) or Player:BuffP(S.MasterofSubtletyBuff)) and 1 or 0) then
+  if S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 2 + ((Player:BuffP(S.TheFirstoftheDead) or Player:BuffP(S.SymbolsofDeath) or Player:BuffP(S.MasterOfSubtletyBuff)) and 1 or 0) then
     if AR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
   end
   if IsInMeleeRange() then
