@@ -6,7 +6,7 @@
 # AethysRotation
 [![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/SimCMinMax/AethysRotation/master/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/SimCMinMax/AethysRotation.svg)](https://github.com/SimCMinMax/AethysRotation/network) [![GitHub stars](https://img.shields.io/github/stars/SimCMinMax/AethysRotation.svg)](https://github.com/SimCMinMax/AethysRotation/stargazers) [![GitHub issues](https://img.shields.io/github/issues/SimCMinMax/AethysRotation.svg)](https://github.com/SimCMinMax/AethysRotation/issues)
 
-AethysRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation.
+AethysRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation at max level.
 The project is hosted on [GitHub](https://github.com/SimCMinMax/AethysRotation) and powered by [AethysCore](https://github.com/SimCMinMax/AethysCore).
 It is maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
 Also, you can find it on [Curse](https://mods.curse.com/project/103143) and [CurseForge](https://www.curseforge.com/projects/103143/).
