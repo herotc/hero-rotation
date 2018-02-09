@@ -18,7 +18,15 @@
 
 --- ============================ CONTENT ============================
   -- Arcane, ID: 62
-
+    AC.AddCoreOverride ("Spell.CooldownRemainsP", 
+    function (self, BypassRecovery, Offset)
+      if self == SpellArcane.MarkofAluneth and Player:IsCasting(self) then
+        return 60;
+      else
+        return self:CooldownRemains( BypassRecovery, Offset or "Auto" );
+      end
+    end
+    , 62);
   -- Fire, ID: 63
 
   -- Frost, ID: 64
