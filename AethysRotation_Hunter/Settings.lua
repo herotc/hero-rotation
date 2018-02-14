@@ -17,6 +17,7 @@
   AR.GUISettings.APL.Hunter = {
     Commons = {
       MultiShotInMain = "Never",
+      CounterShot = false,
       -- SoloMode Settings
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -26,13 +27,12 @@
       OffGCDasOffGCD = {
         -- Racials
         -- Abilities
-        CounterShot = {true, false}
       }
     },
     BeastMastery = {
       ExhilarationHP = 30,
       ShowPoPP = false,
-      UseSilence = false,
+      CounterShotSephuz = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -55,7 +55,7 @@
     Marksmanship = {
       ExhilarationHP = 30,
       ShowPoPP = false,
-      UseSilence = false,
+      CounterShotSephuz = false,
       EnableMovementRotation = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -106,6 +106,7 @@
   local CP_Survival = CreateChildPanel(CP_Hunter, "Survival");
   -- Hunter
   CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.MultiShotInMain", {"Never", "Only with Splash Data", "Always"}, "Multishot in the Main Icon", "When to show Multishot in the main icon or as a suggestion");
+  CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
   -- Beast Mastery
   CreatePanelOption("Slider", CP_BeastMastery, "APL.Hunter.BeastMastery.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOption("GCDasOffGCD", CP_BeastMastery, "APL.Hunter.BeastMastery.GCDasOffGCD.AMurderofCrows", "AMurderofCrows");
@@ -116,7 +117,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_BeastMastery, "APL.Hunter.BeastMastery.OffGCDasOffGCD.Racials", "Racials");
   CreateARPanelOption("OffGCDasOffGCD", CP_BeastMastery, "APL.Hunter.BeastMastery.OffGCDasOffGCD.TitansThunder", "Titans Thunder");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
-  CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.UseCounterShot", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
+  CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.CounterShotSephuz", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
   -- Marksmanship
   CreatePanelOption("Slider", CP_Marksmanship, "APL.Hunter.Marksmanship.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOption("GCDasOffGCD", CP_Marksmanship, "APL.Hunter.Marksmanship.GCDasOffGCD.AMurderofCrows", "AMurderofCrows");
@@ -124,7 +125,7 @@
   CreateARPanelOption("OffGCDasOffGCD", CP_Marksmanship, "APL.Hunter.Marksmanship.OffGCDasOffGCD.Racials", "Racials");
   CreateARPanelOption("OffGCDasOffGCD", CP_Marksmanship, "APL.Hunter.Marksmanship.OffGCDasOffGCD.TrueShot", "TrueShot");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
-  CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseCounterShot", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
+  CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.CounterShotSephuz", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.EnableMovementRotation", "Enable Movement Rotation", "Enable this to show a special rotation while Moving. The optimal standing ability will be shown as a suggestion.");
   -- -- Survival
   CreatePanelOption("Slider", CP_Survival, "APL.Hunter.Survival.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");

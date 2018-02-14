@@ -136,6 +136,10 @@
     end
     -- In Combat
     if Everyone.TargetIsValid() then
+      -- actions+=/counter_shot,if=target.debuff.casting.react // Sephuz Specific
+      if S.CounterShot:IsCastable() and Target:IsInterruptible() and (Settings.Commons.CounterShot or (I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and Settings.BeastMastery.CounterShotSephuz)) then
+        if AR.CastSuggested(S.CounterShot) then return ""; end
+      end
       if AR.CDsON() then
         -- actions+=/arcane_torrent,if=focus.deficit>=30
         if S.ArcaneTorrent:IsCastable() and Player:FocusDeficit() >= 30 then
@@ -235,10 +239,6 @@
       -- actions+=/dire_beast,if=buff.bestial_wrath.up
       if S.DireBeast:IsCastable() and Player:Buff(S.BestialWrath) then
         if AR.Cast(S.DireBeast) then return ""; end
-      end
-      -- Proc Sephuz
-      if S.CounterShot:IsCastable() and I.SephuzSecret:IsEquipped() and Target:IsCasting() and Target:IsInterruptible() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 then
-        if AR.CastSuggested(S.CounterShot) then return ""; end
       end
       -- Pool
       if AR.Cast(S.PoolFocus) then return "Normal Pooling"; end
