@@ -1020,6 +1020,9 @@
   local function APL ()
     -- Unit Update
     AC.GetEnemies(range);
+    if I.SephuzSecret:IsEquipped() then
+      AC.GetEnemies(10);
+    end
     Everyone.AoEToggleEnemiesUpdate();
     
     -- TODO : Mvt and range rotation change
