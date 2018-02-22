@@ -84,20 +84,31 @@
   AR.CastOffGCDOffset = 1;
   function AR.Cast (Object, OffGCD)
     local Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
-    if OffGCD and OffGCD[1] then
-      if AR.CastOffGCDOffset <= 2 then
-        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
-        AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
-        Object.LastDisplayTime = AC.GetTime();
-        return OffGCD[2] and "Should Return" or false;
+    if OffGCD then
+      -- @deprecated 8.0 ForceReturn and thus a table for OffGCD setting is deprecated since 7.3.2.04
+      local OffGCDType = type(OffGCD);
+      if OffGCDType == "table" and OffGCD[1] then
+        if AR.CastOffGCDOffset <= 2 then
+          AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
+          AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
+          Object.LastDisplayTime = AC.GetTime();
+          return OffGCD[2] and "Should Return" or false;
+        end
+      elseif OffGCDType == "boolean" then
+        if AR.CastOffGCDOffset <= 2 then
+          AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
+          AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
+          Object.LastDisplayTime = AC.GetTime();
+          return false;
+        end
       end
     else
       AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
-      return "Should Return";
+      return true;
     end
-    return false;
+    return nil;
   end
   -- Overload for Main Cast (with text)
   function AR.CastAnnotated(Object, OffGCD, Text)
