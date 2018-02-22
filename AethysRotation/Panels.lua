@@ -5,6 +5,11 @@
   -- AethysCore
   local AC = AethysCore;
   local Utils = AC.Utils;
+  -- Lua
+  local stringformat = string.format;
+  local stringgmatch = string.gmatch;
+  local strsplit = strsplit;
+  local tableconcat = table.concat;
   -- File Locals
   local CreatePanelOption = AC.GUI.CreatePanelOption;
   local StringToNumberIfPossible = Utils.StringToNumberIfPossible;
@@ -43,20 +48,61 @@
     end
   end
 
-  local CreateARPanelOption = {
-    GCDasOffGCD =
-      function (Panel, Setting, Name)
-        CreatePanelOption("CheckButton", Panel, Setting .. ".1",
-                          Name .. " as Off GCD",
-                          "Enable if you want to put " .. Name .. " shown as Off GCD (top icons) instead of Main.");
+  do
+    local function OffGCDName (Name)
+      return stringformat("Show as Off GCD: %s", Name);
+    end
+    local function OffGCDDesc (Name)
+      return stringformat("Enable if you want to put %s shown as Off GCD (top icons) instead of Main (Middle icon).", Name);
+    end
+    local CreateARPanelOption = {
+      Enabled = function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting, "Show: " .. Name, "Enable if you want to show when to use " .. Name .. ".");
       end,
-    OffGCDasOffGCD = 
-      function (Panel, Setting, Name)
-        CreatePanelOption("CheckButton", Panel, Setting .. ".1",
-                          Name .. " as Off GCD",
-                          "Enable if you want to put " .. Name .. " shown as Off GCD (top icons) instead of Main.");
+      GCDasOffGCD = function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting .. ".1", OffGCDName(Name), OffGCDDesc(Name));
+      end,
+      OffGCDasOffGCD = function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting .. ".1", OffGCDName(Name), OffGCDDesc(Name));
+      end,
+      GCDasOffGCD2 = function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting, OffGCDName(Name), OffGCDDesc(Name));
+      end,
+      OffGCDasOffGCD2 = function (Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting, OffGCDName(Name), OffGCDDesc(Name));
       end
-  };
-  function AR.GUI.CreateARPanelOption (Type, Panel, Setting, ...)
-    CreateARPanelOption[Type](Panel, Setting, ...);
+    };
+    function AR.GUI.CreateARPanelOption (Type, Panel, Setting, ...)
+      CreateARPanelOption[Type](Panel, Setting, ...);
+    end
+
+    function AR.GUI.CreateARPanelOptions (Panel, Settings)
+      -- Find the corresponding setting table
+      local SettingsSplit = {strsplit(".", Settings)};
+      local SettingsTable = AR.GUISettings;
+      for i = 1, #SettingsSplit do
+        SettingsTable = SettingsTable[SettingsSplit[i]];
+      end
+      -- Iterate over all options available
+      for Type, _ in pairs(CreateARPanelOption) do
+        SettingsType = SettingsTable[Type];
+        if SettingsType then
+          for SettingName, _ in pairs(SettingsType) do
+            -- Split the key on uppercase matches
+            local Name = "";
+            for Word in stringgmatch(SettingName, "[A-Z][a-z]+") do
+              if Name == "" then
+                Name = Word;
+              else
+                Name = Name .. " " .. Word;
+              end
+            end
+            -- Rewrite the setting string
+            local Setting = tableconcat({Settings, Type, SettingName}, ".");
+            -- Construct the option
+            AR.GUI.CreateARPanelOption(Type, Panel, Setting, Name);
+          end
+        end
+      end
+    end
   end
