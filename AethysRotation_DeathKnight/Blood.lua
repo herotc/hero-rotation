@@ -34,7 +34,7 @@
   BoneShield            = Spell(195181),
   VampiricBlood         = Spell(55233),
   BloodMirror           = Spell(206977),
-  BoneStorm             = Spell(194844),
+  Bonestorm             = Spell(194844),
   Consumption           = Spell(205223),
   DeathandDecay         = Spell(43265),
   CrimsonScourge        = Spell(81141),
@@ -166,8 +166,8 @@ local function IcyVeinsRotation()
       if AR.Cast(S.BloodBoil) then return ""; end
     end
 
-    if AR.CDsON() and S.BoneStorm:IsCastable() and Cache.EnemiesCount[10] >= 1 and Player:RunicPower() >= 100 then
-      if AR.Cast(S.BoneStorm, Settings.Blood.GCDasOffGCD.BoneStorm) then return ""; end
+    if AR.CDsON() and S.Bonestorm:IsCastable() and Cache.EnemiesCount[10] >= 1 and Player:RunicPower() >= 100 then
+      if AR.Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm) then return ""; end
     end
     
     if S.DeathandDecay:IsUsable() and (Cache.EnemiesCount[10] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.CrimsonScourge)) then
@@ -194,7 +194,7 @@ local function IcyVeinsRotation()
       if AR.Cast(S.DeathandDecay) then return ""; end
     end
 
-    --[[if S.DeathStrike:IsUsable() and ((Player:RunicPower() > (80 or (90 and S.Ossuary:IsAvailable()))  and S.BoneStorm:IsAvailable() and not Player:Buff(S.BoneStorm) and (S.BoneStorm:CooldownRemains() > 15 or ((Player:Runes() > 3 and Player:RunicPowerDeficit() < 15) and S.BoneStorm:CooldownRemains() > 5))) or not S.BoneStorm:IsAvailable()) 
+    --[[if S.DeathStrike:IsUsable() and ((Player:RunicPower() > (80 or (90 and S.Ossuary:IsAvailable()))  and S.Bonestorm:IsAvailable() and not Player:Buff(S.Bonestorm) and (S.Bonestorm:CooldownRemains() > 15 or ((Player:Runes() > 3 and Player:RunicPowerDeficit() < 15) and S.Bonestorm:CooldownRemains() > 5))) or not S.Bonestorm:IsAvailable()) 
       and (not S.Ossuary:IsAvailable() or Player:BuffStack(S.BoneShield) > 5 or Player:Runes() >= 3 and Player:RunicPowerDeficit() < 10) then
       if AR.Cast(S.DeathStrike) then return ""; end
     end--]]
