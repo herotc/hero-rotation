@@ -30,68 +30,67 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        HornOfWinter = {true, false},
-        Obliteration = {true, false},
-        SindragosasFury = {true, false},
+        HornOfWinter       = {true, false},
+        Obliteration       = {true, false},
+        SindragosasFury    = {true, false},
         BreathofSindragosa = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent = {true, false},
-        Berserking = {true, false},
-        BloodFury = {true, false},
+        ArcaneTorrent       = {true, false},
+        Berserking          = {true, false},
+        BloodFury           = {true, false},
         -- Abilities
-        PillarOfFrost = {true, false},
+        PillarOfFrost       = {true, false},
         HungeringRuneWeapon = {true, false},
-        EmpowerRuneWeapon = {true, false},
-        
+        EmpowerRuneWeapon   = {true, false}
       }
     },
     Unholy = {
     -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        ArmyOfDead = {true, false},
+        ArmyOfDead     = {true, false},
         SummonGargoyle = {true, false},
-        DarkArbiter = {true, false}
+        DarkArbiter    = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent = {true, false},
-        Berserking = {true, false},
-        BloodFury = {true, false},
+        ArcaneTorrent      = {true, false},
+        Berserking         = {true, false},
+        BloodFury          = {true, false},
         -- Abilities
-        BlightedRuneWeapon = {true, false},
+        BlightedRuneWeapon = {true, false}
        }
      },
-
-     Blood = {
-     --Choose the rotation to follow (Default: Icy Veins)
-      RotationToFollow = "Icy Veins",
-     -- {Display GCD as OffGCD, ForceReturn}
+    Blood = {
+      RotationToFollow  = "Icy Veins", -- Choose the rotation to follow (Default: Icy Veins)
+      ArcaneTorrent     = true,
+      Consumption       = true,
+      DancingRuneWeapon = true,
+      -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
         BloodDrinker = {true, false},
-	      BoneStorm = {true, false}
+        BoneStorm    = {true, false}
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         DancingRuneWeapon = {true, false},
-        ArcaneTorrent = {true, false},
-       }
-   },  
-  
+        ArcaneTorrent     = {true, false}
+      }
+    }
   };
   
   AR.GUI.LoadSettingsRecursively(AR.GUISettings);
   -- Panels
-  local ARPanel = AR.GUI.Panel;
+  local ARPanel        = AR.GUI.Panel;
   local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight");
-  local CP_Unholy = CreateChildPanel(CP_Deathknight, "Unholy");
-  local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost");
-  local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
+  local CP_Unholy      = CreateChildPanel(CP_Deathknight, "Unholy");
+  local CP_Frost       = CreateChildPanel(CP_Deathknight, "Frost");
+  local CP_Blood       = CreateChildPanel(CP_Deathknight, "Blood");
   
   --DeathKnight Panels
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Show on use trinkets", "Fel Oiled Machine Supported.");
@@ -117,3 +116,6 @@
   CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BoneStorm", "Bonestorm", "Enable if you want to put Bonestorm shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.DancingRuneWeapon", "Dancing Rune Weapon", "Enable if you want to put Dancing Rune Weapon shown as Off GCD (top icons) instead of Main.");
   CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put Arcane Torrent shown as Off GCD (top icons) instead of Main.");
+  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ArcaneTorrent", "Enable Arcane Torrent (Racial)", "Enable this if you want it to show you when to use Arcane Torrent.");
+  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.Consumption", "Enable Consumption", "Enable this if you want it to show you when to use Consumption.");
+  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.DancingRuneWeapon", "Enable Dancing Rune Weapon", "Enable this if you want it to show you when to use Dancing Rune Weapon.");
