@@ -17,25 +17,18 @@
   -- All settings here should be moved into the GUI someday.
   AR.GUISettings.APL.DeathKnight = {
     Commons = {
-      -- {Display OffGCD as OffGCD, ForceReturn}
-      OffGCDasOffGCD = {
-        -- Racials
-        
-        -- Abilities
-        
-      },
       UseTrinkets = false,
       UsePotions  = false
     },
    Frost = {
-      GCDasOffGCD = {
+      GCDasOffGCD2 = {
         -- Abilities
         HornOfWinter       = true,
         Obliteration       = true,
         SindragosasFury    = true,
         BreathofSindragosa = true
       },
-      OffGCDasOffGCD = {
+      OffGCDasOffGCD2 = {
         -- Racials
         ArcaneTorrent       = true,
         Berserking          = true,
