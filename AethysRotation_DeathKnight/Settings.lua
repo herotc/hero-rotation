@@ -11,6 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
@@ -66,24 +67,27 @@
        }
      },
     Blood = {
-      RotationToFollow  = "Icy Veins", -- Choose the rotation to follow (Default: Icy Veins)
-      ArcaneTorrent     = true,
-      Consumption       = true,
-      DancingRuneWeapon = true,
-      -- {Display GCD as OffGCD, ForceReturn}
-      GCDasOffGCD = {
+      RotationToFollow = "Icy Veins", -- Choose the rotation to follow (Default: Icy Veins)
+      Enabled = {
+        -- Racials
+        ArcaneTorrent     = true,
         -- Abilities
-        BloodDrinker = {true, false},
-        BoneStorm    = {true, false}
+        Consumption       = true,
+        DancingRuneWeapon = true
       },
-      -- {Display OffGCD as OffGCD, ForceReturn}
-      OffGCDasOffGCD = {
-        DancingRuneWeapon = {true, false},
-        ArcaneTorrent     = {true, false}
+      GCDasOffGCD2 = {
+        -- Abilities
+        BloodDrinker = true,
+        Bonestorm    = true
+      },
+      -- Display OffGCD as OffGCD
+      OffGCDasOffGCD2 = {
+        DancingRuneWeapon = true,
+        ArcaneTorrent     = true
       }
     }
   };
-  
+
   AR.GUI.LoadSettingsRecursively(AR.GUISettings);
   -- Panels
   local ARPanel        = AR.GUI.Panel;
@@ -96,26 +100,9 @@
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Show on use trinkets", "Fel Oiled Machine Supported.");
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   --Unholy Panels
-  CreateARPanelOption("GCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.GCDasOffGCD.ArmyOfDead", "Army", "Enable if you want to put Army shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("GCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.GCDasOffGCD.SummonGargoyle", "Gargoyle", "Enable if you want to put Gargoyle shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("GCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.GCDasOffGCD.DarkArbiter", "Dark Arbiter", "Enable if you want to put Dark Arbiter shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.BlightedRuneWeapon", "Blighted Rune Weapon", "Enable if you want to put Blighted Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Unholy, "APL.DeathKnight.Unholy.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put ArcaneTorrent shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
   --Frost Panels
-  CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa", "Breath of Sindragosa", "Enable if you want to put BoS shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.Obliteration", "Obliteration", "Enable if you want to put Obliteration shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.SindragosasFury", "Sindragosa's Fury", "Enable if you want to put Sindragosa's Fury shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("GCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.GCDasOffGCD.HornOfWinter", "Horn of Winter", "Enable if you want to put Horn of Winter shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.PillarOfFrost", "Pillar", "Enable if you want to put Pillar of Frost shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.HungeringRuneWeapon", "Hungering Rune Weapon", "Enable if you want to put Hungering Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon", "Empower Rune Weapon", "Enable if you want to put Empower Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Frost, "APL.DeathKnight.Frost.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put ArcaneTorrent shown as Off GCD (top icons) instead of Main.");
+  CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
   --Blood Panels
   CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.RotationToFollow", {"Icy Veins","SimC"}, "Rotation:", "Define the rotation to follow.(Simc module needs development)");
-  CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BloodDrinker", "Blooddrinker", "Enable if you want to put Blooddrinker shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("GCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.GCDasOffGCD.BoneStorm", "Bonestorm", "Enable if you want to put Bonestorm shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.DancingRuneWeapon", "Dancing Rune Weapon", "Enable if you want to put Dancing Rune Weapon shown as Off GCD (top icons) instead of Main.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Blood, "APL.DeathKnight.Blood.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent", "Enable if you want to put Arcane Torrent shown as Off GCD (top icons) instead of Main.");
-  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ArcaneTorrent", "Enable Arcane Torrent (Racial)", "Enable this if you want it to show you when to use Arcane Torrent.");
-  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.Consumption", "Enable Consumption", "Enable this if you want it to show you when to use Consumption.");
-  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.DancingRuneWeapon", "Enable Dancing Rune Weapon", "Enable this if you want it to show you when to use Dancing Rune Weapon.");
+  CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
