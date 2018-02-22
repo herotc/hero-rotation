@@ -28,42 +28,38 @@
       UsePotions  = false
     },
    Frost = {
-      -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        HornOfWinter       = {true, false},
-        Obliteration       = {true, false},
-        SindragosasFury    = {true, false},
-        BreathofSindragosa = {true, false}
+        HornOfWinter       = true,
+        Obliteration       = true,
+        SindragosasFury    = true,
+        BreathofSindragosa = true
       },
-      -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent       = {true, false},
-        Berserking          = {true, false},
-        BloodFury           = {true, false},
+        ArcaneTorrent       = true,
+        Berserking          = true,
+        BloodFury           = true,
         -- Abilities
-        PillarOfFrost       = {true, false},
-        HungeringRuneWeapon = {true, false},
-        EmpowerRuneWeapon   = {true, false}
+        PillarOfFrost       = true,
+        HungeringRuneWeapon = true,
+        EmpowerRuneWeapon   = true
       }
     },
     Unholy = {
-    -- {Display GCD as OffGCD, ForceReturn}
-      GCDasOffGCD = {
+      GCDasOffGCD2 = {
         -- Abilities
-        ArmyOfDead     = {true, false},
-        SummonGargoyle = {true, false},
-        DarkArbiter    = {true, false}
+        ArmyOfDead     = true,
+        SummonGargoyle = true,
+        DarkArbiter    = true
       },
-      -- {Display OffGCD as OffGCD, ForceReturn}
-      OffGCDasOffGCD = {
+      OffGCDasOffGCD2 = {
         -- Racials
-        ArcaneTorrent      = {true, false},
-        Berserking         = {true, false},
-        BloodFury          = {true, false},
+        ArcaneTorrent      = true,
+        Berserking         = true,
+        BloodFury          = true,
         -- Abilities
-        BlightedRuneWeapon = {true, false}
+        BlightedRuneWeapon = true
        }
      },
     Blood = {
@@ -80,7 +76,6 @@
         BloodDrinker = true,
         Bonestorm    = true
       },
-      -- Display OffGCD as OffGCD
       OffGCDasOffGCD2 = {
         DancingRuneWeapon = true,
         ArcaneTorrent     = true
