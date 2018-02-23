@@ -94,7 +94,7 @@ local function SimulationcraftAPL()
     end
   end
   -- actions.standard=death_strike,if=runic_power.deficit<=15
-  if S.DeathStrike:IsUsable("Melee") and Player:RunicPowerDeficit() <= 15 then
+  if S.DeathStrike:IsReady("Melee") and Player:RunicPowerDeficit() <= 15 then
     if AR.Cast(S.DeathStrike) then return ""; end
   end
   -- actions.standard+=/death_and_decay,if=talent.rapid_decomposition.enabled&!buff.dancing_rune_weapon.up
@@ -118,7 +118,7 @@ local function SimulationcraftAPL()
     if AR.Cast(S.Marrowrend) then return ""; end
   end
   -- actions.standard+=/death_strike,if=buff.blood_shield.up|(runic_power.deficit<15&runic_power.deficit<25|!buff.dancing_rune_weapon.up)
-  if S.DeathStrike:IsUsable("Melee") and Player:RunicPowerDeficit() <= 40 and (Player:Buff(S.BloodShield) or not Player:Buff(S.DancingRuneWeaponBuff)) then
+  if S.DeathStrike:IsReady("Melee") and Player:RunicPowerDeficit() <= 40 and (Player:Buff(S.BloodShield) or not Player:Buff(S.DancingRuneWeaponBuff)) then
     if AR.Cast(S.DeathStrike) then return ""; end
   end
   -- actions.standard+=/consumption
@@ -130,7 +130,7 @@ local function SimulationcraftAPL()
     if AR.Cast(S.HeartStrike) then return ""; end
   end
   -- actions.standard+=/death_and_decay,if=buff.crimson_scourge.up
-  if S.DeathandDecay:IsUsable(30) and Player:Buff(S.CrimsonScourge) then
+  if S.DeathandDecay:IsReady("Melee") and Player:Buff(S.CrimsonScourge) then
     if AR.Cast(S.DeathandDecay) then return ""; end
   end
   -- actions.standard+=/blood_boil,if=buff.haemostasis.stack<5&(buff.haemostasis.stack<3|!buff.dancing_rune_weapon.up)
@@ -170,7 +170,7 @@ local function IcyVeinsRotation()
     if AR.Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm) then return ""; end
   end
   
-  if S.DeathandDecay:IsUsable("Melee") and (Cache.EnemiesCount[8] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[8] > 1 and Player:Buff(S.CrimsonScourge)) then
+  if S.DeathandDecay:IsReady("Melee") and (Cache.EnemiesCount[8] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[8] > 1 and Player:Buff(S.CrimsonScourge)) then
     if AR.Cast(S.DeathandDecay) then return ""; end
   end
 
@@ -178,7 +178,7 @@ local function IcyVeinsRotation()
     if AR.Cast(S.BloodDrinker, Settings.Blood.GCDasOffGCD.BloodDrinker) then return ""; end
   end
   
-  if S.DeathStrike:IsUsable("Melee") and S.BloodDrinker:IsCastableP() and (S.BloodDrinker:IsAvailable() or S.BloodDrinker:CooldownRemains() <= Player:GCD()) and not Player:Buff(S.DancingRuneWeaponBuff) and ((Player:RuneTimeToX(1) <= Player:GCD()) or Player:Runes() >= 1) then
+  if S.DeathStrike:IsReady("Melee") and S.BloodDrinker:IsCastableP() and (S.BloodDrinker:IsAvailable() or S.BloodDrinker:CooldownRemains() <= Player:GCD()) and not Player:Buff(S.DancingRuneWeaponBuff) and ((Player:RuneTimeToX(1) <= Player:GCD()) or Player:Runes() >= 1) then
     if AR.Cast(S.DeathStrike) then return ""; end
   end
 
@@ -186,11 +186,11 @@ local function IcyVeinsRotation()
     if AR.Cast(S.Marrowrend) then return ""; end
   end
   
-  if S.DeathStrike:IsUsable("Melee") and S.Marrowrend:IsCastableP() and Player:BuffStack(S.BoneShield) <= 6 then
+  if S.DeathStrike:IsReady("Melee") and S.Marrowrend:IsCastableP() and Player:BuffStack(S.BoneShield) <= 6 then
     if AR.Cast(S.DeathStrike) then return ""; end
   end
 
-  if S.DeathandDecay:IsUsable("Melee") and ((Cache.EnemiesCount[8] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable() and S.DeathandDecay:CooldownRemains() == 0)  or (Cache.EnemiesCount[8] >= 3 and S.DeathandDecay:CooldownRemains() == 0)) and Player:RunicPowerDeficit() >= 10 then
+  if S.DeathandDecay:IsReady("Melee") and ((Cache.EnemiesCount[8] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable() and S.DeathandDecay:CooldownRemains() == 0)  or (Cache.EnemiesCount[8] >= 3 and S.DeathandDecay:CooldownRemains() == 0)) and Player:RunicPowerDeficit() >= 10 then
     if AR.Cast(S.DeathandDecay) then return ""; end
   end
 
@@ -198,11 +198,11 @@ local function IcyVeinsRotation()
     if AR.Cast(S.HeartStrike) then return ""; end
   end
 
-  if S.DeathStrike:IsUsable("Melee") and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Runes() >= 3 or Player:RunicPowerDeficit() <= 10) then
+  if S.DeathStrike:IsReady("Melee") and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Runes() >= 3 or Player:RunicPowerDeficit() <= 10) then
     if AR.Cast(S.DeathStrike) then return ""; end
   end
 
-  if S.DeathandDecay:IsUsable("Melee") and Player:Buff(S.CrimsonScourge) and not S.RapidDecomposition:IsAvailable() then
+  if S.DeathandDecay:IsReady("Melee") and Player:Buff(S.CrimsonScourge) and not S.RapidDecomposition:IsAvailable() then
     if AR.Cast(S.DeathandDecay) then return ""; end
   end
 
