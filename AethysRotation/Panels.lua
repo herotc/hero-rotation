@@ -85,22 +85,33 @@
       end
       -- Iterate over all options available
       for Type, _ in pairs(CreateARPanelOption) do
-        SettingsType = SettingsTable[Type];
-        if SettingsType then
-          for SettingName, _ in pairs(SettingsType) do
-            -- Split the key on uppercase matches
-            local Name = "";
-            for Word in stringgmatch(SettingName, "[A-Z][a-z]+") do
-              if Name == "" then
-                Name = Word;
-              else
-                Name = Name .. " " .. Word;
+        -- To be 100% backward compatible with ARParser and existing APLs, we skip GCDasOffGCD2 and OffGCDasOffGCD2 options.
+        -- And we fake GCDasOffGCD and OffGCDasOffGCD as GCDasOffGCD2 and OffGCDasOffGCD2 settings.
+        if Type ~= "GCDasOffGCD2" and Type ~= "OffGCDasOffGCD2" then
+          local OptionType;
+          if Type == "GCDasOffGCD" or Type == "OffGCDasOffGCD" then
+            OptionType = Type .. "2";
+          else
+            OptionType = Type;
+          end
+
+          SettingsType = SettingsTable[Type];
+          if SettingsType then
+            for SettingName, _ in pairs(SettingsType) do
+              -- Split the key on uppercase matches
+              local Name = "";
+              for Word in stringgmatch(SettingName, "[A-Z][a-z]+") do
+                if Name == "" then
+                  Name = Word;
+                else
+                  Name = Name .. " " .. Word;
+                end
               end
+              -- Rewrite the setting string
+              local Setting = tableconcat({Settings, Type, SettingName}, ".");
+              -- Construct the option
+              AR.GUI.CreateARPanelOption(OptionType, Panel, Setting, Name);
             end
-            -- Rewrite the setting string
-            local Setting = tableconcat({Settings, Type, SettingName}, ".");
-            -- Construct the option
-            AR.GUI.CreateARPanelOption(Type, Panel, Setting, Name);
           end
         end
       end

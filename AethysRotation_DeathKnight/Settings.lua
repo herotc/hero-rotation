@@ -21,14 +21,14 @@
       UsePotions  = false
     },
    Frost = {
-      GCDasOffGCD2 = {
+      GCDasOffGCD = {
         -- Abilities
         HornOfWinter       = true,
         Obliteration       = true,
         SindragosasFury    = true,
         BreathofSindragosa = true
       },
-      OffGCDasOffGCD2 = {
+      OffGCDasOffGCD = {
         -- Racials
         ArcaneTorrent       = true,
         Berserking          = true,
@@ -40,13 +40,13 @@
       }
     },
     Unholy = {
-      GCDasOffGCD2 = {
+      GCDasOffGCD = {
         -- Abilities
         ArmyOfDead     = true,
         SummonGargoyle = true,
         DarkArbiter    = true
       },
-      OffGCDasOffGCD2 = {
+      OffGCDasOffGCD = {
         -- Racials
         ArcaneTorrent      = true,
         Berserking         = true,
@@ -64,12 +64,12 @@
         Consumption       = true,
         DancingRuneWeapon = true
       },
-      GCDasOffGCD2 = {
+      GCDasOffGCD = {
         -- Abilities
         BloodDrinker = true,
         Bonestorm    = true
       },
-      OffGCDasOffGCD2 = {
+      OffGCDasOffGCD = {
         DancingRuneWeapon = true,
         ArcaneTorrent     = true
       }
