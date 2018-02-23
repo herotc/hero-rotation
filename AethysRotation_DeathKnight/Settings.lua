@@ -57,6 +57,7 @@
      },
     Blood = {
       RotationToFollow = "Icy Veins", -- Choose the rotation to follow (Default: Icy Veins)
+      ConsumptionSuggested = true,
       Enabled = {
         -- Racials
         ArcaneTorrent     = true,
