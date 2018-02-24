@@ -83,27 +83,28 @@
   -- Main Cast
   AR.CastOffGCDOffset = 1;
   function AR.Cast (Object, OffGCD)
-    local Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
+    local ObjectTexture = AR.GetTexture(Object);
+    local Keybind = not AR.GUISettings.General.HideKeyBinds and AC.FindKeyBinding(ObjectTexture);
     if OffGCD then
       -- @deprecated 8.0 ForceReturn and thus a table for OffGCD setting is deprecated since 7.3.2.04
       local OffGCDType = type(OffGCD);
       if OffGCDType == "table" and OffGCD[1] then
         if AR.CastOffGCDOffset <= 2 then
-          AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
+          AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, ObjectTexture, Keybind);
           AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
           Object.LastDisplayTime = AC.GetTime();
           return OffGCD[2] and "Should Return" or false;
         end
       elseif OffGCDType == "boolean" then
         if AR.CastOffGCDOffset <= 2 then
-          AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
+          AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, ObjectTexture, Keybind);
           AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
           Object.LastDisplayTime = AC.GetTime();
           return false;
         end
       end
     else
-      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind);
+      AR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
       return true;
@@ -131,7 +132,7 @@
       QueueTextureTable[i] = AR.GetTexture(QueueSpellTable[i]);
       QueueSpellTable[i].LastDisplayTime = AC.GetTime();
       QueueKeybindTable[i] = not AR.GUISettings.General.HideKeyBinds
-                              and QueueSpellTable[i]:FindKeyBinding();
+                              and AC.FindKeyBinding(QueueTextureTable[i]);
     end
     AR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
     GCDDisplay();
