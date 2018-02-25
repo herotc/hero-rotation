@@ -56,8 +56,8 @@
        }
      },
     Blood = {
-      RotationToFollow = "Icy Veins", -- Choose the rotation to follow (Default: Icy Veins)
       ConsumptionSuggested = true,
+      PoolDuringBlooddrinker = false,
       Enabled = {
         -- Racials
         ArcaneTorrent     = true,
@@ -67,7 +67,7 @@
       },
       GCDasOffGCD = {
         -- Abilities
-        BloodDrinker = true,
+        Blooddrinker = true,
         Bonestorm    = true
       },
       OffGCDasOffGCD = {
@@ -93,5 +93,6 @@
   --Frost Panels
   CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
   --Blood Panels
-  CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.RotationToFollow", {"Icy Veins","SimC"}, "Rotation:", "Define the rotation to follow.(Simc module needs development)");
+  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ConsumptionSuggested", "Suggested: Consumption", "Suggest (Left Top icon) Consumption if Consumption is not enabled.");
+  CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it (supports Quaking).");
   CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
