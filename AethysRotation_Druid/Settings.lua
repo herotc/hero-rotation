@@ -11,7 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
@@ -25,7 +25,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        Racials = {true, false}
+        Racials = true,
         -- Abilities
         
       }
@@ -44,20 +44,20 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        MoonkinForm = {true, false}
+        MoonkinForm = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        BlessingofElune = {true, false},
-        BlessingofAnshe = {true, false},
-        AstralCommunion = {true, false},
-        IncarnationChosenOfElune = {true, false},
-        CelestialAlignment = {true, false},
-        WarriorofElune = {true, false},
-        ForceofNature = {true, false},
-        BarkSkin = {true, false},
-        Sephuz = {true, false}
+        BlessingofElune = true,
+        BlessingofAnshe = true,
+        AstralCommunion = true,
+        IncarnationChosenOfElune = true,
+        CelestialAlignment = true,
+        WarriorofElune = true,
+        ForceofNature = true,
+        BarkSkin = true,
+        Sephuz = true,
       }
     },
     Feral = {
@@ -66,19 +66,19 @@
       SurvivalInstinctsHP = 0,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
-        CatForm = {true, false},
-        RegrowthHeal = {true, false},
+        CatForm = true,
+        RegrowthHeal = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         --Abilities
-        Renewal = {true, false},
-        SurvivalInstincts = {true, false},
-        Prowl = {true, false},
-        ElunesGuidance = {true, false},
-        WildCharge = {true, false},
-        TigersFury = {true, false},
-        Berserk = {true, false},
+        Renewal = true,
+        SurvivalInstincts = true,
+        Prowl = true,
+        ElunesGuidance = true,
+        WildCharge = true,
+        TigersFury = true,
+        Berserk = true,
       },
       StealthMacro = {
         -- Abilities
@@ -105,33 +105,18 @@
   local CP_Feral = CreateChildPanel(CP_Druid, "Feral");
   -- local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian");
 
-  CreateARPanelOption("OffGCDasOffGCD", CP_Druid, "APL.Druid.Commons.OffGCDasOffGCD.Racials", "Racials");
+  CreateARPanelOptions(CP_Druid, "APL.Druid.Commons");
   --Feral
   CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
   CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
   CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
-  CreateARPanelOption("GCDasOffGCD", CP_Feral, "APL.Druid.Feral.GCDasOffGCD.CatForm", "Cat Form");
-  CreateARPanelOption("GCDasOffGCD", CP_Feral, "APL.Druid.Feral.GCDasOffGCD.RegrowthHeal", "Defensive Regrowths");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.Renewal", "Renewal")
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.SurvivalInstincts", "Survival Instincts")
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.Prowl", "Prowl")
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.ElunesGuidance", "Elune's Guidance")
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.WildCharge", "Wild Charge")
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.TigersFury", "Tiger's Fury")
-  CreateARPanelOption("OffGCDasOffGCD", CP_Feral, "APL.Druid.Feral.OffGCDasOffGCD.Berserk", "Berserk and Incarnation")
+  CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
   CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
   CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");
   --Balance
   CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkSkinHP", {0, 100, 1}, "BarkSkin HP", "Set the BarkSkin HP threshold.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMFOOP", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
-  CreateARPanelOption("GCDasOffGCD", CP_Balance, "APL.Druid.Balance.GCDasOffGCD.MoonkinForm", "Moonkin Form");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.BlessingofElune", "Blessing Of Elune");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.BlessingofAnshe", "Blessing Of Anshe");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.AstralCommunion", "Astral Communion");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.IncarnationChosenOfElune", "Incarnation Chosen Of Elune");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.CelestialAlignment", "Celestial Alignment");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.WarriorofElune", "Warrior Of Elune");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Balance, "APL.Druid.Balance.OffGCDasOffGCD.ForceofNature", "Force Of Nature");
+  CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want the addon to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.SolarBeam", "Sephuz: Show Solar Beam", "Enable this if you want the addon to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.Sephuz.EntanglingRoots", "Sephuz: Show Entangling Roots", "Enable this if you want the addon to show you when to use Solar Beam to proc Sephuz's Secret (only when equipped).");

@@ -11,6 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 
 --- ============================ CONTENT ============================
@@ -25,19 +26,19 @@
       StealthOOC = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
-        CrimsonVial = {true, false},
-        Feint = {true, false}
+        CrimsonVial = true,
+        Feint = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        Racials = {true, false},
+        Racials = true,
         -- Stealth CDs
-        Vanish = {true, false},
+        Vanish = true,
         -- Abilities
-        Kick = {true, false},
-        MarkedforDeath = {true, false},
-        Sprint = {true, false},
-        Stealth = {true, false}
+        Kick = true,
+        MarkedforDeath = true,
+        Sprint = true,
+        Stealth = true
       }
     },
     Assassination = {
@@ -57,7 +58,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        Vendetta = {true, false}
+        Vendetta = true,
       }
     },
     Outlaw = {
@@ -74,9 +75,9 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        AdrenalineRush = {true, false},
-        CurseoftheDreadblades = {true, false},
-        BladeFlurry = {true, false},
+        AdrenalineRush = true,
+        CurseoftheDreadblades = true,
+        BladeFlurry = true,
       }
     },
     Subtlety = {
@@ -92,9 +93,9 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        ShadowBlades = {true, false},
-        SymbolsofDeath = {true, false},
-        ShadowDance = {true, false}
+        ShadowBlades = true,
+        SymbolsofDeath = true,
+        ShadowDance = true,
       },
       -- Stealth Macro Enable/Disable Options
       StealthMacro = {
@@ -120,14 +121,7 @@
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, "Feint HP", "Set the Feint HP threshold.");
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.EDMGMantleOffset", {1, 5, 0.25}, "Mantle Damage Offset", "Set the Evisc/Env Mantle Damage Offset.");
   CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.");
-  CreateARPanelOption("GCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.CrimsonVial", "Crimson Vial");
-  CreateARPanelOption("GCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.GCDasOffGCD.Feint", "Feint");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Racials", "Racials");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Vanish", "Vanish");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Kick", "Kick");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.MarkedforDeath", "Marked for Death");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Sprint", "Sprint");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Rogue, "APL.Rogue.Commons.OffGCDasOffGCD.Stealth", "Stealth");
+  CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons");
   -- Assassination
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
@@ -135,21 +129,17 @@
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.FoKRotation", "Enable Fan of Knives Rotation", "Suggest using Fan of Knives on a single target instead of Mutilate.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Assassination, "APL.Rogue.Assassination.OffGCDasOffGCD.Vendetta", "Vendetta");
+  CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
   -- Outlaw
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.");
   CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechHP", {1, 100, 1}, "Roll the Bones Leech HP", "Set the HP threshold before re-rolling for the leech buff (working only if Solo Mode is enabled).");
   CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.BFOffset", {1, 5, 1}, "Blade Flurry Offset", "Set the Blade Flurry timer before suggesting to disable it (to compensate fast movement).");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Outlaw, "APL.Rogue.Outlaw.OffGCDasOffGCD.AdrenalineRush", "Adrenaline Rush");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Outlaw, "APL.Rogue.Outlaw.OffGCDasOffGCD.CurseoftheDreadblades", "Curse of the Dreadblades");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Outlaw, "APL.Rogue.Outlaw.OffGCDasOffGCD.BladeFlurry", "Blade Flurry");
+  CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw");
   -- Subtlety
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.");
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {2, 3, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Subtlety, "APL.Rogue.Subtlety.OffGCDasOffGCD.ShadowBlades", "Shadow Blades");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Subtlety, "APL.Rogue.Subtlety.OffGCDasOffGCD.SymbolsofDeath", "Symbols of Death");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Subtlety, "APL.Rogue.Subtlety.OffGCDasOffGCD.ShadowDance", "Shadow Dance");
+  CreateARPanelOptions(CP_Subtlety, "APL.Rogue.Subtlety");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.ShadowDance", "Stealth Combo - Shadow Dance", "Allow suggesting Shadow Dance stealth ability combos (recommended)");

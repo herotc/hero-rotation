@@ -11,6 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
@@ -24,7 +25,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        Racials = {true, false}
+        Racials = true,
         -- Abilities
 
       }
@@ -46,24 +47,24 @@
         -- Racials
 
         -- Abilities
-        InvokeNiuzaotheBlackOx = {true, false},
-        BlackOxBrew            = {true, false},
-        IronskinBrew           = {true, false},
-        PurifyingBrew          = {true, false}
+        InvokeNiuzaotheBlackOx = true,
+        BlackOxBrew            = true,
+        IronskinBrew           = true,
+        PurifyingBrew          = true,
       }
     },
     Windwalker = {
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        TouchOfDeath = {true, false}
+        TouchOfDeath = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
 
         -- Abilities
-        Serenity = {true, false}
+        Serenity = true,
       }
     }
   };
@@ -75,15 +76,11 @@
   local CP_Windwalker = CreateChildPanel(CP_Monk, "Windwalker");
   local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster");
   -- Monk
-  CreateARPanelOption("OffGCDasOffGCD", CP_Monk, "APL.Monk.Commons.OffGCDasOffGCD.Racials", "Racials");
+  CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
   -- Windwalker
-  CreateARPanelOption("GCDasOffGCD", CP_Windwalker, "APL.Monk.Windwalker.GCDasOffGCD.TouchOfDeath", "Touch of Death");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Windwalker, "APL.Monk.Windwalker.OffGCDasOffGCD.Serenity", "Storm, Earth and Fire / Serenity");
+  CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
   -- Windwalker
-  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx", "Invoke Niuzao the Black Ox");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.BlackOxBrew", "Black Ox Brew");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.IronskinBrew", "Ironskin Brew");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Brewmaster, "APL.Monk.Brewmaster.OffGCDasOffGCD.PurifyingBrew", "Purifying Brew");
+  CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enabled", "Purify", "Enable or disable Purify recommendations.");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Medium", "Purify: Medium", "Enable or disable Purify recommendations when the stagger is medium.");
