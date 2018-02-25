@@ -85,16 +85,7 @@
   function AR.Cast (Object, OffGCD)
     local ObjectTexture = AR.GetTexture(Object);
     local Keybind = not AR.GUISettings.General.HideKeyBinds and AC.FindKeyBinding(ObjectTexture);
-    -- @deprecated 8.0 ForceReturn and thus a table for OffGCD setting is deprecated since 7.3.2.04
-    local OffGCDType = type(OffGCD);
-    if OffGCDType == "table" and OffGCD[1] then
-      if AR.CastOffGCDOffset <= 2 then
-        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, ObjectTexture, Keybind);
-        AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
-        Object.LastDisplayTime = AC.GetTime();
-        return OffGCD[2] and "Should Return" or false;
-      end
-    elseif OffGCDType == "boolean" and OffGCD then
+    if OffGCD then
       if AR.CastOffGCDOffset <= 2 then
         AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, ObjectTexture, Keybind);
         AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
