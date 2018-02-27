@@ -193,10 +193,10 @@ local function FutureAstralPower ()
   end
 end
 
-local function Var_Starfall()
+local function Var_Starfall ()
   -- actions.precombat+=/variable,name=starfall_st,value=talent.soul_of_the_forest.enabled&set_bonus.tier21_4pc
-    v_starfall = S.SoulOfTheForest:IsAvailable() and T214P
-  end
+  v_starfall = S.SoulOfTheForest:IsAvailable() and T214P
+end
 
 --One time calc vars
 local function VarInit ()
@@ -204,6 +204,14 @@ local function VarInit ()
     Var_Starfall()
     var_init=true
     var_calcCombat=true
+  end
+end
+
+local function StarfallCost ()
+  if S.SoulOfTheForest:IsAvailable() then
+    return 40
+  else
+    return 60
   end
 end
 
@@ -559,7 +567,7 @@ local function SingleTarget ()
 
   -- actions.st+=/starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!debuff.stellar_empowerment.up)
   if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
-    or (v_starfall and Target:BuffRemainsP(S.SolarEmpowerment) == 0) then
+    or (v_starfall and Target:DebuffRemainsP(S.StellarEmpowerment) == 0 and FutureAstralPower() >= StarfallCost()) then
     if AR.Cast(S.Starfall) then return ""; end
   end
 
@@ -617,7 +625,7 @@ end
 
 local function AoE ()
   -- actions.AoE=starfall,if=debuff.stellar_empowerment.remains<gcd.max*2|astral_power.deficit<22.5|(buff.celestial_alignment.remains>8|buff.incarnation.remains>8)|target.time_to_die<8
-  if FutureAstralPower() >= 60 and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
+  if FutureAstralPower() >= StarfallCost() and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
     if AR.Cast(S.Starfall) then return ""; end
   end
   
@@ -919,7 +927,7 @@ local function APL ()
         -- aoe
         if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
           -- actions.AoE=starfall,if=debuff.stellar_empowerment.remains<gcd.max*2|astral_power.deficit<22.5|(buff.celestial_alignment.remains>8|buff.incarnation.remains>8)|target.time_to_die<8
-          if FutureAstralPower() >= 60 and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
+          if FutureAstralPower() >= StarfallCost() and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
             if AR.Cast(S.Starfall) then return ""; end
           end
 
