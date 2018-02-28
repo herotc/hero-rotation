@@ -47,6 +47,8 @@
     MindFreeze            = Spell(47528),
     Ossuary               = Spell(219786),
     RapidDecomposition    = Spell(194662),
+    RuneTap               = Spell(194679),
+    UmbilicusEternus      = Spell(193249),
     VampiricBlood         = Spell(55233),
     -- Legendaries
     HaemostasisBuff       = Spell(235558),
@@ -93,6 +95,14 @@ local function APL ()
     end
 
     --- Defensives
+    -- Umbilicus Eternus Cancel
+    if Settings.Blood.UmbilicusEternus > 0 and Player:Buff(S.UmbilicusEternus) and Player:BuffRemains(S.UmbilicusEternus) <= Settings.Blood.UmbilicusEternus then
+      if AR.Cast(S.UmbilicusEternus, true) then return ""; end
+    end
+    -- Rune Tap Emergency
+    if S.RuneTap:IsReady() and Player:HealthPercentage() <= 40 and Player:Runes() >= 3 and S.RuneTap:Charges() > 1 and not Player:Buff(S.RuneTap) then
+      if AR.Cast(S.RuneTap, true) then return ""; end
+    end
     -- Active Mitigation
     if Player:ActiveMitigationNeeded() and S.Marrowrend:TimeSinceLastCast() > 2.5 and S.DeathStrike:TimeSinceLastCast() > 2.5 then
       if S.DeathStrike:IsReady("Melee") and Player:BuffStack(S.BoneShield) > 7 then
@@ -100,6 +110,9 @@ local function APL ()
       end
       if S.Marrowrend:IsCastableP("Melee") then
         if AR.Cast(S.Marrowrend) then return ""; end
+      end
+      if S.DeathStrike:IsReady("Melee") then
+        if AR.Cast(S.DeathStrike) then return ""; end
       end
     end
     -- Bone Shield

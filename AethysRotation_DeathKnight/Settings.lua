@@ -58,6 +58,7 @@
     Blood = {
       ConsumptionSuggested = true,
       PoolDuringBlooddrinker = false,
+      UmbilicusEternus = 0,
       Enabled = {
         -- Racials
         ArcaneTorrent     = true,
@@ -95,4 +96,5 @@
   --Blood Panels
   CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ConsumptionSuggested", "Suggested: Consumption", "Suggest (Left Top icon) Consumption if Consumption is not enabled.");
   CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it (supports Quaking).");
+  CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.UmbilicusEternus", {0, 2, 0.1}, "Cancel: Umbilicus Eternus Remains", "Set the duration you want to start to show the Umbilicus Eternus cancel. Set to 0 to disable it.");
   CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
