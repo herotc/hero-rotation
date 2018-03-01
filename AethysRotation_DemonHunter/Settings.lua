@@ -11,6 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
@@ -18,9 +19,9 @@
     Commons = {
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        Racials = {true, false},
+        Racials = true,
         -- Abilities
-        ConsumeMagic = {true, false}
+        ConsumeMagic = true,
       },
       UseTrinkets = true,
       UsePotions  = true
@@ -29,8 +30,8 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        DemonSpikes = {true, false},
-        InfernalStrike = {true, false}
+        DemonSpikes = true,
+        InfernalStrike = true,
       }
     },
     Havoc = {
@@ -38,9 +39,9 @@
       FelRushDisplayStyle = "Main Icon",
       OffGCDasOffGCD = {
         -- Abilities
-        ChaosBlades = {true, false},
-        Metamorphosis = {true, false},
-        Nemesis = {true, false},
+        ChaosBlades = true,
+        Metamorphosis = true,
+        Nemesis = true,
       },
     }
   };
@@ -51,16 +52,11 @@
   local CP_Havoc = CreateChildPanel(CP_DemonHunter, "Havoc");
   local CP_Vengeance = CreateChildPanel(CP_DemonHunter, "Vengeance");
   
-  CreateARPanelOption("OffGCDasOffGCD", CP_DemonHunter, "APL.DemonHunter.Commons.OffGCDasOffGCD.Racials", "Racials");
-  CreateARPanelOption("OffGCDasOffGCD", CP_DemonHunter, "APL.DemonHunter.Commons.OffGCDasOffGCD.ConsumeMagic", "Consume Magic");
+  CreateARPanelOptions(CP_DemonHunter, "APL.DemonHunter.Commons");
   CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
   
-  CreateARPanelOption("OffGCDasOffGCD", CP_Vengeance, "APL.DemonHunter.Vengeance.OffGCDasOffGCD.DemonSpikes", "Demon Spikes");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Vengeance, "APL.DemonHunter.Vengeance.OffGCDasOffGCD.InfernalStrike", "Infernal Strike");
+  CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance");
 
   CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Havoc, "APL.DemonHunter.Havoc.OffGCDasOffGCD.ChaosBlades", "ChaosBlades");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Havoc, "APL.DemonHunter.Havoc.OffGCDasOffGCD.Metamorphosis", "Metamorphosis");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Havoc, "APL.DemonHunter.Havoc.OffGCDasOffGCD.Nemesis", "Nemesis");
-
+  CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc");

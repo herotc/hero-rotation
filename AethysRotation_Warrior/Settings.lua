@@ -11,6 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 
 --- ============================ CONTENT ============================
@@ -18,10 +19,10 @@
   AR.GUISettings.APL.Warrior = {
     Commons = {
       OffGCDasOffGCD = {
-        Pummel = {true, false},
-        Racials = {true, false},
-        Avatar = {true, false},
-        BattleCry = {true, false},
+        Pummel = true,
+        Racials = true,
+        Avatar = true,
+        BattleCry = true,
       }
     },
 
@@ -31,13 +32,13 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        Warbreaker = {false, false},
-        Bladestorm = {false, false},
-        Ravager = {false, false},
+        Warbreaker = false,
+        Bladestorm = false,
+        Ravager = false,
       },
       OffGCDasOffGCD = {
         -- Abilities
-        FocusedRage = {true, false},
+        FocusedRage = true,
         -- Items
       },
     },
@@ -48,16 +49,16 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        DragonRoar = {true, false},
+        DragonRoar = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        Bloodbath = {true, false},
+        Bloodbath = true,
         -- Items
-        PotionoftheOldWar = {true, false},
-        PotionOfProlongedPower = {true, false},
-        UmbralMoonglaives = {true, false},
+        PotionoftheOldWar = true,
+        PotionOfProlongedPower = true,
+        UmbralMoonglaives = true,
       }
     }
   };
@@ -71,22 +72,14 @@
   local CP_Fury = CreateChildPanel(CP_Warrior, "Fury");
 
   -- Shared Warrior settings
-  CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.Pummel", "Pummel");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.Racials", "Racials");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.Avatar", "Avatar");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Warrior, "APL.Warrior.Commons.OffGCDasOffGCD.BattleCry", "Battle Cry");
+  CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons");
 
   -- Arms settings
-  CreateARPanelOption("OffGCDasOffGCD", CP_Arms, "APL.Warrior.Arms.OffGCDasOffGCD.FocusedRage", "Focused Rage");
+  CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms");
   CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.WarbreakerEnabled", "Enable Warbreaker", "Disable this if you want to omit Warbreaker from the rotation.");
-  CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Warbreaker", "Warbreaker");
-  CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Bladestorm", "Bladestorm");
-  CreateARPanelOption("GCDasOffGCD", CP_Arms, "APL.Warrior.Arms.GCDasOffGCD.Ravager", "Ravager");
   CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
 
   -- Fury settings
-  CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.Bloodbath", "Bloodbath");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Fury, "APL.Warrior.Fury.OffGCDasOffGCD.UmbralMoonglaives", "Umbral Moonglaives");
-  CreateARPanelOption("GCDasOffGCD", CP_Fury, "APL.Warrior.Fury.GCDasOffGCD.DragonRoar", "Dragon Roar");
+  CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury");
   CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoOW", "Show Potion of the Old War", "Enable this if you want it to show you when to use Potion of the Old War.");
   CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");

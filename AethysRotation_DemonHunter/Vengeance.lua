@@ -61,10 +61,11 @@ local function APL ()
 
   -- Misc
   local SoulFragments = Player:BuffStack(S.SoulFragments);
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
   --- Defensives
   -- Demon Spikes
-  if S.DemonSpikes:IsCastable("Melee") and Player:Pain() >= 20 and not Player:Buff(S.DemonSpikesBuff) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= 65) then
+  if S.DemonSpikes:IsCastable("Melee") and Player:Pain() >= 20 and not Player:Buff(S.DemonSpikesBuff) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= 65) and (IsTanking or not Player:HealingAbsorbed()) then
     if AR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
   end
 
@@ -114,10 +115,6 @@ local function APL ()
     if S.Felblade:IsCastable(15) and Player:Pain() <= 75 then
       if AR.Cast(S.Felblade) then return "Cast Felblade"; end
     end
-    -- actions+=/soul_cleave,if=soul_fragments=5
-    if S.SoulCleave:IsCastable("Melee") and not S.SpiritBomb:IsAvailable() and SoulFragments >= 5 then
-      if AR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
-    end
     -- actions+=/fel_devastation
     if AR.CDsON() and S.FelDevastation:IsCastable(20, true) and GetUnitSpeed("player") == 0 and Player:Pain() >= 30 then
       if AR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
@@ -127,12 +124,12 @@ local function APL ()
       if AR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
     end
     if Target:IsInRange("Melee") then
-      -- actions+=/fracture,if=pain>=60&soul_fragments<4
-      if S.Fracture:IsCastable() and Player:Pain() >= 60 and SoulFragments < 4 then
+      -- actions+=/fracture,if=pain>=60
+      if S.Fracture:IsCastable() and Player:Pain() >= 60 then
         if AR.Cast(S.Fracture) then return "Cast Fracture"; end
       end
       -- actions+=/soul_cleave,if=pain>=80
-      if S.SoulCleave:IsCastable() and Player:Pain() >= 80 then
+      if S.SoulCleave:IsCastable() and not S.SpiritBomb:IsAvailable() and (Player:Pain() >= 80 or SoulFragments >= 5) then
         if AR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
       end
       -- actions+=/sever

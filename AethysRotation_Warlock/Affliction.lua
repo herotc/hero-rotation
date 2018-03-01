@@ -723,6 +723,11 @@
   end
   
   local function MGAPL ()
+    --keep spamming drain soul if ua
+    if Player:IsChanneling(S.DrainSoul) and ActiveUAs() > 0 then
+      if AR.Cast(S.DrainSoul) then return ""; end
+    end
+  
     -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&((buff.tormented_souls.react>=4+active_enemies|buff.tormented_souls.react>=9)|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
     if S.ReapSouls:IsCastableP() and not Player:BuffRemainsP(S.DeadwindHarvester) == 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
       and ((SoulsAvailable() >= 4 + Cache.EnemiesCount[range] or SoulsAvailable() >= 9) or Target:FilteredTimeToDie("<=", ComputeDeadwindHarvesterDuration())) then
@@ -1015,6 +1020,9 @@
   local function APL ()
     -- Unit Update
     AC.GetEnemies(range);
+    if I.SephuzSecret:IsEquipped() then
+      AC.GetEnemies(10);
+    end
     Everyone.AoEToggleEnemiesUpdate();
     
     -- TODO : Mvt and range rotation change

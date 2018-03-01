@@ -245,8 +245,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
         if AR.Cast(S.Nightblade) then return "Cast Nightblade 1"; end
       end
     end
-    -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
-    if AR.AoEON() and (not S.DeathfromAbove:IsAvailable() or AC.Tier19_2Pc) and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff) and Rogue.MantleDuration() == 0 then
+    -- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
+    if AR.AoEON() and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff) and Rogue.MantleDuration() == 0 then
       local BestUnit, BestUnitTTD = nil, 12;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Nightblade))
@@ -377,8 +377,8 @@ local function StealthMacro (StealthSpell)
 end
 -- # Builders
 local function Build ()
-  -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2+buff.the_first_of_the_dead.up
-  if Cache.EnemiesCount[10] >= 2 + (Player:BuffP(S.TheFirstoftheDead) and 1 or 0) and S.ShurikenStorm:IsCastable() then
+  -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2+(buff.the_first_of_the_dead.up|buff.symbols_of_death.up|buff.master_of_subtlety.up)
+  if S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 2 + ((Player:BuffP(S.TheFirstoftheDead) or Player:BuffP(S.SymbolsofDeath) or Player:BuffP(S.MasterOfSubtletyBuff)) and 1 or 0) then
     if AR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
   end
   if IsInMeleeRange() then
@@ -771,7 +771,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 01/11/2018
+-- Last Update: 02/03/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -806,7 +806,7 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
 
 -- # Builders
--- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2+buff.the_first_of_the_dead.up
+-- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2+(buff.the_first_of_the_dead.up|buff.symbols_of_death.up|buff.master_of_subtlety.up)
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
 
@@ -829,7 +829,7 @@ AR.SetAPL(261, APL);
 
 -- # Finishers
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&(mantle_duration=0|remains<=mantle_duration)&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
--- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.death_from_above.enabled|set_bonus.tier19_2pc)&(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
+-- actions.finish+=/nightblade,cycle_targets=1,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&mantle_duration=0&((refreshable&(!finality|buff.finality_nightblade.up|variable.dsh_dfa))|remains<tick_time*2)&(spell_targets.shuriken_storm<4&!variable.dsh_dfa|!buff.symbols_of_death.up)
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
 -- actions.finish+=/death_from_above,if=!talent.dark_shadow.enabled|(!buff.shadow_dance.up|spell_targets>=4)&(buff.symbols_of_death.up|cooldown.symbols_of_death.remains>=10+set_bonus.tier20_4pc*5)&buff.the_first_of_the_dead.remains<1&(buff.finality_eviscerate.up|spell_targets.shuriken_storm<4)
 -- actions.finish+=/eviscerate

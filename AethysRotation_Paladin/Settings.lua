@@ -11,6 +11,7 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   AR.GUISettings.APL.Paladin = {
@@ -27,12 +28,12 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent = {true, false},
+        ArcaneTorrent = true,
         -- Abilities
-        AvengingWrath = {true, false},
-        HandoftheProtector = {true, false},
-        LightoftheProtector = {true, false},
-        ShieldoftheRighteous = {true, false}
+        AvengingWrath = true,
+        HandoftheProtector = true,
+        LightoftheProtector = true,
+        ShieldoftheRighteous = true,
       }
     },
     Retribution = {
@@ -42,15 +43,15 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        HolyWrath = {true, false}
+        HolyWrath = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent = {true, false},
+        ArcaneTorrent = true,
         -- Abilities
-        AvengingWrath = {true, false},
-        Crusade = {true, false}
+        AvengingWrath = true,
+        Crusade = true,
       }
     }
   };
@@ -66,15 +67,8 @@
   CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.HandoftheProtectorHP", {0, 100, 1}, "Hand of the Protector HP", "Set the Hand of the Protector HP threshold.");
   CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.LightoftheProtectorHP", {0, 100, 1}, "Light of the Protector HP", "Set the Light of the Protector HP threshold.");
   CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ShieldoftheRighteousHP", {0, 100, 1}, "Shield of the Righteous HP", "Set the Shield of the Righteous HP threshold.");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Protection, "APL.Paladin.Protection.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Protection, "APL.Paladin.Protection.OffGCDasOffGCD.AvengingWrath", "Avenging Wrath");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Protection, "APL.Paladin.Protection.OffGCDasOffGCD.HandoftheProtector", "Hand of the Protector");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Protection, "APL.Paladin.Protection.OffGCDasOffGCD.LightoftheProtector", "Light of the Protector");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Protection, "APL.Paladin.Protection.OffGCDasOffGCD.ShieldoftheRighteous", "Shield of the Righteous");
+  CreateARPanelOptions(CP_Protection, "APL.Paladin.Protection");
   -- Retribution
   CreatePanelOption("Slider", CP_Retribution, "APL.Paladin.Retribution.SoloJusticarDP", {0, 100, 1}, "Solo Justicar's Vengeance with Divine Purpose proc HP", "Set the solo Justicar's Vengeance with Divine Purpose proc HP threshold.");
   CreatePanelOption("Slider", CP_Retribution, "APL.Paladin.Retribution.SoloJusticar5HP", {0, 100, 1}, "Solo Justicar's Vengeance with 5 Holy Power HP", "Set the solo Justicar's Vengeance with 5 Holy Power HP threshold.");
-  CreateARPanelOption("GCDasOffGCD", CP_Retribution, "APL.Paladin.Retribution.GCDasOffGCD.HolyWrath", "Holy Wrath");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Retribution, "APL.Paladin.Retribution.OffGCDasOffGCD.ArcaneTorrent", "Arcane Torrent");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Retribution, "APL.Paladin.Retribution.OffGCDasOffGCD.AvengingWrath", "Avenging Wrath");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Retribution, "APL.Paladin.Retribution.OffGCDasOffGCD.Crusade", "Crusade");
+  CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution");

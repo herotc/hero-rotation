@@ -11,15 +11,15 @@
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
   local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-
+  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- Default settings
   AR.GUISettings.APL.Shaman = {
     Commons = {
       OffGCDasOffGCD = {
-	    WindShear = {true, false},
-	    Racials = {true, false}
+	    WindShear = true,
+	    Racials = true,
       },
       OnUseTrinkets = false,
       HealthstoneEnabled = false,
@@ -30,20 +30,20 @@
 
     Elemental = {
       OffGCDasOffGCD = {
-	    Ascendance = {true, false}
+	    Ascendance = true,
       },
 	  GCDasOffGCD = {
-	    Elementals = {false, false}
+	    Elementals = false,
 	  }
     },
 
     Enhancement = {
       OffGCDasOffGCD = {
-	    DoomWinds = {true, false},
-	    Ascendance = {true, false}
+	    DoomWinds = true,
+	    Ascendance = true,
       },
 	  GCDasOffGCD = {
-	    FeralSpirit = {false, false}
+	    FeralSpirit = false,
 	  }
 	}
   };
@@ -57,19 +57,15 @@
   local CP_Enhancement = CreateChildPanel(CP_Shaman, "Enhancement");
 
   -- Shared Shaman settings
-  CreateARPanelOption("OffGCDasOffGCD", CP_Shaman, "APL.Shaman.Commons.OffGCDasOffGCD.WindShear", "Wind Shear");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Shaman, "APL.Shaman.Commons.OffGCDasOffGCD.Racials", "Racials");
+  CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.OnUseTrinkets", "Show on use trinkets", "Enable this if you want to show on use trinkets when they are ready.");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power on mobs with more than 250M max health.");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.HealthstoneEnabled", "Show Healthstone", "Enable this if you want to show Healthstone when you're low on health.");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.HealingSurgeEnabled", "Show Healing Surge", "Enable this if you want to show Healing Surge when you're low on health.");
   CreatePanelOption("Slider", CP_Shaman, "APL.Shaman.Commons.HealingSurgeHPThreshold", {0, 100, 1}, "Healing Surge HP threshold", "Healing Surge health threshold.");
 
-  -- Elemental settings
-  CreateARPanelOption("GCDasOffGCD", CP_Elemental, "APL.Shaman.Elemental.GCDasOffGCD.Elementals", "Elementals");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Elemental, "APL.Shaman.Elemental.OffGCDasOffGCD.Ascendance", "Ascendance");
+  -- Elemental settings 
+  CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
 
   -- Enhancement settings
-  CreateARPanelOption("GCDasOffGCD", CP_Enhancement, "APL.Shaman.Enhancement.GCDasOffGCD.FeralSpirit", "Feral Spirit");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Enhancement, "APL.Shaman.Enhancement.OffGCDasOffGCD.DoomWinds", "Doom Winds");
-  CreateARPanelOption("OffGCDasOffGCD", CP_Enhancement, "APL.Shaman.Enhancement.OffGCDasOffGCD.Ascendance", "Ascendance");
+  CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");

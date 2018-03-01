@@ -83,23 +83,24 @@
   -- Main Cast
   AR.CastOffGCDOffset = 1;
   function AR.Cast (Object, OffGCD)
-    local Keybind = not AR.GUISettings.General.HideKeyBinds and Object:FindKeyBinding();
-    if OffGCD and OffGCD[1] then
+    local ObjectTexture = AR.GetTexture(Object);
+    local Keybind = not AR.GUISettings.General.HideKeyBinds and AC.FindKeyBinding(ObjectTexture);
+    if OffGCD then
       if AR.CastOffGCDOffset <= 2 then
-        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, AR.GetTexture(Object), Keybind);
+        AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, ObjectTexture, Keybind);
         AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = AC.GetTime();
-        return OffGCD[2] and "Should Return" or false;
+        return false;
       end
     else
       local poolResource = 9999000010
       local Usable = Object.SpellID == poolResource or Object:IsUsable();
-      AR.MainIconFrame:ChangeIcon(AR.GetTexture(Object), Keybind, Usable);
+      AR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
-      return "Should Return";
+      return true;
     end
-    return false;
+    return nil;
   end
   -- Overload for Main Cast (with text)
   function AR.CastAnnotated(Object, OffGCD, Text)
@@ -122,7 +123,7 @@
       QueueTextureTable[i] = AR.GetTexture(QueueSpellTable[i]);
       QueueSpellTable[i].LastDisplayTime = AC.GetTime();
       QueueKeybindTable[i] = not AR.GUISettings.General.HideKeyBinds
-                              and QueueSpellTable[i]:FindKeyBinding();
+                              and AC.FindKeyBinding(QueueTextureTable[i]);
     end
     AR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
     GCDDisplay();
