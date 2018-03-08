@@ -567,7 +567,7 @@ local function SingleTarget ()
 
   -- actions.st+=/starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!debuff.stellar_empowerment.up)
   if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
-    or (v_starfall and Player:DebuffRemainsP(S.Starfall) and Target:DebuffP(S.StellarEmpowerment) == 0 and FutureAstralPower() >= StarfallCost()) then
+    or (v_starfall and ((not Target:Debuff(S.StellarEmpowerment)) or (Player:BuffRemainsP(S.Starfall) == 0 and Target:Debuff(S.StellarEmpowerment))) and FutureAstralPower() >= StarfallCost()) then
     if AR.Cast(S.Starfall) then return ""; end
   end
 
