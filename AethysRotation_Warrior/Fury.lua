@@ -224,7 +224,9 @@ local AR = AethysRotation;
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.execute+=/execute
-    if S.Execute:IsReady() or (AC.Tier19_2Pc and Target:TimeToDie() >= 10 and Player:RageTimeToX(25,0) <= S.Bloodthirst:CooldownRemainsP()) then
+    -- TODO : implement RageTimeToX
+    -- or (AC.Tier19_2Pc and Target:TimeToDie() >= 10 and Player:RageTimeToX(25,0) <= S.Bloodthirst:CooldownRemainsP())
+    if S.Execute:IsReady() then
       if AR.Cast(S.Execute) then return ""; end
     end
     -- actions.execute+=/odyns_fury
