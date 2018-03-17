@@ -354,7 +354,7 @@
       if AR.Cast(S.MarkedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/aimed_shot,if=focus+cast_regen>focus.max&!buff.sentinels_sight.up
-    if IsCastableP(S.AimedShot) and Player:FocusCastRegen(S.AimedShot:CastTime()) > Player:FocusMax() and not Player:Buff(S.SentinelsSight) then
+    if IsCastableP(S.AimedShot) and PlayerFocusPredicted() + Player:FocusCastRegen(S.AimedShot:CastTime()) > Player:FocusMax() and not Player:Buff(S.SentinelsSight) then
       if not IsCastableM(S.AimedShot) then AR.CastSuggested(S.AimedShot) elseif AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/multishot,if=spell_targets.multishot>1&!variable.waiting_for_sentinel
@@ -470,7 +470,7 @@
       if AR.Cast(S.MarkedShot) then return ""; end
     end
     -- actions.patient_sniper+=/aimed_shot,if=focus+cast_regen>focus.max&!buff.sentinels_sight.up
-    if IsCastableP(S.AimedShot) and Player:FocusCastRegen(S.AimedShot:ExecuteTime()) > Player:FocusMax() and not Player:Buff(S.SentinelsSight) then
+    if IsCastableP(S.AimedShot) and PlayerFocusPredicted() + Player:FocusCastRegen(S.AimedShot:ExecuteTime()) > Player:FocusMax() and not Player:Buff(S.SentinelsSight) then
       if not IsCastableM(S.AimedShot) then AR.CastSuggested(S.AimedShot) elseif AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.patient_sniper+=/sidewinders,if=(!debuff.hunters_mark.up|(!buff.marking_targets.up&!buff.trueshot.up))&((buff.marking_targets.up&variable.vuln_aim_casts<1)|buff.trueshot.up|charges_fractional>1.9)

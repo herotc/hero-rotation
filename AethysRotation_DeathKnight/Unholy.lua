@@ -95,7 +95,7 @@
   };
   local I = Item.DeathKnight.Unholy;
  --Rotation Var
-
+  local T202P,T204P = AC.HasTier("T20")
 
   --GUI Settings
   local Settings = {
@@ -267,7 +267,7 @@ local function Cooldowns()
   -- t20 gameplay
   if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
     if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
-  elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:CooldownRemainsP() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 then
+  elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:CooldownRemainsP() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 and T204P then
     if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
   end
   --actions.cooldowns+=/apocalypse,if=debuff.festering_wound.stack>=6

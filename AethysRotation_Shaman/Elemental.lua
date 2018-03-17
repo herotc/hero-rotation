@@ -182,7 +182,7 @@ local function APL ()
     end
 
     -- actions+=/use_item,name=gnawed_thumb_ring,if=equipped.gnawed_thumb_ring&(talent.ascendance.enabled&!buff.ascendance.up|!talent.ascendance.enabled)
-    if I.GnawedThumbRing:IsEquipped() and (S.Ascendance:IsAvailable() and not Player:Buff(S.AscendanceBuff) or not S.Ascendance:IsAvailable()) then
+    if I.GnawedThumbRing:IsEquipped() and I.GnawedThumbRing:IsReady() and (S.Ascendance:IsAvailable() and not Player:Buff(S.AscendanceBuff) or not S.Ascendance:IsAvailable()) then
       if AR.Cast(I.GnawedThumbRing) then return "Use GnawedThumbRing" end
     end
 

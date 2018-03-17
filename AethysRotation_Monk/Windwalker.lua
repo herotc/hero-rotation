@@ -77,7 +77,10 @@ Spell.Monk.Windwalker = {
   TheEmperorsCapacitor             = Spell(235054),
 
   -- Tier Set
-  PressurePoint                    = Spell(247255)
+  PressurePoint                    = Spell(247255),
+
+    -- Misc
+    PoolEnergy                    = Spell(9999000010),
 
 };
 local S = Spell.Monk.Windwalker;
@@ -136,31 +139,6 @@ function Spell:ReadyTime(Index)
 			return EnergyTimeToXP(self:Cost(Index));
 		else return 999; end
 	end
-end
-
--- LowestReadyTime - Returns the lowest ReadyTime + Offset as a spell name.
-local function LowestReadyTime()
-	local SpellList = {
-
-		TigerPalm							= S.TigerPalm:ReadyTime(2),
-		EnergizingElixir			= S.EnergizingElixir:ReadyTime(),
-		ChiWave 							= S.ChiWave:ReadyTime(),
-		RushingJadeWind 			= S.RushingJadeWind:ReadyTime(),
-		WhirlingDragonPunch  	= S.WhirlingDragonPunch:ReadyTime(),
-		FistsOfFury 					= S.FistsOfFury:ReadyTime(),
-		RisingSunKick 				= S.RisingSunKick:ReadyTime(),
-		StrikeOfTheWindlord 	= S.StrikeOfTheWindlord:ReadyTime(),
-	};
-
-	local SpellName = next(SpellList)
-	local ReadyTime = SpellList[SpellName]
-
-	for k, v in pairs(SpellList) do
-	    if SpellList[k] < ReadyTime then
-	        SpellName, ReadyTime = k, v
-	    end
-	end
-		if AR.Cast(S[SpellName]) then return ""; end
 end
 
 -- IsReady - Compare ReadyTime vs CastRemains / GCD
@@ -244,7 +222,7 @@ local function single_target ()
     ) then
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
-  -- actions.st+=/spinning_crane_kick,if=(active_enemies>=3|(buff.bok_proc.up&chi.max-chi>=0))&!prev_gcd.1.spinning_crane_kick&set_bonus.tier21_4pc
+  -- actions.st+=/spinning_crane_kick,if=(active_enemies>=3|(buff.bok_proc.up&chi=chi.max))&!prev_gcd.1.spinning_crane_kick&set_bonus.tier21_4pc
   if S.SpinningCraneKick:IsReady()
     and (
       ( Cache.EnemiesCount[8] >= 3
@@ -302,8 +280,8 @@ local function single_target ()
     if AR.Cast(S.TigerPalm) then return ""; end
   end
 		
-	-- downtime_prediction
-  LowestReadyTime()
+	-- downtime energy pooling
+  if AR.Cast(S.PoolEnergy) then return "Pool Energy"; end
   return false;
 end
 
