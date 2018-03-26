@@ -108,7 +108,8 @@ Spell.Druid.Balance = {
   StellarEmpowerment    = Spell(197637),
   SolarSolstice	        = Spell(252767),
   AstralAcceleration    = Spell(242232),
-  PotionOfProlongedPowerBuff = Spell(229206)
+  PotionOfProlongedPowerBuff = Spell(229206),
+  StellarDriftBuff      = Spell(202461)
 };
 local S = Spell.Druid.Balance;
 
@@ -912,7 +913,7 @@ local function APL ()
       end
 
       --Movement
-      if not Player:IsMoving() or (S.StellarDrift:IsAvailable() and Player:Buff(S.StellarDrift) and Player:BuffRemainsP(S.Starfall) > 0) or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
+      if not Player:IsMoving() or (S.StellarDrift:IsAvailable() and Player:Buff(S.StellarDriftBuff) and Player:BuffRemainsP(S.Starfall) > 0) or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
         -- actions+=/call_action_list,name=AoE,if=(spell_targets.starfall>=2&talent.stellar_drift.enabled)|spell_targets.starfall>=3
         if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
           ShouldReturn = AoE();
