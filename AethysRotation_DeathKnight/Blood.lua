@@ -116,7 +116,7 @@ local function APL ()
       end
     end
     -- Bone Shield
-    if S.Marrowrend:IsCastableP("Melee") and Player:BuffRemains(S.BoneShield) <= Player:GCD() * 2 then
+    if S.Marrowrend:IsCastableP("Melee") and (Player:BuffRemainsP(S.BoneShield) <= 6 or (Target:TimeToDie() < 5 and Player:BuffRemainsP(S.BoneShield) < 10 and Cache.EnemiesCount[5] == 1)) then
       if AR.Cast(S.Marrowrend) then return ""; end
     end 
     -- Healing
@@ -132,7 +132,7 @@ local function APL ()
 
     --- APL
     -- Pool during Blooddrinker if enabled
-    if Settings.Blood.PoolDuringBlooddrinker and Player:IsChanneling(S.Blooddrinker) and Player:BuffRemains(S.BoneShield) and UnitsWithoutBloodPlague == 0 and not Player:ShouldStopCasting() and Player:CastRemains() > 0.2 then
+    if Settings.Blood.PoolDuringBlooddrinker and Player:IsChanneling(S.Blooddrinker) and Player:BuffP(S.BoneShield) and UnitsWithoutBloodPlague == 0 and not Player:ShouldStopCasting() and Player:CastRemains() > 0.2 then
       if AR.Cast(S.Pool) then return "Blooddrinker Pooling"; end
     end
     -- Arcane Torrent
@@ -151,12 +151,12 @@ local function APL ()
     if AR.CDsON() and S.Bonestorm:IsCastableP("Melee") and Cache.EnemiesCount[8] >= 1 and Player:RunicPower() >= 100 then
       if AR.Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm) then return ""; end
     end
-    -- 
+    -- Death and Decay Crimson Scourge
     if AR.AoEON() and S.DeathandDecay:IsReady("Melee") and (Cache.EnemiesCount[8] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[8] > 1 and Player:Buff(S.CrimsonScourge)) then
       if AR.Cast(S.DeathandDecay) then return ""; end
     end
     -- 
-    if S.Blooddrinker:IsCastableP(30) and S.Blooddrinker:IsLearned() and not Player:ShouldStopCasting() and not Player:Buff(S.DancingRuneWeaponBuff) and Player:RunicPowerDeficit() >= 15 then
+    if S.Blooddrinker:IsCastableP(30) and not Player:ShouldStopCasting() and not Player:Buff(S.DancingRuneWeaponBuff) and Player:BuffRemainsP(S.BoneShield) > 3 and Player:RunicPowerDeficit() >= 15 then
       if AR.Cast(S.Blooddrinker, Settings.Blood.GCDasOffGCD.Blooddrinker) then return ""; end
     end
     -- 
