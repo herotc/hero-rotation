@@ -58,7 +58,8 @@ local S = Spell.Monk.Brewmaster;
 -- Items
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
-  ProlongedPower                   = Item(142117)
+  ProlongedPower      = Item(142117),
+  StormstoutsLastGasp = Item((248044), {3}),
 };
 local I = Item.Monk.Brewmaster;
 
@@ -211,6 +212,10 @@ local function APL()
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=55
     if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 55) then
       if AR.Cast(S.TigerPalm) then return ""; end
+    end
+    -- rjw > ks if SLG
+    if S.RushingJadeWind:IsCastableP() and I.StormstoutsLastGasp:IsEquipped() and S.RushingJadeWind:CooldownRemainsP() + 0.5 <= S.KegSmash:CooldownRemainsP() then
+      if AR.Cast(S.RushingJadeWind) then return ""; end
     end
     -- Keg Smash coming back during the next GCD
     if Target:IsInRange(25) and S.KegSmash:CooldownRemainsP() < Player:GCD() then
