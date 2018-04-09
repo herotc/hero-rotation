@@ -510,6 +510,12 @@ local function EmeraldDreamcatcherRotation ()
 end  
 
 local function SingleTarget ()
+  -- actions.st=starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
+  if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
+    or (v_starfall and ((not Target:Debuff(S.StellarEmpowerment)) or (Player:BuffRemainsP(S.Starfall) == 0 and Target:Debuff(S.StellarEmpowerment))) and FutureAstralPower() >= StarfallCost()) then
+    if AR.Cast(S.Starfall) then return ""; end
+  end
+
   -- actions.st+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
   if S.StellarFlare:IsAvailable() and FutureAstralPower() >= 15 and Target:DebuffRefreshableCP(S.StellarFlare) and Target:FilteredTimeToDie(">", 10) and not Player:IsCasting(S.StellarFlare) then
     if AR.Cast(S.StellarFlare) then return ""; end
@@ -562,17 +568,6 @@ local function SingleTarget ()
     end
   end
 
-    -- actions.st+=/starsurge,if=buff.oneths_intuition.react
-  if Player:Buff(S.OnethsIntuition) then
-    if AR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- actions.st+=/starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!debuff.stellar_empowerment.up)
-  if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
-    or (v_starfall and ((not Target:Debuff(S.StellarEmpowerment)) or (Player:BuffRemainsP(S.Starfall) == 0 and Target:Debuff(S.StellarEmpowerment))) and FutureAstralPower() >= StarfallCost()) then
-    if AR.Cast(S.Starfall) then return ""; end
-  end
-
   -- actions.st+=/solar_wrath,if=buff.solar_empowerment.stack=3&astral_power.deficit>10
   if Player:BuffStack(S.SolarEmpowerment) == 3 and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 3) and Player:AstralPowerDeficit(FutureAstralPower()) > 10 then
     if AR.Cast(S.SolarWrath) then return ""; end
@@ -582,9 +577,9 @@ local function SingleTarget ()
   if Player:BuffStack(S.LunarEmpowerment) == 3 and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 3) and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
     if AR.Cast(S.LunarStrike) then return ""; end
   end
-  
-  -- actions.st+=/starsurge,if=astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-  if FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40)) then
+
+  -- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
+  if Player:BuffRemainsP(S.OnethsIntuition) > 0 or FutureAstralPower() >= 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40) then
     if AR.Cast(S.Starsurge) then return ""; end
   end
 
@@ -767,14 +762,15 @@ local function CDs ()
     if AR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
   end
 
-  -- actions+=/blessing_of_elune,if=active_enemies<=2&talent.blessing_of_the_ancients.enabled&buff.blessing_of_elune.down
-  if (Cache.EnemiesCount[Range] <= 2 or not AR.AoEON()) and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:CooldownRemainsP() == 0 and not Player:Buff(S.BlessingofElune) then
-    if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
+  -- actions+=/blessing_of_elune,if=active_enemies<=2&(!variable.starfall_st|(variable.starfall_st&buff.celestial_alignment.up))
+  if S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) 
+    and Cache.EnemiesCount[Range] <= 2 and (not v_starfall or (v_starfall and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0))) then
+      if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
   end
-
-  -- actions+=/blessing_of_elune,if=active_enemies>=3&talent.blessing_of_the_ancients.enabled&buff.blessing_of_anshe.down
-  if AR.AoEON() and Cache.EnemiesCount[Range] >= 3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:CooldownRemainsP() == 0 and not Player:Buff(S.BlessingofAnshe) then
-    if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
+  -- actions+=/blessing_of_anshe,if=active_enemies>=3|variable.starfall_st&!buff.celestial_alignment.up&cooldown.celestial_alignment.remains>15
+  if (S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe))
+    and (Cache.EnemiesCount[Range] >= 3 or (v_starfall and Player:BuffRemainsP(S.CelestialAlignment) == 0 and S.CelestialAlignment:CooldownRemainsP() > 15)) then
+     if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
   end
 
   -- actions+=/blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
@@ -814,8 +810,8 @@ local function CDs ()
       if AR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
   end
 
-  -- actions+=/celestial_alignment,if=astral_power>=40
-  if S.CelestialAlignment:IsAvailable() and not S.IncarnationChosenOfElune:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FutureAstralPower() >= 40
+  -- actions+=/celestial_alignment,if=astral_power>=40&(!variable.starfall_st|time>=7*gcd.max)
+  if S.CelestialAlignment:IsAvailable() and not S.IncarnationChosenOfElune:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FutureAstralPower() >= 40 and (not v_starfall or AC.CombatTime() > 7 * Player:GCD())
     and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
       if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
   end
@@ -857,10 +853,12 @@ local function APL ()
   if not Player:AffectingCombat() then
     if var_calcCombat then var_calcCombat = false end
 
-    if Cache.EnemiesCount[Range] <= 2 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
+    -- actions.precombat+=/blessing_of_elune,if=!variable.starfall_st
+    if not v_starfall and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
       if AR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
     end
-    if Cache.EnemiesCount[Range] >= 3 and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe) then
+    -- actions.precombat+=/blessing_of_anshe,if=variable.starfall_st
+    if v_starfall and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe) then
       if AR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
     end
 
