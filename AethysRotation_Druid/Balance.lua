@@ -584,7 +584,7 @@ local function SingleTarget ()
   end
 
   -- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-  if Player:BuffRemainsP(S.OnethsIntuition) > 0 or FutureAstralPower() >= 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40) then
+  if Player:BuffRemainsP(S.OnethsIntuition) > 0 or (FutureAstralPower() >= 40 and (FutureAstralPower() < 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40))) then
     if AR.Cast(S.Starsurge) then return ""; end
   end
 
