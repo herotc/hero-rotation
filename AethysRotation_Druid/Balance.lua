@@ -109,7 +109,8 @@ Spell.Druid.Balance = {
   SolarSolstice	        = Spell(252767),
   AstralAcceleration    = Spell(242232),
   PotionOfProlongedPowerBuff = Spell(229206),
-  StellarDriftBuff      = Spell(202461)
+  StellarDriftBuff      = Spell(202461),
+  OwlkinFrenzy          = Spell(157228)
 };
 local S = Spell.Druid.Balance;
 
@@ -882,11 +883,11 @@ local function APL ()
   end
 
   -- In Combat
+  if not Player:Buff(S.MoonkinForm) then
+    if AR.Cast(S.MoonkinForm) then return ""; end
+  end
+
   if Everyone.TargetIsValid() then
-    if not Player:Buff(S.MoonkinForm) then
-      if AR.Cast(S.MoonkinForm) then return ""; end
-    end
-    
     if Target:IsInRange(Range) then --in Range
       -- CD usage
       if AR.CDsON() then
@@ -1036,15 +1037,16 @@ end
 AR.SetAPL(102, APL);
 
 --- ======= SIMC =======
---- Last Update: 03/08/2018
+--- Last Update: 04/09/2018
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
 -- actions.precombat+=/food
 -- actions.precombat+=/augmentation
 -- actions.precombat+=/moonkin_form
--- actions.precombat+=/blessing_of_elune
 -- actions.precombat+=/variable,name=starfall_st,value=talent.soul_of_the_forest.enabled
+-- actions.precombat+=/blessing_of_elune,if=!variable.starfall_st
+-- actions.precombat+=/blessing_of_anshe,if=variable.starfall_st
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/potion
@@ -1052,8 +1054,8 @@ AR.SetAPL(102, APL);
 
 -- # Executed every time the actor is available.
 -- actions=potion,name=potion_of_prolonged_power,if=buff.celestial_alignment.up|buff.incarnation.up
--- actions+=/blessing_of_elune,if=active_enemies<=2
--- actions+=/blessing_of_anshe,if=active_enemies>=3
+-- actions+=/blessing_of_elune,if=active_enemies<=2&(!variable.starfall_st|(variable.starfall_st&buff.celestial_alignment.up))
+-- actions+=/blessing_of_anshe,if=active_enemies>=3|variable.starfall_st&!buff.celestial_alignment.up&cooldown.celestial_alignment.remains>15
 -- actions+=/blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
 -- actions+=/berserking,if=buff.celestial_alignment.up|buff.incarnation.up
 -- actions+=/arcane_torrent,if=buff.celestial_alignment.up|buff.incarnation.up
@@ -1064,7 +1066,7 @@ AR.SetAPL(102, APL);
 -- actions+=/astral_communion,if=astral_power.deficit>=79
 -- actions+=/warrior_of_elune
 -- actions+=/incarnation,if=astral_power>=40
--- actions+=/celestial_alignment,if=astral_power>=40
+-- actions+=/celestial_alignment,if=astral_power>=40&(!variable.starfall_st|time>=7*gcd.max)
 -- actions+=/call_action_list,name=aoe,if=(spell_targets.starfall>=2&talent.stellar_drift.enabled)|spell_targets.starfall>=3
 -- actions+=/call_action_list,name=st
 
@@ -1130,15 +1132,14 @@ AR.SetAPL(102, APL);
 -- actions.fury_of_elune+=/lunar_strike,if=buff.lunar_empowerment.stack=3|(buff.lunar_empowerment.remains<5&buff.lunar_empowerment.up)|active_enemies>=2
 -- actions.fury_of_elune+=/solar_wrath
 
--- actions.st=force_of_nature
+-- actions.st=starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
+-- actions.st+=/force_of_nature
 -- actions.st+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
 -- actions.st+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
 -- actions.st+=/sunfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<5.4)&astral_power.deficit>7&target.time_to_die>8
--- actions.st+=/starsurge,if=buff.oneths_intuition.react
--- actions.st+=/starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
 -- actions.st+=/solar_wrath,if=buff.solar_empowerment.stack=3&astral_power.deficit>10
 -- actions.st+=/lunar_strike,if=buff.lunar_empowerment.stack=3&astral_power.deficit>15
--- actions.st+=/starsurge,if=astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
+-- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
 -- actions.st+=/new_moon,if=astral_power.deficit>10&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
 -- actions.st+=/half_moon,if=astral_power.deficit>20&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
 -- actions.st+=/full_moon,if=astral_power.deficit>40
