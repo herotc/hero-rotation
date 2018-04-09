@@ -568,6 +568,11 @@ local function SingleTarget ()
     end
   end
 
+  -- custom : OwlkinFrenzy
+  if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
+    if AR.Cast(S.LunarStrike) then return ""; end
+  end
+
   -- actions.st+=/solar_wrath,if=buff.solar_empowerment.stack=3&astral_power.deficit>10
   if Player:BuffStack(S.SolarEmpowerment) == 3 and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 3) and Player:AstralPowerDeficit(FutureAstralPower()) > 10 then
     if AR.Cast(S.SolarWrath) then return ""; end
@@ -677,6 +682,11 @@ local function AoE ()
   -- actions.AoE+=/starsurge,if=buff.oneths_intuition.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
   if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) < 44) then
     if AR.Cast(S.Starsurge) then return ""; end
+  end
+
+  -- custom : OwlkinFrenzy
+  if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
+    if AR.Cast(S.LunarStrike) then return ""; end
   end
 
   -- actions.AoE+=/new_moon,if=astral_power.deficit>14&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
