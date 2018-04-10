@@ -984,7 +984,18 @@ local function APL ()
             if AR.Cast(S.SunFire) then return ""; end
           end
 
+          -- custom : OwlkinFrenzy
+          if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
+            if AR.Cast(S.LunarStrike) then return ""; end
+          end
+
         else --st
+          -- actions.st=starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
+          if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
+            or (v_starfall and ((not Target:Debuff(S.StellarEmpowerment)) or (Player:BuffRemainsP(S.Starfall) == 0 and Target:Debuff(S.StellarEmpowerment))) and FutureAstralPower() >= StarfallCost()) then
+            if AR.Cast(S.Starfall) then return ""; end
+          end
+
           -- actions.single_target+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
           if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
             if AR.Cast(S.MoonFire) then return ""; end
@@ -1021,13 +1032,13 @@ local function APL ()
             end
           end
 
-          -- actions.single_target+=/starfall,if=buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
-          if Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 44) then
-            if AR.Cast(S.Starfall) then return ""; end
+          -- custom : OwlkinFrenzy
+          if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
+            if AR.Cast(S.LunarStrike) then return ""; end
           end
 
-          -- actions.single_target+=/starsurge,if=astral_power.deficit<44|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-          if FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 44 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40)) then
+          -- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
+          if Player:BuffRemainsP(S.OnethsIntuition) > 0 or (FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40))) then
             if AR.Cast(S.Starsurge) then return ""; end
           end
           
