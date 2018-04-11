@@ -97,13 +97,15 @@ local function APL ()
       -- Rune
       -- PrePot w/ DBM Count
       -- Opener
-      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() and Target:IsInRange("Melee") then
+      if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
         if S.Judgment:IsCastable() then
           if AR.Cast(S.Judgment) then return "Cast Judgment"; end
-        elseif S.Zeal:IsCastable() then
-          if AR.Cast(S.Zeal) then return "Cast Zeal"; end
-        elseif S.CrusaderStrike:IsCastable() then
-          if AR.Cast(S.CrusaderStrike) then return "Cast CrusaderStrike"; end
+        elseif Target:IsInRange("Melee") then 
+          if S.Zeal:IsCastable() then
+            if AR.Cast(S.Zeal) then return "Cast Zeal"; end
+          elseif S.CrusaderStrike:IsCastable() then
+            if AR.Cast(S.CrusaderStrike) then return "Cast CrusaderStrike"; end
+          end
         end
       end
       return;
