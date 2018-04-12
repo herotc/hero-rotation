@@ -180,7 +180,7 @@ local function APL()
     
     -- actions.cooldown=arcane_torrent,if=!talent.demonic.enabled&fury.deficit>=15
     if S.ArcaneTorrent:IsCastable()
-      and (Player.FuryDeficitWithCSRefund()>=15 and not S.Demonic:IsAvailable()) then
+      and (not S.Demonic:IsAvailable() and Player.FuryDeficitWithCSRefund()>=15) then
       if AR.Cast(S.ArcaneTorrent, Settings.Havoc.OffGCDasOffGCD.ArcaneTorrent) then return "Cast Arcane Torrent"; end
     end
     -- actions.cooldown+=/arcane_torrent,if=talent.demonic.enabled&fury.deficit>=15&buff.metamorphosis.up
@@ -467,7 +467,7 @@ end
 AR.SetAPL(577, APL);
 
 --- ======= SIMC =======
---- Last Update: 12/16/2017
+--- Last Update: 02/03/2018
 
 --[[
 # Executed before combat begins. Accepts non-harmful actions only.
@@ -497,6 +497,8 @@ actions+=/pick_up_fragment,if=fury.deficit>=35&((cooldown.eye_beam.remains>5|!ta
 actions+=/run_action_list,name=demonic,if=talent.demonic.enabled
 actions+=/run_action_list,name=normal
 
+actions.cooldown=arcane_torrent,if=!talent.demonic.enabled&fury.deficit>=15
+actions.cooldown+=/arcane_torrent,if=talent.demonic.enabled&fury.deficit>=15&buff.metamorphosis.up
 # Use Metamorphosis when we are done pooling Fury and when we are not waiting for other cooldowns to sync.
 actions.cooldown=metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis|variable.waiting_for_chaos_blades)|target.time_to_die<25
 actions.cooldown+=/metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up
