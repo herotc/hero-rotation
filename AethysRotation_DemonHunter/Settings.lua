@@ -38,6 +38,8 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       FelRushDisplayStyle = "Main Icon",
       OffGCDasOffGCD = {
+        -- Racials
+        ArcaneTorrent = true,
         -- Abilities
         ChaosBlades = true,
         Metamorphosis = true,
