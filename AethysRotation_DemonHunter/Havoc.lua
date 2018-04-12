@@ -177,7 +177,17 @@ local function APL()
   local function Cooldown()
     -- Locals for tracking if we should display these suggestions together
     local MetamorphosisSuggested, ChaosBladesSuggested;
-
+    
+    -- actions.cooldown=arcane_torrent,if=!talent.demonic.enabled&fury.deficit>=15
+    if S.ArcaneTorrent:IsCastable()
+      and (Player.FuryDeficitWithCSRefund()>=15 and not S.Demonic:IsAvailable()) then
+      if AR.Cast(S.ArcaneTorrent, Settings.Havoc.OffGCDasOffGCD.ArcaneTorrent) then return "Cast Arcane Torrent"; end
+    end
+    -- actions.cooldown+=/arcane_torrent,if=talent.demonic.enabled&fury.deficit>=15&buff.metamorphosis.up
+    if S.ArcaneTorrent:IsCastable()
+      and (S.Demonic:IsAvailable() and Player.FuryDeficitWithCSRefund()>=15 and Player:BuffP(S.MetamorphosisBuff)) then
+      if AR.Cast(S.ArcaneTorrent, Settings.Havoc.OffGCDasOffGCD.ArcaneTorrent) then return "Cast Arcane Torrent (Demonic)"; end
+    end
     -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis|variable.waiting_for_chaos_blades)|target.time_to_die<25
     if S.Metamorphosis:IsCastable()
       and (not (S.Demonic:IsAvailable() or PoolingForMeta() or WaitingForNemesis() or WaitingForChaosBlades()) or Target:TimeToDie() < 25) then
