@@ -375,6 +375,7 @@ AR.SetAPL(64, APL);
 
 --- ======= SIMC =======
 --- Last Update: 11/28/2017
+--- Last Check: 16/04/2018
 -- # Executed every time the actor is available.
 -- actions=counterspell
 -- # Free Ice Lance after Flurry. This action has rather high priority to ensure that we don't cast Rune of Power, Ray of Frost, etc. after Flurry and break up the combo. If FoF was already active, we do not lose anything by delaying the Ice Lance.
