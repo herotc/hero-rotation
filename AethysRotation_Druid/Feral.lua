@@ -57,6 +57,7 @@
     RestorationAffinity = Spell(197492),
     Sabertooth          = Spell(202031),
     SavageRoar          = Spell(52610),
+    MomentOfClarity     = Spell(236068),
     -- Artifact
     AshamanesFrenzy     = Spell(210722),
     -- Defensive
@@ -286,8 +287,9 @@
           if S.Regrowth:IsCastable() and Player:ComboPoints() > 3 and S.Bloodtalons:IsAvailable() and Player:BuffP(S.PredatorySwiftness) and Player:BuffP(S.ApexPredator) and Player:BuffDownP(S.Incarnation) then
             if AR.Cast(S.Regrowth) then return ""; end
           end
-          -- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up
-          if S.FerociousBite:IsCastable() and Player:ComboPoints() >= 1 and Player:BuffP(S.ApexPredator) then
+          -- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up&((combo_points>4&(buff.incarnation.up|talent.moment_of_clarity.enabled))|(talent.bloodtalons.enabled&buff.bloodtalons.up&combo_points>3))
+          if S.FerociousBite:IsCastable() and Player:ComboPoints() >= 1 and Player:BuffP(S.ApexPredator) 
+            and ((Player:ComboPoints() > 4 and (Player:BuffP(S.Incarnation) or S.MomentOfClarity:IsAvailable())) or (S.Bloodtalons:IsAvailable() and Player:BuffP(S.BloodtalonsBuff) and Player:ComboPoints() > 3)) then
             if AR.Cast(S.FerociousBite) then return ""; end
           end
           -- run_action_list,name=st_finishers,if=combo_points>4
@@ -450,7 +452,7 @@
 
 
 --- ======= SIMC =======
--- Imported Current APL on 2017-12-02, 07:56 CEST
+-- Imported Current APL on 2018-04-16, 04:18 CEST
 -- # Default consumables
 -- potion=potion_of_prolonged_power
 -- flask=seventh_demon
@@ -511,7 +513,7 @@
 -- actions.single_target+=/ferocious_bite,target_if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>10&(target.health.pct<25|talent.sabertooth.enabled)
 -- actions.single_target+=/regrowth,if=combo_points=5&buff.predatory_swiftness.up&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8)
 -- actions.single_target+=/regrowth,if=combo_points>3&talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.apex_predator.up&buff.incarnation.down
--- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up
+-- actions.single_target+=/ferocious_bite,if=buff.apex_predator.up&((combo_points>4&(buff.incarnation.up|talent.moment_of_clarity.enabled))|(talent.bloodtalons.enabled&buff.bloodtalons.up&combo_points>3))
 -- actions.single_target+=/run_action_list,name=st_finishers,if=combo_points>4
 -- actions.single_target+=/run_action_list,name=st_generators
 
