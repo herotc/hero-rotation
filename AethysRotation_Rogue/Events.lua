@@ -281,7 +281,7 @@
           Player.RSOffset.Offsetvote = Player:ComboPoints()*6.0;
         end
       end
-      , "UNIT_POWER"
+      , "UNIT_POWER_UPDATE"
     );
     -- Set RSOffset when casting a finisher
     AC:RegisterForSelfCombatEvent(
