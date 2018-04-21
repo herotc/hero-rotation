@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 
 ## Title: Aethys |cFFA330C9Rotation|r [|cFFEDA55FWarlock|r]
 ## Author: KutiKuti
