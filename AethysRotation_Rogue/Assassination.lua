@@ -114,24 +114,19 @@ local I = Item.Rogue.Assassination;
 -- Spells Damage
 S.Envenom:RegisterDamage(
   -- Envenom DMG Formula:
-  --  AP * CP * Env_APCoef * AssaResolv_M * Aura_M * ToxicB_M * T19_4PC_M * DS_M * AgoP_M * Mastery_M * Versa_M * SlayersPrecision_M * SiUncrowned_M
-  -- 35037 * 5 * 0.6 * 1.17 * 1.11 * 1.16 * 1 * 1 * 1 * 2.443 * 1.0767 * 1.05 * 1.1
+  --  AP * CP * Env_APCoef * Aura_M * ToxicB_M * T19_4PC_M * DS_M * Mastery_M * Versa_M
   function ()
     return
       -- Attack Power
-      Player:AttackPower() *
+      Player:AttackPowerDamageMod() *
       -- Combo Points
       Rogue.CPSpend() *
       -- Envenom AP Coef
-      0.60 *
-      -- Assassin's Resolve (SpellID: 84601)
-      1.17 *
+      0.16 *
       -- Aura Multiplier (SpellID: 137037)
-      1.28 *
+      1.32 *
       -- Toxic Blade Multiplier
-      (Target:DebuffP(S.ToxicBladeDebuff) and 1.35 or 1) *
-      -- Toxic Blades Multiplier
-      (S.ToxicBlades:ArtifactEnabled() and 1 + S.ToxicBlades:ArtifactRank()*0.03 or 1) *
+      (Target:DebuffP(S.ToxicBladeDebuff) and 1.3 or 1) *
       -- Tier 19 4PC  Multiplier
       (AC.Tier19_4Pc and Rogue.Assa_T19_4PC_EnvMultiplier() or 1) *
       -- Deeper Stratagem Multiplier
@@ -139,37 +134,20 @@ S.Envenom:RegisterDamage(
       -- Mastery Finisher Multiplier
       (1 + Player:MasteryPct()/100) *
       -- Versatility Damage Multiplier
-      (1 + Player:VersatilityDmgPct()/100) *
-      -- Slayer's Precision Multiplier
-      (S.SlayersPrecision:ArtifactEnabled() and 1.05 or 1) *
-      -- Silence of the Uncrowned Multiplier
-      (S.SilenceoftheUncrowned:ArtifactEnabled() and 1.1 or 1);
+      (1 + Player:VersatilityDmgPct()/100);
   end
 );
 S.Mutilate:RegisterDamage(
   function ()
-    -- TODO: Implement most of those thing in the core.
-    local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, physicalBonusPos, physicalBonusNeg, percent = UnitDamage("player");
-    local speed, offhandSpeed = UnitAttackSpeed("player");
-    local wSpeed = speed * (1 + Player:HastePct()/100);
-    local AvgWpnDmg = (minDamage + maxDamage) / 2 / wSpeed / percent - (Player:AttackPower() / 3.5);
     return
-      -- (Average Weapon Damage [Weapon DPS * Swing Speed] + (Attack Power * NormalizedWeaponSpeed / 3.5)) * (MH Factor +OH Factor)
-      (AvgWpnDmg * wSpeed + (Player:AttackPower() * 1.7 / 3.5)) * 1.5 *
+      -- Attack Power (MH Factor + OH Factor)
+      (Player:AttackPowerDamageMod() + Player:AttackPowerDamageMod(true)) *
       -- Mutilate Coefficient
-      3.6 *
-      -- Assassin's Resolve (SpellID: 84601)
-      1.17 *
+      0.35 *
       -- Aura Multiplier (SpellID: 137037)
-      1.28 *
-      -- Assassin's Blades Multiplier
-      (S.AssassinsBlades:ArtifactEnabled() and 1.15 or 1) *
+      1.32 *
       -- Versatility Damage Multiplier
       (1 + Player:VersatilityDmgPct()/100) *
-      -- Slayer's Precision Multiplier
-      (S.SlayersPrecision:ArtifactEnabled() and 1.05 or 1) *
-      -- Silence of the Uncrowned Multiplier
-      (S.SilenceoftheUncrowned:ArtifactEnabled() and 1.1 or 1) *
       -- Insignia of Ravenholdt Effect
       (I.InsigniaofRavenholdt:IsEquipped() and 1.3 or 1);
   end

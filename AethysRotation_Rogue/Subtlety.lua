@@ -95,34 +95,28 @@ local tableinsert = table.insert;
   S.Eviscerate:RegisterDamage(
     -- Eviscerate DMG Formula (Pre-Mitigation):
     --- Player Modifier
-      -- AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * F:Evisc_M * ShadowFangs_M * MoS_M * NS_M * DS_M * DSh_M * SoD_M * ShC_M * Mastery_M * Versa_M * LegionBlade_M * ShUncrowned_M
+      -- AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * NS_M * DS_M * DSh_M * SoD_M * ShC_M * Mastery_M * Versa_M
     --- Target Modifier
       -- NB_M
     function ()
       return
         --- Player Modifier
           -- Attack Power
-          Player:AttackPower() *
+          Player:AttackPowerDamageMod() *
           -- Combo Points
           Rogue.CPSpend() *
           -- Eviscerate R1 AP Coef
-          0.98130 *
+          0.16074 *
           -- Eviscerate R2 Multiplier
           1.5 *
           -- Aura Multiplier (SpellID: 137035)
-          1.27 *
-          -- Finality: Eviscerate Multiplier
-          (Player:BuffP(S.FinalityEviscerate) and 1 + Player:Buff(S.FinalityEviscerate, 17) / 100 or 1) *
-          -- Shadow Fangs Multiplier
-          (S.ShadowFangs:ArtifactEnabled() and 1.04 or 1) *
-          -- Master of Subtlety Multiplier
-          (Player:BuffP(S.MasterOfSubtletyBuff) and 1.1 or 1) *
+          1.25 *
           -- Nightstalker Multiplier
           (S.Nightstalker:IsAvailable() and Player:IsStealthed(true) and 1.12 or 1) *
           -- Deeper Stratagem Multiplier
           (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
           -- Dark Shadow Multiplier
-          (S.DarkShadow:IsAvailable() and Player:BuffP(S.ShadowDanceBuff) and 1.3 or 1) *
+          (S.DarkShadow:IsAvailable() and Player:BuffP(S.ShadowDanceBuff) and 1.25 or 1) *
           -- Symbols of Death Multiplier
           (Player:BuffP(S.SymbolsofDeath) and 1.15+(AC.Tier20_2Pc and 0.1 or 0) or 1) *
           -- Shuriken Combo Multiplier
@@ -131,10 +125,6 @@ local tableinsert = table.insert;
           (1 + Player:MasteryPct()/100) *
           -- Versatility Damage Multiplier
           (1 + Player:VersatilityDmgPct()/100) *
-          -- Legion Blade Multiplier
-          (S.LegionBlade:ArtifactEnabled() and 1.05 or 1) *
-          -- Shadows of the Uncrowned Multiplier
-          (S.ShadowsoftheUncrowned:ArtifactEnabled() and 1.1 or 1) *
         --- Target Modifier
           -- Nightblade Multiplier
           (Target:DebuffP(S.Nightblade) and 1.15 or 1);
