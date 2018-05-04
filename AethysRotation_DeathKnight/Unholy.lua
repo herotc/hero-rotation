@@ -23,64 +23,68 @@
   if not Spell.DeathKnight then Spell.DeathKnight = {}; end
   Spell.DeathKnight.Unholy = {
     -- Racials
-  ArcaneTorrent                 = Spell(50613),
-  Berserking                    = Spell(26297),
-  BloodFury                     = Spell(20572),
-  GiftoftheNaaru                = Spell(59547),
-    -- Artifact
-  Apocalypse                    = Spell(220143),
-  --Abilities
-  ArmyOfDead                    = Spell(42650),
-  ChainsOfIce                   = Spell(45524),
-  ScourgeStrike                 = Spell(55090),
-  DarkTransformation            = Spell(63560),
-  DeathAndDecay                 = Spell(43265),
-  DeathCoil                     = Spell(47541),
-  DeathStrike                   = Spell(49998),
-  FesteringStrike               = Spell(85948),
-  Outbreak                      = Spell(77575),
-  SummonGargoyle                = Spell(49206),
-  SummonPet                     = Spell(46584),
-     --Talents
-  BlightedRuneWeapon            = Spell(194918),
-  Epidemic                      = Spell(207317),
-  Castigator                    = Spell(207305),
-  ClawingShadows                = Spell(207311),
-  Necrosis                      = Spell(207346),
-  ShadowInfusion                = Spell(198943),
-  DarkArbiter                   = Spell(207349),
-  Defile                        = Spell(152280),
-  SoulReaper                    = Spell(130736),
-  --Buffs/Procs
-  MasterOfGhouls                = Spell(246995),
-  SuddenDoom                    = Spell(81340),
-  UnholyStrength                = Spell(53365),
-  NecrosisBuff                  = Spell(216974),
-  DeathAndDecayBuff             = Spell(188290),
-  --Debuffs
-  SoulReaperDebuff              = Spell(130736),
-  FesteringWounds               = Spell(194310), --max 8 stacks
-  VirulentPlagueDebuff          = Spell(191587), -- 13s debuff from Outbreak
-  --Defensives
-  AntiMagicShell                = Spell(48707),
-  IcebornFortitute              = Spell(48792),
-   -- Utility
-  ControlUndead                 = Spell(45524),
-  DeathGrip                     = Spell(49576),
-  MindFreeze                    = Spell(47528),
-  PathOfFrost                   = Spell(3714),
-  WraithWalk                    = Spell(212552),
-  --Legendaries Buffs/SpellIds 
-  ColdHeartBuff                 = Spell(235599),
-  InstructorsFourthLesson       = Spell(208713),
-  KiljaedensBurningWish         = Spell(144259),
-  --DarkArbiter HiddenAura
-  DarkArbiterActive             = Spell(212412),
-  -- Misc
-  PoolForArmy                   = Spell(9999000010)
-  
-  
-  };
+    ArcaneTorrent                 = Spell(50613),
+    Berserking                    = Spell(26297),
+    BloodFury                     = Spell(20572),
+    GiftoftheNaaru                = Spell(59547),
+      -- Artifact
+    Apocalypse                    = Spell(220143),
+    --Abilities
+    ArmyOfDead                    = Spell(42650),
+    ChainsOfIce                   = Spell(45524),
+    ScourgeStrike                 = Spell(55090),
+    DarkTransformation            = Spell(63560),
+    DeathAndDecay                 = Spell(43265),
+    DeathCoil                     = Spell(47541),
+    DeathStrike                   = Spell(49998),
+    FesteringStrike               = Spell(85948),
+    Outbreak                      = Spell(77575),
+    SummonPet                     = Spell(46584),
+       --Talents
+    InfectedClaws                 = Spell(207272),
+    AllWillServe                  = Spell(194916),
+    ClawingShadows                = Spell(207311),
+    PestilentPustules             = Spell(194917),
+    InevitableDoom                = Spell(276023),
+    SoulReaper                    = Spell(130736),
+    BurstingSores                 = Spell(207264),
+    EbonFever                     = Spell(207269),
+    UnholyBlight                  = Spell(115989),
+    CorpseExplosion               = Spell(276049),
+    Defile                        = Spell(152280),
+    Epidemic                      = Spell(207317),
+    DarkInfusion                  = Spell(198943),
+    UnholyFrenzy                  = Spell(207289),
+    SummonGargoyle                = Spell(49206),
+    --Necrosis                      = Spell(207346), not on beta atm
+    --Buffs/Procs
+    --MasterOfGhouls                = Spell(246995), not on beta atm
+    SuddenDoom                    = Spell(81340),
+    UnholyStrength                = Spell(53365),
+    --NecrosisBuff                  = Spell(216974), not on beta atm
+    DeathAndDecayBuff             = Spell(188290),
+    --Debuffs
+    SoulReaperDebuff              = Spell(130736),
+    FesteringWounds               = Spell(194310), --max 8 stacks
+    VirulentPlagueDebuff          = Spell(191587), -- 13s debuff from Outbreak
+    --Defensives
+    AntiMagicShell                = Spell(48707),
+    IcebornFortitute              = Spell(48792),
+     -- Utility
+    ControlUndead                 = Spell(45524),
+    DeathGrip                     = Spell(49576),
+    MindFreeze                    = Spell(47528),
+    PathOfFrost                   = Spell(3714),
+    WraithWalk                    = Spell(212552),
+    --Legendaries Buffs/SpellIds
+    ColdHeartBuff                 = Spell(235599),
+    InstructorsFourthLesson       = Spell(208713),
+    KiljaedensBurningWish         = Spell(144259),
+    --SummonGargoyle HiddenAura
+    SummonGargoyleActive             = Spell(212412), --tbc
+    -- Misc
+    PoolForArmy                   = Spell(9999000010)
+    };
   local S = Spell.DeathKnight.Unholy;
   --Items
   if not Item.DeathKnight then Item.DeathKnight = {}; end
@@ -90,8 +94,8 @@
   InstructorsFourthLesson       = Item(132448, {9}),
   Taktheritrixs                 = Item(137075, {3}),
   ColdHeart                    = Item(151796, {5}),
-  
-  
+
+
   };
   local I = Item.DeathKnight.Unholy;
  --Rotation Var
@@ -103,7 +107,7 @@
     Commons = AR.GUISettings.APL.DeathKnight.Commons,
     Unholy = AR.GUISettings.APL.DeathKnight.Unholy
   };
-  
+
 
   --- ===== APL =====
   --- ===============
@@ -123,7 +127,7 @@
   --actions.aoe+=/clawing_shadows,if=spell_targets.clawing_shadows>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
   if S.ClawingShadows:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
     if AR.Cast(S.ClawingShadows) then return ""; end
-  end 
+  end
   --actions.aoe+=/epidemic,if=spell_targets.epidemic>2
   if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 2 then
     if AR.Cast(S.Epidemic) then return ""; end
@@ -187,7 +191,7 @@ local function DarkArbiter()
 --actions.valkyr=death_coil
  if S.DeathCoil:IsUsable() and (Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 45) then
   if AR.Cast(S.DeathCoil) then return ""; end
- end 
+ end
  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
   if S.ArcaneTorrent:IsCastable() and ( Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 ) then
   if AR.Cast(S.ArcaneTorrent, Settings.Unholy.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
@@ -211,7 +215,7 @@ local function DarkArbiter()
  --actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
  if S.ScourgeStrike:IsCastable() and Target:Debuff(S.FesteringWounds) then
   if AR.Cast(S.ScourgeStrike) then return ""; end
- end 
+ end
   return;
 end
 
@@ -240,7 +244,7 @@ local function DT()
   if S.DarkTransformation:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RuneTimeToX(4) >= Player:GCD() then
     if AR.Cast(S.DarkTransformation) then return ""; end
   end
-    
+
   return;
 end
 local function ColdHeart()
@@ -257,7 +261,7 @@ local function ColdHeart()
     if AR.Cast(S.ChainsOfIce) then return ""; end
   end
   return;
-end 
+end
 local function Cooldowns()
   --actions.cooldowns=call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart.stack>10&!debuff.soul_reaper.up
   if I.ColdHeart and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
@@ -304,9 +308,9 @@ local function APL()
     -- Flask
       -- Food
       -- Rune
-      -- Army w/ Bossmod Countdown 
+      -- Army w/ Bossmod Countdown
       -- Volley toggle
-      -- Opener 
+      -- Opener
 
     if not Player:AffectingCombat() then
     --check if we have our lovely pet with us
@@ -331,9 +335,9 @@ local function APL()
     --Lets call specific APLs
     if Everyone.TargetIsValid()  then
         ShouldReturn = Cooldowns();
-        if ShouldReturn then return ShouldReturn; 
+        if ShouldReturn then return ShouldReturn;
     end
-    
+
     if (S.DarkArbiter:IsAvailable() and  S.DarkArbiter:TimeSinceLastCast() > 22) or S.Defile:IsAvailable() or S.SoulReaper:IsAvailable() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
@@ -349,7 +353,7 @@ end
 
 AR.SetAPL(252, APL);
 --- ====27/11/2017======
---- ======= SIMC =======  
+--- ======= SIMC =======
 --# Default consumables
 --potion=prolonged_power
 ----flask=countless_armies
@@ -443,4 +447,4 @@ AR.SetAPL(252, APL);
 --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=4
 --actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
 --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
-  
+
