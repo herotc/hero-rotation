@@ -260,7 +260,7 @@ local function ColdHeart()
 end 
 local function Cooldowns()
   --actions.cooldowns=call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart.stack>10&!debuff.soul_reaper.up
-  if I.ColdHeart and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
+  if I.ColdHeart:IsEquipped() and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
     ShouldReturn = ColdHeart();
     if ShouldReturn then return ShouldReturn; end
   end
