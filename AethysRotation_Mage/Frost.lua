@@ -291,9 +291,9 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   -- counterspell	
--  if S.Counterspell:IsCastableP() and (true) then
--    if AR.Cast(S.Counterspell) then return ""; end
--  end
+  if S.Counterspell:IsCastableP() and (true) then
+   if AR.Cast(S.Counterspell) then return ""; end
+  end
   -- ice_lance,if=!buff.fingers_of_frost.react&prev_gcd.1.flurry
   if S.IceLance:IsCastableP() and (not bool(Player:BuffStackP(S.FingersofFrostBuff)) and Player:PrevGCDP(1, S.Flurry)) then
     if AR.Cast(S.IceLance) then return ""; end
