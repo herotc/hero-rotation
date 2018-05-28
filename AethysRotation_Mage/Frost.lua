@@ -21,6 +21,8 @@ local AR     = AethysRotation
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Frost = {
+  ArcaneIntellect                       = Spell(1459),
+  WaterElemental                        = Spell(31687),
   MirrorImage                           = Spell(55342),
   Frostbolt                             = Spell(116),
   FrozenOrb                             = Spell(84714),
@@ -39,9 +41,11 @@ Spell.Mage.Frost = {
   RuneofPower                           = Spell(116011),
   IcyVeins                              = Spell(12472),
   IcyVeinsBuff                          = Spell(12472),
+  -- UseItems                              = Spell(),
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
   ArcaneTorrent                         = Spell(50613),
+  LightsJudgment                        = Spell(255647),
   Blink                                 = Spell(1953),
   IceFloes                              = Spell(108839),
   IceFloesBuff                          = Spell(108839),
@@ -97,11 +101,11 @@ local function APL()
     -- food
     -- augmentation
     -- arcane_intellect
-    if S.ArcaneIntellect:IsCastableP() and (true) then
+    if S.ArcaneIntellect:IsCastableP() and not Player:BuffP(S.ArcaneIntellect) and (true) then
       if AR.Cast(S.ArcaneIntellect) then return ""; end
     end
     -- water_elemental
-    if S.WaterElemental:IsCastableP() and (true) then
+    if S.WaterElemental:IsCastableP() and not Pet:IsActive() and (true) then
       if AR.Cast(S.WaterElemental) then return ""; end
     end
     -- snapshot_stats
@@ -189,10 +193,10 @@ local function APL()
     if S.MirrorImage:IsCastableP() and (true) then
       if AR.Cast(S.MirrorImage) then return ""; end
     end
-    -- use_items
-    if S.UseItems:IsCastableP() and (true) then
-      if AR.Cast(S.UseItems) then return ""; end
-    end
+    -- -- use_items
+    -- if S.UseItems:IsCastableP() and (true) then
+    --   if AR.Cast(S.UseItems) then return ""; end
+    -- end
     -- blood_fury
     if S.BloodFury:IsCastableP() and AR.CDsON() and (true) then
       if AR.Cast(S.BloodFury, Settings.Frost.OffGCDasOffGCD.BloodFury) then return ""; end
@@ -286,8 +290,8 @@ local function APL()
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  -- counterspell	
-  if S.Counterspell:IsCastableP() and (true) then
+  -- counterspell
+  if S.Counterspell:IsCastableP() and (true) and Target:IsInterruptible() and Settings.General.InterruptEnabled then
    if AR.Cast(S.Counterspell) then return ""; end
   end
   -- ice_lance,if=!buff.fingers_of_frost.react&prev_gcd.1.flurry
