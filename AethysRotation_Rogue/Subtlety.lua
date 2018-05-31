@@ -101,7 +101,7 @@ local tableinsert = table.insert;
           -- Symbols of Death Multiplier
           (Player:BuffP(S.SymbolsofDeath) and 1.15+(AC.Tier20_2Pc and 0.1 or 0) or 1) *
           -- Shuriken Combo Multiplier
-          (Player:BuffP(S.ShurikenComboBuff) and 1 + Player:Buff(S.ShurikenComboBuff, 17) / 100 or 1) *
+          (Player:BuffP(S.ShurikenComboBuff) and 1 + Player:Buff(S.ShurikenComboBuff,  16) / 100 or 1) *
           -- Mastery Finisher Multiplier
           (1 + Player:MasteryPct()/100) *
           -- Versatility Damage Multiplier
