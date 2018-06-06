@@ -47,6 +47,7 @@ local tableinsert = table.insert;
     VanishBuff                            = Spell(11327),
     VanishBuff2                           = Spell(115193), -- w/ Subterfuge Talent
     -- Talents
+    Alacrity                              = Spell(193539),
     DarkShadow                            = Spell(245687),
     DeeperStratagem                       = Spell(193531),
     EnvelopingShadows                     = Spell(238104),
@@ -55,6 +56,7 @@ local tableinsert = table.insert;
     MarkedforDeath                        = Spell(137619),
     MasterofShadows                       = Spell(196976),
     Nightstalker                          = Spell(14062),
+    ShadowFocus                           = Spell(108209),
     ShurikenTornado                       = Spell(277925),
     Subterfuge                            = Spell(108208),
     Vigor                                 = Spell(14983),
@@ -99,13 +101,13 @@ local tableinsert = table.insert;
           -- Dark Shadow Multiplier
           (S.DarkShadow:IsAvailable() and Player:BuffP(S.ShadowDanceBuff) and 1.25 or 1) *
           -- Symbols of Death Multiplier
-          (Player:BuffP(S.SymbolsofDeath) and 1.15+(AC.Tier20_2Pc and 0.1 or 0) or 1) *
+          (Player:BuffP(S.SymbolsofDeath) and 1.15 or 1) *
           -- Shuriken Combo Multiplier
-          (Player:BuffP(S.ShurikenComboBuff) and 1 + Player:Buff(S.ShurikenComboBuff,  16) / 100 or 1) *
+          (Player:BuffP(S.ShurikenComboBuff) and (1 + Player:Buff(S.ShurikenComboBuff, 16) / 100) or 1) *
           -- Mastery Finisher Multiplier
-          (1 + Player:MasteryPct()/100) *
+          (1 + Player:MasteryPct() / 100) *
           -- Versatility Damage Multiplier
-          (1 + Player:VersatilityDmgPct()/100) *
+          (1 + Player:VersatilityDmgPct() / 100) *
         --- Target Modifier
           -- Nightblade Multiplier
           (Target:DebuffP(S.Nightblade) and 1.15 or 1);
@@ -504,7 +506,7 @@ local function APL ()
       -- actions+=/nightblade,if=target.time_to_die>6&remains<gcd.max&combo_points>=4-(time<10)*2
       if S.Nightblade:IsCastableP() and IsInMeleeRange()
         and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
-        and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
+        and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage() * Settings.Subtlety.EviscerateDMGOffset)
         and Target:DebuffRemainsP(S.Nightblade) < Player:GCD() and Player:ComboPoints() >= 4 - (AC.CombatTime() < 10 and 2 or 0) then
         if AR.Cast(S.Nightblade) then return "Cast Nightblade (Low Duration)"; end
       end
@@ -530,8 +532,8 @@ local function APL ()
       end
 
       -- # Use a builder when reaching the energy threshold
-      -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-      if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
+      -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
+      if Player:EnergyDeficitPredicted() <= Stealth_Threshold() - 40 * num(not (S.Alacrity:IsAvailable() or S.ShadowFocus:IsAvailable() or S.MasterofShadows:IsAvailable())) then
         ShouldReturn = Build();
         if ShouldReturn then return "Build: " .. ShouldReturn; end
       end
@@ -556,7 +558,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 2018-05-23
+-- Last Update: 2018-06-06
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -584,8 +586,8 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=finish,if=combo_points>=4+talent.deeper_stratagem.enabled|target.time_to_die<=1&combo_points>=3
 -- # Wait for Shadow Techniques proc if you are at 5 CP, 30+ energy missing and the proc will happen within the next second (DS, out of stealth, no Blades)
 -- actions+=/wait,sec=time_to_sht.5,if=combo_points=5&time_to_sht.5<=1&energy.deficit>=30&!buff.shadow_blades.up
--- # Use a builder when reaching the energy threshold
--- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
+-- # Use a builder when reaching the energy threshold (minus 40 if none of Alacrity, Shadow Focus, and Master of Shadows is selected)
+-- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
 -- # Lowest priority in all of the APL because it causes a GCD
 -- actions+=/arcane_pulse
 
@@ -595,7 +597,7 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/berserking,if=stealthed.rogue
 -- actions.cds+=/arcane_torrent,if=energy.deficit>70
 -- actions.cds+=/lights_judgment,if=stealthed.rogue
--- actions.cds+=/symbols_of_death
+-- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
 -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
@@ -611,7 +613,7 @@ AR.SetAPL(261, APL);
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.capping_shd&debuff.find_weakness.remains<1
 -- # With Dark Shadow only Dance when Nightblade will stay up. If not capping on charges, use during Symbols or if Symbols is at least 12 seconds away.
--- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.capping_shd|buff.symbols_of_death.remains>=1.2cooldown.symbols_of_death.remains>=12)
+-- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.capping_shd|buff.symbols_of_death.remains>=1.2|cooldown.symbols_of_death.remains>=12)
 -- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
 
 -- # Stealthed Rotation
@@ -624,15 +626,15 @@ AR.SetAPL(261, APL);
 
 -- # Finishers
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
--- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4!buff.symbols_of_death.up)
+-- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
 -- # NB Cycling seems to be not worth it, but is performing somewhat equally. Commented out the old line for now.
--- #actions.finish+=/nightblade,cycle_targets=1,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&remains<tick_time*2&(spell_targets.shuriken_storm<4|-- !buff.symbols_of_death.up)
+-- #actions.finish+=/nightblade,cycle_targets=1,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
 -- actions.finish+=/eviscerate
 
 -- # Builders
 -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
--- actions.build+=/shuriken_toss,if=buff.sharpened_blades.stack>=19
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
+-- actions.build+=/shuriken_toss,if=buff.sharpened_blades.stack>=39
