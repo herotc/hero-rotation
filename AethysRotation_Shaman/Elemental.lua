@@ -113,6 +113,33 @@ local Settings = {
   Shaman = AR.GUISettings.APL.Shaman
 }
 
+local function MaelstromP()
+  local maelstrom = Player:Maelstrom()
+  if not Player:IsCasting() then
+    return maelstrom
+  end
+  local overloadChance = Player:MasteryPct()/100
+  local resonance = 0
+  if S.TotemMastery:IsCastableP() then
+    resonance = Player:CastRemains()
+  end
+  local factor = 1 + 0.75 * overloadChance
+  if Player:IsCasting(S.LightningBolt) then
+    return maelstrom + 8 * factor + resonance 
+  end
+  if Player:IsCasting(S.Icefury) then
+    return maelstrom + 24 * factor + resonance
+  end
+  if Player:IsCasting(S.ChainLightning) then
+    local enemiesHit = min(Cache.EnemiesCount[40], 3)
+    return maelstrom + 6 * enemiesHit * factor + resonance
+  end
+  if Player:IsCasting(S.LavaBurst) then
+    return maelstrom + 12 * factor + resonance
+  end
+  return maelstrom + resonance
+end
+
 -- APL Main
 local function APL ()
   -- Unit Update
