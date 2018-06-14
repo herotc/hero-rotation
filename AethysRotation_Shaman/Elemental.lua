@@ -115,7 +115,7 @@ local Settings = {
 
 local function MaelstromP()
   local maelstrom = Player:Maelstrom()
-  if not Player:MaelstromP()
+  if not Player:IsCasting() then
     return maelstrom
   end
   local overloadChance = Player:MasteryPct()/100
