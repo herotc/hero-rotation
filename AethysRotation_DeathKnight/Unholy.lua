@@ -94,8 +94,6 @@
   
   };
   local I = Item.DeathKnight.Unholy;
- --Rotation Var
-  local T202P,T204P = AC.HasTier("T20")
 
   --GUI Settings
   local Settings = {
@@ -160,7 +158,7 @@ end
     return AOE();
   end
   --actions.generic+=/festering_strike,if=(buff.blighted_rune_weapon.stack*2+debuff.festering_wound.stack)<=2|((buff.blighted_rune_weapon.stack*2+debuff.festering_wound.stack)<=4&talent.castigator.enabled)&(cooldown.army_of_the_dead.remains>5|rune.time_to_4<=gcd)
-  if S.FesteringStrike:IsCastable() and (Player:BuffStack(S.BlightedRuneWeapon) * 2 + Target:DebuffStack(S.FesteringWounds)) <= 2 or ((Player:BuffStack(S.BlightedRuneWeapon) * 2 + Target:DebuffStack(S.FesteringWounds)) <= 4 and S.Castigator:IsAvailable()) and (S.ArmyOfDead:CooldownRemainsP() > 5 or Player:RuneTimeToX(4) <= Player:GCD()) then
+  if S.FesteringStrike:IsCastable() and (Player:BuffStack(S.BlightedRuneWeapon) * 2 + Target:DebuffStack(S.FesteringWounds)) <= 2 or ((Player:BuffStack(S.BlightedRuneWeapon) * 2 + Target:DebuffStack(S.FesteringWounds)) <= 4 and S.Castigator:IsAvailable()) and (S.ArmyOfDead:CooldownRemainsP() > 5 or Player:RuneTimeToX(4) <= Player:GCD()) or (S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <=2) then
     if AR.Cast(S.FesteringStrike) then return ""; end
   end
   --actions.generic+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune.time_to_4>=gcd
@@ -176,7 +174,7 @@ end
     if AR.Cast(S.ClawingShadows) then return ""; end
   end
   --actions.generic+=/death_coil,if=(talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>10)|!talent.dark_arbiter.enabled
-  if S.DeathCoil:IsUsable() and (S.DarkArbiter:IsAvailable() and S.DarkArbiter:CooldownRemainsP() > 10) or not S.DarkArbiter:IsAvailable() then
+  if (S.DeathCoil:IsUsable() and (S.DarkArbiter:IsAvailable() and S.DarkArbiter:CooldownRemainsP() > 10) or not S.DarkArbiter:IsAvailable()) or (S.DeathCoil:IsUsable() and not AR.CDsON()) then
     if AR.Cast(S.DeathCoil) then return ""; end
   end
   return;
@@ -264,12 +262,6 @@ local function Cooldowns()
     if I.ColdHeart:IsEquipped() and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
       ShouldReturn = ColdHeart();
       if ShouldReturn then return ShouldReturn; end
-    end
-    -- t20 gameplay
-    if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
-      if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
-    elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:CooldownRemainsP() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 and T204P then
-      if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
     end
     --actions.cooldowns+=/apocalypse,if=debuff.festering_wound.stack>=6
     if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 then
