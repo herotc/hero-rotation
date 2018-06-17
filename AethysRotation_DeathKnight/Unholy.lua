@@ -259,39 +259,41 @@ local function ColdHeart()
   return;
 end 
 local function Cooldowns()
-  --actions.cooldowns=call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart.stack>10&!debuff.soul_reaper.up
-  if I.ColdHeart:IsEquipped() and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
-    ShouldReturn = ColdHeart();
-    if ShouldReturn then return ShouldReturn; end
+  if AR.CDsON() then
+    --actions.cooldowns=call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart.stack>10&!debuff.soul_reaper.up
+    if I.ColdHeart:IsEquipped() and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
+      ShouldReturn = ColdHeart();
+      if ShouldReturn then return ShouldReturn; end
+    end
+    -- t20 gameplay
+    if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
+      if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
+    elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:CooldownRemainsP() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 and T204P then
+      if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
+    end
+    --actions.cooldowns+=/apocalypse,if=debuff.festering_wound.stack>=6
+    if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 then
+      if AR.Cast(S.Apocalypse) then return ""; end
+    end
+    --actions.cooldowns+=/dark_arbiter,if=(!equipped.137075|cooldown.dark_transformation.remains<2)&runic_power.deficit<30
+    if S.DarkArbiter:IsAvailable() and S.DarkArbiter:IsCastable() and (not I.Taktheritrixs:IsEquipped() or S.DarkTransformation:CooldownRemains() < 2) and Player:RunicPowerDeficit() < 30 then
+      if AR.Cast(S.DarkArbiter, Settings.Unholy.GCDasOffGCD.DarkArbiter) then return ""; end
+    end
+    --actions.cooldowns+=/summon_gargoyle,if=(!equipped.137075|cooldown.dark_transformation.remains<10)&rune.time_to_4>=gcd
+    if S.SummonGargoyle:IsCastable() and (not I.Taktheritrixs:IsEquipped() or S.DarkTransformation:CooldownRemainsP() < 10) and Player:RuneTimeToX(4) >= Player:GCD() then
+      if AR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
+    end
+    --actions.cooldowns+=/soul_reaper,if=(debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<=gcd)|(debuff.festering_wound.stack>=3&rune>=3&cooldown.apocalypse.remains>20)
+    if (S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:CooldownRemainsP() <= Player:GCD()) or (S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 3 and S.Apocalypse:CooldownRemains() > 20) then
+      if AR.Cast(S.SoulReaper) then return ""; end
+    end
   end
-  -- t20 gameplay
-  if AR.CDsON() and S.ArmyOfDead:IsCastable() and Player:Runes() >= 3 then
-    if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
-  elseif AR.CDsON() and (S.ArmyOfDead:IsCastable() or S.ArmyOfDead:CooldownRemainsP() <= 5) and  S.DarkArbiter:TimeSinceLastCast() > 20 and Player:Runes() <= 3 and T204P then
-    if AR.Cast(S.PoolForArmy) then return "Pool For Army"; end
-  end
-  --actions.cooldowns+=/apocalypse,if=debuff.festering_wound.stack>=6
-  if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 then
-    if AR.Cast(S.Apocalypse) then return ""; end
-  end
-  --actions.cooldowns+=/dark_arbiter,if=(!equipped.137075|cooldown.dark_transformation.remains<2)&runic_power.deficit<30
-  if S.DarkArbiter:IsAvailable() and S.DarkArbiter:IsCastable() and (not I.Taktheritrixs:IsEquipped() or S.DarkTransformation:CooldownRemains() < 2) and Player:RunicPowerDeficit() < 30 then
-    if AR.Cast(S.DarkArbiter, Settings.Unholy.GCDasOffGCD.DarkArbiter) then return ""; end
-  end
-  --actions.cooldowns+=/summon_gargoyle,if=(!equipped.137075|cooldown.dark_transformation.remains<10)&rune.time_to_4>=gcd
-  if S.SummonGargoyle:IsCastable() and (not I.Taktheritrixs:IsEquipped() or S.DarkTransformation:CooldownRemainsP() < 10) and Player:RuneTimeToX(4) >= Player:GCD() then
-    if AR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
-  end
-  --actions.cooldowns+=/soul_reaper,if=(debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<=gcd)|(debuff.festering_wound.stack>=3&rune>=3&cooldown.apocalypse.remains>20)
-  if (S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:CooldownRemainsP() <= Player:GCD()) or (S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 3 and S.Apocalypse:CooldownRemains() > 20) then
-    if AR.Cast(S.SoulReaper) then return ""; end
-  end
-  --actions.cooldowns+=/call_action_list,name=dt,if=cooldown.dark_transformation.ready
-  if S.DarkTransformation:IsReady() then
-    ShouldReturn = DT();
-    if ShouldReturn then return ShouldReturn; end
-  end
-  return;
+    --actions.cooldowns+=/call_action_list,name=dt,if=cooldown.dark_transformation.ready
+    if S.DarkTransformation:IsReady() then
+      ShouldReturn = DT();
+      if ShouldReturn then return ShouldReturn; end
+    end
+    return;
 end
 
 local function APL()
@@ -314,7 +316,7 @@ local function APL()
     if AR.Cast(S.SummonPet) then return ""; end
     end
   --army suggestion at pull
-    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() then
+    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() and AR.CDsON() then
           if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
     end
   -- outbreak if virulent_plague is not  the target and we are not in combat
