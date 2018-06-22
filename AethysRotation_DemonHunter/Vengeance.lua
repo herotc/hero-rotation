@@ -24,7 +24,7 @@ local pairs = pairs;
     -- Abilities
     Felblade        = Spell(232893),
     FelDevastation  = Spell(212084),
-    Fracture        = Spell(209795),
+    Fracture        = Spell(263642),
     Frailty         = Spell(247456),
     ImmolationAura  = Spell(178740),
     Sever           = Spell(235964),
@@ -79,7 +79,7 @@ local function APL ()
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       -- actions+=/sever
       if S.Sever:IsCastable("Melee") then
-        if AR.Cast(S.Sever) then return "Cast Shear"; end
+        if AR.Cast(S.Sever) then return "Cast Sever"; end
       end
       -- actions+=/shear
       if S.Shear:IsCastable("Melee") then
@@ -100,7 +100,7 @@ local function APL ()
     end
     -- actions+=/spirit_bomb,if=soul_fragments=5|debuff.frailty.down
     -- Note: Looks like the debuff takes time to refresh so we add TimeSinceLastCast to offset that.
-    if S.SpiritBomb:IsCastable() and S.SpiritBomb:TimeSinceLastCast() > Player:GCD() * 2 and Cache.EnemiesCount[8] >= 1 and (SoulFragments >= 4 or (Target:DebuffDownP(S.Frailty) and SoulFragments >= 1)) then
+    if S.SpiritBomb:IsCastable() and Player:Pain() >= 30 and S.SpiritBomb:TimeSinceLastCast() > Player:GCD() * 2 and Cache.EnemiesCount[8] >= 1 and (SoulFragments >= 4 or (Target:DebuffDownP(S.Frailty) and SoulFragments >= 1)) then
       if AR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
     end
     -- actions+=/soul_carver
@@ -124,8 +124,8 @@ local function APL ()
       if AR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
     end
     if Target:IsInRange("Melee") then
-      -- actions+=/fracture,if=pain>=60
-      if S.Fracture:IsCastable() and Player:Pain() >= 60 then
+      -- actions+=/fracture
+      if S.Fracture:IsCastable() then
         if AR.Cast(S.Fracture) then return "Cast Fracture"; end
       end
       -- actions+=/soul_cleave,if=pain>=80
