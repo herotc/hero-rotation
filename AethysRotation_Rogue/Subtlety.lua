@@ -219,7 +219,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/shuriken_storm,if=spell_targets.shuriken_storm>=3
-  if S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 3 then
+  if AR.AoEON() and S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 3 then
     if ReturnSpellOnly then
       return S.ShurikenStorm
     else
@@ -362,7 +362,7 @@ end
 -- # Builders
 local function Build ()
   -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
-  if S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 2 then
+  if AR.AoEON() and S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 2 then
     if AR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
   end
   -- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=19

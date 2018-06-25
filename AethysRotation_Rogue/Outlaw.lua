@@ -190,6 +190,11 @@ local function Ambush_Condition ()
   return Player:ComboPointsDeficit() >= 2 + 2 * ((S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:CooldownRemainsP() < 1) and 1 or 0)
     + (Player:Buff(S.Broadside) and 1 or 0) and Player:EnergyPredicted() > 60 and not Player:Buff(S.SkullandCrossbones);
 end
+-- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
+-- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
+local function Blade_Flurry_Sync ()
+  return not AR.AoEON() or Cache.EnemiesCount[tostring(S.Dispatch:ID())] < 2 or Player:BuffP(S.BladeFlurry)
+end
 
 local function EnergyTimeToMaxRounded ()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
@@ -255,19 +260,19 @@ local function CDs ()
     end
     if AR.CDsON() then
       -- actions.cds+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-      if S.BladeFlurry:IsCastable() and Cache.EnemiesCount[tostring(S.Dispatch:ID())] >= 2 and not Player:BuffP(S.BladeFlurry) then
+      if AR.AoEON() and S.BladeFlurry:IsCastable() and Cache.EnemiesCount[tostring(S.Dispatch:ID())] >= 2 and not Player:BuffP(S.BladeFlurry) then
         if AR.Cast(S.BladeFlurry, Settings.Outlaw.OffGCDasOffGCD.BladeFlurry) then return "Cast Blade Flurry"; end
       end
-      -- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
-      if S.GhostlyStrike:IsCastable(S.SaberSlash) and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0)) then
+      -- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
+      if S.GhostlyStrike:IsCastable(S.SaberSlash) and Blade_Flurry_Sync() and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0)) then
         if AR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
       end
-      -- actions.cds+=/killing_spree,if=energy.time_to_max>5|energy<15
-      if S.KillingSpree:IsCastable(10) and (EnergyTimeToMaxRounded() > 5 or Player:EnergyPredicted() < 15) then
+      -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
+      if S.KillingSpree:IsCastable(10) and Blade_Flurry_Sync() and (EnergyTimeToMaxRounded() > 5 or Player:EnergyPredicted() < 15) then
         if AR.Cast(S.KillingSpree) then return "Cast Killing Spree"; end
       end
-      -- actions.cds+=/blade_rush
-      if S.BladeRush:IsCastable(S.SaberSlash) then
+      -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
+      if S.BladeRush:IsCastable(S.SaberSlash) and Blade_Flurry_Sync() and EnergyTimeToMaxRounded() > 1 then
         if AR.Cast(S.BladeRush) then return "Cast Blade Rush"; end
       end
       if not Player:IsStealthed(true, true) then
@@ -426,7 +431,7 @@ end
 
 AR.SetAPL(260, APL);
 
--- Last Update: 2018-06-24
+-- Last Update: 2018-06-25
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -445,6 +450,8 @@ AR.SetAPL(260, APL);
 -- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
 -- actions=variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
 -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
+-- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
+-- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 -- actions+=/call_action_list,name=stealth,if=stealthed.all
 -- actions+=/call_action_list,name=cds
 -- actions+=/call_action_list,name=finish,if=combo_points>=cp_max_spend
@@ -460,9 +467,9 @@ AR.SetAPL(260, APL);
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- actions.cds+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
--- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
--- actions.cds+=/killing_spree,if=energy.time_to_max>5|energy<15
--- actions.cds+=/blade_rush
+-- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
+-- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
+-- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
 -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
