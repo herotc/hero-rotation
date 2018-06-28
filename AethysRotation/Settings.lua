@@ -29,6 +29,7 @@
       SoloMode = false,
       -- Remove the toggle icon buttons.
       HideToggleIcons = false,
+      NotEnoughManaEnabled = false,
       RotationDebugOutput = false,
       ScaleUI = 1,
       ScaleButtons = 1
@@ -50,5 +51,6 @@
     CreatePanelOption("CheckButton", CP_General, "General.InterruptWithStun", "Interrupt With Stun", "EXPERIMENTAL: Enable if you want to interrupt with stuns.");
     CreatePanelOption("CheckButton", CP_General, "General.SoloMode", "Solo Mode", "Enable if you want to try to maximize survivability at the cost of dps.");
     CreatePanelOption("CheckButton", CP_General, "General.HideToggleIcons", "Hide toggle icons", "Enable if you want to hide the toggle buttons on the icon frame.", {ReloadRequired = true});
+    CreatePanelOption("CheckButton", CP_General, "General.NotEnoughManaEnabled", "Not enough mana/energy", "Enable if you want a faded icon when you have not enough mana or energy.");
     CreatePanelOption("CheckButton", CP_General, "General.RotationDebugOutput", "Debug Output", "DEBUG: Enable if you want output rotation selection as text for debugging purposes.");
   end

@@ -93,7 +93,9 @@
         return false;
       end
     else
-      AR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind);
+      local poolResource = 9999000010
+      local Usable = Object.SpellID == poolResource or Object:IsUsable();
+      AR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable);
       GCDDisplay();
       Object.LastDisplayTime = AC.GetTime();
       return true;
