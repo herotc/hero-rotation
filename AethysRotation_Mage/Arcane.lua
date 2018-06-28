@@ -280,7 +280,7 @@ local function Burn ()
     if AR.Cast(I.KiljaedensBurningWish) then return ""; end
   end
   -- arcane_barrage,if=set_bonus.tier21_2pc&((set_bonus.tier20_2pc&cooldown.presence_of_mind.up)|(talent.charged_up.enabled&cooldown.charged_up.up))&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.expanding_mind.down
-  if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (AC.Tier21_2Pc and ((AC.Tier20_2Pc and S.PresenceofMind:CooldownUpP()) or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownUpP())) and FuturArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDownP(S.ExpandingMindBuff)) then
+  if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (AC.Tier21_2Pc and ((AC.Tier20_2Pc and S.PresenceofMind:CooldownUpP()) or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownUpP())) and FuturArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDownP(S.ExpandingMind)) then
     if AR.Cast(S.ArcaneBarrage) then return ""; end
   end
   -- presence_of_mind,if=((mana.pct>30|buff.arcane_power.up)&set_bonus.tier20_2pc)|buff.rune_of_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time|buff.arcane_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
