@@ -56,6 +56,7 @@ local tableinsert = table.insert;
     MarkedforDeath                        = Spell(137619),
     MasterofShadows                       = Spell(196976),
     Nightstalker                          = Spell(14062),
+    SecretTechnique                       = Spell(280719),
     ShadowFocus                           = Spell(108209),
     ShurikenTornado                       = Spell(277925),
     Subterfuge                            = Spell(108208),
@@ -150,9 +151,9 @@ end
 local function Stealth_Threshold ()
   return 60 + num(S.Vigor:IsAvailable()) * 35 + num(S.MasterofShadows:IsAvailable()) * 10;
 end
--- actions.stealth_cds=variable,name=capping_shd,value=cooldown.shadow_dance.charges_fractional>=1.725+0.725*talent.enveloping_shadows.enabled
-local function Capping_ShD ()
-  return S.ShadowDance:ChargesFractional() >= 1.725 + 0.725 * num(S.EnvelopingShadows:IsAvailable())
+-- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=1.75
+local function ShD_Threshold ()
+  return S.ShadowDance:ChargesFractional() >= 1.75
 end
 
 -- # Finishers
@@ -174,15 +175,37 @@ local function Finish (ReturnSpellOnly, StealthSpell)
         if AR.Cast(S.Nightblade) then return "Cast Nightblade 1"; end
       end
     end
-    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
+    -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
+    if AR.AoEON() and Cache.EnemiesCount[10] >= 2 and not ShadowDanceBuff then
+      local BestUnit, BestUnitTTD = nil, 5 + 2 * Player:ComboPoints();
+      for _, Unit in pairs(Cache.Enemies["Melee"]) do
+        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Nightblade))
+          and Everyone.CanDoTUnit(Unit, S.Eviscerate:Damage()*Settings.Subtlety.EviscerateDMGOffset)
+          and Unit:DebuffRefreshableP(S.Nightblade, NightbladeThreshold) then
+          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie();
+        end
+      end
+      if BestUnit then
+        AR.CastLeftNameplate(BestUnit, S.Nightblade);
+      end
+    end
+    -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
     if IsInMeleeRange() and Target:DebuffRemainsP(S.Nightblade) < S.SymbolsofDeath:CooldownRemainsP() + 10
-      and S.SymbolsofDeath:CooldownRemainsP() <= 5 + (Player:ComboPoints() == 6 and 1 or 0)
+      and S.SymbolsofDeath:CooldownRemainsP() <= 5
       and (Target:FilteredTimeToDie(">", 5 + S.SymbolsofDeath:CooldownRemainsP(), -Target:DebuffRemainsP(S.Nightblade)) or Target:TimeToDieIsNotValid()) then
       if ReturnSpellOnly then
         return S.Nightblade;
       else
         if AR.Cast(S.Nightblade) then return "Cast Nightblade 2"; end
       end
+    end
+  end
+  -- actions.finish+=/secret_technique,if=buff.symbols_of_death.up
+  if S.SecretTechnique:IsCastable() and Player:BuffP(S.SymbolsofDeath) then
+    if ReturnSpellOnly then
+      return S.SecretTechnique;
+    else
+      if AR.Cast(S.SecretTechnique) then return "Cast Secret Technique"; end
     end
   end
   -- actions.finish+=/eviscerate
@@ -218,6 +241,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and Player:BuffP(VanishBuff)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
+  -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
+  -- !!!NYI!!! (Is this worth it? How do we want to display it in an understandable way?)
   -- actions.stealthed+=/shuriken_storm,if=spell_targets.shuriken_storm>=3
   if AR.AoEON() and S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 3 then
     if ReturnSpellOnly then
@@ -325,27 +350,27 @@ end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
   if IsInMeleeRange() then
-    -- actions.stealth_cds+=/vanish,if=!variable.capping_shd&debuff.find_weakness.remains<1
+    -- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&debuff.find_weakness.remains<1
     if AR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-      and not Capping_ShD() and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 then
+      and not ShD_Threshold() and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 then
       if StealthMacro(S.Vanish) then return "Vanish Macro"; end
     end
-    -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.capping_shd&debuff.find_weakness.remains<1
+    -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&debuff.find_weakness.remains<1
     if AR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
       and GetUnitSpeed("player") == 0 and Player:EnergyDeficitPredicted() > 10
-      and not Capping_ShD() and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 then
+      and not ShD_Threshold() and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 then
       -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
       if Player:Energy() < 40 then
         if AR.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
       end
       if StealthMacro(S.Shadowmeld) then return "Shadowmeld Macro"; end
     end
-    -- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.capping_shd|buff.symbols_of_death.remains>=1.2cooldown.symbols_of_death.remains>=12)
+    -- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets>=4&cooldown.symbols_of_death.remains>10)
     if (AR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
       and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1
       and (not S.DarkShadow:IsAvailable() or Target:DebuffRemainsP(S.Nightblade) >= 5 + num(S.Subterfuge:IsAvailable()))
-      and (Capping_ShD() or Player:BuffRemainsP(S.SymbolsofDeath) >= 1.2 or S.SymbolsofDeath:CooldownRemainsP() >= 12) then
+      and (ShD_Threshold() or Player:BuffRemainsP(S.SymbolsofDeath) >= 1.2 or (Cache.EnemiesCount[10] >= 4 and S.SymbolsofDeath:CooldownRemainsP() > 10)) then
       if StealthMacro(S.ShadowDance) then return "ShadowDance Macro 1"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
@@ -525,11 +550,6 @@ local function APL ()
         ShouldReturn = Finish();
         if ShouldReturn then return "Finish: " .. ShouldReturn; end
       end
-      -- # Wait for Shadow Techniques proc if you are at 5 CP, 30+ energy missing and the proc will happen within the next second (DS, out of stealth, no Blades)
-      -- actions+=/wait,sec=time_to_sht.5,if=combo_points=5&time_to_sht.5<=1&energy.deficit>=30&!buff.shadow_blades.up
-      if Player:ComboPoints() == 5 and Player:EnergyDeficitPredicted() >= 30 and not Player:Buff(S.ShadowBlades) and Player:TimeToSht(5) <= 1 then
-        if AR.Cast(S.PoolEnergy) then return "Wait for Shadow Techniques"; end
-      end
 
       -- # Use a builder when reaching the energy threshold
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
@@ -558,7 +578,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 2018-06-06
+-- Last Update: 2018-07-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -570,10 +590,10 @@ AR.SetAPL(261, APL);
 -- # Used to define when to use stealth CDs or builders
 -- actions.precombat+=/variable,name=stealth_threshold,value=60+talent.vigor.enabled*35+talent.master_of_shadows.enabled*10
 -- actions.precombat+=/stealth
--- actions.precombat+=/marked_for_death,precombat=1
--- actions.precombat+=/shadow_blades
+-- actions.precombat+=/marked_for_death,precombat_seconds=15
+-- actions.precombat+=/shadow_blades,precombat_seconds=1
 -- actions.precombat+=/potion
-
+--
 -- # Check CDs at first
 -- actions=call_action_list,name=cds
 -- # Run fully switches to the Stealthed Rotation (by doing so, it forces pooling if nothing is available).
@@ -584,13 +604,11 @@ AR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&combo_points.deficit>=4
 -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
 -- actions+=/call_action_list,name=finish,if=combo_points>=4+talent.deeper_stratagem.enabled|target.time_to_die<=1&combo_points>=3
--- # Wait for Shadow Techniques proc if you are at 5 CP, 30+ energy missing and the proc will happen within the next second (DS, out of stealth, no Blades)
--- actions+=/wait,sec=time_to_sht.5,if=combo_points=5&time_to_sht.5<=1&energy.deficit>=30&!buff.shadow_blades.up
 -- # Use a builder when reaching the energy threshold (minus 40 if none of Alacrity, Shadow Focus, and Master of Shadows is selected)
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
 -- # Lowest priority in all of the APL because it causes a GCD
 -- actions+=/arcane_pulse
-
+--
 -- # Cooldowns
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|(buff.vanish.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=30))
 -- actions.cds+=/blood_fury,if=stealthed.rogue
@@ -603,38 +621,42 @@ AR.SetAPL(261, APL);
 -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
 -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&dot.nightblade.ticking&buff.symbols_of_death.up&buff.shadow_dance.up
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled
-
+--
 -- # Stealth Cooldowns
 -- # Helper Variable
--- actions.stealth_cds=variable,name=capping_shd,value=cooldown.shadow_dance.charges_fractional>=1.725+0.725*talent.enveloping_shadows.enabled
+-- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=1.75
 -- # Vanish unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
--- actions.stealth_cds+=/vanish,if=!variable.capping_shd&debuff.find_weakness.remains<1
+-- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&debuff.find_weakness.remains<1
 -- # Pool for Shadowmeld + Shadowstrike unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
--- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.capping_shd&debuff.find_weakness.remains<1
--- # With Dark Shadow only Dance when Nightblade will stay up. If not capping on charges, use during Symbols or if Symbols is at least 12 seconds away.
--- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.capping_shd|buff.symbols_of_death.remains>=1.2|cooldown.symbols_of_death.remains>=12)
+-- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&debuff.find_weakness.remains<1
+-- # With Dark Shadow only Dance when Nightblade will stay up. Use during Symbols or above threshold.
+-- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets>=4&-- cooldown.symbols_of_death.remains>10)
 -- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
-
+--
 -- # Stealthed Rotation
 -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
 -- actions.stealthed=shadowstrike,if=buff.stealth.up
 -- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
+-- # At 2 targets with Secret Technique keep up Find Weakness by cycling Shadowstrike.
+-- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
 -- actions.stealthed+=/shuriken_storm,if=spell_targets.shuriken_storm>=3
 -- actions.stealthed+=/shadowstrike
-
+--
 -- # Finishers
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
--- # NB Cycling seems to be not worth it, but is performing somewhat equally. Commented out the old line for now.
--- #actions.finish+=/nightblade,cycle_targets=1,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>12&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
+-- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic.
+-- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
--- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5+(combo_points=6)&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
+-- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
+-- actions.finish+=/secret_technique,if=buff.symbols_of_death.up
 -- actions.finish+=/eviscerate
-
+--
 -- # Builders
 -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
+-- #actions.build+=/shuriken_toss,if=buff.sharpened_blades.stack>=39
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
--- actions.build+=/shuriken_toss,if=buff.sharpened_blades.stack>=39
+
