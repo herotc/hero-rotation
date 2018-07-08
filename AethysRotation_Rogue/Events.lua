@@ -127,7 +127,13 @@
     -- Bleed infos
     local function GetBleedInfos (GUID, SpellID)
       -- Core API is not used since we don't want cached informations
-      return select(6, UnitAura(GUID, GetSpellInfo(SpellID), nil, "HARMFUL|PLAYER"));
+      for i = 1, AC.MAXIMUM do
+        local auraInfo = {UnitAura(GUID, i, "HARMFUL|PLAYER")};
+        if auraInfo[10] == SpellID then
+          return auraInfo[5];
+        end
+      end
+      return nil
     end
     -- Bleed OnApply/OnRefresh Listener
     AC:RegisterForSelfCombatEvent(
