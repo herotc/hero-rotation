@@ -238,10 +238,6 @@ local function CDs ()
       if S.Berserking:IsCastable() then
         if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
       end
-      -- actions.cds+=/arcane_torrent,if=energy.deficit>40
-      --if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 40 then
-      --  if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
-      --end
       -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
       if S.AdrenalineRush:IsCastable() and not Player:BuffP(S.AdrenalineRush) and EnergyTimeToMaxRounded() > 1 then
         if AR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush"; end
@@ -417,6 +413,10 @@ local function APL ()
     -- actions+=/call_action_list,name=build
     ShouldReturn = Build();
     if ShouldReturn then return "Build: " .. ShouldReturn; end
+    -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
+    if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
+      if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+    end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastable(S.SaberSlash) then
       if AR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
@@ -431,7 +431,7 @@ end
 
 AR.SetAPL(260, APL);
 
--- Last Update: 2018-06-25
+-- Last Update: 2018-07-09
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -456,13 +456,13 @@ AR.SetAPL(260, APL);
 -- actions+=/call_action_list,name=cds
 -- actions+=/call_action_list,name=finish,if=combo_points>=cp_max_spend
 -- actions+=/call_action_list,name=build
+-- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
 
 -- # Cooldowns
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
--- actions.cds+=/arcane_torrent,if=energy.deficit>40
 -- actions.cds+=/lights_judgment
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)

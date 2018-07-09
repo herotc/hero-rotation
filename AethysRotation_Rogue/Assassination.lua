@@ -226,11 +226,6 @@ local function CDs ()
       if S.Berserking:IsCastable() then
         if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
       end
-      -- actions.cds+=/arcane_torrent,if=!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
-      -- Note: Temporarly modified the conditions
-      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined * Player:GCDRemains() * 1.1 then
-        if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
-      end
     end
 
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
@@ -262,8 +257,8 @@ local function CDs ()
           if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
         end
       end
-      -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0
-      if S.MasterAssassin:IsAvailable() and not Player:IsStealthed(true, false) and MasterAssassinRemains() <= 0 then
+      -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
+      if S.MasterAssassin:IsAvailable() and not Player:IsStealthed(true, false) and MasterAssassinRemains() <= 0 and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
         if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
       end
     end
@@ -505,6 +500,10 @@ local function APL ()
     -- actions+=/call_action_list,name=direct
     ShouldReturn = Direct();
     if ShouldReturn then return ShouldReturn; end
+    -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
+    if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
+      if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+    end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastableP("Melee") then
       if AR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
@@ -524,7 +523,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 2018-07-08
+-- Last Update: 2018-07-09
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -542,6 +541,7 @@ AR.SetAPL(259, APL);
 -- actions+=/run_action_list,name=stealthed,if=stealthed.rogue
 -- actions+=/call_action_list,name=dot
 -- actions+=/call_action_list,name=direct
+-- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
 -- actions+=/arcane_pulse
 --
 -- # Potion
@@ -550,7 +550,6 @@ AR.SetAPL(259, APL);
 -- # Racials
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
--- actions.cds+=/arcane_torrent,if=!buff.envenom.up&energy.deficit>=15+variable.energy_regen_combined*gcd.remains*1.1
 -- actions.cds+=/lights_judgment,if=debuff.vendetta.up
 --
 -- # Cooldowns
@@ -563,8 +562,8 @@ AR.SetAPL(259, APL);
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
 -- # Vanish with Subterfuge: No stealth/subterfuge, Garrote Refreshable, enough space for incoming Garrote CP
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
--- # Vanish with Master Assasin: No stealth and no active MA buff
--- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0
+-- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range
+-- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
 --
 -- # Exsanguinate after a full duration Rupture or a snaphot Garrote during subterfuge
 -- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|dot.garrote.pmultiplier>1&!cooldown.vanish.up&buff.subterfuge.up

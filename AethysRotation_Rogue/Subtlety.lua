@@ -200,8 +200,16 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
   end
-  -- actions.finish+=/secret_technique,if=buff.symbols_of_death.up
-  if S.SecretTechnique:IsCastable() and Player:BuffP(S.SymbolsofDeath) then
+  -- actions.finish+=/secret_technique,if=buff.symbols_of_death.up&(!talent.dark_shadow.enabled|spell_targets.shuriken_storm<2|buff.shadow_dance.up)
+  if S.SecretTechnique:IsCastable() and Player:BuffP(S.SymbolsofDeath) and (not S.DarkShadow:IsAvailable() or Cache.EnemiesCount[10] < 2 or Player:BuffP(S.ShadowDanceBuff)) then
+    if ReturnSpellOnly then
+      return S.SecretTechnique;
+    else
+      if AR.Cast(S.SecretTechnique) then return "Cast Secret Technique"; end
+    end
+  end
+  -- actions.finish+=/secret_technique,if=spell_targets.shuriken_storm>=2+talent.dark_shadow.enabled+talent.nightstalker.enabled
+  if S.SecretTechnique:IsCastable() and Cache.EnemiesCount[10] >= 2 + num(S.DarkShadow:IsAvailable()) + num(S.Nightstalker:IsAvailable()) then
     if ReturnSpellOnly then
       return S.SecretTechnique;
     else
@@ -309,10 +317,6 @@ local function CDs ()
         end
       end
     end
-    -- actions.cds+=/arcane_torrent,if=energy.deficit>70
-    --if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 70 then
-    --  if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
-    --end
 
     -- actions.cds+=/symbols_of_death
     if S.SymbolsofDeath:IsCastable() then
@@ -559,6 +563,10 @@ local function APL ()
       end
 
       -- # Lowest priority in all of the APL because it causes a GCD
+      -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
+      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
+        if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+      end
       -- actions+=/arcane_pulse
       if S.ArcanePulse:IsCastableP() and IsInMeleeRange() then
         if AR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
@@ -578,7 +586,7 @@ end
 
 AR.SetAPL(261, APL);
 
--- Last Update: 2018-07-07
+-- Last Update: 2018-07-09
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -607,13 +615,13 @@ AR.SetAPL(261, APL);
 -- # Use a builder when reaching the energy threshold (minus 40 if none of Alacrity, Shadow Focus, and Master of Shadows is selected)
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
 -- # Lowest priority in all of the APL because it causes a GCD
+-- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
 --
 -- # Cooldowns
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|(buff.vanish.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=30))
 -- actions.cds+=/blood_fury,if=stealthed.rogue
 -- actions.cds+=/berserking,if=stealthed.rogue
--- actions.cds+=/arcane_torrent,if=energy.deficit>70
 -- actions.cds+=/lights_judgment,if=stealthed.rogue
 -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
@@ -651,7 +659,10 @@ AR.SetAPL(261, APL);
 -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
--- actions.finish+=/secret_technique,if=buff.symbols_of_death.up
+-- # Secret Technique during Symbols. With Dark Shadow and multiple targets also only during Shadow Dance (until threshold in next line).
+-- actions.finish+=/secret_technique,if=buff.symbols_of_death.up&(!talent.dark_shadow.enabled|spell_targets.shuriken_storm<2|buff.shadow_dance.up)
+-- # With enough targets always use SecTec on CD.
+-- actions.finish+=/secret_technique,if=spell_targets.shuriken_storm>=2+talent.dark_shadow.enabled+talent.nightstalker.enabled
 -- actions.finish+=/eviscerate
 --
 -- # Builders
