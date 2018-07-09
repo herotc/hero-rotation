@@ -537,13 +537,11 @@ AR.SetAPL(259, APL);
 -- actions.precombat+=/marked_for_death,if=raid_event.adds.in>15
 --
 -- # Executed every time the actor is available.
--- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*(7)%2
+-- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
 -- actions+=/call_action_list,name=cds
 -- actions+=/run_action_list,name=stealthed,if=stealthed.rogue
 -- actions+=/call_action_list,name=dot
--- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
--- actions+=/envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
--- actions+=/call_action_list,name=filler,if=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
+-- actions+=/call_action_list,name=direct
 -- actions+=/arcane_pulse
 --
 -- # Potion
@@ -564,12 +562,12 @@ AR.SetAPL(259, APL);
 -- # Vanish with Nightstalker + No Exsg: Maximum CP and Vendetta up
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
 -- # Vanish with Subterfuge: No stealth/subterfuge, Garrote Refreshable, enough space for incoming Garrote CP
--- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)|(spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
+-- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
 -- # Vanish with Master Assasin: No stealth and no active MA buff
 -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0
 --
 -- # Exsanguinate after a full duration Rupture or a snaphot Garrote during subterfuge
--- actions.cds+=/exsanguinate,if=(prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|dot.garrote.pmultiplier>1&!cooldown.vanish.up&buff.subterfuge.up)
+-- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|dot.garrote.pmultiplier>1&!cooldown.vanish.up&buff.subterfuge.up
 -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
 --
 -- # Stealthed Actions
@@ -596,8 +594,10 @@ AR.SetAPL(259, APL);
 -- # Crimson Tempest only on multiple targets and when dot is refreshable (independent of CP)
 -- actions.dot+=/crimson_tempest,if=refreshable&spell_targets.fan_of_knives>=2
 --
--- # Filler abilities
--- actions.filler=fan_of_knives,if=buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2
--- actions.filler+=/blindside,if=buff.blindside.up|!talent.venom_rush.enabled
--- actions.filler+=/mutilate
-
+-- # Direct damage abilities
+-- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
+-- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
+-- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
+-- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2)
+-- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
+-- actions.direct+=/mutilate,if=variable.use_filler
