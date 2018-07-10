@@ -80,6 +80,10 @@ local tostring = tostring;
     Outlaw = AR.GUISettings.APL.Rogue.Outlaw
   };
 
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
 -- APL Action Lists (and Variables)
 local SappedSoulSpells = {
   {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(S.SaberSlash); end},
@@ -156,9 +160,9 @@ local function RtB_Reroll ()
     -- 1+ Buff
     elseif Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and RtB_Buffs() <= 0) and true or false;
-    -- Broadsides
-    elseif Settings.Outlaw.RolltheBonesLogic == "Broadsides" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.Broadsides)) and true or false;
+    -- Broadside
+    elseif Settings.Outlaw.RolltheBonesLogic == "Broadside" then
+      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.Broadside)) and true or false;
     -- Buried Treasure
     elseif Settings.Outlaw.RolltheBonesLogic == "Buried Treasure" then
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.BuriedTreasure)) and true or false;
@@ -405,8 +409,8 @@ local function APL ()
     -- actions+=/call_action_list,name=cds
     ShouldReturn = CDs();
     if ShouldReturn then return "CDs: " .. ShouldReturn; end
-    -- actions+=/call_action_list,name=finish,if=combo_points>=cp_max_spend
-    if Player:ComboPoints() >= Rogue.CPMaxSpend() then
+    -- actions+=/call_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))
+    if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffP(S.Broadside)) + num(Player:BuffP(S.Opportunity))) * num(S.QuickDraw:IsAvailable() and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemainsP() > 1)) then
       ShouldReturn = Finish();
       if ShouldReturn then return "Finish: " .. ShouldReturn; end
     end
@@ -431,7 +435,7 @@ end
 
 AR.SetAPL(260, APL);
 
--- Last Update: 2018-07-09
+-- Last Update: 2018-07-10
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -454,7 +458,8 @@ AR.SetAPL(260, APL);
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 -- actions+=/call_action_list,name=stealth,if=stealthed.all
 -- actions+=/call_action_list,name=cds
--- actions+=/call_action_list,name=finish,if=combo_points>=cp_max_spend
+-- # Finish at maximum CP. Substract one for each Broadside and Opportunity when Quick Draw is selected and MfD is not ready after the next second.
+-- actions+=/call_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))
 -- actions+=/call_action_list,name=build
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
