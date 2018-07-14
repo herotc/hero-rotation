@@ -137,6 +137,10 @@ local Settings = {
   Assassination = AR.GUISettings.APL.Rogue.Assassination
 };
 
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
 -- Handle CastLeftNameplate Suggestions for DoT Spells
 local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD)
   -- Prefer melee cycle units
@@ -353,6 +357,11 @@ local function Dot ()
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, ttdval);
     end
   end
+  -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
+  if AR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 2
+    and Target:DebuffRemainsP(S.CrimsonTempest) < 2 + num(Cache.EnemiesCount[10] >= 5) then
+    if AR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
+  end
   -- actions.dot+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
   if Player:ComboPoints() >= 4 then
     local function Evaluate_Rupture_Target(TargetUnit)
@@ -368,17 +377,6 @@ local function Dot ()
     if AR.AoEON() then
       SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4);
     end
-  end
-  -- actions.dot+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&target.time_to_die>4
-  if S.Rupture:IsCastable("Melee") and not S.Exsanguinate:IsAvailable() and Player:ComboPoints() >= 3
-    and not Target:DebuffP(S.Rupture) and (Target:FilteredTimeToDie(">", 4) or Target:TimeToDieIsNotValid())
-    and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
-    if AR.Cast(S.Rupture) then return "Cast Rupture"; end
-  end
-  -- actions.dot+=/crimson_tempest,if=refreshable&spell_targets.fan_of_knives>=2
-  if AR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and Player:ComboPoints() > 0 and Cache.EnemiesCount[10] >= 2
-    and Target:DebuffRefreshableP(S.CrimsonTempest, CrimsonTempestThreshold) then
-    if AR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
   end
   return false;
 end
@@ -523,7 +521,7 @@ end
 
 AR.SetAPL(259, APL);
 
--- Last Update: 2018-07-09
+-- Last Update: 2018-07-14
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -533,7 +531,7 @@ AR.SetAPL(259, APL);
 -- actions.precombat+=/apply_poison
 -- actions.precombat+=/stealth
 -- actions.precombat+=/potion
--- actions.precombat+=/marked_for_death,if=raid_event.adds.in>15
+-- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
 --
 -- # Executed every time the actor is available.
 -- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
@@ -586,12 +584,10 @@ AR.SetAPL(259, APL);
 -- # Garrote upkeep, also tries to use it as a special generator for the last CP before a finisher
 -- actions.dot+=/pool_resource,for_next=1
 -- actions.dot+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&(target.time_to_die-remains>4&spell_targets.fan_of_knives<=1|target.time_to_die-remains>12)
+-- # Crimson Tempest only on multiple targets at 4+ CP when running out in 2s (up to 4 targets) or 3s (5+ targets)
+-- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
 -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
 -- actions.dot+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
--- # Rupture at 3+ if not yet ticking on the primary target
--- actions.dot+=/rupture,if=!talent.exsanguinate.enabled&combo_points>=3&!ticking&target.time_to_die>4
--- # Crimson Tempest only on multiple targets and when dot is refreshable (independent of CP)
--- actions.dot+=/crimson_tempest,if=refreshable&spell_targets.fan_of_knives>=2
 --
 -- # Direct damage abilities
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
@@ -600,3 +596,4 @@ AR.SetAPL(259, APL);
 -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2)
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
 -- actions.direct+=/mutilate,if=variable.use_filler
+
