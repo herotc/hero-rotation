@@ -94,7 +94,7 @@ local tableinsert = table.insert;
           -- Eviscerate R2 Multiplier
           1.5 *
           -- Aura Multiplier (SpellID: 137035)
-          1.25 *
+          1.33 *
           -- Nightstalker Multiplier
           (S.Nightstalker:IsAvailable() and Player:IsStealthed(true) and 1.12 or 1) *
           -- Deeper Stratagem Multiplier
