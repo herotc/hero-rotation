@@ -21,7 +21,7 @@
       OffGCDasOffGCD = {
         Racials = true,
         -- Abilities
-        ConsumeMagic = true,
+        Disrupt = true,
       },
       UseTrinkets = true,
       UsePotions  = true
@@ -38,10 +38,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       FelRushDisplayStyle = "Main Icon",
       OffGCDasOffGCD = {
-        -- Racials
-        ArcaneTorrent = true,
         -- Abilities
-        ChaosBlades = true,
         Metamorphosis = true,
         Nemesis = true,
       },
