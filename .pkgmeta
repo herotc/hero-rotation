@@ -1,11 +1,11 @@
 package-as: AethysRotation
 
 externals:
- AethysCore:
-  url: https://github.com/SimCMinMax/AethysCore
+ HeroLib:
+  url: https://github.com/herotc/hero-lib
 
 required-dependencies:
-  - 271528-aethyscore
+  - 271528-herolib
 
 move-folders:
  AethysRotation/AethysRotation: AethysRotation
@@ -21,8 +21,7 @@ move-folders:
  AethysRotation/AethysRotation_Shaman: AethysRotation_Shaman
  AethysRotation/AethysRotation_Warlock: AethysRotation_Warlock
  AethysRotation/AethysRotation_Warrior: AethysRotation_Warrior
- AethysRotation/AethysCore: AethysCore
- AethysCore/AethysCore: AethysCore
+ hero-lib/HeroLib: HeroLib
  AethysCore/AethysCache: AethysCache
 
 ignore:
@@ -32,6 +31,7 @@ ignore:
  - AethysRotation_ClassTemplate/Settings.lua
  - AethysRotation_ClassTemplate/Spec.lua
  - Symlink.bat
+ - symlink.sh
 
 enable-nolib-creation: no
 

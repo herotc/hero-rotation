@@ -2,8 +2,8 @@
 --- ======= LOCALIZE =======
   -- Addon
   local addonName, AR = ...;
-  -- AethysCore
-  local AC = AethysCore;
+  -- HeroLib
+  local AC = HeroLib;
   -- File Locals
   local GUI = AC.GUI;
   local CreatePanel = GUI.CreatePanel;

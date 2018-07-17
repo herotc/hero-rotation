@@ -2,8 +2,8 @@
 --- ======= LOCALIZE =======
   -- Addon
   local addonName, AR = ...;
-  -- AethysCore
-  local AC = AethysCore;
+  -- HeroLib
+  local AC = HeroLib;
   local Utils = AC.Utils;
   -- Lua
   local stringformat = string.format;

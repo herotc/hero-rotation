@@ -4,8 +4,8 @@
   local addonName, addonTable = ...;
   -- AethysRotation
   local AR = AethysRotation;
-  -- AethysCore
-  local AC = AethysCore;
+  -- HeroLib
+  local AC = HeroLib;
   --File Locals
   local GUI = AC.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;

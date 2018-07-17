@@ -5,7 +5,7 @@
   -- AethysRotation
   local AR = AethysRotation;
   
-  local AC = AethysCore;
+  local AC = HeroLib;
   -- File Locals
   local GUI = AC.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;

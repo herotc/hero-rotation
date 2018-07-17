@@ -7,7 +7,7 @@
 [![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/SimCMinMax/AethysRotation/master/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/SimCMinMax/AethysRotation.svg)](https://github.com/SimCMinMax/AethysRotation/network) [![GitHub stars](https://img.shields.io/github/stars/SimCMinMax/AethysRotation.svg)](https://github.com/SimCMinMax/AethysRotation/stargazers) [![GitHub issues](https://img.shields.io/github/issues/SimCMinMax/AethysRotation.svg)](https://github.com/SimCMinMax/AethysRotation/issues)
 
 AethysRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every situation at max level.
-The project is hosted on [GitHub](https://github.com/SimCMinMax/AethysRotation) and powered by [AethysCore](https://github.com/SimCMinMax/AethysCore).
+The project is hosted on [GitHub](https://github.com/SimCMinMax/AethysRotation) and powered by [HeroLib](https://github.com/SimCMinMax/HeroLib).
 It is maintained by [Aethys](https://github.com/Aethys256/) and the [SimCMinMax](https://github.com/orgs/SimCMinMax/people) team.
 Also, you can find it on [Curse](https://mods.curse.com/project/103143) and [CurseForge](https://www.curseforge.com/projects/103143/).
 
@@ -82,7 +82,7 @@ I (Aethys) am one of the main Rogue theorycrafter and contributor to the Simulat
 
 ## Advanced Users / Developper Notes
 If you want to use the addon directly from the [GitHub repository](https://github.com/SimCMinMax/AethysRotation), you would have to symlink every folders from this repository (AethysRotation folder and every class modules but the template) to your WoW Addons folder.
-Furthermore, to make it working, you need to add the only dependency that is [AethysCore](https://github.com/SimCMinMax/AethysCore) following the same processus (symlink AethysCore & AethysCache from the repository).
+Furthermore, to make it working, you need to add the only dependency that is [HeroLib](https://github.com/SimCMinMax/HeroLib) following the same processus (symlink HeroLib & AethysCache from the repository).
 There is a script that does this for you, open symlink.bat and modify the two vars (WoWRep and GHRep) to match your local setup.
 Make sure AethysRotation's directories doesn't already exist as it will not override them.
 Finally, launch symlink.bat

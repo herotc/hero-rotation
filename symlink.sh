@@ -7,7 +7,7 @@ WoWRep="/Applications/World of Warcraft"
 GHRep=$(pwd)
 
 # Don't touch anything bellow this
-#ln -s "$GHRep/AethysCore/AethysCore" "$WoWRep/Interface/AddOns/AethysCore"
+#ln -s "$GHRep/hero-lib/HeroLib" "$WoWRep/Interface/AddOns/HeroLib"
 #ln -s "$GHRep/AethysCore/AethysCache" "$WoWRep/Interface/AddOns/AethysCache"
 ln -s "$GHRep/AethysRotation" "$WoWRep/Interface/AddOns/AethysRotation"
 ln -s "$GHRep/AethysRotation_DeathKnight" "$WoWRep/Interface/AddOns/AethysRotation_DeathKnight"

@@ -6,7 +6,7 @@ set GHRep="D:\My documents\GitHub"
 
 
 REM don't touch anything bellow this
-mklink /J %WoWRep%"\Interface\AddOns\AethysCore" %GHRep%"\AethysCore\AethysCore"
+mklink /J %WoWRep%"\Interface\AddOns\HeroLib" %GHRep%"\hero-lib\HeroLib"
 mklink /J %WoWRep%"\Interface\AddOns\AethysCache" %GHRep%"\AethysCore\AethysCache"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation" %GHRep%"\AethysRotation\AethysRotation"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_DeathKnight" %GHRep%"\AethysRotation\AethysRotation_DeathKnight"
@@ -21,6 +21,6 @@ mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_Rogue" %GHRep%"\AethysRotati
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_Shaman" %GHRep%"\AethysRotation\AethysRotation_Shaman"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_Warrior" %GHRep%"\AethysRotation\AethysRotation_Warrior"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_Warlock" %GHRep%"\AethysRotation\AethysRotation_Warlock"
-'mklink /J %WoWRep%"\Interface\AddOns\AethysTools" %GHRep%"\AethysTools"
+mklink /J %WoWRep%"\Interface\AddOns\AethysTools" %GHRep%"\AethysTools"
 
 pause

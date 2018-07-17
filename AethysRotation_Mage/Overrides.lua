@@ -1,6 +1,6 @@
 --- ============================ HEADER ============================
-  -- AethysCore
-    local AC      = AethysCore;
+  -- HeroLib
+    local AC      = HeroLib;
     local Cache   = AethysCache;
     local Unit    = AC.Unit;
     local Player  = Unit.Player;

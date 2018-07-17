@@ -7,7 +7,7 @@
 
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
-## Dependencies: AethysCore
+## Dependencies: HeroLib
 ## OptionalDeps: AethysTools, Masque
 ## SavedVariables: AethysRotationDB
 ## SavedVariablesPerCharacter: AethysRotationCharDB

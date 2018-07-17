@@ -2,8 +2,8 @@
 --- ======= LOCALIZE =======
   -- Addon
   local addonName, AR = ...;
-  -- AethysCore
-  local AC = AethysCore;
+  -- HeroLib
+  local AC = HeroLib;
   local AR = AethysRotation;
   local Cache = AethysCache;
   local Unit = AC.Unit;
