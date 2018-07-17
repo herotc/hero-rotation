@@ -8,19 +8,20 @@ required-dependencies:
   - 271528-herolib
 
 move-folders:
- HeroRotation/HeroRotation: HeroRotation
- HeroRotation/HeroRotation_DeathKnight: HeroRotation_DeathKnight
- HeroRotation/HeroRotation_DemonHunter: HeroRotation_DemonHunter
- HeroRotation/HeroRotation_Druid: HeroRotation_Druid
- HeroRotation/HeroRotation_Hunter: HeroRotation_Hunter
- HeroRotation/HeroRotation_Mage: HeroRotation_Mage
- HeroRotation/HeroRotation_Monk: HeroRotation_Monk
- HeroRotation/HeroRotation_Paladin: HeroRotation_Paladin
- HeroRotation/HeroRotation_Priest: HeroRotation_Priest
- HeroRotation/HeroRotation_Rogue: HeroRotation_Rogue
- HeroRotation/HeroRotation_Shaman: HeroRotation_Shaman
- HeroRotation/HeroRotation_Warlock: HeroRotation_Warlock
- HeroRotation/HeroRotation_Warrior: HeroRotation_Warrior
+ hero-rotation/HeroRotation: HeroRotation
+ hero-rotation/HeroRotation_DeathKnight: HeroRotation_DeathKnight
+ hero-rotation/HeroRotation_DemonHunter: HeroRotation_DemonHunter
+ hero-rotation/HeroRotation_Druid: HeroRotation_Druid
+ hero-rotation/HeroRotation_Hunter: HeroRotation_Hunter
+ hero-rotation/HeroRotation_Mage: HeroRotation_Mage
+ hero-rotation/HeroRotation_Monk: HeroRotation_Monk
+ hero-rotation/HeroRotation_Paladin: HeroRotation_Paladin
+ hero-rotation/HeroRotation_Priest: HeroRotation_Priest
+ hero-rotation/HeroRotation_Rogue: HeroRotation_Rogue
+ hero-rotation/HeroRotation_Shaman: HeroRotation_Shaman
+ hero-rotation/HeroRotation_Warlock: HeroRotation_Warlock
+ hero-rotation/HeroRotation_Warrior: HeroRotation_Warrior
+ hero-rotation/hero-lib: hero-lib
  hero-lib/HeroLib: HeroLib
  hero-lib/HeroCache: HeroCache
 
