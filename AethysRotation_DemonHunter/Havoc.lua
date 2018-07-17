@@ -230,8 +230,8 @@ local function APL()
       if AR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
     end
     -- felblade,if=fury<40|(buff.metamorphosis.down&fury.deficit>=40)
-    if S.Felblade:IsCastable(S.Felblade) and Player:Fury() < 40
-      or (not Player:BuffP(S.MetamorphosisBuff) and Player:FuryDeficit() >= 40) then
+    if S.Felblade:IsCastable(S.Felblade)
+      and (Player:Fury() < 40 or (not Player:BuffP(S.MetamorphosisBuff) and Player:FuryDeficit() >= 40)) then
       if AR.Cast(S.Felblade) then return "Cast Felblade"; end
     end
     -- eye_beam,if=(!talent.blind_fury.enabled|fury.deficit>=70)&(!buff.metamorphosis.extended_by_demonic|(set_bonus.tier21_4pc&buff.metamorphosis.remains>16))
