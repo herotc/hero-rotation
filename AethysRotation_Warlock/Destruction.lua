@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -137,9 +137,9 @@
   local I = Item.Warlock.Destruction;
   -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local T192P, T194P = AC.HasTier("T19")
-  local T202P, T204P = AC.HasTier("T20")
-  local T212P, T214P = AC.HasTier("T21");
+  local T192P, T194P = HL.HasTier("T19")
+  local T202P, T204P = HL.HasTier("T20")
+  local T212P, T214P = HL.HasTier("T21");
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range = 40
   local CastIncinerate, CastImmolate, CastConflagrate, CastRainOfFire
@@ -165,7 +165,7 @@
     if not target then 
       return 0
     end
-    return AC.ImmolationTable.Destruction.ImmolationDebuff[target:GUID()] or 0;
+    return HL.ImmolationTable.Destruction.ImmolationDebuff[target:GUID()] or 0;
   end
   
   local function EnemyHasHavoc ()
@@ -290,7 +290,7 @@
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(range);
+    HL.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
     handleSettings()
     

@@ -3,14 +3,14 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local AR = AethysRotation;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   
   -- File Locals
@@ -21,16 +21,16 @@
 --- ======= NON-COMBATLOG =======
   -- OnSpecChange
   local SpecTimer = 0;
-  AC:RegisterForEvent(
+  HL:RegisterForEvent(
     function (Event)
       -- Prevent the first event firing (when login)
-      if not AC.PulseInitialized then return; end
+      if not HL.PulseInitialized then return; end
       -- Timer to prevent bug due to the double/triple event firing.
       -- Since it takes 5s to change spec, we'll take 3seconds as timer.
-      if AC.GetTime() > SpecTimer then
+      if HL.GetTime() > SpecTimer then
         -- Update the timer only on valid scan.
         if AR.PulseInit() ~= "Invalid SpecID" then
-          SpecTimer = AC.GetTime() + 3;
+          SpecTimer = HL.GetTime() + 3;
         end
       end
     end
@@ -94,38 +94,38 @@
     --------------------------
     ----- Shadow --------
     --------------------------
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 		
 		if SpellID == 228260 then --void erruption
 			-- print("reset")
-			AC.VTTime = 0
-			AC.VTApplied = 0
+			HL.VTTime = 0
+			HL.VTApplied = 0
 		end
 
       end
       , "SPELL_CAST_SUCCESS"
     );
 	
-	AC:RegisterForSelfCombatEvent(
+	HL:RegisterForSelfCombatEvent(
       function (...)
 		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
-		if SpellID == 205065 and AC.VTApplied == 0 and Player:GUID() == DestGUID then --void erruption
-			AC.VTApplied = dateEvent
-			-- print("applied : "..AC.VTApplied)
+		if SpellID == 205065 and HL.VTApplied == 0 and Player:GUID() == DestGUID then --void erruption
+			HL.VTApplied = dateEvent
+			-- print("applied : "..HL.VTApplied)
 		end
 
       end
       , "SPELL_AURA_APPLIED"
     );
 	
-	AC:RegisterForSelfCombatEvent(
+	HL:RegisterForSelfCombatEvent(
       function (...)
 		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
 		if SpellID == 205065 and Player:GUID() == DestGUID then --void erruption
-			AC.VTTime = dateEvent - AC.VTApplied
-			-- print("time : "..AC.VTTime)
+			HL.VTTime = dateEvent - HL.VTApplied
+			-- print("time : "..HL.VTTime)
 		end
 
       end

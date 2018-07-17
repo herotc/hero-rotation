@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -96,9 +96,9 @@
   };
   local I = Item.DeathKnight.Frost;
   -- Rotation Var
-  local T192P,T194P = AC.HasTier("T19")
-  local T202P,T204P = AC.HasTier("T20")
-  local T212P,T214P = AC.HasTier("T21")
+  local T192P,T194P = HL.HasTier("T19")
+  local T202P,T204P = HL.HasTier("T20")
+  local T212P,T214P = HL.HasTier("T21")
 
   -- GUI Settings
   local Settings = {
@@ -427,9 +427,9 @@
 --- ======= MAIN =======
 local function APL ()
     -- Unit Update
-    AC.GetEnemies("Melee");
-    AC.GetEnemies(8,true);
-    AC.GetEnemies(10,true);
+    HL.GetEnemies("Melee");
+    HL.GetEnemies(8,true);
+    HL.GetEnemies(10,true);
     Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
 

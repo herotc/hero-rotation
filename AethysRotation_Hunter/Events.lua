@@ -3,26 +3,26 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
 local AR = AethysRotation;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 local Hunter = AR.Commons.Hunter;
-local RangeIndex = AC.Enum.ItemRange.Hostile.RangeIndex
-local TriggerGCD = AC.Enum.TriggerGCD;
+local RangeIndex = HL.Enum.ItemRange.Hostile.RangeIndex
+local TriggerGCD = HL.Enum.TriggerGCD;
 -- Lua
 local pairs = pairs;
 local select = select;
 local wipe = wipe;
-local GetTime = AC.GetTime;
+local GetTime = HL.GetTime;
 
 -- File Locals
 
-AC.RangeTracker = {
+HL.RangeTracker = {
 	AbilityTimeout = 1,
 	NucleusAbilities = {
 		[2643]   = {
@@ -43,9 +43,9 @@ AC.RangeTracker = {
 	NonSplashableCount = {}
 }
 
-local RT = AC.RangeTracker;
+local RT = HL.RangeTracker;
 
-AC:RegisterForSelfCombatEvent(
+HL:RegisterForSelfCombatEvent(
 function (...)
   _,_,_,SourceGUID,_,_,_,DestGUID,_,_,_,SpellID = ...;
   
@@ -65,7 +65,7 @@ end
 , "SPELL_DAMAGE"
 );  
 
-AC:RegisterForEvent(
+HL:RegisterForEvent(
 function(...)
   local GUID = Target:GUID()
   
@@ -83,7 +83,7 @@ end
 , "PLAYER_TARGET_CHANGED"
 )
 
-AC:RegisterForCombatEvent(
+HL:RegisterForCombatEvent(
 function (...)
   DestGUID = select(8, ...);
   for SpellID, Ability in pairs(RT.NucleusAbilities) do
@@ -137,7 +137,7 @@ function Hunter.UpdateSplashCount(Unit, SplashRange)
   
   --Prevent calling Get Enemies twice
   if not Cache.EnemiesCount[MaxRange] then
-    AC.GetEnemies(MaxRange);
+    HL.GetEnemies(MaxRange);
   end
   
   local CurrentCount = 0
@@ -184,7 +184,7 @@ end
 Player.MMHunter = {
   GCDDisable = 0;
 }
-AC:RegisterForSelfCombatEvent(
+HL:RegisterForSelfCombatEvent(
   function (...)
     local CastSpell = Spell(select(12, ...))
     if CastSpell:CastTime() == 0 and TriggerGCD[CastSpell:ID()] then
@@ -200,7 +200,7 @@ AC:RegisterForSelfCombatEvent(
   end
   , "SPELL_CAST_SUCCESS"
 );
-AC:RegisterForSelfCombatEvent(
+HL:RegisterForSelfCombatEvent(
   function (...)
     local CastSpell = Spell(select(12, ...))
     if CastSpell:CastTime() > 0 and TriggerGCD[CastSpell:ID()] then

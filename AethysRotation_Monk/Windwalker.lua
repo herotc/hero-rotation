@@ -3,13 +3,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -163,7 +163,7 @@ local function single_target ()
     and (
       not Player:PrevGCD(1, S.BlackoutKick)
       and Player:ChiDeficit() >= 1
-      and AC.Tier21_4Pc
+      and HL.Tier21_4Pc
       and Player:BuffP(S.BlackoutKickBuff)
     ) then
     if AR.Cast(S.BlackoutKick) then return ""; end
@@ -214,9 +214,9 @@ local function single_target ()
     and (
       not Player:PrevGCD(1, S.BlackoutKick)
       and Player:ChiDeficit() >= 1
-      and AC.Tier21_4Pc
+      and HL.Tier21_4Pc
       and (
-        not AC.tier19_2pc
+        not HL.tier19_2pc
         or S.Serenity:IsAvailable()
       )
     ) then
@@ -232,7 +232,7 @@ local function single_target ()
         )
       )
       and not Player:PrevGCD(1, S.SpinningCraneKick)
-      and AC.Tier21_4Pc
+      and HL.Tier21_4Pc
     ) then
       if AR.Cast(S.SpinningCraneKick) then return ""; end
   end
@@ -330,7 +330,7 @@ local function serenity ()
     if AR.Cast(S.BlackoutKick) then return ""; end
   end
   -- actions.serenity+=/fists_of_fury,if=((equipped.drinking_horn_cover&buff.pressure_point.remains<=2&set_bonus.tier20_4pc)&(cooldown.rising_sun_kick.remains>1|active_enemies>1)),interrupt=1
-  if S.FistsOfFury:IsReady() and ((I.DrinkingHornCover:IsEquipped() and Player:BuffRemainsP(S.PressurePoint) <= 2 and AC.Tier20_4Pc) and (S.RisingSunKick:CooldownRemainsP() > 1 or Cache.EnemiesCount[8] > 1)) then
+  if S.FistsOfFury:IsReady() and ((I.DrinkingHornCover:IsEquipped() and Player:BuffRemainsP(S.PressurePoint) <= 2 and HL.Tier20_4Pc) and (S.RisingSunKick:CooldownRemainsP() > 1 or Cache.EnemiesCount[8] > 1)) then
     if AR.Cast(S.FistsOfFury) then return ""; end
   end
   -- actions.serenity+=/fists_of_fury,if=((!equipped.drinking_horn_cover|buff.bloodlust.up|buff.serenity.remains<1)&(cooldown.rising_sun_kick.remains>1|active_enemies>1)),interrupt=1
@@ -380,8 +380,8 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(5);
-  AC.GetEnemies(8);
+  HL.GetEnemies(5);
+  HL.GetEnemies(8);
   Everyone.AoEToggleEnemiesUpdate();
 	-- Out of Combat
 	if not Player:AffectingCombat() then

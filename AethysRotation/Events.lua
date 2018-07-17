@@ -3,13 +3,13 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   
   -- File Locals
@@ -20,16 +20,16 @@
 --- ======= NON-COMBATLOG =======
   -- OnSpecChange
   local SpecTimer = 0;
-  AC:RegisterForEvent(
+  HL:RegisterForEvent(
     function (Event)
       -- Prevent the first event firing (when login)
-      if not AC.PulseInitialized then return; end
+      if not HL.PulseInitialized then return; end
       -- Timer to prevent bug due to the double/triple event firing.
       -- Since it takes 5s to change spec, we'll take 3seconds as timer.
-      if AC.GetTime() > SpecTimer then
+      if HL.GetTime() > SpecTimer then
         -- Update the timer only on valid scan.
         if AR.PulseInit() ~= "Invalid SpecID" then
-          SpecTimer = AC.GetTime() + 3;
+          SpecTimer = HL.GetTime() + 3;
         end
       end
     end

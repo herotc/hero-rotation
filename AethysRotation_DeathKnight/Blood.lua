@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -78,10 +78,10 @@
 --- ======= MAIN =======
 local function APL ()
   -- Unit Update
-  AC.GetEnemies("Melee");
-  AC.GetEnemies(8, true); -- Death and Decay & Bonestorm
-  AC.GetEnemies(10, true); -- Blood Boil
-  AC.GetEnemies(20, true);
+  HL.GetEnemies("Melee");
+  HL.GetEnemies(8, true); -- Death and Decay & Bonestorm
+  HL.GetEnemies(10, true); -- Blood Boil
+  HL.GetEnemies(20, true);
 
   -- In Combat
   if Everyone.TargetIsValid() then

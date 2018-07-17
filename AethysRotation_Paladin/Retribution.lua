@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -76,7 +76,7 @@ local function Judged ()
 end
 local function MythicDungeon ()
   -- Sapped Soul
-  if AC.MythicDungeon() == "Sapped Soul" then
+  if HL.MythicDungeon() == "Sapped Soul" then
 
   end
   return false;
@@ -112,7 +112,7 @@ local function APL ()
     end
   -- In Combat
     -- Unit Update
-    AC.GetEnemies(8, true); -- Divine Storm
+    HL.GetEnemies(8, true); -- Divine Storm
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
       --[[ Disabled since not coded for Retribution yet
       -- Mythic Dungeon
@@ -135,7 +135,7 @@ local function APL ()
         end
       end
       -- actions+=/call_action_list,name=opener,if=time<2&(cooldown.judgment.up|cooldown.blade_of_justice.up|cooldown.divine_hammer.up|cooldown.wake_of_ashes.up)
-      if AC.CombatTime() < 2 and (S.Judgment:CooldownUp() or S.BladeofJustice:CooldownUp() or S.DivineHammer:CooldownUp() or S.WakeofAshes:CooldownUp()) then
+      if HL.CombatTime() < 2 and (S.Judgment:CooldownUp() or S.BladeofJustice:CooldownUp() or S.DivineHammer:CooldownUp() or S.WakeofAshes:CooldownUp()) then
         -- actions.opener=blood_fury
           -- Not available for Paladin :P
         -- actions.opener+=/berserking
@@ -298,7 +298,7 @@ local function APL ()
         if S.WakeofAshes:IsCastable(10) and (Player:HolyPower() == 0 or (Player:HolyPower() == 1 and (S.BladeofJustice:CooldownRemains() > Player:GCD() or S.DivineHammer:CooldownRemains() > Player:GCD())) or (Player:HolyPower() == 2 and (S.Zeal:ChargesFractional() <= 0.65 or S.CrusaderStrike:ChargesFractional() <= 0.65))) then
           if AR.Cast(S.WakeofAshes) then return "Cast Wake of Ashes"; end
         end
-        if Player:HolyPower() <= 3 - (AC.Tier20_2Pc and 1 or 0) then
+        if Player:HolyPower() <= 3 - (HL.Tier20_2Pc and 1 or 0) then
           -- actions.priority+=/blade_of_justice,if=holy_power<=3-set_bonus.tier20_2pc
           if S.BladeofJustice:IsCastable(S.BladeofJustice) then
             if AR.Cast(S.BladeofJustice) then return "Cast Blade of Justice"; end

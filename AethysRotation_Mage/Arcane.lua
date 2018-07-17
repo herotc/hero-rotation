@@ -4,13 +4,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC      = HeroLib;
+local HL      = HeroLib;
 local Cache   = HeroCache;
-local Unit    = AC.Unit;
+local Unit    = HL.Unit;
 local Player  = Unit.Player;
 local Target  = Unit.Target;
-local Spell   = AC.Spell;
-local Item    = AC.Item;
+local Spell   = HL.Spell;
+local Item    = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -117,7 +117,7 @@ Arcane = AR.GUISettings.APL.Mage.Arcane
 
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
-    AC.GetEnemies(i);
+    HL.GetEnemies(i);
   end
 end
   
@@ -127,7 +127,7 @@ local function Var_TimeUntilBurn ()
   -- variable,name=time_until_burn,op=max,value=cooldown.evocation.remains-variable.average_burn_length
   v_timeUntilBurn = math.max(v_timeUntilBurn, S.Evocation:CooldownRemainsP() - v_averageBurnLength)
   -- variable,name=time_until_burn,op=max,value=cooldown.presence_of_mind.remains,if=set_bonus.tier20_2pc
-  if AC.Tier20_2Pc then
+  if HL.Tier20_2Pc then
     v_timeUntilBurn = math.max(v_timeUntilBurn, S.PresenceofMind:CooldownRemainsP())
   end
   -- variable,name=time_until_burn,op=max,value=action.rune_of_power.usable_in,if=talent.rune_of_power.enabled
@@ -135,7 +135,7 @@ local function Var_TimeUntilBurn ()
     v_timeUntilBurn = math.max(v_timeUntilBurn, S.RuneofPower:UsableInP())
   end
   -- variable,name=time_until_burn,op=max,value=cooldown.charged_up.remains,if=talent.charged_up.enabled&set_bonus.tier21_2pc
-  if (S.ChargedUp:IsAvailable() and AC.Tier21_2Pc) then
+  if (S.ChargedUp:IsAvailable() and HL.Tier21_2Pc) then
     v_timeUntilBurn = math.max(v_timeUntilBurn, S.ChargedUp:CooldownRemainsP())
   end
   -- variable,name=time_until_burn,op=reset,if=target.time_to_die<variable.average_burn_length
@@ -146,7 +146,7 @@ end
 
 local function Var_BurnPhaseDuration ()
   if v_burnPhase then
-    v_burnPhaseDuration = AC.GetTime() - v_burnPhaseStart
+    v_burnPhaseDuration = HL.GetTime() - v_burnPhaseStart
   --else
   --  v_burnPhaseDuration = 0
   end
@@ -166,7 +166,7 @@ local function VarCalc ()
 end
 
 local function VarInit ()
-  if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
+  if not var_init or (HL.CombatTime() > 0 and not var_calcCombat) then
     v_totalBurn = 0
     v_burnPhase = false
     v_burnPhaseDuration = 0
@@ -178,8 +178,8 @@ local function VarInit ()
 end
 
 local function RoPDuration ()
-  if AC.RoPTime == 0 then return 0 end
-  return AC.OffsetRemains(AC.GetTime() - AC.RoPTime, "Auto")
+  if HL.RoPTime == 0 then return 0 end
+  return HL.OffsetRemains(HL.GetTime() - HL.RoPTime, "Auto")
 end
 
 local function FuturArcaneCharges ()
@@ -229,7 +229,7 @@ local function Burn ()
   -- start_burn_phase,if=!burn_phase
   if not v_burnPhase then
     v_burnPhase = true
-    v_burnPhaseStart = AC.GetTime()
+    v_burnPhaseStart = HL.GetTime()
   end
   -- stop_burn_phase,if=prev_gcd.1.evocation&cooldown.evocation.charges=0&burn_phase_duration>0
   if Player:PrevGCDP(1, S.Evocation) and S.Evocation:ChargesP() == 0 and v_burnPhaseDuration > 0 then
@@ -280,11 +280,11 @@ local function Burn ()
     if AR.Cast(I.KiljaedensBurningWish) then return ""; end
   end
   -- arcane_barrage,if=set_bonus.tier21_2pc&((set_bonus.tier20_2pc&cooldown.presence_of_mind.up)|(talent.charged_up.enabled&cooldown.charged_up.up))&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.expanding_mind.down
-  if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (AC.Tier21_2Pc and ((AC.Tier20_2Pc and S.PresenceofMind:CooldownUpP()) or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownUpP())) and FuturArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDownP(S.ExpandingMind)) then
+  if S.ArcaneBarrage:IsCastableP() and Player:ManaP() >= S.ArcaneBarrage:Cost() and (HL.Tier21_2Pc and ((HL.Tier20_2Pc and S.PresenceofMind:CooldownUpP()) or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownUpP())) and FuturArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDownP(S.ExpandingMind)) then
     if AR.Cast(S.ArcaneBarrage) then return ""; end
   end
   -- presence_of_mind,if=((mana.pct>30|buff.arcane_power.up)&set_bonus.tier20_2pc)|buff.rune_of_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time|buff.arcane_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
-  if AR.CDsON() and S.PresenceofMind:IsCastableP() and not Player:Buff(S.PresenceofMind) and (((Player:ManaPercentage() > 30 or Player:BuffRemainsP(S.ArcanePower) > 0) and AC.Tier20_2Pc) or RoPDuration () <= PresenceOfMindMax * S.ArcaneBlast:ExecuteTime() or Player:BuffRemainsP(S.ArcanePower) <= PresenceOfMindMax * S.ArcaneBlast:ExecuteTime()) then
+  if AR.CDsON() and S.PresenceofMind:IsCastableP() and not Player:Buff(S.PresenceofMind) and (((Player:ManaPercentage() > 30 or Player:BuffRemainsP(S.ArcanePower) > 0) and HL.Tier20_2Pc) or RoPDuration () <= PresenceOfMindMax * S.ArcaneBlast:ExecuteTime() or Player:BuffRemainsP(S.ArcanePower) <= PresenceOfMindMax * S.ArcaneBlast:ExecuteTime()) then
     if AR.Cast(S.PresenceofMind) then return ""; end
   end
   -- charged_up,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
@@ -336,7 +336,7 @@ local function Conserve ()
     if AR.Cast(S.MarkofAluneth) then return ""; end
   end
   -- strict_sequence,name=miniburn,if=talent.rune_of_power.enabled&set_bonus.tier20_4pc&variable.time_until_burn>30:rune_of_power:arcane_barrage:presence_of_mind
-  if (S.RuneofPower:IsAvailable() and AC.Tier20_4Pc and v_timeUntilBurn > 30) then
+  if (S.RuneofPower:IsAvailable() and HL.Tier20_4Pc and v_timeUntilBurn > 30) then
     if AR.CastQueue(S.RuneofPower, S.ArcaneBarrage, S.PresenceofMind) then return; end
   end
   -- rune_of_power,if=full_recharge_time<=execute_time|prev_gcd.1.mark_of_aluneth
@@ -429,7 +429,7 @@ local function APL ()
     -- end
 
     -- time_warp,if=buff.bloodlust.down&(time=0|(buff.arcane_power.up&(buff.potion.up|!action.potion.usable))|target.time_to_die<=buff.bloodlust.duration)
-    if AR.CDsON() and Settings.Commons.UseTimeWarp and S.TimeWarp:IsCastable() and (not Player:HasHeroism() and (AC.CombatTime() < 3 or (Player:BuffRemainsP(S.ArcanePower) > 0 and (Player:BuffRemainsP(S.PotionOfDeadlyGrace) > 0 or not I.PotionOfDeadlyGrace:IsReady())) or Target:TimeToDie() <= S.TimeWarp:BaseDuration())) then
+    if AR.CDsON() and Settings.Commons.UseTimeWarp and S.TimeWarp:IsCastable() and (not Player:HasHeroism() and (HL.CombatTime() < 3 or (Player:BuffRemainsP(S.ArcanePower) > 0 and (Player:BuffRemainsP(S.PotionOfDeadlyGrace) > 0 or not I.PotionOfDeadlyGrace:IsReady())) or Target:TimeToDie() <= S.TimeWarp:BaseDuration())) then
       if AR.Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return ""; end
     end
 

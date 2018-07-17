@@ -3,13 +3,13 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   local mathmin = math.min;
   local print = print;
@@ -84,18 +84,18 @@
   AR.CastOffGCDOffset = 1;
   function AR.Cast (Object, OffGCD)
     local ObjectTexture = AR.GetTexture(Object);
-    local Keybind = not AR.GUISettings.General.HideKeyBinds and AC.FindKeyBinding(ObjectTexture);
+    local Keybind = not AR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(ObjectTexture);
     if OffGCD then
       if AR.CastOffGCDOffset <= 2 then
         AR.SmallIconFrame:ChangeIcon(AR.CastOffGCDOffset, ObjectTexture, Keybind);
         AR.CastOffGCDOffset = AR.CastOffGCDOffset + 1;
-        Object.LastDisplayTime = AC.GetTime();
+        Object.LastDisplayTime = HL.GetTime();
         return false;
       end
     else
       AR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind);
       GCDDisplay();
-      Object.LastDisplayTime = AC.GetTime();
+      Object.LastDisplayTime = HL.GetTime();
       return true;
     end
     return nil;
@@ -119,9 +119,9 @@
     QueueKeybindTable = {};
     for i = 1, QueueLength do
       QueueTextureTable[i] = AR.GetTexture(QueueSpellTable[i]);
-      QueueSpellTable[i].LastDisplayTime = AC.GetTime();
+      QueueSpellTable[i].LastDisplayTime = HL.GetTime();
       QueueKeybindTable[i] = not AR.GUISettings.General.HideKeyBinds
-                              and AC.FindKeyBinding(QueueTextureTable[i]);
+                              and HL.FindKeyBinding(QueueTextureTable[i]);
     end
     AR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
     GCDDisplay();
@@ -133,7 +133,7 @@
   function AR.CastLeftCommon (Object)
     AR.LeftIconFrame:ChangeIcon(AR.GetTexture(Object));
     AR.CastLeftOffset = AR.CastLeftOffset + 1;
-    Object.LastDisplayTime = AC.GetTime();
+    Object.LastDisplayTime = HL.GetTime();
   end
   function AR.CastLeft (Object)
     if AR.CastLeftOffset == 1 then
@@ -154,7 +154,7 @@
     if AR.CastSuggestedOffset == 1 then
       AR.SuggestedIconFrame:ChangeIcon(AR.GetTexture(Object));
       AR.CastSuggestedOffset = AR.CastSuggestedOffset + 1;
-      Object.LastDisplayTime = AC.GetTime();
+      Object.LastDisplayTime = HL.GetTime();
     end
     return false;
   end

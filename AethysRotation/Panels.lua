@@ -3,15 +3,15 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
-  local Utils = AC.Utils;
+  local HL = HeroLib;
+  local Utils = HL.Utils;
   -- Lua
   local stringformat = string.format;
   local stringgmatch = string.gmatch;
   local strsplit = strsplit;
   local tableconcat = table.concat;
   -- File Locals
-  local CreatePanelOption = AC.GUI.CreatePanelOption;
+  local CreatePanelOption = HL.GUI.CreatePanelOption;
   local StringToNumberIfPossible = Utils.StringToNumberIfPossible;
 
 

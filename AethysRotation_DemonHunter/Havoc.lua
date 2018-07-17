@@ -3,13 +3,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 
@@ -127,7 +127,7 @@ end
 -- Variables
 -- variable,name=blade_dance,value=talent.first_blood.enabled|set_bonus.tier20_4pc|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
 local function BladeDance()
-  return S.FirstBlood:IsAvailable() or AC.Tier20_4Pc or (AR.AoEON() and Cache.EnemiesCount[8] >= 3 - (S.TrailOfRuin:IsAvailable() and 1 or 0));
+  return S.FirstBlood:IsAvailable() or HL.Tier20_4Pc or (AR.AoEON() and Cache.EnemiesCount[8] >= 3 - (S.TrailOfRuin:IsAvailable() and 1 or 0));
 end
 -- variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 local function WaitingForNemesis()
@@ -236,7 +236,7 @@ local function APL()
     end
     -- eye_beam,if=(!talent.blind_fury.enabled|fury.deficit>=70)&(!buff.metamorphosis.extended_by_demonic|(set_bonus.tier21_4pc&buff.metamorphosis.remains>16))
     if S.EyeBeam:IsReady(20, true) and (not S.BlindFury:IsAvailable() or Player:FuryDeficit() >= 70)
-      and (not IsMetaExtendedByDemonic() or (AC.Tier21_4Pc and Player:BuffRemainsP(S.MetamorphosisBuff) > 16)) then
+      and (not IsMetaExtendedByDemonic() or (HL.Tier21_4Pc and Player:BuffRemainsP(S.MetamorphosisBuff) > 16)) then
       if AR.Cast(S.EyeBeam) then return "Cast Eye Beam"; end
     end
     -- annihilation,if=(talent.blind_fury.enabled|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
@@ -349,9 +349,9 @@ local function APL()
   end
 
   -- Unit Update
-  AC.GetEnemies(8, true); -- Blade Dance/Chaos Nova
-  AC.GetEnemies(S.Disrupt, true); -- 20y, use for TG Bounce and Eye Beam
-  AC.GetEnemies("Melee"); -- Melee
+  HL.GetEnemies(8, true); -- Blade Dance/Chaos Nova
+  HL.GetEnemies(S.Disrupt, true); -- 20y, use for TG Bounce and Eye Beam
+  HL.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
 
   if Everyone.TargetIsValid() then

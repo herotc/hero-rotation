@@ -3,13 +3,13 @@
 local addonName, addonTable = ...;
 
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 
 -- AethysRotation
 local AR = AethysRotation;
@@ -111,7 +111,7 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(8);  -- WhirlWind
+  HL.GetEnemies(8);  -- WhirlWind
   Everyone.AoEToggleEnemiesUpdate();
   -- Out of Combat
   if not Player:AffectingCombat() then
@@ -164,7 +164,7 @@ local function APL ()
 
     -- Omit gcd.remains on this offGCD because we can't react quickly enough otherwise (the intention is to cast this before the next GCD ability, but is a OffGCD abiltiy).
     -- actions+=/battle_cry,if=target.time_to_die<=6|(gcd.remains<=0.5&prev_gcd.1.ravager)|!talent.ravager.enabled&!gcd.remains&target.debuff.colossus_smash.remains>=5&(!cooldown.bladestorm.remains|!set_bonus.tier20_4pc)&(!talent.rend.enabled|dot.rend.remains>4)
-    if S.BattleCry:IsReady() and AR.CDsON() and (Target:TimeToDie() <= 6 or (Player:PrevGCD(1, S.Ravager)) or not S.Ravager:IsAvailable() and Target:DebuffRemainsP(S.ColossusSmashDebuff) >= 5 and (S.Bladestorm:CooldownRemainsP() == 0 or not AC.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemainsP(S.RendDebuff) > 4)) then
+    if S.BattleCry:IsReady() and AR.CDsON() and (Target:TimeToDie() <= 6 or (Player:PrevGCD(1, S.Ravager)) or not S.Ravager:IsAvailable() and Target:DebuffRemainsP(S.ColossusSmashDebuff) >= 5 and (S.Bladestorm:CooldownRemainsP() == 0 or not HL.Tier20_4Pc) and (not S.Rend:IsAvailable() or Target:DebuffRemainsP(S.RendDebuff) > 4)) then
       if AR.Cast(S.BattleCry, Settings.Commons.OffGCDasOffGCD.BattleCry) then return "Cast BattleCry" end
     end
 
@@ -243,7 +243,7 @@ local function APL ()
       end
 
       -- actions.aoe+=/bladestorm,if=buff.battle_cry.up&(set_bonus.tier20_4pc|equipped.the_great_storms_eye)
-      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (AC.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
+      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (HL.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
         if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
@@ -306,7 +306,7 @@ local function APL ()
     -- actions+=/run_action_list,name=execute,target_if=target.health.pct<=20&spell_targets.whirlwind<5
     if Target:HealthPercentage() <= 20 and Cache.EnemiesCount[8] < 5 then
       -- actions.execute=bladestorm,if=buff.battle_cry.up&(set_bonus.tier20_4pc|equipped.the_great_storms_eye)
-      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (AC.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
+      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and (HL.Tier20_4Pc or I.TheGreatStormsEye:IsEquipped())) then
         if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
@@ -328,7 +328,7 @@ local function APL ()
       end
 
       -- actions.execute+=/rend,if=remains<5&cooldown.battle_cry.remains<2&(cooldown.bladestorm.remains<2|!set_bonus.tier20_4pc)
-      if S.Rend:IsReady() and (Target:DebuffRemainsP(S.RendDebuff) < 5 and S.BattleCry:CooldownRemainsP() < 2 and (S.Bladestorm:CooldownRemainsP() < 2 or not AC.Tier20_4Pc)) then
+      if S.Rend:IsReady() and (Target:DebuffRemainsP(S.RendDebuff) < 5 and S.BattleCry:CooldownRemainsP() < 2 and (S.Bladestorm:CooldownRemainsP() < 2 or not HL.Tier20_4Pc)) then
         if AR.Cast(S.Rend) then return "Cast Rend" end
       end
 
@@ -353,7 +353,7 @@ local function APL ()
       end
 
       -- actions.execute+=/bladestorm,interrupt=1,if=(raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)&!set_bonus.tier20_4pc
-      if S.Bladestorm:IsReady() and (Cache.EnemiesCount[8] > 1 and not AC.Tier20_4Pc) then
+      if S.Bladestorm:IsReady() and (Cache.EnemiesCount[8] > 1 and not HL.Tier20_4Pc) then
         if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
     end
@@ -361,7 +361,7 @@ local function APL ()
     -- actions+=/run_action_list,name=single,if=target.health.pct>20
     if Target:HealthPercentage() > 20 then
       -- actions.single=bladestorm,if=buff.battle_cry.up&set_bonus.tier20_4pc
-      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and AC.Tier20_4Pc) then
+      if S.Bladestorm:IsReady() and (Player:Buff(S.BattleCryBuff) and HL.Tier20_4Pc) then
         if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
 
@@ -383,7 +383,7 @@ local function APL ()
       end
 
       -- actions.single+=/rend,if=remains<=gcd.max|remains<5&cooldown.battle_cry.remains<2&(cooldown.bladestorm.remains<2|!set_bonus.tier20_4pc)
-      if S.Rend:IsReady() and (Target:DebuffRemainsP(S.RendDebuff) < 5 and S.BattleCry:CooldownRemainsP() < 2 and (S.Bladestorm:CooldownRemainsP() < 2 or not AC.Tier20_4Pc)) then
+      if S.Rend:IsReady() and (Target:DebuffRemainsP(S.RendDebuff) < 5 and S.BattleCry:CooldownRemainsP() < 2 and (S.Bladestorm:CooldownRemainsP() < 2 or not HL.Tier20_4Pc)) then
         if AR.Cast(S.Rend) then return "Cast Rend" end
       end
 
@@ -428,7 +428,7 @@ local function APL ()
       end
 
       -- actions.single+=/bladestorm,if=(raid_event.adds.in>90|!raid_event.adds.exists)&!set_bonus.tier20_4pc
-      if S.Bladestorm:IsReady() and (not AC.Tier20_4Pc) then
+      if S.Bladestorm:IsReady() and (not HL.Tier20_4Pc) then
         if AR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "Cast Bladestorm" end
       end
     end

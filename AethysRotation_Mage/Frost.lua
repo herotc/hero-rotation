@@ -3,14 +3,14 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local AC     = HeroLib
+local HL     = HeroLib
 local Cache  = HeroCache
-local Unit   = AC.Unit
+local Unit   = HL.Unit
 local Player = Unit.Player
 local Target = Unit.Target
 local Pet    = Unit.Pet
-local Spell  = AC.Spell
-local Item   = AC.Item
+local Spell  = HL.Spell
+local Item   = HL.Item
 -- AethysRotation
 local AR     = AethysRotation
 
@@ -81,7 +81,7 @@ local Settings = {
 local EnemyRanges = {35}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
-    AC.GetEnemies(i);
+    HL.GetEnemies(i);
   end
 end
 
@@ -234,7 +234,7 @@ local function APL()
       if AR.Cast(S.Flurry) then return ""; end
     end
     -- frozen_orb,if=set_bonus.tier20_2pc&buff.fingers_of_frost.react<2
-    if S.FrozenOrb:IsCastableP() and (AC.Tier20_2Pc and Player:BuffStackP(S.FingersofFrostBuff) < 2) then
+    if S.FrozenOrb:IsCastableP() and (HL.Tier20_2Pc and Player:BuffStackP(S.FingersofFrostBuff) < 2) then
       if AR.Cast(S.FrozenOrb) then return ""; end
     end
     -- blizzard,if=active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2

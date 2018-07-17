@@ -3,13 +3,13 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   local pairs = pairs;
   local stringlower = string.lower;
@@ -427,7 +427,7 @@
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
       AR.LastUnitCycled = ThisUnit;
-      AR.LastUnitCycledTime = AC.GetTime();
+      AR.LastUnitCycledTime = HL.GetTime();
 
       return true;
     end

@@ -3,14 +3,14 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
-  local GUI = AC.GUI;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
+  local GUI = HL.GUI;
   local CreatePanelOption = GUI.CreatePanelOption;
 
   -- Lua
@@ -349,7 +349,7 @@
     local Spec = GetSpecialization();
     -- Delay by 1 second until the WoW API returns a valid value.
     if Spec == nil then
-      AC.PulseInitialized = false;
+      HL.PulseInitialized = false;
       C_Timer.After(1, function ()
           AR.PulseInit();
         end
@@ -362,7 +362,7 @@
 
       -- Delay by 1 second until the WoW API returns a valid value.
       if SpecID == nil then
-        AC.PulseInitialized = false;
+        HL.PulseInitialized = false;
         C_Timer.After(1, function ()
             AR.PulseInit();
           end
@@ -399,7 +399,7 @@
           end
           LatestSpecIDChecked = SpecID;
         end
-        if not AC.PulseInitialized then AC.PulseInitialized = true; end
+        if not HL.PulseInitialized then HL.PulseInitialized = true; end
       end
     end
   end
@@ -408,8 +408,8 @@
     Pulse = 0
   };
   function AR.Pulse ()
-    if AC.GetTime() > AR.Timer.Pulse and AR.Locked() then
-      AR.Timer.Pulse = AC.GetTime() + AC.Timer.PulseOffset;
+    if HL.GetTime() > AR.Timer.Pulse and AR.Locked() then
+      AR.Timer.Pulse = HL.GetTime() + HL.Timer.PulseOffset;
 
       AR.ResetIcons();
 
@@ -419,7 +419,7 @@
       if SpecID then
         -- Check if we are ready to cast something to save FPS.
         if AR.ON() and AR.Ready() then
-          AC.CacheHasBeenReset = false;
+          HL.CacheHasBeenReset = false;
           Cache.Reset();
           -- Rotational Debug Output
           if AR.GUISettings.General.RotationDebugOutput then
@@ -449,5 +449,5 @@
   -- Used to force a short/long pulse wait, it also resets the icons.
   function AR.ChangePulseTimer (Offset)
     AR.ResetIcons();
-    AR.Timer.Pulse = AC.GetTime() + Offset;
+    AR.Timer.Pulse = HL.GetTime() + Offset;
   end

@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -419,7 +419,7 @@ do
   };
   MythicDungeon = function ()
     -- Sapped Soul
-    if AC.MythicDungeon() == "Sapped Soul" then
+    if HL.MythicDungeon() == "Sapped Soul" then
       for i = 1, #SappedSoulSpells do
         local Spell = SappedSoulSpells[i];
         if Spell[1]:IsCastable() and Spell[3]() then
@@ -458,8 +458,8 @@ local function APL ()
     VanishBuff = S.VanishBuff;
   end
   -- Unit Update
-  AC.GetEnemies(10, true); -- Shuriken Storm & Death from Above
-  AC.GetEnemies("Melee"); -- Melee
+  HL.GetEnemies(10, true); -- Shuriken Storm & Death from Above
+  HL.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
   --- Defensives
     -- Crimson Vial
@@ -536,7 +536,7 @@ local function APL ()
       if S.Nightblade:IsCastableP() and IsInMeleeRange()
         and (Target:FilteredTimeToDie(">", 6) or Target:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(Target, S.Eviscerate:Damage() * Settings.Subtlety.EviscerateDMGOffset)
-        and Target:DebuffRemainsP(S.Nightblade) < Player:GCD() and Player:ComboPoints() >= 4 - (AC.CombatTime() < 10 and 2 or 0) then
+        and Target:DebuffRemainsP(S.Nightblade) < Player:GCD() and Player:ComboPoints() >= 4 - (HL.CombatTime() < 10 and 2 or 0) then
         if AR.Cast(S.Nightblade) then return "Cast Nightblade (Low Duration)"; end
       end
 

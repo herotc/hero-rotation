@@ -2,13 +2,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -205,7 +205,7 @@
   end
   local function BiteTrigger ()
     -- actions.biteTrigger=lacerate,if=remains<14&set_bonus.tier20_4pc&cooldown.mongoose_bite.remains<gcd*3
-    if S.Lacerate:IsCastable() and Target:DebuffRemainsP(S.Lacerate) < 14 and AC.Tier20_4Pc and S.MongooseBite:CooldownRemains() < Player:GCD() * 3 then
+    if S.Lacerate:IsCastable() and Target:DebuffRemainsP(S.Lacerate) < 14 and HL.Tier20_4Pc and S.MongooseBite:CooldownRemains() < Player:GCD() * 3 then
       if AR.Cast(S.Lacerate) then return ""; end
     end
     -- actions.biteTrigger+=/mongoose_bite,if=charges>=2
@@ -264,8 +264,8 @@
 --- APL Main
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(8);
-    AC.GetEnemies(5);
+    HL.GetEnemies(8);
+    HL.GetEnemies(5);
     Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
       -- Exhilaration

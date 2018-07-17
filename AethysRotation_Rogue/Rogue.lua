@@ -3,14 +3,14 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
   local MouseOver = Unit.MouseOver;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -51,7 +51,7 @@
   function Commons.MfDSniping (MarkedforDeath)
     if MarkedforDeath:IsCastable() then
       -- Get Units up to 30y for MfD.
-      AC.GetEnemies(30);
+      HL.GetEnemies(30);
 
       BestUnit, BestUnitTTD = nil, 60;
       local MOTTD = MouseOver:IsInRange(30) and MouseOver:TimeToDie() or 11111;
@@ -146,7 +146,7 @@
   function Commons.PoisonedBleeds ()
     PoisonedBleedsCount = 0;
     -- Get Units up to 50y (not really worth the potential performance loss to go higher).
-    AC.GetEnemies(50);
+    HL.GetEnemies(50);
     for _, Unit in pairs(Cache.Enemies[50]) do
       if Commons.Poisoned(Unit) then
         -- TODO: For loop for this ? Not sure it's worth considering we would have to make 2 times spell object (Assa is init after Commons)

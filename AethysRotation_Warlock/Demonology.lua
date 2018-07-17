@@ -3,14 +3,14 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Pet = Unit.Pet;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -122,9 +122,9 @@
   
   -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local T192P, T194P = AC.HasTier("T19")
-  local T202P, T204P = AC.HasTier("T20")
-  local T212P, T214P = AC.HasTier("T21");
+  local T192P, T194P = HL.HasTier("T19")
+  local T202P, T204P = HL.HasTier("T20")
+  local T212P, T214P = HL.HasTier("T21");
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range = 40
 	-- BuffCount[x] = {nbBuffed, nbNotBuffed, nbBuffed+nbNotBuffed}
@@ -161,16 +161,16 @@
   
   -- updates the pet table
   local function RefreshPetsTimers ()
-    if not AC.GuardiansTable.Pets then
+    if not HL.GuardiansTable.Pets then
       return
     end
-    for key, Value in pairs(AC.GuardiansTable.Pets) do
+    for key, Value in pairs(HL.GuardiansTable.Pets) do
       local duration = 0
-      if PetsInfo[AC.GuardiansTable.Pets[key][2]] then
-        duration = PetsInfo[AC.GuardiansTable.Pets[key][2]][2]
+      if PetsInfo[HL.GuardiansTable.Pets[key][2]] then
+        duration = PetsInfo[HL.GuardiansTable.Pets[key][2]][2]
       end
-      if GetTime() - AC.GuardiansTable.Pets[key][3] >= duration then
-        AC.GuardiansTable.Pets[key] = nil
+      if GetTime() - HL.GuardiansTable.Pets[key][3] >= duration then
+        HL.GuardiansTable.Pets[key] = nil
       end
     end
   end
@@ -181,10 +181,10 @@
       return 0
     end
     local maxduration = 0.0
-    for key, Value in pairs(AC.GuardiansTable.Pets) do
-      if AC.GuardiansTable.Pets[key][1] == PetType then
-        if (PetsInfo[AC.GuardiansTable.Pets[key][2]][2] - (GetTime() - AC.GuardiansTable.Pets[key][3])) > maxduration then
-          maxduration = AC.OffsetRemains((PetsInfo[AC.GuardiansTable.Pets[key][2]][2] - (GetTime() - AC.GuardiansTable.Pets[key][3])), "Auto" );
+    for key, Value in pairs(HL.GuardiansTable.Pets) do
+      if HL.GuardiansTable.Pets[key][1] == PetType then
+        if (PetsInfo[HL.GuardiansTable.Pets[key][2]][2] - (GetTime() - HL.GuardiansTable.Pets[key][3])) > maxduration then
+          maxduration = HL.OffsetRemains((PetsInfo[HL.GuardiansTable.Pets[key][2]][2] - (GetTime() - HL.GuardiansTable.Pets[key][3])), "Auto" );
         end
       end
     end
@@ -216,12 +216,12 @@
     PetType = PetType or false
     local countBuffed = 0
     local countNotBuffed = 0
-    if not AC.GuardiansTable.Pets then
+    if not HL.GuardiansTable.Pets then
       return countBuffed, countNotBuffed
     end
-    for key, Value in pairs(AC.GuardiansTable.Pets) do
-      if not PetType or (PetType and AC.GuardiansTable.Pets[key][1] == PetType) then
-        if AC.GuardiansTable.Pets[key][5] then
+    for key, Value in pairs(HL.GuardiansTable.Pets) do
+      if not PetType or (PetType and HL.GuardiansTable.Pets[key][1] == PetType) then
+        if HL.GuardiansTable.Pets[key][5] then
           countBuffed = countBuffed + 1
         else
           countNotBuffed = countNotBuffed + 1
@@ -368,7 +368,7 @@
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(range);
+    HL.GetEnemies(range);
     Everyone.AoEToggleEnemiesUpdate();
     RefreshPetsTimers()
     
@@ -515,7 +515,7 @@
             
             -- actions+=/hand_of_guldan,if=soul_shard>=4&(((!(variable.no_de1|prev_gcd.1.hand_of_guldan)&(pet_count>=13&!talent.shadowy_inspiration.enabled|pet_count>=6&talent.shadowy_inspiration.enabled))|!variable.no_de2|soul_shard=5)&talent.power_trip.enabled)
             if S.HandOfGuldan:IsCastable() and FutureShard() >= 4 
-              and (((not (var_no_de1 or Player:PrevGCDP(1, S.HandOfGuldan)) and ((AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets > 12 and not S.ShadowyInspiration:IsAvailable()) or (AC.GuardiansTable.Pets and #AC.GuardiansTable.Pets > 5 and S.ShadowyInspiration:IsAvailable()))) or not var_no_de2 or FutureShard() == 5 ) and S.PowerTrip:IsAvailable()) then
+              and (((not (var_no_de1 or Player:PrevGCDP(1, S.HandOfGuldan)) and ((HL.GuardiansTable.Pets and #HL.GuardiansTable.Pets > 12 and not S.ShadowyInspiration:IsAvailable()) or (HL.GuardiansTable.Pets and #HL.GuardiansTable.Pets > 5 and S.ShadowyInspiration:IsAvailable()))) or not var_no_de2 or FutureShard() == 5 ) and S.PowerTrip:IsAvailable()) then
                 if AR.Cast(S.HandOfGuldan) then return ""; end
             end
             

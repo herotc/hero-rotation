@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -142,7 +142,7 @@ local AR = AethysRotation;
       if AR.Cast(S.RagingBlow) then return ""; end
     end
     -- actions.cooldowns+=/rampage,if=(rage>=100&talent.frothing_berserker.enabled&!set_bonus.tier21_4pc)|set_bonus.tier21_4pc|!talent.frothing_berserker.enabled
-    if S.Rampage:IsReady() and ((Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable() and not AC.Tier21_4Pc) or AC.Tier21_4Pc or not S.FrothingBerserker:IsAvailable()) then
+    if S.Rampage:IsReady() and ((Player:Rage() >= 100 and S.FrothingBerserker:IsAvailable() and not HL.Tier21_4Pc) or HL.Tier21_4Pc or not S.FrothingBerserker:IsAvailable()) then
       if AR.Cast(S.Rampage) then return ""; end
     end
     -- actions.cooldowns+=/odyns_fury,if=buff.enrage.up&(cooldown.raging_blow.remains>0|!talent.inner_rage.enabled)
@@ -225,7 +225,7 @@ local AR = AethysRotation;
     end
     -- actions.execute+=/execute
     -- TODO : implement RageTimeToX
-    -- or (AC.Tier19_2Pc and Target:TimeToDie() >= 10 and Player:RageTimeToX(25,0) <= S.Bloodthirst:CooldownRemainsP())
+    -- or (HL.Tier19_2Pc and Target:TimeToDie() >= 10 and Player:RageTimeToX(25,0) <= S.Bloodthirst:CooldownRemainsP())
     if S.Execute:IsReady() then
       if AR.Cast(S.Execute) then return ""; end
     end
@@ -238,11 +238,11 @@ local AR = AethysRotation;
       if AR.Cast(S.Bloodthirst) then return ""; end
     end
     -- actions.execute+=/furious_slash,if=set_bonus.tier19_2pc
-    if S.FuriousSlash:IsCastable() and AC.Tier19_2Pc and Target:TimeToDie() >= 10 then
+    if S.FuriousSlash:IsCastable() and HL.Tier19_2Pc and Target:TimeToDie() >= 10 then
       if AR.Cast(S.FuriousSlash) then return ""; end
     end
     -- actions.execute+=/raging_blow
-    if S.RagingBlow:IsReady() and (not AC.Tier19_2Pc or (AC.Tier19_2Pc and Target:TimeToDie() < 10)) then
+    if S.RagingBlow:IsReady() and (not HL.Tier19_2Pc or (HL.Tier19_2Pc and Target:TimeToDie() < 10)) then
       if AR.Cast(S.RagingBlow) then return ""; end
     end
     -- actions.execute+=/furious_slash
@@ -283,7 +283,7 @@ local AR = AethysRotation;
       if AR.Cast(S.Bloodthirst) then return ""; end
     end
     -- actions.single_target+=/furious_slash,if=set_bonus.tier19_2pc&!talent.inner_rage.enabled
-    if S.FuriousSlash:IsCastable() and AC.Tier19_2Pc and not S.InnerRage:IsAvailable() then
+    if S.FuriousSlash:IsCastable() and HL.Tier19_2Pc and not S.InnerRage:IsAvailable() then
       if AR.Cast(S.FuriousSlash) then return ""; end
     end
     -- actions.single_target+=/whirlwind,if=buff.wrecking_ball.react&buff.enrage.up
@@ -305,8 +305,8 @@ local AR = AethysRotation;
 -- APL Main
 local function APL ()
 -- Unit Update
-  AC.GetEnemies(8);
-  AC.GetEnemies(10);
+  HL.GetEnemies(8);
+  HL.GetEnemies(10);
   Everyone.AoEToggleEnemiesUpdate();
 
   --- In Combat

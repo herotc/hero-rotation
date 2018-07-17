@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -169,8 +169,8 @@
     end
 
     -- Unit Update
-    AC.GetEnemies(ThrashRadius, true); -- Thrash
-    AC.GetEnemies(AoERadius, true); -- Swipe
+    HL.GetEnemies(ThrashRadius, true); -- Thrash
+    HL.GetEnemies(AoERadius, true); -- Swipe
     Everyone.AoEToggleEnemiesUpdate();
 
     -- Defensives
@@ -187,7 +187,7 @@
     -- Out of Combat
     if not Player:AffectingCombat() then
       -- Prowl
-      if not InCombatLockdown() and S.Prowl:CooldownUp() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and AC.OutOfCombatTime() > 1 then
+      if not InCombatLockdown() and S.Prowl:CooldownUp() and not Player:IsStealthed() and GetNumLootItems() == 0 and not UnitExists("npc") and HL.OutOfCombatTime() > 1 then
         if AR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "Cast"; end
       end
       -- Cat Form
@@ -218,7 +218,7 @@
           if AR.Cast(S.WildCharge, Settings.Feral.OffGCDasOffGCD.WildCharge) then return "Cast"; end
         end
         -- run_action_list,name=single_target,if=dot.rip.ticking|time>15
-        if Target:DebuffRemainsP(S.Rip) > 0 or AC.CombatTime() > 15 then
+        if Target:DebuffRemainsP(S.Rip) > 0 or HL.CombatTime() > 15 then
           if Target:IsInRange(MeleeRange) then
             -- cat_form,if=!buff.cat_form.up
             if S.CatForm:IsCastable(MeleeRange) and not Player:Buff(S.CatForm) then

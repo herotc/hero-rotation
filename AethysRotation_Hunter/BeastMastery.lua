@@ -2,14 +2,14 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Pet = Unit.Pet;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -102,7 +102,7 @@
 --- APL Main
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(40);
+    HL.GetEnemies(40);
     -- Defensives
       -- Exhilaration
       if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.BeastMastery.ExhilarationHP then
@@ -201,7 +201,7 @@
       -- # Hold charges of Dire Beast as long as possible to take advantage of T20 2pc unless T19 2pc is on. With Qa'pla, also try not to waste Kill Command cdr if it is just about to come off cooldown.
       -- NOTE : Change cooldown.kill_command.remains>=1 to cooldown.kill_command.remains>=gcd.max
       -- actions+=/dire_beast,if=((!equipped.qapla_eredun_war_order|cooldown.kill_command.remains>=1)&(set_bonus.tier19_2pc|!buff.bestial_wrath.up))|full_recharge_time<gcd.max|cooldown.titans_thunder.up|spell_targets>1
-      if S.DireBeast:IsCastable() and (((not I.QaplaEredunWarOrder:IsEquipped() or S.KillCommand:CooldownRemains() >= Player:GCD()) and (AC.Tier19_2Pc or not Player:Buff(S.BestialWrath))) or S.DireBeast:FullRechargeTime() < Player:GCD() or S.TitansThunder:CooldownUp() or Cache.EnemiesCount[40] > 1) then
+      if S.DireBeast:IsCastable() and (((not I.QaplaEredunWarOrder:IsEquipped() or S.KillCommand:CooldownRemains() >= Player:GCD()) and (HL.Tier19_2Pc or not Player:Buff(S.BestialWrath))) or S.DireBeast:FullRechargeTime() < Player:GCD() or S.TitansThunder:CooldownUp() or Cache.EnemiesCount[40] > 1) then
         if AR.Cast(S.DireBeast) then return ""; end
       end
       -- actions+=/dire_frenzy,if=(pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2)|full_recharge_time<gcd.max|target.time_to_die<9

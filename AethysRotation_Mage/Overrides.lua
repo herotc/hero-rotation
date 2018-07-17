@@ -1,13 +1,13 @@
 --- ============================ HEADER ============================
   -- HeroLib
-    local AC      = HeroLib;
+    local HL      = HeroLib;
     local Cache   = HeroCache;
-    local Unit    = AC.Unit;
+    local Unit    = HL.Unit;
     local Player  = Unit.Player;
     local Pet     = Unit.Pet;
     local Target  = Unit.Target;
-    local Spell   = AC.Spell;
-    local Item    = AC.Item;
+    local Spell   = HL.Spell;
+    local Item    = HL.Item;
   -- AethysRotation
     local AR      = AethysRotation;
   -- Spells
@@ -21,7 +21,7 @@
 
 --- ============================ CONTENT ============================
   -- Arcane, ID: 62
-    AC.AddCoreOverride ("Spell.CooldownRemainsP",
+    HL.AddCoreOverride ("Spell.CooldownRemainsP",
     function (self, BypassRecovery, Offset)
       if self == SpellArcane.MarkofAluneth and Player:IsCasting(self) then
         return 60;
@@ -33,7 +33,7 @@
   -- Fire, ID: 63
 
   -- Frost, ID: 64
-  AC.AddCoreOverride ("Spell.IsCastableP",
+  HL.AddCoreOverride ("Spell.IsCastableP",
     function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
       local RangeOK = true;
       if Range then
@@ -50,7 +50,7 @@
     , 64);
 
   -- Example (Arcane Mage)
-  -- AC.AddCoreOverride ("Spell.IsCastableP",
+  -- HL.AddCoreOverride ("Spell.IsCastableP",
   -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   --   if Range then
   --     local RangeUnit = ThisUnit or Target;

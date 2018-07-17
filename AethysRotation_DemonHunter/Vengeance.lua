@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -55,8 +55,8 @@ local pairs = pairs;
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(20, true); -- Fel Devastation (I think it's 20 thp)
-  AC.GetEnemies(8, true); -- Sigil of Flame & Spirit Bomb
+  HL.GetEnemies(20, true); -- Fel Devastation (I think it's 20 thp)
+  HL.GetEnemies(8, true); -- Sigil of Flame & Spirit Bomb
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Misc

@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -187,7 +187,7 @@ do
   };
   MythicDungeon = function ()
     -- Sapped Soul
-    if AC.MythicDungeon() == "Sapped Soul" then
+    if HL.MythicDungeon() == "Sapped Soul" then
       for i = 1, #SappedSoulSpells do
         local SappedSoulSpell = SappedSoulSpells[i];
         if SappedSoulSpell[1]:IsCastable() and SappedSoulSpell[3]() then
@@ -249,7 +249,7 @@ local function CDs ()
           end
         else
           -- actions.cds+=/vanish,if=talent.nightstalker.enabled&talent.exsanguinate.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
-          if S.Exsanguinate:CooldownRemainsP() < 1 and (Target:Debuff(S.Rupture) or AC.CombatTime() > 10) then
+          if S.Exsanguinate:CooldownRemainsP() < 1 and (Target:Debuff(S.Rupture) or HL.CombatTime() > 10) then
             if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker, Exsanguinate)"; end
           end
         end
@@ -286,7 +286,7 @@ local function Stealthed ()
     -- actions.stealthed=garrote,cycle_targets=1,if=talent.subterfuge.enabled&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>2
     local function Evaluate_Garrote_Target_A(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
-        and (not AC.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= ExsanguinatedBleedTickTime*2)
+        and (not HL.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= ExsanguinatedBleedTickTime*2)
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target_A(Target)
@@ -298,7 +298,7 @@ local function Stealthed ()
     end
     -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
     local function Evaluate_Garrote_Target_B(TargetUnit)
-      return TargetUnit:DebuffRemainsP(S.Garrote) <= 10 and TargetUnit:PMultiplier(S.Garrote) <= 1 and not AC.Exsanguinated(TargetUnit, "Garrote")
+      return TargetUnit:DebuffRemainsP(S.Garrote) <= 10 and TargetUnit:PMultiplier(S.Garrote) <= 1 and not HL.Exsanguinated(TargetUnit, "Garrote")
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target_B(Target)
@@ -333,15 +333,15 @@ local function Dot ()
   -- actions.dot=rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
   if AR.CDsON() and S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable()
     and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
-      or (not Target:DebuffP(S.Rupture) and (AC.CombatTime() > 10 or (Player:ComboPoints() >= 2)))) then
+      or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (Player:ComboPoints() >= 2)))) then
     if AR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
   -- actions.dot+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&(target.time_to_die-remains>4&spell_targets.fan_of_knives<=1|target.time_to_die-remains>12)
   if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and Player:ComboPointsDeficit() >= 1 then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
-        and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (AC.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
-        and (not AC.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5)
+        and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
+        and (not HL.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5)
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
     local ttdval = Cache.EnemiesCount[10] <= 1 and 4 or 12;
@@ -366,8 +366,8 @@ local function Dot ()
   if Player:ComboPoints() >= 4 then
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
-        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture) <= (AC.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
-        and (not AC.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2)
+        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture) <= (HL.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
+        and (not HL.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2)
         and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold);
     end
     if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target)
@@ -419,9 +419,9 @@ local function APL ()
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
 
   -- Unit Update
-  AC.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
-  AC.GetEnemies(10, true); -- Fan of Knives
-  AC.GetEnemies("Melee"); -- Melee
+  HL.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
+  HL.GetEnemies(10, true); -- Fan of Knives
+  HL.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Compute Cache

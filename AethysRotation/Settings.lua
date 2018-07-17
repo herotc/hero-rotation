@@ -3,9 +3,9 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   -- File Locals
-  local GUI = AC.GUI;
+  local GUI = HL.GUI;
   local CreatePanel = GUI.CreatePanel;
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;

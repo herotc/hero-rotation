@@ -3,14 +3,14 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local AC     = HeroLib
+local HL     = HeroLib
 local Cache  = HeroCache
-local Unit   = AC.Unit
+local Unit   = HL.Unit
 local Player = Unit.Player
 local Target = Unit.Target
 local Pet    = Unit.Pet
-local Spell  = AC.Spell
-local Item   = AC.Item
+local Spell  = HL.Spell
+local Item   = HL.Item
 -- AethysRotation
 local AR     = AethysRotation
 
@@ -105,7 +105,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
-  AC.GetEnemies(8, true);
+  HL.GetEnemies(8, true);
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Misc

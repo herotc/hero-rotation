@@ -3,14 +3,14 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Pet = Unit.Pet;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -294,7 +294,7 @@ end
 
 local function APL()
     --UnitUpdate
-  AC.GetEnemies(10);
+  HL.GetEnemies(10);
   Everyone.AoEToggleEnemiesUpdate();
   --Defensives
   --OutOf Combat

@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -132,9 +132,9 @@ local I = Item.Druid.Balance;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
-local T192P, T194P = AC.HasTier("T19")
-local T202P, T204P = AC.HasTier("T20")
-local T212P, T214P = AC.HasTier("T21")
+local T192P, T194P = HL.HasTier("T19")
+local T202P, T204P = HL.HasTier("T20")
+local T212P, T214P = HL.HasTier("T21")
 local Range = 45
 local NextMoon
 local Moons = {[S.NewMoon:ID()] = true, [S.HalfMoon:ID()] = true, [S.FullMoon:ID()] = true}
@@ -202,7 +202,7 @@ end
 
 --One time calc vars
 local function VarInit ()
-  if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
+  if not var_init or (HL.CombatTime() > 0 and not var_calcCombat) then
     Var_Starfall()
     var_init=true
     var_calcCombat=true
@@ -821,7 +821,7 @@ local function CDs ()
   end
 
   -- actions+=/celestial_alignment,if=astral_power>=40&(!variable.starfall_st|time>=7*gcd.max)
-  if S.CelestialAlignment:IsAvailable() and not S.IncarnationChosenOfElune:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FutureAstralPower() >= 40 and (not v_starfall or AC.CombatTime() > 7 * Player:GCD())
+  if S.CelestialAlignment:IsAvailable() and not S.IncarnationChosenOfElune:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FutureAstralPower() >= 40 and (not v_starfall or HL.CombatTime() > 7 * Player:GCD())
     and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
       if AR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
   end
@@ -844,7 +844,7 @@ local function APL ()
   -- TODO : change level when iscontrollable is here for sephuz
 
   -- Unit Update
-  AC.GetEnemies(Range);
+  HL.GetEnemies(Range);
   Everyone.AoEToggleEnemiesUpdate();
   NextMoonCalculation()
   VarInit()

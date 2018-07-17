@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   
   -- File Locals
@@ -73,28 +73,28 @@
   --- End Combat Log Arguments
 
   -- Arguments Variables
-  AC.RoPTime = 0
+  HL.RoPTime = 0
   
   --------------------------
   -------- Arcane ----------
   --------------------------
     
-  AC:RegisterForSelfCombatEvent(
+  HL:RegisterForSelfCombatEvent(
     function (...)
       dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
       if SpellID == 116014 and Player:GUID() == DestGUID then --void RuneofPower
-        AC.RoPTime = AC.GetTime()
+        HL.RoPTime = HL.GetTime()
       end
 
     end
     , "SPELL_AURA_APPLIED"
   );
   
-  AC:RegisterForSelfCombatEvent(
+  HL:RegisterForSelfCombatEvent(
     function (...)
       dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
       if SpellID == 116014 and Player:GUID() == DestGUID then --void erruption
-        AC.RoPTime = 0
+        HL.RoPTime = 0
       end
     end
     , "SPELL_AURA_REMOVED"

@@ -2,13 +2,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -131,7 +131,7 @@
       if Offset then
         ExpirationTime = OffsetRemainsAuto(ExpirationTime, Offset);
       end
-      local Remains = ExpirationTime - AC.GetTime();
+      local Remains = ExpirationTime - HL.GetTime();
       return Remains >= 0 and Remains or 0;
     else
       return 0;
@@ -258,8 +258,8 @@
       if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
     end
     -- actions.cooldowns+=/variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
-    if TrueshotCooldown == 0 and AC.CombatTime() > 15 and S.TrueShot:CooldownUp() then
-      TrueshotCooldown = AC.CombatTime() * 1.1;
+    if TrueshotCooldown == 0 and HL.CombatTime() > 15 and S.TrueShot:CooldownUp() then
+      TrueshotCooldown = HL.CombatTime() * 1.1;
     end
     -- actions.cooldowns+=/trueshot,if=variable.trueshot_cooldown=0|buff.bloodlust.up|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16
     if AR.CDsON() and S.TrueShot:IsCastable() and (TrueshotCooldown == 0 or Player:HasHeroism() or (TrueshotCooldown > 0 and Target:TimeToDie() > (TrueshotCooldown + 15)) or Player:BuffStack(S.BullsEye) > 25 or Target:TimeToDie() < 16) then
@@ -285,7 +285,7 @@
       if not IsCastableM(S.AimedShot) then AR.CastSuggested(S.AimedShot) elseif AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/aimed_shot,if=spell_targets>1&debuff.vulnerability.remains>cast_time&talent.trick_shot.enabled&set_bonus.tier20_2pc&!buff.t20_2p_critical_aimed_damage.up&action.aimed_shot.in_flight
-    if IsCastableP(S.AimedShot) and Hunter.GetSplashCount(Target,8) > 1 and TargetDebuffRemainsP(S.Vulnerability) > S.AimedShot:CastTime() and S.TrickShot:IsAvailable() and AC.Tier20_2Pc and not Player:Buff(S.CriticalAimed) and S.AimedShot:InFlight() then
+    if IsCastableP(S.AimedShot) and Hunter.GetSplashCount(Target,8) > 1 and TargetDebuffRemainsP(S.Vulnerability) > S.AimedShot:CastTime() and S.TrickShot:IsAvailable() and HL.Tier20_2Pc and not Player:Buff(S.CriticalAimed) and S.AimedShot:InFlight() then
       if not IsCastableM(S.AimedShot) then AR.CastSuggested(S.AimedShot) elseif AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.non_patient_sniper+=/marked_shot,if=spell_targets>1
@@ -400,7 +400,7 @@
       if AR.Cast(S.PiercingShot) then return ""; end
     end
     -- actions.patient_sniper+=/aimed_shot,if=spell_targets>1&talent.trick_shot.enabled&debuff.vulnerability.remains>cast_time&(buff.sentinels_sight.stack>=spell_targets.multishot*5|buff.sentinels_sight.stack+(spell_targets.multishot%2)>20|buff.lock_and_load.up|(set_bonus.tier20_2pc&!buff.t20_2p_critical_aimed_damage.up&action.aimed_shot.in_flight))
-    if IsCastableP(S.AimedShot) and S.TrickShot:IsAvailable() and TargetDebuffRemainsP(S.Vulnerability) > S.AimedShot:CastTime() and (Player:BuffStack(S.SentinelsSight) >= Cache.EnemiesCount[40] * 5 or Player:BuffStack(S.SentinelsSight) + (Cache.EnemiesCount[40] / 2) > 20 or Player:Buff(S.LockandLoad) or (AC.Tier20_2Pc and not Player:Buff(S.CriticalAimed) and S.AimedShot:InFlight())) then
+    if IsCastableP(S.AimedShot) and S.TrickShot:IsAvailable() and TargetDebuffRemainsP(S.Vulnerability) > S.AimedShot:CastTime() and (Player:BuffStack(S.SentinelsSight) >= Cache.EnemiesCount[40] * 5 or Player:BuffStack(S.SentinelsSight) + (Cache.EnemiesCount[40] / 2) > 20 or Player:Buff(S.LockandLoad) or (HL.Tier20_2Pc and not Player:Buff(S.CriticalAimed) and S.AimedShot:InFlight())) then
       if not IsCastableM(S.AimedShot) then AR.CastSuggested(S.AimedShot) elseif AR.Cast(S.AimedShot) then return ""; end
     end
     -- actions.patient_sniper+=/marked_shot,if=spell_targets>1
@@ -446,7 +446,7 @@
     end
     -- actions.patient_sniper+=/arcane_shot,if=spell_targets.multi_shot=1&(!set_bonus.tier20_2pc|!action.aimed_shot.in_flight|buff.t20_2p_critical_aimed_damage.remains>action.aimed_shot.execute_time+gcd)&variable.vuln_aim_casts>0&variable.can_gcd&focus+cast_regen+action.aimed_shot.cast_regen<focus.max&(!variable.pooling_for_piercing|lowest_vuln_within.5>gcd)
     if IsCastableP(S.ArcaneShot) 
-      and ((not AC.Tier20_2Pc or not S.AimedShot:InFlight() or Player:BuffRemains(S.CriticalAimed) > S.AimedShot:ExecuteTime() + Player:GCD()) 
+      and ((not HL.Tier20_2Pc or not S.AimedShot:InFlight() or Player:BuffRemains(S.CriticalAimed) > S.AimedShot:ExecuteTime() + Player:GCD()) 
       and Vuln_Aim_Casts > 0 
       and Can_GCD 
       and PlayerFocusPredicted() + Player:FocusCastRegen(S.ArcaneShot:ExecuteTime()) + Player:FocusCastRegen(S.AimedShot:ExecuteTime()) < Player:FocusMax() 
@@ -521,7 +521,7 @@
 --- APL Main
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(40);
+    HL.GetEnemies(40);
     Everyone.AoEToggleEnemiesUpdate();
     Hunter.UpdateSplashCount(Target, 8)
     -- Defensives

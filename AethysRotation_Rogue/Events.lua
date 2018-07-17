@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   local pairs = pairs;
   local select = select;
@@ -77,7 +77,7 @@
   local DestGUID, SpellID;
 
   -- TODO: Register/Unregister Events on SpecChange
-  AC.BleedTable = {
+  HL.BleedTable = {
     Assassination = {
       Garrote = {},
       Rupture = {}
@@ -90,33 +90,33 @@
   --- Exsanguinated Handler
     -- Exsanguinate Expression
     local BleedDuration, BleedExpires;
-    function AC.Exsanguinated (Unit, SpellName)
+    function HL.Exsanguinated (Unit, SpellName)
       BleedGUID = Unit:GUID();
       if BleedGUID then
         if SpellName == "Garrote" then
-          if AC.BleedTable.Assassination.Garrote[BleedGUID] then
-              return AC.BleedTable.Assassination.Garrote[BleedGUID][3];
+          if HL.BleedTable.Assassination.Garrote[BleedGUID] then
+              return HL.BleedTable.Assassination.Garrote[BleedGUID][3];
           end
         elseif SpellName == "Rupture" then
-          if AC.BleedTable.Assassination.Rupture[BleedGUID] then
-              return AC.BleedTable.Assassination.Rupture[BleedGUID][3];
+          if HL.BleedTable.Assassination.Rupture[BleedGUID] then
+              return HL.BleedTable.Assassination.Rupture[BleedGUID][3];
           end
         end
       end
       return false;
     end
     -- Exsanguinate OnCast Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         -- Exsanguinate
         if SpellID == 200806 then
-          for Key, _ in pairs(AC.BleedTable.Assassination) do
-            for Key2, _ in pairs(AC.BleedTable.Assassination[Key]) do
+          for Key, _ in pairs(HL.BleedTable.Assassination) do
+            for Key2, _ in pairs(HL.BleedTable.Assassination[Key]) do
               if Key2 == DestGUID then
                   -- Change the Exsanguinate info to true
-                  AC.BleedTable.Assassination[Key][Key2][3] = true;
+                  HL.BleedTable.Assassination[Key][Key2][3] = true;
               end
             end
           end
@@ -127,7 +127,7 @@
     -- Bleed infos
     local function GetBleedInfos (GUID, SpellID)
       -- Core API is not used since we don't want cached informations
-      for i = 1, AC.MAXIMUM do
+      for i = 1, HL.MAXIMUM do
         local auraInfo = {UnitAura(GUID, i, "HARMFUL|PLAYER")};
         if auraInfo[10] == SpellID then
           return auraInfo[5];
@@ -136,7 +136,7 @@
       return nil
     end
     -- Bleed OnApply/OnRefresh Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
@@ -144,47 +144,47 @@
         -- Garrote
         if SpellID == 703 then
           BleedDuration, BleedExpires = GetBleedInfos(DestGUID, SpellID);
-          AC.BleedTable.Assassination.Garrote[DestGUID] = {BleedDuration, BleedExpires, false};
+          HL.BleedTable.Assassination.Garrote[DestGUID] = {BleedDuration, BleedExpires, false};
         -- Rupture
         elseif SpellID == 1943 then
           BleedDuration, BleedExpires = GetBleedInfos(DestGUID, SpellID);
-          AC.BleedTable.Assassination.Rupture[DestGUID] = {BleedDuration, BleedExpires, false};
+          HL.BleedTable.Assassination.Rupture[DestGUID] = {BleedDuration, BleedExpires, false};
         end
       end
       , "SPELL_AURA_APPLIED"
       , "SPELL_AURA_REFRESH"
     );
     -- Bleed OnRemove Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         -- Removes the Unit from Garrote Table
         if SpellID == 703 then
-          if AC.BleedTable.Assassination.Garrote[DestGUID] then
-              AC.BleedTable.Assassination.Garrote[DestGUID] = nil;
+          if HL.BleedTable.Assassination.Garrote[DestGUID] then
+              HL.BleedTable.Assassination.Garrote[DestGUID] = nil;
           end
         -- Removes the Unit from Rupture Table
         elseif SpellID == 1943 then
-          if AC.BleedTable.Assassination.Rupture[DestGUID] then
-              AC.BleedTable.Assassination.Rupture[DestGUID] = nil;
+          if HL.BleedTable.Assassination.Rupture[DestGUID] then
+              HL.BleedTable.Assassination.Rupture[DestGUID] = nil;
           end
         end
       end
       , "SPELL_AURA_REMOVED"
     );
     -- Bleed OnUnitDeath Listener
-    AC:RegisterForCombatEvent(
+    HL:RegisterForCombatEvent(
       function (...)
         DestGUID = select(8, ...);
 
         -- Removes the Unit from Garrote Table
-        if AC.BleedTable.Assassination.Garrote[DestGUID] then
-          AC.BleedTable.Assassination.Garrote[DestGUID] = nil;
+        if HL.BleedTable.Assassination.Garrote[DestGUID] then
+          HL.BleedTable.Assassination.Garrote[DestGUID] = nil;
         end
         -- Removes the Unit from Rupture Table
-        if AC.BleedTable.Assassination.Rupture[DestGUID] then
-          AC.BleedTable.Assassination.Rupture[DestGUID] = nil;
+        if HL.BleedTable.Assassination.Rupture[DestGUID] then
+          HL.BleedTable.Assassination.Rupture[DestGUID] = nil;
         end
       end
       , "UNIT_DIED"
@@ -192,47 +192,47 @@
     );
 
   --- Finality Nightblade Handler
-    function AC.Finality (Unit)
+    function HL.Finality (Unit)
       BleedGUID = Unit:GUID();
       if BleedGUID then
-        if AC.BleedTable.Subtlety.Nightblade[BleedGUID] then
-          return AC.BleedTable.Subtlety.Nightblade[BleedGUID];
+        if HL.BleedTable.Subtlety.Nightblade[BleedGUID] then
+          return HL.BleedTable.Subtlety.Nightblade[BleedGUID];
         end
       end
       return false;
     end
     -- Nightblade OnApply/OnRefresh Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         if SpellID == 195452 then
-          AC.BleedTable.Subtlety.Nightblade[DestGUID] = true;
+          HL.BleedTable.Subtlety.Nightblade[DestGUID] = true;
         end
       end
       , "SPELL_AURA_APPLIED"
       , "SPELL_AURA_REFRESH"
     );
     -- Nightblade OnRemove Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         if SpellID == 195452 then
-          if AC.BleedTable.Subtlety.Nightblade[DestGUID] then
-            AC.BleedTable.Subtlety.Nightblade[DestGUID] = nil;
+          if HL.BleedTable.Subtlety.Nightblade[DestGUID] then
+            HL.BleedTable.Subtlety.Nightblade[DestGUID] = nil;
           end
         end
       end
       , "SPELL_AURA_REMOVED"
     );
     -- Nightblade OnUnitDeath Listener
-    AC:RegisterForCombatEvent(
+    HL:RegisterForCombatEvent(
       function (...)
         DestGUID = select(8, ...);
 
-        if AC.BleedTable.Subtlety.Nightblade[DestGUID] then
-          AC.BleedTable.Subtlety.Nightblade[DestGUID] = nil;
+        if HL.BleedTable.Subtlety.Nightblade[DestGUID] then
+          HL.BleedTable.Subtlety.Nightblade[DestGUID] = nil;
         end
       end
       , "UNIT_DIED"
@@ -254,7 +254,7 @@
         return Player:EnergyDeficitPredicted() - Player.RSOffset.Offset;
     end
     -- Zero RSOffset after receiving relentless strikes energize
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         local rsspellid = select(12, ...)
         if (rsspellid == 98440) then
@@ -264,7 +264,7 @@
       , "SPELL_ENERGIZE"
     );
     -- Running Combo Point tally to access after casting finisher
-    AC:RegisterForEvent(
+    HL:RegisterForEvent(
       function (...)
         local type = select(3, ...)
         if (type == "COMBO_POINTS") and (Player:ComboPoints() > 0) then
@@ -274,7 +274,7 @@
       , "UNIT_POWER_UPDATE"
     );
     -- Set RSOffset when casting a finisher
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         local spellID = select(12, ...)
         -- Evis & Nightblade & DfA spellIDs
@@ -295,7 +295,7 @@
       , "SPELL_CAST_SUCCESS"
     );
     -- Prevent RSOffset getting stuck when target dies mid-finisher (mostly DfA)
-    AC:RegisterForCombatEvent(
+    HL:RegisterForCombatEvent(
       function (...)
         local DestGUID = select(8, ...);
         if Player.RSOffset.FinishDestGUID == DestGUID then
@@ -325,7 +325,7 @@
       return aaTable[hitInTable] - GetTime()
     end
     -- Reset on entering world
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         Player.ShadowTechniques.Counter = 0;
         Player.ShadowTechniques.LastMH = GetTime();
@@ -334,7 +334,7 @@
       , "PLAYER_ENTERING_WORLD"
     );
     -- Reset counter on energize
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         SpellID = select(12, ...);
         if SpellID == 196911 then
@@ -344,7 +344,7 @@
       , "SPELL_ENERGIZE"
     );
     -- Increment counter on cast succcess for Shadow Blades
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         SpellID = select(12, ...);
         -- Shadow Blade: MH 121473, OH 121474
@@ -359,7 +359,7 @@
       , "SPELL_CAST_SUCCESS"
     );
     -- Increment counter on successful swings
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         Player.ShadowTechniques.Counter = Player.ShadowTechniques.Counter + 1;
         local IsOffHand = select(24, ...);
@@ -372,7 +372,7 @@
       , "SWING_DAMAGE"
     );
     -- Remember timers on Shadow Blade fails
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         SpellID = select(12, ...);
         -- Shadow Blade: MH 121473, OH 121474
@@ -385,7 +385,7 @@
       , "SPELL_CAST_FAILED"
     );
     -- Remember timers on swing misses
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         local IsOffHand = select(16, ...);
         if IsOffHand then

@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -152,16 +152,16 @@ end
 
 local function CurrentInsanityDrain ()
 	if not Player:Buff(S.VoidForm) then return 0.0; end
-	return 6 + 0.67 * (Player:BuffStack(S.VoidForm) - (2 * (I.MotherShahrazsSeduction:IsEquipped() and 1 or 0)) - AC.VTTime)
+	return 6 + 0.67 * (Player:BuffStack(S.VoidForm) - (2 * (I.MotherShahrazsSeduction:IsEquipped() and 1 or 0)) - HL.VTTime)
 end
 
 local function Var_ActorsFightTimeMod ()
   -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
   -- actions.check+=/variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	if (AC.CombatTime() + Target:TimeToDie()) > 450 and (AC.CombatTime() + Target:TimeToDie()) < 600 then
-		v_actorsFightTimeMod = -((-450 + (AC.CombatTime() + Target:TimeToDie())) / 10)
-	elseif (AC.CombatTime() + Target:TimeToDie()) <= 450 then
-		v_actorsFightTimeMod = ((450 - (AC.CombatTime() + Target:TimeToDie())) / 5)
+	if (HL.CombatTime() + Target:TimeToDie()) > 450 and (HL.CombatTime() + Target:TimeToDie()) < 600 then
+		v_actorsFightTimeMod = -((-450 + (HL.CombatTime() + Target:TimeToDie())) / 10)
+	elseif (HL.CombatTime() + Target:TimeToDie()) <= 450 then
+		v_actorsFightTimeMod = ((450 - (HL.CombatTime() + Target:TimeToDie())) / 5)
   else
     v_actorsFightTimeMod = 0
 	end
@@ -179,7 +179,7 @@ end
 
 local function Var_CdTime ()
   -- actions.precombat+=/variable,name=cd_time,op=set,value=(12+(2-2*talent.mindbender.enabled*set_bonus.tier20_4pc)*set_bonus.tier19_2pc+(1-3*talent.mindbender.enabled*set_bonus.tier20_4pc)*equipped.mangazas_madness+(6+5*talent.mindbender.enabled)*set_bonus.tier20_4pc+2*artifact.lash_of_insanity.rank)
-  v_cdtime = 12 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (AC.Tier20_4Pc and 1 or 0)) * (AC.Tier19_2Pc and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (AC.Tier20_4Pc and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (AC.Tier20_4Pc and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
+  v_cdtime = 12 + ((2 - 2 * (S.Mindbender:IsAvailable() and 1 or 0) * (HL.Tier20_4Pc and 1 or 0)) * (HL.Tier19_2Pc and 1 or 0)) + ((3 - 3 * (S.Mindbender:IsAvailable() and 1 or 0) * (HL.Tier20_4Pc and 1 or 0)) * (I.MangazasMadness:IsEquipped() and 1 or 0)) + ((6 + 5 * (S.Mindbender:IsAvailable() and 1 or 0)) * (HL.Tier20_4Pc and 1 or 0)) + (2 * (S.LashOfInsanity:ArtifactRank() or 0))
 end
 
 local function Var_DotSWPDPGCD ()
@@ -201,13 +201,13 @@ local function Var_S2MSetupTime ()
   -- actions.precombat+=/variable,name=s2msetup_time,op=set,value=(0.8*(83+(20+20*talent.fortress_of_the_mind.enabled)*set_bonus.tier20_4pc-(5*talent.sanlayn.enabled)+(30+42*(desired_targets>1)+10*talent.lingering_insanity.enabled)*set_bonus.tier21_4pc*talent.auspicious_spirits.enabled+((33-13*set_bonus.tier20_4pc)*talent.reaper_of_souls.enabled)+set_bonus.tier19_2pc*4+8*equipped.mangazas_madness+(raw_haste_pct*10*(1+0.7*set_bonus.tier20_4pc))*(2+(0.8*set_bonus.tier19_2pc)+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled)))),if=talent.surrender_to_madness.enabled
   if (S.SurrenderToMadness:IsAvailable()) then
     v_s2msetuptime = 0.8 * (83 
-    + ((20 + 20 * (S.FortressOfTheMind:IsAvailable() and 1 or 0)) * (AC.Tier20_4Pc and 1 or 0))
+    + ((20 + 20 * (S.FortressOfTheMind:IsAvailable() and 1 or 0)) * (HL.Tier20_4Pc and 1 or 0))
     - (5 * (S.Sanlayn:IsAvailable() and 1 or 0))
-    + ((30 + 42 * ((Cache.EnemiesCount[range]>1) and 1 or 0) + 10 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (AC.Tier21_4Pc and 1 or 0) * (S.AuspiciousSpirit:IsAvailable() and 1 or 0))
-    + ((33 - 13 * (AC.Tier20_4Pc and 1 or 0)) * (S.ReaperOfSouls:IsAvailable() and 1 or 0))
-    + (4 * (AC.Tier19_2Pc and 1 or 0))
+    + ((30 + 42 * ((Cache.EnemiesCount[range]>1) and 1 or 0) + 10 * (S.Sanlayn:IsAvailable() and 1 or 0)) * (HL.Tier21_4Pc and 1 or 0) * (S.AuspiciousSpirit:IsAvailable() and 1 or 0))
+    + ((33 - 13 * (HL.Tier20_4Pc and 1 or 0)) * (S.ReaperOfSouls:IsAvailable() and 1 or 0))
+    + (4 * (HL.Tier19_2Pc and 1 or 0))
     + (8 * (I.MangazasMadness:IsEquipped() and 1 or 0))
-    + (Player:HastePct() * 10 * (1 + 0.7 * (AC.Tier20_4Pc and 1 or 0)) * (2 + (0.8 * (AC.Tier19_2Pc and 1 or 0)) + (1 * (S.ReaperOfSouls:IsAvailable() and 1 or 0)) + (2 * (S.MassHysteria:ArtifactRank() or 0)) - (1 * (S.Sanlayn:IsAvailable() and 1 or 0)))))
+    + (Player:HastePct() * 10 * (1 + 0.7 * (HL.Tier20_4Pc and 1 or 0)) * (2 + (0.8 * (HL.Tier19_2Pc and 1 or 0)) + (1 * (S.ReaperOfSouls:IsAvailable() and 1 or 0)) + (2 * (S.MassHysteria:ArtifactRank() or 0)) - (1 * (S.Sanlayn:IsAvailable() and 1 or 0)))))
   else
     v_s2msetuptime = 0
   end 
@@ -230,7 +230,7 @@ end
 
 --One time calc vars
 local function VarInit ()
-  if not var_init or (AC.CombatTime() > 0 and not var_calcCombat) then
+  if not var_init or (HL.CombatTime() > 0 and not var_calcCombat) then
     Var_CdTime()
     Var_DotSWPDPGCD()
     Var_DotVTDPGCD()
@@ -254,15 +254,15 @@ end
 --Calls to cooldown
 local function CDs ()
 	--Power Infusion
-  -- actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(v_cdtime+5 * (Player:HasHeroism() and 1 or 0) *(1+1 * (AC.Tier20_4Pc and 1 or 0)))
+  -- actions.vf+=/power_infusion,if=buff.insanity_drain_stacks.value>=(v_cdtime+5 * (Player:HasHeroism() and 1 or 0) *(1+1 * (HL.Tier20_4Pc and 1 or 0)))
 	if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and not Player:Buff(S.SurrenderToMadness)
-    and CurrentInsanityDrain() >= (v_cdtime + 5 * (Player:HasHeroism() and 1 or 0) * (1 + 1 * (AC.Tier20_4Pc and 1 or 0)))
+    and CurrentInsanityDrain() >= (v_cdtime + 5 * (Player:HasHeroism() and 1 or 0) * (1 + 1 * (HL.Tier20_4Pc and 1 or 0)))
     and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain() + 61)) then
       if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return ""; end
 	end
   -- actions.s2m+=/power_infusion,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)|target.time_to_die<=30
   if Player:Buff(S.VoidForm) and S.PowerInfusion:IsAvailable() and S.PowerInfusion:IsCastable() and Player:Buff(S.SurrenderToMadness)
-    and ((S.ShadowWordDeath:ChargesP() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (AC.Tier20_4Pc and 1 or 0))) or Target:TimeToDie() <= 30) then
+    and ((S.ShadowWordDeath:ChargesP() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (HL.Tier20_4Pc and 1 or 0))) or Target:TimeToDie() <= 30) then
       if AR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return ""; end
   end 
 
@@ -277,13 +277,13 @@ local function CDs ()
   --Mindbender
   -- actions.vf+=/mindbender,if=buff.insanity_drain_stacks.value>=(variable.cd_time+(variable.haste_eval*!set_bonus.tier20_4pc)-(3*set_bonus.tier20_4pc*(raid_event.movement.in<15)*((active_enemies-(raid_event.adds.count*(raid_event.adds.remains>0)))=1))+(5-3*set_bonus.tier20_4pc)*buff.bloodlust.up+2*talent.fortress_of_the_mind.enabled*set_bonus.tier20_4pc)&(!talent.surrender_to_madness.enabled|(talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-buff.insanity_drain_stacks.value))
   if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and not Player:Buff(S.SurrenderToMadness)
-    and CurrentInsanityDrain() >= (v_cdtime + (v_hasteEval * (AC.Tier20_4Pc and 0 or 1)) - (3 * (AC.Tier20_4Pc and 1 or 0) + (5 - 3 * (AC.Tier20_4Pc and 1 or 0)) * (Player:HasHeroism() and 1 or 0) + 2 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) * (AC.Tier20_4Pc and 1 or 0)) + Settings.Shadow.MindbenderUsage)
+    and CurrentInsanityDrain() >= (v_cdtime + (v_hasteEval * (HL.Tier20_4Pc and 0 or 1)) - (3 * (HL.Tier20_4Pc and 1 or 0) + (5 - 3 * (HL.Tier20_4Pc and 1 or 0)) * (Player:HasHeroism() and 1 or 0) + 2 * (S.FortressOfTheMind:IsAvailable() and 1 or 0) * (HL.Tier20_4Pc and 1 or 0)) + Settings.Shadow.MindbenderUsage)
     and (not S.SurrenderToMadness:IsAvailable() or (S.SurrenderToMadness:IsAvailable() and Target:TimeToDie() > v_s2mcheck - CurrentInsanityDrain())) then 
       if AR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return ""; end
   end
   -- actions.s2m+=/mindbender,if=cooldown.shadow_word_death.charges=0&buff.voidform.stack>(45+25*set_bonus.tier20_4pc)
   if Player:Buff(S.VoidForm) and S.Mindbender:IsAvailable() and S.Mindbender:IsCastable() and Player:Buff(S.SurrenderToMadness)
-    and S.ShadowWordDeath:ChargesP() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (AC.Tier20_4Pc and 1 or 0) + Settings.Shadow.MindbenderUsage) then
+    and S.ShadowWordDeath:ChargesP() == 0 and Player:BuffStack(S.VoidForm) > (45 + 25 * (HL.Tier20_4Pc and 1 or 0) + Settings.Shadow.MindbenderUsage) then
       if AR.Cast(S.Mindbender, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return ""; end
   end 
 
@@ -358,7 +358,7 @@ local function s2m ()
   end
   
   -- actions.s2m+=/void_bolt,if=buff.insanity_drain_stacks.value<6&set_bonus.tier19_4pc
-  if S.VoidBolt:IsCastable() and CurrentInsanityDrain() < 6 and AC.Tier19_4Pc then
+  if S.VoidBolt:IsCastable() and CurrentInsanityDrain() < 6 and HL.Tier19_4Pc then
     if AR.Cast(S.VoidBolt) then return ""; end
   end 
   
@@ -726,7 +726,7 @@ end
 --- APL Main
 local function APL ()
 	-- Unit Update
-	AC.GetEnemies(range);
+	HL.GetEnemies(range);
   Everyone.AoEToggleEnemiesUpdate();
   VarInit()
   VarCalc()
@@ -827,7 +827,7 @@ local function APL ()
           end
         end
         -- actions.main+=/void_eruption,if=(talent.mindbender.enabled&cooldown.mindbender.remains<(variable.erupt_eval+gcd.max*4%3))|!talent.mindbender.enabled|set_bonus.tier20_4pc
-				if FutureInsanity() >= InsanityThreshold() and ((S.Mindbender:IsAvailable() and S.Mindbender:CooldownRemainsP() < v_eruptEval) or not S.Mindbender:IsAvailable() or AC.Tier20_4Pc) then
+				if FutureInsanity() >= InsanityThreshold() and ((S.Mindbender:IsAvailable() and S.Mindbender:CooldownRemainsP() < v_eruptEval) or not S.Mindbender:IsAvailable() or HL.Tier20_4Pc) then
 						if AR.Cast(S.VoidEruption) then return ""; end
 				end
 				

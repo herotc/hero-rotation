@@ -3,14 +3,14 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
   local Party = Unit.Party;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -63,7 +63,7 @@
   };
   local I = Item.Paladin.Protection;
   -- Rotation Var
-  local T202PC, T204PC = AC.HasTier("T20");
+  local T202PC, T204PC = HL.HasTier("T20");
   -- GUI Settings
   local Settings = {
     General = AR.GUISettings.General,
@@ -78,7 +78,7 @@
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(10, true);
+    HL.GetEnemies(10, true);
     Everyone.AoEToggleEnemiesUpdate();
     -- Out of Combat
     if not Player:AffectingCombat() then

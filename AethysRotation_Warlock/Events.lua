@@ -3,14 +3,14 @@
   -- Addon
   local addonName, AR = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local AR = AethysRotation;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- Lua
   
   -- File Locals
@@ -21,16 +21,16 @@
 --- ======= NON-COMBATLOG =======
   -- OnSpecChange
   local SpecTimer = 0;
-  AC:RegisterForEvent(
+  HL:RegisterForEvent(
     function (Event)
       -- Prevent the first event firing (when login)
-      if not AC.PulseInitialized then return; end
+      if not HL.PulseInitialized then return; end
       -- Timer to prevent bug due to the double/triple event firing.
       -- Since it takes 5s to change spec, we'll take 3seconds as timer.
-      if AC.GetTime() > SpecTimer then
+      if HL.GetTime() > SpecTimer then
         -- Update the timer only on valid scan.
         if AR.PulseInit() ~= "Invalid SpecID" then
-          SpecTimer = AC.GetTime() + 3;
+          SpecTimer = HL.GetTime() + 3;
         end
       end
     end
@@ -91,13 +91,13 @@
 
   -- Arguments Variables
   
-  AC.ImmolationTable = {
+  HL.ImmolationTable = {
       Destruction = {
         ImmolationDebuff = {},
       }
     };
     
-  AC.GuardiansTable = {
+  HL.GuardiansTable = {
       --{PetType,petID,dateEvent,UnitPetGUID,DE_Buffed}
       Pets = {
       },
@@ -109,53 +109,53 @@
     ----- Destruction --------
     --------------------------
     -- Immolate OnApply/OnRefresh Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         --- Record the Immolate
         if SpellID == 157736 then
-          AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = 0;
+          HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = 0;
         end
       end
       , "SPELL_AURA_APPLIED"
       , "SPELL_AURA_REFRESH"
     );
     -- Immolate OnRemove Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         -- Removes the Unit from Immolate Table
         if SpellID == 157736 then
-          if AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
-               AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = nil;
+          if HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
+               HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = nil;
           end
         end
       end
       , "SPELL_AURA_REMOVED"
     );
     -- Immolate OnUnitDeath Listener
-    AC:RegisterForCombatEvent(
+    HL:RegisterForCombatEvent(
       function (...)
         DestGUID = select(8, ...);
         -- Removes the Unit from Immolate Table
-        if AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
-          AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = nil;
+        if HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
+          HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = nil;
         end
       end
       , "UNIT_DIED"
       , "UNIT_DESTROYED"
     );
     -- Conflagrate Listener
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         -- Add a stack to the table
         if SpellID == 17962 then
-          if AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
-               AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = AC.ImmolationTable.Destruction.ImmolationDebuff[DestGUID]+1;
+          if HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] then
+               HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID] = HL.ImmolationTable.Destruction.ImmolationDebuff[DestGUID]+1;
           end
         end
       end
@@ -167,7 +167,7 @@
     ----- Demonology ---------
     --------------------------
     --Guardians table
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         dateEvent,_,_,_,_,_,_,UnitPetGUID=select(1,...)
        
@@ -176,9 +176,9 @@
           t[i] = str
           i = i + 1
         end
-        local PetType=AC.GuardiansTable.PetList[tonumber(t[6])]
+        local PetType=HL.GuardiansTable.PetList[tonumber(t[6])]
         if PetType then
-          table.insert(AC.GuardiansTable.Pets,{PetType,tonumber(t[6]),GetTime(),UnitPetGUID,false})
+          table.insert(HL.GuardiansTable.Pets,{PetType,tonumber(t[6]),GetTime(),UnitPetGUID,false})
         end
 
       end
@@ -186,12 +186,12 @@
     );
     
     --Buff all guardians
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
         if SpellID == 193396 then
-          for key, Value in pairs(AC.GuardiansTable.Pets) do
-            AC.GuardiansTable.Pets[key][5]=true
+          for key, Value in pairs(HL.GuardiansTable.Pets) do
+            HL.GuardiansTable.Pets[key][5]=true
           end
         end
       end
@@ -199,13 +199,13 @@
     );
     
     --Implosion listener (kill all wild imps)
-    AC:RegisterForSelfCombatEvent(
+    HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
         if SpellID == 196277 then
-          for key, Value in pairs(AC.GuardiansTable.Pets) do
-            if AC.GuardiansTable.Pets[key][1]=="Wild Imp" then
-              AC.GuardiansTable.Pets[key]=nil
+          for key, Value in pairs(HL.GuardiansTable.Pets) do
+            if HL.GuardiansTable.Pets[key][1]=="Wild Imp" then
+              HL.GuardiansTable.Pets[key]=nil
             end
           end
         end

@@ -3,13 +3,13 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -120,9 +120,9 @@
   
   -- Rotation Var
   local ShouldReturn; -- Used to get the return string
-  local T192P, T194P = AC.HasTier("T19");
-  local T202P, T204P = AC.HasTier("T20");
-  local T212P, T214P = AC.HasTier("T21");
+  local T192P, T194P = HL.HasTier("T19");
+  local T202P, T204P = HL.HasTier("T20");
+  local T212P, T214P = HL.HasTier("T21");
   local BestUnit, BestUnitTTD, BestUnitSpellToCast, DebuffRemains; -- Used for cycling
   local range = 40;
   local StackDurationCompute = 5 + 1.5 * (I.ReapAndSow:IsEquipped() and 1 or 0);
@@ -237,7 +237,7 @@
 
   local function HauntAPL ()
     -- reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
-    if S.ReapSouls:IsCastableP() and (not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and AC.CombatTime() > 5 and (SoulsAvailable() >= 5 or Target:TimeToDie() <= SoulsAvailable() * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) + (Player:BuffRemainsP(S.DeadwindHarvester) * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) / 12 * (5 + 1.5 * num(I.ReapAndSow:IsEquipped()))))) then
+    if S.ReapSouls:IsCastableP() and (not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and HL.CombatTime() > 5 and (SoulsAvailable() >= 5 or Target:TimeToDie() <= SoulsAvailable() * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) + (Player:BuffRemainsP(S.DeadwindHarvester) * (5 + 1.5 * num(I.ReapAndSow:IsEquipped())) / 12 * (5 + 1.5 * num(I.ReapAndSow:IsEquipped()))))) then
       if AR.Cast(S.ReapSouls, Settings.Affliction.GCDasOffGCD.ReapSoul) then return ""; end
     end
     -- reap_souls,if=debuff.haunt.remains&!buff.deadwind_harvester.remains
@@ -245,7 +245,7 @@
       if AR.Cast(S.ReapSouls, Settings.Affliction.GCDasOffGCD.ReapSoul) then return ""; end
     end
     -- reap_souls,if=active_enemies>1&!buff.deadwind_harvester.remains&time>5&soul_shard>0&((talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption>=3)|spell_targets.seed_of_corruption>=5)
-    if S.ReapSouls:IsCastableP() and (Cache.EnemiesCount[range] > 1 and not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and AC.CombatTime() > 5 and FutureShard() > 0 and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] >= 3) or Cache.EnemiesCount[range] >= 5)) then
+    if S.ReapSouls:IsCastableP() and (Cache.EnemiesCount[range] > 1 and not bool(Player:BuffRemainsP(S.DeadwindHarvester)) and HL.CombatTime() > 5 and FutureShard() > 0 and ((S.SowTheSeeds:IsAvailable() and Cache.EnemiesCount[range] >= 3) or Cache.EnemiesCount[range] >= 5)) then
       if AR.Cast(S.ReapSouls, Settings.Affliction.GCDasOffGCD.ReapSoul) then return ""; end
     end
     -- agony,cycle_targets=1,if=remains<=tick_time+gcd
@@ -409,7 +409,7 @@
   local function WritheAPL ()
     -- actions.writhe  =reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.tormented_souls.react>=5|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
     -- actions.writhe+=/reap_souls,if=!buff.deadwind_harvester.remains&time>5&(buff.soul_harvest.remains>=(5+1.5*equipped.144364)&buff.active_uas.stack>1|buff.concordance_of_the_legionfall.react|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|trinket.proc.mastery.react|trinket.stacking_proc.mastery.react|trinket.proc.crit.react|trinket.stacking_proc.crit.react|trinket.proc.versatility.react|trinket.stacking_proc.versatility.react|trinket.proc.spell_power.react|trinket.stacking_proc.spell_power.react)
-    if S.ReapSouls:IsCastableP() and Player:BuffRemainsP(S.DeadwindHarvester) > 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
+    if S.ReapSouls:IsCastableP() and Player:BuffRemainsP(S.DeadwindHarvester) > 0 and HL.CombatTime() > 5 and SoulsAvailable() >= 1
       and ((SoulsAvailable() >= 5 or Target:FilteredTimeToDie("<=", ComputeDeadwindHarvesterDuration()))
       or ((Player:BuffRemainsP(S.SoulHarvest) >= StackDurationCompute and ActiveUAs() > 1) or Player:BuffRemainsP(S.Concordance) > 0)) then
         if AR.Cast(S.ReapSouls, Settings.Affliction.GCDasOffGCD.ReapSoul) then return ""; end
@@ -729,7 +729,7 @@
     end
   
     -- actions.mg=reap_souls,if=!buff.deadwind_harvester.remains&time>5&((buff.tormented_souls.react>=4+active_enemies|buff.tormented_souls.react>=9)|target.time_to_die<=buff.tormented_souls.react*(5+1.5*equipped.144364)+(buff.deadwind_harvester.remains*(5+1.5*equipped.144364)%12*(5+1.5*equipped.144364)))
-    if S.ReapSouls:IsCastableP() and not Player:BuffRemainsP(S.DeadwindHarvester) == 0 and AC.CombatTime() > 5 and SoulsAvailable() >= 1
+    if S.ReapSouls:IsCastableP() and not Player:BuffRemainsP(S.DeadwindHarvester) == 0 and HL.CombatTime() > 5 and SoulsAvailable() >= 1
       and ((SoulsAvailable() >= 4 + Cache.EnemiesCount[range] or SoulsAvailable() >= 9) or Target:FilteredTimeToDie("<=", ComputeDeadwindHarvesterDuration())) then
         if AR.Cast(S.ReapSouls, Settings.Affliction.GCDasOffGCD.ReapSoul) then return ""; end
     end
@@ -1019,9 +1019,9 @@
 --- ======= MAIN =======
   local function APL ()
     -- Unit Update
-    AC.GetEnemies(range);
+    HL.GetEnemies(range);
     if I.SephuzSecret:IsEquipped() then
-      AC.GetEnemies(10);
+      HL.GetEnemies(10);
     end
     Everyone.AoEToggleEnemiesUpdate();
     

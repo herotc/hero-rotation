@@ -2,13 +2,13 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 -- AethysRotation
 local AR = AethysRotation;
 -- Lua
@@ -207,7 +207,7 @@ end
 
 local function MythicDungeon ()
   -- Sapped Soul
-  if AC.MythicDungeon() == "Sapped Soul" then
+  if HL.MythicDungeon() == "Sapped Soul" then
     for i = 1, #SappedSoulSpells do
       if SappedSoulSpells[i][1]:IsCastable() and SappedSoulSpells[i][3]() then
         AR.ChangePulseTimer(1);
@@ -345,9 +345,9 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(8); -- Cannonball Barrage
-  AC.GetEnemies(S.Dispatch); -- Blade Flurry
-  AC.GetEnemies(S.SaberSlash); -- Melee
+  HL.GetEnemies(8); -- Cannonball Barrage
+  HL.GetEnemies(S.Dispatch); -- Blade Flurry
+  HL.GetEnemies(S.SaberSlash); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Defensives

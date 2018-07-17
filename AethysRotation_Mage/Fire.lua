@@ -3,14 +3,14 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroLib
-  local AC = HeroLib;
+  local HL = HeroLib;
   local Cache = HeroCache;
-  local Unit = AC.Unit;
+  local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
   local Pet = Unit.Pet;
-  local Spell = AC.Spell;
-  local Item = AC.Item;
+  local Spell = HL.Spell;
+  local Item = HL.Item;
   -- AethysRotation
   local AR = AethysRotation;
   -- Lua
@@ -114,7 +114,7 @@ local function BuffP(Spell, AnyCaster, Offset)
   elseif Spell == S.HeatingUp then
     return HeatLevelPredicted() == 1
   elseif Spell == S.RuneOfPowerAura then
-    return AC.OffsetRemains(S.RuneOfPowerAura:TimeSinceLastAppliedOnPlayer(), "Auto") <= 10
+    return HL.OffsetRemains(S.RuneOfPowerAura:TimeSinceLastAppliedOnPlayer(), "Auto") <= 10
   else
     return Player:BuffP(Spell, AnyCaster, Offset)
   end
@@ -246,7 +246,7 @@ local function RopPhase ()
   local ShouldReturn = ActiveTalents();
   if ShouldReturn then return ShouldReturn; end
   --actions.rop_phase+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains&buff.rune_of_power.remains>cast_time
-  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and S.Pyroblast:ExecuteTime() < Player:BuffRemainsP(S.KaelthassUltimateAbility) and math.min(10 - AC.OffsetRemains(S.RuneOfPowerAura:TimeSinceLastAppliedOnPlayer(), "Auto"), 0) > S.Pyroblast:CastTime() then
+  if S.Pyroblast:IsCastable() and BuffP(S.KaelthassUltimateAbility) and S.Pyroblast:ExecuteTime() < Player:BuffRemainsP(S.KaelthassUltimateAbility) and math.min(10 - HL.OffsetRemains(S.RuneOfPowerAura:TimeSinceLastAppliedOnPlayer(), "Auto"), 0) > S.Pyroblast:CastTime() then
     if AR.Cast(S.Pyroblast) then return ""; end
   end
   --actions.rop_phase+=/fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.up&firestarter.active&charges_fractional>1.7
@@ -409,10 +409,10 @@ local function StandardRotation ()
 end
 
 local function APL ()
-  AC.GetEnemies(40);
+  HL.GetEnemies(40);
   DBRange = (S.BigMouth:ArtifactEnabled() and 10 or 8) + (I.DarcklisDragonfireDiadem:IsEquipped() and 30 or 0);
   if DBRange < 40 then
-    AC.GetEnemies(DBRange);
+    HL.GetEnemies(DBRange);
   end
   Everyone.AoEToggleEnemiesUpdate();
   -- Out of Combat
@@ -442,7 +442,7 @@ local function APL ()
         or S.Combustion:CooldownRemainsP() > 40 and not BuffP(S.Combustion) and not S.Kindling:IsAvailable()
         or Target:TimeToDie() < 11
         or S.Kindling:IsAvailable() and S.RuneOfPower:ChargesFractional() > 1.8
-        or AC.CombatTime() < 40 and S.Combustion:CooldownRemainsP() > 40
+        or HL.CombatTime() < 40 and S.Combustion:CooldownRemainsP() > 40
       ) then
       if AR.Cast(S.RuneOfPower) then return ""; end
     end

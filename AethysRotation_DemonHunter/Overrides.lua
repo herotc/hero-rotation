@@ -1,13 +1,13 @@
 --- ============================ HEADER ============================
   -- HeroLib
-  local AC      = HeroLib;
+  local HL      = HeroLib;
   local Cache   = HeroCache;
-  local Unit    = AC.Unit;
+  local Unit    = HL.Unit;
   local Player  = Unit.Player;
   local Pet     = Unit.Pet;
   local Target  = Unit.Target;
-  local Spell   = AC.Spell;
-  local Item    = AC.Item;
+  local Spell   = HL.Spell;
+  local Item    = HL.Item;
 -- AethysRotation
   local AR      = AethysRotation;
 -- Spells
@@ -21,7 +21,7 @@
 -- Vengeance, ID: 581
 
 -- Example (Arcane Mage)
--- AC.AddCoreOverride ("Spell.IsCastableP", 
+-- HL.AddCoreOverride ("Spell.IsCastableP", 
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 --   if Range then
 --     local RangeUnit = ThisUnit or Target;

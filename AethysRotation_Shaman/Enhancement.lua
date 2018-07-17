@@ -3,13 +3,13 @@
 local addonName, addonTable = ...;
 
 -- HeroLib
-local AC = HeroLib;
+local HL = HeroLib;
 local Cache = HeroCache;
-local Unit = AC.Unit;
+local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = AC.Spell;
-local Item = AC.Item;
+local Spell = HL.Spell;
+local Item = HL.Item;
 
 -- AethysRotation
 local AR = AethysRotation;
@@ -160,7 +160,7 @@ end
 
 -- actions+=/variable,name=LightningCrashNotUp,value=(!buff.lightning_crash.up&set_bonus.tier20_2pc)
 local function LightningCrashNotUp()
-  return (not Player:Buff(S.LightningCrashBuff)) and AC.Tier20_2Pc
+  return (not Player:Buff(S.LightningCrashBuff)) and HL.Tier20_2Pc
 end
 
 -- actions+=/variable,name=alphaWolfCheck,value=((pet.frost_wolf.buff.alpha_wolf.remains<2&pet.fiery_wolf.buff.alpha_wolf.remains<2&pet.lightning_wolf.buff.alpha_wolf.remains<2)&feral_spirit.remains>4)
@@ -171,10 +171,10 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  AC.GetEnemies(40);  -- Lightning Bolt
-  AC.GetEnemies(30);  -- Purge / Wind Shear
-  AC.GetEnemies(10);  -- ES / FB / FT / RB / WS /
-  AC.GetEnemies(8);   -- FOA / CL / Sundering
+  HL.GetEnemies(40);  -- Lightning Bolt
+  HL.GetEnemies(30);  -- Purge / Wind Shear
+  HL.GetEnemies(10);  -- ES / FB / FT / RB / WS /
+  HL.GetEnemies(8);   -- FOA / CL / Sundering
   Everyone.AoEToggleEnemiesUpdate()
 
   -- Out of Combat
