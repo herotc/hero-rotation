@@ -24,8 +24,7 @@
       GCDasOffGCD = {
         -- Abilities
         HornOfWinter       = true,
-        Obliteration       = true,
-        SindragosasFury    = true,
+        FrostwyrmsFury    = true,
         BreathofSindragosa = true
       },
       OffGCDasOffGCD = {
@@ -35,7 +34,6 @@
         BloodFury           = true,
         -- Abilities
         PillarOfFrost       = true,
-        HungeringRuneWeapon = true,
         EmpowerRuneWeapon   = true
       }
     },
@@ -85,7 +83,7 @@
   local CP_Unholy      = CreateChildPanel(CP_Deathknight, "Unholy");
   local CP_Frost       = CreateChildPanel(CP_Deathknight, "Frost");
   local CP_Blood       = CreateChildPanel(CP_Deathknight, "Blood");
-  
+
   --DeathKnight Panels
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Show on use trinkets", "Fel Oiled Machine Supported.");
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");

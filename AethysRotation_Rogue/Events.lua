@@ -84,8 +84,6 @@
     },
     Subtlety = {
       Nightblade = {},
-      FinalityNightblade = false,
-      FinalityNightbladeTime = 0
     }
   };
   local BleedGUID;
@@ -129,7 +127,13 @@
     -- Bleed infos
     local function GetBleedInfos (GUID, SpellID)
       -- Core API is not used since we don't want cached informations
-      return select(6, UnitAura(GUID, GetSpellInfo(SpellID), nil, "HARMFUL|PLAYER"));
+      for i = 1, AC.MAXIMUM do
+        local auraInfo = {UnitAura(GUID, i, "HARMFUL|PLAYER")};
+        if auraInfo[10] == SpellID then
+          return auraInfo[5];
+        end
+      end
+      return nil
     end
     -- Bleed OnApply/OnRefresh Listener
     AC:RegisterForSelfCombatEvent(
@@ -197,27 +201,13 @@
       end
       return false;
     end
-    -- Nighblade OnCast Listener
-    -- Check the Finality buff on cast (because it disappears after) but don't record it until application (because it can miss)
-    AC:RegisterForSelfCombatEvent(
-      function (...)
-        SpellID = select(12, ...);
-
-        -- Nightblade
-        if SpellID == 195452 then
-          AC.BleedTable.Subtlety.FinalityNightblade = Player:Buff(Spell.Rogue.Subtlety.FinalityNightblade) and true or false;
-          AC.BleedTable.Subtlety.FinalityNightbladeTime = AC.GetTime() + 0.3;
-        end
-      end
-      , "SPELL_CAST_SUCCESS"
-    );
     -- Nightblade OnApply/OnRefresh Listener
     AC:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
 
         if SpellID == 195452 then
-          AC.BleedTable.Subtlety.Nightblade[DestGUID] = AC.GetTime() < AC.BleedTable.Subtlety.FinalityNightbladeTime and AC.BleedTable.Subtlety.FinalityNightblade;
+          AC.BleedTable.Subtlety.Nightblade[DestGUID] = true;
         end
       end
       , "SPELL_AURA_APPLIED"
@@ -281,7 +271,7 @@
           Player.RSOffset.Offsetvote = Player:ComboPoints()*6.0;
         end
       end
-      , "UNIT_POWER"
+      , "UNIT_POWER_UPDATE"
     );
     -- Set RSOffset when casting a finisher
     AC:RegisterForSelfCombatEvent(

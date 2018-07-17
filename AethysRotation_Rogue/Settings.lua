@@ -21,8 +21,6 @@
       -- SoloMode Settings
       CrimsonVialHP = 0,
       FeintHP = 0,
-      -- Evisc/Env Mantle Damage Offset Multiplier
-      EDMGMantleOffset = 2,
       StealthOOC = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -50,8 +48,6 @@
       PoisonRefreshCombat = 3,
       -- Suggest Multi-DoT at FoK Range
       RangedMultiDoT = true,
-      -- FoK Rotation Toggle
-      FoKRotation = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
       },
@@ -67,8 +63,6 @@
       RolltheBonesLogic = "SimC",
       -- SoloMode Settings
       RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
-      -- Blade Flurry TimeOut
-      BFOffset = 2,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
       },
@@ -119,7 +113,6 @@
   -- Rogue
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.");
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, "Feint HP", "Set the Feint HP threshold.");
-  CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.EDMGMantleOffset", {1, 5, 0.25}, "Mantle Damage Offset", "Set the Evisc/Env Mantle Damage Offset.");
   CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.");
   CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons");
   -- Assassination
@@ -128,12 +121,10 @@
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
-  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.FoKRotation", "Enable Fan of Knives Rotation", "Suggest using Fan of Knives on a single target instead of Mutilate.");
   CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
   -- Outlaw
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadsides", "Buried Treasure", "Grand Melee", "Jolly Roger", "Shark Infested Waters", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.");
   CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechHP", {1, 100, 1}, "Roll the Bones Leech HP", "Set the HP threshold before re-rolling for the leech buff (working only if Solo Mode is enabled).");
-  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.BFOffset", {1, 5, 1}, "Blade Flurry Offset", "Set the Blade Flurry timer before suggesting to disable it (to compensate fast movement).");
   CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw");
   -- Subtlety
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.");

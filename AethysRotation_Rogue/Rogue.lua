@@ -73,10 +73,10 @@
     end
   end
 
-  -- Everyone CanDotUnit override to account for Mantle
+  -- Everyone CanDotUnit override, originally used for Mantle legendary
   -- Is it worth to DoT the unit ?
   function Commons.CanDoTUnit (Unit, HealthThreshold)
-    return Everyone.CanDoTUnit(Unit, HealthThreshold*(Commons.MantleDuration() > 0 and Settings.EDMGMantleOffset or 1));
+    return Everyone.CanDoTUnit(Unit, HealthThreshold);
   end
 --- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
   -- cp_max_spend
@@ -123,7 +123,8 @@
            tdata -> dots.rupture -> is_ticking();
   ]]
   function Commons.Bleeds ()
-    return (Target:Debuff(Spell.Rogue.Assassination.Garrote) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.Rupture) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.InternalBleeding) and 1 or 0);
+    return (Target:Debuff(Spell.Rogue.Assassination.Garrote) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.Rupture) and 1 or 0)
+    + (Target:Debuff(Spell.Rogue.Assassination.CrimsonTempest) and 1 or 0) + (Target:Debuff(Spell.Rogue.Assassination.InternalBleeding) and 1 or 0);
   end
 
   -- poisoned_bleeds
@@ -158,49 +159,10 @@
         if Unit:Debuff(Spell.Rogue.Assassination.Rupture) then
           PoisonedBleedsCount = PoisonedBleedsCount + 1;
         end
+        if Unit:Debuff(Spell.Rogue.Assassination.CrimsonTempest) then
+          PoisonedBleedsCount = PoisonedBleedsCount + 1;
+        end
       end
     end
     return PoisonedBleedsCount;
-  end
-
-  -- Assassination Tier 19 4PC Envenom Multiplier
-  --[[ Original SimC Code
-    if ( p() -> sets.has_set_bonus( ROGUE_ASSASSINATION, T19, B4 ) )
-    {
-      size_t bleeds = 0;
-      rogue_td_t* tdata = td( target );
-      bleeds += tdata -> dots.garrote -> is_ticking();
-      bleeds += tdata -> dots.internal_bleeding -> is_ticking();
-      bleeds += tdata -> dots.rupture -> is_ticking();
-      // As of 04/08/2017, Mutilated Flesh works on T19 4PC.
-      bleeds += tdata -> dots.mutilated_flesh -> is_ticking();
-
-      m *= 1.0 + p() -> sets.set( ROGUE_ASSASSINATION, T19, B4 ) -> effectN( 1 ).percent() * bleeds;
-    }
-  ]]
-  local T19_4C_BaseMultiplier = 0.1;
-  function Commons.Assa_T19_4PC_EnvMultiplier ()
-    return 1 + T19_4C_BaseMultiplier * (Commons.Bleeds() + (Target:Debuff(Spell.Rogue.Assassination.MutilatedFlesh) and 1 or 0));
-  end
-
-  -- mantle_duration
-  --[[ Original SimC Code
-    if ( buffs.mantle_of_the_master_assassin_aura -> check() )
-    {
-      timespan_t nominal_master_assassin_duration = timespan_t::from_seconds( spell.master_assassins_initiative -> effectN( 1 ).base_value() );
-      timespan_t gcd_remains = timespan_t::from_seconds( std::max( ( gcd_ready - sim -> current_time() ).total_seconds(), 0.0 ) );
-      return gcd_remains + nominal_master_assassin_duration;
-    }
-    else if ( buffs.mantle_of_the_master_assassin -> check() )
-      return buffs.mantle_of_the_master_assassin -> remains();
-    else
-      return timespan_t::from_seconds( 0.0 );
-  ]]
-  local MasterAssassinsInitiative, NominalDuration = Spell(235027), 6;
-  function Commons.MantleDuration ()
-    if Player:BuffRemains(MasterAssassinsInitiative) < 0 then
-      return Player:GCDRemains() + NominalDuration;
-    else
-      return Player:BuffRemainsP(MasterAssassinsInitiative);
-    end
   end

@@ -1,8 +1,8 @@
-## Interface: 70300
+## Interface: 80000
 
 ## Title: Aethys |cFFA330C9Rotation|r
 ## Author: Aethys, SimCMinMax Team
-## Version: 7.3.2.04
+## Version: 8.0.1.00
 ## Notes: Attempt to provide the useful and precise informations to execute the best possible DPS rotation in every situation.
 
 ## DefaultState: Enabled
