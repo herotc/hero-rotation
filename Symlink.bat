@@ -7,7 +7,7 @@ set GHRep="D:\My documents\GitHub"
 
 REM don't touch anything bellow this
 mklink /J %WoWRep%"\Interface\AddOns\HeroLib" %GHRep%"\hero-lib\HeroLib"
-mklink /J %WoWRep%"\Interface\AddOns\AethysCache" %GHRep%"\AethysCore\AethysCache"
+mklink /J %WoWRep%"\Interface\AddOns\HeroCache" %GHRep%"\hero-lib\HeroCache"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation" %GHRep%"\AethysRotation\AethysRotation"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_DeathKnight" %GHRep%"\AethysRotation\AethysRotation_DeathKnight"
 mklink /J %WoWRep%"\Interface\AddOns\AethysRotation_DemonHunter" %GHRep%"\AethysRotation\AethysRotation_DemonHunter"

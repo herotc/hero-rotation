@@ -82,7 +82,7 @@ I (Aethys) am one of the main Rogue theorycrafter and contributor to the Simulat
 
 ## Advanced Users / Developper Notes
 If you want to use the addon directly from the [GitHub repository](https://github.com/SimCMinMax/AethysRotation), you would have to symlink every folders from this repository (AethysRotation folder and every class modules but the template) to your WoW Addons folder.
-Furthermore, to make it working, you need to add the only dependency that is [HeroLib](https://github.com/SimCMinMax/HeroLib) following the same processus (symlink HeroLib & AethysCache from the repository).
+Furthermore, to make it working, you need to add the only dependency that is [HeroLib](https://github.com/SimCMinMax/HeroLib) following the same processus (symlink HeroLib & HeroCache from the repository).
 There is a script that does this for you, open symlink.bat and modify the two vars (WoWRep and GHRep) to match your local setup.
 Make sure AethysRotation's directories doesn't already exist as it will not override them.
 Finally, launch symlink.bat

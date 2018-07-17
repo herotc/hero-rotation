@@ -5,7 +5,7 @@
   -- HeroLib
   local AC = HeroLib;
   local AR = AethysRotation;
-  local Cache = AethysCache;
+  local Cache = HeroCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;

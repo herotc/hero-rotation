@@ -3,7 +3,7 @@
   local addonName, addonTable = ...;
   -- HeroLib
   local AC = HeroLib;
-  local Cache = AethysCache;
+  local Cache = HeroCache;
   local Unit = AC.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
