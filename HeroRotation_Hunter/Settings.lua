@@ -38,15 +38,15 @@
       GCDasOffGCD = {
         -- Abilities
         AMurderofCrows = false,
-        Volley = true,
+        AspectoftheWild = false,
+        BestialWrath = false,
+        Exhilaration = true,
+        SpittingCobra = false,
+        Stampede = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        AspectoftheWild = true,
-        BestialWrath = true,
-        Exhilaration = true,
-        TitansThunder = true,
         -- Items
         PotionOfProlongedPower = true,
         -- Racials
@@ -62,13 +62,12 @@
       GCDasOffGCD = {
         -- Abilities
         AMurderofCrows = false,
-        Volley = true,
+        TrueShot = false,
+        Exhilaration = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        Exhilaration = true,
-        TrueShot = true,
         -- Items
         PotionOfProlongedPower = true,
         -- Racials
@@ -81,14 +80,14 @@
       UseSilence = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+        -- Abilities
+        AspectoftheEagle = false,
+        Butchery = false,
+        Exhilaration = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        AspectoftheEagle = true,
-        Butchery = true,
-        Exhilaration = true,
-        SnakeHunter = true,
         -- Items
         PotionOfProlongedPower = true,
         -- Racials
