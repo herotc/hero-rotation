@@ -30,7 +30,7 @@ ignore:
  - HeroRotation_ClassTemplate/Events.lua
  - HeroRotation_ClassTemplate/Settings.lua
  - HeroRotation_ClassTemplate/Spec.lua
- - Symlink.bat
+ - symlink.bat
  - symlink.sh
 
 enable-nolib-creation: no
