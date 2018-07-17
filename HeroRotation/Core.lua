@@ -194,17 +194,17 @@
             HR.MainFrame:ResizeButtons(Argument3);
           else
             HR.Print("Invalid |cff88ff88[Type]|r for Scale.");
-            HR.Print("Should be |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
+            HR.Print("Should be |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
             HR.Print("Type accepted are |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r.");
           end
         else
           HR.Print("Invalid |cffff8888[Size]|r for Scale.");
-          HR.Print("Should be |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
+          HR.Print("Should be |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
           HR.Print("Size accepted are |cffff8888number > 0 and <= 10|r.");
         end
       else
         HR.Print("Invalid arguments for Scale.");
-        HR.Print("Should be |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
+        HR.Print("Should be |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r.");
         HR.Print("Type accepted are |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r.");
         HR.Print("Size accepted are |cffff8888number > 0 and <= 10|r.");
       end
@@ -212,22 +212,22 @@
       HR.ToggleIconFrame:ResetAnchor();
     elseif Argument1 == "help" then
       HR.Print("|cffffff00--[Toggles]--|r");
-      HR.Print("  On/Off: |cff8888ff/aer toggle|r");
-      HR.Print("  CDs: |cff8888ff/aer cds|r");
-      HR.Print("  AoE: |cff8888ff/aer aoe|r");
+      HR.Print("  On/Off: |cff8888ff/hr toggle|r");
+      HR.Print("  CDs: |cff8888ff/hr cds|r");
+      HR.Print("  AoE: |cff8888ff/hr aoe|r");
       HR.Print("|cffffff00--[User Interface]--|r");
-      HR.Print("  UI Lock: |cff8888ff/aer lock|r");
-      HR.Print("  UI Unlock: |cff8888ff/aer unlock|r");
-      HR.Print("  UI Scale: |cff8888ff/aer scale|r |cff88ff88[Type]|r |cffff8888[Size]|r");
+      HR.Print("  UI Lock: |cff8888ff/hr lock|r");
+      HR.Print("  UI Unlock: |cff8888ff/hr unlock|r");
+      HR.Print("  UI Scale: |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r");
       HR.Print("    [Type]: |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r");
       HR.Print("    [Size]: |cffff8888number > 0 and <= 10|r");
-      HR.Print("  Button Anchor Reset : |cff8888ff/aer resetbuttons|r");
+      HR.Print("  Button Anchor Reset : |cff8888ff/hr resetbuttons|r");
     else
       HR.Print("Invalid arguments.");
-      HR.Print("Type |cff8888ff/aer help|r for more infos.");
+      HR.Print("Type |cff8888ff/hr help|r for more infos.");
     end
   end
-  SLASH_HEROROTATION1 = "/aer"
+  SLASH_HEROROTATION1 = "/hr"
   SLASH_HEROROTATION2 = "/ar"
   SlashCmdList["HEROROTATION"] = HR.CmdHandler;
 
