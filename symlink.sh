@@ -7,8 +7,8 @@ WoWRep="/Applications/World of Warcraft"
 GHRep=$(pwd)
 
 # Don't touch anything bellow this
-#ln -s "$GHRep/hero-lib/HeroLib" "$WoWRep/Interface/AddOns/HeroLib"
-#ln -s "$GHRep/hero-lib/HeroCache" "$WoWRep/Interface/AddOns/HeroCache"
+#ln -s "$GHRep/../hero-lib/HeroLib" "$WoWRep/Interface/AddOns/HeroLib"
+#ln -s "$GHRep/../hero-lib/HeroCache" "$WoWRep/Interface/AddOns/HeroCache"
 ln -s "$GHRep/HeroRotation" "$WoWRep/Interface/AddOns/HeroRotation"
 ln -s "$GHRep/HeroRotation_DeathKnight" "$WoWRep/Interface/AddOns/HeroRotation_DeathKnight"
 ln -s "$GHRep/HeroRotation_DemonHunter" "$WoWRep/Interface/AddOns/HeroRotation_DemonHunter"
@@ -22,4 +22,4 @@ ln -s "$GHRep/HeroRotation_Rogue" "$WoWRep/Interface/AddOns/HeroRotation_Rogue"
 ln -s "$GHRep/HeroRotation_Shaman" "$WoWRep/Interface/AddOns/HeroRotation_Shaman"
 ln -s "$GHRep/HeroRotation_Warrior" "$WoWRep/Interface/AddOns/HeroRotation_Warrior"
 ln -s "$GHRep/HeroRotation_Warlock" "$WoWRep/Interface/AddOns/HeroRotation_Warlock"
-#ln -s "$GHRep/AethysTools" "$WoWRep/Interface/AddOns/AethysTools"
+#ln -s "$GHRep/../AethysTools" "$WoWRep/Interface/AddOns/AethysTools"
