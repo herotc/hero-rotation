@@ -1,0 +1,31 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r
+## Author: Aethys, SimCMinMax Team
+## Version: 8.0.1.00
+## Notes: Attempt to provide the useful and precise informations to execute the best possible DPS rotation in every situation.
+
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## Dependencies: HeroLib
+## OptionalDeps: AethysTools, Masque
+## SavedVariables: HeroRotationDB
+## SavedVariablesPerCharacter: HeroRotationCharDB
+
+# GUI
+Panels.lua
+
+# API
+Settings.lua
+Core.lua
+Events.lua
+
+# APL Commons
+Commons.lua
+
+# UI
+UI.xml
+UI.lua
+
+# Main
+Main.lua

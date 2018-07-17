@@ -1,0 +1,17 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FDeathKnight|r]
+## Author: chrislopez24, 3L00DStrike
+## Notes: Hero Rotation - DeathKnight Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+DeathKnight.lua
+Frost.lua
+Unholy.lua
+Blood.lua
+Events.lua
+Overrides.lua

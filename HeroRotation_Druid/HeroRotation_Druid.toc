@@ -1,0 +1,15 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FDruid|r]
+## Author: Aethys, KutiKuti
+## Notes: Hero Rotation - Druid Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Balance.lua
+Feral.lua 
+Guardian.lua
+Overrides.lua

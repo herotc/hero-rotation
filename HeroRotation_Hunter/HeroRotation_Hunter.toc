@@ -1,0 +1,17 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FHunter|r]
+## Author: Nia
+## Notes: Hero Rotation - Hunter Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Hunter.lua
+BeastMastery.lua
+Marksmanship.lua
+Survival.lua
+Events.lua
+Overrides.lua

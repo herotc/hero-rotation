@@ -1,0 +1,15 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FDemon Hunter|r]
+## Author: Aethys, Kojiyama
+## Notes: Hero Rotation - Demon Hunter Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Havoc.lua
+Vengeance.lua
+Events.lua
+Overrides.lua
