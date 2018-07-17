@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
   -- Addon
-  local addonName, AR = ...;
+  local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
   local Utils = HL.Utils;
@@ -16,9 +16,9 @@
 
 
 --- ============================ CONTENT ============================
-  AR.GUI = {};
+  HR.GUI = {};
 
-  function AR.GUI.LoadSettingsRecursively (Table, KeyChain)
+  function HR.GUI.LoadSettingsRecursively (Table, KeyChain)
     local KeyChain = KeyChain or "";
     for Key, Value in pairs(Table) do
       -- Generate the NewKeyChain
@@ -30,7 +30,7 @@
       end
       -- Continue the table browsing
       if type(Value) == "table" then
-        AR.GUI.LoadSettingsRecursively(Value, NewKeyChain);
+        HR.GUI.LoadSettingsRecursively(Value, NewKeyChain);
       -- Update the value
       else
         -- Check if the final key is a string or a number (the case for table values with numeric index)
@@ -66,14 +66,14 @@
         CreatePanelOption("CheckButton", Panel, Setting, OffGCDName(Name), OffGCDDesc(Name));
       end
     };
-    function AR.GUI.CreateARPanelOption (Type, Panel, Setting, ...)
+    function HR.GUI.CreateARPanelOption (Type, Panel, Setting, ...)
       CreateARPanelOption[Type](Panel, Setting, ...);
     end
 
-    function AR.GUI.CreateARPanelOptions (Panel, Settings)
+    function HR.GUI.CreateARPanelOptions (Panel, Settings)
       -- Find the corresponding setting table
       local SettingsSplit = {strsplit(".", Settings)};
-      local SettingsTable = AR.GUISettings;
+      local SettingsTable = HR.GUISettings;
       for i = 1, #SettingsSplit do
         SettingsTable = SettingsTable[SettingsSplit[i]];
       end
@@ -94,7 +94,7 @@
             -- Rewrite the setting string
             local Setting = tableconcat({Settings, Type, SettingName}, ".");
             -- Construct the option
-            AR.GUI.CreateARPanelOption(Type, Panel, Setting, Name);
+            HR.GUI.CreateARPanelOption(Type, Panel, Setting, Name);
           end
         end
       end

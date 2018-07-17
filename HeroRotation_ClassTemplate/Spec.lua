@@ -11,15 +11,15 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   
 
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
-  local Everyone = AR.Commons.Everyone;
-  local Class = AR.Commons.Class;
+  local Everyone = HR.Commons.Everyone;
+  local Class = HR.Commons.Class;
 
   -- Spells
   if not Spell.Class then Spell.Class = {}; end
@@ -58,9 +58,9 @@
 
   -- GUI Settings
   local Settings = {
-    General = AR.GUISettings.General,
-    Commons = AR.GUISettings.APL.Class.Commons,
-    Spec = AR.GUISettings.APL.Class.Spec
+    General = HR.GUISettings.General,
+    Commons = HR.GUISettings.APL.Class.Commons,
+    Spec = HR.GUISettings.APL.Class.Spec
   };
 
 
@@ -102,7 +102,7 @@
     end
   end
 
-  AR.SetAPL(000, APL);
+  HR.SetAPL(000, APL);
 
 
 --- ======= SIMC =======

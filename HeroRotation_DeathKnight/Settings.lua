@@ -3,19 +3,19 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- HeroLib
   local HL = HeroLib;
   --File Locals
   local GUI = HL.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
-  local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
+  local CreateARPanelOption = HR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
-  AR.GUISettings.APL.DeathKnight = {
+  HR.GUISettings.APL.DeathKnight = {
     Commons = {
       UseTrinkets = false,
       UsePotions  = false
@@ -76,9 +76,9 @@
     }
   };
 
-  AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+  HR.GUI.LoadSettingsRecursively(HR.GUISettings);
   -- Panels
-  local ARPanel        = AR.GUI.Panel;
+  local ARPanel        = HR.GUI.Panel;
   local CP_Deathknight = CreateChildPanel(ARPanel, "DeathKnight");
   local CP_Unholy      = CreateChildPanel(CP_Deathknight, "Unholy");
   local CP_Frost       = CreateChildPanel(CP_Deathknight, "Frost");

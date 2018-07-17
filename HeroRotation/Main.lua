@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
   -- Addon
-  local addonName, AR = ...;
+  local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
   local Cache = HeroCache;
@@ -43,7 +43,7 @@
     end
   end
   local function MasqueUpdate( Addon, Group, SkinID, Gloss, Backdrop, Colors, Disabled )
-    if Addon==AR and MasqueGroups and MasqueFrameList then
+    if Addon==HR and MasqueGroups and MasqueFrameList then
       local k = MasqueFrameList[Group];
       if k then
         if type(k.Icon) == "table" then
@@ -66,93 +66,93 @@
   BINDING_NAME_HEROROTATION_TOGGLE = "Toggle On/Off";
 
 --- ======= MAIN FRAME =======
-  AR.MainFrame = CreateFrame("Frame", "HeroRotation_MainFrame", UIParent);
-  AR.MainFrame:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
-  AR.MainFrame:SetFrameLevel(10);
-  AR.MainFrame:SetWidth(112);
-  AR.MainFrame:SetHeight(96);
+  HR.MainFrame = CreateFrame("Frame", "HeroRotation_MainFrame", UIParent);
+  HR.MainFrame:SetFrameStrata(HR.GUISettings.General.MainFrameStrata);
+  HR.MainFrame:SetFrameLevel(10);
+  HR.MainFrame:SetWidth(112);
+  HR.MainFrame:SetHeight(96);
 
-  AR.MainFrame:SetClampedToScreen(true);
+  HR.MainFrame:SetClampedToScreen(true);
     -- Resize
-    function AR.MainFrame:ResizeUI (Multiplier)
+    function HR.MainFrame:ResizeUI (Multiplier)
       local FramesToResize = {
         -- TODO: Put the Size in one Array in UI.lua and pull it out here
-        {AR.MainFrame, 112, 96},
-        {AR.MainIconFrame, 64, 64},
-        {AR.SmallIconFrame, 64, 32},
-        {AR.SmallIconFrame.Icon[1], AR.GUISettings.General.BlackBorderIcon and 30 or 32, AR.GUISettings.General.BlackBorderIcon and 30 or 32},
-        {AR.SmallIconFrame.Icon[2], AR.GUISettings.General.BlackBorderIcon and 30 or 32, AR.GUISettings.General.BlackBorderIcon and 30 or 32},
-        {AR.LeftIconFrame, 48, 48},
-        {AR.SuggestedIconFrame, 32, 32},
+        {HR.MainFrame, 112, 96},
+        {HR.MainIconFrame, 64, 64},
+        {HR.SmallIconFrame, 64, 32},
+        {HR.SmallIconFrame.Icon[1], HR.GUISettings.General.BlackBorderIcon and 30 or 32, HR.GUISettings.General.BlackBorderIcon and 30 or 32},
+        {HR.SmallIconFrame.Icon[2], HR.GUISettings.General.BlackBorderIcon and 30 or 32, HR.GUISettings.General.BlackBorderIcon and 30 or 32},
+        {HR.LeftIconFrame, 48, 48},
+        {HR.SuggestedIconFrame, 32, 32},
       };
       for Key, Value in pairs(FramesToResize) do
         Value[1]:SetWidth(Value[2]*Multiplier);
         Value[1]:SetHeight(Value[3]*Multiplier);
       end
-	  for i = 1, AR.MaxQueuedCasts do
-		AR.MainIconFrame.Part[i]:SetWidth(64*Multiplier);
-		AR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
+	  for i = 1, HR.MaxQueuedCasts do
+		HR.MainIconFrame.Part[i]:SetWidth(64*Multiplier);
+		HR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
 	  end
-      AR.SuggestedIconFrame:SetPoint("BOTTOM", AR.MainIconFrame, "LEFT", -AR.LeftIconFrame:GetWidth()/2, AR.LeftIconFrame:GetHeight()/2+(AR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
+      HR.SuggestedIconFrame:SetPoint("BOTTOM", HR.MainIconFrame, "LEFT", -HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2+(HR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
       HeroRotationDB.GUISettings["General.ScaleUI"] = Multiplier;
     end
-    function AR.MainFrame:ResizeButtons (Multiplier)
+    function HR.MainFrame:ResizeButtons (Multiplier)
       local FramesToResize = {
         -- TODO: Put the Size in one Array in UI.lua and pull it out here
-        {AR.ToggleIconFrame, 64, 20},
-        {AR.ToggleIconFrame.Button[1], 20, 20},
-        {AR.ToggleIconFrame.Button[2], 20, 20},
-        {AR.ToggleIconFrame.Button[3], 20, 20}
+        {HR.ToggleIconFrame, 64, 20},
+        {HR.ToggleIconFrame.Button[1], 20, 20},
+        {HR.ToggleIconFrame.Button[2], 20, 20},
+        {HR.ToggleIconFrame.Button[3], 20, 20}
       };
       for Key, Value in pairs(FramesToResize) do
         Value[1]:SetWidth(Value[2]*Multiplier);
         Value[1]:SetHeight(Value[3]*Multiplier);
       end
       for i = 1, 3 do
-        AR.ToggleIconFrame.Button[i]:SetPoint("LEFT", AR.ToggleIconFrame, "LEFT", AR.ToggleIconFrame.Button[i]:GetWidth()*(i-1)+i, 0);
+        HR.ToggleIconFrame.Button[i]:SetPoint("LEFT", HR.ToggleIconFrame, "LEFT", HR.ToggleIconFrame.Button[i]:GetWidth()*(i-1)+i, 0);
       end
       HeroRotationDB.GUISettings["General.ScaleButtons"] = Multiplier;
     end
     -- Lock/Unlock
     local LockSpell = Spell(9999000001);
-    function AR.MainFrame:Unlock ()
+    function HR.MainFrame:Unlock ()
       -- Grey Texture
-      AR.ResetIcons();
-      AR.Cast(LockSpell, {false});  -- Main Icon
-      AR.Cast(LockSpell, {true});   -- Small Icon 1
-      AR.Cast(LockSpell, {true});   -- Small Icon 2
-      AR.CastLeft(LockSpell);       -- Left Icon
-      AR.CastSuggested(LockSpell);  -- Suggested Icon
+      HR.ResetIcons();
+      HR.Cast(LockSpell, {false});  -- Main Icon
+      HR.Cast(LockSpell, {true});   -- Small Icon 1
+      HR.Cast(LockSpell, {true});   -- Small Icon 2
+      HR.CastLeft(LockSpell);       -- Left Icon
+      HR.CastSuggested(LockSpell);  -- Suggested Icon
       -- Unlock the UI
       for Key, Value in pairs(UIFrames) do
         Value:EnableMouse(true);
       end
-      AR.MainFrame:SetMovable(true);
-      AR.ToggleIconFrame:SetMovable(true);
+      HR.MainFrame:SetMovable(true);
+      HR.ToggleIconFrame:SetMovable(true);
       HeroRotationDB.Locked = false;
     end
-    function AR.MainFrame:Lock ()
+    function HR.MainFrame:Lock ()
       for Key, Value in pairs(UIFrames) do
         Value:EnableMouse(false);
       end
-      AR.MainFrame:SetMovable(false);
-      AR.ToggleIconFrame:SetMovable(false);
+      HR.MainFrame:SetMovable(false);
+      HR.ToggleIconFrame:SetMovable(false);
       HeroRotationDB.Locked = true;
     end
-    function AR.MainFrame:ToggleLock ()
+    function HR.MainFrame:ToggleLock ()
       if HeroRotationDB.Locked then
-        AR.MainFrame:Unlock ();
-        AR.Print("HeroRotation UI is now |cff00ff00unlocked|r.");
+        HR.MainFrame:Unlock ();
+        HR.Print("HeroRotation UI is now |cff00ff00unlocked|r.");
       else
-        AR.MainFrame:Lock ();
-        AR.Print("HeroRotation UI is now |cffff0000locked|r.");
+        HR.MainFrame:Lock ();
+        HR.Print("HeroRotation UI is now |cffff0000locked|r.");
       end
     end
     -- Start Move
     local function StartMove (self)
       self:StartMoving();
     end
-    AR.MainFrame:SetScript("OnMouseDown", StartMove);
+    HR.MainFrame:SetScript("OnMouseDown", StartMove);
     -- Stop Move
     local function StopMove (self)
       self:StopMovingOrSizing();
@@ -172,24 +172,24 @@
         yOffset
       };
     end
-    AR.MainFrame:SetScript("OnMouseUp", StopMove);
-    AR.MainFrame:SetScript("OnHide", StopMove);
+    HR.MainFrame:SetScript("OnMouseUp", StopMove);
+    HR.MainFrame:SetScript("OnHide", StopMove);
   -- AddonLoaded
-  AR.MainFrame:RegisterEvent("ADDON_LOADED");
-  AR.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
+  HR.MainFrame:RegisterEvent("ADDON_LOADED");
+  HR.MainFrame:SetScript("OnEvent", function (self, Event, Arg1)
       if Event == "ADDON_LOADED" then
         if Arg1 == "HeroRotation" then
           MasqueFrameList = {
-            ["Main Icon"] = AR.MainIconFrame,
-            ["Top Icons"] = AR.SmallIconFrame,
-            ["Left Icon"] = AR.LeftIconFrame,
-            ["Suggested Icon"] = AR.SuggestedIconFrame,
-            ["Part Overlay"] = AR.MainIconPartOverlayFrame,
+            ["Main Icon"] = HR.MainIconFrame,
+            ["Top Icons"] = HR.SmallIconFrame,
+            ["Left Icon"] = HR.LeftIconFrame,
+            ["Suggested Icon"] = HR.SuggestedIconFrame,
+            ["Part Overlay"] = HR.MainIconPartOverlayFrame,
           };
           if not Masque then
             Masque = LibStub( "Masque", true )
             if Masque then
-                Masque:Register( "HeroRotation", MasqueUpdate, AR )
+                Masque:Register( "HeroRotation", MasqueUpdate, HR )
                 for FrameName, Frame in pairs(MasqueFrameList) do
                   MasqueGroups[Frame] = Masque:Group( addonName, FrameName)
                 end
@@ -208,26 +208,26 @@
           if type(HeroRotationCharDB.GUISettings) ~= "table" then
             HeroRotationCharDB.GUISettings = {};
           end
-          AR.GUI.LoadSettingsRecursively(AR.GUISettings);
-          AR.GUI.CorePanelSettingsInit();
+          HR.GUI.LoadSettingsRecursively(HR.GUISettings);
+          HR.GUI.CorePanelSettingsInit();
           -- UI
           if HeroRotationDB and type(HeroRotationDB.IconFramePos) == "table" and #HeroRotationDB.IconFramePos == 5 then
-            AR.MainFrame:SetPoint(HeroRotationDB.IconFramePos[1], _G[HeroRotationDB.IconFramePos[2]], HeroRotationDB.IconFramePos[3], HeroRotationDB.IconFramePos[4], HeroRotationDB.IconFramePos[5]);
+            HR.MainFrame:SetPoint(HeroRotationDB.IconFramePos[1], _G[HeroRotationDB.IconFramePos[2]], HeroRotationDB.IconFramePos[3], HeroRotationDB.IconFramePos[4], HeroRotationDB.IconFramePos[5]);
           else
-            AR.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
+            HR.MainFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 0);
           end
-          AR.MainFrame:SetFrameStrata(AR.GUISettings.General.MainFrameStrata);
-          AR.MainFrame:Show();
-          AR.MainIconFrame:Init();
-          AR.SmallIconFrame:Init();
-          AR.LeftIconFrame:Init();
-          AR.SuggestedIconFrame:Init();
-          AR.ToggleIconFrame:Init();
+          HR.MainFrame:SetFrameStrata(HR.GUISettings.General.MainFrameStrata);
+          HR.MainFrame:Show();
+          HR.MainIconFrame:Init();
+          HR.SmallIconFrame:Init();
+          HR.LeftIconFrame:Init();
+          HR.SuggestedIconFrame:Init();
+          HR.ToggleIconFrame:Init();
           if HeroRotationDB.GUISettings["General.ScaleUI"] then
-            AR.MainFrame:ResizeUI(HeroRotationDB.GUISettings["General.ScaleUI"]);
+            HR.MainFrame:ResizeUI(HeroRotationDB.GUISettings["General.ScaleUI"]);
           end
           if HeroRotationDB.GUISettings["General.ScaleButtons"] then
-            AR.MainFrame:ResizeButtons(HeroRotationDB.GUISettings["General.ScaleButtons"]);
+            HR.MainFrame:ResizeButtons(HeroRotationDB.GUISettings["General.ScaleButtons"]);
           end
           for k, v in pairs(MasqueFrameList) do
             if type(v.Icon) == "table" then
@@ -255,34 +255,34 @@
             end
           end
           UIFrames = {
-            AR.MainFrame,
-            AR.MainIconFrame,
-            AR.MainIconPartOverlayFrame,
-            AR.MainIconFrame.Part[1],
-            AR.MainIconFrame.Part[2],
-            AR.MainIconFrame.Part[3],
-            AR.SmallIconFrame,
-            AR.SmallIconFrame.Icon[1],
-            AR.SmallIconFrame.Icon[2],
-            AR.LeftIconFrame,
-            AR.SuggestedIconFrame,
-            AR.ToggleIconFrame
+            HR.MainFrame,
+            HR.MainIconFrame,
+            HR.MainIconPartOverlayFrame,
+            HR.MainIconFrame.Part[1],
+            HR.MainIconFrame.Part[2],
+            HR.MainIconFrame.Part[3],
+            HR.SmallIconFrame,
+            HR.SmallIconFrame.Icon[1],
+            HR.SmallIconFrame.Icon[2],
+            HR.LeftIconFrame,
+            HR.SuggestedIconFrame,
+            HR.ToggleIconFrame
           };
 
           -- Load additionnal settings
           local CP_General = GUI.GetPanelByName("General")
           if CP_General then
-            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 10, 0.5}, "UI Scale", "Scale of the Icons.", function(value) AR.MainFrame:ResizeUI(value); end);
-            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 10, 0.5}, "Buttons Scale", "Scale of the Buttons.", function(value) AR.MainFrame:ResizeButtons(value); end);
-            CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() AR.MainFrame:ToggleLock(); end);
-            CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() AR.ToggleIconFrame:ResetAnchor(); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 10, 0.5}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 10, 0.5}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
+            CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() HR.MainFrame:ToggleLock(); end);
+            CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() HR.ToggleIconFrame:ResetAnchor(); end);
           end
 
           -- Modules
           C_Timer.After(2, function ()
-              AR.MainFrame:UnregisterEvent("ADDON_LOADED");
-              AR.PulsePreInit();
-              AR.PulseInit();
+              HR.MainFrame:UnregisterEvent("ADDON_LOADED");
+              HR.PulsePreInit();
+              HR.PulseInit();
             end
           );
         end
@@ -291,8 +291,8 @@
   );
 
 --- ======= MAIN =======
-  function AR.PulsePreInit ()
-    AR.MainFrame:Lock();
+  function HR.PulsePreInit ()
+    HR.MainFrame:Lock();
   end
   local EnabledRotation = {
     -- Death Knight
@@ -345,13 +345,13 @@
       [73]    = false                           -- Protection
   };
   local LatestSpecIDChecked = 0;
-  function AR.PulseInit ()
+  function HR.PulseInit ()
     local Spec = GetSpecialization();
     -- Delay by 1 second until the WoW API returns a valid value.
     if Spec == nil then
       HL.PulseInitialized = false;
       C_Timer.After(1, function ()
-          AR.PulseInit();
+          HR.PulseInit();
         end
       );
     else
@@ -364,7 +364,7 @@
       if SpecID == nil then
         HL.PulseInitialized = false;
         C_Timer.After(1, function ()
-            AR.PulseInit();
+            HR.PulseInit();
           end
         );
       else
@@ -375,11 +375,11 @@
 
         -- Check if there is a Rotation for this Spec
         if LatestSpecIDChecked ~= SpecID then
-          if EnabledRotation[SpecID] and AR.APLs[SpecID] then
+          if EnabledRotation[SpecID] and HR.APLs[SpecID] then
             for Key, Value in pairs(UIFrames) do
               Value:Show();
             end
-            AR.MainFrame:SetScript("OnUpdate", AR.Pulse);
+            HR.MainFrame:SetScript("OnUpdate", HR.Pulse);
             -- Spec Registers
               -- Spells
               Player:RegisterListenedSpells(SpecID);
@@ -388,14 +388,14 @@
               Spell:FilterProjectileSpeed(SpecID);
             -- Special Checks
             if GetCVar("nameplateShowEnemies") ~= "1" then
-              AR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
+              HR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
             end
           else
-            AR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
+            HR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
             for Key, Value in pairs(UIFrames) do
               Value:Hide();
             end
-            AR.MainFrame:SetScript("OnUpdate", nil);
+            HR.MainFrame:SetScript("OnUpdate", nil);
           end
           LatestSpecIDChecked = SpecID;
         end
@@ -404,32 +404,32 @@
     end
   end
 
-  AR.Timer = {
+  HR.Timer = {
     Pulse = 0
   };
-  function AR.Pulse ()
-    if HL.GetTime() > AR.Timer.Pulse and AR.Locked() then
-      AR.Timer.Pulse = HL.GetTime() + HL.Timer.PulseOffset;
+  function HR.Pulse ()
+    if HL.GetTime() > HR.Timer.Pulse and HR.Locked() then
+      HR.Timer.Pulse = HL.GetTime() + HL.Timer.PulseOffset;
 
-      AR.ResetIcons();
+      HR.ResetIcons();
 
       -- Check if the current spec is available (might not always be the case)
       -- Especially when switching from area (open world -> instance)
       local SpecID = Cache.Persistent.Player.Spec[1];
       if SpecID then
         -- Check if we are ready to cast something to save FPS.
-        if AR.ON() and AR.Ready() then
+        if HR.ON() and HR.Ready() then
           HL.CacheHasBeenReset = false;
           Cache.Reset();
           -- Rotational Debug Output
-          if AR.GUISettings.General.RotationDebugOutput then
-            CurrResult = AR.APLs[SpecID]();
+          if HR.GUISettings.General.RotationDebugOutput then
+            CurrResult = HR.APLs[SpecID]();
             if CurrResult and CurrResult ~= PrevResult then
-              AR.Print(CurrResult);
+              HR.Print(CurrResult);
               PrevResult = CurrResult;
             end
           else
-            AR.APLs[SpecID]();
+            HR.APLs[SpecID]();
           end
         end
         if MasqueGroups then
@@ -442,12 +442,12 @@
   end
 
   -- Is the player ready ?
-  function AR.Ready ()
+  function HR.Ready ()
     return not Player:IsDeadOrGhost() and not Player:IsMounted() and not Player:IsInVehicle() and not C_PetBattles.IsInBattle();
   end
 
   -- Used to force a short/long pulse wait, it also resets the icons.
-  function AR.ChangePulseTimer (Offset)
-    AR.ResetIcons();
-    AR.Timer.Pulse = HL.GetTime() + Offset;
+  function HR.ChangePulseTimer (Offset)
+    HR.ResetIcons();
+    HR.Timer.Pulse = HL.GetTime() + Offset;
   end

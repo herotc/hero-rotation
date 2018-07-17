@@ -9,7 +9,7 @@
   local Spell   = HL.Spell;
   local Item    = HL.Item;
 -- HeroRotation
-  local AR      = HeroRotation;
+  local HR      = HeroRotation;
 -- Spells
   local SpellProtection  = Spell.Paladin.Protection;
   local SpellRetribution = Spell.Paladin.Retribution;

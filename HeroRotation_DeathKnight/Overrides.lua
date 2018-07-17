@@ -9,7 +9,7 @@
   local Spell   = HL.Spell;
   local Item    = HL.Item;
 -- HeroRotation
-  local AR      = HeroRotation;
+  local HR      = HeroRotation;
 -- Spells
   local SpellBlood   = Spell.DeathKnight.Blood;
   local SpellFrost   = Spell.DeathKnight.Frost;

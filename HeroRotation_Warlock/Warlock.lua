@@ -11,13 +11,13 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   
   -- File Locals
-  AR.Commons.Warlock = {};
-  local Settings = AR.GUISettings.APL.Warlock.Commons;
-  local Warlock = AR.Commons.Warlock;
+  HR.Commons.Warlock = {};
+  local Settings = HR.GUISettings.APL.Warlock.Commons;
+  local Warlock = HR.Commons.Warlock;
 
   local GrimoireOfSupremacy 	= Spell(152107);
 --- ============================ CONTENT ============================

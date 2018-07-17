@@ -11,15 +11,15 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
 
 
 
 --- APL Local Vars
 -- Commons
-  local Everyone = AR.Commons.Everyone;
-  local Hunter = AR.Commons.Hunter;
+  local Everyone = HR.Commons.Everyone;
+  local Hunter = HR.Commons.Hunter;
   -- Spells
   if not Spell.Hunter then Spell.Hunter = {}; end
   Spell.Hunter.BeastMastery = {
@@ -89,9 +89,9 @@
   local ShouldReturn; -- Used to get the return string
   -- GUI Settings
   local Settings = {
-    General = AR.GUISettings.General,
-    Commons = AR.GUISettings.APL.Hunter.Commons,
-    BeastMastery = AR.GUISettings.APL.Hunter.BeastMastery
+    General = HR.GUISettings.General,
+    Commons = HR.GUISettings.APL.Hunter.Commons,
+    BeastMastery = HR.GUISettings.APL.Hunter.BeastMastery
   };
 
 
@@ -106,7 +106,7 @@
     -- Defensives
       -- Exhilaration
       if S.Exhilaration:IsCastable() and Player:HealthPercentage() <= Settings.BeastMastery.ExhilarationHP then
-        if AR.Cast(S.Exhilaration, Settings.BeastMastery.OffGCDasOffGCD.Exhilaration) then return "Cast"; end
+        if HR.Cast(S.Exhilaration, Settings.BeastMastery.OffGCDasOffGCD.Exhilaration) then return "Cast"; end
       end
     -- Out of Combat
     if not Player:AffectingCombat() then
@@ -116,20 +116,20 @@
       -- PrePot w/ Bossmod Countdown
       -- Volley toggle
       if S.Volley:IsCastable() and not Player:Buff(S.Volley) then
-        if AR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return; end
+        if HR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return; end
       end
       -- Opener
       if Everyone.TargetIsValid() and Target:IsInRange(40) then
-        if AR.CDsON() then
+        if HR.CDsON() then
           if S.AMurderofCrows:IsCastable() then
-            if AR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return; end
+            if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return; end
           end
         end
         if S.KillCommand:IsCastable() then
-          if AR.Cast(S.KillCommand) then return; end
+          if HR.Cast(S.KillCommand) then return; end
         end
         if S.CobraShot:IsCastable() then
-          if AR.Cast(S.CobraShot) then return ""; end
+          if HR.Cast(S.CobraShot) then return ""; end
         end
       end
       return;
@@ -138,53 +138,53 @@
     if Everyone.TargetIsValid() then
       -- actions+=/counter_shot,if=target.debuff.casting.react // Sephuz Specific
       if S.CounterShot:IsCastable() and Target:IsInterruptible() and (Settings.Commons.CounterShot or (I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and Settings.BeastMastery.CounterShotSephuz)) then
-        if AR.CastSuggested(S.CounterShot) then return ""; end
+        if HR.CastSuggested(S.CounterShot) then return ""; end
       end
-      if AR.CDsON() then
+      if HR.CDsON() then
         -- actions+=/arcane_torrent,if=focus.deficit>=30
         if S.ArcaneTorrent:IsCastable() and Player:FocusDeficit() >= 30 then
-          if AR.Cast(S.ArcaneTorrent, Settings.BeastMastery.OffGCDasOffGCD.Racials) then return ""; end
+          if HR.Cast(S.ArcaneTorrent, Settings.BeastMastery.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/berserking,if=buff.bestial_wrath.remains>7
         if S.Berserking:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
-          if AR.Cast(S.Berserking, Settings.BeastMastery.OffGCDasOffGCD.Racials) then return ""; end
+          if HR.Cast(S.Berserking, Settings.BeastMastery.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/blood_fury,if=buff.bestial_wrath.remains>7
         if S.BloodFury:IsCastable() and Player:BuffRemains(S.BestialWrath) > 7 then
-          if AR.Cast(S.BloodFury, Settings.BeastMastery.OffGCDasOffGCD.Racials) then return ""; end
+          if HR.Cast(S.BloodFury, Settings.BeastMastery.OffGCDasOffGCD.Racials) then return ""; end
         end
       end
       -- actions+=/volley,toggle=on
       if S.Volley:IsCastable() and not Player:Buff(S.Volley) then
-        if AR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return ""; end
+        if HR.Cast(S.Volley, Settings.BeastMastery.GCDasOffGCD.Volley) then return ""; end
       end
       -- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
       if Settings.BeastMastery.ShowPoPP and I.PotionOfProlongedPower:IsReady() and Player:Buff(S.BestialWrath) and Player:Buff(S.AspectoftheWild) then
-        if AR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
+        if HR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
       end
       -- actions+=/a_murder_of_crows,if=cooldown.bestial_wrath.remains<3|cooldown.bestial_wrath.remains>30|target.time_to_die<16
-      if AR.CDsON() and Target:IsInRange(40) and S.AMurderofCrows:IsCastable() and (S.BestialWrath:CooldownRemains() < 3 or S.BestialWrath:CooldownRemains() > 30 or Target:TimeToDie() < 16) then
-        if AR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return ""; end
+      if HR.CDsON() and Target:IsInRange(40) and S.AMurderofCrows:IsCastable() and (S.BestialWrath:CooldownRemains() < 3 or S.BestialWrath:CooldownRemains() > 30 or Target:TimeToDie() < 16) then
+        if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return ""; end
       end
       -- actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
-      if AR.CDsON() and S.Stampede:IsCastable() and (Player:HasHeroism() or Player:Buff(S.BestialWrath) or ((S.BestialWrath:CooldownRemains() <= 2 or not AR.CDsON()) or (Target:TimeToDie() <= 14))) then
-        if AR.Cast(S.Stampede) then return ""; end
+      if HR.CDsON() and S.Stampede:IsCastable() and (Player:HasHeroism() or Player:Buff(S.BestialWrath) or ((S.BestialWrath:CooldownRemains() <= 2 or not HR.CDsON()) or (Target:TimeToDie() <= 14))) then
+        if HR.Cast(S.Stampede) then return ""; end
       end
       -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
-      if AR.CDsON() and S.BestialWrath:IsCastable() and not Player:Buff(S.BestialWrath) then
-        if AR.Cast(S.BestialWrath, Settings.BeastMastery.OffGCDasOffGCD.BestialWrath) then return ""; end
+      if HR.CDsON() and S.BestialWrath:IsCastable() and not Player:Buff(S.BestialWrath) then
+        if HR.Cast(S.BestialWrath, Settings.BeastMastery.OffGCDasOffGCD.BestialWrath) then return ""; end
       end
       -- # With both AotW cdr sources and OwtP, there's no visible benefit if it's delayed, use it on cd. With only one or neither, pair it with Bestial Wrath. Also use it if the fight will end when the buff does.
       -- actions+=/aspect_of_the_wild,if=(equipped.call_of_the_wild&equipped.convergence_of_fates&talent.one_with_the_pack.enabled)|buff.bestial_wrath.remains>7|target.time_to_die<12
-      if AR.CDsON() and S.AspectoftheWild:IsCastable() and ((I.CalloftheWild:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.OnewiththePack:IsAvailable()) or Player:BuffRemains(S.BestialWrath) > 7 or Target:TimeToDie() < 12) then
-        if AR.Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return ""; end
+      if HR.CDsON() and S.AspectoftheWild:IsCastable() and ((I.CalloftheWild:IsEquipped() and I.ConvergenceofFates:IsEquipped() and S.OnewiththePack:IsAvailable()) or Player:BuffRemains(S.BestialWrath) > 7 or Target:TimeToDie() < 12) then
+        if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.OffGCDasOffGCD.AspectoftheWild) then return ""; end
       end
       -- actions+=/kill_command,target_if=min:bestial_ferocity.remains,if=equipped.qapla_eredun_war_order
       if S.AspectoftheBeast:IsAvailable() and S.KillCommand:IsCastable() and I.QaplaEredunWarOrder:IsEquipped() then
         if Target:DebuffRefreshable(S.BestialFerocity, 1.8) then
-          if AR.Cast(S.KillCommand) then return ""; end
+          if HR.Cast(S.KillCommand) then return ""; end
         end
-        if AR.AoEON() then
+        if HR.AoEON() then
           local BestUnit, BestUnitBFRemains;
           BestUnit, BestUnitBFRemains = nil, 10;
           for _, Unit in pairs(Cache.Enemies[40]) do
@@ -194,7 +194,7 @@
             end
           end
           if BestUnit then
-            AR.CastLeftNameplate(BestUnit, S.KillCommand);
+            HR.CastLeftNameplate(BestUnit, S.KillCommand);
           end
         end
       end
@@ -202,51 +202,51 @@
       -- NOTE : Change cooldown.kill_command.remains>=1 to cooldown.kill_command.remains>=gcd.max
       -- actions+=/dire_beast,if=((!equipped.qapla_eredun_war_order|cooldown.kill_command.remains>=1)&(set_bonus.tier19_2pc|!buff.bestial_wrath.up))|full_recharge_time<gcd.max|cooldown.titans_thunder.up|spell_targets>1
       if S.DireBeast:IsCastable() and (((not I.QaplaEredunWarOrder:IsEquipped() or S.KillCommand:CooldownRemains() >= Player:GCD()) and (HL.Tier19_2Pc or not Player:Buff(S.BestialWrath))) or S.DireBeast:FullRechargeTime() < Player:GCD() or S.TitansThunder:CooldownUp() or Cache.EnemiesCount[40] > 1) then
-        if AR.Cast(S.DireBeast) then return ""; end
+        if HR.Cast(S.DireBeast) then return ""; end
       end
       -- actions+=/dire_frenzy,if=(pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2)|full_recharge_time<gcd.max|target.time_to_die<9
       if S.DireFrenzy:IsCastable() and ((Pet:BuffRemains(S.DireFrenzy) < Player:GCD() * 1.2) or S.DireFrenzy:FullRechargeTime() < Player:GCD() or Target:TimeToDie() < 9) then
-        if AR.Cast(S.DireFrenzy) then return ""; end
+        if HR.Cast(S.DireFrenzy) then return ""; end
       end
       -- actions+=/barrage,if=spell_targets.barrage>1
-      if AR.AoEON() and S.Barrage:IsCastable() and Cache.EnemiesCount[40] > 1 then
-        AR.CastSuggested(S.Barrage);
+      if HR.AoEON() and S.Barrage:IsCastable() and Cache.EnemiesCount[40] > 1 then
+        HR.CastSuggested(S.Barrage);
       end
       -- actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&(buff.bestial_wrath.up|cooldown.bestial_wrath.remains>35))|buff.bestial_wrath.up
-      if AR.CDsON() and S.TitansThunder:IsCastable() and ((S.DireFrenzy:IsAvailable() and (Player:Buff(S.BestialWrath) or S.BestialWrath:CooldownRemains() > 35)) or Player:Buff(S.BestialWrath)) then
-        if AR.Cast(S.TitansThunder, Settings.BeastMastery.OffGCDasOffGCD.TitansThunder) then return ""; end
+      if HR.CDsON() and S.TitansThunder:IsCastable() and ((S.DireFrenzy:IsAvailable() and (Player:Buff(S.BestialWrath) or S.BestialWrath:CooldownRemains() > 35)) or Player:Buff(S.BestialWrath)) then
+        if HR.Cast(S.TitansThunder, Settings.BeastMastery.OffGCDasOffGCD.TitansThunder) then return ""; end
       end
       -- actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-      if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 4 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
-        if Hunter.MultishotInMain() and AR.Cast(S.MultiShot) then return "" else AR.CastSuggested(S.MultiShot) end
+      if HR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 4 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
+        if Hunter.MultishotInMain() and HR.Cast(S.MultiShot) then return "" else HR.CastSuggested(S.MultiShot) end
       end
       -- actions+=/kill_command
       if S.KillCommand:IsCastable() then
-        if AR.Cast(S.KillCommand) then return ""; end
+        if HR.Cast(S.KillCommand) then return ""; end
       end
       -- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-      if AR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
-        if Hunter.MultishotInMain() and AR.Cast(S.MultiShot) then return "" else AR.CastSuggested(S.MultiShot) end
+      if HR.AoEON() and S.MultiShot:IsCastable() and Cache.EnemiesCount[40] > 1 and (Pet:BuffRemains(S.BeastCleaveBuff) < Player:GCD() or not Pet:Buff(S.BeastCleaveBuff)) then
+        if Hunter.MultishotInMain() and HR.Cast(S.MultiShot) then return "" else HR.CastSuggested(S.MultiShot) end
       end
       -- actions+=/chimaera_shot,if=focus<90
       if S.ChimaeraShot:IsCastable() and Target:IsInRange(40) and Player:Focus() < 90 then
-        if AR.Cast(S.ChimaeraShot) then return ""; end
+        if HR.Cast(S.ChimaeraShot) then return ""; end
       end
       -- actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&(spell_targets.multishot=1|focus.regen*cooldown.kill_command.remains>action.kill_command.cost))|target.time_to_die<cooldown.kill_command.remains|(equipped.parsels_tongue&buff.parsels_tongue.remains<=gcd.max*2)
-      if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:CooldownRemains() > Player:FocusTimeToMax() and (S.BestialWrath:CooldownRemains() > Player:FocusTimeToMax() or not AR.CDsON())) or (Player:Buff(S.BestialWrath) and (Player:FocusRegen()*S.KillCommand:CooldownRemains() > S.KillCommand:Cost())) or Target:TimeToDie() < S.KillCommand:CooldownRemains() or (I.ParselsTongue:IsEquipped() and Player:BuffRemains(S.ParselsTongueBuff) <= Player:GCD() * 2)) then
-        if AR.Cast(S.CobraShot) then return ""; end
+      if S.CobraShot:IsCastable() and Target:IsInRange(40) and ((S.KillCommand:CooldownRemains() > Player:FocusTimeToMax() and (S.BestialWrath:CooldownRemains() > Player:FocusTimeToMax() or not HR.CDsON())) or (Player:Buff(S.BestialWrath) and (Player:FocusRegen()*S.KillCommand:CooldownRemains() > S.KillCommand:Cost())) or Target:TimeToDie() < S.KillCommand:CooldownRemains() or (I.ParselsTongue:IsEquipped() and Player:BuffRemains(S.ParselsTongueBuff) <= Player:GCD() * 2)) then
+        if HR.Cast(S.CobraShot) then return ""; end
       end
       -- actions+=/dire_beast,if=buff.bestial_wrath.up
       if S.DireBeast:IsCastable() and Player:Buff(S.BestialWrath) then
-        if AR.Cast(S.DireBeast) then return ""; end
+        if HR.Cast(S.DireBeast) then return ""; end
       end
       -- Pool
-      if AR.Cast(S.PoolFocus) then return "Normal Pooling"; end
+      if HR.Cast(S.PoolFocus) then return "Normal Pooling"; end
       return;
     end
   end
 
-  AR.SetAPL(253, APL);
+  HR.SetAPL(253, APL);
 
 
 --- Last Update: 09/19/2017

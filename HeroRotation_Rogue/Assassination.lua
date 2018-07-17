@@ -10,14 +10,14 @@ local Target = Unit.Target;
 local Spell = HL.Spell;
 local Item = HL.Item;
 -- HeroRotation
-local AR = HeroRotation;
+local HR = HeroRotation;
 -- Lua
 local pairs = pairs;
 
 --- APL Local Vars
 -- Commons
-local Everyone = AR.Commons.Everyone;
-local Rogue = AR.Commons.Rogue;
+local Everyone = HR.Commons.Everyone;
+local Rogue = HR.Commons.Rogue;
 -- Spells
 if not Spell.Rogue then Spell.Rogue = {}; end
 Spell.Rogue.Assassination = {
@@ -132,9 +132,9 @@ local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMG
 local Energy_Regen_Combined;
 -- GUI Settings
 local Settings = {
-  General = AR.GUISettings.General,
-  Commons = AR.GUISettings.APL.Rogue.Commons,
-  Assassination = AR.GUISettings.APL.Rogue.Assassination
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Rogue.Commons,
+  Assassination = HR.GUISettings.APL.Rogue.Assassination
 };
 
 local function num(val)
@@ -152,7 +152,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD)
   end
   if BestUnit then
     if BestUnit:GUID() == Target:GUID() then return; end;
-    AR.CastLeftNameplate(BestUnit, DoTSpell);
+    HR.CastLeftNameplate(BestUnit, DoTSpell);
   -- Check ranged units next, if the RangedMultiDoT option is enabled
   elseif Settings.Assassination.RangedMultiDoT then
     BestUnit, BestUnitTTD = Target, DoTMinTTD;
@@ -163,7 +163,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD)
     end
     if BestUnit then
       if BestUnit:GUID() == Target:GUID() then return; end;
-      AR.CastLeftNameplate(BestUnit, DoTSpell);
+      HR.CastLeftNameplate(BestUnit, DoTSpell);
     end
   end
 end
@@ -191,8 +191,8 @@ do
       for i = 1, #SappedSoulSpells do
         local SappedSoulSpell = SappedSoulSpells[i];
         if SappedSoulSpell[1]:IsCastable() and SappedSoulSpell[3]() then
-          AR.ChangePulseTimer(1);
-          AR.Cast(SappedSoulSpell[1]);
+          HR.ChangePulseTimer(1);
+          HR.Cast(SappedSoulSpell[1]);
           return SappedSoulSpell[2];
         end
       end
@@ -204,7 +204,7 @@ local function TrainingScenario ()
   if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
     -- Kidney Shot
     if S.KidneyShot:IsCastable("Melee") and Player:ComboPoints() > 0 then
-      if AR.Cast(S.KidneyShot) then return "Cast Kidney Shot (Unstable Explosion)"; end
+      if HR.Cast(S.KidneyShot) then return "Cast Kidney Shot (Unstable Explosion)"; end
     end
   end
   return false;
@@ -224,33 +224,33 @@ local function CDs ()
     if Target:Debuff(S.Vendetta) then
       -- actions.cds+=/blood_fury,if=debuff.vendetta.up
       if S.BloodFury:IsCastable() then
-        if AR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
       end
       -- actions.cds+=/berserking,if=debuff.vendetta.up
       if S.Berserking:IsCastable() then
-        if AR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
       end
     end
 
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
     if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
-      AR.CastSuggested(S.MarkedforDeath);
+      HR.CastSuggested(S.MarkedforDeath);
     end
     -- actions.cds+=/vendetta,if=dot.rupture.ticking
     if S.Vendetta:IsCastable() and Target:DebuffP(S.Rupture) then
-      if AR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
+      if HR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
     end
     if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
       if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= Rogue.CPMaxSpend() then
         if not S.Exsanguinate:IsAvailable() then
           -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
           if Target:Debuff(S.Vendetta) then
-            if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
+            if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
           end
         else
           -- actions.cds+=/vanish,if=talent.nightstalker.enabled&talent.exsanguinate.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
           if S.Exsanguinate:CooldownRemainsP() < 1 and (Target:Debuff(S.Rupture) or HL.CombatTime() > 10) then
-            if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker, Exsanguinate)"; end
+            if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker, Exsanguinate)"; end
           end
         end
       end
@@ -258,24 +258,24 @@ local function CDs ()
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
         if not Player:IsStealthed(true, false) and Target:DebuffRefreshableP(S.Garrote, 5.4)
           and ((Cache.EnemiesCount[10] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and Player:ComboPointsDeficit() >= 4)) then
-          if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
         end
       end
       -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
       if S.MasterAssassin:IsAvailable() and not Player:IsStealthed(true, false) and MasterAssassinRemains() <= 0 and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
-        if AR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
+        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
       end
     end
     if S.Exsanguinate:IsCastable() then
       -- actions.cds+=/exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|dot.garrote.pmultiplier>1&!cooldown.vanish.up&buff.subterfuge.up
       if Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() and not Player:IsStealthed(true, false)
         or Target:PMultiplier(S.Garrote) > 1 and not S.Vanish:CooldownUp() and Player:BuffP(S.Subterfuge) then
-        if AR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
+        if HR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
       end
     end
     -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
     if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) then
-      if AR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
+      if HR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
     end
   end
   return false;
@@ -291,9 +291,9 @@ local function Stealthed ()
     end
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target_A(Target)
       and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
-      if AR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge, Refresh)"; end
+      if HR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge, Refresh)"; end
     end
-    if AR.AoEON() then
+    if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_A, 2);
     end
     -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
@@ -303,41 +303,41 @@ local function Stealthed ()
     end
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target_B(Target)
       and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
-      if AR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge)"; end
+      if HR.Cast(S.Garrote) then return "Cast Garrote (Subterfuge)"; end
     end
-    if AR.AoEON() then
+    if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_B, 2);
     end
   end
   -- actions.stealthed+=/rupture,if=talent.nightstalker.enabled&target.time_to_die-remains>6
   if S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Nightstalker:IsAvailable()
     and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
-    if AR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
+    if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
   -- actions.stealthed+=/envenom,if=combo_points>=cp_max_spend
   if S.Envenom:IsCastable("Melee") and Player:ComboPoints() >= Rogue.CPMaxSpend() then
-    if AR.Cast(S.Envenom) then return "Cast Envenom"; end
+    if HR.Cast(S.Envenom) then return "Cast Envenom"; end
   end
   -- actions.stealthed+=/garrote,if=!talent.subterfuge.enabled&target.time_to_die-remains>4
   if S.Garrote:IsCastable("Melee") and not S.Subterfuge:IsAvailable()
     and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
-    if AR.Cast(S.Garrote) then return "Cast Garrote"; end
+    if HR.Cast(S.Garrote) then return "Cast Garrote"; end
   end
   -- actions.stealthed+=/mutilate
   if S.Mutilate:IsCastable("Melee") then
-    if AR.Cast(S.Mutilate) then return "Cast Mutilate"; end
+    if HR.Cast(S.Mutilate) then return "Cast Mutilate"; end
   end
 end
 -- # Damage over time abilities
 local function Dot ()
   -- actions.dot=rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
-  if AR.CDsON() and S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable()
+  if HR.CDsON() and S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable()
     and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
       or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (Player:ComboPoints() >= 2)))) then
-    if AR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
+    if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
   -- actions.dot+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&(target.time_to_die-remains>4&spell_targets.fan_of_knives<=1|target.time_to_die-remains>12)
-  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not AR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and Player:ComboPointsDeficit() >= 1 then
+  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not HR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and Player:ComboPointsDeficit() >= 1 then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
@@ -349,18 +349,18 @@ local function Dot ()
       and (Target:FilteredTimeToDie(">", ttdval, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
       -- actions.maintain+=/pool_resource,for_next=1
       if Player:EnergyPredicted() < 45 then
-        if AR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
+        if HR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
       end
-      if AR.Cast(S.Garrote) then return "Cast Garrote (Refresh)"; end
+      if HR.Cast(S.Garrote) then return "Cast Garrote (Refresh)"; end
     end
-    if AR.AoEON() then
+    if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, ttdval);
     end
   end
   -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
-  if AR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 2
+  if HR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 2
     and Target:DebuffRemainsP(S.CrimsonTempest) < 2 + num(Cache.EnemiesCount[10] >= 5) then
-    if AR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
+    if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
   end
   -- actions.dot+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
   if Player:ComboPoints() >= 4 then
@@ -372,9 +372,9 @@ local function Dot ()
     end
     if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target)
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
-      if AR.Cast(S.Rupture) then return "Cast Rupture (Refresh)"; end
+      if HR.Cast(S.Rupture) then return "Cast Rupture (Refresh)"; end
     end
-    if AR.AoEON() then
+    if HR.AoEON() then
       SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4);
     end
   end
@@ -386,7 +386,7 @@ local function Direct ()
   if S.Envenom:IsCastable("Melee") and Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and 1 or 0)
     and (Target:DebuffP(S.Vendetta) or Target:DebuffP(S.ToxicBladeDebuff) or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined or Cache.EnemiesCount[10] >= 2)
     and (not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() > 2) then
-    if AR.Cast(S.Envenom) then return "Cast Envenom"; end
+    if HR.Cast(S.Envenom) then return "Cast Envenom"; end
   end
 
   -------------------------------------------------------------------
@@ -400,16 +400,16 @@ local function Direct ()
   -------------------------------------------------------------------
 
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2)
-  if AR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2) then
-    if AR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2) then
+    if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
   end
   -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
   if S.Blindside:IsCastable("Melee") and (Player:BuffP(S.BlindsideBuff) or (not S.VenomRush:IsAvailable() and Target:HealthPercentage() < 30)) then
-    if AR.Cast(S.Blindside) then return "Cast Blindside"; end
+    if HR.Cast(S.Blindside) then return "Cast Blindside"; end
   end
   -- actions.direct+=/mutilate,if=variable.use_filler
   if S.Mutilate:IsCastable("Melee") then
-    if AR.Cast(S.Mutilate) then return "Cast Mutilate"; end
+    if HR.Cast(S.Mutilate) then return "Cast Mutilate"; end
   end
   return false;
 end
@@ -443,11 +443,11 @@ local function APL ()
   -- Lethal Poison
   if Player:BuffRemainsP(S.DeadlyPoison) <= PoisonRefreshTime
     and Player:BuffRemainsP(S.WoundPoison) <= PoisonRefreshTime then
-    AR.CastSuggested(S.DeadlyPoison);
+    HR.CastSuggested(S.DeadlyPoison);
   end
   -- Non-Lethal Poison
   if Player:BuffRemainsP(S.CripplingPoison) <= PoisonRefreshTime then
-    AR.CastSuggested(S.CripplingPoison);
+    HR.CastSuggested(S.CripplingPoison);
   end
 
   -- Out of Combat
@@ -481,7 +481,7 @@ local function APL ()
     Energy_Regen_Combined = Player:EnergyRegen() + Rogue.PoisonedBleeds() * 7 / (2 * Player:SpellHaste());
 
     -- actions+=/call_action_list,name=cds
-    if AR.CDsON() then
+    if HR.CDsON() then
       ShouldReturn = CDs();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -489,7 +489,7 @@ local function APL ()
     if Player:IsStealthed(true, false) then
       ShouldReturn = Stealthed();
       if ShouldReturn then return ShouldReturn .. " (Stealthed)"; end
-      if AR.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end
+      if HR.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end
       return;
     end
     -- actions+=/call_action_list,name=dot
@@ -500,26 +500,26 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
     if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
-      if AR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
     end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastableP("Melee") then
-      if AR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
+      if HR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
     end
     -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
     if S.PoisonedKnife:IsCastable(30) and not Player:IsStealthed(true, true)
       and ((not Target:IsInRange(10) and Player:EnergyTimeToMax() <= Player:GCD()*1.2)
         or (not Target:IsInRange("Melee") and Target:DebuffRefreshableP(S.DeadlyPoisonDebuff, 4))) then
-      if AR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife"; end
+      if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife"; end
     end
     -- Trick to take in consideration the Recovery Setting
     if S.Mutilate:IsCastable("Melee") then
-      if AR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
+      if HR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
     end
   end
 end
 
-AR.SetAPL(259, APL);
+HR.SetAPL(259, APL);
 
 -- Last Update: 2018-07-14
 

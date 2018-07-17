@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
   -- Addon
-  local addonName, AR = ...;
+  local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
   -- File Locals
@@ -13,7 +13,7 @@
 
 --- ============================ CONTENT ============================
   -- Default settings
-  AR.GUISettings = {
+  HR.GUISettings = {
     General = {
       -- Main Frame Strata
       MainFrameStrata = "BACKGROUND",
@@ -36,9 +36,9 @@
     APL = {}
   };
 
-  function AR.GUI.CorePanelSettingsInit ()
+  function HR.GUI.CorePanelSettingsInit ()
     -- GUI
-    local ARPanel = CreatePanel(AR.GUI, "HeroRotation", "PanelFrame", AR.GUISettings, HeroRotationDB.GUISettings);
+    local ARPanel = CreatePanel(HR.GUI, "HeroRotation", "PanelFrame", HR.GUISettings, HeroRotationDB.GUISettings);
     -- Child Panel
     local CP_General = CreateChildPanel(ARPanel, "General");
     -- Controls

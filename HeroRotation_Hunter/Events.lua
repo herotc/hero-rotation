@@ -5,13 +5,13 @@ local addonName, addonTable = ...;
 -- HeroLib
 local HL = HeroLib;
 local Cache = HeroCache;
-local AR = HeroRotation;
+local HR = HeroRotation;
 local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = HL.Spell;
 local Item = HL.Item;
-local Hunter = AR.Commons.Hunter;
+local Hunter = HR.Commons.Hunter;
 local RangeIndex = HL.Enum.ItemRange.Hostile.RangeIndex
 local TriggerGCD = HL.Enum.TriggerGCD;
 -- Lua

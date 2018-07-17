@@ -9,7 +9,7 @@
   local Spell   = HL.Spell;
   local Item    = HL.Item;
 -- HeroRotation
-  local AR      = HeroRotation;
+  local HR      = HeroRotation;
 -- Spells
   local SpellBM = Spell.Hunter.BeastMastery;
   local SpellMM = Spell.Hunter.Marksmanship;

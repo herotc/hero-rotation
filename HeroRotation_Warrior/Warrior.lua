@@ -10,9 +10,9 @@ local Target = Unit.Target;
 local Spell = HL.Spell;
 local Item = HL.Item;
 -- HeroRotation
-local AR = HeroRotation;
+local HR = HeroRotation;
 -- Lua
 -- Commons
-AR.Commons.Warrior = {};
+HR.Commons.Warrior = {};
 -- GUI Settings
-local Settings = AR.GUISettings.APL.Warrior.Commons;
+local Settings = HR.GUISettings.APL.Warrior.Commons;

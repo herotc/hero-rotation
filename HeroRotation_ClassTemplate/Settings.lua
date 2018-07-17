@@ -3,12 +3,12 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
 
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
-  AR.GUISettings.APL.Class = {
+  HR.GUISettings.APL.Class = {
     Commons = {
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {

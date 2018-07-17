@@ -9,7 +9,7 @@
   local Spell   = HL.Spell;
   local Item    = HL.Item;
 -- HeroRotation
-  local AR      = HeroRotation;
+  local HR      = HeroRotation;
 -- Spells
   local SpellAffli   = Spell.Warlock.Affliction;
   local SpellDemo    = Spell.Warlock.Demonology;

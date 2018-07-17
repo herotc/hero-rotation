@@ -11,15 +11,15 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   local tableinsert = table.insert;
 
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
-  local Everyone = AR.Commons.Everyone;
-  local Druid = AR.Commons.Druid;
+  local Everyone = HR.Commons.Everyone;
+  local Druid = HR.Commons.Druid;
   -- Spells
   if not Spell.Druid then Spell.Druid = {}; end
   Spell.Druid.Guardian = {
@@ -105,9 +105,9 @@
   
   -- GUI Settings
   local Settings = {
-    General = AR.GUISettings.General,
-    Commons = AR.GUISettings.APL.Druid.Commons,
-    Guardian = AR.GUISettings.APL.Druid.Guardian
+    General = HR.GUISettings.General,
+    Commons = HR.GUISettings.APL.Druid.Commons,
+    Guardian = HR.GUISettings.APL.Druid.Guardian
   };
 
 
@@ -147,23 +147,23 @@
         if Player:Buff(S.CatForm) then
           -- Shred
           if S.Shred:IsCastable(MeleeRange) then
-              if AR.Cast(S.Shred) then return "Cast"; end
+              if HR.Cast(S.Shred) then return "Cast"; end
           end
           return;
         end
         if Player:Buff(S.BearForm) then
           if S.Mangle:IsCastable(MeleeRange) then
-            if AR.Cast(S.Mangle) then return ""; end
+            if HR.Cast(S.Mangle) then return ""; end
           end
           if S.ThrashBear:IsCastable(AoERadius, true) then
-            if AR.Cast(S.ThrashBear) then return ""; end
+            if HR.Cast(S.ThrashBear) then return ""; end
           end
           if S.SwipeBear:IsCastable(AoERadius, true) then
-            if AR.Cast(S.SwipeBear) then return ""; end
+            if HR.Cast(S.SwipeBear) then return ""; end
           end
         end
         if S.Moonfire:IsCastable(RangedRange) then
-          if AR.Cast(S.Moonfire) then return ""; end
+          if HR.Cast(S.Moonfire) then return ""; end
         end
       end
       return;
@@ -174,28 +174,28 @@
         -- Thrash
         -- Note: Due to an in-game bug, you cannot apply a new thrash if there is the bear one.
         if S.ThrashCat:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 and Target:DebuffRefreshable(S.ThrashCat, 4.5) and not Target:Debuff(S.ThrashBearDebuff) then
-          if AR.Cast(S.ThrashCat) then return "Cast"; end
+          if HR.Cast(S.ThrashCat) then return "Cast"; end
         end
         -- Rip
         if S.Rip:IsCastable(MeleeRange) and Player:ComboPoints() >= 5 and Target:DebuffRefreshable(S.Rip, 7.2) then
-          if AR.Cast(S.Rip) then return "Cast"; end
+          if HR.Cast(S.Rip) then return "Cast"; end
         end
         -- Rake
         if S.Rake:IsCastable(MeleeRange) and Target:DebuffRefreshable(S.RakeDebuff, 4.5) then
-          if AR.Cast(S.Rake) then return "Cast"; end
+          if HR.Cast(S.Rake) then return "Cast"; end
         end
         -- Swipe
         if S.SwipeCat:IsCastable() and Cache.EnemiesCount[AoERadius] >= 2 then
-          if AR.Cast(S.SwipeCat) then return "Cast"; end
+          if HR.Cast(S.SwipeCat) then return "Cast"; end
         end
         -- Shred
         if S.Shred:IsCastable(MeleeRange) then
-            if AR.Cast(S.Shred) then return "Cast"; end
+            if HR.Cast(S.Shred) then return "Cast"; end
         end
         return;
       end
       if Player:Buff(S.BearForm) then
-        local UseMaul = not AR.CDsON() and Cache.EnemiesCount[AoERadius] < 5 and Player:HealthPercentage() >= 60;
+        local UseMaul = not HR.CDsON() and Cache.EnemiesCount[AoERadius] < 5 and Player:HealthPercentage() >= 60;
         local IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target);
         -- # Executed every time the actor is available.
         -- actions=auto_attack
@@ -210,16 +210,16 @@
         -- actions+=/frenzied_regeneration,if=incoming_damage_5s%health.max>=0.5|health<=health.max*0.4
         if not UseMaul and S.FrenziedRegeneration:IsCastable() and Player:Rage() > 10
           and Player:HealthPercentage() <= 60 and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
-          if AR.Cast(S.FrenziedRegeneration, {true, false}) then return ""; end
+          if HR.Cast(S.FrenziedRegeneration, {true, false}) then return ""; end
         end
         if not UseMaul and S.Ironfur:IsCastable() and Player:Rage() >= S.Ironfur:Cost() + 1
           and ( ( IsTanking and ( not Player:Buff(S.Ironfur) or ( Player:BuffStack(S.Ironfur) < 2 and ( Player:Buff(S.GoryFur) or Player:BuffRefreshableP(S.Ironfur, 2.4) ) ) ) )
             or Player:Rage() >= 85 or Player:ActiveMitigationNeeded() ) then
-          if AR.Cast(S.Ironfur, {true, false}) then return ""; end
+          if HR.Cast(S.Ironfur, {true, false}) then return ""; end
         end
 
         if S.Moonfire:IsCastable(RangedRange) and not Target:IsInRange(MeleeRange) and Target:DebuffRefreshableP(S.MoonfireDebuff, 0) then
-          if AR.Cast(S.Moonfire) then return ""; end
+          if HR.Cast(S.Moonfire) then return ""; end
         end
 
         -- Get aggro on units near
@@ -238,53 +238,53 @@
         end
         if UnitsNotTankedCount > 0 then
           if S.ThrashBear:IsCastable() then
-            if AR.Cast(S.ThrashBear) then return ""; end
+            if HR.Cast(S.ThrashBear) then return ""; end
           end
           if S.SwipeBear:IsCastable() then
-            if AR.Cast(S.SwipeBear) then return ""; end
+            if HR.Cast(S.SwipeBear) then return ""; end
           end
         end
 
         if S.Moonfire:IsCastable(RangedRange) and Player:Buff(S.Incarnation) and Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8) then
-          if AR.Cast(S.Moonfire) then return ""; end
+          if HR.Cast(S.Moonfire) then return ""; end
         end
         if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 85 then
-          if AR.Cast(S.Maul) then return ""; end
+          if HR.Cast(S.Maul) then return ""; end
         end
         if S.ThrashBear:IsCastable(AoERadius, true) and Cache.EnemiesCount[AoERadius] >= 2 then
-          if AR.Cast(S.ThrashBear) then return ""; end
+          if HR.Cast(S.ThrashBear) then return ""; end
         end
         if S.Mangle:IsCastable(MeleeRange) then
-          if AR.Cast(S.Mangle) then return ""; end
+          if HR.Cast(S.Mangle) then return ""; end
         end
         if S.ThrashBear:IsCastable(AoERadius, true) then
-          if AR.Cast(S.ThrashBear) then return ""; end
+          if HR.Cast(S.ThrashBear) then return ""; end
         end
         -- actions+=/pulverize,if=buff.pulverize.up=0|buff.pulverize.remains<=6
         if S.Pulverize:IsCastable(MeleeRange) and Target:DebuffStack(S.ThrashBearDebuff) >= 2 and Player:BuffRefreshableP(S.PulverizeBuff, 6) then
-          if AR.Cast(S.Pulverize) then return ""; end
+          if HR.Cast(S.Pulverize) then return ""; end
         end
         if S.Moonfire:IsCastable(RangedRange) and (Player:Buff(S.GalacticGuardianBuff) or Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8)) then
-          if AR.Cast(S.Moonfire) then return ""; end
+          if HR.Cast(S.Moonfire) then return ""; end
         end
         if S.ThrashBear:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 then
-          if AR.Cast(S.ThrashBear) then return ""; end
+          if HR.Cast(S.ThrashBear) then return ""; end
         end
         if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 70 then
-          if AR.Cast(S.Maul) then return ""; end
+          if HR.Cast(S.Maul) then return ""; end
         end
         if S.SwipeBear:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 then
-          if AR.Cast(S.SwipeBear) then return ""; end
+          if HR.Cast(S.SwipeBear) then return ""; end
         end
         if S.Moonfire:IsCastable(RangedRange) then
-          if AR.Cast(S.Moonfire) then return ""; end
+          if HR.Cast(S.Moonfire) then return ""; end
         end
         return;
       end
     end
   end
 
-  AR.SetAPL(104, APL);
+  HR.SetAPL(104, APL);
 
 
 --- ======= SIMC =======

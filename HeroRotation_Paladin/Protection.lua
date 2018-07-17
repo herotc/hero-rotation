@@ -12,15 +12,15 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   
 
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
-  local Everyone = AR.Commons.Everyone;
-  local Paladin = AR.Commons.Paladin;
+  local Everyone = HR.Commons.Everyone;
+  local Paladin = HR.Commons.Paladin;
   -- Spells
   if not Spell.Paladin then Spell.Paladin = {}; end
   Spell.Paladin.Protection = {
@@ -66,9 +66,9 @@
   local T202PC, T204PC = HL.HasTier("T20");
   -- GUI Settings
   local Settings = {
-    General = AR.GUISettings.General,
-    Commons = AR.GUISettings.APL.Paladin.Commons,
-    Protection = AR.GUISettings.APL.Paladin.Protection
+    General = HR.GUISettings.General,
+    Commons = HR.GUISettings.APL.Paladin.Commons,
+    Protection = HR.GUISettings.APL.Paladin.Protection
   };
 
 
@@ -90,11 +90,11 @@
       if Everyone.TargetIsValid() and Target:IsInRange(30) then
         -- Avenger's Shield
         if S.AvengersShield:IsCastable() then
-          if AR.Cast(S.AvengersShield) then return; end
+          if HR.Cast(S.AvengersShield) then return; end
         end
         -- Judgment
         if S.Judgment:IsCastable() then
-          if AR.Cast(S.Judgment) then return; end
+          if HR.Cast(S.Judgment) then return; end
         end
       end
       return;
@@ -104,62 +104,62 @@
       -- CDs
         -- SotR (HP or (AS on CD and 3 Charges))
         if S.ShieldoftheRighteous:IsCastable("Melee") and Player:BuffRefreshable(S.ShieldoftheRighteousBuff, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then
-          if AR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return; end
+          if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return; end
         end
         -- Avengin Wrath (CDs On)
-        if AR.CDsON() and S.AvengingWrath:IsCastable("Melee") then
-          if AR.Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return; end
+        if HR.CDsON() and S.AvengingWrath:IsCastable("Melee") then
+          if HR.Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return; end
         end
         -- Eye of Tyr (HP)
         if S.EyeofTyr:IsCastable(8, true) and Player:HealthPercentage() <= Settings.Protection.EyeofTyrHP then
-          if AR.Cast(S.EyeofTyr) then return; end
+          if HR.Cast(S.EyeofTyr) then return; end
         end
       -- Defensives
       if Target:IsInRange(10) then
         if not Player:HealingAbsorbed() then
           if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP - 35 then
-            if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
+            if HR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
           end
           -- LotP (HP) / HotP (HP)
           if S.LightoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP then
-            if AR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return; end
+            if HR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return; end
           end
           if S.HandoftheProtector:IsCastable() and Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP then
-            if AR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
+            if HR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return; end
           end
         end
       end
       -- Avenger's Shield
       if S.AvengersShield:IsCastable(30) then
-        if AR.Cast(S.AvengersShield) then return; end
+        if HR.Cast(S.AvengersShield) then return; end
       end
       -- Consecration 
       if S.Consecration:IsCastable("Melee") then
-        if AR.Cast(S.Consecration) then return; end
+        if HR.Cast(S.Consecration) then return; end
       end
       -- Judgment
       if S.Judgment:IsCastable(30) then
-        if AR.Cast(S.Judgment) then return; end
+        if HR.Cast(S.Judgment) then return; end
       end
       -- Blessed Hammer
       if S.BlessedHammer:IsCastable(10, true) and S.BlessedHammer:Charges() > 1 then
-        if AR.Cast(S.BlessedHammer) then return; end
+        if HR.Cast(S.BlessedHammer) then return; end
       end
       if Target:IsInRange("Melee") then
         -- Shield of the Righteous
          if S.ShieldoftheRighteous:IsCastable() and S.ShieldoftheRighteous:Charges() == 3 then
-          if AR.Cast(S.ShieldoftheRighteous) then return; end
+          if HR.Cast(S.ShieldoftheRighteous) then return; end
         end
         -- Hammer of the Righteous
         if (S.ConsecratedHammer:IsAvailable() or S.HammeroftheRighteous:IsCastable()) then
-          if AR.Cast(S.HammeroftheRighteous) then return; end
+          if HR.Cast(S.HammeroftheRighteous) then return; end
         end
       end
       return;
     end
   end
 
-  AR.SetAPL(66, APL);
+  HR.SetAPL(66, APL);
 
 
 --- ======= SIMC =======

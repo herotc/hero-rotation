@@ -11,13 +11,13 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   
   -- File Locals
-  AR.Commons.Mage = {};
-  local Settings = AR.GUISettings.APL.Mage.Commons;
-  local Mage = AR.Commons.Mage;
+  HR.Commons.Mage = {};
+  local Settings = HR.GUISettings.APL.Mage.Commons;
+  local Mage = HR.Commons.Mage;
 
 
 --- ============================ CONTENT ============================

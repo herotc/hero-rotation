@@ -12,21 +12,21 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   local mathmin = math.min;
   local pairs = pairs;
   -- File Locals
   local Commons = {};
-  AR.Commons.Rogue = Commons;
-  local Settings = AR.GUISettings.APL.Rogue.Commons;
-  local Everyone = AR.Commons.Everyone;
+  HR.Commons.Rogue = Commons;
+  local Settings = HR.GUISettings.APL.Rogue.Commons;
+  local Everyone = HR.Commons.Everyone;
 
 --- ============================ CONTENT ============================
   -- Stealth
   function Commons.Stealth (Stealth, Setting)
     if Settings.StealthOOC and Stealth:IsCastable() and not Player:IsStealthed() then
-      if AR.Cast(Stealth, Settings.OffGCDasOffGCD.Stealth) then return "Cast Stealth (OOC)"; end
+      if HR.Cast(Stealth, Settings.OffGCDasOffGCD.Stealth) then return "Cast Stealth (OOC)"; end
     end
     return false;
   end
@@ -34,7 +34,7 @@
   -- Crimson Vial
   function Commons.CrimsonVial (CrimsonVial)
     if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.CrimsonVialHP then
-      if AR.Cast(CrimsonVial, Settings.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)"; end
+      if HR.Cast(CrimsonVial, Settings.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)"; end
     end
     return false;
   end
@@ -42,7 +42,7 @@
   -- Feint
   function Commons.Feint (Feint)
     if Feint:IsCastable() and not Player:Buff(Feint) and Player:HealthPercentage() <= Settings.FeintHP then
-      if AR.Cast(Feint, Settings.GCDasOffGCD.Feint) then return "Cast Feint (Defensives)"; end
+      if HR.Cast(Feint, Settings.GCDasOffGCD.Feint) then return "Cast Feint (Defensives)"; end
     end
   end
 
@@ -68,7 +68,7 @@
         end
       end
       if BestUnit then
-        AR.CastLeftNameplate(BestUnit, MarkedforDeath);
+        HR.CastLeftNameplate(BestUnit, MarkedforDeath);
       end
     end
   end

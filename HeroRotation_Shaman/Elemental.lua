@@ -12,7 +12,7 @@ local Spell = HL.Spell;
 local Item = HL.Item;
 
 -- HeroRotation
-local AR = HeroRotation;
+local HR = HeroRotation;
 
 -- APL from T21_Shaman_Elemental on 2017-12-06
 
@@ -86,7 +86,7 @@ Spell.Shaman.Elemental = {
   PoolFocus             = Spell(9999000010)
 }
 local S = Spell.Shaman.Elemental
-local Everyone = AR.Commons.Everyone;
+local Everyone = HR.Commons.Everyone;
 
 -- Items
 if not Item.Shaman then Item.Shaman = {} end
@@ -109,8 +109,8 @@ local I = Item.Shaman.Elemental
 
 -- GUI Settings
 local Settings = {
-  General = AR.GUISettings.General,
-  Shaman = AR.GUISettings.APL.Shaman
+  General = HR.GUISettings.General,
+  Shaman = HR.GUISettings.APL.Shaman
 }
 
 local function MaelstromP()
@@ -176,9 +176,9 @@ local function APL ()
     -- Opener
     if Everyone.TargetIsValid() then
       if S.TotemMastery:IsCastableP() and (not Player:Buff(S.ResonanceTotemBuff) and S.TotemMastery:TimeSinceLastCast() >= 5) then
-        if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
+        if HR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
       elseif S.LightningBolt:IsCastableP(40) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
     end
     return
@@ -186,139 +186,139 @@ local function APL ()
 
   -- Interrupts
   if S.WindShear:IsCastableP(30) and Target:IsInterruptible() and Settings.General.InterruptEnabled then
-    if AR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
+    if HR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
   end
 
   -- In Combat
   if Everyone.TargetIsValid() then
     -- Potion of Prolonged Power
     if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
-      if AR.CastSuggested(I.PoPP) then return "Use PoPP" end
+      if HR.CastSuggested(I.PoPP) then return "Use PoPP" end
     end
 
     -- Use healthstone if we have it and our health is low.
     if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 50) then
-      if AR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
+      if HR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
     end
 
     -- Heal when we have less than the set health threshold (instant casts only)!
     if Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingSurgeHPThreshold then
       if S.HealingSurge:IsCastableP() and (Player:Maelstrom() >= 20 and Player:Mana() >= S.HealingSurge:Cost()) then
-        if AR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
+        if HR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
       end
     end
 
     -- On use trinkets.
     if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange("Melee") and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
-      if AR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
+      if HR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
     end
 
     -- actions+=/totem_mastery,if=buff.resonance_totem.remains<2
     -- TODO: Handle this as per the APL.
     if S.TotemMastery:IsCastableP() and ((not Player:Buff(S.ResonanceTotemBuff) and S.TotemMastery:TimeSinceLastCast() >= 5) or S.TotemMastery:TimeSinceLastCast() >= 120 - 3) then
-      if AR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
+      if HR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
     end
 
     -- actions+=/fire_elemental
     -- actions+=/storm_elemental
     if S.FireElemental:IsCastableP() and (S.EarthElemental:TimeSinceLastCast() >= 60) then
-      if AR.Cast(S.FireElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast FireElemental" end
+      if HR.Cast(S.FireElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast FireElemental" end
     end
     if S.EarthElemental:IsCastableP() and (S.FireElemental:TimeSinceLastCast() >= 60) then
-      if AR.Cast(S.EarthElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast EarthElemental" end
+      if HR.Cast(S.EarthElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast EarthElemental" end
     end
 
     -- actions+=/elemental_mastery
     if S.ElementalMastery:IsCastableP() then
-      if AR.Cast(S.ElementalMastery) then return "Cast ElementalMastery" end
+      if HR.Cast(S.ElementalMastery) then return "Cast ElementalMastery" end
     end
 
     -- actions+=/use_item,name=gnawed_thumb_ring,if=equipped.gnawed_thumb_ring&(talent.ascendance.enabled&!buff.ascendance.up|!talent.ascendance.enabled)
     if I.GnawedThumbRing:IsEquipped() and I.GnawedThumbRing:IsReady() and (S.Ascendance:IsAvailable() and not Player:BuffP(S.AscendanceBuff) or not S.Ascendance:IsAvailable()) then
-      if AR.Cast(I.GnawedThumbRing) then return "Use GnawedThumbRing" end
+      if HR.Cast(I.GnawedThumbRing) then return "Use GnawedThumbRing" end
     end
 
     -- Racial
     -- actions+=/blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
     if S.BloodFury:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemains() > 50) then
-      if AR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
+      if HR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
     end
 
     -- Racial
     -- actions+=/berserking,if=!talent.ascendance.enabled|buff.ascendance.up
     if S.Berserking:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff)) then
-      if AR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
+      if HR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
     end
 
     -- actions+=/run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
     if Cache.EnemiesCount[40] > 2 then
       -- actions.aoe=stormkeeper
       if S.Stormkeeper:IsCastableP() then
-        if AR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+        if HR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
       end
 
       -- actions.aoe+=/ascendance
       if S.Ascendance:IsCastableP() then
         if S.Ascendance:IsAvailable() and not Player:Buff(S.AscendanceBuff) then
-          if AR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+          if HR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
         end
       end
 
       -- actions.aoe+=/liquid_magma_totem
       if S.LiquidMagmaTotem:IsCastableP() then
         if S.LiquidMagmaTotem:IsAvailable() then
-          if AR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
+          if HR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
         end
       end
 
       -- actions.aoe+=/flame_shock,if=spell_targets.chain_lightning<4&maelstrom>=20,target_if=refreshable
       if S.FlameShock:IsCastableP() and (Cache.EnemiesCount[40] < 4 and MaelstromMinP() >= 20) then
         if Target:DebuffRemainsP(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.aoe+=/earthquake
       if S.EarthQuake:IsCastableP() then
         if MaelstromMinP() >= S.EarthQuake:Cost() then
-          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+          if HR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
         end
       end
 
       -- actions.aoe+=/lava_burst,if=dot.flame_shock.remains>cast_time&buff.lava_surge.up&!talent.lightning_rod.enabled&spell_targets.chain_lightning<4
       if S.LavaBurst:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) > S.LavaBurst:CastTime() and Player:BuffP(S.LavaSurgeBuff) and not S.LightningRod:IsAvailable() and Cache.EnemiesCount[40] < 4) then
-        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+        if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
       end
 
       -- actions.aoe+=/elemental_blast,if=!talent.lightning_rod.enabled&spell_targets.chain_lightning<5|talent.lightning_rod.enabled&spell_targets.chain_lightning<4
       if S.ElementalBlast:IsCastableP() and ((not S.LightningRod:IsAvailable() and Cache.EnemiesCount[40] < 5) or (S.LightningRod:IsAvailable() and Cache.EnemiesCount[40] < 4)) then
-        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
+        if HR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
       end
 
       -- actions.aoe+=/lava_beam
       if S.LavaBeam:IsCastableP() then
-        if AR.Cast(S.LavaBeam) then return "Cast LavaBeam" end
+        if HR.Cast(S.LavaBeam) then return "Cast LavaBeam" end
       end
 
       -- actions.aoe+=/chain_lightning,target_if=debuff.lightning_rod.down
       if S.ChainLightning:IsCastableP() and not Target:DebuffP(S.LightningRodDebuff) then
-        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+        if HR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
       end
 
       -- actions.aoe+=/chain_lightning
       if S.ChainLightning:IsCastableP() then
-        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+        if HR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
       end
 
       -- actions.aoe+=/lava_burst,moving=1
       if S.LavaBurst:IsCastableP() and Player:IsMoving() then
-        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+        if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
       end
 
       -- actions.aoe+=/flame_shock,moving=1,target_if=refreshable
       if S.FlameShock:IsCastableP() and Player:IsMoving() then
         if Target:DebuffRemainsP(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
     end
@@ -327,103 +327,103 @@ local function APL ()
     if S.Ascendance:IsAvailable() then
       -- actions.single_asc=ascendance,if=dot.flame_shock.remains>buff.ascendance.duration&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&!buff.stormkeeper.up
       if S.Ascendance:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) > Player:BuffRemainsP(S.AscendanceBuff) and (HL.CombatTime() >= 60 or Player:BuffP(S.BloodLustBuff)) and S.LavaBurst:CooldownRemainsP() > 0 and not Player:BuffP(S.StormkeeperBuff)) then
-        if AR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+        if HR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
       end
 
       -- actions.single_asc+=/flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
       if S.FlameShock:IsCastableP() and (not Target:DebuffP(S.FlameShockDebuff) or (Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:GCDRemains())) then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_asc+=/flame_shock,if=maelstrom>=20&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
       if S.FlameShock:IsCastableP() and (MaelstromMinP() >= 20 and Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:BuffRemainsP(S.AscendanceBuff) and S.Ascendance:CooldownRemainsP() + S.Ascendance:BaseDuration() <= S.FlameShockDebuff:BaseDuration()) then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_asc+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up
       if S.EarthQuake:IsCastableP() and (Player:BuffP(S.EOTGS) and not Player:BuffP(S.AscendanceBuff)) then
         if MaelstromMinP() >= S.EarthQuake:Cost() then
-          if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+          if HR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
         end
       end
 
       -- actions.single_asc+=/elemental_blast
       if S.ElementalBlast:IsCastableP() then
-        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
+        if HR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
       end
 
       -- actions.single_asc+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
       if S.EarthShock:IsCastableP() and (MaelstromP() >= 117 or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() >= 92)) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_asc+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
       if S.Stormkeeper:IsCastableP() and (Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+        if HR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
       end
 
       -- actions.single_asc+=/liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
       if S.LiquidMagmaTotem:IsCastableP() and (Cache.EnemiesCount[40] < 3)  then
-        if AR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
+        if HR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
       end
 
       -- actions.single_asc+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
       if S.LightningBolt:IsCastableP() and (Player:BuffP(S.PowerOfTheMaelstromBuff) and Player:BuffP(S.StormkeeperBuff) and Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_asc+=/lava_burst,if=dot.flame_shock.remains>cast_time&(cooldown_react|buff.ascendance.up)
       if S.LavaBurst:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) > S.LavaBurst:CastTime()) then
-        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+        if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
       end
 
       -- actions.single_asc+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
       if S.FlameShock:IsCastableP() and (MaelstromMinP() >= 20 and Player:BuffP(S.ElementalFocusBuff)) then
         if Target:DebuffRemains(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_asc+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastableP() and (MaelstromP() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and MaelstromP() > 70 and S.Aftershock:IsAvailable())) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_asc+=/lava_beam,if=active_enemies>1&spell_targets.lava_beam>1
       if S.LavaBeam:IsCastableP() and (Cache.EnemiesCount[40] > 1) then
-        if AR.Cast(S.LavaBeam) then return "Cast LavaBeam" end
+        if HR.Cast(S.LavaBeam) then return "Cast LavaBeam" end
       end
 
       -- actions.single_asc+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
       if S.LightningBolt:IsCastableP() and (Player:BuffP(S.PowerOfTheMaelstromBuff) and Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_asc+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
       if S.ChainLightning:IsCastableP() and (Cache.EnemiesCount[40] > 1) then
-        if AR.Cast(S.ChainLightning) then return "Cast LightningBolt" end
+        if HR.Cast(S.ChainLightning) then return "Cast LightningBolt" end
       end
 
       -- actions.single_asc+=/lightning_bolt
       if S.LightningBolt:IsCastableP() then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_asc+=/flame_shock,moving=1,target_if=refreshable
       if S.FlameShock:IsCastableP() and Player:IsMoving() then
         if Target:DebuffRemainsP(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_asc+=/earth_shock,moving=1
       if S.EarthShock:IsCastableP() and Player:IsMoving() then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_asc+=/flame_shock,moving=1,if=movement.distance>6
       if S.FlameShock:IsCastableP() and Player:IsMoving() then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
 
@@ -431,104 +431,104 @@ local function APL ()
     if S.Icefury:IsAvailable() then
       -- actions.single_if=flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
       if S.FlameShock:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:GCDRemains()) then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&!buff.ascendance.up
       if S.EarthQuake:IsCastableP() and (Player:BuffP(S.EOTGS) and not Player:BuffP(S.AscendanceBuff)) then
-        if AR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
+        if HR.Cast(S.EarthQuake) then return "Cast EarthQuake" end
       end
 
       -- actions.single_if+=/elemental_blast
       if S.ElementalBlast:IsCastableP() then
-        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
+        if HR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
       end
 
       -- actions.single_if+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
       if S.EarthShock:IsCastableP() and (MaelstromP() >= 117 or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() >= 92)) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_if+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
       if S.Stormkeeper:IsCastableP() and (Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+        if HR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
       end
 
       -- actions.single_if+=/icefury,if=(raid_event.movement.in<5|maelstrom<=101&artifact.swelling_maelstrom.enabled|!artifact.swelling_maelstrom.enabled&maelstrom<=76)&!buff.ascendance.up
       if S.Icefury:IsCastableP() and (((MaelstromP() <= 101 and S.SwellingMaelstrom:IsAvailable()) or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() <= 76)) and not Player:BuffP(S.AscendanceBuff)) then
-        if AR.Cast(S.Icefury) then return "Cast Icefury" end
+        if HR.Cast(S.Icefury) then return "Cast Icefury" end
       end
 
       -- actions.single_if+=/liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
       if S.LiquidMagmaTotem:IsCastableP() and (Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
+        if HR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
       end
 
       -- actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
       if S.LightningBolt:IsCastableP() and (Player:BuffP(S.PowerOfTheMaelstromBuff) and Player:BuffP(S.StormkeeperBuff) and Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_if+=/lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
       if S.LavaBurst:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) > S.FlameShock:CastTime()) then
-        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+        if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
       end
 
       -- TODO: spell_haste
       -- actions.single_if+=/frost_shock,if=buff.icefury.up&((maelstrom>=20&raid_event.movement.in>buff.icefury.remains)|buff.icefury.remains<(1.5*spell_haste*buff.icefury.stack+1))
       if S.FrostShock:IsCastableP() and (Player:BuffP(S.IcefuryBuff) and ((MaelstromMinP() >= 20) or Player:BuffRemainsP(S.IcefuryBuff) < (1.5 * Player:BuffStackP(S.IcefuryBuff) + 1))) then
-        if AR.Cast(S.FrostShock) then return "Cast FrostShock" end
+        if HR.Cast(S.FrostShock) then return "Cast FrostShock" end
       end
 
       -- actions.single_if+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
       if S.FlameShock:IsCastableP() and (MaelstromMinP() >= 20 and Player:BuffP(S.ElementalFocusBuff)) then
         if Target:DebuffRemains(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_if+=/frost_shock,moving=1,if=buff.icefury.up
       if S.FrostShock:IsCastableP() and (Player:IsMoving() and Player:BuffP(S.IcefuryBuff)) then
-        if AR.Cast(S.FrostShock) then return "Cast FrostShock" end
+        if HR.Cast(S.FrostShock) then return "Cast FrostShock" end
       end
 
       -- actions.single_if+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled&buff.earthen_strength.up
       if S.EarthShock:IsCastableP() and (MaelstromP() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and MaelstromP() > 70 and S.Aftershock:IsAvailable() and Player:BuffP(S.EarthenStrengthBuff))) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
       if S.LightningBolt:IsCastableP() and (Player:BuffP(S.PowerOfTheMaelstromBuff) and Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_if+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
       if S.ChainLightning:IsCastableP() and (Cache.EnemiesCount[40] > 1) then
-        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+        if HR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
       end
 
       -- actions.single_if+=/lightning_bolt
       if S.LightningBolt:IsCastableP() then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_if+=/flame_shock,moving=1,target_if=refreshable
       if S.FlameShock:IsCastableP() and Player:IsMoving() then
         if Target:DebuffRemainsP(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_if+=/earth_shock,moving=1
       if S.EarthShock:IsCastableP() and Player:IsMoving() then
         if MaelstromMinP() >= 10 then
-          if AR.Cast(S.EarthShock) then return "Cast FlameShock" end
+          if HR.Cast(S.EarthShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_if+=/flame_shock,moving=1,if=movement.distance>6
       if S.FlameShock:IsCastableP() and Player:IsMoving() then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
 
@@ -536,97 +536,97 @@ local function APL ()
     if S.LightningRod:IsAvailable() then
       -- actions.single_lr=flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
       if S.FlameShock:IsCastableP() and (not Target:DebuffP(S.FlameShockDebuff) and Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:GCDRemains()) then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
 
       -- actions.single_lr+=/elemental_blast
       if S.ElementalBlast:IsCastableP() then
-        if AR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
+        if HR.Cast(S.ElementalBlast) then return "Cast ElementalBlast" end
       end
 
       -- actions.single_lr+=/earth_shock,if=maelstrom>=117|!artifact.swelling_maelstrom.enabled&maelstrom>=92
       if S.EarthShock:IsCastableP() and (MaelstromP() >= 117 or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() >= 92)) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_lr+=/stormkeeper,if=raid_event.adds.count<3|raid_event.adds.in>50
       if S.Stormkeeper:IsCastableP() and (Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+        if HR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
       end
 
       -- actions.single_lr+=/liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
       if S.LiquidMagmaTotem:IsCastableP() and (Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
+        if HR.Cast(S.LiquidMagmaTotem) then return "Cast LiquidMagmaTotem" end
       end
 
       -- actions.single_lr+=/lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
       if S.LavaBeam:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) > S.LavaBurst:CastTime()) then
-        if AR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+        if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
       end
 
       -- actions.single_lr+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
       if S.FlameShock:IsCastableP() and (MaelstromMinP() >= 20 and Player:BuffP(S.ElementalFocusBuff)) then
         if Target:DebuffRemains(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_lr+=/earth_shock,if=maelstrom>=111|!artifact.swelling_maelstrom.enabled&maelstrom>=86|equipped.smoldering_heart&equipped.the_deceivers_blood_pact&maelstrom>70&talent.aftershock.enabled
       if S.EarthShock:IsCastableP() and (MaelstromP() >= 111 or (not S.SwellingMaelstrom:IsAvailable() and MaelstromP() >= 86) or (I.SmolderingHeart:IsEquipped() and I.TheDeceiversBloodPact:IsEquipped() and MaelstromP() > 70 and S.Aftershock:IsAvailable())) then
-        if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+        if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
       end
 
       -- actions.single_lr+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3,target_if=debuff.lightning_rod.down
       if S.LightningBolt:IsCastableP() and (Player:BuffP(S.PowerOfTheMaelstromBuff) and Cache.EnemiesCount[40] < 3 and not Target:DebuffP(LightningRodDebuff)) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_lr+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
       if S.LightningBolt:IsCastableP() and (Player:BuffP(S.PowerOfTheMaelstromBuff) and Cache.EnemiesCount[40] < 3) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_lr+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1,target_if=debuff.lightning_rod.down
       if S.ChainLightning:IsCastableP() and (Cache.EnemiesCount[40] > 1 and not Target:DebuffP(S.LightningRodDebuff)) then
-        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+        if HR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
       end
 
       -- actions.single_lr+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
       if S.ChainLightning:IsCastableP() and (Cache.EnemiesCount[40] > 1) then
-        if AR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
+        if HR.Cast(S.ChainLightning) then return "Cast ChainLightning" end
       end
 
       -- actions.single_lr+=/lightning_bolt,target_if=debuff.lightning_rod.down
       if S.LightningBolt:IsCastableP() and (not Target:DebuffP(S.LightningRodDebuff)) then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_lr+=/lightning_bolt
       if S.LightningBolt:IsCastableP() then
-        if AR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
+        if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
       end
 
       -- actions.single_lr+=/flame_shock,moving=1,target_if=refreshable
       if S.FlameShock:IsCastableP() and (Player:IsMoving()) then
         if Target:DebuffRemainsP(S.FlameShockDebuff) <= 2.5 then
-          if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+          if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
         end
       end
 
       -- actions.single_lr+=/earth_shock,moving=1
       if S.EarthShock:IsCastableP() and Player:IsMoving() then
         if MaelstromMinP() >= 10 then
-          if AR.Cast(S.EarthShock) then return "Cast EarthShock" end
+          if HR.Cast(S.EarthShock) then return "Cast EarthShock" end
         end
       end
 
       -- actions.single_lr+=/flame_shock,moving=1,if=movement.distance>6
       if S.FlameShock:IsCastableP() and Player:IsMoving() then
-        if AR.Cast(S.FlameShock) then return "Cast FlameShock" end
+        if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
       end
     end
-    if AR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
+    if HR.Cast(S.PoolFocus) then return "Cast PoolFocus" end
   end
 end
 
-AR.SetAPL(262, APL)
+HR.SetAPL(262, APL)

@@ -3,19 +3,19 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
     -- HeroLib
   local HL = HeroLib;
   -- File Locals
   local GUI = HL.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
-  local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
+  local CreateARPanelOption = HR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
   -- All settings here should be moved into the GUI someday.
-  AR.GUISettings.APL.Druid = {
+  HR.GUISettings.APL.Druid = {
     Commons = {
       
       -- {Display GCD as OffGCD, ForceReturn}
@@ -96,10 +96,10 @@
     },
   };
 
-    AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+    HR.GUI.LoadSettingsRecursively(HR.GUISettings);
 
   -- Child Panels
-  local ARPanel = AR.GUI.Panel;
+  local ARPanel = HR.GUI.Panel;
   local CP_Druid = CreateChildPanel(ARPanel, "Druid");
   local CP_Balance = CreateChildPanel(CP_Druid, "Balance");
   local CP_Feral = CreateChildPanel(CP_Druid, "Feral");

@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
   -- Addon
-  local addonName, AR = ...;
+  local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
   local Cache = HeroCache;
@@ -28,7 +28,7 @@
       -- Since it takes 5s to change spec, we'll take 3seconds as timer.
       if HL.GetTime() > SpecTimer then
         -- Update the timer only on valid scan.
-        if AR.PulseInit() ~= "Invalid SpecID" then
+        if HR.PulseInit() ~= "Invalid SpecID" then
           SpecTimer = HL.GetTime() + 3;
         end
       end

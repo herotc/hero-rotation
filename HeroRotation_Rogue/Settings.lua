@@ -3,20 +3,20 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- HeroLib
   local HL = HeroLib;
   -- File Locals
   local GUI = HL.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
-  local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
+  local CreateARPanelOption = HR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 
 
 --- ============================ CONTENT ============================
   -- Default settings
-  AR.GUISettings.APL.Rogue = {
+  HR.GUISettings.APL.Rogue = {
     Commons = {
       -- SoloMode Settings
       CrimsonVialHP = 0,
@@ -101,10 +101,10 @@
     }
   };
 
-  AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+  HR.GUI.LoadSettingsRecursively(HR.GUISettings);
 
   -- Child Panels
-  local ARPanel = AR.GUI.Panel;
+  local ARPanel = HR.GUI.Panel;
   local CP_Rogue = CreateChildPanel(ARPanel, "Rogue");
   local CP_Assassination = CreateChildPanel(CP_Rogue, "Assassination");
   local CP_Outlaw = CreateChildPanel(CP_Rogue, "Outlaw");

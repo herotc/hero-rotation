@@ -11,13 +11,13 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
 
   -- File Locals
-  AR.Commons.Monk = {};
-  local Settings = AR.GUISettings.APL.Monk.Commons;
-  local Monk = AR.Commons.Monk;
+  HR.Commons.Monk = {};
+  local Settings = HR.GUISettings.APL.Monk.Commons;
+  local Monk = HR.Commons.Monk;
 
 
 --- ============================ CONTENT ============================

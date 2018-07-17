@@ -10,14 +10,14 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   
   -- Commons
-  AR.Commons.Hunter = {};
+  HR.Commons.Hunter = {};
   -- GUI Settings
-  local Settings = AR.GUISettings.APL.Hunter.Commons;
-  local Hunter = AR.Commons.Hunter;
+  local Settings = HR.GUISettings.APL.Hunter.Commons;
+  local Hunter = HR.Commons.Hunter;
 
   --- Commons Functions
   

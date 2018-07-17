@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
   -- Addon
-  local addonName, AR = ...;
+  local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
   local Cache = HeroCache;
@@ -13,10 +13,10 @@
   -- Lua
   local pairs = pairs;
   -- File Locals
-  AR.Commons = {};
+  HR.Commons = {};
   local Commons = {};
-  AR.Commons.Everyone = Commons;
-  local Settings = AR.GUISettings.General;
+  HR.Commons.Everyone = Commons;
+  local Settings = HR.GUISettings.General;
 
 
 --- ============================ CONTENT ============================
@@ -34,7 +34,7 @@
         [120651] = true
   }
   function Commons.AoEToggleEnemiesUpdate ()
-    if not AR.AoEON() or AoEInsensibleUnit[Target:NPCID()] then
+    if not HR.AoEON() or AoEInsensibleUnit[Target:NPCID()] then
       for Key, Value in pairs(Cache.EnemiesCount) do
         Cache.EnemiesCount[Key] = math.min(1, Cache.EnemiesCount[Key]);
       end
@@ -55,12 +55,12 @@
   function Commons.Interrupt (Range, Spell, Setting, StunSpells)
     if Settings.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(Range) then
       if Spell:IsCastable() then
-        if AR.Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
+        if HR.Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
       elseif Settings.InterruptWithStun and Target:CanBeStunned() then
         if StunSpells then
           for i = 1, #StunSpells do
             if StunSpells[i][1]:IsCastable() and StunSpells[i][3]() then
-              if AR.Cast(StunSpells[i][1]) then return StunSpells[i][2]; end
+              if HR.Cast(StunSpells[i][1]) then return StunSpells[i][2]; end
             end
           end
         end

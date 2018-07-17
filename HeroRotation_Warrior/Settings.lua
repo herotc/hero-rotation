@@ -3,20 +3,20 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- HeroLib
   local HL = HeroLib;
   -- File Locals
   local GUI = HL.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
-  local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
+  local CreateARPanelOption = HR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 
 
 --- ============================ CONTENT ============================
   -- Default settings
-  AR.GUISettings.APL.Warrior = {
+  HR.GUISettings.APL.Warrior = {
     Commons = {
       OffGCDasOffGCD = {
         Pummel = true,
@@ -63,10 +63,10 @@
     }
   };
 
-  AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+  HR.GUI.LoadSettingsRecursively(HR.GUISettings);
 
   -- Child Panels
-  local ARPanel = AR.GUI.Panel;
+  local ARPanel = HR.GUI.Panel;
   local CP_Warrior = CreateChildPanel(ARPanel, "Warrior");
   local CP_Arms = CreateChildPanel(CP_Warrior, "Arms");
   local CP_Fury = CreateChildPanel(CP_Warrior, "Fury");

@@ -3,18 +3,18 @@
   -- Addon
   local addonName, addonTable = ...;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- HeroLib
   local HL = HeroLib;
   -- File Locals
   local GUI = HL.GUI;
   local CreateChildPanel = GUI.CreateChildPanel;
   local CreatePanelOption = GUI.CreatePanelOption;
-  local CreateARPanelOption = AR.GUI.CreateARPanelOption;
-  local CreateARPanelOptions = AR.GUI.CreateARPanelOptions;
+  local CreateARPanelOption = HR.GUI.CreateARPanelOption;
+  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 
 --- ============================ CONTENT ============================
-  AR.GUISettings.APL.Paladin = {
+  HR.GUISettings.APL.Paladin = {
     Protection = {
       -- CDs HP %
       EyeofTyrHP = 60,
@@ -56,9 +56,9 @@
     }
   };
   -- GUI
-  AR.GUI.LoadSettingsRecursively(AR.GUISettings);
+  HR.GUI.LoadSettingsRecursively(HR.GUISettings);
   -- Child Panels
-  local ARPanel = AR.GUI.Panel;
+  local ARPanel = HR.GUI.Panel;
   local CP_Paladin = CreateChildPanel(ARPanel, "Paladin");
   local CP_Protection = CreateChildPanel(CP_Paladin, "Protection");
   local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution");

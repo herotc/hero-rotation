@@ -11,13 +11,13 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
   
   -- File Locals
-  AR.Commons.DeathKnight = {};
-  local Settings = AR.GUISettings.APL.DeathKnight.Commons;
-  local DeathKnight = AR.Commons.DeathKnight;
+  HR.Commons.DeathKnight = {};
+  local Settings = HR.GUISettings.APL.DeathKnight.Commons;
+  local DeathKnight = HR.Commons.DeathKnight;
 
 
 --- ============================ CONTENT ============================

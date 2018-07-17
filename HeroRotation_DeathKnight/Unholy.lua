@@ -12,13 +12,13 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- HeroRotation
-  local AR = HeroRotation;
+  local HR = HeroRotation;
   -- Lua
 
   --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
-  local Everyone = AR.Commons.Everyone;
-  local DeathKnight = AR.Commons.DeathKnight;
+  local Everyone = HR.Commons.Everyone;
+  local DeathKnight = HR.Commons.DeathKnight;
   -- Spells
   if not Spell.DeathKnight then Spell.DeathKnight = {}; end
   Spell.DeathKnight.Unholy = {
@@ -101,9 +101,9 @@
 
   --GUI Settings
   local Settings = {
-    General = AR.GUISettings.General,
-    Commons = AR.GUISettings.APL.DeathKnight.Commons,
-    Unholy = AR.GUISettings.APL.DeathKnight.Unholy
+    General = HR.GUISettings.General,
+    Commons = HR.GUISettings.APL.DeathKnight.Commons,
+    Unholy = HR.GUISettings.APL.DeathKnight.Unholy
   };
 
 
@@ -112,74 +112,74 @@
   local function AOE()
   --actions.aoe=death_and_decay,if=spell_targets.death_and_decay>=2
   if S.DeathAndDecay:IsCastable() and Cache.EnemiesCount[10] >= 2 then
-    if AR.Cast(S.DeathAndDecay) then return ""; end
+    if HR.Cast(S.DeathAndDecay) then return ""; end
   end
   --actions.aoe+=/epidemic,if=spell_targets.epidemic>4
   if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 4 then
-    if AR.Cast(S.Epidemic) then return ""; end
+    if HR.Cast(S.Epidemic) then return ""; end
   end
   --actions.aoe+=/scourge_strike,if=spell_targets.scourge_strike>=2&(death_and_decay.ticking|defile.ticking)
   if S.ScourgeStrike:IsCastable() and (Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff)) or Target:Debuff(S.FesteringWounds) then
-    if AR.Cast(S.ScourgeStrike) then return ""; end
+    if HR.Cast(S.ScourgeStrike) then return ""; end
   end
   --actions.aoe+=/clawing_shadows,if=spell_targets.clawing_shadows>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
   if S.ClawingShadows:IsCastable() and Cache.EnemiesCount[10] >= 2 and Player:Buff(S.DeathAndDecayBuff) then
-    if AR.Cast(S.ClawingShadows) then return ""; end
+    if HR.Cast(S.ClawingShadows) then return ""; end
   end
   --actions.aoe+=/epidemic,if=spell_targets.epidemic>2
   if S.Epidemic:IsCastable() and Cache.EnemiesCount[10] > 2 then
-    if AR.Cast(S.Epidemic) then return ""; end
+    if HR.Cast(S.Epidemic) then return ""; end
   end
   return;
 end
  local function Generic()
   --actions.generic=scourge_strike,if=debuff.soul_reaper.up&debuff.festering_wound.up
   if S.ScourgeStrike:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:Debuff(S.FesteringWounds) then
-    if AR.Cast(S.ScourgeStrike) then return ""; end
+    if HR.Cast(S.ScourgeStrike) then return ""; end
   end
   --actions.generic+=/clawing_shadows,if=debuff.soul_reaper.up&debuff.festering_wound.up
   if S.ClawingShadows:IsCastable() and Target:Debuff(S.SoulReaperDebuff) and Target:Debuff(S.FesteringWounds) then
-    if AR.Cast(S.ClawingShadows) then return ""; end
+    if HR.Cast(S.ClawingShadows) then return ""; end
   end
   --actions.generic+=/death_coil,if=runic_power.deficit<22&(talent.shadow_infusion.enabled|(!talent.dark_arbiter.enabled|cooldown.dark_arbiter.remains>5))
   if S.DeathCoil:IsUsable() and Player:RunicPowerDeficit() < 22 and (S.ShadowInfusion:IsAvailable() or (not S.DarkArbiter:IsAvailable() or S.DarkArbiter:CooldownRemainsP() > 5)) then
-    if AR.Cast(S.DeathCoil) then return ""; end
+    if HR.Cast(S.DeathCoil) then return ""; end
   end
   --actions.generic+=/death_coil,if=!buff.necrosis.up&buff.sudden_doom.react&((!talent.dark_arbiter.enabled&rune<=3)|cooldown.dark_arbiter.remains>5)
   if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and Player:Buff(S.SuddenDoom) and ((not S.DarkArbiter:IsAvailable() and Player:Runes() <= 3) or S.DarkArbiter:CooldownRemainsP() > 5) then
-    if AR.Cast(S.DeathCoil) then return ""; end
+    if HR.Cast(S.DeathCoil) then return ""; end
   end
   --actions.generic+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<=6
   if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6 and S.Apocalypse:CooldownRemains() <= 6 then
-    if AR.Cast(S.FesteringStrike) then return ""; end
+    if HR.Cast(S.FesteringStrike) then return ""; end
   end
   --actions.generic+=/defile
   if S.Defile:IsAvailable() and S.Defile:IsCastable() then
-    if AR.Cast(S.Defile) then return ""; end
+    if HR.Cast(S.Defile) then return ""; end
   end
   --actions.generic+=/call_action_list,name=aoe,if=active_enemies>=2
-  if AR.AoEON() and Cache.EnemiesCount[10] >= 2 then
+  if HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
     return AOE();
   end
   --actions.generic+=/festering_strike,if=(buff.blighted_rune_weapon.stack*2+debuff.festering_wound.stack)<=2|((buff.blighted_rune_weapon.stack*2+debuff.festering_wound.stack)<=4&talent.castigator.enabled)&(cooldown.army_of_the_dead.remains>5|rune.time_to_4<=gcd)
   if S.FesteringStrike:IsCastable() and (Player:BuffStack(S.BlightedRuneWeapon) * 2 + Target:DebuffStack(S.FesteringWounds)) <= 2 or ((Player:BuffStack(S.BlightedRuneWeapon) * 2 + Target:DebuffStack(S.FesteringWounds)) <= 4 and S.Castigator:IsAvailable()) and (S.ArmyOfDead:CooldownRemainsP() > 5 or Player:RuneTimeToX(4) <= Player:GCD()) or (S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <=2) then
-    if AR.Cast(S.FesteringStrike) then return ""; end
+    if HR.Cast(S.FesteringStrike) then return ""; end
   end
   --actions.generic+=/death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune.time_to_4>=gcd
   if S.DeathCoil:IsUsable() and not Player:Buff(S.NecrosisBuff) and S.Necrosis:IsAvailable() and Player:RuneTimeToX(4) >= Player:GCD() then
-    if AR.Cast(S.DeathCoil) then return ""; end
+    if HR.Cast(S.DeathCoil) then return ""; end
   end
   --actions.generic+=/scourge_strike,if=(buff.necrosis.up|buff.unholy_strength.react|rune>=2)&debuff.festering_wound.stack>=1&(debuff.festering_wound.stack>=3|!(talent.castigator.enabled|equipped.132448))&(cooldown.army_of_the_dead.remains>5|rune.time_to_4<=gcd)
   if S.ScourgeStrike:IsCastable() and (Player:Buff(S.NecrosisBuff) or Player:Buff(S.UnholyStrength) or Player:Runes() >= 2) and Target:DebuffStack(S.FesteringWounds) >= 1 and (Target:DebuffStack(S.FesteringWounds) >= 3 or not (S.Castigator:IsAvailable() or I.InstructorsFourthLesson:IsEquipped())) and (S.ArmyOfDead:CooldownRemainsP() > 5 or Player:RuneTimeToX(4) <= Player:GCD()) then
-    if AR.Cast(S.ScourgeStrike) then return ""; end
+    if HR.Cast(S.ScourgeStrike) then return ""; end
   end
   --actions.generic+=/clawing_shadows,if=(buff.necrosis.up|buff.unholy_strength.react|rune>=2)&debuff.festering_wound.stack>=1&(debuff.festering_wound.stack>=3|!equipped.132448)&(cooldown.army_of_the_dead.remains>5|rune.time_to_4<=gcd)
   if S.ClawingShadows:IsCastable() and (Player:Buff(S.NecrosisBuff) or Player:Buff(S.UnholyStrength) or Player:Runes() >= 2) and Target:DebuffStack(S.FesteringWounds) >= 1 and (Target:DebuffStack(S.FesteringWounds) >= 3 or not I.InstructorsFourthLesson:IsEquipped()) and (S.ArmyOfDead:CooldownRemainsP() > 5 or Player:RuneTimeToX(4) <= Player:GCD()) then
-    if AR.Cast(S.ClawingShadows) then return ""; end
+    if HR.Cast(S.ClawingShadows) then return ""; end
   end
   --actions.generic+=/death_coil,if=(talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>10)|!talent.dark_arbiter.enabled
-  if (S.DeathCoil:IsUsable() and (S.DarkArbiter:IsAvailable() and S.DarkArbiter:CooldownRemainsP() > 10) or not S.DarkArbiter:IsAvailable()) or (S.DeathCoil:IsUsable() and not AR.CDsON()) then
-    if AR.Cast(S.DeathCoil) then return ""; end
+  if (S.DeathCoil:IsUsable() and (S.DarkArbiter:IsAvailable() and S.DarkArbiter:CooldownRemainsP() > 10) or not S.DarkArbiter:IsAvailable()) or (S.DeathCoil:IsUsable() and not HR.CDsON()) then
+    if HR.Cast(S.DeathCoil) then return ""; end
   end
   return;
 end
@@ -188,15 +188,15 @@ end
 local function DarkArbiter()
 --actions.valkyr=death_coil
  if S.DeathCoil:IsUsable() and (Player:Buff(S.SuddenDoom) or Player:RunicPower() >= 45) then
-  if AR.Cast(S.DeathCoil) then return ""; end
+  if HR.Cast(S.DeathCoil) then return ""; end
  end
  --actions.valkyr+=/arcane_torrent,if=runic_power<45|runic_power.deficit>20
   if S.ArcaneTorrent:IsCastable() and ( Player:RunicPower() < 45 or Player:RunicPowerDeficit() > 20 ) then
-  if AR.Cast(S.ArcaneTorrent, Settings.Unholy.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
+  if HR.Cast(S.ArcaneTorrent, Settings.Unholy.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
  end
  --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<6&cooldown.apocalypse.remains<3
  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 6  and S.Apocalypse:CooldownRemainsP() < 3 then
-  if AR.Cast(S.FesteringStrike) then return ""; end
+  if HR.Cast(S.FesteringStrike) then return ""; end
  end
  --actions.valkyr+=/call_action_list,name=aoe,if=active_enemies>=2
  if Cache.EnemiesCount[10] >= 2 then
@@ -204,15 +204,15 @@ local function DarkArbiter()
  end
  --actions.valkyr+=/festering_strike,if=debuff.festering_wound.stack<=4
  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWounds) <= 4 then
-  if AR.Cast(S.FesteringStrike) then return ""; end
+  if HR.Cast(S.FesteringStrike) then return ""; end
  end
  --actions.valkyr+=/clawing_shadows,if=debuff.festering_wound.up
  if S.ClawingShadows:IsCastable() and Target:Debuff(S.FesteringWounds) then
-  if AR.Cast(S.ClawingShadows) then return ""; end
+  if HR.Cast(S.ClawingShadows) then return ""; end
  end
  --actions.valkyr+=/scourge_strike,if=debuff.festering_wound.up
  if S.ScourgeStrike:IsCastable() and Target:Debuff(S.FesteringWounds) then
-  if AR.Cast(S.ScourgeStrike) then return ""; end
+  if HR.Cast(S.ScourgeStrike) then return ""; end
  end
   return;
 end
@@ -220,27 +220,27 @@ end
 local function DT()
   --actions.dt=dark_transformation,if=equipped.137075&talent.dark_arbiter.enabled&(talent.shadow_infusion.enabled|cooldown.dark_arbiter.remains>52)&cooldown.dark_arbiter.remains>30&!equipped.140806
   if S.DarkTransformation:IsCastable() and I.Taktheritrixs:IsEquipped() and S.DarkArbiter:IsAvailable() and (S.ShadowInfusion:IsAvailable() or S.DarkArbiter:CooldownRemainsP() > 52) and S.DarkArbiter:CooldownRemainsP() > 30 and not I.ConvergenceofFates:IsEquipped() then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if HR.Cast(S.DarkTransformation) then return ""; end
   end
   --actions.dt+=/dark_transformation,if=equipped.137075&(talent.shadow_infusion.enabled|cooldown.dark_arbiter.remains>(52*1.333))&equipped.140806&cooldown.dark_arbiter.remains>(30*1.333)
   if S.DarkTransformation:IsCastable() and I.Taktheritrixs:IsEquipped() and (S.ShadowInfusion:IsAvailable() or S.DarkArbiter:CooldownRemainsP() > (52 * 1.333)) and I.ConvergenceofFates:IsEquipped() and S.DarkArbiter:CooldownRemainsP() > (30 * 1.333) then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if HR.Cast(S.DarkTransformation) then return ""; end
   end
   --actions.dt+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.dark_arbiter.remains-8
   if S.DarkTransformation:IsCastable() and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.DarkArbiter:CooldownRemainsP() - 8 then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if HR.Cast(S.DarkTransformation) then return ""; end
   end
   --actions.dt+=/dark_transformation,if=equipped.137075&(talent.shadow_infusion.enabled|cooldown.summon_gargoyle.remains>55)&cooldown.summon_gargoyle.remains>35
   if S.DarkTransformation:IsCastable() and I.Taktheritrixs:IsEquipped() and (S.ShadowInfusion:IsAvailable() or S.SummonGargoyle:CooldownRemainsP() > 55) and S.SummonGargoyle:CooldownRemainsP() > 35 then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if HR.Cast(S.DarkTransformation) then return ""; end
   end
   --actions.dt+=/dark_transformation,if=equipped.137075&target.time_to_die<cooldown.summon_gargoyle.remains-8
   if S.DarkTransformation:IsCastable() and I.Taktheritrixs:IsEquipped() and Target:TimeToDie() < S.SummonGargoyle:CooldownRemainsP() - 8 then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if HR.Cast(S.DarkTransformation) then return ""; end
   end
   --actions.dt+=/dark_transformation,if=!equipped.137075&rune.time_to_4>=gcd
   if S.DarkTransformation:IsCastable() and not I.Taktheritrixs:IsEquipped() and Player:RuneTimeToX(4) >= Player:GCD() then
-    if AR.Cast(S.DarkTransformation) then return ""; end
+    if HR.Cast(S.DarkTransformation) then return ""; end
   end
 
   return;
@@ -248,20 +248,20 @@ end
 local function ColdHeart()
   --actions.cold_heart=chains_of_ice,if=buff.unholy_strength.remains<gcd&buff.unholy_strength.react&buff.cold_heart.stack>16
   if S.ChainsOfIce:IsCastable() and Player:BuffRemainsP(S.UnholyStrength) < Player:GCD() and Player:Buff(S.UnholyStrength) and Player:BuffStack(S.ColdHeartBuff) > 16 then
-    if AR.Cast(S.ChainsOfIce) then return ""; end
+    if HR.Cast(S.ChainsOfIce) then return ""; end
   end
   --actions.cold_heart+=/chains_of_ice,if=buff.master_of_ghouls.remains<gcd&buff.master_of_ghouls.up&buff.cold_heart.stack>17
   if S.ChainsOfIce:IsCastable() and Player:BuffRemainsP(S.MasterOfGhouls) < Player:GCD() and Player:Buff(S.MasterOfGhouls) and Player:BuffStack(S.ColdHeartBuff) > 17 then
-    if AR.Cast(S.ChainsOfIce) then return ""; end
+    if HR.Cast(S.ChainsOfIce) then return ""; end
   end
   --actions.cold_heart+=/chains_of_ice,if=buff.cold_heart.stack=20&buff.unholy_strength.react
   if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ColdHeartBuff) == 20 and Player:Buff(S.UnholyStrength) then
-    if AR.Cast(S.ChainsOfIce) then return ""; end
+    if HR.Cast(S.ChainsOfIce) then return ""; end
   end
   return;
 end
 local function Cooldowns()
-  if AR.CDsON() then
+  if HR.CDsON() then
     --actions.cooldowns=call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart.stack>10&!debuff.soul_reaper.up
     if I.ColdHeart:IsEquipped() and Player:BuffStack(S.ColdHeartBuff) >= 15 and not Target:Debuff(S.SoulReaperDebuff) then
       ShouldReturn = ColdHeart();
@@ -269,19 +269,19 @@ local function Cooldowns()
     end
     --actions.cooldowns+=/apocalypse,if=debuff.festering_wound.stack>=6
     if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 then
-      if AR.Cast(S.Apocalypse) then return ""; end
+      if HR.Cast(S.Apocalypse) then return ""; end
     end
     --actions.cooldowns+=/dark_arbiter,if=(!equipped.137075|cooldown.dark_transformation.remains<2)&runic_power.deficit<30
     if S.DarkArbiter:IsAvailable() and S.DarkArbiter:IsCastable() and (not I.Taktheritrixs:IsEquipped() or S.DarkTransformation:CooldownRemains() < 2) and Player:RunicPowerDeficit() < 30 then
-      if AR.Cast(S.DarkArbiter, Settings.Unholy.GCDasOffGCD.DarkArbiter) then return ""; end
+      if HR.Cast(S.DarkArbiter, Settings.Unholy.GCDasOffGCD.DarkArbiter) then return ""; end
     end
     --actions.cooldowns+=/summon_gargoyle,if=(!equipped.137075|cooldown.dark_transformation.remains<10)&rune.time_to_4>=gcd
     if S.SummonGargoyle:IsCastable() and (not I.Taktheritrixs:IsEquipped() or S.DarkTransformation:CooldownRemainsP() < 10) and Player:RuneTimeToX(4) >= Player:GCD() then
-      if AR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
+      if HR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
     end
     --actions.cooldowns+=/soul_reaper,if=(debuff.festering_wound.stack>=6&cooldown.apocalypse.remains<=gcd)|(debuff.festering_wound.stack>=3&rune>=3&cooldown.apocalypse.remains>20)
     if (S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 6 and S.Apocalypse:CooldownRemainsP() <= Player:GCD()) or (S.SoulReaper:IsAvailable() and S.SoulReaper:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 3 and S.Apocalypse:CooldownRemains() > 20) then
-      if AR.Cast(S.SoulReaper) then return ""; end
+      if HR.Cast(S.SoulReaper) then return ""; end
     end
   end
     --actions.cooldowns+=/call_action_list,name=dt,if=cooldown.dark_transformation.ready
@@ -309,22 +309,22 @@ local function APL()
     if not Player:AffectingCombat() then
     --check if we have our lovely pet with us
     if not Pet:IsActive() and S.SummonPet:IsCastable() then
-    if AR.Cast(S.SummonPet) then return ""; end
+    if HR.Cast(S.SummonPet) then return ""; end
     end
   --army suggestion at pull
-    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() and AR.CDsON() then
-          if AR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
+    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() and HR.CDsON() then
+          if HR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
     end
   -- outbreak if virulent_plague is not  the target and we are not in combat
     if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
-      if AR.Cast(S.Outbreak) then return ""; end
+      if HR.Cast(S.Outbreak) then return ""; end
     end
       return;
     end
     --InCombat
       --actions+=/outbreak,target_if=(dot.virulent_plague.tick_time_remains+tick_time<=dot.virulent_plague.remains)&dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsUsable() and not Target:Debuff(S.VirulentPlagueDebuff) or Target:DebuffRemainsP(S.VirulentPlagueDebuff) < Player:GCD()*1.5 then
-      if AR.Cast(S.Outbreak) then return ""; end
+      if HR.Cast(S.Outbreak) then return ""; end
     end
     --Lets call specific APLs
     if Everyone.TargetIsValid()  then
@@ -345,7 +345,7 @@ local function APL()
   end
 end
 
-AR.SetAPL(252, APL);
+HR.SetAPL(252, APL);
 --- ====27/11/2017======
 --- ======= SIMC =======
 --# Default consumables
