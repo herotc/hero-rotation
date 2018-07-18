@@ -34,7 +34,6 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 - Solo Mode to prioritize survivability over DPS. (If implemented in the rotation)
 
 ## Supported Rotations
-[![Spec](https://img.shields.io/badge/Spec-OK-brightgreen.svg)]() [![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg)]() [![Spec](https://img.shields.io/badge/Spec-Outdated-red.svg)]()
 | Class        | Specs                                                                                 |                                                                                   |                                                                                 |
 | :---         | :---                                                                                  | :---                                                                              | :---                                                                            |
 | Death Knight | [![Blood](https://img.shields.io/badge/Blood-Outdated-red.svg)]()                   | [![Frost](https://img.shields.io/badge/Frost-Outdated-red.svg)]()               | [![Unholy](https://img.shields.io/badge/Unholy-Outdated-red.svg)]()           |
@@ -49,6 +48,8 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 | Shaman       | [![Elemental](https://img.shields.io/badge/Elemental-Outdated-red.svg)]()           | [![Enhancement](https://img.shields.io/badge/Enhancement-Outdated-red.svg)]()   |                                                                                 |
 | Warlock      | [![Affliction](https://img.shields.io/badge/Affliction-Outdated-red.svg)]()         | [![Demonology](https://img.shields.io/badge/Demonology-Outdated-red.svg)]()     | [![Destruction](https://img.shields.io/badge/Destruction-Outdated-red.svg)]() |
 | Warrior      | [![Arms](https://img.shields.io/badge/Arms-Outdated-red.svg)]()                     | [![Fury](https://img.shields.io/badge/Fury-Outdated-red.svg)]()                 |                                                                                 |
+
+[![Spec](https://img.shields.io/badge/Spec-OK-brightgreen.svg)]() [![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg)]() [![Spec](https://img.shields.io/badge/Spec-Outdated-red.svg)]()
 
 ## Support the team
 | Name                                        | Maintaining                    | Since     | Donate                                                                                                    | Watch                                                                                                |
