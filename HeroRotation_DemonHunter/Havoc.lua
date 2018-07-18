@@ -279,7 +279,7 @@ local function APL()
       if HR.Cast(S.VengefulRetreat) then return "Cast Vengeful Retreat (Momentum)"; end
     end
     -- fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
-    if S.FelRush:IsCastable(20, true) and (S.Momentum:IsAvailable() or S.FelMastery:IsAvailable()) then
+    if S.FelRush:IsCastable(20, true) and (WaitingForMomentum() or S.FelMastery:IsAvailable()) then
       if CastFelRush() then return "Cast Fel Rush (Momentum)"; end
     end
     -- fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
