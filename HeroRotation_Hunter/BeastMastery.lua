@@ -129,9 +129,6 @@ local function APL ()
       if HR.CDsON() and S.BestialWrath:IsCastable() and not Player:Buff(S.BestialWrath) then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.OffGCDasOffGCD.BestialWrath) then return ""; end
       end
-      -- if S.BardedShot:IsCastable() then
-      --   if HR.Cast(S.BardedShot) then return; end
-      -- end
       if S.KillCommand:IsCastable() then
         if HR.Cast(S.KillCommand) then return; end
       end
@@ -178,7 +175,7 @@ local function APL ()
       if HR.CastSuggested(I.PotionOfProlongedPower) then return ""; end
     end
     -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-    if S.BardedShot:IsCastable() and Pet:BuffRemains(S.Frenzy) and (Pet:BuffRemains(S.Frenzy) < Player:GCD() * 1.5) then
+    if S.BardedShot:IsCastable() and (Pet:Buff(S.Frenzy) and (Pet:BuffRemains(S.Frenzy) < Player:GCD() * 1.5)) then
         if HR.Cast(S.BardedShot) then return ""; end
     end
     -- actions+=/a_murder_of_crows
