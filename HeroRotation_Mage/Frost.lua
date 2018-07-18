@@ -299,8 +299,8 @@ local function APL()
     if HR.Cast(S.IceLance) then return ""; end
   end
   -- time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(cooldown.icy_veins.remains<1|target.time_to_die<50)
-  if S.TimeWarp:IsCastableP() and (Player:HasNotHeroism() and (Player:BuffDownP(S.ExhaustionBuff) or I.ShardoftheExodar:IsEquipped()) and (S.IcyVeins:CooldownRemainsP() < 1 or Target:TimeToDie() < 50)) then
-    if HR.Cast(S.TimeWarp) then return ""; end
+--  if S.TimeWarp:IsCastableP() and (Player:HasNotHeroism() and (Player:BuffDownP(S.ExhaustionBuff) or I.ShardoftheExodar:IsEquipped()) and (S.IcyVeins:CooldownRemainsP() < 1 or Target:TimeToDie() < 50)) then
+--    if HR.Cast(S.TimeWarp) then return ""; end
   end
   -- call_action_list,name=cooldowns
   if (true) then
