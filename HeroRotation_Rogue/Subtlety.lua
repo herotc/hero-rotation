@@ -73,6 +73,7 @@ local tableinsert = table.insert;
     KidneyShot                            = Spell(408),
     Sprint                                = Spell(2983),
     -- Misc
+    TheDreadlordsDeceit                   = Spell(228224),
     PoolEnergy                            = Spell(9999000010)
   };
   local S = Spell.Rogue.Subtlety;
@@ -175,8 +176,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
         if HR.Cast(S.Nightblade) then return "Cast Nightblade 1"; end
       end
     end
-    -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
-    if HR.AoEON() and Cache.EnemiesCount[10] >= 2 and not ShadowDanceBuff then
+    -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(spell_targets.shuriken_storm<=5|talent.secret_technique.enabled)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
+    if HR.AoEON() and Cache.EnemiesCount[10] >= 2 and not ShadowDanceBuff
+      and (Cache.EnemiesCount[10] <= 5 or S.SecretTechnique:IsAvailable()) then
       local BestUnit, BestUnitTTD = nil, 5 + 2 * Player:ComboPoints();
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Nightblade))
@@ -390,8 +392,8 @@ end
 
 -- # Builders
 local function Build ()
-  -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
-  if HR.AoEON() and S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 2 then
+  -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2|buff.the_dreadlords_deceit.stack>=29
+  if HR.AoEON() and S.ShurikenStorm:IsCastableP() and (Cache.EnemiesCount[10] >= 2 or Player:BuffStackP(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
   end
   -- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=19
@@ -586,7 +588,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-07-09
+-- Last Update: 2018-07-18
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -655,8 +657,8 @@ HR.SetAPL(261, APL);
 -- # Finishers
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
--- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic.
--- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
+-- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic if you have less then 6 targets or play with Secret Technique.
+-- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(spell_targets.shuriken_storm<=5|talent.secret_technique.enabled)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
 -- # Secret Technique during Symbols. With Dark Shadow and multiple targets also only during Shadow Dance (until threshold in next line).
@@ -666,7 +668,7 @@ HR.SetAPL(261, APL);
 -- actions.finish+=/eviscerate
 --
 -- # Builders
--- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2
+-- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2|buff.the_dreadlords_deceit.stack>=29
 -- #actions.build+=/shuriken_toss,if=buff.sharpened_blades.stack>=39
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab

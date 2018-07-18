@@ -67,6 +67,7 @@ Spell.Rogue.Assassination = {
   WoundPoison           = Spell(8679),
   WoundPoisonDebuff     = Spell(8680),
   -- Misc
+  TheDreadlordsDeceit   = Spell(208693),
   PoolEnergy            = Spell(9999000010)
 };
 local S = Spell.Rogue.Assassination;
@@ -323,6 +324,10 @@ local function Stealthed ()
     and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
     if HR.Cast(S.Garrote) then return "Cast Garrote"; end
   end
+  -- actions.stealthed+=/fan_of_knives,if=spell_targets>=3
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and Cache.EnemiesCount[10] >= 3 then
+    if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
+  end
   -- actions.stealthed+=/mutilate
   if S.Mutilate:IsCastable("Melee") then
     if HR.Cast(S.Mutilate) then return "Cast Mutilate"; end
@@ -399,8 +404,8 @@ local function Direct ()
   -------------------------------------------------------------------
   -------------------------------------------------------------------
 
-  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2)
-  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2) then
+  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2|buff.the_dreadlords_deceit.stack>=29)
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2 or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
   end
   -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
@@ -521,7 +526,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-07-14
+-- Last Update: 2018-07-18
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -576,6 +581,7 @@ HR.SetAPL(259, APL);
 -- actions.stealthed+=/rupture,if=talent.nightstalker.enabled&target.time_to_die-remains>6
 -- actions.stealthed+=/envenom,if=combo_points>=cp_max_spend
 -- actions.stealthed+=/garrote,if=!talent.subterfuge.enabled&target.time_to_die-remains>4
+-- actions.stealthed+=/fan_of_knives,if=spell_targets>=3
 -- actions.stealthed+=/mutilate
 --
 -- # Damage over time abilities
@@ -593,7 +599,7 @@ HR.SetAPL(259, APL);
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
 -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
--- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2)
+-- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2|buff.the_dreadlords_deceit.stack>=29)
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
 -- actions.direct+=/mutilate,if=variable.use_filler
 
