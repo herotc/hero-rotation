@@ -239,7 +239,7 @@ local function CDs ()
     end
     -- actions.cds+=/vendetta,if=dot.rupture.ticking
     if S.Vendetta:IsCastable() and Target:DebuffP(S.Rupture) then
-      if HR.Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
+      if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
     end
     if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
       if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= Rogue.CPMaxSpend() then
@@ -505,11 +505,11 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
     if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
     end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastableP("Melee") then
-      if HR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
+      if HR.Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse"; end
     end
     -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
     if S.PoisonedKnife:IsCastable(30) and not Player:IsStealthed(true, true)

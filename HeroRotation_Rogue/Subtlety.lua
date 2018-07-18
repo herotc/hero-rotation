@@ -338,7 +338,7 @@ local function CDs ()
       -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
       if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
         and Player:ComboPointsDeficit() >= 2 + num(Player:IsStealthed(true, true)) then
-        if HR.Cast(S.ShadowBlades) then return "Cast Shadow Blades"; end
+        if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades"; end
       end
       -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&dot.nightblade.ticking&buff.symbols_of_death.up&buff.shadow_dance.up
       if S.ShurikenTornado:IsCastableP() and Cache.EnemiesCount[10] >= 3 and Target:DebuffP(S.Nightblade) and Player:BuffP(S.SymbolsofDeath) and Player:BuffP(S.ShadowDanceBuff) then
@@ -567,11 +567,11 @@ local function APL ()
       -- # Lowest priority in all of the APL because it causes a GCD
       -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
       if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
-        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
       end
       -- actions+=/arcane_pulse
       if S.ArcanePulse:IsCastableP() and IsInMeleeRange() then
-        if HR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
+        if HR.Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse"; end
       end
 
       -- Shuriken Toss Out of Range

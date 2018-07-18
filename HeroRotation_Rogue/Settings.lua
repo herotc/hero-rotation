@@ -24,6 +24,7 @@
       StealthOOC = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+        Racials = true,
         CrimsonVial = true,
         Feint = true,
       },
@@ -50,11 +51,10 @@
       RangedMultiDoT = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+        Vendetta = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        -- Abilities
-        Vendetta = true,
       }
     },
     Outlaw = {
@@ -65,13 +65,11 @@
       RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+        AdrenalineRush = true,
+        BladeFlurry = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        -- Abilities
-        AdrenalineRush = true,
-        CurseoftheDreadblades = true,
-        BladeFlurry = true,
       }
     },
     Subtlety = {
@@ -83,11 +81,11 @@
       STMfDAsDPSCD = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+        ShadowBlades = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        ShadowBlades = true,
         SymbolsofDeath = true,
         ShadowDance = true,
       },
