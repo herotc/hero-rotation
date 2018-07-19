@@ -28,6 +28,7 @@ local tableinsert = table.insert;
     ArcaneTorrent                         = Spell(50613),
     Berserking                            = Spell(26297),
     BloodFury                             = Spell(20572),
+    LightsJudgment                        = Spell(255647),
     Shadowmeld                            = Spell(58984),
     -- Abilities
     Backstab                              = Spell(53),
@@ -566,12 +567,16 @@ local function APL ()
 
       -- # Lowest priority in all of the APL because it causes a GCD
       -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
-      if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
+      if S.ArcaneTorrent:IsCastableP("Melee") and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
         if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
       end
       -- actions+=/arcane_pulse
-      if S.ArcanePulse:IsCastableP() and IsInMeleeRange() then
+      if S.ArcanePulse:IsCastableP("Melee") then
         if HR.Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse"; end
+      end
+      -- actions+=/lights_judgment
+      if S.LightsJudgment:IsCastableP("Melee") then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
       end
 
       -- Shuriken Toss Out of Range
@@ -588,7 +593,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-07-18
+-- Last Update: 2018-07-19
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -619,12 +624,12 @@ HR.SetAPL(261, APL);
 -- # Lowest priority in all of the APL because it causes a GCD
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
+-- actions+=/lights_judgment
 --
 -- # Cooldowns
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|(buff.vanish.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=30))
 -- actions.cds+=/blood_fury,if=stealthed.rogue
 -- actions.cds+=/berserking,if=stealthed.rogue
--- actions.cds+=/lights_judgment,if=stealthed.rogue
 -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
@@ -657,7 +662,7 @@ HR.SetAPL(261, APL);
 -- # Finishers
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
--- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic if you have less then 6 targets or play with Secret Technique.
+-- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic if you have less than 6 targets or play with Secret Technique.
 -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(spell_targets.shuriken_storm<=5|talent.secret_technique.enabled)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
