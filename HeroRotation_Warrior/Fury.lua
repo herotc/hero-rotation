@@ -105,7 +105,7 @@ local HR = HeroRotation;
       if HR.Cast(S.Siegebreaker) then return ""; end
     end
     -- actions.single_target+=/rampage,if=buff.recklessness.up|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
-    if S.Rampage:IsReady() and ((Player:Rage() >= 85 or (S.Carnage:IsAvailable() and Player:Rage() >= 75)) and Player:Buff(S.Recklessness) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.Enrage) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.Enrage) < Player:GCD() or Player:Rage() > 90))) then
+    if S.Rampage:IsReady() and (Player:Buff(S.Recklessness) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.Enrage) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.Enrage) < Player:GCD() or Player:Rage() > 90))) then
       if HR.Cast(S.Rampage) then return ""; end
     end
     -- actions.single_target+=/execute,if=buff.enrage.up
@@ -178,7 +178,7 @@ local function APL ()
     if HR.Cast(S.Bloodthirst) then return ""; end
   end
   -- actions+=/rampage,if=cooldown.recklessness.remains<3
-  if S.Rampage:IsReady() and (Player:Rage() >= 85 or (S.Carnage:IsAvailable() and Player:Rage() >= 75) and S.Recklessness:CooldownRemainsP() < 3 then
+  if S.Rampage:IsReady() and S.Recklessness:CooldownRemainsP() < 3 then
     if HR.Cast(S.Rampage) then return ""; end
   end
   -- actions+=/recklessness
