@@ -33,7 +33,7 @@ local HR = HeroRotation;
     BerserkerRage                 = Spell(18499),
     Bloodthirst                   = Spell(23881),
     Charge                        = Spell(100),
-    Execute                       = Spell(5308),
+    Execute                       = Spell(280735),
     HeroicLeap                    = Spell(6544),
     HeroicThrow                   = Spell(57755),
     RagingBlow                    = Spell(85288),
@@ -62,6 +62,8 @@ local HR = HeroRotation;
     AngerManagement               = Spell(152278),
     Siegebreaker                  = Spell(280772),
     SiegebreakerDebuff            = Spell(280773),
+    SuddenDeath                   = Spell(280721),
+    SuddenDeathBuff               = Spell(280776),
     -- Defensive
     -- Utility
     Pummel                         = Spell(6552),
@@ -153,7 +155,19 @@ local function APL ()
   HL.GetEnemies(8);
   HL.GetEnemies(10);
   Everyone.AoEToggleEnemiesUpdate();
-
+  -- Out of Combat
+  if not Player:AffectingCombat() and not Player:IsCasting() then
+    -- Buff
+    if S.BattleShout:IsCastable() and not Player:Buff(S.BattleShout) then
+      if HR.Cast(S.BattleShout) then return ""; end
+    end
+    -- Reset Combat Variables
+    -- Flask
+    -- Food
+    -- Rune
+    -- PrePot w/ Bossmod Countdown
+    -- Opener
+  end
   --- In Combat
   if Everyone.TargetIsValid() then
   -- actions+=/charge
