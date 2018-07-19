@@ -64,6 +64,7 @@ local HR = HeroRotation;
     SiegebreakerDebuff            = Spell(280773),
     SuddenDeath                   = Spell(280721),
     SuddenDeathBuff               = Spell(280776),
+    SuddenDeathBuffLeg            = Spell(225947),
     -- Defensive
     -- Utility
     Pummel                         = Spell(6552),
