@@ -47,7 +47,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 | Rogue        | [![Assassination](https://img.shields.io/badge/Assassination-WIP-orange.svg)]()       | [![Outlaw](https://img.shields.io/badge/Outlaw-WIP-orange.svg)]()                 | [![Subtlety](https://img.shields.io/badge/Subtlety-WIP-orange.svg)]()           |
 | Shaman       | [![Elemental](https://img.shields.io/badge/Elemental-Outdated-red.svg)]()             | [![Enhancement](https://img.shields.io/badge/Enhancement-Outdated-red.svg)]()     |                                                                                 |
 | Warlock      | [![Affliction](https://img.shields.io/badge/Affliction-Outdated-red.svg)]()           | [![Demonology](https://img.shields.io/badge/Demonology-Outdated-red.svg)]()       | [![Destruction](https://img.shields.io/badge/Destruction-Outdated-red.svg)]()   |
-| Warrior      | [![Arms](https://img.shields.io/badge/Arms-Outdated-red.svg)]()                       | [![Fury](https://img.shields.io/badge/Fury-Outdated-red.svg)]()                   |                                                                                 |
+| Warrior      | [![Arms](https://img.shields.io/badge/Arms-Outdated-red.svg)]()                       | [![Fury](https://img.shields.io/badge/Fury-WIP-orange.svg)]()                   |                                                                                 |
 
 [![Spec](https://img.shields.io/badge/Spec-OK-brightgreen.svg)]() [![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg)]() [![Spec](https://img.shields.io/badge/Spec-Outdated-red.svg)]()
 
