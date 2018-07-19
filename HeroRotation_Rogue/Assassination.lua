@@ -26,6 +26,7 @@ Spell.Rogue.Assassination = {
   ArcaneTorrent         = Spell(25046),
   Berserking            = Spell(26297),
   BloodFury             = Spell(20572),
+  LightsJudgment        = Spell(255647),
   -- Abilities
   Envenom               = Spell(32645),
   FanofKnives           = Spell(51723),
@@ -504,12 +505,16 @@ local function APL ()
     ShouldReturn = Direct();
     if ShouldReturn then return ShouldReturn; end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
-    if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
+    if S.ArcaneTorrent:IsCastableP("Melee") and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
     end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastableP("Melee") then
       if HR.Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse"; end
+    end
+    -- actions+=/lights_judgment
+    if S.LightsJudgment:IsCastableP("Melee") then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
     end
     -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
     if S.PoisonedKnife:IsCastable(30) and not Player:IsStealthed(true, true)
@@ -526,7 +531,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-07-18
+-- Last Update: 2018-07-19
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -546,6 +551,7 @@ HR.SetAPL(259, APL);
 -- actions+=/call_action_list,name=direct
 -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
 -- actions+=/arcane_pulse
+-- actions+=/lights_judgment
 --
 -- # Potion
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
@@ -553,7 +559,6 @@ HR.SetAPL(259, APL);
 -- # Racials
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
--- actions.cds+=/lights_judgment,if=debuff.vendetta.up
 --
 -- # Cooldowns
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)

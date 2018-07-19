@@ -49,12 +49,14 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        DragonRoar = true,
+        Bladestorm = false,
+        DragonRoar = false,
+        Recklessness = false,
+        Siegebreaker = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        Bloodbath = true,
         -- Items
         PotionoftheOldWar = true,
         PotionOfProlongedPower = true,

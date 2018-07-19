@@ -228,19 +228,19 @@
           if HR.Cast(S.ArcaneTorrent, Settings.Marksmanship.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/berserking,if=cooldown.trueshot.remains>30
-        if S.Berserking:IsCastable() and S.BestialWrath:CooldownRemains() > 30 then
+        if S.Berserking:IsCastable() and S.TrueShot:CooldownRemains() > 30 then
           if HR.Cast(S.Berserking, Settings.Marksmanship.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/blood_fury,if=cooldown.trueshot.remains>30
-        if S.BloodFury:IsCastable() and S.BestialWrath:CooldownRemains() > 30 then
+        if S.BloodFury:IsCastable() and S.TrueShot:CooldownRemains() > 30 then
           if HR.Cast(S.BloodFury, Settings.Marksmanship.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/ancestral_call,if=cooldown.trueshot.remains>30
-        if S.AncestralCall:IsCastable() and S.BestialWrath:CooldownRemains() > 30 then
+        if S.AncestralCall:IsCastable() and S.TrueShot:CooldownRemains() > 30 then
           if HR.Cast(S.AncestralCall, Settings.Marksmanship.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/fireblood,if=cooldown.trueshot.remains>30
-        if S.Fireblood:IsCastable() and S.BestialWrath:CooldownRemains() > 30 then
+        if S.Fireblood:IsCastable() and S.TrueShot:CooldownRemains() > 30 then
           if HR.Cast(S.Fireblood, Settings.Marksmanship.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/lights_judgment

@@ -29,6 +29,7 @@ local tostring = tostring;
     ArcaneTorrent                   = Spell(25046),
     Berserking                      = Spell(26297),
     BloodFury                       = Spell(20572),
+    LightsJudgment                  = Spell(255647),
     Shadowmeld                      = Spell(58984),
     -- Abilities
     AdrenalineRush                  = Spell(13750),
@@ -418,12 +419,16 @@ local function APL ()
     ShouldReturn = Build();
     if ShouldReturn then return "Build: " .. ShouldReturn; end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
-    if S.ArcaneTorrent:IsCastable() and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
+    if S.ArcaneTorrent:IsCastableP(S.SaberSlash) and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
     end
     -- actions+=/arcane_pulse
-    if S.ArcanePulse:IsCastable(S.SaberSlash) then
+    if S.ArcanePulse:IsCastableP(S.SaberSlash) then
       if HR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
+    end
+    -- actions+=/lights_judgment
+    if S.LightsJudgment:IsCastableP(S.SaberSlash) then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
     end
     -- OutofRange Pistol Shot
     if not Target:IsInRange(10) and S.PistolShot:IsCastable(20) and not Player:IsStealthed(true, true)
@@ -435,7 +440,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2018-07-10
+-- Last Update: 2018-07-19
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -463,12 +468,12 @@ HR.SetAPL(260, APL);
 -- actions+=/call_action_list,name=build
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
+-- actions+=/lights_judgment
 
 -- # Cooldowns
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
--- actions.cds+=/lights_judgment
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- actions.cds+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
