@@ -33,7 +33,8 @@ local HR = HeroRotation;
     BerserkerRage                 = Spell(18499),
     Bloodthirst                   = Spell(23881),
     Charge                        = Spell(100),
-    Execute                       = Spell(280735),
+    Execute                       = Spell(5308),
+    ExecuteMassacre               = Spell(280735),
     HeroicLeap                    = Spell(6544),
     HeroicThrow                   = Spell(57755),
     RagingBlow                    = Spell(85288),
@@ -114,6 +115,9 @@ local HR = HeroRotation;
     -- actions.single_target+=/execute,if=buff.enrage.up
     if S.Execute:IsReady() and Player:Buff(S.Enrage) then
       if HR.Cast(S.Execute) then return ""; end
+    end
+    if S.ExecuteMassacre:IsReady() and Player:Buff(S.Enrage) then
+      if HR.Cast(S.ExecuteMassacre) then return ""; end
     end
     -- actions.single_target+=/bloodthirst,if=buff.enrage.down
     if S.Bloodthirst:IsCastable() and not Player:Buff(S.Enrage) then
