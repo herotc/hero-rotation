@@ -1,8 +1,8 @@
 REM Modify the two vars so it match you own setup. Make sure you have it surrounded by double quotes
 REM WoWRep  : World of warcraft main directory
 REM GHRep   : Where you github project are stored (by default in mydocuments/Github)
-set WoWRep="D:\World of Warcraft"
-set GHRep="D:\My documents\GitHub"
+set WoWRep="C:\World of Warcraft"
+set GHRep="C:\Users\Chris\Desktop\GitHub"
 
 
 REM don't touch anything bellow this
