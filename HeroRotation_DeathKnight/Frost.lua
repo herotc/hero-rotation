@@ -369,7 +369,7 @@
       -- actions.cooldowns+=/berserking,if=buff.pillar_of_frost.up
       -- # Frost cooldowns
       -- actions.cooldowns+=/pillar_of_frost,if=cooldown.empower_rune_weapon.remains
-      if S.PillarOfFrost:IsCastableP() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 then
+      if S.PillarOfFrost:IsCastableP() and S.EmpowerRuneWeapon:CooldownDown() then
         if HR.Cast(S.PillarOfFrost, Settings.DeathKnight.Frost.GCDasOffGCD.PillarOfFrost) then return ""; end
       end
       -- actions.cooldowns+=/empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10
@@ -394,7 +394,7 @@
             --[[END OF COLD HEART APL]] --
         end
         -- actions.cooldowns+=/frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up)
-        if S.FrostwyrmsFury:IsCastable() and Player:BuffRemainsP(S.PillarOfFrost) <= Player:GCD() * 2 and Player:Buff(S.PillarOfFrost) then
+        if S.FrostwyrmsFury:IsCastable() and Player:BuffRemains(S.PillarOfFrost) <= Player:GCD() * 2 and Player:Buff(S.PillarOfFrost) then
             if HR.CastSuggested(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
         end
 
