@@ -42,15 +42,14 @@
         -- Abilities
         ArmyOfDead     = true,
         SummonGargoyle = true,
-        DarkArbiter    = true
+        UnholyFrenzy   = false,
+        SoulReaper     = false
       },
       OffGCDasOffGCD = {
         -- Racials
         ArcaneTorrent      = true,
         Berserking         = true,
-        BloodFury          = true,
-        -- Abilities
-        BlightedRuneWeapon = true
+        BloodFury          = true
        }
      },
     Blood = {

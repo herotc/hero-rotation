@@ -476,7 +476,10 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=aoe,if=active_enemies>=2
-    -- TODO: AoE Rotation
+    if not pooling and Cache.EnemiesCount[10] >= 2 then
+      ShouldReturn = AOE();
+      if ShouldReturn then return ShouldReturn; end
+    end
     --actions+=/call_action_list,name=standard
     if not pooling then
         ShouldReturn = Standard();
