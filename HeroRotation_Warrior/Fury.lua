@@ -42,6 +42,7 @@ local HR = HeroRotation;
     Recklessness                  = Spell(1719),
     VictoryRush                   = Spell(34428),
     Whirlwind                     = Spell(190411),
+    WhirlwindBuff                 = Spell(85739),
     Enrage                        = Spell(184362),
     -- Talents
     WarMachine                    = Spell(262231),
@@ -149,6 +150,7 @@ local HR = HeroRotation;
     end
     -- actions.single_target+=/whirlwind
     if S.Whirlwind:IsCastable() then
+      print('2');
       if HR.Cast(S.Whirlwind) then return ""; end
     end
     return false;
@@ -211,7 +213,8 @@ local function APL ()
     if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return ""; end
   end
   -- actions+=/whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
-  if HR.AoEON() and S.Whirlwind:IsCastable() and Cache.EnemiesCount[8] > 1 and not Player:Buff(S.MeatCleaver) then
+  if HR.AoEON() and S.Whirlwind:IsCastable() and (Cache.EnemiesCount[8] > 1 and not Player:Buff(S.WhirlwindBuff)) then
+    print('1');
     if HR.Cast(S.Whirlwind) then return ""; end
   end
   if HR.CDsON() then
