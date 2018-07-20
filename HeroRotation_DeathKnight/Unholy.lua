@@ -108,11 +108,6 @@
     --(cooldown.summon_gargoyle.remains<5&(cooldown.dark_transformation.remains<5|!equipped.137075))&talent.summon_gargoyle.enabled
     return (S.SummonGargoyle:CooldownRemains() < 5 and (S.DarkTransformation:CooldownRemains() < 5 or not I.Taktheritrixs:IsEquipped())) and S.SummonGargoyle:IsAvailable()
   end
-  function Player:RuneDeficit()
-    local RunesMax = 6;
-    return RunesMax - self:Runes()
-  end
-
 
   --- ===== APL =====
   --- ===============
@@ -150,7 +145,7 @@
     if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- death_coil,if=buff.sudden_doom.react&rune.deficit>=4
-  if S.DeathCoil:IsUsable() and Player:BuffStack(S.SuddenDoom) and Player:RuneDeficit() >= 4 then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and Player:Runes() <= 2 then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   return false;
@@ -159,7 +154,7 @@ end
 
  local function Generic()
   -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
-  if S.DeathCoil:IsUsable() and Player:BuffStack(S.SuddenDoom) and not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22 then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22 then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
