@@ -126,11 +126,11 @@
     if HR.Cast(S.Defile) then return ""; end
   end
   -- epidemic,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
-  if S.Epidemic:IsCastable() and Player:Buff(S.DeathAndDecayBuff) and Player:Rune() < 2 and not PoolingForGargoyle() then
+  if S.Epidemic:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
   end
   -- death_coil,if=death_and_decay.ticking&rune<2&!talent.epidemic.enabled&!variable.pooling_for_gargoyle
-  if S.DeathCoil:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Rune() < 2 and not S.Epidemic:IsAvailable() and notPoolingForGargoyle() then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not S.Epidemic:IsAvailable() and not PoolingForGargoyle() then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
@@ -142,7 +142,7 @@
     if HR.Cast(S.ClawingShadows) then return ""; end
   end
   -- epidemic,if=!variable.pooling_for_gargoyle
-  if S.Epidemic:IsCastable() and not PoolingForGargoyle() then
+  if S.Epidemic:IsUsable() and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
   end
   -- festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
