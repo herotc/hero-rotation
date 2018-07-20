@@ -27,15 +27,14 @@
         HornOfWinter       = true,
         FrostwyrmsFury    = true,
         ArcaneTorrent       = true,
+        PillarOfFrost       = true,
+        EmpowerRuneWeapon   = true,
         BreathofSindragosa = true
       },
       OffGCDasOffGCD = {
         -- Racials
         Berserking          = true,
-        BloodFury           = true,
-        -- Abilities
-        PillarOfFrost       = true,
-        EmpowerRuneWeapon   = true
+        BloodFury           = true
       }
     },
     Unholy = {

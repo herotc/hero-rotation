@@ -138,7 +138,7 @@
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse.enabled
-    if S.Obliterate:IsCastableP() and (not Player:BuffP(S.FrozenPulseBuff) and S.FrozenPulse:IsAvailable()) then
+    if S.Obliterate:IsCastableP() and Player:Runes() > 3 and S.FrozenPulse:IsAvailable() then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- frost_strike,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
@@ -370,15 +370,15 @@
       -- # Frost cooldowns
       -- actions.cooldowns+=/pillar_of_frost,if=cooldown.empower_rune_weapon.remains
       if S.PillarOfFrost:IsCastableP() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 then
-        if HR.Cast(S.PillarOfFrost, Settings.DeathKnight.Frost.OffGCDasOffGCD.PillarOfFrost) then return ""; end
+        if HR.Cast(S.PillarOfFrost, Settings.DeathKnight.Frost.GCDasOffGCD.PillarOfFrost) then return ""; end
       end
       -- actions.cooldowns+=/empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10
-      if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:IsReady() and not S.BreathofSindragosa:IsAvailable() and Player:RuneTimeToX(5) < Player:GCD() and Player:RunicPowerDeficit() >= 40 then
-        if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
+      if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and not S.BreathofSindragosa:IsAvailable() and Player:RuneTimeToX(5) < Player:GCD() and Player:RunicPowerDeficit() >= 40 then
+        if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
       -- actions.cooldowns+=/empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
-      if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:IsReady() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
-        if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.OffGCDasOffGCD.EmpowerRuneWeapon) then return ""; end
+      if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
+        if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
       -- actions.cooldowns+=/call_action_list,name=cold_heart,if=(equipped.cold_heart|talent.cold_heart.enabled)&(((buff.cold_heart_item.stack>=10|buff.cold_heart_talent.stack>=10)&debuff.razorice.stack=5)|target.time_to_die<=gcd)
       if (S.ColdHeartTalent:IsAvailable() or I.ColdHeart:IsEquipped()) and (((Player:BuffStack(S.ColdHeartBuff) >= 10 or Player:BuffStack(S.ColdHeartItemBuff) >= 10) and Target:DebuffStack(S.RazorIce) == 5) or Target:TimeToDie() <= Player:GCD()) then
@@ -394,8 +394,8 @@
             --[[END OF COLD HEART APL]] --
         end
         -- actions.cooldowns+=/frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up)
-        if S.FrostwyrmsFury:IsCastable() and Player:BuffRemainsP(S.PillarOfFrost) <= Player:GCD() and Player:Buff(S.PillarOfFrost) then
-            if HR.Cast(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
+        if S.FrostwyrmsFury:IsCastable() and Player:BuffRemainsP(S.PillarOfFrost) <= Player:GCD() * 2 and Player:Buff(S.PillarOfFrost) then
+            if HR.CastSuggested(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
         end
 
         return false;
@@ -449,7 +449,7 @@ local function APL ()
         if HR.Cast(S.FrostStrike) then return ""; end
     end
     --actions+=/breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
-    if S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() and S.PillarOfFrost:CooldownRemainsP() then
+    if S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
         if HR.Cast(S.BreathofSindragosa, Settings.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa) then return ""; end
     end
     --actions+=/call_action_list,name=cooldowns
