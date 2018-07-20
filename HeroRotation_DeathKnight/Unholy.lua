@@ -28,7 +28,7 @@
     BloodFury                     = Spell(20572),
     GiftoftheNaaru                = Spell(59547),
     --Abilities
-    ArmyOfDead                    = Spell(42650),
+    ArmyOfTheDead                 = Spell(42650),
     Apocalypse                    = Spell(275699),
     ChainsOfIce                   = Spell(45524),
     ScourgeStrike                 = Spell(55090),
@@ -61,8 +61,7 @@
     UnholyStrength                = Spell(53365),
     DeathAndDecayBuff             = Spell(188290),
     --Debuffs
-    SoulReaperDebuff              = Spell(130736),
-    FesteringWounds               = Spell(194310), --max 8 stacks
+    FesteringWound                = Spell(194310), --max 8 stacks
     VirulentPlagueDebuff          = Spell(191587), -- 13s debuff from Outbreak
     --Defensives
     AntiMagicShell                = Spell(48707),
@@ -170,11 +169,11 @@ end
     if HR.Cast(S.Defile) then return ""; end
   end
   -- scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
-  if S.ScourgeStrike:IsCastable() and (((Target:Debuff(S.FesteringWounds) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWounds) > 4) and S.ArmyOfDead:CooldownRemainsP() > 5) then
+  if S.ScourgeStrike:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and S.ArmyOfTheDead:CooldownRemainsP() > 5) then
     if HR.Cast(S.ScourgeStrike) then return ""; end
   end
   -- clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
-  if S.ClawingShadows:IsCastable() and (((Target:Debuff(S.FesteringWounds) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWounds) > 4) and S.ArmyOfDead:CooldownRemainsP() > 5) then
+  if S.ClawingShadows:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and S.ArmyOfTheDead:CooldownRemainsP() > 5) then
     if HR.Cast(S.ClawingShadows) then return ""; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
@@ -182,7 +181,7 @@ end
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&cooldown.army_of_the_dead.remains>5
-  if S.FesteringStrike:IsCastable() and (((((Target:DebuffStack(S.FesteringWounds) < 4 and not Player:Buff(S.UnholyFrenzy)) or Target:DebuffStack(S.FesteringWounds) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStack(S.FesteringWounds) < 1) and S.ArmyOfDead:CooldownRemainsP() > 5) then
+  if S.FesteringStrike:IsCastable() and (((((Target:DebuffStack(S.FesteringWound) < 4 and not Player:Buff(S.UnholyFrenzy)) or Target:DebuffStack(S.FesteringWound) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStack(S.FesteringWound) < 1) and S.ArmyOfTheDead:CooldownRemainsP() > 5) then
     if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- death_coil,if=!variable.pooling_for_gargoyle
@@ -215,11 +214,11 @@ local function Cooldowns()
       local ShouldReturn = ColdHeart(); if ShouldReturn then return ShouldReturn; end
     end
     -- army_of_the_dead
-    if S.ArmyOfDead:IsCastable() then
-      if HR.Cast(S.ArmyOfDead) then return ""; end
+    if S.ArmyOfTheDead:IsCastable() then
+      if HR.Cast(S.ArmyOfTheDead) then return ""; end
     end
     -- apocalypse,if=debuff.festering_wound.stack>=4
-    if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWounds) >= 4 then
+    if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWound) >= 4 then
       if HR.Cast(S.Apocalypse) then return ""; end
     end
     -- dark_transformation,if=(equipped.137075&cooldown.summon_gargoyle.remains>40)|(!equipped.137075|!talent.summon_gargoyle.enabled)
@@ -231,7 +230,7 @@ local function Cooldowns()
       if HR.Cast(S.SummonGargoyle) then return ""; end
     end
     -- unholy_frenzy,if=debuff.festering_wound.stack<4
-    if S.UnholyFrenzy:IsCastable() and Target:DebuffStack(S.FesteringWounds) < 4 then
+    if S.UnholyFrenzy:IsCastable() and Target:DebuffStack(S.FesteringWound) < 4 then
       if HR.Cast(S.UnholyFrenzy) then return ""; end
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
@@ -270,8 +269,8 @@ local function APL()
     if HR.Cast(S.SummonPet) then return ""; end
     end
   --army suggestion at pull
-    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfDead:CooldownUp() and HR.CDsON() then
-          if HR.Cast(S.ArmyOfDead, Settings.Unholy.GCDasOffGCD.ArmyOfDead) then return ""; end
+    if Everyone.TargetIsValid() and Target:IsInRange(30) and S.ArmyOfTheDead:CooldownUp() and HR.CDsON() then
+          if HR.Cast(S.ArmyOfTheDead, Settings.Unholy.GCDasOffGCD.ArmyOfTheDead) then return ""; end
     end
   -- outbreak if virulent_plague is not  the target and we are not in combat
     if Everyone.TargetIsValid() and Target:IsInRange(30) and not Target:Debuff(S.VirulentPlagueDebuff)then
