@@ -296,12 +296,10 @@ local function APL()
     end
     if Cache.EnemiesCount[10] >= 2 then
       ShouldReturn = AOE();
-      print("aoe");
       if ShouldReturn then return ShouldReturn; end
     end
     if (S.SummonGargoyle:IsAvailable() and  S.SummonGargoyle:TimeSinceLastCast() > 22) or S.ArmyOfTheDammed:IsAvailable() or S.UnholyFrenzy:IsAvailable() then
     ShouldReturn = Generic();
-    print("Generic");
     if ShouldReturn then return ShouldReturn; end
     end
     return
