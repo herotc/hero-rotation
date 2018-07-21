@@ -27,11 +27,17 @@
       UsePotions  = true
     },
     Vengeance = {
+      MetamorphosisHealthThreshold = 50,
+      FieryBrandHealthThreshold = 40,
+      DemonSpikesHealthThreshold = 65,
+      BrandForDamage = false,
+      ConserveInfernalStrike = true,
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
         DemonSpikes = true,
-        InfernalStrike = true,
+        InfernalStrike = false,
+        FieryBrand = false,
       }
     },
     Havoc = {
@@ -55,6 +61,11 @@
   CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
   
+  CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.MetamorphosisHealthThreshold", {5, 100, 5}, "Metamorphosis Health Threshold", "Suggest Metamorphosis when below this health percentage.");
+  CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {5, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.");
+  CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikesHealthThreshold", {5, 100, 5}, "Demon Spikes Health Threshold", "Suggest Demon Spikes when below this health percentage.");
+  CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.BrandForDamage", "Fiery Brand for DPS", "Use Fiery Brand as a DPS ability when using the Charred Flesh talent.")
+  CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.ConserveInfernalStrike", "Conserve Infernal Strike", "Save at least 1 Infernal Strike charge for mobility.")
   CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance");
 
   CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.");
