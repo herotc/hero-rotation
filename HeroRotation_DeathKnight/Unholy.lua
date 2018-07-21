@@ -120,7 +120,7 @@
     if HR.Cast(S.Defile) then return ""; end
   end
   -- epidemic,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
-  if S.Epidemic:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
+  if S.Epidemic:IsAvailable() and S.Epidemic:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
   end
   -- death_coil,if=death_and_decay.ticking&rune<2&!talent.epidemic.enabled&!variable.pooling_for_gargoyle
@@ -136,11 +136,11 @@
     if HR.Cast(S.ClawingShadows) then return ""; end
   end
   -- epidemic,if=!variable.pooling_for_gargoyle
-  if S.Epidemic:IsUsable() and not PoolingForGargoyle() then
+  if S.Epidemic:IsAvailable() and S.Epidemic:IsUsable() and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
   end
   -- festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
-  if S.FesteringStrike:IsCastable() and (S.BurstingSores:IsAvailable() and Cache.EnemiesCount[5] >= 2 and Target:DebuffStackP(S.FesteringWound) <= 1) then
+  if S.FesteringStrike:IsCastable() and (S.BurstingSores:IsAvailable() and Cache.EnemiesCount[8] >= 2 and Target:DebuffStack(S.FesteringWound) <= 1) then
     if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- death_coil,if=buff.sudden_doom.react&rune.deficit>=4
@@ -157,7 +157,7 @@ end
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
-  if S.DeathCoil:IsUsable() and Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and not PoolingForGargoyle() then
+  if S.DeathCoil:IsUsable() and Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWound) > 4) and not PoolingForGargoyle() then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- death_and_decay,if=talent.pestilence.enabled&cooldown.apocalypse.remains
@@ -251,6 +251,7 @@ end
 
 local function APL()
     --UnitUpdate
+  HL.GetEnemies(8);
   HL.GetEnemies(10);
   Everyone.AoEToggleEnemiesUpdate();
   --Defensives
