@@ -175,6 +175,18 @@
       HeroRotationCharDB.Toggles[3] = not HeroRotationCharDB.Toggles[3];
       HR.ToggleIconFrame:UpdateButtonText(3);
       HR.Print("HeroRotation is now "..(HeroRotationCharDB.Toggles[3] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
+    elseif Argument1 == "custom1" then
+      HeroRotationCharDB.Toggles[4] = not HeroRotationCharDB.Toggles[4];
+      HR.ToggleIconFrame:UpdateButtonText(4);
+      HR.Print("custom1 is now "..(HeroRotationCharDB.Toggles[4] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
+    elseif Argument1 == "custom2" then
+      HeroRotationCharDB.Toggles[5] = not HeroRotationCharDB.Toggles[5];
+      HR.ToggleIconFrame:UpdateButtonText(5);
+      HR.Print("custom2 is now "..(HeroRotationCharDB.Toggles[5] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
+    elseif Argument1 == "custom3" then
+      HeroRotationCharDB.Toggles[6] = not HeroRotationCharDB.Toggles[6];
+      HR.ToggleIconFrame:UpdateButtonText(6);
+      HR.Print("custom3 is now "..(HeroRotationCharDB.Toggles[6] and "|cff00ff00enabled|r." or "|cffff0000disabled|r."));
     elseif Argument1 == "unlock" then
       HR.MainFrame:Unlock();
       HR.Print("HeroRotation UI is now |cff00ff00unlocked|r.");
@@ -215,6 +227,9 @@
       HR.Print("  On/Off: |cff8888ff/hr toggle|r");
       HR.Print("  CDs: |cff8888ff/hr cds|r");
       HR.Print("  AoE: |cff8888ff/hr aoe|r");
+      HR.Print("  custom1: |cff8888ff/hr custom1|r");
+      HR.Print("  custom2: |cff8888ff/hr custom2|r");
+      HR.Print("  custom3: |cff8888ff/hr custom3|r");
       HR.Print("|cffffff00--[User Interface]--|r");
       HR.Print("  UI Lock: |cff8888ff/hr lock|r");
       HR.Print("  UI Unlock: |cff8888ff/hr unlock|r");
@@ -246,7 +261,22 @@
     return HeroRotationCharDB.Toggles[3];
   end
 
-  -- Get if the UI is locked.
+  -- Get if the Custom1 toggle is on.
+  function HR.Custom1 ()
+    return HeroRotationCharDB.Toggles[4];
+  end
+
+  -- Get if the Custom1 toggle is on.
+  function HR.Custom2 ()
+    return HeroRotationCharDB.Toggles[5];
+  end
+
+  -- Get if the Custom1 toggle is on.
+  function HR.Custom3 ()
+    return HeroRotationCharDB.Toggles[6];
+  end
+
+-- Get if the UI is locked.
   function HR.Locked ()
     return HeroRotationDB.Locked;
   end

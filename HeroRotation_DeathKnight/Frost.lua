@@ -458,7 +458,7 @@ local function APL ()
     end
     --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
     local pooling = false
-    if (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemainsP() < 5) then
+    if HR.Custom1() and (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemainsP() < 5) then
         pooling = true
         ShouldReturn = BoS_Pooling();
         if ShouldReturn then return ShouldReturn; end

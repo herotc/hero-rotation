@@ -534,6 +534,9 @@
     self:AddButton("C", 1, "CDs", "cds");
     self:AddButton("A", 2, "AoE", "aoe");
     self:AddButton("O", 3, "On/Off", "toggle");
+    self:AddButton("1", 4, "Custom1", "custom1");
+    self:AddButton("2", 5, "Custom2", "custom2");
+    self:AddButton("3", 6, "Custom3", "custom3");
   end
   -- Reset Anchor
   function HR.ToggleIconFrame:ResetAnchor ()
