@@ -41,6 +41,11 @@
     CobraShot                     = Spell(193455),
     KillCommand                   = Spell(34026),
     MultiShot                     = Spell(2643),
+    -- Pet
+    CallPet                       = Spell(883),
+    Intimidation                  = Spell(19577),
+    MendPet                       = Spell(136),
+    RevivePet                     = Spell(982),
     -- Talents
     AMurderofCrows                = Spell(131894),
     AnimalCompanion               = Spell(267116),
@@ -140,9 +145,17 @@ local function APL ()
   end
   -- In Combat
   if Everyone.TargetIsValid() then
+    -- call pet
+    if not Pet:IsActive() then
+      if HR.Cast(S.CallPet, Settings.BeastMastery.GCDasOffGCD.CallPet) then return ""; end
+    end
     -- actions+=/counter_shot,if=target.debuff.casting.react // Sephuz Specific
     if S.CounterShot:IsCastable() and Target:IsInterruptible() and (Settings.Commons.CounterShot or (I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and Settings.BeastMastery.CounterShotSephuz)) then
       if HR.CastSuggested(S.CounterShot) then return ""; end
+    end
+    -- same for Intimidation
+    if S.Intimidation:IsCastable() and Target:IsInterruptible() and (Settings.BeastMastery.GCDasOffGCD.Intimidation or (I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and Settings.BeastMastery.IntimidationSephuz)) then
+      if HR.CastSuggested(S.Intimidation) then return ""; end
     end
     if HR.CDsON() then
       -- actions+=/arcane_torrent,if=focus.deficit>=30
@@ -232,11 +245,15 @@ local function APL ()
     end
     -- Pool
     if HR.Cast(S.PoolFocus) then return "Normal Pooling"; end
-    return;
+      return;
+    end
+    -- heal pet
+    if Pet:IsActive() and Pet:HealthPercentage() <= 75 and not Pet:Buff(S.MendPet) then
+      if HR.Cast(S.MendPet, Settings.BeastMastery.GCDasOffGCD.MendPet) then return ""; end
+    end
   end
-end
 
-  HR.SetAPL(253, APL);
+HR.SetAPL(253, APL);
 
 
 --- Last Update: 07/17/2018
