@@ -26,7 +26,9 @@ local pairs = pairs;
     ImmolationAura      = Spell(178740),
     InfernalStrike      = Spell(189110),
     Shear               = Spell(203782),
-    SigilofFlame        = Spell(204596),
+    SigilofFlame,       -- Dynamic
+    SigilofFlameNoCS    = Spell(204596),
+    SigilofFlameCS      = Spell(204513),
     SigilofFlameDebuff  = Spell(204598),
     SoulCleave          = Spell(228477),
     SoulFragments       = Spell(203981),
@@ -38,6 +40,7 @@ local pairs = pairs;
     FieryBrandDebuff    = Spell(207771),
     -- Talents
     CharredFlesh        = Spell(264002),
+    ConcentratedSigils  = Spell(207666),
     Felblade            = Spell(232893),
     FelDevastation      = Spell(212084),
     Fracture            = Spell(263642),
@@ -241,7 +244,8 @@ local function APL ()
   -- HL.GetEnemies(S.Disrupt, true); -- 20y, use for TG Bounce and Fel Devastation
   Everyone.AoEToggleEnemiesUpdate();
 
-  -- Misc
+  -- Module Tracking Updates
+  S.SigilofFlame = S.ConcentratedSigils:IsAvailable() and S.SigilofFlameCS or S.SigilofFlameNoCS;
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
   UpdateSoulFragments();
   UpdateIsInMeleeRange();
