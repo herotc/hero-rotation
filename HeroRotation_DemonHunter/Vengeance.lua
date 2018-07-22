@@ -57,7 +57,7 @@ local pairs = pairs;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local CleaveRangeID = tostring(S.Disrupt:ID()); -- 20y range
-local SoulFragments, SoulFragmentsAdjusted;
+local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment;
 local IsTanking;
 local IsInMeleeRange, IsInAoERange;
 
@@ -74,10 +74,16 @@ local function UpdateSoulFragments()
 
   -- Check if we have cast Fracture or Shear within the last GCD and haven't "snapshot" yet
   if SoulFragmentsAdjusted == 0 then
-    if S.Fracture:TimeSinceLastCast() < Player:GCD() then
-      SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5);
-    elseif S.Shear:TimeSinceLastCast() < Player:GCD() then
-      SoulFragmentsAdjusted = math.min(SoulFragments + 1, 5);
+    if S.Fracture:IsAvailable() then
+      if S.Fracture:TimeSinceLastCast() < Player:GCD() and S.Fracture.LastCastTime ~= LastSoulFragmentAdjustment then
+        SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5);
+        LastSoulFragmentAdjustment = S.Fracture.LastCastTime;
+      end
+    else
+      if S.Shear:TimeSinceLastCast() < Player:GCD() and S.Fracture.Shear ~= LastSoulFragmentAdjustment then
+        SoulFragmentsAdjusted = math.min(SoulFragments + 1, 5);
+        LastSoulFragmentAdjustment = S.Shear.LastCastTime;
+      end
     end
   else
     -- If we have a soul fragement "snapshot", see if we should invalidate it based on time
@@ -240,7 +246,7 @@ local function APL ()
       if HR.Cast(S.Shear) then return "Cast Shear"; end
     end
     -- actions+=/throw_glaive
-    if S.ThrowGlaive:IsCastable() then
+    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) then
       if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OOR)"; end
     end
   end
