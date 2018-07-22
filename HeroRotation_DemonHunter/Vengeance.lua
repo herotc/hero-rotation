@@ -133,9 +133,12 @@ local function APL ()
     local ActiveMitigationNeeded = Player:ActiveMitigationNeeded();
 
     -- Demon Spikes
-    if S.DemonSpikes:IsCastable("Melee") and S.DemonSpikes:ChargesFractional() > 1.9 and not Player:Buff(S.DemonSpikesBuff)
-      and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
-      if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
+    if S.DemonSpikes:IsCastable("Melee") and not Player:Buff(S.DemonSpikesBuff) then
+      if S.DemonSpikes:ChargesFractional() > 1.9 then
+        if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes (Capped)"; end
+      elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
+        if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes (Danger)"; end
+      end
     end
 
     -- Fiery Brand
