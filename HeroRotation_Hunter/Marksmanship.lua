@@ -35,7 +35,7 @@
     ArcaneShot                    = Spell(185358),
     BurstingShot                  = Spell(186387),
     HuntersMark                   = Spell(185365),
-    MultiShot                     = Spell(2643),
+    MultiShot                     = Spell(257620),
     PreciseShots                  = Spell(260242),
     RapidFire                     = Spell(257044),
     SteadyShot                    = Spell(56641),
@@ -99,8 +99,6 @@
   };
   -- Register for InFlight tracking
   S.AimedShot:RegisterInFlight();
-  S.ArcaneShot:RegisterInFlight(S.MarkingTargets);
-  S.MultiShot:RegisterInFlight(S.MarkingTargets);
 
   local GCDPrev = Player:GCDRemains();
   local function OffsetRemainsAuto (ExpirationTime, Offset)
@@ -265,19 +263,19 @@
         if HR.Cast(S.ExplosiveShot) then return ""; end
       end
       -- actions+=/multishot,if=active_enemies>2&buff.precise_shots.up&cooldown.aimed_shot.full_recharge_time<gcd*buff.precise_shots.stack+action.aimed_shot.cast_time
-      if S.MultiShot:IsCastable() and Hunter.GetSplashCount(Target,8) > 1 and Player:Buff(S.PreciseShots) and S.AimedShot:FullRechargeTime() < Player:GCD() * Player:BuffStack(S.PreciseShots) + S.AimedShot:CastTime() then
+      if S.MultiShot:IsCastable() and (Hunter.GetSplashCount(Target,8) > 2 and Player:Buff(S.PreciseShots) and S.AimedShot:FullRechargeTime() < Player:GCD() * Player:BuffStack(S.PreciseShots) + S.AimedShot:CastTime()) then
         if Hunter.MultishotInMain() and HR.Cast(S.MultiShot) then return "" else HR.CastSuggested(S.MultiShot) end
       end
       -- actions+=/arcane_shot,if=active_enemies<3&buff.precise_shots.up&cooldown.aimed_shot.full_recharge_time<gcd*buff.precise_shots.stack+action.aimed_shot.cast_time
-      if S.ArcaneShot:IsCastable() and Hunter.GetSplashCount(Target,8) < 3 and Player:Buff(S.PreciseShots) and S.AimedShot:FullRechargeTime() < Player:GCD() * Player:BuffStack(S.PreciseShots) + S.AimedShot:CastTime() then
+      if S.ArcaneShot:IsCastable() and (Hunter.GetSplashCount(Target,8) < 3 and Player:Buff(S.PreciseShots) and S.AimedShot:FullRechargeTime() < Player:GCD() * Player:BuffStack(S.PreciseShots) + S.AimedShot:CastTime()) then
         if HR.Cast(S.ArcaneShot) then return ""; end
       end
       -- actions+=/aimed_shot,if=buff.precise_shots.down&buff.double_tap.down&(active_enemies>2&buff.trick_shots.up|active_enemies<3&full_recharge_time<cast_time+gcd)
-      if S.AimedShot:IsCastable() and not Player:Buff(S.PreciseShots) and not Player:Buff(S.DoubleTap) and (Hunter.GetSplashCount(Target,8) > 2 and Player:Buff(S.TrickShots) or Hunter.GetSplashCount(Target,8) < 3 and S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD()) then
+      if S.AimedShot:IsCastable() and (not Player:Buff(S.PreciseShots) and not Player:Buff(S.DoubleTap) and ((Hunter.GetSplashCount(Target,8) > 2 and Player:Buff(S.TrickShots)) or Hunter.GetSplashCount(Target,8) < 3 and S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD())) then
         if not IsCastableM(S.AimedShot) then HR.CastSuggested(S.AimedShot) elseif HR.Cast(S.AimedShot) then return ""; end
       end
       -- actions+=/rapid_fire,if=active_enemies<3|buff.trick_shots.up
-      if S.RapidFire:IsCastable() and Hunter.GetSplashCount(Target,8) < 3 or Player:Buff(S.TrickShots) then
+      if S.RapidFire:IsCastable() and (Hunter.GetSplashCount(Target,8) < 3 or Player:Buff(S.TrickShots)) then
         if HR.Cast(S.RapidFire) then return ""; end
       end
       -- actions+=/explosive_shot
