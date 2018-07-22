@@ -18,23 +18,23 @@
   HR.GUISettings.APL.DeathKnight = {
     Commons = {
       UseTrinkets = false,
-      UsePotions  = false
+      UsePotions  = false,
+      UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Deathstrikes
     },
    Frost = {
       GCDasOffGCD = {
         -- Abilities
         HornOfWinter       = true,
         FrostwyrmsFury    = true,
+        ArcaneTorrent       = true,
+        PillarOfFrost       = true,
+        EmpowerRuneWeapon   = true,
         BreathofSindragosa = true
       },
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent       = true,
         Berserking          = true,
-        BloodFury           = true,
-        -- Abilities
-        PillarOfFrost       = true,
-        EmpowerRuneWeapon   = true
+        BloodFury           = true
       }
     },
     Unholy = {
@@ -42,15 +42,14 @@
         -- Abilities
         ArmyOfDead     = true,
         SummonGargoyle = true,
-        DarkArbiter    = true
+        UnholyFrenzy   = false,
+        SoulReaper     = false
       },
       OffGCDasOffGCD = {
         -- Racials
         ArcaneTorrent      = true,
         Berserking         = true,
-        BloodFury          = true,
-        -- Abilities
-        BlightedRuneWeapon = true
+        BloodFury          = true
        }
      },
     Blood = {
@@ -87,6 +86,7 @@
   --DeathKnight Panels
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Show on use trinkets", "Fel Oiled Machine Supported.");
   CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+  CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", {1, 100, 1}, "Use Deathstrike on low HP", "Set the HP threshold to use DeathStrike (working only if Solo Mode is enabled).");
   --Unholy Panels
   CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
   --Frost Panels

@@ -22,30 +22,99 @@ local pairs = pairs;
   if not Spell.DemonHunter then Spell.DemonHunter = {}; end
   Spell.DemonHunter.Vengeance = {
     -- Abilities
-    Felblade        = Spell(232893),
-    FelDevastation  = Spell(212084),
-    Fracture        = Spell(209795),
-    Frailty         = Spell(247456),
-    ImmolationAura  = Spell(178740),
-    Sever           = Spell(235964),
-    Shear           = Spell(203782),
-    SigilofFlame    = Spell(204596),
-    SpiritBomb      = Spell(247454),
-    SoulCleave      = Spell(228477),
-    SoulFragments   = Spell(203981),
-    ThrowGlaive     = Spell(204157),
-    -- Offensive
-    SoulCarver      = Spell(207407),
+    Frailty             = Spell(247456),
+    ImmolationAura      = Spell(178740),
+    InfernalStrike      = Spell(189110),
+    Shear               = Spell(203782),
+    SigilofFlame,       -- Dynamic
+    SigilofFlameNoCS    = Spell(204596),
+    SigilofFlameCS      = Spell(204513),
+    SigilofFlameDebuff  = Spell(204598),
+    SoulCleave          = Spell(228477),
+    SoulFragments       = Spell(203981),
+    ThrowGlaive         = Spell(204157),
     -- Defensive
-    DemonSpikes     = Spell(203720),
-    DemonSpikesBuff = Spell(203819),
+    DemonSpikes         = Spell(203720),
+    DemonSpikesBuff     = Spell(203819),
+    FieryBrand          = Spell(204021),
+    FieryBrandDebuff    = Spell(207771),
+    Torment             = Spell(185245),
+    -- Talents
+    CharredFlesh        = Spell(264002),
+    ConcentratedSigils  = Spell(207666),
+    Felblade            = Spell(232893),
+    FelDevastation      = Spell(212084),
+    Fracture            = Spell(263642),
+    SoulBarrier         = Spell(263648),
+    SpiritBomb          = Spell(247454),
+    SpiritBombDebuff    = Spell(247456),
     -- Utility
-    ConsumeMagic    = Spell(183752),
-    InfernalStrike  = Spell(189110)
+    Disrupt             = Spell(183752),
+    Metamorphosis       = Spell(187827),
   };
   local S = Spell.DemonHunter.Vengeance;
+
 -- Rotation Var
-  
+local ShouldReturn; -- Used to get the return string
+local CleaveRangeID = tostring(S.Disrupt:ID()); -- 20y range
+local SoulFragments, SoulFragmentsAdjusted;
+local IsTanking;
+local IsInMeleeRange, IsInAoERange;
+
+-- Soul Fragments function taking into consideration aura lag
+local function UpdateSoulFragments()
+  SoulFragments = Player:BuffStack(S.SoulFragments);
+
+  -- Casting Spirit Bomb or Soul Cleave immediately updates the buff
+  if S.SpiritBomb:TimeSinceLastCast() < Player:GCD()
+  or S.SoulCleave:TimeSinceLastCast() < Player:GCD() then
+    SoulFragmentsAdjusted = 0;
+    return;
+  end
+
+  -- Check if we have cast Fracture or Shear within the last GCD and haven't "snapshot" yet
+  if SoulFragmentsAdjusted == 0 then
+    if S.Fracture:TimeSinceLastCast() < Player:GCD() then
+      SoulFragmentsAdjusted = math.min(SoulFragments + 2, 5);
+    elseif S.Shear:TimeSinceLastCast() < Player:GCD() then
+      SoulFragmentsAdjusted = math.min(SoulFragments + 1, 5);
+    end
+  else
+    -- If we have a soul fragement "snapshot", see if we should invalidate it based on time
+    if S.Fracture:IsAvailable() then
+      if S.Fracture:TimeSinceLastCast() >= Player:GCD() then
+        SoulFragmentsAdjusted = 0;
+      end
+    else
+      if S.Shear:TimeSinceLastCast() >= Player:GCD() then
+        SoulFragmentsAdjusted = 0;
+      end
+    end
+  end
+
+  -- If we have a higher Soul Fragment "snapshot", use it instead
+  if SoulFragmentsAdjusted > SoulFragments then
+    SoulFragments = SoulFragmentsAdjusted;
+  elseif SoulFragmentsAdjusted > 0 then
+    -- Otherwise, the "snapshot" is invalid, so reset it if it has a value
+    -- Relevant in cases where we use a generator two GCDs in a row
+    SoulFragmentsAdjusted = 0;
+  end
+end
+
+-- Melee Is In Range w/ Movement Handlers
+local function UpdateIsInMeleeRange()
+  if S.Felblade:TimeSinceLastCast() < Player:GCD()
+  or S.InfernalStrike:TimeSinceLastCast() < Player:GCD() then
+    IsInMeleeRange = true;
+    IsInAoERange = true;
+    return;
+  end
+
+  IsInMeleeRange = Target:IsInRange("Melee");
+  IsInAoERange = IsInMeleeRange or Cache.EnemiesCount[8] > 0;
+end
+
 -- GUI Settings
   local Settings = {
     General = HR.GUISettings.General,
@@ -54,20 +123,137 @@ local pairs = pairs;
 
 -- APL Main
 local function APL ()
+  local function Defensives()
+    local ActiveMitigationNeeded = Player:ActiveMitigationNeeded();
+
+    -- Demon Spikes
+    if S.DemonSpikes:IsCastable("Melee") and S.DemonSpikes:ChargesFractional() > 1.9 and not Player:Buff(S.DemonSpikesBuff)
+      and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
+      if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
+    end
+
+    -- Fiery Brand
+    if S.FieryBrand:IsCastable() and not Player:Buff(S.FieryBrand)
+      and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
+      if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand) then return "Cast Fiery Brand"; end
+    end
+
+    -- Metamorphosis
+    if S.Metamorphosis:IsCastable("Melee") and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold then
+      HR.CastSuggested(S.Metamorphosis);
+    end
+  end
+
+  local function Brand()
+    if Settings.Vengeance.BrandForDamage then
+      -- actions.brand+=/sigil_of_flame,if=cooldown.fiery_brand.remains<2
+      if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
+        and S.FieryBrand:CooldownRemainsP() < 2 then
+        if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand Soon)"; end
+      end
+      -- actions.brand+=/infernal_strike,if=cooldown.fiery_brand.remains=0
+      if S.InfernalStrike:IsCastable() and S.FieryBrand:IsReady() then
+        if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand Soon)"; end
+      end
+      -- actions.brand+=/fiery_brand
+      if IsInMeleeRange and S.FieryBrand:IsCastable() then
+        if HR.Cast(S.FieryBrand) then return "Cast Fiery Brand (Brand)"; end
+      end
+    end
+
+    -- Shared condition below: if=dot.fiery_brand.ticking
+    if not Target:DebuffP(S.FieryBrandDebuff) then
+      return;
+    end
+
+    if IsInMeleeRange then
+      -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
+      if S.ImmolationAura:IsCastable() then
+        if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
+      end
+      -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
+      if S.FelDevastation:IsCastable() then
+        if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
+      end
+    end
+
+    -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
+    if S.InfernalStrike:IsCastable()
+      and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand)"; end
+    end
+    -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
+      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
+    end
+  end
+
+  local function Normal()
+    -- actions+=/infernal_strike
+    if S.InfernalStrike:IsCastable() and not (S.CharredFlesh:IsAvailable() and Settings.Vengeance.BrandForDamage)
+      and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
+    end
+    -- actions+=/spirit_bomb,if=soul_fragments>=4
+    -- Note: Use IsAvailable() here since IsCastable() can't predict properly since Spirit Bomb is not usable with 0 fragments
+    if S.SpiritBomb:IsAvailable() and IsInAoERange and SoulFragments >= 4 then
+      if HR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
+    end
+    -- actions+=/immolation_aura,if=pain<=90
+    if S.ImmolationAura:IsCastable() and IsInAoERange and Player:Pain() <= 90 then
+      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
+    end
+    -- actions+=/felblade,if=pain<=70
+    if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then
+      if HR.Cast(S.Felblade) then return "Cast Felblade"; end
+    end
+    if S.Fracture:IsAvailable() and IsInMeleeRange then
+      -- actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&talent.fracture.enabled&soul_fragments=0&cooldown.fracture.charges_fractional<1.75
+      if S.SoulCleave:IsReady() and SoulFragments == 0 and S.Fracture:ChargesFractional() < 1.75 then
+        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave (Filler)"; end
+      end
+      -- actions+=/fracture,if=soul_fragments<=3
+      if IsInMeleeRange and S.Fracture:IsCastable() and SoulFragments <= 3 then
+        if HR.Cast(S.Fracture) then return "Cast Fracture"; end
+      end
+    end
+    -- actions+=/fel_devastation
+    if S.FelDevastation:IsCastable() and IsInAoERange then
+      if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
+    end
+    -- actions+=/soul_cleave,if=!talent.spirit_bomb.enabled
+    -- actions+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
+    if S.SoulCleave:IsReady() then
+      if not S.SpiritBomb:IsAvailable() then
+        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
+      elseif SoulFragments == 0 then
+        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave (Spirit Bomb)"; end
+      end
+    end
+    -- actions+=/sigil_of_flame
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
+      and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
+      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
+    end
+    -- actions+=/shear
+    if IsInMeleeRange and S.Shear:IsReady() then
+      if HR.Cast(S.Shear) then return "Cast Shear"; end
+    end
+    -- actions+=/throw_glaive
+    if S.ThrowGlaive:IsCastable() then
+      if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OOR)"; end
+    end
+  end
+
   -- Unit Update
-  HL.GetEnemies(20, true); -- Fel Devastation (I think it's 20 thp)
   HL.GetEnemies(8, true); -- Sigil of Flame & Spirit Bomb
   Everyone.AoEToggleEnemiesUpdate();
 
-  -- Misc
-  local SoulFragments = Player:BuffStack(S.SoulFragments);
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-
-  --- Defensives
-  -- Demon Spikes
-  if S.DemonSpikes:IsCastable("Melee") and Player:Pain() >= 20 and not Player:Buff(S.DemonSpikesBuff) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= 65) and (IsTanking or not Player:HealingAbsorbed()) then
-    if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
-  end
+  -- Module Tracking Updates
+  S.SigilofFlame = S.ConcentratedSigils:IsAvailable() and S.SigilofFlameCS or S.SigilofFlameNoCS;
+  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  UpdateSoulFragments();
+  UpdateIsInMeleeRange();
 
   --- Out of Combat
   if not Player:AffectingCombat() then
@@ -75,76 +261,68 @@ local function APL ()
     -- Food
     -- Rune
     -- PrePot w/ DBM Count
-    -- Opener (Shear)
     if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
-      -- actions+=/sever
-      if S.Sever:IsCastable("Melee") then
-        if HR.Cast(S.Sever) then return "Cast Shear"; end
-      end
-      -- actions+=/shear
-      if S.Shear:IsCastable("Melee") then
-        if HR.Cast(S.Shear) then return "Cast Shear"; end
-      end
+      return Normal();
     end
     return;
   end
+
+  --- Defensives
+  if (IsTanking or not Player:HealingAbsorbed()) then
+    ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+  end
+
   --- In Combat
   if Everyone.TargetIsValid() then
-    -- Consume Magic
-    if Settings.General.InterruptEnabled and S.ConsumeMagic:IsCastable(20) and Target:IsInterruptible() then
-      if HR.Cast(S.ConsumeMagic, Settings.Vengeance.OffGCDasOffGCD.ConsumeMagic) then return "Cast Consume Magic"; end
+    if S.CharredFlesh:IsAvailable() then
+      ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
     end
-    -- Infernal Strike Charges Dump
-    if S.InfernalStrike:IsCastable("Melee") and S.InfernalStrike:ChargesFractional() > 1.9 then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
-    end
-    -- actions+=/spirit_bomb,if=soul_fragments=5|debuff.frailty.down
-    -- Note: Looks like the debuff takes time to refresh so we add TimeSinceLastCast to offset that.
-    if S.SpiritBomb:IsCastable() and S.SpiritBomb:TimeSinceLastCast() > Player:GCD() * 2 and Cache.EnemiesCount[8] >= 1 and (SoulFragments >= 4 or (Target:DebuffDownP(S.Frailty) and SoulFragments >= 1)) then
-      if HR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
-    end
-    -- actions+=/soul_carver
-    if HR.CDsON() and S.SoulCarver:IsCastable("Melee") then
-      if HR.Cast(S.SoulCarver) then return "Cast Soul Carver"; end
-    end
-    -- actions+=/immolation_aura,if=pain<=80
-    if S.ImmolationAura:IsCastable() and Cache.EnemiesCount[8] >= 1 and not Player:Buff(S.ImmolationAura) and Player:Pain() <= 80 then
-      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
-    end
-    -- actions+=/felblade,if=pain<=70
-    if S.Felblade:IsCastable(15) and Player:Pain() <= 75 then
-      if HR.Cast(S.Felblade) then return "Cast Felblade"; end
-    end
-    -- actions+=/fel_devastation
-    if HR.CDsON() and S.FelDevastation:IsCastable(20, true) and GetUnitSpeed("player") == 0 and Player:Pain() >= 30 then
-      if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
-    end
-    -- actions+=/sigil_of_flame
-    if S.SigilofFlame:IsCastable() and Cache.EnemiesCount[8] >= 1 then
-      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
-    end
-    if Target:IsInRange("Melee") then
-      -- actions+=/fracture,if=pain>=60
-      if S.Fracture:IsCastable() and Player:Pain() >= 60 then
-        if HR.Cast(S.Fracture) then return "Cast Fracture"; end
-      end
-      -- actions+=/soul_cleave,if=pain>=80
-      if S.SoulCleave:IsCastable() and not S.SpiritBomb:IsAvailable() and (Player:Pain() >= 80 or SoulFragments >= 5) then
-        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
-      end
-      -- actions+=/sever
-      if S.Sever:IsCastable() then
-        if HR.Cast(S.Sever) then return "Cast Sever"; end
-      end
-      -- actions+=/shear
-      if S.Shear:IsCastable() then
-        if HR.Cast(S.Shear) then return "Cast Shear"; end
-      end
-    end
-    if Target:IsInRange(30) and S.ThrowGlaive:IsCastable() then
-      if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OoR)"; end
-    end
+    return Normal();
   end
 end
 
 HR.SetAPL(581, APL);
+
+--- ======= SIMC =======
+--- Last Update: 07/21/2018
+
+--[[
+
+# Executed every time the actor is available.
+actions=auto_attack
+actions+=/consume_magic
+# ,if=!raid_event.adds.exists|active_enemies>1
+actions+=/use_item,slot=trinket1
+actions+=/call_action_list,name=brand,if=talent.charred_flesh.enabled
+actions+=/call_action_list,name=defensives
+actions+=/call_action_list,name=normal
+
+# Fiery Brand Rotation
+actions.brand=sigil_of_flame,if=cooldown.fiery_brand.remains<2
+actions.brand+=/infernal_strike,if=cooldown.fiery_brand.remains=0
+actions.brand+=/fiery_brand
+actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
+actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
+actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
+actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
+
+# Defensives
+actions.defensives=demon_spikes
+actions.defensives+=/metamorphosis
+actions.defensives+=/fiery_brand
+
+# Normal Rotation
+actions.normal=infernal_strike
+actions.normal+=/spirit_bomb,if=soul_fragments>=4
+actions.normal+=/immolation_aura,if=pain<=90
+actions.normal+=/felblade,if=pain<=70
+actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&talent.fracture.enabled&soul_fragments=0&cooldown.fracture.charges_fractional<1.75
+actions.normal+=/fracture,if=soul_fragments<=3
+actions.normal+=/fel_devastation
+actions.normal+=/soul_cleave,if=!talent.spirit_bomb.enabled
+actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
+actions.normal+=/sigil_of_flame
+actions.normal+=/shear
+actions.normal+=/throw_glaive
+
+--]]
