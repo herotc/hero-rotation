@@ -39,7 +39,7 @@
     PreciseShots                  = Spell(260242),
     RapidFire                     = Spell(257044),
     SteadyShot                    = Spell(56641),
-    TrickShots                    = Spell(257621),
+    TrickShots                    = Spell(257622),
     TrueShot                      = Spell(193526),
     -- Talents
     AMurderofCrows                = Spell(131894),
