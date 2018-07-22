@@ -38,6 +38,7 @@ local pairs = pairs;
     DemonSpikesBuff     = Spell(203819),
     FieryBrand          = Spell(204021),
     FieryBrandDebuff    = Spell(207771),
+    Torment             = Spell(185245),
     -- Talents
     CharredFlesh        = Spell(264002),
     ConcentratedSigils  = Spell(207666),
@@ -49,7 +50,7 @@ local pairs = pairs;
     SpiritBombDebuff    = Spell(247456),
     -- Utility
     Disrupt             = Spell(183752),
-    Metamorphosis       = Spell(191427),
+    Metamorphosis       = Spell(187827),
   };
   local S = Spell.DemonHunter.Vengeance;
 
@@ -79,7 +80,7 @@ local function UpdateSoulFragments()
       SoulFragmentsAdjusted = math.min(SoulFragments + 1, 5);
     end
   else
-    -- If we have a soul fragement "snapshot", see if we should invalidate it
+    -- If we have a soul fragement "snapshot", see if we should invalidate it based on time
     if S.Fracture:IsAvailable() then
       if S.Fracture:TimeSinceLastCast() >= Player:GCD() then
         SoulFragmentsAdjusted = 0;
@@ -94,6 +95,10 @@ local function UpdateSoulFragments()
   -- If we have a higher Soul Fragment "snapshot", use it instead
   if SoulFragmentsAdjusted > SoulFragments then
     SoulFragments = SoulFragmentsAdjusted;
+  elseif SoulFragmentsAdjusted > 0 then
+    -- Otherwise, the "snapshot" is invalid, so reset it if it has a value
+    -- Relevant in cases where we use a generator two GCDs in a row
+    SoulFragmentsAdjusted = 0;
   end
 end
 
@@ -124,11 +129,11 @@ local function APL ()
     -- Demon Spikes
     if S.DemonSpikes:IsCastable("Melee") and S.DemonSpikes:ChargesFractional() > 1.9 and not Player:Buff(S.DemonSpikesBuff)
       and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
-    if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
+      if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes"; end
     end
 
     -- Fiery Brand
-    if S.FieryBrand:IsCastable("Melee") and not Player:Buff(S.FieryBrand)
+    if S.FieryBrand:IsCastable() and not Player:Buff(S.FieryBrand)
       and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
       if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand) then return "Cast Fiery Brand"; end
     end
@@ -142,7 +147,8 @@ local function APL ()
   local function Brand()
     if Settings.Vengeance.BrandForDamage then
       -- actions.brand+=/sigil_of_flame,if=cooldown.fiery_brand.remains<2
-      if S.SigilofFlame:IsCastable() and S.FieryBrand:CooldownRemainsP() < 2 then
+      if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
+        and S.FieryBrand:CooldownRemainsP() < 2 then
         if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand Soon)"; end
       end
       -- actions.brand+=/infernal_strike,if=cooldown.fiery_brand.remains=0
@@ -177,7 +183,7 @@ local function APL ()
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand)"; end
     end
     -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
-    if S.SigilofFlame:IsCastable() then
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
       if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
     end
   end
@@ -225,7 +231,8 @@ local function APL ()
       end
     end
     -- actions+=/sigil_of_flame
-    if S.SigilofFlame:IsCastable() and IsInAoERange and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
+      and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
       if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
     end
     -- actions+=/shear
@@ -233,15 +240,13 @@ local function APL ()
       if HR.Cast(S.Shear) then return "Cast Shear"; end
     end
     -- actions+=/throw_glaive
-    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) then
+    if S.ThrowGlaive:IsCastable() then
       if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OOR)"; end
     end
   end
 
   -- Unit Update
   HL.GetEnemies(8, true); -- Sigil of Flame & Spirit Bomb
-  -- 20y check is not needed for the current APL, uncomment if needed
-  -- HL.GetEnemies(S.Disrupt, true); -- 20y, use for TG Bounce and Fel Devastation
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Module Tracking Updates
