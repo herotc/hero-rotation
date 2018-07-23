@@ -40,10 +40,9 @@ Spell.Mage.Frost = {
   ConeofCold                            = Spell(120),
   IcyVeins                              = Spell(12472),
   RuneofPower                           = Spell(116011),
-  UseItems                              = Spell(),
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(),
+  LightsJudgment                        = Spell(255647),
   Blink                                 = Spell(1953),
   IceFloes                              = Spell(108839),
   IceFloesBuff                          = Spell(108839),
@@ -206,9 +205,6 @@ local function APL()
       if HR.CastSuggested(I.ProlongedPower) then return ""; end
     end
     -- use_items
-    if S.UseItems:IsCastableP() and (true) then
-      if HR.Cast(S.UseItems) then return ""; end
-    end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() and (true) then
       if HR.Cast(S.BloodFury, Settings.Frost.OffGCDasOffGCD.BloodFury) then return ""; end
