@@ -114,15 +114,15 @@
 
   local function Standard()
     -- howling_blast,if=!dot.frost_fever.ticking&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
-    if S.HowlingBlast:IsCastableP() and (not Target:DebuffP(S.FrostFever) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
+    if S.HowlingBlast:IsCastableP(30, true) and (not Target:DebuffP(S.FrostFever) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- glacial_advance,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&spell_targets.glacial_advance>=2&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
-    if S.GlacialAdvance:IsCastableP() and (Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffP(S.IcyTalonsBuff) and Cache.EnemiesCount[30] >= 2 and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
+    if not DeathStrikeHeal() and S.GlacialAdvance:IsCastableP() and (Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffP(S.IcyTalonsBuff) and Cache.EnemiesCount[30] >= 2 and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
-    if S.FrostStrike:IsUsable() and (Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffP(S.IcyTalonsBuff) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffP(S.IcyTalonsBuff) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- remorseless_winter
@@ -130,31 +130,31 @@
       if HR.Cast(S.RemorselessWinter) then return ""; end
     end
     -- frost_strike,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled
-    if S.FrostStrike:IsUsable() and (S.RemorselessWinter:CooldownRemainsP() <= (2 * Player:GCD()) and S.GatheringStorm:IsAvailable()) then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (S.RemorselessWinter:CooldownRemainsP() <= (2 * Player:GCD()) and S.GatheringStorm:IsAvailable()) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- howling_blast,if=buff.rime.up
-    if S.HowlingBlast:IsCastableP() and (Player:Buff(S.Rime)) then
+    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime)) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse.enabled
-    if S.Obliterate:IsCastableP() and Player:Runes() > 3 and S.FrozenPulse:IsAvailable() then
+    if S.Obliterate:IsCastableP("Melee") and Player:Runes() > 3 and S.FrozenPulse:IsAvailable() then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- frost_strike,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
-    if S.FrostStrike:IsUsable() and (Player:RunicPowerDeficit() < (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (Player:RunicPowerDeficit() < (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- frostscythe,if=buff.killing_machine.up&rune.time_to_4>=gcd
-    if S.FrostScythe:IsCastableP() and (Player:BuffP(S.KillingMachine) and Player:RuneTimeToX(4) >= Player:GCD()) then
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:BuffP(S.KillingMachine) and Player:RuneTimeToX(4) >= Player:GCD()) then
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
-    if S.Obliterate:IsCastableP() and (Player:RunicPowerDeficit() > (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() > (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- frost_strike
-    if S.FrostStrike:IsUsable() then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- horn_of_winter
@@ -167,6 +167,7 @@
     end
     return false;
   end
+
   local function AOE()
     if HR.AoEON() then
     -- remorseless_winter,if=talent.gathering_storm.enabled
@@ -178,15 +179,15 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- frost_strike,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled
-    if S.FrostStrike:IsUsable() and (S.RemorselessWinter:CooldownRemainsP() <= 2 * Player:GCD() and S.GatheringStorm:IsAvailable()) then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (S.RemorselessWinter:CooldownRemainsP() <= 2 * Player:GCD() and S.GatheringStorm:IsAvailable()) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- howling_blast,if=buff.rime.up
-    if S.HowlingBlast:IsCastableP() and (Player:Buff(S.Rime)) then
+    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime)) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- frostscythe,if=buff.killing_machine.up
-    if S.FrostScythe:IsCastableP() and (Player:BuffP(S.KillingMachine)) then
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:BuffP(S.KillingMachine)) then
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- glacial_advance,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
@@ -194,7 +195,7 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- frost_strike,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
-    if S.FrostStrike:IsUsable() and (Player:RunicPowerDeficit() < (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (Player:RunicPowerDeficit() < (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- remorseless_winter
@@ -202,11 +203,11 @@
       if HR.Cast(S.RemorselessWinter) then return ""; end
     end
     -- frostscythe
-    if S.FrostScythe:IsCastableP() then
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 then
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
-    if S.Obliterate:IsCastableP() and (Player:RunicPowerDeficit() > (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() > (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- glacial_advance
@@ -214,7 +215,7 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- frost_strike
-    if S.FrostStrike:IsUsable() then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- horn_of_winter
@@ -229,25 +230,13 @@
   return false;
   end
 
-  local function ColdHeart()
-    -- chains_of_ice,if=(buff.cold_heart_item.stack>5|buff.cold_heart_talent.stack>5)&target.time_to_die<gcd
-    if S.ChainsOfIce:IsCastableP() and ((Player:BuffStackP(S.ColdHeartItemBuff) > 5 or Player:BuffStackP(S.ColdHeartBuff) > 5) and Target:TimeToDie() < Player:GCD()) then
-      if HR.Cast(S.ChainsOfIce) then return ""; end
-    end
-    -- chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up
-    if S.ChainsOfIce:IsCastableP() and ((Player:BuffRemainsP(S.PillarOfFrost) <= Player:GCD() * (1 + (S.FrostwyrmsFury:IsReady() and 1 or 0)) or Player:BuffRemainsP(S.PillarOfFrost) < Player:RuneTimeToX(3)) and Player:BuffP(S.PillarOfFrost)) then
-      if HR.Cast(S.ChainsOfIce) then return ""; end
-    end
-    return false;
-  end
-
   local function BoS_Pooling()
     -- howling_blast,if=buff.rime.up
-    if S.HowlingBlast:IsCastableP() and Player:Buff(S.Rime) then
+    if S.HowlingBlast:IsCastableP(30, true) and Player:Buff(S.Rime) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- obliterate,if=rune.time_to_4<gcd&runic_power.deficit>=25
-    if S.Obliterate:IsCastableP() and (Player:RuneTimeToX(4) < Player:GCD() and Player:RunicPowerDeficit() >= 25) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RuneTimeToX(4) < Player:GCD() and Player:RunicPowerDeficit() >= 25) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- glacial_advance,if=runic_power.deficit<20&cooldown.pillar_of_frost.remains>rune.time_to_4
@@ -255,11 +244,11 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- frostscythe,if=buff.killing_machine.up&runic_power.deficit>(15+talent.runic_attenuation.enabled*3)
-    if S.FrostScythe:IsCastableP() and (Player:Buff(S.KillingMachine) and Player:RunicPowerDeficit() > (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:Buff(S.KillingMachine) and Player:RunicPowerDeficit() > (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- obliterate,if=runic_power.deficit>=(25+talent.runic_attenuation.enabled*3)
-    if S.Obliterate:IsCastableP() and (Player:RunicPowerDeficit() >= (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() >= (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- glacial_advance,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&spell_targets.glacial_advance>=2
@@ -267,7 +256,7 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- frost_strike,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40
-    if S.FrostStrike:IsUsable() and (S.PillarOfFrost:CooldownRemainsP() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40) then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (S.PillarOfFrost:CooldownRemainsP() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40) then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     return false;
@@ -275,7 +264,7 @@
 
   local function BoS_Ticking()
     -- obliterate,if=runic_power<=30
-    if S.Obliterate:IsCastableP() and (Player:RunicPower() <= 30) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RunicPower() <= 30) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- remorseless_winter,if=talent.gathering_storm.enabled
@@ -283,15 +272,15 @@
       if HR.Cast(S.RemorselessWinter) then return ""; end
     end
     -- howling_blast,if=buff.rime.up
-    if S.HowlingBlast:IsCastableP() and (Player:Buff(S.Rime)) then
+    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime)) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- obliterate,if=rune.time_to_5<gcd|runic_power<=45
-    if S.Obliterate:IsCastableP() and (Player:RuneTimeToX(5) < Player:GCD() or Player:RunicPower() <= 45) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RuneTimeToX(5) < Player:GCD() or Player:RunicPower() <= 45) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- frostscythe,if=buff.killing_machine.up
-    if S.FrostScythe:IsCastableP() and (Player:BuffP(S.KillingMachine)) then
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:BuffP(S.KillingMachine)) then
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- horn_of_winter,if=runic_power.deficit>=30&rune.time_to_3>gcd
@@ -307,7 +296,7 @@
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- obliterate,if=runic_power.deficit>25|rune>3
-    if S.Obliterate:IsCastableP() and (Player:RunicPowerDeficit() > 25 or Player:Runes() > 3) then
+    if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() > 25 or Player:Runes() > 3) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- arcane_torrent,if=runic_power.deficit>20
@@ -323,15 +312,15 @@
       if HR.Cast(S.RemorselessWinter) then return ""; end
     end
     -- obliterate,if=!talent.frostscythe.enabled&!buff.rime.up&spell_targets.howling_blast>=3
-    if S.Obliterate:IsCastableP() and (not S.FrostScythe:IsAvailable() and not Player:Buff(S.Rime) and Cache.EnemiesCount[30] >= 3) then
+    if S.Obliterate:IsCastableP("Melee") and (not S.FrostScythe:IsAvailable() and not Player:Buff(S.Rime) and Cache.EnemiesCount[30] >= 3) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- frostscythe,if=(buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance)))&(rune.time_to_4>gcd|spell_targets.frostscythe>=2)
-    if S.FrostScythe:IsCastableP() and ((Player:BuffP(S.KillingMachine) or (Player:BuffP(S.KillingMachine) and (Player:PrevGCDP(1, S.FrostStrike) or Player:PrevGCDP(1, S.HowlingBlast) or Player:PrevGCDP(1, S.GlacialAdvance)))) and (Player:RuneTimeToX(4) > Player:GCD() or Cache.EnemiesCount[8] >= 2)) then
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and ((Player:BuffP(S.KillingMachine) or (Player:BuffP(S.KillingMachine) and (Player:PrevGCDP(1, S.FrostStrike) or Player:PrevGCDP(1, S.HowlingBlast) or Player:PrevGCDP(1, S.GlacialAdvance)))) and (Player:RuneTimeToX(4) > Player:GCD() or Cache.EnemiesCount[8] >= 2)) then
       if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- obliterate,if=buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance))
-    if S.Obliterate:IsCastableP() and Player:BuffP(S.KillingMachine) or (Player:BuffP(S.KillingMachine) and (Player:PrevGCDP(1, S.FrostStrike) or Player:PrevGCDP(1, S.HowlingBlast) or Player:PrevGCDP(1, S.GlacialAdvance))) then
+    if S.Obliterate:IsCastableP("Melee") and Player:BuffP(S.KillingMachine) or (Player:BuffP(S.KillingMachine) and (Player:PrevGCDP(1, S.FrostStrike) or Player:PrevGCDP(1, S.HowlingBlast) or Player:PrevGCDP(1, S.GlacialAdvance))) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- glacial_advance,if=(!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd)&spell_targets.glacial_advance>=2
@@ -339,19 +328,19 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
-    if S.HowlingBlast:IsCastableP() and (Player:Buff(S.Rime) and Cache.EnemiesCount[30] >= 2) then
+    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime) and Cache.EnemiesCount[30] >= 2) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- frost_strike,if=!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd
-    if S.FrostStrike:IsUsable() and not Player:Buff(S.Rime) or Player:RunicPowerDeficit() < 10 or Player:RuneTimeToX(2) > Player:GCD() then
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and not Player:Buff(S.Rime) or Player:RunicPowerDeficit() < 10 or Player:RuneTimeToX(2) > Player:GCD() then
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- howling_blast,if=buff.rime.up
-    if S.HowlingBlast:IsCastableP() and (Player:Buff(S.Rime)) then
+    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime)) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- obliterate
-    if S.Obliterate:IsCastableP() then
+    if S.Obliterate:IsCastableP("Melee") then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     return false;
@@ -384,11 +373,11 @@
       if (S.ColdHeartTalent:IsAvailable() or I.ColdHeart:IsEquipped()) and (((Player:BuffStack(S.ColdHeartBuff) >= 10 or Player:BuffStack(S.ColdHeartItemBuff) >= 10) and Target:DebuffStack(S.RazorIce) == 5) or Target:TimeToDie() <= Player:GCD()) then
           --[[COLD HEART LEGENDARY APL]] --
           -- actions.cold_heart=chains_of_ice,if=(buff.cold_heart_item.stack>5|buff.cold_heart_talent.stack>5)&target.time_to_die<gcd
-          if S.ChainsOfIce:IsCastable() and (Player:BuffStack(S.ColdHeartItemBuff) > 5 or Player:BuffStack(S.ColdHeartBuff) > 5) and Target:TimeToDie() <= Player:GCD() then
+          if S.ChainsOfIce:IsCastableP(30) and (Player:BuffStack(S.ColdHeartItemBuff) > 5 or Player:BuffStack(S.ColdHeartBuff) > 5) and Target:TimeToDie() <= Player:GCD() then
             if HR.Cast(S.ChainsOfIce) then return ""; end
           end
           -- actions.cold_heart+=/chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up
-          if S.ChainsOfIce:IsCastable() and (Player:BuffRemainsP(S.PillarOfFrost) <= Player:GCD() * (1 + (S.FrostwyrmsFury:CooldownUp() and 1 or 0)) or Player:BuffRemainsP(S.PillarOfFrost) < Player:RuneTimeToX(3)) and Player:BuffP(S.PillarOfFrost) then
+          if S.ChainsOfIce:IsCastableP(30) and (Player:BuffRemainsP(S.PillarOfFrost) <= Player:GCD() * (1 + (S.FrostwyrmsFury:CooldownUp() and 1 or 0)) or Player:BuffRemainsP(S.PillarOfFrost) < Player:RuneTimeToX(3)) and Player:BuffP(S.PillarOfFrost) then
             if HR.Cast(S.ChainsOfIce) then return ""; end
           end
             --[[END OF COLD HEART APL]] --
