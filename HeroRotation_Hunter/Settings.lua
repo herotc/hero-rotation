@@ -34,13 +34,17 @@
       ExhilarationHP = 30,
       ShowPoPP = false,
       CounterShotSephuz = false,
+      IntimidationSephuz = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
         AMurderofCrows = false,
         AspectoftheWild = false,
         BestialWrath = false,
+        CallPet = false,
         Exhilaration = true,
+        Intimidation = false,
+        MendPet = true,
         SpittingCobra = false,
         Stampede = false,
       },
@@ -83,11 +87,15 @@
         -- Abilities
         AspectoftheEagle = false,
         Butchery = false,
+        CallPet = false,
+        CoordinatedAssault = false,
         Exhilaration = false,
+        MendPet = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
+        Muzzle = true,
         -- Items
         PotionOfProlongedPower = true,
         -- Racials
@@ -112,6 +120,7 @@
   CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.CounterShotSephuz", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
+  CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.IntimidationShotSephuz", "Use Intimidation for Sephuz", "Enable this if you want it to show you when to use Intimidation to proc Sephuz's Secret (only when equipped). ");
   -- Marksmanship
   CreatePanelOption("Slider", CP_Marksmanship, "APL.Hunter.Marksmanship.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
@@ -121,3 +130,4 @@
   -- -- Survival
   CreatePanelOption("Slider", CP_Survival, "APL.Hunter.Survival.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival");
+  CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.MuzzleSephuz", "Use Muzzle for Sephuz", "Enable this if you want it to show you when to use Muzzleto proc Sephuz's Secret (only when equipped). ");

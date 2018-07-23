@@ -6,6 +6,7 @@
   local Cache = HeroCache;
   local Unit = HL.Unit;
   local Player = Unit.Player;
+  local Pet = Unit.Pet;
   local Target = Unit.Target;
   local Spell = HL.Spell;
   local Item = HL.Item;
@@ -41,6 +42,11 @@
     SerpentSting                  = Spell(259491),
     WildfireBomb                  = Spell(259495),
     WildfireBombDot               = Spell(269747),
+    -- Pet
+    CallPet                       = Spell(883),
+    Intimidation                  = Spell(19577),
+    MendPet                       = Spell(136),
+    RevivePet                     = Spell(982),
     -- Talents
     AlphaPredator                 = Spell(269737),
     AMurderofCrows                = Spell(131894),
@@ -53,6 +59,7 @@
     GuerrillaTactics              = Spell(264332),
     InternalBleeding              = Spell(270343),
     HydrasBite                    = Spell(260241),
+    Muzzle                        = Spell(187707),
     MongooseBite                  = Spell(259387),
     MongooseFury                  = Spell(259388),
     SteelTrap                     = Spell(162488),
@@ -145,6 +152,14 @@
     end
     -- In Combat
     if Everyone.TargetIsValid() then
+      -- call pet
+      if not Pet:IsActive() then
+        if HR.Cast(S.CallPet, Settings.Survival.GCDasOffGCD.CallPet) then return ""; end
+      end
+      -- actions+=/muzzle,if=target.debuff.casting.react // Sephuz Specific
+      if S.Muzzle:IsCastable() and Target:IsInterruptible() and (Settings.Survival.OffGCDasOffGCD.Muzzle or (I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer()>=30 and Settings.Survival.MuzzleSephuz)) then
+        if HR.CastSuggested(S.Muzzle) then return ""; end
+      end
       -- actions+=/use_items
       if HR.CDsON() then
         -- actions+=/arcane_torrent,if=focus.deficit>=30
@@ -186,7 +201,7 @@
       end
       -- actions+=/coordinated_assault
       if HR.CDsON() and S.CoordinatedAssault:IsCastable() then
-        if HR.Cast(S.CoordinatedAssault) then return ""; end
+        if HR.Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault) then return ""; end
       end
       -- actions+=/chakrams,if=active_enemies>1
       if HR.CDsON() and Target:IsInRange(40) and S.Chakrams:IsCastable() and Player:FocusPredicted(0.2) > 30 and Cache.EnemiesCount[40] > 1 then
@@ -201,9 +216,9 @@
         if HR.Cast(S.WildfireBomb) then return ""; end
       end
       -- add ShrapnelBomb PheromoneBomb and VolatileBomb for the talent WildfireInfusion
-      if Target:IsInRange(40) and (S.WildfireInfusion:IsAvailable() and (S.ShrapnelBomb:IsCastable() or S.PheromoneBomb:IsCastable() or S.VolatileBomb:IsCastable())) 
-      and ((Player:Focus() + Player:FocusCastRegen (Player:GCD()) < Player:FocusMax() or Cache.EnemiesCount[5] > 1) 
-      and ((not Target:Debuff(S.ShrapnelBombDot) or not Target:Debuff(S.PheromoneBombDot) or not Target:Debuff(S.VolatileBombDot)) 
+      if Target:IsInRange(40) and (S.WildfireInfusion:IsAvailable() and (S.ShrapnelBomb:IsCastable() or S.PheromoneBomb:IsCastable() or S.VolatileBomb:IsCastable()))
+      and ((Player:Focus() + Player:FocusCastRegen (Player:GCD()) < Player:FocusMax() or Cache.EnemiesCount[5] > 1)
+      and ((not Target:Debuff(S.ShrapnelBombDot) or not Target:Debuff(S.PheromoneBombDot) or not Target:Debuff(S.VolatileBombDot))
       and not Player:Buff(S.MongooseFury) or (S.ShrapnelBomb:FullRechargeTime() or S.PheromoneBomb:FullRechargeTime() or S.VolatileBomb:FullRechargeTime()) < Player:GCD())) then
         if HR.Cast(S.WildfireBomb) then return ""; end
       end
@@ -255,11 +270,15 @@
       if S.RaptorStrikeRanged:IsCastable() and Player:FocusPredicted(0.2) > 30 then
         if HR.Cast(S.RaptorStrikeRanged) then return ""; end
       end
-    -- Pool
-    if HR.Cast(S.PoolFocus) then return "Normal Pooling"; end
-      return;
+      -- Pool
+      if HR.Cast(S.PoolFocus) then return "Normal Pooling"; end
+        return;
+      end
+      -- heal pet
+      if Pet:IsActive() and Pet:HealthPercentage() <= 75 and not Pet:Buff(S.MendPet) then
+        if HR.Cast(S.MendPet, Settings.Survival.GCDasOffGCD.MendPet) then return ""; end
+      end
     end
-  end
 
   HR.SetAPL(255, APL);
 
