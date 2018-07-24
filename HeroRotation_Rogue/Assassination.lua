@@ -75,8 +75,10 @@ local S = Spell.Rogue.Assassination;
 -- Items
 if not Item.Rogue then Item.Rogue = {}; end
 Item.Rogue.Assassination = {
+  -- Nothing
 };
 local I = Item.Rogue.Assassination;
+
 -- Spells Damage
 S.Envenom:RegisterDamage(
   -- Envenom DMG Formula:
@@ -126,12 +128,14 @@ S.Garrote:RegisterPMultiplier(
 S.Rupture:RegisterPMultiplier(
   {NighstalkerMultiplier}
 );
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste();
 local Stealth;
 local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
-local Energy_Regen_Combined;
+local ComboPoints, ComboPointsDeficit, Energy_Regen_Combined;
+
 -- GUI Settings
 local Settings = {
   General = HR.GUISettings.General,
@@ -203,9 +207,9 @@ do
   end
 end
 local function TrainingScenario ()
-  if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*Player:ComboPoints() then
+  if Target:CastName() == "Unstable Explosion" and Target:CastPercentage() > 60-10*ComboPoints then
     -- Kidney Shot
-    if S.KidneyShot:IsCastable("Melee") and Player:ComboPoints() > 0 then
+    if S.KidneyShot:IsCastable("Melee") and ComboPoints > 0 then
       if HR.Cast(S.KidneyShot) then return "Cast Kidney Shot (Unstable Explosion)"; end
     end
   end
@@ -213,7 +217,7 @@ local function TrainingScenario ()
 end
 local Interrupts = {
   {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
-  {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end}
+  {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return ComboPoints > 0; end}
 }
 
 -- APL Action Lists (and Variables)
@@ -235,7 +239,7 @@ local function CDs ()
     end
 
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
-    if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+    if S.MarkedforDeath:IsCastable() and ComboPointsDeficit >= Rogue.CPMaxSpend() then
       HR.CastSuggested(S.MarkedforDeath);
     end
     -- actions.cds+=/vendetta,if=dot.rupture.ticking
@@ -243,7 +247,7 @@ local function CDs ()
       if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
     end
     if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
-      if S.Nightstalker:IsAvailable() and Player:ComboPoints() >= Rogue.CPMaxSpend() then
+      if S.Nightstalker:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() then
         if not S.Exsanguinate:IsAvailable() then
           -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
           if Target:Debuff(S.Vendetta) then
@@ -259,7 +263,7 @@ local function CDs ()
       if S.Subterfuge:IsAvailable() then
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
         if not Player:IsStealthed(true, false) and Target:DebuffRefreshableP(S.Garrote, 5.4)
-          and ((Cache.EnemiesCount[10] <= 3 and Player:ComboPointsDeficit() >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and Player:ComboPointsDeficit() >= 4)) then
+          and ((Cache.EnemiesCount[10] <= 3 and ComboPointsDeficit >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and ComboPointsDeficit >= 4)) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
         end
       end
@@ -312,12 +316,12 @@ local function Stealthed ()
     end
   end
   -- actions.stealthed+=/rupture,if=combo_points>=4&(talent.nightstalker.enabled|!ticking)&target.time_to_die-remains>6
-  if S.Rupture:IsCastable("Melee") and Player:ComboPoints() >= 4 and (S.Nightstalker:IsAvailable() or not Target:DebuffP(S.Rupture))
+  if S.Rupture:IsCastable("Melee") and ComboPoints >= 4 and (S.Nightstalker:IsAvailable() or not Target:DebuffP(S.Rupture))
     and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
     if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
   -- actions.stealthed+=/envenom,if=combo_points>=cp_max_spend
-  if S.Envenom:IsCastable("Melee") and Player:ComboPoints() >= Rogue.CPMaxSpend() then
+  if S.Envenom:IsCastable("Melee") and ComboPoints >= Rogue.CPMaxSpend() then
     if HR.Cast(S.Envenom) then return "Cast Envenom"; end
   end
   -- actions.stealthed+=/garrote,if=!talent.subterfuge.enabled&target.time_to_die-remains>4
@@ -337,13 +341,13 @@ end
 -- # Damage over time abilities
 local function Dot ()
   -- actions.dot=rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
-  if HR.CDsON() and S.Rupture:IsCastable("Melee") and Player:ComboPoints() > 0 and S.Exsanguinate:IsAvailable()
-    and ((Player:ComboPoints() >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
-      or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (Player:ComboPoints() >= 2)))) then
+  if HR.CDsON() and S.Rupture:IsCastable("Melee") and ComboPoints > 0 and S.Exsanguinate:IsAvailable()
+    and ((ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
+      or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (ComboPoints >= 2)))) then
     if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
   -- actions.dot+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&(target.time_to_die-remains>4&spell_targets.fan_of_knives<=1|target.time_to_die-remains>12)
-  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not HR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and Player:ComboPointsDeficit() >= 1 then
+  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not HR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and ComboPointsDeficit >= 1 then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime))
@@ -364,12 +368,12 @@ local function Dot ()
     end
   end
   -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
-  if HR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and Player:ComboPoints() >= 4 and Cache.EnemiesCount[10] >= 2
+  if HR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and ComboPoints >= 4 and Cache.EnemiesCount[10] >= 2
     and Target:DebuffRemainsP(S.CrimsonTempest) < 2 + num(Cache.EnemiesCount[10] >= 5) then
     if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
   end
   -- actions.dot+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time)&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>4
-  if Player:ComboPoints() >= 4 then
+  if ComboPoints >= 4 then
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
         and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture) <= (HL.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime))
@@ -389,7 +393,7 @@ end
 -- # Direct damage abilities
 local function Direct ()
   -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
-  if S.Envenom:IsCastable("Melee") and Player:ComboPoints() >= 4 + (S.DeeperStratagem:IsAvailable() and 1 or 0)
+  if S.Envenom:IsCastable("Melee") and ComboPoints >= 4 + (S.DeeperStratagem:IsAvailable() and 1 or 0)
     and (Target:DebuffP(S.Vendetta) or Target:DebuffP(S.ToxicBladeDebuff) or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined or Cache.EnemiesCount[10] >= 2)
     and (not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() > 2) then
     if HR.Cast(S.Envenom) then return "Cast Envenom"; end
@@ -399,7 +403,7 @@ local function Direct ()
   -------------------------------------------------------------------
   -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
   -- This is used in all following fillers, so we just return false if not true and won't consider these.
-  if not (Player:ComboPointsDeficit() > 1 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined or Cache.EnemiesCount[10] >= 2) then
+  if not (ComboPointsDeficit > 1 or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined or Cache.EnemiesCount[10] >= 2) then
     return false;
   end
   -------------------------------------------------------------------
@@ -425,14 +429,17 @@ local function APL ()
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
 
   -- Unit Update
+  HL.GetEnemies(50); -- Used for Rogue.PoisonedBleeds()
   HL.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
   HL.GetEnemies(10, true); -- Fan of Knives
   HL.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Compute Cache
-  RuptureThreshold = (4 + Player:ComboPoints() * 4) * 0.3;
-  CrimsonTempestThreshold = (2 + Player:ComboPoints() * 2) * 0.3;
+  ComboPoints = Player:ComboPoints();
+  ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints;
+  RuptureThreshold = (4 + ComboPoints * 4) * 0.3;
+  CrimsonTempestThreshold = (2 + ComboPoints * 2) * 0.3;
   RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   GarroteDMGThreshold = S.Mutilate:Damage()*Settings.Assassination.MutilateDMGOffset; -- Used as TTD Not Valid fallback since it's a generator.
 

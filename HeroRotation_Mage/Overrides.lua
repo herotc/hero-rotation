@@ -15,6 +15,14 @@
     local SpellFire   = Spell.Mage.Fire;
     local SpellFrost  = Spell.Mage.Frost;
 
+    local Settings = {
+      General = HR.GUISettings.General,
+      Commons = HR.GUISettings.APL.Mage.Commons,
+      Frost = HR.GUISettings.APL.Mage.Frost,
+      Fire = HR.GUISettings.APL.Mage.Fire,
+      Arcane = HR.GUISettings.APL.Mage.Arcane,
+    };
+
     SpellFrost.GlacialSpikeBuff   = Spell(199844);
   -- Lua
 
@@ -43,6 +51,10 @@
 
       if self == SpellFrost.GlacialSpike then
         return self:IsLearned() and RangeOK and (Player:BuffP(SpellFrost.GlacialSpikeBuff) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 4 and Player:IsCasting(SpellFrost.Frostbolt))) and not Player:IsCasting(SpellFrost.GlacialSpike);
+      elseif self == SpellFrost.Counterspell then
+        return self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK and Target:IsInterruptible() and Settings.General.InterruptEnabled
+      elseif self == SpellFrost.WaterElemental then
+        return self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK and not Pet:IsActive()
       else
         return self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK;
       end
