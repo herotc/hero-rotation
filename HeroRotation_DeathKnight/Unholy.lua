@@ -181,7 +181,7 @@ end
 
  local function Generic()
   -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
-  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22 then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and (not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22) then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
@@ -243,7 +243,7 @@ local function Cooldowns()
     end
     -- army_of_the_dead
     if S.ArmyOfTheDead:IsCastable() then
-      if HR.Cast(S.ArmyOfTheDead) then return ""; end
+      if HR.Cast(S.ArmyOfTheDead, Settings.Unholy.GCDasOffGCD.ArmyOfTheDead) then return ""; end
     end
     -- apocalypse,if=debuff.festering_wound.stack>=4
     if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWound) >= 4 then
@@ -263,7 +263,7 @@ local function Cooldowns()
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
     if S.UnholyFrenzy:IsCastable() and (Cache.EnemiesCount[10] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
-      if HR.Cast(S.UnholyFrenzy, Settings.DeathKnight.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
+      if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
     end
     -- soul_reaper,target_if=(target.time_to_die<8|rune<=2)&!buff.unholy_frenzy.up
     if S.SoulReaper:IsCastable() then
@@ -321,7 +321,8 @@ local function APL()
       ShouldReturn = AOE();
       if ShouldReturn then return ShouldReturn; end
     end
-    if (S.SummonGargoyle:IsAvailable() and  S.SummonGargoyle:TimeSinceLastCast() > 22) or S.ArmyOfTheDammed:IsAvailable() or S.UnholyFrenzy:IsAvailable() then
+    -- gargoyle apl doesnt have a proper apl yet, lets use the standard one incase someone select that talent for now even if its not optimal
+    if --[[(S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() > 22)]] S.SummonGargoyle:IsAvailable() or S.ArmyOfTheDammed:IsAvailable() or S.UnholyFrenzy:IsAvailable() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
     end
