@@ -429,6 +429,7 @@ local function APL ()
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
 
   -- Unit Update
+  HL.GetEnemies(50); -- Used for Rogue.PoisonedBleeds()
   HL.GetEnemies(30); -- Used for Poisoned Knife Poison refresh
   HL.GetEnemies(10, true); -- Fan of Knives
   HL.GetEnemies("Melee"); -- Melee
