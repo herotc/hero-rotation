@@ -388,7 +388,7 @@
         end
         -- actions.cooldowns+=/frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up)
         if S.FrostwyrmsFury:IsCastable() and Player:BuffRemains(S.PillarOfFrost) <= Player:GCD() * 2 and Player:Buff(S.PillarOfFrost) then
-            if HR.CastSuggested(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
+            if HR.Cast(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
         end
 
         return false;
