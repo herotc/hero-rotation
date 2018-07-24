@@ -255,11 +255,11 @@ local function Cooldowns()
     end
     -- summon_gargoyle,if=runic_power.deficit<14
     if S.SummonGargoyle:IsCastable() and Player:RunicPowerDeficit() < 14 then
-      if HR.Cast(S.SummonGargoyle) then return ""; end
+      if HR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
     end
     -- unholy_frenzy,if=debuff.festering_wound.stack<4
     if S.UnholyFrenzy:IsCastable() and Target:DebuffStack(S.FesteringWound) < 4 then
-      if HR.Cast(S.UnholyFrenzy) then return ""; end
+      if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
     if S.UnholyFrenzy:IsCastable() and (Cache.EnemiesCount[10] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
@@ -267,7 +267,7 @@ local function Cooldowns()
     end
     -- soul_reaper,target_if=(target.time_to_die<8|rune<=2)&!buff.unholy_frenzy.up
     if S.SoulReaper:IsCastable() then
-      if HR.Cast(S.SoulReaper) then return ""; end
+      if HR.Cast(S.SoulReaper, Settings.Unholy.GCDasOffGCD.SoulReaper) then return ""; end
     end
     -- unholy_blight
     if S.UnholyBlight:IsCastable() then
@@ -279,8 +279,8 @@ end
 
 local function APL()
     --UnitUpdate
-  HL.GetEnemies(8);
-  HL.GetEnemies(10);
+  HL.GetEnemies(8); -- Melee Range / Bursting Sores 8yd
+  HL.GetEnemies(10); -- DnD 10yd
   Everyone.AoEToggleEnemiesUpdate();
   --Defensives
   --OutOf Combat
