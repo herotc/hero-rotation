@@ -145,8 +145,6 @@
   local PoisonedBleedsCount = 0;
   function Commons.PoisonedBleeds ()
     PoisonedBleedsCount = 0;
-    -- Get Units up to 50y (not really worth the potential performance loss to go higher).
-    HL.GetEnemies(50);
     for _, Unit in pairs(Cache.Enemies[50]) do
       if Commons.Poisoned(Unit) then
         -- TODO: For loop for this ? Not sure it's worth considering we would have to make 2 times spell object (Assa is init after Commons)
@@ -157,9 +155,6 @@
           PoisonedBleedsCount = PoisonedBleedsCount + 1;
         end
         if Unit:Debuff(Spell.Rogue.Assassination.Rupture) then
-          PoisonedBleedsCount = PoisonedBleedsCount + 1;
-        end
-        if Unit:Debuff(Spell.Rogue.Assassination.CrimsonTempest) then
           PoisonedBleedsCount = PoisonedBleedsCount + 1;
         end
       end
