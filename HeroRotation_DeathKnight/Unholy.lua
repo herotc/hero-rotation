@@ -123,8 +123,8 @@
   if S.Epidemic:IsAvailable() and S.Epidemic:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
   end
-  -- death_coil,if=death_and_decay.ticking&rune<2&!talent.epidemic.enabled&!variable.pooling_for_gargoyle
-  if S.DeathCoil:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not S.Epidemic:IsAvailable() and not PoolingForGargoyle() then
+  -- death_coil,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
+  if S.DeathCoil:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
@@ -147,13 +147,41 @@
   if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and Player:Runes() <= 2 then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
+  -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
+  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22 then
+    if HR.Cast(S.DeathCoil) then return ""; end
+  end
+  -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
+  if S.DeathCoil:IsUsable() and Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWound) > 4) and not PoolingForGargoyle() then
+    if HR.Cast(S.DeathCoil) then return ""; end
+  end
+  -- scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
+  if S.ScourgeStrike:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and S.ArmyOfTheDead:CooldownRemainsP() > 5 or S.ArmyOfTheDead:IsCastable())  then
+    if HR.Cast(S.ScourgeStrike) then return ""; end
+  end
+  -- clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
+  if S.ClawingShadows:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and S.ArmyOfTheDead:CooldownRemainsP() > 5 or S.ArmyOfTheDead:IsCastable()) then
+    if HR.Cast(S.ClawingShadows) then return ""; end
+  end
+  -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
+  if S.DeathCoil:IsUsable() and Player:RunicPowerDeficit() < 20 and not PoolingForGargoyle() then
+    if HR.Cast(S.DeathCoil) then return ""; end
+  end
+  -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&cooldown.army_of_the_dead.remains>5
+  if S.FesteringStrike:IsCastable() and (((((Target:DebuffStack(S.FesteringWound) < 4 and not Player:Buff(S.UnholyFrenzy)) or Target:DebuffStack(S.FesteringWound) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStack(S.FesteringWound) < 1) and S.ArmyOfTheDead:CooldownRemainsP() > 5 or S.ArmyOfTheDead:IsCastable()) then
+    if HR.Cast(S.FesteringStrike) then return ""; end
+  end
+  -- death_coil,if=!variable.pooling_for_gargoyle
+  if S.DeathCoil:IsUsable() and not PoolingForGargoyle() then
+    if HR.Cast(S.DeathCoil) then return ""; end
+  end
   return false;
 end
 
 
  local function Generic()
   -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
-  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22 then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and (not PoolingForGargoyle() or S.SummonGargoyle:TimeSinceLastCast() <= 22) then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
@@ -169,11 +197,11 @@ end
     if HR.Cast(S.Defile) then return ""; end
   end
   -- scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
-  if S.ScourgeStrike:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and S.ArmyOfTheDead:CooldownRemainsP() > 5) then
+  if S.ScourgeStrike:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and (S.ArmyOfTheDead:CooldownRemainsP() > 5 or S.ArmyOfTheDead:IsCastable())) then
     if HR.Cast(S.ScourgeStrike) then return ""; end
   end
   -- clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
-  if S.ClawingShadows:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and S.ArmyOfTheDead:CooldownRemainsP() > 5) then
+  if S.ClawingShadows:IsCastable() and (((Target:Debuff(S.FesteringWound) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStack(S.FesteringWound) > 4) and (S.ArmyOfTheDead:CooldownRemainsP() > 5 or S.ArmyOfTheDead:IsCastable())) then
     if HR.Cast(S.ClawingShadows) then return ""; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
@@ -181,14 +209,13 @@ end
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&cooldown.army_of_the_dead.remains>5
-  if S.FesteringStrike:IsCastable() and (((((Target:DebuffStack(S.FesteringWound) < 4 and not Player:Buff(S.UnholyFrenzy)) or Target:DebuffStack(S.FesteringWound) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStack(S.FesteringWound) < 1) and S.ArmyOfTheDead:CooldownRemainsP() > 5) then
+  if S.FesteringStrike:IsCastable() and (((((Target:DebuffStack(S.FesteringWound) < 4 and not Player:Buff(S.UnholyFrenzy)) or Target:DebuffStack(S.FesteringWound) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStack(S.FesteringWound) < 1) and (S.ArmyOfTheDead:CooldownRemainsP() > 5 or S.ArmyOfTheDead:IsCastable())) then
     if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- death_coil,if=!variable.pooling_for_gargoyle
   if S.DeathCoil:IsUsable() and not PoolingForGargoyle() then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
-  if HR.Cast(S.PoolForResources) then return "Pooling";end
   return false;
 end
 
@@ -215,7 +242,7 @@ local function Cooldowns()
     end
     -- army_of_the_dead
     if S.ArmyOfTheDead:IsCastable() then
-      if HR.Cast(S.ArmyOfTheDead) then return ""; end
+      if HR.Cast(S.ArmyOfTheDead, Settings.Unholy.GCDasOffGCD.ArmyOfTheDead) then return ""; end
     end
     -- apocalypse,if=debuff.festering_wound.stack>=4
     if S.Apocalypse:IsCastable() and Target:DebuffStack(S.FesteringWound) >= 4 then
@@ -227,32 +254,32 @@ local function Cooldowns()
     end
     -- summon_gargoyle,if=runic_power.deficit<14
     if S.SummonGargoyle:IsCastable() and Player:RunicPowerDeficit() < 14 then
-      if HR.Cast(S.SummonGargoyle) then return ""; end
+      if HR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
     end
     -- unholy_frenzy,if=debuff.festering_wound.stack<4
     if S.UnholyFrenzy:IsCastable() and Target:DebuffStack(S.FesteringWound) < 4 then
-      if HR.Cast(S.UnholyFrenzy) then return ""; end
+      if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
-    if S.UnholyFrenzy:IsCastable() and (Cache.EnemiesCount[10] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
-      if HR.Cast(S.UnholyFrenzy, Settings.DeathKnight.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
+    if S.UnholyFrenzy:IsCastable() and (Cache.EnemiesCount[10] >= 2 and ((S.DeathAndDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
+      if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
     end
     -- soul_reaper,target_if=(target.time_to_die<8|rune<=2)&!buff.unholy_frenzy.up
     if S.SoulReaper:IsCastable() then
-      if HR.Cast(S.SoulReaper) then return ""; end
+      if HR.Cast(S.SoulReaper, Settings.Unholy.GCDasOffGCD.SoulReaper) then return ""; end
     end
     -- unholy_blight
     if S.UnholyBlight:IsCastable() then
       if HR.Cast(S.UnholyBlight) then return ""; end
     end
-    return;
+    return false;
   end
 end
 
 local function APL()
     --UnitUpdate
-  HL.GetEnemies(8);
-  HL.GetEnemies(10);
+  HL.GetEnemies(8); -- Melee Range / Bursting Sores 8yd
+  HL.GetEnemies(10); -- DnD 10yd
   Everyone.AoEToggleEnemiesUpdate();
   --Defensives
   --OutOf Combat
@@ -293,10 +320,12 @@ local function APL()
       ShouldReturn = AOE();
       if ShouldReturn then return ShouldReturn; end
     end
-    if (S.SummonGargoyle:IsAvailable() and  S.SummonGargoyle:TimeSinceLastCast() > 22) or S.ArmyOfTheDammed:IsAvailable() or S.UnholyFrenzy:IsAvailable() then
+    -- gargoyle apl doesnt have a proper apl yet, lets use the standard one incase someone select that talent for now even if its not optimal
+    if --[[(S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() > 22)]] S.SummonGargoyle:IsAvailable() or S.ArmyOfTheDammed:IsAvailable() or S.UnholyFrenzy:IsAvailable() then
     ShouldReturn = Generic();
     if ShouldReturn then return ShouldReturn; end
     end
+    if HR.CastAnnotated(S.PoolForResources, false, "WAIT") then return "Wait/Pool Resources"; end
     return
   end
 end

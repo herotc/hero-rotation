@@ -312,7 +312,7 @@
       if HR.Cast(S.RemorselessWinter) then return ""; end
     end
     -- obliterate,if=!talent.frostscythe.enabled&!buff.rime.up&spell_targets.howling_blast>=3
-    if S.Obliterate:IsCastableP("Melee") and (not S.FrostScythe:IsAvailable() and not Player:Buff(S.Rime) and Cache.EnemiesCount[30] >= 3) then
+    if S.Obliterate:IsCastableP("Melee") and (not S.FrostScythe:IsAvailable() and not Player:Buff(S.Rime) and Cache.EnemiesCount[10] >= 3) then
       if HR.Cast(S.Obliterate) then return ""; end
     end
     -- frostscythe,if=(buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance)))&(rune.time_to_4>gcd|spell_targets.frostscythe>=2)
@@ -328,7 +328,7 @@
       if HR.Cast(S.GlacialAdvance) then return ""; end
     end
     -- howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
-    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime) and Cache.EnemiesCount[30] >= 2) then
+    if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime) and Cache.EnemiesCount[10] >= 2) then
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- frost_strike,if=!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd
@@ -338,6 +338,10 @@
     -- howling_blast,if=buff.rime.up
     if S.HowlingBlast:IsCastableP(30, true) and (Player:Buff(S.Rime)) then
       if HR.Cast(S.HowlingBlast) then return ""; end
+    end
+    -- frostscythe, if=spell_targets.frostscythe>=2
+    if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 2 then
+      if HR.Cast(S.FrostScythe) then return ""; end
     end
     -- obliterate
     if S.Obliterate:IsCastableP("Melee") then
@@ -384,7 +388,7 @@
         end
         -- actions.cooldowns+=/frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up)
         if S.FrostwyrmsFury:IsCastable() and Player:BuffRemains(S.PillarOfFrost) <= Player:GCD() * 2 and Player:Buff(S.PillarOfFrost) then
-            if HR.CastSuggested(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
+            if HR.Cast(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
         end
 
         return false;
@@ -394,9 +398,9 @@ end
 local function APL ()
     -- Unit Update
     HL.GetEnemies("Melee");
-    HL.GetEnemies(8,true);
-    HL.GetEnemies(10,true);
-    HL.GetEnemies(30,true);
+    HL.GetEnemies(8,true);  -- Frostscythe 8yd
+    HL.GetEnemies(10,true); -- Howling Blast 10yd
+    HL.GetEnemies(30,true); -- Glacial Advance 30yd
     Everyone.AoEToggleEnemiesUpdate();
     -- Defensives
 
@@ -560,6 +564,7 @@ end
 -- actions.obliteration+=/howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
 -- actions.obliteration+=/frost_strike,if=!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd
 -- actions.obliteration+=/howling_blast,if=buff.rime.up
+-- actions.obliteration+=/frostscythe,if=spell_targets.frostscythe>=2
 -- actions.obliteration+=/obliterate
 --
 -- actions.standard=remorseless_winter
