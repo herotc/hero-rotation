@@ -307,11 +307,11 @@ local function APL()
   --  if HR.Cast(S.TimeWarp) then return ""; end
   --end
   -- call_action_list,name=cooldowns
-  if (true) then
+  if HR.CDsON() then
     local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
-  if (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
+  if HR.AoEON() and (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
     local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=single
