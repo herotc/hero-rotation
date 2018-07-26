@@ -12,9 +12,9 @@
     HeroRotation.CmdHandler("custom1");
   </Binding>
   <Binding name="HEROROTATION_CUSTOM2" description="Toggle On/Off the Custom2." category="ADDONS">
-    HeroRotation.CmdHandler("custom1");
+    HeroRotation.CmdHandler("custom2");
   </Binding>
   <Binding name="HEROROTATION_CUSTOM3" description="Toggle On/Off the Custom3." category="ADDONS">
-    HeroRotation.CmdHandler("custom1");
+    HeroRotation.CmdHandler("custom3");
   </Binding>
 </Bindings>
