@@ -415,6 +415,7 @@
       -- Set the Texture
       IconFrame.Texture:SetTexture(HR.GetTexture(Object));
       IconFrame.Texture:SetAllPoints(IconFrame);
+      IconFrame.Texture:SetAlpha(ThisUnit:IsInRange(Object) and 1 or 0.4);
       IconFrame:ClearAllPoints();
       if not IconFrame:IsVisible() then
         if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
