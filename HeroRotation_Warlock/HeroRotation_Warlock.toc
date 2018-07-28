@@ -1,0 +1,17 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FWarlock|r]
+## Author: KutiKuti
+## Notes: Hero Rotation - Warlock Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Events.lua
+Warlock.lua
+Destruction.lua
+Demonology.lua
+Affliction.lua
+Overrides.lua

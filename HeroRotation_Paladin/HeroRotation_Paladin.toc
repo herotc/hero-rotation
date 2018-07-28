@@ -1,0 +1,14 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FPaladin|r]
+## Author: Aethys, chrislopez24
+## Notes: Hero Rotation - Paladin Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Protection.lua
+Retribution.lua
+Overrides.lua
