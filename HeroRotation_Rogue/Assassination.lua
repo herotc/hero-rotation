@@ -150,25 +150,26 @@ end
 -- Handle CastLeftNameplate Suggestions for DoT Spells
 local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD)
   -- Prefer melee cycle units
-  local BestUnit, BestUnitTTD = Target, DoTMinTTD;
+  local BestUnit, BestUnitTTD = nil, DoTMinTTD;
+  local TargetGUID = Target:GUID();
   for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
-    if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
+    if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell))
+    and DoTEvaluation(CycleUnit) then
       BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
     end
   end
   if BestUnit then
-    if BestUnit:GUID() == Target:GUID() then return; end;
     HR.CastLeftNameplate(BestUnit, DoTSpell);
   -- Check ranged units next, if the RangedMultiDoT option is enabled
   elseif Settings.Assassination.RangedMultiDoT then
-    BestUnit, BestUnitTTD = Target, DoTMinTTD;
+    BestUnit, BestUnitTTD = nil, DoTMinTTD;
     for _, CycleUnit in pairs(Cache.Enemies[10]) do
-      if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
+      if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell))
+      and DoTEvaluation(CycleUnit) then
         BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
       end
     end
     if BestUnit then
-      if BestUnit:GUID() == Target:GUID() then return; end;
       HR.CastLeftNameplate(BestUnit, DoTSpell);
     end
   end
