@@ -131,13 +131,16 @@ local function BladeDance()
 end
 -- variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 local function WaitingForNemesis()
+  if not HR.CDsON() then
+    return false;
+  end
   return not (not S.Nemesis:IsAvailable() or S.Nemesis:IsReady() or S.Nemesis:CooldownRemainsP() > Target:TimeToDie() or S.Nemesis:CooldownRemainsP() > 60);
 end
 -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30&(!variable.waiting_for_nemesis|cooldown.nemesis.remains<10)
 local function PoolingForMeta()
   if not HR.CDsON() then
     return false;
-  end;
+  end
   return not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemainsP() < 6 and Player:FuryDeficit() > 30
     and (not WaitingForNemesis() or S.Nemesis:CooldownRemainsP() < 10);
 end
