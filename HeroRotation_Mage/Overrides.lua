@@ -51,12 +51,13 @@
 
       if self == SpellFrost.GlacialSpike then
         return self:IsLearned() and RangeOK and (Player:BuffP(SpellFrost.GlacialSpikeBuff) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 4 and Player:IsCasting(SpellFrost.Frostbolt))) and not Player:IsCasting(SpellFrost.GlacialSpike);
-      elseif self == SpellFrost.Counterspell then
-        return self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK and Target:IsInterruptible() and Settings.General.InterruptEnabled
-      elseif self == SpellFrost.WaterElemental then
-        return self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK and not Pet:IsActive()
       else
-        return self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK;
+        local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
+        if self == SpellFrost.WaterElemental then
+          return BaseCheck and not Pet:IsActive()
+        else
+          return BaseCheck
+        end
       end
     end
     , 64);
