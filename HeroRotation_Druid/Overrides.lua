@@ -40,6 +40,24 @@
     end
     , 103);
 
+    HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local RangeOK = true;
+      if Range then
+        local RangeUnit = ThisUnit or Target;
+        RangeOK = RangeUnit:IsInRange( Range, AoESpell );
+      end
+
+      local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
+
+      if self == SpellFeral.Regrowth and BaseCheck and SpellFeral.Bloodtalons:IsAvailable() and (not Player:AffectingCombat()) then
+        return Player:BuffDownP(SpellFeral.BloodtalonsBuff)
+      end
+
+      return BaseCheck
+    end
+    , 103);
+
 -- Guardian, ID: 104
 
 -- Restoration, ID: 105
