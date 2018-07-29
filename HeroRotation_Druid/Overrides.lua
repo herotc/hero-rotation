@@ -20,13 +20,32 @@
 -- Balance, ID: 102
 
 -- Feral, ID: 103
+    HL.AddCoreOverride ("Unit.BuffP",
+    function ( self, Spell, AnyCaster, Offset )
+      if Spell == SpellFeral.CatForm or Spell == SpellFeral.CatFormBuff or Spell == SpellFeral.Prowl or Spell == SpellFeral.ProwlBuff then
+        return self:Buff(Spell);
+      else
+        return self:BuffRemains( Spell, AnyCaster, Offset or "Auto" ) > 0;
+      end
+    end
+    , 103);
+
+    HL.AddCoreOverride ("Unit.BuffDownP",
+    function ( self, Spell, AnyCaster, Offset )
+      if Spell == SpellFeral.CatForm or Spell == SpellFeral.CatFormBuff or Spell == SpellFeral.Prowl or Spell == SpellFeral.ProwlBuff then
+        return self:BuffDown(Spell);
+      else
+        return self:BuffRemains( Spell, AnyCaster, Offset or "Auto" ) == 0;
+      end
+    end
+    , 103);
 
 -- Guardian, ID: 104
 
 -- Restoration, ID: 105
 
 -- Example (Arcane Mage)
--- HL.AddCoreOverride ("Spell.IsCastableP", 
+-- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 --   if Range then
 --     local RangeUnit = ThisUnit or Target;
