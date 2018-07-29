@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Modify the two vars so it match you own setup. Make sure you have it surrounded by double quotes
 # WoWRep  : World of warcraft main directory
