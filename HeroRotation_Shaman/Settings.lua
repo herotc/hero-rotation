@@ -30,20 +30,15 @@
 
     Elemental = {
       OffGCDasOffGCD = {
-	    Ascendance = true,
       },
 	  GCDasOffGCD = {
-	    Elementals = false,
 	  }
     },
 
     Enhancement = {
       OffGCDasOffGCD = {
-	    DoomWinds = true,
-	    Ascendance = true,
       },
 	  GCDasOffGCD = {
-	    FeralSpirit = false,
 	  }
 	}
   };
@@ -58,13 +53,13 @@
 
   -- Shared Shaman settings
   CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons");
-  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.OnUseTrinkets", "Show on use trinkets", "Enable this if you want to show on use trinkets when they are ready.");
-  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power on mobs with more than 250M max health.");
+  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.OnUseTrinkets", "Show on use trinkets", "Enable this if you want to show supported on use trinkets when they are ready.");
+  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.HealthstoneEnabled", "Show Healthstone", "Enable this if you want to show Healthstone when you're low on health.");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.HealingSurgeEnabled", "Show Healing Surge", "Enable this if you want to show Healing Surge when you're low on health.");
   CreatePanelOption("Slider", CP_Shaman, "APL.Shaman.Commons.HealingSurgeHPThreshold", {0, 100, 1}, "Healing Surge HP threshold", "Healing Surge health threshold.");
 
-  -- Elemental settings 
+  -- Elemental settings
   CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
 
   -- Enhancement settings

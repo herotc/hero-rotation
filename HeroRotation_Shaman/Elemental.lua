@@ -125,7 +125,7 @@ local function MaelstromP()
   end
   local factor = 1 + 0.75 * overloadChance
   if Player:IsCasting(S.LightningBolt) then
-    return maelstrom + 8 * factor + resonance 
+    return maelstrom + 8 * factor + resonance
   end
   if Player:IsCasting(S.Icefury) then
     return maelstrom + 24 * factor + resonance
@@ -150,7 +150,7 @@ local function MaelstromMinP()
     resonance = Player:CastRemains()
   end
   if Player:IsCasting(S.LightningBolt) then
-    return maelstrom + 8 + resonance 
+    return maelstrom + 8 + resonance
   end
   if Player:IsCasting(S.Icefury) then
     return maelstrom + 24 + resonance
@@ -222,10 +222,10 @@ local function APL ()
     -- actions+=/fire_elemental
     -- actions+=/storm_elemental
     if S.FireElemental:IsCastableP() and (S.EarthElemental:TimeSinceLastCast() >= 60) then
-      if HR.Cast(S.FireElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast FireElemental" end
+      if HR.Cast(S.FireElemental) then return "Cast FireElemental" end
     end
     if S.EarthElemental:IsCastableP() and (S.FireElemental:TimeSinceLastCast() >= 60) then
-      if HR.Cast(S.EarthElemental, Settings.Shaman.Elemental.GCDasOffGCD.Elementals) then return "Cast EarthElemental" end
+      if HR.Cast(S.EarthElemental) then return "Cast EarthElemental" end
     end
 
     -- actions+=/elemental_mastery
@@ -260,7 +260,7 @@ local function APL ()
       -- actions.aoe+=/ascendance
       if S.Ascendance:IsCastableP() then
         if S.Ascendance:IsAvailable() and not Player:Buff(S.AscendanceBuff) then
-          if HR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+          if HR.Cast(S.Ascendance) then return "Cast Ascendance" end
         end
       end
 
@@ -327,7 +327,7 @@ local function APL ()
     if S.Ascendance:IsAvailable() then
       -- actions.single_asc=ascendance,if=dot.flame_shock.remains>buff.ascendance.duration&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&!buff.stormkeeper.up
       if S.Ascendance:IsCastableP() and (Target:DebuffRemainsP(S.FlameShockDebuff) > Player:BuffRemainsP(S.AscendanceBuff) and (HL.CombatTime() >= 60 or Player:BuffP(S.BloodLustBuff)) and S.LavaBurst:CooldownRemainsP() > 0 and not Player:BuffP(S.StormkeeperBuff)) then
-        if HR.Cast(S.Ascendance, Settings.Shaman.Elemental.OffGCDasOffGCD.Ascendance) then return "Cast Ascendance" end
+        if HR.Cast(S.Ascendance) then return "Cast Ascendance" end
       end
 
       -- actions.single_asc+=/flame_shock,if=!ticking|dot.flame_shock.remains<=gcd
