@@ -93,7 +93,9 @@
         return false;
       end
     else
-      HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind);
+      local PoolResource = 9999000010
+      local Usable = Object.SpellID == PoolResource or Object:IsUsable();
+      HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable);
       GCDDisplay();
       Object.LastDisplayTime = HL.GetTime();
       return true;

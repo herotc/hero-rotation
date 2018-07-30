@@ -30,7 +30,7 @@ Spell.Mage.Frost = {
   CometStorm                            = Spell(153595),
   IceNova                               = Spell(157997),
   Flurry                                = Spell(44614),
-  Ebonbolt                              = Spell(214634),
+  Ebonbolt                              = Spell(257537),
   BrainFreezeBuff                       = Spell(190446),
   IciclesBuff                           = Spell(205473),
   GlacialSpike                          = Spell(199786),
@@ -40,6 +40,7 @@ Spell.Mage.Frost = {
   ConeofCold                            = Spell(120),
   IcyVeins                              = Spell(12472),
   RuneofPower                           = Spell(116011),
+  RuneofPowerBuff                       = Spell(116014),
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
   LightsJudgment                        = Spell(255647),
@@ -47,11 +48,10 @@ Spell.Mage.Frost = {
   IceFloes                              = Spell(108839),
   IceFloesBuff                          = Spell(108839),
   WintersChillDebuff                    = Spell(228358),
+  GlacialSpikeBuff                      = Spell(199844),
   SplittingIce                          = Spell(56377),
   ZannesuJourneyBuff                    = Spell(206397),
   Counterspell                          = Spell(2139),
-  TimeWarp                              = Spell(80353),
-  ExhaustionBuff                        = Spell(57723),
   FreezingRain                          = Spell(240555)
 };
 local S = Spell.Mage.Frost;
@@ -59,8 +59,7 @@ local S = Spell.Mage.Frost;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
-  ProlongedPower                   = Item(142117),
-  ShardoftheExodar                 = Item(132410)
+  ProlongedPower                   = Item(142117)
 };
 local I = Item.Mage.Frost;
 
@@ -94,8 +93,10 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  local Precombat, Aoe, Cooldowns, Movement, Single
   UpdateRanges()
-  local function Precombat()
+  Everyone.AoEToggleEnemiesUpdate()
+  Precombat = function()
     -- flask
     -- food
     -- augmentation
@@ -109,8 +110,8 @@ local function APL()
     end
     -- snapshot_stats
     -- mirror_image
-    if S.MirrorImage:IsCastableP() and (true) then
-      if HR.Cast(S.MirrorImage) then return ""; end
+    if S.MirrorImage:IsCastableP() and HR.CDsON() and (true) then
+      if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return ""; end
     end
     -- potion
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
@@ -121,7 +122,7 @@ local function APL()
       if HR.Cast(S.Frostbolt) then return ""; end
     end
   end
-  local function Aoe()
+  Aoe = function()
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() and (true) then
       if HR.Cast(S.FrozenOrb) then return ""; end
@@ -175,30 +176,30 @@ local function APL()
       if HR.Cast(S.IceLance) then return ""; end
     end
   end
-  local function Cooldowns()
+  Cooldowns = function()
     -- icy_veins
-    if S.IcyVeins:IsCastableP() and (true) then
-      if HR.Cast(S.IcyVeins) then return ""; end
+    if S.IcyVeins:IsCastableP() and HR.CDsON() and (true) then
+      if HR.Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return ""; end
     end
     -- mirror_image
-    if S.MirrorImage:IsCastableP() and (true) then
-      if HR.Cast(S.MirrorImage) then return ""; end
+    if S.MirrorImage:IsCastableP() and HR.CDsON() and (true) then
+      if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return ""; end
     end
     -- rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
     if S.RuneofPower:IsCastableP() and (Target:TimeToDie() > 10 + S.RuneofPower:CastTime() and Target:TimeToDie() < 25) then
-      if HR.Cast(S.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
     end
     -- rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(!talent.ebonbolt.enabled&buff.brain_freeze.react|talent.ebonbolt.enabled&(full_recharge_time<=cooldown.ebonbolt.remains&buff.brain_freeze.react|cooldown.ebonbolt.remains<cast_time&!buff.brain_freeze.react))
     if S.RuneofPower:IsCastableP() and (Cache.EnemiesCount[35] == 1 and S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) == 5 and (not S.Ebonbolt:IsAvailable() and bool(Player:BuffStackP(S.BrainFreezeBuff)) or S.Ebonbolt:IsAvailable() and (S.RuneofPower:FullRechargeTimeP() <= S.Ebonbolt:CooldownRemainsP() and bool(Player:BuffStackP(S.BrainFreezeBuff)) or S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime() and not bool(Player:BuffStackP(S.BrainFreezeBuff))))) then
-      if HR.Cast(S.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
     end
     -- rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
     if S.RuneofPower:IsCastableP() and (Cache.EnemiesCount[35] == 1 and not S.GlacialSpike:IsAvailable() and (Player:PrevGCDP(1, S.FrozenOrb) or S.Ebonbolt:IsAvailable() and S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime() or S.CometStorm:IsAvailable() and S.CometStorm:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RayofFrost:IsAvailable() and S.RayofFrost:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RuneofPower:ChargesFractional() > 1.9)) then
-      if HR.Cast(S.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
     end
     -- rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
     if S.RuneofPower:IsCastableP() and (Cache.EnemiesCount[35] > 1 and Player:PrevGCDP(1, S.FrozenOrb)) then
-      if HR.Cast(S.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
     end
     -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 70) then
@@ -207,28 +208,28 @@ local function APL()
     -- use_items
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() and (true) then
-      if HR.Cast(S.BloodFury, Settings.Frost.OffGCDasOffGCD.BloodFury) then return ""; end
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- berserking
     if S.Berserking:IsCastableP() and HR.CDsON() and (true) then
-      if HR.Cast(S.Berserking, Settings.Frost.OffGCDasOffGCD.Berserking) then return ""; end
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and (true) then
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (true) then
       if HR.Cast(S.LightsJudgment) then return ""; end
     end
   end
-  local function Movement()
+  Movement = function()
     -- blink,if=movement.distance>10
     if S.Blink:IsCastableP() and (movement.distance > 10) then
       if HR.Cast(S.Blink) then return ""; end
     end
     -- ice_floes,if=buff.ice_floes.down
     if S.IceFloes:IsCastableP() and (Player:BuffDownP(S.IceFloesBuff)) then
-      if HR.Cast(S.IceFloes) then return ""; end
+      if HR.Cast(S.IceFloes, Settings.Frost.OffGCDasOffGCD.IceFloes) then return ""; end
     end
   end
-  local function Single()
+  Single = function()
     -- ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
     if S.IceNova:IsCastableP() and (S.IceNova:CooldownUpP() and Target:DebuffP(S.WintersChillDebuff)) then
       if HR.Cast(S.IceNova) then return ""; end
@@ -295,23 +296,20 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   -- counterspell
-  if S.Counterspell:IsCastableP() and (true) then
-    if HR.Cast(S.Counterspell) then return ""; end
+  if S.Counterspell:IsCastableP() and Settings.General.InterruptEnabled and Target:IsInterruptible() and (true) then
+    if HR.CastAnnotated(S.Counterspell, false, "Interrupt") then return ""; end
   end
   -- ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
   if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
     if HR.Cast(S.IceLance) then return ""; end
   end
   -- time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(prev_gcd.1.icy_veins|target.time_to_die<50)
-  --if S.TimeWarp:IsCastableP() and (Player:HasNotHeroism() and (Player:BuffDownP(S.ExhaustionBuff) or I.ShardoftheExodar:IsEquipped()) and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 50)) then
-  --  if HR.Cast(S.TimeWarp) then return ""; end
-  --end
   -- call_action_list,name=cooldowns
-  if HR.CDsON() then
+  if HR.CDsON() and (true) then
     local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
-  if HR.AoEON() and (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
+  if (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
     local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=single

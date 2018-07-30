@@ -32,7 +32,7 @@
     Consecration             = Spell(26573),
     ConsecrationBuff         = Spell(188370),
     HammeroftheRighteous     = Spell(53595),
-    Judgment                 = Spell(20271),
+    Judgment                 = Spell(275779),
     ShieldoftheRighteous     = Spell(53600),
     ShieldoftheRighteousBuff = Spell(132403),
     GrandCrusader            = Spell(85043),

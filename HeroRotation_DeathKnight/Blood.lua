@@ -47,8 +47,8 @@
     MindFreeze            = Spell(47528),
     Ossuary               = Spell(219786),
     RapidDecomposition    = Spell(194662),
+    RuneStrike            = Spell(210764),
     RuneTap               = Spell(194679),
-    UmbilicusEternus      = Spell(193249),
     VampiricBlood         = Spell(55233),
     -- Legendaries
     HaemostasisBuff       = Spell(235558),
@@ -95,10 +95,7 @@ local function APL ()
     end
 
     --- Defensives
-    -- Umbilicus Eternus Cancel
-    if Settings.Blood.UmbilicusEternus > 0 and Player:Buff(S.UmbilicusEternus) and Player:BuffRemains(S.UmbilicusEternus) <= Settings.Blood.UmbilicusEternus then
-      if HR.Cast(S.UmbilicusEternus, true) then return ""; end
-    end
+
     -- Rune Tap Emergency
     if S.RuneTap:IsReady() and Player:HealthPercentage() <= 40 and Player:Runes() >= 3 and S.RuneTap:Charges() > 1 and not Player:Buff(S.RuneTap) then
       if HR.Cast(S.RuneTap, true) then return ""; end
@@ -155,32 +152,32 @@ local function APL ()
     if HR.AoEON() and S.DeathandDecay:IsReady("Melee") and (Cache.EnemiesCount[8] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[8] > 1 and Player:Buff(S.CrimsonScourge)) then
       if HR.Cast(S.DeathandDecay) then return ""; end
     end
-    -- 
-    if S.Blooddrinker:IsCastableP(30) and not Player:ShouldStopCasting() and not Player:Buff(S.DancingRuneWeaponBuff) and Player:BuffRemainsP(S.BoneShield) > 3 and Player:RunicPowerDeficit() >= 15 then
+    -- Blooddrinker
+    if S.Blooddrinker:IsCastableP(30) and not Player:ShouldStopCasting() and not Player:Buff(S.DancingRuneWeaponBuff) and Player:BuffRemainsP(S.BoneShield) > 3 and Player:RunicPowerDeficit() >= 10 then
       if HR.Cast(S.Blooddrinker, Settings.Blood.GCDasOffGCD.Blooddrinker) then return ""; end
     end
-    -- 
-    if S.DeathStrike:IsReady("Melee") and S.Blooddrinker:IsCastableP() and (S.Blooddrinker:IsAvailable() or S.Blooddrinker:CooldownRemains() <= Player:GCD()) and not Player:Buff(S.DancingRuneWeaponBuff) and ((Player:RuneTimeToX(1) <= Player:GCD()) or Player:Runes() >= 1) then
-      if HR.Cast(S.DeathStrike) then return ""; end
+    -- Death Strike: Blooddrinker Runic Power Dump
+    if S.DeathStrike:IsReady("Melee") and S.Blooddrinker:IsCastableP() and (S.Blooddrinker:IsAvailable() or S.Blooddrinker:CooldownRemains() <= Player:GCD()) and not Player:Buff(S.DancingRuneWeaponBuff) and ((Player:RuneTimeToX(1) <= Player:GCD()) or Player:Runes() >= 1) and Player:RunicPowerDeficit() < 10 then
+      if HR.Cast(S.DeathStrike, Settings.Blood.GCDasOffGCD.Blooddrinker) then return ""; end
     end
-    -- 
-    if S.Marrowrend:IsCastableP("Melee") and Player:BuffStack(S.BoneShield) <= 6 and Player:RunicPowerDeficit() >= 20 then
+    -- Marrowrend: Refresh Bone Shield
+    if S.Marrowrend:IsCastableP("Melee") and ((not (Player:Buff(S.DancingRuneWeaponBuff)) and Player:BuffStack(S.BoneShield) <=7) or Player:BuffStack(S.BoneShield) <= 4) and Player:RunicPowerDeficit() >= 20 then
       if HR.Cast(S.Marrowrend) then return ""; end
     end
-    -- 
-    if S.DeathStrike:IsReady("Melee") and S.Marrowrend:IsCastableP() and Player:BuffStack(S.BoneShield) <= 6 then
+    -- Death Strike: Marrowrend Runic Power Dump
+    if S.DeathStrike:IsReady("Melee") and S.Marrowrend:IsCastableP() and Player:BuffStack(S.BoneShield) <= 7 then
       if HR.Cast(S.DeathStrike) then return ""; end
     end
     -- Death and Decay: ST Rapid Decomposition / AoE
     if HR.AoEON() and S.DeathandDecay:IsReady("Melee") and Player:RunicPowerDeficit() >= 10 and ((Cache.EnemiesCount[8] == 1 and Player:Runes() >= 3 and S.RapidDecomposition:IsAvailable()) or Cache.EnemiesCount[8] >= 3) then
       if HR.Cast(S.DeathandDecay) then return ""; end
     end
-    -- Hearth Strike
+    -- Heart Strike
     if S.HeartStrike:IsCastableP("Melee") and ((Player:RuneTimeToX(3) <= Player:GCD()) or Player:Runes() >=3) and (Player:RunicPowerDeficit()>= 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() >= (15 + math.min(Cache.EnemiesCount["Melee"], 5) * 2))) then
       if HR.Cast(S.HeartStrike) then return ""; end
     end
-    -- Death Strike Runic Power Dump
-    if S.DeathStrike:IsReady("Melee") and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Runes() >= 3 or Player:RunicPowerDeficit() <= 15) then
+    -- Death Strike: Heart Strike Runic Power Dump
+    if S.DeathStrike:IsReady("Melee") and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Runes() >= 3) and (Player:RunicPowerDeficit() < 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() < (15 + math.min(Cache.EnemiesCount["Melee"], 5) * 2))) then
       if HR.Cast(S.DeathStrike) then return ""; end
     end
     -- Death and Decay ST
@@ -198,6 +195,14 @@ local function APL ()
     -- Death's Caress Pull
     if S.DeathsCaress:IsCastableP(30) and not Target:IsInRange(10) and not Target:Debuff(S.BloodPlague) then
       if HR.Cast(S.DeathsCaress) then return "";end
+    end
+    -- Blood Boil: Max Charges
+    if S.BloodBoil:IsCastableP() and Cache.EnemiesCount[10] >= 1 and S.BloodBoil:Charges() == 2 then
+      if HR.Cast(S.BloodBoil) then return ""; end
+    end
+    -- Rune Strike
+    if S.RuneStrike:IsCastable() and Player:Runes() <= 2 then
+      if HR.Cast(S.RuneStrike) then return ""; end
     end
     -- Blood Boil
     if S.BloodBoil:IsCastableP() and Cache.EnemiesCount[10] >= 1 then

@@ -139,9 +139,14 @@
     self:Show();
   end
   -- Change Icon
-  function HR.MainIconFrame:ChangeIcon (Texture, Keybind)
+  function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable)
     -- Texture
     self.Texture:SetTexture(Texture);
+    if HR.GUISettings.General.NotEnoughManaEnabled and not Usable then
+      self.Texture:SetGradient("HORIZONTAL", 0.5, 0.5, 1.0, 0.5, 0.5, 1.0);
+    else
+      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+    end
     self.Texture:SetAllPoints(self);
     -- Keybind
     if Keybind then
@@ -415,6 +420,7 @@
       -- Set the Texture
       IconFrame.Texture:SetTexture(HR.GetTexture(Object));
       IconFrame.Texture:SetAllPoints(IconFrame);
+      IconFrame.Texture:SetAlpha(ThisUnit:IsInRange(Object) and 1 or 0.4);
       IconFrame:ClearAllPoints();
       if not IconFrame:IsVisible() then
         if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
