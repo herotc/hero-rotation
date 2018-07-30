@@ -14,7 +14,7 @@ local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
 
--- APL from T21_Shaman_Enhancement on 2017-12-03
+-- APL from T21_Shaman_Enhancement on 2018-07-29
 
 -- APL Local Vars
 -- Spells
@@ -26,14 +26,15 @@ Spell.Shaman.Enhancement = {
 
   -- Abilities
   CrashLightning        = Spell(187874),
-  CrashLightningBuff    = Spell(187878),
-  LightningCrashBuff    = Spell(242284),
+  CrashLightningBuff    = Spell(187878), -- CrashLightning buff for hitting 2 or more targets
   Flametongue           = Spell(193796),
   FlametongueBuff       = Spell(194084),
   Frostbrand            = Spell(196834),
   FrostbrandBuff        = Spell(196834),
   StormStrike           = Spell(17364),
   StormbringerBuff      = Spell(201846),
+  EarthElemental        = Spell(198103),
+  GatheringStormsBuff   = Spell(198300),
 
   FeralSpirit           = Spell(51533),
   LavaLash              = Spell(60103),
@@ -43,7 +44,6 @@ Spell.Shaman.Enhancement = {
   HealingSurge          = Spell(188070),
 
   -- Talents
-  Windsong              = Spell(201898),
   HotHandBuff           = Spell(215785),
   Landslide             = Spell(197992),
   LandslideBuff         = Spell(202004),
@@ -55,23 +55,22 @@ Spell.Shaman.Enhancement = {
   Sundering             = Spell(197214),
   Ascendance            = Spell(114051),
   AscendanceBuff        = Spell(114051),
-  Boulderfist           = Spell(246035),
   EarthenSpike          = Spell(188089),
   EarthenSpikeDebuff    = Spell(188089),
+  ForcefulWinds         = Spell(262647),
+  SearingAssault        = Spell(192087),
 
-  -- T21 2pc set bonus
-  FotMBuff              = Spell(254308),
-
-  -- Artifact
-  AlphaWolf             = Spell(198434),
+  TotemMastery          = Spell(262395),
+  ResonanceTotemBuff    = Spell(262417),
+  StormTotemBuff        = Spell(262397),
+  EmberTotemBuff        = Spell(262399),
+  TailwindTotemBuff     = Spell(262400),
 
   -- Utility
   WindShear             = Spell(57994),
 
-  -- ToS Trinkets
+  -- Legion Trinkets
   SpecterOfBetrayal     = Spell(246461),
-
-  -- World Trinkets
   HornOfValor           = Spell(215956),
 
   -- Misc
@@ -87,10 +86,8 @@ Item.Shaman.Enhancement = {
   SmolderingHeart           = Item(151819, {10}),
   AkainusAbsoluteJustice    = Item(137084, {9}),
 
-  -- ToS Trinkets
+  -- Legion Trinkets
   SpecterOfBetrayal         = Item(151190, {13, 14}),
-
-  -- World Trinkets
   HornOfValor				= Item(133642, {13, 14}),
 
   -- Misc
@@ -108,7 +105,7 @@ local Settings = {
 --- APL Variables
 -- actions+=/variable,name=furyCheck80,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&((maelstrom>35&cooldown.lightning_bolt.remains>=3*gcd)|maelstrom>80)))
 local function furyCheck80()
-  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and ((Player:Maelstrom() > 35 and (S.LightningBolt:CooldownRemainsP() >= 3 * Player:GCD()) or (Player:Maelstrom() > 80)))
+  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and (Player:Maelstrom() > 35 and (S.LightningBolt:CooldownRemainsP() >= 3 * Player:GCD()) or (Player:Maelstrom() > 80)))
 end
 
 -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
@@ -122,7 +119,7 @@ local function furyCheck35()
 end
 
 -- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
-local function furyCheck35()
+local function furyCheck25()
   return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25)
 end
 
@@ -139,10 +136,9 @@ end
 -- APL Main
 local function APL ()
   -- Unit Update
-  HL.GetEnemies(40);      -- Lightning Bolt
-  HL.GetEnemies(30);      -- Purge / Wind Shear
-  HL.GetEnemies(10);      -- ES / FB / FT / RB / WS /
-  HL.GetEnemies(8);       -- FOA / CL / Sundering
+  HL.GetEnemies(40);      -- LightningBolt, HealingSurge
+  HL.GetEnemies(30);      -- WindShear
+  HL.GetEnemies(10);      -- EarthenSpike
   HL.GetEnemies("Melee"); -- Melee
   Everyone.AoEToggleEnemiesUpdate()
 
@@ -152,7 +148,7 @@ local function APL ()
     -- actions+=/call_action_list,name=opener
     if Everyone.TargetIsValid() then
       -- actions.opener=rockbiter,if=maelstrom<15&time<gcd
-      if S.Rockbiter:IsCastableP(10) and Player:Maelstrom() < 15 then
+      if S.Rockbiter:IsCastableP(20) and Player:Maelstrom() < 15 then
         if HR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
       end
     end
@@ -198,63 +194,60 @@ local function APL ()
       end
 
       -- actions.asc+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>1
-      if S.CrashLightning:IsCastableP() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[8] > 1) then
+      if S.CrashLightning:IsCastableP("Melee", true) and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1) then
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
 
       -- actions.asc+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
-      if S.Rockbiter:IsCastableP(20) and S.Landslide:IsAvailable() and not Player:Buff(LandslideBuff) and S.Rockbiter:ChargesFractional() > 1.7 then
+      if S.Rockbiter:IsCastableP(20) and S.Landslide:IsAvailable() and not Player:Buff(S.LandslideBuff) and S.Rockbiter:ChargesFractional() > 1.7 then
         if HR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
       end
 
       -- actions.asc+=/windstrike
-      if S.WindStrike:IsCastableP(100) then
+      if S.WindStrike:IsCastableP(30) then
         if HR.Cast(S.WindStrike) then return "Cast WindStrike" end
       end
     end
 
     -- actions+=/call_action_list,name=buffs
     -- actions.buffs=crash_lightning,if=!buff.crash_lightning.up&active_enemies>1
-    if S.CrashLightning:IsCastableP(8) and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[8] > 1) then
+    if S.CrashLightning:IsCastableP("Melee", true) and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.buffs+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
-    if S.Rockbiter:IsCastableP(10) and (S.Landslide:IsAvailable() and not Player:Buff(S.LandslideBuff) and S.Rockbiter:FractionalCharges() > 1.7) then
+    if S.Rockbiter:IsCastableP(20) and (S.Landslide:IsAvailable() and not Player:Buff(S.LandslideBuff) and S.Rockbiter:ChargesFractional() > 1.7) then
       if HR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
     end
 
     -- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
-    if S.FuryOfAir:IsCastableP(8, true) and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
+    if S.FuryOfAir:IsCastableP(10, true) and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() > 22) then
       if HR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
     end
 
     -- actions.buffs+=/flametongue,if=!buff.flametongue.up
-    if S.Flametongue:IsCastableP(10) and (not Player:Buff(S.FlametongueBuff)) then
+    if S.Flametongue:IsCastableP(20) and (not Player:Buff(S.FlametongueBuff)) then
       if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
     end
 
     -- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck45
-    if S.Frostbrand:IsCastableP(10) and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck45()) then
+    if S.Frostbrand:IsCastableP(20) and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck45()) then
       if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
     end
 
     -- actions.buffs+=/flametongue,if=buff.flametongue.remains<6+gcd
-    if S.Flametongue:IsCastableP(10) and (Player:BuffRemainsP(S.FlametongueBuff) < 6 + Player:GCD()) then
+    if S.Flametongue:IsCastableP(20) and (Player:BuffRemainsP(S.FlametongueBuff) < 6 + Player:GCD()) then
       if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
     end
 
     -- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<6+gcd
-    if S.Frostbrand:IsCastableP(10) and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < 6 + Player:GCD()) then
+    if S.Frostbrand:IsCastableP(20) and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < 6 + Player:GCD()) then
       if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
     end
 
-    -- REVISIT
-    -- REVISIT
-    -- REVISIT
-    -- REVISIT
+    -- Not exact, but if we don't have totems down then place them
     -- actions.buffs+=/totem_mastery,if=buff.resonance_totem.remains<2
-    if S.TotemMastery:IsCastableP() and (Player:BuffRemainsP(S.ResonanceTotem) < 2) then
+    if S.TotemMastery:IsCastableP() and (not Player:Buff(S.ResonanceTotemBuff)) then
       if HR.Cast(S.TotemMastery) then return "Cast TotemMastery" end
     end
 
@@ -292,7 +285,7 @@ local function APL ()
       end
 
       -- actions.cds+=/earth_elemental
-      if S.EarthElemental:IsCastableP then
+      if S.EarthElemental:IsCastableP() then
         if HR.Cast(S.EarthElemental) then return "Cast EarthElemental" end
       end
     end
@@ -304,17 +297,17 @@ local function APL ()
     end
 
     -- actions.core+=/sundering,if=active_enemies>=3
-    if S.Sundering:IsCastableP() and Player:Maelstrom() >= S.Sundering:Cost() and (Cache.EnemiesCount[8] >= 3) then
+    if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() and (Cache.EnemiesCount[10] >= 3) then
       if HR.Cast(S.Sundering) then return "Cast Sundering" end
     end
 
     -- actions.core+=/stormstrike,if=buff.stormbringer.up|buff.gathering_storms.up
-    if S.StormStrike:IsCastableP("Melee") and (Player:Buff(S.StormbringerBuff) or Player:Buff(S.GatheringStorms)) then
+    if S.StormStrike:IsCastableP("Melee") and (Player:Buff(S.StormbringerBuff) or Player:Buff(S.GatheringStormsBuff)) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.core+=/crash_lightning,if=active_enemies>=3
-    if S.CrashLightning:IsCastableP("Melee", true) and (Cache.EnemiesCount[8] >= 3) then
+    if S.CrashLightning:IsCastableP("Melee", true) and (Cache.EnemiesCount[10] >= 3) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
@@ -324,22 +317,22 @@ local function APL ()
     end
 
     -- actions.core+=/stormstrike,if=(!talent.overcharge.enabled&variable.furyCheck35)|(talent.overcharge.enabled&variable.furyCheck80)
-    if S.StormStrike:IsCastableP() and ((not S.Overcharge:IsAvailable() and furyCheck35()) or (S.Overcharge:IsAvailable() and furyCheck80())) then
+    if S.StormStrike:IsCastableP("Melee") and ((not S.Overcharge:IsAvailable() and furyCheck35()) or (S.Overcharge:IsAvailable() and furyCheck80())) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.filler+=/sundering
-    if S.Sundering:IsCastableP() then
+    if S.Sundering:IsCastableP(10) then
       if HR.Cast(S.Sundering) then return "Cast Sundering" end
     end
 
     -- actions.core+=/crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1
-    if S.CrashLightning:IsCastableP("Melee", true) and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[8] > 1) then
+    if S.CrashLightning:IsCastableP("Melee", true) and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[10] > 1) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.core+=/flametongue,if=talent.searing_assault.enabled
-    if S.Flametongue:IsCastableP(10) and (S.SearingAssault:IsAvailable()) then
+    if S.Flametongue:IsCastableP(20) and (S.SearingAssault:IsAvailable()) then
       if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
     end
 
@@ -349,28 +342,28 @@ local function APL ()
     end
 
     -- actions.core+=/crash_lightning,if=active_enemies>1
-    if S.CrashLightning:IsCastableP("Melee", true) and (Cache.EnemiesCount[8] > 1) then
+    if S.CrashLightning:IsCastableP("Melee", true) and (Cache.EnemiesCount[10] > 1) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions+=/call_action_list,name=filler
     -- actions.filler=rockbiter,if=maelstrom<70
-    if S.Rockbiter:IsCastableP(10) and (Player:Maelstrom() < 70) then
+    if S.Rockbiter:IsCastableP(20) and (Player:Maelstrom() < 70) then
       if HR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
     end
 
     -- actions.filler+=/flametongue,if=talent.searing_assault.enabled|buff.flametongue.remains<4.8
-    if S.Flametongue:IsCastableP(10) and (S.SearingAssault:IsAvailable() or Player:BuffRemainsP(S.FlametongueBuff) < 4.8) then
+    if S.Flametongue:IsCastableP(20) and (S.SearingAssault:IsAvailable() or Player:BuffRemainsP(S.FlametongueBuff) < 4.8) then
       if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
     end
 
     -- actions.filler+=/crash_lightning,if=talent.crashing_storm.enabled&debuff.earthen_spike.up&maelstrom>=40&variable.OCPool60
-    if S.CrashLightning:IsCastableP() and (S.CrashLightning:IsAvailable() and Target:Debuff(S.EarthenSpikeDebuff) and Player:Maelstrom() >= 40 and OCPool60()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and (S.CrashLightning:IsAvailable() and Target:Debuff(S.EarthenSpikeDebuff) and Player:Maelstrom() >= 40 and OCPool60()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.filler+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8&maelstrom>40
-    if S.Frostbrand:IsCastableP(10) and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < 4.8 and Player:Maelstrom() > 40) then
+    if S.Frostbrand:IsCastableP(20) and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < 4.8 and Player:Maelstrom() > 40) then
       if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
     end
 
@@ -380,17 +373,17 @@ local function APL ()
     end
 
     -- actions.filler+=/rockbiter
-    if S.Rockbiter:IsCastableP(10) then
+    if S.Rockbiter:IsCastableP(20) then
       if HR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
     end
 
     -- actions.filler+=/crash_lightning,if=(maelstrom>=65|talent.crashing_storm.enabled)&variable.OCPool60&variable.furyCheck45
-    if S.CrashLightning:IsCastableP(8) and ((Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable()) and OCPool60() and furyCheck45()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and ((Player:Maelstrom() >= 65 or S.CrashingStorm:IsAvailable()) and OCPool60() and furyCheck45()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.filler+=/flametongue
-    if S.Flametongue:IsCastableP(10) then
+    if S.Flametongue:IsCastableP(20) then
         if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
     end
 
