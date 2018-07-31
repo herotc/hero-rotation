@@ -110,7 +110,7 @@ local function APL()
 
   -- Misc
   local BrewMaxCharge = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
-  local IronskinDuration = 7;
+  local IronskinDuration = (6 + S.PotentKick:ArtifactRank() * 0.5);
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
   --- Defensives
@@ -194,8 +194,7 @@ local function APL()
       if HR.Cast(S.BlackoutStrike) then return ""; end
     end
     -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
-    if S.BreathofFire:IsCastableP(10)
-     then
+    if S.BreathofFire:IsCastableP(10, true) and (Player:BuffDownP(S.BlackoutComboBuff) and (Player:HasNotHeroism() or (Player:HasHeroism() and true and Target:DebuffRefreshableCP(S.BreathofFireDotDebuff)))) then
       if HR.Cast(S.BreathofFire) then return ""; end
     end
     -- rushing_jade_wind
