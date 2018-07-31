@@ -448,9 +448,11 @@ local function APL ()
     if UseBreathofSindragosa() and S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
         if HR.Cast(S.BreathofSindragosa, Settings.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa) then return ""; end
     end
+  end
     --actions+=/call_action_list,name=cooldowns
+    if HR.CDsON() then
     ShouldReturn = Cooldowns();
-    if ShouldReturn then return ShouldReturn;
+    if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
     if UseBreathofSindragosa() and (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < 5) then
@@ -470,7 +472,7 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=aoe,if=active_enemies>=2
-    if Cache.EnemiesCount[10] >= 2 then
+    if not pooling and HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
       ShouldReturn = AOE();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -480,8 +482,7 @@ local function APL ()
 
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait/Pool Resources"; end
     return;
-end
-end
+  end
 
   HR.SetAPL(251, APL);
 --- ====18/07/2018======

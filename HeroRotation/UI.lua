@@ -377,6 +377,7 @@
   };
   -- Add the Icon on Nameplates
   function HR.Nameplate.AddIcon (ThisUnit, Object)
+    if HR.GUISettings.General.NamePlateIconAnchor == "Disable" then return true end
     local Token = stringlower(ThisUnit.UnitID);
     local Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
     if Nameplate then
