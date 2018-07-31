@@ -13,6 +13,7 @@
 -- Spells
   local SpellArms  = Spell.Warrior.Arms;
   local SpellFury  = Spell.Warrior.Fury;
+  local SpellProtection  = Spell.Warrior.Protection;
 -- Lua
 
 --- ============================ CONTENT ============================
