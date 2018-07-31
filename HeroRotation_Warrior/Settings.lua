@@ -64,10 +64,22 @@
       }
     },
 
-    Protection ={
-      ShowPoOW = false,
-      ShowPoPP = false
+    Protection = {
+      UseLastStandToFillShieldBlockDownTime = true,
+      -- {Display GCD as OffGCD, ForceReturn}
+      GCDasOffGCD = {
+        Avatar            = true,
+        DemoralizingShout = true,
+        IgnorePain        = true,
+        LastStand         = true
+      },
+      -- {Display OffGCD as OffGCD, ForceReturn}
+      OffGCDasOffGCD = {
+        -- Abilities
+        ShieldBlock       = true,
+      }
     },
+
   };
 
   HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -94,5 +106,4 @@
 
   -- Protection settings
   CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
-  CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.ShowPoOW", "Show Potion of the Old War", "Enable this if you want it to show you when to use Potion of the Old War.");
-  CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
+  CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseLastStandToFillShieldBlockDownTime", "Use Last Stand to fill Shield Block down time", "Enable this if you want to fill Shield Block down time with Last Stand.");

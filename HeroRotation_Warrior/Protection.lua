@@ -1,5 +1,4 @@
 --- Localize Vars
--- /dump GetSpellLink'Ignore Pain'
 -- Addon
 local addonName, addonTable = ...;
 
@@ -14,10 +13,6 @@ local Item = HL.Item;
 
 -- HeroRotation
 local HR = HeroRotation;
-
--- ip formula (strength + weapDPS * 6) * (1 + apMastery) * (1 + vers) * 3.5
--- (365+0x6)x(1+.08)x(1+0)x3.5
-
 
 -- APL Local Vars
 local Everyone = HR.Commons.Everyone;
@@ -50,13 +45,8 @@ Spell.Warrior.Protection = {
   AvatarBuff = Spell(12345),
   LastStandBuff = Spell(12975),
 
-
   -- Talents
   
-
-  -- Artifact
-  
-
   -- Defensive
   IgnorePain = Spell(190456),
   LastStand = Spell(12975),
@@ -87,12 +77,6 @@ local Settings = {
     Commons = HR.GUISettings.APL.Warrior.Commons,
     Protection = HR.GUISettings.APL.Warrior.Protection
 }
-
--- APL Variables
---local function battle_cry_deadly_calm()
---  if Player:Buff(S.BattleCryBuff) and S.DeadlyCalm:IsAvailable() then return true
---  else return false end
---end
 
 local function isCurrentlyTanking()
   -- is player currently tanking any enemies within 16 yard radius
@@ -170,25 +154,26 @@ local function APL ()
   if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
 
     -- Generates +20 Rage
-    if S.Avatar:IsReady() then
-      if HR.Cast(S.Avatar) then return "Cast Avatar" end
+    if HR.CDsON() and S.Avatar:IsReady() then
+      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "Cast Avatar" end
     end
 
     -- Generates +40 Rage
-    if S.DemoralizingShout:IsReady() then
-      if HR.Cast(S.DemoralizingShout) then return "Cast DemoralizingShout" end
+    if HR.CDsON() and S.DemoralizingShout:IsReady() then
+      if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "Cast DemoralizingShout" end
     end
 
     -- Check for target casting mitigation check or DBM timer
     -- for mitigation check or high damage intake
 
     -- Mitigation + Defensive
-    if S.ShieldBlock:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) and isCurrentlyTanking() then
-      if HR.Cast(S.ShieldBlock) then return "Cast ShieldBlock" end
+    if S.ShieldBlock:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and 
+        (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) and isCurrentlyTanking() then
+      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "Shield Block" end
     end
 
-    if S.LastStand:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and isCurrentlyTanking() then
-      if HR.Cast(S.LastStand) then return "Cast LastStand" end
+    if S.LastStand:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and isCurrentlyTanking() and Settings.Protection.UseLastStandToFillShieldBlockDownTime then
+      if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "Cast LastStand" end
     end
 
     -- Victory Rush Check - High Priority
