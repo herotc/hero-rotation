@@ -3,13 +3,13 @@
 local addonName, addonTable = ...;
 
 -- HeroLib
-local HL = HeroLib;
-local Cache = HeroCache;
-local Unit = HL.Unit;
+local HL     = HeroLib;
+local Cache  = HeroCache;
+local Unit   = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
-local Spell = HL.Spell;
-local Item = HL.Item;
+local Spell  = HL.Spell;
+local Item   = HL.Item;
 
 -- HeroRotation
 local HR = HeroRotation;
@@ -20,44 +20,44 @@ local Everyone = HR.Commons.Everyone;
 if not Spell.Warrior then Spell.Warrior = {}; end
 Spell.Warrior.Protection = {
   -- Racials
-  Berserking                     = Spell(26297),
-  BloodFury                      = Spell(20572),
-  ArcaneTorrent                  = Spell(28730),
+  Berserking         = Spell(26297),
+  BloodFury          = Spell(20572),
+  ArcaneTorrent      = Spell(28730),
 
   -- Abilities
-  Intercept   = Spell(198304),
-  ThunderClap = Spell(6343),
-  ShieldSlam  = Spell(23922),
-  Revenge     = Spell(6572),
-  Devastate   = Spell(20243),
-  Avatar      = Spell(107574),
-  VictoryRush = Spell(34428), --20% of max hp
-  DemoralizingShout = Spell(1160),
+  Intercept          = Spell(198304),
+  ThunderClap        = Spell(6343),
+  ShieldSlam         = Spell(23922),
+  Revenge            = Spell(6572),
+  Devastate          = Spell(20243),
+  Avatar             = Spell(107574),
+  VictoryRush        = Spell(34428), --20% of max hp
+  DemoralizingShout  = Spell(1160),
 
   -- Mitigation
-  ShieldBlock = Spell(2565),
+  ShieldBlock        = Spell(2565),
 
   -- Buffs
-  FreeRevenge = Spell(5302),
-  ShieldBlockBuff = Spell(132404),
+  FreeRevenge        = Spell(5302),
+  ShieldBlockBuff    = Spell(132404),
   VengenceIgnorePain = Spell(202574),
-  VengenceRevenge = Spell(132404),
-  AvatarBuff = Spell(12345),
-  LastStandBuff = Spell(12975),
+  VengenceRevenge    = Spell(132404),
+  AvatarBuff         = Spell(12345),
+  LastStandBuff      = Spell(12975),
 
   -- Talents
   
   -- Defensive
-  IgnorePain = Spell(190456),
-  LastStand = Spell(12975),
+  IgnorePain         = Spell(190456),
+  LastStand          = Spell(12975),
   
   -- Utility
-  Pummel = Spell(6552),
+  Pummel             = Spell(6552),
 
   -- Legendaries
 
   -- Misc
-  PoolFocus                      = Spell(9999000010)
+  PoolFocus          = Spell(9999000010)
 }
 local S = Spell.Warrior.Protection;
 
@@ -65,9 +65,8 @@ local S = Spell.Warrior.Protection;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Protection = {
   -- Legendaries
-
   -- Misc
-  PoPP                      = Item(142117),
+  PoPP                = Item(142117),
 };
 local I = Item.Warrior.Protection;
 
@@ -88,7 +87,7 @@ end
 local function shouldCastIp()
 
   if Player:Buff(S.IgnorePain) then 
-    local castIP = tonumber((GetSpellDescription(190456):match("up to (.-) total damage prevented."):gsub(",","")));
+    local castIP = tonumber((GetSpellDescription(190456):match("%d+%S+%d"):gsub("%D","")))
     local IPCap = math.floor(castIP * 1.3);
     local currentIp = Player:Buff(S.IgnorePain, 16, true)
 
@@ -180,11 +179,6 @@ local function APL ()
     if S.VictoryRush:IsReady() and Player:HealthPercentage() < 30 then
       if HR.Cast(S.VictoryRush) then return "Cast VictoryRush" end
     end
-
-    -- Potion of Prolonged Power
-    --if Settings.Protection.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 90 or Target:HealthPercentage() < 35 or Player:Buff(S.BattleCryBuff))) then
-    --  if HR.CastSuggested(I.PoPP) then return "Use PoPP" end
-    --end
 
     -- Prevent rage cap 100
     local res = rageDump(100);
