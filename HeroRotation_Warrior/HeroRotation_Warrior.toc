@@ -12,4 +12,5 @@ Settings.lua
 Warrior.lua
 Arms.lua
 Fury.lua
+Protection.lua
 Overrides.lua
