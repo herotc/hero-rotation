@@ -172,7 +172,6 @@
   end
 
   local function AOE()
-    if HR.AoEON() then
     -- remorseless_winter,if=talent.gathering_storm.enabled
     if S.RemorselessWinter:IsCastableP() and (S.GatheringStorm:IsAvailable()) then
       if HR.Cast(S.RemorselessWinter) then return ""; end
@@ -229,8 +228,7 @@
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.ArcaneTorrent, Settings.DeathKnight.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
     end
-  end
-  return false;
+    return false;
   end
 
   local function BoS_Pooling()
@@ -354,7 +352,6 @@
   end
 
   local function Cooldowns()
-    if HR.CDsON() then
       -- actions.cooldowns=use_items
       -- actions.cooldowns+=/use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
       -- actions.cooldowns+=/potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -394,9 +391,8 @@
             if HR.Cast(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
         end
 
-        return false;
+      return false;
     end
-end
 --- ======= MAIN =======
 local function APL ()
     -- Unit Update
