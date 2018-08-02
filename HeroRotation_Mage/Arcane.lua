@@ -1,3 +1,21 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ @Gnoma69 Sign out
+20
+39 37 herotc/hero-rotation
+ Code  Issues 27  Pull requests 3  Wiki  Insights
+hero-rotation/HeroRotation_Mage/Arcane.lua
+5e2d589  10 days ago
+@ghr74 ghr74 [Mage] Fix LUA errors
+@aethys256 @Glynnyx @ghr74
+     
+Executable File  348 lines (332 sloc)  16.8 KB
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
@@ -166,7 +184,7 @@ local function APL()
       if HR.Cast(S.ChargedUp) then return ""; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
-    if S.NetherTempest:IsCastableP() and ((Player:BuffRefreshableCP(S.NetherTempest) or not Player:BuffP(S.NetherTempest)) and Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+    if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempest) or not Target:DebuffP(S.NetherTempest)) and Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
       if HR.Cast(S.NetherTempest) then return ""; end
     end
     -- time_warp,if=buff.bloodlust.down&((buff.arcane_power.down&cooldown.arcane_power.remains=0)|(target.time_to_die<=buff.bloodlust.duration))
@@ -248,7 +266,7 @@ local function APL()
       if HR.Cast(S.PresenceofMind) then return ""; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
-    if S.NetherTempest:IsCastableP() and ((Player:BuffRefreshableCP(S.NetherTempest) or not Player:BuffP(S.NetherTempest)) and Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+    if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempest) or not Target:DebuffP(S.NetherTempest)) and Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
       if HR.Cast(S.NetherTempest) then return ""; end
     end
     -- arcane_blast,if=(buff.rule_of_threes.up|buff.rhonins_assaulting_armwraps.react)&buff.arcane_charge.stack>=3
@@ -345,3 +363,16 @@ local function APL()
 end
 
 HR.SetAPL(62, APL)
+© 2018 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+API
+Training
+Shop
+Blog
+About
+Press h to open a hovercard with more details.
