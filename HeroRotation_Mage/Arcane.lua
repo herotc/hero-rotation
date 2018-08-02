@@ -22,6 +22,7 @@ local HR     = HeroRotation
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Arcane = {
   ArcaneIntellect                       = Spell(1459),
+  ArcaneFamiliarBuff				          	= Spell(210126),
   SummonArcaneFamiliar                  = Spell(205022),
   MirrorImage                           = Spell(55342),
   ArcaneBlast                           = Spell(30451),
@@ -127,7 +128,7 @@ local function APL()
       if HR.Cast(S.ArcaneIntellect) then return ""; end
     end
     -- summon_arcane_familiar
-    if S.SummonArcaneFamiliar:IsCastableP() and (true) then
+    if S.SummonArcaneFamiliar:IsCastableP() and (Player:BuffDownP(S.ArcaneFamiliarBuff)) then
       if HR.Cast(S.SummonArcaneFamiliar) then return ""; end
     end
     -- snapshot_stats
