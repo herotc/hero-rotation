@@ -1,0 +1,11 @@
+<Bindings>
+  <Binding name="HEROROTATION_CDS" description="Toggle On/Off the CDs." header="HEROROTATION" category="ADDONS">
+    HeroRotation.CmdHandler("cds");
+  </Binding>
+  <Binding name="HEROROTATION_AOE" description="Toggle On/Off the AoE." category="ADDONS">
+    HeroRotation.CmdHandler("aoe");
+  </Binding>
+  <Binding name="HEROROTATION_TOGGLE" description="Toggle On/Off the Addon." category="ADDONS">
+    HeroRotation.CmdHandler("toggle");
+  </Binding>
+</Bindings>

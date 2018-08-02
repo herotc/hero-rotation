@@ -1,0 +1,16 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FWarrior|r]
+## Author: lithium720, Lockem, Nia, Aethys
+## Notes: Hero Rotation - Warrior Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Warrior.lua
+Arms.lua
+Fury.lua
+Protection.lua
+Overrides.lua

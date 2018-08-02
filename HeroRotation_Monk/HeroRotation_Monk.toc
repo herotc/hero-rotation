@@ -1,0 +1,17 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FMonk|r]
+## Author: Lockem
+## Notes: Hero Rotation - Monk Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## OptionalDeps: BrewmasterTools
+## Dependencies: HeroRotation
+
+Settings.lua
+Monk.lua
+Brewmaster.lua
+Windwalker.lua
+Events.lua
+Overrides.lua

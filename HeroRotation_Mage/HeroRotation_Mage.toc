@@ -1,0 +1,17 @@
+## Interface: 80000
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FMage|r]
+## Author: Glynny, Zulandia, Nia
+## Notes: Hero Rotation - Mage Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Mage.lua
+Frost.lua
+Fire.lua
+Arcane.lua
+Events.lua
+Overrides.lua
