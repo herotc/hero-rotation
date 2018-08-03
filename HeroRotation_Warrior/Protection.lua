@@ -106,7 +106,7 @@ local function rageDump(rage)
   -- Using Vengence Talent
     --check which buff
     -- cast appropriate
-
+    -- TODO
     -- if not using vengence talent
     -- cast either IP or Revenege depending on if tanking
     -- Ignore Pain (Dump excess rage)
@@ -128,6 +128,8 @@ local function APL ()
   -- Unit Update
   HL.GetEnemies(8);
   Everyone.AoEToggleEnemiesUpdate();
+
+  local gcdTime = Player:GCD();
   
   -- Out of Combat
   if not Player:AffectingCombat() then
@@ -153,20 +155,20 @@ local function APL ()
   if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
 
     -- Generates +20 Rage
-    if HR.CDsON() and S.Avatar:IsReady() then
+    if HR.CDsON() and S.Avatar:IsReady() and (Player:Rage() <= (Player:RageMax() - 20)) then
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "Cast Avatar" end
     end
 
     -- Generates +40 Rage
-    if HR.CDsON() and S.DemoralizingShout:IsReady() then
+    if HR.CDsON() and S.DemoralizingShout:IsReady() and (Player:Rage() <= (Player:RageMax() - 40)) then
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "Cast DemoralizingShout" end
     end
 
     -- Check for target casting mitigation check or DBM timer
     -- for mitigation check or high damage intake
 
-    -- Mitigation + Defensive
-    if S.ShieldBlock:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and 
+    -- Mitigation + Defensive - 30 Rage
+    if S.ShieldBlock:IsReady() and (not (Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
         (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) and isCurrentlyTanking() then
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "Shield Block" end
     end
@@ -181,43 +183,26 @@ local function APL ()
     end
 
     -- Prevent rage cap 100
-    local res = rageDump(100);
+    local res = rageDump(Player:RageMax());
     if res then
       return res;
     end
       
-    -- AOE 2+ Targets
+    -- AOE 2+ Targets (Higher Priority when AOE)
     if Cache.EnemiesCount[8] >= 2 then
-      -- Thunder Clap
+      -- Thunder Clap + 6 Rage
       if S.ThunderClap:IsReady() then
         if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
       end
       
     end
-
-    -- Standard Rotatation
-    -- spenders
-    -- Shield Block 40 Rage
-    -- Ignore Pain 40 Rage 
-    -- Revenge 30 Rage
-
-    -- Builders
-    -- intercept 15
-    -- Shield Slam 15
-    -- ThunderClap 5 rage
-    -- Avatar 20
-    -- devastate 2 rage
-    -- Demoralizing Shout 40 Rage
-
-    -- optimizers
-    -- vengence 33% reduced cost for revenge or ignore pain
     
-    -- Shield Slam
+    -- Shield Slam + 18 Rage
     if S.ShieldSlam:IsReady() then
       if HR.Cast(S.ShieldSlam) then return "Cast ShieldSlam" end
     end
 
-    -- Thunder Clap
+    -- Thunder Clap + 6 Rage
     if S.ThunderClap:IsReady() then
       if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
     end
@@ -237,12 +222,17 @@ local function APL ()
       if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
     end
 
+    -- Revenge with High Rage - 30 Rage
+    if S.Revenge:IsReady() and (Player:Rage() >= 60) then
+      if HR.Cast(S.Revenge) then return "Cast Revenge" end
+    end
+
     -- Victory Rush Check - Low Priority
-    if S.VictoryRush:IsReady() and Player:HealthPercentage() < 80 then
+    if S.VictoryRush:IsReady() and Player:HealthPercentage() < 50 then
       if HR.Cast(S.VictoryRush) then return "Cast VictoryRush" end
     end
 
-    -- Devastate (Fish for SS resets)
+    -- Devastate
     if S.Devastate:IsReady() then
       if HR.Cast(S.Devastate) then return "Cast Devastate" end
     end
