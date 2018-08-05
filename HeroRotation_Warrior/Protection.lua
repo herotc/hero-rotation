@@ -42,10 +42,11 @@ Spell.Warrior.Protection = {
   ShieldBlockBuff    = Spell(132404),
   VengenceIgnorePain = Spell(202574),
   VengenceRevenge    = Spell(132404),
-  AvatarBuff         = Spell(12345),
+  AvatarBuff         = Spell(107574),
   LastStandBuff      = Spell(12975),
 
   -- Talents
+  UnstoppableForce   = Spell(275336),
   
   -- Defensive
   IgnorePain         = Spell(190456),
@@ -107,7 +108,7 @@ local function rageDump(rage)
     --check which buff
     -- cast appropriate
     -- TODO
-    -- if not using vengence talent
+  -- if not using vengence talent
     -- cast either IP or Revenege depending on if tanking
     -- Ignore Pain (Dump excess rage)
   if S.IgnorePain:IsReady() and (Player:Rage() >= rage) and  isCurrentlyTanking() and shouldCastIp() then
@@ -152,6 +153,10 @@ local function APL ()
   end
 
   -- In Combat
+  if Everyone.TargetIsValid() and S.Intercept:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(25)) then
+    if HR.Cast(S.Intercept) then return "Cast Intercept" end
+  end
+
   if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
 
     -- Generates +20 Rage
@@ -188,8 +193,8 @@ local function APL ()
       return res;
     end
       
-    -- AOE 2+ Targets (Higher Priority when AOE)
-    if Cache.EnemiesCount[8] >= 2 then
+    -- AOE 2+ Targets (Higher Priority when AOE) or Avatar Up and Unstoppable Force is Talented
+    if Cache.EnemiesCount[8] >= 2 or (Player:Buff(S.AvatarBuff) and S.UnstoppableForce:IsAvailable()) then
       -- Thunder Clap + 6 Rage
       if S.ThunderClap:IsReady() then
         if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
@@ -238,6 +243,7 @@ local function APL ()
     end
 
   end
+
 end
 
 HR.SetAPL(73, APL);
