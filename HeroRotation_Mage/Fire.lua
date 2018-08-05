@@ -21,6 +21,7 @@ local HR     = HeroRotation
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Fire = {
+  ArcaneIntellectBuff                   = Spell(1459),
   ArcaneIntellect                       = Spell(1459),
   MirrorImage                           = Spell(55342),
   Pyroblast                             = Spell(11366),
@@ -113,7 +114,7 @@ local function APL()
     -- food
     -- augmentation
     -- arcane_intellect
-    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellect) and (true) then
+    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff) and (true) then
       if HR.Cast(S.ArcaneIntellect) then return ""; end
     end
     -- snapshot_stats
@@ -162,8 +163,8 @@ local function APL()
       local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
     end
     -- combustion
-    if S.Combustion:IsCastableP() and (true) then
-      if HR.Cast(S.Combustion) then return ""; end
+    if S.Combustion:IsCastableP() and HR.CDsON() and (true) then
+      if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return ""; end
     end
     -- potion
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
