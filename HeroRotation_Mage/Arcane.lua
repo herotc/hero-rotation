@@ -117,6 +117,9 @@ local function StopBurnPhase ()
   varBurnPhase = 0
 end
 
+function Player:ArcaneChargesP()
+    return math.min(self:ArcaneCharges() + num(self:IsCasting(S.ArcaneBlast)),4)
+end
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Burn, Conserve, Movement
@@ -166,11 +169,11 @@ local function APL()
       if HR.Cast(S.MirrorImage) then return ""; end
     end
     -- charged_up,if=buff.arcane_charge.stack<=1&(!set_bonus.tier20_2pc|cooldown.presence_of_mind.remains>5)
-    if S.ChargedUp:IsCastableP() and (Player:BuffStackP(S.ArcaneChargeBuff) <= 1 and (not HL.Tier20_2Pc or S.PresenceofMind:CooldownRemainsP() > 5)) then
+    if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1 and (not HL.Tier20_2Pc or S.PresenceofMind:CooldownRemainsP() > 5)) then
       if HR.Cast(S.ChargedUp) then return ""; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
-    if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+    if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
       if HR.Cast(S.NetherTempest) then return ""; end
     end
     -- time_warp,if=buff.bloodlust.down&((buff.arcane_power.down&cooldown.arcane_power.remains=0)|(target.time_to_die<=buff.bloodlust.duration))
@@ -179,7 +182,7 @@ local function APL()
       if HR.Cast(S.LightsJudgment) then return ""; end
     end
     -- rune_of_power,if=!buff.arcane_power.up&(mana.pct>=50|cooldown.arcane_power.remains=0)&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
-    if S.RuneofPower:IsCastableP() and (not Player:BuffP(S.ArcanePowerBuff) and (Player:ManaPercentage() >= 50 or S.ArcanePower:CooldownRemainsP() == 0) and (Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax())) then
+    if S.RuneofPower:IsCastableP() and (not Player:BuffP(S.ArcanePowerBuff) and (Player:ManaPercentage() >= 50 or S.ArcanePower:CooldownRemainsP() == 0) and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
       if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return ""; end
     end
     -- arcane_power
@@ -200,7 +203,7 @@ local function APL()
       if HR.Cast(S.PresenceofMind) then return ""; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))
-    if S.ArcaneOrb:IsCastableP() and (Player:BuffStackP(S.ArcaneChargeBuff) == 0 or (Cache.EnemiesCount[40] < 3 or (Cache.EnemiesCount[40] < 2 and S.Resonance:IsAvailable()))) then
+    if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() == 0 or (Cache.EnemiesCount[40] < 3 or (Cache.EnemiesCount[40] < 2 and S.Resonance:IsAvailable()))) then
       if HR.Cast(S.ArcaneOrb) then return ""; end
     end
     -- arcane_blast,if=buff.presence_of_mind.up&set_bonus.tier20_2pc&talent.overpowered.enabled&buff.arcane_power.up
@@ -208,7 +211,7 @@ local function APL()
       if HR.Cast(S.ArcaneBlast) then return ""; end
     end
     -- arcane_barrage,if=(active_enemies>=3|(active_enemies>=2&talent.resonance.enabled))&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
-    if S.ArcaneBarrage:IsCastableP() and ((Cache.EnemiesCount[40] >= 3 or (Cache.EnemiesCount[40] >= 2 and S.Resonance:IsAvailable())) and (Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax())) then
+    if S.ArcaneBarrage:IsCastableP() and ((Cache.EnemiesCount[40] >= 3 or (Cache.EnemiesCount[40] >= 2 and S.Resonance:IsAvailable())) and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
       if HR.Cast(S.ArcaneBarrage) then return ""; end
     end
     -- arcane_explosion,if=active_enemies>=3|(active_enemies>=2&talent.resonance.enabled)
@@ -242,23 +245,23 @@ local function APL()
       if HR.Cast(S.MirrorImage) then return ""; end
     end
     -- charged_up,if=buff.arcane_charge.stack=0
-    if S.ChargedUp:IsCastableP() and (Player:BuffStackP(S.ArcaneChargeBuff) == 0) then
+    if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() == 0) then
       if HR.Cast(S.ChargedUp) then return ""; end
     end
     -- presence_of_mind,if=set_bonus.tier20_2pc&buff.arcane_charge.stack=0
-    if S.PresenceofMind:IsCastableP() and (HL.Tier20_2Pc and Player:BuffStackP(S.ArcaneChargeBuff) == 0) then
+    if S.PresenceofMind:IsCastableP() and (HL.Tier20_2Pc and Player:ArcaneChargesP() == 0) then
       if HR.Cast(S.PresenceofMind) then return ""; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
-    if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+    if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
       if HR.Cast(S.NetherTempest) then return ""; end
     end
     -- arcane_blast,if=(buff.rule_of_threes.up|buff.rhonins_assaulting_armwraps.react)&buff.arcane_charge.stack>=3
-    if S.ArcaneBlast:IsCastableP() and ((Player:BuffP(S.RuleofThreesBuff) or bool(Player:BuffStackP(S.RhoninsAssaultingArmwrapsBuff))) and Player:BuffStackP(S.ArcaneChargeBuff) >= 3) then
+    if S.ArcaneBlast:IsCastableP() and ((Player:BuffP(S.RuleofThreesBuff) or bool(Player:BuffStackP(S.RhoninsAssaultingArmwrapsBuff))) and Player:ArcaneChargesP() >= 3) then
       if HR.Cast(S.ArcaneBlast) then return ""; end
     end
     -- rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
-    if S.RuneofPower:IsCastableP() and (Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or S.RuneofPower:RechargeP() <= S.ArcanePower:CooldownRemainsP() or Target:TimeToDie() <= S.ArcanePower:CooldownRemainsP())) then
+    if S.RuneofPower:IsCastableP() and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or S.RuneofPower:RechargeP() <= S.ArcanePower:CooldownRemainsP() or Target:TimeToDie() <= S.ArcanePower:CooldownRemainsP())) then
       if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return ""; end
     end
     -- arcane_missiles,if=mana.pct<=95&buff.clearcasting.react,chain=1
@@ -266,11 +269,11 @@ local function APL()
       if HR.Cast(S.ArcaneMissiles) then return ""; end
     end
     -- arcane_blast,if=equipped.mystic_kilt_of_the_rune_master&buff.arcane_charge.stack=0
-    if S.ArcaneBlast:IsCastableP() and (I.MysticKiltoftheRuneMaster:IsEquipped() and Player:BuffStackP(S.ArcaneChargeBuff) == 0) then
+    if S.ArcaneBlast:IsCastableP() and (I.MysticKiltoftheRuneMaster:IsEquipped() and Player:ArcaneChargesP() == 0) then
       if HR.Cast(S.ArcaneBlast) then return ""; end
     end
     -- arcane_barrage,if=(buff.arcane_charge.stack=buff.arcane_charge.max_stack)&(mana.pct<=35|(talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd))
-    if S.ArcaneBarrage:IsCastableP() and ((Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax()) and (Player:ManaPercentage() <= 35 or (S.ArcaneOrb:IsAvailable() and S.ArcaneOrb:CooldownRemainsP() <= Player:GCD()))) then
+    if S.ArcaneBarrage:IsCastableP() and ((Player:ArcaneChargesP() == Player:ArcaneChargesMax()) and (Player:ManaPercentage() <= 35 or (S.ArcaneOrb:IsAvailable() and S.ArcaneOrb:CooldownRemainsP() <= Player:GCD()))) then
       if HR.Cast(S.ArcaneBarrage) then return ""; end
     end
     -- supernova,if=mana.pct<=95
@@ -278,7 +281,7 @@ local function APL()
       if HR.Cast(S.Supernova) then return ""; end
     end
     -- arcane_explosion,if=active_enemies>=3&(mana.pct>=40|buff.arcane_charge.stack=3)
-    if S.ArcaneExplosion:IsCastableP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentage() >= 40 or Player:BuffStackP(S.ArcaneChargeBuff) == 3)) then
+    if S.ArcaneExplosion:IsCastableP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentage() >= 40 or Player:ArcaneChargesP() == 3)) then
       if HR.Cast(S.ArcaneExplosion) then return ""; end
     end
     -- arcane_torrent
@@ -321,7 +324,7 @@ local function APL()
     end
   end
   -- call precombat
-  if not Player:AffectingCombat() then
+  if not Player:AffectingCombat() and not Player:IsCasting() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   -- counterspell,if=target.debuff.casting.react
@@ -330,7 +333,7 @@ local function APL()
   end
   -- time_warp,if=time=0&buff.bloodlust.down
   -- call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length|(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0)))
-  if (bool(VarBurnPhase) or Target:TimeToDie() < VarAverageBurnLength or (S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:BuffStackP(S.ArcaneChargeBuff) == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0)))) then
+  if (bool(VarBurnPhase) or Target:TimeToDie() < VarAverageBurnLength or (S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0)))) then
     local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=conserve,if=!burn_phase
