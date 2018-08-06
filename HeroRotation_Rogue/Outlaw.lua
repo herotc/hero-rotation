@@ -19,67 +19,73 @@ local tostring = tostring;
 
 --- APL Local Vars
 -- Commons
-  local Everyone = HR.Commons.Everyone;
-  local Rogue = HR.Commons.Rogue;
+local Everyone = HR.Commons.Everyone;
+local Rogue = HR.Commons.Rogue;
+
 -- Spells
-  if not Spell.Rogue then Spell.Rogue = {}; end
-  Spell.Rogue.Outlaw = {
-    -- Racials
-    ArcanePulse                     = Spell(260364),
-    ArcaneTorrent                   = Spell(25046),
-    Berserking                      = Spell(26297),
-    BloodFury                       = Spell(20572),
-    LightsJudgment                  = Spell(255647),
-    Shadowmeld                      = Spell(58984),
-    -- Abilities
-    AdrenalineRush                  = Spell(13750),
-    Ambush                          = Spell(8676),
-    BetweentheEyes                  = Spell(199804),
-    BladeFlurry                     = Spell(13877),
-    Opportunity                     = Spell(195627),
-    PistolShot                      = Spell(185763),
-    RolltheBones                    = Spell(193316),
-    Dispatch                        = Spell(2098),
-    SaberSlash                      = Spell(193315),
-    Stealth                         = Spell(1784),
-    Vanish                          = Spell(1856),
-    VanishBuff                      = Spell(11327),
-    -- Talents
-    BladeRush                       = Spell(271877),
-    DeeperStratagem                 = Spell(193531),
-    GhostlyStrike                   = Spell(196937),
-    KillingSpree                    = Spell(51690),
-    LoadedDiceBuff                  = Spell(256171),
-    MarkedforDeath                  = Spell(137619),
-    QuickDraw                       = Spell(196938),
-    SliceandDice                    = Spell(5171),
-    -- Defensive
-    CrimsonVial                     = Spell(185311),
-    Feint                           = Spell(1966),
-    -- Utility
-    Kick                            = Spell(1766),
-    -- Roll the Bones
-    Broadside                       = Spell(193356),
-    BuriedTreasure                  = Spell(199600),
-    GrandMelee                      = Spell(193358),
-    RuthlessPrecision               = Spell(193357),
-    SkullandCrossbones              = Spell(199603),
-    TrueBearing                     = Spell(193359)
-  };
-  local S = Spell.Rogue.Outlaw;
+if not Spell.Rogue then Spell.Rogue = {}; end
+Spell.Rogue.Outlaw = {
+  -- Racials
+  ArcanePulse                     = Spell(260364),
+  ArcaneTorrent                   = Spell(25046),
+  Berserking                      = Spell(26297),
+  BloodFury                       = Spell(20572),
+  LightsJudgment                  = Spell(255647),
+  Shadowmeld                      = Spell(58984),
+  -- Abilities
+  AdrenalineRush                  = Spell(13750),
+  Ambush                          = Spell(8676),
+  BetweentheEyes                  = Spell(199804),
+  BladeFlurry                     = Spell(13877),
+  Opportunity                     = Spell(195627),
+  PistolShot                      = Spell(185763),
+  RolltheBones                    = Spell(193316),
+  Dispatch                        = Spell(2098),
+  SinisterStrike                  = Spell(193315),
+  Stealth                         = Spell(1784),
+  Vanish                          = Spell(1856),
+  VanishBuff                      = Spell(11327),
+  -- Talents
+  AcrobaticStrikes                = Spell(196924),
+  BladeRush                       = Spell(271877),
+  DeeperStratagem                 = Spell(193531),
+  GhostlyStrike                   = Spell(196937),
+  KillingSpree                    = Spell(51690),
+  LoadedDiceBuff                  = Spell(256171),
+  MarkedforDeath                  = Spell(137619),
+  QuickDraw                       = Spell(196938),
+  SliceandDice                    = Spell(5171),
+  -- Defensive
+  CrimsonVial                     = Spell(185311),
+  Feint                           = Spell(1966),
+  -- Utility
+  Kick                            = Spell(1766),
+  -- Roll the Bones
+  Broadside                       = Spell(193356),
+  BuriedTreasure                  = Spell(199600),
+  GrandMelee                      = Spell(193358),
+  RuthlessPrecision               = Spell(193357),
+  SkullandCrossbones              = Spell(199603),
+  TrueBearing                     = Spell(193359)
+};
+local S = Spell.Rogue.Outlaw;
+
 -- Items
-  if not Item.Rogue then Item.Rogue = {}; end
-  Item.Rogue.Outlaw = {
-  };
-  local I = Item.Rogue.Outlaw;
+if not Item.Rogue then Item.Rogue = {}; end
+Item.Rogue.Outlaw = {
+};
+local I = Item.Rogue.Outlaw;
+
 -- Rotation Var
-  local ShouldReturn; -- Used to get the return string
+local ShouldReturn; -- Used to get the return string
+local BladeFlurryRange = 6;
+
 -- GUI Settings
-  local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.Rogue.Commons,
-    Outlaw = HR.GUISettings.APL.Rogue.Outlaw
-  };
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Rogue.Commons,
+  Outlaw = HR.GUISettings.APL.Rogue.Outlaw
+};
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -87,7 +93,7 @@ end
 
 -- APL Action Lists (and Variables)
 local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(S.SaberSlash); end},
+  {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(S.SinisterStrike); end},
   {S.Feint, "Cast Feint (Sapped Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sapped Soul)", function () return true; end}
 };
@@ -198,7 +204,7 @@ end
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 local function Blade_Flurry_Sync ()
-  return not HR.AoEON() or Cache.EnemiesCount[tostring(S.Dispatch:ID())] < 2 or Player:BuffP(S.BladeFlurry)
+  return not HR.AoEON() or Cache.EnemiesCount[BladeFlurryRange] < 2 or Player:BuffP(S.BladeFlurry)
 end
 
 local function EnergyTimeToMaxRounded ()
@@ -233,7 +239,7 @@ local function CDs ()
   -- TODO: Add Potion
   -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
   -- TODO: Add Items
-  if Target:IsInRange(S.SaberSlash) then
+  if Target:IsInRange(S.SinisterStrike) then
     if HR.CDsON() then
       -- actions.cds+=/blood_fury
       if S.BloodFury:IsCastable() then
@@ -252,8 +258,8 @@ local function CDs ()
     if S.MarkedforDeath:IsCastable() then
       -- Note: Increased the SimC condition by 50% since we are slower.
       if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (Target:FilteredTimeToDie("<", 2) and Player:ComboPointsDeficit() > 0)
-        or (((Cache.EnemiesCount[30] == 1 and Player:BuffRemainsP(S.TrueBearing) > 15 - (Player:BuffP(S.AdrenalineRush) and 5 or 0))
-          or Target:IsDummy()) and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
+        or (((Player:BuffRemainsP(S.TrueBearing) > 15 - (Player:BuffP(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy())
+          and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
         if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
       elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
         HR.CastSuggested(S.MarkedforDeath);
@@ -261,11 +267,11 @@ local function CDs ()
     end
     if HR.CDsON() then
       -- actions.cds+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-      if HR.AoEON() and S.BladeFlurry:IsCastable() and Cache.EnemiesCount[tostring(S.Dispatch:ID())] >= 2 and not Player:BuffP(S.BladeFlurry) then
+      if HR.AoEON() and S.BladeFlurry:IsCastable() and Cache.EnemiesCount[BladeFlurryRange] >= 2 and not Player:BuffP(S.BladeFlurry) then
         if HR.Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then return "Cast Blade Flurry"; end
       end
       -- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
-      if S.GhostlyStrike:IsCastable(S.SaberSlash) and Blade_Flurry_Sync() and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0)) then
+      if S.GhostlyStrike:IsCastable(S.SinisterStrike) and Blade_Flurry_Sync() and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0)) then
         if HR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
       end
       -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
@@ -273,7 +279,7 @@ local function CDs ()
         if HR.Cast(S.KillingSpree) then return "Cast Killing Spree"; end
       end
       -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
-      if S.BladeRush:IsCastable(S.SaberSlash) and Blade_Flurry_Sync() and EnergyTimeToMaxRounded() > 1 then
+      if S.BladeRush:IsCastable(S.SinisterStrike) and Blade_Flurry_Sync() and EnergyTimeToMaxRounded() > 1 then
         if HR.Cast(S.BladeRush) then return "Cast Blade Rush"; end
       end
       if not Player:IsStealthed(true, true) then
@@ -292,7 +298,7 @@ local function CDs ()
 end
 
 local function Stealth ()
-  if Target:IsInRange(S.SaberSlash) then
+  if Target:IsInRange(S.SinisterStrike) then
     -- actions.stealth=ambush
     if S.Ambush:IsCastable() then
       if HR.Cast(S.Ambush) then return "Cast Ambush"; end
@@ -338,18 +344,17 @@ local function Build ()
     if HR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
   end
   -- actions.build+=/sinister_strike
-  if S.SaberSlash:IsCastable(S.SaberSlash) then
-    if HR.Cast(S.SaberSlash) then return "Cast Saber Slash"; end
+  if S.SinisterStrike:IsCastable(S.SinisterStrike) then
+    if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike"; end
   end
 end
 
 -- APL Main
 local function APL ()
   -- Unit Update
-  HL.GetEnemies(8); -- Cannonball Barrage
-  HL.GetEnemies(S.Dispatch); -- Blade Flurry
-  HL.GetEnemies(S.SaberSlash); -- Melee
-  Everyone.AoEToggleEnemiesUpdate();
+  BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6;
+  HL.GetEnemies(BladeFlurryRange);
+  HL.GetEnemies("Melee");
 
   -- Defensives
   -- Crimson Vial
@@ -371,7 +376,7 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange(S.SaberSlash) then
+    if Everyone.TargetIsValid() and Target:IsInRange(S.SinisterStrike) then
       if Player:ComboPoints() >= 5 then
         if S.Dispatch:IsCastable() then
           if HR.Cast(S.Dispatch) then return "Cast Dispatch (Opener)"; end
@@ -379,8 +384,8 @@ local function APL ()
       else
         if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
           if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
-        elseif S.SaberSlash:IsCastable() then
-          if HR.Cast(S.SaberSlash) then return "Cast Saber Slash (Opener)"; end
+        elseif S.SinisterStrike:IsCastable() then
+          if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)"; end
         end
       end
     end
@@ -398,7 +403,7 @@ local function APL ()
     ShouldReturn = TrainingScenario();
     if ShouldReturn then return ShouldReturn; end
     -- Kick
-    if Settings.General.InterruptEnabled and S.Kick:IsCastable(S.SaberSlash) and Target:IsInterruptible() then
+    if Settings.General.InterruptEnabled and S.Kick:IsCastable(S.SinisterStrike) and Target:IsInterruptible() then
       if HR.Cast(S.Kick, Settings.Commons.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
     end
 
@@ -419,15 +424,15 @@ local function APL ()
     ShouldReturn = Build();
     if ShouldReturn then return "Build: " .. ShouldReturn; end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
-    if S.ArcaneTorrent:IsCastableP(S.SaberSlash) and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
+    if S.ArcaneTorrent:IsCastableP(S.SinisterStrike) and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
     end
     -- actions+=/arcane_pulse
-    if S.ArcanePulse:IsCastableP(S.SaberSlash) then
+    if S.ArcanePulse:IsCastableP(S.SinisterStrike) then
       if HR.Cast(S.ArcanePulse) then return "Cast Arcane Pulse"; end
     end
     -- actions+=/lights_judgment
-    if S.LightsJudgment:IsCastableP(S.SaberSlash) then
+    if S.LightsJudgment:IsCastableP(S.SinisterStrike) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
     end
     -- OutofRange Pistol Shot
