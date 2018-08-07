@@ -320,8 +320,8 @@ local function Stealthed ()
     if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_B, 2);
     end
-    -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture
-    if S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 1 and Player:PrevGCD(1, S.Rupture) then
+    -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
+    if S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 1 and Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 5+4*Rogue.CPMaxSpend() then
       -- actions.stealthed+=/pool_resource,for_next=1
       if Player:EnergyPredicted() < 45 then
         if HR.Cast(S.PoolEnergy) then return "Pool for Garrote (Exsanguinate)"; end
@@ -528,7 +528,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-08-06
+-- Last Update: 2018-08-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -560,7 +560,7 @@ HR.SetAPL(259, APL);
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
 -- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
 -- actions.stealthed+=/pool_resource,for_next=1
--- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture
+-- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
 --
 -- # Potion
 -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
