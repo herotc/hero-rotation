@@ -21,6 +21,7 @@ local HR     = HeroRotation
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Frost = {
+  ArcaneIntellectBuff                   = Spell(1459),
   ArcaneIntellect                       = Spell(1459),
   WaterElemental                        = Spell(31687),
   MirrorImage                           = Spell(55342),
@@ -91,6 +92,8 @@ local function bool(val)
   return val ~= 0
 end
 
+S.FrozenOrb.EffectID = 84721
+S.FrozenOrb:RegisterInFlight()
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cooldowns, Movement, Single
@@ -101,7 +104,7 @@ local function APL()
     -- food
     -- augmentation
     -- arcane_intellect
-    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellect) and (true) then
+    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff) and (true) then
       if HR.Cast(S.ArcaneIntellect) then return ""; end
     end
     -- water_elemental
@@ -255,7 +258,7 @@ local function APL()
       if HR.Cast(S.IceLance) then return ""; end
     end
     -- ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
-    if S.RayofFrost:IsCastableP() and (not S.FrozenOrb:InFlight() and ground_aoe.frozen_orb.remains == 0) then
+    if S.RayofFrost:IsCastableP() and (not S.FrozenOrb:InFlight() and Player:FrozenOrbGroundAoeRemains() == 0) then
       if HR.Cast(S.RayofFrost) then return ""; end
     end
     -- comet_storm
@@ -292,7 +295,7 @@ local function APL()
     end
   end
   -- call precombat
-  if not Player:AffectingCombat() then
+  if not Player:AffectingCombat() and (not Player:IsCasting() or Player:IsCasting(S.WaterElemental)) then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   -- counterspell

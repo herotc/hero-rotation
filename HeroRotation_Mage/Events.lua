@@ -11,14 +11,14 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- Lua
-  
+
   -- File Locals
-  
+
 
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
-  
+
 
 --- ======= COMBATLOG =======
   --- Combat Log Arguments
@@ -74,11 +74,11 @@
 
   -- Arguments Variables
   HL.RoPTime = 0
-  
+
   --------------------------
   -------- Arcane ----------
   --------------------------
-    
+
   HL:RegisterForSelfCombatEvent(
     function (...)
       dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
@@ -89,7 +89,7 @@
     end
     , "SPELL_AURA_APPLIED"
   );
-  
+
   HL:RegisterForSelfCombatEvent(
     function (...)
       dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
@@ -99,3 +99,26 @@
     end
     , "SPELL_AURA_REMOVED"
   );
+
+  --------------------------
+  -------- Frost -----------
+  --------------------------
+
+  local FrozenOrbFirstHit = true
+  local FrozenOrbHitTime = 0
+
+  HL:RegisterForSelfCombatEvent(function(...)
+    local spellID = select(12, ...)
+    if spellID == 84721 and FrozenOrbFirstHit then
+      FrozenOrbFirstHit = false
+      FrozenOrbHitTime = HL.GetTime()
+      C_Timer.After(10, function()
+        FrozenOrbFirstHit = true
+        FrozenOrbHitTime = 0
+      end)
+    end
+  end, "SPELL_DAMAGE")
+
+  function Player:FrozenOrbGroundAoeRemains()
+    return math.max(HL.OffsetRemains(FrozenOrbHitTime - (HL.GetTime() - 10), "Auto"), 0)
+  end
