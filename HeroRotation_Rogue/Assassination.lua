@@ -92,7 +92,7 @@ S.Envenom:RegisterDamage(
       -- Envenom AP Coef
       0.16 *
       -- Aura Multiplier (SpellID: 137037)
-      1.32 *
+      1.27 *
       -- Toxic Blade Multiplier
       (Target:DebuffP(S.ToxicBladeDebuff) and 1.3 or 1) *
       -- Deeper Stratagem Multiplier
@@ -111,7 +111,7 @@ S.Mutilate:RegisterDamage(
       -- Mutilate Coefficient
       0.35 *
       -- Aura Multiplier (SpellID: 137037)
-      1.32 *
+      1.27 *
       -- Versatility Damage Multiplier
       (1 + Player:VersatilityDmgPct()/100);
   end
