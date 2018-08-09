@@ -327,7 +327,7 @@ local function APL()
   if not Player:AffectingCombat() and not Player:IsCasting() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  -- counterspell,if=target.debuff.casting.react
+  -- counterspell,if=target.debuff.casting.react - Interim solution provided just to comment out the spell until I have time to fix it properly. Busy with IRL work [09/08/2018 Glynny]
 --  if S.Counterspell:IsCastableP() and Settings.General.InterruptEnabled and Target:IsInterruptible() and (Target:IsCasting()) then
 --    if HR.CastAnnotated(S.Counterspell, false, "Interrupt") then return ""; end
 --  end
