@@ -67,6 +67,8 @@
       GCDasOffGCD = {
         AdrenalineRush = true,
         BladeFlurry = true,
+        KillingSpree = false,
+        BladeRush = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
