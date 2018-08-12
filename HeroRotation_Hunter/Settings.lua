@@ -85,16 +85,17 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        AspectoftheEagle = false,
         Butchery = false,
         CallPet = false,
         CoordinatedAssault = false,
         Exhilaration = false,
+        Harpoon = true,
         MendPet = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
+        AspectoftheEagle = false,
         Muzzle = true,
         -- Items
         PotionOfProlongedPower = true,
