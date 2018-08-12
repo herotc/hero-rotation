@@ -365,7 +365,7 @@ local function APL()
   end
   -- use_items
   -- warrior_of_elune
-  if S.WarriorofElune:IsCastableP() and (true) then
+  if S.WarriorofElune:IsCastableP() and not Player:Buff(S.WarriorofElune) then
     if HR.Cast(S.WarriorofElune) then return ""; end
   end
   -- run_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=1
