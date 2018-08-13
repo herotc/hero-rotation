@@ -541,6 +541,9 @@
     self:AddButton("C", 1, "CDs", "cds");
     self:AddButton("A", 2, "AoE", "aoe");
     self:AddButton("O", 3, "On/Off", "toggle");
+    self:AddButton("1", 4, "Custom1", "custom1");
+    self:AddButton("2", 5, "Custom2", "custom2");
+    self:AddButton("3", 6, "Custom3", "custom3");
   end
   -- Reset Anchor
   function HR.ToggleIconFrame:ResetAnchor ()
@@ -554,9 +557,12 @@
     ButtonFrame:SetFrameLevel(self:GetFrameLevel() - 1);
     ButtonFrame:SetWidth(20);
     ButtonFrame:SetHeight(20);
-    ButtonFrame:SetPoint("LEFT", self, "LEFT", 20*(i-1)+i, 0);
+    local buttons_per_row = 3
+    local c = (i-1)%buttons_per_row+1
+    local r = (i-c)/buttons_per_row
+    ButtonFrame:SetPoint("LEFT", self, "LEFT", 20*(c-1)+c, -(20*r));
 
-    -- Button Tooltip (Optional)
+      -- Button Tooltip (Optional)
     if Tooltip then
       ButtonFrame:SetScript("OnEnter",
         function ()
@@ -629,5 +635,3 @@
       self.Button[i]:SetFormattedText("|cffff0000%s|r", self.Button[i].text);
     end
   end
-
-

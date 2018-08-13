@@ -64,6 +64,9 @@
   BINDING_NAME_HEROROTATION_CDS = "Toggle CDs";
   BINDING_NAME_HEROROTATION_AOE = "Toggle AoE";
   BINDING_NAME_HEROROTATION_TOGGLE = "Toggle On/Off";
+  BINDING_NAME_HEROROTATION_CUSTOM1 = "Toggle Custom1";
+  BINDING_NAME_HEROROTATION_CUSTOM2 = "Toggle Custom2";
+  BINDING_NAME_HEROROTATION_CUSTOM3 = "Toggle Custom3";
 
 --- ======= MAIN FRAME =======
   HR.MainFrame = CreateFrame("Frame", "HeroRotation_MainFrame", UIParent);

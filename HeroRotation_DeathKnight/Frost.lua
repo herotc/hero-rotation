@@ -100,6 +100,9 @@
   local T202P,T204P = HL.HasTier("T20")
   local T212P,T214P = HL.HasTier("T21")
 
+  -- Custom Buttons
+  local UseBreathofSindragosa = HR.Custom1;
+
   -- GUI Settings
   local Settings = {
     General = HR.GUISettings.General,
@@ -231,31 +234,31 @@
   local function BoS_Pooling()
     -- howling_blast,if=buff.rime.up
     if S.HowlingBlast:IsCastableP(30, true) and Player:Buff(S.Rime) then
-      if HR.Cast(S.HowlingBlast) then return ""; end
+      if HR.Cast(S.HowlingBlast) then return "Pooling: HowlingBlast"; end
     end
     -- obliterate,if=rune.time_to_4<gcd&runic_power.deficit>=25
     if S.Obliterate:IsCastableP("Melee") and (Player:RuneTimeToX(4) < Player:GCD() and Player:RunicPowerDeficit() >= 25) then
-      if HR.Cast(S.Obliterate) then return ""; end
+      if HR.Cast(S.Obliterate) then return "Pooling: Obliterate"; end
     end
     -- glacial_advance,if=runic_power.deficit<20&cooldown.pillar_of_frost.remains>rune.time_to_4
     if S.GlacialAdvance:IsCastableP() and (Player:RunicPowerDeficit() < 20 and S.PillarOfFrost:CooldownRemainsP() > Player:RuneTimeToX(4)) then
-      if HR.Cast(S.GlacialAdvance) then return ""; end
+      if HR.Cast(S.GlacialAdvance) then return "Pooling: GlacialAdvance"; end
     end
     -- frostscythe,if=buff.killing_machine.up&runic_power.deficit>(15+talent.runic_attenuation.enabled*3)
     if S.FrostScythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:Buff(S.KillingMachine) and Player:RunicPowerDeficit() > (15 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
-      if HR.Cast(S.FrostScythe) then return ""; end
+      if HR.Cast(S.FrostScythe) then return "Pooling: FrostScythe"; end
     end
     -- obliterate,if=runic_power.deficit>=(25+talent.runic_attenuation.enabled*3)
     if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() >= (25 + (S.RunicAttenuation:IsAvailable() and 1 or 0) * 3)) then
-      if HR.Cast(S.Obliterate) then return ""; end
+      if HR.Cast(S.Obliterate) then return "Pooling: Obliterate 2"; end
     end
     -- glacial_advance,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&spell_targets.glacial_advance>=2
     if S.GlacialAdvance:IsCastableP() and (S.PillarOfFrost:CooldownRemainsP() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40 and Cache.EnemiesCount[30] >= 2) then
-      if HR.Cast(S.GlacialAdvance) then return ""; end
+      if HR.Cast(S.GlacialAdvance) then return "Pooling: GlacialAdvance 2"; end
     end
     -- frost_strike,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40
-    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (S.PillarOfFrost:CooldownRemainsP() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40) then
-      if HR.Cast(S.FrostStrike) then return ""; end
+    if not DeathStrikeHeal() and S.FrostStrike:IsReady(13) and (S.PillarOfFrost:CooldownRemains() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40) then
+      if HR.Cast(S.FrostStrike) then return "Pooling: FrostStrike"; end
     end
     return false;
   end
@@ -367,7 +370,7 @@
         if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
       -- actions.cooldowns+=/empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
-      if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
+      if UseBreathofSindragosa() and S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
         if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
       -- actions.cooldowns+=/call_action_list,name=cold_heart,if=(equipped.cold_heart|talent.cold_heart.enabled)&(((buff.cold_heart_item.stack>=10|buff.cold_heart_talent.stack>=10)&debuff.razorice.stack=5)|target.time_to_die<=gcd)
@@ -438,7 +441,7 @@ local function APL ()
         if HR.Cast(S.FrostStrike) then return ""; end
     end
     --actions+=/breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
-    if S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
+    if UseBreathofSindragosa() and S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
         if HR.Cast(S.BreathofSindragosa, Settings.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa) then return ""; end
     end
   end
@@ -448,9 +451,7 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
-    local pooling = false
-    if (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemainsP() < 5) then
-        pooling = true
+    if UseBreathofSindragosa() and (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < 5) then
         ShouldReturn = BoS_Pooling();
         if ShouldReturn then return ShouldReturn; end
         if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Pooling"; end
@@ -472,13 +473,10 @@ local function APL ()
       if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/call_action_list,name=standard
-    if not pooling then
-        ShouldReturn = Standard();
-        if ShouldReturn then return ShouldReturn; end
-    end
+    ShouldReturn = Standard();
+    if ShouldReturn then return ShouldReturn; end
 
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait/Pool Resources"; end
-
     return;
   end
 
