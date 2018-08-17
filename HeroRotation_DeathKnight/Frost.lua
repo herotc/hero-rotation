@@ -47,7 +47,6 @@
     BreathofSindragosaTicking     = Spell(155166),
     FrostScythe                   = Spell(207230),
     FrozenPulse                   = Spell(194909),
-    FreezingFog                   = Spell(207060),
     GatheringStorm                = Spell(194912),
     GatheringStormBuff            = Spell(211805),
     GlacialAdvance                = Spell(194913),
@@ -58,9 +57,8 @@
     Obliteration                  = Spell(281238),
     RunicAttenuation              = Spell(207104),
     Icecap                        = Spell(207126),
-    ColdHeartTalent               = Spell(281208),
+    ColdHeart                     = Spell(281208),
     ColdHeartBuff                 = Spell(281209),
-    ColdHeartItemBuff             = Spell(235599),
     FrostwyrmsFury                = Spell(279302),
     -- Defensive
     AntiMagicShell                = Spell(48707),
@@ -82,13 +80,6 @@
   if not Item.DeathKnight then Item.DeathKnight = {}; end
   Item.DeathKnight.Frost = {
     -- Legendaries
-    ConvergenceofFates            = Item(140806, {13, 14}),
-    ColdHeart                     = Item(151796, {5}),
-    ConsortsColdCore              = Item(144293, {8}),
-    KiljaedensBurningWish         = Item(144259, {13, 14}),
-    KoltirasNewfoundWill          = Item(132366, {6}),
-    SealOfNecrofantasia           = Item(137223, {11, 12}),
-    ToravonsWhiteoutBindings      = Item(132458, {9}),
     --Trinkets
     --Potion
     ProlongedPower                = Item(142117)
@@ -370,11 +361,11 @@
       if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
         if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
-      -- actions.cooldowns+=/call_action_list,name=cold_heart,if=(equipped.cold_heart|talent.cold_heart.enabled)&(((buff.cold_heart_item.stack>=10|buff.cold_heart_talent.stack>=10)&debuff.razorice.stack=5)|target.time_to_die<=gcd)
-      if (S.ColdHeartTalent:IsAvailable() or I.ColdHeart:IsEquipped()) and (((Player:BuffStack(S.ColdHeartBuff) >= 10 or Player:BuffStack(S.ColdHeartItemBuff) >= 10) and Target:DebuffStack(S.RazorIce) == 5) or Target:TimeToDie() <= Player:GCD()) then
+      --actions.cooldowns+=/call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.time_to_die<=gcd)
+      if S.ColdHeart:IsAvailable() and ((Player:BuffStack(S.ColdHeartBuff) >= 10 and Target:DebuffStack(S.RazorIce) == 5) or Target:TimeToDie() <= Player:GCD()) then
           --[[COLD HEART LEGENDARY APL]] --
-          -- actions.cold_heart=chains_of_ice,if=(buff.cold_heart_item.stack>5|buff.cold_heart_talent.stack>5)&target.time_to_die<gcd
-          if S.ChainsOfIce:IsCastableP(30) and (Player:BuffStack(S.ColdHeartItemBuff) > 5 or Player:BuffStack(S.ColdHeartBuff) > 5) and Target:TimeToDie() <= Player:GCD() then
+          -- actions.cold_heart=chains_of_ice,if=buff.cold_heart.stack>5&target.time_to_die<gcd
+          if S.ChainsOfIce:IsCastableP(30) and Player:BuffStack(S.ColdHeartBuff) > 5 and Target:TimeToDie() < Player:GCD() then
             if HR.Cast(S.ChainsOfIce) then return ""; end
           end
           -- actions.cold_heart+=/chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up

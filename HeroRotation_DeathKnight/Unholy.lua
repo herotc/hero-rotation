@@ -72,10 +72,6 @@
     MindFreeze                    = Spell(47528),
     PathOfFrost                   = Spell(3714),
     WraithWalk                    = Spell(212552),
-    --Legendaries Buffs/SpellIds
-    ColdHeartItemBuff             = Spell(235599),
-    InstructorsFourthLesson       = Spell(208713),
-    KiljaedensBurningWish         = Spell(144259),
     --SummonGargoyle HiddenAura
     SummonGargoyleActive          = Spell(212412), --tbc
     -- Misc
@@ -85,12 +81,8 @@
   --Items
   if not Item.DeathKnight then Item.DeathKnight = {}; end
   Item.DeathKnight.Unholy = {
-    --Legendaries WIP
-  ConvergenceofFates            = Item(140806, {13, 14}),
-  InstructorsFourthLesson       = Item(132448, {9}),
-  Taktheritrixs                 = Item(137075, {3}),
-  ColdHeart                    = Item(151796, {5}),
-
+    --Legendaries (Legion)
+  Taktheritrixs                 = Item(137075, {3})
 
   };
   local I = Item.DeathKnight.Unholy;
@@ -219,26 +211,7 @@ end
   return false;
 end
 
-local function ColdHeart()
-  -- chains_of_ice,if=buff.unholy_strength.remains<gcd&buff.unholy_strength.react&buff.cold_heart_item.stack>16
-  if S.ChainsOfIce:IsCastable() and (Player:BuffRemainsP(S.UnholyStrength) < Player:GCD() and Player:Buff(S.UnholyStrength) and Player:BuffStack(S.ColdHeartItemBuff) > 16) then
-    if HR.Cast(S.ChainsOfIce) then return ""; end
-  end
-  -- chains_of_ice,if=buff.master_of_ghouls.remains<gcd&buff.master_of_ghouls.up&buff.cold_heart_item.stack>17
-  if S.ChainsOfIce:IsCastable() and (Player:BuffRemains(S.MasterOfGhouls) < Player:GCD() and Player:Buff(S.MasterOfGhouls) and Player:BuffStack(S.ColdHeartItemBuff) > 17) then
-    if HR.Cast(S.ChainsOfIce) then return ""; end
-  end
-  -- chains_of_ice,if=buff.cold_heart_item.stack=20&buff.unholy_strength.react
-  if S.ChainsOfIce:IsCastable() and Player:BuffStack(S.ColdHeartItemBuff) == 20 and Player:Buff(S.UnholyStrength) then
-    if HR.Cast(S.ChainsOfIce) then return ""; end
-  end
-  return;
-end
 local function Cooldowns()
-    -- call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart_item.stack>10
-    if (I.ColdHeart:IsEquipped() and Player:BuffStack(S.ColdHeartItemBuff) > 10) then
-      local ShouldReturn = ColdHeart(); if ShouldReturn then return ShouldReturn; end
-    end
     -- army_of_the_dead
     if S.ArmyOfTheDead:IsCastable() then
       if HR.Cast(S.ArmyOfTheDead, Settings.Unholy.GCDasOffGCD.ArmyOfTheDead) then return ""; end
