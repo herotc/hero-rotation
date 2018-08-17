@@ -163,7 +163,7 @@ local function APL()
       if HR.Cast(S.GlacialSpike) then return ""; end
     end
     -- cone_of_cold
-    if S.ConeofCold:IsCastableP() and (true) then
+    if S.ConeofCold:IsCastableP() and (Cache.EnemiesCount[12] >= 1) and (true) then
       if HR.Cast(S.ConeofCold) then return ""; end
     end
     -- frostbolt
