@@ -78,7 +78,7 @@ Spell.Shaman.Enhancement = {
   -- Misc
   PoolFocus             = Spell(9999000010),
 }
-local S = Spell.Shaman.Enhancement
+local S = Spell.Shaman.Enhancement;
 local Everyone = HR.Commons.Everyone;
 
 -- Items
@@ -92,11 +92,13 @@ Item.Shaman.Enhancement = {
   SpecterOfBetrayal         = Item(151190, {13, 14}),
   HornOfValor				= Item(133642, {13, 14}),
 
-  -- Misc
-  PoPP                      = Item(142117),
+  -- Consumables
+  BPoA                      = Item(163223),  -- Battle Potion of Agility
+  CHP                       = Item(152494),  -- Coastal Healing Potion
+  BSAR                      = Item(160053),  -- Battle-Scarred Augment Rune
   Healthstone               = Item(5512),
 }
-local I = Item.Shaman.Enhancement
+local I = Item.Shaman.Enhancement;
 
 -- GUI Settings
 local Settings = {
@@ -164,13 +166,17 @@ local function APL ()
       if HR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
     end
 
-    -- Use healthstone if we have it and our health is low.
-    if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 50) then
-      if HR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
+    -- Use healthstone or health potion if we have it and our health is low.
+    if Settings.Shaman.Commons.ShowHSHP and (Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold) then
+      if I.Healthstone:IsReady() then
+        if HR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
+      elseif I.CHP:IsReady() then
+        if HR.CastSuggested(I.CHP) then return "Use CHP" end
+      end
     end
 
     -- Heal when we have less than the set health threshold!
-    if S.HealingSurge:IsReady() and Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingSurgeHPThreshold then
+    if S.HealingSurge:IsReady() and Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold then
       -- Instant casts using maelstrom only.
       if Player:Maelstrom() >= 20 then
         if HR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
@@ -275,10 +281,15 @@ local function APL ()
         if HR.Cast(S.BloodFury, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast BloodFury" end
       end
 
-      -- Potion of Prolonged Power
+      -- Battle Potion of Agility
       -- actions.cds+=/potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
-      if Settings.Shaman.Commons.ShowPoPP and I.PoPP:IsReady() and ((Player:Buff(S.AscendanceBuff)) or (not S.Ascendance:IsAvailable() and S.FeralSpirit:TimeSinceLastCast() <= 10) or Target:TimeToDie() <= 60) then
-        if HR.CastSuggested(I.PoPP) then return "Use PoPP" end
+      if Settings.Shaman.Commons.ShowBPoA and I.BPoA:IsReady() and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and ((Player:Buff(S.AscendanceBuff)) or (not S.Ascendance:IsAvailable() and S.FeralSpirit:TimeSinceLastCast() <= 10) or Target:TimeToDie() <= 60) then
+        if HR.CastSuggested(I.BPoA) then return "Use BPoA" end
+      end
+
+      -- Battle-Scarred Augment Rune
+      if Settings.Shaman.Commons.ShowBSAR and I.BSAR:IsReady() and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and ((Player:Buff(S.AscendanceBuff)) or (not S.Ascendance:IsAvailable() and S.FeralSpirit:TimeSinceLastCast() <= 10) or Target:TimeToDie() <= 60) then
+        if HR.CastSuggested(I.BSAR) then return "Use BSAR" end
       end
 
       -- actions.cds+=/feral_spirit
