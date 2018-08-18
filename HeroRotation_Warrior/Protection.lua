@@ -173,7 +173,8 @@ local function APL ()
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "Shield Block" end
     end
 
-    if S.LastStand:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and isCurrentlyTanking() and Settings.Protection.UseLastStandToFillShieldBlockDownTime then
+    if S.LastStand:IsReady() and (not Player:Buff(S.ShieldBlockBuff)) and isCurrentlyTanking() and Settings.Protection.UseLastStandToFillShieldBlockDownTime
+      and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
       if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "Cast LastStand" end
     end
 
