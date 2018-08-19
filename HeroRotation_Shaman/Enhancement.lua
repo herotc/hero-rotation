@@ -293,7 +293,7 @@ local function APL ()
       end
 
       -- actions.cds+=/feral_spirit
-      if S.FeralSpirit:IsCastableP() then
+      if S.FeralSpirit:IsCastableP() and Settings.Shaman.Enhancement.EnableFS then
         if HR.Cast(S.FeralSpirit) then return "Cast FeralSpirit" end
       end
 
@@ -303,7 +303,7 @@ local function APL ()
       end
 
       -- actions.cds+=/earth_elemental
-      if S.EarthElemental:IsCastableP() then
+      if S.EarthElemental:IsCastableP() and Settings.Shaman.Enhancement.EnableEE then
         if HR.Cast(S.EarthElemental) then return "Cast EarthElemental" end
       end
     end
