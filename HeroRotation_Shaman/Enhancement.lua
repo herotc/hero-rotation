@@ -14,7 +14,7 @@ local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
 
--- APL from T22_Shaman_Enhancement on 2018-08-19
+-- APL from T22_Shaman_Enhancement on 2018-08-19 13:50 PDT
 -- https://github.com/simulationcraft/simc/blob/143242249d1c65a36194fe0f60f86974c754bb22/profiles/Tier22/T22_Shaman_Enhancement.simc
 
 -- APL Local Vars
@@ -80,6 +80,10 @@ Spell.Shaman.Enhancement = {
   SpecterOfBetrayal     = Spell(246461),
   HornOfValor           = Spell(215956),
 
+  -- Item Buffs
+  BSARBuff              = Spell(270058),
+  DFRBuff               = Spell(224001),
+
   -- Misc
   PoolFocus             = Spell(9999000010),
 }
@@ -89,7 +93,7 @@ local Everyone = HR.Commons.Everyone;
 -- Items
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
-  -- Legendaries
+  -- Legion Legendaries
   SmolderingHeart           = Item(151819, {10}),
   AkainusAbsoluteJustice    = Item(137084, {9}),
 
@@ -97,11 +101,16 @@ Item.Shaman.Enhancement = {
   SpecterOfBetrayal         = Item(151190, {13, 14}),
   HornOfValor				= Item(133642, {13, 14}),
 
-  -- Consumables
+  -- BfA Consumables
+  Healthstone               = Item(5512),
+
   BPoA                      = Item(163223),  -- Battle Potion of Agility
   CHP                       = Item(152494),  -- Coastal Healing Potion
   BSAR                      = Item(160053),  -- Battle-Scarred Augment Rune
-  Healthstone               = Item(5512),
+
+  -- Legion Consumables
+  DAR                       = Item(140587),  -- Defiled Augment Rune
+  PoPP                      = Item(142117),  -- Potion of Prolonged Power
 }
 local I = Item.Shaman.Enhancement;
 
@@ -186,6 +195,26 @@ local function APL ()
       -- Instant casts using maelstrom only.
       if Player:Maelstrom() >= 20 then
         if HR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
+      end
+    end
+
+    -- Potions
+    -- Potion of Prolonged Power, then Battle Potion of Agility
+    if Settings.Shaman.Commons.ShowPotions and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and ((Player:Buff(S.AscendanceBuff)) or Target:TimeToDie() <= 60 or Player:HasHeroism()) then
+      if I.PoPP:IsReady() then
+        if HR.CastSuggested(I.PoPP) then return "Use PoPP" end
+      elseif I.BPoA:IsReady() then
+        if HR.CastSuggested(I.BPoA) then return "Use BPoA" end
+      end
+    end
+
+    -- Runes
+    -- Defiled Augment Rune, then Battle-Scarred Augment Rune
+    if Settings.Shaman.Commons.ShowRunes and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and (not Player:Buff(S.DFRBuff) and not Player:Buff(S.BSARBuff)) then
+      if I.DAR:IsReady() then
+        if HR.CastSuggested(I.DAR) then return "Use DAR" end
+      elseif I.BSAR:IsReady() then
+        if HR.CastSuggested(I.BSAR) then return "Use BSAR" end
       end
     end
 
@@ -291,16 +320,8 @@ local function APL ()
         if HR.Cast(S.AncestralCall, Settings.Shaman.Commons.OffGCDasOffGCD.Racials) then return "Cast AncestralCall" end
       end
 
-      -- Battle Potion of Agility
       -- actions.cds+=/potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
-      if Settings.Shaman.Commons.ShowBPoA and I.BPoA:IsReady() and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and ((Player:Buff(S.AscendanceBuff)) or (not S.Ascendance:IsAvailable() and S.FeralSpirit:TimeSinceLastCast() <= 10) or Target:TimeToDie() <= 60) then
-        if HR.CastSuggested(I.BPoA) then return "Use BPoA" end
-      end
-
-      -- Battle-Scarred Augment Rune
-      if Settings.Shaman.Commons.ShowBSAR and I.BSAR:IsReady() and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and ((Player:Buff(S.AscendanceBuff)) or (not S.Ascendance:IsAvailable() and S.FeralSpirit:TimeSinceLastCast() <= 10) or Target:TimeToDie() <= 60) then
-        if HR.CastSuggested(I.BSAR) then return "Use BSAR" end
-      end
+      -- Already handled
 
       -- actions.cds+=/feral_spirit
       if S.FeralSpirit:IsCastableP() and Settings.Shaman.Enhancement.EnableFS then

@@ -23,8 +23,8 @@
       },
       OnUseTrinkets = false,
 
-      ShowBPoA = false,
-      ShowBSAR = false,
+      ShowPotions = false,
+      ShowRunes = false,
       ConsumableMinHPThreshHold = 2500,
 
       ShowHSHP = false,
@@ -50,8 +50,8 @@
   CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons");
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.OnUseTrinkets", "Show on use trinkets", "Enable this if you want to show supported on use trinkets when they are ready.");
 
-  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowBPoA", "Show BPoA", "Enable this if you want it to show you when to use Battle Potion of Agility.");
-  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowBSAR", "Show BSAR", "Enable this if you want it to show you when to use Battle-Scarred Augment Rune.");
+  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowPotions", "Show potions", "Enable this if you want it to show you when to use Battle Potion of Agility, etc.");
+  CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowRunes", "Show runes", "Enable this if you want it to show you when to use Battle-Scarred Augment Rune, etc.");
   CreatePanelOption("Slider", CP_Shaman, "APL.Shaman.Commons.ConsumableMinHPThreshHold", {0, 5000, 25}, "Consumable HP threshold (k)", "Minimum amount of health (times x1000) the target needs to have to show consumables.");
 
   CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.ShowHSHP", "Show healthstones & health potions", "Enable this if you want to show Healthstones and health potions when you're low on health.");
