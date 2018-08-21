@@ -77,7 +77,7 @@ local Settings = {
 
 -- Variables
 
-local EnemyRanges = {40}
+local EnemyRanges = {15, 40}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -148,6 +148,10 @@ local function Precombat ()
 end
 
 local function CDs ()
+  -- Suggest moonkin form if you're not in it.
+  if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) then
+    if HR.Cast(S.MoonkinForm, true) then return ""; end
+  end
   -- potion,if=buff.celestial_alignment.up|buff.incarnation.up
   if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) then
     if HR.CastSuggested(I.ProlongedPower) then return ""; end
@@ -189,6 +193,7 @@ local function CDs ()
   if S.ForceofNature:IsCastableP() and ((Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) or (S.CelestialAlignment:CooldownRemainsP() > 30 or S.Incarnation:CooldownRemainsP() > 30)) then
     if HR.Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return ""; end
   end
+
 end
 
 local function Dot ()
@@ -244,7 +249,7 @@ local function EmpowermentCapCheck ()
 --          (buff.solar_empowerment.stack=3|(variable.az_sb>1&spell_targets.starfall<3&astral_power>=32&!buff.sunblaze.up))&
 --          !(variable.az_hn=3&active_enemies=1)&
 --          !(spell_targets.moonfire>=2&active_enemies<=4&variable.az_potm=3)
-  if S.LunarStrike:IsCastableP() and Player:AstralPowerDeficit() >= 16 and (Player:BuffStackP(S.LunarEmpowermentBuff) == 3 or (Cache.EnemiesCount[40] < 3 and Player:AstralPower() >= 40 and Player:BuffStackP(S.LunarEmpowermentBuff) == 2 and Player:BuffStack(S.SolarEmpowermentBuff) == 2)) then
+  if S.LunarStrike:IsCastableP() and Player:AstralPowerDeficit() >= 16 and (Player:BuffStackP(S.LunarEmpowermentBuff) == 3 or (Cache.EnemiesCount[15] < 3 and Player:AstralPower() >= 40 and Player:BuffStackP(S.LunarEmpowermentBuff) == 2 and Player:BuffStack(S.SolarEmpowermentBuff) == 2)) then
     if HR.Cast(S.LunarStrike) then return "Lunar Strike at Cap"; end
   end
 
@@ -284,8 +289,8 @@ local function CoreRotation ()
     if HR.Cast(S.LunarStrike) then return ""; end
   end
   -- don't suggest an empowered cast if we're casting the last empowered stack
-  -- bad assumption: detects cleave targets based on 20yds from caster, centered. cannot do clump detection, i am not clever enough yet
-  if (Cache.EnemiesCount[40] >= 2) then
+  -- bad assumption: detects cleave targets based on 15yds from caster, centered. cannot do clump detection, i am not clever enough yet
+  if (Cache.EnemiesCount[15] >= 2) then
     -- Cleave situation: prioritize lunar strike empower > solar wrath empower > lunar strike
     if S.LunarStrike:IsCastableP() and Player:BuffP(S.LunarEmpowermentBuff) and not (Player:BuffStackP(S.LunarEmpowermentBuff) == 1 and Player:IsCasting(S.LunarStrike)) then
       if HR.Cast(S.LunarStrike) then return ""; end
