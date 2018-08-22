@@ -405,7 +405,7 @@ local function Direct ()
   -------------------------------------------------------------------
 
   -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
-  if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 and (S.SharpenedBladesPower.AzeriteRank() >= 2 or Cache.EnemiesCount[10] <= 4) then
+  if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 and (S.SharpenedBladesPower:AzeriteRank() >= 2 or Cache.EnemiesCount[10] <= 4) then
     if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife (Sharpened Blades)"; end
   end
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)

@@ -326,7 +326,7 @@ local function Finish ()
   end
   -- # BTE worth being used with the boosted crit chance from Ruthless Precision
   -- actions.finish+=/between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
-  if S.BetweentheEyes:IsCastable(20) and (Player:BuffP(S.RuthlessPrecision) or S.AceUpYourSleeve.AzeriteEnabled() or S.Deadshot.AzeriteEnabled()) then
+  if S.BetweentheEyes:IsCastable(20) and (Player:BuffP(S.RuthlessPrecision) or S.AceUpYourSleeve:AzeriteEnabled() or S.Deadshot:AzeriteEnabled()) then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/dispatch
