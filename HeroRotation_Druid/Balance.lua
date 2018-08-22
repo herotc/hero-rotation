@@ -174,7 +174,7 @@ local function CDs ()
   end
   -- warrior_of_elune
   if S.WarriorofElune:IsCastableP() and not Player:Buff(S.WarriorofElune) then
-    if HR.Cast(S.WarriorofElune, Settings.Balance.GCDasOffGcd.WarriorOfElune) then return ""; end
+    if HR.Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return ""; end
   end
   -- TODO(mrdmnd / synecdoche): INNERVATE here if azerite.lively_spirit and incarn is up or C.A cooldown is < 12 s
   -- incarnation,if=astral_power>=40
