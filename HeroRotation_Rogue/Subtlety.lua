@@ -63,6 +63,7 @@ local tableinsert = table.insert;
     Subterfuge                            = Spell(108208),
     Vigor                                 = Spell(14983),
     -- Azerite Traits
+    SharpenedBladesPower                  = Spell(272911),
     SharpenedBladesBuff                   = Spell(272916),
     -- Defensive
     CrimsonVial                           = Spell(185311),
@@ -254,7 +255,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   end
   -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
   -- !!!NYI!!! (Is this worth it? How do we want to display it in an understandable way?)
-  -- actions.stealthed+=/shuriken_storm,if=spell_targets.shuriken_storm>=3
+  -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
   if HR.AoEON() and S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 3 then
     if ReturnSpellOnly then
       return S.ShurikenStorm
@@ -372,7 +373,7 @@ local function Stealth_CDs ()
       end
       if StealthMacro(S.Shadowmeld) then return "Shadowmeld Macro"; end
     end
-    -- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets>=4&cooldown.symbols_of_death.remains>10)
+    -- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
     if (HR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
       and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1
@@ -393,13 +394,14 @@ end
 
 -- # Builders
 local function Build ()
-  -- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2|buff.the_dreadlords_deceit.stack>=29
+  -- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=1+3*azerite.sharpened_blades.rank=2+4*azerite.sharpened_blades.rank=3
+  if S.ShurikenToss:IsCastableP() and Player:BuffStackP(S.SharpenedBladesBuff) >= 29
+    and Cache.EnemiesCount[10] <= 1 + 3 * num(S.SharpenedBladesPower:AzeriteRank() == 2) + 4 * num(S.SharpenedBladesPower:AzeriteRank() == 3) then
+    if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
+  end
+  -- actions.build=shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
   if HR.AoEON() and S.ShurikenStorm:IsCastableP() and (Cache.EnemiesCount[10] >= 2 or Player:BuffStackP(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
-  end
-  -- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=19
-  if S.ShurikenToss:IsCastableP() and (Player:BuffStackP(S.SharpenedBladesBuff) >= 19) then
-    if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
   end
   if IsInMeleeRange() then
     -- actions.build+=/gloomblade
@@ -558,6 +560,12 @@ local function APL ()
         if ShouldReturn then return "Finish: " .. ShouldReturn; end
       end
 
+      -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
+      if Cache.EnemiesCount[10] == 4 and Player:ComboPoints() >= 4 then
+        ShouldReturn = Finish();
+        if ShouldReturn then return "Finish 4T: " .. ShouldReturn; end
+      end
+
       -- # Use a builder when reaching the energy threshold
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
       if Player:EnergyDeficitPredicted() <= Stealth_Threshold() - 40 * num(not (S.Alacrity:IsAvailable() or S.ShadowFocus:IsAvailable() or S.MasterofShadows:IsAvailable())) then
@@ -593,7 +601,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-07-19
+-- Last Update: 2018-08-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -619,6 +627,8 @@ HR.SetAPL(261, APL);
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&combo_points.deficit>=4
 -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
 -- actions+=/call_action_list,name=finish,if=combo_points>=4+talent.deeper_stratagem.enabled|target.time_to_die<=1&combo_points>=3
+-- # With DS also finish at 4+ against exactly 4 targets (outside stealth)
+-- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
 -- # Use a builder when reaching the energy threshold (minus 40 if none of Alacrity, Shadow Focus, and Master of Shadows is selected)
 -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
 -- # Lowest priority in all of the APL because it causes a GCD
@@ -646,7 +656,7 @@ HR.SetAPL(261, APL);
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&debuff.find_weakness.remains<1
 -- # With Dark Shadow only Dance when Nightblade will stay up. Use during Symbols or above threshold.
--- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets>=4&-- cooldown.symbols_of_death.remains>10)
+-- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
 -- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
 --
 -- # Stealthed Rotation
@@ -656,7 +666,7 @@ HR.SetAPL(261, APL);
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
 -- # At 2 targets with Secret Technique keep up Find Weakness by cycling Shadowstrike.
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
--- actions.stealthed+=/shuriken_storm,if=spell_targets.shuriken_storm>=3
+-- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
 -- actions.stealthed+=/shadowstrike
 --
 -- # Finishers
@@ -673,8 +683,8 @@ HR.SetAPL(261, APL);
 -- actions.finish+=/eviscerate
 --
 -- # Builders
--- actions.build=shuriken_storm,if=spell_targets.shuriken_storm>=2|buff.the_dreadlords_deceit.stack>=29
--- #actions.build+=/shuriken_toss,if=buff.sharpened_blades.stack>=39
+-- # Shuriken Toss at 29+ Sharpened Blades stacks. 1T at Rank 1, up to 4 at Rank 2, up to 5 at Rank 3
+-- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=1+3*azerite.sharpened_blades.rank=2+4*azerite.sharpened_blades.rank=3
+-- actions.build+=/shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
-

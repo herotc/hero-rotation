@@ -55,6 +55,9 @@ Spell.Rogue.Assassination = {
   ToxicBlade            = Spell(245388),
   ToxicBladeDebuff      = Spell(245389),
   VenomRush             = Spell(152152),
+  -- Azerite Traits
+  SharpenedBladesPower  = Spell(272911),
+  SharpenedBladesBuff   = Spell(272916),
   -- Defensive
   CrimsonVial           = Spell(185311),
   Feint                 = Spell(1966),
@@ -401,6 +404,10 @@ local function Direct ()
   -------------------------------------------------------------------
   -------------------------------------------------------------------
 
+  -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
+  if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 and (S.SharpenedBladesPower.AzeriteRank() >= 2 or Cache.EnemiesCount[10] <= 4) then
+    if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife (Sharpened Blades)"; end
+  end
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
   if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2 + num(Player:IsStealthed(true, false)) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
@@ -528,7 +535,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-08-07
+-- Last Update: 2018-08-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -601,6 +608,8 @@ HR.SetAPL(259, APL);
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
 -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
+-- # Poisoned Knife at 29+ stacks of Sharpened Blades. Up to 4 targets with Rank 1, more otherwise.
+-- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
 -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
 -- #Loss LOL, even at 3 Ranks
 -- #actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=39
