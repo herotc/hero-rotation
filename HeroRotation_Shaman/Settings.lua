@@ -34,7 +34,7 @@
 
     Enhancement = {
       EnableFS = true,
-      EnableEE = true
+      EnableEE = false
 	}
   };
 
