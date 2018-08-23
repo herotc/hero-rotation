@@ -81,6 +81,7 @@ local Settings = {
 -- Variables
 local VarBurnPhase = 0;
 local VarBurnPhaseStart = 0;
+local VarBurnPhaseEnd = 0;
 local VarBurnPhaseDuration = 0;
 local VarTotalBurns = 0;
 local VarAverageBurnLength = 0;
@@ -109,12 +110,15 @@ local function ArcaneMissilesProcMax ()
 end
 
 local function StartBurnPhase ()
-  varBurnPhase = 1
-  varBurnPhaseStart = HL.GetTime()
+  VarBurnPhase = 1
+  VarBurnPhaseStart = HL.GetTime()
 end
 
 local function StopBurnPhase ()
-  varBurnPhase = 0
+  VarBurnPhase = 0
+  VarBurnPhaseEnd = HL.GetTime()
+  VarBurnPhaseDuration = VarBurnPhaseEnd - VarBurnPhaseStart
+  VarAverageBurnLength = (VarAverageBurnLength * VarTotalBurns - VarAverageBurnLength + (VarBurnPhaseDuration)) / VarTotalBurns
 end
 
 function Player:ArcaneChargesP()
@@ -131,24 +135,24 @@ local function APL()
     -- augmentation
     -- arcane_intellect
     if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff) and (true) then
-      if HR.Cast(S.ArcaneIntellect) then return ""; end
+      if HR.Cast(S.ArcaneIntellect) then return "Cast Arcane Intellect"; end
     end
     -- summon_arcane_familiar
     if S.SummonArcaneFamiliar:IsCastableP() and Player:BuffDownP(S.SummonArcaneFamiliarBuff) and (true) then
-      if HR.Cast(S.SummonArcaneFamiliar) then return ""; end
+      if HR.Cast(S.SummonArcaneFamiliar) then return "Summon Arcane Familiar"; end
     end
     -- snapshot_stats
     -- mirror_image
     if S.MirrorImage:IsCastableP() and (true) then
-      if HR.Cast(S.MirrorImage) then return ""; end
+      if HR.Cast(S.MirrorImage) then return "Cast Mirror Images"; end
     end
     -- potion
     if I.DeadlyGrace:IsReady() and Settings.Commons.UsePotions and (true) then
-      if HR.CastSuggested(I.DeadlyGrace) then return ""; end
+      if HR.CastSuggested(I.DeadlyGrace) then return "Use Potion"; end
     end
     -- arcane_blast
     if S.ArcaneBlast:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "Cast Arcane Blast"; end
     end
   end
   Burn = function()
@@ -160,167 +164,176 @@ local function APL()
     if (not bool(VarBurnPhase)) then
       StartBurnPhase()
     end
+	-- if we're evocating then stop if we have enough mana
+	if (bool(VarBurnPhase)) and (Player:IsChanneling(S.Evocation) and (Player:ManaPercentage() < 97 or (bool(Player:BuffStackP(S.ClearcastingBuff)) and Player:ManaPercentage() < 92))) then
+	  if HR.Cast(S.Evocation) then return "Burn - Keep Evocating"; end
+	end
+	if (bool(VarBurnPhase)) and ((Player:IsChanneling(S.Evocation) or Player:PrevGCD(1, S.Evocation)) and (Player:ManaPercentage() >= 97 or (bool(Player:BuffStackP(S.ClearcastingBuff)) and Player:ManaPercentage() >= 92))) then
+      StopBurnPhase()
+	  return "Burn - Stop Evocating (Enough Mana)"
+	end
     -- stop_burn_phase,if=burn_phase&(prev_gcd.1.evocation|(equipped.gravity_spiral&cooldown.evocation.charges=0&prev_gcd.1.evocation))&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
     if (bool(VarBurnPhase) and (Player:PrevGCDP(1, S.Evocation) or (I.GravitySpiral:IsEquipped() and S.Evocation:ChargesP() == 0 and Player:PrevGCDP(1, S.Evocation))) and Target:TimeToDie() > VarAverageBurnLength and VarBurnPhaseDuration > 0) then
       StopBurnPhase()
+	  return "Burn Phase - Stop Burning"
     end
     -- mirror_image
     if S.MirrorImage:IsCastableP() and (true) then
-      if HR.Cast(S.MirrorImage) then return ""; end
+      if HR.Cast(S.MirrorImage) then return "Burn - Cast Mirror Images"; end
     end
     -- charged_up,if=buff.arcane_charge.stack<=1&(!set_bonus.tier20_2pc|cooldown.presence_of_mind.remains>5)
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1 and (not HL.Tier20_2Pc or S.PresenceofMind:CooldownRemainsP() > 5)) then
-      if HR.Cast(S.ChargedUp) then return ""; end
+      if HR.Cast(S.ChargedUp) then return "Burn - Cast Charged Up"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
     if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.NetherTempest) then return ""; end
+      if HR.Cast(S.NetherTempest) then return "Burn - Cast Nether Tempest"; end
     end
     -- time_warp,if=buff.bloodlust.down&((buff.arcane_power.down&cooldown.arcane_power.remains=0)|(target.time_to_die<=buff.bloodlust.duration))
     -- lights_judgment,if=buff.arcane_power.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.LightsJudgment) then return ""; end
+      if HR.Cast(S.LightsJudgment) then return "Burn - Lights Judgement"; end
     end
     -- rune_of_power,if=!buff.arcane_power.up&(mana.pct>=50|cooldown.arcane_power.remains=0)&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
     if S.RuneofPower:IsCastableP() and (not Player:BuffP(S.ArcanePowerBuff) and (Player:ManaPercentage() >= 50 or S.ArcanePower:CooldownRemainsP() == 0) and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
-      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "Burn - Cast Rune of Power"; end
     end
     -- arcane_power
     if S.ArcanePower:IsCastableP() and (true) then
-      if HR.Cast(S.ArcanePower) then return ""; end
+      if HR.Cast(S.ArcanePower) then return "Burn - Arcane Power"; end
     end
     -- use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() and (true) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Burn - Bloof Fury"; end
     end
     -- berserking
     if S.Berserking:IsCastableP() and HR.CDsON() and (true) then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return " Burn - Berserking"; end
     end
     -- presence_of_mind
-    if S.PresenceofMind:IsCastableP() and (true) then
-      if HR.Cast(S.PresenceofMind) then return ""; end
+    if S.PresenceofMind:IsCastableP() and not Player:Buff(S.PresenceofMindBuff) and (true) then
+      if HR.Cast(S.PresenceofMind) then return "Burn - Cast Presence of Mind"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))
     if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() == 0 or (Cache.EnemiesCount[40] < 3 or (Cache.EnemiesCount[40] < 2 and S.Resonance:IsAvailable()))) then
-      if HR.Cast(S.ArcaneOrb) then return ""; end
+      if HR.Cast(S.ArcaneOrb) then return "Burn - Cast Arcane Orb"; end
     end
     -- arcane_blast,if=buff.presence_of_mind.up&set_bonus.tier20_2pc&talent.overpowered.enabled&buff.arcane_power.up
     if S.ArcaneBlast:IsCastableP() and (Player:BuffP(S.PresenceofMindBuff) and HL.Tier20_2Pc and S.Overpowered:IsAvailable() and Player:BuffP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "Burn - Cast Arcane Blast (Tier20)"; end
     end
     -- arcane_barrage,if=(active_enemies>=3|(active_enemies>=2&talent.resonance.enabled))&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
     if S.ArcaneBarrage:IsCastableP() and ((Cache.EnemiesCount[40] >= 3 or (Cache.EnemiesCount[40] >= 2 and S.Resonance:IsAvailable())) and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "Burn - Cast Arcane Barrage"; end
     end
     -- arcane_explosion,if=active_enemies>=3|(active_enemies>=2&talent.resonance.enabled)
     if S.ArcaneExplosion:IsCastableP() and (Cache.EnemiesCount[10] >= 3 or (Cache.EnemiesCount[10] >= 2 and S.Resonance:IsAvailable())) then
-      if HR.Cast(S.ArcaneExplosion) then return ""; end
+      if HR.Cast(S.ArcaneExplosion) then return "Burn - Cast Arcane Explosion"; end
     end
     -- arcane_missiles,if=(buff.clearcasting.react&mana.pct<=95),chain=1
     if S.ArcaneMissiles:IsCastableP() and ((bool(Player:BuffStackP(S.ClearcastingBuff)) and Player:ManaPercentage() <= 95)) then
-      if HR.Cast(S.ArcaneMissiles) then return ""; end
+      if HR.Cast(S.ArcaneMissiles) then return "Burn - Cast Arcane Missiles"; end
     end
     -- arcane_blast
-    if S.ArcaneBlast:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+    if S.ArcaneBlast:IsUsableP() and (true) then
+      if HR.Cast(S.ArcaneBlast) then return "Burn - Cast Arcane Blast"; end
     end
     -- variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
-    if (true) then
-      VarAverageBurnLength = (VarAverageBurnLength * VarTotalBurns - VarAverageBurnLength + (VarBurnPhaseDuration)) / VarTotalBurns
-    end
+    -- if (true) then
+    --   VarAverageBurnLength = (VarAverageBurnLength * VarTotalBurns - VarAverageBurnLength + (VarBurnPhaseDuration)) / VarTotalBurns
+    -- end
     -- evocation,interrupt_if=mana.pct>=97|(buff.clearcasting.react&mana.pct>=92)
     if S.Evocation:IsCastableP() and (true) then
-      if HR.Cast(S.Evocation) then return ""; end
+      if HR.Cast(S.Evocation) then return "Burn - Cast Evocation"; end
     end
     -- arcane_barrage
     if S.ArcaneBarrage:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "Burn - Cast Arcane Barrage (Burn too quick)"; end
     end
   end
   Conserve = function()
     -- mirror_image
     if S.MirrorImage:IsCastableP() and (true) then
-      if HR.Cast(S.MirrorImage) then return ""; end
+      if HR.Cast(S.MirrorImage) then return "Conserve - Cast Mirror Images"; end
     end
     -- charged_up,if=buff.arcane_charge.stack=0
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() == 0) then
-      if HR.Cast(S.ChargedUp) then return ""; end
+      if HR.Cast(S.ChargedUp) then return "Conserve - Cast Charged Up"; end
     end
     -- presence_of_mind,if=set_bonus.tier20_2pc&buff.arcane_charge.stack=0
     if S.PresenceofMind:IsCastableP() and (HL.Tier20_2Pc and Player:ArcaneChargesP() == 0) then
-      if HR.Cast(S.PresenceofMind) then return ""; end
+      if HR.Cast(S.PresenceofMind) then return "Conserve - Cast Presence of Mind"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
     if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.NetherTempest) then return ""; end
+      if HR.Cast(S.NetherTempest) then return "Conserve - Cast Nether Tempest"; end
     end
     -- arcane_blast,if=(buff.rule_of_threes.up|buff.rhonins_assaulting_armwraps.react)&buff.arcane_charge.stack>=3
     if S.ArcaneBlast:IsCastableP() and ((Player:BuffP(S.RuleofThreesBuff) or bool(Player:BuffStackP(S.RhoninsAssaultingArmwrapsBuff))) and Player:ArcaneChargesP() >= 3) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "Conserve - Cast Arcane Blast (Rule of 3 or Rhonins"; end
     end
     -- rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
     if S.RuneofPower:IsCastableP() and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or S.RuneofPower:RechargeP() <= S.ArcanePower:CooldownRemainsP() or Target:TimeToDie() <= S.ArcanePower:CooldownRemainsP())) then
-      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "Conserve - Cast Rune of Power"; end
     end
     -- arcane_missiles,if=mana.pct<=95&buff.clearcasting.react,chain=1
     if S.ArcaneMissiles:IsCastableP() and (Player:ManaPercentage() <= 95 and bool(Player:BuffStackP(S.ClearcastingBuff))) then
-      if HR.Cast(S.ArcaneMissiles) then return ""; end
+      if HR.Cast(S.ArcaneMissiles) then return "Conserve - Cast Arcane Missiles"; end
     end
     -- arcane_blast,if=equipped.mystic_kilt_of_the_rune_master&buff.arcane_charge.stack=0
     if S.ArcaneBlast:IsCastableP() and (I.MysticKiltoftheRuneMaster:IsEquipped() and Player:ArcaneChargesP() == 0) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "Conserve - Cast Arcane Blast (Kilt)"; end
     end
     -- arcane_barrage,if=(buff.arcane_charge.stack=buff.arcane_charge.max_stack)&(mana.pct<=35|(talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd))
     if S.ArcaneBarrage:IsCastableP() and ((Player:ArcaneChargesP() == Player:ArcaneChargesMax()) and (Player:ManaPercentage() <= 35 or (S.ArcaneOrb:IsAvailable() and S.ArcaneOrb:CooldownRemainsP() <= Player:GCD()))) then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "Conserve - Cast Arcane Orb"; end
     end
     -- supernova,if=mana.pct<=95
     if S.Supernova:IsCastableP() and (Player:ManaPercentage() <= 95) then
-      if HR.Cast(S.Supernova) then return ""; end
+      if HR.Cast(S.Supernova) then return "Conserve - Cast Supernova"; end
     end
     -- arcane_explosion,if=active_enemies>=3&(mana.pct>=40|buff.arcane_charge.stack=3)
     if S.ArcaneExplosion:IsCastableP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentage() >= 40 or Player:ArcaneChargesP() == 3)) then
-      if HR.Cast(S.ArcaneExplosion) then return ""; end
+      if HR.Cast(S.ArcaneExplosion) then return "Conserve - Cast Arcane Explosion"; end
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (true) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Conserve - Arcane Torrent"; end
     end
     -- arcane_blast
     if S.ArcaneBlast:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "Conserve - Cast Arcane Blast"; end
     end
     -- arcane_barrage
     if S.ArcaneBarrage:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "Conserve - Cast Arcane Barrage"; end
     end
   end
   Movement = function()
     -- shimmer,if=movement.distance>=10
     if S.Shimmer:IsCastableP() and (movement.distance >= 10) then
-      if HR.Cast(S.Shimmer) then return ""; end
+      if HR.Cast(S.Shimmer) then return "Movement - Cast Shimmer"; end
     end
     -- blink,if=movement.distance>=10
     if S.Blink:IsCastableP() and (movement.distance >= 10) then
-      if HR.Cast(S.Blink) then return ""; end
+      if HR.Cast(S.Blink) then return "Movement - Cast Blink"; end
     end
     -- presence_of_mind
     if S.PresenceofMind:IsCastableP() and (true) then
-      if HR.Cast(S.PresenceofMind) then return ""; end
+      if HR.Cast(S.PresenceofMind) then return "Movement - Cast Presence of Mind"; end
     end
     -- arcane_missiles
     if S.ArcaneMissiles:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneMissiles) then return ""; end
+      if HR.Cast(S.ArcaneMissiles) then return "Movement - Cast Arcane Missiles"; end
     end
     -- arcane_orb
     if S.ArcaneOrb:IsCastableP() and (true) then
-      if HR.Cast(S.ArcaneOrb) then return ""; end
+      if HR.Cast(S.ArcaneOrb) then return "Movement - Cast Arcane Orb"; end
     end
     -- supernova
     if S.Supernova:IsCastableP() and (true) then
-      if HR.Cast(S.Supernova) then return ""; end
+      if HR.Cast(S.Supernova) then return "Movement - Cast Supernova"; end
     end
   end
   -- call precombat
