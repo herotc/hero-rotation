@@ -123,33 +123,33 @@ local Settings = {
 --- APL Variables
 -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
 local function furyCheck45()
-  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45)
+  return (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 45))
 end
 
 -- actions+=/variable,name=furyCheck35,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>35))
 local function furyCheck35()
-  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 35)
+  return (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 35))
 end
 
 -- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
 local function furyCheck25()
-  return not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25)
+  return (not S.FuryOfAir:IsAvailable() or (S.FuryOfAir:IsAvailable() and Player:Maelstrom() > 25))
 end
 
 
 -- actions+=/variable,name=OCPool80,value=(!talent.overcharge.enabled|active_enemies>1|(talent.overcharge.enabled&active_enemies=1&(cooldown.lightning_bolt.remains>=2*gcd|maelstrom>80)))
 local function OCPool80()
-  return not S.Overcharge:IsAvailable() or Cache.EnemiesCount[10] > 1 or (S.Overcharge:IsAvailable() and Cache.EnemiesCount[10] > 1 and (S.LightningBolt:CooldownRemainsP() >= 2 * Player:GCD() or Player:Maelstrom() > 80))
+  return (not S.Overcharge:IsAvailable() or Cache.EnemiesCount[10] > 1 or (S.Overcharge:IsAvailable() and Cache.EnemiesCount[10] > 1 and (S.LightningBolt:CooldownRemainsP() >= 2 * Player:GCD() or Player:Maelstrom() > 80)))
 end
 
 -- actions+=/variable,name=OCPool70,value=(!talent.overcharge.enabled|active_enemies>1|(talent.overcharge.enabled&active_enemies=1&(cooldown.lightning_bolt.remains>=2*gcd|maelstrom>70)))
 local function OCPool70()
-  return not S.Overcharge:IsAvailable() or Cache.EnemiesCount[10] > 1 or (S.Overcharge:IsAvailable() and Cache.EnemiesCount[10] > 1 and (S.LightningBolt:CooldownRemainsP() >= 2 * Player:GCD() or Player:Maelstrom() > 70))
+  return (not S.Overcharge:IsAvailable() or Cache.EnemiesCount[10] > 1 or (S.Overcharge:IsAvailable() and Cache.EnemiesCount[10] > 1 and (S.LightningBolt:CooldownRemainsP() >= 2 * Player:GCD() or Player:Maelstrom() > 70)))
 end
 
 -- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|active_enemies>1|(talent.overcharge.enabled&active_enemies=1&(cooldown.lightning_bolt.remains>=2*gcd|maelstrom>60)))
 local function OCPool60()
-  return not S.Overcharge:IsAvailable() or Cache.EnemiesCount[10] > 1 or (S.Overcharge:IsAvailable() and Cache.EnemiesCount[10] > 1 and (S.LightningBolt:CooldownRemainsP() >= 2 * Player:GCD() or Player:Maelstrom() > 60))
+  return (not S.Overcharge:IsAvailable() or Cache.EnemiesCount[10] > 1 or (S.Overcharge:IsAvailable() and Cache.EnemiesCount[10] > 1 and (S.LightningBolt:CooldownRemainsP() >= 2 * Player:GCD() or Player:Maelstrom() > 60)))
 end
 
 -- APL Main
@@ -410,6 +410,11 @@ local function APL ()
     -- actions.filler+=/crash_lightning,if=talent.crashing_storm.enabled&variable.OCPool60
     if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (S.CrashingStorm:IsAvailable() and OCPool60()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
+    end
+
+    -- actions.filler+=/lava_lash,if=variable.OCPool80&variable.furyCheck45
+    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() then
+      if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions.filler+=/rockbiter
