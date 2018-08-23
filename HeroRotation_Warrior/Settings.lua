@@ -35,10 +35,11 @@
         Warbreaker = false,
         Bladestorm = false,
         Ravager = false,
+        Charge = true,
+        Avatar = true,
       },
       OffGCDasOffGCD = {
         -- Abilities
-        FocusedRage = true,
         -- Items
       },
     },

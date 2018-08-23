@@ -18,13 +18,25 @@
 
 --- ============================ CONTENT ============================
 -- Arms, ID: 71
-
+  local ArmsOldSpellIsCastableP
+  ArmsOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local BaseCheck = ArmsOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      if self == SpellArms.Execute then
+        return BaseCheck and self:IsUsable()
+      elseif self == SpellArms.Charge then
+        return (not Target:IsInRange(8) and Target:IsInRange(25))
+      else
+        return BaseCheck
+      end
+    end
+  , 71);
 -- Fury, ID: 72
 
 -- Protection, ID: 73
 
 -- Example (Arcane Mage)
--- HL.AddCoreOverride ("Spell.IsCastableP", 
+-- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 --   if Range then
 --     local RangeUnit = ThisUnit or Target;
