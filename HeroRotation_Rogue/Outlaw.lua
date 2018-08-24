@@ -310,6 +310,10 @@ local function Stealth ()
 end
 
 local function Finish ()
+  -- actions.finish=between_the_eyes,if=azerite.deadshot.rank>=2&buff.roll_the_bones.up
+  if S.BetweentheEyes:IsCastable(20) and S.Deadshot:AzeriteRank() >= 2 and RtB_Buffs() >= 1 then
+    if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Deadshot)"; end
+  end
   -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
   -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.SliceandDice:IsAvailable() and S.SliceandDice:IsCastable()
@@ -448,7 +452,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2018-08-22
+-- Last Update: 2018-08-24
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -497,9 +501,11 @@ HR.SetAPL(260, APL);
 -- actions.stealth=ambush
 --
 -- # Finishers
--- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
+-- # BtE over RtB rerolls with 2+ Deadshot traits.
+-- actions.finish=between_the_eyes,if=azerite.deadshot.rank>=2&buff.roll_the_bones.up
+-- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
 -- actions.finish+=/roll_the_bones,if=(buff.roll_the_bones.remains<=3|variable.rtb_reroll)&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)
--- # BTE with the Ruthless Precision buff from RtB or with the Ace Up Your Sleeve or Deadshot traits.
+-- # BtE with the Ruthless Precision buff from RtB or with the Ace Up Your Sleeve or Deadshot traits.
 -- actions.finish+=/between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
 -- actions.finish+=/dispatch
 --
