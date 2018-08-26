@@ -389,7 +389,7 @@
               Spell:FilterProjectileSpeed(SpecID);
             -- Special Checks
             if GetCVar("nameplateShowEnemies") ~= "1" then
-              HR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
+              HR.Print("It looks like enemy nameplates are disabled, you should enable them in order to get proper AoE rotation.");
             end
           else
             HR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
