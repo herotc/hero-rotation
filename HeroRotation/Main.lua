@@ -371,6 +371,7 @@
         -- Load the Class Module if it's possible and not already loaded
         if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
           LoadAddOn(EnabledRotation[SpecID]);
+          HL.LoadOverrides(SpecID)
         end
 
         -- Check if there is a Rotation for this Spec
