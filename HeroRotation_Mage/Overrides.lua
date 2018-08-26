@@ -116,18 +116,18 @@
     , 63);
 
   -- Frost, ID: 64
-    HL.AddCoreOverride ("Spell.IsCastableP",
+    local FrostOldSpellIsCastableP
+    FrostOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
       function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
         local RangeOK = true;
         if Range then
           local RangeUnit = ThisUnit or Target;
           RangeOK = RangeUnit:IsInRange( Range, AoESpell );
         end
-
         if self == SpellFrost.GlacialSpike then
           return self:IsLearned() and RangeOK and (Player:BuffP(SpellFrost.GlacialSpikeBuff) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 4 and Player:IsCasting(SpellFrost.Frostbolt))) and not Player:IsCasting(SpellFrost.GlacialSpike);
         else
-          local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
+          local BaseCheck = FrostOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
           if self == SpellFrost.WaterElemental then
             return BaseCheck and not Pet:IsActive()
           else
