@@ -143,9 +143,9 @@ local function APL()
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
       if HR.CastSuggested(I.ProlongedPower) then return ""; end
     end
-    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions and (true) then
-      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
-    end
+--    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions and (true) then
+--      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+--    end
   end
 
   --- In Combat
@@ -165,9 +165,9 @@ local function APL()
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.ProlongedPower) then return ""; end
     end
-    if I.ProlongeBattlePotionOfAgilitydPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
-    end
+--    if I.ProlongeBattlePotionOfAgilitydPower:IsReady() and Settings.Commons.UsePotions then
+--      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+--    end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.BloodFury, Settings.Brewmaster.OffGCDasOffGCD.BloodFury) then return ""; end
