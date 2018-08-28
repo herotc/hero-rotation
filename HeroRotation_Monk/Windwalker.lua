@@ -32,6 +32,8 @@ Spell.Monk.Windwalker = {
   GiftoftheNaaru                   = Spell(59547),
   Shadowmeld                       = Spell(58984),
   QuakingPalm                      = Spell(107079),
+  Fireblood                        = Spell(265221),
+  AncestralCall                    = Spell(274738),
 
   -- Abilities
   TigerPalm                        = Spell(100780),
@@ -272,18 +274,44 @@ end
 -- Storm Earth And Fire
 local function sef ()
   -- actions.sef=tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1
-  if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir)
+  if S.TigerPalm:IsReadyP() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir)
   and Player:EnergyTimeToMaxPredicted() <= 0 and Player:Chi() < 1 then
-      if HR.Cast(S.TigerPalm) then return ""; end
+      if HR.Cast(S.TigerPalm) then return "Cast Tiger Palm"; end
     end
+  -- actions.cd=invoke_xuen_the_white_tiger
+  if HR.CDsON() and S.InvokeXuentheWhiteTiger:IsReadyP() then
+    if HR.Cast(S.InvokeXuentheWhiteTiger) then return "Cast Invoke Xuen the White Tiger"; end
+  end
+  -- actions.cd+=/blood_fury
+  if HR.CDsON() and S.BloodFury:IsReadyP() then
+    if HR.CastSuggested(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
+  end
+  -- actions.cd+=/berserking
+  if HR.CDsON() and S.Berserking:IsReadyP() then
+    if HR.CastSuggested(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
+  end
   -- actions.sef+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
   if S.ArcaneTorrent:IsReadyP() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5 then
-    if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
   end
+  -- actions.cd+=/fireblood
+  if HR.CDsON() and S.Fireblood:IsReadyP() then
+    if HR.CastSuggested(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+  end
+  -- actions.cd+=/ancestral_call
+  if HR.CDsON() and S.AncestralCall:IsReadyP() then
+    if HR.CastSuggested(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
+  end
+  -- actions.cd+=/touch_of_death
+	if HR.CDsON() and S.TouchOfDeath:IsReadyP() and Target:TimeToDie() >= 9 then
+	  if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return "Cast Touch of Death"; end
+	end
   -- actions.sef+=/storm_earth_and_fire,if=!buff.storm_earth_and_fire.up
   if HR.CDsON() and not Player:BuffP(S.StormEarthAndFire) then
-    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return ""; end
+    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "Cast Storm, Earth and Fire"; end
   end
+  -- HR.AoEON()
+  -- Cache.EnemiesCount[10] >= 3
   -- actions.sef+=/call_action_list,name=st
   ShouldReturn = single_target ();
   if ShouldReturn then return ShouldReturn; end
@@ -293,57 +321,85 @@ end
 -- Serenity
 local function serenity ()
   -- actions.serenity=tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1&!buff.serenity.up
-  if S.TigerPalm:Ready(2) and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir)
+  if S.TigerPalm:IsReadyP() and not Player:PrevGCD(1, S.TigerPalm) and not Player:PrevGCD(1, S.EnergizingElixir)
   and Player:EnergyPredicted() >= Player:EnergyMax() and Player:Chi() < 1 and not Player:BuffP(S.Serenity) then
-    if HR.Cast(S.TigerPalm) then return ""; end
+    if HR.Cast(S.TigerPalm) then return "Cast Tiger Palm"; end
   end
-  -- actions.serenity+=/serenity
-  if HR.CDsON() and S.Serenity:IsReadyP() then
-    if HR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return ""; end
+  -- actions.cd=invoke_xuen_the_white_tiger
+  if HR.CDsON() and S.InvokeXuentheWhiteTiger:IsReadyP() then
+    if HR.Cast(S.InvokeXuentheWhiteTiger) then return "Cast Invoke Xuen the White Tiger"; end
   end
-  -- actions.serenity+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3
-  if S.RisingSunKick:IsReadyP() and Cache.EnemiesCount[8] < 3 then
-    if HR.Cast(S.RisingSunKick) then return ""; end
+  -- actions.cd+=/blood_fury
+  if HR.CDsON() and S.BloodFury:IsReadyP() then
+    if HR.CastSuggested(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
   end
-  -- actions.serenity+=/strike_of_the_windlord
-  if S.StrikeOfTheWindlord:IsReadyP() then
-    if HR.Cast(S.StrikeOfTheWindlord) then return ""; end
+  -- actions.cd+=/berserking
+  if HR.CDsON() and S.Berserking:IsReadyP() then
+    if HR.CastSuggested(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
   end
-  -- actions.serenity+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(!prev_gcd.1.blackout_kick)&(prev_gcd.1.strike_of_the_windlord|prev_gcd.1.fists_of_fury)&active_enemies<2
-  if S.BlackoutKick:IsReadyP() and not Player:PrevGCD(1, S.BlackoutKick) and (Player:PrevGCD(1,S.StrikeOfTheWindlord) or Player:PrevGCD(1,S.FistsOfFury)) and Cache.EnemiesCount[8] < 2 then
-    if HR.Cast(S.BlackoutKick) then return ""; end
+  -- actions.sef+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
+  if S.ArcaneTorrent:IsReadyP() and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5 then
+    if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
   end
-  -- actions.serenity+=/fists_of_fury,if=((equipped.drinking_horn_cover&buff.pressure_point.remains<=2&set_bonus.tier20_4pc)&(cooldown.rising_sun_kick.remains>1|active_enemies>1)),interrupt=1
-  if S.FistsOfFury:IsReadyP() and ((I.DrinkingHornCover:IsEquipped() and Player:BuffRemainsP(S.PressurePoint) <= 2 and HL.Tier20_4Pc) and (S.RisingSunKick:CooldownRemainsP() > 1 or Cache.EnemiesCount[8] > 1)) then
-    if HR.Cast(S.FistsOfFury) then return ""; end
+  -- actions.cd+=/fireblood
+  if HR.CDsON() and S.Fireblood:IsReadyP() then
+    if HR.CastSuggested(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
   end
-  -- actions.serenity+=/fists_of_fury,if=((!equipped.drinking_horn_cover|buff.bloodlust.up|buff.serenity.remains<1)&(cooldown.rising_sun_kick.remains>1|active_enemies>1)),interrupt=1
-  if S.FistsOfFury:IsReadyP() and ((not I.DrinkingHornCover:IsEquipped() or Player:BuffP(S.Bloodlust) or Player:BuffRemainsP(S.Serenity) < 1) and (S.RisingSunKick:CooldownRemainsP() > 1 or Cache.EnemiesCount[8] > 1)) then
-    if HR.Cast(S.FistsOfFury) then return ""; end
+  -- actions.cd+=/ancestral_call
+  if HR.CDsON() and S.AncestralCall:IsReadyP() then
+    if HR.CastSuggested(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
+  end
+  -- actions.cd+=/touch_of_death
+	if HR.CDsON() and S.TouchOfDeath:IsReadyP() and Target:TimeToDie() >= 9 then
+	  if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return "Cast Touch of Death"; end
+  end
+  -- actions.serenity+=/rushing_jade_wind,if=talent.rushing_jade_wind.enabled&!prev_gcd.1.rushing_jade_wind&buff.rushing_jade_wind.down
+  if S.RushingJadeWind:IsReadyP() and not Player:PrevGCD(1, S.RushingJadeWind) and Player:BuffDownP(S.RushingJadeWind) then
+    if HR.Cast(S.RushingJadeWind) then return "Cast Rushing Jade Wind"; end
+  end
+  -- actions.serenity+=/serenity,if=cooldown.rising_sun_kick.remains<=2&cooldown.fists_of_fury.remains<=4
+  if HR.CDsON() and S.Serenity:IsReadyP() and S.RisingSunKick:CooldownRemainsP() <= 2 and S.FistsOfFury:CooldownRemainsP() <= 4 then
+    if HR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "Cast Serenity"; end
+  end
+  -- actions.serenity+=/fists_of_fury,if=prev_gcd.1.rising_sun_kick&prev_gcd.2.serenity
+  if S.FistsOfFury:IsReadyP() and Player:PrevGCD(1,S.RisingSunKick) and Player:PrevGCD(2,S.Serenity) then
+    if HR.Cast(S.FistsOfFury) then return "Cast Fists of Fury"; end
+  end
+  -- actions.serenity+=/fists_of_fury,if=buff.serenity.remains<=1.05
+  if S.FistsOfFury:IsReadyP() and Player:BuffRemainsP(S.Serenity) <= 1.05 then
+    if HR.Cast(S.FistsOfFury) then return "Cast Fists of Fury"; end
+  end
+  -- actions.serenity+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
+  if S.RisingSunKick:IsReadyP() then
+    if HR.Cast(S.RisingSunKick) then return "Cast Rising Sun Kick"; end
+  end
+  --actions.serenity+=/fist_of_the_white_tiger,if=prev_gcd.1.blackout_kick&prev_gcd.2.rising_sun_kick&chi.max-chi>2
+  if S.FistOfTheWhiteTiger:IsReadyP() and Player:PrevGCD(1, S.BlackoutKick) and Player:PrevGCD(2, S.RisingSunKick) and Player:ChiDeficit() > 2 then
+    if HR.Cast(S.FistOfTheWhiteTiger) then return "Cast Fist of the White Tiger"; end
+  end
+  -- actions.serenity+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=prev_gcd.1.blackout_kick&prev_gcd.2.rising_sun_kick&chi.max-chi>1
+  if S.TigerPalm:IsReadyP() and not Player:PrevGCD(1, S.BlackoutKick) and Player:PrevGCD(2, S.RisingSunKick) and Player:ChiDeficit() > 1 then
+    if HR.Cast(S.TigerPalm) then return "Cast Tiger Palm"; end
+  end
+  -- actions.serenity+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&cooldown.rising_sun_kick.remains>=2&cooldown.fists_of_fury.remains>=2
+  if S.BlackoutKick:IsReadyP() and not Player:PrevGCD(1, S.BlackoutKick) and S.RisingSunKick:CooldownRemainsP() >= 2 and S.FistsOfFury:CooldownRemainsP() >= 2 then
+    if HR.Cast(S.BlackoutKick) then return "Cast Blackout Kick"; end
   end
   -- actions.serenity+=/spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
   if S.SpinningCraneKick:IsReadyP() and Cache.EnemiesCount[8] >= 3 and not Player:PrevGCD(1, S.SpinningCraneKick) then
-    if HR.Cast(S.SpinningCraneKick) then return ""; end
+    if HR.Cast(S.SpinningCraneKick) then return "Spinning Crane Kick"; end
   end
-  -- actions.serenity+=/rushing_jade_wind,if=!prev_gcd.1.rushing_jade_wind&buff.rushing_jade_wind.down&buff.serenity.remains>=4
-  if S.RushingJadeWind:IsReadyP() and not Player:PrevGCD(1, S.RushingJadeWind) and Player:BuffDownP(S.RushingJadeWind) and Player:BuffRemainsP(S.Serenity) >= 4 then
-    if HR.Cast(S.RushingJadeWind) then return ""; end
-  end
-  -- actions.serenity+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies>=3
-  if S.RisingSunKick:IsReadyP() and Cache.EnemiesCount[8] >= 3 then
-    if HR.Cast(S.RisingSunKick) then return ""; end
-  end
-  -- actions.serenity+=/rushing_jade_wind,if=!prev_gcd.1.rushing_jade_wind&buff.rushing_jade_wind.down&active_enemies>1
-  if S.RushingJadeWind:IsReadyP() and not Player:PrevGCD(1, S.RushingJadeWind) and Player:BuffDownP(S.RushingJadeWind) and Cache.EnemiesCount[8] > 1 then
-    if HR.Cast(S.RushingJadeWind) then return ""; end
+  -- actions.serenity+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
+  if S.RisingSunKick:IsReadyP() then
+    if HR.Cast(S.RisingSunKick) then return "Cast Rising Sun Kick"; end
   end
   -- actions.serenity+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick
   if S.SpinningCraneKick:IsReadyP() and not Player:PrevGCD(1, S.SpinningCraneKick) then
-    if HR.Cast(S.SpinningCraneKick) then return ""; end
+    if HR.Cast(S.SpinningCraneKick) then return "Spinning Crane Kick"; end
   end
   -- actions.serenity+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick
   if S.BlackoutKick:IsReadyP() and not Player:PrevGCD(1, S.BlackoutKick) then
-    if HR.Cast(S.BlackoutKick) then return ""; end
+    if HR.Cast(S.BlackoutKick) then return "Cast Blackout Kick"; end
   end
   return false;
 end
@@ -394,10 +450,6 @@ local function APL ()
 		-- actions.st+=/chi_burst
 		if S.ChiBurst:IsReadyP() then
 			if HR.Cast(S.ChiBurst) then return ""; end
-		end
-		-- actions+=/touch_of_death
-		if HR.CDsON() and S.TouchOfDeath:IsReadyP() and Target:TimeToDie() >= 9 then
-			if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return ""; end
 		end
 		-- -- actions+=/call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
 		if (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() <= 0) or Player:BuffP(S.Serenity) then
