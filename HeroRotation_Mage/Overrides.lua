@@ -75,9 +75,11 @@
       end
     , 63);
 
-    HL.AddCoreOverride ("Player.BuffRemainsP",
+    local FirePlayerBuffRemainsP
+    FirePlayerBuffRemainsP = HL.AddCoreOverride ("Player.BuffRemainsP",
     function (self, Spell, AnyCaster, Offset)
-      if Spell == SpellFire.HotStreakBuff and Player:BuffDownP(SpellFire.HotStreakBuff) then
+      local BaseCheck = FirePlayerBuffRemainsP(self, Spell, AnyCaster, Offset)
+      if Spell == SpellFire.HotStreakBuff and BaseCheck == 0 then
         return ( HeatLevelPredicted() == 2 ) and 15 or 0
       elseif Spell == SpellFire.RuneofPowerBuff then
         local ROPtime = HL.OffsetRemains(SpellFire.RuneofPowerBuff:TimeSinceLastAppliedOnPlayer(), "Auto")
@@ -112,6 +114,16 @@
       else
         return BaseCheck
       end
+    end
+    , 63);
+
+    local FireOldPlayerAffectingCombat
+    FireOldPlayerAffectingCombat = HL.AddCoreOverride ("Player.AffectingCombat",
+    function (self)
+      return  FireOldPlayerAffectingCombat(self)
+           or SpellFire.Pyroblast:InFlight()
+           or SpellFire.Fireball:InFlight()
+           or SpellFire.PhoenixFlames:InFlight()
     end
     , 63);
 
