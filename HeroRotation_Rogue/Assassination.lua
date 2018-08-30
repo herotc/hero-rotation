@@ -323,6 +323,17 @@ local function Stealthed ()
     if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_B, 2);
     end
+    -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains
+    local function Evaluate_Garrote_Target_C(TargetUnit)
+      return S.ShroudedSuffocation:AzeriteEnabled() and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
+    end
+    if Target:IsInRange("Melee") and Evaluate_Garrote_Target_C(Target)
+      and (Target:FilteredTimeToDie(">", 0, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
+      if HR.Cast(S.Garrote) then return "Cast Garrote (Shrouded Suffocation)"; end
+    end
+    if HR.AoEON() then
+      SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_C, 0);
+    end
     -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
     if S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 1 and Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 5+4*Rogue.CPMaxSpend() then
       -- actions.stealthed+=/pool_resource,for_next=1
@@ -404,8 +415,8 @@ local function Direct ()
   -------------------------------------------------------------------
   -------------------------------------------------------------------
 
-  -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
-  if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 and (S.SharpenedBladesPower:AzeriteRank() >= 2 or Cache.EnemiesCount[10] <= 4) then
+  -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
+  if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 then
     if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife (Sharpened Blades)"; end
   end
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
@@ -535,7 +546,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-08-22
+-- Last Update: 2018-08-30
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -565,6 +576,8 @@ HR.SetAPL(259, APL);
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>2
 -- # Subterfuge: Override normal Garrotes with snapshot versions
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
+-- # Subterfuge w/ Shrouded Suffocation: Reapply for bonus CP and extended snapshot duration
+-- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains
 -- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
 -- actions.stealthed+=/pool_resource,for_next=1
 -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
@@ -608,11 +621,8 @@ HR.SetAPL(259, APL);
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
 -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
--- # Poisoned Knife at 29+ stacks of Sharpened Blades. Up to 4 targets with Rank 1, more otherwise.
--- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
+-- # Poisoned Knife at 29+ stacks of Sharpened Blades.
+-- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
 -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
--- #Loss LOL, even at 3 Ranks
--- #actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=39
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
 -- actions.direct+=/mutilate,if=variable.use_filler
-

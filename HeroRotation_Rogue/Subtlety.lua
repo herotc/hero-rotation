@@ -63,6 +63,9 @@ local tableinsert = table.insert;
     Subterfuge                            = Spell(108208),
     Vigor                                 = Spell(14983),
     -- Azerite Traits
+    BladeInTheShadows                     = Spell(275896),
+    NightsVengeancePower                  = Spell(273418),
+    NightsVengeanceBuff                   = Spell(273424),
     SharpenedBladesPower                  = Spell(272911),
     SharpenedBladesBuff                   = Spell(272916),
     -- Defensive
@@ -164,6 +167,15 @@ end
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffP(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
 
+  -- actions.finish=eviscerate,if=talent.shadow_focus.enabled&spell_targets.shuriken_storm>=5&buff.nights_vengeance.up
+  if S.Eviscerate:IsCastable() and IsInMeleeRange() and S.ShadowFocus:IsAvailable() and Cache.EnemiesCount[10] >= 5 and Player:BuffP(S.NightsVengeanceBuff) then
+    if ReturnSpellOnly then
+      return S.Eviscerate;
+    else
+      if HR.Cast(S.Eviscerate) then return "Cast Eviscerate (Nights Vengeance)"; end
+    end
+  end
+
   if S.Nightblade:IsCastable() then
     local NightbladeThreshold = (6+Rogue.CPSpend()*2)*0.3;
     -- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
@@ -178,9 +190,9 @@ local function Finish (ReturnSpellOnly, StealthSpell)
         if HR.Cast(S.Nightblade) then return "Cast Nightblade 1"; end
       end
     end
-    -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(spell_targets.shuriken_storm<=5|talent.secret_technique.enabled)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
+    -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(talent.secret_technique.enabled|azerite.nights_vengeance.enabled|spell_targets.shuriken_storm<=5)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
     if HR.AoEON() and Cache.EnemiesCount[10] >= 2 and not ShadowDanceBuff
-      and (Cache.EnemiesCount[10] <= 5 or S.SecretTechnique:IsAvailable()) then
+      and (S.SecretTechnique:IsAvailable() or S.NightsVengeancePower:AzeriteEnabled() or Cache.EnemiesCount[10] <= 5) then
       local BestUnit, BestUnitTTD = nil, 5 + 2 * Player:ComboPoints();
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
         if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemainsP(S.Nightblade))
@@ -253,8 +265,24 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and Player:BuffP(VanishBuff)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
+  -- actions.stealthed+=/shuriken_toss,if=buff.sharpened_blades.stack>=29
+  if S.ShurikenToss:IsCastableP() and Player:BuffStackP(S.SharpenedBladesBuff) >= 29 then
+    if ReturnSpellOnly then
+      return S.ShurikenToss
+    else
+      if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
+    end
+  end
   -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
   -- !!!NYI!!! (Is this worth it? How do we want to display it in an understandable way?)
+  -- actions.stealthed+=/shadowstrike,if=!talent.deeper_stratagem.enabled&azerite.blade_in_the_shadows.rank=3&spell_targets.shuriken_storm=3
+  if S.Shadowstrike:IsCastableP() and not S.DeeperStratagem:IsAvailable() and S.BladeInTheShadows:AzeriteRank() == 3 and Cache.EnemiesCount[10] == 3 then
+    if ReturnSpellOnly then
+      return S.Shadowstrike
+    else
+      if HR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (3T BitS)"; end
+    end
+  end
   -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
   if HR.AoEON() and S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 3 then
     if ReturnSpellOnly then
@@ -394,9 +422,11 @@ end
 
 -- # Builders
 local function Build ()
-  -- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=1+3*azerite.sharpened_blades.rank=2+4*azerite.sharpened_blades.rank=3
-  if S.ShurikenToss:IsCastableP() and Player:BuffStackP(S.SharpenedBladesBuff) >= 29
-    and Cache.EnemiesCount[10] <= 1 + 3 * num(S.SharpenedBladesPower:AzeriteRank() == 2) + 4 * num(S.SharpenedBladesPower:AzeriteRank() == 3) then
+  -- actions.build=shuriken_toss,if=!talent.nightstalker.enabled&(!talent.dark_shadow.enabled|cooldown.symbols_of_death.remains>10)&buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=(3*azerite.sharpened_blades.rank)
+  if S.ShurikenToss:IsCastableP() and not S.Nightstalker:IsAvailable()
+    and (not S.DarkShadow:IsAvailable() or S.SymbolsofDeath:CooldownRemainsP() > 10)
+    and Player:BuffStackP(S.SharpenedBladesBuff) >= 29
+    and Cache.EnemiesCount[10] <= 3 * S.SharpenedBladesPower:AzeriteRank() then
     if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
   end
   -- actions.build=shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
@@ -601,7 +631,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-08-22
+-- Last Update: 2018-08-30
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -664,16 +694,22 @@ HR.SetAPL(261, APL);
 -- actions.stealthed=shadowstrike,if=buff.stealth.up
 -- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
+-- # Shuriken Toss at 29+ Sharpened Blades stacks in Stealth for damage bonuses.
+-- actions.stealthed+=/shuriken_toss,if=buff.sharpened_blades.stack>=29
 -- # At 2 targets with Secret Technique keep up Find Weakness by cycling Shadowstrike.
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
+-- # Without Deeper Stratagem and 3 Ranks of Blade in the Shadows it is worth using Shadowstrike on 3 targets.
+-- actions.stealthed+=/shadowstrike,if=!talent.deeper_stratagem.enabled&azerite.blade_in_the_shadows.rank=3&spell_targets.shuriken_storm=3
 -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
 -- actions.stealthed+=/shadowstrike
 --
 -- # Finishers
+-- # Eviscerate gets highest priority at 5+ targets with Shadow Focus and Nights Vengeance up
+-- actions.finish=eviscerate,if=talent.shadow_focus.enabled&spell_targets.shuriken_storm>=5&buff.nights_vengeance.up
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
--- actions.finish=nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
+-- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
 -- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic if you have less than 6 targets or play with Secret Technique.
--- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(spell_targets.shuriken_storm<=5|talent.secret_technique.enabled)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
+-- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(talent.secret_technique.enabled|azerite.nights_vengeance.enabled|spell_targets.shuriken_storm<=5)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
 -- # Secret Technique during Symbols. With Dark Shadow and multiple targets also only during Shadow Dance (until threshold in next line).
@@ -683,8 +719,8 @@ HR.SetAPL(261, APL);
 -- actions.finish+=/eviscerate
 --
 -- # Builders
--- # Shuriken Toss at 29+ Sharpened Blades stacks. 1T at Rank 1, up to 4 at Rank 2, up to 5 at Rank 3
--- actions.build=shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=1+3*azerite.sharpened_blades.rank=2+4*azerite.sharpened_blades.rank=3
+-- # Shuriken Toss at 29+ Sharpened Blades stacks. Up to 3 targets per rank. Save for stealth if using Nightstalker or Dark Shadow when possible.
+-- actions.build=shuriken_toss,if=!talent.nightstalker.enabled&(!talent.dark_shadow.enabled|cooldown.symbols_of_death.remains>10)&buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=(3*azerite.sharpened_blades.rank)
 -- actions.build+=/shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
