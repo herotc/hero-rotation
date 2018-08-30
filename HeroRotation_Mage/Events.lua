@@ -122,3 +122,21 @@
   function Player:FrozenOrbGroundAoeRemains()
     return math.max(HL.OffsetRemains(FrozenOrbHitTime - (HL.GetTime() - 10), "Auto"), 0)
   end
+
+  local brain_freeze_active = false
+
+  HL:RegisterForSelfCombatEvent(function(...)
+    local spellID = select(12, ...)
+    if spellID == Spell.Mage.Frost.Flurry:ID() then
+      brain_freeze_active =     Player:Buff(Spell.Mage.Frost.BrainFreezeBuff)
+                            or  Spell.Mage.Frost.BrainFreezeBuff:TimeSinceLastRemovedOnPlayer() < 0.1
+    end
+  end, "SPELL_CAST_SUCCESS")
+
+  function Player:BrainFreezeActive()
+    if self:IsCasting(Spell.Mage.Frost.Flurry) then
+      return false
+    else
+      return brain_freeze_active
+    end
+  end
