@@ -350,8 +350,8 @@ local function CDs ()
       end
     end
 
-    -- actions.cds+=/symbols_of_death
-    if S.SymbolsofDeath:IsCastable() then
+    -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking
+    if S.SymbolsofDeath:IsCastable() and Target:DebuffP(S.Nightblade) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death"; end
     end
     if HR.CDsON() then
@@ -517,6 +517,15 @@ local function APL ()
       -- PrePot w/ Bossmod Countdown
       -- Opener
       if Everyone.TargetIsValid() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange()) then
+        -- Precombat CDs
+        if HR.CDsON() then
+          if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+            if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
+          end
+          if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
+            if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades (OOC)"; end
+          end
+        end
         if Player:IsStealthed(true, true) then
           ShouldReturn = Stealthed();
           if ShouldReturn then return ShouldReturn .. " (OOC)"; end

@@ -480,6 +480,12 @@ local function APL ()
       ShouldReturn = Rogue.Stealth(Stealth);
       if ShouldReturn then return ShouldReturn; end
     end
+    -- Precombat CDs
+    if HR.CDsON() then
+      if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
+      end
+    end
     -- Flask
     -- Food
     -- Rune

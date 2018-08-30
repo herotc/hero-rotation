@@ -323,7 +323,7 @@ local function Finish ()
   -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
   -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.SliceandDice:IsAvailable() and S.SliceandDice:IsCastable()
-    and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Player:BuffRemainsP(S.SliceandDice) == 0)
+    and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Target:TimeToDieIsNotValid() or Player:BuffRemainsP(S.SliceandDice) == 0)
     and Player:BuffRemainsP(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
   end
@@ -331,7 +331,7 @@ local function Finish ()
   -- Note: Added RtB_BuffRemains() == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.RolltheBones:IsCastable() and (RtB_BuffRemains() <= 3 or RtB_Reroll())
     and (Target:FilteredTimeToDie(">", 20)
-    or Target:FilteredTimeToDie(">", RtB_BuffRemains()) or RtB_BuffRemains() == 0) then
+    or Target:FilteredTimeToDie(">", RtB_BuffRemains()) or Target:TimeToDieIsNotValid() or RtB_BuffRemains() == 0) then
     if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
   end
   -- # BTE worth being used with the boosted crit chance from Ruthless Precision
@@ -379,6 +379,15 @@ local function APL ()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
+    -- Precombat CDs
+    if HR.CDsON() then
+      if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
+      end
+      if S.AdrenalineRush:IsCastable() and not Player:BuffP(S.AdrenalineRush) then
+        if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (OOC)"; end
+      end
+    end
     -- Stealth
     if not Player:Buff(S.VanishBuff) then
       ShouldReturn = Rogue.Stealth(S.Stealth);
@@ -389,12 +398,11 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange(S.SinisterStrike) then
+    if Everyone.TargetIsValid() then
       if Player:ComboPoints() >= 5 then
-        if S.Dispatch:IsCastable() then
-          if HR.Cast(S.Dispatch) then return "Cast Dispatch (Opener)"; end
-        end
-      else
+        ShouldReturn = Finish();
+        if ShouldReturn then return "Finish: " .. ShouldReturn; end
+      elseif Target:IsInRange(S.SinisterStrike) then
         if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
           if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
         elseif S.SinisterStrike:IsCastable() then
