@@ -73,6 +73,10 @@ Spell.Shaman.Enhancement = {
   EmberTotemBuff        = Spell(262399),
   TailwindTotemBuff     = Spell(262400),
 
+  -- Azerite Traits
+  LightningConduit       = Spell(275388),
+  LightningConduitDebuff = Spell(275391),
+
   -- Utility
   WindShear             = Spell(57994),
 
@@ -350,11 +354,10 @@ local function APL ()
       if HR.Cast(S.Sundering) then return "Cast Sundering" end
     end
 
-    -- TODO: Azerite checks when HL supports them.
     -- actions.core+=/stormstrike,cycle_targets=1,if=azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&active_enemies>1&(buff.stormbringer.up|(variable.OCPool70&variable.furyCheck35))
-    -- if S.StormStrike:IsCastableP("Melee") and () then
-    --   if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
-    -- end
+    if S.StormStrike:IsCastableP("Melee") and (S.LightningConduit:IsAvailable() and not Target:Debuff(S.LightningConduitDebuff) and Cache.EnemiesCount[10] > 1 and (Player:Buff(S.StormbringerBuff) or (OCPool70() and furyCheck35()))) then
+      if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
+    end
 
     -- actions.core+=/stormstrike,if=buff.stormbringer.up|(buff.gathering_storms.up&variable.OCPool70&variable.furyCheck35)
     if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (Player:Buff(S.GatheringStormsBuff) and OCPool70() and furyCheck35())) then
