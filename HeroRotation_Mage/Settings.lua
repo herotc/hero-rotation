@@ -36,12 +36,12 @@
       GCDasOffGCD = {
         -- Abilities
         RuneofPower = true,
+        IcyVeins = true,
+        MirrorImage = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        IcyVeins = true,
-        MirrorImage = true,
         IceFloes = true,
       }
     },
@@ -85,7 +85,7 @@
   local CP_Arcane = CreateChildPanel(CP_Mage, "Arcane");
   local CP_Fire = CreateChildPanel(CP_Mage, "Fire");
   local CP_Frost = CreateChildPanel(CP_Mage, "Frost");
-  
+
   -- Controls
   -- Mage
   CreateARPanelOptions(CP_Mage, "APL.Mage.Commons");

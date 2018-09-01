@@ -139,9 +139,14 @@
     self:Show();
   end
   -- Change Icon
-  function HR.MainIconFrame:ChangeIcon (Texture, Keybind)
+  function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable)
     -- Texture
     self.Texture:SetTexture(Texture);
+    if HR.GUISettings.General.NotEnoughManaEnabled and not Usable then
+      self.Texture:SetGradient("HORIZONTAL", 0.5, 0.5, 1.0, 0.5, 0.5, 1.0);
+    else
+      self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+    end
     self.Texture:SetAllPoints(self);
     -- Keybind
     if Keybind then
@@ -372,6 +377,7 @@
   };
   -- Add the Icon on Nameplates
   function HR.Nameplate.AddIcon (ThisUnit, Object)
+    if HR.GUISettings.General.NamePlateIconAnchor == "Disable" then return true end
     local Token = stringlower(ThisUnit.UnitID);
     local Nameplate = C_NamePlate.GetNamePlateForUnit(Token);
     if Nameplate then

@@ -40,7 +40,8 @@
     Unholy = {
       GCDasOffGCD = {
         -- Abilities
-        ArmyOfTheDead     = true,
+        ArmyOfTheDead  = true,
+        Apocalypse     = false,
         SummonGargoyle = true,
         UnholyFrenzy   = false,
         SoulReaper     = false

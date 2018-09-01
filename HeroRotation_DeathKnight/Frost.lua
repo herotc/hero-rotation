@@ -169,7 +169,6 @@
   end
 
   local function AOE()
-    if HR.AoEON() then
     -- remorseless_winter,if=talent.gathering_storm.enabled
     if S.RemorselessWinter:IsCastableP() and (S.GatheringStorm:IsAvailable()) then
       if HR.Cast(S.RemorselessWinter) then return ""; end
@@ -226,8 +225,7 @@
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.ArcaneTorrent, Settings.DeathKnight.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
     end
-  end
-  return false;
+    return false;
   end
 
   local function BoS_Pooling()
@@ -351,7 +349,6 @@
   end
 
   local function Cooldowns()
-    if HR.CDsON() then
       -- actions.cooldowns=use_items
       -- actions.cooldowns+=/use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
       -- actions.cooldowns+=/potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -391,9 +388,8 @@
             if HR.Cast(S.FrostwyrmsFury, Settings.DeathKnight.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
         end
 
-        return false;
+      return false;
     end
-end
 --- ======= MAIN =======
 local function APL ()
     -- Unit Update
@@ -445,9 +441,11 @@ local function APL ()
     if S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
         if HR.Cast(S.BreathofSindragosa, Settings.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa) then return ""; end
     end
+  end
     --actions+=/call_action_list,name=cooldowns
+    if HR.CDsON() then
     ShouldReturn = Cooldowns();
-    if ShouldReturn then return ShouldReturn;
+    if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
     local pooling = false
@@ -469,7 +467,7 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=aoe,if=active_enemies>=2
-    if not pooling and Cache.EnemiesCount[10] >= 2 then
+    if not pooling and HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
       ShouldReturn = AOE();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -482,8 +480,7 @@ local function APL ()
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait/Pool Resources"; end
 
     return;
-end
-end
+  end
 
   HR.SetAPL(251, APL);
 --- ====18/07/2018======

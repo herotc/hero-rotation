@@ -17,7 +17,7 @@
   -- All settings here should be moved into the GUI someday.
   HR.GUISettings.APL.Druid = {
     Commons = {
-      
+
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -27,7 +27,7 @@
         -- Racials
         Racials = true,
         -- Abilities
-        
+
       }
     },
     Balance = {
@@ -67,23 +67,24 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         CatForm = true,
-        RegrowthHeal = true,
+        -- RegrowthHeal = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         --Abilities
-        Renewal = true,
-        SurvivalInstincts = true,
+        -- Renewal = true,
+        -- SurvivalInstincts = true,
         Prowl = true,
-        ElunesGuidance = true,
+        -- ElunesGuidance = true,
         WildCharge = true,
         TigersFury = true,
         Berserk = true,
+        Incarnation = true,
       },
       StealthMacro = {
         -- Abilities
-        Shadowmeld = true,
-        JungleStalker = true,
+        -- Shadowmeld = true,
+        -- JungleStalker = true,
       }
     },
     Guardian = {
@@ -107,12 +108,12 @@
 
   CreateARPanelOptions(CP_Druid, "APL.Druid.Commons");
   --Feral
-  CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
-  CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
-  CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
+  -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
+  -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
+  -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
   CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
-  CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
-  CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");
+  -- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
+  -- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");
   --Balance
   CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkSkinHP", {0, 100, 1}, "BarkSkin HP", "Set the BarkSkin HP threshold.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMFOOP", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
