@@ -57,14 +57,15 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        TouchOfDeath = true,
+        InvokeXuenTheWhiteTiger = true,
+        TouchOfDeath            = true,
+        Serenity                = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
 
         -- Abilities
-        Serenity = true,
       }
     }
   };
