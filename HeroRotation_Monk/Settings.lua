@@ -41,13 +41,13 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
+        InvokeNiuzaotheBlackOx = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
 
         -- Abilities
-        InvokeNiuzaotheBlackOx = true,
         BlackOxBrew            = true,
         IronskinBrew           = true,
         PurifyingBrew          = true,
