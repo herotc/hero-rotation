@@ -134,7 +134,7 @@ local function APL()
     -- food
     -- augmentation
     -- arcane_intellect
-    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff) and (true) then
+    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff, true) and (true) then
       if HR.Cast(S.ArcaneIntellect) then return "Cast Arcane Intellect"; end
     end
     -- summon_arcane_familiar
