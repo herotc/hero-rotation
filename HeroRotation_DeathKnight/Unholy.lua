@@ -97,7 +97,7 @@
   -- Variables
   local function PoolingForGargoyle()
     --(cooldown.summon_gargoyle.remains<5&(cooldown.dark_transformation.remains<5|!equipped.137075))&talent.summon_gargoyle.enabled
-    return (S.SummonGargoyle:CooldownRemains() < 5 and (S.DarkTransformation:CooldownRemains() < 5 or not I.Taktheritrixs:IsEquipped())) and S.SummonGargoyle:IsAvailable()
+    return S.SummonGargoyle:CooldownRemains() < 5 and S.SummonGargoyle:IsAvailable()
   end
 
   --- ===== APL =====
@@ -130,6 +130,10 @@
   -- epidemic,if=!variable.pooling_for_gargoyle
   if S.Epidemic:IsAvailable() and S.Epidemic:IsUsable() and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
+  end
+  -- festering_strike,target_if=debuff.festering_wound.stack<=1&cooldown.death_and_decay.remains
+  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWound) <= 1 and S.DeathAndDecay.CooldownDown() then
+    if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
   if S.FesteringStrike:IsCastable() and (S.BurstingSores:IsAvailable() and Cache.EnemiesCount[8] >= 2 and Target:DebuffStack(S.FesteringWound) <= 1) then
@@ -216,20 +220,16 @@ local function Cooldowns()
     if S.ArmyOfTheDead:IsCastable() then
       if HR.Cast(S.ArmyOfTheDead, Settings.Unholy.GCDasOffGCD.ArmyOfTheDead) then return ""; end
     end
-    -- dark_transformation,if=(equipped.137075&cooldown.summon_gargoyle.remains>40)|(!equipped.137075|!talent.summon_gargoyle.enabled)
-    if S.DarkTransformation:IsCastable() and ((I.Taktheritrixs:IsEquipped() and S.SummonGargoyle:CooldownRemainsP() > 40) or (not I.Taktheritrixs:IsEquipped() or not S.SummonGargoyle:IsAvailable())) then
+    -- dark_transformation
+    if S.DarkTransformation:IsCastable() and Pet:IsActive() then
       if HR.Cast(S.DarkTransformation) then return ""; end
     end
     -- summon_gargoyle,if=runic_power.deficit<14
     if S.SummonGargoyle:IsCastable() and Player:RunicPowerDeficit() < 14 then
       if HR.Cast(S.SummonGargoyle, Settings.Unholy.GCDasOffGCD.SummonGargoyle) then return ""; end
     end
-    -- unholy_frenzy,if=debuff.festering_wound.stack<4
-    if S.UnholyFrenzy:IsCastable() and Target:DebuffStack(S.FesteringWound) < 4 then
-      if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
-    end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
-    if S.UnholyFrenzy:IsCastable() and (Cache.EnemiesCount[10] >= 2 and ((S.DeathAndDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
+    if S.UnholyFrenzy:IsCastable() and Target:DebuffStack(S.FesteringWound) < 4 or (Cache.EnemiesCount[10] >= 2 and ((S.DeathAndDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
       if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return ""; end
     end
     -- soul_reaper,target_if=(target.time_to_die<8|rune<=2)&!buff.unholy_frenzy.up
