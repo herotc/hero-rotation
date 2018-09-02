@@ -165,7 +165,7 @@ local function APL ()
   -- Pre Combat --
   Precombat = function()
     -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
-    if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable())then
+    if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
       if HR.Cast(S.ChiBurst) then return "Cast Pre-Combat Chi Burst"; end
     end
     -- actions.precombat+=/chi_wave
@@ -224,8 +224,8 @@ local function APL ()
       if HR.Cast(S.RisingSunKick) then return "Cast Serenity Rising Sun Kick"; end
     end
     -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick&!azerite.swift_roundhouse.enabled)|buff.serenity.remains<1|active_enemies>1
-    if S.FistsOfFury:IsReadyP() and (Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or 
-      Player:BuffRemainsP(S.Serenity) < 1 or Cache.EnemiesCount[8] > 1 then
+    if S.FistsOfFury:IsReadyP() and ((Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or 
+      Player:BuffRemainsP(S.Serenity) < 1 or Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.FistsOfFury) then return "Cast Serenity Fists of Fury"; end
     end
     -- actions.serenity+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(active_enemies>=3|(active_enemies=2&prev_gcd.1.blackout_kick))
@@ -307,7 +307,7 @@ local function APL ()
       if HR.Cast(S.WhirlingDragonPunch) then return "Cast Single Target Whirling Dragon Punch"; end
     end
     -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(cooldown.fists_of_fury.remains>2|chi>=5|azerite.swift_roundhouse.rank>2)
-    if S.RisingSunKick:IsReadyP() and S.FistsOfFury:CooldownRemainsP() > 2 or Player:Chi() >= 5 or S.SwiftRoundhouse:AzeriteRank() > 2 then
+    if S.RisingSunKick:IsReadyP() and (S.FistsOfFury:CooldownRemainsP() > 2 or Player:Chi() >= 5 or S.SwiftRoundhouse:AzeriteRank() > 2) then
       if HR.Cast(S.RisingSunKick) then return "Cast Single Target Rising Sun Kick"; end
     end
  	  -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1&active_enemies>1
@@ -347,7 +347,7 @@ local function APL ()
   		if HR.Cast(S.ChiWave) then return "Cast Single Target Chi Wave"; end
     end
 	  -- actions.st+=/chi_burst,if=chi.max-chi>=1&active_enemies=1|chi.max-chi>=2
-	  if S.ChiBurst:IsReadyP() and (Player:ChiDeficit() >= 1 and Cache.EnemiesCount[8] == 1) or Player:ChiDeficit() >= 2 then
+	  if S.ChiBurst:IsReadyP() and ((Player:ChiDeficit() >= 1 and Cache.EnemiesCount[8] == 1) or Player:ChiDeficit() >= 2) then
 		  if HR.Cast(S.ChiBurst) then return "Cast Single Target Chi Burst"; end
   	end  
     -- actions.st+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&chi.max-chi>=2&(buff.rushing_jade_wind.down|energy>56)
