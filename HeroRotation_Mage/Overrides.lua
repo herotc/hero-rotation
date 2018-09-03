@@ -43,6 +43,19 @@
       end
     end
     , 62);
+
+    local ArcanePlayerBuffRemainsP
+    ArcanePlayerBuffRemainsP = HL.AddCoreOverride ("Player.BuffRemainsP",
+    function (self, Spell, AnyCaster, Offset)
+      local BaseCheck = ArcanePlayerBuffRemainsP(self, Spell, AnyCaster, Offset)
+      if Spell == SpellArcane.RuneofPowerBuff then
+        local ROPtime = HL.OffsetRemains(SpellArcane.RuneofPowerBuff:TimeSinceLastAppliedOnPlayer(), "Auto")
+        return math.max(10-ROPtime, 0)
+      else
+        return BaseCheck
+      end
+    end
+    , 62);
   -- Fire, ID: 63
     local function HeatLevelPredicted ()
       if Player:BuffP(SpellFire.HotStreakBuff) then
