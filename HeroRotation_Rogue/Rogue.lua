@@ -67,7 +67,7 @@
           end
         end
       end
-      if BestUnit then
+      if BestUnit and BestUnit:GUID() ~= Target:GUID() then
         HR.CastLeftNameplate(BestUnit, MarkedforDeath);
       end
     end
