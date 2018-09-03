@@ -132,7 +132,7 @@
     if HR.Cast(S.Epidemic) then return ""; end
   end
   -- festering_strike,target_if=debuff.festering_wound.stack<=1&cooldown.death_and_decay.remains
-  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWound) <= 1 and S.DeathAndDecay.CooldownDown() then
+  if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWound) <= 1 and S.DeathAndDecay:CooldownDown() then
     if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
