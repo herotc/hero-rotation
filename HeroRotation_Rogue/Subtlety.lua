@@ -361,7 +361,7 @@ local function CDs ()
       if S.MarkedforDeath:IsCastable() then
         if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) or (Settings.Subtlety.STMfDAsDPSCD and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
-        elseif Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
           HR.CastSuggested(S.MarkedforDeath);
         end
       end
