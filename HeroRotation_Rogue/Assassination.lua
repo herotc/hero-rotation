@@ -58,6 +58,7 @@ Spell.Rogue.Assassination = {
   -- Azerite Traits
   SharpenedBladesPower  = Spell(272911),
   SharpenedBladesBuff   = Spell(272916),
+  ShroudedSuffocation   = Spell(278666),
   -- Defensive
   CrimsonVial           = Spell(185311),
   Feint                 = Spell(1966),
@@ -247,15 +248,22 @@ local function CDs ()
     if S.MarkedforDeath:IsCastable() and ComboPointsDeficit >= Rogue.CPMaxSpend() then
       HR.CastSuggested(S.MarkedforDeath);
     end
-    -- actions.cds+=/vendetta,if=dot.rupture.ticking
-    if S.Vendetta:IsCastable() and Target:DebuffP(S.Rupture) then
+    -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1)
+    if S.Vendetta:IsCastable() and not Player:IsStealthed(true, false) and Target:DebuffP(S.Rupture)
+      and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) > 1) then
       if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
     end
     if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
-      -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
+      -- actions.cds+=/vanish,if=talent.subterfuge.enabled&exsanguinated.garrote&dot.garrote.pmultiplier>1&dot.garrote.remains<=2*spell_haste
+      if S.Subterfuge:IsAvailable() and S.ShroudedSuffocation:AzeriteEnabled() and Target:PMultiplier(S.Garrote) > 1
+        and Target:DebuffRemainsP(S.Garrote) <= 2 * Player:SpellHaste() then
+        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge SS)"; end
+      end
+      -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
       if S.Exsanguinate:IsAvailable() and (S.Nightstalker:IsAvailable() or S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 2)
-        and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1 then
-          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
+        and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1
+        and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) <= 1) then
+        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
       end
       -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
       if S.Nightstalker:IsAvailable() and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() and Target:Debuff(S.Vendetta) then
@@ -323,6 +331,12 @@ local function Stealthed ()
     if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_B, 2);
     end
+  end
+  -- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking
+  if S.Rupture:IsCastable("Melee") and S.Subterfuge:IsAvailable() and ComboPoints > 0 and S.ShroudedSuffocation:AzeriteEnabled() and not Target:DebuffP(S.Rupture) then
+    if HR.Cast(S.Rupture) then return "Cast Rupture (Shrouded Suffocation)"; end
+  end
+  if S.Garrote:IsCastable("Melee") and S.Subterfuge:IsAvailable() then
     -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains
     local function Evaluate_Garrote_Target_C(TargetUnit)
       return S.ShroudedSuffocation:AzeriteEnabled() and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
@@ -552,7 +566,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-08-30
+-- Last Update: 2018-09-03
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -582,6 +596,8 @@ HR.SetAPL(259, APL);
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&refreshable&(!exsanguinated|remains<=tick_time*2)&target.time_to_die-remains>2
 -- # Subterfuge: Override normal Garrotes with snapshot versions
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
+-- # Subterfuge + Shrouded Suffocation: Apply early Rupture that will be refreshed for pandemic
+-- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking
 -- # Subterfuge w/ Shrouded Suffocation: Reapply for bonus CP and extended snapshot duration
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains
 -- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
@@ -596,11 +612,17 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 --
 -- # Cooldowns
--- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
--- actions.cds+=/vendetta,if=dot.rupture.ticking
+-- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
+-- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
+-- # If no adds will die within the next 30s, use MfD on boss without any CP.
+-- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
+-- # Vendetta outside stealth with Rupture up. With Subterfuge talent and Shrouded Suffocation power always use with buffed Garrote.
+-- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1)
 --
+-- # Special Subterfuge Vanish condition to use at the end of the exsanguinated opener Garrote
+-- actions.cds+=/vanish,if=talent.subterfuge.enabled&exsanguinated.garrote&dot.garrote.pmultiplier>1&dot.garrote.remains<=2*spell_haste
 -- # Vanish with Exsg + (Nightstalker, or Subterfuge only on 1T): Maximum CP and Exsg ready for next GCD
--- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
+-- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
 -- # Vanish with Nightstalker + No Exsg: Maximum CP and Vendetta up
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
 -- # Vanish with Subterfuge + (No Exsg or 2T+): No stealth/subterfuge, Garrote Refreshable, enough space for incoming Garrote CP
