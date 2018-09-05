@@ -355,7 +355,7 @@ local function APL ()
     end
 
     -- actions.core+=/stormstrike,cycle_targets=1,if=azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&active_enemies>1&(buff.stormbringer.up|(variable.OCPool70&variable.furyCheck35))
-    if S.StormStrike:IsCastableP("Melee") and (S.LightningConduit:IsAvailable() and not Target:Debuff(S.LightningConduitDebuff) and Cache.EnemiesCount[10] > 1 and (Player:Buff(S.StormbringerBuff) or (OCPool70() and furyCheck35()))) then
+    if S.StormStrike:IsCastableP("Melee") and (S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and Cache.EnemiesCount[10] > 1 and (Player:Buff(S.StormbringerBuff) or (OCPool70() and furyCheck35()))) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
