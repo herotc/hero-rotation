@@ -15,6 +15,14 @@
   -- Lua
 
 
+--- ======================== CUSTOM BUTTONS =========================
+  if not HR.CustomButtons then HR.CustomButtons = {}; end
+  HR.CustomButtons[251] = {
+    [1] = {"P", "Start pooling resources for Breath of Sindragosa"},
+    [2] = {"B", "Use Breath of Sindragosa" }
+  };
+  local PoolBreathofSindragosa = HR.Custom1;
+  local UseBreathofSindragosa = function() return HR.Custom2() and HR.Custom1(); end
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -358,7 +366,7 @@
         if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
       -- actions.cooldowns+=/empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
-      if S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
+      if UseBreathofSindragosa() and S.EmpowerRuneWeapon:IsCastable() and S.PillarOfFrost:CooldownUp() and S.BreathofSindragosa:IsAvailable() and Player:Runes() >= 3 and Player:RunicPower() > 60 then
         if HR.Cast(S.EmpowerRuneWeapon, Settings.DeathKnight.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return ""; end
       end
       --actions.cooldowns+=/call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.time_to_die<=gcd)
@@ -429,7 +437,7 @@ local function APL ()
         if HR.Cast(S.FrostStrike) then return ""; end
     end
     --actions+=/breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
-    if S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
+    if UseBreathofSindragosa() and S.BreathofSindragosa:IsCastable() and S.EmpowerRuneWeapon:CooldownRemainsP() > 0 and S.PillarOfFrost:CooldownRemainsP() > 0 then
         if HR.Cast(S.BreathofSindragosa, Settings.DeathKnight.Frost.GCDasOffGCD.BreathofSindragosa) then return ""; end
     end
   end
@@ -439,9 +447,7 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
-    local pooling = false
-    if (S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemainsP() < 5) then
-        pooling = true
+    if PoolBreathofSindragosa() and S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemainsP() < 5 then
         ShouldReturn = BoS_Pooling();
         if ShouldReturn then return ShouldReturn; end
         if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Pooling"; end
@@ -458,15 +464,13 @@ local function APL ()
         if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/run_action_list,name=aoe,if=active_enemies>=2
-    if not pooling and HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
+    if HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
       ShouldReturn = AOE();
       if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/call_action_list,name=standard
-    if not pooling then
-        ShouldReturn = Standard();
-        if ShouldReturn then return ShouldReturn; end
-    end
+    ShouldReturn = Standard();
+    if ShouldReturn then return ShouldReturn; end
 
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait/Pool Resources"; end
 

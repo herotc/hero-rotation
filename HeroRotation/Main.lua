@@ -64,6 +64,11 @@
   BINDING_NAME_HEROROTATION_CDS = "Toggle CDs";
   BINDING_NAME_HEROROTATION_AOE = "Toggle AoE";
   BINDING_NAME_HEROROTATION_TOGGLE = "Toggle On/Off";
+  BINDING_NAME_HEROROTATION_CUSTOM1 = "Toggle Custom1";
+  BINDING_NAME_HEROROTATION_CUSTOM2 = "Toggle Custom2";
+  BINDING_NAME_HEROROTATION_CUSTOM3 = "Toggle Custom3";
+
+
 
 --- ======= MAIN FRAME =======
   HR.MainFrame = CreateFrame("Frame", "HeroRotation_MainFrame", UIParent);
@@ -391,6 +396,8 @@
             if GetCVar("nameplateShowEnemies") ~= "1" then
               HR.Print("It looks like enemy nameplates are disabled, you should enable them in order to get proper AoE rotation.");
             end
+            -- Reset Custom Buttons
+            HR.ToggleIconFrame:ResetCustomButtons(SpecID)
           else
             HR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
             for Key, Value in pairs(UIFrames) do

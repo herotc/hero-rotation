@@ -541,6 +541,9 @@
     self:AddButton("C", 1, "CDs", "cds");
     self:AddButton("A", 2, "AoE", "aoe");
     self:AddButton("O", 3, "On/Off", "toggle");
+    self:AddButton("", 4, "", "custom1");
+    self:AddButton("", 5, "", "custom2");
+    self:AddButton("", 6, "", "custom3");
   end
   -- Reset Anchor
   function HR.ToggleIconFrame:ResetAnchor ()
@@ -554,29 +557,14 @@
     ButtonFrame:SetFrameLevel(self:GetFrameLevel() - 1);
     ButtonFrame:SetWidth(20);
     ButtonFrame:SetHeight(20);
-    ButtonFrame:SetPoint("LEFT", self, "LEFT", 20*(i-1)+i, 0);
+    local buttons_per_row = 3
+    local c = (i-1)%buttons_per_row+1
+    local r = (i-c)/buttons_per_row
+    ButtonFrame:SetPoint("LEFT", self, "LEFT", 20*(c-1)+c, -(20*r));
 
-    -- Button Tooltip (Optional)
-    if Tooltip then
-      ButtonFrame:SetScript("OnEnter",
-        function ()
-          GameTooltip:SetOwner(HR.ToggleIconFrame, "ANCHOR_BOTTOM", 0, 0);
-          GameTooltip:ClearLines();
-          GameTooltip:SetBackdropColor(0, 0, 0, 1);
-          GameTooltip:SetText(Tooltip, nil, nil, nil, 1, true);
-          GameTooltip:Show();
-        end
-      );
-      ButtonFrame:SetScript("OnLeave",
-        function ()
-          GameTooltip:Hide();
-        end
-      );
-    end
 
     -- Button Text
     ButtonFrame:SetNormalFontObject("GameFontNormalSmall");
-    ButtonFrame.text = Text;
 
     -- Button Texture
     local NormalTexture = ButtonFrame:CreateTexture();
@@ -617,12 +605,31 @@
 
     self.Button[i] = ButtonFrame;
 
-    HR.ToggleIconFrame:UpdateButtonText(i);
+    HR.ToggleIconFrame:UpdateButtonText(i, Text, Tooltip);
 
     ButtonFrame:Show();
   end
   -- Update a button text
-  function HR.ToggleIconFrame:UpdateButtonText (i)
+  function HR.ToggleIconFrame:UpdateButtonText (i, Text, Tooltip)
+    if Text then
+      self.Button[i].text = Text;
+    end
+    if Tooltip then
+      self.Button[i]:SetScript("OnEnter",
+        function ()
+          GameTooltip:SetOwner(HR.ToggleIconFrame, "ANCHOR_BOTTOM", 0, 0);
+          GameTooltip:ClearLines();
+          GameTooltip:SetBackdropColor(0, 0, 0, 1);
+          GameTooltip:SetText(Tooltip, nil, nil, nil, 1, true);
+          GameTooltip:Show();
+        end
+      );
+      self.Button[i]:SetScript("OnLeave",
+        function ()
+          GameTooltip:Hide();
+        end
+      );
+    end
     if HeroRotationCharDB.Toggles[i] then
       self.Button[i]:SetFormattedText("|cff00ff00%s|r", self.Button[i].text);
     else
@@ -630,4 +637,15 @@
     end
   end
 
-
+  function HR.ToggleIconFrame:ResetCustomButtons(SpecID)
+    for i = 4, 6 do
+      self.Button[i]:Hide();
+    end
+    if HR.CustomButtons and HR.CustomButtons[SpecID] then
+      local buttons = HR.CustomButtons[SpecID];
+      for i = 1, #buttons do
+        HR.ToggleIconFrame:UpdateButtonText(i+3, buttons[i][1], buttons[i][2]);
+        self.Button[i+3]:Show();
+      end
+    end
+  end
