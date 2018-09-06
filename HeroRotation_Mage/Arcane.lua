@@ -357,7 +357,7 @@ local function APL()
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=conserve,if=!burn_phase
-    if  (not bool(VarBurnPhase)) then
+    if  (not bool(VarBurnPhase)) or (not HR.CDsON()) then
       local ShouldReturn = Conserve(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=movement
