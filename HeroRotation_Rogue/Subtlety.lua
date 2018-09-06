@@ -102,7 +102,7 @@ local tableinsert = table.insert;
           -- Aura Multiplier (SpellID: 137035)
           1.28 *
           -- Nightstalker Multiplier
-          (S.Nightstalker:IsAvailable() and Player:IsStealthed(true) and 1.12 or 1) *
+          (S.Nightstalker:IsAvailable() and Player:IsStealthedP(true) and 1.12 or 1) *
           -- Deeper Stratagem Multiplier
           (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
           -- Dark Shadow Multiplier
@@ -339,7 +339,7 @@ local function CDs ()
       -- TODO: Add Potion Suggestion
 
       -- Racials
-      if Player:IsStealthed(true, false) then
+      if Player:IsStealthedP(true, false) then
         -- actions.cds+=/blood_fury,if=stealthed.rogue
         if S.BloodFury:IsCastable() then
           if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
@@ -360,15 +360,15 @@ local function CDs ()
       -- Note: Done at the start of the Rotation (Rogue Commmon)
       -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
       if S.MarkedforDeath:IsCastable() then
-        if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) or (Settings.Subtlety.STMfDAsDPSCD and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
+        if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) or (Settings.Subtlety.STMfDAsDPSCD and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
-        elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        elseif not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
           HR.CastSuggested(S.MarkedforDeath);
         end
       end
       -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
       if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
-        and Player:ComboPointsDeficit() >= 2 + num(Player:IsStealthed(true, true)) then
+        and Player:ComboPointsDeficit() >= 2 + num(Player:IsStealthedP(true, true)) then
         if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades"; end
       end
       -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&dot.nightblade.ticking&buff.symbols_of_death.up&buff.shadow_dance.up
@@ -480,7 +480,7 @@ end
 local Interrupts = {
   {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
   {S.KidneyShot, "Cast Kidney Shot (Interrupt)", function () return Player:ComboPoints() > 0; end},
-  {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthed(true, true); end}
+  {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthedP(true, true); end}
 };
 
 -- APL Main
@@ -527,7 +527,7 @@ local function APL ()
             if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades (OOC)"; end
           end
         end
-        if Player:IsStealthed(true, true) then
+        if Player:IsStealthedP(true, true) then
           ShouldReturn = Stealthed();
           if ShouldReturn then return ShouldReturn .. " (OOC)"; end
           if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
@@ -565,7 +565,7 @@ local function APL ()
 
       -- # Run fully switches to the Stealthed Rotation (by doing so, it forces pooling if nothing is available).
       -- actions+=/run_action_list,name=stealthed,if=stealthed.all
-      if Player:IsStealthed(true, true) then
+      if Player:IsStealthedP(true, true) then
         ShouldReturn = Stealthed();
         if ShouldReturn then return "Stealthed: " .. ShouldReturn; end
         -- run_action_list forces the return
@@ -628,7 +628,7 @@ local function APL ()
       end
 
       -- Shuriken Toss Out of Range
-      if S.ShurikenToss:IsCastable(30) and not Target:IsInRange(10) and not Player:IsStealthed(true, true) and not Player:BuffP(S.Sprint)
+      if S.ShurikenToss:IsCastable(30) and not Target:IsInRange(10) and not Player:IsStealthedP(true, true) and not Player:BuffP(S.Sprint)
         and Player:EnergyDeficitPredicted() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end

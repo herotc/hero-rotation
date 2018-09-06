@@ -294,9 +294,9 @@ local function CDs ()
       -- Note: Increased the SimC condition by 50% since we are slower.
       if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()*1.5) or (Target:FilteredTimeToDie("<", 2) and Player:ComboPointsDeficit() > 0)
         or (((Player:BuffRemainsP(S.TrueBearing) > 15 - (Player:BuffP(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy())
-          and not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
+          and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
         if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
-      elseif not Player:IsStealthed(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
+      elseif not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
         HR.CastSuggested(S.MarkedforDeath);
       end
     end
@@ -321,7 +321,7 @@ local function CDs ()
       if S.BladeRush:IsCastable(S.SinisterStrike) and Blade_Flurry_Sync() and EnergyTimeToMaxRounded() > 1 then
         if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush"; end
       end
-      if Settings.Outlaw.UseDPSVanish and not Player:IsStealthed(true, true) then
+      if Settings.Outlaw.UseDPSVanish and not Player:IsStealthedP(true, true) then
         -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
         -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
         if S.Vanish:IsCastable() and Ambush_Condition() then
@@ -436,7 +436,7 @@ local function APL ()
         ShouldReturn = Finish();
         if ShouldReturn then return "Finish: " .. ShouldReturn; end
       elseif Target:IsInRange(S.SinisterStrike) then
-        if Player:IsStealthed(true, true) and S.Ambush:IsCastable() then
+        if Player:IsStealthedP(true, true) and S.Ambush:IsCastable() then
           if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
         elseif S.SinisterStrike:IsCastable() then
           if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)"; end
@@ -462,7 +462,7 @@ local function APL ()
     end
 
     -- actions+=/call_action_list,name=stealth,if=stealthed.all
-    if Player:IsStealthed(true, true) then
+    if Player:IsStealthedP(true, true) then
       ShouldReturn = Stealth();
       if ShouldReturn then return "Stealth: " .. ShouldReturn; end
     end
@@ -490,7 +490,7 @@ local function APL ()
       if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
     end
     -- OutofRange Pistol Shot
-    if not Target:IsInRange(10) and S.PistolShot:IsCastable(20) and not Player:IsStealthed(true, true)
+    if not Target:IsInRange(10) and S.PistolShot:IsCastable(20) and not Player:IsStealthedP(true, true)
       and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or EnergyTimeToMaxRounded() <= 1.2) then
       if HR.Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)"; end
     end
