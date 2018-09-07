@@ -197,7 +197,7 @@ local function RtB_Reroll ()
       -- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
       -- actions=variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
       -- # Reroll for 2+ buffs or Ruthless Precision with Deadshot Rank 2+.
-      -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.rank>=2,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
+      -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
       -- # Always reroll for 2+ buffs with Snake Eyes unless at 3 Ranks, then reroll everything.
       -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.enabled,value=rtb_buffs<2|(azerite.snake_eyes.rank=3&rtb_buffs<5)
       if S.SnakeEyesPower:AzeriteEnabled() then
@@ -211,7 +211,7 @@ local function RtB_Reroll ()
         if S.SnakeEyesPower:AzeriteRank() >= 2 and Player:BuffStackP(S.SnakeEyesBuff) >= 2 - num(Player:BuffP(S.Broadside)) then
           Cache.APLVar.RtB_Reroll = false;
         end
-      elseif S.Deadshot:AzeriteRank() >= 2 then
+      elseif S.Deadshot:AzeriteEnabled() or S.AceUpYourSleeve:AzeriteEnabled() then
         Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffP(S.LoadedDiceBuff) or
           Player:BuffRemainsP(S.RuthlessPrecision) <= S.BetweentheEyes:CooldownRemainsP())) and true or false;
       else
@@ -347,8 +347,8 @@ end
 
 local function Finish ()
   -- # BtE over RtB rerolls with 2+ Deadshot traits or Ruthless Precision.
-  -- actions.finish=between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.rank>=2&buff.roll_the_bones.up)
-  if S.BetweentheEyes:IsCastable(20) and (Player:BuffP(S.RuthlessPrecision) or (S.Deadshot:AzeriteRank() >= 2 and RtB_Buffs() >= 1)) then
+  -- actions.finish=between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
+  if S.BetweentheEyes:IsCastable(20) and (Player:BuffP(S.RuthlessPrecision) or (S.Deadshot:AzeriteEnabled() or S.AceUpYourSleeve:AzeriteEnabled()) and RtB_Buffs() >= 1) then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Pre RtB)"; end
   end
   -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
@@ -499,7 +499,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2018-09-02
+-- Last Update: 2018-09-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -517,8 +517,8 @@ HR.SetAPL(260, APL);
 -- # Executed every time the actor is available.
 -- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
 -- actions=variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
--- # Reroll for 2+ buffs or Ruthless Precision with Deadshot Rank 2+.
--- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.rank>=2,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
+-- # Reroll for 2+ buffs or Ruthless Precision with Deadshot or Ace up your Sleeve.
+-- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
 -- # Always reroll for 2+ buffs with Snake Eyes unless at 3 Ranks, then reroll everything.
 -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.enabled,value=rtb_buffs<2|(azerite.snake_eyes.rank=3&rtb_buffs<5)
 -- # Do not reroll if Snake Eyes is at 2+ Ranks and 2+ stacks of the buff (1+ stack with Broadside up)
@@ -560,8 +560,8 @@ HR.SetAPL(260, APL);
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
 
 -- # Finishers
--- # BtE over RtB rerolls with 2+ Deadshot traits or Ruthless Precision.
--- actions.finish=between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.rank>=2&buff.roll_the_bones.up)
+-- # BtE over RtB rerolls with Deadshot/Ace traits or Ruthless Precision.
+-- actions.finish=between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
 -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
 -- actions.finish+=/roll_the_bones,if=(buff.roll_the_bones.remains<=3|variable.rtb_reroll)&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)
 -- # BtE with the Ace Up Your Sleeve or Deadshot traits.

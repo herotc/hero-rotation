@@ -167,8 +167,9 @@ end
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffP(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
 
-  -- actions.finish=eviscerate,if=talent.shadow_focus.enabled&spell_targets.shuriken_storm>=5&buff.nights_vengeance.up
-  if S.Eviscerate:IsCastable() and IsInMeleeRange() and S.ShadowFocus:IsAvailable() and Cache.EnemiesCount[10] >= 5 and Player:BuffP(S.NightsVengeanceBuff) then
+  -- actions.finish=eviscerate,if=talent.shadow_focus.enabled&buff.nights_vengeance.up&spell_targets.shuriken_storm>=2+3*talent.secret_technique.enabled
+  if S.Eviscerate:IsCastable() and IsInMeleeRange() and S.ShadowFocus:IsAvailable() and Player:BuffP(S.NightsVengeanceBuff)
+    and Cache.EnemiesCount[10] >= 2 + 3 * num(S.SecretTechnique:IsAvailable()) then
     if ReturnSpellOnly then
       return S.Eviscerate;
     else
@@ -641,7 +642,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-08-30
+-- Last Update: 2018-09-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -714,8 +715,8 @@ HR.SetAPL(261, APL);
 -- actions.stealthed+=/shadowstrike
 --
 -- # Finishers
--- # Eviscerate gets highest priority at 5+ targets with Shadow Focus and Nights Vengeance up
--- actions.finish=eviscerate,if=talent.shadow_focus.enabled&spell_targets.shuriken_storm>=5&buff.nights_vengeance.up
+-- # Eviscerate highest priority at 2+ targets with Shadow Focus (5+ with Secret Technique in addition) and Night's Vengeance up.
+-- actions.finish=eviscerate,if=talent.shadow_focus.enabled&buff.nights_vengeance.up&spell_targets.shuriken_storm>=2+3*talent.secret_technique.enabled
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
 -- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic if you have less than 6 targets or play with Secret Technique.
