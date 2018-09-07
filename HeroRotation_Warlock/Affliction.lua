@@ -87,7 +87,7 @@ local Settings = {
 local VarSpammableSeed = 0;
 local VarPadding = 0;
 
-local EnemyRanges = {40, 5}
+local EnemyRanges = {35, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -127,7 +127,7 @@ HL.UnstableAfflictionDebuffsPrev = {
 
 local function NbAffected (SpellAffected)
     local nbaff = 0
-    for Key, Value in pairs(Cache.Enemies[40]) do
+    for Key, Value in pairs(Cache.Enemies[35]) do
       if Value:DebuffRemainsP(SpellAffected) > 0 then nbaff = nbaff + 1; end
     end
     return nbaff;
@@ -186,15 +186,15 @@ local function APL()
       if HR.Cast(S.ShadowBolt) then return ""; end
     end
     -- agony,if=buff.movement.up&!(talent.siphon_life.enabled&(prev_gcd.1.agony&prev_gcd.2.agony&prev_gcd.3.agony)|prev_gcd.1.agony)
-    if S.Agony:IsCastableP() and (Player:BuffP(S.MovementBuff) and not (S.SiphonLife:IsAvailable() and (Player:PrevGCDP(1, S.Agony) and Player:PrevGCDP(2, S.Agony) and Player:PrevGCDP(3, S.Agony)) or Player:PrevGCDP(1, S.Agony))) then
+    if S.Agony:IsCastableP() and (Player:IsMoving() and not (S.SiphonLife:IsAvailable() and (Player:PrevGCDP(1, S.Agony) and Player:PrevGCDP(2, S.Agony) and Player:PrevGCDP(3, S.Agony)) or Player:PrevGCDP(1, S.Agony))) then
       if HR.Cast(S.Agony) then return ""; end
     end
     -- siphon_life,if=buff.movement.up&!(prev_gcd.1.siphon_life&prev_gcd.2.siphon_life&prev_gcd.3.siphon_life)
-    if S.SiphonLife:IsCastableP() and (Player:BuffP(S.MovementBuff) and not (Player:PrevGCDP(1, S.SiphonLife) and Player:PrevGCDP(2, S.SiphonLife) and Player:PrevGCDP(3, S.SiphonLife))) then
+    if S.SiphonLife:IsCastableP() and (Player:IsMoving() and not (Player:PrevGCDP(1, S.SiphonLife) and Player:PrevGCDP(2, S.SiphonLife) and Player:PrevGCDP(3, S.SiphonLife))) then
       if HR.Cast(S.SiphonLife) then return ""; end
     end
     -- corruption,if=buff.movement.up&!prev_gcd.1.corruption&!talent.absolute_corruption.enabled
-    if S.Corruption:IsCastableP() and (Player:BuffP(S.MovementBuff) and not Player:PrevGCDP(1, S.Corruption) and not S.AbsoluteCorruption:IsAvailable()) then
+    if S.Corruption:IsCastableP() and (Player:IsMoving() and not Player:PrevGCDP(1, S.Corruption) and not S.AbsoluteCorruption:IsAvailable()) then
       if HR.Cast(S.Corruption) then return ""; end
     end
     -- drain_life,if=(buff.inevitable_demise.stack>=90&(cooldown.deathbolt.remains>execute_time|!talent.deathbolt.enabled)&(cooldown.phantom_singularity.remains>execute_time|!talent.phantom_singularity.enabled)&(cooldown.dark_soul.remains>execute_time|!talent.dark_soul_misery.enabled)&(cooldown.vile_taint.remains>execute_time|!talent.vile_taint.enabled)&cooldown.summon_darkglare.remains>execute_time+10|buff.inevitable_demise.stack>30&target.time_to_die<=10)
