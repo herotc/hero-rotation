@@ -334,15 +334,15 @@ local function APL ()
         -- actions=potion,if=pet.demonic_tyrant.active|target.time_to_die<30
         -- actions+=/use_items,if=pet.demonic_tyrant.active|target.time_to_die<=15
         -- actions+=/berserking,if=pet.demonic_tyrant.active|target.time_to_die<=15
-        if S.Berserking:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 75 and Target:TimeToDie() <= 15) then
+        if S.Berserking:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 75 or Target:TimeToDie() <= 15) then
           if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/blood_fury,if=pet.demonic_tyrant.active|target.time_to_die<=15
-        if S.BloodFury:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 75 Target:TimeToDie() <= 15) then
+        if S.BloodFury:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 75 or Target:TimeToDie() <= 15) then
           if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/fireblood,if=pet.demonic_tyrant.active|target.time_to_die<=15
-        if S.Fireblood:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 75 Target:TimeToDie() <= 15) then
+        if S.Fireblood:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 75 or Target:TimeToDie() <= 15) then
           if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
         end
         -- actions+=/doom,if=!ticking&time_to_die>30&spell_targets.implosion<2
