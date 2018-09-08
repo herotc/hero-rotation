@@ -74,6 +74,7 @@
         SummonFelguard = true,
         GrimoireFelguard = true,
         DemonicEmpowerment = true,
+        SummonTyrant = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
