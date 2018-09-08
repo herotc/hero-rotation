@@ -159,22 +159,25 @@ local function APL()
       if HR.Cast(S.GrimoireofSacrifice, Settings.Affliction.GCDasOffGCD.GrimoireofSacrifice) then return ""; end
     end
     -- snapshot_stats
-    -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return ""; end
-    end
-    -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
-    if S.SeedofCorruption:IsCastableP() and (Cache.EnemiesCount[35] >= 3) then
-      if HR.Cast(S.SeedofCorruption) then return ""; end
-    end
-    -- haunt
-    if S.Haunt:IsCastableP() and Player:DebuffDownP(S.HauntDebuff) then
-      if HR.Cast(S.Haunt) then return ""; end
-    end
-    -- shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3
-    if S.ShadowBolt:IsCastableP() and (not S.Haunt:IsAvailable() and Cache.EnemiesCount[35] < 3) then
-      if HR.Cast(S.ShadowBolt) then return ""; end
-    end
+	-- Have a valid target before displaying a combat spell
+	if Everyone.TargetIsValid() then
+      -- potion
+      if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.ProlongedPower) then return ""; end
+      end
+      -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
+      if S.SeedofCorruption:IsCastableP() and (Cache.EnemiesCount[35] >= 3) then
+        if HR.Cast(S.SeedofCorruption) then return ""; end
+      end
+      -- haunt
+      if S.Haunt:IsCastableP() and Player:DebuffDownP(S.HauntDebuff) then
+        if HR.Cast(S.Haunt) then return ""; end
+      end
+      -- shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3
+      if S.ShadowBolt:IsCastableP() and (not S.Haunt:IsAvailable() and Cache.EnemiesCount[35] < 3) then
+        if HR.Cast(S.ShadowBolt) then return ""; end
+      end
+	end
   end
   Fillers = function()
     -- deathbolt,if=cooldown.summon_darkglare.remains>=30+gcd|cooldown.summon_darkglare.remains>140
