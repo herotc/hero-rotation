@@ -539,17 +539,20 @@ local function APL ()
     -- actions+=/call_action_list,name=direct
     ShouldReturn = Direct();
     if ShouldReturn then return ShouldReturn; end
-    -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
-    if S.ArcaneTorrent:IsCastableP("Melee") and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
-    end
-    -- actions+=/arcane_pulse
-    if S.ArcanePulse:IsCastableP("Melee") then
-      if HR.Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse"; end
-    end
-    -- actions+=/lights_judgment
-    if S.LightsJudgment:IsCastableP("Melee") then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
+    -- Racials
+    if HR.CDsON() then
+      -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
+      if S.ArcaneTorrent:IsCastableP("Melee") and Player:EnergyDeficitPredicted() > 15 + Energy_Regen_Combined then
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+      end
+      -- actions+=/arcane_pulse
+      if S.ArcanePulse:IsCastableP("Melee") then
+        if HR.Cast(S.ArcanePulse, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Pulse"; end
+      end
+      -- actions+=/lights_judgment
+      if S.LightsJudgment:IsCastableP("Melee") then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
+      end
     end
     -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
     if S.PoisonedKnife:IsCastable(30) and not Player:IsStealthedP(true, true)
