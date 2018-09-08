@@ -179,16 +179,19 @@ local function CDs ()
   end
 end
 
-local function NetherPortalRot ()
-  -- actions.nether_portal=call_action_list,name=nether_portal_building,if=cooldown.nether_portal.remains<20
-  if S.NetherPortal:CooldownRemainsP() < 20 then
-    ShouldReturn = NetherPortalBuild()
-    if ShouldReturn then return ShouldReturn; end
+local function BuildRot ()
+  -- actions.build_a_shard=demonbolt,if=azerite.forbidden_knowledge.enabled&buff.forbidden_knowledge.react&!buff.demonic_core.react&cooldown.summon_demonic_tyrant.remains>20
+  if S.Demonbolt:IsCastable() and Player:BuffRemainsP(S.ForbiddenKnowledge) > 0 
+    and Player:BuffRemainsP(S.DemonicCoreBuff) == 0 and S.SummonTyrant:CooldownRemainsP() > 20 then
+      if HR.Cast(S.Demonbolt) then return ""; end
   end
-  -- actions.nether_portal+=/call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>160
-  if S.NetherPortal:CooldownRemainsP() > 160 then
-    ShouldReturn = NetherPortalActive()
-    if ShouldReturn then return ShouldReturn; end
+  -- actions.build_a_shard+=/soul_strike
+  if S.SoulStrike:IsCastable() then
+    if HR.Cast(S.SoulStrike) then return ""; end
+  end
+  -- actions.build_a_shard+=/shadow_bolt
+  if S.ShadowBolt:IsCastable() then
+    if HR.Cast(S.ShadowBolt) then return ""; end
   end
 end
 
@@ -261,6 +264,19 @@ local function NetherPortalBuild ()
   if ShouldReturn then return ShouldReturn; end
 end
 
+local function NetherPortalRot ()
+  -- actions.nether_portal=call_action_list,name=nether_portal_building,if=cooldown.nether_portal.remains<20
+  if S.NetherPortal:CooldownRemainsP() < 20 then
+    ShouldReturn = NetherPortalBuild()
+    if ShouldReturn then return ShouldReturn; end
+  end
+  -- actions.nether_portal+=/call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>160
+  if S.NetherPortal:CooldownRemainsP() > 160 then
+    ShouldReturn = NetherPortalActive()
+    if ShouldReturn then return ShouldReturn; end
+  end
+end
+
 local function ImplosionRot ()
   -- actions.implosion=implosion,if=(buff.wild_imps.stack>=6&(soul_shard<3|prev_gcd.1.call_dreadstalkers|buff.wild_imps.stack>=9|prev_gcd.1.bilescourge_bombers|(!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan))&!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&buff.demonic_power.down)|(time_to_die<3&buff.wild_imps.stack>0)|(prev_gcd.2.call_dreadstalkers&buff.wild_imps.stack>2&!talent.demonic_calling.enabled)
   -- actions.implosion+=/grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
@@ -275,22 +291,6 @@ local function ImplosionRot ()
   -- actions.implosion+=/demonbolt,if=soul_shard<=3&buff.demonic_core.up&(buff.demonic_core.stack>=3|buff.demonic_core.remains<=gcd*5.7)
   -- actions.implosion+=/doom,cycle_targets=1,max_cycle_targets=7,if=refreshable
   -- actions.implosion+=/call_action_list,name=build_a_shard
-end
-
-local function BuildRot ()
-  -- actions.build_a_shard=demonbolt,if=azerite.forbidden_knowledge.enabled&buff.forbidden_knowledge.react&!buff.demonic_core.react&cooldown.summon_demonic_tyrant.remains>20
-  if S.Demonbolt:IsCastable() and Player:BuffRemainsP(S.ForbiddenKnowledge) > 0 
-    and Player:BuffRemainsP(S.DemonicCoreBuff) == 0 and S.SummonTyrant:CooldownRemainsP() > 20 then
-      if HR.Cast(S.Demonbolt) then return ""; end
-  end
-  -- actions.build_a_shard+=/soul_strike
-  if S.SoulStrike:IsCastable() then
-    if HR.Cast(S.SoulStrike) then return ""; end
-  end
-  -- actions.build_a_shard+=/shadow_bolt
-  if S.ShadowBolt:IsCastable() then
-    if HR.Cast(S.ShadowBolt) then return ""; end
-  end
 end
 
 --- ======= MAIN =======
