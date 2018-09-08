@@ -169,7 +169,6 @@
   -- Calculate future shard count
   local function FutureShard()
     local Shard = Player:SoulShards()
-	local FutShard = 0
 	if not Player:IsCasting() then
 	  return Shard
 	else
