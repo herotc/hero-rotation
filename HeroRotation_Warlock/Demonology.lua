@@ -157,16 +157,6 @@ local function FutureShard()
 end
 
 local function CDs ()
-  --[[ actions+=/service_pet
-  if S.GrimoireFelguard:IsAvailable() and S.GrimoireFelguard:CooldownRemainsP() == 0 and FutureShard() >= 1 then
-    if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return ""; end
-  end]]
-
-  --[[ Nether Portal
-  if S.NetherPortal:IsCastable(40) and FutureShard() >= 3 then
-    if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return ""; end
-  end]]
-
   -- Demonic Tyrant
   -- Remove once pet tracking is fixed
   if S.SummonTyrant:IsCastable(40) then
