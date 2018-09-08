@@ -201,7 +201,7 @@ local function NetherPortalActive ()
     if HR.Cast(S.GrimoireFelguard) then return ""; end
   end
   -- actions.nether_portal_active+=/summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
-  if S.SummonVilefiend:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 40 or S.SummonTyrant:CooldownRemainsP() < 12) then
+  if S.SummonVilefiend:IsCastable() and not Player:IsCasting(S.SummonVilefiend) and (S.SummonTyrant:CooldownRemainsP() > 40 or S.SummonTyrant:CooldownRemainsP() < 12) then
     if HR.Cast(S.SummonVilefiend) then return ""; end
   end
   -- actions.nether_portal_active+=/call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
@@ -378,7 +378,7 @@ local function APL ()
           if HR.Cast(S.GrimoireFelguard) then return ""; end
         end
         -- actions+=/summon_vilefiend,if=equipped.132369|cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
-        if S.SummonVilefiend:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 40 or S.SummonTyrant:CooldownRemainsP() < 12) then
+        if S.SummonVilefiend:IsCastable() and not Player:IsCasting(S.SummonVilefiend) and (S.SummonTyrant:CooldownRemainsP() > 40 or S.SummonTyrant:CooldownRemainsP() < 12) then
           if HR.Cast(S.SummonVilefiend) then return ""; end
         end
         -- actions+=/call_dreadstalkers,if=equipped.132369|(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
@@ -408,7 +408,8 @@ local function APL ()
         -- actions+=/demonbolt,if=soul_shard<=3&buff.demonic_core.up&((cooldown.summon_demonic_tyrant.remains<10|cooldown.summon_demonic_tyrant.remains>22)|buff.demonic_core.stack>=3|buff.demonic_core.remains<5|time_to_die<25)
         if S.Demonbolt:IsCastable() and FutureShard() <= 3 and Player:BuffRemainsP(S.DemonicCoreBuff) > 0
           and ( (S.SummonTyrant:CooldownRemainsP() < 10 or S.SummonTyrant:CooldownRemainsP() > 22)
-          or Player.BuffStackP(S.DemonicCoreBuff) >= 3 or Player:BuffRemainsP(S.DemonicCoreBuff) < 5
+          or Player.BuffStackP(S.DemonicCoreBuff) >= 3 
+          or Player:BuffRemainsP(S.DemonicCoreBuff) < 5
           or Target:TimeToDie() < 25 ) then
             if HR.Cast(S.Demonbolt) then return ""; end
         end
