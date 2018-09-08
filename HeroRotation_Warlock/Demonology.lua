@@ -206,7 +206,7 @@
 
   local function CDs ()
     -- actions+=/service_pet
-    if S.GrimoireFelguard:IsAvailable() and S.GrimoireFelguard:CooldownRemainsP() == 0 then
+    if S.GrimoireFelguard:IsAvailable() and S.GrimoireFelguard:CooldownRemainsP() == 0 and FutureShard() >= 1 then
       if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return ""; end
     end
 	
@@ -256,7 +256,7 @@
         
         -- actions.precombat+=/demonbolt
         -- actions.precombat+=/shadow_bolt
-        if (Player:IsCasting(S.Demonbolt) or Player:IsCasting(S.ShadowBolt)) and FutureShard() >= 2 then
+        if (Player:IsCasting(S.Demonbolt) or Player:IsCasting(S.ShadowBolt)) and S.CallDreadStalkers:IsCastable() and (FutureShard() >= 2 or (FutureShard() >= 1 and Player:BuffRemainsP(S.DemonicCallingBuff) > 0) then
           if HR.Cast(S.CallDreadStalkers) then return ""; end
         else
           if S.Demonbolt:IsCastable() then
