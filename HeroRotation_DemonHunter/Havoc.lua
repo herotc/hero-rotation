@@ -120,7 +120,7 @@ end
 local function IsMetaExtendedByDemonic()
   if not Player:BuffP(S.MetamorphosisBuff) then
     return false;
-  elseif(S.EyeBeam:TimeSinceLastCast() < S.MetamorphosisImpact:TimeSinceLastCast()) then
+  elseif(S.MetamorphosisImpact:TimeSinceLastCast() + Player:BuffRemainsP(S.MetamorphosisBuff) > 30) then
     return true;
   end
 
