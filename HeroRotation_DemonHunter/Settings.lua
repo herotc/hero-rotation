@@ -4,7 +4,7 @@
   local addonName, addonTable = ...;
   -- HeroRotation
   local HR = HeroRotation;
-  
+
   local HL = HeroLib;
   -- File Locals
   local GUI = HL.GUI;
@@ -56,11 +56,11 @@
   local CP_DemonHunter = CreateChildPanel(ARPanel, "DemonHunter");
   local CP_Havoc = CreateChildPanel(CP_DemonHunter, "Havoc");
   local CP_Vengeance = CreateChildPanel(CP_DemonHunter, "Vengeance");
-  
+
   CreateARPanelOptions(CP_DemonHunter, "APL.DemonHunter.Commons");
   CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
-  
+
   CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.MetamorphosisHealthThreshold", {5, 100, 5}, "Metamorphosis Health Threshold", "Suggest Metamorphosis when below this health percentage.");
   CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {5, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.");
   CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikesHealthThreshold", {5, 100, 5}, "Demon Spikes Health Threshold", "Suggest Demon Spikes when below this health percentage.");
@@ -69,4 +69,5 @@
   CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance");
 
   CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.");
+  CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.ConserveFelRush", "Conserve Fel Rush", "Save at least 1 Fel Rush charge for mobility.");
   CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc");
