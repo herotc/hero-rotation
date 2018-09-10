@@ -306,18 +306,18 @@ local function APL ()
   	if S.WhirlingDragonPunch:IsReady() then
       if HR.Cast(S.WhirlingDragonPunch) then return "Cast Single Target Whirling Dragon Punch"; end
     end
-    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(cooldown.fists_of_fury.remains>2|chi>=5|azerite.swift_roundhouse.rank>2)
-    if S.RisingSunKick:IsReadyP() and (S.FistsOfFury:CooldownRemainsP() > 2 or Player:Chi() >= 5 or S.SwiftRoundhouse:AzeriteRank() > 2) then
+    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(cooldown.fists_of_fury.remains>2|chi>=5|azerite.swift_roundhouse.rank>1)
+    if S.RisingSunKick:IsReadyP() and (S.FistsOfFury:CooldownRemainsP() > 2 or Player:Chi() >= 5 or S.SwiftRoundhouse:AzeriteRank() > 1) then
       if HR.Cast(S.RisingSunKick) then return "Cast Single Target Rising Sun Kick"; end
     end
  	  -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1&active_enemies>1
 	  if S.RushingJadeWind:IsReadyP() and Player:BufBuffDownPfP(S.RushingJadeWind) and Player:EnergyTimeToMaxPredicted() > 1 and Cache.EnemiesCount[8] > 1 then
 	    if HR.Cast(S.RushingJadeWind) then return "Cast Single Target Rushing Jade Wind"; end
   	end
-    -- actions.st+=/fists_of_fury,if=energy.time_to_max>2.5&(azerite.swift_roundhouse.rank<3|(cooldown.whirling_dragon_punch.remains<10&talent.whirling_dragon_punch.enabled)|active_enemies>1)
+    -- actions.st+=/fists_of_fury,if=energy.time_to_max>2.5&(azerite.swift_roundhouse.rank<2|(cooldown.whirling_dragon_punch.remains<10&talent.whirling_dragon_punch.enabled)|active_enemies>1)
     if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 2.5 and
       (
-        S.SwiftRoundhouse:AzeriteRank() < 3 or
+        S.SwiftRoundhouse:AzeriteRank() < 2 or
         (S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 10) or
         Cache.EnemiesCount[8] > 1
       ) then
