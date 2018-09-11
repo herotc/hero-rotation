@@ -32,6 +32,10 @@
   local function bool(val)
     return val ~= 0
   end
+
+  local function ROPRemains(ROP)
+    return math.max(HL.OffsetRemains(10-ROP:TimeSinceLastAppliedOnPlayer(), "Auto"), 0)
+  end
 --- ============================ CONTENT ============================
   -- Arcane, ID: 62
     HL.AddCoreOverride ("Spell.CooldownRemainsP",
@@ -49,8 +53,19 @@
     function (self, Spell, AnyCaster, Offset)
       local BaseCheck = ArcanePlayerBuffRemainsP(self, Spell, AnyCaster, Offset)
       if Spell == SpellArcane.RuneofPowerBuff then
-        local ROPtime = HL.OffsetRemains(SpellArcane.RuneofPowerBuff:TimeSinceLastAppliedOnPlayer(), "Auto")
-        return math.max(10-ROPtime, 0)
+        return ROPRemains(SpellArcane.RuneofPowerBuff)
+      else
+        return BaseCheck
+      end
+    end
+    , 62);
+
+    local ArcaneSpellIsCastableP
+    ArcaneSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local BaseCheck = ArcaneSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      if self == SpellArcane.PresenceofMind then
+        return Player:BuffDown(SpellArcane.PresenceofMindBuff) and BaseCheck
       else
         return BaseCheck
       end
@@ -95,8 +110,7 @@
       if Spell == SpellFire.HotStreakBuff and BaseCheck == 0 then
         return ( HeatLevelPredicted() == 2 ) and 15 or 0
       elseif Spell == SpellFire.RuneofPowerBuff then
-        local ROPtime = HL.OffsetRemains(SpellFire.RuneofPowerBuff:TimeSinceLastAppliedOnPlayer(), "Auto")
-        return math.max(10-ROPtime, 0)
+        return ROPRemains(SpellFire.RuneofPowerBuff)
       elseif Spell == SpellFire.PyroclasmBuff and self:IsCasting(SpellFire.Pyroblast) then
         return 0
       end
