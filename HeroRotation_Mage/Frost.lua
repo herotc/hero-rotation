@@ -21,6 +21,7 @@ local HR     = HeroRotation
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Frost = {
+  ArcaneIntellectBuff                   = Spell(1459),
   ArcaneIntellect                       = Spell(1459),
   WaterElemental                        = Spell(31687),
   MirrorImage                           = Spell(55342),
@@ -44,14 +45,16 @@ Spell.Mage.Frost = {
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
   LightsJudgment                        = Spell(255647),
+  Fireblood                             = Spell(265221),
+  AncestralCall                         = Spell(274738),
   Blink                                 = Spell(1953),
   IceFloes                              = Spell(108839),
   IceFloesBuff                          = Spell(108839),
   WintersChillDebuff                    = Spell(228358),
   GlacialSpikeBuff                      = Spell(199844),
   SplittingIce                          = Spell(56377),
-  ZannesuJourneyBuff                    = Spell(206397),
-  Counterspell                          = Spell(2139),
+  WintersReach                          = Spell(273346),
+  WintersReachBuff                      = Spell(273347),
   FreezingRain                          = Spell(240555)
 };
 local S = Spell.Mage.Frost;
@@ -91,9 +94,18 @@ local function bool(val)
   return val ~= 0
 end
 
+S.FrozenOrb.EffectID = 84721
+S.FrozenOrb:RegisterInFlight()
+S.Frostbolt:RegisterInFlight()
+-- S.Flurry:RegisterPMultiplier(
+--   S.WintersChillDebuff,
+--   {S.BrainFreezeBuff, 2}
+-- )
+-- S.Flurry.EffectID = S.WintersChillDebuff.SpellID
+-- S.Flurry:RegisterInFlight(S.BrainFreezeBuff)
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Aoe, Cooldowns, Movement, Single
+  local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -101,42 +113,42 @@ local function APL()
     -- food
     -- augmentation
     -- arcane_intellect
-    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellect) and (true) then
+    if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff, true) then
       if HR.Cast(S.ArcaneIntellect) then return ""; end
     end
     -- water_elemental
-    if S.WaterElemental:IsCastableP() and (true) then
+    if S.WaterElemental:IsCastableP() then
       if HR.Cast(S.WaterElemental) then return ""; end
     end
     -- snapshot_stats
     -- mirror_image
-    if S.MirrorImage:IsCastableP() and HR.CDsON() and (true) then
+    if S.MirrorImage:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return ""; end
     end
     -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
+    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.ProlongedPower) then return ""; end
     end
     -- frostbolt
-    if S.Frostbolt:IsCastableP() and (true) then
+    if S.Frostbolt:IsCastableP() and Everyone.TargetIsValid() then
       if HR.Cast(S.Frostbolt) then return ""; end
     end
   end
   Aoe = function()
     -- frozen_orb
-    if S.FrozenOrb:IsCastableP() and (true) then
+    if S.FrozenOrb:IsCastableP() then
       if HR.Cast(S.FrozenOrb) then return ""; end
     end
     -- blizzard
-    if S.Blizzard:IsCastableP() and (true) then
+    if S.Blizzard:IsCastableP() then
       if HR.Cast(S.Blizzard) then return ""; end
     end
     -- comet_storm
-    if S.CometStorm:IsCastableP() and (true) then
+    if S.CometStorm:IsCastableP() then
       if HR.Cast(S.CometStorm) then return ""; end
     end
     -- ice_nova
-    if S.IceNova:IsCastableP() and (true) then
+    if S.IceNova:IsCastableP() then
       if HR.Cast(S.IceNova) then return ""; end
     end
     -- flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.frostbolt&(buff.icicles.stack<4|!talent.glacial_spike.enabled)|prev_gcd.1.glacial_spike)
@@ -148,23 +160,23 @@ local function APL()
       if HR.Cast(S.IceLance) then return ""; end
     end
     -- ray_of_frost
-    if S.RayofFrost:IsCastableP() and (true) then
+    if S.RayofFrost:IsCastableP() then
       if HR.Cast(S.RayofFrost) then return ""; end
     end
     -- ebonbolt
-    if S.Ebonbolt:IsCastableP() and (true) then
+    if S.Ebonbolt:IsCastableP() then
       if HR.Cast(S.Ebonbolt) then return ""; end
     end
     -- glacial_spike
-    if S.GlacialSpike:IsCastableP() and (true) then
+    if S.GlacialSpike:IsCastableP() then
       if HR.Cast(S.GlacialSpike) then return ""; end
     end
     -- cone_of_cold
-    if S.ConeofCold:IsCastableP() and (true) then
+    if S.ConeofCold:IsCastableP() then
       if HR.Cast(S.ConeofCold) then return ""; end
     end
     -- frostbolt
-    if S.Frostbolt:IsCastableP() and (true) then
+    if S.Frostbolt:IsCastableP() then
       if HR.Cast(S.Frostbolt) then return ""; end
     end
     -- call_action_list,name=movement
@@ -172,34 +184,27 @@ local function APL()
       local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
     end
     -- ice_lance
-    if S.IceLance:IsCastableP() and (true) then
+    if S.IceLance:IsCastableP() then
       if HR.Cast(S.IceLance) then return ""; end
     end
   end
   Cooldowns = function()
+    -- time_warp
     -- icy_veins
-    if S.IcyVeins:IsCastableP() and HR.CDsON() and (true) then
+    if S.IcyVeins:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return ""; end
     end
     -- mirror_image
-    if S.MirrorImage:IsCastableP() and HR.CDsON() and (true) then
+    if S.MirrorImage:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return ""; end
     end
-    -- rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
-    if S.RuneofPower:IsCastableP() and (Target:TimeToDie() > 10 + S.RuneofPower:CastTime() and Target:TimeToDie() < 25) then
+    -- rune_of_power,if=prev_gcd.1.frozen_orb|time_to_die>10+cast_time&time_to_die<20
+    if S.RuneofPower:IsCastableP() and (Player:PrevGCDP(1, S.FrozenOrb) or Target:TimeToDie() > 10 + S.RuneofPower:CastTime() and Target:TimeToDie() < 20) then
       if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
     end
-    -- rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(!talent.ebonbolt.enabled&buff.brain_freeze.react|talent.ebonbolt.enabled&(full_recharge_time<=cooldown.ebonbolt.remains&buff.brain_freeze.react|cooldown.ebonbolt.remains<cast_time&!buff.brain_freeze.react))
-    if S.RuneofPower:IsCastableP() and (Cache.EnemiesCount[35] == 1 and S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) == 5 and (not S.Ebonbolt:IsAvailable() and bool(Player:BuffStackP(S.BrainFreezeBuff)) or S.Ebonbolt:IsAvailable() and (S.RuneofPower:FullRechargeTimeP() <= S.Ebonbolt:CooldownRemainsP() and bool(Player:BuffStackP(S.BrainFreezeBuff)) or S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime() and not bool(Player:BuffStackP(S.BrainFreezeBuff))))) then
-      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
-    end
-    -- rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
-    if S.RuneofPower:IsCastableP() and (Cache.EnemiesCount[35] == 1 and not S.GlacialSpike:IsAvailable() and (Player:PrevGCDP(1, S.FrozenOrb) or S.Ebonbolt:IsAvailable() and S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime() or S.CometStorm:IsAvailable() and S.CometStorm:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RayofFrost:IsAvailable() and S.RayofFrost:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RuneofPower:ChargesFractional() > 1.9)) then
-      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
-    end
-    -- rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
-    if S.RuneofPower:IsCastableP() and (Cache.EnemiesCount[35] > 1 and Player:PrevGCDP(1, S.FrozenOrb)) then
-      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
+    -- call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains
+    if (S.RuneofPower:IsAvailable() and Cache.EnemiesCount[35] == 1 and S.RuneofPower:FullRechargeTime() < S.FrozenOrb:CooldownRemainsP()) then
+      local ShouldReturn = TalentRop(); if ShouldReturn then return ShouldReturn; end
     end
     -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 70) then
@@ -207,16 +212,24 @@ local function APL()
     end
     -- use_items
     -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (true) then
+    if S.BloodFury:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() and (true) then
+    if S.Berserking:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (true) then
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.LightsJudgment) then return ""; end
+    end
+    -- fireblood
+    if S.Fireblood:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
+    -- ancestral_call
+    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
   end
   Movement = function()
@@ -236,14 +249,14 @@ local function APL()
     end
     -- flurry,if=!talent.glacial_spike.enabled&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&prev_gcd.1.frostbolt)
     if S.Flurry:IsCastableP() and (not S.GlacialSpike:IsAvailable() and (Player:PrevGCDP(1, S.Ebonbolt) or bool(Player:BuffStackP(S.BrainFreezeBuff)) and Player:PrevGCDP(1, S.Frostbolt))) then
-      if HR.Cast(S.Flurry) then return ""; end
+      if HR.Cast(S.Flurry) then return "Flurry 246"; end
     end
     -- flurry,if=talent.glacial_spike.enabled&buff.brain_freeze.react&(prev_gcd.1.frostbolt&buff.icicles.stack<4|prev_gcd.1.glacial_spike|prev_gcd.1.ebonbolt)
     if S.Flurry:IsCastableP() and (S.GlacialSpike:IsAvailable() and bool(Player:BuffStackP(S.BrainFreezeBuff)) and (Player:PrevGCDP(1, S.Frostbolt) and Player:BuffStackP(S.IciclesBuff) < 4 or Player:PrevGCDP(1, S.GlacialSpike) or Player:PrevGCDP(1, S.Ebonbolt))) then
-      if HR.Cast(S.Flurry) then return ""; end
+      if HR.Cast(S.Flurry) then return "Flurry 250"; end
     end
     -- frozen_orb
-    if S.FrozenOrb:IsCastableP() and (true) then
+    if S.FrozenOrb:IsCastableP() then
       if HR.Cast(S.FrozenOrb) then return ""; end
     end
     -- blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
@@ -254,32 +267,36 @@ local function APL()
     if S.IceLance:IsCastableP() and (bool(Player:BuffStackP(S.FingersofFrostBuff))) then
       if HR.Cast(S.IceLance) then return ""; end
     end
-    -- ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
-    if S.RayofFrost:IsCastableP() and (not S.FrozenOrb:InFlight() and ground_aoe.frozen_orb.remains == 0) then
-      if HR.Cast(S.RayofFrost) then return ""; end
-    end
     -- comet_storm
-    if S.CometStorm:IsCastableP() and (true) then
+    if S.CometStorm:IsCastableP() then
       if HR.Cast(S.CometStorm) then return ""; end
     end
     -- ebonbolt,if=!talent.glacial_spike.enabled|buff.icicles.stack=5&!buff.brain_freeze.react
     if S.Ebonbolt:IsCastableP() and (not S.GlacialSpike:IsAvailable() or Player:BuffStackP(S.IciclesBuff) == 5 and not bool(Player:BuffStackP(S.BrainFreezeBuff))) then
       if HR.Cast(S.Ebonbolt) then return ""; end
     end
+    -- ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
+    if S.RayofFrost:IsCastableP() and (not S.FrozenOrb:InFlight() and Player:FrozenOrbGroundAoeRemains() == 0) then
+      if HR.Cast(S.RayofFrost) then return ""; end
+    end
+    -- blizzard,if=cast_time=0|active_enemies>1
+    if S.Blizzard:IsCastableP() and (S.Blizzard:CastTime() == 0 or Cache.EnemiesCount[35] > 1) then
+      if HR.Cast(S.Blizzard) then return ""; end
+    end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
     if S.GlacialSpike:IsCastableP() and (bool(Player:BuffStackP(S.BrainFreezeBuff)) or Player:PrevGCDP(1, S.Ebonbolt) or Cache.EnemiesCount[35] > 1 and S.SplittingIce:IsAvailable()) then
       if HR.Cast(S.GlacialSpike) then return ""; end
     end
-    -- blizzard,if=cast_time=0|active_enemies>1|buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time
-    if S.Blizzard:IsCastableP() and (S.Blizzard:CastTime() == 0 or Cache.EnemiesCount[35] > 1 or Player:BuffStackP(S.ZannesuJourneyBuff) == 5 and Player:BuffRemainsP(S.ZannesuJourneyBuff) > S.Blizzard:CastTime()) then
-      if HR.Cast(S.Blizzard) then return ""; end
-    end
     -- ice_nova
-    if S.IceNova:IsCastableP() and (true) then
+    if S.IceNova:IsCastableP() then
       if HR.Cast(S.IceNova) then return ""; end
     end
+    -- flurry,if=azerite.winters_reach.enabled&!buff.brain_freeze.react&buff.winters_reach.react
+    if S.Flurry:IsCastableP() and (S.WintersReach:AzeriteEnabled() and not bool(Player:BuffStackP(S.BrainFreezeBuff)) and bool(Player:BuffStackP(S.WintersReachBuff))) then
+      if HR.Cast(S.Flurry) then return "Flurry 290"; end
+    end
     -- frostbolt
-    if S.Frostbolt:IsCastableP() and (true) then
+    if S.Frostbolt:IsCastableP() then
       if HR.Cast(S.Frostbolt) then return ""; end
     end
     -- call_action_list,name=movement
@@ -287,34 +304,42 @@ local function APL()
       local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
     end
     -- ice_lance
-    if S.IceLance:IsCastableP() and (true) then
+    if S.IceLance:IsCastableP() then
       if HR.Cast(S.IceLance) then return ""; end
     end
   end
+  TalentRop = function()
+    -- rune_of_power,if=talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
+    if S.RuneofPower:IsCastableP() and (S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) == 5 and (bool(Player:BuffStackP(S.BrainFreezeBuff)) or S.Ebonbolt:IsAvailable() and S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime())) then
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
+    end
+    -- rune_of_power,if=!talent.glacial_spike.enabled&(talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
+    if S.RuneofPower:IsCastableP() and (not S.GlacialSpike:IsAvailable() and (S.Ebonbolt:IsAvailable() and S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime() or S.CometStorm:IsAvailable() and S.CometStorm:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RayofFrost:IsAvailable() and S.RayofFrost:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RuneofPower:ChargesFractional() > 1.9)) then
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return ""; end
+    end
+  end
   -- call precombat
-  if not Player:AffectingCombat() then
+  if not Player:AffectingCombat() and (not Player:IsCasting() or Player:IsCasting(S.WaterElemental)) then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  -- counterspell
-  if S.Counterspell:IsCastableP() and Settings.General.InterruptEnabled and Target:IsInterruptible() and (true) then
-    if HR.CastAnnotated(S.Counterspell, false, "Interrupt") then return ""; end
-  end
-  -- ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
-  if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
-    if HR.Cast(S.IceLance) then return ""; end
-  end
-  -- time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(prev_gcd.1.icy_veins|target.time_to_die<50)
-  -- call_action_list,name=cooldowns
-  if HR.CDsON() and (true) then
-    local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
-  if (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
-    local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- call_action_list,name=single
-  if (true) then
-    local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
+  if Everyone.TargetIsValid() then
+    -- counterspell
+    -- ice_lance,if=prev_gcd.1.flurry&brain_freeze_active&!buff.fingers_of_frost.react
+    if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and Player:BrainFreezeActive() and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
+      if HR.Cast(S.IceLance) then return ""; end
+    end
+    -- call_action_list,name=cooldowns
+    if HR.CDsON() then
+      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
+    if (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
+      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=single
+    if (true) then
+      local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
+    end
   end
 end
 

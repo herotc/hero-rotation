@@ -101,8 +101,10 @@ Item.Shaman.Elemental = {
   -- Rings
   GnawedThumbRing           = Item(134526, {11}, {12}),
 
-  -- Misc
-  PoPP                      = Item(142117),
+  -- Consumables
+  BPoA                      = Item(163223),  -- Battle Potion of Agility
+  CHP                       = Item(152494),  -- Coastal Healing Potion
+  BSAR                      = Item(160053),  -- Battle-Scarred Augment Rune
   Healthstone               = Item(5512),
 }
 local I = Item.Shaman.Elemental
@@ -191,14 +193,23 @@ local function APL ()
 
   -- In Combat
   if Everyone.TargetIsValid() then
-    -- Potion of Prolonged Power
-    if Settings.Shaman.Commons.ShowPoPP and Target:MaxHealth() >= 250000000 and (I.PoPP:IsReady() and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35)) then
-      if HR.CastSuggested(I.PoPP) then return "Use PoPP" end
+    -- Battle Potion of Agility
+    if Settings.Shaman.Commons.ShowBPoA and I.BPoA:IsReady() and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and (Player:Buff(S.AscendanceBuff) or Target:TimeToDie() <= 60) then
+      if HR.CastSuggested(I.BPoA) then return "Use BPoA" end
     end
 
-    -- Use healthstone if we have it and our health is low.
-    if Settings.Shaman.Commons.HealthstoneEnabled and (I.Healthstone:IsReady() and Player:HealthPercentage() <= 50) then
-      if HR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
+    -- Battle-Scarred Augment Rune
+    if Settings.Shaman.Commons.ShowBSAR and I.BSAR:IsReady() and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and (Player:Buff(S.AscendanceBuff) or Target:TimeToDie() <= 60) then
+      if HR.CastSuggested(I.BSAR) then return "Use BSAR" end
+    end
+
+    -- Use healthstone or health potion if we have it and our health is low.
+    if Settings.Shaman.Commons.ShowHSHP and (Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold) then
+      if I.Healthstone:IsReady() then
+        if HR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
+      elseif I.CHP:IsReady() then
+        if HR.CastSuggested(I.CHP) then return "Use CHP" end
+      end
     end
 
     -- Heal when we have less than the set health threshold (instant casts only)!
@@ -209,8 +220,10 @@ local function APL ()
     end
 
     -- On use trinkets.
-    if Settings.Shaman.Commons.OnUseTrinkets and I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange("Melee") and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
-      if HR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
+    if Settings.Shaman.Commons.OnUseTrinkets then
+	  if I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange("Melee") and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
+	    if HR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
+	  end
     end
 
     -- actions+=/totem_mastery,if=buff.resonance_totem.remains<2

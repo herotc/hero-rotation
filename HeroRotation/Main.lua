@@ -371,6 +371,7 @@
         -- Load the Class Module if it's possible and not already loaded
         if EnabledRotation[SpecID] and not IsAddOnLoaded(EnabledRotation[SpecID]) then
           LoadAddOn(EnabledRotation[SpecID]);
+          HL.LoadOverrides(SpecID)
         end
 
         -- Check if there is a Rotation for this Spec
@@ -388,7 +389,7 @@
               Spell:FilterProjectileSpeed(SpecID);
             -- Special Checks
             if GetCVar("nameplateShowEnemies") ~= "1" then
-              HR.Print("It looks like enemies nameplates are disabled, you should enable them in order to get proper AoE rotation.");
+              HR.Print("It looks like enemy nameplates are disabled, you should enable them in order to get proper AoE rotation.");
             end
           else
             HR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");

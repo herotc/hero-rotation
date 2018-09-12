@@ -1,1168 +1,348 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroLib
-local HL = HeroLib;
-local Cache = HeroCache;
-local Unit = HL.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = HL.Spell;
-local Item = HL.Item;
+local HL     = HeroLib
+local Cache  = HeroCache
+local Unit   = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Pet    = Unit.Pet
+local Spell  = HL.Spell
+local Item   = HL.Item
 -- HeroRotation
-local HR = HeroRotation;
--- Lua
+local HR     = HeroRotation
 
---- APL Local Vars
--- Commons
-local Everyone = HR.Commons.Everyone;
+--- ============================ CONTENT ===========================
+--- ======= APL LOCALS =======
+-- luacheck: max_line_length 9999
 
 -- Spells
-if not Spell.Druid then Spell.Druid = {}; end
+if not Spell.Druid then Spell.Druid = {} end
 Spell.Druid.Balance = {
-  -- Racials
-  ArcaneTorrent			    = Spell(25046),
-  Berserking				    = Spell(26297),
-  BloodFury				      = Spell(20572),
-  GiftoftheNaaru		    = Spell(59547),
-  Shadowmeld            = Spell(58984),
-  LightsJudgment        = Spell(255647),
-
-  -- Forms
-  MoonkinForm 			    = Spell(24858),
-  BearForm 				      = Spell(5487),
-  CatForm 				      = Spell(768),
-  TravelForm 				    = Spell(783),
-
-  -- Abilities
-  CelestialAlignment    = Spell(194223),
-  LunarStrike 			    = Spell(194153),
-  SolarWrath 				    = Spell(190984),
-  MoonFire 				      = Spell(8921),
-  MoonFireDebuff 		    = Spell(164812),
-  SunFire 				      = Spell(93402),
-  SunFireDebuff 		    = Spell(164815),
-  Starsurge 				    = Spell(78674),
-  Starfall 				      = Spell(191034),
-
-  -- Talents
-  ForceofNature  		    = Spell(205636),
-  WarriorofElune  	    = Spell(202425),
-  Starlord  				    = Spell(202345),
-    
-  Renewal  				      = Spell(108235),
-  DisplacerBeast  	    = Spell(102280),
-  WildCharge  			    = Spell(102401),
-    
-  FeralAffinity 		    = Spell(202157),
-  GuardianAffinity      = Spell(197491),
-  RestorationAffinity   = Spell(197492),
-
-  MightyBash  	        = Spell(5211),
-  MassEntanglement      = Spell(102359),
-  Typhoon  		          = Spell(132469),
-
-  SoulOfTheForest  	    = Spell(114107),
-  IncarnationChosenOfElune = Spell(102560),
-  StellarFlare  		    = Spell(202347),
-
-  ShootingStars  		    = Spell(202342),
-  AstralCommunion  	    = Spell(202359),
-  BlessingofTheAncients = Spell(202360),
-  BlessingofElune  	    = Spell(202737),
-  BlessingofAnshe  	    = Spell(202739),
-
-  FuryofElune  			    = Spell(202770),
-  StellarDrift  		    = Spell(202354),
-  NaturesBalance  	    = Spell(202430),
-
-  -- Artifact
-  NewMoon 				      = Spell(202767),
-  HalfMoon 				      = Spell(202768),
-  FullMoon 				      = Spell(202771),
-
-  -- Defensive
-  Barkskin 				      = Spell(22812),
-  FrenziedRegeneration  = Spell(22842),
-  Ironfur 				      = Spell(192081),
-  Regrowth 				      = Spell(8936),
-  Rejuvenation 			    = Spell(774),
-  Swiftmend 				    = Spell(18562),
-  HealingTouch 			    = Spell(5185),
-
-  -- Utility
-  Innervate 				    = Spell(29166),
-  SolarBeam 				    = Spell(78675),
-  EntanglingRoots       = Spell(339),
-
-  -- Legendaries
-  OnethsIntuition		      = Spell(209406),
-  OnethsOverconfidence    = Spell(209407),
-  EmeraldDreamcatcher     = Spell(208190),
-  SephuzBuff              = Spell(208052),
-  NorgannonsBuff          = Spell(236431),
-
-  -- Misc
-  SolarEmpowerment	    = Spell(164545),
-  LunarEmpowerment	    = Spell(164547),
-  StellarEmpowerment    = Spell(197637),
-  SolarSolstice	        = Spell(252767),
-  AstralAcceleration    = Spell(242232),
-  PotionOfProlongedPowerBuff = Spell(229206),
-  StellarDriftBuff      = Spell(202461),
-  OwlkinFrenzy          = Spell(157228)
+  MoonkinForm                           = Spell(24858),
+  SolarWrath                            = Spell(190984),
+  FuryofElune                           = Spell(202770),
+  CelestialAlignmentBuff                = Spell(194223),
+  IncarnationBuff                       = Spell(102560),
+  CelestialAlignment                    = Spell(194223),
+  Incarnation                           = Spell(102560),
+  ForceofNature                         = Spell(205636),
+  Sunfire                               = Spell(93402),
+  SunfireDebuff                         = Spell(164815),
+  Moonfire                              = Spell(8921),
+  MoonfireDebuff                        = Spell(164812),
+  StellarFlare                          = Spell(202347),
+  LunarStrike                           = Spell(194153),
+  LunarEmpowermentBuff                  = Spell(164547),
+  SolarEmpowermentBuff                  = Spell(164545),
+  Starsurge                             = Spell(78674),
+  OnethsIntuitionBuff                   = Spell(209406),
+  Starfall                              = Spell(191034),
+  StarlordBuff                          = Spell(279709),
+  NewMoon                               = Spell(274281),
+  HalfMoon                              = Spell(274282),
+  FullMoon                              = Spell(274283),
+  WarriorofEluneBuff                    = Spell(202425),
+  BloodFury                             = Spell(20572),
+  Berserking                            = Spell(26297),
+  ArcaneTorrent                         = Spell(50613),
+  LightsJudgment                        = Spell(255647),
+  WarriorofElune                        = Spell(202425),
+  SunblazeBuff                          = Spell(274399),
+  OwlkinFrenzyBuff                      = Spell(157228),
+  SolarBeam                             = Spell(78675),
 };
 local S = Spell.Druid.Balance;
 
 -- Items
-if not Item.Druid then Item.Druid = {}; end
+if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
-  -- Legendaries
-  EmeraldDreamcatcher		  = Item(137062, {1}),
-  LadyAndTheChild         = Item(144295, {3}), 
-  OnethsIntuition         = Item(137092, {9}), 
-  SephuzSecret 			      = Item(132452, {11, 12}),
-  RadiantMoonlight        = Item(151800, {15}), 
-
-  -- Potion
-  PotionOfProlongedPower  = Item(142117)
+  ProlongedPower                   = Item(142117),
+  TheEmeraldDreamcatcher           = Item(137062)
 };
 local I = Item.Druid.Balance;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local BestUnit, BestUnitTTD, BestUnitSpellToCast; -- Used for cycling
-local T192P, T194P = HL.HasTier("T19")
-local T202P, T204P = HL.HasTier("T20")
-local T212P, T214P = HL.HasTier("T21")
-local Range = 45
-local NextMoon
-local Moons = {[S.NewMoon:ID()] = true, [S.HalfMoon:ID()] = true, [S.FullMoon:ID()] = true}
-local v_starfall
-local var_init = false
-local var_calcCombat = false
 
 -- GUI Settings
+local Everyone = HR.Commons.Everyone;
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Druid.Commons,
   Balance = HR.GUISettings.APL.Druid.Balance
 };
 
--- Prediction for the next Moon
-local function NextMoonCalculation ()
-  if Player:IsCasting() then
-    if Player:IsCasting(S.NewMoon) then 
-        NextMoon = S.HalfMoon
-      elseif Player:IsCasting(S.HalfMoon) then 
-        NextMoon = S.FullMoon
-      elseif Player:IsCasting(S.FullMoon) then --TODO : manage RadiantMoonlight
-        NextMoon = S.NewMoon 
-        NextMoon.TextureSpellID = 218838 -- force new moon texture
-      end
-    else
-    if S.NewMoon:IsCastable() then 
-      NextMoon = S.NewMoon
-    elseif S.HalfMoon:IsCastable() then 
-      NextMoon = S.HalfMoon
-    elseif S.FullMoon:IsCastable() then 
-      NextMoon = S.FullMoon 
-    end
+-- Variables
+
+local EnemyRanges = {15, 40}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
   end
 end
 
--- Compute the futur astral power after the cast
-local function FutureAstralPower ()
-  local AstralPower = Player:AstralPower()
-  local CA_mod = ((Player:BuffRemainsP(S.CelestialAlignment) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0) and 1.5 or 1)
-  local BoE_mod = (Player:Buff(S.BlessingofElune) and 1.25 or 1)
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
+
+local function FutureAstralPower()
+  local AstralPower=Player:AstralPower()
   if not Player:IsCasting() then
     return AstralPower
   else
-    if Player:IsCasting(S.NewMoon) then
+    if Player:IsCasting(S.NewnMoon) then
       return AstralPower + 10
     elseif Player:IsCasting(S.HalfMoon) then
       return AstralPower + 20
     elseif Player:IsCasting(S.FullMoon) then
       return AstralPower + 40
+    elseif Player:IsCasting(S.StellarFlare) then
+      return AstralPower + 8
     elseif Player:IsCasting(S.SolarWrath) then
-      return AstralPower + 8 * CA_mod * BoE_mod
+      return AstralPower + 8
     elseif Player:IsCasting(S.LunarStrike) then
-      return AstralPower + 12  * CA_mod * BoE_mod
+      return AstralPower + 12
     else
       return AstralPower
     end
   end
 end
 
-local function Var_Starfall ()
-  -- actions.precombat+=/variable,name=starfall_st,value=talent.soul_of_the_forest.enabled
-  v_starfall = S.SoulOfTheForest:IsAvailable()
-end
-
---One time calc vars
-local function VarInit ()
-  if not var_init or (HL.CombatTime() > 0 and not var_calcCombat) then
-    Var_Starfall()
-    var_init=true
-    var_calcCombat=true
+local function SuggestCycleDot(DoTSpell, DoTEvaluation, DoTMinTTD)
+  local BestUnit, BestUnitTTD = nil, DoTMinTTD;
+  local TargetGUID = Target:GUID();
+  for _, CycleUnit in pairs(Cache.Enemies[40]) do
+    if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(DoTSpell)) and DoTEvaluation(CycleUnit) then
+      BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
+    end
   end
-end
-
-local function StarfallCost ()
-  if S.SoulOfTheForest:IsAvailable() then
-    return 40
-  else
-    return 60
+  if BestUnit then
+    HR.CastLeftNameplate(BestUnit, DoTSpell);
   end
 end
 
--- Overrides the base duration from spell because of spec aura
-local function BaseDurationBalance (Spell)
-  local SpellBaseDuration = Spell:BaseDuration()
-  if Spell:ID() == S.MoonFireDebuff:ID()  then SpellBaseDuration = SpellBaseDuration + 6 end
-  if Spell:ID() == S.SunFireDebuff:ID()   then SpellBaseDuration = SpellBaseDuration + 6 end
-  return SpellBaseDuration
-end
-
--- Overrides the max duration from spell because of spec aura
-local function MaxDurationBalance (Spell)
-  return BaseDurationBalance(Spell) * 1.3
-end
-
--- Overrides the pandemic Threshold from spell because of spec aura
-local function PandemicThresholdBalance (Spell)
-  return BaseDurationBalance(Spell) * 0.3
-end
-
-local function FuryOfElune ()
-  -- actions.fury_of_elune=incarnation,if=astral_power>=95&cooldown.fury_of_elune.remains<=gcd
-  if S.IncarnationChosenOfElune:IsAvailable() and FutureAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() == 0 then
-    if HR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/force_of_nature,if=!buff.fury_of_elune.up  
-  if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 and Player:BuffRemainsP(S.FuryofElune) == 0 then
-    if HR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
-  end
-  
-  -- actions.fury_of_elune+=/fury_of_elune,if=astral_power>=95
-  if FutureAstralPower() >= 95 and S.FuryofElune:CooldownRemainsP() == 0 then
-    if HR.Cast(S.FuryofElune) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=90))
-  if S.NewMoon:IsCastable() and NextMoon == S.NewMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) == 3)
-    and (Player:BuffRemainsP(S.FuryofElune) > S.NewMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FutureAstralPower() <= 90))	then
-      if HR.Cast(S.NewMoon) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/half_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=80))
-  if S.HalfMoon:IsCastable() and NextMoon == S.HalfMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) == 3) 
-    and (Player:BuffRemainsP(S.FuryofElune) > S.HalfMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FutureAstralPower() <= 80)) then
-      if HR.Cast(S.HalfMoon) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))
-  if S.FullMoon:IsCastable() and NextMoon == S.FullMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) == 3) 
-    and (Player:BuffRemainsP(S.FuryofElune) > S.FullMoon:CastTime() or (S.FuryofElune:CooldownRemainsP() < Player:GCD() * 3 and FutureAstralPower() <= 60)) then
-      if HR.Cast(S.FullMoon) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune.up&astral_power<=25
-  if S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemainsP() == 0 and FutureAstralPower() <= 75 then
-    if HR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/warrior_of_elune,if=buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
-  if S.WarriorofElune:IsAvailable() and S.WarriorofElune:CooldownRemainsP() == 0 and not Player:Buff(S.WarriorofElune)
-    and (Player:BuffRemainsP(S.FuryofElune) > 0 or (S.FuryofElune:CooldownRemainsP() >= 35 and Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1)))then
-      if HR.Cast(S.WarriorofElune) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/lunar_strike,if=buff.warrior_of_elune.up&(astral_power<=90|(astral_power<=85&buff.incarnation.up))
-  if S.LunarStrike:IsCastable() and Player:Buff(S.WarriorofElune) 
-    and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.WarriorofElune) == 1)
-    and (FutureAstralPower() <= 90 or (Player:BuffRemainsP(IncarnationChosenOfElune) > S.LunarStrike:CastTime() and FutureAstralPower() <= 85)) then
-      if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/new_moon,if=astral_power<=90&buff.fury_of_elune.up
-  if S.NewMoon:IsAvailable()  and NextMoon == S.NewMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1)  
-    and FutureAstralPower() <= 90 
-    and Player:BuffRemainsP(S.FuryofElune) > S.NewMoon:CastTime() then
-      if HR.Cast(S.NewMoon) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/half_moon,if=astral_power<=80&buff.fury_of_elune.up&astral_power>cast_time*12
-  if S.NewMoon:IsAvailable()  and NextMoon == S.HalfMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1)
-    and FutureAstralPower() > S.HalfMoon:CastTime() * 12
-    and FutureAstralPower() <= 80
-    and Player:BuffRemainsP(S.FuryofElune) > S.HalfMoon:CastTime() then	
-      if HR.Cast(S.HalfMoon) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/full_moon,if=astral_power<=60&buff.fury_of_elune.up&astral_power>cast_time*12
-  if S.NewMoon:IsAvailable() and NextMoon == S.FullMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) 
-    and FutureAstralPower() > S.FullMoon:CastTime() * 12
-    and FutureAstralPower() <= 60
-    and Player:BuffRemainsP(S.FuryofElune) > S.FullMoon:CastTime() then
-      if HR.Cast(S.FullMoon) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/moonfire,if=buff.fury_of_elune.down&remains<=6.6
-  if Player:BuffRemainsP(S.FuryofElune) == 0 and Target:DebuffRemainsP(S.MoonFireDebuff) <= PandemicThresholdBalance(S.MoonFireDebuff)  then
-    if HR.Cast(S.MoonFire) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/sunfire,if=buff.fury_of_elune.down&remains<5.4
-  if Player:BuffRemainsP(S.FuryofElune) == 0 and Target:DebuffRemainsP(S.SunFireDebuff) <= PandemicThresholdBalance(S.SunFireDebuff)  then
-    if HR.Cast(S.SunFire) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/stellar_flare,if=remains<7.2&active_enemies=1
-  if S.StellarFlare:IsAvailable() and FutureAstralPower() >= 15 and Target:DebuffRemainsP(S.StellarFlare) <= PandemicThresholdBalance(S.StellarFlare) then
-    if HR.Cast(S.StellarFlare) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/starfall,if=(active_enemies>=2&talent.stellar_flare.enabled|active_enemies>=3)&buff.fury_of_elune.down&cooldown.fury_of_elune.remains>10
-  if (HR.AoEON() and ((Cache.EnemiesCount[Range] >= 2 and S.StellarFlare:IsAvailable()) or Cache.EnemiesCount[Range] >= 3)
-    and Player:BuffRemainsP(S.FuryofElune) == 0 and S.FuryofElune:CooldownRemainsP() > 10 and FutureAstralPower() >= 60) or Player:Buff(S.OnethsOverconfidence) then
-      if HR.Cast(S.Starfall) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/starsurge,if=active_enemies<=2&buff.fury_of_elune.down&cooldown.fury_of_elune.remains>7
-  if FutureAstralPower() >= 40 and Cache.EnemiesCount[Range] <= 2 and Player:BuffRemainsP(S.FuryofElune) == 0 and S.FuryofElune:CooldownRemainsP() > 7 then
-    if HR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
-  if FutureAstralPower() >= 40 and Player:BuffRemainsP(S.FuryofElune) == 0
-    and ((FutureAstralPower() >= 92 and S.FuryofElune:CooldownRemainsP() > Player:GCD() * 3) 
-    or (S.WarriorofElune:CooldownRemainsP() <= 5 and S.FuryofElune:CooldownRemainsP() >= 35  and Player:BuffStack(S.WarriorofElune) < 2)) then
-      if HR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/solar_wrath,if=buff.solar_empowerment.up
-  if Player:Buff(S.SolarEmpowerment) and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 1) then
-    if HR.Cast(S.SolarWrath) then return ""; end
-  end	
-
-  -- actions.fury_of_elune+=/lunar_strike,if=buff.lunar_empowerment.stack=3|(buff.lunar_empowerment.remains<5&buff.lunar_empowerment.up)|active_enemies>=2
-  if ((Player:BuffStack(S.LunarEmpowerment) == 3 and not(Player:IsCasting(S.LunarStrike)))
-    or (Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) and Player:BuffRemainsP(S.LunarEmpowerment) < 5)
-    or Cache.EnemiesCount[Range] >= 2) then
-      if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.fury_of_elune+=/solar_wrath
-  if HR.Cast(S.SolarWrath) then return ""; end
-end 
-
-local function EmeraldDreamcatcherRotation ()
-  -- actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
-  if S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemainsP() == 0 and Player:AstralPowerDeficit(FutureAstralPower()) >= 75 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > 0 then
-    if HR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return ""; end
-  end
-
-  -- actions.ed+=/incarnation,if=astral_power>=60|buff.bloodlust.up
-  if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:CooldownRemainsP() == 0 and (FutureAstralPower() >= 60  or Player:HasHeroism())then
-    if HR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
-  end
-
-  -- actions.ed+=/celestial_alignment,if=astral_power>=60&!buff.the_emerald_dreamcatcher.up
-  if S.CelestialAlignment:IsAvailable()and not S.IncarnationChosenOfElune:IsAvailable()  and S.CelestialAlignment:CooldownRemainsP() == 0 and FutureAstralPower() >= 60 and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-    if HR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
-  end
-
-  -- actions.ed+=/starsurge,if=(gcd.max*astral_power%26)>target.time_to_die
-  if FutureAstralPower() >= (40 - (5 * Player:BuffStack(S.EmeraldDreamcatcher))) and Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 26) then
-    if HR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- actions.ed+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2
-  if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[Range] < 4 and FutureAstralPower() >= 15 and Target:DebuffRefreshableCP(S.StellarFlare) and not Player:IsCasting(S.StellarFlare) then
-    if HR.Cast(S.StellarFlare) then return ""; end
-  end
-  if HR.AoEON() and Cache.EnemiesCount[Range] < 4 and FutureAstralPower() >= 15 then
-    BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-    for Key, Value in pairs(Cache.Enemies[Range]) do
-      if S.StellarFlare:IsAvailable() and Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.StellarFlare)) and Value:DebuffRefreshableCP(S.StellarFlare) then
-        BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-
-  -- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
-  if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRefreshableCP(S.MoonFireDebuff)))
-    and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() or Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0) then
-      if HR.Cast(S.MoonFire) then return ""; end
-  end
-
-  -- actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
-  if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRefreshableCP(S.SunFireDebuff)))
-    and (Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() or Player:BuffRemainsP(S.EmeraldDreamcatcher)==0) then
-      if HR.Cast(S.SunFire) then return ""; end
-  end
-
-  -- actions.ed+=/starfall,if=buff.oneths_overconfidence.react&buff.the_emerald_dreamcatcher.remains>execute_time
-  if Player:Buff(S.OnethsIntuition) and Player:BuffRemainsP(S.EmeraldDreamcatcher) > Player:GCD() then
-    if HR.Cast(S.Starfall) then return ""; end
-  end
-
-  -- actions.ed+=/new_moon,if=astral_power.deficit>=10&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 10 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.NewMoon:CastTime() and FutureAstralPower() >= 16 and NextMoon == S.NewMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
-      if HR.Cast(S.NewMoon) then return ""; end
-  end
-
-  -- actions.ed+=/half_moon,if=astral_power.deficit>=20&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=6
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 20 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.HalfMoon:CastTime() and FutureAstralPower() >= 6 and NextMoon == S.HalfMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then	
-      if HR.Cast(S.HalfMoon) then return ""; end
-  end
-
-  -- actions.ed+=/full_moon,if=astral_power.deficit>=40&buff.the_emerald_dreamcatcher.remains>execute_time
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 40 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.FullMoon:CastTime() and NextMoon == S.FullMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
-      if HR.Cast(S.FullMoon) then return ""; end
-  end
-
-  -- actions.ed+=/lunar_strike,if=(buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5))&spell_haste<0.4
-  if Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.LunarStrike:CastTime() and Player:SpellHaste() < 0.4
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FutureAstralPower()) >= 15) 
-    or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.LunarStrike:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.LunarStrike:CastTime()) and Player:AstralPowerDeficit(FutureAstralPower()) >= 22.5))  then
-      if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.ed+=/solar_wrath,if=buff.solar_empowerment.stack>1&buff.the_emerald_dreamcatcher.remains>2*execute_time&astral_power>=6&(dot.moonfire.remains>5|(dot.sunfire.remains<5.4&dot.moonfire.remains>6.6))&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=10|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15)
-  if Player:BuffStack(S.SolarEmpowerment) > 1 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.SolarWrath:CastTime() * 2 and FutureAstralPower() >= 6 
-    and (Target:DebuffRemainsP(S.MoonFireDebuff) > 5 or (Target:DebuffRemainsP(S.SunFireDebuff) <= PandemicThresholdBalance(S.SunFireDebuff) and Target:DebuffRemainsP(S.MoonFireDebuff) <= PandemicThresholdBalance(S.MoonFireDebuff))) 
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FutureAstralPower()) >= 10) 
-    or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.SolarWrath:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.SolarWrath:CastTime()) and Player:AstralPowerDeficit(FutureAstralPower()) >= 15)) then
-      if HR.Cast(S.SolarWrath) then return ""; end
-  end	
-
-  -- actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=11&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5)
-  if Player:Buff(S.LunarEmpowerment) and not(Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.LunarStrike:CastTime() and FutureAstralPower() >= 11
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FutureAstralPower()) >= 15) 
-    or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.LunarStrike:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.LunarStrike:CastTime()) and Player:AstralPowerDeficit(FutureAstralPower()) >= 22.5)) then
-      if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.ed+=/solar_wrath,if=buff.solar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=10|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15)
-  if Player:BuffStack(S.SolarEmpowerment) > 1 and Player:BuffRemainsP(S.EmeraldDreamcatcher) > 0 and FutureAstralPower() >= 16 
-    and ((Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and Player:AstralPowerDeficit(FutureAstralPower()) >= 10) 
-    or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.SolarWrath:CastTime() or Player:BuffRemainsP(S.CelestialAlignment) > S.SolarWrath:CastTime()) and Player:AstralPowerDeficit(FutureAstralPower()) >= 15)) then
-      if HR.Cast(S.SolarWrath) then return ""; end
-  end	
-
-  -- actions.ed+=/starsurge,if=(buff.the_emerald_dreamcatcher.up&buff.the_emerald_dreamcatcher.remains<gcd.max)|astral_power>85|((buff.celestial_alignment.up|buff.incarnation.up)&astral_power>30)
-  if FutureAstralPower() >= (40 - (5 * Player:BuffStack(S.EmeraldDreamcatcher)))
-    and (Player:BuffRemainsP(S.EmeraldDreamcatcher) < Player:GCD() or FutureAstralPower() > 85 or ((Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD()) and FutureAstralPower() > 30)) then
-      if HR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- actions.ed+=/starfall,if=buff.oneths_overconfidence.up
-  if Player:Buff(S.OnethsOverconfidence) then
-    if HR.Cast(S.Starfall) then return ""; end
-  end
-
-  -- actions.ed+=/new_moon,if=astral_power.deficit>=10
-  if Player:AstralPowerDeficit(FutureAstralPower()) >= 10 and NextMoon == S.NewMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
-      if HR.Cast(S.NewMoon) then return ""; end
-  end
-
-  -- actions.ed+=/half_moon,if=astral_power.deficit>=20
-  if Player:AstralPowerDeficit(FutureAstralPower()) >= 20 and NextMoon == S.HalfMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then	
-      if HR.Cast(S.HalfMoon) then return ""; end
-  end
-
-  -- actions.ed+=/full_moon,if=astral_power.deficit>=40
-  if Player:AstralPowerDeficit(FutureAstralPower()) >= 40 and NextMoon == S.FullMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
-      if HR.Cast(S.FullMoon) then return ""; end
-  end
-
-  -- actions.ed+=/solar_wrath,if=buff.solar_empowerment.up
-  if Player:Buff(S.SolarEmpowerment) and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 1) then
-    if HR.Cast(S.SolarWrath) then return ""; end
-  end	
-
-  -- actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up
-  if Player:Buff(S.LunarEmpowerment) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.ed+=/solar_wrath
-  if HR.Cast(S.SolarWrath) then return ""; end
-end  
-
-local function SingleTarget ()
-  -- actions.st=starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
-  if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
-    or (v_starfall and ((not Target:Debuff(S.StellarEmpowerment)) or (Player:BuffRemainsP(S.Starfall) == 0 and Target:Debuff(S.StellarEmpowerment))) and FutureAstralPower() >= StarfallCost()) then
-    if HR.Cast(S.Starfall) then return ""; end
-  end
-
-  -- actions.st+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
-  if S.StellarFlare:IsAvailable() and FutureAstralPower() >= 15 and Target:DebuffRefreshableCP(S.StellarFlare) and Target:FilteredTimeToDie(">", 10) and not Player:IsCasting(S.StellarFlare) then
-    if HR.Cast(S.StellarFlare) then return ""; end
-  end
-  if HR.AoEON() and FutureAstralPower() >= 15 and S.StellarFlare:IsAvailable() then
-    BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-    for Key, Value in pairs(Cache.Enemies[Range]) do
-      if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.StellarFlare)) and Value:DebuffRefreshableCP(S.StellarFlare) then
-        BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-  
-  -- actions.st+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
-  if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
-    if HR.Cast(S.MoonFire) then return ""; end
-    end
-    if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 8, nil;
-      for Key, Value in pairs(Cache.Enemies[Range]) do
-        if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) 
-        and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) 
-        or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-  
-  -- actions.st+=/sunfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<5.4)&astral_power.deficit>7&target.time_to_die>8
-  if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
-    if HR.Cast(S.SunFire) then return ""; end
-    end
-    if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 8, nil;
-      for Key, Value in pairs(Cache.Enemies[Range]) do
-        if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff))
-          and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) 
-          or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
-            BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-
-  -- custom : OwlkinFrenzy
-  if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.st+=/solar_wrath,if=buff.solar_empowerment.stack=3&astral_power.deficit>10
-  if Player:BuffStack(S.SolarEmpowerment) == 3 and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 3) and Player:AstralPowerDeficit(FutureAstralPower()) > 10 then
-    if HR.Cast(S.SolarWrath) then return ""; end
-  end
-
-  -- actions.st+=/lunar_strike,if=buff.lunar_empowerment.stack=3&astral_power.deficit>15
-  if Player:BuffStack(S.LunarEmpowerment) == 3 and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 3) and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-  if Player:BuffRemainsP(S.OnethsIntuition) > 0 or (FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40))) then
-    if HR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- actions.st+=/new_moon,if=astral_power.deficit>10&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 10 and Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and NextMoon == S.NewMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) or S.NewMoon:ChargesP() == 3 then
-      if HR.Cast(S.NewMoon) then return ""; end
-  end
-
-  -- actions.st+=/half_moon,if=astral_power.deficit>20&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 20 and Player:BuffRemainsP(S.IncarnationChosenOfElune) == 0 and Player:BuffRemainsP(S.CelestialAlignment) == 0 and NextMoon == S.HalfMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) or S.NewMoon:ChargesP() == 3 then	
-      if HR.Cast(S.HalfMoon) then return ""; end
-  end
-
-  -- actions.st+=/full_moon,if=astral_power.deficit>40
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 40 and NextMoon == S.FullMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
-      if HR.Cast(S.FullMoon) then return ""; end
-  end
-
-  -- actions.st+=/lunar_strike,if=buff.warrior_of_elune.up&buff.lunar_empowerment.up
-  if Player:Buff(S.WarriorofElune) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.WarriorofElune) == 1) and Player:Buff(S.LunarEmpowerment) then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.st+=/solar_wrath,if=buff.solar_empowerment.up
-  if Player:Buff(S.SolarEmpowerment) and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 1) then
-    if HR.Cast(S.SolarWrath) then return ""; end
-  end	
-
-  -- actions.st+=/lunar_strike,if=buff.lunar_empowerment.up
-  if Player:Buff(S.LunarEmpowerment) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.st+=/solar_wrath
-  if HR.Cast(S.SolarWrath) then return ""; end
-end
-
-local function AoE ()
-  -- actions.AoE=starfall,if=debuff.stellar_empowerment.remains<gcd.max*2|astral_power.deficit<22.5|(buff.celestial_alignment.remains>8|buff.incarnation.remains>8)|target.time_to_die<8
-  if FutureAstralPower() >= StarfallCost() and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
-    if HR.Cast(S.Starfall) then return ""; end
-  end
-  
-  -- actions.AoE+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
-  if S.StellarFlare:IsAvailable() and FutureAstralPower() >= 15 and Target:DebuffRefreshableCP(S.StellarFlare) and not Player:IsCasting(S.StellarFlare) and Target:FilteredTimeToDie(">", 10) then
-    if HR.Cast(S.StellarFlare) then return ""; end
-    end
-    if HR.AoEON() and FutureAstralPower() >= 15 and S.StellarFlare:IsAvailable() then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 10, nil;
-      for Key, Value in pairs(Cache.Enemies[Range]) do
-        if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.StellarFlare)) and Value:DebuffRefreshableCP(S.StellarFlare) then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.StellarFlare;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-
-  -- actions.AoE+=/sunfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:DebuffRefreshableCP(S.SunFireDebuff) and Target:FilteredTimeToDie(">", 4) then
-    if HR.Cast(S.SunFire) then return ""; end
-    end
-    if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 4, nil;
-      for Key, Value in pairs(Cache.Enemies[Range]) do
-        if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff)) and Value:DebuffRefreshableCP(S.SunFireDebuff) then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-
-  -- actions.AoE+=/moonfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:DebuffRefreshableCP(S.MoonFireDebuff) and Target:FilteredTimeToDie(">", 4) then
-    if HR.Cast(S.MoonFire) then return ""; end
-    end
-    if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-      BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 4, nil;
-      for Key, Value in pairs(Cache.Enemies[Range]) do
-        if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) and Value:DebuffRefreshableCP(S.MoonFireDebuff) then
-          BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
-      end					
-    end
-    if BestUnit then
-      if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-    end
-  end
-
-  -- actions.AoE+=/starsurge,if=buff.oneths_intuition.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
-  if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) < 44) then
-    if HR.Cast(S.Starsurge) then return ""; end
-  end
-
-  -- custom : OwlkinFrenzy
-  if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.AoE+=/new_moon,if=astral_power.deficit>14&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 14 and NextMoon == S.NewMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1)
-    and (not(Player:BuffRemainsP(S.AstralAcceleration) > 0 or Player:BuffRemainsP(S.IncarnationChosenOfElune) > S.NewMoon:CastTime()) or S.NewMoon:ChargesP() == 3) then
-      if HR.Cast(S.NewMoon) then return ""; end
-  end
-
-  -- actions.AoE+=/half_moon,if=astral_power.deficit>24
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 24 and NextMoon == S.HalfMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then	
-      if HR.Cast(S.HalfMoon) then return ""; end
-  end
-
-  -- actions.AoE+=/full_moon,if=astral_power.deficit>44
-  if Player:AstralPowerDeficit(FutureAstralPower()) > 44 and NextMoon == S.FullMoon
-    and (S.NewMoon:ChargesP() - (Moons[Player:CastID()] and 1 or 0) >= 1) then
-      if HR.Cast(S.FullMoon) then return ""; end
-  end
-
-  -- actions.AoE+=/lunar_strike,if=buff.warrior_of_elune.up
-  if Player:Buff(S.WarriorofElune) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.WarriorofElune) == 1) then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.AoE+=/solar_wrath,if=buff.solar_empowerment.up
-  if Player:Buff(S.SolarEmpowerment) and not (Player:IsCasting(S.SolarWrath) and Player:BuffStack(S.SolarEmpowerment) == 1) then
-    if HR.Cast(S.SolarWrath) then return ""; end
-  end	
-
-  -- actions.AoE+=/lunar_strike,if=buff.lunar_empowerment.up
-  if Player:Buff(S.LunarEmpowerment) and not (Player:IsCasting(S.LunarStrike) and Player:BuffStack(S.LunarEmpowerment) == 1) then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.AoE+=/lunar_strike,if=spell_targets.lunar_strike>=4|spell_haste<0.45
-  if Cache.EnemiesCount[Range] >= 4 or Player:SpellHaste() < 0.45 then
-    if HR.Cast(S.LunarStrike) then return ""; end
-  end
-
-  -- actions.AoE+=/solar_wrath
-  if HR.Cast(S.SolarWrath) then return ""; end
-end
-
-local function Sephuz()
-  -- EntanglingRoots
-  --TODO : change level when iscontrollable is here
-  if S.EntanglingRoots:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.EntanglingRoots then
-    if HR.CastSuggested(S.EntanglingRoots) then return "Cast"; end
-  end
-
-  -- MightyBash
-  --TODO : change level when iscontrollable is here
-
-  if S.MightyBash:IsAvailable() and S.MightyBash:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.MightyBash then
-    if HR.CastSuggested(S.MightyBash) then return "Cast"; end
-  end
-
-  -- MassEntanglement
-  --TODO : change level when iscontrollable is here
-
-  if S.MassEntanglement:IsAvailable() and S.MassEntanglement:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.MassEntanglement then
-    if HR.CastSuggested(S.MassEntanglement) then return "Cast"; end
-  end
-
-  -- Typhoon 
-  --TODO : change level when iscontrollable is here
-  if S.Typhoon:IsAvailable() and S.Typhoon:IsCastable() and Target:Level() < 103 and Settings.Balance.Sephuz.Typhoon then
-    if HR.CastSuggested(S.Typhoon) then return "Cast"; end
-  end
-
-  -- SolarBeam
-  if S.SolarBeam:IsCastable() and Target:IsCasting() and Target:IsInterruptible() and Settings.Balance.Sephuz.SolarBeam then
-    if HR.CastSuggested(S.SolarBeam) then return "Cast"; end
-  end
-end
-
--- CD Usage
-local function CDs ()
-  -- actions=potion,name=potion_of_prolonged_power,if=buff.celestial_alignment.up|buff.incarnation.up
-  if Settings.Balance.ShowPoPP and I.PotionOfProlongedPower:IsReady() and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0 or Target:FilteredTimeToDie("<=", 60)) then
-    if HR.CastSuggested(I.PotionOfProlongedPower) then return "Cast"; end
-  end
-
-  -- actions+=/blessing_of_elune,if=active_enemies<=2&(!variable.starfall_st|(variable.starfall_st&buff.celestial_alignment.up))
-  if S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) 
-    and Cache.EnemiesCount[Range] <= 2 and (not v_starfall or (v_starfall and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0))) then
-      if HR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
-  end
-  -- actions+=/blessing_of_anshe,if=active_enemies>=3|variable.starfall_st&!buff.celestial_alignment.up&cooldown.celestial_alignment.remains>15
-  if (S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe))
-    and (Cache.EnemiesCount[Range] >= 3 or (v_starfall and Player:BuffRemainsP(S.CelestialAlignment) == 0 and S.CelestialAlignment:CooldownRemainsP() > 15)) then
-     if HR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
-  end
-
-  -- actions+=/blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
-  if S.BloodFury:IsAvailable() and S.BloodFury:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
-    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-  end
-
-  -- actions+=/berserking,if=buff.celestial_alignment.up|buff.incarnation.up
-  if S.Berserking:IsAvailable() and S.Berserking:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
-    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-  end
-
-  -- actions+=/arcane_torrent,if=buff.celestial_alignment.up|buff.incarnation.up
-  if S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
-    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-  end
-
-  -- actions+=/lights_judgment,if=buff.celestial_alignment.up|buff.incarnation.up
-  if S.LightsJudgment:IsAvailable() and S.LightsJudgment:CooldownRemainsP() == 0 and (Player:BuffRemainsP(S.IncarnationChosenOfElune) > 0 or Player:BuffRemainsP(S.CelestialAlignment) > 0) then
-    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-  end
-  -- actions+=/astral_communion,if=astral_power.deficit>=79
-  if S.AstralCommunion:IsAvailable() and S.AstralCommunion:CooldownRemainsP() == 0 and Player:AstralPowerDeficit(FutureAstralPower()) >= 79
-    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-      if HR.Cast(S.AstralCommunion, Settings.Balance.OffGCDasOffGCD.AstralCommunion) then return ""; end
-  end
-
-  -- actions+=/warrior_of_elune
-  if S.WarriorofElune:IsAvailable() and S.WarriorofElune:CooldownRemainsP() == 0
-    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-      if HR.Cast(S.WarriorofElune, Settings.Balance.OffGCDasOffGCD.WarriorofElune) then return ""; end
-  end
-
-  -- actions+=/incarnation,if=astral_power>=40
-  if S.IncarnationChosenOfElune:IsAvailable() and S.IncarnationChosenOfElune:CooldownRemainsP() == 0 and FutureAstralPower() >= 40
-    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-      if HR.Cast(S.IncarnationChosenOfElune, Settings.Balance.OffGCDasOffGCD.IncarnationChosenOfElune) then return ""; end
-  end
-
-  -- actions+=/celestial_alignment,if=astral_power>=40&(!variable.starfall_st|time>=7*gcd.max)
-  if S.CelestialAlignment:IsAvailable() and not S.IncarnationChosenOfElune:IsAvailable() and S.CelestialAlignment:CooldownRemainsP() == 0 and FutureAstralPower() >= 40 and (not v_starfall or HL.CombatTime() > 7 * Player:GCD())
-    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) == 0 then
-      if HR.Cast(S.CelestialAlignment, Settings.Balance.OffGCDasOffGCD.CelestialAlignment) then return ""; end
-  end
-
-  -- actions.AoE+=/force_of_nature
-  -- actions.ed+=/force_of_nature,if=buff.the_emerald_dreamcatcher.remains>execute_time
-  if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 
-    and not S.FuryofElune:IsAvailable() and not I.EmeraldDreamcatcher:IsEquipped() then
-      if HR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
-  end
-  if S.ForceofNature:IsAvailable() and S.ForceofNature:CooldownRemainsP() == 0 and I.EmeraldDreamcatcher:IsEquipped()
-    and not S.FuryofElune:IsAvailable() and Player:BuffRemainsP(S.EmeraldDreamcatcher) > S.ForceofNature:ExecuteTime () then
-      if HR.Cast(S.ForceofNature, Settings.Balance.OffGCDasOffGCD.ForceofNature) then return ""; end
-  end
-end
-
--- APL Main
-local function APL ()
-  -- TODO : Add prepot
-  -- TODO : change level when iscontrollable is here for sephuz
-
-  -- Unit Update
-  HL.GetEnemies(Range);
-  Everyone.AoEToggleEnemiesUpdate();
-  NextMoonCalculation()
-  VarInit()
-
-  -- Defensives
-  if S.Barkskin:IsCastable() and Player:HealthPercentage() <= Settings.Balance.BarkSkinHP then
-    if HR.Cast(S.Barkskin, Settings.Balance.OffGCDasOffGCD.BarkSkin) then return "Cast"; end
-  end  
-
-  -- Buffs
-  if not Player:Buff(S.MoonkinForm) and not Player:AffectingCombat() and Settings.Balance.ShowMFOOP then
-    if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return ""; end
-  end
-
-  -- Out of Combat
-  if not Player:AffectingCombat() then
-    if var_calcCombat then var_calcCombat = false end
-
-    -- actions.precombat+=/blessing_of_elune,if=!variable.starfall_st
-    if not v_starfall and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofElune) then
-      if HR.Cast(S.BlessingofElune, Settings.Balance.OffGCDasOffGCD.BlessingofElune) then return ""; end
-    end
-    -- actions.precombat+=/blessing_of_anshe,if=variable.starfall_st
-    if v_starfall and S.BlessingofTheAncients:IsAvailable() and S.BlessingofTheAncients:IsCastable() and not Player:Buff(S.BlessingofAnshe) then
-      if HR.Cast(S.BlessingofAnshe, Settings.Balance.OffGCDasOffGCD.BlessingofAnshe) then return ""; end
-    end
-
-    -- Flask
-    -- Food
-    -- Rune
-    -- PrePot w/ DBM Count
-    -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange(Range) then
-      if S.NewMoon:IsAvailable() and NextMoon:IsCastable() then
-        if HR.Cast(NextMoon) then return ""; end
-      end
-      if S.StellarFlare:IsAvailable() and Cache.EnemiesCount[Range] < 4 and FutureAstralPower() >= 15 then
-        if HR.Cast(S.StellarFlare) then return ""; end
-      end
-      if HR.Cast(S.MoonFire) then return ""; end
-    end
-
-    return;
-  end
-
-  -- In Combat
-  if not Player:Buff(S.MoonkinForm) then
+local function Precombat ()
+  -- moonkin_form
+  if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) then
     if HR.Cast(S.MoonkinForm) then return ""; end
   end
-
-  if Everyone.TargetIsValid() then
-    if Target:IsInRange(Range) then --in Range
-      -- CD usage
-      if HR.CDsON() then
-        ShouldReturn = CDs();
-        if ShouldReturn then return ShouldReturn; end
-      end
-
-      -- Sephuz usage
-      if I.SephuzSecret:IsEquipped() and S.SephuzBuff:TimeSinceLastAppliedOnPlayer() >= 30 then
-        ShouldReturn = Sephuz();
-        if ShouldReturn then return ShouldReturn; end
-      end
-
-      -- actions+=/call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elune.remains<target.time_to_die
-      if S.FuryofElune:IsAvailable() and Target:FilteredTimeToDie(">", S.FuryofElune:CooldownRemainsP()) then
-        ShouldReturn = FuryOfElune(); 
-        if ShouldReturn then return ShouldReturn; end
-      end
-
-      -- actions+=/call_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=1
-      if I.EmeraldDreamcatcher:IsEquipped() and (Cache.EnemiesCount[Range] <= 1 or not HR.AoEON()) then
-        ShouldReturn = EmeraldDreamcatcherRotation ();
-        if ShouldReturn then return ShouldReturn; end
-      end
-
-      --Movement
-      if not Player:IsMoving() or (S.StellarDrift:IsAvailable() and Player:Buff(S.StellarDriftBuff) and Player:BuffRemainsP(S.Starfall) > 0) or Player:BuffRemainsP(S.NorgannonsBuff) > 0 then	--static
-        -- actions+=/call_action_list,name=AoE,if=(spell_targets.starfall>=2&talent.stellar_drift.enabled)|spell_targets.starfall>=3
-        if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
-          ShouldReturn = AoE();
-          if ShouldReturn then return ShouldReturn; end
-        end
-
-        -- actions+=/call_action_list,name=single_target
-        ShouldReturn = SingleTarget();
-        if ShouldReturn then return ShouldReturn; end
-
-      else --moving
-        -- aoe
-        if ((Cache.EnemiesCount[Range] >= 2 and S.StellarDrift:IsAvailable()) or Cache.EnemiesCount[Range] >= 3) then
-          -- actions.AoE=starfall,if=debuff.stellar_empowerment.remains<gcd.max*2|astral_power.deficit<22.5|(buff.celestial_alignment.remains>8|buff.incarnation.remains>8)|target.time_to_die<8
-          if FutureAstralPower() >= StarfallCost() and (Player:BuffRemainsP(S.Starfall) < Player:GCD() * 2 or Player:AstralPowerDeficit(FutureAstralPower()) < 22.5 or (Player:DebuffRemainsP(S.CelestialAlignment) > 8 or Player:DebuffRemainsP(S.IncarnationChosenOfElune) > 8) or Target:FilteredTimeToDie("<", 8)) then
-            if HR.Cast(S.Starfall) then return ""; end
-          end
-
-          -- actions.AoE+=/sunfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
-          if Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:DebuffRefreshableCP(S.SunFireDebuff) and Target:FilteredTimeToDie(">", 4) then
-            if HR.Cast(S.SunFire) then return ""; end
-            end
-            if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 4, nil;
-              for Key, Value in pairs(Cache.Enemies[Range]) do
-                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff)) and Value:DebuffRefreshableCP(S.SunFireDebuff) then
-                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
-              end					
-            end
-            if BestUnit then
-              if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-            end
-          end
-
-          -- actions.AoE+=/moonfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
-          if Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:DebuffRefreshableCP(S.MoonFireDebuff) and Target:FilteredTimeToDie(">", 4) then
-            if HR.Cast(S.MoonFire) then return ""; end
-            end
-            if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 4, nil;
-              for Key, Value in pairs(Cache.Enemies[Range]) do
-                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) and Value:DebuffRefreshableCP(S.MoonFireDebuff) then
-                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
-              end					
-            end
-            if BestUnit then
-              if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-            end
-          end
-
-          -- actions.AoE+=/starsurge,if=buff.oneths_intuition.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
-          if Player:Buff(S.OnethsIntuition) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) < 44) then
-            if HR.Cast(S.Starsurge) then return ""; end
-          end
-          
-          if Target:DebuffRemainsP(S.SunFireDebuff) > Target:DebuffRemainsP(S.MoonFireDebuff) then
-            if HR.Cast(S.MoonFire) then return ""; end
-          else
-            if HR.Cast(S.SunFire) then return ""; end
-          end
-
-          -- custom : OwlkinFrenzy
-          if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
-            if HR.Cast(S.LunarStrike) then return ""; end
-          end
-
-        else --st
-          -- actions.st=starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
-          if (Player:Buff(S.OnethsOverconfidence) and (Player:BuffRemainsP(S.AstralAcceleration) == 0 or Player:BuffRemainsP(S.AstralAcceleration) > 5 or Player:AstralPowerDeficit(FutureAstralPower()) > 40))
-            or (v_starfall and ((not Target:Debuff(S.StellarEmpowerment)) or (Player:BuffRemainsP(S.Starfall) == 0 and Target:Debuff(S.StellarEmpowerment))) and FutureAstralPower() >= StarfallCost()) then
-            if HR.Cast(S.Starfall) then return ""; end
-          end
-
-          -- actions.single_target+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
-          if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
-            if HR.Cast(S.MoonFire) then return ""; end
-            end
-            if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 8, nil;
-              for Key, Value in pairs(Cache.Enemies[Range]) do
-                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.MoonFireDebuff)) 
-                and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) + ((Player:IsCasting(S.LunarStrike)) and 5 or 0) < 3) 
-                or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.MoonFireDebuff) < PandemicThresholdBalance(S.MoonFireDebuff))) then
-                  BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.MoonFire;
-              end					
-            end
-            if BestUnit then
-              if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-            end
-          end
-          
-          -- actions.single_target+=/sunfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<5.4)&astral_power.deficit>7&target.time_to_die>8
-          if ((S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) or (not S.NaturesBalance:IsAvailable() and Target:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) and Player:AstralPowerDeficit(FutureAstralPower()) > 7 and Target:FilteredTimeToDie(">", 8) then
-            if HR.Cast(S.SunFire) then return ""; end
-            end
-            if HR.AoEON() and Player:AstralPowerDeficit(FutureAstralPower()) > 7 then
-              BestUnit, BestUnitTTD, BestUnitSpellToCast = nil, 8, nil;
-              for Key, Value in pairs(Cache.Enemies[Range]) do
-                if Value:FilteredTimeToDie(">", BestUnitTTD, - Value:DebuffRemainsP(S.SunFireDebuff))
-                  and ((S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) + ((Player:IsCasting(S.SolarWrath)) and 3.3 or 0) < 3) 
-                  or (not S.NaturesBalance:IsAvailable() and Value:DebuffRemainsP(S.SunFireDebuff) < PandemicThresholdBalance(S.SunFireDebuff))) then
-                    BestUnit, BestUnitTTD, BestUnitSpellToCast = Value, Value:TimeToDie(), S.SunFire;
-              end					
-            end
-            if BestUnit then
-              if HR.CastLeftNameplate(BestUnit, BestUnitSpellToCast) then return ""; end
-            end
-          end
-
-          -- custom : OwlkinFrenzy
-          if Player:BuffRemainsP(S.OwlkinFrenzy) > Player:GCD() and Player:AstralPowerDeficit(FutureAstralPower()) > 15 then
-            if HR.Cast(S.LunarStrike) then return ""; end
-          end
-
-          -- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
-          if Player:BuffRemainsP(S.OnethsIntuition) > 0 or (FutureAstralPower() >= 40 and (Player:AstralPowerDeficit(FutureAstralPower()) < 40 or (Player:BuffRemainsP(S.IncarnationChosenOfElune) > Player:GCD() or Player:BuffRemainsP(S.CelestialAlignment) > Player:GCD() or Player:BuffRemainsP(S.AstralAcceleration) > 5 or (T214P and Player:BuffRemainsP(S.SolarSolstice) == 0)) or Target:FilteredTimeToDie("<", Player:GCD() * FutureAstralPower() / 40))) then
-            if HR.Cast(S.Starsurge) then return ""; end
-          end
-          
-          if Target:DebuffRemainsP(S.SunFireDebuff) > Target:DebuffRemainsP(S.MoonFireDebuff) then
-            if HR.Cast(S.MoonFire) then return ""; end
-          else
-            if HR.Cast(S.SunFire) then return ""; end
-          end
-        end
-      end
-    end
+  -- potion
+  if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
+    if HR.CastSuggested(I.ProlongedPower) then return ""; end
+  end
+  -- solar_wrath
+  if S.SolarWrath:IsCastableP() and not Player:IsCasting(S.SolarWrath) then
+    if HR.Cast(S.SolarWrath) then return ""; end
+  end
+  -- sunfire
+  if S.Sunfire:IsCastableP() and (true) then
+    if HR.Cast(S.Sunfire) then return ""; end
   end
 end
 
-HR.SetAPL(102, APL);
+local function CDs ()
+  -- Suggest moonkin form if you're not in it.
+  if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) then
+    if HR.Cast(S.MoonkinForm, true) then return ""; end
+  end
+  -- potion,if=buff.celestial_alignment.up|buff.incarnation.up
+  if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) then
+    if HR.CastSuggested(I.ProlongedPower) then return ""; end
+  end
+  -- blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
+  if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) then
+    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
+  -- berserking,if=buff.celestial_alignment.up|buff.incarnation.up
+  if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) then
+    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
+  -- arcane_torrent,if=buff.celestial_alignment.up|buff.incarnation.up
+  if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) then
+    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
+  -- lights_judgment,if=buff.celestial_alignment.up|buff.incarnation.up
+  if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) then
+    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+  end
+  -- warrior_of_elune
+  if S.WarriorofElune:IsCastableP() and not Player:Buff(S.WarriorofElune) then
+    if HR.Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return ""; end
+  end
+  -- TODO(mrdmnd / synecdoche): INNERVATE here if azerite.lively_spirit and incarn is up or C.A cooldown is < 12 s
+  -- incarnation,if=astral_power>=40
+  if S.Incarnation:IsCastableP() and (FutureAstralPower() >= 40) then
+    if HR.Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return ""; end
+  end
+  -- celestial_alignment,if=astral_power>=40
+  if S.CelestialAlignment:IsCastableP() and (FutureAstralPower() >= 40) then
+    if HR.Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return ""; end
+  end
+  -- fury_of_elune,if=(buff.celestial_alignment.up|buff.incarnation.up)|(cooldown.celestial_alignment.remains>30|cooldown.incarnation.remains>30)
+  if S.FuryofElune:IsCastableP() and ((Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) or (S.CelestialAlignment:CooldownRemainsP() > 30 or S.Incarnation:CooldownRemainsP() > 30)) then
+    if HR.Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryOfElune) then return ""; end
+  end
+  -- force_of_nature,if=(buff.celestial_alignment.up|buff.incarnation.up)|(cooldown.celestial_alignment.remains>30|cooldown.incarnation.remains>30)
+  if S.ForceofNature:IsCastableP() and ((Player:BuffP(S.CelestialAlignmentBuff) or Player:BuffP(S.IncarnationBuff)) or (S.CelestialAlignment:CooldownRemainsP() > 30 or S.Incarnation:CooldownRemainsP() > 30)) then
+    if HR.Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceOfNature) then return ""; end
+  end
 
---- ======= SIMC =======
---- Last Update: 04/09/2018
+end
 
--- # Executed before combat begins. Accepts non-harmful actions only.
--- actions.precombat=flask
--- actions.precombat+=/food
--- actions.precombat+=/augmentation
--- actions.precombat+=/moonkin_form
--- actions.precombat+=/variable,name=starfall_st,value=talent.soul_of_the_forest.enabled
--- actions.precombat+=/blessing_of_elune,if=!variable.starfall_st
--- actions.precombat+=/blessing_of_anshe,if=variable.starfall_st
--- # Snapshot raid buffed stats before combat begins and pre-potting is done.
--- actions.precombat+=/snapshot_stats
--- actions.precombat+=/potion
--- actions.precombat+=/new_moon
+local function Dot ()
+-- TODO(mrdmnd): add conditions on azerite traits
+-- Code largely lifted from assassination implmentation.
+--actions+=/sunfire,
+--          target_if=refreshable|(variable.az_hn=3&active_enemies<=2&(dot.moonfire.ticking|time_to_die<=6.6)&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking|time_to_die<=7.2)&astral_power<40),
+--          if=astral_power.deficit>=7&target.time_to_die>5.4&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.sunfire)|variable.az_hn=3
+--actions+=/moonfire,
+--          target_if=refreshable,
+--          if=astral_power.deficit>=7&target.time_to_die>6.6&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.moonfire)
+--actions+=/stellar_flare,
+--          target_if=refreshable,
+--          if=astral_power.deficit>=12&target.time_to_die>7.2&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.stellar_flare)
+  local function Evaluate_Sunfire_Target(TargetUnit)
+    return TargetUnit:DebuffRefreshableCP(S.SunfireDebuff) and Target:TimeToDie() > 5.4
+  end
+  local function Evaluate_Moonfire_Target(TargetUnit)
+    return TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff) and Target:TimeToDie() > 6.6
+  end
+  local function Evaluate_StellarFlare_Target(TargetUnit)
+    return TargetUnit:DebuffRefreshableCP(S.StellarFlare) and Target:TimeToDie() > 7.2
+  end
 
--- # Executed every time the actor is available.
--- actions=potion,name=potion_of_prolonged_power,if=buff.celestial_alignment.up|buff.incarnation.up
--- actions+=/blessing_of_elune,if=active_enemies<=2&(!variable.starfall_st|(variable.starfall_st&buff.celestial_alignment.up))
--- actions+=/blessing_of_anshe,if=active_enemies>=3|variable.starfall_st&!buff.celestial_alignment.up&cooldown.celestial_alignment.remains>15
--- actions+=/blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
--- actions+=/berserking,if=buff.celestial_alignment.up|buff.incarnation.up
--- actions+=/arcane_torrent,if=buff.celestial_alignment.up|buff.incarnation.up
--- actions+=/lights_judgment,if=buff.celestial_alignment.up|buff.incarnation.up
--- actions+=/use_items
--- actions+=/call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elune.remains<target.time_to_die
--- actions+=/call_action_list,name=ed,if=equipped.the_emerald_dreamcatcher&active_enemies<=1
--- actions+=/astral_communion,if=astral_power.deficit>=79
--- actions+=/warrior_of_elune
--- actions+=/incarnation,if=astral_power>=40
--- actions+=/celestial_alignment,if=astral_power>=40&(!variable.starfall_st|time>=7*gcd.max)
--- actions+=/call_action_list,name=aoe,if=(spell_targets.starfall>=2&talent.stellar_drift.enabled)|spell_targets.starfall>=3
--- actions+=/call_action_list,name=st
+  -- main target refreshes
+  if Evaluate_Sunfire_Target(Target) then
+    if HR.Cast(S.Sunfire) then return ""; end
+  end
+  if Evaluate_Moonfire_Target(Target) then
+    if HR.Cast(S.Moonfire) then return ""; end
+  end
+  if S.StellarFlare:IsCastableP() and Evaluate_StellarFlare_Target(Target) then
+    if HR.Cast(S.StellarFlare) then return ""; end
+  end
 
--- actions.aoe=starfall,if=buff.stellar_empowerment.remains<gcd.max*2|astral_power.deficit<22.5|(buff.celestial_alignment.remains>8|buff.incarnation.remains>8)|target.time_to_die<8
--- actions.aoe+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
--- actions.aoe+=/sunfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
--- actions.aoe+=/moonfire,target_if=refreshable,if=astral_power.deficit>7&target.time_to_die>4
--- actions.aoe+=/force_of_nature
--- actions.aoe+=/starsurge,if=buff.oneths_intuition.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<44)
--- actions.aoe+=/new_moon,if=astral_power.deficit>14&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
--- actions.aoe+=/half_moon,if=astral_power.deficit>24
--- actions.aoe+=/full_moon,if=astral_power.deficit>44
--- actions.aoe+=/lunar_strike,if=buff.warrior_of_elune.up
--- actions.aoe+=/solar_wrath,if=buff.solar_empowerment.up
--- actions.aoe+=/lunar_strike,if=buff.lunar_empowerment.up
--- actions.aoe+=/lunar_strike,if=spell_targets.lunar_strike>=4|spell_haste<0.45
--- actions.aoe+=/solar_wrath
+  local ttdval = 12
+  SuggestCycleDot(S.Sunfire, Evaluate_Sunfire_Target, ttdval)
+  SuggestCycleDot(S.Moonfire, Evaluate_Moonfire_Target, ttdval)
+  if S.StellarFlare:IsCastableP() then
+    SuggestCycleDot(S.StellarFlare, Evaluate_StellarFlare_Target, ttdval)
+  end
+end
 
--- actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
--- actions.ed+=/incarnation,if=astral_power>=60|buff.bloodlust.up
--- actions.ed+=/celestial_alignment,if=astral_power>=60&!buff.the_emerald_dreamcatcher.up
--- actions.ed+=/starsurge,if=(gcd.max*astral_power%26)>target.time_to_die
--- actions.ed+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2
--- actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
--- actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
--- actions.ed+=/force_of_nature,if=buff.the_emerald_dreamcatcher.remains>execute_time
--- actions.ed+=/starfall,if=buff.oneths_overconfidence.react&buff.the_emerald_dreamcatcher.remains>execute_time
--- actions.ed+=/new_moon,if=astral_power.deficit>=10&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16
--- actions.ed+=/half_moon,if=astral_power.deficit>=20&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=6
--- actions.ed+=/full_moon,if=astral_power.deficit>=40&buff.the_emerald_dreamcatcher.remains>execute_time
--- actions.ed+=/lunar_strike,if=(buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5))&spell_haste<0.4
--- actions.ed+=/solar_wrath,if=buff.solar_empowerment.stack>1&buff.the_emerald_dreamcatcher.remains>2*execute_time&astral_power>=6&(dot.moonfire.remains>5|(dot.sunfire.remains<5.4&dot.moonfire.remains>6.6))&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=10|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15)
--- actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=11&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=22.5)
--- actions.ed+=/solar_wrath,if=buff.solar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=10|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power.deficit>=15)
--- actions.ed+=/starsurge,if=(buff.the_emerald_dreamcatcher.up&buff.the_emerald_dreamcatcher.remains<gcd.max)|astral_power>85|((buff.celestial_alignment.up|buff.incarnation.up)&astral_power>30)
--- actions.ed+=/starfall,if=buff.oneths_overconfidence.up
--- actions.ed+=/new_moon,if=astral_power.deficit>=10
--- actions.ed+=/half_moon,if=astral_power.deficit>=20
--- actions.ed+=/full_moon,if=astral_power.deficit>=40
--- actions.ed+=/solar_wrath,if=buff.solar_empowerment.up
--- actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up
--- actions.ed+=/solar_wrath
+local function EmpowermentCapCheck ()
+-- TODO(mrdmnd) - add conditions on azerite traits
+--actions+=/lunar_strike,
+--          if=astral_power.deficit>=16&
+--          (buff.lunar_empowerment.stack=3|(spell_targets<3 & astral_power>=40 & (buff.lunar_empowerment.stack=2&buff.solar_empowerment.stack=2)))&
+--          !(variable.az_hn=3&active_enemies=1)&
+--          !(spell_targets.moonfire>=2&variable.az_potm=3&active_enemies=2)
+--actions+=/solar_wrath,
+--          if=astral_power.deficit>=12&
+--          (buff.solar_empowerment.stack=3|(variable.az_sb>1&spell_targets.starfall<3&astral_power>=32&!buff.sunblaze.up))&
+--          !(variable.az_hn=3&active_enemies=1)&
+--          !(spell_targets.moonfire>=2&active_enemies<=4&variable.az_potm=3)
+  if S.LunarStrike:IsCastableP() and Player:AstralPowerDeficit() >= 16 and (Player:BuffStackP(S.LunarEmpowermentBuff) == 3 or (Cache.EnemiesCount[15] < 3 and Player:AstralPower() >= 40 and Player:BuffStackP(S.LunarEmpowermentBuff) == 2 and Player:BuffStack(S.SolarEmpowermentBuff) == 2)) then
+    if HR.Cast(S.LunarStrike) then return "Lunar Strike at Cap"; end
+  end
 
--- actions.fury_of_elune=incarnation,if=astral_power>=95&cooldown.fury_of_elune.remains<=gcd
--- actions.fury_of_elune+=/force_of_nature,if=!buff.fury_of_elune.up
--- actions.fury_of_elune+=/fury_of_elune,if=astral_power>=95
--- actions.fury_of_elune+=/new_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=90))
--- actions.fury_of_elune+=/half_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=80))
--- actions.fury_of_elune+=/full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))
--- actions.fury_of_elune+=/astral_communion,if=buff.fury_of_elune.up&astral_power<=25
--- actions.fury_of_elune+=/warrior_of_elune,if=buff.fury_of_elune.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
--- actions.fury_of_elune+=/lunar_strike,if=buff.warrior_of_elune.up&(astral_power<=90|(astral_power<=85&buff.incarnation.up))
--- actions.fury_of_elune+=/new_moon,if=astral_power<=90&buff.fury_of_elune.up
--- actions.fury_of_elune+=/half_moon,if=astral_power<=80&buff.fury_of_elune.up&astral_power>cast_time*12
--- actions.fury_of_elune+=/full_moon,if=astral_power<=60&buff.fury_of_elune.up&astral_power>cast_time*12
--- actions.fury_of_elune+=/moonfire,if=buff.fury_of_elune.down&remains<=6.6
--- actions.fury_of_elune+=/sunfire,if=buff.fury_of_elune.down&remains<5.4
--- actions.fury_of_elune+=/stellar_flare,if=remains<7.2&active_enemies=1
--- actions.fury_of_elune+=/starfall,if=(active_enemies>=2&talent.stellar_flare.enabled|active_enemies>=3)&buff.fury_of_elune.down&cooldown.fury_of_elune.remains>10
--- actions.fury_of_elune+=/starsurge,if=active_enemies<=2&buff.fury_of_elune.down&cooldown.fury_of_elune.remains>7
--- actions.fury_of_elune+=/starsurge,if=buff.fury_of_elune.down&((astral_power>=92&cooldown.fury_of_elune.remains>gcd*3)|(cooldown.warrior_of_elune.remains<=5&cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.stack<2))
--- actions.fury_of_elune+=/solar_wrath,if=buff.solar_empowerment.up
--- actions.fury_of_elune+=/lunar_strike,if=buff.lunar_empowerment.stack=3|(buff.lunar_empowerment.remains<5&buff.lunar_empowerment.up)|active_enemies>=2
--- actions.fury_of_elune+=/solar_wrath
+  if S.SolarWrath:IsCastableP() and Player:AstralPowerDeficit() >= 12 and (Player:BuffStackP(S.SolarEmpowermentBuff) == 3) then
+    if HR.Cast(S.SolarWrath) then return "Solar Wrath at Cap"; end
+  end
+end
 
--- actions.st=starfall,if=(buff.oneths_overconfidence.react&(!buff.astral_acceleration.up|buff.astral_acceleration.remains>5|astral_power.deficit<40))|(variable.starfall_st&!buff.stellar_empowerment.up)
--- actions.st+=/force_of_nature
--- actions.st+=/stellar_flare,target_if=refreshable,if=target.time_to_die>10
--- actions.st+=/moonfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<6.6)&astral_power.deficit>7&target.time_to_die>8
--- actions.st+=/sunfire,target_if=refreshable,if=((talent.natures_balance.enabled&remains<3)|remains<5.4)&astral_power.deficit>7&target.time_to_die>8
--- actions.st+=/solar_wrath,if=buff.solar_empowerment.stack=3&astral_power.deficit>10
--- actions.st+=/lunar_strike,if=buff.lunar_empowerment.stack=3&astral_power.deficit>15
--- actions.st+=/starsurge,if=buff.oneths_intuition.react|astral_power.deficit<40|(buff.celestial_alignment.up|buff.incarnation.up|buff.astral_acceleration.remains>5|(set_bonus.tier21_4pc&!buff.solar_solstice.up))|(gcd.max*(astral_power%40))>target.time_to_die
--- actions.st+=/new_moon,if=astral_power.deficit>10&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
--- actions.st+=/half_moon,if=astral_power.deficit>20&(!(buff.celestial_alignment.up|buff.incarnation.up)|(charges=2&recharge_time<5)|charges=3)
--- actions.st+=/full_moon,if=astral_power.deficit>40
--- actions.st+=/lunar_strike,if=buff.warrior_of_elune.up&buff.lunar_empowerment.up
--- actions.st+=/solar_wrath,if=buff.solar_empowerment.up
--- actions.st+=/lunar_strike,if=buff.lunar_empowerment.up
--- actions.st+=/solar_wrath
+local function CoreRotation ()
+-- TODO(mrdmnd): Implement conditionals on azerite traits. For now, assume all vairable.az_WHATEVER evaluates to zero.
+-- actions+=/starsurge,if=(spell_targets.starfall<3&(!buff.starlord.up|buff.starlord.remains>=4)|execute_time*(astral_power%40)>target.time_to_die)&(!buff.celestial_alignment.up&!buff.incarnation.up|variable.az_streak<2|!prev_gcd.1.starsurge)
+-- actions+=/starfall,if=spell_targets.starfall>=3&(!buff.starlord.up|buff.starlord.remains>=4)
+-- actions+=/new_moon,if=astral_power.deficit>10+execute_time%1.5
+-- actions+=/half_moon,if=astral_power.deficit>20+execute_time%1.5
+-- actions+=/full_moon,if=astral_power.deficit>40+execute_time%1.5
+-- actions+=/lunar_strike,if=((buff.warrior_of_elune.up|buff.lunar_empowerment.up|spell_targets>=3&!buff.solar_empowerment.up)&(!buff.celestial_alignment.up&!buff.incarnation.up|variable.az_streak<2|!prev_gcd.1.lunar_strike)|(variable.az_ds&!buff.dawning_sun.up))&!(spell_targets.moonfire>=2&active_enemies<=4&(variable.az_potm=3|variable.az_potm=2&active_enemies=2))
+-- actions+=/solar_wrath,if=(!buff.celestial_alignment.up&!buff.incarnation.up|variable.az_streak<2|!prev_gcd.1.solar_wrath)&!(spell_targets.moonfire>=2&active_enemies<=4&(variable.az_potm=3|variable.az_potm=2&active_enemies=2))
+-- actions+=/sunfire,if=(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.sunfire)&!(variable.az_potm>=2&spell_targets.moonfire>=2)
+-- actions+=/moonfire
+  if S.Starsurge:IsCastableP() and Cache.EnemiesCount[40] < 3 and (not Player:BuffP(S.StarlordBuff) or Player:BuffRemainsP(S.StarlordBuff) >= 4 or (Player:GCD() * (FutureAstralPower() / 40)) > Target:TimeToDie()) and FutureAstralPower() >= 40 then
+    if HR.Cast(S.Starsurge) then return ""; end
+  end
+  if S.Starfall:IsCastableP() and Cache.EnemiesCount[40] >= 3 and (not Player:BuffP(S.StarlordBuff) or Player:BuffRemainsP(S.StarlordBuff) >= 4) and FutureAstralPower() >= 50 then
+    if HR.Cast(S.Starfall) then return ""; end
+  end
+  if S.NewMoon:IsCastableP() and (Player:AstralPowerDeficit() > 10 + (Player:GCD() / 1.5)) then
+    if HR.Cast(S.NewMoon) then return ""; end
+  end
+  if S.HalfMoon:IsCastableP() and (Player:AstralPowerDeficit() > 20+ (Player:GCD() / 1.5)) then
+    if HR.Cast(S.HalfMoon) then return ""; end
+  end
+  if S.FullMoon:IsCastableP() and (Player:AstralPowerDeficit() > 40+ (Player:GCD() / 1.5)) then
+    if HR.Cast(S.FullMoon) then return ""; end
+  end
+  -- Lunar strike when warrior of elune or OwlkinFrenzy is up
+  if S.LunarStrike:IsCastableP() and (Player:BuffP(S.WarriorofEluneBuff) or Player:BuffP(S.OwlkinFrenzyBuff)) then
+    if HR.Cast(S.LunarStrike) then return ""; end
+  end
+  -- don't suggest an empowered cast if we're casting the last empowered stack
+  -- bad assumption: detects cleave targets based on 15yds from caster, centered. cannot do clump detection, i am not clever enough yet
+  if (Cache.EnemiesCount[15] >= 2) then
+    -- Cleave situation: prioritize lunar strike empower > solar wrath empower > lunar strike
+    if S.LunarStrike:IsCastableP() and Player:BuffP(S.LunarEmpowermentBuff) and not (Player:BuffStackP(S.LunarEmpowermentBuff) == 1 and Player:IsCasting(S.LunarStrike)) then
+      if HR.Cast(S.LunarStrike) then return ""; end
+    end
+    if S.SolarWrath:IsCastableP() and Player:BuffP(S.SolarEmpowermentBuff) and not (Player:BuffStackP(S.SolarEmpowermentBuff) == 1 and Player:IsCasting(S.SolarWrath)) then
+      if HR.Cast(S.SolarWrath) then return ""; end
+    end
+    if S.LunarStrike:IsCastableP() and (true) then
+      if HR.Cast(S.LunarStrike) then return ""; end
+    end
+  else
+    -- ST situation: prioritize solar wrath empower > lunar strike empower > solar wrath
+    if S.SolarWrath:IsCastableP() and Player:BuffP(S.SolarEmpowermentBuff) and not (Player:BuffStackP(S.SolarEmpowermentBuff) == 1 and Player:IsCasting(S.SolarWrath)) then
+      if HR.Cast(S.SolarWrath) then return ""; end
+    end
+    if S.LunarStrike:IsCastableP() and Player:BuffP(S.LunarEmpowermentBuff) and not (Player:BuffStackP(S.LunarEmpowermentBuff) == 1 and Player:IsCasting(S.LunarStrike)) then
+      if HR.Cast(S.LunarStrike) then return ""; end
+    end
+    if S.SolarWrath:IsCastableP() and (true) then
+      if HR.Cast(S.SolarWrath) then return ""; end
+    end
+  end
+
+  if S.Moonfire:IsCastableP() and (true) then
+    if HR.Cast(S.Moonfire) then return ""; end
+  end
+end
+
+--- ======= ACTION LISTS =======
+local function APL()
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
+
+  if not Player:AffectingCombat() then
+    ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+  end
+
+  Everyone.Interrupt(5, S.SolarBeam, Settings.Commons.OffGCDasOffGCD.SolarBeam, Interrupts);
+
+  if HR.CDsON() then
+    ShouldReturn = CDs();
+    if ShouldReturn then return ShouldReturn; end
+  end
+
+  ShouldReturn = Dot();
+  if ShouldReturn then return ShouldReturn; end
+
+  ShouldReturn = EmpowermentCapCheck();
+  if ShouldReturn then return ShouldReturn; end
+
+  ShouldReturn = CoreRotation();
+  if ShouldReturn then return ShouldReturn; end
+end
+
+HR.SetAPL(102, APL)

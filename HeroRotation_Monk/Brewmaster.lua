@@ -46,6 +46,7 @@ Spell.Monk.Brewmaster = {
   PotentKick                            = Spell(213047),
   PurifyingBrew                         = Spell(119582),
   RushingJadeWind                       = Spell(116847),
+  SpecialDelivery                       = Spell(196730),
   TigerPalm                             = Spell(100780),
   HeavyStagger                          = Spell(124273),
   ModerateStagger                       = Spell(124274),
@@ -58,8 +59,8 @@ local S = Spell.Monk.Brewmaster;
 -- Items
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
-  ProlongedPower      = Item(142117),
-  StormstoutsLastGasp = Item((248044), {3}),
+  ProlongedPower        = Item(142117),
+  BattlePotionOfAgility = Item(163223),
 };
 local I = Item.Monk.Brewmaster;
 
@@ -110,15 +111,12 @@ local function APL()
 
   -- Misc
   local BrewMaxCharge = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
-  local IronskinDuration = (6 + S.PotentKick:ArtifactRank() * 0.5);
+  local IronskinDuration = 7;
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
   --- Defensives
-  -- purifying_brew,if=stagger.heavy|(stagger.moderate&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.5&buff.ironskin_brew.remains>=buff.ironskin_brew.duration*2.5)
-  if S.PurifyingBrew:IsCastableP() and ShouldPurify() then
-    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
-  end
-  -- ironskin_brew,if=buff.blackout_combo.down&cooldown.brews.charges_fractional>=cooldown.brews.max_charges-0.1-(1+buff.ironskin_brew.remains<=buff.ironskin_brew.duration*0.5)&buff.ironskin_brew.remains<=buff.ironskin_brew.duration*2
+  -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
+  -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
   -- Note: Extra handling of the charge management only while tanking.
   --       "- (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)"
   if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
@@ -126,12 +124,16 @@ local function APL()
       and Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 2 then
     if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
+  -- purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
+  if S.PurifyingBrew:IsCastableP() and ShouldPurify() then
+    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
+  end
   -- BlackoutCombo Stagger Pause w/ Ironskin Brew
   if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
     if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
   end
-  -- black_ox_brew,if=incoming_damage_1500ms&stagger.heavy&cooldown.brews.charges_fractional<=0.75
-  if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.75 and (ShouldPurify() or Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration) then
+  -- black_ox_brew,if=cooldown.brews.charges_fractional<0.5
+  if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.5 then
     if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
   end
 
@@ -141,11 +143,13 @@ local function APL()
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
       if HR.CastSuggested(I.ProlongedPower) then return ""; end
     end
+--    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions and (true) then
+--      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+--    end
   end
 
   --- In Combat
   if Everyone.TargetIsValid() then
-    -- black_ox_brew,if=(energy+(energy.regen*(cooldown.keg_smash.remains)))<40&buff.blackout_combo.down&cooldown.keg_smash.up
     -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
     if S.BlackOxBrew:IsCastableP() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemainsP())) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
       if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then
@@ -161,6 +165,9 @@ local function APL()
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.ProlongedPower) then return ""; end
     end
+--    if I.ProlongeBattlePotionOfAgilitydPower:IsReady() and Settings.Commons.UsePotions then
+--      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+--    end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.BloodFury, Settings.Brewmaster.OffGCDasOffGCD.BloodFury) then return ""; end
@@ -173,33 +180,33 @@ local function APL()
     if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and HR.CDsON() then
       if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
     end
-    -- arcane_torrent,if=energy<31
-    if HR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
-      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
-    end
-    -- keg_smash,if=spell_targets>=3
-    if S.KegSmash:IsCastableP(25) and Cache.EnemiesCount[8] >= 3 then
+    -- keg_smash,if=spell_targets>=2
+    if S.KegSmash:IsCastableP(25) and Cache.EnemiesCount[8] >= 2 then
       if HR.Cast(S.KegSmash) then return ""; end
     end
-    -- tiger_palm,if=buff.blackout_combo.up
-    if S.TigerPalm:IsCastableP("Melee") and Player:BuffP(S.BlackoutComboBuff) then
+    -- tiger_palm,if=talent.rushing_jade_wind.enabled&buff.blackout_combo.up&buff.rushing_jade_wind.up
+    if S.TigerPalm:IsCastableP("Melee") and S.RushingJadeWind:IsAvailable() and Player:BuffP(S.BlackoutComboBuff) and Player:BuffP(S.RushingJadeWind) then
       if HR.Cast(S.TigerPalm) then return ""; end
     end
-    -- keg_smash
-    if S.KegSmash:IsCastableP(25) then
-      if HR.Cast(S.KegSmash) then return ""; end
+    -- tiger_palm,if=(talent.invoke_niuzao_the_black_ox.enabled|talent.special_delivery.enabled)&buff.blackout_combo.up
+    if S.TigerPalm:IsCastableP("Melee") and (S.InvokeNiuzaotheBlackOx:IsAvailable() or S.SpecialDelivery:IsAvailable()) and Player:BuffP(S.BlackoutComboBuff) then
+      if HR.Cast(S.TigerPalm) then return ""; end
     end
     -- blackout_strike
     if S.BlackoutStrike:IsCastableP("Melee") then
       if HR.Cast(S.BlackoutStrike) then return ""; end
     end
+    -- keg_smash
+    if S.KegSmash:IsCastableP(25) then
+      if HR.Cast(S.KegSmash) then return ""; end
+    end
+    -- rushing_jade_wind,if=buff.rushing_jade_wind.down
+    if S.RushingJadeWind:IsCastableP() and Player:BuffDownP(S.RushingJadeWind) then
+      if HR.Cast(S.RushingJadeWind) then return ""; end
+    end
     -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
     if S.BreathofFire:IsCastableP(10, true) and (Player:BuffDownP(S.BlackoutComboBuff) and (Player:HasNotHeroism() or (Player:HasHeroism() and true and Target:DebuffRefreshableCP(S.BreathofFireDotDebuff)))) then
       if HR.Cast(S.BreathofFire) then return ""; end
-    end
-    -- rushing_jade_wind
-    if S.RushingJadeWind:IsCastableP() then
-      if HR.Cast(S.RushingJadeWind) then return ""; end
     end
     -- chi_burst
     if S.ChiBurst:IsCastableP(10) then
@@ -209,22 +216,16 @@ local function APL()
     if S.ChiWave:IsCastableP(25) then
       if HR.Cast(S.ChiWave) then return ""; end
     end
-    -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=55
-    if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 55) then
+    -- arcane_torrent,if=energy<31
+    if HR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
+      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
+    end
+    -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
+    if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 65) then
       if HR.Cast(S.TigerPalm) then return ""; end
     end
-    -- rjw > ks if SLG
-    if S.RushingJadeWind:IsCastableP() and I.StormstoutsLastGasp:IsEquipped() and S.RushingJadeWind:CooldownRemainsP() + 0.5 <= S.KegSmash:CooldownRemainsP() then
-      if HR.Cast(S.RushingJadeWind) then return ""; end
-    end
-    -- Keg Smash coming back during the next GCD
-    if Target:IsInRange(25) and S.KegSmash:CooldownRemainsP() < Player:GCD() then
-      if HR.Cast(S.KegSmash) then return ""; end
-    end
-    -- Trick to take in consideration the Recovery Setting
-    if S.TigerPalm:IsCastable("Melee") then
-      if HR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
-    end
+  	-- downtime energy pooling
+    if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
 

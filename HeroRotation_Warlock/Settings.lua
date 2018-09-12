@@ -19,19 +19,17 @@
     Commons = {
       PetReminder = "Always",
       ForcePet = "No",
+      UsePotions = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        SummonDoomGuard = true,
-        SummonInfernal = true,
-        LifeTap = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
         Racials = true,
         -- Abilities
-        
+
       }
     },
     Destruction = {
@@ -85,33 +83,31 @@
       }
     },
     Affliction = {
-      UnendingResolveHP = 20,
+      -- UnendingResolveHP = 20,
       ShowPoPP = false,
-      Sephuz = {
-        HowlOfTerror = false,
-        MortalCoil = false,
-        Fear = false,
-        SingeMagic = false,
-        SpellLock = false
-      },
+      -- Sephuz = {
+      --   HowlOfTerror = false,
+      --   MortalCoil = false,
+      --   Fear = false,
+      --   SingeMagic = false,
+      --   SpellLock = false
+      -- },
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        SummonFelhunter = true,
-        GrimoireFelhunter = true,
+        DarkSoul = true,
+        SummonDarkglare = true,
+        SummonPet = true,
         GrimoireOfSacrifice = true,
-        ReapSoul = true,
         PhantomSingularity = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        UnendingResolve = true,
-        SoulHarvest = true,
       }
     }
   };
-  
+
   HR.GUI.LoadSettingsRecursively(HR.GUISettings);
 
   -- Child Panels
@@ -124,6 +120,7 @@
   CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons");
   CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.PetReminder", {"Always", "Not with Grimoire of Supremacy", "Never"}, "Pet Summon Reminder", "Whether to show a Pet Summoning Reminder for a more optimal pet if you already have an active one.");
   -- CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.ForcePet", {"No", "Infernal", "DoomGuard"}, "Force a specific pet", "Force the addon to show you a specific pet instead of the one the rotation propose.");
+  CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.UsePotions", "Show Potions", "Enable this if you want it to show you to use Potions.");
   -- Destruction
   CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
   CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType", {"Auto","Orange","Green"}, "Spell icons", "Define what icons you want to appear.");
@@ -144,9 +141,8 @@
   CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.AxeToss", "Sephuz: Show Axe Toss", "Enable this if you want it to show you when to use Axe Toss (Felguard spell) to proc Sephuz's Secret (only when equipped).");
   -- Affliction
   CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction");
-  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
-  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.SingeMagic", "Sephuz: Show Singe Magic", "Enable this if you want it to show you when to use Singe Magic (Imp spell) to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.SpellLock", "Sephuz: Show Spell Lock", "Enable this if you want it to show you when to use Spell Lock (Felhunter spell) to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.SingeMagic", "Sephuz: Show Singe Magic", "Enable this if you want it to show you when to use Singe Magic (Imp spell) to proc Sephuz's Secret (only when equipped).");
+  -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.SpellLock", "Sephuz: Show Spell Lock", "Enable this if you want it to show you when to use Spell Lock (Felhunter spell) to proc Sephuz's Secret (only when equipped).");
 

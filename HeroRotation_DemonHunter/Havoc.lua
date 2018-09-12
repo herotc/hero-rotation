@@ -62,6 +62,9 @@ Spell.DemonHunter.Havoc = {
   T21_4pc_Buff                  = Spell(252165),
   -- Misc
   PoolEnergy                    = Spell(9999000010),
+  -- Azerite Traits
+  RevolvingBlades               = Spell(279581),
+  UnboundChaos                  = Spell(275144),
 };
 local S = Spell.DemonHunter.Havoc;
 
@@ -111,17 +114,6 @@ local function IsInMeleeRange ()
   end
 
   return Target:IsInRange("Melee");
-end
-
--- Special Havoc Functions
-local function IsMetaExtendedByDemonic()
-  if not Player:BuffP(S.MetamorphosisBuff) then
-    return false;
-  elseif(S.EyeBeam:TimeSinceLastCast() < S.MetamorphosisImpact:TimeSinceLastCast()) then
-    return true;
-  end
-
-  return false;
 end
 
 -- Variables
@@ -194,6 +186,10 @@ local function APL()
     return HR.Cast(S.FelRush);
   end
 
+  local function ConserveFelRush()
+    return not Settings.Havoc.ConserveFelRush or S.FelRush:Charges() == 2
+  end
+
   local function DarkSlash()
     if not IsInMeleeRange() then return; end
 
@@ -223,9 +219,13 @@ local function APL()
     if S.DeathSweep:IsReady(8, true) and BladeDance() then
       if HR.Cast(S.DeathSweep) then return "Cast Death Sweep"; end
     end
-    -- blade_dance,if=variable.blade_dance&cooldown.eye_beam.remains>5&!cooldown.metamorphosis.ready
+    -- eye_beam,if=!buff.metamorphosis.extended_by_demonic&(raid_event.adds.up|raid_event.adds.in>25)
+    if S.EyeBeam:IsReady(20, true) then
+      if HR.Cast(S.EyeBeam) then return "Cast Eye Beam (AoE)"; end
+    end
+    -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
     if S.BladeDance:IsReady(8, true)
-      and BladeDance() and S.EyeBeam:CooldownRemainsP() > 5 and not S.Metamorphosis:IsReady() then
+      and BladeDance() and (not HR.CDsON() or not S.Metamorphosis:IsReady()) and (S.EyeBeam:CooldownRemainsP() > (5 - S.RevolvingBlades:AzeriteRank() * 3)) then
       if HR.Cast(S.BladeDance) then return "Cast Blade Dance"; end
     end
     -- immolation_aura
@@ -236,11 +236,6 @@ local function APL()
     if S.Felblade:IsCastable(S.Felblade)
       and (Player:Fury() < 40 or (not Player:BuffP(S.MetamorphosisBuff) and Player:FuryDeficit() >= 40)) then
       if HR.Cast(S.Felblade) then return "Cast Felblade"; end
-    end
-    -- eye_beam,if=(!talent.blind_fury.enabled|fury.deficit>=70)&(!buff.metamorphosis.extended_by_demonic|(set_bonus.tier21_4pc&buff.metamorphosis.remains>16))
-    if S.EyeBeam:IsReady(20, true) and (not S.BlindFury:IsAvailable() or Player:FuryDeficit() >= 70)
-      and (not IsMetaExtendedByDemonic() or (HL.Tier21_4Pc and Player:BuffRemainsP(S.MetamorphosisBuff) > 16)) then
-      if HR.Cast(S.EyeBeam) then return "Cast Eye Beam"; end
     end
     -- annihilation,if=(talent.blind_fury.enabled|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
     if InMeleeRange and S.Annihilation:IsReady()
@@ -253,7 +248,11 @@ local function APL()
       if HR.Cast(S.ChaosStrike) then return "Cast Chaos Strike"; end
     end
     -- fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
-    if S.FelRush:IsCastable(20, true) and S.DemonBlades:IsAvailable() and not S.EyeBeam:IsReady() then
+    if S.FelRush:IsCastable(20, true) and S.DemonBlades:IsAvailable() and not S.EyeBeam:IsReady() and ConserveFelRush() then
+      if CastFelRush() then return "Cast Fel Rush (Filler)"; end
+    end
+    -- fel_rush,if=!talent.demon_blades.enabled&!cooldown.eye_beam.ready&azerite.unbound_chaos.rank>0
+    if S.FelRush:IsCastable(20, true) and not S.DemonBlades:IsAvailable() and not S.EyeBeam:IsReady() and S.UnboundChaos:AzeriteRank() > 0 and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (Filler)"; end
     end
     -- demons_bite
@@ -265,7 +264,7 @@ local function APL()
       if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glave (OOR)"; end
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
-    if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) then
+    if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (OOR)"; end
     end
     -- throw_glaive,if=talent.demon_blades.enabled
@@ -282,12 +281,16 @@ local function APL()
       if HR.Cast(S.VengefulRetreat) then return "Cast Vengeful Retreat (Momentum)"; end
     end
     -- fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
-    if S.FelRush:IsCastable(20, true) and (WaitingForMomentum() or S.FelMastery:IsAvailable()) then
+    if S.FelRush:IsCastable(20, true) and (WaitingForMomentum() or S.FelMastery:IsAvailable()) and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (Momentum)"; end
     end
     -- fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
     if S.FelBarrage:IsCastable(8, true) and not WaitingForMomentum() then
       if HR.Cast(S.FelBarrage) then return "Cast Fel Barrage"; end
+    end
+    -- death_sweep,if=variable.blade_dance
+    if S.DeathSweep:IsReady(8, true) and BladeDance() then
+      if HR.Cast(S.DeathSweep) then return "Cast Death Sweep"; end
     end
     -- immolation_aura
     if S.ImmolationAura:IsCastable(8, true) then
@@ -297,13 +300,13 @@ local function APL()
     if S.EyeBeam:IsReady(20, true) and HR.AoEON() and Cache.EnemiesCount[CleaveRangeID] > 1 and not WaitingForMomentum() then
       if HR.Cast(S.EyeBeam) then return "Cast Eye Beam (AoE)"; end
     end
-    -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsReady(8, true) and BladeDance() then
-      if HR.Cast(S.DeathSweep) then return "Cast Death Sweep"; end
-    end
     -- blade_dance,if=variable.blade_dance
     if S.BladeDance:IsReady(8, true) and BladeDance() then
       if HR.Cast(S.BladeDance) then return "Cast Blade Dance"; end
+    end
+    -- fel_rush,if=!talent.momentum.enabled&!talent.demon_blades.enabled&azerite.unbound_chaos.enabled
+    if S.FelRush:IsCastable(20, true) and not S.Momentum:IsAvailable() and not S.DemonBlades:IsAvailable() and S.UnboundChaos:AzeriteEnabled() and ConserveFelRush() then
+      if CastFelRush() then return "Cast Fel Rush (Filler)"; end
     end
     -- felblade,if=fury.deficit>=40
     if S.Felblade:IsCastable(S.Felblade) and Player:FuryDeficit() >= 40 then
@@ -322,7 +325,7 @@ local function APL()
     -- chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
     if InMeleeRange and S.ChaosStrike:IsReady()
       and (S.DemonBlades:IsAvailable() or not WaitingForMomentum() or Player:FuryDeficit() < 30)
-      and not PoolingForBladeDance() and not WaitingForDarkSlash() then
+      and not PoolingForMeta() and not PoolingForBladeDance() and not WaitingForDarkSlash() then
       if HR.Cast(S.ChaosStrike) then return "Cast Chaos Strike"; end
     end
     -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
@@ -334,7 +337,7 @@ local function APL()
       if HR.Cast(S.DemonsBite) then return "Cast Demon's Bite"; end
     end
     -- fel_rush,if=!talent.momentum.enabled&raid_event.movement.in>charges*10&talent.demon_blades.enabled
-    if S.FelRush:IsCastable(20) and not S.Momentum:IsAvailable() and S.DemonBlades:IsAvailable() then
+    if S.FelRush:IsCastable(20) and not S.Momentum:IsAvailable() and S.DemonBlades:IsAvailable() and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (Filler)"; end
     end
     -- felblade,if=movement.distance>15|buff.out_of_range.up
@@ -342,7 +345,7 @@ local function APL()
       if HR.Cast(S.Felblade) then return "Cast Felblade (OOR)"; end
     end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
-    if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) then
+    if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (OOR)"; end
     end
     -- throw_glaive,if=talent.demon_blades.enabled

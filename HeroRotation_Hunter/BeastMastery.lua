@@ -200,7 +200,7 @@ local function APL ()
       if HR.Cast(S.SpittingCobra, Settings.BeastMastery.GCDasOffGCD.SpittingCobra) then return ""; end
     end
     -- actions+=/stampede,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<gcd|target.time_to_die<15
-    if HR.CDsON() and S.Stampede:IsCastable() and (Player:Buff(S.BestialWrath) or ((S.BestialWrath:CooldownRemains() <= 2 or not AR.CDsON()) or (Target:TimeToDie() <= 15))) then
+    if HR.CDsON() and S.Stampede:IsCastable() and (Player:Buff(S.BestialWrath) or ((S.BestialWrath:CooldownRemains() <= 2 or not HR.CDsON()) or (Target:TimeToDie() <= 15))) then
       if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede) then return ""; end
     end
     -- actions+=/aspect_of_the_wild
