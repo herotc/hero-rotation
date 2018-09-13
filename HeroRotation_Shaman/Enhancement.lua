@@ -185,20 +185,20 @@ local function APL ()
       if HR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
     end
 
-    -- Healing surge when we have less than the set health threshold!
-    if S.HealingSurge:IsReady() and Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold then
-      -- Instant casts using maelstrom only.
-      if Player:Maelstrom() >= 20 then
-        if HR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
-      end
-    end
-
     -- Use healthstone or health potion if we have it and our health is low.
     if Settings.Shaman.Commons.ShowHSHP and (Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold) then
       if I.Healthstone:IsReady() then
         if HR.CastSuggested(I.Healthstone) then return "Use Healthstone" end
       elseif I.CHP:IsReady() then
         if HR.CastSuggested(I.CHP) then return "Use CHP" end
+      end
+    end
+
+    -- Healing surge when we have less than the set health threshold!
+    if S.HealingSurge:IsReady() and Settings.Shaman.Commons.HealingSurgeEnabled and Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold then
+      -- Instant casts using maelstrom only.
+      if Player:Maelstrom() >= 20 then
+        if HR.Cast(S.HealingSurge) then return "Cast HealingSurge" end
       end
     end
 
