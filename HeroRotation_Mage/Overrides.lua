@@ -41,7 +41,9 @@
     HL.AddCoreOverride ("Spell.CooldownRemainsP",
     function (self, BypassRecovery, Offset)
       if self == SpellArcane.MarkofAluneth and Player:IsCasting(self) then
-        return 60;
+        return 60
+      elseif self == SpellArcane.RuneofPower and Player:IsCasting(self) then
+        return 10
       else
         return self:CooldownRemains( BypassRecovery, Offset or "Auto" );
       end
@@ -53,7 +55,23 @@
     function (self, Spell, AnyCaster, Offset)
       local BaseCheck = ArcanePlayerBuffRemainsP(self, Spell, AnyCaster, Offset)
       if Spell == SpellArcane.RuneofPowerBuff then
-        return ROPRemains(SpellArcane.RuneofPowerBuff)
+        return self:IsCasting(SpellArcane.RuneofPower) and 10 or ROPRemains(Spell)
+      else
+        return BaseCheck
+      end
+    end
+    , 62);
+
+    local ArcanePlayerBuffDownP
+    ArcanePlayerBuffDownP = HL.AddCoreOverride ("Player.BuffDownP",
+    function (self, Spell, AnyCaster, Offset)
+      local BaseCheck = ArcanePlayerBuffDownP(self, Spell, AnyCaster, Offset)
+      if Spell == SpellArcane.RuneofPowerBuff then
+        if self:IsCasting(SpellArcane.RuneofPower) then
+          return false
+        else
+          return self:BuffRemainsP() == 0
+        end
       else
         return BaseCheck
       end
