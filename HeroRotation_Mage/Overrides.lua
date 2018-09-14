@@ -70,7 +70,7 @@
         if self:IsCasting(SpellArcane.RuneofPower) then
           return false
         else
-          return self:BuffRemainsP() == 0
+          return self:BuffRemainsP(Spell, AnyCaster, Offset) == 0
         end
       else
         return BaseCheck
