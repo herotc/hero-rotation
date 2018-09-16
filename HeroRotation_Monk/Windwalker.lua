@@ -324,8 +324,8 @@ local function APL ()
       if HR.Cast(S.WhirlingDragonPunch) then 
         return "Cast Single Target Whirling Dragon Punch"; end
     end
-    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(cooldown.fists_of_fury.remains>2|chi>=5|azerite.swift_roundhouse.rank>1)
-    if S.RisingSunKick:IsReadyP() and (S.FistsOfFury:CooldownRemainsP() > 2 or Player:Chi() >= 5 or S.SwiftRoundhouse:AzeriteRank() > 1) then
+    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
+    if S.RisingSunKick:IsReadyP()  then
       if HR.Cast(S.RisingSunKick) then 
         return "Cast Single Target Rising Sun Kick"; end
     end
@@ -355,7 +355,7 @@ local function APL ()
       if HR.Cast(S.EnergizingElixir) then 
         return "Cast Single Target Energizing Elixir"; end
 	  end
-    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>2|chi>=3)&(cooldown.fists_of_fury.remains>2|chi>=4|azerite.swift_roundhouse.enabled)&buff.swift_roundhouse.stack<2
+    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>2|chi>=3)&(cooldown.fists_of_fury.remains>2|chi>=4|(chi=2&prev_gcd.1.tiger_palm)|(azerite.swift_roundhouse.rank>=2&active_enemies=1))&buff.swift_roundhouse.stack<2
     if S.BlackoutKick:IsReadyP()
       and (
         not Player:PrevGCD(1, S.BlackoutKick)
@@ -363,6 +363,7 @@ local function APL ()
         and (
           S.FistsOfFury:CooldownRemainsP() > 2 or 
           Player:Chi() >= 4 or 
+          (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm)) or
           (S.SwiftRoundhouse:AzeriteRank() > 1 and Cache.EnemiesCount[5] == 1)
         )
         and Player:BuffStack(S.SwiftRoundhouseBuff) < 2
