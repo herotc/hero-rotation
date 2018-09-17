@@ -183,12 +183,10 @@ local function APL()
     -- stop_burn_phase,if=burn_phase&variable.bs_rotation=0&prev_gcd.1.evocation&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
     if (bool(VarBurnPhase) and VarBsRotation == 0 and Player:PrevGCDP(1, S.Evocation) and Target:TimeToDie() > VarAverageBurnLength and VarBurnPhaseDuration > 0) then
       StopBurnPhase()
-	  return "Burn - Stop Burn"
     end
     -- stop_burn_phase,if=burn_phase&variable.bs_rotation=1&buff.arcane_power.down&cooldown.arcane_power.remains>0&buff.arcane_power.down&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
     if (bool(VarBurnPhase) and VarBsRotation == 1 and Player:BuffDownP(S.ArcanePowerBuff) and S.ArcanePower:CooldownRemainsP() > 0 and Player:BuffDownP(S.ArcanePowerBuff) and Target:TimeToDie() > VarAverageBurnLength and VarBurnPhaseDuration > 0) then
       StopBurnPhase()
-	  return "Burn - Stop Burn (BS)"
     end
     -- charged_up,if=buff.arcane_charge.stack<=1
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1) then
@@ -276,9 +274,9 @@ local function APL()
       if HR.Cast(S.ArcaneBlast) then return "Burn - Cast Arcane Blast"; end
     end
     -- variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
-    -- if (true) then
-    --  VarAverageBurnLength = (VarAverageBurnLength * VarTotalBurns - VarAverageBurnLength + (VarBurnPhaseDuration)) / VarTotalBurns
-    -- end
+    if (true) then
+     VarAverageBurnLength = (VarAverageBurnLength * VarTotalBurns - VarAverageBurnLength + (VarBurnPhaseDuration)) / VarTotalBurns
+    end
     -- evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1
     if S.Evocation:IsCastableP() then
       if HR.Cast(S.Evocation) then return "Burn - Cast Evocation"; end
