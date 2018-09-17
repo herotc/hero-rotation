@@ -177,13 +177,8 @@ local function APL()
       StartBurnPhase()
     end
     -- if we're evocating then stop if we have enough mana
-    if (bool(VarBurnPhase)) and (Player:IsChanneling(S.Evocation)) then
-	  if (Player:ManaPercentage() < 85) then
-        if HR.Cast(S.Evocation) then return "Burn - Keep Evocating"; end
-	  else
-	    StopBurnPhase()
-		return "Burn - Stop Burn (Enough mana)"
-	  end
+    if (bool(VarBurnPhase)) and (Player:IsChanneling(S.Evocation)) and (Player:ManaPercentage() < 85) then
+      if HR.Cast(S.Evocation) then return "Burn - Keep Evocating"; end
     end
     -- stop_burn_phase,if=burn_phase&variable.bs_rotation=0&prev_gcd.1.evocation&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
     if (bool(VarBurnPhase) and VarBsRotation == 0 and Player:PrevGCDP(1, S.Evocation) and Target:TimeToDie() > VarAverageBurnLength and VarBurnPhaseDuration > 0) then
