@@ -43,7 +43,7 @@ local pairs = pairs;
     -- Offensive
     AvengingWrath                 = Spell(31884),
     Crusade                       = Spell(231895),
-    WakeofAshes                   = Spell(205273),
+    WakeofAshes                   = Spell(255937),
     -- Defensive
     -- Utility
     HammerofJustice               = Spell(853),
