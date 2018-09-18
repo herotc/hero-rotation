@@ -1,6 +1,6 @@
 ## Interface: 80000
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FRogue|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFFFFF569Rogue|r]
 ## Author: Aethys, Mystler
 ## Notes: Hero Rotation - Rogue Module.
 

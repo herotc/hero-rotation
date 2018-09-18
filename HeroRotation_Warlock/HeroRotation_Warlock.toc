@@ -1,6 +1,6 @@
 ## Interface: 80000
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FWarlock|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFF8787EDWarlock|r]
 ## Author: KutiKuti
 ## Notes: Hero Rotation - Warlock Module.
 

@@ -1,6 +1,6 @@
 ## Interface: 80000
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FHunter|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFFABD473Hunter|r]
 ## Author: Nia
 ## Notes: Hero Rotation - Hunter Module.
 

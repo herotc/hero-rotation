@@ -1,6 +1,6 @@
 ## Interface: 80000
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FMonk|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFF00FF96Monk|r]
 ## Author: Lockem
 ## Notes: Hero Rotation - Monk Module.
 

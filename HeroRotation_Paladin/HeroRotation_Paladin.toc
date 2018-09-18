@@ -1,6 +1,6 @@
 ## Interface: 80000
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFEDA55FPaladin|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFFF58CBAPaladin|r]
 ## Author: Aethys, chrislopez24
 ## Notes: Hero Rotation - Paladin Module.
 
