@@ -176,7 +176,7 @@ local function APL()
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
   end
   BosPooling = function()
@@ -258,7 +258,7 @@ local function APL()
     end
     -- arcane_torrent,if=runic_power.deficit>20
     if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 20) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- wait for resources
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Ticking"; end
@@ -403,7 +403,7 @@ local function APL()
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
   end
   -- call precombat
