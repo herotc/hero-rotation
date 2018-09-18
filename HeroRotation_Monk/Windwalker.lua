@@ -359,7 +359,7 @@ local function APL ()
           S.FistsOfFury:CooldownRemainsP() > 2 or 
           Player:Chi() >= 4 or 
           (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm)) or
-          (S.SwiftRoundhouse:AzeriteRank() > 1 and Cache.EnemiesCount[5] == 1)
+          (S.SwiftRoundhouse:AzeriteRank() >= 2 and Cache.EnemiesCount[5] == 1)
         )
         and Player:BuffStack(S.SwiftRoundhouseBuff) < 2
       ) then
