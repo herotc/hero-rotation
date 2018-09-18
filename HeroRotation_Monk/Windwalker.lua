@@ -431,13 +431,13 @@ local function APL ()
         return ShouldReturn; end
     end
     -- actions+=/call_action_list,name=st,if=active_enemies<3
-    if (Cache.EnemiesCount[8] < 3 then
+    if Cache.EnemiesCount[8] < 3 then
       local ShouldReturn = SingleTarget(); 
       if ShouldReturn then 
         return ShouldReturn; end
     end;
     -- actions+=/call_action_list,name=aoe,if=active_enemies>=3
-    if (Cache.EnemiesCount[8] >= 3 then
+    if Cache.EnemiesCount[8] >= 3 then
       local ShouldReturn = Aoe(); 
       if ShouldReturn then 
         return ShouldReturn; end
