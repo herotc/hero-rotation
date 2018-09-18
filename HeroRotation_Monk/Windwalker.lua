@@ -334,13 +334,8 @@ local function APL ()
       if HR.Cast(S.RushingJadeWind) then 
         return "Cast Single Target Rushing Jade Wind"; end
   	end
-    -- actions.st+=/fists_of_fury,if=energy.time_to_max>2.5&(azerite.swift_roundhouse.rank<2|(cooldown.whirling_dragon_punch.remains<10&talent.whirling_dragon_punch.enabled)|active_enemies>1)
-    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 2.5 and
-      (
-        S.SwiftRoundhouse:AzeriteRank() < 2 or
-        (S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 10) or
-        Cache.EnemiesCount[8] > 1
-      ) then
+    -- actions.st+=/fists_of_fury,if=energy.time_to_max>2.5
+    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 2.5 then
       if HR.Cast(S.FistsOfFury) then 
         return "Cast Single Target Fists of Fury"; end
     end
@@ -364,7 +359,7 @@ local function APL ()
           S.FistsOfFury:CooldownRemainsP() > 2 or 
           Player:Chi() >= 4 or 
           (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm)) or
-          (S.SwiftRoundhouse:AzeriteRank() >= 2 and Cache.EnemiesCount[5] == 1)
+          (S.SwiftRoundhouse:AzeriteRank() > 1 and Cache.EnemiesCount[5] == 1)
         )
         and Player:BuffStack(S.SwiftRoundhouseBuff) < 2
       ) then
@@ -435,14 +430,14 @@ local function APL ()
       if ShouldReturn then 
         return ShouldReturn; end
     end
-    -- actions+=/call_action_list,name=st,if=active_enemies<3|(active_enemies=3&azerite.swift_roundhouse.rank>2)
-    if (Cache.EnemiesCount[8] < 3 or (Cache.EnemiesCount[8] == 3 and S.SwiftRoundhouse:AzeriteRank() > 2)) then
+    -- actions+=/call_action_list,name=st,if=active_enemies<3
+    if (Cache.EnemiesCount[8] < 3 then
       local ShouldReturn = SingleTarget(); 
       if ShouldReturn then 
         return ShouldReturn; end
     end;
-    -- actions+=/call_action_list,name=aoe,if=active_enemies>3|(active_enemies=3&azerite.swift_roundhouse.rank<=2)
-    if (Cache.EnemiesCount[8] > 3 or (Cache.EnemiesCount[8] == 3 and S.SwiftRoundhouse:AzeriteRank() <= 2)) then
+    -- actions+=/call_action_list,name=aoe,if=active_enemies>=3
+    if (Cache.EnemiesCount[8] >= 3 then
       local ShouldReturn = Aoe(); 
       if ShouldReturn then 
         return ShouldReturn; end
