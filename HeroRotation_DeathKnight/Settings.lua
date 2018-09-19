@@ -31,7 +31,7 @@ HR.GUISettings.APL.DeathKnight = {
   Frost = {
     GCDasOffGCD = {
       -- Abilities
-      HornOfWinter = true,
+      HornofWinter = true,
       FrostwyrmsFury = true,
       PillarofFrost = true,
       EmpowerRuneWeapon = true,

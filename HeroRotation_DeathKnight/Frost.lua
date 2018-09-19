@@ -171,7 +171,7 @@ local function APL()
     end
     -- horn_of_winter
     if S.HornofWinter:IsCastableP() then
-      if HR.Cast(S.HornofWinter) then return ""; end
+      if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return ""; end
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() then
@@ -241,7 +241,7 @@ local function APL()
     end
     -- horn_of_winter,if=runic_power.deficit>=30&rune.time_to_3>gcd
     if S.HornofWinter:IsCastableP() and (Player:RunicPowerDeficit() >= 30 and Player:RuneTimeToX(3) > Player:GCD()) then
-      if HR.Cast(S.HornofWinter) then return ""; end
+      if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return ""; end
     end
     -- remorseless_winter
     if S.RemorselessWinter:IsCastableP() then
@@ -322,7 +322,7 @@ local function APL()
     end
     -- frostwyrms_fury,if=buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up
     if S.FrostwyrmsFury:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() and Player:BuffP(S.PillarofFrostBuff)) then
-      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffCGC.FrostwyrmsFury) then return ""; end
+      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
     end
   end
   Obliteration = function()
@@ -398,7 +398,7 @@ local function APL()
     end
     -- horn_of_winter
     if S.HornofWinter:IsCastableP() then
-      if HR.Cast(S.HornofWinter) then return ""; end
+      if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return ""; end
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() then
