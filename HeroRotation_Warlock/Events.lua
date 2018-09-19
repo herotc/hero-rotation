@@ -169,7 +169,7 @@
     --Guardians table
     HL:RegisterForSelfCombatEvent(
       function (...)
-        dateEvent,_,_,_,_,_,_,UnitPetGUID=select(1,...)
+        local dateEvent,_,_,_,_,_,_,UnitPetGUID=select(1,...)
        
         local t={} ; i=1
         for str in string.gmatch(UnitPetGUID, "([^-]+)") do
@@ -188,7 +188,7 @@
     --Implosion listener (kill all wild imps)
     HL:RegisterForSelfCombatEvent(
       function (...)
-        DestGUID, _, _, _, SpellID = select(8, ...);
+        local DestGUID, _, _, _, SpellID = select(8, ...);
         if SpellID == 196277 then
           for key, Value in pairs(HL.GuardiansTable.Pets) do
             if HL.GuardiansTable.Pets[key][1]=="Wild Imp" then
@@ -203,7 +203,7 @@
     -- Listen for imp felfirebolts and remove imps after 5 casts
     HL:RegisterForCombatEvent(
       function (...)
-        UnitGUID, _, _, _, _, _, _, _, SpellID = select(4, ...);
+        local UnitGUID, _, _, _, _, _, _, _, SpellID = select(4, ...);
         if SpellID == 104318 then
           for key, Value in pairs(HL.GuardiansTable.Pets) do
             if HL.GuardiansTable.Pets[key][4] == UnitGUID then
