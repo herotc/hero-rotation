@@ -33,7 +33,7 @@ HR.GUISettings.APL.DeathKnight = {
       -- Abilities
       HornOfWinter = true,
       FrostwyrmsFury = true,
-      PillarOfFrost = true,
+      PillarofFrost = true,
       EmpowerRuneWeapon = true,
       BreathofSindragosa = true
     },

@@ -59,8 +59,7 @@ local S = Spell.DeathKnight.Frost;
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Frost = {
-  BattlePotionofStrength           = Item(142117),
-  --BattlePotionofStrength           = Item(163224),
+  BattlePotionofStrength           = Item(163224),
   RazdunksBigRedButton             = Item(159611),
   MerekthasFang                    = Item(158367),
   FirstMatesSpyglass               = Item(158163)
@@ -323,7 +322,7 @@ local function APL()
     end
     -- frostwyrms_fury,if=buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up
     if S.FrostwyrmsFury:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() and Player:BuffP(S.PillarofFrostBuff)) then
-      if HR.Cast(S.FrostwyrmsFury) then return ""; end
+      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffCGC.FrostwyrmsFury) then return ""; end
     end
   end
   Obliteration = function()
