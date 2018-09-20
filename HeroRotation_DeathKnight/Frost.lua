@@ -43,7 +43,7 @@ Spell.DeathKnight.Frost = {
   Berserking                            = Spell(26297),
   EmpowerRuneWeapon                     = Spell(47568),
   BreathofSindragosa                    = Spell(152279),
-  ColdHeart                             = Spell(281209),
+  ColdHeart                             = Spell(281208),
   RazoriceDebuff                        = Spell(51714),
   FrozenPulseBuff                       = Spell(194909),
   FrozenPulse                           = Spell(194909),
@@ -59,8 +59,7 @@ local S = Spell.DeathKnight.Frost;
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Frost = {
-  BattlePotionofStrength           = Item(142117),
-  --BattlePotionofStrength           = Item(163224),
+  BattlePotionofStrength           = Item(163224),
   RazdunksBigRedButton             = Item(159611),
   MerekthasFang                    = Item(158367),
   FirstMatesSpyglass               = Item(158163)
@@ -116,6 +115,9 @@ local function APL()
     end
     -- opener
     if Everyone.TargetIsValid() then
+      if S.BreathofSindragosa:IsAvailable() and S.Obliterate:IsCastableP("Melee") then
+        if HR.Cast(S.Obliterate) then return ""; end
+      end
       if S.HowlingBlast:IsCastableP(30, true) and (not Target:DebuffP(S.FrostFeverDebuff)) then
         if HR.Cast(S.HowlingBlast) then return ""; end
       end
@@ -172,11 +174,11 @@ local function APL()
     end
     -- horn_of_winter
     if S.HornofWinter:IsCastableP() then
-      if HR.Cast(S.HornofWinter) then return ""; end
+      if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return ""; end
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
   end
   BosPooling = function()
@@ -242,7 +244,7 @@ local function APL()
     end
     -- horn_of_winter,if=runic_power.deficit>=30&rune.time_to_3>gcd
     if S.HornofWinter:IsCastableP() and (Player:RunicPowerDeficit() >= 30 and Player:RuneTimeToX(3) > Player:GCD()) then
-      if HR.Cast(S.HornofWinter) then return ""; end
+      if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return ""; end
     end
     -- remorseless_winter
     if S.RemorselessWinter:IsCastableP() then
@@ -258,7 +260,7 @@ local function APL()
     end
     -- arcane_torrent,if=runic_power.deficit>20
     if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 20) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- wait for resources
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Ticking"; end
@@ -323,7 +325,7 @@ local function APL()
     end
     -- frostwyrms_fury,if=buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up
     if S.FrostwyrmsFury:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() and Player:BuffP(S.PillarofFrostBuff)) then
-      if HR.Cast(S.FrostwyrmsFury) then return ""; end
+      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury) then return ""; end
     end
   end
   Obliteration = function()
@@ -399,11 +401,11 @@ local function APL()
     end
     -- horn_of_winter
     if S.HornofWinter:IsCastableP() then
-      if HR.Cast(S.HornofWinter) then return ""; end
+      if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return ""; end
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Frost.GCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
   end
   -- call precombat
@@ -433,7 +435,7 @@ local function APL()
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- call_action_list,name=cooldowns
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
@@ -449,7 +451,7 @@ local function APL()
       return Obliteration();
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
-    if (Cache.EnemiesCount[10] >= 2) then
+    if HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
       return Aoe();
     end
     -- call_action_list,name=standard
