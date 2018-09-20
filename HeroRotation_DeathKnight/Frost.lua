@@ -43,7 +43,7 @@ Spell.DeathKnight.Frost = {
   Berserking                            = Spell(26297),
   EmpowerRuneWeapon                     = Spell(47568),
   BreathofSindragosa                    = Spell(152279),
-  ColdHeart                             = Spell(281209),
+  ColdHeart                             = Spell(281208),
   RazoriceDebuff                        = Spell(51714),
   FrozenPulseBuff                       = Spell(194909),
   FrozenPulse                           = Spell(194909),
@@ -115,6 +115,9 @@ local function APL()
     end
     -- opener
     if Everyone.TargetIsValid() then
+      if S.BreathofSindragosa:IsAvailable() and S.Obliterate:IsCastableP("Melee") then
+        if HR.Cast(S.Obliterate) then return ""; end
+      end
       if S.HowlingBlast:IsCastableP(30, true) and (not Target:DebuffP(S.FrostFeverDebuff)) then
         if HR.Cast(S.HowlingBlast) then return ""; end
       end
@@ -432,7 +435,7 @@ local function APL()
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- call_action_list,name=cooldowns
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<5
@@ -448,7 +451,7 @@ local function APL()
       return Obliteration();
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
-    if (Cache.EnemiesCount[10] >= 2) then
+    if HR.AoEON() and Cache.EnemiesCount[10] >= 2 then
       return Aoe();
     end
     -- call_action_list,name=standard
