@@ -412,10 +412,10 @@ local function APL ()
   if not Player:AffectingCombat() then
     -- Precombat CDs
     if HR.CDsON() then
-      if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
-        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
-      end
       if Settings.Outlaw.PrecombatAR and Everyone.TargetIsValid() then
+        if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
+        end
         if S.AdrenalineRush:IsCastable() and not Player:BuffP(S.AdrenalineRush) then
           if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (OOC)"; end
         end
