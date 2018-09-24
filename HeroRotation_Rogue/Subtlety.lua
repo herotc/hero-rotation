@@ -52,6 +52,7 @@ local tableinsert = table.insert;
     DarkShadow                            = Spell(245687),
     DeeperStratagem                       = Spell(193531),
     EnvelopingShadows                     = Spell(238104),
+    FindWeakness                          = Spell(91023),
     FindWeaknessDebuff                    = Spell(91021),
     Gloomblade                            = Spell(200758),
     MarkedforDeath                        = Spell(137619),
@@ -267,8 +268,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and Player:BuffP(VanishBuff)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
-  -- actions.stealthed+=/shuriken_toss,if=buff.sharpened_blades.stack>=29
-  if S.ShurikenToss:IsCastableP() and Player:BuffStackP(S.SharpenedBladesBuff) >= 29 then
+  -- actions.stealthed+=/shuriken_toss,if=buff.sharpened_blades.stack>=29&(!talent.find_weakness.enabled|debuff.find_weakness.up)
+  if S.ShurikenToss:IsCastableP() and Player:BuffStackP(S.SharpenedBladesBuff) >= 29 and (not S.FindWeakness:IsAvailable() or Target:DebuffP(S.FindWeaknessDebuff)) then
     if ReturnSpellOnly then
       return S.ShurikenToss
     else
@@ -641,7 +642,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-09-13
+-- Last Update: 2018-09-24
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -705,8 +706,8 @@ HR.SetAPL(261, APL);
 -- actions.stealthed=shadowstrike,if=buff.stealth.up
 -- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
--- # Shuriken Toss at 29+ Sharpened Blades stacks in Stealth for damage bonuses.
--- actions.stealthed+=/shuriken_toss,if=buff.sharpened_blades.stack>=29
+-- # Shuriken Toss at 29+ Sharpened Blades stacks in Stealth for damage bonuses. Hold for Find Weakness if possible.
+-- actions.stealthed+=/shuriken_toss,if=buff.sharpened_blades.stack>=29&(!talent.find_weakness.enabled|debuff.find_weakness.up)
 -- # At 2 targets with Secret Technique keep up Find Weakness by cycling Shadowstrike.
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
 -- # Without Deeper Stratagem and 3 Ranks of Blade in the Shadows it is worth using Shadowstrike on 3 targets.
