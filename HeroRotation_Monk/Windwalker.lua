@@ -229,7 +229,7 @@ local function APL ()
   -- Serenity --
   Serenity = function()
     -- actions.serenity=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
-    if S.RisingSunKick:IsReadyP() and (Cache.EnemiesCount[5] < 1 or Player:PrevGCD(1,S.SpinningCraneKick)) then
+    if S.RisingSunKick:IsReadyP() and (Cache.EnemiesCount[5] < 3 or Player:PrevGCD(1,S.SpinningCraneKick)) then
       if HR.Cast(S.RisingSunKick) then 
         return "Cast Serenity Rising Sun Kick"; end
     end
