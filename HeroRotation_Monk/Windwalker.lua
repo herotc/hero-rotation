@@ -287,8 +287,10 @@ local function APL ()
       (
         not Player:PrevGCD(1, S.SpinningCraneKick) and 
           (
-            (Player:Chi() > 3 or S.FistsOfFury:CooldownRemainsP() > 6) and
-            (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemainsP() > 2) or
+            (
+              (Player:Chi() > 3 or S.FistsOfFury:CooldownRemainsP() > 6) and
+              (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemainsP() > 2)
+            ) or
             Player:EnergyTimeToMaxPredicted() <= 3 
           )
       ) then
