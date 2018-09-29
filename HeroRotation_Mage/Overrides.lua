@@ -97,7 +97,7 @@
       return math.min(
           num(Player:BuffP(SpellFire.HeatingUpBuff))
         + num(Player:BuffP(SpellFire.CombustionBuff) and (Player:IsCasting(SpellFire.Fireball) or Player:IsCasting(SpellFire.Scorch) or Player:IsCasting(SpellFire.Pyroblast)))
-        + num((Player:IsCasting(SpellFire.Scorch) and (Target:HealthPercentage() <= 30 and (Item.Mage.Fire.Item132454:IsEquipped() or SpellFire.SearingTouch:IsAvailable()))))
+        + num((Player:IsCasting(SpellFire.Scorch) and (Target:HealthPercentage() <= 30 and SpellFire.SearingTouch:IsAvailable())))
         + num(bool(SpellFire.Firestarter:ActiveStatus()) and (Player:IsCasting(SpellFire.Fireball) or Player:IsCasting(SpellFire.Pyroblast)))
         + num(SpellFire.PhoenixFlames:InFlight())
         + num(SpellFire.Pyroblast:InFlight(SpellFire.CombustionBuff))
