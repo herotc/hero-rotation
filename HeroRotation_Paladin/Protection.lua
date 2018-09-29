@@ -14,7 +14,7 @@
   -- HeroRotation
   local HR = HeroRotation;
   -- Lua
-  
+
 
 
 --- ============================ CONTENT ============================
@@ -25,7 +25,7 @@
   if not Spell.Paladin then Spell.Paladin = {}; end
   Spell.Paladin.Protection = {
     -- Racials
-    
+
     -- Abilities
     AvengersShield           = Spell(31935),
     AvengingWrath            = Spell(31884),
@@ -40,26 +40,24 @@
     BlessedHammer            = Spell(204019),
     ConsecratedHammer        = Spell(203785),
     CrusadersJudgment        = Spell(204023),
-    -- Artifact
-    EyeofTyr                 = Spell(209202),
     -- Defensive
     LightoftheProtector      = Spell(184092),
     HandoftheProtector       = Spell(213652),
     -- Utility
-    
+
     -- Legendaries
-    
+
     -- Misc
-    
+
     -- Macros
-    
+
   };
   local S = Spell.Paladin.Protection;
   -- Items
   if not Item.Paladin then Item.Paladin = {}; end
   Item.Paladin.Protection = {
     -- Legendaries
-    
+
   };
   local I = Item.Paladin.Protection;
   -- Rotation Var
@@ -110,10 +108,6 @@
         if HR.CDsON() and S.AvengingWrath:IsCastable("Melee") then
           if HR.Cast(S.AvengingWrath, Settings.Protection.OffGCDasOffGCD.AvengingWrath) then return; end
         end
-        -- Eye of Tyr (HP)
-        if S.EyeofTyr:IsCastable(8, true) and Player:HealthPercentage() <= Settings.Protection.EyeofTyrHP then
-          if HR.Cast(S.EyeofTyr) then return; end
-        end
       -- Defensives
       if Target:IsInRange(10) then
         if not Player:HealingAbsorbed() then
@@ -129,13 +123,17 @@
           end
         end
       end
+      -- Consecration
+      if S.Consecration:IsCastable("Melee") and (not Player:Buff(S.ConsecrationBuff) or S.Consecration:TimeSinceLastCast() > 10) then
+        if HR.Cast(S.Consecration) then return; end
+      end
+      -- Judgment
+      if S.Judgment:IsCastable(30) and S.ShieldoftheRighteous:ChargesFractional() < 2.75 then
+        if HR.Cast(S.Judgment) then return; end
+      end
       -- Avenger's Shield
       if S.AvengersShield:IsCastable(30) then
         if HR.Cast(S.AvengersShield) then return; end
-      end
-      -- Consecration 
-      if S.Consecration:IsCastable("Melee") then
-        if HR.Cast(S.Consecration) then return; end
       end
       -- Judgment
       if S.Judgment:IsCastable(30) then
@@ -163,5 +161,5 @@
 
 
 --- ======= SIMC =======
---- Last Update: 04/30/2017
--- I did it for my Paladin alt to tank Dungeons, so I took these talents: 3133121
+--- Last Update: 09/29/2018
+-- I did it for my Paladin alt to tank Dungeons, so I took these talents: 1213221
