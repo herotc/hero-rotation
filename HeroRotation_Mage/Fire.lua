@@ -77,7 +77,7 @@ local Settings = {
 
 -- Variables
 
-local EnemyRanges = {40}
+local EnemyRanges = {40,10}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -340,6 +340,7 @@ local function APL()
     end
   end
   -- call precombat
+  print(S.DragonsBreath:IsCastableP())
   if not Player:AffectingCombat() and not Player:IsCasting() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end

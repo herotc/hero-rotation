@@ -156,6 +156,8 @@
       local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
       if self == SpellFire.RuneofPower then
         return BaseCheck and not Player:IsCasting(SpellFire.RuneofPower)
+      elseif self == SpellFire.DragonsBreath then
+        return BaseCheck and (Cache.EnemiesCount[10] >= 1)
       else
         return BaseCheck
       end
