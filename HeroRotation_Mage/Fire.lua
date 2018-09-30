@@ -211,7 +211,7 @@ local function APL()
       if HR.Cast(S.Scorch) then return ""; end
     end
     -- dragons_breath,if=!buff.hot_streak.react&action.fire_blast.charges<1
-    if S.DragonsBreath:IsCastableP() and (not bool(Player:BuffStackP(S.HotStreakBuff)) and S.FireBlast:ChargesP() < 1) then
+    if S.DragonsBreath:IsCastableP() and (not bool(Player:BuffStackP(S.HotStreakBuff)) and S.FireBlast:ChargesP() < 1) and (Cache.EnemiesCount[12] >= 1) then
       if HR.Cast(S.DragonsBreath) then return ""; end
     end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
