@@ -88,6 +88,86 @@
   , 265)
 -- Demonology, ID: 266
 
+-- Returns the amount of wild imps that are up
+HL.AddCoreOverride("Player.PetStack",
+function (PetType)
+  PetType = PetType or false
+  local count = 0
+  if not HL.GuardiansTable.Pets or not PetType then
+    return count
+  end
+  for key, petData in pairs(HL.GuardiansTable.Pets) do
+    if petData[1] == PetType then
+      count = count +1
+    end 
+  end
+  return count
+end
+, 266)
+
+HL.AddCoreOverride("Player.PetDuration",
+function (PetType)
+  if not PetType then return 0 end
+  local PetsInfo = {
+    [55659] = {"Wild Imp", 20},
+    [99737] = {"Wild Imp", 20},
+    [98035] = {"Dreadstalker", 12},
+    [17252] = {"Felguard", 15},
+    [135002] = {"Demonic Tyrant", 15},
+  }
+  local maxduration = 0
+  for key, Value in pairs(HL.GuardiansTable.Pets) do
+    if HL.GuardiansTable.Pets[key][1] == PetType then
+      if (PetsInfo[HL.GuardiansTable.Pets[key][2]][2] - (GetTime() - HL.GuardiansTable.Pets[key][3])) > maxduration then
+        maxduration = HL.OffsetRemains((PetsInfo[HL.GuardiansTable.Pets[key][2]][2] - (GetTime() - HL.GuardiansTable.Pets[key][3])), "Auto" );
+      end
+    end
+  end
+  return maxduration
+end
+, 266)
+
+HL.AddCoreOverride ("Player.SoulShardsP",
+    function (self)
+      local Shard = Player:SoulShards()
+      if not Player:IsCasting() then
+        return Shard
+      else
+        if Player:IsCasting(SpellDemo.NetherPortal) then
+          return Shard - 3
+        elseif Player:IsCasting(SpellDemo.CallDreadStalkers) and Player:BuffRemainsP(SpellDemo.DemonicCallingBuff) == 0 then
+          return Shard - 2
+        elseif Player:IsCasting(SpellDemo.CallDreadStalkers) and Player:BuffRemainsP(SpellDemo.DemonicCallingBuff) > 0 then
+          return Shard - 1
+        elseif Player:IsCasting(SpellDemo.SummonVilefiend) then
+          return Shard - 1
+        elseif Player:IsCasting(SpellDemo.SummonFelguard) then
+          return Shard - 1
+        elseif Player:IsCasting(SpellDemo.HandOfGuldan) then
+          if Shard > 3 then
+            return Shard - 3
+          else
+            return 0
+          end
+        elseif Player:IsCasting(SpellDemo.Demonbolt) then
+          if Shard >= 4 then
+            return 5
+          else
+            return Shard + 2
+          end
+        elseif Player:IsCasting(SpellDemo.Shadowbolt) then
+          if Shard == 5 then
+            return Shard
+          else
+            return Shard + 1
+          end
+        else
+          return Shard
+        end
+      end
+    end
+  , 266);
+
 -- Destruction, ID: 267
 
 -- Example (Arcane Mage)

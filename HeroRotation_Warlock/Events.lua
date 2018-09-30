@@ -98,10 +98,10 @@
     };
     
   HL.GuardiansTable = {
-      --{PetType,petID,dateEvent,UnitPetGUID,DE_Buffed}
+      --{PetType,petID,dateEvent,UnitPetGUID,CastsLeft}
       Pets = {
       },
-      PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[11859]="Doomguard",[89]="Infernal",[103673]="DarkGlare"}
+      PetList={[55659]="Wild Imp",[99737]="Wild Imp",[98035]="Dreadstalker",[135002]="Demonic Tyrant",[17252]="Felguard"}
     };
   
   
@@ -169,7 +169,7 @@
     --Guardians table
     HL:RegisterForSelfCombatEvent(
       function (...)
-        dateEvent,_,_,_,_,_,_,UnitPetGUID=select(1,...)
+        local dateEvent,_,_,_,_,_,_,UnitPetGUID=select(1,...)
        
         local t={} ; i=1
         for str in string.gmatch(UnitPetGUID, "([^-]+)") do
@@ -178,34 +178,40 @@
         end
         local PetType=HL.GuardiansTable.PetList[tonumber(t[6])]
         if PetType then
-          table.insert(HL.GuardiansTable.Pets,{PetType,tonumber(t[6]),GetTime(),UnitPetGUID,false})
+          table.insert(HL.GuardiansTable.Pets,{PetType,tonumber(t[6]),GetTime(),UnitPetGUID,5})
         end
 
       end
       , "SPELL_SUMMON"
     );
     
-    --Buff all guardians
+    --Implosion listener (kill all wild imps)
     HL:RegisterForSelfCombatEvent(
       function (...)
-        DestGUID, _, _, _, SpellID = select(8, ...);
-        if SpellID == 193396 then
+        local DestGUID, _, _, _, SpellID = select(8, ...);
+        if SpellID == 196277 then
           for key, Value in pairs(HL.GuardiansTable.Pets) do
-            HL.GuardiansTable.Pets[key][5]=true
+            if HL.GuardiansTable.Pets[key][1]=="Wild Imp" then
+              HL.GuardiansTable.Pets[key]=nil
+            end
           end
         end
       end
       , "SPELL_CAST_SUCCESS"
     );
-    
-    --Implosion listener (kill all wild imps)
-    HL:RegisterForSelfCombatEvent(
+
+    -- Listen for imp felfirebolts and remove imps after 5 casts
+    HL:RegisterForCombatEvent(
       function (...)
-        DestGUID, _, _, _, SpellID = select(8, ...);
-        if SpellID == 196277 then
+        local UnitGUID, _, _, _, _, _, _, _, SpellID = select(4, ...);
+        if SpellID == 104318 then
           for key, Value in pairs(HL.GuardiansTable.Pets) do
-            if HL.GuardiansTable.Pets[key][1]=="Wild Imp" then
-              HL.GuardiansTable.Pets[key]=nil
+            if HL.GuardiansTable.Pets[key][4] == UnitGUID then
+              if HL.GuardiansTable.Pets[key][5] - 1 > 0 then
+                HL.GuardiansTable.Pets[key][5] = HL.GuardiansTable.Pets[key][5] - 1
+              else
+                HL.GuardiansTable.Pets[key]=nil
+              end
             end
           end
         end
