@@ -79,7 +79,7 @@ local Settings = {
 
 -- Variables
 
-local EnemyRanges = {35}
+local EnemyRanges = {35,10}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -172,7 +172,7 @@ local function APL()
       if HR.Cast(S.GlacialSpike) then return ""; end
     end
     -- cone_of_cold
-    if S.ConeofCold:IsCastableP() then
+    if (S.ConeofCold:IsCastableP() and (Cache.EnemiesCount[10] >= 1)) then
       if HR.Cast(S.ConeofCold) then return ""; end
     end
     -- frostbolt
