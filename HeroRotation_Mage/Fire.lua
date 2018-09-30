@@ -340,7 +340,6 @@ local function APL()
     end
   end
   -- call precombat
-  print(S.DragonsBreath:IsCastableP())
   if not Player:AffectingCombat() and not Player:IsCasting() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
