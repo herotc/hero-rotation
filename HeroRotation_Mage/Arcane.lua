@@ -115,8 +115,10 @@ end
 BurnPhase:Reset()
 
 function BurnPhase:Start()
-  self.state = true
-  self.last_start = HL.GetTime()
+  if Player:AffectingCombat() then
+    self.state = true
+    self.last_start = HL.GetTime()
+  end
 end
 
 function BurnPhase:Stop()
@@ -125,7 +127,7 @@ function BurnPhase:Stop()
 end
 
 function BurnPhase:On()
-  return self.state
+  return self.state or (not Player:AffectingCombat() and Player:IsCasting() and ((S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0)))))
 end
 
 function BurnPhase:Duration()
@@ -139,6 +141,12 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   BurnPhase:Reset()
 end, "PLAYER_REGEN_DISABLED")
+
+-- HL:RegisterForEvent(function(_, srcunit)
+--   if srcunit == "player" and not Player:AffectingCombat() then
+--     BurnPhase:Reset()
+--   end
+-- end, "UNIT_SPELLCAST_INTERRUPTED")
 
 local function PresenceOfMindMax ()
   return 2
@@ -183,7 +191,7 @@ local function APL()
     end
     -- arcane_blast
     if S.ArcaneBlast:IsReadyP() then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "AB Precombat"; end
     end
   end
   Burn = function()
@@ -207,7 +215,7 @@ local function APL()
     end
     -- charged_up,if=buff.arcane_charge.stack<=1
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1) then
-      if HR.Cast(S.ChargedUp) then return ""; end
+      if HR.Cast(S.ChargedUp) then return "CU B"; end
     end
     -- mirror_image
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
@@ -219,7 +227,7 @@ local function APL()
     end
     -- arcane_blast,if=buff.rule_of_threes.up&talent.overpowered.enabled
     if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and S.Overpowered:IsAvailable() and Cache.EnemiesCount[40] < 3) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "AB BURN 229"; end
     end
     -- lights_judgment,if=buff.arcane_power.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.ArcanePowerBuff)) then
@@ -267,7 +275,7 @@ local function APL()
       if HR.Cast(S.ArcaneBarrage) then return ""; end
     end
     -- arcane_explosion,if=active_enemies>=3
-    if S.ArcaneExplosion:IsCastableP() and (Cache.EnemiesCount[10] >= 3) then
+    if S.ArcaneExplosion:IsReadyP() and (Cache.EnemiesCount[10] >= 3) then
       if HR.Cast(S.ArcaneExplosion) then return ""; end
     end
     -- arcane_missiles,if=buff.clearcasting.react&active_enemies<3&(talent.amplification.enabled|(!talent.overpowered.enabled&azerite.arcane_pummeling.rank>=2)|buff.arcane_power.down),chain=1
@@ -276,7 +284,7 @@ local function APL()
     end
     -- arcane_blast
     if S.ArcaneBlast:IsReadyP() and (Cache.EnemiesCount[40] < 3) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "AB BURN 286"; end
     end
     -- variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
     if (true) then
@@ -298,7 +306,7 @@ local function APL()
     end
     -- charged_up,if=buff.arcane_charge.stack=0
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() == 0) then
-      if HR.Cast(S.ChargedUp) then return ""; end
+      if HR.Cast(S.ChargedUp) then return "CU C"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
     if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
@@ -310,7 +318,7 @@ local function APL()
     end
     -- arcane_blast,if=buff.rule_of_threes.up&buff.arcane_charge.stack>3
     if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and Player:ArcaneChargesP() > 3) then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "AB Cons ROP 320"; end
     end
     -- rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|full_recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
     if S.RuneofPower:IsCastableP() and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or S.RuneofPower:FullRechargeTimeP() <= S.ArcanePower:CooldownRemainsP() or Target:TimeToDie() <= S.ArcanePower:CooldownRemainsP())) then
@@ -329,12 +337,12 @@ local function APL()
       if HR.Cast(S.Supernova) then return ""; end
     end
     -- arcane_explosion,if=active_enemies>=3&(mana.pct>=variable.conserve_mana|buff.arcane_charge.stack=3)
-    if S.ArcaneExplosion:IsCastableP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentageP() >= VarConserveMana or Player:ArcaneChargesP() == 3)) then
+    if S.ArcaneExplosion:IsReadyP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentageP() >= VarConserveMana or Player:ArcaneChargesP() == 3)) then
       if HR.Cast(S.ArcaneExplosion) then return ""; end
     end
     -- arcane_blast
     if S.ArcaneBlast:IsReadyP() then
-      if HR.Cast(S.ArcaneBlast) then return ""; end
+      if HR.Cast(S.ArcaneBlast) then return "AB Cons 344"; end
     end
     -- arcane_barrage
     if S.ArcaneBarrage:IsCastableP() then
