@@ -60,6 +60,24 @@
     end
     , 62);
 
+    local ArcanePlayerBuffP
+    ArcanePlayerBuffP = HL.AddCoreOverride ("Player.BuffP",
+    function (self, Spell, AnyCaster, Offset)
+      local BaseCheck = ArcanePlayerBuffP(self, Spell, AnyCaster, Offset)
+      if Spell == SpellArcane.RuneofPowerBuff then
+        return self:IsCasting(SpellArcane.RuneofPower) or (ROPRemains(Spell) > 0)
+      elseif Spell == SpellArcane.RuleofThreesBuff then
+        if self:IsCasting(SpellArcane.ArcaneBlast) then
+          return self:ArcaneCharges() == 2
+        else
+          return BaseCheck
+        end
+      else
+        return BaseCheck
+      end
+    end
+    , 62);
+
     local ArcanePlayerBuffDownP
     ArcanePlayerBuffDownP = HL.AddCoreOverride ("Player.BuffDownP",
     function (self, Spell, AnyCaster, Offset)
