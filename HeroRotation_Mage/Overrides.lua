@@ -40,9 +40,7 @@
   -- Arcane, ID: 62
     HL.AddCoreOverride ("Spell.CooldownRemainsP",
     function (self, BypassRecovery, Offset)
-      if self == SpellArcane.MarkofAluneth and Player:IsCasting(self) then
-        return 60
-      elseif self == SpellArcane.RuneofPower and Player:IsCasting(self) then
+      if self == SpellArcane.RuneofPower and Player:IsCasting(self) then
         return 10
       else
         return self:CooldownRemains( BypassRecovery, Offset or "Auto" );
