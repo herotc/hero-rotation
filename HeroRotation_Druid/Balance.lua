@@ -137,13 +137,15 @@ local function Precombat ()
   if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
     if HR.CastSuggested(I.ProlongedPower) then return ""; end
   end
-  -- solar_wrath
-  if S.SolarWrath:IsCastableP() and not Player:IsCasting(S.SolarWrath) then
-    if HR.Cast(S.SolarWrath) then return ""; end
-  end
-  -- sunfire
-  if S.Sunfire:IsCastableP() and (true) then
-    if HR.Cast(S.Sunfire) then return ""; end
+  if Everyone.TargetIsValid() then -- opener
+    -- solar_wrath
+    if S.SolarWrath:IsCastableP() and not Player:IsCasting(S.SolarWrath) then
+      if HR.Cast(S.SolarWrath) then return ""; end
+    end
+    -- sunfire
+    if S.Sunfire:IsCastableP() and Everyone.TargetIsValid() then
+      if HR.Cast(S.Sunfire) then return ""; end
+    end
   end
 end
 
@@ -328,21 +330,23 @@ local function APL()
     ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
 
-  Everyone.Interrupt(5, S.SolarBeam, Settings.Commons.OffGCDasOffGCD.SolarBeam, Interrupts);
+  if Everyone.TargetIsValid() then
+    Everyone.Interrupt(5, S.SolarBeam, Settings.Commons.OffGCDasOffGCD.SolarBeam, Interrupts);
 
-  if HR.CDsON() then
-    ShouldReturn = CDs();
+    if HR.CDsON() then
+      ShouldReturn = CDs();
+      if ShouldReturn then return ShouldReturn; end
+    end
+
+    ShouldReturn = Dot();
+    if ShouldReturn then return ShouldReturn; end
+
+    ShouldReturn = EmpowermentCapCheck();
+    if ShouldReturn then return ShouldReturn; end
+
+    ShouldReturn = CoreRotation();
     if ShouldReturn then return ShouldReturn; end
   end
-
-  ShouldReturn = Dot();
-  if ShouldReturn then return ShouldReturn; end
-
-  ShouldReturn = EmpowermentCapCheck();
-  if ShouldReturn then return ShouldReturn; end
-
-  ShouldReturn = CoreRotation();
-  if ShouldReturn then return ShouldReturn; end
 end
 
 HR.SetAPL(102, APL)
