@@ -108,16 +108,18 @@ local function APL()
     if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (not Player:BuffP(S.ShadowformBuff)) then
       if HR.Cast(S.Shadowform) then return ""; end
     end
-    -- mind_blast
-    if S.MindBlast:IsReadyP() and not Player:IsCasting(S.MindBlast) then
-      if HR.Cast(S.MindBlast) then return ""; end
-    end
-    -- shadow_word_void
-    if S.ShadowWordVoid:IsReadyP() and not Player:IsCasting(S.ShadowWordVoid) then
-      if HR.Cast(S.ShadowWordVoid) then return ""; end
-    end
-    if S.VampiricTouch:IsReadyP() and not Player:IsCasting(S.VampiricTouch) then
-      if HR.Cast(S.VampiricTouch) then return ""; end
+    if Everyone.TargetIsValid() then
+      -- mind_blast
+      if S.MindBlast:IsReadyP() and not Player:IsCasting(S.MindBlast) then
+        if HR.Cast(S.MindBlast) then return ""; end
+      end
+      -- shadow_word_void
+      if S.ShadowWordVoid:IsReadyP() and not Player:IsCasting(S.ShadowWordVoid) then
+        if HR.Cast(S.ShadowWordVoid) then return ""; end
+      end
+      if S.VampiricTouch:IsReadyP() and not Player:IsCasting(S.VampiricTouch) then
+        if HR.Cast(S.VampiricTouch) then return ""; end
+      end
     end
   end
   Aoe = function()

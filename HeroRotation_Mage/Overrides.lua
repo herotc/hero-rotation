@@ -40,9 +40,7 @@
   -- Arcane, ID: 62
     HL.AddCoreOverride ("Spell.CooldownRemainsP",
     function (self, BypassRecovery, Offset)
-      if self == SpellArcane.MarkofAluneth and Player:IsCasting(self) then
-        return 60
-      elseif self == SpellArcane.RuneofPower and Player:IsCasting(self) then
+      if self == SpellArcane.RuneofPower and Player:IsCasting(self) then
         return 10
       else
         return self:CooldownRemains( BypassRecovery, Offset or "Auto" );
@@ -56,6 +54,24 @@
       local BaseCheck = ArcanePlayerBuffRemainsP(self, Spell, AnyCaster, Offset)
       if Spell == SpellArcane.RuneofPowerBuff then
         return self:IsCasting(SpellArcane.RuneofPower) and 10 or ROPRemains(Spell)
+      else
+        return BaseCheck
+      end
+    end
+    , 62);
+
+    local ArcanePlayerBuffP
+    ArcanePlayerBuffP = HL.AddCoreOverride ("Player.BuffP",
+    function (self, Spell, AnyCaster, Offset)
+      local BaseCheck = ArcanePlayerBuffP(self, Spell, AnyCaster, Offset)
+      if Spell == SpellArcane.RuneofPowerBuff then
+        return self:IsCasting(SpellArcane.RuneofPower) or (ROPRemains(Spell) > 0)
+      elseif Spell == SpellArcane.RuleofThreesBuff then
+        if self:IsCasting(SpellArcane.ArcaneBlast) then
+          return self:ArcaneCharges() == 2
+        else
+          return BaseCheck
+        end
       else
         return BaseCheck
       end
@@ -97,7 +113,7 @@
       return math.min(
           num(Player:BuffP(SpellFire.HeatingUpBuff))
         + num(Player:BuffP(SpellFire.CombustionBuff) and (Player:IsCasting(SpellFire.Fireball) or Player:IsCasting(SpellFire.Scorch) or Player:IsCasting(SpellFire.Pyroblast)))
-        + num((Player:IsCasting(SpellFire.Scorch) and (Target:HealthPercentage() <= 30 and (Item.Mage.Fire.Item132454:IsEquipped() or SpellFire.SearingTouch:IsAvailable()))))
+        + num((Player:IsCasting(SpellFire.Scorch) and (Target:HealthPercentage() <= 30 and SpellFire.SearingTouch:IsAvailable())))
         + num(bool(SpellFire.Firestarter:ActiveStatus()) and (Player:IsCasting(SpellFire.Fireball) or Player:IsCasting(SpellFire.Pyroblast)))
         + num(SpellFire.PhoenixFlames:InFlight())
         + num(SpellFire.Pyroblast:InFlight(SpellFire.CombustionBuff))
@@ -156,6 +172,8 @@
       local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
       if self == SpellFire.RuneofPower then
         return BaseCheck and not Player:IsCasting(SpellFire.RuneofPower)
+      elseif self == SpellFire.DragonsBreath then
+        return BaseCheck and (Cache.EnemiesCount[10] >= 1)
       else
         return BaseCheck
       end

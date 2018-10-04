@@ -228,13 +228,18 @@ local function APL ()
 
   -- Serenity --
   Serenity = function()
-    -- actions.serenity=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
-    if S.RisingSunKick:IsReadyP() then
+    -- actions.serenity=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
+    if S.RisingSunKick:IsReadyP() and (Cache.EnemiesCount[5] < 3 or Player:PrevGCD(1,S.SpinningCraneKick)) then
       if HR.Cast(S.RisingSunKick) then 
         return "Cast Serenity Rising Sun Kick"; end
     end
-    -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick&!azerite.swift_roundhouse.enabled)|buff.serenity.remains<1|active_enemies>1
-    if S.FistsOfFury:IsReadyP() and ((Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or Player:BuffRemainsP(S.Serenity) < 1 or Cache.EnemiesCount[8] > 1) then
+    -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick&!azerite.swift_roundhouse.enabled)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
+    if S.FistsOfFury:IsReadyP() and 
+      (
+        (Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or 
+        Player:BuffRemainsP(S.Serenity) < 1 or 
+        (Cache.EnemiesCount[8] > 1 and Cache.EnemiesCount[8] < 5)
+      ) then
       if HR.Cast(S.FistsOfFury) then 
         return "Cast Serenity Fists of Fury"; end
     end
@@ -273,13 +278,22 @@ local function APL ()
         return "Cast AoE Rushing Jade Wind"; end
   	end
     -- actions.aoe+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<gcd)&cooldown.fists_of_fury.remains>3
-    if S.RisingSunKick:IsReadyP() and (S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() > Player:GCD()) and
-      S.FistsOfFury:CooldownRemainsP() > 3 then
+    if S.RisingSunKick:IsReadyP() and (S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() > Player:GCD()) and S.FistsOfFury:CooldownRemainsP() > 3 then
       if HR.Cast(S.RisingSunKick) then 
         return "Cast AoE Rising Sun Kick"; end
     end
-    -- actions.aoe+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(chi>2|cooldown.fists_of_fury.remains>4)
-    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and (Player:Chi() > 2 or S.FistsOfFury:CooldownRemainsP() > 4)) then
+    -- actions.aoe+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
+    if S.SpinningCraneKick:IsReadyP() and 
+      (
+        not Player:PrevGCD(1, S.SpinningCraneKick) and 
+          (
+            (
+              (Player:Chi() > 3 or S.FistsOfFury:CooldownRemainsP() > 6) and
+              (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemainsP() > 2)
+            ) or
+            Player:EnergyTimeToMaxPredicted() <= 3 
+          )
+      ) then
       if HR.Cast(S.SpinningCraneKick) then 
         return "Cast AoE Spinning Crane Kick"; end
     end
@@ -324,6 +338,16 @@ local function APL ()
       if HR.Cast(S.WhirlingDragonPunch) then 
         return "Cast Single Target Whirling Dragon Punch"; end
     end
+    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi>=5
+    if S.RisingSunKick:IsReadyP() and Player:Chi() >= 5 then
+      if HR.Cast(S.RisingSunKick) then 
+        return "Cast Single Target Rising Sun Kick"; end
+    end
+    -- actions.st+=/fists_of_fury,if=energy.time_to_max>3
+    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 3 then
+      if HR.Cast(S.FistsOfFury) then 
+        return "Cast Single Target Fists of Fury"; end
+    end
     -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
     if S.RisingSunKick:IsReadyP()  then
       if HR.Cast(S.RisingSunKick) then 
@@ -350,13 +374,13 @@ local function APL ()
       if HR.Cast(S.EnergizingElixir) then 
         return "Cast Single Target Energizing Elixir"; end
 	  end
-    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>2|chi>=3)&(cooldown.fists_of_fury.remains>2|chi>=4|(chi=2&prev_gcd.1.tiger_palm)|(azerite.swift_roundhouse.rank>=2&active_enemies=1))&buff.swift_roundhouse.stack<2
+    -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>3|chi>=3)&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm)|(azerite.swift_roundhouse.rank>=2&active_enemies=1))&buff.swift_roundhouse.stack<2
     if S.BlackoutKick:IsReadyP()
       and (
         not Player:PrevGCD(1, S.BlackoutKick)
-        and (S.RisingSunKick:CooldownRemainsP() > 2 or Player:Chi() >= 3)
+        and (S.RisingSunKick:CooldownRemainsP() > 3 or Player:Chi() >= 3)
         and (
-          S.FistsOfFury:CooldownRemainsP() > 2 or 
+          S.FistsOfFury:CooldownRemainsP() > 4 or 
           Player:Chi() >= 4 or 
           (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm)) or
           (S.SwiftRoundhouse:AzeriteRank() >= 2 and Cache.EnemiesCount[5] == 1)
@@ -382,13 +406,7 @@ local function APL ()
       if HR.Cast(S.TigerPalm) then 
         return "Cast Single Target Tiger Palm"; end
     end
-    -- actions.st+=/flying_serpent_kick,if=prev_gcd.1.blackout_kick&chi>1&buff.swift_roundhouse.stack<2,interrupt=1
-	  -- actions.st+=/fists_of_fury,if=energy.time_to_max>2.5&cooldown.rising_sun_kick.remains>2&buff.swift_roundhouse.stack=2
-    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 2.5 and S.RisingSunKick:CooldownRemainsP() > 2 and
-      Player:BuffStack(S.SwiftRoundhouseBuff) == 2 then
-      if HR.Cast(S.FistsOfFury) then 
-        return "Cast Single Target Fists of Fury"; end
-    end
+    -- actions.st+=/flying_serpent_kick,if=prev_gcd.1.blackout_kick&chi>3&buff.swift_roundhouse.stack<2,interrupt=1
   end
 
 	-- Out of Combat

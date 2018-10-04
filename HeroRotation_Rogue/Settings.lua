@@ -47,6 +47,8 @@
       -- Poison Refresh (in minutes)
       PoisonRefresh = 15,
       PoisonRefreshCombat = 3,
+      -- Suggest Mutilate on 2 targets instead of FoK
+      MutiOnTwoTargets = false,
       -- Suggest Multi-DoT at FoK Range
       RangedMultiDoT = true,
       -- {Display GCD as OffGCD, ForceReturn}
@@ -122,6 +124,7 @@
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.MutiOnTwoTargets", "Suggest Mutilate on two targets", "Suggest Mutilate instead of Fan of Knives when fighting two targets.");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
   CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
   -- Outlaw
