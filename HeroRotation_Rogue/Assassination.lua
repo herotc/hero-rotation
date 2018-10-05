@@ -56,6 +56,7 @@ Spell.Rogue.Assassination = {
   ToxicBladeDebuff      = Spell(245389),
   VenomRush             = Spell(152152),
   -- Azerite Traits
+  DoubleDose            = Spell(273007),
   SharpenedBladesPower  = Spell(272911),
   SharpenedBladesBuff   = Spell(272916),
   ShroudedSuffocation   = Spell(278666),
@@ -433,13 +434,30 @@ local function Direct ()
   if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 then
     if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife (Sharpened Blades)"; end
   end
-  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
-  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2 + num(Player:IsStealthedP(true, false) or Settings.Assassination.MutiOnTwoTargets) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
+  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 4 + num(Player:IsStealthedP(true, false)) + num(S.DoubleDose:AzeriteRank() > 2) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
+  end
+  -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and Player:BuffP(S.DeadlyPoison) and Cache.EnemiesCount[10] >= 3 then
+    for _, CycleUnit in pairs(Cache.Enemies[10]) do
+      if not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
+        if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (DP Refresh)"; end
+      end
+    end
   end
   -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
   if S.Blindside:IsCastable("Melee") and (Player:BuffP(S.BlindsideBuff) or (not S.VenomRush:IsAvailable() and Target:HealthPercentage() < 30)) then
     if HR.Cast(S.Blindside) then return "Cast Blindside"; end
+  end
+  -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
+  if S.Mutilate:IsCastable("Melee") and Cache.EnemiesCount[10] == 2 then
+    for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
+      if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
+        HR.CastLeftNameplate(CycleUnit, S.Mutilate);
+        break;
+      end
+    end
   end
   -- actions.direct+=/mutilate,if=variable.use_filler
   if S.Mutilate:IsCastable("Melee") then
@@ -569,7 +587,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-09-05
+-- Last Update: 2018-10-05
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -582,7 +600,9 @@ HR.SetAPL(259, APL);
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
 --
 -- # Executed every time the actor is available.
--- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
+-- # Restealth if possible (no vulnerable enemies in combat)
+-- actions=stealth
+-- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
 -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
 -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
 -- actions+=/call_action_list,name=cds
@@ -655,6 +675,10 @@ HR.SetAPL(259, APL);
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target
 -- # Poisoned Knife at 29+ stacks of Sharpened Blades.
 -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
--- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
+-- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
+-- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets
+-- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
+-- # Tab-Mutilate to apply Deadly Poison at 2 targets
+-- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
 -- actions.direct+=/mutilate,if=variable.use_filler
