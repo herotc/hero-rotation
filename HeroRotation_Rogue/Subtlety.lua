@@ -368,16 +368,20 @@ local function CDs ()
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or Cache.EnemiesCount[10] < 3 or not S.ShurikenTornado:CooldownUp()) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death"; end
     end
+    -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
+    if S.MarkedforDeath:IsCastable() and Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) then
+      if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
+    end
+    -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
+    -- Note: Without Settings.Subtlety.STMfDAsDPSCD
+    if not Settings.Subtlety.STMfDAsDPSCD and S.MarkedforDeath:IsCastable() and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+      HR.CastSuggested(S.MarkedforDeath);
+    end
     if HR.CDsON() then
-      -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
-      -- Note: Done at the start of the Rotation (Rogue Commmon)
       -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
-      if S.MarkedforDeath:IsCastable() then
-        if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit()) or (Settings.Subtlety.STMfDAsDPSCD and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend()) then
-          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
-        elseif not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
-          HR.CastSuggested(S.MarkedforDeath);
-        end
+      -- Note: With Settings.Subtlety.STMfDAsDPSCD
+      if Settings.Subtlety.STMfDAsDPSCD and S.MarkedforDeath:IsCastable() and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
       end
       -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
       if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
@@ -524,7 +528,7 @@ local function APL ()
   --- Out of Combat
     if not Player:AffectingCombat() then
       -- Stealth
-    -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
+      -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
       if not Player:Buff(S.ShadowDanceBuff) and not Player:Buff(VanishBuff) then
         ShouldReturn = Rogue.Stealth(Stealth);
         if ShouldReturn then return ShouldReturn; end
