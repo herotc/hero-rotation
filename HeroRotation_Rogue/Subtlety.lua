@@ -149,6 +149,16 @@ local function IsInMeleeRange ()
   return Target:IsInRange("Melee") and true or false;
 end
 
+local function MayBurnShadowDance()
+  if Settings.Subtlety.BurnShadowDance == "On Bosses not in Dungeons" and Player:IsInDungeon() then
+    return false
+  elseif Settings.Subtlety.BurnShadowDance ~= "Always" and not Target:IsInBossList() then
+    return false
+  else
+    return true
+  end
+end
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -397,7 +407,7 @@ local function CDs ()
         if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado (SF)"; end
       end
       -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled
-      if S.ShadowDance:IsCastable() and not Player:BuffP(S.ShadowDanceBuff) and Target:FilteredTimeToDie("<=", 5 + num(S.Subterfuge:IsAvailable())) then
+      if S.ShadowDance:IsCastable() and MayBurnShadowDance() and not Player:BuffP(S.ShadowDanceBuff) and Target:FilteredTimeToDie("<=", 5 + num(S.Subterfuge:IsAvailable())) then
         if StealthMacro(S.ShadowDance) then return "Shadow Dance Macro"; end
       end
     end
@@ -433,7 +443,7 @@ local function Stealth_CDs ()
     end
     -- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
     if (HR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
-      and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
+      and S.ShadowDance:IsCastable() and MayBurnShadowDance() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1
       and Target:TimeToDie() < S.SymbolsofDeath:CooldownRemainsP() then
       if StealthMacro(S.ShadowDance) then return "ShadowDance Macro 2"; end

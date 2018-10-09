@@ -77,6 +77,8 @@
       }
     },
     Subtlety = {
+      -- Burn Shadow Dance charges when the target is about to die
+      BurnShadowDance = "On Bosses not in Dungeons",
       -- Damage Offsets
       EviscerateDMGOffset = 3,
       -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
@@ -131,6 +133,7 @@
   CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.PrecombatAR", "Show Precombat Adrenaline Rush", "Display Adrenaline Rush when outside of combat with a valid target.");
   CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw");
   -- Subtlety
+  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", {"Always", "On Bosses", "On Bosses not in Dungeons"}, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.");
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.");
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {2, 3, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.");
