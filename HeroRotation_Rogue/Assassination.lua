@@ -56,6 +56,7 @@ Spell.Rogue.Assassination = {
   ToxicBladeDebuff      = Spell(245389),
   VenomRush             = Spell(152152),
   -- Azerite Traits
+  DoubleDose            = Spell(273007),
   SharpenedBladesPower  = Spell(272911),
   SharpenedBladesBuff   = Spell(272916),
   ShroudedSuffocation   = Spell(278666),
@@ -233,7 +234,7 @@ local function CDs ()
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
 
     -- Racials
-    if Target:Debuff(S.Vendetta) then
+    if HR.CDsON() and Target:Debuff(S.Vendetta) then
       -- actions.cds+=/blood_fury,if=debuff.vendetta.up
       if S.BloodFury:IsCastable() then
         if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
@@ -245,49 +246,56 @@ local function CDs ()
     end
 
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
-    if S.MarkedforDeath:IsCastable() and ComboPointsDeficit >= Rogue.CPMaxSpend() then
-      HR.CastSuggested(S.MarkedforDeath);
-    end
-    -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1)
-    if S.Vendetta:IsCastable() and not Player:IsStealthedP(true, false) and Target:DebuffP(S.Rupture)
-      and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) > 1) then
-      if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
-    end
-    if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
-      -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!dot.garrote.ticking&variable.single_target
-      if S.Subterfuge:IsAvailable() and not Target:DebuffP(S.Garrote) and Cache.EnemiesCount[10] < 2 then
-        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge Garrote)"; end
+    if S.MarkedforDeath:IsCastable() then
+      if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit() * 1.5) then
+        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
       end
-      -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
-      if S.Exsanguinate:IsAvailable() and (S.Nightstalker:IsAvailable() or S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 2)
-        and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1
-        and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) <= 1) then
-        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
-      end
-      -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
-      if S.Nightstalker:IsAvailable() and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() and Target:Debuff(S.Vendetta) then
-        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
-      end
-      -- actions.cds+=/vanish,if=talent.subterfuge.enabled&(!talent.exsanguinate.enabled|spell_targets.fan_of_knives>=2)&!stealthed.rogue&cooldown.garrote.up&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
-      if S.Subterfuge:IsAvailable() and (not S.Exsanguinate:IsAvailable() or Cache.EnemiesCount[10] >= 2) and not Player:IsStealthedP(true, false)
-        and S.Garrote:CooldownUp() and Target:DebuffRefreshableP(S.Garrote, 5.4)
-        and ((Cache.EnemiesCount[10] <= 3 and ComboPointsDeficit >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and ComboPointsDeficit >= 4)) then
-        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
-      end
-      -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
-      if S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0 and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
-        if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
+      if ComboPointsDeficit >= Rogue.CPMaxSpend() then
+        HR.CastSuggested(S.MarkedforDeath);
       end
     end
-    if S.Exsanguinate:IsCastable() then
-      -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
-      if Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() and not Target:DebuffRefreshableP(S.Garrote, 5.4) then
-        if HR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
+    if HR.CDsON() then
+      -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1)
+      if S.Vendetta:IsCastable() and not Player:IsStealthedP(true, false) and Target:DebuffP(S.Rupture)
+        and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) > 1) then
+        if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
       end
-    end
-    -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
-    if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) then
-      if HR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
+      if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
+        -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!dot.garrote.ticking&variable.single_target
+        if S.Subterfuge:IsAvailable() and not Target:DebuffP(S.Garrote) and Cache.EnemiesCount[10] < 2 then
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge Garrote)"; end
+        end
+        -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
+        if S.Exsanguinate:IsAvailable() and (S.Nightstalker:IsAvailable() or S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 2)
+          and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1
+          and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) <= 1) then
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
+        end
+        -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
+        if S.Nightstalker:IsAvailable() and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() and Target:Debuff(S.Vendetta) then
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
+        end
+        -- actions.cds+=/vanish,if=talent.subterfuge.enabled&(!talent.exsanguinate.enabled|spell_targets.fan_of_knives>=2)&!stealthed.rogue&cooldown.garrote.up&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
+        if S.Subterfuge:IsAvailable() and (not S.Exsanguinate:IsAvailable() or Cache.EnemiesCount[10] >= 2) and not Player:IsStealthedP(true, false)
+          and S.Garrote:CooldownUp() and Target:DebuffRefreshableP(S.Garrote, 5.4)
+          and ((Cache.EnemiesCount[10] <= 3 and ComboPointsDeficit >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and ComboPointsDeficit >= 4)) then
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
+        end
+        -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
+        if S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0 and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
+        end
+      end
+      if S.Exsanguinate:IsCastable() then
+        -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
+        if Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() and not Target:DebuffRefreshableP(S.Garrote, 5.4) then
+          if HR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
+        end
+      end
+      -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
+      if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) then
+        if HR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
+      end
     end
   end
   return false;
@@ -433,13 +441,30 @@ local function Direct ()
   if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 then
     if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife (Sharpened Blades)"; end
   end
-  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
-  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 2 + num(Player:IsStealthedP(true, false) or Settings.Assassination.MutiOnTwoTargets) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
+  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 4 + num(Player:IsStealthedP(true, false)) + num(S.DoubleDose:AzeriteRank() > 2) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
+  end
+  -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
+  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and Player:BuffP(S.DeadlyPoison) and Cache.EnemiesCount[10] >= 3 then
+    for _, CycleUnit in pairs(Cache.Enemies[10]) do
+      if not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
+        if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (DP Refresh)"; end
+      end
+    end
   end
   -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
   if S.Blindside:IsCastable("Melee") and (Player:BuffP(S.BlindsideBuff) or (not S.VenomRush:IsAvailable() and Target:HealthPercentage() < 30)) then
     if HR.Cast(S.Blindside) then return "Cast Blindside"; end
+  end
+  -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
+  if S.Mutilate:IsCastable("Melee") and Cache.EnemiesCount[10] == 2 then
+    for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
+      if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
+        HR.CastLeftNameplate(CycleUnit, S.Mutilate);
+        break;
+      end
+    end
   end
   -- actions.direct+=/mutilate,if=variable.use_filler
   if S.Mutilate:IsCastable("Melee") then
@@ -494,16 +519,19 @@ local function APL ()
       ShouldReturn = Rogue.Stealth(Stealth);
       if ShouldReturn then return ShouldReturn; end
     end
-    -- Precombat CDs
-    if HR.CDsON() then
-      if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() and Everyone.TargetIsValid() then
-        if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
-      end
-    end
     -- Flask
     -- Food
     -- Rune
     -- PrePot w/ Bossmod Countdown
+    -- Opener
+    if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
+      -- Precombat CDs
+      if HR.CDsON() then
+        if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() and Everyone.TargetIsValid() then
+          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
+        end
+      end
+    end
   end
 
   -- In Combat
@@ -529,10 +557,8 @@ local function APL ()
       if ShouldReturn then return ShouldReturn .. " (Stealthed)"; end
     end
     -- actions+=/call_action_list,name=cds
-    if HR.CDsON() then
-      ShouldReturn = CDs();
-      if ShouldReturn then return ShouldReturn; end
-    end
+    ShouldReturn = CDs();
+    if ShouldReturn then return ShouldReturn; end
     -- actions+=/call_action_list,name=dot
     ShouldReturn = Dot();
     if ShouldReturn then return ShouldReturn; end
@@ -569,7 +595,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-09-05
+-- Last Update: 2018-10-05
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -582,7 +608,9 @@ HR.SetAPL(259, APL);
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
 --
 -- # Executed every time the actor is available.
--- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
+-- # Restealth if possible (no vulnerable enemies in combat)
+-- actions=stealth
+-- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
 -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
 -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
 -- actions+=/call_action_list,name=cds
@@ -655,6 +683,10 @@ HR.SetAPL(259, APL);
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target
 -- # Poisoned Knife at 29+ stacks of Sharpened Blades.
 -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
--- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
+-- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
+-- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets
+-- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
+-- # Tab-Mutilate to apply Deadly Poison at 2 targets
+-- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
 -- actions.direct+=/mutilate,if=variable.use_filler

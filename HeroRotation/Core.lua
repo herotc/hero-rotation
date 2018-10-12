@@ -4,7 +4,7 @@
   local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
-  local Cache = HeroCache;
+  local Cache, Utils = HeroCache, HL.Utils;
   local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
@@ -148,6 +148,40 @@
       HR.CastLeftCommon(Object);
     end
     return false;
+  end
+
+  function HR.CastCycle(Object, Range, Condition)
+    if Condition(Target) then
+      return HR.Cast(Object)
+    end
+    if HR.AoEON() then
+      local BestUnit = nil
+      local TargetGUID = Target:GUID()
+      for _, CycleUnit in pairs(Cache.Enemies[Range]) do
+        if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and Condition(CycleUnit) then
+          HR.CastLeftNameplate(CycleUnit, Object)
+          break
+        end
+      end
+    end
+  end
+
+  function HR.CastTargetIf(Object, Range, TargetIfMode, TargetIfCondition, Condition)
+    if not HR.AoEON() and Condition(Target) then
+      return HR.Cast(Object)
+    end
+    if HR.AoEON() then
+      local BestUnit, BestConditionValue = nil, nil
+      local TargetGUID = Target:GUID()
+      for _, CycleUnit in pairs(Cache.Enemies[Range]) do
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and ((Condition and Condition(CycleUnit)) or not Condition) and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
+          BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
+        end
+      end
+      if BestUnit then
+        HR.CastLeftNameplate(BestUnit, Object)
+      end
+    end
   end
 
   -- Suggested Icon Cast

@@ -47,8 +47,6 @@
       -- Poison Refresh (in minutes)
       PoisonRefresh = 15,
       PoisonRefreshCombat = 3,
-      -- Suggest Mutilate on 2 targets instead of FoK
-      MutiOnTwoTargets = false,
       -- Suggest Multi-DoT at FoK Range
       RangedMultiDoT = true,
       -- {Display GCD as OffGCD, ForceReturn}
@@ -79,6 +77,8 @@
       }
     },
     Subtlety = {
+      -- Burn Shadow Dance charges when the target is about to die
+      BurnShadowDance = "On Bosses not in Dungeons",
       -- Damage Offsets
       EviscerateDMGOffset = 3,
       -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
@@ -124,7 +124,6 @@
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)");
   CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
-  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.MutiOnTwoTargets", "Suggest Mutilate on two targets", "Suggest Mutilate instead of Fan of Knives when fighting two targets.");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
   CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
   -- Outlaw
@@ -134,6 +133,7 @@
   CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.PrecombatAR", "Show Precombat Adrenaline Rush", "Display Adrenaline Rush when outside of combat with a valid target.");
   CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw");
   -- Subtlety
+  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", {"Always", "On Bosses", "On Bosses not in Dungeons"}, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.");
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.");
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {2, 3, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.");
