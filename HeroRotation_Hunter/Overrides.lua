@@ -22,9 +22,19 @@
 -- Marksmanship, ID: 254
 
 -- Survival, ID: 255
+local OldSVIsCastableP
+OldSVIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellSV.MongooseBite or self == SpellSV.RaptorStrike then
+    return OldSVIsCastableP(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
+  else
+    return OldSVIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  end
+end
+, 255);
 
 -- Example (Arcane Mage)
--- HL.AddCoreOverride ("Spell.IsCastableP", 
+-- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 --   if Range then
 --     local RangeUnit = ThisUnit or Target;
