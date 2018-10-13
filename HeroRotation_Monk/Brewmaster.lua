@@ -181,7 +181,7 @@ local function APL()
       if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
     end
     -- keg_smash,if=spell_targets>=2
-    if S.KegSmash:IsCastableP(25) and Cache.EnemiesCount[8] >= 2 then
+    if S.KegSmash:IsCastableP(25) and Commons.GetPlayerEnemiesCount(8, true) >= 2 then
       if HR.Cast(S.KegSmash) then return ""; end
     end
     -- tiger_palm,if=talent.rushing_jade_wind.enabled&buff.blackout_combo.up&buff.rushing_jade_wind.up
