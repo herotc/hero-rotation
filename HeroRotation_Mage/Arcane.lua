@@ -226,7 +226,7 @@ local function APL()
       if HR.Cast(S.NetherTempest) then return ""; end
     end
     -- arcane_blast,if=buff.rule_of_threes.up&talent.overpowered.enabled
-    if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and S.Overpowered:IsAvailable() and Cache.EnemiesCount[40] < 3) then
+    if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and S.Overpowered:IsAvailable()) then
       if HR.Cast(S.ArcaneBlast) then return "AB BURN 229"; end
     end
     -- lights_judgment,if=buff.arcane_power.down
@@ -283,7 +283,7 @@ local function APL()
       if HR.Cast(S.ArcaneMissiles) then return ""; end
     end
     -- arcane_blast
-    if S.ArcaneBlast:IsReadyP() and (Cache.EnemiesCount[40] < 3) then
+    if S.ArcaneBlast:IsReadyP() then
       if HR.Cast(S.ArcaneBlast) then return "AB BURN 286"; end
     end
     -- variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
