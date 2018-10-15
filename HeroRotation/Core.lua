@@ -172,14 +172,17 @@
     end
     if HR.AoEON() then
       local BestUnit, BestConditionValue = nil, nil
-      local TargetGUID = Target:GUID()
       for _, CycleUnit in pairs(Cache.Enemies[Range]) do
         if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and ((Condition and Condition(CycleUnit)) or not Condition) and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
           BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
         end
       end
       if BestUnit then
-        HR.CastLeftNameplate(BestUnit, Object)
+        if BestUnit:GUID() == Target:GUID() then
+          return HR.Cast(Object)
+        else
+          HR.CastLeftNameplate(BestUnit, Object)
+        end
       end
     end
   end
