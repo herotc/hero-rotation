@@ -114,8 +114,7 @@ end
 
 S.FerociousBiteMaxEnergy.CustomCost = {
   [3] = function ()
-          if Player:BuffP(S.ApexPredatorBuff) then return 0
-          elseif (Player:BuffP(S.IncarnationBuff) or Player:BuffP(S.BerserkBuff)) then return 25
+          if (Player:BuffP(S.IncarnationBuff) or Player:BuffP(S.BerserkBuff)) then return 25
           else return 50
           end
         end
