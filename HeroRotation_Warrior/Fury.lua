@@ -164,7 +164,7 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() and not Player:IsCasting() then
     -- Buff
-    if S.BattleShout:IsCastable() and not Player:Buff(S.BattleShout) then
+    if S.BattleShout:IsCastable() and Player:BuffDownP(S.BattleShout, true) then
       if HR.Cast(S.BattleShout) then return ""; end
     end
     -- Reset Combat Variables
