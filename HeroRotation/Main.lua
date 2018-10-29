@@ -114,7 +114,7 @@
       HeroRotationDB.GUISettings["General.ScaleButtons"] = Multiplier;
     end
     -- Lock/Unlock
-    local LockSpell = Spell(0);
+    local LockSpell = Spell(18282);
     function HR.MainFrame:Unlock ()
       -- Grey Texture
       HR.ResetIcons();
