@@ -358,11 +358,8 @@ local function Finish ()
     and Player:BuffRemainsP(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
   end
-  -- actions.finish+=/roll_the_bones,if=(buff.roll_the_bones.remains<=3|variable.rtb_reroll)&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)
-  -- Note: Added RtB_BuffRemains() == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
-  if S.RolltheBones:IsCastable() and (RtB_BuffRemains() <= 3 or RtB_Reroll())
-    and (Target:FilteredTimeToDie(">", 20)
-    or Target:FilteredTimeToDie(">", RtB_BuffRemains()) or Target:TimeToDieIsNotValid() or RtB_BuffRemains() == 0) then
+  -- actions.finish+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
+  if S.RolltheBones:IsCastable() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
     if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
   end
   -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
@@ -499,7 +496,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2018-09-07
+-- Last Update: 2018-11-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -513,10 +510,12 @@ HR.SetAPL(260, APL);
 -- actions.precombat+=/roll_the_bones,precombat_seconds=2
 -- actions.precombat+=/slice_and_dice,precombat_seconds=2
 -- actions.precombat+=/adrenaline_rush,precombat_seconds=1
-
+--
 -- # Executed every time the actor is available.
+-- # Restealth if possible (no vulnerable enemies in combat)
+-- actions=stealth
 -- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
--- actions=variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
+-- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
 -- # Reroll for 2+ buffs or Ruthless Precision with Deadshot or Ace up your Sleeve.
 -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
 -- # Always reroll for 2+ buffs with Snake Eyes unless at 3 Ranks, then reroll everything.
@@ -534,17 +533,11 @@ HR.SetAPL(260, APL);
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
-
--- # Builders
--- actions.build=pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up
--- actions.build+=/sinister_strike
-
+--
 -- # Cooldowns
--- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
+-- actions.cds=potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
--- actions.cds+=/fireblood
--- actions.cds+=/ancestral_call
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
@@ -558,15 +551,19 @@ HR.SetAPL(260, APL);
 -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
-
+--
+-- # Stealth
+-- actions.stealth=ambush
+--
 -- # Finishers
 -- # BtE over RtB rerolls with Deadshot/Ace traits or Ruthless Precision.
 -- actions.finish=between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
 -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
--- actions.finish+=/roll_the_bones,if=(buff.roll_the_bones.remains<=3|variable.rtb_reroll)&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)
+-- actions.finish+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
 -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
 -- actions.finish+=/between_the_eyes,if=azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
 -- actions.finish+=/dispatch
-
--- # Stealth
--- actions.stealth=ambush
+--
+-- # Builders
+-- actions.build=pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up
+-- actions.build+=/sinister_strike
