@@ -27,6 +27,7 @@ Spell.Rogue.Assassination = {
   Berserking            = Spell(26297),
   BloodFury             = Spell(20572),
   LightsJudgment        = Spell(255647),
+  Shadowmeld            = Spell(58984),
   -- Abilities
   Envenom               = Spell(32645),
   FanofKnives           = Spell(51723),
@@ -286,6 +287,10 @@ local function CDs ()
         if S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0 and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
         end
+      end
+      -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&!dot.garrote.ticking&combo_points.deficit>=1
+      if HR.CDsON() and S.Shadowmeld:IsCastable() and not Player:IsStealthedP(true, true) and S.ShroudedSuffocation:AzeriteEnabled() and not Target:DebuffP(S.Garrote) and Player:ComboPointsDeficit() >= 1 then
+        if HR.Cast(S.Shadowmeld) then return "Cast Shadowmeld"; end
       end
       if S.Exsanguinate:IsCastable() then
         -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
@@ -592,7 +597,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-11-07
+-- Last Update: 2018-11-15
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -657,6 +662,9 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&(!talent.exsanguinate.enabled|!variable.single_target)&!stealthed.rogue&cooldown.garrote.up&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
 -- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range
 -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
+--
+-- # Shadowmeld for Shrouded Suffocation garrote after vanished Garrote drops
+-- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&!dot.garrote.ticking&combo_points.deficit>=1
 --
 -- # Exsanguinate when both Rupture and Garrote are up for long enough
 -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
