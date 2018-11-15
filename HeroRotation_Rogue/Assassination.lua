@@ -288,8 +288,8 @@ local function CDs ()
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
         end
       end
-      -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&!dot.garrote.ticking&combo_points.deficit>=1
-      if HR.CDsON() and S.Shadowmeld:IsCastable() and not Player:IsStealthedP(true, true) and S.ShroudedSuffocation:AzeriteEnabled() and not Target:DebuffP(S.Garrote) and Player:ComboPointsDeficit() >= 1 then
+      -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=3
+      if HR.CDsON() and S.Shadowmeld:IsCastable() and not Player:IsStealthedP(true, true) and S.ShroudedSuffocation:AzeriteEnabled() and Target:DebuffRefreshableP(S.Garrote, 5.4) and Target:PMultiplier(S.Garrote) <= 1 and Player:ComboPointsDeficit() >= 3 then
         if HR.Cast(S.Shadowmeld) then return "Cast Shadowmeld"; end
       end
       if S.Exsanguinate:IsCastable() then
@@ -663,8 +663,8 @@ HR.SetAPL(259, APL);
 -- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range
 -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
 --
--- # Shadowmeld for Shrouded Suffocation garrote after vanished Garrote drops
--- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&!dot.garrote.ticking&combo_points.deficit>=1
+-- # Shadowmeld for Shrouded Suffocation CP (dmg amp does not work)
+-- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=3
 --
 -- # Exsanguinate when both Rupture and Garrote are up for long enough
 -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
