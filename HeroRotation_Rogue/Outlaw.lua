@@ -207,8 +207,8 @@ local function RtB_Reroll ()
           Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2) and true or false;
         end
         -- # Do not reroll if Snake Eyes is at 2+ Ranks and 2+ stacks of the buff (1+ stack with Broadside up)
-        -- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
-        if S.SnakeEyesPower:AzeriteRank() >= 2 and Player:BuffStackP(S.SnakeEyesBuff) >= 2 - num(Player:BuffP(S.Broadside)) then
+        -- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.enabled&buff.snake_eyes.stack>=2-buff.broadside.up
+        if S.SnakeEyesPower:AzeriteEnabled() and Player:BuffStackP(S.SnakeEyesBuff) >= 2 - num(Player:BuffP(S.Broadside)) then
           Cache.APLVar.RtB_Reroll = false;
         end
       elseif S.Deadshot:AzeriteEnabled() or S.AceUpYourSleeve:AzeriteEnabled() then
@@ -520,8 +520,8 @@ HR.SetAPL(260, APL);
 -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
 -- # Always reroll for 2+ buffs with Snake Eyes unless at 3 Ranks, then reroll everything.
 -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.enabled,value=rtb_buffs<2|(azerite.snake_eyes.rank=3&rtb_buffs<5)
--- # Do not reroll if Snake Eyes is at 2+ Ranks and 2+ stacks of the buff (1+ stack with Broadside up)
--- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
+-- # Do not reroll with 2+ stacks of the Snake Eyes buff (1+ stack with Broadside up).
+-- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.enabled&buff.snake_eyes.stack>=2-buff.broadside.up
 -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
