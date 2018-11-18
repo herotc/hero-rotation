@@ -25,10 +25,17 @@
 local OldSVIsCastableP
 OldSVIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self == SpellSV.MongooseBite or self == SpellSV.RaptorStrike then
+  if self.SpellID == SpellSV.MongooseBiteNormal.SpellID or self.SpellID == SpellSV.RaptorStrikeNormal.SepllID then
     return OldSVIsCastableP(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
   else
-    return OldSVIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldSVIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellSV.SummonPet then
+      return (not Pet:IsActive()) and BaseCheck
+    elseif self == SpellSV.AspectoftheEagle then
+      return HR.GUISettings.APL.Hunter.Survival.AspectoftheEagle and BaseCheck
+    else
+      return BaseCheck
+    end
   end
 end
 , 255);
