@@ -167,7 +167,8 @@
   end
 
   function HR.CastTargetIf(Object, Range, TargetIfMode, TargetIfCondition, Condition)
-    if not HR.AoEON() and Condition(Target) then
+    local TargetCondition = (not Condition or (Condition and Condition(Target)))
+    if not HR.AoEON() and TargetCondition then
       return HR.Cast(Object)
     end
     if HR.AoEON() then
@@ -178,7 +179,7 @@
         end
       end
       if BestUnit then
-        if BestUnit:GUID() == Target:GUID() then
+        if (BestUnit:GUID() == Target:GUID()) or (TargetCondition and (BestConditionValue == TargetIfCondition(Target))) then
           return HR.Cast(Object)
         else
           HR.CastLeftNameplate(BestUnit, Object)
