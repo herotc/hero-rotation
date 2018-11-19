@@ -508,9 +508,6 @@ local function APL()
     -- auto_attack
     -- use_items
     -- call_action_list,name=cds
-    if S.AspectoftheEagle:IsCastableP() then
-      if HR.Cast(S.AspectoftheEagle) then return "" end
-    end
     if (true) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
