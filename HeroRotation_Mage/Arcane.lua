@@ -84,6 +84,11 @@ local VarConserveMana = 60;
 local VarTotalBurns = 0;
 local VarAverageBurnLength = 0;
 
+HL:RegisterForEvent(function()
+  VarTotalBurns = 0
+  VarAverageBurnLength = 0
+end, "PLAYER_REGEN_ENABLED")
+
 local EnemyRanges = {40, 10}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
@@ -91,17 +96,13 @@ local function UpdateRanges()
   end
 end
 
+
 local function num(val)
   if val then return 1 else return 0 end
 end
 
 local function bool(val)
   return val ~= 0
-end
-
-local function InitVars()
-  VarTotalBurns = 0;
-  VarAverageBurnLength = 0;
 end
 
 Player.ArcaneBurnPhase = {}
@@ -135,18 +136,8 @@ function BurnPhase:Duration()
 end
 
 HL:RegisterForEvent(function()
-  InitVars()
-end, "PLAYER_REGEN_ENABLED")
-
-HL:RegisterForEvent(function()
   BurnPhase:Reset()
 end, "PLAYER_REGEN_DISABLED")
-
--- HL:RegisterForEvent(function(_, srcunit)
---   if srcunit == "player" and not Player:AffectingCombat() then
---     BurnPhase:Reset()
---   end
--- end, "UNIT_SPELLCAST_INTERRUPTED")
 
 local function PresenceOfMindMax ()
   return 2
@@ -170,11 +161,11 @@ local function APL()
     -- augmentation
     -- arcane_intellect
     if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff, true) then
-      if HR.Cast(S.ArcaneIntellect) then return ""; end
+      if HR.Cast(S.ArcaneIntellect) then return "arcane_intellect 3"; end
     end
     -- summon_arcane_familiar
     if S.SummonArcaneFamiliar:IsCastableP() and Player:BuffDownP(S.SummonArcaneFamiliarBuff) then
-      if HR.Cast(S.SummonArcaneFamiliar) then return ""; end
+      if HR.Cast(S.SummonArcaneFamiliar) then return "summon_arcane_familiar 7"; end
     end
     -- variable,name=conserve_mana,op=set,value=60
     if (true) then
@@ -183,15 +174,15 @@ local function APL()
     -- snapshot_stats
     -- mirror_image
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.MirrorImage) then return ""; end
+      if HR.Cast(S.MirrorImage) then return "mirror_image 14"; end
     end
     -- potion
     if I.DeadlyGrace:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.DeadlyGrace) then return ""; end
+      if HR.CastSuggested(I.DeadlyGrace) then return "deadly_grace 16"; end
     end
     -- arcane_blast
     if S.ArcaneBlast:IsReadyP() then
-      if HR.Cast(S.ArcaneBlast) then return "AB Precombat"; end
+      if HR.Cast(S.ArcaneBlast) then return "arcane_blast 18"; end
     end
   end
   Burn = function()
@@ -215,76 +206,76 @@ local function APL()
     end
     -- charged_up,if=buff.arcane_charge.stack<=1
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1) then
-      if HR.Cast(S.ChargedUp) then return "CU B"; end
+      if HR.Cast(S.ChargedUp) then return "charged_up 30"; end
     end
     -- mirror_image
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.MirrorImage) then return ""; end
+      if HR.Cast(S.MirrorImage) then return "mirror_image 34"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
     if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.NetherTempest) then return ""; end
+      if HR.Cast(S.NetherTempest) then return "nether_tempest 36"; end
     end
-    -- arcane_blast,if=buff.rule_of_threes.up&talent.overpowered.enabled
+    -- arcane_blast,if=buff.rule_of_threes.up&talent.overpowered.enabled&active_enemies<3
     if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and S.Overpowered:IsAvailable() and Cache.EnemiesCount[40] < 3) then
-      if HR.Cast(S.ArcaneBlast) then return "AB BURN 229"; end
+      if HR.Cast(S.ArcaneBlast) then return "arcane_blast 58"; end
     end
     -- lights_judgment,if=buff.arcane_power.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.LightsJudgment) then return ""; end
+      if HR.Cast(S.LightsJudgment) then return "lights_judgment 70"; end
     end
     -- rune_of_power,if=!buff.arcane_power.up&(mana.pct>=50|cooldown.arcane_power.remains=0)&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
     if S.RuneofPower:IsCastableP() and (not Player:BuffP(S.ArcanePowerBuff) and (Player:ManaPercentageP() >= 50 or S.ArcanePower:CooldownRemainsP() == 0) and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
-      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "rune_of_power 74"; end
     end
     -- berserking
     if S.Berserking:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 84"; end
     end
     -- arcane_power
     if S.ArcanePower:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return ""; end
+      if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power 86"; end
     end
     -- use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 89"; end
     end
     -- fireblood
     if S.Fireblood:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 91"; end
     end
     -- ancestral_call
     if S.AncestralCall:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 93"; end
     end
     -- presence_of_mind,if=buff.rune_of_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time|buff.arcane_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
     if S.PresenceofMind:IsCastableP() and HR.CDsON() and (Player:BuffRemainsP(S.RuneofPowerBuff) <= PresenceOfMindMax() * S.ArcaneBlast:ExecuteTime() or Player:BuffRemainsP(S.ArcanePowerBuff) <= PresenceOfMindMax() * S.ArcaneBlast:ExecuteTime()) then
-      if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return ""; end
+      if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 95"; end
     end
     -- potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
     if I.DeadlyGrace:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc")))) then
-      if HR.CastSuggested(I.DeadlyGrace) then return ""; end
+      if HR.CastSuggested(I.DeadlyGrace) then return "deadly_grace 113"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))
     if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() == 0 or (Cache.EnemiesCount[40] < 3 or (Cache.EnemiesCount[40] < 2 and S.Resonance:IsAvailable()))) then
-      if HR.Cast(S.ArcaneOrb) then return ""; end
+      if HR.Cast(S.ArcaneOrb) then return "arcane_orb 121"; end
     end
     -- arcane_barrage,if=active_enemies>=3&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
     if S.ArcaneBarrage:IsCastableP() and (Cache.EnemiesCount[40] >= 3 and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 139"; end
     end
     -- arcane_explosion,if=active_enemies>=3
     if S.ArcaneExplosion:IsReadyP() and (Cache.EnemiesCount[10] >= 3) then
-      if HR.Cast(S.ArcaneExplosion) then return ""; end
+      if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion 151"; end
     end
     -- arcane_missiles,if=buff.clearcasting.react&active_enemies<3&(talent.amplification.enabled|(!talent.overpowered.enabled&azerite.arcane_pummeling.rank>=2)|buff.arcane_power.down),chain=1
     if S.ArcaneMissiles:IsCastableP() and (bool(Player:BuffStackP(S.ClearcastingBuff)) and Cache.EnemiesCount[40] < 3 and (S.Amplification:IsAvailable() or (not S.Overpowered:IsAvailable() and S.ArcanePummeling:AzeriteRank() >= 2) or Player:BuffDownP(S.ArcanePowerBuff))) then
-      if HR.Cast(S.ArcaneMissiles) then return ""; end
+      if HR.Cast(S.ArcaneMissiles) then return "arcane_missiles 159"; end
     end
-    -- arcane_blast
+    -- arcane_blast,if=active_enemies<3
     if S.ArcaneBlast:IsReadyP() and (Cache.EnemiesCount[40] < 3) then
-      if HR.Cast(S.ArcaneBlast) then return "AB BURN 286"; end
+      if HR.Cast(S.ArcaneBlast) then return "arcane_blast 177"; end
     end
     -- variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
     if (true) then
@@ -292,87 +283,87 @@ local function APL()
     end
     -- evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1
     if S.Evocation:IsCastableP() then
-      if HR.Cast(S.Evocation) then return ""; end
+      if HR.Cast(S.Evocation) then return "evocation 195"; end
     end
     -- arcane_barrage
     if S.ArcaneBarrage:IsCastableP() then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 197"; end
     end
   end
   Conserve = function()
     -- mirror_image
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.MirrorImage) then return ""; end
+      if HR.Cast(S.MirrorImage) then return "mirror_image 199"; end
     end
     -- charged_up,if=buff.arcane_charge.stack=0
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() == 0) then
-      if HR.Cast(S.ChargedUp) then return "CU C"; end
+      if HR.Cast(S.ChargedUp) then return "charged_up 201"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
     if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.NetherTempest) then return ""; end
+      if HR.Cast(S.NetherTempest) then return "nether_tempest 205"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack<=2&(cooldown.arcane_power.remains>10|active_enemies<=2)
     if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() <= 2 and (S.ArcanePower:CooldownRemainsP() > 10 or Cache.EnemiesCount[40] <= 2)) then
-      if HR.Cast(S.ArcaneOrb) then return ""; end
+      if HR.Cast(S.ArcaneOrb) then return "arcane_orb 227"; end
     end
     -- arcane_blast,if=buff.rule_of_threes.up&buff.arcane_charge.stack>3
     if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and Player:ArcaneChargesP() > 3) then
-      if HR.Cast(S.ArcaneBlast) then return "AB Cons ROP 320"; end
+      if HR.Cast(S.ArcaneBlast) then return "arcane_blast 239"; end
     end
     -- rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|full_recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
     if S.RuneofPower:IsCastableP() and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or S.RuneofPower:FullRechargeTimeP() <= S.ArcanePower:CooldownRemainsP() or Target:TimeToDie() <= S.ArcanePower:CooldownRemainsP())) then
-      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return ""; end
+      if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "rune_of_power 245"; end
     end
-    -- arcane_missiles,if=mana.pct<=95&buff.clearcasting.react,chain=1
-    if S.ArcaneMissiles:IsCastableP() and (Player:ManaPercentageP() <= 95 and bool(Player:BuffStackP(S.ClearcastingBuff))) then
-      if HR.Cast(S.ArcaneMissiles) then return ""; end
+    -- arcane_missiles,if=mana.pct<=95&buff.clearcasting.react&active_enemies<3,chain=1
+    if S.ArcaneMissiles:IsCastableP() and (Player:ManaPercentageP() <= 95 and bool(Player:BuffStackP(S.ClearcastingBuff)) and Cache.EnemiesCount[40] < 3) then
+      if HR.Cast(S.ArcaneMissiles) then return "arcane_missiles 273"; end
     end
     -- arcane_barrage,if=((buff.arcane_charge.stack=buff.arcane_charge.max_stack)&((mana.pct<=variable.conserve_mana)|(cooldown.arcane_power.remains>cooldown.rune_of_power.full_recharge_time&mana.pct<=variable.conserve_mana+25))|(talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd&cooldown.arcane_power.remains>10))|mana.pct<=(variable.conserve_mana-10)
     if S.ArcaneBarrage:IsCastableP() and (((Player:ArcaneChargesP() == Player:ArcaneChargesMax()) and ((Player:ManaPercentageP() <= VarConserveMana) or (S.ArcanePower:CooldownRemainsP() > S.RuneofPower:FullRechargeTimeP() and Player:ManaPercentageP() <= VarConserveMana + 25)) or (S.ArcaneOrb:IsAvailable() and S.ArcaneOrb:CooldownRemainsP() <= Player:GCD() and S.ArcanePower:CooldownRemainsP() > 10)) or Player:ManaPercentageP() <= (VarConserveMana - 10)) then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 283"; end
     end
     -- supernova,if=mana.pct<=95
     if S.Supernova:IsCastableP() and (Player:ManaPercentageP() <= 95) then
-      if HR.Cast(S.Supernova) then return ""; end
+      if HR.Cast(S.Supernova) then return "supernova 305"; end
     end
     -- arcane_explosion,if=active_enemies>=3&(mana.pct>=variable.conserve_mana|buff.arcane_charge.stack=3)
     if S.ArcaneExplosion:IsReadyP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentageP() >= VarConserveMana or Player:ArcaneChargesP() == 3)) then
-      if HR.Cast(S.ArcaneExplosion) then return ""; end
+      if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion 307"; end
     end
     -- arcane_blast
     if S.ArcaneBlast:IsReadyP() then
-      if HR.Cast(S.ArcaneBlast) then return "AB Cons 344"; end
+      if HR.Cast(S.ArcaneBlast) then return "arcane_blast 319"; end
     end
     -- arcane_barrage
     if S.ArcaneBarrage:IsCastableP() then
-      if HR.Cast(S.ArcaneBarrage) then return ""; end
+      if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 321"; end
     end
   end
   Movement = function()
     -- shimmer,if=movement.distance>=10
     if S.Shimmer:IsCastableP() and (movement.distance >= 10) then
-      if HR.Cast(S.Shimmer) then return ""; end
+      if HR.Cast(S.Shimmer) then return "shimmer 323"; end
     end
     -- blink,if=movement.distance>=10
     if S.Blink:IsCastableP() and (movement.distance >= 10) then
-      if HR.Cast(S.Blink) then return ""; end
+      if HR.Cast(S.Blink) then return "blink 325"; end
     end
     -- presence_of_mind
     if S.PresenceofMind:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return ""; end
+      if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 327"; end
     end
     -- arcane_missiles
     if S.ArcaneMissiles:IsCastableP() then
-      if HR.Cast(S.ArcaneMissiles) then return ""; end
+      if HR.Cast(S.ArcaneMissiles) then return "arcane_missiles 329"; end
     end
     -- arcane_orb
     if S.ArcaneOrb:IsCastableP() then
-      if HR.Cast(S.ArcaneOrb) then return ""; end
+      if HR.Cast(S.ArcaneOrb) then return "arcane_orb 331"; end
     end
     -- supernova
     if S.Supernova:IsCastableP() then
-      if HR.Cast(S.Supernova) then return ""; end
+      if HR.Cast(S.Supernova) then return "supernova 333"; end
     end
   end
   -- call precombat
