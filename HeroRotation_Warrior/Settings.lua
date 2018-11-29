@@ -18,6 +18,7 @@
   -- Default settings
   HR.GUISettings.APL.Warrior = {
     Commons = {
+      UsePotions = true,
       OffGCDasOffGCD = {
         Pummel = true,
         Racials = true,
@@ -27,8 +28,6 @@
     },
 
     Arms = {
-      ShowPoPP = false,
-      WarbreakerEnabled = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -94,11 +93,10 @@
 
   -- Shared Warrior settings
   CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons");
+  CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 
   -- Arms settings
   CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms");
-  CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.WarbreakerEnabled", "Enable Warbreaker", "Disable this if you want to omit Warbreaker from the rotation.");
-  CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
 
   -- Fury settings
   CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury");
