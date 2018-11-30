@@ -19,6 +19,7 @@
     Commons = {
       MultiShotInMain = "Never",
       CounterShot = false,
+      UsePotions = false,
       -- SoloMode Settings
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -27,6 +28,7 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
+        Racials = true,
         -- Abilities
       }
     },
@@ -79,28 +81,21 @@
       }
     },
     Survival = {
-      ExhilarationHP = 30,
-      ShowPoPP = false,
-      UseSilence = false,
+      AspectoftheEagle = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
         Butchery = false,
-        CallPet = false,
-        CoordinatedAssault = false,
-        Exhilaration = false,
+        SummonPet = false,
+        CoordinatedAssault = true,
         Harpoon = true,
-        MendPet = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        AspectoftheEagle = false,
-        Muzzle = true,
+        AspectoftheEagle = true,
         -- Items
-        PotionOfProlongedPower = true,
         -- Racials
-        Racials = true,
       }
     }
   };
@@ -116,6 +111,7 @@
   -- Hunter
   CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.MultiShotInMain", {"Never", "Only with Splash Data", "Always"}, "Multishot in the Main Icon", "When to show Multishot in the main icon or as a suggestion");
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
+  CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   -- Beast Mastery
   CreatePanelOption("Slider", CP_BeastMastery, "APL.Hunter.BeastMastery.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
@@ -129,6 +125,5 @@
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.CounterShotSephuz", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.EnableMovementRotation", "Enable Movement Rotation", "Enable this to show a special rotation while Moving. The optimal standing ability will be shown as a suggestion.");
   -- -- Survival
-  CreatePanelOption("Slider", CP_Survival, "APL.Hunter.Survival.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
+  CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
   CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival");
-  CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.MuzzleSephuz", "Use Muzzle for Sephuz", "Enable this if you want it to show you when to use Muzzleto proc Sephuz's Secret (only when equipped). ");

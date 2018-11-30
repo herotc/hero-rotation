@@ -159,6 +159,20 @@ local function MayBurnShadowDance()
   end
 end
 
+local function UsePriorityRotation()
+  if Cache.EnemiesCount[10] < 2 then
+    return false
+  end
+  if Settings.Subtlety.AlwaysUsePriorityRotation then
+    return true
+  end
+  -- Zul Mythic
+  if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
+    return true
+  end
+  return false
+end
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -203,7 +217,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
     -- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(talent.secret_technique.enabled|azerite.nights_vengeance.enabled|spell_targets.shuriken_storm<=5)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
-    if HR.AoEON() and Cache.EnemiesCount[10] >= 2 and not ShadowDanceBuff
+    if HR.AoEON() and not UsePriorityRotation() and Cache.EnemiesCount[10] >= 2 and not ShadowDanceBuff
       and (S.SecretTechnique:IsAvailable() or S.NightsVengeancePower:AzeriteEnabled() or Cache.EnemiesCount[10] <= 5) then
       local BestUnit, BestUnitTTD = nil, 5 + 2 * Player:ComboPoints();
       for _, Unit in pairs(Cache.Enemies["Melee"]) do
@@ -434,10 +448,12 @@ local function Stealth_CDs ()
       if StealthMacro(S.Shadowmeld) then return "Shadowmeld Macro"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
+    -- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(!talent.nightstalker.enabled&!talent.dark_shadow.enabled|!variable.use_priority_rotation|combo_points.deficit<=1)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
     if (HR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
       and S.ShadowDance:IsCastable() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1
       and (not S.DarkShadow:IsAvailable() or Target:DebuffRemainsP(S.Nightblade) >= 5 + num(S.Subterfuge:IsAvailable()))
+      and (not S.Nightstalker:IsAvailable() and not S.DarkShadow:IsAvailable() or not UsePriorityRotation() or Player:ComboPointsDeficit() <= 1)
       and (ShD_Threshold() or Player:BuffRemainsP(S.SymbolsofDeath) >= 1.2 or (Cache.EnemiesCount[10] >= 4 and S.SymbolsofDeath:CooldownRemainsP() > 10)) then
       if StealthMacro(S.ShadowDance) then return "ShadowDance Macro 1"; end
     end
@@ -623,6 +639,12 @@ local function APL ()
         if HR.Cast(S.Nightblade) then return "Cast Nightblade (Low Duration)"; end
       end
 
+      -- actions+=/call_action_list,name=stealth_cds,if=variable.use_priority_rotation
+      if UsePriorityRotation() then
+        local ShouldReturn = Stealth_CDs();
+        if ShouldReturn then return "Stealth CDs: (Priority Rotation)" .. ShouldReturn; end
+      end
+
       -- # Consider using a Stealth CD when reaching the energy threshold and having space for at least 4 CP
       -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&combo_points.deficit>=4
       if Player:EnergyDeficit() <= Stealth_Threshold() and Player:ComboPointsDeficit() >= 4 then
@@ -634,8 +656,8 @@ local function APL ()
         local ShouldReturn = Stealth_CDs();
         if ShouldReturn then return "Stealth CDs: (SecTec) " .. ShouldReturn; end
       end
-      -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&talent.dark_shadow.enabled&!talent.secret_technique.enabled&spell_targets.shuriken_storm>=2&(!talent.shuriken_tornado.enabled|!cooldown.shuriken_tornado.up)
-      if Player:EnergyDeficit() <= Stealth_Threshold() and S.DarkShadow:IsAvailable() and not S.SecretTechnique:IsAvailable()
+      -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&talent.dark_shadow.enabled&spell_targets.shuriken_storm>=2&(!talent.shuriken_tornado.enabled|!cooldown.shuriken_tornado.up)
+      if Player:EnergyDeficit() <= Stealth_Threshold() and S.DarkShadow:IsAvailable()
         and Cache.EnemiesCount[10] >= 2 and (not S.ShurikenTornado:IsAvailable() or not S.ShurikenTornado:CooldownUp()) then
         local ShouldReturn = Stealth_CDs();
         if ShouldReturn then return "Stealth CDs: (Dark Multi)" .. ShouldReturn; end
@@ -689,7 +711,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2018-10-05
+-- Last Update: 2018-11-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -710,14 +732,18 @@ HR.SetAPL(261, APL);
 -- actions+=/run_action_list,name=stealthed,if=stealthed.all
 -- # Apply Nightblade at 2+ CP during the first 10 seconds, after that 4+ CP if it expires within the next GCD or is not up
 -- actions+=/nightblade,if=target.time_to_die>6&remains<gcd.max&combo_points>=4-(time<10)*2
+-- # Only change rotation if we have priority_rotation set and multiple targets up.
+-- actions+=/variable,name=use_priority_rotation,value=priority_rotation&spell_targets.shuriken_storm>=2
+-- # Priority Rotation? Let's give a crap about energy for the stealth CDs (builder still respect it). Yup, it can be that simple.
+-- actions+=/call_action_list,name=stealth_cds,if=variable.use_priority_rotation
 -- # Used to define when to use stealth CDs or builders
 -- actions+=/variable,name=stealth_threshold,value=25+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+talent.shadow_focus.enabled*20+talent.alacrity.enabled*10+15*(spell_targets.shuriken_storm>=3)
 -- # Consider using a Stealth CD when reaching the energy threshold and having space for at least 4 CP
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&combo_points.deficit>=4
 -- # With Dark Shadow, also use a Stealth CD when reaching the energy threshold and Secret Technique is ready.
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&talent.dark_shadow.enabled&talent.secret_technique.enabled&cooldown.secret_technique.up
--- # With Dark Shadow and not talented into Secret Technique, we only care about energy against multiple targets. Exception: Tornado is ready.
--- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&talent.dark_shadow.enabled&!talent.secret_technique.enabled&spell_targets.shuriken_storm>=2&(!talent.shuriken_tornado.enabled|!cooldown.shuriken_tornado.up)
+-- # With Dark Shadow against multiple targets, we only care about energy. Exception: Tornado is ready.
+-- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold&talent.dark_shadow.enabled&spell_targets.shuriken_storm>=2&(!talent.shuriken_tornado.enabled|!cooldown.shuriken_tornado.up)
 -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
 -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
 -- # With DS also finish at 4+ against exactly 4 targets (outside stealth)
@@ -730,13 +756,13 @@ HR.SetAPL(261, APL);
 -- actions+=/lights_judgment
 --
 -- # Cooldowns
--- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
+-- actions.cds=potion,if=buff.bloodlust.react|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
 -- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
 -- actions.cds+=/berserking,if=buff.symbols_of_death.up
 -- # Use Dance off-gcd before the first Shuriken Storm from Tornado comes in.
--- actions.cds+=/shadow_dance,off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+-- actions.cds+=/shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
--- actions.cds+=/symbols_of_death,off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+-- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # Use Symbols on cooldown (after first Nightblade) unless we are going to pop Tornado and do not have Shadow Focus.
 -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
@@ -748,7 +774,7 @@ HR.SetAPL(261, APL);
 -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&!talent.shadow_focus.enabled&dot.nightblade.ticking&!stealthed.all&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
 -- # At 3+ with Shadow Focus use Tornado with SoD already up.
 -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
--- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled
+-- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled&!raid_event.adds.up
 --
 -- # Stealth Cooldowns
 -- # Helper Variable
@@ -758,9 +784,9 @@ HR.SetAPL(261, APL);
 -- # Pool for Shadowmeld + Shadowstrike unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&debuff.find_weakness.remains<1&combo_points.deficit>1
--- # With Dark Shadow only Dance when Nightblade will stay up. Use during Symbols or above threshold.
--- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
--- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
+-- # With Dark Shadow only Dance when Nightblade will stay up. Use during Symbols or above threshold. Only before finishers if we have amp talents and priority rotation.
+-- actions.stealth_cds+=/shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(!talent.nightstalker.enabled&!talent.dark_shadow.enabled|!variable.use_priority_rotation|combo_points.deficit<=1)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
+-- actions.stealth_cds+=/shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains&!raid_event.adds.up
 --
 -- # Stealthed Rotation
 -- # If stealth is up, we really want to use Shadowstrike to benefits from the passive bonus, even if we are at max cp (from the precombat MfD).
@@ -782,7 +808,7 @@ HR.SetAPL(261, APL);
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2&(spell_targets.shuriken_storm<4|!buff.symbols_of_death.up)
 -- # Multidotting outside Dance on targets that will live for the duration of Nightblade with refresh during pandemic if you have less than 6 targets or play with Secret Technique.
--- actions.finish+=/nightblade,cycle_targets=1,if=spell_targets.shuriken_storm>=2&(talent.secret_technique.enabled|azerite.nights_vengeance.enabled|spell_targets.shuriken_storm<=5)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
+-- actions.finish+=/nightblade,cycle_targets=1,if=!variable.use_priority_rotation&spell_targets.shuriken_storm>=2&(talent.secret_technique.enabled|azerite.nights_vengeance.enabled|spell_targets.shuriken_storm<=5)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
 -- # Secret Technique during Symbols. With Dark Shadow only during Shadow Dance (until threshold in next line).
@@ -794,6 +820,6 @@ HR.SetAPL(261, APL);
 -- # Builders
 -- # Shuriken Toss at 29+ Sharpened Blades stacks. Up to 3 targets per rank. Save for stealth if using Nightstalker or Dark Shadow when possible.
 -- actions.build=shuriken_toss,if=!talent.nightstalker.enabled&(!talent.dark_shadow.enabled|cooldown.symbols_of_death.remains>10)&buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=(3*azerite.sharpened_blades.rank)
--- actions.build+=/shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
+-- actions.build+=/shuriken_storm,if=spell_targets>=2
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
