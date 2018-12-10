@@ -58,8 +58,7 @@ Spell.Rogue.Assassination = {
   VenomRush             = Spell(152152),
   -- Azerite Traits
   DoubleDose            = Spell(273007),
-  SharpenedBladesPower  = Spell(272911),
-  SharpenedBladesBuff   = Spell(272916),
+  EchoingBlades         = Spell(287649),
   ShroudedSuffocation   = Spell(278666),
   -- Defensive
   CrimsonVial           = Spell(185311),
@@ -439,9 +438,9 @@ local function Direct ()
   -------------------------------------------------------------------
   -------------------------------------------------------------------
 
-  -- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
-  if S.PoisonedKnife:IsCastable(30) and Player:BuffStack(S.SharpenedBladesBuff) >= 29 then
-    if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife (Sharpened Blades)"; end
+  -- actions.direct+=/fan_of_knives,if=variable.use_filler&azerite.echoing_blades.enabled&spell_targets.fan_of_knives>=2
+  if S.FanofKnives:IsCastable("Melee") and S.EchoingBlades:AzeriteEnabled() and Cache.EnemiesCount[10] >= 2 then
+    if HR.Cast(S.PoisonedKnife) then return "Cast Fan of Knives (Echoing Blades)"; end
   end
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
   if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 4 + num(Player:IsStealthedP(true, false)) + num(S.DoubleDose:AzeriteRank() > 2) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
@@ -597,7 +596,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2018-11-18
+-- Last Update: 2018-12-10
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -649,7 +648,7 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&combo_points.deficit>=cp_max_spend
--- # Vendetta outside stealth with Rupture up. With Subterfuge talent and Shrouded Suffocation power always use with buffed Garrote. With Nightstalker and Exsanguinate use up to 5s  (3s with DS) before Vanish combo.
+-- # Vendetta outside stealth with Rupture up. With Subterfuge talent and Shrouded Suffocation power always use with buffed Garrote. With Nightstalker and Exsanguinate use up to 5s (3s with DS) before Vanish combo.
 -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1)&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)
 --
 -- # Extra Subterfuge Vanish condition: Use when Garrote dropped on Single Target
@@ -685,10 +684,11 @@ HR.SetAPL(259, APL);
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
 -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target
--- # Poisoned Knife at 29+ stacks of Sharpened Blades.
--- actions.direct+=/poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
+-- # With Echoing Blades, Fan of Knives at 2+ targets.
+-- actions.direct+=/fan_of_knives,if=variable.use_filler&azerite.echoing_blades.enabled&spell_targets.fan_of_knives>=2
+-- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ (5+ with Double Dose) targets.
 -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
--- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets
+-- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets.
 -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled&!azerite.double_dose.enabled)
 -- # Tab-Mutilate to apply Deadly Poison at 2 targets
