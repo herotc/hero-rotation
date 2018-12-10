@@ -74,7 +74,10 @@ local pairs = pairs;
 
 -- APL Action Lists (and Variables)
 local function Judged ()
-  return Target:Debuff(S.JudgmentDebuff) or S.Judgment:CooldownRemains() > Player:GCD()*2;
+  return Target:Debuff(S.JudgmentDebuff) or S.Judgment:CooldownRemains() > Player:GCD()*2 or Player:HolyPower() >=4;
+end
+local function Bladed ()
+  return S.BladeofJustice:CooldownRemains() > Player:GCD()*2;
 end
 local function Inquisitioned ()
   return Player:Buff(S.Inquisition) or S.Inquisition:CooldownRemains() > Player:GCD()*2;
@@ -150,9 +153,9 @@ local function APL ()
 	  
 	  local Var_HoW = (Target:HealthPercentage() <= 20 or (Player:Buff(S.Crusade) or Player:Buff(S.AvengingWrath)) and S.HammerOfWrath:IsReady());
 	  		if Var_HoW and not S.WakeofAshes:IsReady() then
-			if Player:HolyPower() == 4  then
+			if Player:HolyPower() == 4 and S.HammerOfWrath:IsReady() then
 				if HR.Cast(S.HammerOfWrath) then return "Cast HammerOfWrath"; end
-			elseif Player:HolyPower() <=3 and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 then
+			elseif Player:HolyPower() <=3 and S.HammerOfWrath:IsReady()  and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 then
 				if HR.Cast(S.HammerOfWrath) then return "Cast HammerOfWrath"; end
 			end
 		end
@@ -232,7 +235,7 @@ local function APL ()
         local Var_DS_Castable = (Cache.EnemiesCount[8] >= 2 or (Player:BuffStack(S.ScarletInquisitorsExpurgation) >= 29 and (Player:Buff(S.AvengingWrath) or Player:BuffStack(S.Crusade) >= 15 or not HR.CDsON() or (S.Crusade:IsAvailable() and S.Crusade:CooldownRemains() > 15 and not Player:Buff(S.Crusade)) or (not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemains() > 15)))) and HR.AoEON();
         -- actions.priority+=/variable,name=crusade,value=!talent.crusade.enabled|cooldown.crusade.remains>gcd*3
         local Var_Crusade = (not S.Crusade:IsAvailable() or (S.Crusade:CooldownRemains() > Player:GCD() * 3)) and HR.CDsON() or (not HR.CDsON() or Settings.Retribution.OffGCDasOffGCD.Crusade);
-        if Judged() then
+        if Judged() or Bladed() then
 		
 			  if S.DivineStorm:IsReady() then
 				if Var_DS_Castable and Player:Buff(S.DivinePurposeBuff) then
@@ -353,7 +356,7 @@ local function APL ()
         if HR.AoEON() and S.Consecration:IsCastable(10, true) then
           if HR.Cast(S.Consecration) then return "Cast Consecration"; end
         end
-        if Judged() then
+        if Judged() or Bladed() then
           if Var_DS_Castable and S.DivineStorm:IsReady() then
             -- actions.priority+=/divine_storm,if=debuff.judgment.up&variable.ds_castable&buff.divine_purpose.react
             if Player:Buff(S.DivinePurposeBuff) then
