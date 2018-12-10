@@ -40,6 +40,7 @@ local pairs = pairs;
     TheFiresofJustice             = Spell(203316),
     TheFiresofJusticeBuff         = Spell(209785),
     Zeal                          = Spell(217020),
+	HammerOfWrath                 = Spell(24275),
     -- Offensive
     AvengingWrath                 = Spell(31884),
     Crusade                       = Spell(231895),
@@ -102,7 +103,9 @@ local function APL ()
       -- PrePot w/ DBM Count
       -- Opener
       if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
-        if S.Judgment:IsCastable() then
+		if S.BladeofJustice:IsCastable() then
+			if HR.Cast(S.BladeofJustice) then return "Cast BladeofJustice"; end
+        elseif S.Judgment:IsCastable() then
           if HR.Cast(S.Judgment) then return "Cast Judgment"; end
         elseif Target:IsInRange("Melee") then 
           if S.Zeal:IsCastable() then
@@ -144,6 +147,15 @@ local function APL ()
 	  if Player:BuffRemainsP(S.Inquisition) < Player:GCD()*4.5 and Player:HolyPower() >=3 then
 		if HR.Cast(S.Inquisition) then return "Cast Inquisition"; end
 	  end
+	  
+	  local Var_HoW = (Target:HealthPercentage() <= 20 or (Player:Buff(S.Crusade) or Player:Buff(S.AvengingWrath)) and S.HammerOfWrath:IsReady());
+	  		if Var_HoW and not S.WakeofAshes:IsReady() then
+			if Player:HolyPower() == 4  then
+				if HR.Cast(S.HammerOfWrath) then return "Cast HammerOfWrath"; end
+			elseif Player:HolyPower() <=3 and S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 then
+				if HR.Cast(S.HammerOfWrath) then return "Cast HammerOfWrath"; end
+			end
+		end
       -- actions+=/call_action_list,name=opener,if=time<2&(cooldown.judgment.up|cooldown.blade_of_justice.up|cooldown.divine_hammer.up|cooldown.wake_of_ashes.up)
       if HL.CombatTime() < 2 and (S.Judgment:CooldownUp() or S.BladeofJustice:CooldownUp() or S.DivineHammer:CooldownUp() or S.WakeofAshes:CooldownUp()) then
         -- actions.opener=blood_fury
@@ -380,12 +392,13 @@ local function APL ()
           end
         end
         if Target:IsInRange("Melee") and Player:HolyPower() <= 4 then
+		  if S.HammerOfWrath:IsReady() and Var_HoW then
+			if HR.Cast(S.HammerOfWrath) then return "Cast HammerOfWrath 2"; end
           -- actions+=/zeal,if=holy_power<=4
-          if S.Zeal:IsCastable() then
+          elseif S.Zeal:IsCastable() then
             if HR.Cast(S.Zeal) then return "Cast Zeal"; end
-          end
           -- actions+=/crusader_strike,if=holy_power<=4
-          if S.CrusaderStrike:IsCastable() then
+          elseif S.CrusaderStrike:IsCastable() then
             if HR.Cast(S.CrusaderStrike) then return "Cast Crusader Strike"; end
           end
         end
