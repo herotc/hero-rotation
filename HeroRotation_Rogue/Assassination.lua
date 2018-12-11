@@ -440,7 +440,7 @@ local function Direct ()
 
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&azerite.echoing_blades.enabled&spell_targets.fan_of_knives>=2
   if S.FanofKnives:IsCastable("Melee") and S.EchoingBlades:AzeriteEnabled() and Cache.EnemiesCount[10] >= 2 then
-    if HR.Cast(S.PoisonedKnife) then return "Cast Fan of Knives (Echoing Blades)"; end
+    if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (Echoing Blades)"; end
   end
   -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
   if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 4 + num(Player:IsStealthedP(true, false)) + num(S.DoubleDose:AzeriteRank() > 2) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
