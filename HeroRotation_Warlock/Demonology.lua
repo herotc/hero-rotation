@@ -194,12 +194,6 @@ local function DoomDoTCycle()
 end
 
 local function CDs ()
-  -- Demonic Tyrant
-  -- Remove once pet tracking is fixed
-  --[[if S.SummonTyrant:IsCastable(40) then
-    if HR.Cast(S.SummonTyrant, Settings.Demonology.GCDasOffGCD.SummonTyrant) then return ""; end
-  end]]
-
   -- actions+=/berserking
   if S.Berserking:IsAvailable() and S.Berserking:IsCastable() then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
@@ -347,7 +341,7 @@ local function ImplosionRot ()
 	  if HR.Cast(S.Demonbolt) then return ""; end
   end
   -- actions.implosion+=/summon_vilefiend,if=(cooldown.summon_demonic_tyrant.remains>40&spell_targets.implosion<=2)|cooldown.summon_demonic_tyrant.remains<12
-  if S.SummonVilefiend:IsCastable() and (S.SummonTyrant:CooldownRemainsP() > 40 and Cache.EnemiesCount[range] <= 2) or S.SummonTyrant:CooldownRemainsP() < 12 then
+  if S.SummonVilefiend:IsCastable() and not Player:IsCasting(S.SummonVilefiend) and ((S.SummonTyrant:CooldownRemainsP() > 40 and Cache.EnemiesCount[range] <= 2) or S.SummonTyrant:CooldownRemainsP() < 12) then
     if HR.Cast(S.SummonVilefiend) then return ""; end
   end
   -- actions.implosion+=/bilescourge_bombers,if=cooldown.summon_demonic_tyrant.remains>9
@@ -480,7 +474,7 @@ local function APL ()
 		  and (WildImpsCount() >= 3 + num(S.InnerDemons:IsAvailable()) + (num(S.DemonicConsumption:IsAvailable())*3)
 		  or Player:PrevGCDP(1, S.HandOfGuldan) and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() >= 3 + num(S.InnerDemons:IsAvailable())))
 		  and (FutureShard() < 3 or DreadStalkersTime() < Player:GCD() * 2.7 or GrimoireFelguardTime() < Player:GCD() * 2.7) then
-		    if HR.Cast(S.SummonTyrant, Settings.Demonology.GCDasOffGCD.SummonTyrant) then return ""; end
+		    if HR.Cast(S.SummonTyrant) then return ""; end
 		end
         -- actions+=/power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
         if S.PowerSiphon:IsCastable() and WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 
