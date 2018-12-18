@@ -341,7 +341,7 @@ local function ImplosionRot ()
 	  if HR.Cast(S.Demonbolt) then return ""; end
   end
   -- actions.implosion+=/summon_vilefiend,if=(cooldown.summon_demonic_tyrant.remains>40&spell_targets.implosion<=2)|cooldown.summon_demonic_tyrant.remains<12
-  if S.SummonVilefiend:IsCastable() and not Player:IsCasting(S.SummonVilefiend) and ((S.SummonTyrant:CooldownRemainsP() > 40 and Cache.EnemiesCount[range] <= 2) or S.SummonTyrant:CooldownRemainsP() < 12) then
+  if S.SummonVilefiend:IsCastable() and not Player:IsCasting(S.SummonVilefiend) and FutureShard() > 0 and ((S.SummonTyrant:CooldownRemainsP() > 40 and Cache.EnemiesCount[range] <= 2) or S.SummonTyrant:CooldownRemainsP() < 12) then
     if HR.Cast(S.SummonVilefiend) then return ""; end
   end
   -- actions.implosion+=/bilescourge_bombers,if=cooldown.summon_demonic_tyrant.remains>9
