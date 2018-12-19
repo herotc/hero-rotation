@@ -287,15 +287,13 @@ end
 HR.SetAPL(581, APL);
 
 --- ======= SIMC =======
---- Last Update: 07/21/2018
+--- Last Update: 08/22/2018
 
 --[[
 
 # Executed every time the actor is available.
 actions=auto_attack
 actions+=/consume_magic
-# ,if=!raid_event.adds.exists|active_enemies>1
-actions+=/use_item,slot=trinket1
 actions+=/call_action_list,name=brand,if=talent.charred_flesh.enabled
 actions+=/call_action_list,name=defensives
 actions+=/call_action_list,name=normal
@@ -317,13 +315,12 @@ actions.defensives+=/fiery_brand
 # Normal Rotation
 actions.normal=infernal_strike
 actions.normal+=/spirit_bomb,if=soul_fragments>=4
-actions.normal+=/immolation_aura,if=pain<=90
-actions.normal+=/felblade,if=pain<=70
-actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&talent.fracture.enabled&soul_fragments=0&cooldown.fracture.charges_fractional<1.75
-actions.normal+=/fracture,if=soul_fragments<=3
-actions.normal+=/fel_devastation
 actions.normal+=/soul_cleave,if=!talent.spirit_bomb.enabled
 actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
+actions.normal+=/immolation_aura,if=pain<=90
+actions.normal+=/felblade,if=pain<=70
+actions.normal+=/fracture,if=soul_fragments<=3
+actions.normal+=/fel_devastation
 actions.normal+=/sigil_of_flame
 actions.normal+=/shear
 actions.normal+=/throw_glaive
