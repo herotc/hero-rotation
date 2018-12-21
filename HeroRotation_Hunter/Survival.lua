@@ -239,7 +239,7 @@ local function APL()
     end
     -- potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|time_to_die<26
     if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll") and not Player:IsRace("Orc")) or Target:TimeToDie() < 26) then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "prolonged_power 38"; end
+      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion 38"; end
     end
     -- aspect_of_the_eagle,if=target.distance>=6
     if S.AspectoftheEagle:IsCastableP() and HR.CDsON() and (not Target:IsInRange("Melee")) then
