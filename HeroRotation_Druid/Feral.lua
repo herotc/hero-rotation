@@ -64,7 +64,10 @@ Spell.Druid.Feral = {
   ThrashCatDebuff                       = Spell(106830),
   WildFleshrending                      = Spell(279527),
   ClearcastingBuff                      = Spell(135700),
-  SwipeCat                              = Spell(106785)
+  SwipeCat                              = Spell(106785),
+  PrimalWrath                           = Spell(285381),
+  ScentofBlood                          = Spell(285564),
+  ScentofBloodBuff                      = Spell(285646),
 };
 local S = Spell.Druid.Feral;
 
@@ -161,13 +164,13 @@ local function APL()
     if S.Regrowth:IsCastableP() and (S.Bloodtalons:IsAvailable()) then
       if HR.Cast(S.Regrowth) then return "regrowth 3"; end
     end
-    -- variable,name=use_thrash,value=2
+    -- variable,name=use_thrash,value=0
     if (true) then
-      VarUseThrash = 2
+      VarUseThrash = 0
     end
-    -- variable,name=use_thrash,value=1,if=azerite.power_of_the_moon.enabled
-    if (S.PoweroftheMoon:AzeriteEnabled()) then
-      VarUseThrash = 1
+    -- variable,name=use_thrash,value=2,if=azerite.wild_fleshrending.enabled
+    if (S.WildFleshrending:AzeriteEnabled()) then
+      VarUseThrash = 2
     end
     -- variable,name=delayed_tf_opener,value=0
     if (true) then
@@ -312,6 +315,16 @@ local function APL()
       end
     end
     -- pool_resource,for_next=1
+    -- primal_wrath,target_if=spell_targets.primal_wrath>1&dot.rip.remains<4
+    if S.PrimalWrath:IsCastableP() and (Cache.EnemiesCount[8] > 1 and Target:DebuffRemainsP(S.RipDebuff) < 4) then
+      if HR.Cast(S.PrimalWrath) then return "primal_wrath 200"; end
+    end
+    -- pool_resource,for_next=1
+    -- primal_wrath,target_if=spell_targets.primal_wrath>=2
+    if S.PrimalWrath:IsCastableP() and Cache.EnemiesCount[8] >= 2 then
+      if HR.Cast(S.PrimalWrath) then return "primal_wrath 201"; end
+    end
+    -- pool_resource,for_next=1
     -- rip,target_if=!ticking|(remains<=duration*0.3)&(target.health.pct>25&!talent.sabertooth.enabled)|(remains<=duration*0.8&persistent_multiplier>dot.rip.pmultiplier)&target.time_to_die>8
     if S.Rip:IsCastableP() then
       if HR.CastCycle(S.Rip, 8, EvaluateCycleRip209) then return "rip 249" end
@@ -353,12 +366,30 @@ local function APL()
       if HR.Cast(S.BrutalSlash) then return "brutal_slash 290"; end
     end
     -- pool_resource,for_next=1
-    -- thrash_cat,if=refreshable&(spell_targets.thrash_cat>2)
+    -- thrash_cat,if=(refreshable)&(spell_targets.thrash_cat>2)
     if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and (Cache.EnemiesCount[8] > 2)) then
       if S.ThrashCat:IsUsablePPool() then
         if HR.Cast(S.ThrashCat) then return "thrash_cat 293"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 294"; end
+      end
+    end
+    -- pool_resource,for_next=1
+    -- thrash_cat,if=(talent.scent_of_blood.enabled&buff.scent_of_blood.down)&spell_targets.thrash_cat>3
+    if S.ThrashCat:IsCastableP() and ((S.ScentofBlood:IsAvailable() and not Player:BuffP(S.ScentofBloodBuff)) and Cache.EnemiesCount[8] > 3) then
+      if S.ThrashCat:IsUsablePPool() then
+        if HR.Cast(S.ThrashCat) then return "thrash_cat 295"; end
+      else
+        if HR.Cast(S.PoolResource) then return "pool_resource 296"; end
+      end
+    end
+    -- pool_resource,for_next=1
+    -- swipe_cat,if=buff.scent_of_blood.up
+    if S.SwipeCat:IsCastableP() and Player:BuffP(S.ScentofBloodBuff) then
+      if S.SwipeCat:IsUsablePPool() then
+        if HR.Cast(S.SwipeCat) then return "swipe_cat 297"; end
+      else
+        if HR.Cast(S.PoolResource) then return "pool_resource 298"; end
       end
     end
     -- pool_resource,for_next=1
@@ -404,14 +435,6 @@ local function APL()
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 425"; end
       end
-    end
-    -- shred,if=buff.clearcasting.react
-    if S.Shred:IsCastableP() and (bool(Player:BuffStackP(S.ClearcastingBuff))) then
-      if HR.Cast(S.Shred) then return "shred 427"; end
-    end
-    -- moonfire_cat,if=azerite.power_of_the_moon.enabled&!buff.incarnation.up
-    if S.MoonfireCat:IsCastableP() and (S.PoweroftheMoon:AzeriteEnabled() and not Player:BuffP(S.IncarnationBuff)) then
-      if HR.Cast(S.MoonfireCat) then return "moonfire_cat 431"; end
     end
     -- shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
     if S.Shred:IsCastableP() and (Target:DebuffRemainsP(S.RakeDebuff) > (S.Shred:Cost() + S.Rake:Cost() - Player:EnergyPredicted()) / Player:EnergyRegen() or bool(Player:BuffStackP(S.ClearcastingBuff))) then
