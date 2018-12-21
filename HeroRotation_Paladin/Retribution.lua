@@ -98,6 +98,8 @@ local conditions_wake_of_ashes
 local conditions_inquisition
 --spell_targets
 local var_spell_targets
+--Hammer of Wrath
+local conditions_hammer_of_wrath
 -- APL Main
 local function APL ()-- APL Action Lists (and Variables)
   --- Out of Combat
@@ -146,6 +148,8 @@ local function APL ()-- APL Action Lists (and Variables)
 		conditions_wake_of_ashes = (Player:HolyPower() <= 0 or Player:HolyPower() == 1 and S.BladeofJustice:CooldownRemains() > Player:GCD())
 		-- Inquisition
 		conditions_inquisition = ((not Player:Buff(S.Inquisition) or Player:BuffRemainsP(S.Inquisition) <5) and Player:HolyPower() >=3) or ((S.ExecutionSentence:IsAvailable() and S.ExecutionSentence:CooldownRemains() <10 and Player:BuffRemainsP(S.Inquisition) < 15 or S.AvengingWrath:CooldownRemains() <15 and Player:BuffRemainsP(S.Inquisition) <20) and Player:HolyPower() >=3)
+		
+
 		--# Executed every time the actor is available.
 		--actions=auto_attack
 		--actions+=/rebuke
@@ -268,7 +272,7 @@ function wake_opener_ES_HoW()
 	if (S.WakeofAshes:IsAvailable() and S.WakeofAshes:IsReady()) then
 			if HR.Cast(S.WakeofAshes) then return "Cast Wake of Ashes"; end
 	end
-	if (not conditions_hammer_of_wrath) then
+	if (conditions_hammer_of_wrath) then
 		if HR.Cast(S.HammerOfWrath) then return "Cast Hammer of Wrath"; end
 	end	
 	if (conditions_execution_sentence) then
@@ -298,7 +302,7 @@ function wake_opener_HoW()
 	if (S.WakeofAshes:IsAvailable() and S.WakeofAshes:IsReady()) then
 			if HR.Cast(S.WakeofAshes) then return "Cast Wake of Ashes"; end
 	end
-	if (not conditions_hammer_of_wrath) then
+	if (conditions_hammer_of_wrath) then
 		if HR.Cast(S.HammerOfWrath) then return "Cast Hammer of Wrath"; end
 	end	
 end
@@ -320,6 +324,7 @@ function wake_opener_Inq()
 			if HR.Cast(S.AvengingWrath, Settings.Retribution.OffGCDasOffGCD.AvengingWrath) then return "Cast Avenging Wrath"; end
         end
 	end
+
 	if (conditions_templars_verdict) then
 		if S.TemplarsVerdict:IsCastable() then
 			if HR.Cast(S.TemplarsVerdict) then return "Cast Templars Verdict" end
@@ -368,8 +373,10 @@ function cooldowns()
 end
 
 function generators()
+	
 	--actions.generators=variable,name=HoW,value=(!talent.hammer_of_wrath.enabled|target.health.pct>=20&(buff.avenging_wrath.down|buff.crusade.down))
-	conditions_hammer_of_wrath = (not S.HammerOfWrath:IsAvailable() or Target:HealthPercentage() >= 20 and (not Player:Buff(S.Crusade) or not Player:Buff(S.AvengingWrath)));
+	var_HoW = (not S.HammerOfWrath:IsAvailable() or Target:HealthPercentage() >= 20 and (not Player:Buff(S.Crusade) or not Player:Buff(S.AvengingWrath)))
+
 	--actions.generators+=/call_action_list,name=finishers,if=holy_power>=5
 	if (Player:HolyPower() >=5) then
 		finishers()
@@ -381,20 +388,21 @@ function generators()
 		end
 	end
 	--actions.generators+=/blade_of_justice,if=holy_power<=2|(holy_power=3&(cooldown.hammer_of_wrath.remains>gcd*2|variable.HoW))
-	if (Player:HolyPower() <= 2 or (Player:HolyPower() == 3 and (S.HammerOfWrath:CooldownRemains() > Player:GCD() * 2) or conditions_hammer_of_wrath)) then 
+	if (Player:HolyPower() <= 2 or (Player:HolyPower() == 3 and (S.HammerOfWrath:CooldownRemains() > Player:GCD() * 2) or var_HoW)) then 
 		if (conditions_blade_of_justice) then
 			if HR.Cast(S.BladeofJustice) then return "Cast Blade of Justice"; end
 		end
 	end
 	--actions.generators+=/judgment,if=holy_power<=2|(holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|variable.HoW))
-	if (Player:HolyPower() <= 2 or (Player:HolyPower() <=4 and (S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 or conditions_hammer_of_wrath))) then
+	if (Player:HolyPower() <= 2 or (Player:HolyPower() <=4 and (S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 or var_HoW))) then
 		if S.Judgment:IsCastable() then
 			if HR.Cast(S.Judgment) then return "Cast Judgment"; end
 		end
 	end
 	--actions.generators+=/hammer_of_wrath,if=holy_power<=4
+	conditions_hammer_of_wrath = (S.HammerOfWrath:IsAvailable() and (Player:Buff(S.Crusade) or Player:Buff(S.AvengingWrath) or Target:HealthPercentage() <= 20) and S.HammerOfWrath:IsReady()) 
 	if (Player:HolyPower() <=4) then
-		if (not conditions_hammer_of_wrath) then
+		if (conditions_hammer_of_wrath) then
 			if HR.Cast(S.HammerOfWrath) then return "Cast Hammer of Wrath"; end
 		end	
 	end
