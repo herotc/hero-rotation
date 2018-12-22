@@ -67,7 +67,7 @@ local S = Spell.Warrior.Arms;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
-  BattlePotionofStrength                = Item(142117)
+  BattlePotionofStrength                = Item(163224)
 };
 local I = Item.Warrior.Arms;
 
