@@ -40,6 +40,7 @@
       },
       OffGCDasOffGCD = {
         -- Abilities
+        DeadlyCalm = true,
         -- Items
       },
     },
