@@ -34,6 +34,7 @@
         Warbreaker = false,
         Bladestorm = false,
         Ravager = false,
+        DeadlyCalm = false,
         Charge = true,
         Avatar = true,
       },
