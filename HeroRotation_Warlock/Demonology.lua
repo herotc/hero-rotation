@@ -95,6 +95,7 @@ local S = Spell.Warlock.Demonology;
 -- Items
 if not Item.Warlock then Item.Warlock = {}; end
 Item.Warlock.Demonology = {
+  BattlePotionofInt     = Item(163222)
 };
 local I = Item.Warlock.Demonology;
 
@@ -397,10 +398,13 @@ local function APL ()
     -- actions.precombat+=/augmentation
 	-- actions.precombat+=/inner_demons,if=talent.inner_demons.enabled
     -- actions.precombat+=/snapshot_stats
-    -- actions.precombat+=/potion
 
     -- Opener
     if Everyone.TargetIsValid() then
+      -- actions.precombat+=/potion
+      if I.BattlePotionofInt:IsReady() and (Settings.Commons.UsePotions or Settings.Demonology.ShowBPoI) then
+        if HR.CastSuggested(I.BattlePotionofInt) then return ""; end
+      end
       -- actions.precombat+=/demonbolt
       if Player:IsCasting(S.Demonbolt) and S.BilescourgeBombers:IsCastable() then
         if HR.Cast(S.BilescourgeBombers) then return ""; end

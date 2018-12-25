@@ -61,13 +61,7 @@
     },
     Demonology = {
       UnendingResolveHP = 20,
-      ShowPoPP = false,
-      Sephuz = {
-        ShadowFury = false,
-        MortalCoil = false,
-        Fear = false,
-        AxeToss = false
-      },
+      ShowBPoI = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -135,11 +129,7 @@
   -- Demonology
   CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
   CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology");
-  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
-  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.ShadowFury", "Sephuz: Show Shadow Fury", "Enable this if you want it to show you when to use Shadow Fury to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.Fear", "Sephuz: Show Fear", "Enable this if you want it to show you when to use Fear to proc Sephuz's Secret (only when equipped).");
-  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.Sephuz.AxeToss", "Sephuz: Show Axe Toss", "Enable this if you want it to show you when to use Axe Toss (Felguard spell) to proc Sephuz's Secret (only when equipped).");
+  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowBPoI", "Show Battle Potion of Intellect", "Enable this if you want it to show you when to use Battle Potion of Intellect.");
   -- Affliction
   CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction");
   -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
