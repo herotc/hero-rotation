@@ -153,7 +153,7 @@ local function EvaluateCycleMoonfireCat382(TargetUnit)
 end
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Cooldowns, Opener, SingleTarget, StFinishers, StGenerators
+  local Precombat, Cooldowns, Opener, SingleTarget, Finishers, Generators
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -297,16 +297,16 @@ local function APL()
     if S.Regrowth:IsCastableP() and (Player:ComboPoints() == 5 and Player:BuffP(S.PredatorySwiftnessBuff) and S.Bloodtalons:IsAvailable() and Player:BuffDownP(S.BloodtalonsBuff) and (not Player:BuffP(S.IncarnationBuff) or Target:DebuffRemainsP(S.RipDebuff) < 8)) then
       if HR.Cast(S.Regrowth) then return "regrowth 181"; end
     end
-    -- run_action_list,name=st_finishers,if=combo_points>4
+    -- run_action_list,name=finishers,if=combo_points>4
     if (Player:ComboPoints() > 4) then
-      return StFinishers();
+      return Finishers();
     end
-    -- run_action_list,name=st_generators
+    -- run_action_list,name=generators
     if (true) then
-      return StGenerators();
+      return Generators();
     end
   end
-  StFinishers = function()
+  Finishers = function()
     -- pool_resource,for_next=1
     -- savage_roar,if=buff.savage_roar.down
     if S.SavageRoar:IsCastableP() and (Player:BuffDownP(S.SavageRoarBuff)) then
@@ -354,7 +354,7 @@ local function APL()
       if HR.Cast(S.FerociousBiteMaxEnergy) then return "ferocious_bite 262"; end
     end
   end
-  StGenerators = function()
+  Generators = function()
     -- regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&combo_points=4&dot.rake.remains<4
     if S.Regrowth:IsCastableP() and (S.Bloodtalons:IsAvailable() and Player:BuffP(S.PredatorySwiftnessBuff) and Player:BuffDownP(S.BloodtalonsBuff) and Player:ComboPoints() == 4 and Target:DebuffRemainsP(S.RakeDebuff) < 4) then
       if HR.Cast(S.Regrowth) then return "regrowth 268"; end
