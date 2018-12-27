@@ -23,7 +23,7 @@ if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Frost = {
   ArcaneIntellectBuff                   = Spell(1459),
   ArcaneIntellect                       = Spell(1459),
-  WaterElemental                        = Spell(31687),
+  SummonWaterElemental                  = Spell(31687),
   MirrorImage                           = Spell(55342),
   Frostbolt                             = Spell(116),
   FrozenOrb                             = Spell(84714),
@@ -53,8 +53,6 @@ Spell.Mage.Frost = {
   WintersChillDebuff                    = Spell(228358),
   GlacialSpikeBuff                      = Spell(199844),
   SplittingIce                          = Spell(56377),
-  WintersReach                          = Spell(273346),
-  WintersReachBuff                      = Spell(273347),
   FreezingRain                          = Spell(240555)
 };
 local S = Spell.Mage.Frost;
@@ -85,6 +83,8 @@ local function UpdateRanges()
   end
 end
 
+S.FrozenOrb:RegisterInFlight()
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -94,7 +94,6 @@ local function bool(val)
 end
 
 S.FrozenOrb.EffectID = 84721
-S.FrozenOrb:RegisterInFlight()
 S.Frostbolt:RegisterInFlight()
 --- ======= ACTION LISTS =======
 local function APL()
@@ -109,9 +108,9 @@ local function APL()
     if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff, true) then
       if HR.Cast(S.ArcaneIntellect) then return "arcane_intellect 3"; end
     end
-    -- water_elemental
-    if S.WaterElemental:IsCastableP() then
-      if HR.Cast(S.WaterElemental) then return "water_elemental 7"; end
+    -- summon_water_elemental
+    if S.SummonWaterElemental:IsCastableP() then
+      if HR.Cast(S.SummonWaterElemental) then return "summon_water_elemental 7"; end
     end
     -- snapshot_stats
     -- mirror_image
@@ -287,31 +286,27 @@ local function APL()
     if S.IceNova:IsCastableP() then
       if HR.Cast(S.IceNova) then return "ice_nova 217"; end
     end
-    -- flurry,if=azerite.winters_reach.enabled&!buff.brain_freeze.react&buff.winters_reach.react
-    if S.Flurry:IsCastableP() and (S.WintersReach:AzeriteEnabled() and not bool(Player:BuffStackP(S.BrainFreezeBuff)) and bool(Player:BuffStackP(S.WintersReachBuff))) then
-      if HR.Cast(S.Flurry) then return "flurry 219"; end
-    end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
-      if HR.Cast(S.Frostbolt) then return "frostbolt 227"; end
+      if HR.Cast(S.Frostbolt) then return "frostbolt 219"; end
     end
-    -- -- call_action_list,name=movement
+    -- call_action_list,name=movement
     -- if (true) then
     --   local ShouldReturn = Movement(); if ShouldReturn then return ShouldReturn; end
     -- end
     -- ice_lance
     if S.IceLance:IsCastableP() then
-      if HR.Cast(S.IceLance) then return "ice_lance 231"; end
+      if HR.Cast(S.IceLance) then return "ice_lance 223"; end
     end
   end
   TalentRop = function()
     -- rune_of_power,if=talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
     if S.RuneofPower:IsCastableP() and (S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) == 5 and (bool(Player:BuffStackP(S.BrainFreezeBuff)) or S.Ebonbolt:IsAvailable() and S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime())) then
-      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power 233"; end
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power 225"; end
     end
     -- rune_of_power,if=!talent.glacial_spike.enabled&(talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
     if S.RuneofPower:IsCastableP() and (not S.GlacialSpike:IsAvailable() and (S.Ebonbolt:IsAvailable() and S.Ebonbolt:CooldownRemainsP() < S.RuneofPower:CastTime() or S.CometStorm:IsAvailable() and S.CometStorm:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RayofFrost:IsAvailable() and S.RayofFrost:CooldownRemainsP() < S.RuneofPower:CastTime() or S.RuneofPower:ChargesFractionalP() > 1.9)) then
-      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power 251"; end
+      if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power 243"; end
     end
   end
   -- call precombat
@@ -320,9 +315,9 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell
-    -- ice_lance,if=prev_gcd.1.flurry&brain_freeze_active&!buff.fingers_of_frost.react
-    if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and Player:BrainFreezeActive() and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
-      if HR.Cast(S.IceLance) then return "ice_lance 293"; end
+    -- ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
+    if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
+      if HR.Cast(S.IceLance) then return "ice_lance 285"; end
     end
     -- call_action_list,name=cooldowns
     if HR.CDsON() then
