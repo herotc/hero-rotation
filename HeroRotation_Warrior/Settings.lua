@@ -34,11 +34,13 @@
         Warbreaker = false,
         Bladestorm = false,
         Ravager = false,
+        DeadlyCalm = false,
         Charge = true,
         Avatar = true,
       },
       OffGCDasOffGCD = {
         -- Abilities
+        DeadlyCalm = true,
         -- Items
       },
     },

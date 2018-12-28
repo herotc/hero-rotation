@@ -1,4 +1,4 @@
-## Interface: 80000
+## Interface: 80100
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFF0070DEShaman|r]
 ## Author: lithium720, Tael

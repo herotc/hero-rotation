@@ -140,16 +140,16 @@ local function APL ()
         if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes (Danger)"; end
       end
     end
+    
+    -- Metamorphosis
+    if S.Metamorphosis:IsCastable("Melee") and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold then
+      HR.CastSuggested(S.Metamorphosis);
+    end
 
     -- Fiery Brand
     if S.FieryBrand:IsCastable() and not Player:Buff(S.FieryBrand)
       and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
       if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand) then return "Cast Fiery Brand"; end
-    end
-
-    -- Metamorphosis
-    if S.Metamorphosis:IsCastable("Melee") and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold then
-      HR.CastSuggested(S.Metamorphosis);
     end
   end
 
@@ -208,28 +208,6 @@ local function APL ()
     if S.SpiritBomb:IsAvailable() and IsInAoERange and SoulFragments >= 4 then
       if HR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
     end
-    -- actions+=/immolation_aura,if=pain<=90
-    if S.ImmolationAura:IsCastable() and IsInAoERange and Player:Pain() <= 90 then
-      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
-    end
-    -- actions+=/felblade,if=pain<=70
-    if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then
-      if HR.Cast(S.Felblade) then return "Cast Felblade"; end
-    end
-    if S.Fracture:IsAvailable() and IsInMeleeRange then
-      -- actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&talent.fracture.enabled&soul_fragments=0&cooldown.fracture.charges_fractional<1.75
-      if S.SoulCleave:IsReady() and SoulFragments == 0 and S.Fracture:ChargesFractional() < 1.75 then
-        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave (Filler)"; end
-      end
-      -- actions+=/fracture,if=soul_fragments<=3
-      if IsInMeleeRange and S.Fracture:IsCastable() and SoulFragments <= 3 then
-        if HR.Cast(S.Fracture) then return "Cast Fracture"; end
-      end
-    end
-    -- actions+=/fel_devastation
-    if S.FelDevastation:IsCastable() and IsInAoERange then
-      if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
-    end
     -- actions+=/soul_cleave,if=!talent.spirit_bomb.enabled
     -- actions+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
     if S.SoulCleave:IsReady() then
@@ -238,6 +216,22 @@ local function APL ()
       elseif SoulFragments == 0 then
         if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave (Spirit Bomb)"; end
       end
+    end
+    -- actions+=/immolation_aura,if=pain<=90
+    if S.ImmolationAura:IsCastable() and IsInAoERange and Player:Pain() <= 90 then
+      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
+    end
+    -- actions+=/felblade,if=pain<=70
+    if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then
+      if HR.Cast(S.Felblade) then return "Cast Felblade"; end
+    end
+    -- actions+=/fracture,if=soul_fragments<=3
+    if S.Fracture:IsCastable() and IsInMeleeRange and SoulFragments <= 3 then
+      if HR.Cast(S.Fracture) then return "Cast Fracture"; end
+    end
+    -- actions+=/fel_devastation
+    if S.FelDevastation:IsCastable() and IsInAoERange then
+      if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
     end
     -- actions+=/sigil_of_flame
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
@@ -293,15 +287,13 @@ end
 HR.SetAPL(581, APL);
 
 --- ======= SIMC =======
---- Last Update: 07/21/2018
+--- Last Update: 08/22/2018
 
 --[[
 
 # Executed every time the actor is available.
 actions=auto_attack
 actions+=/consume_magic
-# ,if=!raid_event.adds.exists|active_enemies>1
-actions+=/use_item,slot=trinket1
 actions+=/call_action_list,name=brand,if=talent.charred_flesh.enabled
 actions+=/call_action_list,name=defensives
 actions+=/call_action_list,name=normal
@@ -323,13 +315,12 @@ actions.defensives+=/fiery_brand
 # Normal Rotation
 actions.normal=infernal_strike
 actions.normal+=/spirit_bomb,if=soul_fragments>=4
-actions.normal+=/immolation_aura,if=pain<=90
-actions.normal+=/felblade,if=pain<=70
-actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&talent.fracture.enabled&soul_fragments=0&cooldown.fracture.charges_fractional<1.75
-actions.normal+=/fracture,if=soul_fragments<=3
-actions.normal+=/fel_devastation
 actions.normal+=/soul_cleave,if=!talent.spirit_bomb.enabled
 actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
+actions.normal+=/immolation_aura,if=pain<=90
+actions.normal+=/felblade,if=pain<=70
+actions.normal+=/fracture,if=soul_fragments<=3
+actions.normal+=/fel_devastation
 actions.normal+=/sigil_of_flame
 actions.normal+=/shear
 actions.normal+=/throw_glaive
