@@ -164,7 +164,6 @@ local function APL ()
 
   spell_targets = Cache.EnemiesCount[40]
   flame_shock_refreshable = (Target:DebuffRemains(S.FlameShockDebuff) <= 6.5)
-  print(FutureMaelstromPower())
   -- Out of Combat
 	if not Player:AffectingCombat() then
 		-- Opener
