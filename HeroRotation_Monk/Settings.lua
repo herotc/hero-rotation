@@ -27,7 +27,6 @@
         -- Racials
         Racials = true,
         -- Abilities
-
       }
     },
     Brewmaster = {
@@ -64,8 +63,10 @@
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-
         -- Abilities
+        SpearHandStrike = true,
+        -- Items
+        LustrousGoldenPlumage = true,
       }
     }
   };
@@ -80,7 +81,7 @@
   CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
   -- Windwalker
   CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
-  -- Windwalker
+  -- Brewmaster
   CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enabled", "Purify", "Enable or disable Purify recommendations.");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
