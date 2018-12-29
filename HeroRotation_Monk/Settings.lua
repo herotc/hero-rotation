@@ -65,6 +65,7 @@
         -- Racials
         -- Abilities
         SpearHandStrike = true,
+        TouchOfKarma = true,
         -- Items
         LustrousGoldenPlumage = true,
       }
