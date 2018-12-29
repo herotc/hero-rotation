@@ -132,23 +132,22 @@ local function FutureMaelstromPower()
 	if (Player:AffectingCombat()) then
 		if S.TotemMastery:IsCastableP() then
 			resonance = Player:CastRemains()
-			return MaelstromPower + resonance
 		end
-	end
-	if not Player:IsCasting() then
-		return MaelstromPower
-	else
-		if Player:IsCasting(S.LightningBolt) then
-			return MaelstromPower + 8
-		elseif Player:IsCasting(S.LavaBurst) then
-			return MaelstromPower + 10
-		elseif Player:IsCasting(S.ChainLightning) then
-			local enemiesHit = min(Cache.EnemiesCount[40], 3)
-			return MaelstromPower + 4 * enemiesHit * factor + resonance
-		elseif Player:IsCasting(S.Icefury) then
-			return MaelstromPower + 25 * factor + resonance
-		else
+		if not Player:IsCasting() then
 			return MaelstromPower
+		else
+			if Player:IsCasting(S.LightningBolt) then
+				return MaelstromPower + 8 + resonance
+			elseif Player:IsCasting(S.LavaBurst) then
+				return MaelstromPower + 10 + resonance
+			elseif Player:IsCasting(S.ChainLightning) then
+				local enemiesHit = min(Cache.EnemiesCount[40], 3)
+				return MaelstromPower + 4 * enemiesHit * factor + resonance
+			elseif Player:IsCasting(S.Icefury) then
+				return MaelstromPower + 25 * factor + resonance
+			else
+				return MaelstromPower
+			end
 		end
 	end
 end
@@ -165,6 +164,7 @@ local function APL ()
 
   spell_targets = Cache.EnemiesCount[40]
   flame_shock_refreshable = (Target:DebuffRemains(S.FlameShockDebuff) <= 6.5)
+  print(FutureMaelstromPower())
   -- Out of Combat
 	if not Player:AffectingCombat() then
 		-- Opener
@@ -187,7 +187,7 @@ local function APL ()
 			--# Use Stormkeeper precombat unless some adds will spawn soon.
 			--actions.precombat+=/stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
 			if (not S.Stormkeeper:IsAvailable() and S.Stormkeeper:IsReady()) then
-				if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.StormElemental) then return "Cast Stormkeeper" end
+				if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "Cast Stormkeeper" end
 			end
 			--actions.precombat+=/fire_elemental,if=!talent.storm_elemental.enabled
 			if (not S.StormElemental:IsAvailable() and S.FireElemental:IsReady()) then
@@ -278,7 +278,7 @@ function aoe()
 	--actions.aoe=stormkeeper,if=talent.stormkeeper.enabled
 	if (S.Stormkeeper:IsAvailable()) then
 		if (S.Stormkeeper:IsReady()) then
-			if HR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+			if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "Cast Stormkeeper" end
 		end
 	end
 	--actions.aoe+=/ascendance,if=talent.ascendance.enabled&(talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120&cooldown.storm_elemental.remains>15|!talent.storm_elemental.enabled)
@@ -375,7 +375,7 @@ function single_target()
 	--actions.single_target+=/stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(!talent.surge_of_power.enabled|buff.surge_of_power.up|maelstrom>=44)
 	if (S.Stormkeeper:IsAvailable() and (not S.SurgeOfPower:IsAvailable() or Player:Buff(S.SurgeOfPowerBuff) or FutureMaelstromPower() >= 44)) then
 		if (S.Stormkeeper:IsReady()) then
-			if HR.Cast(S.Stormkeeper) then return "Cast Stormkeeper" end
+			if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "Cast Stormkeeper" end
 		end
 	end
 	--actions.single_target+=/liquid_magma_totem,if=talent.liquid_magma_totem.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
