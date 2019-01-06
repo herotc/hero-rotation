@@ -18,8 +18,8 @@
   HR.GUISettings.APL.Shaman = {
     Commons = {
       OffGCDasOffGCD = {
-	    WindShear = true,
-	    Racials = true,
+        WindShear = true,
+        Racials = true,
       },
       OnUseTrinkets = false,
 
@@ -33,26 +33,25 @@
     },
 
     Enhancement = {
-		GCDasOffGCD = {
-			-- Abilities
-			FeralSpirit = true,
-		},
+      GCDasOffGCD = {
+        -- Abilities
+        FeralSpirit = true,
+      },
       EnableEE = true
-	},
-	Elemental = {
-		GCDasOffGCD = {
-			-- Abilities
-			FireElemental = true,
-			EarthElemental = true,
-			StormElemental = true,
-			Stormkeeper = true,
-			Ascendance = true,
-		
-		},
-	EnableEE = true,
-	EnableFE = true,
-	EnableSE = true,
-	},
+    },
+    Elemental = {
+      GCDasOffGCD = {
+      -- Abilities
+        FireElemental = true,
+        EarthElemental = true,
+        StormElemental = true,
+        Stormkeeper = true,
+        Ascendance = true,
+      },
+      EnableEE = true,
+      EnableFE = true,
+      EnableSE = true,
+    },
   };
 
   HR.GUI.LoadSettingsRecursively(HR.GUISettings);
