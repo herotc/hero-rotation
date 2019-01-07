@@ -203,7 +203,7 @@
           return self:IsLearned() and RangeOK and (bool(Player:BuffStackP(SpellFrost.GlacialSpikeBuff)) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 5));
         else
           local BaseCheck = FrostOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-          if self == SpellFrost.WaterElemental then
+          if self == SpellFrost.SummonWaterElemental then
             return BaseCheck and not Pet:IsActive()
           else
             return BaseCheck

@@ -18,8 +18,8 @@
   HR.GUISettings.APL.Shaman = {
     Commons = {
       OffGCDasOffGCD = {
-	    WindShear = true,
-	    Racials = true,
+        WindShear = true,
+        Racials = true,
       },
       OnUseTrinkets = false,
 
@@ -33,9 +33,25 @@
     },
 
     Enhancement = {
-      EnableFS = true,
-      EnableEE = false
-	}
+      GCDasOffGCD = {
+        -- Abilities
+        FeralSpirit = true,
+      },
+      EnableEE = true
+    },
+    Elemental = {
+      GCDasOffGCD = {
+      -- Abilities
+        FireElemental = true,
+        EarthElemental = true,
+        StormElemental = true,
+        Stormkeeper = true,
+        Ascendance = true,
+      },
+      EnableEE = true,
+      EnableFE = true,
+      EnableSE = true,
+    },
   };
 
   HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -44,7 +60,7 @@
   local ARPanel = HR.GUI.Panel;
   local CP_Shaman = CreateChildPanel(ARPanel, "Shaman");
   local CP_Enhancement = CreateChildPanel(CP_Shaman, "Enhancement");
-  -- local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental");
+  local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental");
 
   -- Shared Shaman settings
   CreateARPanelOptions(CP_Shaman, "APL.Shaman.Commons");
@@ -64,4 +80,7 @@
   CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.EnableEE", "Show Earth Elemental in rotation", "Uncheck this if you don't want to see Earth Elemental in the rotation.");
 
   -- Elemental settings
-  -- CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
+  CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
+  CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableEE", "Show Earth Elemental in rotation", "Uncheck this if you don't want to see Earth Elemental in the rotation.");
+  CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableFE", "Show Fire Elemental in rotation", "Uncheck this if you don't want to see Fire Elemental in the rotation.");
+  CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableSE", "Show Storm Elemental in rotation", "Uncheck this if you don't want to see Storm Elementa in the rotation.");

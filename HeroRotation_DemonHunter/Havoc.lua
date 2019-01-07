@@ -65,6 +65,7 @@ Spell.DemonHunter.Havoc = {
   -- Azerite Traits
   RevolvingBlades               = Spell(279581),
   UnboundChaos                  = Spell(275144),
+  ChaoticTransformation         = Spell(288754),
 };
 local S = Spell.DemonHunter.Havoc;
 
@@ -83,7 +84,7 @@ Item.DemonHunter.Havoc = {
   VoidStalkersContract          = Item(151307, {13, 14}),
   ForgefiendsFabricator         = Item(151963, {13, 14}),
   -- Potion
-  ProlongedPower                = Item(142117),
+  BattlePotionofAgi             = Item(163223),
 };
 local I = Item.DemonHunter.Havoc;
 
@@ -117,9 +118,9 @@ local function IsInMeleeRange ()
 end
 
 -- Variables
--- variable,name=blade_dance,value=talent.first_blood.enabled|set_bonus.tier20_4pc|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+-- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
 local function BladeDance()
-  return S.FirstBlood:IsAvailable() or HL.Tier20_4Pc or (HR.AoEON() and Cache.EnemiesCount[8] >= 3 - (S.TrailOfRuin:IsAvailable() and 1 or 0));
+  return S.FirstBlood:IsAvailable() or (HR.AoEON() and Cache.EnemiesCount[8] >= 3 - (S.TrailOfRuin:IsAvailable() and 1 or 0));
 end
 -- variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 local function WaitingForNemesis()
@@ -158,17 +159,19 @@ local function APL()
       and (not (S.Demonic:IsAvailable() or PoolingForMeta() or WaitingForNemesis()) or Target:TimeToDie() < 25) then
       if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "Cast Metamorphosis"; end
     end
-    -- metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up
-    if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and Player:BuffP(S.MetamorphosisBuff)) then
+    -- metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up&(!azerite.chaotic_transformation.enabled|!variable.blade_dance|!cooldown.blade_dance.ready)
+    if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and Player:BuffP(S.MetamorphosisBuff) 
+      and (not S.ChaoticTransformation:AzeriteEnabled() or not BladeDance() or not S.BladeDance:IsReady())) then
       if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "Cast Metamorphosis (Demonic)"; end
     end
+    -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
     -- nemesis,if=!raid_event.adds.exists
     if S.Nemesis:IsCastable() then
       if HR.Cast(S.Nemesis, Settings.Havoc.OffGCDasOffGCD.Nemesis) then return "Cast Nemesis"; end
     end
     -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
-      if HR.CastSuggested(I.ProlongedPower) then return "Use Potion"; end
+    if I.BattlePotionofAgi:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
+      if HR.CastSuggested(I.BattlePotionofAgi) then return "Use Potion"; end
     end
   end
 
@@ -251,10 +254,6 @@ local function APL()
     if S.FelRush:IsCastable(20, true) and S.DemonBlades:IsAvailable() and not S.EyeBeam:IsReady() and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (Filler)"; end
     end
-    -- fel_rush,if=!talent.demon_blades.enabled&!cooldown.eye_beam.ready&azerite.unbound_chaos.rank>0
-    if S.FelRush:IsCastable(20, true) and not S.DemonBlades:IsAvailable() and not S.EyeBeam:IsReady() and S.UnboundChaos:AzeriteRank() > 0 and ConserveFelRush() then
-      if CastFelRush() then return "Cast Fel Rush (Filler)"; end
-    end
     -- demons_bite
     if InMeleeRange and S.DemonsBite:IsCastable() then
       if HR.Cast(S.DemonsBite) then return "Cast Demon's Bite"; end
@@ -263,9 +262,13 @@ local function APL()
     if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and not IsInMeleeRange() then
       if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glave (OOR)"; end
     end
-    -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
-    if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) and ConserveFelRush() then
+    -- fel_rush,if=movement.distance>15|buff.out_of_range.up
+    if S.FelRush:IsCastable(20) and not IsInMeleeRange() and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (OOR)"; end
+    end
+    -- vengeful_retreat,if=movement.distance>15
+    if S.VengefulRetreat:IsCastable(20) and not IsInMeleeRange() then
+      if HR.Cast(S.VengefulRetreat) then return "Cast Vengeful Retreat (OOR)"; end
     end
     -- throw_glaive,if=talent.demon_blades.enabled
     if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and S.DemonBlades:IsAvailable() then
@@ -276,7 +279,7 @@ local function APL()
   local function Normal()
     local InMeleeRange = IsInMeleeRange()
 
-    -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down
+    -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
     if S.VengefulRetreat:IsCastable("Melee", true) and S.Momentum:IsAvailable() and Player:BuffDownP(S.PreparedBuff) then
       if HR.Cast(S.VengefulRetreat) then return "Cast Vengeful Retreat (Momentum)"; end
     end
@@ -303,10 +306,6 @@ local function APL()
     -- blade_dance,if=variable.blade_dance
     if S.BladeDance:IsReady(8, true) and BladeDance() then
       if HR.Cast(S.BladeDance) then return "Cast Blade Dance"; end
-    end
-    -- fel_rush,if=!talent.momentum.enabled&!talent.demon_blades.enabled&azerite.unbound_chaos.enabled
-    if S.FelRush:IsCastable(20, true) and not S.Momentum:IsAvailable() and not S.DemonBlades:IsAvailable() and S.UnboundChaos:AzeriteEnabled() and ConserveFelRush() then
-      if CastFelRush() then return "Cast Fel Rush (Filler)"; end
     end
     -- felblade,if=fury.deficit>=40
     if S.Felblade:IsCastable(S.Felblade) and Player:FuryDeficit() >= 40 then
@@ -347,6 +346,10 @@ local function APL()
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
     if S.FelRush:IsCastable(20) and (not IsInMeleeRange() and not S.Momentum:IsAvailable()) and ConserveFelRush() then
       if CastFelRush() then return "Cast Fel Rush (OOR)"; end
+    end
+    -- vengeful_retreat,if=movement.distance>15
+    if S.VengefulRetreat:IsCastable(20) and not IsInMeleeRange() then
+      if HR.Cast(S.VengefulRetreat) then return "Cast Vengeful Retreat (OOR)"; end
     end
     -- throw_glaive,if=talent.demon_blades.enabled
     if S.ThrowGlaive:IsCastable(S.ThrowGlaive) and S.DemonBlades:IsAvailable() then
@@ -396,7 +399,7 @@ end
 HR.SetAPL(577, APL);
 
 --- ======= SIMC =======
---- Last Update: 02/03/2018
+--- Last Update: Dec 13, 2018
 
 --[[
 # Executed before combat begins. Accepts non-harmful actions only.
@@ -406,11 +409,11 @@ actions.precombat+=/food
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion
-actions.precombat+=/metamorphosis
+actions.precombat+=/metamorphosis,if=!azerite.chaotic_transformation.enabled
 
 # Executed every time the actor is available.
 actions=auto_attack
-actions+=/variable,name=blade_dance,value=talent.first_blood.enabled|set_bonus.tier20_4pc|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+actions+=/variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
 actions+=/variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 actions+=/variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30&(!variable.waiting_for_nemesis|cooldown.nemesis.remains<10)
 actions+=/variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
@@ -424,7 +427,7 @@ actions+=/run_action_list,name=demonic,if=talent.demonic.enabled
 actions+=/run_action_list,name=normal
 
 actions.cooldown=metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis)|target.time_to_die<25
-actions.cooldown+=/metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up
+actions.cooldown+=/metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up&(!azerite.chaotic_transformation.enabled|!variable.blade_dance|!cooldown.blade_dance.ready)
 actions.cooldown+=/nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
 actions.cooldown+=/nemesis,if=!raid_event.adds.exists
 actions.cooldown+=/potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
@@ -435,10 +438,10 @@ actions.dark_slash+=/chaos_strike,if=debuff.dark_slash.up
 
 actions.demonic=fel_barrage,if=active_enemies>desired_targets|raid_event.adds.in>30
 actions.demonic+=/death_sweep,if=variable.blade_dance
-actions.demonic+=/blade_dance,if=variable.blade_dance&cooldown.eye_beam.remains>5&!cooldown.metamorphosis.ready
+actions.demonic+=/eye_beam,if=!buff.metamorphosis.extended_by_demonic&(raid_event.adds.up|raid_event.adds.in>25)
+actions.demonic+=/blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
 actions.demonic+=/immolation_aura
 actions.demonic+=/felblade,if=fury<40|(buff.metamorphosis.down&fury.deficit>=40)
-actions.demonic+=/eye_beam,if=(!talent.blind_fury.enabled|fury.deficit>=70)&(!buff.metamorphosis.extended_by_demonic|(set_bonus.tier21_4pc&buff.metamorphosis.remains>16))
 actions.demonic+=/annihilation,if=(talent.blind_fury.enabled|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
 actions.demonic+=/chaos_strike,if=(talent.blind_fury.enabled|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
 actions.demonic+=/fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
@@ -448,12 +451,12 @@ actions.demonic+=/fel_rush,if=movement.distance>15|buff.out_of_range.up
 actions.demonic+=/vengeful_retreat,if=movement.distance>15
 actions.demonic+=/throw_glaive,if=talent.demon_blades.enabled
 
-actions.normal=vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down
+actions.normal=vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
 actions.normal+=/fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
 actions.normal+=/fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
+actions.normal+=/death_sweep,if=variable.blade_dance
 actions.normal+=/immolation_aura
 actions.normal+=/eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
-actions.normal+=/death_sweep,if=variable.blade_dance
 actions.normal+=/blade_dance,if=variable.blade_dance
 actions.normal+=/felblade,if=fury.deficit>=40
 actions.normal+=/eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_dark_slash&raid_event.adds.in>cooldown
