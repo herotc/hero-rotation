@@ -479,16 +479,16 @@ local function APL ()
         end
         -- actions+=/summon_demonic_tyrant,if=equipped.132369|(buff.dreadstalkers.remains>cast_time&(buff.wild_imps.stack>=3+talent.inner_demons.enabled+talent.demonic_consumption.enabled*3|prev_gcd.1.hand_of_guldan&(!talent.demonic_consumption.enabled|buff.wild_imps.stack>=3+talent.inner_demons.enabled))&(soul_shard<3|buff.dreadstalkers.remains<gcd*2.7|buff.grimoire_felguard.remains<gcd*2.7))
         if S.SummonTyrant:IsCastableP() and DreadStalkersTime() > S.SummonTyrant:CastTime()
-      and (WildImpsCount() >= 3 + num(S.InnerDemons:IsAvailable()) + (num(S.DemonicConsumption:IsAvailable())*3)
-      or Player:PrevGCDP(1, S.HandOfGuldan) and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() >= 3 + num(S.InnerDemons:IsAvailable())))
-      and (FutureShard() < 3 or DreadStalkersTime() < Player:GCD() * 2.7 or GrimoireFelguardTime() < Player:GCD() * 2.7) then
-        if HR.Cast(S.SummonTyrant) then return ""; end
-    end
+          and (WildImpsCount() >= 3 + num(S.InnerDemons:IsAvailable()) + (num(S.DemonicConsumption:IsAvailable())*3)
+          or Player:PrevGCDP(1, S.HandOfGuldan) and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() >= 3 + num(S.InnerDemons:IsAvailable())))
+          and (FutureShard() < 3 or DreadStalkersTime() < Player:GCD() * 2.7 or GrimoireFelguardTime() < Player:GCD() * 2.7) then
+            if HR.Cast(S.SummonTyrant) then return ""; end
+        end
         -- actions+=/power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
         if S.PowerSiphon:IsCastableP() and WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 
-      and Player:BuffRemainsP(S.DemonicPowerBuff) == 0 and Cache.EnemiesCount[range] < 2 then
-        if HR.Cast(S.PowerSiphon) then return ""; end
-    end
+          and Player:BuffRemainsP(S.DemonicPowerBuff) == 0 and Cache.EnemiesCount[range] < 2 then
+            if HR.Cast(S.PowerSiphon) then return ""; end
+        end
         -- actions+=/doom,if=talent.doom.enabled&refreshable&time_to_die>(dot.doom.remains+30)
         if S.Doom:IsCastableP() and Target:DebuffRefreshableCP(S.Doom) and Target:TimeToDie() > Target:DebuffRemainsP(S.Doom) + 30 then
           if HR.Cast(S.Doom) then return ""; end
