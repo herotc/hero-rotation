@@ -48,6 +48,7 @@
     Fury = {
       ShowPoOW = false,
       ShowPoPP = false,
+      ShowBPoS = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
