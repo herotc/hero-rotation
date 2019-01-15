@@ -59,15 +59,14 @@ Spell.Warrior.Arms = {
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
   Avatar                                = Spell(107574),
-  Massacre                              = Spell(281001),
-  Pummel                                = Spell(6552)
+  Massacre                              = Spell(281001)
 };
 local S = Spell.Warrior.Arms;
 
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
-  BattlePotionofStrength                = Item(163224)
+  BattlePotionofStrength           = Item(163224)
 };
 local I = Item.Warrior.Arms;
 
@@ -119,13 +118,7 @@ local function APL()
     -- snapshot_stats
     -- potion
     if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion 4"; end
-    end
-  end
-  -- Add Pummel check
-  if Settings.General.InterruptEnabled and Target:IsInterruptible()  then
-    if S.Pummel:IsCastableP("Melee") then
-      if HR.Cast(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel) then return "pummel interrupt"; end
+      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
     end
   end
   Execute = function()
@@ -270,7 +263,7 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 220"; end
     end
     -- execute,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sudden_death.react
-    if S.Execute:IsCastableP() and (not (Cache.EnemiesCount[8] > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or Player:BuffRemainsP(S.SuddenDeathBuff) > 0) then
+    if S.Execute:IsCastableP() and (not (Cache.EnemiesCount[8] > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or bool(Player:BuffStackP(S.SuddenDeathBuff))) then
       if HR.Cast(S.Execute) then return "execute 222"; end
     end
     -- mortal_strike,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)
@@ -278,7 +271,7 @@ local function APL()
       if HR.Cast(S.MortalStrike) then return "mortal_strike 232"; end
     end
     -- whirlwind,if=raid_event.adds.up
-    if S.Whirlwind:IsReadyP() and Cache.EnemiesCount[8] > 1 then
+    if S.Whirlwind:IsReadyP() and ((Cache.EnemiesCount[8] > 1)) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 240"; end
     end
     -- overpower
@@ -320,7 +313,7 @@ local function APL()
       if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 296"; end
     end
     -- execute,if=buff.sudden_death.react
-    if S.Execute:IsCastableP() and Player:BuffRemainsP(S.SuddenDeathBuff) > 0 then
+    if S.Execute:IsCastableP() and (bool(Player:BuffStackP(S.SuddenDeathBuff))) then
       if HR.Cast(S.Execute) then return "execute 298"; end
     end
     -- bladestorm,if=cooldown.mortal_strike.remains&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)
@@ -368,7 +361,7 @@ local function APL()
     -- auto_attack
     -- potion
     if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "prolonged_power 354"; end
+      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 354"; end
     end
     -- blood_fury,if=debuff.colossus_smash.up
     if S.BloodFury:IsCastableP() and HR.CDsON() and (Target:DebuffP(S.ColossusSmashDebuff)) then
@@ -403,11 +396,11 @@ local function APL()
       if HR.Cast(S.SweepingStrikes) then return "sweeping_strikes 390"; end
     end
     -- run_action_list,name=hac,if=raid_event.adds.exists
-    if Cache.EnemiesCount[8] > 1 then
+    if ((Cache.EnemiesCount[8] > 1)) then
       return Hac();
     end
     -- run_action_list,name=five_target,if=spell_targets.whirlwind>4
-    if Cache.EnemiesCount[8] > 4 then
+    if (Cache.EnemiesCount[8] > 4) then
       return FiveTarget();
     end
     -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
