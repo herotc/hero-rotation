@@ -97,7 +97,7 @@ local function FutureAstralPower()
   if not Player:IsCasting() then
     return AstralPower
   else
-    if Player:IsCasting(S.NewnMoon) then
+    if Player:IsCasting(S.NewMoon) then
       return AstralPower + 10
     elseif Player:IsCasting(S.HalfMoon) then
       return AstralPower + 20
