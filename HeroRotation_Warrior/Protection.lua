@@ -92,36 +92,31 @@ local function shouldCastIp()
     local IPCap = math.floor(castIP * 1.3);
     local currentIp = Player:Buff(S.IgnorePain, 16, true)
 
+    -- Dont cast IP if we are currently at 80% of IP Cap remaining
     if currentIp  < (0.8 * IPCap) then
       return true
     else
       return false
     end
   else
+    -- No IP buff currently
     return true
   end
 end
 
 
 local function rageDump(rage)
-  -- Using Vengence Talent
-    --check which buff
-    -- cast appropriate
-    -- TODO
-  -- if not using vengence talent
-    -- cast either IP or Revenege depending on if tanking
-    -- Ignore Pain (Dump excess rage)
-  if S.IgnorePain:IsReady() and (Player:Rage() >= rage) and  isCurrentlyTanking() and shouldCastIp() then
+    -- Ignore Pain if actively tanking, IP is not almost capped and dont have vengence buff for revenge
+  if S.IgnorePain:IsReady() and (Player:Rage() >= rage) and isCurrentlyTanking() and shouldCastIp() and (not Player:Buff(S.VengenceRevenge))  then
     if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
   end
   
-  -- Revenge (Dump excess rage)
+  -- Revenge 
   if S.Revenge:IsReady() and (Player:Rage() >= rage) and (not isCurrentlyTanking()) then
     if HR.Cast(S.Revenge) then return "Cast Revenge" end
   end
 
   return nil;
-
 end
 
 -- APL Main
@@ -178,7 +173,8 @@ local function APL ()
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "Shield Block" end
     end
 
-    if S.LastStand:IsReady() and (not (Player:Buff(S.ShieldBlockBuff))) and isCurrentlyTanking() and Settings.Protection.UseLastStandToFillShieldBlockDownTime then
+    if S.LastStand:IsReady() and (not Player:Buff(S.ShieldBlockBuff)) and isCurrentlyTanking() and Settings.Protection.UseLastStandToFillShieldBlockDownTime
+      and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
       if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "Cast LastStand" end
     end
 
@@ -199,7 +195,6 @@ local function APL ()
       if S.ThunderClap:IsReady() then
         if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
       end
-      
     end
     
     -- Shield Slam + 18 Rage
@@ -212,17 +207,22 @@ local function APL ()
       if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
     end
 
-    -- Ignore Pain with vengence proc
-    if S.IgnorePain:IsReady() and (Player:Buff(S.VengenceIgnorePain)) and (Player:Rage() >= 42) and isCurrentlyTanking() then
-      if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
-    end
-
-    -- Revenge with Buff (Free Revenege)
+    -- Revenge with Buff (Free Revenege) - 0 rage
     if S.Revenge:IsReady() and (Player:Buff(S.FreeRevenge)) then
       if HR.Cast(S.Revenge) then return "Cast Revenge" end
     end
 
-    -- Ignore Pain (Spend the rage for defensive)
+    -- Ignore Pain with vengence proc - ?? rage
+    if S.IgnorePain:IsReady() and (Player:Buff(S.VengenceIgnorePain)) and (Player:Rage() >= 42) and isCurrentlyTanking() and shouldCastIp() then
+      if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
+    end
+
+    -- Revenge with vengence proc  - ?? Rage
+    if S.Revenge:IsReady() and Player:Buff(S.VengenceRevenge) and (Player:Rage() >= 60) then
+      if HR.Cast(S.Revenge) then return "Cast Revenge" end
+    end
+
+    -- Ignore Pain (Spend the rage for defensive) -- Non Vengence Scenarios
     if S.IgnorePain:IsReady() and (Player:Rage() >= 55) and isCurrentlyTanking() and shouldCastIp() then
       if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
     end
@@ -241,9 +241,7 @@ local function APL ()
     if S.Devastate:IsReady() then
       if HR.Cast(S.Devastate) then return "Cast Devastate" end
     end
-
   end
-
 end
 
 HR.SetAPL(73, APL);

@@ -90,6 +90,7 @@ local HR = HeroRotation;
     -- Potions
     PotionOfProlongedPower        = Item(142117),
     PotionoftheOldWar             = Item(127844),
+    BattlePotionofStrength        = Item(163224),
   };
   local I = Item.Warrior.Fury;
 -- Rotation Var
@@ -105,8 +106,8 @@ local HR = HeroRotation;
 --- APL Action Lists (and Variables)
   -- # single_target
   local function single_target ()
-    -- actions.single_target=siegebreaker,if=buff.recklessness.up|cooldown.recklessness.remains>28
-    if HR.CDsON() and S.Siegebreaker:IsReady() and S.Siegebreaker:IsAvailable() and (Player:Buff(S.Recklessness) or S.Recklessness:CooldownRemainsP() > 28 ) then
+    -- actions.single_target=siegebreaker
+    if HR.CDsON() and S.Siegebreaker:IsCastable() then
       if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return ""; end
     end
     -- actions.single_target+=/rampage,if=buff.recklessness.up|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
@@ -136,8 +137,8 @@ local HR = HeroRotation;
     if HR.CDsON() and S.Bladestorm:IsCastable() and Player:PrevGCDP(1, S.Rampage) and (Target:Debuff(S.SiegebreakerDebuff) or not S.Siegebreaker:IsAvailable()) then
       if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm) then return ""; end
     end
-    -- actions.single_target+=/dragon_roar,if=buff.enrage.up&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
-    if HR.CDsON() and S.DragonRoar:IsCastable() and Player:Buff(S.Enrage) and (Target:Debuff(S.SiegebreakerDebuff) or not S.Siegebreaker:IsAvailable()) then
+    -- actions.single_target+=/dragon_roar,if=buff.enrage.up
+    if HR.CDsON() and S.DragonRoar:IsCastable() and Player:Buff(S.Enrage) then
       if HR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return ""; end
     end
     -- actions.single_target+=/raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
@@ -195,6 +196,9 @@ local function APL ()
   if Settings.Fury.ShowPoOW and I.PotionoftheOldWar:IsReady() then
     if HR.CastSuggested(I.PotionoftheOldWar) then return ""; end
   end
+  if Settings.Fury.ShowBPoS and I.BattlePotionofStrength:IsReady() then
+    if HR.CastSuggested(I.BattlePotionofStrength) then return ""; end
+  end
   -- actions+=/furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
   if S.FuriousSlash:IsCastable() and S.FuriousSlash:IsAvailable() and (Player:BuffStack(S.FuriousSlashBuff) < 3 or Player:BuffRemainsP(S.FuriousSlashBuff) < 3 or (S.Recklessness:CooldownRemainsP() < 3 and Player:BuffRemainsP(S.FuriousSlashBuff) < 9)) then
     if HR.Cast(S.FuriousSlash) then return ""; end
@@ -250,36 +254,39 @@ local function APL ()
 end
 HR.SetAPL(72, APL);
 
---- Last Update: 07/19/2018
+--- Last Update: Oct 25, 2018
 
--- # Executed every time the actor is available.
--- actions=auto_attack
--- actions+=/charge
--- # This is mostly to prevent cooldowns from being accidentally used during movement.
--- actions+=/run_action_list,name=movement,if=movement.distance>5
--- actions+=/heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
--- actions+=/potion
--- actions+=/furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
--- actions+=/bloodthirst,if=equipped.kazzalax_fujiedas_fury&(buff.fujiedas_fury.down|remains<2)
--- actions+=/rampage,if=cooldown.recklessness.remains<3
--- actions+=/recklessness
--- actions+=/whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
--- actions+=/blood_fury,if=buff.recklessness.up
--- actions+=/berserking,if=buff.recklessness.up
--- actions+=/arcane_torrent,if=rage<40&!buff.recklessness.up
--- actions+=/lights_judgment,if=cooldown.recklessness.remains<3
--- actions+=/run_action_list,name=single_target
+--[[
+# Executed every time the actor is available.
+actions=auto_attack
+actions+=/charge
+# This is mostly to prevent cooldowns from being accidentally used during movement.
+actions+=/run_action_list,name=movement,if=movement.distance>5
+actions+=/heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+actions+=/potion
+actions+=/furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
+actions+=/bloodthirst,if=equipped.kazzalax_fujiedas_fury&(buff.fujiedas_fury.down|remains<2)
+actions+=/rampage,if=cooldown.recklessness.remains<3
+actions+=/recklessness
+actions+=/whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
+actions+=/blood_fury,if=buff.recklessness.up
+actions+=/berserking,if=buff.recklessness.up
+actions+=/lights_judgment,if=buff.recklessness.down
+actions+=/fireblood,if=buff.recklessness.up
+actions+=/ancestral_call,if=buff.recklessness.up
+actions+=/run_action_list,name=single_target
 
--- actions.movement=heroic_leap
+actions.movement=heroic_leap
 
--- actions.single_target=siegebreaker,if=buff.recklessness.up|cooldown.recklessness.remains>28
--- actions.single_target+=/rampage,if=buff.recklessness.up|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
--- actions.single_target+=/execute,if=buff.enrage.up
--- actions.single_target+=/bloodthirst,if=buff.enrage.down
--- actions.single_target+=/raging_blow,if=charges=2
--- actions.single_target+=/bloodthirst
--- actions.single_target+=/bladestorm,if=prev_gcd.1.rampage&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
--- actions.single_target+=/dragon_roar,if=buff.enrage.up&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
--- actions.single_target+=/raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
--- actions.single_target+=/furious_slash,if=talent.furious_slash.enabled
--- actions.single_target+=/whirlwind
+actions.single_target=siegebreaker
+actions.single_target+=/rampage,if=buff.recklessness.up|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
+actions.single_target+=/execute,if=buff.enrage.up
+actions.single_target+=/bloodthirst,if=buff.enrage.down
+actions.single_target+=/raging_blow,if=charges=2
+actions.single_target+=/bloodthirst
+actions.single_target+=/bladestorm,if=prev_gcd.1.rampage&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
+actions.single_target+=/dragon_roar,if=buff.enrage.up
+actions.single_target+=/raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
+actions.single_target+=/furious_slash,if=talent.furious_slash.enabled
+actions.single_target+=/whirlwind
+]]
