@@ -34,19 +34,14 @@
     },
     BeastMastery = {
       ExhilarationHP = 30,
-      ShowPoPP = false,
-      CounterShotSephuz = false,
-      IntimidationSephuz = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
         AMurderofCrows = false,
         AspectoftheWild = false,
         BestialWrath = false,
-        CallPet = false,
+        SummonPet = false,
         Exhilaration = true,
-        Intimidation = false,
-        MendPet = true,
         SpittingCobra = false,
         Stampede = false,
       },
@@ -54,16 +49,11 @@
       OffGCDasOffGCD = {
         -- Abilities
         -- Items
-        PotionOfProlongedPower = true,
         -- Racials
-        Racials = true,
       }
     },
     Marksmanship = {
       ExhilarationHP = 30,
-      ShowPoPP = false,
-      CounterShotSephuz = false,
-      EnableMovementRotation = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -75,9 +65,7 @@
       OffGCDasOffGCD = {
         -- Abilities
         -- Items
-        PotionOfProlongedPower = true,
         -- Racials
-        Racials = true,
       }
     },
     Survival = {

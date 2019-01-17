@@ -18,8 +18,30 @@
 
 --- ============================ CONTENT ============================
 -- Beast Mastery, ID: 253
+local OldBMIsCastableP
+OldBMIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldBMIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellBM.SummonPet then
+    return (not Pet:IsActive()) and BaseCheck
+  else
+    return BaseCheck
+  end
+end
+, 253);
 
 -- Marksmanship, ID: 254
+local OldMMIsCastableP
+OldMMIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldMMIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellMM.SummonPet then
+    return (not Pet:IsActive()) and BaseCheck
+  else
+    return BaseCheck
+  end
+end
+, 254);
 
 -- Survival, ID: 255
 local OldSVIsCastableP
