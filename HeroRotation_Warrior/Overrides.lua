@@ -31,7 +31,21 @@
       end
     end
   , 71);
+  
 -- Fury, ID: 72
+  local FuryOldSpellIsCastableP
+  FuryOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local BaseCheck = FuryOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      if self == SpellFury.Execute then
+        return BaseCheck and self:IsUsable()
+      elseif self == SpellFury.Charge then
+        return (not Target:IsInRange(8) and Target:IsInRange(25))
+      else
+        return BaseCheck
+      end
+    end
+  , 72);
 
 -- Protection, ID: 73
 
