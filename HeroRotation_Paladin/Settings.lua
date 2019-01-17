@@ -15,6 +15,13 @@
 
 --- ============================ CONTENT ============================
   HR.GUISettings.APL.Paladin = {
+    Commons = {
+      UsePotions = true,
+      OffGCDasOffGCD = {
+        Rebuke = true,
+        Racials = true,
+      }
+    },
     Protection = {
       -- CDs HP %
       EyeofTyrHP = 60,
@@ -43,15 +50,11 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        HolyWrath = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Racials
-        ArcaneTorrent = true,
         -- Abilities
-        AvengingWrath = true,
-        Crusade = true,
       }
     }
   };
@@ -62,6 +65,11 @@
   local CP_Paladin = CreateChildPanel(ARPanel, "Paladin");
   local CP_Protection = CreateChildPanel(CP_Paladin, "Protection");
   local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution");
+  
+  -- Shared Paladin settings
+  CreateARPanelOptions(CP_Paladin, "APL.Paladin.Commons");
+  CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
+  
   -- Protection
   CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.EyeofTyrHP", {0, 100, 1}, "Eye of Tyr HP", "Set the Eye of Tyr HP threshold.");
   CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.HandoftheProtectorHP", {0, 100, 1}, "Hand of the Protector HP", "Set the Hand of the Protector HP threshold.");
