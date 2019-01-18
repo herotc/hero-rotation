@@ -173,7 +173,7 @@ local function APL()
       return Movement();
     end
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-    if S.HeroicLeap:IsCastableP() and (((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap) and 10000000000 > 45) or not false) then
+    if S.HeroicLeap:IsCastableP() and ((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap) and 10000000000 > 45) then
       if HR.Cast(S.HeroicLeap) then return "heroic_leap 82"; end
     end
     -- potion
