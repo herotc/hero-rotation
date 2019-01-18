@@ -169,11 +169,11 @@ local function APL()
       if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge) then return "charge 78"; end
     end
     -- run_action_list,name=movement,if=movement.distance>5
-    if (movement.distance > 5) then
+    if ((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap)) then
       return Movement();
     end
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-    if S.HeroicLeap:IsCastableP() and ((raid_event.movement.distance > 25 and 10000000000 > 45) or not false) then
+    if S.HeroicLeap:IsCastableP() and ((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap) and 10000000000 > 45) then
       if HR.Cast(S.HeroicLeap) then return "heroic_leap 82"; end
     end
     -- potion
