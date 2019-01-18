@@ -72,7 +72,7 @@ local S = Spell.Hunter.Survival;
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Survival = {
-  ProlongedPower                   = Item(142117)
+  BattlePotionofAgility            = Item(163223)
 };
 local I = Item.Hunter.Survival;
 
@@ -143,6 +143,10 @@ local function CurrentMongooseBite ()
   return S.MongooseBiteEagle:IsLearned() and S.MongooseBiteEagle or S.MongooseBiteNormal
 end
 
+local function EvaluateCycleCarveCdr62(TargetUnit)
+  return (Cache.EnemiesCount[8] < 5) and (Cache.EnemiesCount[8] < 5)
+end
+
 local function EvaluateTargetIfFilterMongooseBite98(TargetUnit)
   return TargetUnit:DebuffStackP(S.LatentPoisonDebuff)
 end
@@ -200,8 +204,8 @@ local function APL()
     end
     -- snapshot_stats
     -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 6"; end
+    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
     end
     -- steel_trap
     if S.SteelTrap:IsCastableP() and Player:DebuffDownP(S.SteelTrapDebuff) and Everyone.TargetIsValid() then
@@ -234,8 +238,8 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 28"; end
     end
     -- potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|time_to_die<26
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll") and not Player:IsRace("Orc")) or Target:TimeToDie() < 26) then
-      if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 38"; end
+    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll") and not Player:IsRace("Orc")) or Target:TimeToDie() < 26) then
+      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 38"; end
     end
     -- aspect_of_the_eagle,if=target.distance>=6
     if S.AspectoftheEagle:IsCastableP() and HR.CDsON() and (not Target:IsInRange("Melee")) then
@@ -244,10 +248,12 @@ local function APL()
   end
   Cleave = function()
     -- variable,name=carve_cdr,op=setif,value=active_enemies,value_else=5,condition=active_enemies<5
-    VarCarveCdr = math.min(Cache.EnemiesCount[8], 5)
+    if true then
+      if HR.CastCycle(VarCarveCdr, 8, EvaluateCycleCarveCdr62) then return "carve_cdr 76" end
+    end
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows) then return "a_murder_of_crows 77"; end
+      if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 77"; end
     end
     -- coordinated_assault
     if S.CoordinatedAssault:IsCastableP() and HR.CDsON() then
@@ -333,7 +339,7 @@ local function APL()
     end
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows) then return "a_murder_of_crows 289"; end
+      if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 289"; end
     end
     -- steel_trap
     if S.SteelTrap:IsCastableP() then
@@ -371,7 +377,7 @@ local function APL()
   St = function()
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows) then return "a_murder_of_crows 347"; end
+      if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 347"; end
     end
     -- mongoose_bite,if=talent.birds_of_prey.enabled&buff.coordinated_assault.up&(buff.coordinated_assault.remains<gcd|buff.blur_of_talons.up&buff.blur_of_talons.remains<gcd)
     if S.MongooseBite:IsReadyP() and (S.BirdsofPrey:IsAvailable() and Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffRemainsP(S.CoordinatedAssaultBuff) < Player:GCD() or Player:BuffP(S.BlurofTalonsBuff) and Player:BuffRemainsP(S.BlurofTalonsBuff) < Player:GCD())) then
@@ -445,7 +451,7 @@ local function APL()
   WfiSt = function()
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows) then return "a_murder_of_crows 503"; end
+      if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 503"; end
     end
     -- coordinated_assault
     if S.CoordinatedAssault:IsCastableP() and HR.CDsON() then
@@ -504,11 +510,11 @@ local function APL()
       if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 639"; end
     end
   end
+  if Everyone.TargetIsValid() then
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  if Everyone.TargetIsValid() then
     -- auto_attack
     -- use_items
     -- call_action_list,name=cds
