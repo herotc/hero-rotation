@@ -204,7 +204,7 @@ local function APL ()
 
     -- Potions
     -- Potion of Prolonged Power, then Battle Potion of Agility
-    if Settings.Shaman.Commons.ShowPotions and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and ((Player:Buff(S.AscendanceBuff)) or Target:TimeToDie() <= 60 or Player:HasHeroism()) then
+    if Settings.Shaman.Commons.ShowPotions and Target:MaxHealth() >= (Settings.Shaman.Commons.ConsumableMinHPThreshHold * 1000) and (Target:TimeToDie() <= 60 or Player:HasHeroism()) then
       if I.PoPP:IsReady() then
         if HR.CastSuggested(I.PoPP) then return "Use PoPP" end
       elseif I.BPoA:IsReady() then

@@ -66,7 +66,7 @@ local S = Spell.Warrior.Arms;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
-  ProlongedPower                   = Item(142117)
+  BattlePotionofStrength           = Item(163224)
 };
 local I = Item.Warrior.Arms;
 
@@ -117,8 +117,8 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 4"; end
+    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
     end
   end
   Execute = function()
@@ -140,7 +140,7 @@ local function APL()
     end
     -- deadly_calm
     if S.DeadlyCalm:IsCastableP() then
-      if HR.Cast(S.DeadlyCalm, Settings.Arms.GCDasOffGCD.DeadlyCalm) then return "deadly_calm 30"; end
+      if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 30"; end
     end
     -- bladestorm,if=rage<30&!buff.deadly_calm.up
     if S.Bladestorm:IsCastableP() and HR.CDsON() and (Player:Rage() < 30 and not Player:BuffP(S.DeadlyCalmBuff)) then
@@ -194,7 +194,7 @@ local function APL()
     end
     -- deadly_calm
     if S.DeadlyCalm:IsCastableP() then
-      if HR.Cast(S.DeadlyCalm, Settings.Arms.GCDasOffGCD.DeadlyCalm) then return "deadly_calm 92"; end
+      if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 92"; end
     end
     -- cleave
     if S.Cleave:IsReadyP() then
@@ -236,7 +236,7 @@ local function APL()
     end
     -- deadly_calm,if=(cooldown.bladestorm.remains>6|talent.ravager.enabled&cooldown.ravager.remains>6)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
     if S.DeadlyCalm:IsCastableP() and ((S.Bladestorm:CooldownRemainsP() > 6 or S.Ravager:IsAvailable() and S.Ravager:CooldownRemainsP() > 6) and (S.ColossusSmash:CooldownRemainsP() < 2 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 2))) then
-      if HR.Cast(S.DeadlyCalm, Settings.Arms.GCDasOffGCD.DeadlyCalm) then return "deadly_calm 164"; end
+      if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 164"; end
     end
     -- ravager,if=(raid_event.adds.up|raid_event.adds.in>target.time_to_die)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
     if S.Ravager:IsCastableP() and HR.CDsON() and (((Cache.EnemiesCount[8] > 1) or 10000000000 > Target:TimeToDie()) and (S.ColossusSmash:CooldownRemainsP() < 2 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 2))) then
@@ -310,7 +310,7 @@ local function APL()
     end
     -- deadly_calm
     if S.DeadlyCalm:IsCastableP() then
-      if HR.Cast(S.DeadlyCalm, Settings.Arms.GCDasOffGCD.DeadlyCalm) then return "deadly_calm 296"; end
+      if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 296"; end
     end
     -- execute,if=buff.sudden_death.react
     if S.Execute:IsCastableP() and (bool(Player:BuffStackP(S.SuddenDeathBuff))) then
@@ -360,8 +360,8 @@ local function APL()
     end
     -- auto_attack
     -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 354"; end
+    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 354"; end
     end
     -- blood_fury,if=debuff.colossus_smash.up
     if S.BloodFury:IsCastableP() and HR.CDsON() and (Target:DebuffP(S.ColossusSmashDebuff)) then

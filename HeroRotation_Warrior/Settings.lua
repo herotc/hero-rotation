@@ -40,6 +40,7 @@
       },
       OffGCDasOffGCD = {
         -- Abilities
+        DeadlyCalm = true,
         -- Items
       },
     },
@@ -47,6 +48,7 @@
     Fury = {
       ShowPoOW = false,
       ShowPoPP = false,
+      ShowBPoS = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities

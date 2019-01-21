@@ -21,6 +21,17 @@
 -- Protection, ID: 66
 
 -- Retribution, ID: 70
+  local RetOldSpellIsCastableP
+  RetOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local BaseCheck = RetOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      if self == SpellRetribution.HammerofWrath then
+        return BaseCheck and self:IsUsable()
+      else
+        return BaseCheck
+      end
+    end
+  , 70);
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP", 
