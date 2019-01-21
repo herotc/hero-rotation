@@ -454,7 +454,7 @@ function finishers()
 		if HR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
 	end
 	--actions.finishers+=/divine_storm,if=variable.ds_castable&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)|buff.empyrean_power.up&debuff.judgment.down&buff.divine_purpose.down
-	if (conditions_ds_castable and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > Player:GCD() * 2) or Player:Buff(S.EmpyreanPowerBuff) and Target:Debuff(S.Judgment) and not Player:Buff(S.DivinePurposeBuff) ) then
+	if (conditions_ds_castable and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > Player:GCD() * 2) or Player:Buff(S.EmpyreanPowerBuff) and not Target:Debuff(S.Judgment) and not Player:Buff(S.DivinePurposeBuff) ) then
 		if HR.Cast(S.DivineStorm) then return "Cast Divine Storm"; end
 	end
 	
