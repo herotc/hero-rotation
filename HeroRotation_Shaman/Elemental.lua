@@ -204,7 +204,7 @@ local function APL ()
         if HR.Cast(S.ElementalBlast) then return "Cast Elemental Blast" end
       end
       --actions.precombat+=/lava_burst,if=!talent.elemental_blast.enabled
-      if (not S.ElementalBlast:IsAvailable() and S.LavaBurst:IsReady()) then
+      if (not S.ElementalBlast:IsAvailable() and S.LavaBurst:IsReady() and not Player:IsCasting(S.LavaBurst)) then
         if HR.Cast(S.LavaBurst) then return "Cast Lava Burst" end
       end
     end
