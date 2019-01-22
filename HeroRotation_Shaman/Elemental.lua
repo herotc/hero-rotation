@@ -204,7 +204,7 @@ local function APL ()
         if HR.Cast(S.ElementalBlast) then return "Cast Elemental Blast" end
       end
       --actions.precombat+=/lava_burst,if=!talent.elemental_blast.enabled
-      if (not S.ElementalBlast:IsAvailable() and S.LavaBurst:IsReady()) then
+      if (not S.ElementalBlast:IsAvailable() and S.LavaBurst:IsReady() and not Player:IsCasting(S.LavaBurst)) then
         if HR.Cast(S.LavaBurst) then return "Cast Lava Burst" end
       end
     end
@@ -449,7 +449,10 @@ function single_target()
     if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
   end
   --actions.single_target+=/lava_burst,if=cooldown_react
-  if (S.LavaBurst:IsReady()) then
+  if (S.LavaBurst:IsReady() and not Player:IsCasting(S.LavaBurst)) then
+    if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
+  end
+  if (S.LavaBurst:IsReady() and Player:IsCasting(S.LavaBurst) and Player:Buff(S.LavaSurgeBuff)) then
     if HR.Cast(S.LavaBurst) then return "Cast LavaBurst" end
   end
   --# Don't accidentally use Surge of Power with Flame Shock during single target.
