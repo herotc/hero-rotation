@@ -240,8 +240,6 @@ local function rockslide_enabled()
   return (not freezerburn_enabled() and (S.Boulderfist:IsAvailable() and S.Landslide:IsAvailable() and S.StrengthOfEarth:AzeriteEnabled()))
 end
 
-
-
 -- APL Main
 local function APL ()
   -- Unit Update
@@ -451,7 +449,7 @@ local function APL ()
 
     -- actions.cds+=/feral_spirit
     if S.FeralSpirit:IsCastableP() and Settings.Shaman.Enhancement.EnableFS then
-      if HR.Cast(S.FeralSpirit) then return "Cast FeralSpirit" end
+      if HR.Cast(S.FeralSpirit, Settings.Shaman.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit" end
     end
 
     -- actions.cds+=/ascendance,if=cooldown.strike.remains>0
@@ -600,7 +598,7 @@ local function APL ()
     end
 
     -- actions.filler+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8+gcd&variable.furyCheck_FB
-    if S.Frostbrand:IsCastableP(20) and Player:Maelstrom() >= S.Frostbrand:Cost() and (S.Hailstorm:IsAvailable() and not Player:BuffRemainsP(S.FrostbrandBuff) < 4.8 + Player:GCDRemains() and furyCheck_FB()) then
+    if S.Frostbrand:IsCastableP(20) and Player:Maelstrom() >= S.Frostbrand:Cost() and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < (4.8 + Player:GCDRemains()) and furyCheck_FB()) then
       if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
     end
 
