@@ -112,11 +112,11 @@
     if HR.Cast(S.Defile) then return ""; end
   end
   -- epidemic,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
-  if S.Epidemic:IsAvailable() and S.Epidemic:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
+  if S.Epidemic:IsAvailable() and S.Epidemic:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Rune() < 2 and not PoolingForGargoyle() then
     if HR.Cast(S.Epidemic) then return ""; end
   end
   -- death_coil,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
-  if S.DeathCoil:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Runes() < 2 and not PoolingForGargoyle() then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.DeathAndDecayBuff) and Player:Rune() < 2 and not PoolingForGargoyle() then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
@@ -140,7 +140,7 @@
     if HR.Cast(S.FesteringStrike) then return ""; end
   end
   -- death_coil,if=buff.sudden_doom.react&rune.deficit>=4
-  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and Player:Runes() <= 2 then
+  if S.DeathCoil:IsUsable() and Player:Buff(S.SuddenDoom) and Player:Rune() <= 2 then
     if HR.Cast(S.DeathCoil) then return ""; end
   end
   -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
