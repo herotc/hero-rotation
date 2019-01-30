@@ -14,7 +14,6 @@ local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
 
--- APL from T22_Shaman_Enhancement on 2018-08-19 13:50 PDT
 -- https://github.com/simulationcraft/simc/blob/143242249d1c65a36194fe0f60f86974c754bb22/profiles/Tier22/T22_Shaman_Enhancement.simc
 
 -- APL Local Vars
@@ -75,13 +74,15 @@ Spell.Shaman.Enhancement = {
   TailwindTotemBuff     = Spell(262400),
 
   -- Azerite Traits
-  LightningConduit        = Spell(275388),
-  LightningConduitDebuff  = Spell(275391),
-  PrimalPrimer            = Spell(272992),
-  PrimalPrimerDebuff      = Spell(273006),
-  StrengthOfEarth         = Spell(273461),
-  NaturalHarmony          = Spell(278697),
-  NaturalHarmonyFrostBuff = Spell(279029),
+  LightningConduit         = Spell(275388),
+  LightningConduitDebuff   = Spell(275391),
+  PrimalPrimer             = Spell(272992),
+  PrimalPrimerDebuff       = Spell(273006),
+  StrengthOfEarth          = Spell(273461),
+  NaturalHarmony           = Spell(278697),
+  NaturalHarmonyFireBuff   = Spell(279028),
+  NaturalHarmonyNatureBuff = Spell(279033),
+  NaturalHarmonyFrostBuff  = Spell(279029),
 
   -- Utility
   WindShear             = Spell(57994),
@@ -142,7 +143,7 @@ local function furyCheck_SS()
   if S.FuryOfAir:IsAvailable() then
     return Player:Maelstrom() >= 6 + S.StormStrike:Cost()
   else
-    return false
+    return Player:Maelstrom() >= 0
   end
 end
 -- actions+=/variable,name=furyCheck_LL,value=maelstrom>=(talent.fury_of_air.enabled*(6+action.lava_lash.cost))
@@ -150,7 +151,7 @@ local function furyCheck_LL()
   if S.FuryOfAir:IsAvailable() then
     return Player:Maelstrom() >= 6 + S.LavaLash:Cost()
   else
-    return false
+    return Player:Maelstrom() >= 0
   end
 end
 -- actions+=/variable,name=furyCheck_CL,value=maelstrom>=(talent.fury_of_air.enabled*(6+action.crash_lightning.cost))
@@ -158,7 +159,7 @@ local function furyCheck_CL()
   if S.FuryOfAir:IsAvailable() then
     return Player:Maelstrom() >= 6 + S.CrashLightning:Cost()
   else
-    return false
+    return Player:Maelstrom() >= 0
   end
 end
 -- actions+=/variable,name=furyCheck_FB,value=maelstrom>=(talent.fury_of_air.enabled*(6+action.frostbrand.cost))
@@ -166,7 +167,7 @@ local function furyCheck_FB()
   if S.FuryOfAir:IsAvailable() then
     return Player:Maelstrom() >= 6 + S.Frostbrand:Cost()
   else
-    return false
+    return Player:Maelstrom() >= 0
   end
 end
 -- actions+=/variable,name=furyCheck_ES,value=maelstrom>=(talent.fury_of_air.enabled*(6+action.earthen_spike.cost))
@@ -174,7 +175,7 @@ local function furyCheck_ES()
   if S.FuryOfAir:IsAvailable() then
     return Player:Maelstrom() >= 6 + S.EarthenSpike:Cost()
   else
-    return false
+    return Player:Maelstrom() >= 0
   end
 end
 -- actions+=/variable,name=furyCheck_LB,value=maelstrom>=(talent.fury_of_air.enabled*(6+40))
@@ -182,7 +183,7 @@ local function furyCheck_LB()
   if S.FuryOfAir:IsAvailable() then
     return Player:Maelstrom() >= 6 + S.FuryOfAir:Cost()
   else
-    return false
+    return Player:Maelstrom() >= 0
   end
 end
 -- # Attempt to pool maelstrom so you'll be able to cast a fully-powered lightning bolt as soon as it's available when fighting one target.
@@ -396,12 +397,12 @@ local function APL ()
     end
 
     -- actions.priority+=/flametongue,if=(azerite.natural_harmony.enabled&buff.natural_harmony_fire.remains<=2*gcd)
-    if S.Flametongue:IsCastableP(20) and (S.NaturalHarmony:AzeriteEnabled() and Player:BuffRemainsP(S.NaturalHarmonyFrostBuff) <= 2 * Player:GCDRemains()) then
+    if S.Flametongue:IsCastableP(20) and (S.NaturalHarmony:AzeriteEnabled() and Player:BuffRemainsP(S.NaturalHarmonyFireBuff) <= 2 * Player:GCDRemains()) then
       if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
     end
 
     -- actions.priority+=/rockbiter,if=(azerite.natural_harmony.enabled&buff.natural_harmony_nature.remains<=2*gcd)&maelstrom<70
-    if S.Rockbiter:IsCastableP(20) and (S.NaturalHarmony:AzeriteEnabled() and Player:BuffRemainsP(S.NaturalHarmonyFrostBuff) <= 2 * Player:GCDRemains() and Player:Maelstrom() < 70) then
+    if S.Rockbiter:IsCastableP(20) and (S.NaturalHarmony:AzeriteEnabled() and Player:BuffRemainsP(S.NaturalHarmonyNatureBuff) <= 2 * Player:GCDRemains() and Player:Maelstrom() < 70) then
       if HR.Cast(S.Rockbiter) then return "Cast Rockbiter" end
     end
 
