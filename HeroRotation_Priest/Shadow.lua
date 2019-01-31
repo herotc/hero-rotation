@@ -199,7 +199,7 @@ local function APL()
       if HR.Cast(S.MindSear) then return "mind_sear 78"; end
     end
     -- void_bolt
-    if S.VoidBolt:IsReadyP() then
+    if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 82"; end
     end
     -- shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
@@ -268,7 +268,7 @@ local function APL()
       if HR.Cast(S.DarkAscension) then return "dark_ascension 178"; end
     end
     -- void_bolt
-    if S.VoidBolt:IsReadyP() then
+    if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 182"; end
     end
     -- mind_sear,if=buff.harvested_thoughts.up&cooldown.void_bolt.remains>=1.5&azerite.searing_dialogue.rank>=1
