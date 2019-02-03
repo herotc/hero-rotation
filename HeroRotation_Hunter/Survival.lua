@@ -143,10 +143,6 @@ local function CurrentMongooseBite ()
   return S.MongooseBiteEagle:IsLearned() and S.MongooseBiteEagle or S.MongooseBiteNormal
 end
 
-local function EvaluateCycleCarveCdr62(TargetUnit)
-  return (Cache.EnemiesCount[8] < 5) and (Cache.EnemiesCount[8] < 5)
-end
-
 local function EvaluateTargetIfFilterMongooseBite98(TargetUnit)
   return TargetUnit:DebuffStackP(S.LatentPoisonDebuff)
 end
@@ -248,9 +244,7 @@ local function APL()
   end
   Cleave = function()
     -- variable,name=carve_cdr,op=setif,value=active_enemies,value_else=5,condition=active_enemies<5
-    if true then
-      if HR.CastCycle(VarCarveCdr, 8, EvaluateCycleCarveCdr62) then return "carve_cdr 76" end
-    end
+    VarCarveCdr = math.min(Cache.EnemiesCount[8], 5)
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
       if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 77"; end

@@ -19,7 +19,7 @@
     Commons = {
       OffGCDasOffGCD = {
         WindShear = true,
-        Racials = true,
+        Racials = true
       },
       OnUseTrinkets = false,
 
@@ -35,22 +35,23 @@
     Enhancement = {
       GCDasOffGCD = {
         -- Abilities
-        FeralSpirit = true,
+        FeralSpirit = false,
       },
-      EnableEE = true
+      EnableFS = true,
+      EnableEE = false
     },
     Elemental = {
       GCDasOffGCD = {
       -- Abilities
-        FireElemental = true,
-        EarthElemental = true,
-        StormElemental = true,
         Stormkeeper = true,
+        StormElemental = true,
+        EarthElemental = true,
+        FireElemental = true,
         Ascendance = true,
       },
       EnableEE = true,
       EnableFE = true,
-      EnableSE = true,
+      EnableSE = true
     },
   };
 
