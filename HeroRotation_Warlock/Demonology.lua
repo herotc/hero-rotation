@@ -365,13 +365,15 @@ local function ImplosionRot ()
   -- actions.implosion+=/doom,cycle_targets=1,max_cycle_targets=7,if=refreshable
   if HR.AoEON() then
     if S.Doom:IsCastableP() and Target:DebuffRefreshableCP(S.Doom) and Target:TimeToDie() > 30 then
-    if HR.Cast(S.Doom) then return ""; end
-  end
-  DoomDoTCycle()
+      if HR.Cast(S.Doom) then return ""; end
+    end
+    if S.Doom:IsAvailable() then
+      DoomDoTCycle()
+    end
   else
     if S.Doom:IsCastableP() and Target:DebuffRefreshableCP(S.Doom) and Target:TimeToDie() > 30 then
-    if HR.Cast(S.Doom) then return ""; end
-  end
+      if HR.Cast(S.Doom) then return ""; end
+    end
   end
   -- actions.implosion+=/call_action_list,name=build_a_shard
   ShouldReturn = BuildRot()
