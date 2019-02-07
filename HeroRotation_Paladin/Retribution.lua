@@ -35,7 +35,8 @@ Spell.Paladin.Retribution = {
   RighteousVerdict                      = Spell(267610),
   ExecutionSentence                     = Spell(267798),
   DivineStorm                           = Spell(53385),
-  DivinePurposeBuff                     = Spell(223817),
+  DivinePurpose                         = Spell(223817),
+  DivinePurposeBuff                     = Spell(223819),
   EmpyreanPowerBuff                     = Spell(286393),
   JudgmentDebuff                        = Spell(197277),
   TemplarsVerdict                       = Spell(85256),
@@ -508,7 +509,7 @@ local function APL()
       VarOpenerDone = 1
     end
     -- In case Wake of Ashes isn't selected
-    if not S.WakeofAshes:IsAvailable() then
+    if (not S.WakeofAshes:IsAvailable()) or S.DivinePurpose:IsAvailable() then
       VarOpenerDone = 1
     end
   end
