@@ -483,7 +483,7 @@ local function APL()
       -- wake_opener_Inq
       -- inquisition
       if Opener4 == 0 then
-        if S.Inquisition:IsReadyP() and not Player:PrevGCDP(1, S.Inquisition) then
+        if S.Inquisition:IsReadyP() and not Player:PrevGCDP(1, S.Inquisition) and Player:BuffRefreshableCP(S.InquisitionBuff) then
           if HR.Cast(S.Inquisition) then return "wake_opener_Inq 4 - Inquisition"; end
         else
           Opener4 = 1
