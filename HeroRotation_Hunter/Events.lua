@@ -65,6 +65,13 @@ do
         LastDamageTime=0,
         LastDamaged={},
         Timeout=4
+      },
+      [271686] = {
+        -- Heed My Call
+        Range=3,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=4
       }
     },
     SplashableCount = {}
