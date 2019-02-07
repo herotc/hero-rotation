@@ -33,17 +33,6 @@
     end
   , 70);
 
-  local RetOldSpellIsReadyP
-  RetOldSpellIsReadyP = HL.AddCoreOverride ("Spell.IsReadyP",
-    function (self, Range, AoESpell, ThisUnit)
-      local BaseCheck = RetOldSpellIsReadyP(self, Range, AoESpell, ThisUnit)
-      if self == SpellRetribution.Inquisition then
-        return BaseCheck and self:IsAvailable()
-      else
-        return BaseCheck
-      end
-    end
-  , 70);
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
