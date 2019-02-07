@@ -13,6 +13,7 @@ local Spell  = HL.Spell
 local Item   = HL.Item
 -- HeroRotation
 local HR     = HeroRotation
+local Hunter = HR.Commons.Hunter
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -99,6 +100,7 @@ local function APL()
   local Precombat, Cds, St, Trickshots
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  Hunter.UpdateSplashCount(Target, 10)
   Precombat = function()
     -- flask
     -- augmentation
@@ -125,7 +127,7 @@ local function APL()
       if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot 20"; end
     end
     -- aimed_shot,if=active_enemies<3
-    if S.AimedShot:IsReadyP() and (Cache.EnemiesCount[40] < 3) then
+    if S.AimedShot:IsReadyP() and (Hunter.GetSplashCount(Target, 10) < 3) then
       if HR.Cast(S.AimedShot) then return "aimed_shot 38"; end
     end
   end
@@ -177,7 +179,7 @@ local function APL()
       if HR.Cast(S.ExplosiveShot) then return "explosive_shot 126"; end
     end
     -- barrage,if=active_enemies>1
-    if S.Barrage:IsReadyP() and (Cache.EnemiesCount[40] > 1) then
+    if S.Barrage:IsReadyP() and (Hunter.GetSplashCount(Target, 15) > 1) then
       if HR.Cast(S.Barrage) then return "barrage 128"; end
     end
     -- a_murder_of_crows
@@ -271,11 +273,11 @@ local function APL()
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<3
-    if (Cache.EnemiesCount[40] < 3) then
+    if (Hunter.GetSplashCount(Target, 10) < 3) then
       local ShouldReturn = St(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=trickshots,if=active_enemies>2
-    if (Cache.EnemiesCount[40] > 2) then
+    if (Hunter.GetSplashCount(Target, 10) > 2) then
       local ShouldReturn = Trickshots(); if ShouldReturn then return ShouldReturn; end
     end
   end
