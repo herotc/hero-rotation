@@ -35,7 +35,7 @@ do
     Range=10,
     LastDamageTime=0,
     LastDamaged={},
-    Timeout=4
+    Timeout=6
   }
 
   HL.RangeTracker = {
@@ -172,8 +172,8 @@ function Hunter.UpdateSplashCount(UpdateUnit, SplashRange)
   for _, Enemy in pairs(Enemies) do
     --Units that are outside of the parameters or havent been seen lately get removed
     if NumericRange(Enemy:MaxDistanceToPlayer()) > MinRange
-    and NumericRange(Enemy:MinDistanceToPlayer()) < MaxRange then
-    --and RecentlyDamagedIn(Enemy:GUID(), SplashRange) then
+    and NumericRange(Enemy:MinDistanceToPlayer()) < MaxRange
+    and RecentlyDamagedIn(Enemy:GUID(), SplashRange) then
       CurrentCount = CurrentCount + 1
     end
   end
