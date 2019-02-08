@@ -47,6 +47,7 @@ Spell.Monk.Windwalker = {
   CracklingJadeLightning           = Spell(117952),
   BlackoutKick                     = Spell(100784),
   BlackoutKickBuff                 = Spell(116768),
+  DanceOfChijiBuff                 = Spell(286587),
 
   -- Talents
   ChiWave                          = Spell(115098),
@@ -328,11 +329,6 @@ local function APL ()
 
   -- Single Target --
   SingleTarget = function()
- 	  -- actions.st=cancel_buff,name=rushing_jade_wind,if=active_enemies=1&(!talent.serenity.enabled|cooldown.serenity.remains>3)
-    if S.RushingJadeWind:IsReadyP() and Player:BuffP(S.RushingJadeWind) and Cache.EnemiesCount[5] == 1 and (not S.Serenity:IsAvailable() or S.Serenity:CooldownRemainsP() > 3) then
-      if HR.Cast(S.RushingJadeWind) then 
-        return "Cancel Single Target Rushing Jade Wind"; end
-  	end
   	-- actions.st+=/whirling_dragon_punch
   	if S.WhirlingDragonPunch:IsReady() then
       if HR.Cast(S.WhirlingDragonPunch) then 
@@ -349,23 +345,22 @@ local function APL ()
         return "Cast Single Target Fists of Fury"; end
     end
     -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
-    if S.RisingSunKick:IsReadyP()  then
+    if S.RisingSunKick:IsReadyP() then
       if HR.Cast(S.RisingSunKick) then 
         return "Cast Single Target Rising Sun Kick"; end
     end
- 	  -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1&active_enemies>1
-	  if S.RushingJadeWind:IsReadyP() and Player:BuffDownP(S.RushingJadeWind) and Player:EnergyTimeToMaxPredicted() > 1 and Cache.EnemiesCount[8] > 1 then
+    -- actions.st+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&buff.dance_of_chiji.up
+    if not Player:PrevGCD(1, S.SpinningCraneKick) and Player:BuffP(S.DanceOfChijiBuff) then 
+      if HR.Cast(S.SpinningCraneKick) then
+        return "Cast AoE Spinning Crane Kick"; end
+    end
+ 	  -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
+	  if S.RushingJadeWind:IsReadyP() and Player:BuffDownP(S.RushingJadeWind) and Cache.EnemiesCount[8] > 1 then
       if HR.Cast(S.RushingJadeWind) then 
         return "Cast Single Target Rushing Jade Wind"; end
   	end
-    -- actions.st+=/fists_of_fury,if=energy.time_to_max>2.5
-    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 2.5 then
-      if HR.Cast(S.FistsOfFury) then 
-        return "Cast Single Target Fists of Fury"; end
-    end
-    -- actions.st+=/fist_of_the_white_tiger,if=chi<=2&(buff.rushing_jade_wind.down|energy>46)
-    if S.FistOfTheWhiteTiger:IsReadyP() and Player:Chi() <= 2 and 
-      (Player:BuffDownP(S.RushingJadeWind) or Player:EnergyPredicted() > 46) then
+    -- actions.st+=/fist_of_the_white_tiger,if=chi<=2
+    if S.FistOfTheWhiteTiger:IsReadyP() and Player:Chi() <= 2 then
       if HR.Cast(S.FistOfTheWhiteTiger) then 
         return "Cast Single Target Fist of the White Tiger"; end
     end
