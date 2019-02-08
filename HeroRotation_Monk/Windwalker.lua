@@ -258,6 +258,11 @@ local function APL ()
 
   -- Area of Effect --
   Aoe = function()
+    -- actions.aoe=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
+    if S.RisingSunKick:IsReadyP() and (S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 5) and S.FistsOfFury:CooldownRemainsP() > 3 then
+      if HR.Cast(S.RisingSunKick) then 
+        return "Cast AoE Rising Sun Kick"; end
+    end
   	-- actions.aoe=whirling_dragon_punch
   	if S.WhirlingDragonPunch:IsReady() then
       if HR.Cast(S.WhirlingDragonPunch) then 
@@ -268,21 +273,16 @@ local function APL ()
       if HR.Cast(S.EnergizingElixir) then 
         return "Cast AoE Energizing Elixir"; end
 	  end
-    -- actions.aoe+=/fists_of_fury,if=energy.time_to_max>2.5
-    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 2.5 then
+    -- actions.aoe+=/fists_of_fury,if=energy.time_to_max>3
+    if S.FistsOfFury:IsReadyP() and Player:EnergyTimeToMaxPredicted() > 3 then
       if HR.Cast(S.FistsOfFury) then 
         return "Cast AoE Fists of Fury"; end
     end
- 	  -- actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1
-     if S.RushingJadeWind:IsReadyP() and Player:BuffDownP(S.RushingJadeWind) and Player:EnergyTimeToMaxPredicted() > 1 then
+ 	  -- actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.down
+     if S.RushingJadeWind:IsReadyP() and Player:BuffDownP(S.RushingJadeWind) then
       if HR.Cast(S.RushingJadeWind) then 
         return "Cast AoE Rushing Jade Wind"; end
   	end
-    -- actions.aoe+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<gcd)&cooldown.fists_of_fury.remains>3
-    if S.RisingSunKick:IsReadyP() and (S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() > Player:GCD()) and S.FistsOfFury:CooldownRemainsP() > 3 then
-      if HR.Cast(S.RisingSunKick) then 
-        return "Cast AoE Rising Sun Kick"; end
-    end
     -- actions.aoe+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
     if S.SpinningCraneKick:IsReadyP() and 
       (
@@ -303,14 +303,13 @@ local function APL ()
       if HR.Cast(S.ChiBurst) then 
         return "Cast AoE Chi Burst"; end
   	end  
-    -- actions.aoe+=/fist_of_the_white_tiger,if=chi.max-chi>=3&(energy>46|buff.rushing_jade_wind.down)
-    if S.FistOfTheWhiteTiger:IsReadyP() and Player:ChiDeficit() >= 3 and 
-      (Player:BuffDownP(S.RushingJadeWind) or Player:EnergyPredicted() > 46) then
+    -- actions.aoe+=/fist_of_the_white_tiger,if=chi.max-chi>=3
+    if S.FistOfTheWhiteTiger:IsReadyP() and Player:ChiDeficit() >= 3 then
       if HR.Cast(S.FistOfTheWhiteTiger) then 
         return "Cast AoE Fist of the White Tiger"; end
     end
-    -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&chi.max-chi>=2&(energy>56|buff.rushing_jade_wind.down)
-    if S.TigerPalm:IsReadyP() and not Player:PrevGCD(1, S.TigerPalm) and Player:ChiDeficit() >= 2 and (Player:BuffDownP(S.RushingJadeWind) or Player:EnergyPredicted() > 56) then
+    -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|!prev_gcd.1.tiger_palm)
+    if S.TigerPalm:IsReadyP() and Player:ChiDeficit() >= 2 and (not S.HitCombo:IsAvailable() or not Player:PrevGCD(1, S.TigerPalm)) then
       if HR.Cast(S.TigerPalm) then 
         return "Cast AoE Tiger Palm"; end
     end
@@ -320,8 +319,9 @@ local function APL ()
         return "Cast AoE Chi Wave"; end
     end
     -- actions.aoe+=/flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
-    -- actions.aoe+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick
-    if S.BlackoutKick:IsReadyP() and not Player:PrevGCD(1, S.BlackoutKick) then
+    -- actions.aoe+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(buff.bok_proc.up|(talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi<4))
+    if S.BlackoutKick:IsReadyP() and not Player:PrevGCD(1, S.BlackoutKick) and
+      (Player:BuffP(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 4)) then
       if HR.Cast(S.BlackoutKick) then 
         return "Cast AoE Blackout Kick"; end
     end
