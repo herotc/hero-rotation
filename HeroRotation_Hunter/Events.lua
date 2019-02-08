@@ -21,163 +21,193 @@ local wipe = wipe;
 local GetTime = HL.GetTime;
 
 -- File Locals
+do
+  local ChimaeraShot = {
+    -- Chimaera Shot
+    Range=8,
+    LastDamageTime=0,
+    LastDamaged={},
+    Timeout=4
+  }
+  
+  local Multishot = {
+    -- Multi-Shot
+    Range=10,
+    LastDamageTime=0,
+    LastDamaged={},
+    Timeout=6
+  }
 
-HL.RangeTracker = {
-	AbilityTimeout = 1,
-	NucleusAbilities = {
-		[2643]   = {
-			Range=8, 
-			--Spell = Spell.Hunter.Marksmanship and Spell.Hunter.Marksmanship.MultiShot or Spell.Hunter.BeastMastery.Multishot, 
-			LastDamageTime=0,
-			LastDamaged={},
-			Timeout=4
-		},
-		[194392] = {
-			Range=8, 
-			--Spell = Spell.Hunter.Marksmanship and Spell.Hunter.Marksmanship.Volley or Spell.Hunter.BeastMastery.Volley, 
-			LastDamageTime=0,
-			LastDamaged={},
-			Timeout=4
-		}
-	},
-	NonSplashableCount = {}
-}
+  HL.RangeTracker = {
+    AbilityTimeout = 1,
+    NucleusAbilities = {
+      [2643]   = Multishot,
+      [257620] = Multishot,
+      [194392] = {
+        -- Volley
+        Range=8,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=4
+      },
+      [171454] = ChimaeraShot,
+      [171457] = ChimaeraShot,
+      [118459] = {
+        -- Beast Cleave
+        Range=10,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=4
+      },
+      [201754] = {
+        -- Stomp
+        Range=10,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=4
+      },
+      [271686] = {
+        -- Heed My Call
+        Range=3,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=4
+      }
+    },
+    SplashableCount = {}
+  }
+end
 
 local RT = HL.RangeTracker;
 
-HL:RegisterForSelfCombatEvent(
-function (...)
-  _,_,_,SourceGUID,_,_,_,DestGUID,_,_,_,SpellID = ...;
-  
-  local Ability = RT.NucleusAbilities[SpellID];
-  
-  if Ability then
-		
-    if Ability.LastDamageTime+RT.AbilityTimeout < GetTime() then
-      wipe(Ability.LastDamaged);
+do
+  local UpdateAbilityCache = function (...)
+    local _,_,_,_,_,_,_,DestGUID,_,_,_,SpellID = ...;
+    local Ability = RT.NucleusAbilities[SpellID];
+    if Ability then
+      if Ability.LastDamageTime+RT.AbilityTimeout < GetTime() then
+        wipe(Ability.LastDamaged);
+      end
+
+      Ability.LastDamaged[DestGUID] = true;
+      Ability.LastDamageTime = GetTime();
     end
-		
-    Ability.LastDamaged[DestGUID] = true;
-    Ability.LastDamageTime = GetTime();
-  end	
-  
-end 	
-, "SPELL_DAMAGE"
-);  
+  end
+
+  HL:RegisterForSelfCombatEvent(UpdateAbilityCache, "SPELL_DAMAGE");
+  HL:RegisterForPetCombatEvent(UpdateAbilityCache, "SPELL_DAMAGE");
+end
 
 HL:RegisterForEvent(
-function(...)
-  local GUID = Target:GUID()
-  
-  for SpellID, Ability in pairs(RT.NucleusAbilities) do
-    if Ability.LastDamaged[GUID] then
-      --If the new Target is already known we just retain the proximity map
-    else
-      --Otherwise we Reset
-      wipe(Ability.LastDamaged);
-      Ability.LastDamageTime = 0;
+  function()
+    local GUID = Target:GUID()
+    for _, Ability in pairs(RT.NucleusAbilities) do
+      if Ability.LastDamaged[GUID] then
+        --If the new Target is already known we just retain the proximity map
+      else
+        --Otherwise we Reset
+        wipe(Ability.LastDamaged);
+        Ability.LastDamageTime = 0;
+      end
     end
-  end	  
-  
-end
-, "PLAYER_TARGET_CHANGED"
-)
+  end
+, "PLAYER_TARGET_CHANGED");
 
 HL:RegisterForCombatEvent(
-function (...)
-  DestGUID = select(8, ...);
-  for SpellID, Ability in pairs(RT.NucleusAbilities) do
-    Ability.LastDamaged[DestGUID] = nil;
-  end		 
-end
-, "UNIT_DIED"
-, "UNIT_DESTROYED"
-); 
-
-
-
+  function (...)
+    local DestGUID = select(8, ...);
+    for _, Ability in pairs(RT.NucleusAbilities) do
+      Ability.LastDamaged[DestGUID] = nil;
+    end
+  end
+, "UNIT_DIED", "UNIT_DESTROYED");
 
 local function NumericRange(range)
   return range == "Melee" and 5 or range;
-end   
+end
 
 local function EffectiveRangeSanitizer(EffectiveRange)
   --The Enemies Cache only works for specific Ranges
-  
   for i=2,#RangeIndex do
-    if RangeIndex[i] >= EffectiveRange then			
+    if RangeIndex[i] >= EffectiveRange then
       return RangeIndex[i]
     end
   end
   return -1
 end
 
-local function RecentlyDamagedIn(GUID,SplashRange)
+local function RecentlyDamagedIn(GUID, SplashRange)
   local ValidAbility = false
-  for SpellID, Ability in pairs(RT.NucleusAbilities) do
+  for _, Ability in pairs(RT.NucleusAbilities) do
     --The Ability needs to have splash radius thats smaller or equal to over
-    if SplashRange >= Ability.Range and Ability.LastDamageTime+Ability.Timeout > GetTime() then
+    if SplashRange >= Ability.Range then
       ValidAbility = true
-      if Ability.LastDamaged[GUID] then return true end
+      if Ability.LastDamageTime+Ability.Timeout > GetTime() then
+        if Ability.LastDamaged[GUID] and Ability.LastDamaged then return true end
+      end
     end
-    
-  end  
+  end
   --If we didnt find a valid ability we return true
   return not ValidAbility;
 end
 
-function Hunter.UpdateSplashCount(Unit, SplashRange)
-  
-  if not Unit:Exists() then return end
-  
-  local Distance = NumericRange(Unit:MaxDistanceToPlayer());
-  
+function Hunter.UpdateSplashCount(UpdateUnit, SplashRange)
+  if not UpdateUnit:Exists() then return end
+
+  -- Purge abilities that don't contain our current target
+  -- Mostly for cases where our pet AoE damaged enemies after we target swapped
+  local TargetGUID = Target:GUID()
+  for _, Ability in pairs(RT.NucleusAbilities) do
+    if not Ability.LastDamaged[TargetGUID] then
+      wipe(Ability.LastDamaged);
+      Ability.LastDamageTime = 0;
+    end
+  end
+
+  local Distance = NumericRange(UpdateUnit:MaxDistanceToPlayer());
   local MaxRange = EffectiveRangeSanitizer(Distance+SplashRange);
   local MinRange = EffectiveRangeSanitizer(Distance-SplashRange);
-  
+
   --Prevent calling Get Enemies twice
   if not Cache.EnemiesCount[MaxRange] then
     HL.GetEnemies(MaxRange);
   end
-  
-  local CurrentCount = 0
+
+  -- Use the Enemies Cache as the starting point
   local Enemies = Cache.Enemies[MaxRange]
-  
-  for i, Enemy in pairs(Enemies) do
-    --Units that are outside of the parameters or havent been seen lately get removed			
-    if NumericRange(Enemy:MaxDistanceToPlayer()) < MinRange or NumericRange(Enemy:MinDistanceToPlayer()) > MaxRange or not RecentlyDamagedIn(Enemy:GUID(),SplashRange) then
-      CurrentCount = CurrentCount+1
+  local CurrentCount = 0
+  for _, Enemy in pairs(Enemies) do
+    --Units that are outside of the parameters or havent been seen lately get removed
+    if NumericRange(Enemy:MaxDistanceToPlayer()) > MinRange
+    and NumericRange(Enemy:MinDistanceToPlayer()) < MaxRange
+    and RecentlyDamagedIn(Enemy:GUID(), SplashRange) then
+      CurrentCount = CurrentCount + 1
     end
   end
-	
-  RT.NonSplashableCount[MaxRange] = CurrentCount
-  
+
+  if not RT.SplashableCount[UpdateUnit:GUID()] then
+    RT.SplashableCount[UpdateUnit:GUID()] = {}
+  end
+  RT.SplashableCount[UpdateUnit:GUID()][SplashRange] = CurrentCount
 end
 
-function Hunter.GetSplashCount(Unit,SplashRange)
-  
-  local Distance = NumericRange(Unit:MaxDistanceToPlayer())
-  
-  local EffectiveRange = EffectiveRangeSanitizer(Distance+SplashRange)
-  
-  local CacheCount = Cache.EnemiesCount[EffectiveRange]
-  
-  
-  --We subtract all the impossible units 
-  local Count = math.max(CacheCount and (CacheCount-RT.NonSplashableCount[EffectiveRange]) or 1,1)
-  
-  --print(Count,Hunter.ValidateSplashCache())
-  
-  return Count
+function Hunter.GetSplashCount(UpdateUnit, SplashRange)
+  if not UpdateUnit:Exists() then return 0 end
+
+  local SplashableUnit = RT.SplashableCount[UpdateUnit:GUID()];
+  if SplashableUnit and SplashableUnit[SplashRange] then
+    return math.max(1, SplashableUnit[SplashRange])
+  end
+
+  return 1;
 end
 
 function Hunter.ValidateSplashCache()
-  for SpellID, Ability in pairs(RT.NucleusAbilities) do
+  for _, Ability in pairs(RT.NucleusAbilities) do
     if Ability.LastDamageTime+Ability.Timeout > GetTime() then return true; end
-  end			
-  
+  end
   return false;
-end 
+end
 
 -- MM Hunter GCD Management
 
@@ -200,6 +230,7 @@ HL:RegisterForSelfCombatEvent(
   end
   , "SPELL_CAST_SUCCESS"
 );
+
 HL:RegisterForSelfCombatEvent(
   function (...)
     local CastSpell = Spell(select(12, ...))
@@ -215,4 +246,4 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_CAST_START"
-);  
+);
