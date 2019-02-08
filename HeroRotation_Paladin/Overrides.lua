@@ -27,6 +27,8 @@
       local BaseCheck = RetOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
       if self == SpellRetribution.HammerofWrath then
         return BaseCheck and self:IsUsable()
+      elseif self == SpellRetribution.AvengingWrath or self == SpellRetribution.Crusade then
+        return BaseCheck and HR.CDsON()
       else
         return BaseCheck
       end
