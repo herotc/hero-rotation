@@ -36,7 +36,7 @@ OldMMIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.SummonPet then
-    return (not Pet:IsActive()) and BaseCheck
+    return (not Pet:IsActive() and not HR.GUISettings.APL.Hunter.Marksmanship.UseLoneWolf) and BaseCheck
   else
     return BaseCheck
   end
