@@ -183,12 +183,12 @@ local function RtB_Reroll ()
     -- Grand Melee
     elseif Settings.Outlaw.RolltheBonesLogic == "Grand Melee" then
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.GrandMelee)) and true or false;
-    -- Jolly Roger
-    elseif Settings.Outlaw.RolltheBonesLogic == "Jolly Roger" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.JollyRoger)) and true or false;
-    -- Shark Infested Waters
-    elseif Settings.Outlaw.RolltheBonesLogic == "Shark Infested Waters" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.SharkInfestedWaters)) and true or false;
+    -- Skull and Crossbones
+    elseif Settings.Outlaw.RolltheBonesLogic == "Skull and Crossbones" then
+      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.SkullandCrossbones)) and true or false;
+    -- Ruthless Precision
+    elseif Settings.Outlaw.RolltheBonesLogic == "Ruthless Precision" then
+      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.RuthlessPrecision)) and true or false;
     -- True Bearing
     elseif Settings.Outlaw.RolltheBonesLogic == "True Bearing" then
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.TrueBearing)) and true or false;

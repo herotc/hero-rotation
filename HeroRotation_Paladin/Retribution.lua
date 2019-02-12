@@ -35,7 +35,8 @@ Spell.Paladin.Retribution = {
   RighteousVerdict                      = Spell(267610),
   ExecutionSentence                     = Spell(267798),
   DivineStorm                           = Spell(53385),
-  DivinePurposeBuff                     = Spell(223817),
+  DivinePurpose                         = Spell(223817),
+  DivinePurposeBuff                     = Spell(223819),
   EmpyreanPowerBuff                     = Spell(286393),
   JudgmentDebuff                        = Spell(197277),
   TemplarsVerdict                       = Spell(85256),
@@ -144,15 +145,15 @@ local function APL()
     end
     -- shield_of_vengeance
     if S.ShieldofVengeance:IsCastableP() then
-      if HR.Cast(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
+      if HR.CastLeft(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
     end
     -- avenging_wrath,if=buff.inquisition.up|!talent.inquisition.enabled
     if S.AvengingWrath:IsCastableP() and (Player:BuffP(S.InquisitionBuff) or not S.Inquisition:IsAvailable()) then
-      if HR.Cast(S.AvengingWrath) then return "avenging_wrath 32"; end
+      if HR.Cast(S.AvengingWrath, Settings.Retribution.GCDasOffGCD.AvengingWrath) then return "avenging_wrath 32"; end
     end
     -- crusade,if=holy_power>=4
     if S.Crusade:IsCastableP() and (Player:HolyPower() >= 4) then
-      if HR.Cast(S.Crusade) then return "crusade 38"; end
+      if HR.Cast(S.Crusade, Settings.Retribution.GCDasOffGCD.Crusade) then return "crusade 38"; end
     end
   end
   Finishers = function()
@@ -240,7 +241,7 @@ local function APL()
     -- shield_of_vengeance
     if Opener1 == 0 then
       if S.ShieldofVengeance:IsCastableP() then
-        if HR.Cast(S.ShieldofVengeance) then return "Common Opener 1 - Shield of Vengeance"; end
+        if HR.CastLeft(S.ShieldofVengeance) then return "Common Opener 1 - Shield of Vengeance"; end
       else
         Opener1 = 1
       end
@@ -267,7 +268,7 @@ local function APL()
       -- crusade
       if Opener4 == 0 then
         if S.Crusade:IsCastableP() then
-          if HR.Cast(S.Crusade) then return "wake_opener_ES_CS 4 - Crusade"; end
+          if HR.Cast(S.Crusade, Settings.Retribution.GCDasOffGCD.Crusade) then return "wake_opener_ES_CS 4 - Crusade"; end
         else
           Opener4 = 1
         end
@@ -321,7 +322,7 @@ local function APL()
       -- crusade
       if Opener4 == 0 then
         if S.Crusade:IsCastableP() then
-          if HR.Cast(S.Crusade) then return "wake_opener_CS 4 - Crusade"; end
+          if HR.Cast(S.Crusade, Settings.Retribution.GCDasOffGCD.Crusade) then return "wake_opener_CS 4 - Crusade"; end
         else
           Opener4 = 1
         end
@@ -375,7 +376,7 @@ local function APL()
       -- crusade
       if Opener4 == 0 then
         if S.Crusade:IsCastableP() then
-          if HR.Cast(S.Crusade) then return "wake_opener_ES_HoW 4 - Crusade"; end
+          if HR.Cast(S.Crusade, Settings.Retribution.GCDasOffGCD.Crusade) then return "wake_opener_ES_HoW 4 - Crusade"; end
         else
           Opener4 = 1
         end
@@ -429,7 +430,7 @@ local function APL()
       -- crusade
       if Opener4 == 0 then
         if S.Crusade:IsCastableP() then
-          if HR.Cast(S.Crusade) then return "wake_opener_ES_HoW 4 - Crusade"; end
+          if HR.Cast(S.Crusade, Settings.Retribution.GCDasOffGCD.Crusade) then return "wake_opener_ES_HoW 4 - Crusade"; end
         else
           Opener4 = 1
         end
@@ -482,7 +483,7 @@ local function APL()
       -- wake_opener_Inq
       -- inquisition
       if Opener4 == 0 then
-        if S.Inquisition:IsReadyP() and not Player:PrevGCDP(1, S.Inquisition) then
+        if S.Inquisition:IsReadyP() and not Player:PrevGCDP(1, S.Inquisition) and Player:BuffRefreshableCP(S.InquisitionBuff) then
           if HR.Cast(S.Inquisition) then return "wake_opener_Inq 4 - Inquisition"; end
         else
           Opener4 = 1
@@ -491,7 +492,7 @@ local function APL()
       -- avenging_wrath
       if Opener5 == 0 then
         if S.AvengingWrath:IsCastableP() then
-          if HR.Cast(S.AvengingWrath) then return "wake_opener_Inq 5 - AvengingWrath"; end
+          if HR.Cast(S.AvengingWrath, Settings.Retribution.GCDasOffGCD.AvengingWrath) then return "wake_opener_Inq 5 - AvengingWrath"; end
         else
           Opener5 = 1
         end
@@ -508,7 +509,7 @@ local function APL()
       VarOpenerDone = 1
     end
     -- In case Wake of Ashes isn't selected
-    if not S.WakeofAshes:IsAvailable() then
+    if (not S.WakeofAshes:IsAvailable()) or S.DivinePurpose:IsAvailable() then
       VarOpenerDone = 1
     end
   end

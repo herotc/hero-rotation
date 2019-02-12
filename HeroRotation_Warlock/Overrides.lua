@@ -87,6 +87,74 @@
       end
   , 265)
 -- Demonology, ID: 266
+  local DemoOldSpellIsCastableP
+  DemoOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local RangeOK = true;
+      if Range then
+        local RangeUnit = ThisUnit or Target;
+        RangeOK = RangeUnit:IsInRange( Range, AoESpell );
+      end
+      local BaseCheck = DemoOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      if self == SpellDemo.SummonPet then
+        return BaseCheck and not Pet:IsActive()
+      elseif self == SpellDemo.SummonVilefiend then
+        return BaseCheck and not Player:IsCasting(SpellDemo.SummonVilefiend) and Player:SoulShardsP() > 0
+      elseif self == SpellDemo.CallDreadstalkers then
+        return BaseCheck and not Player:IsCasting(SpellDemo.CallDreadstalkers) and (Player:SoulShardsP() > 1 or (Player:SoulShardsP() > 0 and Player:BuffP(SpellDemo.DemonicCallingBuff)))
+      elseif self == SpellDemo.BilescourgeBombers then
+        return BaseCheck and Player:SoulShardsP() > 1
+      elseif self == SpellDemo.NetherPortal or self == SpellDemo.GrimoireFelguard then
+        return BaseCheck and Player:SoulShardsP() > 0
+      else
+        return BaseCheck
+      end
+    end
+  , 266);
+  
+  HL.AddCoreOverride ("Player.SoulShardsP",
+    function (self)
+      local Shard = WarlockPowerBar_UnitPower(self.UnitID)
+      if not Player:IsCasting() then
+        return Shard
+      else
+        if Player:IsCasting(SpellDemo.NetherPortal) then
+          return Shard - 3
+        elseif (Player:IsCasting(SpellDemo.CallDreadStalkers) and not Player:BuffP(SpellDemo.DemonicCallingBuff))
+            or  Player:IsCasting(SpellDemo.BilescourgeBombers) then
+          return Shard - 2
+        elseif (Player:IsCasting(SpellDemo.CallDreadStalkers) and Player:BuffP(SpellDemo.DemonicCallingBuff))
+            or  Player:IsCasting(SpellDemo.SummonVilefiend)
+            or  Player:IsCasting(SpellDemo.SummonFelguard)
+            or  Player:IsCasting(SpellDemo.GrimoireFelguard) 
+            or  Player:IsCasting(SpellDemo.NetherPortal) then
+          return Shard - 1
+        elseif Player:IsCasting(SpellDemo.HandOfGuldan) then
+          if Shard > 3 then
+            return Shard - 3
+          else
+            return 0
+          end
+        elseif Player:IsCasting(SpellDemo.Demonbolt) then
+          if Shard >= 4 then
+            return 5
+          else
+            return Shard + 2
+          end
+        elseif Player:IsCasting(SpellDemo.Shadowbolt) then
+          if Shard == 5 then
+            return Shard
+          else
+            return Shard + 1
+          end
+        elseif Player:IsCasting(SpellDemo.SummonTyrant) and SpellDemo.BalefulInvocation:AzeriteEnabled() then 
+          return 5
+        else
+          return Shard
+        end
+      end
+    end
+  , 266);
 
 -- Destruction, ID: 267
 

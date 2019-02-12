@@ -27,6 +27,8 @@
       local BaseCheck = RetOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
       if self == SpellRetribution.HammerofWrath then
         return BaseCheck and self:IsUsable()
+      elseif self == SpellRetribution.AvengingWrath or self == SpellRetribution.Crusade then
+        return BaseCheck and HR.CDsON()
       else
         return BaseCheck
       end
@@ -34,7 +36,7 @@
   , 70);
 
 -- Example (Arcane Mage)
--- HL.AddCoreOverride ("Spell.IsCastableP", 
+-- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 --   if Range then
 --     local RangeUnit = ThisUnit or Target;
