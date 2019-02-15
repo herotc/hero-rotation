@@ -114,22 +114,22 @@
   
   HL.AddCoreOverride ("Player.SoulShardsP",
     function (self)
-      local Shard = WarlockPowerBar_UnitPower(self.UnitID)
+      local Shard = Player:SoulShards();
       if not Player:IsCasting() then
         return Shard
       else
         if Player:IsCasting(SpellDemo.NetherPortal) then
           return Shard - 3
-        elseif (Player:IsCasting(SpellDemo.CallDreadStalkers) and not Player:BuffP(SpellDemo.DemonicCallingBuff))
+        elseif (Player:IsCasting(SpellDemo.CallDreadstalkers) and not Player:BuffP(SpellDemo.DemonicCallingBuff))
             or  Player:IsCasting(SpellDemo.BilescourgeBombers) then
           return Shard - 2
-        elseif (Player:IsCasting(SpellDemo.CallDreadStalkers) and Player:BuffP(SpellDemo.DemonicCallingBuff))
+        elseif (Player:IsCasting(SpellDemo.CallDreadstalkers) and Player:BuffP(SpellDemo.DemonicCallingBuff))
             or  Player:IsCasting(SpellDemo.SummonVilefiend)
-            or  Player:IsCasting(SpellDemo.SummonFelguard)
+            or  Player:IsCasting(SpellDemo.SummonPet)
             or  Player:IsCasting(SpellDemo.GrimoireFelguard) 
             or  Player:IsCasting(SpellDemo.NetherPortal) then
           return Shard - 1
-        elseif Player:IsCasting(SpellDemo.HandOfGuldan) then
+        elseif Player:IsCasting(SpellDemo.HandofGuldan) then
           if Shard > 3 then
             return Shard - 3
           else
@@ -141,13 +141,13 @@
           else
             return Shard + 2
           end
-        elseif Player:IsCasting(SpellDemo.Shadowbolt) then
+        elseif Player:IsCasting(SpellDemo.ShadowBolt) then
           if Shard == 5 then
             return Shard
           else
             return Shard + 1
           end
-        elseif Player:IsCasting(SpellDemo.SummonTyrant) and SpellDemo.BalefulInvocation:AzeriteEnabled() then 
+        elseif Player:IsCasting(SpellDemo.SummonDemonicTyrant) and SpellDemo.BalefulInvocation:AzeriteEnabled() then 
           return 5
         else
           return Shard
