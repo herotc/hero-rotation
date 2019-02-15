@@ -298,7 +298,7 @@ local function CDs ()
         end
       end
       -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
-      if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) then
+      if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) and Player:ComboPointsDeficit() > 0 then
         if HR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
       end
     end
