@@ -80,7 +80,9 @@ local S = Spell.Rogue.Assassination;
 -- Items
 if not Item.Rogue then Item.Rogue = {}; end
 Item.Rogue.Assassination = {
-  -- Nothing
+  -- Trinkets
+  GalecallersBoon       = Item(159614, {13, 14}),
+  InvocationOfYulon     = Item(165568, {13, 14}),
 };
 local I = Item.Rogue.Assassination;
 
@@ -245,6 +247,19 @@ local function CDs ()
       end
     end
 
+    -- Trinkets
+    if Settings.Commons.UseTrinkets then
+      -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains<=1&(!talent.subterfuge.enabled|dot.garrote.pmultiplier>1)|cooldown.vendetta.remains>45
+      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady()
+        and ((S.Vendetta:CooldownRemains() <= 1 and (not S.Subterfuge:IsAvailable() or Target:PMultiplier(S.Garrote) > 1))
+        or S.Vendetta:CooldownRemains() > 45) then
+        HR.CastSuggested(I.GalecallersBoon);
+      end
+      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
+        HR.CastSuggested(I.InvocationOfYulon);
+      end
+    end
+
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
     if S.MarkedforDeath:IsCastable() then
       if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit() * 1.5) then
@@ -262,29 +277,36 @@ local function CDs ()
         if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
       end
       if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
+        local VanishSuggested = false;
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!dot.garrote.ticking&variable.single_target
-        if S.Subterfuge:IsAvailable() and not Target:DebuffP(S.Garrote) and Cache.EnemiesCount[10] < 2 then
-          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge Garrote)"; end
+        if not VanishSuggested and S.Subterfuge:IsAvailable() and not Target:DebuffP(S.Garrote) and Cache.EnemiesCount[10] < 2 then
+            if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge Garrote)"; end
+          VanishSuggested = true;
         end
         -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
-        if S.Exsanguinate:IsAvailable() and (S.Nightstalker:IsAvailable() or S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 2)
+        if not VanishSuggested and S.Exsanguinate:IsAvailable() and (S.Nightstalker:IsAvailable() or S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 2)
           and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1
           and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) <= 1) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
+          VanishSuggested = true;
         end
         -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
-        if S.Nightstalker:IsAvailable() and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() and Target:Debuff(S.Vendetta) then
+        if not VanishSuggested and S.Nightstalker:IsAvailable() and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() and Target:Debuff(S.Vendetta) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
+          VanishSuggested = true;
         end
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&(!talent.exsanguinate.enabled|spell_targets.fan_of_knives>=2)&!stealthed.rogue&cooldown.garrote.up&dot.garrote.refreshable&(spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives|spell_targets.fan_of_knives>=4&combo_points.deficit>=4)
-        if S.Subterfuge:IsAvailable() and (not S.Exsanguinate:IsAvailable() or Cache.EnemiesCount[10] >= 2) and not Player:IsStealthedP(true, false)
+        if not VanishSuggested and S.Subterfuge:IsAvailable() and (not S.Exsanguinate:IsAvailable() or Cache.EnemiesCount[10] >= 2) and not Player:IsStealthedP(true, false)
           and S.Garrote:CooldownUp() and Target:DebuffRefreshableP(S.Garrote, 5.4)
           and ((Cache.EnemiesCount[10] <= 3 and ComboPointsDeficit >= 1+Cache.EnemiesCount[10]) or (Cache.EnemiesCount[10] >= 4 and ComboPointsDeficit >= 4)) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
+          VanishSuggested = true;
         end
         -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable
-        if S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0 and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
+        if not VanishSuggested and S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0
+          and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
+          VanishSuggested = true;
         end
       end
       -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
@@ -376,7 +398,8 @@ local function Dot ()
   local function EmpoweredDotRefresh()
     return Cache.EnemiesCount[10] >= 3 + num(S.ShroudedSuffocation:AzeriteEnabled())
   end
-  if S.Garrote:IsCastable() and (not S.Subterfuge:IsAvailable() or not HR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and ComboPointsDeficit >= 1 then
+  if S.Garrote:IsCastable() and (Settings.Assassination.AlwaysSuggestGarrote or not S.Subterfuge:IsAvailable()
+    or not HR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4)) and ComboPointsDeficit >= 1 then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh())

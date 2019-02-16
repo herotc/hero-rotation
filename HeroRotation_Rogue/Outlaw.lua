@@ -60,8 +60,10 @@ Spell.Rogue.Outlaw = {
   -- Azerite Traits
   AceUpYourSleeve                 = Spell(278676),
   Deadshot                        = Spell(272935),
+  DeadshotBuff                    = Spell(272940),
   SnakeEyesPower                  = Spell(275846),
   SnakeEyesBuff                   = Spell(275863),
+  KeepYourWitsBuff                = Spell(288988),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -80,6 +82,9 @@ local S = Spell.Rogue.Outlaw;
 -- Items
 if not Item.Rogue then Item.Rogue = {}; end
 Item.Rogue.Outlaw = {
+  -- Trinkets
+  GalecallersBoon       = Item(159614, {13, 14}),
+  InvocationOfYulon     = Item(165568, {13, 14}),
 };
 local I = Item.Rogue.Outlaw;
 
@@ -260,9 +265,9 @@ end
 local function CDs ()
   -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
   -- TODO: Add Potion
-  -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
-  -- TODO: Add Items
+
   if Target:IsInRange(S.SinisterStrike) then
+    -- Racials
     if HR.CDsON() then
       -- actions.cds+=/blood_fury
       if S.BloodFury:IsCastable() then
@@ -281,10 +286,19 @@ local function CDs ()
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
       end
       -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
-      if S.AdrenalineRush:IsCastable() and not Player:BuffP(S.AdrenalineRush) and EnergyTimeToMaxRounded() > 1 then
+      if S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) and EnergyTimeToMaxRounded() > 1 then
         if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush"; end
       end
     end
+
+    -- Trinkets
+    -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+    if Settings.Commons.UseTrinkets then
+      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
+        HR.CastSuggested(I.InvocationOfYulon);
+      end
+    end
+
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
     if S.MarkedforDeath:IsCastable() then
       -- Note: Increased the SimC condition by 50% since we are slower.
@@ -305,17 +319,23 @@ local function CDs ()
           if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry"; end
         end
       end
-      -- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
-      if S.GhostlyStrike:IsCastable(S.SinisterStrike) and Blade_Flurry_Sync() and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0)) then
-        if HR.Cast(S.GhostlyStrike) then return "Cast Ghostly Strike"; end
-      end
-      -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
-      if S.KillingSpree:IsCastable(10) and Blade_Flurry_Sync() and (EnergyTimeToMaxRounded() > 5 or Player:EnergyPredicted() < 15) then
-        if HR.Cast(S.KillingSpree, Settings.Outlaw.GCDasOffGCD.KillingSpree) then return "Cast Killing Spree"; end
-      end
-      -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
-      if S.BladeRush:IsCastable(S.SinisterStrike) and Blade_Flurry_Sync() and EnergyTimeToMaxRounded() > 1 then
-        if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush"; end
+      if Blade_Flurry_Sync() then
+        -- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
+        if S.GhostlyStrike:IsCastableP(S.SinisterStrike) and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0)) then
+          if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike"; end
+        end
+        -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
+        if S.KillingSpree:IsCastableP(10) and (EnergyTimeToMaxRounded() > 5 or Player:EnergyPredicted() < 15) then
+          if Settings.Outlaw.KillingSpreeDisplayStyle == "Suggested" then
+            if HR.CastSuggested(S.KillingSpree) then return "Cast Killing Spree"; end
+          else
+            if HR.Cast(S.KillingSpree, (Settings.Outlaw.KillingSpreeDisplayStyle == "Cooldown")) then return "Cast Killing Spree"; end
+          end
+        end
+        -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
+        if S.BladeRush:IsCastableP(S.SinisterStrike) and EnergyTimeToMaxRounded() > 1 then
+          if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush"; end
+        end
       end
       if Settings.Outlaw.UseDPSVanish and not Player:IsStealthedP(true, true) then
         -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
@@ -344,12 +364,12 @@ end
 local function Finish ()
   -- # BtE over RtB rerolls with 2+ Deadshot traits or Ruthless Precision.
   -- actions.finish=between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
-  if S.BetweentheEyes:IsCastable(20) and (Player:BuffP(S.RuthlessPrecision) or (S.Deadshot:AzeriteEnabled() or S.AceUpYourSleeve:AzeriteEnabled()) and RtB_Buffs() >= 1) then
+  if S.BetweentheEyes:IsCastableP(20) and (Player:BuffP(S.RuthlessPrecision) or (S.Deadshot:AzeriteEnabled() or S.AceUpYourSleeve:AzeriteEnabled()) and RtB_Buffs() >= 1) then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Pre RtB)"; end
   end
   -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
   -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
-  if S.SliceandDice:IsAvailable() and S.SliceandDice:IsCastable()
+  if S.SliceandDice:IsAvailable() and S.SliceandDice:IsCastableP()
     and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Target:TimeToDieIsNotValid() or Player:BuffRemainsP(S.SliceandDice) == 0)
     and Player:BuffRemainsP(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
@@ -360,7 +380,7 @@ local function Finish ()
   end
   -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
   -- actions.finish+=/between_the_eyes,if=azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
-  if S.BetweentheEyes:IsCastable(20) and (S.AceUpYourSleeve:AzeriteEnabled() or S.Deadshot:AzeriteEnabled()) then
+  if S.BetweentheEyes:IsCastableP(20) and (S.AceUpYourSleeve:AzeriteEnabled() or S.Deadshot:AzeriteEnabled()) then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/dispatch
@@ -368,16 +388,16 @@ local function Finish ()
     if HR.Cast(S.Dispatch) then return "Cast Dispatch"; end
   end
   -- OutofRange BtE
-  if S.BetweentheEyes:IsCastable(20) and not Target:IsInRange(10) then
+  if S.BetweentheEyes:IsCastableP(20) and not Target:IsInRange(10) then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OOR)"; end
   end
 end
 
 local function Build ()
-  -- actions.build=pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up
+  -- actions.build=pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up)
   if S.PistolShot:IsCastable(20)
     and Player:ComboPointsDeficit() >= (1 + (Player:BuffP(S.Broadside) and 1 or 0) + (S.QuickDraw:IsAvailable() and 1 or 0))
-    and Player:BuffP(S.Opportunity) then
+    and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 25 or Player:BuffP(S.DeadshotBuff)) then
     if HR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
   end
   -- actions.build+=/sinister_strike
@@ -409,7 +429,7 @@ local function APL ()
         if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
         end
-        if S.AdrenalineRush:IsCastable() and not Player:BuffP(S.AdrenalineRush) then
+        if S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) then
           if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (OOC)"; end
         end
       end
@@ -483,7 +503,7 @@ local function APL ()
       if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
     end
     -- OutofRange Pistol Shot
-    if not Target:IsInRange(10) and S.PistolShot:IsCastable(20) and not Player:IsStealthedP(true, true)
+    if not Target:IsInRange(BladeFlurryRange) and S.PistolShot:IsCastable(20) and not Player:IsStealthedP(true, true)
       and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or EnergyTimeToMaxRounded() <= 1.2) then
       if HR.Cast(S.PistolShot) then return "Cast Pistol Shot (OOR)"; end
     end
@@ -492,7 +512,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2018-12-11
+-- Last Update: 2019-02-06
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -561,5 +581,5 @@ HR.SetAPL(260, APL);
 -- actions.finish+=/dispatch
 --
 -- # Builders
--- actions.build=pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up
+-- actions.build=pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up)
 -- actions.build+=/sinister_strike
