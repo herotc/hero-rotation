@@ -130,6 +130,7 @@
   CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
   CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology");
   CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowBPoI", "Show Battle Potion of Intellect", "Enable this if you want it to show you when to use Battle Potion of Intellect.");
+  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.GCDasOffGCD.SummonTyrant", "Show SummonTyrant as GCDasOffGCD", "Enable this if you want it to show yo SummonTyrant as GCDasOffGCD");
   -- Affliction
   CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction");
   -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
