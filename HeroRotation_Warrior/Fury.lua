@@ -87,11 +87,19 @@ local function bool(val)
   return val ~= 0
 end
 
+S.ExecuteDefault    = Spell(5308)
+S.ExecuteMassacre   = Spell(280735)
+
+local function UpdateExecuteID()
+    S.Execute = S.Massacre:IsAvailable() and S.ExecuteMassacre or S.ExecuteDefault
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Movement, SingleTarget
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  UpdateExecuteID()
   Precombat = function()
     -- flask
     -- food
