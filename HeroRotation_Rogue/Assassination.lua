@@ -348,9 +348,9 @@ local function Stealthed ()
     if HR.AoEON() then
       SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target_A, 2);
     end
-    -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&pmultiplier<=1&target.time_to_die-remains>2
+    -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&target.time_to_die-remains>2
     local function Evaluate_Garrote_Target_B(TargetUnit)
-      return TargetUnit:PMultiplier(S.Garrote) <= 1 and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
+      return TargetUnit:DebuffRemainsP(S.Garrote, 10) and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target_B(Target)
       and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
@@ -649,8 +649,8 @@ HR.SetAPL(259, APL);
 -- actions.stealthed=rupture,if=combo_points>=4&(talent.nightstalker.enabled|talent.subterfuge.enabled&(talent.exsanguinate.enabled&cooldown.exsanguinate.remains<=2|!ticking)&variable.single_target)&target.time_to_die-remains>6
 -- # Subterfuge: Apply or Refresh with buffed Garrotes
 -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&refreshable&target.time_to_die-remains>2
--- # Subterfuge: Override normal Garrotes with snapshot versions
--- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&pmultiplier<=1&target.time_to_die-remains>2
+-- # Subterfuge: Override older non-pandemic Garrotes as second prio
+-- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&target.time_to_die-remains>2
 -- # Subterfuge + Shrouded Suffocation: Apply early Rupture that will be refreshed for pandemic
 -- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking
 -- # Subterfuge w/ Shrouded Suffocation: Reapply for bonus CP and extended snapshot duration
