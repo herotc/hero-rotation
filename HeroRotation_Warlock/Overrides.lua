@@ -118,9 +118,7 @@
       if not Player:IsCasting() then
         return Shard
       else
-        if Player:IsCasting(SpellDemo.NetherPortal) then
-          return Shard - 3
-        elseif (Player:IsCasting(SpellDemo.CallDreadstalkers) and not Player:BuffP(SpellDemo.DemonicCallingBuff))
+        if (Player:IsCasting(SpellDemo.CallDreadstalkers) and not Player:BuffP(SpellDemo.DemonicCallingBuff))
             or  Player:IsCasting(SpellDemo.BilescourgeBombers) then
           return Shard - 2
         elseif (Player:IsCasting(SpellDemo.CallDreadstalkers) and Player:BuffP(SpellDemo.DemonicCallingBuff))
