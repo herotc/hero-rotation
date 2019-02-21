@@ -48,6 +48,7 @@ Spell.Warlock.Demonology = {
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
   ExplosivePotential                    = Spell(275395),
+  BalefulInvocation                     = Spell(287059),
   DemonicConsumption                    = Spell(267215),
 };
 local S = Spell.Warlock.Demonology;
