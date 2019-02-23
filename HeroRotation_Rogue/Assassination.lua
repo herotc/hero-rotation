@@ -350,7 +350,7 @@ local function Stealthed ()
     end
     -- actions.stealthed+=/garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&target.time_to_die-remains>2
     local function Evaluate_Garrote_Target_B(TargetUnit)
-      return TargetUnit:DebuffRemainsP(S.Garrote, 10) and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
+      return TargetUnit:DebuffRemainsP(S.Garrote) <= 10 and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target_B(Target)
       and (Target:FilteredTimeToDie(">", 2, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
