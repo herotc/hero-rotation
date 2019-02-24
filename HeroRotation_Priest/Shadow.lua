@@ -42,6 +42,7 @@ Spell.Priest.Shadow = {
   DarkVoid                              = Spell(263346),
   ShadowWordPainDebuff                  = Spell(589),
   Mindbender                            = Spell(200174),
+  Shadowfiend                           = Spell(34433),
   ShadowCrash                           = Spell(205385),
   ShadowWordPain                        = Spell(589),
   Misery                                = Spell(238558),
@@ -130,11 +131,17 @@ end
 local function EvaluateCycleMindSear169(TargetUnit)
   return Cache.EnemiesCount[40] > 1
 end
+
+S.MindbenderDefault = S.Mindbender
+local function UpdateMindbenderID()
+  S.Mindbender = S.MindbenderDefault:IsAvailable() and S.MindbenderDefault or S.Shadowfiend
+end
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cleave, Single
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  UpdateMindbenderID()
   Precombat = function()
     -- flask
     -- food
