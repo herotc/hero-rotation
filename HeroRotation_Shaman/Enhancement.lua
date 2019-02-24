@@ -87,9 +87,8 @@ Spell.Shaman.Enhancement = {
   -- Utility
   WindShear             = Spell(57994),
 
-  -- Legion Trinkets
-  SpecterOfBetrayal     = Spell(246461),
-  HornOfValor           = Spell(215956),
+  -- BfA Trinkets
+  GalecallersBoon       = Spell(268314),
 
   -- Item Buffs
   BSARBuff              = Spell(270058),
@@ -108,9 +107,8 @@ Item.Shaman.Enhancement = {
   SmolderingHeart           = Item(151819, {10}),
   AkainusAbsoluteJustice    = Item(137084, {9}),
 
-  -- Legion Trinkets
-  SpecterOfBetrayal         = Item(151190, {13, 14}),
-  HornOfValor				= Item(133642, {13, 14}),
+  -- BfA Trinkets
+  GalecallersBoon           = Item(159614, {13, 14}),
 
   -- BfA Consumables
   Healthstone               = Item(5512),
@@ -307,14 +305,10 @@ local function APL ()
       end
     end
 
-    -- Legion Trinkets
+    -- BfA Trinkets
     if Settings.Shaman.Commons.OnUseTrinkets then
-	  if I.SpecterOfBetrayal:IsEquipped() and Target:IsInRange("Melee") and S.SpecterOfBetrayal:TimeSinceLastCast() > 45 and not Player:IsMoving() then
-	    if HR.CastSuggested(I.SpecterOfBetrayal) then return "Use SpecterOfBetrayal" end
-	  end
-
-	  if I.HornOfValor:IsEquipped() and Target:IsInRange("Melee") and S.HornOfValor:TimeSinceLastCast() > 120 then
-	    if HR.CastSuggested(I.HornOfValor) then return "Use HornOfValor" end
+	  if I.GalecallersBoon:IsEquipped() and Target:IsInRange("Melee") and S.GalecallersBoon:TimeSinceLastCast() >= 60 and not Player:IsMoving() then
+	    if HR.CastSuggested(I.GalecallersBoon) then return "Use GalecallersBoon" end
 	  end
     end
 
