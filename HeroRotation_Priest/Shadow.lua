@@ -184,7 +184,7 @@ local function APL()
       if HR.Cast(S.ShadowWordVoid) then return "shadow_word_void added 1"; end
     end
     -- vampiric_touch
-    if S.VampiricTouch:IsCastableP() and Player:DebuffDownP(S.VampiricTouchDebuff) and Everyone.TargetIsValid() then
+    if S.VampiricTouch:IsCastableP() and not Player:IsCasting(S.VampiricTouch) and Player:DebuffDownP(S.VampiricTouchDebuff) and Everyone.TargetIsValid() then
       if HR.Cast(S.VampiricTouch) then return "vampiric_touch 58"; end
     end
   end
