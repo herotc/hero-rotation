@@ -353,7 +353,7 @@ local function APL()
       return Cleave();
     end
     -- run_action_list,name=single,if=active_enemies=1
-    if (Cache.EnemiesCount[40] == 1) then
+    if (true) then
       return Single();
     end
   end
