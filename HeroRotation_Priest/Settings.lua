@@ -33,14 +33,12 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        Shadowfiend = true,
         Mindbender = true,
         Shadowform = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        PowerInfusion = true,
         Dispersion = true,
         SurrenderToMadness = true,
         -- Items
