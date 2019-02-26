@@ -22,6 +22,17 @@
 -- Frost, ID: 251
 
 -- Unholy, ID: 252
+local OldUHIsCastableP
+OldUHIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldUHIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellUnholy.RaiseDead then
+    return (not Pet:IsActive()) and BaseCheck
+  else
+    return BaseCheck
+  end
+end
+, 252);
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP", 
