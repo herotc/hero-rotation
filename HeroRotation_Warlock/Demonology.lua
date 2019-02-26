@@ -122,7 +122,7 @@ local function APL()
     -- augmentation
     -- summon_pet
     if S.SummonPet:IsCastableP() then
-      if HR.Cast(S.SummonPet) then return "summon_pet 3"; end
+      if HR.Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
     end
     -- inner_demons,if=talent.inner_demons.enabled
     -- snapshot_stats
@@ -172,7 +172,7 @@ local function APL()
     end
     -- grimoire_felguard
     if S.GrimoireFelguard:IsCastableP() then
-      if HR.Cast(S.GrimoireFelguard) then return "grimoire_felguard 34"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return "grimoire_felguard 34"; end
     end
     -- hand_of_guldan,if=soul_shard=5|soul_shard=4&buff.demonic_calling.remains
     if S.HandofGuldan:IsCastableP() and (Player:SoulShardsP() == 5 or Player:SoulShardsP() == 4 and bool(Player:BuffRemainsP(S.DemonicCallingBuff))) then
@@ -184,7 +184,7 @@ local function APL()
     end
     -- summon_demonic_tyrant,if=prev_gcd.1.call_dreadstalkers
     if S.SummonDemonicTyrant:IsCastableP() and (Player:PrevGCDP(1, S.CallDreadstalkers)) then
-      if HR.Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant 44"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant 44"; end
     end
     -- soul_strike,if=(soul_shard<3|soul_shard=4&buff.demonic_core.stack<=3)|buff.demonic_core.down&soul_shard<5
     if S.SoulStrike:IsCastableP() and ((Player:SoulShardsP() < 3 or Player:SoulShardsP() == 4 and Player:BuffStackP(S.DemonicCoreBuff) <= 3) or Player:BuffDownP(S.DemonicCoreBuff) and Player:SoulShardsP() < 5) then
@@ -206,7 +206,7 @@ local function APL()
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
     if S.GrimoireFelguard:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() < 13) then
-      if HR.Cast(S.GrimoireFelguard) then return "grimoire_felguard 92"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return "grimoire_felguard 92"; end
     end
     -- call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
     if S.CallDreadstalkers:IsCastableP() and ((S.SummonDemonicTyrant:CooldownRemainsP() < 9 and bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or (S.SummonDemonicTyrant:CooldownRemainsP() < 11 and not bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or S.SummonDemonicTyrant:CooldownRemainsP() > 14) then
@@ -214,7 +214,7 @@ local function APL()
     end
     -- summon_demonic_tyrant
     if S.SummonDemonicTyrant:IsCastableP() then
-      if HR.Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant 110"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant 110"; end
     end
     -- hand_of_guldan,if=soul_shard>=5
     if S.HandofGuldan:IsCastableP() and (Player:SoulShardsP() >= 5) then
@@ -270,7 +270,7 @@ local function APL()
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
     if S.GrimoireFelguard:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() < 13) then
-      if HR.Cast(S.GrimoireFelguard) then return "grimoire_felguard 183"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return "grimoire_felguard 183"; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
     if S.SummonVilefiend:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 40 or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
@@ -290,11 +290,11 @@ local function APL()
     end
     -- summon_demonic_tyrant,if=buff.nether_portal.remains<5&soul_shard=0
     if S.SummonDemonicTyrant:IsCastableP() and (Player:BuffRemainsP(S.NetherPortalBuff) < 5 and Player:SoulShardsP() == 0) then
-      if HR.Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant 243"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant 243"; end
     end
     -- summon_demonic_tyrant,if=buff.nether_portal.remains<action.summon_demonic_tyrant.cast_time+0.5
     if S.SummonDemonicTyrant:IsCastableP() and (Player:BuffRemainsP(S.NetherPortalBuff) < S.SummonDemonicTyrant:CastTime() + 0.5) then
-      if HR.Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant 247"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant 247"; end
     end
     -- demonbolt,if=buff.demonic_core.up&soul_shard<=3
     if S.Demonbolt:IsCastableP() and (Player:BuffP(S.DemonicCoreBuff) and Player:SoulShardsP() <= 3) then
@@ -395,7 +395,7 @@ local function APL()
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13
     if S.GrimoireFelguard:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() < 13) then
-      if HR.Cast(S.GrimoireFelguard) then return "grimoire_felguard 383"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return "grimoire_felguard 383"; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
     if S.SummonVilefiend:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 40 or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
@@ -411,7 +411,7 @@ local function APL()
     end
     -- summon_demonic_tyrant,if=soul_shard<3&(!talent.demonic_consumption.enabled|buff.wild_imps.stack>0)
     if S.SummonDemonicTyrant:IsCastableP() and (Player:SoulShardsP() < 3 and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() > 0)) then
-      if HR.Cast(S.SummonDemonicTyrant) then return "summon_demonic_tyrant 407"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant 407"; end
     end
     -- power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
     if S.PowerSiphon:IsCastableP() and (WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 and Player:BuffDownP(S.DemonicPowerBuff) and Cache.EnemiesCount[40] < 2) then

@@ -61,20 +61,17 @@
     },
     Demonology = {
       UnendingResolveHP = 20,
-      ShowBPoI = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
-        SummonFelguard = true,
-        GrimoireFelguard = true,
-        DemonicEmpowerment = true,
-        SummonTyrant = true,
+        SummonPet = false,
+        GrimoireFelguard = false,
+        SummonDemonicTyrant = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
         UnendingResolve = true,
-        SoulHarvest = true,
       }
     },
     Affliction = {
