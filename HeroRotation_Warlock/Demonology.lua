@@ -28,7 +28,6 @@ Spell.Warlock.Demonology = {
   ShadowBolt                            = Spell(686),
   HandofGuldan                          = Spell(105174),
   Implosion                             = Spell(196277),
-  ExplosivePotentialBuff                = Spell(275395),
   Doom                                  = Spell(265412),
   DemonicStrength                       = Spell(267171),
   BilescourgeBombers                    = Spell(267211),
@@ -48,6 +47,7 @@ Spell.Warlock.Demonology = {
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
   ExplosivePotential                    = Spell(275395),
+  ExplosivePotentialBuff                = Spell(275398),
   BalefulInvocation                     = Spell(287059),
   DemonicConsumption                    = Spell(267215),
 };
