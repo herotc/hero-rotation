@@ -33,6 +33,7 @@
       }
     },
     BeastMastery = {
+      UseSplashData = true,
       ExhilarationHP = 30,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -102,6 +103,7 @@
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   -- Beast Mastery
+  CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Multi-Shot, Beast Cleave, and Stomp");
   CreatePanelOption("Slider", CP_BeastMastery, "APL.Hunter.BeastMastery.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");

@@ -29,20 +29,24 @@ do
     LastDamaged={},
     Timeout=4
   }
-  
-  local Multishot = {
-    -- Multi-Shot
-    Range=10,
-    LastDamageTime=0,
-    LastDamaged={},
-    Timeout=6
-  }
 
   HL.RangeTracker = {
     AbilityTimeout = 1,
     NucleusAbilities = {
-      [2643]   = Multishot,
-      [257620] = Multishot,
+      [2643]   = {
+        -- Multi-Shot (Beast Mastery)
+        Range=8,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=4
+      },
+      [257620]   = {
+        -- Multi-Shot (Marksmanship)
+        Range=10,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=6
+      },
       [194392] = {
         -- Volley
         Range=8,
