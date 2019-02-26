@@ -138,7 +138,7 @@ local function APL()
       if HR.Cast(S.Defile) then return "defile 14"; end
     end
     -- epidemic,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
-    if S.Epidemic:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and Player:Rune() < 2 and not bool(VarPoolingForGargoyle)) then
+    if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:Rune() < 2 and not bool(VarPoolingForGargoyle)) then
       if HR.Cast(S.Epidemic) then return "epidemic 16"; end
     end
     -- death_coil,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
@@ -154,7 +154,7 @@ local function APL()
       if HR.Cast(S.ClawingShadows) then return "clawing_shadows 28"; end
     end
     -- epidemic,if=!variable.pooling_for_gargoyle
-    if S.Epidemic:IsCastableP() and (not bool(VarPoolingForGargoyle)) then
+    if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle)) then
       if HR.Cast(S.Epidemic) then return "epidemic 32"; end
     end
     -- festering_strike,target_if=debuff.festering_wound.stack<=1&cooldown.death_and_decay.remains
