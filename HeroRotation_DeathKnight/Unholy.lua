@@ -103,7 +103,7 @@ local function EvaluateCycleSoulReaper151(TargetUnit)
 end
 
 local function EvaluateCycleOutbreak275(TargetUnit)
-  return TargetUnit:DebuffRemainsP(S.VirulentPlagueDebuff) <= (Player:GCD() + Player:GCDRemains())
+  return TargetUnit:DebuffRemainsP(S.VirulentPlagueDebuff) <= Player:GCD()
 end
 --- ======= ACTION LISTS =======
 local function APL()
