@@ -125,7 +125,7 @@ local function APL()
     end
     -- army_of_the_dead,delay=2
     if S.ArmyoftheDead:IsCastableP() then
-      if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 8"; end
+      if HR.Cast(S.ArmyoftheDead) then return "army_of_the_dead 8"; end
     end
   end
   Aoe = function()
@@ -201,7 +201,7 @@ local function APL()
   Cooldowns = function()
     -- army_of_the_dead
     if S.ArmyoftheDead:IsCastableP() then
-      if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 113"; end
+      if HR.Cast(S.ArmyoftheDead) then return "army_of_the_dead 113"; end
     end
     -- apocalypse,if=debuff.festering_wound.stack>=4
     if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4) then
