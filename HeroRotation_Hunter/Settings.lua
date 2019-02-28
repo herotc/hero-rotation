@@ -58,8 +58,9 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
+        SummonPet = false,
         AMurderofCrows = false,
-        TrueShot = false,
+        Trueshot = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
