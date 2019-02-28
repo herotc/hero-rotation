@@ -47,7 +47,9 @@ Spell.DeathKnight.Unholy = {
   Berserking                            = Spell(26297),
   Outbreak                              = Spell(77575),
   OutbreakDebuff                        = Spell(196782),
-  VirulentPlagueDebuff                  = Spell(191587)
+  VirulentPlagueDebuff                  = Spell(191587),
+  DeathStrike                           = Spell(49998),
+  DeathStrikeBuff                       = Spell(101568)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -94,6 +96,10 @@ local function bool(val)
   return val ~= 0
 end
 
+local function DeathStrikeHeal()
+  return (Settings.General.SoloMode and Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP) and true or false;
+end
+
 local function EvaluateCycleFesteringStrike40(TargetUnit)
   return TargetUnit:DebuffStackP(S.FesteringWoundDebuff) <= 1 and bool(S.DeathandDecay:CooldownRemainsP())
 end
@@ -110,6 +116,7 @@ local function APL()
   local Precombat, Aoe, Cooldowns, Generic
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  local no_heal = not DeathStrikeHeal()
   Precombat = function()
     -- flask
     -- food
@@ -279,6 +286,14 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- use DeathStrike on low HP in Solo Mode
+    if not no_heal and S.DeathStrike:IsReadyP("Melee") then
+      if HR.Cast(S.DeathStrike) then return ""; end
+    end
+    -- use DeathStrike with Proc in Solo Mode
+    if Settings.General.SoloMode and S.DeathStrike:IsReadyP("Melee") and Player:BuffP(S.DeathStrikeBuff) then
+      if HR.Cast(S.DeathStrike) then return ""; end
+    end
     -- auto_attack
     -- variable,name=pooling_for_gargoyle,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle.enabled
     if (true) then
