@@ -61,6 +61,8 @@
         SummonPet = false,
         AMurderofCrows = false,
         Trueshot = false,
+        HuntersMark = false,
+        DoubleTap = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
