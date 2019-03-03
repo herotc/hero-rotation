@@ -138,7 +138,7 @@ local function APL()
   end
 
   --- Out of Combat
-  if not Player:AffectingCombat() then
+  if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     -- potion
     if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
       if HR.CastSuggested(I.ProlongedPower) then return ""; end

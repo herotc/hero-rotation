@@ -123,17 +123,19 @@ local function APL()
       if HR.Cast(S.SummonPet, Settings.BeastMastery.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
     end
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
-    end
-    -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
-    if S.AspectoftheWild:IsCastableP() and Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled()) then
-      if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
-    end
-    -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
-    if S.BestialWrath:IsCastableP() and Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) then
-      if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
+      end
+      -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
+      if S.AspectoftheWild:IsCastableP() and Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled()) then
+        if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
+      end
+      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
+      if S.BestialWrath:IsCastableP() and Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) then
+        if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
+      end
     end
   end
   Cds = function()

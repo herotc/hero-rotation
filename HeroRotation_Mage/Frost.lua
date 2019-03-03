@@ -113,17 +113,19 @@ local function APL()
       if HR.Cast(S.SummonWaterElemental) then return "summon_water_elemental 7"; end
     end
     -- snapshot_stats
-    -- mirror_image
-    if S.MirrorImage:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 10"; end
-    end
-    -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 12"; end
-    end
-    -- frostbolt
-    if S.Frostbolt:IsCastableP() and Everyone.TargetIsValid() then
-      if HR.Cast(S.Frostbolt) then return "frostbolt 14"; end
+    if Everyone.TargetIsValid() then
+      -- mirror_image
+      if S.MirrorImage:IsCastableP() and HR.CDsON() then
+        if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 10"; end
+      end
+      -- potion
+      if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 12"; end
+      end
+      -- frostbolt
+      if S.Frostbolt:IsCastableP() and Everyone.TargetIsValid() then
+        if HR.Cast(S.Frostbolt) then return "frostbolt 14"; end
+      end
     end
   end
   Aoe = function()

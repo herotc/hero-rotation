@@ -116,9 +116,11 @@ local function APL()
     -- food
     -- augmentation
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      end
     end
   end
   Execute = function()

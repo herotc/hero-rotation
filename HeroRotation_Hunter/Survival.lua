@@ -199,17 +199,19 @@ local function APL()
       if HR.Cast(S.SummonPet, Settings.Survival.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
     end
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
-    end
-    -- steel_trap
-    if S.SteelTrap:IsCastableP() and Player:DebuffDownP(S.SteelTrapDebuff) and Everyone.TargetIsValid() then
-      if HR.Cast(S.SteelTrap) then return "steel_trap 8"; end
-    end
-    -- harpoon
-    if S.Harpoon:IsCastableP() and Everyone.TargetIsValid() then
-      if HR.Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon) then return "harpoon 12"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
+      end
+      -- steel_trap
+      if S.SteelTrap:IsCastableP() and Player:DebuffDownP(S.SteelTrapDebuff) and Everyone.TargetIsValid() then
+        if HR.Cast(S.SteelTrap) then return "steel_trap 8"; end
+      end
+      -- harpoon
+      if S.Harpoon:IsCastableP() and Everyone.TargetIsValid() then
+        if HR.Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon) then return "harpoon 12"; end
+      end
     end
   end
   Cds = function()

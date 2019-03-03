@@ -131,8 +131,10 @@ local function APL()
       if HR.Cast(S.RaiseDead) then return "raise_dead 6"; end
     end
     -- army_of_the_dead,delay=2
-    if S.ArmyoftheDead:IsCastableP() then
-      if HR.Cast(S.ArmyoftheDead) then return "army_of_the_dead 8"; end
+    if Everyone.TargetIsValid() then
+      if S.ArmyoftheDead:IsCastableP() then
+        if HR.Cast(S.ArmyoftheDead) then return "army_of_the_dead 8"; end
+      end
     end
   end
   Aoe = function()

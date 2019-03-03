@@ -110,25 +110,27 @@ local function APL()
       if HR.Cast(S.SummonPet, Settings.Marksmanship.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
     end
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 12"; end
-    end
-    -- hunters_mark
-    if S.HuntersMark:IsCastableP() and Target:DebuffDown(S.HuntersMarkDebuff) then
-      if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark) then return "hunters_mark 14"; end
-    end
-    -- double_tap,precast_time=10
-    if S.DoubleTap:IsCastableP() then
-      if HR.Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap 18"; end
-    end
-    -- trueshot,precast_time=1.5,if=active_enemies>2
-    if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (Cache.EnemiesCount[40] > 2) then
-      if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot 20"; end
-    end
-    -- aimed_shot,if=active_enemies<3
-    if S.AimedShot:IsReadyP() and (Hunter.GetSplashCount(Target, 10) < 3) then
-      if HR.Cast(S.AimedShot) then return "aimed_shot 38"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 12"; end
+      end
+      -- hunters_mark
+      if S.HuntersMark:IsCastableP() and Target:DebuffDown(S.HuntersMarkDebuff) then
+        if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark) then return "hunters_mark 14"; end
+      end
+      -- double_tap,precast_time=10
+      if S.DoubleTap:IsCastableP() then
+        if HR.Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap 18"; end
+      end
+      -- trueshot,precast_time=1.5,if=active_enemies>2
+      if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (Cache.EnemiesCount[40] > 2) then
+        if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot 20"; end
+      end
+      -- aimed_shot,if=active_enemies<3
+      if S.AimedShot:IsReadyP() and (Hunter.GetSplashCount(Target, 10) < 3) then
+        if HR.Cast(S.AimedShot) then return "aimed_shot 38"; end
+      end
     end
   end
   Cds = function()

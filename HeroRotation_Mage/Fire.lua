@@ -117,17 +117,19 @@ local function APL()
       if HR.Cast(S.ArcaneIntellect) then return ""; end
     end
     -- snapshot_stats
-    -- mirror_image
-    if S.MirrorImage:IsCastableP() then
-      if HR.Cast(S.MirrorImage) then return ""; end
-    end
-    -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return ""; end
-    end
-    -- pyroblast
-    if S.Pyroblast:IsCastableP() and Everyone.TargetIsValid() then
-      if HR.Cast(S.Pyroblast) then return ""; end
+    if Everyone.TargetIsValid() then
+      -- mirror_image
+      if S.MirrorImage:IsCastableP() then
+        if HR.Cast(S.MirrorImage) then return ""; end
+      end
+      -- potion
+      if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.ProlongedPower) then return ""; end
+      end
+      -- pyroblast
+      if S.Pyroblast:IsCastableP() and Everyone.TargetIsValid() then
+        if HR.Cast(S.Pyroblast) then return ""; end
+      end
     end
   end
   ActiveTalents = function()

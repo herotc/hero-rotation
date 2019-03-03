@@ -163,34 +163,36 @@ local function APL()
     -- flask
     -- food
     -- augmentation
-    -- regrowth,if=talent.bloodtalons.enabled
-    if S.Regrowth:IsCastableP() and (S.Bloodtalons:IsAvailable()) then
-      if HR.Cast(S.Regrowth) then return "regrowth 3"; end
-    end
-    -- variable,name=use_thrash,value=0
-    if (true) then
-      VarUseThrash = 0
-    end
-    -- variable,name=use_thrash,value=2,if=azerite.wild_fleshrending.enabled
-    if (S.WildFleshrending:AzeriteEnabled()) then
-      VarUseThrash = 2
-    end
-    -- cat_form
-    if S.CatForm:IsCastableP() and Player:BuffDownP(S.CatFormBuff) then
-      if HR.Cast(S.CatForm, Settings.Feral.GCDasOffGCD.CatForm) then return "cat_form 15"; end
-    end
-    -- prowl
-    if S.Prowl:IsCastableP() and Player:BuffDownP(S.ProwlBuff) then
-      if HR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "prowl 19"; end
-    end
-    -- snapshot_stats
-    -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 24"; end
-    end
-    -- berserk
-    if S.Berserk:IsCastableP() and Player:BuffDownP(S.BerserkBuff) and HR.CDsON() then
-      if HR.Cast(S.Berserk, Settings.Feral.OffGCDasOffGCD.Berserk) then return "berserk 26"; end
+    if Everyone.TargetIsValid() then
+      -- regrowth,if=talent.bloodtalons.enabled
+      if S.Regrowth:IsCastableP() and (S.Bloodtalons:IsAvailable()) then
+        if HR.Cast(S.Regrowth) then return "regrowth 3"; end
+      end
+      -- variable,name=use_thrash,value=0
+      if (true) then
+        VarUseThrash = 0
+      end
+      -- variable,name=use_thrash,value=2,if=azerite.wild_fleshrending.enabled
+      if (S.WildFleshrending:AzeriteEnabled()) then
+        VarUseThrash = 2
+      end
+      -- cat_form
+      if S.CatForm:IsCastableP() and Player:BuffDownP(S.CatFormBuff) then
+        if HR.Cast(S.CatForm, Settings.Feral.GCDasOffGCD.CatForm) then return "cat_form 15"; end
+      end
+      -- prowl
+      if S.Prowl:IsCastableP() and Player:BuffDownP(S.ProwlBuff) then
+        if HR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "prowl 19"; end
+      end
+      -- snapshot_stats
+      -- potion
+      if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 24"; end
+      end
+      -- berserk
+      if S.Berserk:IsCastableP() and Player:BuffDownP(S.BerserkBuff) and HR.CDsON() then
+        if HR.Cast(S.Berserk, Settings.Feral.OffGCDasOffGCD.Berserk) then return "berserk 26"; end
+      end
     end
   end
   Cooldowns = function()

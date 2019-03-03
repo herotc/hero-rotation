@@ -165,15 +165,15 @@ local function APL ()
 
   -- Pre Combat --
   Precombat = function()
-    -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
-    if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
-      if HR.Cast(S.ChiBurst) then 
-        return "Cast Pre-Combat Chi Burst"; end
-    end
-    -- actions.precombat+=/chi_wave
-    if S.ChiWave:IsReadyP() then
-      if HR.Cast(S.ChiWave) then 
-        return "Cast Pre-Combat Chi Wave"; end
+    if Everyone.TargetIsValid() then
+      -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
+      if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
+        if HR.Cast(S.ChiBurst) then return "Cast Pre-Combat Chi Burst"; end
+      end
+      -- actions.precombat+=/chi_wave
+      if S.ChiWave:IsReadyP() then
+        if HR.Cast(S.ChiWave) then return "Cast Pre-Combat Chi Wave"; end
+      end
     end
   end
 

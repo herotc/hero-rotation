@@ -105,13 +105,15 @@ local function APL()
     -- food
     -- augmentation
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
-    end
-    -- recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
-    if S.Recklessness:IsCastableP() and Player:BuffDownP(S.RecklessnessBuff) and HR.CDsON() and (not S.FuriousSlash:IsAvailable() and not S.RecklessAbandon:IsAvailable()) then
-      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 6"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      end
+      -- recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
+      if S.Recklessness:IsCastableP() and Player:BuffDownP(S.RecklessnessBuff) and HR.CDsON() and (not S.FuriousSlash:IsAvailable() and not S.RecklessAbandon:IsAvailable()) then
+        if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 6"; end
+      end
     end
   end
   Movement = function()

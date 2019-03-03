@@ -329,10 +329,11 @@
     
     -- Out of Combat
     if not Player:AffectingCombat() then
-      -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
-      if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
-        if HR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
-      end
+      if Everyone.TargetIsValid() and Target:IsInRange(range) then
+        -- actions.precombat+=/life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
+        if S.LifeTap:IsCastable() and S.EmpoweredLifeTap:IsAvailable() and Player:BuffRemainsP(S.EmpoweredLifeTapBuff) == 0 then
+          if HR.Cast(S.LifeTap, Settings.Commons.GCDasOffGCD.LifeTap) then return ""; end
+        end
       
       -- Flask
       -- Food
@@ -340,7 +341,6 @@
       -- PrePot w/ Bossmod Countdown
 		
       -- Opener
-      if Everyone.TargetIsValid() and Target:IsInRange(range) then
         if not Player:IsCasting() or (Player:IsCasting(S.Immolate) and S.RoaringBlaze:IsAvailable()) then
           if HR.Cast(CastImmolate) then return ""; end
         else

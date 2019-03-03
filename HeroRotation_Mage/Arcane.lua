@@ -172,17 +172,19 @@ local function APL()
       VarConserveMana = 60
     end
     -- snapshot_stats
-    -- mirror_image
-    if S.MirrorImage:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.MirrorImage) then return "mirror_image 14"; end
-    end
-    -- potion
-    if I.DeadlyGrace:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.DeadlyGrace) then return "deadly_grace 16"; end
-    end
-    -- arcane_blast
-    if S.ArcaneBlast:IsReadyP() then
-      if HR.Cast(S.ArcaneBlast) then return "arcane_blast 18"; end
+    if Everyone.TargetIsValid() then
+      -- mirror_image
+      if S.MirrorImage:IsCastableP() and HR.CDsON() then
+        if HR.Cast(S.MirrorImage) then return "mirror_image 14"; end
+      end
+      -- potion
+      if I.DeadlyGrace:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.DeadlyGrace) then return "deadly_grace 16"; end
+      end
+      -- arcane_blast
+      if S.ArcaneBlast:IsReadyP() then
+        if HR.Cast(S.ArcaneBlast) then return "arcane_blast 18"; end
+      end
     end
   end
   Burn = function()

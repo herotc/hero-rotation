@@ -121,13 +121,15 @@ local function APL()
     -- food
     -- augmentation
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
-    end
-    -- arcane_torrent,if=!talent.wake_of_ashes.enabled
-    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (not S.WakeofAshes:IsAvailable()) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 6"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      end
+      -- arcane_torrent,if=!talent.wake_of_ashes.enabled
+      if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (not S.WakeofAshes:IsAvailable()) then
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 6"; end
+      end
     end
   end
   Cooldowns = function()

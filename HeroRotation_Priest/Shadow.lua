@@ -147,45 +147,47 @@ local function APL()
     -- food
     -- augmentation
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 4"; end
-    end
-    -- variable,name=mind_blast_targets,op=set,value=floor((4.5+azerite.whispers_of_the_damned.rank)%(1+0.4*azerite.searing_dialogue.rank))
-    if (true) then
-      VarMindBlastTargets = math.floor ((4.5 + S.WhispersoftheDamned:AzeriteRank()) / (1 + 0.4 * S.SearingDialogue:AzeriteRank()))
-    end
-    -- variable,name=swp_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank+0.2*azerite.thought_harvester.rank)*(1-0.018*azerite.searing_dialogue.rank*spell_targets.mind_sear)*(1-0.14*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
-    if (true) then
-      VarSwpTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() + 0.2 * S.ThoughtHarvester:AzeriteRank()) * (1 - 0.018 * S.SearingDialogue:AzeriteRank() * Cache.EnemiesCount[40]) * (1 - 0.14 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
-    end
-    -- variable,name=vt_trait_ranks_check,op=set,value=(1-0.04*azerite.thought_harvester.rank-0.05*azerite.spiteful_apparitions.rank)*(1+0.15*azerite.searing_dialogue.rank*spell_targets.mind_sear)
-    if (true) then
-      VarVtTraitRanksCheck = (1 - 0.04 * S.ThoughtHarvester:AzeriteRank() - 0.05 * S.SpitefulApparitions:AzeriteRank()) * (1 + 0.15 * S.SearingDialogue:AzeriteRank() * Cache.EnemiesCount[40])
-    end
-    -- variable,name=vt_mis_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank-0.03*azerite.thought_harvester.rank-0.055*azerite.spiteful_apparitions.rank)*(1-0.04*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
-    if (true) then
-      VarVtMisTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() - 0.03 * S.ThoughtHarvester:AzeriteRank() - 0.055 * S.SpitefulApparitions:AzeriteRank()) * (1 - 0.04 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
-    end
-    -- variable,name=vt_mis_sd_check,op=set,value=1-0.014*azerite.searing_dialogue.rank
-    if (true) then
-      VarVtMisSdCheck = 1 - 0.014 * S.SearingDialogue:AzeriteRank()
-    end
-    -- shadowform,if=!buff.shadowform.up
-    if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (not Player:BuffP(S.ShadowformBuff)) then
-      if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 48"; end
-    end
-    -- mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
-    if S.MindBlast:IsReadyP() and Everyone.TargetIsValid() and (Cache.EnemiesCount[40] < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.MindBlast) then
-      if HR.Cast(S.MindBlast) then return "mind_blast 54"; end
-    end
-    -- shadow_word_void (added)
-    if S.ShadowWordVoid:IsReadyP() and Everyone.TargetIsValid() and not Player:IsCasting(S.ShadowWordVoid) and (Cache.EnemiesCount[40] < 2 or S.ThoughtHarvester:AzeriteRank() == 0) then
-      if HR.Cast(S.ShadowWordVoid) then return "shadow_word_void added 1"; end
-    end
-    -- vampiric_touch
-    if S.VampiricTouch:IsCastableP() and not Player:IsCasting(S.VampiricTouch) and Player:DebuffDownP(S.VampiricTouchDebuff) and Everyone.TargetIsValid() then
-      if HR.Cast(S.VampiricTouch) then return "vampiric_touch 58"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 4"; end
+      end
+      -- variable,name=mind_blast_targets,op=set,value=floor((4.5+azerite.whispers_of_the_damned.rank)%(1+0.4*azerite.searing_dialogue.rank))
+      if (true) then
+        VarMindBlastTargets = math.floor ((4.5 + S.WhispersoftheDamned:AzeriteRank()) / (1 + 0.4 * S.SearingDialogue:AzeriteRank()))
+      end
+      -- variable,name=swp_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank+0.2*azerite.thought_harvester.rank)*(1-0.018*azerite.searing_dialogue.rank*spell_targets.mind_sear)*(1-0.14*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
+      if (true) then
+        VarSwpTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() + 0.2 * S.ThoughtHarvester:AzeriteRank()) * (1 - 0.018 * S.SearingDialogue:AzeriteRank() * Cache.EnemiesCount[40]) * (1 - 0.14 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
+      end
+      -- variable,name=vt_trait_ranks_check,op=set,value=(1-0.04*azerite.thought_harvester.rank-0.05*azerite.spiteful_apparitions.rank)*(1+0.15*azerite.searing_dialogue.rank*spell_targets.mind_sear)
+      if (true) then
+        VarVtTraitRanksCheck = (1 - 0.04 * S.ThoughtHarvester:AzeriteRank() - 0.05 * S.SpitefulApparitions:AzeriteRank()) * (1 + 0.15 * S.SearingDialogue:AzeriteRank() * Cache.EnemiesCount[40])
+      end
+      -- variable,name=vt_mis_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank-0.03*azerite.thought_harvester.rank-0.055*azerite.spiteful_apparitions.rank)*(1-0.04*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
+      if (true) then
+        VarVtMisTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() - 0.03 * S.ThoughtHarvester:AzeriteRank() - 0.055 * S.SpitefulApparitions:AzeriteRank()) * (1 - 0.04 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
+      end
+      -- variable,name=vt_mis_sd_check,op=set,value=1-0.014*azerite.searing_dialogue.rank
+      if (true) then
+        VarVtMisSdCheck = 1 - 0.014 * S.SearingDialogue:AzeriteRank()
+      end
+      -- shadowform,if=!buff.shadowform.up
+      if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (not Player:BuffP(S.ShadowformBuff)) then
+        if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 48"; end
+      end
+      -- mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
+      if S.MindBlast:IsReadyP() and Everyone.TargetIsValid() and (Cache.EnemiesCount[40] < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.MindBlast) then
+        if HR.Cast(S.MindBlast) then return "mind_blast 54"; end
+      end
+      -- shadow_word_void (added)
+      if S.ShadowWordVoid:IsReadyP() and Everyone.TargetIsValid() and not Player:IsCasting(S.ShadowWordVoid) and (Cache.EnemiesCount[40] < 2 or S.ThoughtHarvester:AzeriteRank() == 0) then
+        if HR.Cast(S.ShadowWordVoid) then return "shadow_word_void added 1"; end
+      end
+      -- vampiric_touch
+      if S.VampiricTouch:IsCastableP() and not Player:IsCasting(S.VampiricTouch) and Player:DebuffDownP(S.VampiricTouchDebuff) and Everyone.TargetIsValid() then
+        if HR.Cast(S.VampiricTouch) then return "vampiric_touch 58"; end
+      end
     end
   end
   Cleave = function()

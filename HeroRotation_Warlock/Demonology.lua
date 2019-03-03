@@ -126,13 +126,15 @@ local function APL()
     end
     -- inner_demons,if=talent.inner_demons.enabled
     -- snapshot_stats
-    -- potion
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 10"; end
-    end
-    -- demonbolt
-    if S.Demonbolt:IsCastableP() then
-      if HR.Cast(S.Demonbolt) then return "demonbolt 12"; end
+    if Everyone.TargetIsValid() then
+      -- potion
+      if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 10"; end
+      end
+      -- demonbolt
+      if S.Demonbolt:IsCastableP() then
+        if HR.Cast(S.Demonbolt) then return "demonbolt 12"; end
+      end
     end
   end
   BuildAShard = function()
@@ -332,7 +334,7 @@ local function APL()
     end
   end
   -- call precombat
-  if not Player:AffectingCombat() and Everyone.TargetIsValid() and not Player:IsCasting() then
+  if not Player:AffectingCombat() and not Player:IsCasting() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then

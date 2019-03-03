@@ -264,7 +264,7 @@ local function APL ()
     -- Food
     -- Rune
     -- PrePot w/ DBM Count
-    if Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost() then
+    if Everyone.TargetIsValid() then
       return Normal();
     end
     return;
