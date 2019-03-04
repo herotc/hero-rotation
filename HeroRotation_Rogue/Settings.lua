@@ -107,7 +107,7 @@
         Shadowmeld = true,
         ShadowDance = true
       },
-      AlwaysUsePriorityRotation = false
+      UsePriorityRotation = "Never"
     }
   };
 
@@ -150,4 +150,4 @@
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.ShadowDance", "Stealth Combo - Shadow Dance", "Allow suggesting Shadow Dance stealth ability combos (recommended)");
-  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.AlwaysUsePriorityRotation", "Always use Priority Rotation", "Always show rotation for maximum priority damage (at the cost of overall damage). Zul Mythic will use priority rotation automatically without setting this.");
+  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.UsePriorityRotation", {"Never", "On Bosses", "Always"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall damage). Zul Mythic will use priority rotation automatically without setting this.");

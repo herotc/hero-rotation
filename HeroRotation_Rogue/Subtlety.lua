@@ -163,7 +163,10 @@ local function UsePriorityRotation()
   if Cache.EnemiesCount[10] < 2 then
     return false
   end
-  if Settings.Subtlety.AlwaysUsePriorityRotation then
+  if Settings.Subtlety.UsePriorityRotation == "Always" then
+    return true
+  end
+  if Settings.Subtlety.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
     return true
   end
   -- Zul Mythic
