@@ -63,6 +63,7 @@ local tableinsert = table.insert;
     ShurikenTornado                       = Spell(277925),
     Subterfuge                            = Spell(108208),
     Vigor                                 = Spell(14983),
+    Weaponmaster                          = Spell(193537),
     -- Azerite Traits
     BladeInTheShadows                     = Spell(275896),
     Inevitability                         = Spell(278683),
@@ -305,8 +306,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
       if HR.Cast(S.Shadowstrike) then return "Cast Shadowstrike (3T BitS)"; end
     end
   end
-  -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
-  if S.Shadowstrike:IsCastableP() and UsePriorityRotation() and (Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 or (S.Inevitability:AzeriteEnabled() and Player:BuffP(S.SymbolsofDeath) and Cache.EnemiesCount[10] <= 3 + num(S.BladeInTheShadows:AzeriteEnabled()))) then
+  -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(talent.find_weakness.enabled&debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=4|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
+  if S.Shadowstrike:IsCastableP() and UsePriorityRotation() and (S.FindWeakness:IsAvailable() and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 or S.Weaponmaster:IsAvailable() and Cache.EnemiesCount[10] <= 4 or S.Inevitability:AzeriteEnabled() and Player:BuffP(S.SymbolsofDeath) and Cache.EnemiesCount[10] <= 3 + num(S.BladeInTheShadows:AzeriteEnabled())) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -785,8 +786,8 @@ HR.SetAPL(261, APL);
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
 -- # Without Deeper Stratagem and 3 Ranks of Blade in the Shadows it is worth using Shadowstrike on 3 targets.
 -- actions.stealthed+=/shadowstrike,if=!talent.deeper_stratagem.enabled&azerite.blade_in_the_shadows.rank=3&spell_targets.shuriken_storm=3
--- # For priority rotation, use Shadowstrike over Storm if FW is running off (on any amount of targets) or to maximize SoD extension with Inevitability on 3 targets (4 with BitS).
--- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
+-- # For priority rotation, use Shadowstrike over Storm 1) with WM against up to 4 targets, 2) if FW is running off (on any amount of targets), or 3) to maximize SoD extension with Inevitability on 3 targets (4 with BitS).
+-- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(talent.find_weakness.enabled&debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=4|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
 -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
 -- actions.stealthed+=/shadowstrike
 --
