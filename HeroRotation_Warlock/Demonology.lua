@@ -111,6 +111,7 @@ end
 local function EvaluateCycleDoom162(TargetUnit)
   return TargetUnit:DebuffRefreshableCP(S.DoomDebuff)
 end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, BuildAShard, DconEpOpener, Implosion, NetherPortal, NetherPortalActive, NetherPortalBuilding
@@ -149,7 +150,7 @@ local function APL()
   end
   DconEpOpener = function()
     -- hand_of_guldan,line_cd=30
-    if S.HandofGuldan:IsCastableP() and (HL.CombatTime() < 5 and Player:SoulShardsP() > 2) then
+    if S.HandofGuldan:IsCastableP() and (HL.CombatTime() < 2 and Player:SoulShardsP() > 2) then
       if HR.Cast(S.HandofGuldan) then return "hand_of_guldan 18"; end
     end
     -- implosion,if=buff.wild_imps.stack>2&buff.explosive_potential.down
