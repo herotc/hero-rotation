@@ -162,7 +162,7 @@ local function APL()
     end
     -- demonic_strength
     if S.DemonicStrength:IsCastableP() then
-      if HR.Cast(S.DemonicStrength) then return "demonic_strength 28"; end
+      if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 28"; end
     end
     -- bilescourge_bombers
     if S.BilescourgeBombers:IsCastableP() then
@@ -385,7 +385,7 @@ local function APL()
     end
     -- demonic_strength,if=(buff.wild_imps.stack<6|buff.demonic_power.up)|spell_targets.implosion<2
     if S.DemonicStrength:IsCastableP() and ((WildImpsCount() < 6 or Player:BuffP(S.DemonicPowerBuff)) or Cache.EnemiesCount[40] < 2) then
-      if HR.Cast(S.DemonicStrength) then return "demonic_strength 371"; end
+      if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 371"; end
     end
     -- call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
     if (S.NetherPortal:IsAvailable() and Cache.EnemiesCount[40] <= 2) then

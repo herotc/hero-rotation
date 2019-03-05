@@ -67,6 +67,7 @@
         SummonPet = false,
         GrimoireFelguard = false,
         SummonDemonicTyrant = false,
+        DemonicStrength = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

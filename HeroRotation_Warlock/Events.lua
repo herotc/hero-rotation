@@ -12,7 +12,7 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- Lua
-  
+  local find = string.find
   -- File Locals
   
 
@@ -98,18 +98,36 @@
     };
     
   HL.GuardiansTable = {
-      --{ID, name, spawnTime, ImpCasts, Duration, despawnTime}
-      Pets = { 
-      },
-      ImpCount = 0,
+    --{ID, name, spawnTime, ImpCasts, Duration, despawnTime}
+    Pets = { 
+    },
+    ImpCount = 0,
 	  FelguardDuration = 0,
 	  DreadstalkerDuration = 0,
 	  DemonicTyrantDuration = 0
-    };
+  };
 	
-    local PetDurations = {["Dreadstalker"] = 12.25, ["Wild Imp"] = 20, ["Felguard"] = 28, ["Demonic Tyrant"] = 15};
-	local PetTypes = {["Dreadstalker"] = true, ["Wild Imp"]  = true, ["Felguard"]  = true, ["Demonic Tyrant"]  = true};
+  --local PetDurations = {["Dreadstalker"] = 12.25, ["Wild Imp"] = 20, ["Felguard"] = 28, ["Demonic Tyrant"] = 15};
+	--local PetTypes = {["Dreadstalker"] = true, ["Wild Imp"]  = true, ["Felguard"]  = true, ["Demonic Tyrant"]  = true};
   
+  local PetsData = {
+    [98035] = {
+      name = "Dreadstalker",
+      duration = 12.25
+    },
+    [55659] = {
+      name = "Wild Imp",
+      duration = 20
+    },
+    [17252] = {
+      name = "Felguard",
+      duration = 28
+    },
+    [135002] = {
+      name = "Demonic Tyrant",
+      duration = 15
+    },
+  }  
   
     --------------------------
     ----- Destruction --------
@@ -213,32 +231,35 @@
     -- Add demon to table
     HL:RegisterForSelfCombatEvent(
       function (...)
-        local tiemstamp,Event,_,_,_,_,_,UnitPetGUID,petName,_,_,SpellID=select(1,...)
+        local timestamp,Event,_,_,_,_,_,UnitPetGUID,_,_,_,SpellID=select(1,...)
+        local _, _, _, _, _, _, _, UnitPetID = find(UnitPetGUID, "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)")
+        UnitPetID = tonumber(UnitPetID)
        
         -- Add pet
-        if (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetTypes[petName]) then
+        if (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetsData[UnitPetID]) then
+          local summonedPet = PetsData[UnitPetID]
           local petTable = {
             ID = UnitPetGUID,
-            name = petName,
+            name = summonedPet.name,
             spawnTime = GetTime(),
             ImpCasts = 5,
-            Duration = PetDurations[petName],
-            despawnTime = GetTime() + tonumber(PetDurations[petName])
+            Duration = summonedPet.duration,
+            despawnTime = GetTime() + tonumber(summonedPet.duration)
           }
           table.insert(HL.GuardiansTable.Pets,petTable)
-		  if petName == "Wild Imp" then
+		      if summonedPet.name == "Wild Imp" then
             HL.GuardiansTable.ImpCount = HL.GuardiansTable.ImpCount + 1
-		  elseif petName == "Felguard" then
-		    HL.GuardiansTable.FelguardDuration = PetDurations[petName]
-		  elseif petName == "Dreadstalker" then
-		    HL.GuardiansTable.DreadstalkerDuration = PetDurations[petName]
-		  elseif petName == "Demonic Tyrant" then
-		    HL.GuardiansTable.DemonicTyrantDuration = PetDurations[petName]
-		  end
+		      elseif summonedPet.name == "Felguard" then
+		        HL.GuardiansTable.FelguardDuration = summonedPet.duration
+		      elseif summonedPet.name == "Dreadstalker" then
+		        HL.GuardiansTable.DreadstalkerDuration = summonedPet.duration
+		      elseif summonedPet.name == "Demonic Tyrant" then
+		        HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration
+		      end
         end
         
         -- Add 15 seconds and 7 casts to all pets when Tyrant is cast
-        if petName == "Demonic Tyrant" then
+        if PetsData[UnitPetID] and PetsData[UnitPetID].name == "Demonic Tyrant" then
           for key, petTable in pairs(HL.GuardiansTable.Pets) do
             if petTable then
               petTable.despawnTime = petTable.despawnTime + 15
@@ -267,8 +288,8 @@
           end
         end
         
-        -- Clear the imp table upon Implosion cast
-        if SpellID == 196277 then
+        -- Clear the imp table upon Implosion cast or Demonic Tyrant cast if Demonic Consumption is talented
+        if SourceGUID == Player:GUID() and (SpellID == 196277 or (SpellID == 265187 and Spell(267215):IsAvailable())) then
           for key, petTable in pairs(HL.GuardiansTable.Pets) do
             if petTable.name == "Wild Imp" then
               HL.GuardiansTable.Pets[key] = nil
