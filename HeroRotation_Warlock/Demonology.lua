@@ -71,14 +71,12 @@ local Settings = {
   Demonology = HR.GUISettings.APL.Warlock.Demonology
 };
 
-
 local EnemyRanges = {40}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
   end
 end
-
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -117,6 +115,7 @@ local function APL()
   local Precombat, BuildAShard, DconEpOpener, Implosion, NetherPortal, NetherPortalActive, NetherPortalBuilding
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  UpdatePetTable()
   Precombat = function()
     -- flask
     -- food

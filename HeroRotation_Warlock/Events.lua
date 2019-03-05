@@ -106,9 +106,6 @@
 	  DreadstalkerDuration = 0,
 	  DemonicTyrantDuration = 0
   };
-	
-  --local PetDurations = {["Dreadstalker"] = 12.25, ["Wild Imp"] = 20, ["Felguard"] = 28, ["Demonic Tyrant"] = 15};
-	--local PetTypes = {["Dreadstalker"] = true, ["Wild Imp"]  = true, ["Felguard"]  = true, ["Demonic Tyrant"]  = true};
   
   local PetsData = {
     [98035] = {
@@ -116,6 +113,10 @@
       duration = 12.25
     },
     [55659] = {
+      name = "Wild Imp",
+      duration = 20
+    },
+    [143622] = {
       name = "Wild Imp",
       duration = 20
     },
@@ -186,12 +187,11 @@
       , "SPELL_CAST_SUCCESS"
     );
     
-    
     --------------------------
     ----- Demonology ---------
     --------------------------
     -- Update the GuardiansTable
-    local function UpdatePetTable()
+    function UpdatePetTable()
       for key, petTable in pairs(HL.GuardiansTable.Pets) do
         if petTable then
           -- Remove expired pets
