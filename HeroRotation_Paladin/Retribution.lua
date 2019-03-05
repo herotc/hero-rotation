@@ -146,7 +146,7 @@ local function APL()
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
     end
     -- shield_of_vengeance
-    if S.ShieldofVengeance:IsCastableP() then
+    if S.ShieldofVengeance:IsCastableP() and Settings.Retribution.ShieldofVengeance then
       if HR.CastLeft(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
     end
     -- avenging_wrath,if=buff.inquisition.up|!talent.inquisition.enabled
@@ -242,7 +242,7 @@ local function APL()
     -- Common to all openers
     -- shield_of_vengeance
     if Opener1 == 0 then
-      if S.ShieldofVengeance:IsCastableP() then
+      if S.ShieldofVengeance:IsCastableP() and Settings.Retribution.ShieldofVengeance then
         if HR.CastLeft(S.ShieldofVengeance) then return "Common Opener 1 - Shield of Vengeance"; end
       else
         Opener1 = 1
