@@ -525,6 +525,10 @@ local function APL()
     if S.Rebuke:IsCastableP() and Target:IsInterruptible() and Settings.General.InterruptEnabled then
       if HR.CastAnnotated(S.Rebuke, false, "Interrupt") then return "rebuke 218"; end
     end
+    -- Set VarOpenerDone to 1 if character does not have any level 100 talents
+    if not S.DivinePurpose:IsAvailable() and not S.Crusade:IsAvailable() and not S.Inquisition:IsAvailable() then
+      VarOpenerDone = 1
+    end
     -- call_action_list,name=opener
     if VarOpenerDone == 0 then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
