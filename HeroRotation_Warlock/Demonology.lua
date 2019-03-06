@@ -122,6 +122,10 @@ local function ImpsSpawnedDuring(miliseconds)
     ImpSpawned = ImpSpawned + 1
   end
 
+  if Player:IsCasting(S.HandofGuldan) then
+    ImpSpawned = ImpSpawned + (Player:SoulShards() >= 3 and 3 or Player:SoulShards())
+  end
+
   ImpSpawned = ImpSpawned +  HL.GuardiansTable.ImpsSpawnedFromHoG
 
   return ImpSpawned
@@ -133,6 +137,7 @@ local function APL()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Warlock.UpdatePetTable()
+  Warlock.UpdateSoulShards()
   Precombat = function()
     -- flask
     -- food

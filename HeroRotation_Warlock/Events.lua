@@ -105,10 +105,10 @@
     FelguardDuration = 0,
     DreadstalkerDuration = 0,
     DemonicTyrantDuration = 0,
-    
+
     -- Used for Wild Imps spawn prediction
     InnerDemonsNextCast = 0,
-    ImpsSpawnedFromHoG = 0    
+    ImpsSpawnedFromHoG = 0
   };
 
   local PetsData = {
@@ -318,12 +318,19 @@
       , "SPELL_CAST_SUCCESS"
     );
 
-    -- Snapshot how many Soul Shards we have at the start of HoG cast
+    -- Keep track how many Soul Shards we have
+    Warlock.SoulShards = 0;
+    function Warlock.UpdateSoulShards()
+      Warlock.SoulShards = Player:SoulShards()
+    end
+
+    -- On Successful HoG cast add how many Imps will spawn
     HL:RegisterForSelfCombatEvent(
-      function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
+      function(_, event, _, _, _, _, _, _, _, _, _, SpellID)
         if SpellID == 105174 then
-          HL.GuardiansTable.ImpsSpawnedFromHoG = Player:SoulShardsP() >= 3 and 3 or Player:SoulShardsP()
+          HL.GuardiansTable.ImpsSpawnedFromHoG = HL.GuardiansTable.ImpsSpawnedFromHoG + (Warlock.SoulShards >= 3 and 3 or Warlock.SoulShards)
         end
       end
-      , "SPELL_CAST_START"
+      , "SPELL_CAST_SUCCESS"
     );
+
