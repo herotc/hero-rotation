@@ -480,10 +480,8 @@ function single_target()
     if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
   end
   --actions.single_target+=/flame_shock,moving=1,target_if=refreshable
-  if (Player:IsMoving() and Target:DebuffRefreshableCP(S.FlameShock)) then
-    if (S.FlameShock:IsReady() and flame_shock_refreshable) then
+  if S.FlameShock:IsReady() and (Player:IsMoving() and Target:DebuffRefreshableCP(S.FlameShock)) then
       if HR.Cast(S.FlameShock) then return "Cast FlameShock" end
-    end
   end
   --actions.single_target+=/flame_shock,moving=1,if=movement.distance>6
   --# Frost Shock is our movement filler.
