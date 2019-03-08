@@ -191,7 +191,7 @@ local function APL()
       if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 38"; end
     end
     -- bilescourge_bombers
-    if S.BilescourgeBombers:IsCastableP() then
+    if S.BilescourgeBombers:IsReadyP() then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 50"; end
     end
     -- soul_strike,line_cd=30,if=!buff.bloodlust.remains|time>5&prev_gcd.1.hand_of_guldan
@@ -265,7 +265,7 @@ local function APL()
       if HR.Cast(S.SummonVilefiend) then return "summon_vilefiend 168"; end
     end
     -- bilescourge_bombers,if=cooldown.summon_demonic_tyrant.remains>9
-    if S.BilescourgeBombers:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 9) then
+    if S.BilescourgeBombers:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 9) then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 174"; end
     end
     -- soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
@@ -297,7 +297,7 @@ local function APL()
   end
   NetherPortalActive = function()
     -- bilescourge_bombers
-    if S.BilescourgeBombers:IsCastableP() then
+    if S.BilescourgeBombers:IsReadyP() then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 213"; end
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
@@ -410,7 +410,7 @@ local function APL()
       if HR.Cast(S.Doom) then return "doom 381"; end
     end
     -- bilescourge_bombers,if=azerite.explosive_potential.rank>0&time<10&spell_targets.implosion<2&buff.dreadstalkers.remains&talent.nether_portal.enabled
-    if S.BilescourgeBombers:IsCastableP() and (S.ExplosivePotential:AzeriteRank() > 0 and HL.CombatTime() < 10 and Cache.EnemiesCount[40] < 2 and DreadStalkersTime() > 0 and S.NetherPortal:IsAvailable()) then
+    if S.BilescourgeBombers:IsReadyP() and (S.ExplosivePotential:AzeriteRank() > 0 and HL.CombatTime() < 10 and Cache.EnemiesCount[40] < 2 and DreadStalkersTime() > 0 and S.NetherPortal:IsAvailable()) then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 395"; end
     end
     -- demonic_strength,if=(buff.wild_imps.stack<6|buff.demonic_power.up)|spell_targets.implosion<2
@@ -438,7 +438,7 @@ local function APL()
       if HR.Cast(S.CallDreadstalkers) then return "call_dreadstalkers 427"; end
     end
     -- bilescourge_bombers
-    if S.BilescourgeBombers:IsCastableP() then
+    if S.BilescourgeBombers:IsReadyP() then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 439"; end
     end
     -- hand_of_guldan,if=(azerite.baleful_invocation.enabled|talent.demonic_consumption.enabled)&prev_gcd.1.hand_of_guldan&cooldown.summon_demonic_tyrant.remains<2
