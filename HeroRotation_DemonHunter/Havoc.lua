@@ -141,6 +141,10 @@ end
 local function PoolingForBladeDance()
   return BladeDance() and (Player:Fury() < (75 - (S.FirstBlood:IsAvailable() and 20 or 0)));
 end
+-- variable,name=pooling_for_eye_beam,value=talent.demonic.enabled&!talent.blind_fury.enabled&cooldown.eye_beam.remains<(gcd.max*2)&fury.deficit>20
+local function PoolingForEyeBeam()
+  return S.Demonic:IsAvailable() and not S.BlindFury:IsAvailable() and S.EyeBeam:CooldownRemainsP() < (Player:GCD() * 2) and Player:FuryDeficit() > 20;
+end
 -- variable,name=waiting_for_dark_slash,value=talent.dark_slash.enabled&!variable.pooling_for_blade_dance&!variable.pooling_for_meta&cooldown.dark_slash.up
 local function WaitingForDarkSlash()
   return S.DarkSlash:IsAvailable() and not PoolingForBladeDance() and not PoolingForMeta() and S.DarkSlash:IsReady();
@@ -159,9 +163,9 @@ local function APL()
       and (not (S.Demonic:IsAvailable() or PoolingForMeta() or WaitingForNemesis()) or Target:TimeToDie() < 25) then
       if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "Cast Metamorphosis"; end
     end
-    -- metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up&(!azerite.chaotic_transformation.enabled|!variable.blade_dance|!cooldown.blade_dance.ready)
-    if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and Player:BuffP(S.MetamorphosisBuff) 
-      and (not S.ChaoticTransformation:AzeriteEnabled() or not BladeDance() or not S.BladeDance:IsReady())) then
+    -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&cooldown.blade_dance.remains>gcd.max))
+    if S.Metamorphosis:IsCastable() and S.Demonic:IsAvailable()
+      and (not S.ChaoticTransformation:AzeriteEnabled() or (S.EyeBeam:CooldownRemainsP() > 20 and S.BladeDance:CooldownRemainsP() > Player:GCD())) then
       if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "Cast Metamorphosis (Demonic)"; end
     end
     -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
@@ -214,17 +218,18 @@ local function APL()
   local function Demonic()
     local InMeleeRange = IsInMeleeRange()
 
-    -- fel_barrage,if=active_enemies>desired_targets|raid_event.adds.in>30
-    if S.FelBarrage:IsCastable(8, true) then
-      if HR.Cast(S.FelBarrage) then return "Cast Fel Barrage"; end
-    end
     -- death_sweep,if=variable.blade_dance
     if S.DeathSweep:IsReady(8, true) and BladeDance() then
       if HR.Cast(S.DeathSweep) then return "Cast Death Sweep"; end
     end
-    -- eye_beam,if=!buff.metamorphosis.extended_by_demonic&(raid_event.adds.up|raid_event.adds.in>25)
+    -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
     if S.EyeBeam:IsReady(20, true) then
       if HR.Cast(S.EyeBeam) then return "Cast Eye Beam (AoE)"; end
+    end
+    -- fel_barrage,if=((!cooldown.eye_beam.up|buff.metamorphosis.up)&raid_event.adds.in>30)|active_enemies>desired_targets
+    if S.FelBarrage:IsCastable(8, true)
+      and ((S.EyeBeam:CooldownRemainsP() == 0 or Player:BuffP(S.MetamorphosisBuff)) or Cache.EnemiesCount[CleaveRangeID] > 1) then
+      if HR.Cast(S.FelBarrage) then return "Cast Fel Barrage"; end
     end
     -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
     if S.BladeDance:IsReady(8, true)
@@ -235,19 +240,16 @@ local function APL()
     if S.ImmolationAura:IsCastable(8, true) then
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
     end
-    -- felblade,if=fury<40|(buff.metamorphosis.down&fury.deficit>=40)
-    if S.Felblade:IsCastable(S.Felblade)
-      and (Player:Fury() < 40 or (not Player:BuffP(S.MetamorphosisBuff) and Player:FuryDeficit() >= 40)) then
-      if HR.Cast(S.Felblade) then return "Cast Felblade"; end
-    end
-    -- annihilation,if=(talent.blind_fury.enabled|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
-    if InMeleeRange and S.Annihilation:IsReady()
-      and (S.BlindFury:IsAvailable() or Player:FuryDeficit() < 30 or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not PoolingForBladeDance() then
+    -- annihilation,if=!variable.pooling_for_blade_dance
+    if InMeleeRange and S.Annihilation:IsReady() and not PoolingForBladeDance() then
       if HR.Cast(S.Annihilation) then return "Cast Annihilation"; end
     end
-    -- chaos_strike,if=(talent.blind_fury.enabled|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
-    if InMeleeRange and S.ChaosStrike:IsReady()
-      and (S.BlindFury:IsAvailable() or Player:FuryDeficit() < 30) and not PoolingForBladeDance() then
+    -- felblade,if=fury.deficit>=40
+    if S.Felblade:IsCastable(S.Felblade) and Player:FuryDeficit() >= 40 then
+      if HR.Cast(S.Felblade) then return "Cast Felblade"; end
+    end
+    -- chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
+    if InMeleeRange and S.ChaosStrike:IsReady() and not PoolingForBladeDance() and not PoolingForEyeBeam() then
       if HR.Cast(S.ChaosStrike) then return "Cast Chaos Strike"; end
     end
     -- fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
@@ -399,7 +401,7 @@ end
 HR.SetAPL(577, APL);
 
 --- ======= SIMC =======
---- Last Update: Dec 13, 2018
+--- Last Update: Mar 09, 2019
 
 --[[
 # Executed before combat begins. Accepts non-harmful actions only.
@@ -417,6 +419,7 @@ actions+=/variable,name=blade_dance,value=talent.first_blood.enabled|spell_targe
 actions+=/variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 actions+=/variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30&(!variable.waiting_for_nemesis|cooldown.nemesis.remains<10)
 actions+=/variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
+actions+=/variable,name=pooling_for_eye_beam,value=talent.demonic.enabled&!talent.blind_fury.enabled&cooldown.eye_beam.remains<(gcd.max*2)&fury.deficit>20
 actions+=/variable,name=waiting_for_dark_slash,value=talent.dark_slash.enabled&!variable.pooling_for_blade_dance&!variable.pooling_for_meta&cooldown.dark_slash.up
 actions+=/variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
 actions+=/disrupt
@@ -427,23 +430,24 @@ actions+=/run_action_list,name=demonic,if=talent.demonic.enabled
 actions+=/run_action_list,name=normal
 
 actions.cooldown=metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis)|target.time_to_die<25
-actions.cooldown+=/metamorphosis,if=talent.demonic.enabled&buff.metamorphosis.up&(!azerite.chaotic_transformation.enabled|!variable.blade_dance|!cooldown.blade_dance.ready)
+actions.cooldown+=/metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&cooldown.blade_dance.remains>gcd.max))
 actions.cooldown+=/nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
 actions.cooldown+=/nemesis,if=!raid_event.adds.exists
 actions.cooldown+=/potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
+actions.cooldown+=/use_item,name=variable_intensity_gigavolt_oscillating_reactor
 
 actions.dark_slash=dark_slash,if=fury>=80&(!variable.blade_dance|!cooldown.blade_dance.ready)
 actions.dark_slash+=/annihilation,if=debuff.dark_slash.up
 actions.dark_slash+=/chaos_strike,if=debuff.dark_slash.up
 
-actions.demonic=fel_barrage,if=active_enemies>desired_targets|raid_event.adds.in>30
-actions.demonic+=/death_sweep,if=variable.blade_dance
-actions.demonic+=/eye_beam,if=!buff.metamorphosis.extended_by_demonic&(raid_event.adds.up|raid_event.adds.in>25)
+actions.demonic=death_sweep,if=variable.blade_dance
+actions.demonic+=/eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
+actions.demonic+=/fel_barrage,if=((!cooldown.eye_beam.up|buff.metamorphosis.up)&raid_event.adds.in>30)|active_enemies>desired_targets
 actions.demonic+=/blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
 actions.demonic+=/immolation_aura
-actions.demonic+=/felblade,if=fury<40|(buff.metamorphosis.down&fury.deficit>=40)
-actions.demonic+=/annihilation,if=(talent.blind_fury.enabled|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
-actions.demonic+=/chaos_strike,if=(talent.blind_fury.enabled|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
+actions.demonic+=/annihilation,if=!variable.pooling_for_blade_dance
+actions.demonic+=/felblade,if=fury.deficit>=40
+actions.demonic+=/chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
 actions.demonic+=/fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
 actions.demonic+=/demons_bite
 actions.demonic+=/throw_glaive,if=buff.out_of_range.up
