@@ -83,6 +83,7 @@ Item.Rogue.Assassination = {
   -- Trinkets
   GalecallersBoon       = Item(159614, {13, 14}),
   InvocationOfYulon     = Item(165568, {13, 14}),
+  LustrousGoldenPlumage = Item(159617, {13, 14}),
 };
 local I = Item.Rogue.Assassination;
 
@@ -249,11 +250,13 @@ local function CDs ()
 
     -- Trinkets
     if Settings.Commons.UseTrinkets then
-      -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains<=1&(!talent.subterfuge.enabled|dot.garrote.pmultiplier>1)|cooldown.vendetta.remains>45
-      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady()
-        and ((S.Vendetta:CooldownRemains() <= 1 and (not S.Subterfuge:IsAvailable() or Target:PMultiplier(S.Garrote) > 1))
-        or S.Vendetta:CooldownRemains() > 45) then
+      -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
+      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and S.Vendetta:CooldownRemains() > 45 then
         HR.CastSuggested(I.GalecallersBoon);
+      end
+      -- use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
+      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and Target:Debuff(S.Vendetta) then
+        HR.CastSuggested(I.LustrousGoldenPlumage);
       end
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
         HR.CastSuggested(I.InvocationOfYulon);

@@ -85,6 +85,7 @@ Item.Rogue.Outlaw = {
   -- Trinkets
   GalecallersBoon       = Item(159614, {13, 14}),
   InvocationOfYulon     = Item(165568, {13, 14}),
+  LustrousGoldenPlumage = Item(159617, {13, 14}),
 };
 local I = Item.Rogue.Outlaw;
 
@@ -294,6 +295,12 @@ local function CDs ()
     -- Trinkets
     -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
     if Settings.Commons.UseTrinkets then
+      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
+        HR.CastSuggested(I.GalecallersBoon);
+      end
+      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() then
+        HR.CastSuggested(I.LustrousGoldenPlumage);
+      end
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
         HR.CastSuggested(I.InvocationOfYulon);
       end
