@@ -115,6 +115,7 @@
   HL.AddCoreOverride ("Player.SoulShardsP",
     function (self)
       local Shard = Player:SoulShards()
+      Shard = math.floor(Shard)
       if not Player:IsCasting() then
         return Shard
       else
