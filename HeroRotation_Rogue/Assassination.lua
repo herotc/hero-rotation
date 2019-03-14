@@ -198,20 +198,23 @@ local function CheckTargetIfTarget(Mode, ModeEvaluation, IfEvaluation)
   local BestUnit, BestValue = nil, 0;
   local function RunTargetIfCycler(Range)
     for _, CycleUnit in pairs(Cache.Enemies[Range]) do
+      local ValueForUnit = ModeEvaluation(CycleUnit);
       if not BestUnit and Mode == "first" then
-        if ModeEvaluation(CycleUnit) ~= 0 then
-          BestUnit = CycleUnit;
+        if ValueForUnit ~= 0 then
+          BestUnit, BestValue = CycleUnit, ValueForUnit;
         end
       elseif Mode == "min" then
-        local ValueForUnit = ModeEvaluation(CycleUnit);
         if not BestUnit or ValueForUnit < BestValue then
           BestUnit, BestValue = CycleUnit, ValueForUnit;
         end
       elseif Mode == "max" then
-        local ValueForUnit = ModeEvaluation(CycleUnit);
         if not BestUnit or ValueForUnit > BestValue then
           BestUnit, BestValue = CycleUnit, ValueForUnit;
         end
+      end
+      -- Same mode value, prefer longer TTD
+      if BestUnit and ValueForUnit == BestValue and CycleUnit:TimeToDie() > BestUnit:TimeToDie() then
+        BestUnit, BestValue = CycleUnit, ValueForUnit;
       end
     end
   end
@@ -221,7 +224,7 @@ local function CheckTargetIfTarget(Mode, ModeEvaluation, IfEvaluation)
   if Settings.Assassination.RangedMultiDoT then
     RunTargetIfCycler(10);
   end
-  -- Prefer target if equal results
+  -- Prefer current target if equal mode value results to prevent "flickering"
   if BestUnit and BestValue == TargetsModeValue and IfEvaluation(Target) then
     return Target;
   end
