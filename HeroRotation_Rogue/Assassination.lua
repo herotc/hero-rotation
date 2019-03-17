@@ -249,6 +249,28 @@ local function SSBuffed(TargetUnit)
   return S.ShroudedSuffocation:AzeriteEnabled() and TargetUnit:PMultiplier(S.Garrote) > 1;
 end
 
+-- non_ss_buffed_targets
+local function NonSSBuffedTargets()
+  local count = 0;
+  for _, CycleUnit in pairs(Cache.Enemies[10]) do
+    if not CycleUnit:DebuffP(S.Garrote) or not SSBuffed(CycleUnit) then
+      count = count + 1;
+    end
+  end
+  return count;
+end
+
+-- ss_buffed_targets_above_pandemic
+local function SSBuffedTargetsAbovePandemic()
+  local count = 0;
+  for _, CycleUnit in pairs(Cache.Enemies[10]) do
+    if CycleUnit:DebuffRemainsP(S.Garrote) > 5.4 and SSBuffed(CycleUnit) then
+      count = count + 1;
+    end
+  end
+  return count;
+end
+
 local MythicDungeon;
 do
   local SappedSoulSpells = {
@@ -348,26 +370,19 @@ local function CDs ()
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
           VanishSuggested = true;
         end
-        -- actions.cds+=/variable,name=eb_exception,value=azerite.echoing_blades.enabled&spell_targets.fan_of_knives=2
-        local VarEbException = S.EchoingBlades:AzeriteEnabled() and Cache.EnemiesCount[10] == 2;
-        -- actions.cds+=/vanish,target_if=max:ss_buffed*(dot.garrote.remains-5.4-100*(spell_targets.fan_of_knives>=6)),if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(dot.garrote.refreshable|azerite.shrouded_suffocation.enabled&!variable.eb_exception&raid_event.adds.in>12)&(!ss_buffed|variable.eb_exception)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4
+        -- actions.cds+=/variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
+        local VarSSVanishCondition = S.ShroudedSuffocation:AzeriteEnabled() and (NonSSBuffedTargets() >= 1 or Cache.EnemiesCount[10] == 3)
+          and (SSBuffedTargetsAbovePandemic() == 0 or Cache.EnemiesCount[10] >= 6);
+        -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
         if not VanishSuggested and S.Subterfuge:IsAvailable() and not Player:IsStealthedP(true, false)
-          and S.Garrote:CooldownUp() then
-            local function VanishTargetIfFunc(TargetUnit)
-              return num(SSBuffed(TargetUnit)) * (TargetUnit:DebuffRemainsP(S.Garrote) - 5.4 - 100 * num(Cache.EnemiesCount[10] >= 6));
-            end
-            local function VanishIfFunc(TargetUnit)
-              return (TargetUnit:DebuffRefreshableP(S.Garrote, 5.4) or S.ShroudedSuffocation:AzeriteEnabled() and not VarEbException)
-                and (not SSBuffed(TargetUnit) or VarEbException)
-                and ComboPointsDeficit >= min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * Cache.EnemiesCount[10], 4);
-            end
-            if HR.AoEON() and CheckTargetIfTarget("max", VanishTargetIfFunc, VanishIfFunc) then
-              if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
-              VanishSuggested = true;
-            elseif not HR.AoEON() and VanishIfFunc(Target) then
-              if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
-              VanishSuggested = true;
-            end
+          and S.Garrote:CooldownUp() and (VarSSVanishCondition or not S.ShroudedSuffocation:AzeriteEnabled() and Target:DebuffRefreshableP(S.Garrote, 5.4))
+          and ComboPointsDeficit >= min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * Cache.EnemiesCount[10], 4) then
+          -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
+          if Player:EnergyPredicted() < 45 then
+            if HR.Cast(S.PoolEnergy) then return "Pool for Vanish (Subterfuge)"; end
+          end
+          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
+          VanishSuggested = true;
         end
         -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3
         if not VanishSuggested and S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0
@@ -405,12 +420,12 @@ local function Stealthed ()
   if S.Garrote:IsCastable("Melee") and S.Subterfuge:IsAvailable() then
     -- actions.stealthed+=/garrote,if=azerite.shrouded_suffocation.enabled&buff.subterfuge.up&buff.subterfuge.remains<1.3&!ss_buffed
     -- Not implemented because this is special for simc and we can have a shifting main target in reality where simc checks only a fix target on all normal abilities.
-    -- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&remains<12&target.time_to_die-remains>2
+    -- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&(remains<12|pmultiplier<=1)&target.time_to_die-remains>2
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemainsP(S.Garrote);
     end
     local function GarroteIfFunc(TargetUnit)
-      return TargetUnit:DebuffRemainsP(S.Garrote) < 12
+      return (TargetUnit:DebuffRemainsP(S.Garrote) < 12 or TargetUnit:PMultiplier(S.Garrote) <= 1)
         and (TargetUnit:FilteredTimeToDie(">", 2, -TargetUnit:DebuffRemainsP(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
@@ -430,12 +445,12 @@ local function Stealthed ()
     if HR.Cast(S.Rupture) then return "Cast Rupture (Shrouded Suffocation)"; end
   end
   if S.Garrote:IsCastable("Melee") and S.Subterfuge:IsAvailable() then
-    -- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&(!azerite.echoing_blades.enabled|spell_targets.fan_of_knives!=2)&target.time_to_die>remains&(remains<18|!ss_buffed)
+    -- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains&(remains<18|!ss_buffed)
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemainsP(S.Garrote);
     end
     local function GarroteIfFunc(TargetUnit)
-      return S.ShroudedSuffocation:AzeriteEnabled() and (not S.EchoingBlades:AzeriteEnabled() or Cache.EnemiesCount[10] ~= 2)
+      return S.ShroudedSuffocation:AzeriteEnabled()
         and (TargetUnit:FilteredTimeToDie(">", 0, -TargetUnit:DebuffRemainsP(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
         and (TargetUnit:DebuffRemainsP(S.Garrote) < 18 or not SSBuffed(TargetUnit))
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
@@ -478,6 +493,7 @@ local function Dot ()
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh())
         and (not HL.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5 and EmpoweredDotRefresh())
+        and not SSBuffed(TargetUnit)
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold) and (MasterAssassinRemains() <= 0 or not Target:DebuffP(S.Garrote));
     end
     local ttdval = Cache.EnemiesCount[10] <= 1 and 4 or 12;
@@ -693,7 +709,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-03-14
+-- Last Update: 2019-03-17
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -722,13 +738,16 @@ HR.SetAPL(259, APL);
 -- # Nighstalker, or Subt+Exsg on 1T: Snapshot Rupture
 -- actions.stealthed=rupture,if=combo_points>=4&(talent.nightstalker.enabled|talent.subterfuge.enabled&(talent.exsanguinate.enabled&cooldown.exsanguinate.remains<=2|!ticking)&variable.single_target)&target.time_to_die-remains>6
 -- # Subterfuge + Shrouded Suffocation: Ensure we use one global to apply Garrote to the main target if it is not snapshot yet, so all other main target abilities profit.
+-- actions.stealthed+=/pool_resource,for_next=1
 -- actions.stealthed+=/garrote,if=azerite.shrouded_suffocation.enabled&buff.subterfuge.up&buff.subterfuge.remains<1.3&!ss_buffed
 -- # Subterfuge: Apply or Refresh with buffed Garrotes
--- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&remains<12&target.time_to_die-remains>2
+-- actions.stealthed+=/pool_resource,for_next=1
+-- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&(remains<12|pmultiplier<=1)&target.time_to_die-remains>2
 -- # Subterfuge + Shrouded Suffocation in ST: Apply early Rupture that will be refreshed for pandemic
 -- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking&variable.single_target
--- # Subterfuge w/ Shrouded Suffocation: Reapply for bonus CP and/or extended snapshot duration, excepton with EB on 2T.
--- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&(!azerite.echoing_blades.enabled|spell_targets.fan_of_knives!=2)&target.time_to_die>remains&(remains<18|!ss_buffed)
+-- # Subterfuge w/ Shrouded Suffocation: Reapply for bonus CP and/or extended snapshot duration.
+-- actions.stealthed+=/pool_resource,for_next=1
+-- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains&(remains<18|!ss_buffed)
 -- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
 -- actions.stealthed+=/pool_resource,for_next=1
 -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
@@ -754,19 +773,16 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&variable.single_target)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
 -- # Vanish with Nightstalker + No Exsg: Maximum CP and Vendetta up
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
--- actions.cds+=/variable,name=eb_exception,value=azerite.echoing_blades.enabled&spell_targets.fan_of_knives=2
 -- # Vanish with Subterfuge:
 -- # - No stealth/subterfuge, Garrote ready and refreshable, enough space for incoming Garrote CP (up to deficit of 4)
 -- # - With Shrouded Suffocation:
--- #   - With Echoing Blades at 2T, no change (ignore the following).
--- #   - Ignore pandemic refreshable for non SS-Garrotes. Yes, fire away so you'll get the 30% bonus without having to cast another Garrote during Subterfuge.
--- #   - Require at least 1 target with no SS-Garrote (ran off or not applied), all other SS-Garotes refreshable.
--- #   - On 6+ targets, Vanish to Garrote 3 non-SS enemies.
--- # Technical note on what happens in the APL line: The if condition is only checked on the target_if target, which is by priority:
--- #   1. Target with longest SS-Garrote over pandemic threshold (if less than 6 enemies, positive value).
--- #   2. Target that has no SS-Garrote ticking (0 value).
--- #   3. Target with longest SS-Garrote in pandemic range (negative value).
--- actions.cds+=/vanish,target_if=max:ss_buffed*(dot.garrote.remains-5.4-100*(spell_targets.fan_of_knives>=6)),if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(dot.garrote.refreshable|azerite.shrouded_suffocation.enabled&!variable.eb_exception&raid_event.adds.in>12)&(!ss_buffed|variable.eb_exception)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4
+-- #   - Ignore pandemic refreshable for non SS-Garrotes, i.e. fire away so you'll get the 30% bonus without having to cast another Garrote during Subterfuge.
+-- #   - Up to 2 targets: Require one SS-Garrote to run off, and on 2T the other pandemic refreshable.
+-- #   - 3-5 targets: Require all SS-Garrotes pandemic refreshable and refresh those.
+-- #   - 6+ targets: Vanish to Garrote three non-SS enemies.
+-- actions.cds+=/variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
+-- actions.cds+=/pool_resource,for_next=1,extra_amount=45
+-- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
 -- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range
 -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3
 --
