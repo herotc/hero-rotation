@@ -69,6 +69,7 @@ local tableinsert = table.insert;
     Inevitability                         = Spell(278683),
     NightsVengeancePower                  = Spell(273418),
     NightsVengeanceBuff                   = Spell(273424),
+    Perforate                             = Spell(277673),
     TheFirstDance                         = Spell(278681),
     -- Defensive
     CrimsonVial                           = Spell(185311),
@@ -297,6 +298,14 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and (Player:BuffP(VanishBuff) or S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
+  -- actions.stealthed+=/gloomblade,if=azerite.perforate.rank>=2&spell_targets.shuriken_storm<=2
+  if S.Gloomblade:IsCastableP() and S.Perforate:AzeriteRank() >= 2 and Cache.EnemiesCount[10] <= 2 then
+    if ReturnSpellOnly then
+      return S.Gloomblade
+    else
+      if HR.Cast(S.Gloomblade) then return "Cast Gloomblade (Perforate)"; end
+    end
+  end
   -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
   -- !!!NYI!!! (Is this worth it? How do we want to display it in an understandable way?)
   -- actions.stealthed+=/shadowstrike,if=!talent.deeper_stratagem.enabled&azerite.blade_in_the_shadows.rank=3&spell_targets.shuriken_storm=3
@@ -480,8 +489,8 @@ end
 
 -- # Builders
 local function Build ()
-  -- actions.build=shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
-  if HR.AoEON() and S.ShurikenStorm:IsCastableP() and (Cache.EnemiesCount[10] >= 2 or Player:BuffStackP(S.TheDreadlordsDeceit) >= 29) then
+  -- actions.build=shuriken_storm,if=spell_targets>=2+(talent.gloomblade.enabled&azerite.perforate.rank>=2)|buff.the_dreadlords_deceit.stack>=29
+  if HR.AoEON() and S.ShurikenStorm:IsCastableP() and (Cache.EnemiesCount[10] >= 2 + num(S.Gloomblade:IsAvailable() and S.Perforate:AzeriteRank() >= 2) or Player:BuffStackP(S.TheDreadlordsDeceit) >= 29) then
     if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
   end
   if IsInMeleeRange() then
@@ -703,7 +712,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-03-09
+-- Last Update: 2019-03-25
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -786,6 +795,8 @@ HR.SetAPL(261, APL);
 -- actions.stealthed=shadowstrike,if=(talent.find_weakness.enabled|spell_targets.shuriken_storm<3)&(buff.stealth.up|buff.vanish.up)
 -- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish or The First Dance and no Dark Shadow + no Subterfuge
 -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
+-- # Use Gloomblade over Shadowstrike and Storm with 2+ Perforate at 2 or less targets.
+-- actions.stealthed+=/gloomblade,if=azerite.perforate.rank>=2&spell_targets.shuriken_storm<=2
 -- # At 2 targets with Secret Technique keep up Find Weakness by cycling Shadowstrike.
 -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
 -- # Without Deeper Stratagem and 3 Ranks of Blade in the Shadows it is worth using Shadowstrike on 3 targets.
@@ -811,6 +822,6 @@ HR.SetAPL(261, APL);
 -- actions.finish+=/eviscerate
 --
 -- # Builders
--- actions.build=shuriken_storm,if=spell_targets>=2
+-- actions.build=shuriken_storm,if=spell_targets>=2+(talent.gloomblade.enabled&azerite.perforate.rank>=2)
 -- actions.build+=/gloomblade
 -- actions.build+=/backstab
