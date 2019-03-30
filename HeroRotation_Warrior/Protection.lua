@@ -46,7 +46,8 @@ Spell.Warrior.Protection = {
   Avatar                                = Spell(107574),
   LastStand                             = Spell(12975),
   VictoryRush                           = Spell(34428),
-  ImpendingVictory                      = Spell(202168)
+  ImpendingVictory                      = Spell(202168),
+  Pummel                                = Spell(6552)
 };
 local S = Spell.Warrior.Protection;
 
@@ -127,6 +128,11 @@ local function APL()
       end
     end
   end
+  if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange("Melee") then
+    if S.Pummel:IsReady() then
+      if HR.Cast(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel) then return "pummel interrupt"; end
+    end
+  end
   Defensive = function()
     -- Only worry about defensives if tanking
     if isCurrentlyTanking() then
@@ -154,7 +160,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
     end
     -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable()) then
+    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable() and Player:Rage() <= (Player:RageMax() - 40)) then
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
     end
     -- dragon_roar
