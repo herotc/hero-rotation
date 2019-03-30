@@ -1,82 +1,90 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
-
+local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib;
-local Cache  = HeroCache;
-local Unit   = HL.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell  = HL.Spell;
-local Item   = HL.Item;
-
+local HL     = HeroLib
+local Cache  = HeroCache
+local Unit   = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Pet    = Unit.Pet
+local Spell  = HL.Spell
+local Item   = HL.Item
 -- HeroRotation
-local HR = HeroRotation;
+local HR     = HeroRotation
 
--- APL Local Vars
-local Everyone = HR.Commons.Everyone;
+--- ============================ CONTENT ===========================
+--- ======= APL LOCALS =======
+-- luacheck: max_line_length 9999
+
 -- Spells
-if not Spell.Warrior then Spell.Warrior = {}; end
+if not Spell.Warrior then Spell.Warrior = {} end
 Spell.Warrior.Protection = {
-  -- Racials
-  Berserking         = Spell(26297),
-  BloodFury          = Spell(20572),
-  ArcaneTorrent      = Spell(28730),
-
-  -- Abilities
-  Intercept          = Spell(198304),
-  ThunderClap        = Spell(6343),
-  ShieldSlam         = Spell(23922),
-  Revenge            = Spell(6572),
-  Devastate          = Spell(20243),
-  Avatar             = Spell(107574),
-  VictoryRush        = Spell(34428), --20% of max hp
-  DemoralizingShout  = Spell(1160),
-
-  -- Mitigation
-  ShieldBlock        = Spell(2565),
-
-  -- Buffs
-  FreeRevenge        = Spell(5302),
-  ShieldBlockBuff    = Spell(132404),
-  VengenceIgnorePain = Spell(202574),
-  VengenceRevenge    = Spell(132404),
-  AvatarBuff         = Spell(107574),
-  LastStandBuff      = Spell(12975),
-
-  -- Talents
-  UnstoppableForce   = Spell(275336),
-  
-  -- Defensive
-  IgnorePain         = Spell(190456),
-  LastStand          = Spell(12975),
-  
-  -- Utility
-  Pummel             = Spell(6552),
-
-  -- Legendaries
-
-  -- Misc
-  PoolFocus          = Spell(9999000010)
-}
+  ThunderClap                           = Spell(6343),
+  DemoralizingShout                     = Spell(1160),
+  BoomingVoice                          = Spell(202743),
+  DragonRoar                            = Spell(118000),
+  Revenge                               = Spell(6572),
+  Ravager                               = Spell(228920),
+  ShieldBlock                           = Spell(2565),
+  ShieldSlam                            = Spell(23922),
+  ShieldBlockBuff                       = Spell(132404),
+  UnstoppableForce                      = Spell(275336),
+  AvatarBuff                            = Spell(107574),
+  BraceForImpact                        = Spell(277636),
+  DeafeningCrash                        = Spell(272824),
+  Devastate                             = Spell(20243),
+  Intercept                             = Spell(198304),
+  BloodFury                             = Spell(20572),
+  Berserking                            = Spell(26297),
+  ArcaneTorrent                         = Spell(50613),
+  LightsJudgment                        = Spell(255647),
+  Fireblood                             = Spell(265221),
+  AncestralCall                         = Spell(274738),
+  IgnorePain                            = Spell(190456),
+  Avatar                                = Spell(107574),
+  LastStand                             = Spell(12975),
+  VictoryRush                           = Spell(34428),
+  ImpendingVictory                      = Spell(202168)
+};
 local S = Spell.Warrior.Protection;
 
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Protection = {
-  -- Legendaries
-  -- Misc
-  PoPP                = Item(142117),
+  BattlePotionofStrength           = Item(163224),
+  GrongsPrimalRage                 = Item(165574)
 };
 local I = Item.Warrior.Protection;
 
+-- Rotation Var
+local ShouldReturn; -- Used to get the return string
+
 -- GUI Settings
+local Everyone = HR.Commons.Everyone;
 local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.Warrior.Commons,
-    Protection = HR.GUISettings.APL.Warrior.Protection
-}
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Warrior.Commons,
+  Protection = HR.GUISettings.APL.Warrior.Protection
+};
+
+
+local EnemyRanges = {5}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
+  end
+end
+
+
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
 
 local function isCurrentlyTanking()
   -- is player currently tanking any enemies within 16 yard radius
@@ -84,9 +92,7 @@ local function isCurrentlyTanking()
   return IsTanking;
 end
 
--- Determine if it is optimal to cast ip. We dont want to waste rage and over cap it
 local function shouldCastIp()
-
   if Player:Buff(S.IgnorePain) then 
     local castIP = tonumber((GetSpellDescription(190456):match("%d+%S+%d"):gsub("%D","")))
     local IPCap = math.floor(castIP * 1.3);
@@ -104,144 +110,184 @@ local function shouldCastIp()
   end
 end
 
-
-local function rageDump(rage)
-    -- Ignore Pain if actively tanking, IP is not almost capped and dont have vengence buff for revenge
-  if S.IgnorePain:IsReady() and (Player:Rage() >= rage) and isCurrentlyTanking() and shouldCastIp() and (not Player:Buff(S.VengenceRevenge))  then
-    if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
-  end
-  
-  -- Revenge 
-  if S.Revenge:IsReady() and (Player:Rage() >= rage) and (not isCurrentlyTanking()) then
-    if HR.Cast(S.Revenge) then return "Cast Revenge" end
-  end
-
-  return nil;
-end
-
--- APL Main
-local function APL ()
-  -- Unit Update
-  HL.GetEnemies(8);
-  Everyone.AoEToggleEnemiesUpdate();
-
-  local gcdTime = Player:GCD();
-  
-  -- Out of Combat
-  if not Player:AffectingCombat() then
-
-    -- Opener Charge + 15 Rage
+--- ======= ACTION LISTS =======
+local function APL()
+  local Precombat, Aoe, St, Defensive
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
+  Precombat = function()
+    -- flask
+    -- food
+    -- augmentation
+    -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- Intercept
-      if S.Intercept:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(25)) then
-        if HR.Cast(S.Intercept) then return "Cast Intercept" end
+      -- potion
+      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
       end
     end
-    return
   end
-
-  -- Interrupts
-  if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange("Melee") then
-    if S.Pummel:IsReady() then
-      if HR.Cast(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel) then return "Cast Pummel"; end
-    end
-  end
-
-  -- In Combat
-  if Everyone.TargetIsValid() and S.Intercept:IsReady() and (not Target:IsInRange(8) and Target:IsInRange(25)) then
-    if HR.Cast(S.Intercept) then return "Cast Intercept" end
-  end
-
-  if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
-
-    -- Generates +20 Rage
-    if HR.CDsON() and S.Avatar:IsReady() and (Player:Rage() <= (Player:RageMax() - 20)) then
-      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "Cast Avatar" end
-    end
-
-    -- Generates +40 Rage
-    if HR.CDsON() and S.DemoralizingShout:IsReady() and (Player:Rage() <= (Player:RageMax() - 40)) then
-      if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "Cast DemoralizingShout" end
-    end
-
-    -- Check for target casting mitigation check or DBM timer
-    -- for mitigation check or high damage intake
-
-    -- Mitigation + Defensive - 30 Rage
-    if S.ShieldBlock:IsReady() and (not (Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
-        (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) and isCurrentlyTanking() then
-      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "Shield Block" end
-    end
-
-    if S.LastStand:IsReady() and (not Player:Buff(S.ShieldBlockBuff)) and isCurrentlyTanking() and Settings.Protection.UseLastStandToFillShieldBlockDownTime
-      and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
-      if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "Cast LastStand" end
-    end
-
-    -- Victory Rush Check - High Priority
-    if S.VictoryRush:IsReady() and Player:HealthPercentage() < 30 then
-      if HR.Cast(S.VictoryRush) then return "Cast VictoryRush" end
-    end
-
-    -- Prevent rage cap 100
-    local res = rageDump(Player:RageMax());
-    if res then
-      return res;
-    end
-      
-    -- AOE 2+ Targets (Higher Priority when AOE) or Avatar Up and Unstoppable Force is Talented
-    if Cache.EnemiesCount[8] >= 2 or (Player:Buff(S.AvatarBuff) and S.UnstoppableForce:IsAvailable()) then
-      -- Thunder Clap + 6 Rage
-      if S.ThunderClap:IsReady() then
-        if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
+  Defensive = function()
+    -- Only worry about defensives if tanking
+    if isCurrentlyTanking() then
+      if S.ShieldBlock:IsReadyP() and (not (Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
+        (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) then
+          if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block defensive" end
+      end
+      if S.LastStand:IsCastableP() and (not Player:Buff(S.ShieldBlockBuff)) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
+        and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
+          if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
+      end
+      if Player:HealthPercentage() < 30 then
+        if S.VictoryRush:IsReadyP() then
+          if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
+        end
+        if S.ImpendingVictory:IsReadyP() then
+          if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
+        end
       end
     end
-    
-    -- Shield Slam + 18 Rage
-    if S.ShieldSlam:IsReady() then
-      if HR.Cast(S.ShieldSlam) then return "Cast ShieldSlam" end
+  end
+  Aoe = function()
+    -- thunder_clap
+    if S.ThunderClap:IsCastableP() then
+      if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
     end
-
-    -- Thunder Clap + 6 Rage
-    if S.ThunderClap:IsReady() then
-      if HR.Cast(S.ThunderClap) then return "Cast ThunderClap" end
+    -- demoralizing_shout,if=talent.booming_voice.enabled
+    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable()) then
+      if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
     end
-
-    -- Revenge with Buff (Free Revenege) - 0 rage
-    if S.Revenge:IsReady() and (Player:Buff(S.FreeRevenge)) then
-      if HR.Cast(S.Revenge) then return "Cast Revenge" end
+    -- dragon_roar
+    if S.DragonRoar:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
     end
-
-    -- Ignore Pain with vengence proc - ?? rage
-    if S.IgnorePain:IsReady() and (Player:Buff(S.VengenceIgnorePain)) and (Player:Rage() >= 42) and isCurrentlyTanking() and shouldCastIp() then
-      if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
+    -- revenge
+    if S.Revenge:IsReadyP() then
+      if HR.Cast(S.Revenge) then return "revenge 14"; end
     end
-
-    -- Revenge with vengence proc  - ?? Rage
-    if S.Revenge:IsReady() and Player:Buff(S.VengenceRevenge) and (Player:Rage() >= 60) then
-      if HR.Cast(S.Revenge) then return "Cast Revenge" end
+    -- ravager
+    if S.Ravager:IsCastableP() then
+      if HR.Cast(S.Ravager) then return "ravager 16"; end
     end
-
-    -- Ignore Pain (Spend the rage for defensive) -- Non Vengence Scenarios
-    if S.IgnorePain:IsReady() and (Player:Rage() >= 55) and isCurrentlyTanking() and shouldCastIp() then
-      if HR.Cast(S.IgnorePain) then return "Cast IgnorePain" end
+    -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) then
+      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 18"; end
     end
-
-    -- Revenge with High Rage - 30 Rage
-    if S.Revenge:IsReady() and (Player:Rage() >= 60) then
-      if HR.Cast(S.Revenge) then return "Cast Revenge" end
+    -- shield_slam
+    if S.ShieldSlam:IsCastableP() then
+      if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
     end
-
-    -- Victory Rush Check - Low Priority
-    if S.VictoryRush:IsReady() and Player:HealthPercentage() < 50 then
-      if HR.Cast(S.VictoryRush) then return "Cast VictoryRush" end
+  end
+  St = function()
+    -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
+    if S.ThunderClap:IsCastableP() and (Cache.EnemiesCount[5] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
+      if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
     end
-
-    -- Devastate
-    if S.Devastate:IsReady() then
-      if HR.Cast(S.Devastate) then return "Cast Devastate" end
+    -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down&azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff) and S.BraceForImpact:AzeriteRank() > S.DeafeningCrash:AzeriteRank() and Player:BuffP(S.AvatarBuff)) then
+      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 32"; end
+    end
+    -- shield_slam,if=azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up&buff.shield_block.up
+    if S.ShieldSlam:IsCastableP() and (S.BraceForImpact:AzeriteRank() > S.DeafeningCrash:AzeriteRank() and Player:BuffP(S.AvatarBuff) and Player:BuffP(S.ShieldBlockBuff)) then
+      if HR.Cast(S.ShieldSlam) then return "shield_slam 44"; end
+    end
+    -- thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
+    if S.ThunderClap:IsCastableP() and ((S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff))) then
+      if HR.Cast(S.ThunderClap) then return "thunder_clap 54"; end
+    end
+    -- demoralizing_shout,if=talent.booming_voice.enabled
+    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable()) then
+      if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
+    end
+    -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) then
+      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 64"; end
+    end
+    -- shield_slam
+    if S.ShieldSlam:IsCastableP() then
+      if HR.Cast(S.ShieldSlam) then return "shield_slam 70"; end
+    end
+    -- dragon_roar
+    if S.DragonRoar:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 72"; end
+    end
+    -- thunder_clap
+    if S.ThunderClap:IsCastableP() then
+      if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
+    end
+    -- revenge
+    if S.Revenge:IsReadyP() then
+      if HR.Cast(S.Revenge) then return "revenge 76"; end
+    end
+    -- ravager
+    if S.Ravager:IsCastableP() then
+      if HR.Cast(S.Ravager) then return "ravager 78"; end
+    end
+    -- devastate
+    if S.Devastate:IsCastableP() then
+      if HR.Cast(S.Devastate) then return "devastate 80"; end
+    end
+  end
+  -- call precombat
+  if not Player:AffectingCombat() then
+    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+  end
+  if Everyone.TargetIsValid() then
+    -- auto_attack
+    -- intercept,if=time=0
+    if S.Intercept:IsCastableP() and (HL.CombatTime() == 0 and not Target:IsInRange(8)) then
+      if HR.Cast(S.Intercept) then return "intercept 84"; end
+    end
+    -- use_items,if=cooldown.avatar.remains>20
+    -- use_item,name=grongs_primal_rage,if=buff.avatar.down
+    if I.GrongsPrimalRage:IsReady() and (Player:BuffDownP(S.AvatarBuff)) then
+      if HR.CastSuggested(I.GrongsPrimalRage) then return "grongs_primal_rage 87"; end
+    end
+    -- blood_fury
+    if S.BloodFury:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 91"; end
+    end
+    -- berserking
+    if S.Berserking:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 93"; end
+    end
+    -- arcane_torrent
+    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 95"; end
+    end
+    -- lights_judgment
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.LightsJudgment) then return "lights_judgment 97"; end
+    end
+    -- fireblood
+    if S.Fireblood:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 99"; end
+    end
+    -- ancestral_call
+    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 101"; end
+    end
+    -- potion,if=buff.avatar.up|target.time_to_die<25
+    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
+      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 103"; end
+    end
+    -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
+    if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and shouldCastIp()) then
+      if HR.Cast(S.IgnorePain, Settings.Protection.OffGCDasOffGCD.IgnorePain) then return "ignore_pain 107"; end
+    end
+    -- avatar
+    if S.Avatar:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
+    end
+    -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
+    if (Cache.EnemiesCount[5] >= 3) then
+      return Aoe();
+    end
+    -- call_action_list,name=st
+    if (true) then
+      local ShouldReturn = St(); if ShouldReturn then return ShouldReturn; end
     end
   end
 end
 
-HR.SetAPL(73, APL);
+HR.SetAPL(73, APL)

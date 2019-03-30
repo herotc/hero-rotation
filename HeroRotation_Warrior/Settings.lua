@@ -73,13 +73,13 @@
       GCDasOffGCD = {
         Avatar            = true,
         DemoralizingShout = true,
-        IgnorePain        = true,
         LastStand         = true
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
-        ShieldBlock       = true,
+        IgnorePain        = true,
+        ShieldBlock       = true
       }
     },
 
