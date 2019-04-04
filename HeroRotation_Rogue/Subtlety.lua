@@ -664,6 +664,13 @@ local function APL ()
         if ShouldReturn then return "Stealth CDs: " .. ShouldReturn; end
       end
 
+      -- actions+=/nightblade,if=azerite.nights_vengeance.enabled&spell_targets.shuriken_storm<2&cooldown.symbols_of_death.remains<=3&!buff.nights_vengeance.up&combo_points>=2
+      if S.Nightblade:IsCastableP() and IsInMeleeRange()
+        and S.NightsVengeancePower:AzeriteEnabled() and Cache.EnemiesCount[10] < 2 and S.SymbolsofDeath:CooldownRemainsP() <= 3
+        and not Player:BuffP(S.NightsVengeanceBuff) and Player:ComboPoints() >= 2 then
+        if HR.Cast(S.Nightblade) then return "Cast Nightblade (Nights Vengeance)"; end
+      end
+
       -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
       -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
       if Player:ComboPointsDeficit() <= 1 or (Target:FilteredTimeToDie("<=", 1) and Player:ComboPoints() >= 3) then
@@ -712,7 +719,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-03-25
+-- Last Update: 2019-04-04
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -741,6 +748,8 @@ HR.SetAPL(261, APL);
 -- actions+=/variable,name=stealth_threshold,value=25+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+talent.shadow_focus.enabled*20+talent.alacrity.enabled*10+15*(spell_targets.shuriken_storm>=3)
 -- # Consider using a Stealth CD when reaching the energy threshold
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
+-- # Night's Vengeance: Nightblade before Symbols at low CP to combine early refresh with getting the buff up.
+-- actions+=/nightblade,if=azerite.nights_vengeance.enabled&spell_targets.shuriken_storm<2&cooldown.symbols_of_death.remains<=3&!buff.nights_vengeance.up&combo_points>=2
 -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
 -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
 -- # With DS also finish at 4+ against exactly 4 targets (outside stealth)
