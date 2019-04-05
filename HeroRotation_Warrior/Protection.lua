@@ -45,6 +45,7 @@ Spell.Warrior.Protection = {
   IgnorePain                            = Spell(190456),
   Avatar                                = Spell(107574),
   LastStand                             = Spell(12975),
+  LastStandBuff                         = Spell(12975),
   VictoryRush                           = Spell(34428),
   ImpendingVictory                      = Spell(202168),
   Pummel                                = Spell(6552)
@@ -111,9 +112,18 @@ local function shouldCastIp()
   end
 end
 
+local function offensiveShieldBlock()
+  if Settings.Protection.UseShieldBlockDefensively == false then
+    return true
+  else
+    return false
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, St, Defensive
+  local gcdTime = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -134,23 +144,20 @@ local function APL()
     end
   end
   Defensive = function()
-    -- Only worry about defensives if tanking
-    if isCurrentlyTanking() then
-      if S.ShieldBlock:IsReadyP() and (not (Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
-        (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) then
-          if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block defensive" end
+    if S.ShieldBlock:IsReadyP() and (not (Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
+      (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) then
+        if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block defensive" end
+    end
+    if S.LastStand:IsCastableP() and (not Player:Buff(S.ShieldBlockBuff)) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
+      and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
+        if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
+    end
+    if Player:HealthPercentage() < 30 then
+      if S.VictoryRush:IsReadyP() then
+        if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
       end
-      if S.LastStand:IsCastableP() and (not Player:Buff(S.ShieldBlockBuff)) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
-        and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
-          if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
-      end
-      if Player:HealthPercentage() < 30 then
-        if S.VictoryRush:IsReadyP() then
-          if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
-        end
-        if S.ImpendingVictory:IsReadyP() then
-          if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
-        end
+      if S.ImpendingVictory:IsReadyP() then
+        if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
       end
     end
   end
@@ -176,7 +183,7 @@ local function APL()
       if HR.Cast(S.Ravager) then return "ravager 16"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) then
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff) and offensiveShieldBlock()) then
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 18"; end
     end
     -- shield_slam
@@ -190,7 +197,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down&azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up
-    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff) and S.BraceForImpact:AzeriteRank() > S.DeafeningCrash:AzeriteRank() and Player:BuffP(S.AvatarBuff)) then
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff) and S.BraceForImpact:AzeriteRank() > S.DeafeningCrash:AzeriteRank() and Player:BuffP(S.AvatarBuff) and offensiveShieldBlock()) then
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 32"; end
     end
     -- shield_slam,if=azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up&buff.shield_block.up
@@ -206,7 +213,7 @@ local function APL()
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) then
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff) and offensiveShieldBlock()) then
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 64"; end
     end
     -- shield_slam
@@ -239,6 +246,10 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Check defensives if tanking
+    if isCurrentlyTanking() then
+      local ShouldReturn = Defensive(); if ShouldReturn then return ShouldReturn; end
+    end
     -- auto_attack
     -- intercept,if=time=0
     if S.Intercept:IsCastableP() and (HL.CombatTime() == 0 and not Target:IsInRange(8)) then
@@ -278,7 +289,7 @@ local function APL()
       if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 103"; end
     end
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
-    if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and shouldCastIp()) then
+    if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and shouldCastIp() and isCurrentlyTanking()) then
       if HR.Cast(S.IgnorePain, Settings.Protection.OffGCDasOffGCD.IgnorePain) then return "ignore_pain 107"; end
     end
     -- avatar
