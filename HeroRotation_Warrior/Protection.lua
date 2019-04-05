@@ -152,14 +152,6 @@ local function APL()
       and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
         if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
     end
-    if Player:HealthPercentage() < 30 then
-      if S.VictoryRush:IsReadyP() then
-        if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
-      end
-      if S.ImpendingVictory:IsReadyP() then
-        if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
-      end
-    end
   end
   Aoe = function()
     -- thunder_clap
@@ -189,6 +181,10 @@ local function APL()
     -- shield_slam
     if S.ShieldSlam:IsCastableP() then
       if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
+    end
+	-- devastate
+    if S.Devastate:IsCastableP() then
+      if HR.Cast(S.Devastate) then return "devastate 80"; end
     end
   end
   St = function()
@@ -287,6 +283,12 @@ local function APL()
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 103"; end
+    end
+    if Player:HealthPercentage() < 30 and S.VictoryRush:IsReady() then
+      if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
+	end
+    if Player:HealthPercentage() < 30 and S.ImpendingVictory:IsReadyP() then
+      if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
     end
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
     if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and shouldCastIp() and isCurrentlyTanking()) then
