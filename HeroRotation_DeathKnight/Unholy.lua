@@ -49,7 +49,8 @@ Spell.DeathKnight.Unholy = {
   OutbreakDebuff                        = Spell(196782),
   VirulentPlagueDebuff                  = Spell(191587),
   DeathStrike                           = Spell(49998),
-  DeathStrikeBuff                       = Spell(101568)
+  DeathStrikeBuff                       = Spell(101568),
+  MindFreeze                            = Spell(47528)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -128,12 +129,12 @@ local function APL()
     end
     -- raise_dead
     if S.RaiseDead:IsCastableP() then
-      if HR.Cast(S.RaiseDead) then return "raise_dead 6"; end
+      if HR.CastSuggested(S.RaiseDead) then return "raise_dead 6"; end
     end
     -- army_of_the_dead,delay=2
     if Everyone.TargetIsValid() then
       if S.ArmyoftheDead:IsCastableP() then
-        if HR.Cast(S.ArmyoftheDead) then return "army_of_the_dead 8"; end
+        if HR.CastSuggested(S.ArmyoftheDead) then return "army_of_the_dead 8"; end
       end
     end
   end
@@ -210,7 +211,7 @@ local function APL()
   Cooldowns = function()
     -- army_of_the_dead
     if S.ArmyoftheDead:IsCastableP() then
-      if HR.Cast(S.ArmyoftheDead) then return "army_of_the_dead 113"; end
+      if HR.CastSuggested(S.ArmyoftheDead) then return "army_of_the_dead 113"; end
     end
     -- apocalypse,if=debuff.festering_wound.stack>=4
     if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4) then
@@ -218,7 +219,7 @@ local function APL()
     end
     -- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
     if S.DarkTransformation:IsCastableP() and (not (Cache.EnemiesCount[30] > 1) or 10000000000 > 15) then
-      if HR.Cast(S.DarkTransformation) then return "dark_transformation 119"; end
+      if HR.Cast(S.DarkTransformation, true) then return "dark_transformation 119"; end
     end
     -- summon_gargoyle,if=runic_power.deficit<14
     if S.SummonGargoyle:IsCastableP() and (Player:RunicPowerDeficit() < 14) then
@@ -275,7 +276,7 @@ local function APL()
       if HR.Cast(S.DeathCoil) then return "death_coil 206"; end
     end
     -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&cooldown.army_of_the_dead.remains>5
-    if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not Player:BuffP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and S.ArmyoftheDead:CooldownRemainsP() > 5) then
+    if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < gt4 and not Player:BuffP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and S.ArmyoftheDead:CooldownRemainsP() > 5) then
       if HR.Cast(S.FesteringStrike) then return "festering_strike 210"; end
     end
     -- death_coil,if=!variable.pooling_for_gargoyle
@@ -288,6 +289,7 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    Everyone.Interrupt(15, S.MindFreeze, true, Interrupts);
     -- use DeathStrike on low HP in Solo Mode
     if not no_heal and S.DeathStrike:IsReadyP("Melee") then
       if HR.Cast(S.DeathStrike) then return ""; end
