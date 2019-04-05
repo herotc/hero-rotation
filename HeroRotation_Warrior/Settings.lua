@@ -69,6 +69,7 @@
 
     Protection = {
       UseLastStandToFillShieldBlockDownTime = true,
+      UseShieldBlockDefensively = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         Avatar            = true,
@@ -109,3 +110,4 @@
   -- Protection settings
   CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
   CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseLastStandToFillShieldBlockDownTime", "Use Last Stand to fill Shield Block down time", "Enable this if you want to fill Shield Block down time with Last Stand.");
+  CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseShieldBlockDefensively", "Use Shield Block purely defensively", "Enable this if you only want to use Shield Block in a defensive manner.");
