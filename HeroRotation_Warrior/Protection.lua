@@ -45,6 +45,7 @@ Spell.Warrior.Protection = {
   IgnorePain                            = Spell(190456),
   Avatar                                = Spell(107574),
   LastStand                             = Spell(12975),
+  LastStandBuff                         = Spell(12975),
   VictoryRush                           = Spell(34428),
   ImpendingVictory                      = Spell(202168),
   Pummel                                = Spell(6552)
@@ -122,6 +123,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, St, Defensive
+  local gcdTime = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
