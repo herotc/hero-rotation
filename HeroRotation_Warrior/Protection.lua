@@ -165,7 +165,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
     end
     -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable() and Player:Rage() <= (Player:RageMax() - 40)) then
+    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
     end
     -- dragon_roar
@@ -173,7 +173,7 @@ local function APL()
       if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not (shouldCastIp() or isCurrentlyTanking())) and Player:Rage() >= 50)) then
+    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 14"; end
     end
     -- ravager
@@ -211,7 +211,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 54"; end
     end
     -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable()) then
+    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
@@ -231,7 +231,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not (shouldCastIp() or isCurrentlyTanking())) and Player:Rage() >= 50)) then
+    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 76"; end
     end
     -- ravager
