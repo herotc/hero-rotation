@@ -26,6 +26,7 @@ Spell.Warrior.Protection = {
   BoomingVoice                          = Spell(202743),
   DragonRoar                            = Spell(118000),
   Revenge                               = Spell(6572),
+  FreeRevenge                           = Spell(5302),
   Ravager                               = Spell(228920),
   ShieldBlock                           = Spell(2565),
   ShieldSlam                            = Spell(23922),
@@ -100,8 +101,8 @@ local function shouldCastIp()
     local IPCap = math.floor(castIP * 1.3);
     local currentIp = Player:Buff(S.IgnorePain, 16, true)
 
-    -- Dont cast IP if we are currently at 80% of IP Cap remaining
-    if currentIp  < (0.8 * IPCap) then
+    -- Dont cast IP if we are currently at 50% of IP Cap remaining
+    if currentIp  < (0.5 * IPCap) then
       return true
     else
       return false
@@ -114,6 +115,14 @@ end
 
 local function offensiveShieldBlock()
   if Settings.Protection.UseShieldBlockDefensively == false then
+    return true
+  else
+    return false
+  end
+end
+
+local function offensiveRage()
+  if Settings.Protection.UseRageDefensively == false then
     return true
   else
     return false
@@ -138,18 +147,15 @@ local function APL()
       end
     end
   end
-  if Settings.General.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange("Melee") then
-    if S.Pummel:IsReady() then
-      if HR.Cast(S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel) then return "pummel interrupt"; end
-    end
-  end
+  -- Interrupt
+  Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, Interrupts)
   Defensive = function()
-    if S.ShieldBlock:IsReadyP() and (not (Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
-      (not (Player:Buff(S.LastStandBuff))) and (Player:Rage() >= 30) then
+    if S.ShieldBlock:IsReadyP() and (((not Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
+      (not Player:Buff(S.LastStandBuff)) and Player:Rage() >= 30) then
         if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block defensive" end
     end
-    if S.LastStand:IsCastableP() and (not Player:Buff(S.ShieldBlockBuff)) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
-      and (S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
+    if S.LastStand:IsCastableP() and ((not Player:Buff(S.ShieldBlockBuff)) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
+      and S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
         if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
     end
   end
@@ -167,7 +173,7 @@ local function APL()
       if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP() then
+    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not (shouldCastIp() or isCurrentlyTanking())) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 14"; end
     end
     -- ravager
@@ -225,7 +231,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP() then
+    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not (shouldCastIp() or isCurrentlyTanking())) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 76"; end
     end
     -- ravager
@@ -286,7 +292,7 @@ local function APL()
     end
     if Player:HealthPercentage() < 30 and S.VictoryRush:IsReady() then
       if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
-	end
+    end
     if Player:HealthPercentage() < 30 and S.ImpendingVictory:IsReadyP() then
       if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
     end
