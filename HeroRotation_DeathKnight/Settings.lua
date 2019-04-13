@@ -41,10 +41,7 @@ HR.GUISettings.APL.DeathKnight = {
   Unholy = {
     GCDasOffGCD = {
       -- Abilities
-      Apocalypse = false,
-      SummonGargoyle = true,
-      UnholyFrenzy = false,
-      SoulReaper = false
+      DarkTransformation = true,
     }
   },
   Blood = {
