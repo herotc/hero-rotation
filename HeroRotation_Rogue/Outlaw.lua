@@ -401,8 +401,8 @@ local function Finish ()
 end
 
 local function Build ()
-  -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up)
-  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 25 or Player:BuffP(S.DeadshotBuff)) then
+  -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up|energy<45)
+  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 25 or Player:BuffP(S.DeadshotBuff) or Player:EnergyPredicted() < 45) then
     if HR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
   end
   -- actions.build+=/sinister_strike
@@ -519,7 +519,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2019-03-07
+-- Last Update: 2019-04-13
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -589,5 +589,5 @@ HR.SetAPL(260, APL);
 --
 -- # Builders
 -- # Use Pistol Shot if the Oppotunity buff is up. Avoid using when Keep Your Wits stacks are high unless the Deadshot buff is also up.
--- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up)
+-- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up|energy<45)
 -- actions.build+=/sinister_strike
