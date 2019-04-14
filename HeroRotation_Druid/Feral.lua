@@ -177,11 +177,11 @@ local function APL()
         VarUseThrash = 2
       end
       -- cat_form
-      if S.CatForm:IsCastableP() and Player:BuffDownP(S.CatFormBuff) then
+      if S.CatForm:IsCastableP() and Player:BuffDownP(S.CatFormBuff) and Everyone.TargetIsValid() then
         if HR.Cast(S.CatForm, Settings.Feral.GCDasOffGCD.CatForm) then return "cat_form 15"; end
       end
       -- prowl
-      if S.Prowl:IsCastableP() and Player:BuffDownP(S.ProwlBuff) then
+      if S.Prowl:IsCastableP() and Player:BuffDownP(S.ProwlBuff) and Everyone.TargetIsValid() then
         if HR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "prowl 19"; end
       end
       -- snapshot_stats
