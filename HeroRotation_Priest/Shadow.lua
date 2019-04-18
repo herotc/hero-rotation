@@ -232,11 +232,11 @@ local function APL()
     end
     -- mind_blast,target_if=spell_targets.mind_sear<variable.mind_blast_targets
     if S.MindBlast:IsReadyP() and not Player:IsCasting(S.MindBlast) then
-      if HR.CastCycle(S.MindBlast, 40, EvaluateCycleMindBlast107) then return "mind_blast 107" end
+      if HR.CastCycle(S.MindBlast, 40, EvaluateCycleMindBlast103) then return "mind_blast 107" end
     end
     -- shadow_word_void (added)
     if S.ShadowWordVoid:IsReadyP() and not (Player:IsCasting(S.ShadowWordVoid) and S.ShadowWordVoid:ChargesP() == 1) then
-      if HR.CastCycle(S.ShadowWordVoid, 40, EvaluateCycleMindBlast107) then return "shadow_word_void added 107" end
+      if HR.CastCycle(S.ShadowWordVoid, 40, EvaluateCycleMindBlast103) then return "shadow_word_void added 107" end
     end
     -- shadow_crash,if=(raid_event.adds.in>5&raid_event.adds.duration<2)|raid_event.adds.duration>2
     if S.ShadowCrash:IsReadyP() and not Player:IsCasting(S.ShadowCrash) then
