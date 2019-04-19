@@ -301,7 +301,7 @@ local function APL()
       if HR.Cast(S.DarkVoid) then return "dark_void 204"; end
     end
     -- mindbender,if=talent.mindbender.enabled|(buff.voidform.stack>18|target.time_to_die<15)
-    if S.Mindbender:IsReadyP() and (S.Mindbender:IsAvailable() or (Player:BuffStackP(S.VoidformBuff) > 18 or Target:TimeToDie() < 15)) then
+    if S.Mindbender:IsReadyP() and (S.MindbenderDefault:IsAvailable() or (Player:BuffStackP(S.VoidformBuff) > 18 or Target:TimeToDie() < 15)) then
       if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender 206"; end
     end
     -- shadow_word_death,if=!buff.voidform.up|(cooldown.shadow_word_death.charges=2&buff.voidform.stack<15)
