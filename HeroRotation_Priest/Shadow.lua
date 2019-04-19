@@ -81,7 +81,7 @@ local VarVtTraitRanksCheck = 0;
 local VarVtMisTraitRanksCheck = 0;
 local VarVtMisSdCheck = 0;
 local VarDotsUp = 0;
-S.MindbenderDefault = S.Mindbender
+S.MindbenderTalent = S.Mindbender
 
 HL:RegisterForEvent(function()
   VarMindBlastTargets = 0
@@ -174,7 +174,7 @@ local function APL()
         VarVtMisSdCheck = 1 - 0.014 * S.SearingDialogue:AzeriteRank()
       end
       -- Mindbender management
-      S.Mindbender = S.MindbenderDefault:IsAvailable() and S.MindbenderDefault or S.Shadowfiend
+      S.Mindbender = S.MindbenderTalent:IsAvailable() and S.MindbenderTalent or S.Shadowfiend
       -- shadowform,if=!buff.shadowform.up
       if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (not Player:BuffP(S.ShadowformBuff)) then
         if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 44"; end
@@ -301,7 +301,7 @@ local function APL()
       if HR.Cast(S.DarkVoid) then return "dark_void 204"; end
     end
     -- mindbender,if=talent.mindbender.enabled|(buff.voidform.stack>18|target.time_to_die<15)
-    if S.Mindbender:IsReadyP() and (S.Mindbender:IsAvailable() or (Player:BuffStackP(S.VoidformBuff) > 18 or Target:TimeToDie() < 15)) then
+    if S.Mindbender:IsReadyP() and (S.MindbenderTalent:IsAvailable() or (Player:BuffStackP(S.VoidformBuff) > 18 or Target:TimeToDie() < 15)) then
       if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender 206"; end
     end
     -- shadow_word_death,if=!buff.voidform.up|(cooldown.shadow_word_death.charges=2&buff.voidform.stack<15)
