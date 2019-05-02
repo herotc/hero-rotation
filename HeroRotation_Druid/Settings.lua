@@ -27,7 +27,7 @@
         -- Racials
         Racials = true,
         -- Abilities
-
+        SkullBash = true,
       }
     },
     Balance = {
@@ -47,6 +47,7 @@
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
+        SolarBeam = true
       }
     },
     Feral = {

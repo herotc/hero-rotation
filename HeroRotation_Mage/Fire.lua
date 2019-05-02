@@ -53,7 +53,8 @@ Spell.Mage.Fire = {
   IncantersFlowBuff                     = Spell(1463),
   Preheat                               = Spell(273331),
   PreheatDebuff                         = Spell(273333),
-  Firestarter                           = Spell(205026)
+  Firestarter                           = Spell(205026),
+  Counterspell                          = Spell(2139)
 };
 local S = Spell.Mage.Fire;
 
@@ -347,6 +348,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell,if=target.debuff.casting.react
+    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
     -- time_warp,if=time=0&buff.bloodlust.down
     -- mirror_image,if=buff.combustion.down
     if S.MirrorImage:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then

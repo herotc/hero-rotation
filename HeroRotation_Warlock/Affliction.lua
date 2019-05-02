@@ -58,7 +58,8 @@ Spell.Warlock.Affliction = {
   SiphonLifeDebuff                      = Spell(63106),
   UnstableAffliction                    = Spell(30108),
   UnstableAfflictionDebuff              = Spell(30108),
-  Berserking                            = Spell(26297)
+  Berserking                            = Spell(26297),
+  SpellLock                             = Spell(19647)
 };
 local S = Spell.Warlock.Affliction;
 
@@ -232,6 +233,8 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, false);
     -- variable,name=spammable_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=8
     if (true) then
       VarSpammableSeed = num(S.SowtheSeeds:IsAvailable() and Cache.EnemiesCount[35] >= 3 or S.SiphonLife:IsAvailable() and Cache.EnemiesCount[35] >= 5 or Cache.EnemiesCount[35] >= 8)

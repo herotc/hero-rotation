@@ -44,7 +44,8 @@
     LightoftheProtector      = Spell(184092),
     HandoftheProtector       = Spell(213652),
     -- Utility
-
+    HammerofJustice          = Spell(853),
+    Rebuke                   = Spell(96231),
     -- Legendaries
 
     -- Misc
@@ -69,6 +70,10 @@
     Protection = HR.GUISettings.APL.Paladin.Protection
   };
 
+  -- Stuns
+  local StunInterrupts = {
+    {S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end},
+  };
 
 --- ======= ACTION LISTS =======
 
@@ -99,6 +104,8 @@
     end
     -- In Combat
     if Everyone.TargetIsValid() then
+      -- Interrupts
+      Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts);
       -- CDs
         -- SotR (HP or (AS on CD and 3 Charges))
         if S.ShieldoftheRighteous:IsCastable("Melee") and Player:BuffRefreshable(S.ShieldoftheRighteousBuff, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65)) then

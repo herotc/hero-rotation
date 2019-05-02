@@ -45,7 +45,8 @@ Spell.Paladin.Retribution = {
   Judgment                              = Spell(20271),
   Consecration                          = Spell(205228),
   CrusaderStrike                        = Spell(35395),
-  Rebuke                                = Spell(96231)
+  Rebuke                                = Spell(96231),
+  HammerofJustice                       = Spell(853)
 };
 local S = Spell.Paladin.Retribution;
 
@@ -65,6 +66,10 @@ local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Paladin.Commons,
   Retribution = HR.GUISettings.APL.Paladin.Retribution
+};
+
+local StunInterrupts = {
+  {S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end},
 };
 
 -- Variables
@@ -521,10 +526,8 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- auto_attack
-    -- rebuke
-    if S.Rebuke:IsCastableP() and Target:IsInterruptible() and Settings.General.InterruptEnabled then
-      if HR.CastAnnotated(S.Rebuke, false, "Interrupt") then return "rebuke 218"; end
-    end
+    -- Interrupts
+    Everyone.Interrupt(5, S.Rebuke, Rebuke, StunInterrupts);
     -- Set VarOpenerDone to 1 if character does not have any level 100 talents
     if not S.DivinePurpose:IsAvailable() and not S.Crusade:IsAvailable() and not S.Inquisition:IsAvailable() then
       VarOpenerDone = 1

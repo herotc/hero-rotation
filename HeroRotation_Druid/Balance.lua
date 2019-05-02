@@ -331,7 +331,7 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    Everyone.Interrupt(5, S.SolarBeam, Settings.Commons.OffGCDasOffGCD.SolarBeam, Interrupts);
+    Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false);
 
     if HR.CDsON() then
       ShouldReturn = CDs();

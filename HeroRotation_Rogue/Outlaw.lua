@@ -69,6 +69,7 @@ Spell.Rogue.Outlaw = {
   Feint                           = Spell(1966),
   -- Utility
   Kick                            = Spell(1766),
+  Blind                           = Spell(2094),
   -- Roll the Bones
   Broadside                       = Spell(193356),
   BuriedTreasure                  = Spell(199600),
@@ -411,6 +412,11 @@ local function Build ()
   end
 end
 
+-- Stuns
+local Interrupts = {
+  {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
+};
+
 -- APL Main
 local function APL ()
   -- Unit Update
@@ -474,10 +480,8 @@ local function APL ()
     -- Training Scenario
     ShouldReturn = TrainingScenario();
     if ShouldReturn then return ShouldReturn; end
-    -- Kick
-    if Settings.General.InterruptEnabled and S.Kick:IsCastable(S.SinisterStrike) and Target:IsInterruptible() then
-      if HR.Cast(S.Kick, Settings.Commons.OffGCDasOffGCD.Kick) then return "Cast Kick"; end
-    end
+    -- Interrupts
+    Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
 
     -- actions+=/call_action_list,name=stealth,if=stealthed.all
     if Player:IsStealthedP(true, true) then

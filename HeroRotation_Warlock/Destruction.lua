@@ -63,7 +63,6 @@
     -- Pet abilities
     CauterizeMaster		= Spell(119905),--imp
     Suffering				  = Spell(119907),--voidwalker
-    SpellLock				  = Spell(119910),--Dogi
     Whiplash				  = Spell(119909),--Bitch
     ShadowLock				= Spell(171140),--doomguard
     MeteorStrike			= Spell(171152),--infernal
@@ -352,6 +351,9 @@
     
     -- In Combat
     if Everyone.TargetIsValid() then
+      -- Interrupts
+      Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, false);
+      
       if Target:IsInRange(range) then
         -- Cds Usage
         if HR.CDsON() then

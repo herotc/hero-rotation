@@ -25,6 +25,7 @@
         -- Racials
         Racials = true,
         -- Abilities
+        Silence = true,
       }
     },
     Shadow = {

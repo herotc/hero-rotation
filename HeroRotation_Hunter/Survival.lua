@@ -65,7 +65,9 @@ Spell.Hunter.Survival = {
   VipersVenom                           = Spell(268501),
   BlurofTalons                          = Spell(277653),
   WildernessSurvival                    = Spell(278532),
-  ArcaneTorrent                         = Spell(50613)
+  ArcaneTorrent                         = Spell(50613),
+  Intimidation                          = Spell(19577),
+  Muzzle                                = Spell(187707)
 };
 local S = Spell.Hunter.Survival;
 
@@ -85,6 +87,11 @@ local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
   Survival = HR.GUISettings.APL.Hunter.Survival
+};
+
+-- Stuns
+local StunInterrupts = {
+  {S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end},
 };
 
 -- Variables
@@ -507,10 +514,12 @@ local function APL()
     end
   end
   if Everyone.TargetIsValid() then
-  -- call precombat
-  if not Player:AffectingCombat() then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-  end
+    -- call precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Interrupts
+    Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts);
     -- auto_attack
     -- use_items
     -- call_action_list,name=cds

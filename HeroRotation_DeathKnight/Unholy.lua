@@ -296,7 +296,7 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    Everyone.Interrupt(15, S.MindFreeze, true, Interrupts);
+    Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false);
     -- use DeathStrike on low HP in Solo Mode
     if not no_heal and S.DeathStrike:IsReadyP("Melee") then
       if HR.Cast(S.DeathStrike) then return ""; end

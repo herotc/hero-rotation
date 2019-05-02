@@ -76,6 +76,7 @@ Spell.Monk.Windwalker = {
   Disable                          = Spell(116095),
   HealingElixir                    = Spell(122281), --Talent
   Paralysis                        = Spell(115078),
+  SpearHandStrike                  = Spell(116705),
 
   -- Legendaries
   TheEmperorsCapacitor             = Spell(235054),
@@ -404,17 +405,19 @@ local function APL ()
     -- actions.st+=/flying_serpent_kick,if=prev_gcd.1.blackout_kick&chi>3&buff.swift_roundhouse.stack<2,interrupt=1
   end
 
-	-- Out of Combat
-	if not Player:AffectingCombat() then
-		if Everyone.TargetIsValid() then
-	    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
-		end
-	end
+  -- Out of Combat
+  if not Player:AffectingCombat() then
+    if Everyone.TargetIsValid() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+  end
 
-	-- In Combat
-	if Everyone.TargetIsValid() then
-		-- actions+=/call_action_list,name=serenity,if=buff.serenity.up
-		if Player:BuffP(S.Serenity) then
+  -- In Combat
+  if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
+    -- actions+=/call_action_list,name=serenity,if=buff.serenity.up
+    if Player:BuffP(S.Serenity) then
       local ShouldReturn = Serenity(); 
       if ShouldReturn then 
         return ShouldReturn; 

@@ -48,6 +48,7 @@ Spell.Monk.Brewmaster = {
   RushingJadeWind                       = Spell(116847),
   SpecialDelivery                       = Spell(196730),
   TigerPalm                             = Spell(100780),
+  SpearHandStrike                       = Spell(116705),
   HeavyStagger                          = Spell(124273),
   ModerateStagger                       = Spell(124274),
   LightStagger                          = Spell(124275),
@@ -150,6 +151,8 @@ local function APL()
 
   --- In Combat
   if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
     -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
     if S.BlackOxBrew:IsCastableP() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemainsP())) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
       if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then

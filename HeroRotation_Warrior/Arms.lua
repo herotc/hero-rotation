@@ -59,7 +59,9 @@ Spell.Warrior.Arms = {
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
   Avatar                                = Spell(107574),
-  Massacre                              = Spell(281001)
+  Massacre                              = Spell(281001),
+  Pummel                                = Spell(6552),
+  IntimidatingShout                     = Spell(5246)
 };
 local S = Spell.Warrior.Arms;
 
@@ -81,6 +83,10 @@ local Settings = {
   Arms = HR.GUISettings.APL.Warrior.Arms
 };
 
+-- Stuns
+local StunInterrupts = {
+  {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
+};
 
 local EnemyRanges = {8}
 local function UpdateRanges()
@@ -360,6 +366,8 @@ local function APL()
     if S.Charge:IsCastableP() then
       if HR.Cast(S.Charge, Settings.Arms.GCDasOffGCD.Charge) then return "charge 351"; end
     end
+    -- Interrupts
+    Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
     -- auto_attack
     -- potion
     if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then

@@ -53,7 +53,8 @@ Spell.Mage.Frost = {
   WintersChillDebuff                    = Spell(228358),
   GlacialSpikeBuff                      = Spell(199844),
   SplittingIce                          = Spell(56377),
-  FreezingRain                          = Spell(240555)
+  FreezingRain                          = Spell(240555),
+  Counterspell                          = Spell(2139)
 };
 local S = Spell.Mage.Frost;
 
@@ -317,6 +318,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell
+    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
     -- ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
     if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
       if HR.Cast(S.IceLance) then return "ice_lance 285"; end

@@ -55,7 +55,8 @@ Spell.Hunter.Marksmanship = {
   SteadyFocus                           = Spell(193533),
   SteadyShot                            = Spell(56641),
   TrickShotsBuff                        = Spell(257622),
-  Multishot                             = Spell(257620)
+  Multishot                             = Spell(257620),
+  CounterShot                           = Spell(147362),
 };
 local S = Spell.Hunter.Marksmanship;
 
@@ -268,6 +269,8 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false);
     -- auto_shot
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
     -- call_action_list,name=cds

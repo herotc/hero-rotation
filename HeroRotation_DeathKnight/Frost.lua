@@ -56,6 +56,7 @@ Spell.DeathKnight.Frost = {
   UnholyStrengthBuff                    = Spell(53365),
   IcyCitadel                            = Spell(272718),
   IcyCitadelBuff                        = Spell(272719),
+  MindFreeze                            = Spell(47528),
   PoolRange                             = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Frost;
@@ -506,6 +507,8 @@ local function APL()
     if Settings.General.SoloMode and S.DeathStrike:IsReadyP("Melee") and Player:BuffP(S.DeathStrikeBuff) then
       if HR.Cast(S.DeathStrike) then return ""; end
     end
+    -- Interrupts
+    Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false);
     -- auto_attack
     -- howling_blast,if=!dot.frost_fever.ticking&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
     if S.HowlingBlast:IsCastableP(30, true) and (not Target:DebuffP(S.FrostFeverDebuff) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then

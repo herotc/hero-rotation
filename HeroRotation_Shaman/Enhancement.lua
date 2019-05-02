@@ -264,9 +264,7 @@ local function APL ()
   -- In Combat
   if Everyone.TargetIsValid() then
     -- Interrupt
-    if S.WindShear:IsCastableP(30) and Player:Maelstrom() >= S.WindStrike:Cost() and Target:IsInterruptible() and Settings.General.InterruptEnabled then
-      if HR.Cast(S.WindShear, Settings.Shaman.Commons.OffGCDasOffGCD.WindShear) then return "Cast WindShear" end
-    end
+    Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false);
 
     -- Use healthstone or health potion if we have it and our health is low.
     if Settings.Shaman.Commons.ShowHSHP and (Player:HealthPercentage() <= Settings.Shaman.Commons.HealingHPThreshold) then

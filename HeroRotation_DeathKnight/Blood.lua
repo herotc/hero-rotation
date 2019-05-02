@@ -27,6 +27,7 @@
     Berserking            = Spell(26297),
     BloodFury             = Spell(20572),
     -- Abilities
+    Asphyxiate            = Spell(221562),
     BloodBoil             = Spell(50842),
     Blooddrinker          = Spell(206931),
     BloodMirror           = Spell(206977),
@@ -70,6 +71,10 @@
     Blood = HR.GUISettings.APL.DeathKnight.Blood
   };
 
+  -- Interrupts List
+  local StunInterrupts = {
+    {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
+  };
 
 --- ======= ACTION LISTS =======
   
@@ -123,9 +128,7 @@ local function APL ()
 
     --- Utility
     -- Interrupt
-    if Settings.General.InterruptEnabled and Target:IsInterruptible() and S.MindFreeze:IsCastableP("Melee") then
-      if HR.CastAnnotated(S.MindFreeze, false, "Interrupt") then return ""; end
-    end
+    Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts);
 
     --- APL
     -- Pool during Blooddrinker if enabled

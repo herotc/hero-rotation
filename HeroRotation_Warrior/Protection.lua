@@ -49,7 +49,8 @@ Spell.Warrior.Protection = {
   LastStandBuff                         = Spell(12975),
   VictoryRush                           = Spell(34428),
   ImpendingVictory                      = Spell(202168),
-  Pummel                                = Spell(6552)
+  Pummel                                = Spell(6552),
+  IntimidatingShout                     = Spell(5246)
 };
 local S = Spell.Warrior.Protection;
 
@@ -72,6 +73,10 @@ local Settings = {
   Protection = HR.GUISettings.APL.Warrior.Protection
 };
 
+-- Stuns
+local StunInterrupts = {
+  {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
+};
 
 local EnemyRanges = {5}
 local function UpdateRanges()
@@ -148,7 +153,7 @@ local function APL()
     end
   end
   -- Interrupt
-  Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, Interrupts)
+  Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
   Defensive = function()
     if S.ShieldBlock:IsReadyP() and (((not Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
       (not Player:Buff(S.LastStandBuff)) and Player:Rage() >= 30) then

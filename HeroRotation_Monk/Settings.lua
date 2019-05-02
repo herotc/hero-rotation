@@ -27,7 +27,7 @@
         -- Racials
         Racials = true,
         -- Abilities
-
+        SpearHandStrike = true,
       }
     },
     Brewmaster = {

@@ -367,7 +367,7 @@ local function APL()
 
   if Everyone.TargetIsValid() then
     -- Interrupts
-    Everyone.Interrupt(20, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts);
+    Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts);
 
     -- call_action_list,name=cooldown,if=gcd.remains=0
     if HR.CDsON() then

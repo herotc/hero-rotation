@@ -29,7 +29,7 @@
         -- Racials
         Racials = true,
         -- Abilities
-
+        SpellLock = true,
       }
     },
     Destruction = {

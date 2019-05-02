@@ -26,6 +26,7 @@ HR.GUISettings.APL.DeathKnight = {
       Trinkets = true,
       Potions = true,
       Racials = true,
+      MindFreeze = true,
     }
   },
   Frost = {

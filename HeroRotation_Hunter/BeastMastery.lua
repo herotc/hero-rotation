@@ -50,6 +50,8 @@ Spell.Hunter.BeastMastery = {
   DireBeast                             = Spell(120679),
   CobraShot                             = Spell(193455),
   SpittingCobra                         = Spell(194407),
+  Intimidation                          = Spell(19577),
+  CounterShot                           = Spell(147362),
   -- Misc
   PoolFocus                             = Spell(9999000010),
 };
@@ -72,6 +74,11 @@ local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
   BeastMastery = HR.GUISettings.APL.Hunter.BeastMastery
+};
+
+-- Stuns
+local StunInterrupts = {
+  {S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end},
 };
 
 local EnemyRanges = {40}
@@ -287,6 +294,8 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items
     -- call_action_list,name=cds

@@ -63,6 +63,7 @@ Spell.Druid.Feral = {
   MoonfireCatDebuff                     = Spell(155625),
   ClearcastingBuff                      = Spell(135700),
   Shred                                 = Spell(5221),
+  SkullBash                             = Spell(106839),
   ShadowmeldBuff                        = Spell(58984)
 };
 local S = Spell.Druid.Feral;
@@ -391,6 +392,8 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
     -- auto_attack,if=!buff.prowl.up&!buff.shadowmeld.up
     -- run_action_list,name=opener,if=variable.opener_done=0
     if (VarOpenerDone == 0) then

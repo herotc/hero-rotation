@@ -30,6 +30,7 @@
         -- Racials
         Racials = true,
         -- Abilities
+        CounterShot = true,
       }
     },
     BeastMastery = {
@@ -85,6 +86,7 @@
       OffGCDasOffGCD = {
         -- Abilities
         AspectoftheEagle = true,
+        Muzzle = true,
         -- Items
         -- Racials
       }

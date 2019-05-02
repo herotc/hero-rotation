@@ -57,7 +57,8 @@ Spell.Mage.Arcane = {
   ArcanePummeling                       = Spell(270669),
   Supernova                             = Spell(157980),
   Shimmer                               = Spell(212653),
-  Blink                                 = Spell(1953)
+  Blink                                 = Spell(1953),
+  Counterspell                          = Spell(2139)
 };
 local S = Spell.Mage.Arcane;
 
@@ -374,6 +375,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell,if=target.debuff.casting.react
+    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
     -- call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length
     if HR.CDsON() and (BurnPhase:On() or Target:TimeToDie() < VarAverageBurnLength) then
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end

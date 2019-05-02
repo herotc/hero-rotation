@@ -52,7 +52,9 @@ Spell.Warlock.Demonology = {
   Fireblood                             = Spell(265221),
   BalefulInvocation                     = Spell(287059),
   ShadowsBite                           = Spell(272944),
-  ShadowsBiteBuff                       = Spell(272945)
+  ShadowsBiteBuff                       = Spell(272945),
+  SpellLock                             = Spell(19647),
+  AxeToss                               = Spell(89766)
 };
 local S = Spell.Warlock.Demonology;
 
@@ -72,6 +74,11 @@ local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Warlock.Commons,
   Demonology = HR.GUISettings.APL.Warlock.Demonology
+};
+
+-- Stuns
+local StunInterrupts = {
+  {S.AxeToss, "Cast Axe Toss (Interrupt)", function () return true; end},
 };
 
 local EnemyRanges = {40}
@@ -368,6 +375,8 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Interrupts
+    Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts);
     -- potion,if=pet.demonic_tyrant.active&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 322"; end

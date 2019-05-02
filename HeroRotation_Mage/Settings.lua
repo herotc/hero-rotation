@@ -29,6 +29,7 @@
         Racials = true,
         -- Abilities
         TimeWarp = true,
+        Counterspell = true,
       }
     },
     Frost = {

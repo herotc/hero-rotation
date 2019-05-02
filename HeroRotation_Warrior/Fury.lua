@@ -47,7 +47,9 @@ Spell.Warrior.Fury = {
   Berserking                            = Spell(26297),
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
-  AncestralCall                         = Spell(274738)
+  AncestralCall                         = Spell(274738),
+  Pummel                                = Spell(6552),
+  IntimidatingShout                     = Spell(5246)
 };
 local S = Spell.Warrior.Fury;
 
@@ -70,6 +72,10 @@ local Settings = {
   Fury = HR.GUISettings.APL.Warrior.Fury
 };
 
+-- Stuns
+local StunInterrupts = {
+  {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
+};
 
 local EnemyRanges = {8}
 local function UpdateRanges()
@@ -178,6 +184,8 @@ local function APL()
     if S.Charge:IsCastableP() then
       if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge) then return "charge 78"; end
     end
+    -- Interrupts
+    Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
     -- run_action_list,name=movement,if=movement.distance>5
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap)) then
       return Movement();

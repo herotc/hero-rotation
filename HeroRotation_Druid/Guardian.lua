@@ -170,6 +170,8 @@
     end
     -- In Combat
     if Everyone.TargetIsValid() then
+      -- Interrupts
+      Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
       if Player:Buff(S.CatForm) then
         -- Thrash
         -- Note: Due to an in-game bug, you cannot apply a new thrash if there is the bear one.
