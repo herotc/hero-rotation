@@ -42,6 +42,9 @@ HR.GUISettings.APL.DeathKnight = {
     GCDasOffGCD = {
       -- Abilities
       DarkTransformation = true,
+      ArmyoftheDead = true,
+      DeathandDecay = false,
+      UnholyFrenzy = true,
     }
   },
   Blood = {
