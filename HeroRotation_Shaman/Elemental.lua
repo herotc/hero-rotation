@@ -120,6 +120,7 @@ local I = Item.Shaman.Elemental
 local Settings = {
   General = HR.GUISettings.General,
   Shaman = HR.GUISettings.APL.Shaman,
+  Commons = HR.GUISettings.APL.Shaman.Commons,
   Elemental = HR.GUISettings.APL.Shaman.Elemental
 }
 
