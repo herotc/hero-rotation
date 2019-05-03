@@ -124,6 +124,7 @@ end
 -- GUI Settings
   local Settings = {
     General = HR.GUISettings.General,
+    Commons = HR.GUISettings.APL.DemonHunter.Commons,
     Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
   };
 
