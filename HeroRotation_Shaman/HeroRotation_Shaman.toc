@@ -9,6 +9,8 @@
 ## Dependencies: HeroRotation
 
 Settings.lua
+Shaman.lua
 Elemental.lua
 Enhancement.lua
+Events.lua
 Overrides.lua
