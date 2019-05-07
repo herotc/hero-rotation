@@ -383,7 +383,11 @@ local function APL()
       if HR.Cast(S.MoonfireCat) then return "moonfire_cat 380"; end
     end
     -- rip,if=!ticking
-    if S.Rip:IsCastableP() and (not Target:DebuffP(S.RipDebuff)) then
+    -- Manual addition: Use Primal Wrath if >= 2 targets or Rip if only 1 target
+    if S.PrimalWrath:IsCastableP() and (not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[5] >= 2) then
+      if HR.Cast(S.PrimalWrath) then return "primal_wrath opener"; end
+    end
+    if S.Rip:IsCastableP() and (not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[5] == 1) then
       if HR.Cast(S.Rip) then return "rip 388"; end
     end
   end
