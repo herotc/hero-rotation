@@ -17,6 +17,17 @@
 
 --- ============================ CONTENT ============================
 -- Elemental, ID: 262
+local OldEleIsCastableP
+OldEleIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldEleIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellElemental.TotemMastery then
+    return BaseCheck and (not Player:BuffP(SpellElemental.ResonanceTotemBuff))
+  else
+    return BaseCheck
+  end
+end
+, 262);
 
 -- Enhancement, ID: 263
 
