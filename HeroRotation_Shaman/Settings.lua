@@ -36,6 +36,7 @@
       GCDasOffGCD = {
         -- Abilities
         FeralSpirit = false,
+        Sundering = false,
       },
       EnableFS = true,
       EnableEE = false

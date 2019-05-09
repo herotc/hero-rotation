@@ -375,7 +375,7 @@ local function APL ()
 
     -- actions.priority+=/sundering,if=active_enemies>=3
     if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() and (Cache.EnemiesCount[10] >= 3) then
-      if HR.Cast(S.Sundering) then return "Cast Sundering" end
+      if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
     end
 
     -- actions.priority+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
@@ -548,7 +548,7 @@ local function APL ()
 
     -- actions.filler=sundering
     if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() then
-      if HR.Cast(S.Sundering) then return "Cast Sundering" end
+      if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
     end
 
     -- actions.filler+=/crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
