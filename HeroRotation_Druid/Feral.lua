@@ -384,10 +384,10 @@ local function APL()
     end
     -- rip,if=!ticking
     -- Manual addition: Use Primal Wrath if >= 2 targets or Rip if only 1 target
-    if S.PrimalWrath:IsCastableP() and (not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[5] >= 2) then
+    if S.PrimalWrath:IsCastableP() and (S.PrimalWrath:IsAvailable() and not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[5] >= 2) then
       if HR.Cast(S.PrimalWrath) then return "primal_wrath opener"; end
     end
-    if S.Rip:IsCastableP() and (not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[5] == 1) then
+    if S.Rip:IsCastableP() and (not Target:DebuffP(S.RipDebuff)) then
       if HR.Cast(S.Rip) then return "rip 388"; end
     end
   end
