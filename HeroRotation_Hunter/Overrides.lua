@@ -43,6 +43,18 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 end
 , 254);
 
+local OldMMIsReadyP
+OldMMIsReadyP = HL.AddCoreOverride("Spell.IsReadyP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldMMIsReadyP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellMM.AimedShot then
+    return BaseCheck and (not Player:IsCasting(SpellMM.AimedShot))
+  else
+    return BaseCheck
+  end
+end
+, 254);
+
 -- Survival, ID: 255
 local OldSVIsCastableP
 OldSVIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",

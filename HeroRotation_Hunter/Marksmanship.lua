@@ -78,11 +78,27 @@ local Settings = {
   Marksmanship = HR.GUISettings.APL.Hunter.Marksmanship
 };
 
-
 local EnemyRanges = {40}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
+  end
+end
+
+local function GetEnemiesCount(range)
+  if range == nil then range = 10 end
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Marksmanship.UseSplashData then
+      Hunter.UpdateSplashCount(Target, range)
+      return Hunter.GetSplashCount(Target, range)
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[40]
+    end
+  else
+    return 1
   end
 end
 
@@ -107,7 +123,7 @@ local function APL()
     -- augmentation
     -- food
     -- summon_pet,if=active_enemies<3
-    if S.SummonPet:IsCastableP() and (Cache.EnemiesCount[40] < 3) then
+    if S.SummonPet:IsCastableP() and (GetEnemiesCount(10) < 3) then
       if HR.Cast(S.SummonPet, Settings.Marksmanship.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
     end
     -- snapshot_stats
@@ -125,11 +141,11 @@ local function APL()
         if HR.Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap 18"; end
       end
       -- trueshot,precast_time=1.5,if=active_enemies>2
-      if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (Cache.EnemiesCount[40] > 2) then
+      if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (GetEnemiesCount(10) > 2) then
         if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot 20"; end
       end
       -- aimed_shot,if=active_enemies<3
-      if S.AimedShot:IsReadyP() and (Hunter.GetSplashCount(Target, 10) < 3) then
+      if S.AimedShot:IsReadyP() and (GetEnemiesCount(10) < 3) then
         if HR.Cast(S.AimedShot) then return "aimed_shot 38"; end
       end
     end
@@ -182,7 +198,7 @@ local function APL()
       if HR.Cast(S.ExplosiveShot) then return "explosive_shot 126"; end
     end
     -- barrage,if=active_enemies>1
-    if S.Barrage:IsReadyP() and (Hunter.GetSplashCount(Target, 15) > 1) then
+    if S.Barrage:IsReadyP() and (GetEnemiesCount(15) > 1) then
       if HR.Cast(S.Barrage) then return "barrage 128"; end
     end
     -- a_murder_of_crows
@@ -278,11 +294,11 @@ local function APL()
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<3
-    if (Hunter.GetSplashCount(Target, 10) < 3) then
+    if (GetEnemiesCount(10) < 3) then
       local ShouldReturn = St(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=trickshots,if=active_enemies>2
-    if (Hunter.GetSplashCount(Target, 10) > 2) then
+    if (GetEnemiesCount(10) > 2) then
       local ShouldReturn = Trickshots(); if ShouldReturn then return ShouldReturn; end
     end
   end

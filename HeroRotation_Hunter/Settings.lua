@@ -55,6 +55,7 @@
       }
     },
     Marksmanship = {
+      UseSplashData = true,
       UseLoneWolf = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
