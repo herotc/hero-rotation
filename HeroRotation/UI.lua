@@ -388,7 +388,7 @@
       local HealthBar;
       if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then
         if _G.ElvUI and _G.ElvUI[1].NamePlates then
-          HealthBar = Nameplate.unitFrame.HealthBar;
+          HealthBar = Nameplate.unitFrame.Health;
           NameplateIconSize = HealthBar:GetWidth() / 3.5;
         elseif _G.ShestakUI and _G.ShestakUI[2].nameplate.enable then
           HealthBar = Nameplate.unitFrame.Health;
