@@ -288,7 +288,7 @@ local function APL()
       if HR.Cast(Thrash()) then return "thrash 152"; end
     end
     -- maul
-    if S.Maul:IsReadyP() and Player:HealthPercentage() >= 80 and Player:Rage() > 85 then
+    if S.Maul:IsReadyP() and (not IsTanking or (Player:HealthPercentage() >= 80 and Player:Rage() > 85)) then
       if HR.Cast(S.Maul) then return "maul 154"; end
     end
     -- moonfire,if=azerite.power_of_the_moon.rank>1&active_enemies=1
