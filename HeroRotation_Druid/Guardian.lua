@@ -68,7 +68,6 @@ local I = Item.Druid.Guardian;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local IsTanking;
-local UseMaul;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -157,7 +156,6 @@ local function APL()
   Everyone.AoEToggleEnemiesUpdate()
   Druid.UpdateSplashCount(Target, 10)
   IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
-  UseMaul = GetEnemiesCount(AoERadius) < 5 and (Player:HealthPercentage() >= 80 or Player:Rage() > 75)
   Precombat = function()
     -- flask
     -- food
@@ -247,7 +245,7 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- maul,if=rage.deficit<10&active_enemies<4
-    if UseMaul and S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and GetEnemiesCount(AoERadius) < 4) then
+    if S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and GetEnemiesCount(AoERadius) < 4) then
       if HR.Cast(S.Maul) then return "maul 41"; end
     end
     -- ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
@@ -290,7 +288,7 @@ local function APL()
       if HR.Cast(Thrash()) then return "thrash 152"; end
     end
     -- maul
-    if UseMaul and S.Maul:IsReadyP() then
+    if S.Maul:IsReadyP() and Player:HealthPercentage() >= 80 and Player:Rage() > 85 then
       if HR.Cast(S.Maul) then return "maul 154"; end
     end
     -- moonfire,if=azerite.power_of_the_moon.rank>1&active_enemies=1
