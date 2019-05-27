@@ -53,7 +53,8 @@ Spell.Druid.Guardian = {
   FrenziedRegeneration                  = Spell(22842),
   BalanceAffinity                       = Spell(197488),
   WildChargeTalent                      = Spell(102401),
-  WildChargeBear                        = Spell(16979)
+  WildChargeBear                        = Spell(16979),
+  SurvivalInstincts                     = Spell(61336)
 };
 local S = Spell.Druid.Guardian;
 
@@ -156,7 +157,7 @@ local function APL()
   Everyone.AoEToggleEnemiesUpdate()
   Druid.UpdateSplashCount(Target, 10)
   IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
-  UseMaul = GetEnemiesCount(AoERadius) < 5 and Player:HealthPercentage() >= 60
+  UseMaul = GetEnemiesCount(AoERadius) < 5 and (Player:HealthPercentage() >= 80 or Player:Rage() > 75)
   Precombat = function()
     -- flask
     -- food
@@ -202,24 +203,28 @@ local function APL()
     end
     -- Defensives and Bristling Fur
     if IsTanking and Player:BuffP(S.BearForm) then
-      if not UseMaul and S.FrenziedRegeneration:IsCastableP() and Player:Rage() > 10
+      if Player:HealthPercentage() < Settings.Guardian.FrenziedRegenHP and S.FrenziedRegeneration:IsCastableP() and Player:Rage() > 10
         and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
         if HR.Cast(S.FrenziedRegeneration, Settings.Guardian.GCDasOffGCD.FrenziedRegen) then return "frenzied_regen defensive"; end
       end
-      if not UseMaul and S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (not Player:Buff(S.Ironfur) 
+      if S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (not Player:Buff(S.Ironfur) 
         or (Player:BuffStack(S.Ironfur) < 2 and Player:BuffRefreshableP(S.Ironfur, 2.4))) then
         if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur defensive"; end
       end
       -- barkskin,if=buff.bear_form.up
-      --if S.Barkskin:IsCastableP() then
-        --if HR.Cast(S.Barkskin) then return "barkskin 24"; end
-      --end
+      if S.Barkskin:IsCastableP() and Player:HealthPercentage() < Settings.Guardian.BarkskinHP then
+        if HR.Cast(S.Barkskin, Settings.Guardian.OffGCDasOffGCD.Barkskin) then return "barkskin 24"; end
+      end
       -- lunar_beam,if=buff.bear_form.up
-      --if S.LunarBeam:IsCastableP() then
-        --if HR.Cast(S.LunarBeam) then return "lunar_beam 28"; end
-      --end
+      if S.LunarBeam:IsCastableP() and Player:HealthPercentage() < Settings.Guardian.LunarBeamHP then
+        if HR.Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam) then return "lunar_beam 28"; end
+      end
+      -- Survival Instincts
+      if S.SurvivalInstincts:IsCastableP() and Player:HealthPercentage() < Settings.Guardian.SurvivalInstinctsHP then
+        if HR.Cast(S.SurvivalInstincts, Settings.Guardian.OffGCDasOffGCD.SurvivalInstincts) then return "survival_instincts defensive"; end
+      end
       -- bristling_fur,if=buff.bear_form.up
-      if S.BristlingFur:IsCastableP() then
+      if S.BristlingFur:IsCastableP() and Player:Rage() < Settings.Guardian.BristlingFurRage then
         if HR.Cast(S.BristlingFur) then return "bristling_fur 32"; end
       end
     end
