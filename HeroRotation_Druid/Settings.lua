@@ -78,11 +78,14 @@
       }
     },
     Guardian = {
+      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
+        FrenziedRegen = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
+        Ironfur = true,
       }
     },
   };
@@ -94,7 +97,7 @@
   local CP_Druid = CreateChildPanel(ARPanel, "Druid");
   local CP_Balance = CreateChildPanel(CP_Druid, "Balance");
   local CP_Feral = CreateChildPanel(CP_Druid, "Feral");
-  -- local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian");
+  local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian");
 
   CreateARPanelOptions(CP_Druid, "APL.Druid.Commons");
   CreatePanelOption("CheckButton", CP_Druid, "APL.Druid.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
@@ -111,3 +114,6 @@
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPotion", "Show Potion", "Enable this if you want the addon to show you when to use a potion.");
   CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
+  --Guardian
+  CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Swipe or Thrash.");
+  CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian");

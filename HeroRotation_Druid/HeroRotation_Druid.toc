@@ -9,7 +9,9 @@
 ## Dependencies: HeroRotation
 
 Settings.lua
+Druid.lua
 Balance.lua
 Feral.lua
 Guardian.lua
+Events.lua
 Overrides.lua

@@ -1,315 +1,302 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, addonTable = ...;
-  -- HeroLib
-  local HL = HeroLib;
-  local Cache = HeroCache;
-  local Unit = HL.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = HL.Spell;
-  local Item = HL.Item;
-  -- HeroRotation
-  local HR = HeroRotation;
-  -- Lua
-  local tableinsert = table.insert;
+-- Addon
+local addonName, addonTable = ...
+-- HeroLib
+local HL     = HeroLib
+local Cache  = HeroCache
+local Unit   = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Pet    = Unit.Pet
+local Spell  = HL.Spell
+local Item   = HL.Item
+-- HeroRotation
+local HR     = HeroRotation
+local Druid  = HR.Commons.Druid
 
-
---- ============================ CONTENT ============================
+--- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
-  local Everyone = HR.Commons.Everyone;
-  local Druid = HR.Commons.Druid;
-  -- Spells
-  if not Spell.Druid then Spell.Druid = {}; end
-  Spell.Druid.Guardian = {
-    -- Racials
-    
-    -- Abilities
-    FrenziedRegeneration = Spell(22842),
-    GoreBuff             = Spell(93622),
-    GoryFur              = Spell(201671),
-    Ironfur              = Spell(192081),
-    Mangle               = Spell(33917),
-    Maul                 = Spell(6807),
-    Moonfire             = Spell(8921),
-    MoonfireDebuff       = Spell(164812),
-    Regrowth             = Spell(8936),
-    SwipeBear            = Spell(213771),
-    SwipeCat             = Spell(106785),
-    ThrashBear           = Spell(77758),
-    ThrashBearDebuff     = Spell(192090),
-    ThrashCat            = Spell(106830),
-    -- Talents
-    BalanceAffinity      = Spell(197488),
-    BloodFrenzy          = Spell(203962),
-    Brambles             = Spell(203953),
-    BristlingFur         = Spell(155835),
-    Earthwarden          = Spell(203974),
-    EarthwardenBuff      = Spell(203975),
-    FeralAffinity        = Spell(202155),
-    GalacticGuardian     = Spell(203964),
-    GalacticGuardianBuff = Spell(213708),
-    GuardianofElune      = Spell(155578),
-    GuardianofEluneBuff  = Spell(213680),
-    Incarnation          = Spell(102558),
-    LunarBeam            = Spell(204066),
-    Pulverize            = Spell(80313),
-    PulverizeBuff        = Spell(158792),
-    RestorationAffinity  = Spell(197492),
-    SouloftheForest      = Spell(158477),
-    -- Artifact
-    RageoftheSleeper     = Spell(200851),
-    -- Defensive
-    SurvivalInstincts    = Spell(61336),
-    Barkskin             = Spell(22812),
-    -- Utility
-    Growl                = Spell(6795),
-    SkullBash            = Spell(106839),
-    -- Affinity
-    FerociousBite        = Spell(22568),
-    HealingTouch         = Spell(5185),
-    LunarStrike          = Spell(197628),
-    Rake                 = Spell(1822),
-    RakeDebuff           = Spell(155722),
-    Rejuvenation         = Spell(774),
-    Rip                  = Spell(1079),
-    Shred                = Spell(5221),
-    SolarWrath           = Spell(197629),
-    Starsurge            = Spell(197626),
-    Sunfire              = Spell(197630),
-    SunfireDebuff        = Spell(164815),
-    Swiftmend            = Spell(18562),
-    -- Shapeshift
-    BearForm             = Spell(5487),
-    CatForm              = Spell(768),
-    MoonkinForm          = Spell(197625),
-    TravelForm           = Spell(783),
-    -- Legendaries
-    
-    -- Misc
-    
-    -- Macros
-    
-  };
-  local S = Spell.Druid.Guardian;
-  -- Items
-  if not Item.Druid then Item.Druid = {}; end
-  Item.Druid.Guardian = {
-    -- Legendaries
-    EkowraithCreatorofWorlds = Item(137015, {5}),
-    LuffaWrappings = Item(137056, {9})
-  };
-  local I = Item.Druid.Guardian;
-  -- Rotation Var
-  
-  -- GUI Settings
-  local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.Druid.Commons,
-    Guardian = HR.GUISettings.APL.Druid.Guardian
-  };
+-- luacheck: max_line_length 9999
 
+-- Spells
+if not Spell.Druid then Spell.Druid = {} end
+Spell.Druid.Guardian = {
+  BearForm                              = Spell(5487),
+  CatForm                               = Spell(768),
+  BloodFury                             = Spell(20572),
+  Berserking                            = Spell(26297),
+  ArcaneTorrent                         = Spell(50613),
+  LightsJudgment                        = Spell(255647),
+  Fireblood                             = Spell(265221),
+  AncestralCall                         = Spell(274738),
+  Barkskin                              = Spell(22812),
+  LunarBeam                             = Spell(204066),
+  BristlingFur                          = Spell(155835),
+  Maul                                  = Spell(6807),
+  Ironfur                               = Spell(192081),
+  LayeredMane                           = Spell(279552),
+  Pulverize                             = Spell(80313),
+  PulverizeBuff                         = Spell(158792),
+  ThrashBearDebuff                      = Spell(192090),
+  Moonfire                              = Spell(8921),
+  MoonfireDebuff                        = Spell(164812),
+  Incarnation                           = Spell(102558),
+  ThrashCat                             = Spell(106830),
+  ThrashBear                            = Spell(77758),
+  IncarnationBuff                       = Spell(102558),
+  SwipeCat                              = Spell(106785),
+  SwipeBear                             = Spell(213771),
+  Mangle                                = Spell(33917),
+  GalacticGuardianBuff                  = Spell(213708),
+  PoweroftheMoon                        = Spell(273367),
+  FrenziedRegeneration                  = Spell(22842),
+  BalanceAffinity                       = Spell(197488),
+  WildChargeTalent                      = Spell(102401),
+  WildChargeBear                        = Spell(16979)
+};
+local S = Spell.Druid.Guardian;
 
---- ======= ACTION LISTS =======
-  
+-- Items
+if not Item.Druid then Item.Druid = {} end
+Item.Druid.Guardian = {
+  BattlePotionofAgility            = Item(163223)
+};
+local I = Item.Druid.Guardian;
 
+-- Rotation Var
+local ShouldReturn; -- Used to get the return string
+local IsTanking;
+local UseMaul;
 
---- ======= MAIN =======
-  local function APL ()
-    -- Unit Update
-    local MeleeRange, AoERadius, RangedRange;
-    if S.BalanceAffinity:IsAvailable() then
-      -- Have to use the spell itself since Balance Affinity is a special range increase
-      MeleeRange = S.Mangle;
-      if I.EkowraithCreatorofWorlds:IsEquipped() then
-        AoERadius = I.LuffaWrappings:IsEquipped() and 20.9 or 16.75;
-      else
-        AoERadius = I.LuffaWrappings:IsEquipped() and 16.25 or 13;
-      end
-      RangedRange = S.Moonfire;
+-- GUI Settings
+local Everyone = HR.Commons.Everyone;
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Druid.Commons,
+  Guardian = HR.GUISettings.APL.Druid.Guardian
+};
+
+local EnemyRanges = {40}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
+  end
+end
+
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
+
+local function Swipe()
+  if Player:Buff(S.CatForm) then
+    return S.SwipeCat;
+  else
+    return S.SwipeBear;
+  end
+end
+
+local function Thrash()
+  if Player:Buff(S.CatForm) then
+    return S.ThrashCat;
+  else
+    return S.ThrashBear;
+  end
+end
+
+local function GetEnemiesCount(range)
+  if range == nil then range = 8 end
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Guardian.UseSplashData then
+      Druid.UpdateSplashCount(Target, range)
+      return Druid.GetSplashCount(Target, range)
     else
-      MeleeRange = "Melee";
-      AoERadius = I.LuffaWrappings:IsEquipped() and 10 or 8;
-      RangedRange = 40;
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[8]
     end
-    HL.GetEnemies(AoERadius, true); -- Thrash & Swipe
-    Everyone.AoEToggleEnemiesUpdate();
-    -- Defensives
-    -- Out of Combat
-    if not Player:AffectingCombat() then
-      -- Flask
-      -- Food
-      -- Rune
-      -- PrePot w/ Bossmod Countdown
-      -- Opener
-      if Everyone.TargetIsValid() then
-        if Player:Buff(S.CatForm) then
-          -- Shred
-          if S.Shred:IsCastable(MeleeRange) then
-              if HR.Cast(S.Shred) then return "Cast"; end
-          end
-          return;
-        end
-        if Player:Buff(S.BearForm) then
-          if S.Mangle:IsCastable(MeleeRange) then
-            if HR.Cast(S.Mangle) then return ""; end
-          end
-          if S.ThrashBear:IsCastable(AoERadius, true) then
-            if HR.Cast(S.ThrashBear) then return ""; end
-          end
-          if S.SwipeBear:IsCastable(AoERadius, true) then
-            if HR.Cast(S.SwipeBear) then return ""; end
-          end
-        end
-        if S.Moonfire:IsCastable(RangedRange) then
-          if HR.Cast(S.Moonfire) then return ""; end
-        end
-      end
-      return;
+  else
+    return 1
+  end
+end
+
+local function EvaluateCyclePulverize77(TargetUnit)
+  return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and not Player:BuffP(S.PulverizeBuff)
+end
+
+local function EvaluateCycleMoonfire88(TargetUnit)
+  return TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff) and GetEnemiesCount(40) < 2
+end
+
+local function EvaluateCycleMoonfire139(TargetUnit)
+  return Player:BuffP(S.GalacticGuardianBuff) and GetEnemiesCount(40) < 2
+end
+--- ======= ACTION LISTS =======
+local function APL()
+  local Precombat, Cooldowns
+  -- Determine ranges
+  local MeleeRange, AoERadius, RangedRange
+  if S.BalanceAffinity:IsAvailable() then
+    -- Have to use the spell itself since Balance Affinity is a special range increase
+    MeleeRange = S.Mangle
+    AoERadius = 11
+    RangedRange = S.Moonfire
+  else
+    MeleeRange = "Melee"
+    AoERadius = 8
+    RangedRange = 40
+  end
+  EnemyRanges = {RangedRange, AoERadius, MeleeRange}
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
+  Druid.UpdateSplashCount(Target, 10)
+  IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
+  UseMaul = GetEnemiesCount(AoERadius) < 5 and Player:HealthPercentage() >= 60
+  Precombat = function()
+    -- flask
+    -- food
+    -- augmentation
+    -- bear_form
+    if S.BearForm:IsCastableP() and Player:BuffDownP(S.BearForm) then
+      if HR.Cast(S.BearForm) then return "bear_form 3"; end
     end
-    -- In Combat
-    if Everyone.TargetIsValid() then
-      -- Interrupts
-      Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
-      if Player:Buff(S.CatForm) then
-        -- Thrash
-        -- Note: Due to an in-game bug, you cannot apply a new thrash if there is the bear one.
-        if S.ThrashCat:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 and Target:DebuffRefreshable(S.ThrashCat, 4.5) and not Target:Debuff(S.ThrashBearDebuff) then
-          if HR.Cast(S.ThrashCat) then return "Cast"; end
-        end
-        -- Rip
-        if S.Rip:IsCastable(MeleeRange) and Player:ComboPoints() >= 5 and Target:DebuffRefreshable(S.Rip, 7.2) then
-          if HR.Cast(S.Rip) then return "Cast"; end
-        end
-        -- Rake
-        if S.Rake:IsCastable(MeleeRange) and Target:DebuffRefreshable(S.RakeDebuff, 4.5) then
-          if HR.Cast(S.Rake) then return "Cast"; end
-        end
-        -- Swipe
-        if S.SwipeCat:IsCastable() and Cache.EnemiesCount[AoERadius] >= 2 then
-          if HR.Cast(S.SwipeCat) then return "Cast"; end
-        end
-        -- Shred
-        if S.Shred:IsCastable(MeleeRange) then
-            if HR.Cast(S.Shred) then return "Cast"; end
-        end
-        return;
-      end
-      if Player:Buff(S.BearForm) then
-        local UseMaul = not HR.CDsON() and Cache.EnemiesCount[AoERadius] < 5 and Player:HealthPercentage() >= 60;
-        local IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target);
-        -- # Executed every time the actor is available.
-        -- actions=auto_attack
-        -- actions+=/blood_fury
-        -- actions+=/berserking
-        -- actions+=/arcane_torrent
-        -- actions+=/use_item,slot=trinket2
-        -- actions+=/incarnation
-        -- actions+=/rage_of_the_sleeper
-        -- actions+=/lunar_beam
-
-        -- actions+=/frenzied_regeneration,if=incoming_damage_5s%health.max>=0.5|health<=health.max*0.4
-        if not UseMaul and S.FrenziedRegeneration:IsCastable() and Player:Rage() > 10
-          and Player:HealthPercentage() <= 60 and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
-          if HR.Cast(S.FrenziedRegeneration, {true, false}) then return ""; end
-        end
-        if not UseMaul and S.Ironfur:IsCastable() and Player:Rage() >= S.Ironfur:Cost() + 1
-          and ( ( IsTanking and ( not Player:Buff(S.Ironfur) or ( Player:BuffStack(S.Ironfur) < 2 and ( Player:Buff(S.GoryFur) or Player:BuffRefreshableP(S.Ironfur, 2.4) ) ) ) )
-            or Player:Rage() >= 85 or Player:ActiveMitigationNeeded() ) then
-          if HR.Cast(S.Ironfur, {true, false}) then return ""; end
-        end
-
-        if S.Moonfire:IsCastable(RangedRange) and not Target:IsInRange(MeleeRange) and Target:DebuffRefreshableP(S.MoonfireDebuff, 0) then
-          if HR.Cast(S.Moonfire) then return ""; end
-        end
-
-        -- Get aggro on units near
-        local Tanks = {};
-        local Others = {};
-        for _, ThisUnit in pairs(IsInRaid() and Unit.Raid or Unit.Party) do
-          tableinsert(UnitGroupRolesAssigned(ThisUnit.UnitID) == "TANK" and Tanks or Others, ThisUnit);
-        end
-        local UnitsNotTankedCount = 0;
-        for _, ThisUnit in pairs(Cache.Enemies[AoERadius]) do
-          for _, ThisPlayer in pairs(Others) do
-            if ThisPlayer:IsTanking(ThisUnit, 1) then
-              UnitsNotTankedCount = UnitsNotTankedCount + 1;
-            end
-          end
-        end
-        if UnitsNotTankedCount > 0 then
-          if S.ThrashBear:IsCastable() then
-            if HR.Cast(S.ThrashBear) then return ""; end
-          end
-          if S.SwipeBear:IsCastable() then
-            if HR.Cast(S.SwipeBear) then return ""; end
-          end
-        end
-
-        if S.Moonfire:IsCastable(RangedRange) and Player:Buff(S.Incarnation) and Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8) then
-          if HR.Cast(S.Moonfire) then return ""; end
-        end
-        if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 85 then
-          if HR.Cast(S.Maul) then return ""; end
-        end
-        if S.ThrashBear:IsCastable(AoERadius, true) and Cache.EnemiesCount[AoERadius] >= 2 then
-          if HR.Cast(S.ThrashBear) then return ""; end
-        end
-        if S.Mangle:IsCastable(MeleeRange) then
-          if HR.Cast(S.Mangle) then return ""; end
-        end
-        if S.ThrashBear:IsCastable(AoERadius, true) then
-          if HR.Cast(S.ThrashBear) then return ""; end
-        end
-        -- actions+=/pulverize,if=buff.pulverize.up=0|buff.pulverize.remains<=6
-        if S.Pulverize:IsCastable(MeleeRange) and Target:DebuffStack(S.ThrashBearDebuff) >= 2 and Player:BuffRefreshableP(S.PulverizeBuff, 6) then
-          if HR.Cast(S.Pulverize) then return ""; end
-        end
-        if S.Moonfire:IsCastable(RangedRange) and (Player:Buff(S.GalacticGuardianBuff) or Target:DebuffRefreshableP(S.MoonfireDebuff, 4.8)) then
-          if HR.Cast(S.Moonfire) then return ""; end
-        end
-        if S.ThrashBear:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 then
-          if HR.Cast(S.ThrashBear) then return ""; end
-        end
-        if UseMaul and S.Maul:IsCastable(MeleeRange) and Player:Rage() >= 70 then
-          if HR.Cast(S.Maul) then return ""; end
-        end
-        if S.SwipeBear:IsCastable() and Cache.EnemiesCount[AoERadius] >= 1 then
-          if HR.Cast(S.SwipeBear) then return ""; end
-        end
-        if S.Moonfire:IsCastable(RangedRange) then
-          if HR.Cast(S.Moonfire) then return ""; end
-        end
-        return;
-      end
+    -- snapshot_stats
+    -- potion
+    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 8"; end
     end
   end
+  Cooldowns = function()
+    -- potion
+    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 10"; end
+    end
+    -- blood_fury
+    if S.BloodFury:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 12"; end
+    end
+    -- berserking
+    if S.Berserking:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 14"; end
+    end
+    -- arcane_torrent
+    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 16"; end
+    end
+    -- lights_judgment
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.LightsJudgment) then return "lights_judgment 18"; end
+    end
+    -- fireblood
+    if S.Fireblood:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 20"; end
+    end
+    -- ancestral_call
+    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 22"; end
+    end
+    -- Defensives and Bristling Fur
+    if IsTanking and Player:BuffP(S.BearForm) then
+      if not UseMaul and S.FrenziedRegeneration:IsCastableP() and Player:Rage() > 10
+        and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
+        if HR.Cast(S.FrenziedRegeneration, Settings.Guardian.GCDasOffGCD.FrenziedRegen) then return "frenzied_regen defensive"; end
+      end
+      if not UseMaul and S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (not Player:Buff(S.Ironfur) 
+        or (Player:BuffStack(S.Ironfur) < 2 and Player:BuffRefreshableP(S.Ironfur, 2.4))) then
+        if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur defensive"; end
+      end
+      -- barkskin,if=buff.bear_form.up
+      --if S.Barkskin:IsCastableP() then
+        --if HR.Cast(S.Barkskin) then return "barkskin 24"; end
+      --end
+      -- lunar_beam,if=buff.bear_form.up
+      --if S.LunarBeam:IsCastableP() then
+        --if HR.Cast(S.LunarBeam) then return "lunar_beam 28"; end
+      --end
+      -- bristling_fur,if=buff.bear_form.up
+      if S.BristlingFur:IsCastableP() then
+        if HR.Cast(S.BristlingFur) then return "bristling_fur 32"; end
+      end
+    end
+    -- use_items
+  end
+  -- call precombat
+  if not Player:AffectingCombat() and Everyone.TargetIsValid() then
+    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+  end
+  if Everyone.TargetIsValid() then
+    -- Charge if out of range
+    if S.WildChargeTalent:IsAvailable() and S.WildChargeBear:IsCastableP() and not Target:IsInRange(AoERadius) and Target:IsInRange(25) then
+      if HR.Cast(S.WildChargeBear) then return "wild_charge in_combat"; end
+    end
+    -- Interrupts
+    Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
+    -- auto_attack
+    -- call_action_list,name=cooldowns
+    if (true) then
+      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- maul,if=rage.deficit<10&active_enemies<4
+    if UseMaul and S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and GetEnemiesCount(AoERadius) < 4) then
+      if HR.Cast(S.Maul) then return "maul 41"; end
+    end
+    -- ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
+    if S.Ironfur:IsCastableP() and (S.Ironfur:Cost() == 0 or (Player:Rage() > S.Ironfur:Cost() and S.LayeredMane:AzeriteEnabled() and GetEnemiesCount(AoERadius) > 2)) then
+      if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur 49"; end
+    end
+    -- pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
+    if S.Pulverize:IsCastableP() then
+      if HR.CastCycle(S.Pulverize, 8, EvaluateCyclePulverize77) then return "pulverize 83" end
+    end
+    if S.Pulverize:IsCastableP() and Target:DebuffStackP(S.ThrashBearDebuff) == 3 then
+      if HR.Cast(S.Pulverize) then return "pulverize 84"; end
+    end
+    -- moonfire,target_if=dot.moonfire.refreshable&active_enemies<2
+    if S.Moonfire:IsCastableP() then
+      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire88) then return "moonfire 100" end
+    end
+    -- incarnation
+    if S.Incarnation:IsCastableP() then
+      if HR.Cast(S.Incarnation) then return "incarnation 101"; end
+    end
+    -- thrash,if=(buff.incarnation.down&active_enemies>1)|(buff.incarnation.up&active_enemies>4)
+    if Thrash():IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and GetEnemiesCount(AoERadius) > 1) or (Player:BuffP(S.IncarnationBuff) and GetEnemiesCount(AoERadius) > 4)) then
+      if HR.Cast(Thrash()) then return "thrash 103"; end
+    end
+    -- swipe,if=buff.incarnation.down&active_enemies>4
+    if Swipe():IsCastableP() and (Player:BuffDownP(S.IncarnationBuff) and GetEnemiesCount(AoERadius) > 4) then
+      if HR.Cast(Swipe()) then return "swipe 121"; end
+    end
+    -- mangle,if=dot.thrash_bear.ticking
+    if S.Mangle:IsCastableP() and (Target:DebuffP(S.ThrashBearDebuff)) then
+      if HR.Cast(S.Mangle) then return "mangle 131"; end
+    end
+    -- moonfire,target_if=buff.galactic_guardian.up&active_enemies<2
+    if S.Moonfire:IsCastableP() then
+      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire139) then return "moonfire 151" end
+    end
+    -- thrash
+    if Thrash():IsCastableP() then
+      if HR.Cast(Thrash()) then return "thrash 152"; end
+    end
+    -- maul
+    if UseMaul and S.Maul:IsReadyP() then
+      if HR.Cast(S.Maul) then return "maul 154"; end
+    end
+    -- moonfire,if=azerite.power_of_the_moon.rank>1&active_enemies=1
+    if S.Moonfire:IsCastableP() and (S.PoweroftheMoon:AzeriteRank() > 1 and GetEnemiesCount(AoERadius) == 1) then
+      if HR.Cast(S.Moonfire) then return "moonfire 156"; end
+    end
+    -- swipe
+    if Swipe():IsCastableP() then
+      if HR.Cast(Swipe()) then return "swipe 168"; end
+    end
+  end
+end
 
-  HR.SetAPL(104, APL);
-
-
---- ======= SIMC =======
---- Last Update: 09/24/2017
-
--- # Executed every time the actor is available.
--- actions=auto_attack
--- actions+=/blood_fury
--- actions+=/berserking
--- actions+=/arcane_torrent
--- actions+=/use_item,slot=trinket2
--- actions+=/incarnation
--- actions+=/rage_of_the_sleeper
--- actions+=/lunar_beam
--- actions+=/frenzied_regeneration,if=incoming_damage_5s%health.max>=0.5|health<=health.max*0.4
--- actions+=/bristling_fur,if=buff.ironfur.stack=1|buff.ironfur.down
--- actions+=/ironfur,if=(buff.ironfur.up=0)|(buff.gory_fur.up=1)|(rage>=80)
--- actions+=/moonfire,if=buff.incarnation.up=1&dot.moonfire.remains<=4.8
--- actions+=/thrash_bear,if=buff.incarnation.up=1&dot.thrash.remains<=4.5
--- actions+=/mangle
--- actions+=/thrash_bear
--- actions+=/pulverize,if=buff.pulverize.up=0|buff.pulverize.remains<=6
--- actions+=/moonfire,if=buff.galactic_guardian.up=1&(!ticking|dot.moonfire.remains<=4.8)
--- actions+=/moonfire,if=buff.galactic_guardian.up=1
--- actions+=/moonfire,if=dot.moonfire.remains<=4.8
--- actions+=/swipe_bear
+HR.SetAPL(104, APL)
