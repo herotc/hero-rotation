@@ -54,7 +54,8 @@ Spell.Druid.Guardian = {
   BalanceAffinity                       = Spell(197488),
   WildChargeTalent                      = Spell(102401),
   WildChargeBear                        = Spell(16979),
-  SurvivalInstincts                     = Spell(61336)
+  SurvivalInstincts                     = Spell(61336),
+  SkullBash                             = Spell(106839)
 };
 local S = Spell.Druid.Guardian;
 
