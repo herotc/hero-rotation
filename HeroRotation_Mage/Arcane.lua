@@ -153,7 +153,7 @@ function Player:ArcaneChargesP()
   return math.min(self:ArcaneCharges() + num(self:IsCasting(S.ArcaneBlast)),4)
 end
 
-function BlinkAny()
+local function BlinkAny()
   return S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
 end
 
