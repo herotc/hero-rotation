@@ -47,6 +47,7 @@ Spell.Mage.Frost = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  Shimmer                               = Spell(212653),
   Blink                                 = Spell(1953),
   IceFloes                              = Spell(108839),
   IceFloesBuff                          = Spell(108839),
@@ -76,7 +77,6 @@ local Settings = {
   Frost = HR.GUISettings.APL.Mage.Frost
 };
 
-
 local EnemyRanges = {35, 10}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
@@ -96,6 +96,11 @@ end
 
 S.FrozenOrb.EffectID = 84721
 S.Frostbolt:RegisterInFlight()
+
+function BlinkAny()
+  return S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop
@@ -228,8 +233,8 @@ local function APL()
   end
   Movement = function()
     -- blink,if=movement.distance>10
-    if S.Blink:IsCastableP() and (movement.distance > 10) then
-      if HR.Cast(S.Blink) then return "blink 111"; end
+    if BlinkAny():IsCastableP() and (not Target:IsInRange(S.Frostbolt:MaximumRange())) then
+      if HR.Cast(BlinkAny()) then return "blink 111"; end
     end
     -- ice_floes,if=buff.ice_floes.down
     if S.IceFloes:IsCastableP() and (Player:BuffDownP(S.IceFloesBuff)) then
