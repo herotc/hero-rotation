@@ -226,7 +226,7 @@ local function APL()
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 42"; end
     end
     -- solar_wrath
-    if S.SolarWrath:IsCastableP() and not Player:IsCasting(S.SolarWrath) then
+    if S.SolarWrath:IsCastableP() then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
     end
   end
