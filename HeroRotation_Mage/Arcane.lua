@@ -153,13 +153,10 @@ function Player:ArcaneChargesP()
   return math.min(self:ArcaneCharges() + num(self:IsCasting(S.ArcaneBlast)),4)
 end
 
-local function BlinkAny()
-  return S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
-end
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Burn, Conserve, Movement
+  local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -347,8 +344,8 @@ local function APL()
   end
   Movement = function()
     -- blink_any,if=movement.distance>=10
-    if BlinkAny():IsCastableP() and (not Target:IsInRange(S.ArcaneBlast:MaximumRange())) then
-      if HR.Cast(BlinkAny()) then return "blink_any 337"; end
+    if BlinkAny:IsCastableP() and (not Target:IsInRange(S.ArcaneBlast:MaximumRange())) then
+      if HR.Cast(BlinkAny) then return "blink_any 337"; end
     end
     -- presence_of_mind
     if S.PresenceofMind:IsCastableP() and HR.CDsON() then

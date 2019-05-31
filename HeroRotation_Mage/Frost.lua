@@ -97,13 +97,10 @@ end
 S.FrozenOrb.EffectID = 84721
 S.Frostbolt:RegisterInFlight()
 
-function BlinkAny()
-  return S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
-end
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop
+  local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -233,8 +230,8 @@ local function APL()
   end
   Movement = function()
     -- blink,if=movement.distance>10
-    if BlinkAny():IsCastableP() and (not Target:IsInRange(S.Frostbolt:MaximumRange())) then
-      if HR.Cast(BlinkAny()) then return "blink 111"; end
+    if BlinkAny:IsCastableP() and (not Target:IsInRange(S.Frostbolt:MaximumRange())) then
+      if HR.Cast(BlinkAny) then return "blink 111"; end
     end
     -- ice_floes,if=buff.ice_floes.down
     if S.IceFloes:IsCastableP() and (Player:BuffDownP(S.IceFloesBuff)) then
