@@ -1,9 +1,11 @@
 
-**Not every specs are update for BfA, please check the table below (Supported Rotations), if a spec is in WIP or Outdated, please do not report an issue about it.**
+**Not every spec is updated for BfA, so please check the table below (Supported Rotations). If a spec is in WIP or Outdated status, please do not report an issue about it.**
 
-**If you are experiencing issues with AoE rotation (likely abilities not being recommended), be sure to have enemies nameplates enabled and enough nameplates shown (camera can hide them).**
+**If you are experiencing issues with AoE rotations (likely abilities not being recommended), be sure to have enemies nameplates enabled and enough nameplates shown (camera can hide them).**
 
-**If you see an icon with "POOL" written inside, it means you have to pool your resources. It's a normal behavior, please see this [link explaining resource pooling](https://wow.gamepedia.com/Resource_pooling).**
+**If you see an icon with "POOL" written inside, it means you have to pool your resources. It's a normal behavior. Please see this [link explaining resource pooling](https://wow.gamepedia.com/Resource_pooling).**
+
+**If you update the addon via the Twitch Client and wish to get every change as they are released, please set the addon type to Alpha by right clicking the addon name and selecting Alpha under Release Type. Note that this can potentially include updates that break functionality!**
 
 # HeroRotation
 [![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/herotc/hero-rotation/master/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/network) [![GitHub stars](https://img.shields.io/github/stars/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/stargazers) [![GitHub issues](https://img.shields.io/github/issues/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/issues)
@@ -13,10 +15,10 @@ The project is hosted on [GitHub](https://github.com/herotc/hero-rotation) and p
 It is maintained by [Aethys](https://github.com/aethys256/) and the [HeroTC](https://github.com/herotc) team.
 Also, you can find it on [Curse](https://www.curseforge.com/wow/addons/herorotation) and [CurseForge](https://wow.curseforge.com/projects/herorotation).
 
-**There are a lot of helpful commands, do '/hr help' to see them in-game !
-Although, most of the commands and options are being moving to Addons Panels, you can see them by going into Interface -> Addons -> HeroRotation.**
+**There are a lot of helpful commands. Do '/hr help' to see them in-game!
+Most of the commands and options are being moved to Addons Panels, and you can see them by going into Interface -> Addons -> HeroRotation.**
 
-Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated !
+Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated!
 
 ## Key Features
 - Main icon that shows the next ability you should cast.
@@ -68,6 +70,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 | [Kojiyama](https://github.com/EvanMichaels) | Havoc, Vengeance, Rogue        |  Sep 2017 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/kojiyama/5)      |                                                                                                      |
 | [Blackytemp](https://github.com/ghr74)      | Feral, Rogue, Fire             |  Oct 2017 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/blackytempdev/5) |                                                                                                      |
 | [Hinalover](https://github.com/Hinalover)   | Monk                           |  Jan 2018 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/Hinalover/5)     |                                                                                                      |
+| [Cilraaz](https://github.com/Cilraaz)       | A Little Bit of Everything     |  Jan 2019 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/Cilraaz/5)       |                                                                                                      |
 
 ### Past members
 [Riff](https://github.com/tombell), [Tael](https://github.com/Tae-l), [Locke](https://github.com/Lockem90), [3L00DStrike](https://github.com/3L00DStrike)
@@ -75,10 +78,10 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 
 ## Special Mention About SimC APL
 As said earlier, every rotation is based on SimulationCraft Action Priority Lists (APL).
-What it means is, it heavily relies on how optimized those APLs are, especially for some talents, tier bonuses and legendaries support.
+What this means is it heavily relies on how optimized those APLs are, especially for some talents, tier bonuses, and legendaries support.
 Do remember that what the addon tells you is what the robot on SimulationCraft would do in your situation.
-It also means that you can improve the current APL by using the addon and report the issues you might encounter.
-I am a Rogue theorycrafter and contributor to SimulationCraft, both SimC APL and addon rotation are 100% synced. Both tools are used to do Rogue theorycrafting.
+It also means that you can improve the current APL by using the addon and reporting any issues you might encounter.
+I am a Rogue theorycrafter and contributor to SimulationCraft, so both SimC APL and addon rotation are 100% synced. Both tools are used to do Rogue theorycrafting.
 
 ## Special Thanks
 - [SimulationCraft](http://simulationcraft.org/) for everything the project gives to the whole WoW Community.
@@ -86,12 +89,12 @@ I am a Rogue theorycrafter and contributor to SimulationCraft, both SimC APL and
 - [Skasch](https://github.com/skasch) for what we built together and the motivation he gave to me.
 - [Mystler](https://github.com/Mystler) & [Kojiyama](https://github.com/EvanMichaels) for their help on everything related to rogues that frees me a lot of time.
 
-## Advanced Users / Developper Notes
-If you want to use the addon directly from the [GitHub repository](https://github.com/herotc/hero-rotation), you would have to symlink every folders from this repository (HeroRotation folder and every class modules but the template) to your WoW Addons folder.
-Furthermore, to make it working, you need to add the only dependency that is [HeroLib](https://github.com/herotc/hero-lib) following the same processus (symlink HeroLib & HeroCache from the repository).
-There is a script that does this for you, open symlink.bat (or symlink.sh) and modify the two vars (WoWRep and GHRep) to match your local setup.
+## Advanced Users / Developer Notes
+If you want to use the addon directly from the [GitHub repository](https://github.com/herotc/hero-rotation), you would have to symlink every folder from this repository (HeroRotation folder and every class module, except for the template) to your WoW Addons folder.
+Furthermore, to make it work, you need to add the only dependency, which is [HeroLib](https://github.com/herotc/hero-lib) following the same processus (symlink HeroLib & HeroCache from the repository).
+There is a script that does this for you. Open symlink.bat (or symlink.sh) and modify the two vars (WoWRep and GHRep) to match your local setup.
 Make sure HeroRotation's directories doesn't already exist as it will not override them.
-Finally, launch symlink.bat
+Finally, launch symlink.bat.
 
 Stay tuned !
 Aethys
