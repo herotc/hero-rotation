@@ -70,7 +70,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 | [Kojiyama](https://github.com/EvanMichaels) | Havoc, Vengeance, Rogue        |  Sep 2017 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/kojiyama/5)      |                                                                                                      |
 | [Blackytemp](https://github.com/ghr74)      | Feral, Rogue, Fire             |  Oct 2017 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/blackytempdev/5) |                                                                                                      |
 | [Hinalover](https://github.com/Hinalover)   | Monk                           |  Jan 2018 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/Hinalover/5)     |                                                                                                      |
-| [Cilraaz](https://github.com/Cilraaz)       | A Little Bit of Everything     |  Jan 2019 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/Cilraaz/5)       |                                                                                                      |
+| [Cilraaz](https://github.com/Cilraaz)       | A Little Bit of Everything     |  Jan 2019 | [![Donate](https://img.shields.io/badge/Donate-PayPal-003087.svg)](https://www.paypal.me/Cilraaz/5)       |[![Stream](https://img.shields.io/badge/Stream-Twitch-6441a4.svg)](https://www.twitch.tv/cilraaz)     |
 
 ### Past members
 [Riff](https://github.com/tombell), [Tael](https://github.com/Tae-l), [Locke](https://github.com/Lockem90), [3L00DStrike](https://github.com/3L00DStrike)
