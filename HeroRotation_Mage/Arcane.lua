@@ -13,6 +13,7 @@ local Spell  = HL.Spell
 local Item   = HL.Item
 -- HeroRotation
 local HR     = HeroRotation
+local Mage   = HR.Commons.Mage
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -99,6 +100,27 @@ local function UpdateRanges()
   end
 end
 
+local function GetEnemiesCount(range)
+  if range == nil then range = 10 end
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Arcane.UseSplashData then
+      Mage.UpdateSplashCount(Target, range)
+      return Mage.GetSplashCount(Target, range)
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      if range == 10 or range == 40 then
+        return Cache.EnemiesCount[range]
+      else
+        return Cache.EnemiesCount[40]
+      end
+    end
+  else
+    return 1
+  end
+end
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -159,6 +181,7 @@ local function APL()
   local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  Mage.UpdateSplashCount(Target, 10)
   Precombat = function()
     -- flask
     -- food
@@ -215,7 +238,7 @@ local function APL()
       if HR.Cast(S.NetherTempest) then return "nether_tempest 38"; end
     end
     -- arcane_blast,if=buff.rule_of_threes.up&talent.overpowered.enabled&active_enemies<3
-    if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and S.Overpowered:IsAvailable() and Cache.EnemiesCount[10] < 3) then
+    if S.ArcaneBlast:IsReadyP() and (Player:BuffP(S.RuleofThreesBuff) and S.Overpowered:IsAvailable() and GetEnemiesCount(10) < 3) then
       if HR.Cast(S.ArcaneBlast) then return "arcane_blast 60"; end
     end
     -- lights_judgment,if=buff.arcane_power.down
@@ -256,23 +279,23 @@ local function APL()
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 117"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))
-    if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() == 0 or (Cache.EnemiesCount[10] < 3 or (Cache.EnemiesCount[10] < 2 and S.Resonance:IsAvailable()))) then
+    if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() == 0 or (GetEnemiesCount(10) < 3 or (GetEnemiesCount(10) < 2 and S.Resonance:IsAvailable()))) then
       if HR.Cast(S.ArcaneOrb) then return "arcane_orb 125"; end
     end
     -- arcane_barrage,if=active_enemies>=3&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
-    if S.ArcaneBarrage:IsCastableP() and (Cache.EnemiesCount[40] >= 3 and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
+    if S.ArcaneBarrage:IsCastableP() and (GetEnemiesCount(40) >= 3 and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
       if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 143"; end
     end
     -- arcane_explosion,if=active_enemies>=3
-    if S.ArcaneExplosion:IsReadyP() and (Cache.EnemiesCount[10] >= 3) then
+    if S.ArcaneExplosion:IsReadyP() and (GetEnemiesCount(10) >= 3) then
       if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion 155"; end
     end
     -- arcane_missiles,if=buff.clearcasting.react&active_enemies<3&(talent.amplification.enabled|(!talent.overpowered.enabled&azerite.arcane_pummeling.rank>=2)|buff.arcane_power.down),chain=1
-    if S.ArcaneMissiles:IsCastableP() and (bool(Player:BuffStackP(S.ClearcastingBuff)) and Cache.EnemiesCount[10] < 3 and (S.Amplification:IsAvailable() or (not S.Overpowered:IsAvailable() and S.ArcanePummeling:AzeriteRank() >= 2) or Player:BuffDownP(S.ArcanePowerBuff))) then
+    if S.ArcaneMissiles:IsCastableP() and (bool(Player:BuffStackP(S.ClearcastingBuff)) and GetEnemiesCount(10) < 3 and (S.Amplification:IsAvailable() or (not S.Overpowered:IsAvailable() and S.ArcanePummeling:AzeriteRank() >= 2) or Player:BuffDownP(S.ArcanePowerBuff))) then
       if HR.Cast(S.ArcaneMissiles) then return "arcane_missiles 163"; end
     end
     -- arcane_blast,if=active_enemies<3
-    if S.ArcaneBlast:IsReadyP() and (Cache.EnemiesCount[10] < 3) then
+    if S.ArcaneBlast:IsReadyP() and (GetEnemiesCount(10) < 3) then
       if HR.Cast(S.ArcaneBlast) then return "arcane_blast 181"; end
     end
     -- variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
@@ -302,7 +325,7 @@ local function APL()
       if HR.Cast(S.NetherTempest) then return "nether_tempest 209"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack<=2&(cooldown.arcane_power.remains>10|active_enemies<=2)
-    if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() <= 2 and (S.ArcanePower:CooldownRemainsP() > 10 or Cache.EnemiesCount[10] <= 2)) then
+    if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() <= 2 and (S.ArcanePower:CooldownRemainsP() > 10 or GetEnemiesCount(10) <= 2)) then
       if HR.Cast(S.ArcaneOrb) then return "arcane_orb 231"; end
     end
     -- arcane_blast,if=buff.rule_of_threes.up&buff.arcane_charge.stack>3
@@ -318,7 +341,7 @@ local function APL()
       if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "rune_of_power 257"; end
     end
     -- arcane_missiles,if=mana.pct<=95&buff.clearcasting.react&active_enemies<3,chain=1
-    if S.ArcaneMissiles:IsCastableP() and (Player:ManaPercentageP() <= 95 and bool(Player:BuffStackP(S.ClearcastingBuff)) and Cache.EnemiesCount[10] < 3) then
+    if S.ArcaneMissiles:IsCastableP() and (Player:ManaPercentageP() <= 95 and bool(Player:BuffStackP(S.ClearcastingBuff)) and GetEnemiesCount(10) < 3) then
       if HR.Cast(S.ArcaneMissiles) then return "arcane_missiles 285"; end
     end
     -- arcane_barrage,if=((buff.arcane_charge.stack=buff.arcane_charge.max_stack)&((mana.pct<=variable.conserve_mana)|(talent.rune_of_power.enabled&cooldown.arcane_power.remains>cooldown.rune_of_power.full_recharge_time&mana.pct<=variable.conserve_mana+25))|(talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd&cooldown.arcane_power.remains>10))|mana.pct<=(variable.conserve_mana-10)
@@ -330,7 +353,7 @@ local function APL()
       if HR.Cast(S.Supernova) then return "supernova 319"; end
     end
     -- arcane_explosion,if=active_enemies>=3&(mana.pct>=variable.conserve_mana|buff.arcane_charge.stack=3)
-    if S.ArcaneExplosion:IsReadyP() and (Cache.EnemiesCount[10] >= 3 and (Player:ManaPercentageP() >= VarConserveMana or Player:ArcaneChargesP() == 3)) then
+    if S.ArcaneExplosion:IsReadyP() and (GetEnemiesCount(10) >= 3 and (Player:ManaPercentageP() >= VarConserveMana or Player:ArcaneChargesP() == 3)) then
       if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion 321"; end
     end
     -- arcane_blast

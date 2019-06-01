@@ -59,6 +59,7 @@
       }
     },
     Arcane = {
+      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -88,6 +89,7 @@
   CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTimeWarp", "Use Time Warp", "Enable this if you want the addon to show you when to use Time Warp.");
   CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   -- Arcane
+  CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Arcane Explosion");
   CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
   -- Fire
   CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
