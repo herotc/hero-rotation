@@ -271,7 +271,7 @@ local function APL()
       end
     end
     -- ferocious_bite,max_energy=1
-    if S.FerociousBiteMaxEnergy:IsCastableP() and S.FerociousBiteMaxEnergy:IsUsableP() then
+    if S.FerociousBiteMaxEnergy:IsReadyP() and Player:ComboPoints() > 0 then
       if HR.Cast(S.FerociousBiteMaxEnergy) then return "ferocious_bite 168"; end
     end
   end
@@ -416,7 +416,7 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- ferocious_bite,target_if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>10&(talent.sabertooth.enabled)
-    if S.FerociousBite:IsCastableP() then
+    if S.FerociousBite:IsReadyP() and Player:ComboPoints() > 0 then
       if HR.CastCycle(S.FerociousBite, 8, EvaluateCycleFerociousBite418) then return "ferocious_bite 426" end
     end
     -- regrowth,if=combo_points=5&buff.predatory_swiftness.up&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8)
