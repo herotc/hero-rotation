@@ -68,6 +68,7 @@
         GrimoireFelguard = false,
         SummonDemonicTyrant = false,
         DemonicStrength = false,
+        NetherPortal = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

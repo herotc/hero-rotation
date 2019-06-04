@@ -347,7 +347,7 @@ local function APL()
   NetherPortalBuilding = function()
     -- nether_portal,if=soul_shard>=5&(!talent.power_siphon.enabled|buff.demonic_core.up)
     if S.NetherPortal:IsReadyP() and (Player:SoulShardsP() >= 5 and (not S.PowerSiphon:IsAvailable() or Player:BuffP(S.DemonicCoreBuff))) then
-      if HR.Cast(S.NetherPortal) then return "nether_portal 297"; end
+      if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return "nether_portal 297"; end
     end
     -- call_dreadstalkers
     if S.CallDreadstalkers:IsReadyP() then
