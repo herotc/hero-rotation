@@ -448,7 +448,7 @@ local function APL ()
 
     -- actions.cds+=/ascendance,if=cooldown.strike.remains>0
     if S.Ascendance:IsCastableP() and ((S.WindStrike:CooldownRemainsP() > 0 or S.StormStrike:CooldownRemainsP() > 0)) then
-      if HR.Cast(S.Ascendance) then return "Cast Ascendance" end
+      if HR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance" end
     end
 
     -- actions.cds+=/earth_elemental

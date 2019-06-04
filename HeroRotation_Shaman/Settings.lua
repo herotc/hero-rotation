@@ -37,6 +37,7 @@
         -- Abilities
         FeralSpirit = false,
         Sundering = false,
+        Ascendance = false,
       },
       EnableFS = true,
       EnableEE = false
