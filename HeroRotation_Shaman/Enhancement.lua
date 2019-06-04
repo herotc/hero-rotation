@@ -127,6 +127,7 @@ local I = Item.Shaman.Enhancement;
 local Settings = {
   General = HR.GUISettings.General,
   Shaman = HR.GUISettings.APL.Shaman,
+  Enhancement = HR.GUISettings.APL.Shaman.Enhancement,
   Commons = HR.GUISettings.APL.Shaman.Commons,
 }
 
