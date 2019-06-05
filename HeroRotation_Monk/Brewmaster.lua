@@ -112,7 +112,7 @@ local function GetNextTick()
 end
 
 -- makeTempAdder function from BrewmasterTools
-function BrMMakeTempAdder()
+local function BrMMakeTempAdder()
   local val = 0
   return function(toAdd, decayTime) --modify upvalue
     val = val + toAdd
