@@ -12,7 +12,7 @@ local Pet    = Unit.Pet
 local Spell  = HL.Spell
 local Item   = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR   = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -60,8 +60,8 @@ local S = Spell.Monk.Brewmaster;
 -- Items
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
-  ProlongedPower        = Item(142117),
   BattlePotionOfAgility = Item(163223),
+  InvocationOfYulon     = Item(165568),
 };
 local I = Item.Monk.Brewmaster;
 
@@ -77,18 +77,57 @@ local Settings = {
   Brewmaster = HR.GUISettings.APL.Monk.Brewmaster
 };
 
--- Variables
-local BrewmasterToolsEnabled = BrewmasterTools and true or false;
-if not BrewmasterToolsEnabled then
-  HR.Print("Purifying disabled. You need Brewmaster Tools to enable it.");
+-- Array of the 3 stagger levels
+local staggerDebuffs = {
+  [124273] = true,
+  [124274] = true,
+  [124275] = true,
+};
+
+-- UnitAura function from BrewmasterTools
+local function BrMUnitAura(unit, spellID, filter)
+  local i, id = 0, 0
+  if type(spellID) == "number" then
+    while id do
+      i = i + 1
+      id = select(10, UnitAura(unit, i, filter))
+      if spellID == id then
+        return UnitAura(unit, i, filter)
+      end
+    end
+  else
+    while id do
+      i = i + 1
+      id = select(10, UnitAura(unit, i, filter))
+      if spellID[id] then
+        return UnitAura(unit, i, filter)
+      end
+    end
+  end
 end
 
+-- GetNextTick function from BrewmasterTools
+local function GetNextTick()
+  return select(16,BrMUnitAura("player", staggerDebuffs, "HARMFUL")) or 0
+end
+
+-- makeTempAdder function from BrewmasterTools
+function BrMMakeTempAdder()
+  local val = 0
+  return function(toAdd, decayTime) --modify upvalue
+    val = val + toAdd
+    C_Timer.After(decayTime,function()
+      val = val - toAdd
+    end)
+  end,
+  function()  return val  end --access upvalue
+end
+
+BrMAddToPool, BrMGetNormalStagger = BrMMakeTempAdder()
+
 local function ShouldPurify ()
-  if not BrewmasterToolsEnabled or not Settings.Brewmaster.Purify.Enabled then
-    return false;
-  end
-  local NormalizedStagger = BrewmasterTools.GetNormalStagger();
-  local NextStaggerTick = BrewmasterTools.GetNextTick();
+  local NormalizedStagger = BrMGetNormalStagger();
+  local NextStaggerTick = GetNextTick();
   local NStaggerPct = NextStaggerTick > 0 and NextStaggerTick/Player:MaxHealth() or 0;
   local ProgressPct = NormalizedStagger > 0 and Player:Stagger()/NormalizedStagger or 0;
   if NStaggerPct > 0.015 and ProgressPct > 0 then
@@ -115,44 +154,69 @@ local function APL()
   local IronskinDuration = 7;
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
-  --- Defensives
-  -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
-  -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
-  -- Note: Extra handling of the charge management only while tanking.
-  --       "- (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)"
-  if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
-      and S.Brews:ChargesFractional() >= BrewMaxCharge - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)
-      and Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 2 then
-    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
-  end
-  -- purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
-  if S.PurifyingBrew:IsCastableP() and ShouldPurify() then
-    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
-  end
-  -- BlackoutCombo Stagger Pause w/ Ironskin Brew
-  if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
-    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
-  end
-  -- black_ox_brew,if=cooldown.brews.charges_fractional<0.5
-  if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.5 then
-    if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
+  local function Defensives()
+    -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
+    -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
+    -- Note: Extra handling of the charge management only while tanking.
+    --       "- (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)"
+    if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
+        and S.Brews:ChargesFractional() >= BrewMaxCharge - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)
+        and Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 2 then
+      if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
+    end
+    -- purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
+    if S.PurifyingBrew:IsCastableP() and ShouldPurify() then
+      if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return ""; end
+    end
+    -- BlackoutCombo Stagger Pause w/ Ironskin Brew
+    if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
+      if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
+    end
   end
 
   --- Out of Combat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (true) then
-      if HR.CastSuggested(I.ProlongedPower) then return ""; end
+    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
     end
---    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions and (true) then
---      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
---    end
   end
 
   --- In Combat
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
+    -- Defensives
+    if IsTanking then
+      ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Invocation of Yu'lon
+    if I.InvocationOfYulon:IsReady() then
+      if HR.CastSuggested(I.InvocationOfYulon) then return ""; end
+    end
+    -- potion
+    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+    end
+    -- blood_fury
+    if S.BloodFury:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BloodFury, Settings.Brewmaster.OffGCDasOffGCD.BloodFury) then return ""; end
+    end
+    -- berserking
+    if S.Berserking:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Berserking, Settings.Brewmaster.OffGCDasOffGCD.Berserking) then return ""; end
+    end
+    -- lights_judgment
+    -- fireblood
+    -- ancestral_call
+    -- invoke_niuzao_the_black_ox
+    if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and HR.CDsON() and Target:TimeToDie() > 25 then
+      if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
+    end
+    -- black_ox_brew,if=cooldown.brews.charges_fractional<0.5
+    if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.5 then
+      if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
+    end
     -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
     if S.BlackOxBrew:IsCastableP() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemainsP())) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
       if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then
@@ -163,25 +227,6 @@ local function APL()
         if S.Brews:Charges() >= 1 then HR.Cast(S.IronskinBrew, ForceOffGCD); end
         if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return ""; end
       end
-    end
-    -- potion
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.ProlongedPower) then return ""; end
-    end
---    if I.ProlongeBattlePotionOfAgilitydPower:IsReady() and Settings.Commons.UsePotions then
---      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
---    end
-    -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BloodFury, Settings.Brewmaster.OffGCDasOffGCD.BloodFury) then return ""; end
-    end
-    -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Berserking, Settings.Brewmaster.OffGCDasOffGCD.Berserking) then return ""; end
-    end
-    -- invoke_niuzao_the_black_ox
-    if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and HR.CDsON() then
-      if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
     end
     -- keg_smash,if=spell_targets>=2
     if S.KegSmash:IsCastableP(25) and Cache.EnemiesCount[8] >= 2 then
@@ -219,15 +264,19 @@ local function APL()
     if S.ChiWave:IsCastableP(25) then
       if HR.Cast(S.ChiWave) then return ""; end
     end
-    -- arcane_torrent,if=energy<31
-    if HR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
-      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
-    end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
     if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 65) then
       if HR.Cast(S.TigerPalm) then return ""; end
     end
-  	-- downtime energy pooling
+    -- arcane_torrent,if=energy<31
+    if HR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
+      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
+    end
+    -- rushing_jade_wind
+    if S.RushingJadeWind:IsCastableP() then
+      if HR.Cast(S.RushingJadeWind) then return ""; end
+    end
+    -- downtime energy pooling
     if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
