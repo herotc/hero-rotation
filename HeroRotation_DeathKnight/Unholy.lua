@@ -38,6 +38,7 @@ Spell.DeathKnight.Unholy = {
   UnholyFrenzyBuff                      = Spell(207289),
   DarkTransformation                    = Spell(63560),
   SummonGargoyle                        = Spell(49206),
+  DarkArbiter                           = Spell(207349),
   UnholyFrenzy                          = Spell(207289),
   MagusoftheDead                        = Spell(288417),
   SoulReaper                            = Spell(130736),
@@ -121,6 +122,7 @@ local function APL()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   local no_heal = not DeathStrikeHeal()
+  local Gargoyle = S.DarkArbiter:IsLearned() and S.DarkArbiter or S.SummonGargoyle
   Precombat = function()
     -- flask
     -- food
@@ -225,8 +227,8 @@ local function APL()
       if HR.Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation 119"; end
     end
     -- summon_gargoyle,if=runic_power.deficit<14
-    if S.SummonGargoyle:IsCastableP() and (Player:RunicPowerDeficit() < 14) then
-      if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle 123"; end
+    if Gargoyle:IsCastableP() and (Player:RunicPowerDeficit() < 14) then
+      if HR.Cast(Gargoyle) then return "summon_gargoyle 123"; end
     end
     -- unholy_frenzy,if=debuff.festering_wound.stack<4&!(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled)
     if S.UnholyFrenzy:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not (I.RampingAmplitudeGigavoltEngine:IsEquipped() or S.MagusoftheDead:AzeriteEnabled())) then
