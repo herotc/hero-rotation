@@ -283,7 +283,7 @@ local function APL()
       if HR.Cast(S.ArcaneOrb) then return "arcane_orb 125"; end
     end
     -- arcane_barrage,if=active_enemies>=3&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
-    if S.ArcaneBarrage:IsCastableP() and (Cache.EnemiesCount(40) >= 3 and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
+    if S.ArcaneBarrage:IsCastableP() and (Cache.EnemiesCount[40] >= 3 and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
       if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 143"; end
     end
     -- arcane_explosion,if=active_enemies>=3
