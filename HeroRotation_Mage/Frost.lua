@@ -62,7 +62,8 @@ local S = Spell.Mage.Frost;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
-  ProlongedPower                   = Item(142117)
+  ProlongedPower                   = Item(142117),
+  TidestormCodex                   = Item(165576)
 };
 local I = Item.Mage.Frost;
 
@@ -126,7 +127,7 @@ local function APL()
         if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 12"; end
       end
       -- frostbolt
-      if S.Frostbolt:IsCastableP() and Everyone.TargetIsValid() then
+      if S.Frostbolt:IsCastableP() then
         if HR.Cast(S.Frostbolt) then return "frostbolt 14"; end
       end
     end
@@ -169,8 +170,12 @@ local function APL()
       if HR.Cast(S.GlacialSpike) then return "glacial_spike 46"; end
     end
     -- cone_of_cold
-    if (S.ConeofCold:IsCastableP() and (Cache.EnemiesCount[10] >= 1)) then
+    if S.ConeofCold:IsCastableP() and (Cache.EnemiesCount[10] >= 1) then
       if HR.Cast(S.ConeofCold) then return "cone_of_cold 48"; end
+    end
+    -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
+    if I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+      if HR.Cast(I.TidestormCodex) then return "tidestorm_codex 49"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
@@ -194,7 +199,7 @@ local function APL()
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 58"; end
     end
-    -- rune_of_power,if=prev_gcd.1.frozen_orb|time_to_die>10+cast_time&time_to_die<20
+    -- rune_of_power,if=prev_gcd.1.frozen_orb|target.time_to_die>10+cast_time&target.time_to_die<20
     if S.RuneofPower:IsCastableP() and (Player:PrevGCDP(1, S.FrozenOrb) or Target:TimeToDie() > 10 + S.RuneofPower:CastTime() and Target:TimeToDie() < 20) then
       if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power 60"; end
     end
@@ -202,8 +207,8 @@ local function APL()
     if (S.RuneofPower:IsAvailable() and Cache.EnemiesCount[35] == 1 and S.RuneofPower:FullRechargeTimeP() < S.FrozenOrb:CooldownRemainsP()) then
       local ShouldReturn = TalentRop(); if ShouldReturn then return ShouldReturn; end
     end
-    -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 70) then
+    -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<30
+    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
       if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 96"; end
     end
     -- use_items
@@ -290,6 +295,10 @@ local function APL()
     -- ice_nova
     if S.IceNova:IsCastableP() then
       if HR.Cast(S.IceNova) then return "ice_nova 217"; end
+    end
+    -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
+    if I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+      if HR.Cast(I.TidestormCodex) then return "tidestorm_codex 218"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
