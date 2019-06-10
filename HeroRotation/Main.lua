@@ -272,8 +272,8 @@
           -- Load additionnal settings
           local CP_General = GUI.GetPanelByName("General")
           if CP_General then
-            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 10, 0.5}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
-            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 10, 0.5}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleUI", {0.5, 5, 0.1}, "UI Scale", "Scale of the Icons.", function(value) HR.MainFrame:ResizeUI(value); end);
+            CreatePanelOption("Slider", CP_General, "General.ScaleButtons", {0.5, 5, 0.1}, "Buttons Scale", "Scale of the Buttons.", function(value) HR.MainFrame:ResizeButtons(value); end);
             CreatePanelOption("Button", CP_General, "ButtonMove", "Lock/Unlock", "Enable the moving of the frames.", function() HR.MainFrame:ToggleLock(); end);
             CreatePanelOption("Button", CP_General, "ButtonReset", "Reset Buttons", "Resets the anchor of buttons.", function() HR.ToggleIconFrame:ResetAnchor(); end);
           end
