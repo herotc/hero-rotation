@@ -246,13 +246,13 @@ local function APL()
       if HR.Cast(S.ThrowGlaive) then return "throw_glaive 135"; end
     end
     -- fel_rush,if=movement.distance>15|buff.out_of_range.up
-    if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and ConserveFelRush()) then
-      if CastFelRush() then return "fel_rush 139"; end
-    end
+    -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and ConserveFelRush()) then
+      -- if CastFelRush() then return "fel_rush 139"; end
+    -- end
     -- vengeful_retreat,if=movement.distance>15
-    if S.VengefulRetreat:IsCastableP("Melee", true) then
-      if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 143"; end
-    end
+    -- if S.VengefulRetreat:IsCastableP("Melee", true) then
+      -- if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 143"; end
+    -- end
     -- throw_glaive,if=talent.demon_blades.enabled
     if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
       if HR.Cast(S.ThrowGlaive) then return "throw_glaive 145"; end
@@ -316,17 +316,17 @@ local function APL()
       if CastFelRush() then return "fel_rush 245"; end
     end
     -- felblade,if=movement.distance>15|buff.out_of_range.up
-    if S.Felblade:IsCastableP(15) and (not IsInMeleeRange()) then
-      if HR.Cast(S.Felblade) then return "felblade 255"; end
-    end
+    -- if S.Felblade:IsCastableP(15) and (not IsInMeleeRange()) then
+      -- if HR.Cast(S.Felblade) then return "felblade 255"; end
+    -- end
     -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
-    if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and not S.Momentum:IsAvailable() and ConserveFelRush()) then
-      if CastFelRush() then return "fel_rush 259"; end
-    end
+    -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and not S.Momentum:IsAvailable() and ConserveFelRush()) then
+      -- if CastFelRush() then return "fel_rush 259"; end
+    -- end
     -- vengeful_retreat,if=movement.distance>15
-    if S.VengefulRetreat:IsCastableP("Melee", true) then
-      if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 265"; end
-    end
+    -- if S.VengefulRetreat:IsCastableP("Melee", true) then
+      -- if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 265"; end
+    -- end
     -- throw_glaive,if=talent.demon_blades.enabled
     if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
       if HR.Cast(S.ThrowGlaive) then return "throw_glaive 267"; end
