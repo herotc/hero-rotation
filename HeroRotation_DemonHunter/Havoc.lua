@@ -122,28 +122,6 @@ local function IsInMeleeRange()
   return Target:IsInRange("Melee")
 end
 
-local function IsMetaExtendedByDemonic()
-  if not Player:BuffP(S.MetamorphosisBuff) then
-    return false;
-  elseif(S.EyeBeam:TimeSinceLastCast() < S.MetamorphosisImpact:TimeSinceLastCast()) then
-    return true;
-  end
-
-  return false;
-end
-
-local function MetamorphosisCooldownAdjusted()
-  -- TODO: Make this better by sampling the Fury expenses over time instead of approximating
-  if I.ConvergenceofFates:IsEquipped() and I.DelusionsOfGrandeur:IsEquipped() then
-    return S.Metamorphosis:CooldownRemainsP() * 0.56;
-  elseif I.ConvergenceofFates:IsEquipped() then
-    return S.Metamorphosis:CooldownRemainsP() * 0.78;
-  elseif I.DelusionsOfGrandeur:IsEquipped() then
-    return S.Metamorphosis:CooldownRemainsP() * 0.67;
-  end
-  return S.Metamorphosis:CooldownRemainsP()
-end
-
 local function CastFelRush()
   if Settings.Havoc.FelRushDisplayStyle == "Suggested" then
     return HR.CastSuggested(S.FelRush);
@@ -272,7 +250,7 @@ local function APL()
       if CastFelRush() then return "fel_rush 139"; end
     end
     -- vengeful_retreat,if=movement.distance>15
-    if S.VengefulRetreat:IsCastableP() and (not IsInMeleeRange()) then
+    if S.VengefulRetreat:IsCastableP("Melee", true) then
       if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 143"; end
     end
     -- throw_glaive,if=talent.demon_blades.enabled
@@ -282,7 +260,7 @@ local function APL()
   end
   Normal = function()
     -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
-    if S.VengefulRetreat:IsCastableP() and (S.Momentum:IsAvailable() and Player:BuffDownP(S.PreparedBuff) and HL.CombatTime() > 1) then
+    if S.VengefulRetreat:IsCastableP("Melee", true) and (S.Momentum:IsAvailable() and Player:BuffDownP(S.PreparedBuff) and HL.CombatTime() > 1) then
       if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 149"; end
     end
     -- fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
@@ -346,7 +324,7 @@ local function APL()
       if CastFelRush() then return "fel_rush 259"; end
     end
     -- vengeful_retreat,if=movement.distance>15
-    if S.VengefulRetreat:IsCastableP() and (not IsInMeleeRange()) then
+    if S.VengefulRetreat:IsCastableP("Melee", true) then
       if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 265"; end
     end
     -- throw_glaive,if=talent.demon_blades.enabled
