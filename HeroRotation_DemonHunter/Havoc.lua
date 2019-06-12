@@ -50,7 +50,9 @@ Spell.DemonHunter.Havoc = {
   FirstBlood                            = Spell(206416),
   TrailofRuin                           = Spell(258881),
   MomentumBuff                          = Spell(208628),
-  Disrupt                               = Spell(183752)
+  Disrupt                               = Spell(183752),
+  FelEruption                           = Spell(211881),
+  ChaosNova                             = Spell(179057),
 };
 local S = Spell.DemonHunter.Havoc;
 
@@ -160,17 +162,17 @@ local function APL()
     end
     -- metamorphosis,if=!azerite.chaotic_transformation.enabled
     if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and not S.ChaoticTransformation:AzeriteEnabled()) then
-      if HR.Cast(S.Metamorphosis) then return "metamorphosis 6"; end
+      if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 6"; end
     end
   end
   Cooldown = function()
     -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis)|target.time_to_die<25
     if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and not (S.Demonic:IsAvailable() or bool(VarPoolingForMeta) or bool(VarWaitingForNemesis)) or Target:TimeToDie() < 25) then
-      if HR.Cast(S.Metamorphosis) then return "metamorphosis 12"; end
+      if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 12"; end
     end
     -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&cooldown.blade_dance.remains>gcd.max))
     if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and S.Demonic:IsAvailable() and (not S.ChaoticTransformation:AzeriteEnabled() or (S.EyeBeam:CooldownRemainsP() > 12 and S.BladeDance:CooldownRemainsP() > Player:GCD()))) then
-      if HR.Cast(S.Metamorphosis) then return "metamorphosis 20"; end
+      if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 20"; end
     end
     -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
     -- nemesis,if=!raid_event.adds.exists
@@ -214,7 +216,7 @@ local function APL()
       if HR.Cast(S.FelBarrage) then return "fel_barrage 83"; end
     end
     -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
-    if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance) and not S.Metamorphosis:CooldownUpP() and (S.EyeBeam:CooldownRemainsP() > (5 - S.RevolvingBlades:AzeriteRank() * 3))) then
+    if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance) and (S.EyeBeam:CooldownRemainsP() > (5 - S.RevolvingBlades:AzeriteRank() * 3))) then
       if HR.Cast(S.BladeDance) then return "blade_dance 95"; end
     end
     -- immolation_aura
