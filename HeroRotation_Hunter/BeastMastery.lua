@@ -52,6 +52,7 @@ Spell.Hunter.BeastMastery = {
   SpittingCobra                         = Spell(194407),
   Intimidation                          = Spell(19577),
   CounterShot                           = Spell(147362),
+  Exhilaration                          = Spell(109304),
   -- Misc
   PoolFocus                             = Spell(9999000010),
 };
@@ -294,6 +295,10 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Self heal, if below setting value
+    if S.Exhilaration:IsCastableP() and Player:HealthPercentage() <= Settings.BeastMastery.ExhilarationHP then
+      if HR.Cast(S.Exhilaration, Settings.BeastMastery.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
+    end
     -- Interrupts
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
