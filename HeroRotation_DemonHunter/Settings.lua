@@ -46,6 +46,9 @@
       OffGCDasOffGCD = {
         -- Abilities
         Metamorphosis = true,
+      },
+      GCDasOffGCD = {
+        -- Abilities
         Nemesis = true,
       },
     }
