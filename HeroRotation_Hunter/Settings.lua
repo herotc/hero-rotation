@@ -20,10 +20,12 @@
       MultiShotInMain = "Never",
       CounterShot = false,
       UsePotions = false,
+      ExhilarationHP = 30,
       -- SoloMode Settings
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
+        Exhilaration = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -35,7 +37,6 @@
     },
     BeastMastery = {
       UseSplashData = true,
-      ExhilarationHP = 30,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -43,7 +44,6 @@
         AspectoftheWild = false,
         BestialWrath = false,
         SummonPet = false,
-        Exhilaration = true,
         SpittingCobra = false,
         Stampede = false,
       },

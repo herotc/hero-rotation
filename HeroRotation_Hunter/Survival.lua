@@ -67,7 +67,8 @@ Spell.Hunter.Survival = {
   WildernessSurvival                    = Spell(278532),
   ArcaneTorrent                         = Spell(50613),
   Intimidation                          = Spell(19577),
-  Muzzle                                = Spell(187707)
+  Muzzle                                = Spell(187707),
+  Exhilaration                          = Spell(109304),
 };
 local S = Spell.Hunter.Survival;
 
@@ -517,6 +518,10 @@ local function APL()
     -- call precombat
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Self heal, if below setting value
+    if S.Exhilaration:IsCastableP() and Player:HealthPercentage() <= Settings.Commons.ExhilarationHP then
+      if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
     end
     -- Interrupts
     Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts);

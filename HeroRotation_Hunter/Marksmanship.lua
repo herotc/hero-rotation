@@ -57,6 +57,7 @@ Spell.Hunter.Marksmanship = {
   TrickShotsBuff                        = Spell(257622),
   Multishot                             = Spell(257620),
   CounterShot                           = Spell(147362),
+  Exhilaration                          = Spell(109304),
 };
 local S = Spell.Hunter.Marksmanship;
 
@@ -285,6 +286,10 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Self heal, if below setting value
+    if S.Exhilaration:IsCastableP() and Player:HealthPercentage() <= Settings.Commons.ExhilarationHP then
+      if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
+    end
     -- Interrupts
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false);
     -- auto_shot

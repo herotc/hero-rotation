@@ -296,8 +296,8 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- Self heal, if below setting value
-    if S.Exhilaration:IsCastableP() and Player:HealthPercentage() <= Settings.BeastMastery.ExhilarationHP then
-      if HR.Cast(S.Exhilaration, Settings.BeastMastery.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
+    if S.Exhilaration:IsCastableP() and Player:HealthPercentage() <= Settings.Commons.ExhilarationHP then
+      if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
     end
     -- Interrupts
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
