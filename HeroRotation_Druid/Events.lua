@@ -25,15 +25,36 @@ do
   HL.RangeTracker = {
     AbilityTimeout = 1,
     NucleusAbilities = {
-      -- Trash Bear
+      -- Thrash (Bear)
       [77758]  = {
         Range=8,
         LastDamageTime=0,
         LastDamaged={},
         Timeout=6
       },
-      -- Swipe Bear
+      -- Swipe (Bear)
       [213771] = {
+        Range=8,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=6
+      },
+      -- Sunfire (Balance)
+      [93402] = {
+        Range=8,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=6
+      },
+      -- Starfall (Balance)
+      [191034] = {
+        Range=15,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=6
+      },
+      -- Lunar Strike (Balance)
+      [194153] = {
         Range=8,
         LastDamageTime=0,
         LastDamaged={},
