@@ -235,7 +235,7 @@ local function APL()
   end
   -- Moonkin Form OOC, if setting is true
   if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) and Settings.Balance.ShowMoonkinFormOOC then
-    if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form ooc"; end
+    if HR.Cast(S.MoonkinForm) then return "moonkin_form ooc"; end
   end
   -- call precombat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
