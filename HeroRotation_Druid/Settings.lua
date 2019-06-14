@@ -42,6 +42,7 @@
         WarriorofElune = true,
         ForceofNature = true,
         FuryofElune = true,
+        Starfall = false,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
