@@ -37,17 +37,17 @@
       ShowPotion = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
-        Barkskin = true,
-        Renewal = true,
         MoonkinForm = true,
         CelestialAlignment = true, -- also does Incarnation!
-        WarriorOfElune = true,
-        ForceOfNature = true,
-        FuryOfElune = true,
+        WarriorofElune = true,
+        ForceofNature = true,
+        FuryofElune = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
-        SolarBeam = true
+        SolarBeam = true,
+        Renewal = true,
+        Barkskin = true,
       }
     },
     Feral = {

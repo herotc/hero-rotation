@@ -59,7 +59,10 @@ Spell.Druid.Balance = {
   LunarStrike                           = Spell(194153),
   WarriorofEluneBuff                    = Spell(202425),
   ShootingStars                         = Spell(202342),
-  NaturesBalance                        = Spell(202430)
+  NaturesBalance                        = Spell(202430),
+  Barkskin                              = Spell(22812),
+  Renewal                               = Spell(108238),
+  SolarBeam                             = Spell(78675)
 };
 local S = Spell.Druid.Balance;
 
@@ -218,7 +221,7 @@ local function APL()
     end
     -- moonkin_form
     if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) then
-      if HR.Cast(S.MoonkinForm) then return "moonkin_form 39"; end
+      if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
     end
     -- snapshot_stats
     -- potion
@@ -230,11 +233,24 @@ local function APL()
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
     end
   end
+  -- Moonkin Form OOC, if setting is true
+  if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) and Settings.Balance.ShowMoonkinFormOOC then
+    if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form ooc"; end
+  end
   -- call precombat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    -- Defensives
+    if S.Renewal:IsCastableP() and Player:HealthPercentage() <= Settings.Balance.RenewalHP then
+      if HR.Cast(S.Renewal, Settings.Balance.OffGCDasOffGCD.Renewal) then return "renewal defensive"; end
+    end
+    if S.Barkskin:IsCastableP() and Player:HealthPercentage() <= Settings.Balance.BarkskinHP then
+      if HR.Cast(S.Barkskin, Settings.Balance.OffGCDasOffGCD.Barkskin) then return "barkskin defensive"; end
+    end
+    -- Interrupt
+    Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false);
     -- potion,if=buff.ca_inc.remains>6&active_enemies=1
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6 and Cache.EnemiesCount[40] == 1) then
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 47"; end
@@ -286,7 +302,7 @@ local function APL()
     -- use_items,if=cooldown.ca_inc.remains>30
     -- warrior_of_elune
     if S.WarriorofElune:IsCastableP() then
-      if HR.Cast(S.WarriorofElune) then return "warrior_of_elune 108"; end
+      if HR.Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune 108"; end
     end
     -- innervate,if=azerite.lively_spirit.enabled&(cooldown.incarnation.remains<2|cooldown.celestial_alignment.remains<12)
     if S.Innervate:IsCastableP() and (S.LivelySpirit:AzeriteEnabled() and (S.Incarnation:CooldownRemainsP() < 2 or S.CelestialAlignment:CooldownRemainsP() < 12)) then
@@ -294,19 +310,19 @@ local function APL()
     end
     -- incarnation,if=dot.sunfire.remains>8&dot.moonfire.remains>12&(dot.stellar_flare.remains>6|!talent.stellar_flare.enabled)&ap_check&!buff.ca_inc.up
     if S.Incarnation:IsCastableP() and (Target:DebuffRemainsP(S.SunfireDebuff) > 8 and Target:DebuffRemainsP(S.MoonfireDebuff) > 12 and (Target:DebuffRemainsP(S.StellarFlareDebuff) > 6 or not S.StellarFlare:IsAvailable()) and AP_Check(S.Incarnation) and not Player:BuffP(CaInc())) then
-      if HR.Cast(S.Incarnation) then return "incarnation 118"; end
+      if HR.Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return "incarnation 118"; end
     end
     -- celestial_alignment,if=astral_power>=40&!buff.ca_inc.up&ap_check&(!azerite.lively_spirit.enabled|buff.lively_spirit.up)&(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
     if S.CelestialAlignment:IsCastableP() and (FutureAstralPower() >= 40 and not Player:BuffP(CaInc()) and AP_Check(S.CelestialAlignment) and (not S.LivelySpirit:AzeriteEnabled() or Player:BuffP(S.LivelySpiritBuff)) and (Target:DebuffRemainsP(S.SunfireDebuff) > 2 and Target:DebuffP(S.MoonfireDebuff) and (Target:DebuffP(S.StellarFlareDebuff) or not S.StellarFlare:IsAvailable()))) then
-      if HR.Cast(S.CelestialAlignment) then return "celestial_alignment 130"; end
+      if HR.Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return "celestial_alignment 130"; end
     end
     -- fury_of_elune,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&solar_wrath.ap_check
     if S.FuryofElune:IsCastableP() and ((Player:BuffP(CaInc()) or CaInc():CooldownRemainsP() > 30) and AP_Check(S.SolarWrath)) then
-      if HR.Cast(S.FuryofElune) then return "fury_of_elune 146"; end
+      if HR.Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune) then return "fury_of_elune 146"; end
     end
     -- force_of_nature,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&ap_check
     if S.ForceofNature:IsCastableP() and ((Player:BuffP(CaInc()) or CaInc():CooldownRemainsP() > 30) and AP_Check(S.ForceofNature)) then
-      if HR.Cast(S.ForceofNature) then return "force_of_nature 152"; end
+      if HR.Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature 152"; end
     end
     -- cancel_buff,name=starlord,if=buff.starlord.remains<3&!solar_wrath.ap_check
     -- if (Player:BuffRemainsP(S.StarlordBuff) < 3 and not bool(solar_wrath.ap_check)) then
