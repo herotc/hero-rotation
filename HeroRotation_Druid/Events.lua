@@ -46,8 +46,15 @@ do
         LastDamaged={},
         Timeout=6
       },
+      -- Sunfire DoT (Balance)
+      [164815] = {
+        Range=8,
+        LastDamageTime=0,
+        LastDamaged={},
+        Timeout=6
+      },
       -- Starfall (Balance)
-      [191034] = {
+      [191037] = {
         Range=15,
         LastDamageTime=0,
         LastDamaged={},
@@ -82,7 +89,7 @@ do
   end
 
   HL:RegisterForSelfCombatEvent(UpdateAbilityCache, "SPELL_DAMAGE");
-  HL:RegisterForPetCombatEvent(UpdateAbilityCache, "SPELL_DAMAGE");
+  HL:RegisterForSelfCombatEvent(UpdateAbilityCache, "SPELL_PERIODIC_DAMAGE");
 end
 
 HL:RegisterForEvent(
