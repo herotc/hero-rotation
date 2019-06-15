@@ -93,8 +93,8 @@ local function GetEnemiesCount()
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
     if Settings.BeastMastery.UseSplashData then
-      Hunter.UpdateSplashCount(Target, 10)
-      return Hunter.GetSplashCount(Target, 10)
+      HL.GetEnemies(10, nil, true, Target)
+      return Cache.EnemiesCount[10]
     else
       UpdateRanges()
       Everyone.AoEToggleEnemiesUpdate()
@@ -112,6 +112,14 @@ end
 local function bool(val)
   return val ~= 0
 end
+
+-- Register Splash Data Nucleus Abilities
+HL.RegisterNucleusAbility(2643, 8, 4)               -- Multi-Shot
+HL.RegisterNucleusAbility(194392, 8, 4)             -- Volley
+HL.RegisterNucleusAbility({171454, 171457}, 8, 4)   -- Chimaera Shot
+HL.RegisterNucleusAbility(118459, 10, 4)            -- Beast Cleave
+HL.RegisterNucleusAbility(201754, 10, 4)            -- Stomp
+HL.RegisterNucleusAbility(271686, 3, 4)             -- Head My Call
 
 --- ======= ACTION LISTS =======
 local function APL()
