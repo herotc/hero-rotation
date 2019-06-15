@@ -69,7 +69,7 @@ local I = Item.Druid.Guardian;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local IsTanking;
-local MeleeRange, AoERadius, RangedRange; -- Range variables
+local AoERadius, RangedRange; -- Range variables
 local AoETar, RangedTar; -- Target variables
 
 -- GUI Settings
@@ -80,7 +80,7 @@ local Settings = {
   Guardian = HR.GUISettings.APL.Druid.Guardian
 };
 
-local EnemyRanges = {40}
+local EnemyRanges = {}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
