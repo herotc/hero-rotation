@@ -104,7 +104,7 @@ Item.Monk.Windwalker = {
 local I = Item.Monk.Windwalker;
 
 -- Rotation Var
-local EnemiesCount5, EnemiesCount8;
+local EnemiesCount;
 
 local BaseCost = {
   [S.BlackoutKick] = (Player:Level() < 12 and 3 or (Player:Level() < 22 and 2 or 1)),
@@ -155,7 +155,7 @@ function Spell:Ready(Index)
   return self:IsReadyP();
 end
 
-local EnemyRanges = {40, 10}
+local EnemyRanges = {8, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -165,18 +165,23 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Windwalker.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
       UpdateRanges()
       Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[40]
+      return Cache.EnemiesCount[8]
     end
   else
     return 1
   end
 end
+
+HL.RegisterNucleusAbility(113656, 8, 6)               -- Fists of Fury
+HL.RegisterNucleusAbility(101546, 8, 6)               -- Spinning Crane Kick
+HL.RegisterNucleusAbility(261715, 8, 6)               -- Rushing Jade Wind
+HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
 
 -- Action Lists --
 --- ======= MAIN =======
@@ -184,8 +189,7 @@ end
 local function APL ()
   local Precombat, Cooldowns, SingleTarget, Serenity, Aoe
   -- Unit Update
-  EnemiesCount5 = GetEnemiesCount(5)
-  EnemiesCount8 = GetEnemiesCount(8)
+  EnemiesCount = GetEnemiesCount(8)
 
   -- Pre Combat --
   Precombat = function()
@@ -254,7 +258,7 @@ local function APL ()
   -- Serenity --
   Serenity = function()
     -- actions.serenity=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
-    if S.RisingSunKick:IsReadyP() and (EnemiesCount5 < 3 or Player:PrevGCD(1,S.SpinningCraneKick)) then
+    if S.RisingSunKick:IsReadyP() and (EnemiesCount < 3 or Player:PrevGCD(1,S.SpinningCraneKick)) then
       if HR.Cast(S.RisingSunKick) then 
         return "Cast Serenity Rising Sun Kick"; end
     end
@@ -263,13 +267,13 @@ local function APL ()
       (
         (Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or 
         Player:BuffRemainsP(S.Serenity) < 1 or 
-        (EnemiesCount8 > 1 and EnemiesCount8 < 5)
+        (EnemiesCount > 1 and EnemiesCount < 5)
       ) then
       if HR.Cast(S.FistsOfFury) then 
         return "Cast Serenity Fists of Fury"; end
     end
     -- actions.serenity+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(active_enemies>=3|(active_enemies=2&prev_gcd.1.blackout_kick))
-    if S.SpinningCraneKick:IsReadyP() and not Player:PrevGCD(1, S.SpinningCraneKick) and (EnemiesCount8 >= 3 or (EnemiesCount8 == 2 and Player:PrevGCD(1, S.BlackoutKick))) then
+    if S.SpinningCraneKick:IsReadyP() and not Player:PrevGCD(1, S.SpinningCraneKick) and (EnemiesCount >= 3 or (EnemiesCount == 2 and Player:PrevGCD(1, S.BlackoutKick))) then
       if HR.Cast(S.SpinningCraneKick) then 
         return "Cast Serenity Spinning Crane Kick"; end
     end
@@ -379,7 +383,7 @@ local function APL ()
         return "Cast AoE Spinning Crane Kick"; end
     end
  	  -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
-	  if S.RushingJadeWind:IsReadyP() and Player:BuffDownP(S.RushingJadeWind) and EnemiesCount8 > 1 then
+	  if S.RushingJadeWind:IsReadyP() and Player:BuffDownP(S.RushingJadeWind) and EnemiesCount > 1 then
       if HR.Cast(S.RushingJadeWind) then 
         return "Cast Single Target Rushing Jade Wind"; end
   	end
@@ -402,7 +406,7 @@ local function APL ()
           S.FistsOfFury:CooldownRemainsP() > 4 or 
           Player:Chi() >= 4 or 
           (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm)) or
-          (S.SwiftRoundhouse:AzeriteRank() >= 2 and EnemiesCount5 == 1)
+          (S.SwiftRoundhouse:AzeriteRank() >= 2 and EnemiesCount == 1)
         )
         and Player:BuffStack(S.SwiftRoundhouseBuff) < 2
       ) then
@@ -415,7 +419,7 @@ local function APL ()
         return "Cast Single Target Chi Wave"; end
     end
 	  -- actions.st+=/chi_burst,if=chi.max-chi>=1&active_enemies=1|chi.max-chi>=2
-	  if S.ChiBurst:IsReadyP() and ((Player:ChiDeficit() >= 1 and EnemiesCount8 == 1) or Player:ChiDeficit() >= 2) then
+	  if S.ChiBurst:IsReadyP() and ((Player:ChiDeficit() >= 1 and EnemiesCount == 1) or Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ChiBurst) then 
         return "Cast Single Target Chi Burst"; end
   	end  
@@ -470,13 +474,13 @@ local function APL ()
         return ShouldReturn; end
     end
     -- actions+=/call_action_list,name=st,if=active_enemies<3
-    if EnemiesCount8 < 3 then
+    if EnemiesCount < 3 then
       local ShouldReturn = SingleTarget(); 
       if ShouldReturn then 
         return ShouldReturn; end
     end;
     -- actions+=/call_action_list,name=aoe,if=active_enemies>=3
-    if EnemiesCount8 >= 3 then
+    if EnemiesCount >= 3 then
       local ShouldReturn = Aoe(); 
       if ShouldReturn then 
         return ShouldReturn; end
