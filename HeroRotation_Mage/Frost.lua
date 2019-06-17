@@ -69,6 +69,7 @@ local I = Item.Mage.Frost;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local EnemiesCount10, EnemiesCount35;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -82,6 +83,22 @@ local EnemyRanges = {35, 10}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
+  end
+end
+
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.BeastMastery.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[40]
+    end
+  else
+    return 1
   end
 end
 
@@ -102,8 +119,8 @@ S.Frostbolt:RegisterInFlight()
 local function APL()
   local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop
   local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
+  EnemiesCount10 = GetEnemiesCount(10)
+  EnemiesCount35 = GetEnemiesCount(35)
   Precombat = function()
     -- flask
     -- food
@@ -170,7 +187,7 @@ local function APL()
       if HR.Cast(S.GlacialSpike) then return "glacial_spike 46"; end
     end
     -- cone_of_cold
-    if S.ConeofCold:IsCastableP() and (Cache.EnemiesCount[10] >= 1) then
+    if S.ConeofCold:IsCastableP() and (EnemiesCount10 >= 1) then
       if HR.Cast(S.ConeofCold) then return "cone_of_cold 48"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
@@ -204,7 +221,7 @@ local function APL()
       if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power 60"; end
     end
     -- call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains
-    if (S.RuneofPower:IsAvailable() and Cache.EnemiesCount[35] == 1 and S.RuneofPower:FullRechargeTimeP() < S.FrozenOrb:CooldownRemainsP()) then
+    if (S.RuneofPower:IsAvailable() and EnemiesCount35 == 1 and S.RuneofPower:FullRechargeTimeP() < S.FrozenOrb:CooldownRemainsP()) then
       local ShouldReturn = TalentRop(); if ShouldReturn then return ShouldReturn; end
     end
     -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<30
@@ -265,7 +282,7 @@ local function APL()
       if HR.Cast(S.FrozenOrb) then return "frozen_orb 153"; end
     end
     -- blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
-    if S.Blizzard:IsCastableP() and (Cache.EnemiesCount[35] > 2 or Cache.EnemiesCount[35] > 1 and S.Blizzard:CastTime() == 0 and Player:BuffStackP(S.FingersofFrostBuff) < 2) then
+    if S.Blizzard:IsCastableP() and (EnemiesCount35 > 2 or EnemiesCount35 > 1 and S.Blizzard:CastTime() == 0 and Player:BuffStackP(S.FingersofFrostBuff) < 2) then
       if HR.Cast(S.Blizzard) then return "blizzard 155"; end
     end
     -- ice_lance,if=buff.fingers_of_frost.react
@@ -285,11 +302,11 @@ local function APL()
       if HR.Cast(S.RayofFrost) then return "ray_of_frost 183"; end
     end
     -- blizzard,if=cast_time=0|active_enemies>1
-    if S.Blizzard:IsCastableP() and (S.Blizzard:CastTime() == 0 or Cache.EnemiesCount[35] > 1) then
+    if S.Blizzard:IsCastableP() and (S.Blizzard:CastTime() == 0 or EnemiesCount35 > 1) then
       if HR.Cast(S.Blizzard) then return "blizzard 189"; end
     end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
-    if S.GlacialSpike:IsCastableP() and (bool(Player:BuffStackP(S.BrainFreezeBuff)) or Player:PrevGCDP(1, S.Ebonbolt) or Cache.EnemiesCount[35] > 1 and S.SplittingIce:IsAvailable()) then
+    if S.GlacialSpike:IsCastableP() and (bool(Player:BuffStackP(S.BrainFreezeBuff)) or Player:PrevGCDP(1, S.Ebonbolt) or EnemiesCount35 > 1 and S.SplittingIce:IsAvailable()) then
       if HR.Cast(S.GlacialSpike) then return "glacial_spike 201"; end
     end
     -- ice_nova
@@ -339,7 +356,7 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
-    if (Cache.EnemiesCount[35] > 3 and S.FreezingRain:IsAvailable() or Cache.EnemiesCount[35] > 4) then
+    if (EnemiesCount35 > 3 and S.FreezingRain:IsAvailable() or EnemiesCount35 > 4) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=single
