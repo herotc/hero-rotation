@@ -131,6 +131,8 @@ local Settings = {
   Commons = HR.GUISettings.APL.Shaman.Commons,
 }
 
+local EnemiesCount10, EnemiesCount40;
+
 --- APL Variables
 -- # Attempt to sync racial cooldowns with Ascendance or Feral Spirits, or use on cooldown if saving them will result in significant cooldown waste
 -- actions+=/variable,name=cooldown_sync,value=(talent.ascendance.enabled&(buff.ascendance.up|cooldown.ascendance.remains>50))|(!talent.ascendance.enabled&(feral_spirit.remains>5|cooldown.feral_spirit.remains>50))
@@ -189,7 +191,7 @@ end
 -- # Attempt to pool maelstrom so you'll be able to cast a fully-powered lightning bolt as soon as it's available when fighting one target.
 -- actions+=/variable,name=OCPool,value=(active_enemies>1|(cooldown.lightning_bolt.remains>=2*gcd))
 local function OCPool()
-  return (Cache.EnemiesCount[10] > 1 or S.LightningBolt:CooldownRemainsP() >= 2 + Player:GCDRemains())
+  return (EnemiesCount10 > 1 or S.LightningBolt:CooldownRemainsP() >= 2 + Player:GCDRemains())
 end
 -- actions+=/variable,name=OCPool_SS,value=(variable.OCPool|maelstrom>=(talent.overcharge.enabled*(40+action.stormstrike.cost)))
 local function OCPool_SS()
@@ -226,11 +228,11 @@ end
 -- # Attempt to pool maelstrom for Crash Lightning if multiple targets are present.
 -- actions+=/variable,name=CLPool_LL,value=active_enemies=1|maelstrom>=(action.crash_lightning.cost+action.lava_lash.cost)
 local function CLPool_LL()
-  return (Cache.EnemiesCount[10] == 1 or Player:Maelstrom() >= S.CrashLightning:Cost() + S.LavaLash:Cost())
+  return (EnemiesCount10 == 1 or Player:Maelstrom() >= S.CrashLightning:Cost() + S.LavaLash:Cost())
 end
 -- actions+=/variable,name=CLPool_SS,value=active_enemies=1|maelstrom>=(action.crash_lightning.cost+action.stormstrike.cost)
 local function CLPool_SS()
-  return (Cache.EnemiesCount[10] == 1 or Player:Maelstrom() >= S.CrashLightning:Cost() + S.StormStrike:Cost())
+  return (EnemiesCount10 == 1 or Player:Maelstrom() >= S.CrashLightning:Cost() + S.StormStrike:Cost())
 end
 -- actions+=/variable,name=freezerburn_enabled,value=(talent.hot_hand.enabled&talent.hailstorm.enabled&azerite.primal_primer.enabled)
 local function freezerburn_enabled()
@@ -241,14 +243,34 @@ local function rockslide_enabled()
   return (not freezerburn_enabled() and (S.Boulderfist:IsAvailable() and S.Landslide:IsAvailable() and S.StrengthOfEarth:AzeriteEnabled()))
 end
 
+local EnemyRanges = {40, 10}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
+  end
+end
+
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.BeastMastery.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[40]
+    end
+  else
+    return 1
+  end
+end
+
 -- APL Main
 local function APL ()
   -- Unit Update
-  HL.GetEnemies(40);      -- LightningBolt, HealingSurge
-  HL.GetEnemies(30);      -- WindShear
-  HL.GetEnemies(10);      -- EarthenSpike
-  HL.GetEnemies("Melee"); -- Melee
-  Everyone.AoEToggleEnemiesUpdate()
+  EnemiesCount10 = GetEnemiesCount(10);
+  EnemiesCount40 = GetEnemiesCount(40);
 
   -- Out of Combat
   if not Player:AffectingCombat() then
@@ -320,7 +342,7 @@ local function APL ()
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=crash_lightning,if=!buff.crash_lightning.up&active_enemies>1&variable.furyCheck_CL
-      if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1 and furyCheck_CL() then
+      if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and not Player:Buff(S.CrashLightningBuff) and EnemiesCount10 > 1 and furyCheck_CL() then
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
 
@@ -338,33 +360,33 @@ local function APL ()
     -- actions+=/call_action_list,name=priority
     -- actions.priority=crash_lightning,if=active_enemies>=(8-(talent.forceful_winds.enabled*3))&variable.freezerburn_enabled&variable.furyCheck_CL
     if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() then
-      if S.ForcefulWinds:IsAvailable() and (Cache.EnemiesCount[10] >= (8 - 3)) and freezerburn_enabled() and furyCheck_CL() then
+      if S.ForcefulWinds:IsAvailable() and (EnemiesCount10 >= (8 - 3)) and freezerburn_enabled() and furyCheck_CL() then
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
-      elseif S.ForcefulWinds:IsAvailable() and (Cache.EnemiesCount[10] >= 8) and freezerburn_enabled() and furyCheck_CL() then
+      elseif S.ForcefulWinds:IsAvailable() and (EnemiesCount10 >= 8) and freezerburn_enabled() and furyCheck_CL() then
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
 
     -- actions.priority+=/lava_lash,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack=10&active_enemies=1&variable.freezerburn_enabled&variable.furyCheck_LL
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and Cache.EnemiesCount[10] == 1 and freezerburn_enabled() and furyCheck_LL()) then
+    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and EnemiesCount10 == 1 and freezerburn_enabled() and furyCheck_LL()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions.priority+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>1&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (not Player:Buff(S.CrashLightningBuff) and EnemiesCount10 > 1 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.priority+=/fury_of_air,if=!buff.fury_of_air.up&maelstrom>=20&spell_targets.fury_of_air_damage>=(1+variable.freezerburn_enabled)
     if S.FuryOfAir:IsCastableP(10, true) and Player:Maelstrom() >= S.FuryOfAir:Cost() then
-      if not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() >= 20 and Cache.EnemiesCount[10] >= 2 then
+      if not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() >= 20 and EnemiesCount10 >= 2 then
         if HR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
       end
     end
 
     -- actions.priority+=/fury_of_air,if=buff.fury_of_air.up&&spell_targets.fury_of_air_damage<(1+variable.freezerburn_enabled)
     -- Disable if we don't have enough maelstrom.
-    if S.FuryOfAir:IsCastableP() and (Player:Buff(S.FuryOfAirBuff) and Cache.EnemiesCount[10] <= 1) then
+    if S.FuryOfAir:IsCastableP() and (Player:Buff(S.FuryOfAirBuff) and EnemiesCount10 <= 1) then
       if HR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
     end
 
@@ -375,7 +397,7 @@ local function APL ()
     end
 
     -- actions.priority+=/sundering,if=active_enemies>=3
-    if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() and (Cache.EnemiesCount[10] >= 3) then
+    if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() and (EnemiesCount10 >= 3) then
       if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
     end
 
@@ -401,7 +423,7 @@ local function APL ()
     end
 
     -- actions+=/call_action_list,name=maintenance,if=active_enemies<3
-    if Cache.EnemiesCount[10] < 3 then
+    if EnemiesCount10 < 3 then
       -- actions.maintenance=flametongue,if=!buff.flametongue.up
       if S.Flametongue:IsCastableP(20) and (not Player:Buff(S.Flametongue)) then
         if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
@@ -469,22 +491,22 @@ local function APL ()
     end
 
     -- actions.freezerburn_core+=/stormstrike,cycle_targets=1,if=active_enemies>1&azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&variable.furyCheck_SS
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Cache.EnemiesCount[10] > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
+    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (EnemiesCount10 > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.freezerburn_core+=/stormstrike,if=buff.stormbringer.up|(active_enemies>1&buff.gathering_storms.up&variable.furyCheck_SS)
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
+    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (EnemiesCount10 > 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.freezerburn_core+=/crash_lightning,if=active_enemies>=3&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (Cache.EnemiesCount[10] > 3 and furyCheck_CL()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (EnemiesCount10 > 3 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.freezerburn_core+=/lightning_bolt,if=talent.overcharge.enabled&active_enemies=1&variable.furyCheck_LB&maelstrom>=40
-    if S.LightningBolt:IsCastableP(40) and (S.Overcharge:IsAvailable() and Cache.EnemiesCount[40] == 1 and furyCheck_LB() and Player:Maelstrom() >= 40) then
+    if S.LightningBolt:IsCastableP(40) and (S.Overcharge:IsAvailable() and EnemiesCount40 == 1 and furyCheck_LB() and Player:Maelstrom() >= 40) then
       if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
     end
 
@@ -510,22 +532,22 @@ local function APL ()
     end
 
     -- actions.default_core+=/stormstrike,cycle_targets=1,if=active_enemies>1&azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&variable.furyCheck_SS
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Cache.EnemiesCount[10] > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
+    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (EnemiesCount10 > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.default_core+=/stormstrike,if=buff.stormbringer.up|(active_enemies>1&buff.gathering_storms.up&variable.furyCheck_SS)
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (Cache.EnemiesCount[10] >= 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
+    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (EnemiesCount10 >= 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.default_core+=/crash_lightning,if=active_enemies>=3&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (Cache.EnemiesCount[10] > 3 and furyCheck_CL()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (EnemiesCount10 > 3 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.default_core+=/lightning_bolt,if=talent.overcharge.enabled&active_enemies=1&variable.furyCheck_LB&maelstrom>=40
-    if S.LightningBolt:IsCastableP(40) and (S.Overcharge:IsAvailable() and Cache.EnemiesCount[40] == 1 and furyCheck_LB() and Player:Maelstrom() >= 40) then
+    if S.LightningBolt:IsCastableP(40) and (S.Overcharge:IsAvailable() and EnemiesCount40 == 1 and furyCheck_LB() and Player:Maelstrom() >= 40) then
       if HR.Cast(S.LightningBolt) then return "Cast LightningBolt" end
     end
 
@@ -535,7 +557,7 @@ local function APL ()
     end
 
     -- actions+=/call_action_list,name=maintenance,if=active_enemies>=3
-    if Cache.EnemiesCount[10] >= 3 then
+    if EnemiesCount10 >= 3 then
       -- actions.maintenance=flametongue,if=!buff.flametongue.up
       if S.Flametongue:IsCastableP(20) and (not Player:Buff(S.Flametongue)) then
         if HR.Cast(S.Flametongue) then return "Cast Flametongue" end
@@ -553,7 +575,7 @@ local function APL ()
     end
 
     -- actions.filler+=/crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (S.ForcefulWinds:IsAvailable() and EnemiesCount10 > 1 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
@@ -568,7 +590,7 @@ local function APL ()
     end
 
     -- actions.filler+=/crash_lightning,if=active_enemies>1&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
+    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (EnemiesCount10 > 1 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
