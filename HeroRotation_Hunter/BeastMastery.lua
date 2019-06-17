@@ -113,12 +113,12 @@ local function bool(val)
 end
 
 -- Register Splash Data Nucleus Abilities
-HL.RegisterNucleusAbility(2643, 8, 4)               -- Multi-Shot
-HL.RegisterNucleusAbility(194392, 8, 4)             -- Volley
-HL.RegisterNucleusAbility({171454, 171457}, 8, 4)   -- Chimaera Shot
-HL.RegisterNucleusAbility(118459, 10, 4)            -- Beast Cleave
-HL.RegisterNucleusAbility(201754, 10, 4)            -- Stomp
-HL.RegisterNucleusAbility(271686, 3, 4)             -- Head My Call
+HL.RegisterNucleusAbility(2643, 8, 6)               -- Multi-Shot
+HL.RegisterNucleusAbility(194392, 8, 6)             -- Volley
+HL.RegisterNucleusAbility({171454, 171457}, 8, 6)   -- Chimaera Shot
+HL.RegisterNucleusAbility(118459, 10, 6)            -- Beast Cleave
+HL.RegisterNucleusAbility(201754, 10, 6)            -- Stomp
+HL.RegisterNucleusAbility(271686, 3, 6)             -- Head My Call
 
 --- ======= ACTION LISTS =======
 local function APL()
