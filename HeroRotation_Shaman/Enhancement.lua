@@ -259,7 +259,7 @@ local function GetEnemiesCount(range)
     else
       UpdateRanges()
       Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[40]
+      return Cache.EnemiesCount[10]
     end
   else
     return 1
