@@ -90,7 +90,7 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Marksmanship.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
@@ -112,6 +112,9 @@ end
 local function bool(val)
   return val ~= 0
 end
+
+HL.RegisterNucleusAbility(257620, 10, 6)               -- Multi-Shot
+HL.RegisterNucleusAbility(120360, 40, 6)               -- Barrage
 
 --- ======= ACTION LISTS =======
 local function APL()
