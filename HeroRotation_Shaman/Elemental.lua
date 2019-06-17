@@ -75,6 +75,7 @@ local I = Item.Shaman.Elemental;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -92,11 +93,12 @@ local function UpdateRanges()
   end
 end
 
-local function GetEnemiesCount()
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.Elemental.UseSplashData then
-      Shaman.UpdateSplashCount(Target, 10)
-      return Shaman.GetSplashCount(Target, 10)
+    if Settings.BeastMastery.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
     else
       UpdateRanges()
       Everyone.AoEToggleEnemiesUpdate()
@@ -116,7 +118,7 @@ local function bool(val)
 end
 
 local function EvaluateCycleFlameShock47(TargetUnit)
-  return TargetUnit:DebuffRefreshableCP(S.FlameShockDebuff) and (Cache.EnemiesCount[40] < (5 - num(not S.TotemMastery:IsAvailable())) or not S.StormElemental:IsAvailable() and (S.FireElemental:CooldownRemainsP() > (120 + 14 * Player:SpellHaste()) or S.FireElemental:CooldownRemainsP() < (24 - 14 * Player:SpellHaste()))) and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120 or Cache.EnemiesCount[40] == 3 and Player:BuffStackP(S.WindGustBuff) < 14)
+  return TargetUnit:DebuffRefreshableCP(S.FlameShockDebuff) and (EnemiesCount < (5 - num(not S.TotemMastery:IsAvailable())) or not S.StormElemental:IsAvailable() and (S.FireElemental:CooldownRemainsP() > (120 + 14 * Player:SpellHaste()) or S.FireElemental:CooldownRemainsP() < (24 - 14 * Player:SpellHaste()))) and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120 or EnemiesCount == 3 and Player:BuffStackP(S.WindGustBuff) < 14)
 end
 
 local function EvaluateCycleFlameShock148(TargetUnit)
@@ -128,7 +130,7 @@ local function EvaluateCycleFlameShock163(TargetUnit)
 end
 
 local function EvaluateCycleFlameShock390(TargetUnit)
-  return TargetUnit:DebuffRefreshableCP(S.FlameShockDebuff) and Cache.EnemiesCount[40] > 1 and Player:BuffP(S.SurgeofPowerBuff)
+  return TargetUnit:DebuffRefreshableCP(S.FlameShockDebuff) and EnemiesCount > 1 and Player:BuffP(S.SurgeofPowerBuff)
 end
 
 local function EvaluateCycleFlameShock511(TargetUnit)
@@ -141,9 +143,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, SingleTarget
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
-  EnemiesCount = GetEnemiesCount()
+  EnemiesCount = GetEnemiesCount(40)
   Precombat = function()
     -- flask
     -- food
@@ -227,7 +227,7 @@ local function APL()
       if HR.Cast(S.FrostShock) then return "frost_shock 120"; end
     end
     -- elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
-    if S.ElementalBlast:IsCastableP() and (S.ElementalBlast:IsAvailable() and EnemiesCount[40] < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120)) then
+    if S.ElementalBlast:IsCastableP() and (S.ElementalBlast:IsAvailable() and EnemiesCount < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120)) then
       if HR.Cast(S.ElementalBlast) then return "elemental_blast 126"; end
     end
     -- lava_beam,if=talent.ascendance.enabled

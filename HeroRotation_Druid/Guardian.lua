@@ -70,7 +70,7 @@ local I = Item.Druid.Guardian;
 local ShouldReturn; -- Used to get the return string
 local IsTanking;
 local AoERadius, RangedRange; -- Range variables
-local AoETar, RangedTar; -- Target variables
+local EnemiesCountAoE, EnemiesCountRanged; -- Target variables
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -112,16 +112,15 @@ local function Thrash()
 end
 
 local function GetEnemiesCount(range)
-  if range == nil then range = 8 end
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.Guardian.UseSplashData then
-      Druid.UpdateSplashCount(Target, range)
-      return Druid.GetSplashCount(Target, range)
+    if Settings.BeastMastery.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
     else
       UpdateRanges()
       Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[8]
+      return Cache.EnemiesCount[40]
     end
   else
     return 1
@@ -133,11 +132,11 @@ local function EvaluateCyclePulverize77(TargetUnit)
 end
 
 local function EvaluateCycleMoonfire88(TargetUnit)
-  return TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff) and RangedTar < 2
+  return TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff) and EnemiesCountRanged < 2
 end
 
 local function EvaluateCycleMoonfire139(TargetUnit)
-  return Player:BuffP(S.GalacticGuardianBuff) and RangedTar < 2
+  return Player:BuffP(S.GalacticGuardianBuff) and EnemiesCountRanged < 2
 end
 --- ======= ACTION LISTS =======
 local function APL()
@@ -151,10 +150,8 @@ local function APL()
     RangedRange = 40
   end
   EnemyRanges = {RangedRange, AoERadius}
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
-  AoETar = GetEnemiesCount(AoERadius)
-  RangedTar = GetEnemiesCount(RangedRange)
+  EnemiesCountAoE = GetEnemiesCount(AoERadius)
+  EnemiesCountRanged = GetEnemiesCount(RangedRange)
   IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
   Precombat = function()
     -- flask
@@ -245,11 +242,11 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- maul,if=rage.deficit<10&active_enemies<4
-    if S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and AoETar < 4) then
+    if S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and EnemiesCountAoE < 4) then
       if HR.Cast(S.Maul) then return "maul 41"; end
     end
     -- ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
-    if S.Ironfur:IsCastableP() and (S.Ironfur:Cost() == 0 or (Player:Rage() > S.Ironfur:Cost() and S.LayeredMane:AzeriteEnabled() and AoETar > 2)) then
+    if S.Ironfur:IsCastableP() and (S.Ironfur:Cost() == 0 or (Player:Rage() > S.Ironfur:Cost() and S.LayeredMane:AzeriteEnabled() and EnemiesCountAoE > 2)) then
       if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur 49"; end
     end
     -- pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
@@ -268,11 +265,11 @@ local function APL()
       if HR.Cast(S.Incarnation) then return "incarnation 101"; end
     end
     -- thrash,if=(buff.incarnation.down&active_enemies>1)|(buff.incarnation.up&active_enemies>4)
-    if Thrash():IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and AoETar > 1) or (Player:BuffP(S.IncarnationBuff) and AoETar > 4)) then
+    if Thrash():IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and EnemiesCountAoE > 1) or (Player:BuffP(S.IncarnationBuff) and EnemiesCountAoE > 4)) then
       if HR.Cast(Thrash()) then return "thrash 103"; end
     end
     -- swipe,if=buff.incarnation.down&active_enemies>4
-    if Swipe():IsCastableP() and (Player:BuffDownP(S.IncarnationBuff) and AoETar > 4) then
+    if Swipe():IsCastableP() and (Player:BuffDownP(S.IncarnationBuff) and EnemiesCountAoE > 4) then
       if HR.Cast(Swipe()) then return "swipe 121"; end
     end
     -- mangle,if=dot.thrash_bear.ticking
@@ -292,7 +289,7 @@ local function APL()
       if HR.Cast(S.Maul) then return "maul 154"; end
     end
     -- moonfire,if=azerite.power_of_the_moon.rank>1&active_enemies=1
-    if S.Moonfire:IsCastableP() and (S.PoweroftheMoon:AzeriteRank() > 1 and AoETar == 1) then
+    if S.Moonfire:IsCastableP() and (S.PoweroftheMoon:AzeriteRank() > 1 and EnemiesCountAoE == 1) then
       if HR.Cast(S.Moonfire) then return "moonfire 156"; end
     end
     -- swipe
