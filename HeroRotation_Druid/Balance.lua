@@ -206,7 +206,7 @@ HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat
-  EnemiesCount = GetEnemiesCount(40)
+  EnemiesCount = GetEnemiesCount(8)
   Precombat = function()
     -- flask
     -- food

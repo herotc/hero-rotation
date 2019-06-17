@@ -111,6 +111,7 @@
 
   CreateARPanelOptions(CP_Druid, "APL.Druid.Commons");
   CreatePanelOption("CheckButton", CP_Druid, "APL.Druid.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
+  
   --Feral
   -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
   -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
@@ -118,15 +119,17 @@
   CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
   -- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
   -- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");
+  
   --Balance
-  CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Sunfire");
+  CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.");
   CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
   CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPotion", "Show Potion", "Enable this if you want the addon to show you when to use a potion.");
   CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
+  
   --Guardian
-  CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Swipe or Thrash.");
+  CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian");
   CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.");
   CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.LunarBeamHP", {0, 100, 1}, "Lunar Beam HP", "Set the Lunar Beam HP threshold.");

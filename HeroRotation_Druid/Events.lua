@@ -12,6 +12,4 @@ local Target = Unit.Target;
 local Spell = HL.Spell;
 local Item = HL.Item;
 local Druid = HR.Commons.Druid;
-local RangeIndex = HL.Enum.ItemRange.Hostile.RangeIndex
-local TriggerGCD = HL.Enum.TriggerGCD;
 -- Lua
