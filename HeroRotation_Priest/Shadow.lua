@@ -66,6 +66,7 @@ local I = Item.Priest.Shadow;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -100,6 +101,21 @@ local function UpdateRanges()
   end
 end
 
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Shadow.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[40]
+    end
+  else
+    return 1
+  end
+end
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -121,29 +137,33 @@ local function EvaluateCycleShadowWordDeath84(TargetUnit)
 end
 
 local function EvaluateCycleMindBlast103(TargetUnit)
-  return Cache.EnemiesCount[40] < VarMindBlastTargets
+  return EnemiesCount < VarMindBlastTargets
 end
 
 local function EvaluateCycleShadowWordPain114(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > ((num(true) - 1.2 + 3.3 * Cache.EnemiesCount[40]) * VarSwpTraitRanksCheck * (1 - 0.012 * S.SearingDialogue:AzeriteRank() * Cache.EnemiesCount[40]))) and (not S.Misery:IsAvailable())
+  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > ((num(true) - 1.2 + 3.3 * EnemiesCount) * VarSwpTraitRanksCheck * (1 - 0.012 * S.SearingDialogue:AzeriteRank() * EnemiesCount))) and (not S.Misery:IsAvailable())
 end
 
 local function EvaluateCycleVampiricTouch133(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.VampiricTouchDebuff)) and (TargetUnit:TimeToDie() > ((1 + 3.3 * Cache.EnemiesCount[40]) * VarVtTraitRanksCheck * (1 + 0.10 * S.SearingDialogue:AzeriteRank() * Cache.EnemiesCount[40])))
+  return (TargetUnit:DebuffRefreshableCP(S.VampiricTouchDebuff)) and (TargetUnit:TimeToDie() > ((1 + 3.3 * EnemiesCount) * VarVtTraitRanksCheck * (1 + 0.10 * S.SearingDialogue:AzeriteRank() * EnemiesCount)))
 end
 
 local function EvaluateCycleVampiricTouch150(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff)) and ((S.Misery:IsAvailable() and TargetUnit:TimeToDie() > ((1.0 + 2.0 * Cache.EnemiesCount[40]) * VarVtMisTraitRanksCheck * (VarVtMisSdCheck * Cache.EnemiesCount[40]))))
+  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff)) and ((S.Misery:IsAvailable() and TargetUnit:TimeToDie() > ((1.0 + 2.0 * EnemiesCount) * VarVtMisTraitRanksCheck * (VarVtMisSdCheck * EnemiesCount))))
 end
 
 local function EvaluateCycleMindSear169(TargetUnit)
-  return Cache.EnemiesCount[40] > 1
+  return EnemiesCount > 1
 end
+
+HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption
+HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
+HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cleave, Single
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
+  EnemiesCount = GetEnemiesCount(8)
   Precombat = function()
     if Everyone.TargetIsValid() then
       -- flask
@@ -181,11 +201,11 @@ local function APL()
         if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 44"; end
       end
       -- mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
-      if S.MindBlast:IsReadyP() and Everyone.TargetIsValid() and (Cache.EnemiesCount[40] < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.MindBlast) then
+      if S.MindBlast:IsReadyP() and Everyone.TargetIsValid() and (EnemiesCount < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.MindBlast) then
         if HR.Cast(S.MindBlast) then return "mind_blast 54"; end
       end
       -- shadow_word_void (added)
-      if S.ShadowWordVoid:IsReadyP() and Everyone.TargetIsValid() and (Cache.EnemiesCount[40] < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.ShadowWordVoid) then
+      if S.ShadowWordVoid:IsReadyP() and Everyone.TargetIsValid() and (EnemiesCount < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.ShadowWordVoid) then
         if HR.Cast(S.ShadowWordVoid) then return "shadow_word_void added 54"; end
       end
       -- vampiric_touch
@@ -367,7 +387,7 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 271"; end
     end
     -- run_action_list,name=cleave,if=active_enemies>1
-    if (Cache.EnemiesCount[40] > 1) then
+    if (EnemiesCount > 1) then
       return Cleave();
     end
     -- run_action_list,name=single,if=active_enemies=1
