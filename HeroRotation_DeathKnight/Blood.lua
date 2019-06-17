@@ -1,92 +1,118 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, addonTable = ...;
-  -- HeroLib
-  local HL = HeroLib;
-  local Cache = HeroCache;
-  local Unit = HL.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = HL.Spell;
-  local Item = HL.Item;
-  -- HeroRotation
-  local HR = HeroRotation;
-  -- Lua
-
+-- Addon
+local addonName, addonTable = ...;
+-- HeroLib
+local HL = HeroLib;
+local Cache = HeroCache;
+local Unit = HL.Unit;
+local Player = Unit.Player;
+local Target = Unit.Target;
+local Spell = HL.Spell;
+local Item = HL.Item;
+-- HeroRotation
+local HR = HeroRotation;
+-- Lua
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
-  local Everyone = HR.Commons.Everyone;
-  local DeathKnight = HR.Commons.DeathKnight;
-  -- Spells
-  if not Spell.DeathKnight then Spell.DeathKnight = {}; end
-  Spell.DeathKnight.Blood = {
-    -- Racials
-    ArcaneTorrent         = Spell(50613),
-    Berserking            = Spell(26297),
-    BloodFury             = Spell(20572),
-    -- Abilities
-    Asphyxiate            = Spell(221562),
-    BloodBoil             = Spell(50842),
-    Blooddrinker          = Spell(206931),
-    BloodMirror           = Spell(206977),
-    BloodPlague           = Spell(55078),
-    BloodShield           = Spell(77535),
-    BoneShield            = Spell(195181),
-    Bonestorm             = Spell(194844),
-    Consumption           = Spell(205223),
-    CrimsonScourge        = Spell(81141),
-    DancingRuneWeapon     = Spell(49028),
-    DancingRuneWeaponBuff = Spell(81256),
-    DeathandDecay         = Spell(43265),
-    DeathsCaress          = Spell(195292),
-    DeathStrike           = Spell(49998),
-    HeartBreaker          = Spell(221536),
-    HeartStrike           = Spell(206930),
-    Marrowrend            = Spell(195182),
-    MindFreeze            = Spell(47528),
-    Ossuary               = Spell(219786),
-    RapidDecomposition    = Spell(194662),
-    RuneStrike            = Spell(210764),
-    RuneTap               = Spell(194679),
-    VampiricBlood         = Spell(55233),
-    -- Legendaries
-    HaemostasisBuff       = Spell(235558),
-    -- Misc
-    Pool            = Spell(9999000010)
-  };
-  local S = Spell.DeathKnight.Blood;
-  if not Item.DeathKnight then Item.DeathKnight = {}; end
-    Item.DeathKnight.Blood = {
-    --Legendaries
-    --Potion
-    ProlongedPower = Item(142117)
-  };
-  local I = Item.DeathKnight.Blood;
-  -- GUI Settings
-  local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.DeathKnight.Commons,
-    Blood = HR.GUISettings.APL.DeathKnight.Blood
-  };
+local Everyone = HR.Commons.Everyone;
+local DeathKnight = HR.Commons.DeathKnight;
+-- Spells
+if not Spell.DeathKnight then Spell.DeathKnight = {}; end
+Spell.DeathKnight.Blood = {
+  -- Racials
+  ArcaneTorrent         = Spell(50613),
+  Berserking            = Spell(26297),
+  BloodFury             = Spell(20572),
+  -- Abilities
+  Asphyxiate            = Spell(221562),
+  BloodBoil             = Spell(50842),
+  Blooddrinker          = Spell(206931),
+  BloodMirror           = Spell(206977),
+  BloodPlague           = Spell(55078),
+  BloodShield           = Spell(77535),
+  BoneShield            = Spell(195181),
+  Bonestorm             = Spell(194844),
+  Consumption           = Spell(205223),
+  CrimsonScourge        = Spell(81141),
+  DancingRuneWeapon     = Spell(49028),
+  DancingRuneWeaponBuff = Spell(81256),
+  DeathandDecay         = Spell(43265),
+  DeathsCaress          = Spell(195292),
+  DeathStrike           = Spell(49998),
+  HeartBreaker          = Spell(221536),
+  HeartStrike           = Spell(206930),
+  Marrowrend            = Spell(195182),
+  MindFreeze            = Spell(47528),
+  Ossuary               = Spell(219786),
+  RapidDecomposition    = Spell(194662),
+  RuneStrike            = Spell(210764),
+  RuneTap               = Spell(194679),
+  VampiricBlood         = Spell(55233),
+  -- Legendaries
+  HaemostasisBuff       = Spell(235558),
+  -- Misc
+  Pool                  = Spell(9999000010)
+};
+local S = Spell.DeathKnight.Blood;
 
-  -- Interrupts List
-  local StunInterrupts = {
-    {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
-  };
+-- Items
+if not Item.DeathKnight then Item.DeathKnight = {}; end
+  Item.DeathKnight.Blood = {
+  --Legendaries
+  --Potion
+  ProlongedPower = Item(142117)
+};
+local I = Item.DeathKnight.Blood;
 
---- ======= ACTION LISTS =======
-  
+-- Rotation Var
+local ShouldReturn; -- Used to get the return string
+local EnemiesCount;
 
+-- GUI Settings
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.DeathKnight.Commons,
+  Blood = HR.GUISettings.APL.DeathKnight.Blood
+};
+
+-- Interrupts List
+local StunInterrupts = {
+  {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
+};
+
+local EnemyRanges = {8, 5}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
+  end
+end
+
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Blood.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[8]
+    end
+  else
+    return 1
+  end
+end
+
+HL.RegisterNucleusAbility(50842, 10, 6)               -- Blood Boil
+HL.RegisterNucleusAbility(194844, 8, 6)               -- Bonestorm
+HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
 
 --- ======= MAIN =======
 local function APL ()
   -- Unit Update
-  HL.GetEnemies("Melee");
-  HL.GetEnemies(8, true); -- Death and Decay & Bonestorm
-  HL.GetEnemies(10, true); -- Blood Boil
-  HL.GetEnemies(20, true);
+  EnemiesCount = GetEnemiesCount(8)
 
   -- In Combat
   if Everyone.TargetIsValid() then
@@ -118,7 +144,7 @@ local function APL ()
       end
     end
     -- Bone Shield
-    if S.Marrowrend:IsCastableP("Melee") and (Player:BuffRemainsP(S.BoneShield) <= 6 or (Target:TimeToDie() < 5 and Player:BuffRemainsP(S.BoneShield) < 10 and Cache.EnemiesCount[5] == 1)) then
+    if S.Marrowrend:IsCastableP("Melee") and (Player:BuffRemainsP(S.BoneShield) <= 6 or (Target:TimeToDie() < 5 and Player:BuffRemainsP(S.BoneShield) < 10 and EnemiesCount == 1)) then
       if HR.Cast(S.Marrowrend) then return ""; end
     end 
     -- Healing
@@ -144,15 +170,15 @@ local function APL ()
       if HR.Cast(S.DancingRuneWeapon, Settings.Blood.OffGCDasOffGCD.DancingRuneWeapon) then return ""; end
     end
     -- Blood Boil refresh Blood Plague
-    if S.BloodBoil:IsCastableP() and Cache.EnemiesCount[10] >= 1 and UnitsWithoutBloodPlague >= 1 then
+    if S.BloodBoil:IsCastableP() and EnemiesCount >= 1 and UnitsWithoutBloodPlague >= 1 then
       if HR.Cast(S.BloodBoil) then return ""; end
     end
     -- Bonestorm
-    if HR.CDsON() and S.Bonestorm:IsCastableP("Melee") and Cache.EnemiesCount[8] >= 1 and Player:RunicPower() >= 100 then
+    if HR.CDsON() and S.Bonestorm:IsCastableP("Melee") and EnemiesCount >= 1 and Player:RunicPower() >= 100 then
       if HR.Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm) then return ""; end
     end
     -- Death and Decay Crimson Scourge
-    if HR.AoEON() and S.DeathandDecay:IsReady("Melee") and (Cache.EnemiesCount[8] == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (Cache.EnemiesCount[8] > 1 and Player:Buff(S.CrimsonScourge)) then
+    if HR.AoEON() and S.DeathandDecay:IsReady("Melee") and (EnemiesCount == 1 and Player:Buff(S.CrimsonScourge) and S.RapidDecomposition:IsAvailable()) or (EnemiesCount > 1 and Player:Buff(S.CrimsonScourge)) then
       if HR.Cast(S.DeathandDecay) then return ""; end
     end
     -- Blooddrinker
@@ -172,15 +198,15 @@ local function APL ()
       if HR.Cast(S.DeathStrike) then return ""; end
     end
     -- Death and Decay: ST Rapid Decomposition / AoE
-    if HR.AoEON() and S.DeathandDecay:IsReady("Melee") and Player:RunicPowerDeficit() >= 10 and ((Cache.EnemiesCount[8] == 1 and Player:Rune() >= 3 and S.RapidDecomposition:IsAvailable()) or Cache.EnemiesCount[8] >= 3) then
+    if HR.AoEON() and S.DeathandDecay:IsReady("Melee") and Player:RunicPowerDeficit() >= 10 and ((EnemiesCount == 1 and Player:Rune() >= 3 and S.RapidDecomposition:IsAvailable()) or EnemiesCount >= 3) then
       if HR.Cast(S.DeathandDecay) then return ""; end
     end
     -- Heart Strike
-    if S.HeartStrike:IsCastableP("Melee") and ((Player:RuneTimeToX(3) <= Player:GCD()) or Player:Rune() >=3) and (Player:RunicPowerDeficit()>= 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() >= (15 + math.min(Cache.EnemiesCount["Melee"], 5) * 2))) then
+    if S.HeartStrike:IsCastableP("Melee") and ((Player:RuneTimeToX(3) <= Player:GCD()) or Player:Rune() >=3) and (Player:RunicPowerDeficit()>= 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() >= (15 + math.min(EnemiesCount, 5) * 2))) then
       if HR.Cast(S.HeartStrike) then return ""; end
     end
     -- Death Strike: Heart Strike Runic Power Dump
-    if S.DeathStrike:IsReady("Melee") and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Rune() >= 3) and (Player:RunicPowerDeficit() < 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() < (15 + math.min(Cache.EnemiesCount["Melee"], 5) * 2))) then
+    if S.DeathStrike:IsReady("Melee") and (Player:RuneTimeToX(3) <= Player:GCD() or Player:Rune() >= 3) and (Player:RunicPowerDeficit() < 15 or (S.HeartBreaker:IsAvailable() and Player:Buff(S.DeathandDecay) and Player:RunicPowerDeficit() < (15 + math.min(EnemiesCount, 5) * 2))) then
       if HR.Cast(S.DeathStrike) then return ""; end
     end
     -- Death and Decay ST
@@ -200,7 +226,7 @@ local function APL ()
       if HR.Cast(S.DeathsCaress) then return "";end
     end
     -- Blood Boil: Max Charges
-    if S.BloodBoil:IsCastableP() and Cache.EnemiesCount[10] >= 1 and S.BloodBoil:Charges() == 2 then
+    if S.BloodBoil:IsCastableP() and EnemiesCount >= 1 and S.BloodBoil:Charges() == 2 then
       if HR.Cast(S.BloodBoil) then return ""; end
     end
     -- Rune Strike
@@ -208,7 +234,7 @@ local function APL ()
       if HR.Cast(S.RuneStrike) then return ""; end
     end
     -- Blood Boil
-    if S.BloodBoil:IsCastableP() and Cache.EnemiesCount[10] >= 1 then
+    if S.BloodBoil:IsCastableP() and EnemiesCount >= 1 then
       if HR.Cast(S.BloodBoil) then return ""; end
     end
     -- Out of Range
