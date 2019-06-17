@@ -89,7 +89,7 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Frost.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
@@ -114,6 +114,11 @@ end
 
 S.FrozenOrb.EffectID = 84721
 S.Frostbolt:RegisterInFlight()
+
+HL.RegisterNucleusAbility(84714, 8, 6)               -- Frost Orb
+HL.RegisterNucleusAbility(190356, 8, 6)              -- Blizzard
+HL.RegisterNucleusAbility(153595, 6, 6)              -- Comet Storm
+HL.RegisterNucleusAbility(120, 12, 6)                -- Cone of Cold
 
 --- ======= ACTION LISTS =======
 local function APL()

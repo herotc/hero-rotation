@@ -104,7 +104,7 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Arcane.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
@@ -170,6 +170,9 @@ end
 function Player:ArcaneChargesP()
   return math.min(self:ArcaneCharges() + num(self:IsCasting(S.ArcaneBlast)),4)
 end
+
+HL.RegisterNucleusAbility(1449, 10, 6)               -- Arcane Explosion
+HL.RegisterNucleusAbility(44425, 10, 6)              -- Arcane Barrage
 
 --- ======= ACTION LISTS =======
 local function APL()

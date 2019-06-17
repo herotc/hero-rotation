@@ -89,7 +89,7 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Fire.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
@@ -122,10 +122,17 @@ function S.Firestarter:ActiveRemains()
     return S.Firestarter:IsAvailable() and ((Target:HealthPercentage() > 90) and Target:TimeToX(90, 3) or 0)
 end
 
+HL.RegisterNucleusAbility(157981, 8, 6)               -- Blast Wave
+HL.RegisterNucleusAbility(153561, 8, 6)               -- Meteor
+HL.RegisterNucleusAbility(31661, 8, 6)                -- Dragon's Breath
+HL.RegisterNucleusAbility(44457, 10, 6)               -- Living Bomb
+HL.RegisterNucleusAbility(2120, 8, 6)                 -- Flamestrike
+HL.RegisterNucleusAbility(257541, 8, 6)               -- Phoenix Flames
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, ActiveTalents, CombustionPhase, RopPhase, StandardRotation
-  EnemiesCount = GetEnemiesCount(40)
+  EnemiesCount = GetEnemiesCount(8)
   Precombat = function()
     -- flask
     -- food
