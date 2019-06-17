@@ -15,6 +15,7 @@ local HR = HeroRotation;
 
 -- Commons
 HR.Commons.Druid = {};
+
 -- GUI Settings
 local Settings = HR.GUISettings.APL.Druid.Commons;
 local Druid = HR.Commons.Druid;

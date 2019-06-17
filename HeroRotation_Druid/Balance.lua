@@ -13,7 +13,6 @@ local Spell  = HL.Spell
 local Item   = HL.Item
 -- HeroRotation
 local HR     = HeroRotation
-local Druid  = HR.Commons.Druid
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -199,6 +198,10 @@ end
 local function EvaluateCycleStellarFlare348(TargetUnit)
   return (TargetUnit:DebuffRefreshableCP(S.StellarFlareDebuff)) and (AP_Check(S.StellarFlare) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) >= 5 and (not bool(VarAzSs) or not Player:BuffP(CaInc()) or not Player:PrevGCDP(1, S.StellarFlare)) and not Player:IsCasting(S.StellarFlare))
 end
+
+HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
+HL.RegisterNucleusAbility(191037, 15, 6)              -- Starfall
+HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
 
 --- ======= ACTION LISTS =======
 local function APL()
