@@ -96,7 +96,7 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Elemental.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
@@ -140,10 +140,15 @@ end
 local function EvaluateCycleFlameShock562(TargetUnit)
   return TargetUnit:DebuffRefreshableCP(S.FlameShockDebuff)
 end
+
+HL.RegisterNucleusAbility(188443, 10, 6)               -- Chain Lightning
+HL.RegisterNucleusAbility(61882, 8, 6)                 -- Earthquake
+HL.RegisterNucleusAbility(192222, 8, 6)                -- Liquid Magma Totem
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, SingleTarget
-  EnemiesCount = GetEnemiesCount(40)
+  EnemiesCount = GetEnemiesCount(8)
   Precombat = function()
     -- flask
     -- food
