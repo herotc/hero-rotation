@@ -13,7 +13,6 @@ local Spell  = HL.Spell
 local Item   = HL.Item
 -- HeroRotation
 local HR     = HeroRotation
-local Hunter = HR.Commons.Hunter
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -128,7 +127,7 @@ local function APL()
   -- GCD Max + Latency Grace Period
   -- BM APL uses a lot of gcd.max specific timing that is slightly tight for real-world suggestions
   GCDMax = Player:GCD() + 0.150
-  EnemiesCount = GetEnemiesCount(10)
+  EnemiesCount = GetEnemiesCount(8)
 
   Precombat = function()
     -- flask

@@ -17,7 +17,6 @@
   -- All settings here should be moved into the GUI someday.
   HR.GUISettings.APL.Hunter = {
     Commons = {
-      MultiShotInMain = "Never",
       CounterShot = false,
       UsePotions = false,
       ExhilarationHP = 30,
@@ -74,6 +73,7 @@
       }
     },
     Survival = {
+      UseSplashData = true,
       AspectoftheEagle = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -102,22 +102,26 @@
   local CP_BeastMastery = CreateChildPanel(CP_Hunter, "BeastMastery");
   local CP_Marksmanship = CreateChildPanel(CP_Hunter, "Marksmanship");
   local CP_Survival = CreateChildPanel(CP_Hunter, "Survival");
+  
   -- Hunter
-  CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.MultiShotInMain", {"Never", "Only with Splash Data", "Always"}, "Multishot in the Main Icon", "When to show Multishot in the main icon or as a suggestion");
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
+  
   -- Beast Mastery
-  CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Multi-Shot, Beast Cleave, and Stomp");
+  CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.CounterShotSephuz", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
   CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.IntimidationShotSephuz", "Use Intimidation for Sephuz", "Enable this if you want it to show you when to use Intimidation to proc Sephuz's Secret (only when equipped). ");
+  
   -- Marksmanship
-  CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities such as Multi-Shot");
+  CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseLoneWolf", "Use Lone Wolf", "Enable this if you want to use Lone Wolf and not be notified to summon a pet.");
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.EnableMovementRotation", "Enable Movement Rotation", "Enable this to show a special rotation while Moving. The optimal standing ability will be shown as a suggestion.");
+  
   -- -- Survival
+  CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
   CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival");

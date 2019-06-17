@@ -113,13 +113,13 @@ end
 local function GetEnemiesCount(range)
   -- Unit Update - Update differently depending on if splash data is being used
   if HR.AoEON() then
-    if Settings.BeastMastery.UseSplashData then
+    if Settings.Survival.UseSplashData then
       HL.GetEnemies(range, nil, true, Target)
       return Cache.EnemiesCount[range]
     else
       UpdateRanges()
       Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[40]
+      return Cache.EnemiesCount[8]
     end
   else
     return 1
@@ -206,6 +206,12 @@ end
 local function EvaluateTargetIfFilterRaptorStrike239(TargetUnit)
   return TargetUnit:DebuffStackP(S.LatentPoisonDebuff)
 end
+
+HL.RegisterNucleusAbility(187708, 8, 6)                           -- Carve
+HL.RegisterNucleusAbility(212436, 8, 6)                           -- Butchery
+HL.RegisterNucleusAbility({259495, 270335, 270323, 271045}, 8, 6) -- Bombs
+HL.RegisterNucleusAbility(259391, 40, 6)                          -- Chakrams
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cds, Cleave, MbApWfiSt, St, WfiSt
