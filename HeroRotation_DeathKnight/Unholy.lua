@@ -70,6 +70,7 @@ local I = Item.DeathKnight.Unholy;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -90,6 +91,22 @@ local EnemyRanges = {30, 10, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
+  end
+end
+
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Unholy.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[8]
+    end
+  else
+    return 1
   end
 end
 
@@ -116,11 +133,15 @@ end
 local function EvaluateCycleOutbreak303(TargetUnit)
   return TargetUnit:DebuffRemainsP(S.VirulentPlagueDebuff) <= Player:GCD()
 end
+
+HL.RegisterNucleusAbility(152280, 8, 6)               -- Defile
+HL.RegisterNucleusAbility(115989, 8, 6)               -- Unholy Blight
+HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cooldowns, Generic
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
+  EnemiesCount = GetEnemiesCount(8)
   local no_heal = not DeathStrikeHeal()
   local Gargoyle = S.DarkArbiter:IsLearned() and S.DarkArbiter or S.SummonGargoyle
   Precombat = function()
@@ -177,7 +198,7 @@ local function APL()
       if HR.CastCycle(S.FesteringStrike, 30, EvaluateCycleFesteringStrike40) then return "festering_strike 46" end
     end
     -- festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
-    if S.FesteringStrike:IsCastableP() and (S.BurstingSores:IsAvailable() and Cache.EnemiesCount[5] >= 2 and Target:DebuffStackP(S.FesteringWoundDebuff) <= 1) then
+    if S.FesteringStrike:IsCastableP() and (S.BurstingSores:IsAvailable() and EnemiesCount >= 2 and Target:DebuffStackP(S.FesteringWoundDebuff) <= 1) then
       if HR.Cast(S.FesteringStrike) then return "festering_strike 47"; end
     end
     -- death_coil,if=buff.sudden_doom.react&rune.deficit>=4
@@ -223,7 +244,7 @@ local function APL()
       if HR.Cast(S.Apocalypse) then return "apocalypse 115"; end
     end
     -- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
-    if S.DarkTransformation:IsCastableP() and (not (Cache.EnemiesCount[30] > 1) or 10000000000 > 15) then
+    if S.DarkTransformation:IsCastableP() and (not (EnemiesCount > 1) or 10000000000 > 15) then
       if HR.Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation 119"; end
     end
     -- summon_gargoyle,if=runic_power.deficit<14
@@ -239,7 +260,7 @@ local function APL()
       if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 133"; end
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
-    if S.UnholyFrenzy:IsCastableP() and (Cache.EnemiesCount[30] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
+    if S.UnholyFrenzy:IsCastableP() and (EnemiesCount >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
       if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 141"; end
     end
     -- soul_reaper,target_if=target.time_to_die<8&target.time_to_die>4
@@ -247,7 +268,7 @@ local function APL()
       if HR.CastCycle(S.SoulReaper, 30, EvaluateCycleSoulReaper163) then return "soul_reaper 165" end
     end
     -- soul_reaper,if=(!raid_event.adds.exists|raid_event.adds.in>20)&rune<=(1-buff.unholy_frenzy.up)
-    if S.SoulReaper:IsCastableP() and ((not (Cache.EnemiesCount[30] > 1) or 10000000000 > 20) and Player:Rune() <= (1 - num(Player:BuffP(S.UnholyFrenzyBuff)))) then
+    if S.SoulReaper:IsCastableP() and ((not (EnemiesCount > 1) or 10000000000 > 20) and Player:Rune() <= (1 - num(Player:BuffP(S.UnholyFrenzyBuff)))) then
       if HR.Cast(S.SoulReaper) then return "soul_reaper 166"; end
     end
     -- unholy_blight
@@ -358,7 +379,7 @@ local function APL()
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
-    if (Cache.EnemiesCount[10] >= 2) then
+    if (EnemiesCount >= 2) then
       return Aoe();
     end
     -- call_action_list,name=generic
