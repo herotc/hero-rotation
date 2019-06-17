@@ -68,7 +68,7 @@ local I = Item.Druid.Guardian;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local IsTanking;
-local AoERadius, RangedRange; -- Range variables
+local AoERadius; -- Range variables
 local EnemiesCount; -- Target variables
 
 -- GUI Settings
@@ -257,7 +257,7 @@ local function APL()
     end
     -- moonfire,target_if=dot.moonfire.refreshable&active_enemies<2
     if S.Moonfire:IsCastableP() then
-      if HR.CastCycle(S.Moonfire, RangedRange, EvaluateCycleMoonfire88) then return "moonfire 100" end
+      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire88) then return "moonfire 100" end
     end
     -- incarnation
     if S.Incarnation:IsCastableP() then
@@ -277,7 +277,7 @@ local function APL()
     end
     -- moonfire,target_if=buff.galactic_guardian.up&active_enemies<2
     if S.Moonfire:IsCastableP() then
-      if HR.CastCycle(S.Moonfire, RangedRange, EvaluateCycleMoonfire139) then return "moonfire 151" end
+      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire139) then return "moonfire 151" end
     end
     -- thrash
     if Thrash():IsCastableP() then
