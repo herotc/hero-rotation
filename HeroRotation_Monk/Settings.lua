@@ -55,6 +55,7 @@
       }
     },
     Windwalker = {
+      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -80,9 +81,12 @@
   -- Monk
   CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
   CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
+  
   -- Windwalker
+  CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
-  -- Windwalker
+  
+  -- Brewmaster
   CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enabled", "Purify", "Enable or disable Purify recommendations.");
   CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
