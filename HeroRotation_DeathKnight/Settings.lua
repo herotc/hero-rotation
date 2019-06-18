@@ -30,7 +30,6 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Frost = {
-    UseSplashData = true,
     GCDasOffGCD = {
       -- Abilities
       HornofWinter = true,
@@ -41,7 +40,6 @@ HR.GUISettings.APL.DeathKnight = {
     },
   },
   Unholy = {
-    UseSplashData = true,
     GCDasOffGCD = {
       -- Abilities
       DarkTransformation = true,
@@ -54,7 +52,6 @@ HR.GUISettings.APL.DeathKnight = {
     ConsumptionSuggested = true,
     PoolDuringBlooddrinker = false,
     UmbilicusEternus = 0,
-    UseSplashData = true,
     Enabled = {
       -- Racials
       ArcaneTorrent = true,
@@ -86,13 +83,10 @@ local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Deathstrike on low HP", "Set the HP threshold to use DeathStrike (working only if Solo Mode is enabled).");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 --Unholy Panels
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 --Frost Panels
-CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
 --Blood Panels
-CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ConsumptionSuggested", "Suggested: Consumption", "Suggest (Left Top icon) Consumption if Consumption is not enabled.");
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it (supports Quaking).");
 CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.UmbilicusEternus", { 0, 2, 0.1 }, "Cancel: Umbilicus Eternus Remains", "Set the duration you want to start to show the Umbilicus Eternus cancel. Set to 0 to disable it.");

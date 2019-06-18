@@ -56,7 +56,6 @@
       RegrowthHP = 0,
       RenewalHP = 0,
       SurvivalInstinctsHP = 0,
-      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         CatForm = true,
@@ -86,7 +85,6 @@
       SurvivalInstinctsHP = 30,
       FrenziedRegenHP = 70,
       BristlingFurRage = 50,
-      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         FrenziedRegen = true,
@@ -114,7 +112,6 @@
   CreatePanelOption("CheckButton", CP_Druid, "APL.Druid.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
   
   --Feral
-  CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
   -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
   -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
@@ -131,7 +128,6 @@
   CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
   
   --Guardian
-  CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian");
   CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.");
   CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.LunarBeamHP", {0, 100, 1}, "Lunar Beam HP", "Set the Lunar Beam HP threshold.");

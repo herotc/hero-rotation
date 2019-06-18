@@ -74,7 +74,6 @@ local I = Item.Warrior.Arms;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -93,22 +92,6 @@ local EnemyRanges = {8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
-  end
-end
-
-local function GetEnemiesCount(range)
-  -- Unit Update - Update differently depending on if splash data is being used
-  if HR.AoEON() then
-    if Settings.Arms.UseSplashData then
-      HL.GetEnemies(range, nil, true, Target)
-      return Cache.EnemiesCount[range]
-    else
-      UpdateRanges()
-      Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[8]
-    end
-  else
-    return 1
   end
 end
 
@@ -135,7 +118,8 @@ HL.RegisterNucleusAbility(1680, 8, 6)                 -- Whirlwind
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Execute, FiveTarget, Hac, SingleTarget
-  EnemiesCount = GetEnemiesCount(8)
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
   UpdateExecuteID()
   Precombat = function()
     -- flask
@@ -175,7 +159,7 @@ local function APL()
       if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 32"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
-    if S.Cleave:IsReadyP() and (EnemiesCount > 2) then
+    if S.Cleave:IsReadyP() and (Cache.EnemiesCount[8] > 2) then
       if HR.Cast(S.Cleave) then return "cleave 36"; end
     end
     -- slam,if=buff.crushing_assault.up
@@ -255,7 +239,7 @@ local function APL()
   end
   Hac = function()
     -- rend,if=remains<=duration*0.3&(!raid_event.adds.up|buff.sweeping_strikes.up)
-    if S.Rend:IsReadyP() and (Target:DebuffRemainsP(S.RendDebuff) <= S.RendDebuff:BaseDuration() * 0.3 and (not (EnemiesCount > 1) or Player:BuffP(S.SweepingStrikesBuff))) then
+    if S.Rend:IsReadyP() and (Target:DebuffRemainsP(S.RendDebuff) <= S.RendDebuff:BaseDuration() * 0.3 and (not (Cache.EnemiesCount[8] > 1) or Player:BuffP(S.SweepingStrikesBuff))) then
       if HR.Cast(S.Rend) then return "rend 140"; end
     end
     -- skullsplitter,if=rage<60&(cooldown.deadly_calm.remains>3|!talent.deadly_calm.enabled)
@@ -267,39 +251,39 @@ local function APL()
       if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 164"; end
     end
     -- ravager,if=(raid_event.adds.up|raid_event.adds.in>target.time_to_die)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
-    if S.Ravager:IsCastableP() and HR.CDsON() and (((EnemiesCount > 1) or 10000000000 > Target:TimeToDie()) and (S.ColossusSmash:CooldownRemainsP() < 2 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 2))) then
+    if S.Ravager:IsCastableP() and HR.CDsON() and (((Cache.EnemiesCount[8] > 1) or 10000000000 > Target:TimeToDie()) and (S.ColossusSmash:CooldownRemainsP() < 2 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 2))) then
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 178"; end
     end
     -- colossus_smash,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled)
-    if S.ColossusSmash:IsCastableP() and ((EnemiesCount > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
+    if S.ColossusSmash:IsCastableP() and ((Cache.EnemiesCount[8] > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
       if HR.Cast(S.ColossusSmash) then return "colossus_smash 188"; end
     end
     -- warbreaker,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled)
-    if S.Warbreaker:IsCastableP() and HR.CDsON() and ((EnemiesCount > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
+    if S.Warbreaker:IsCastableP() and HR.CDsON() and ((Cache.EnemiesCount[8] > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
       if HR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker 194"; end
     end
     -- bladestorm,if=(debuff.colossus_smash.up&raid_event.adds.in>target.time_to_die)|raid_event.adds.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
-    if S.Bladestorm:IsCastableP() and HR.CDsON() and ((Target:DebuffP(S.ColossusSmashDebuff) and 10000000000 > Target:TimeToDie()) or (EnemiesCount > 1) and ((Target:DebuffRemainsP(S.ColossusSmashDebuff) > 4.5 and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff))) then
+    if S.Bladestorm:IsCastableP() and HR.CDsON() and ((Target:DebuffP(S.ColossusSmashDebuff) and 10000000000 > Target:TimeToDie()) or (Cache.EnemiesCount[8] > 1) and ((Target:DebuffRemainsP(S.ColossusSmashDebuff) > 4.5 and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff))) then
       if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 200"; end
     end
     -- overpower,if=!raid_event.adds.up|(raid_event.adds.up&azerite.seismic_wave.enabled)
-    if S.Overpower:IsCastableP() and (not (EnemiesCount > 1) or ((EnemiesCount > 1) and S.SeismicWave:AzeriteEnabled())) then
+    if S.Overpower:IsCastableP() and (not (Cache.EnemiesCount[8] > 1) or ((Cache.EnemiesCount[8] > 1) and S.SeismicWave:AzeriteEnabled())) then
       if HR.Cast(S.Overpower) then return "overpower 212"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
-    if S.Cleave:IsReadyP() and (EnemiesCount > 2) then
+    if S.Cleave:IsReadyP() and (Cache.EnemiesCount[8] > 2) then
       if HR.Cast(S.Cleave) then return "cleave 220"; end
     end
     -- execute,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sudden_death.react
-    if S.Execute:IsCastableP() and (not (EnemiesCount > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or bool(Player:BuffStackP(S.SuddenDeathBuff))) then
+    if S.Execute:IsCastableP() and (not (Cache.EnemiesCount[8] > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or bool(Player:BuffStackP(S.SuddenDeathBuff))) then
       if HR.Cast(S.Execute) then return "execute 222"; end
     end
     -- mortal_strike,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)
-    if S.MortalStrike:IsReadyP() and (not (EnemiesCount > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2)) then
+    if S.MortalStrike:IsReadyP() and (not (Cache.EnemiesCount[8] > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2)) then
       if HR.Cast(S.MortalStrike) then return "mortal_strike 232"; end
     end
     -- whirlwind,if=raid_event.adds.up
-    if S.Whirlwind:IsReadyP() and (EnemiesCount > 1) then
+    if S.Whirlwind:IsReadyP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 240"; end
     end
     -- overpower
@@ -311,7 +295,7 @@ local function APL()
       if HR.Cast(S.Whirlwind) then return "whirlwind 246"; end
     end
     -- slam,if=!talent.fervor_of_battle.enabled&!raid_event.adds.up
-    if S.Slam:IsReadyP() and (not S.FervorofBattle:IsAvailable() and not (EnemiesCount > 1)) then
+    if S.Slam:IsReadyP() and (not S.FervorofBattle:IsAvailable() and not (Cache.EnemiesCount[8] > 1)) then
       if HR.Cast(S.Slam) then return "slam 250"; end
     end
   end
@@ -349,7 +333,7 @@ local function APL()
       if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 302"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
-    if S.Cleave:IsReadyP() and (EnemiesCount > 2) then
+    if S.Cleave:IsReadyP() and (Cache.EnemiesCount[8] > 2) then
       if HR.Cast(S.Cleave) then return "cleave 316"; end
     end
     -- overpower,if=azerite.seismic_wave.rank=3
@@ -422,15 +406,15 @@ local function APL()
       if HR.Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar 382"; end
     end
     -- sweeping_strikes,if=spell_targets.whirlwind>1&(cooldown.bladestorm.remains>10|cooldown.colossus_smash.remains>8|azerite.test_of_might.enabled)
-    if S.SweepingStrikes:IsCastableP() and (EnemiesCount > 1 and (S.Bladestorm:CooldownRemainsP() > 10 or S.ColossusSmash:CooldownRemainsP() > 8 or S.TestofMight:AzeriteEnabled())) then
+    if S.SweepingStrikes:IsCastableP() and (Cache.EnemiesCount[8] > 1 and (S.Bladestorm:CooldownRemainsP() > 10 or S.ColossusSmash:CooldownRemainsP() > 8 or S.TestofMight:AzeriteEnabled())) then
       if HR.Cast(S.SweepingStrikes) then return "sweeping_strikes 390"; end
     end
     -- run_action_list,name=hac,if=raid_event.adds.exists
-    if (EnemiesCount > 1) then
+    if (Cache.EnemiesCount[8] > 1) then
       return Hac();
     end
     -- run_action_list,name=five_target,if=spell_targets.whirlwind>4
-    if (EnemiesCount > 4) then
+    if (Cache.EnemiesCount[8] > 4) then
       return FiveTarget();
     end
     -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20

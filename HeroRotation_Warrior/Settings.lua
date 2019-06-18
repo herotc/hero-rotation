@@ -28,7 +28,6 @@
     },
 
     Arms = {
-      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -50,7 +49,6 @@
       ShowPoOW = false,
       ShowPoPP = false,
       ShowBPoS = false,
-      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -73,7 +71,6 @@
       UseLastStandToFillShieldBlockDownTime = true,
       UseShieldBlockDefensively = true,
       UseRageDefensively = true,
-      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         Avatar            = true,
@@ -104,17 +101,14 @@
   CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 
   -- Arms settings
-  CreatePanelOption("CheckButton", CP_Arms, "APL.Warrior.Arms.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms");
 
   -- Fury settings
-  CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury");
   CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoOW", "Show Potion of the Old War", "Enable this if you want it to show you when to use Potion of the Old War.");
   CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
 
   -- Protection settings
-  CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
   CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseLastStandToFillShieldBlockDownTime", "Use Last Stand to fill Shield Block down time", "Enable this if you want to fill Shield Block down time with Last Stand.");
   CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseShieldBlockDefensively", "Use Shield Block purely defensively", "Enable this if you only want to use Shield Block in a defensive manner.");

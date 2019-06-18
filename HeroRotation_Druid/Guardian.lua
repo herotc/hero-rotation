@@ -69,7 +69,7 @@ local I = Item.Druid.Guardian;
 local ShouldReturn; -- Used to get the return string
 local IsTanking;
 local AoERadius; -- Range variables
-local EnemiesCount; -- Target variables
+local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -79,7 +79,7 @@ local Settings = {
   Guardian = HR.GUISettings.APL.Druid.Guardian
 };
 
-local EnemyRanges = {40, 8}
+local EnemyRanges = {11, 8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -110,22 +110,6 @@ local function Thrash()
   end
 end
 
-local function GetEnemiesCount(range)
-  -- Unit Update - Update differently depending on if splash data is being used
-  if HR.AoEON() then
-    if Settings.Guardian.UseSplashData then
-      HL.GetEnemies(range, nil, true, Target)
-      return Cache.EnemiesCount[range]
-    else
-      UpdateRanges()
-      Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[8]
-    end
-  else
-    return 1
-  end
-end
-
 local function EvaluateCyclePulverize77(TargetUnit)
   return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and not Player:BuffP(S.PulverizeBuff)
 end
@@ -150,7 +134,9 @@ local function APL()
   else
     AoERadius = 8
   end
-  EnemiesCount = GetEnemiesCount(AoERadius)
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
+  EnemiesCount = Cache.EnemiesCount[AoERadius]
   IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
   Precombat = function()
     -- flask
@@ -257,7 +243,7 @@ local function APL()
     end
     -- moonfire,target_if=dot.moonfire.refreshable&active_enemies<2
     if S.Moonfire:IsCastableP() then
-      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire88) then return "moonfire 100" end
+      if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire88) then return "moonfire 100" end
     end
     -- incarnation
     if S.Incarnation:IsCastableP() then
@@ -277,7 +263,7 @@ local function APL()
     end
     -- moonfire,target_if=buff.galactic_guardian.up&active_enemies<2
     if S.Moonfire:IsCastableP() then
-      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire139) then return "moonfire 151" end
+      if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire139) then return "moonfire 151" end
     end
     -- thrash
     if Thrash():IsCastableP() then

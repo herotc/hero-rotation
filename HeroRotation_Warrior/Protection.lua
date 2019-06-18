@@ -78,26 +78,10 @@ local StunInterrupts = {
   {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
 };
 
-local EnemyRanges = {5}
+local EnemyRanges = {8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
-  end
-end
-
-local function GetEnemiesCount(range)
-  -- Unit Update - Update differently depending on if splash data is being used
-  if HR.AoEON() then
-    if Settings.Protection.UseSplashData then
-      HL.GetEnemies(range, nil, true, Target)
-      return Cache.EnemiesCount[range]
-    else
-      UpdateRanges()
-      Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[8]
-    end
-  else
-    return 1
   end
 end
 
@@ -158,7 +142,8 @@ HL.RegisterNucleusAbility(228920, 8, 6)             -- Ravager
 local function APL()
   local Precombat, Aoe, St, Defensive
   local gcdTime = Player:GCD()
-  EnemiesCount = GetEnemiesCount(8)
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
     -- flask
     -- food
@@ -219,7 +204,7 @@ local function APL()
   end
   St = function()
     -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
-    if S.ThunderClap:IsCastableP() and (EnemiesCount == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
+    if S.ThunderClap:IsCastableP() and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
       if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down&azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up
@@ -329,7 +314,7 @@ local function APL()
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
-    if (EnemiesCount >= 3) then
+    if (Cache.EnemiesCount[8] >= 3) then
       return Aoe();
     end
     -- call_action_list,name=st

@@ -33,7 +33,6 @@
     },
 
     Enhancement = {
-      UseSplashData = true,
       GCDasOffGCD = {
         -- Abilities
         FeralSpirit = false,
@@ -81,7 +80,6 @@
   CreatePanelOption("Slider", CP_Shaman, "APL.Shaman.Commons.HealingHPThreshold", {0, 100, 1}, "Healing surge / health pot HP threshold", "Healing Surge and/or health pot HP percent threshold.");
 
   -- Enhancement settings
-  CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");
   CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.EnableFS", "Show Feral Spirit in rotation", "Uncheck this if you don't want to see Feral Spirit in the rotation.");
   CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.EnableEE", "Show Earth Elemental in rotation", "Uncheck this if you don't want to see Earth Elemental in the rotation.");

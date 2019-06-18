@@ -66,7 +66,6 @@ local I = Item.DemonHunter.Havoc;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -105,22 +104,6 @@ local EnemyRanges = {40, 20, 8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
-  end
-end
-
-local function GetEnemiesCount(range)
-  -- Unit Update - Update differently depending on if splash data is being used
-  if HR.AoEON() then
-    if Settings.Havoc.UseSplashData then
-      HL.GetEnemies(range, nil, true, Target)
-      return Cache.EnemiesCount[range]
-    else
-      UpdateRanges()
-      Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[8]
-    end
-  else
-    return 1
   end
 end
 
@@ -170,7 +153,8 @@ HL.RegisterNucleusAbility(179057, 8, 6)               -- Chaos Nova
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldown, DarkSlash, Demonic, Normal
-  EnemiesCount = GetEnemiesCount(8)
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
     -- flask
     -- augmentation
@@ -200,7 +184,7 @@ local function APL()
     end
     -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
     -- nemesis,if=!raid_event.adds.exists
-    if S.Nemesis:IsCastableP(50) and (not EnemiesCount > 1) then
+    if S.Nemesis:IsCastableP(50) and (not Cache.EnemiesCount[40] > 1) then
       if HR.Cast(S.Nemesis, Settings.Havoc.GCDasOffGCD.Nemesis) then return "nemesis 51"; end
     end
     -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
@@ -236,7 +220,7 @@ local function APL()
       if HR.Cast(S.EyeBeam) then return "eye_beam 79"; end
     end
     -- fel_barrage,if=((!cooldown.eye_beam.up|buff.metamorphosis.up)&raid_event.adds.in>30)|active_enemies>desired_targets
-    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and ((not S.EyeBeam:CooldownUpP() or Player:BuffP(S.MetamorphosisBuff)) or EnemiesCount > 1) then
+    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and ((not S.EyeBeam:CooldownUpP() or Player:BuffP(S.MetamorphosisBuff)) or Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.FelBarrage) then return "fel_barrage 83"; end
     end
     -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
@@ -294,7 +278,7 @@ local function APL()
       if CastFelRush() then return "fel_rush 155"; end
     end
     -- fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
-    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (not bool(VarWaitingForMomentum) and EnemiesCount > 1) then
+    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (not bool(VarWaitingForMomentum) and Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.FelBarrage) then return "fel_barrage 165"; end
     end
     -- death_sweep,if=variable.blade_dance
@@ -306,7 +290,7 @@ local function APL()
       if HR.Cast(S.ImmolationAura) then return "immolation_aura 179"; end
     end
     -- eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
-    if S.EyeBeam:IsReadyP(20) and (EnemiesCount > 1 and not bool(VarWaitingForMomentum)) then
+    if S.EyeBeam:IsReadyP(20) and (Cache.EnemiesCount[20] > 1 and not bool(VarWaitingForMomentum)) then
       if HR.Cast(S.EyeBeam) then return "eye_beam 181"; end
     end
     -- blade_dance,if=variable.blade_dance
@@ -372,7 +356,7 @@ local function APL()
     
     -- Set Variables
     -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
-    VarBladeDance = num(S.FirstBlood:IsAvailable() or EnemiesCount >= (3 - num(S.TrailofRuin:IsAvailable())))
+    VarBladeDance = num(S.FirstBlood:IsAvailable() or Cache.EnemiesCount[8] >= (3 - num(S.TrailofRuin:IsAvailable())))
     -- variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
     VarWaitingForNemesis = num(not (not S.Nemesis:IsAvailable() or S.Nemesis:CooldownUpP() or S.Nemesis:CooldownRemainsP() > Target:TimeToDie() or S.Nemesis:CooldownRemainsP() > 60))
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30&(!variable.waiting_for_nemesis|cooldown.nemesis.remains<10)

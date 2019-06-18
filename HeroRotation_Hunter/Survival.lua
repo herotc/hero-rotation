@@ -81,7 +81,6 @@ local I = Item.Hunter.Survival;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -107,22 +106,6 @@ local EnemyRanges = {8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
-  end
-end
-
-local function GetEnemiesCount(range)
-  -- Unit Update - Update differently depending on if splash data is being used
-  if HR.AoEON() then
-    if Settings.Survival.UseSplashData then
-      HL.GetEnemies(range, nil, true, Target)
-      return Cache.EnemiesCount[range]
-    else
-      UpdateRanges()
-      Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[8]
-    end
-  else
-    return 1
   end
 end
 
@@ -215,7 +198,8 @@ HL.RegisterNucleusAbility(259391, 40, 6)                          -- Chakrams
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cds, Cleave, MbApWfiSt, St, WfiSt
-  EnemiesCount = GetEnemiesCount(8)
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
   S.WildfireBomb = CurrentWildfireInfusion()
   S.RaptorStrike = CurrentRaptorStrike()
   S.MongooseBite = CurrentMongooseBite()
@@ -275,7 +259,7 @@ local function APL()
   end
   Cleave = function()
     -- variable,name=carve_cdr,op=setif,value=active_enemies,value_else=5,condition=active_enemies<5
-    VarCarveCdr = math.min(EnemiesCount, 5)
+    VarCarveCdr = math.min(Cache.EnemiesCount[8], 5)
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
       if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 77"; end
@@ -553,19 +537,19 @@ local function APL()
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=mb_ap_wfi_st,if=active_enemies<3&talent.wildfire_infusion.enabled&talent.alpha_predator.enabled&talent.mongoose_bite.enabled
-    if (EnemiesCount < 3 and S.WildfireInfusion:IsAvailable() and S.AlphaPredator:IsAvailable() and S.MongooseBite:IsAvailable()) then
+    if (Cache.EnemiesCount[8] < 3 and S.WildfireInfusion:IsAvailable() and S.AlphaPredator:IsAvailable() and S.MongooseBite:IsAvailable()) then
       local ShouldReturn = MbApWfiSt(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=wfi_st,if=active_enemies<3&talent.wildfire_infusion.enabled
-    if (EnemiesCount < 3 and S.WildfireInfusion:IsAvailable()) then
+    if (Cache.EnemiesCount[8] < 3 and S.WildfireInfusion:IsAvailable()) then
       local ShouldReturn = WfiSt(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<2|azerite.blur_of_talons.enabled&talent.birds_of_prey.enabled&buff.coordinated_assault.up
-    if (EnemiesCount < 2 or S.BlurofTalons:AzeriteEnabled() and S.BirdsofPrey:IsAvailable() and Player:BuffP(S.CoordinatedAssaultBuff)) then
+    if (Cache.EnemiesCount[8] < 2 or S.BlurofTalons:AzeriteEnabled() and S.BirdsofPrey:IsAvailable() and Player:BuffP(S.CoordinatedAssaultBuff)) then
       local ShouldReturn = St(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies>1
-    if (EnemiesCount > 1) then
+    if (Cache.EnemiesCount[8] > 1) then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- arcane_torrent

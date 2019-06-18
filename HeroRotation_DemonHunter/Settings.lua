@@ -43,7 +43,6 @@
     Havoc = {
       -- {Display OffGCD as OffGCD, ForceReturn}
       FelRushDisplayStyle = "Main Icon",
-      UseSplashData = true,
       OffGCDasOffGCD = {
         -- Abilities
         Metamorphosis = true,
@@ -73,6 +72,5 @@
   CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance");
 
   CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.");
-  CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.ConserveFelRush", "Conserve Fel Rush", "Save at least 1 Fel Rush charge for mobility.");
   CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc");

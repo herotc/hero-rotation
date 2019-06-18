@@ -73,7 +73,6 @@
       }
     },
     Survival = {
-      UseSplashData = true,
       AspectoftheEagle = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -122,6 +121,5 @@
   CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.EnableMovementRotation", "Enable Movement Rotation", "Enable this to show a special rotation while Moving. The optimal standing ability will be shown as a suggestion.");
   
   -- -- Survival
-  CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
   CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival");

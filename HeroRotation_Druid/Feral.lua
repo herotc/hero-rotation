@@ -77,7 +77,6 @@ local I = Item.Druid.Feral;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -100,22 +99,6 @@ local EnemyRanges = {8, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
-  end
-end
-
-local function GetEnemiesCount(range)
-  -- Unit Update - Update differently depending on if splash data is being used
-  if HR.AoEON() then
-    if Settings.Feral.UseSplashData then
-      HL.GetEnemies(range, nil, true, Target)
-      return Cache.EnemiesCount[range]
-    else
-      UpdateRanges()
-      Everyone.AoEToggleEnemiesUpdate()
-      return Cache.EnemiesCount[5]
-    end
-  else
-    return 1
   end
 end
 
@@ -145,11 +128,11 @@ S.Rake:RegisterPMultiplier(
 )
 
 local function EvaluateCyclePrimalWrath95(TargetUnit)
-  return EnemiesCount > 1 and TargetUnit:DebuffRemainsP(S.RipDebuff) < 4
+  return Cache.EnemiesCount[5] > 1 and TargetUnit:DebuffRemainsP(S.RipDebuff) < 4
 end
 
 local function EvaluateCyclePrimalWrath106(TargetUnit)
-  return EnemiesCount >= 2
+  return Cache.EnemiesCount[5] >= 2
 end
 
 local function EvaluateCycleRip115(TargetUnit)
@@ -180,7 +163,8 @@ HL.RegisterNucleusAbility(106785, 8, 6)               -- Swipe (Cat)
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldowns, Finishers, Generators, Opener
-  EnemiesCount = GetEnemiesCount(8)
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
     -- flask
     -- food
@@ -306,12 +290,12 @@ local function APL()
       if HR.Cast(S.Regrowth) then return "regrowth 184"; end
     end
     -- brutal_slash,if=spell_targets.brutal_slash>desired_targets
-    if S.BrutalSlash:IsCastableP() and (EnemiesCount > 1) then
+    if S.BrutalSlash:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.BrutalSlash) then return "brutal_slash 196"; end
     end
     -- pool_resource,for_next=1
     -- thrash_cat,if=(refreshable)&(spell_targets.thrash_cat>2)
-    if S.ThrashCat:IsCastableP() and ((Target:DebuffRefreshableCP(S.ThrashCatDebuff)) and (EnemiesCount > 2)) then
+    if S.ThrashCat:IsCastableP() and ((Target:DebuffRefreshableCP(S.ThrashCatDebuff)) and (Cache.EnemiesCount[8] > 2)) then
       if S.ThrashCat:IsUsablePPool() then
         if HR.Cast(S.ThrashCat) then return "thrash_cat 199"; end
       else
@@ -320,7 +304,7 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- thrash_cat,if=(talent.scent_of_blood.enabled&buff.scent_of_blood.down)&spell_targets.thrash_cat>3
-    if S.ThrashCat:IsCastableP() and ((S.ScentofBlood:IsAvailable() and Player:BuffDownP(S.ScentofBloodBuff)) and EnemiesCount > 3) then
+    if S.ThrashCat:IsCastableP() and ((S.ScentofBlood:IsAvailable() and Player:BuffDownP(S.ScentofBloodBuff)) and Cache.EnemiesCount[8] > 3) then
       if S.ThrashCat:IsUsablePPool() then
         if HR.Cast(S.ThrashCat) then return "thrash_cat 209"; end
       else
@@ -360,7 +344,7 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- thrash_cat,if=refreshable&((variable.use_thrash=2&(!buff.incarnation.up|azerite.wild_fleshrending.enabled))|spell_targets.thrash_cat>1)
-    if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (not Player:BuffP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or EnemiesCount > 1)) then
+    if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (not Player:BuffP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or Cache.EnemiesCount[8] > 1)) then
       if S.ThrashCat:IsUsablePPool() then
         if HR.Cast(S.ThrashCat) then return "thrash_cat 312"; end
       else
@@ -373,7 +357,7 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- swipe_cat,if=spell_targets.swipe_cat>1
-    if S.SwipeCat:IsCastableP() and (EnemiesCount > 1) then
+    if S.SwipeCat:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if S.SwipeCat:IsUsablePPool() then
         if HR.Cast(S.SwipeCat) then return "swipe_cat 344"; end
       else
@@ -405,7 +389,7 @@ local function APL()
     end
     -- rip,if=!ticking
     -- Manual addition: Use Primal Wrath if >= 2 targets or Rip if only 1 target
-    if S.PrimalWrath:IsCastableP() and (S.PrimalWrath:IsAvailable() and not Target:DebuffP(S.RipDebuff) and EnemiesCount >= 2) then
+    if S.PrimalWrath:IsCastableP() and (S.PrimalWrath:IsAvailable() and not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[8] >= 2) then
       if HR.Cast(S.PrimalWrath) then return "primal_wrath opener"; end
     end
     if S.Rip:IsCastableP() and (not Target:DebuffP(S.RipDebuff)) then
