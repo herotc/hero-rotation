@@ -40,6 +40,7 @@
         RuneofPower = true,
         IcyVeins = true,
         MirrorImage = true,
+        FrozenOrb = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

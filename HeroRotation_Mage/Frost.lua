@@ -156,7 +156,7 @@ local function APL()
   Aoe = function()
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() then
-      if HR.Cast(S.FrozenOrb) then return "frozen_orb 16"; end
+      if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 16"; end
     end
     -- blizzard
     if S.Blizzard:IsCastableP() then
@@ -283,7 +283,7 @@ local function APL()
     end
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() then
-      if HR.Cast(S.FrozenOrb) then return "frozen_orb 153"; end
+      if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 153"; end
     end
     -- blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
     if S.Blizzard:IsCastableP() and (EnemiesCount > 2 or EnemiesCount > 1 and S.Blizzard:CastTime() == 0 and Player:BuffStackP(S.FingersofFrostBuff) < 2) then
