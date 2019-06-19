@@ -79,7 +79,7 @@ local I = Item.Druid.Balance;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
-local EnemiesCount;
+local EnemiesCount, EnemiesCount40;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -100,7 +100,7 @@ HL:RegisterForEvent(function()
   VarSfTargets = 0
 end, "PLAYER_REGEN_ENABLED")
 
-local EnemyRanges = {40}
+local EnemyRanges = {40, 15, 8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -206,7 +206,8 @@ HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat
-  EnemiesCount = GetEnemiesCount(8)
+  EnemiesCount = GetEnemiesCount(15)
+  EnemiesCount40 = GetEnemiesCount(40) -- To populate Cache.Enemies[40] for CastCycles
   Precombat = function()
     -- flask
     -- food
