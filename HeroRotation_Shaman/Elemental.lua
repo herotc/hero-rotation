@@ -149,6 +149,7 @@ HL.RegisterNucleusAbility(192222, 8, 6)                -- Liquid Magma Totem
 local function APL()
   local Precombat, Aoe, SingleTarget
   EnemiesCount = GetEnemiesCount(8)
+  HL.GetEnemies(40) -- For CastCycle calls
   Precombat = function()
     -- flask
     -- food
