@@ -37,6 +37,7 @@
         -- Abilities
         Mindbender = true,
         Shadowform = true,
+        VoidEruption = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

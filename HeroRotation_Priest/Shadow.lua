@@ -218,7 +218,7 @@ local function APL()
   Cleave = function()
     -- void_eruption
     if S.VoidEruption:IsReadyP() and Player:Insanity() >= InsanityThreshold() and not Player:IsCasting(S.VoidEruption) then
-      if HR.Cast(S.VoidEruption) then return "void_eruption 58"; end
+      if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption 58"; end
     end
     -- dark_ascension,if=buff.voidform.down
     if S.DarkAscension:IsReadyP() and (Player:BuffDownP(S.VoidformBuff)) and not Player:IsCasting(S.VoidEruption) then
@@ -296,7 +296,7 @@ local function APL()
   Single = function()
     -- void_eruption
     if S.VoidEruption:IsReadyP() and Player:Insanity() >= InsanityThreshold() and not Player:IsCasting(S.VoidEruption) then
-      if HR.Cast(S.VoidEruption) then return "void_eruption 176"; end
+      if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption) then return "void_eruption 176"; end
     end
     -- dark_ascension,if=buff.voidform.down
     if S.DarkAscension:IsReadyP() and (Player:BuffDownP(S.VoidformBuff)) and not Player:IsCasting(S.VoidEruption) then
