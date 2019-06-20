@@ -164,6 +164,7 @@ HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
 local function APL()
   local Precombat, Cleave, Single
   EnemiesCount = GetEnemiesCount(8)
+  HL.GetEnemies(40) -- For CastCycle calls
   Precombat = function()
     if Everyone.TargetIsValid() then
       -- flask
