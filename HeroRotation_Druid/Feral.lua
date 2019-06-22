@@ -95,7 +95,7 @@ HL:RegisterForEvent(function()
   VarOpenerDone = 0
 end, "PLAYER_REGEN_ENABLED")
 
-local EnemyRanges = {8, 5}
+local EnemyRanges = {40, 8, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
