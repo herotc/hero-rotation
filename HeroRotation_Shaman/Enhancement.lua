@@ -93,6 +93,33 @@ Spell.Shaman.Enhancement = {
   -- Item Buffs
   BSARBuff              = Spell(270058),
   DFRBuff               = Spell(224001),
+  
+  -- BfA Essences
+  BloodOfTheEnemy       = Spell(297108),
+  BloodOfTheEnemy2      = Spell(298273),
+  BloodOfTheEnemy3      = Spell(298277),
+  MemoryOfLucidDreams   = Spell(298357),
+  MemoryOfLucidDreams2  = Spell(299372),
+  MemoryOfLucidDreams3  = Spell(299374),
+  PurifyingBlast        = Spell(295337),
+  PurifyingBlast2       = Spell(299345),
+  PurifyingBlast3       = Spell(299347),
+  ConcentratedFlame     = Spell(295373),
+  ConcentratedFlame2    = Spell(299349),
+  ConcentratedFlame3    = Spell(299353),
+  TheUnboundForce       = Spell(298452),
+  TheUnboundForce2      = Spell(299376),
+  TheUnboundForce3      = Spell(299378),
+  RecklessForce         = Spell(302932),
+  WorldveinResonance    = Spell(295186),
+  WorldveinResonance2   = Spell(298628),
+  WorldveinResonance3   = Spell(299334),
+  FocusedAzeriteBeam    = Spell(295258),
+  FocusedAzeriteBeam2   = Spell(299336),
+  FocusedAzeriteBeam3   = Spell(299338),
+  GuardianOfAzeroth     = Spell(295840),
+  GuardianOfAzeroth2    = Spell(299355),
+  GuardianOfAzeroth3    = Spell(299358),
 
   -- Misc
   PoolFocus             = Spell(9999000010),
@@ -248,6 +275,25 @@ local function UpdateRanges()
   end
 end
 
+local function DetermineEssenceRanks()
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams
+  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast
+  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast
+  S.ConcentratedFlame = S.ConcentratedFlame2:IsAvailable() and S.ConcentratedFlame2 or S.ConcentratedFlame
+  S.ConcentratedFlame = S.ConcentratedFlame3:IsAvailable() and S.ConcentratedFlame3 or S.ConcentratedFlame
+  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce
+  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce
+  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance
+  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam
+  S.GuardianOfAzeroth = S.GuardianOfAzeroth2:IsAvailable() and S.GuardianOfAzeroth2 or S.GuardianOfAzeroth
+  S.GuardianOfAzeroth = S.GuardianOfAzeroth3:IsAvailable() and S.GuardianOfAzeroth3 or S.GuardianOfAzeroth
+end
+
 HL.RegisterNucleusAbility(187874, 8, 6)               -- Crash Lightning
 HL.RegisterNucleusAbility(197214, 11, 6)              -- Sundering
 
@@ -259,6 +305,7 @@ local function APL ()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
+    DetermineEssenceRanks()
     -- Opener
     -- actions+=/call_action_list,name=opener
     if Everyone.TargetIsValid() then
@@ -314,9 +361,9 @@ local function APL ()
 
     -- BfA Trinkets
     if Settings.Shaman.Commons.OnUseTrinkets then
-	  if I.GalecallersBoon:IsEquipped() and Target:IsInRange("Melee") and S.GalecallersBoon:TimeSinceLastCast() >= 60 and not Player:IsMoving() then
-	    if HR.CastSuggested(I.GalecallersBoon) then return "Use GalecallersBoon" end
-	  end
+      if I.GalecallersBoon:IsEquipped() and Target:IsInRange("Melee") and S.GalecallersBoon:TimeSinceLastCast() >= 60 and not Player:IsMoving() then
+        if HR.CastSuggested(I.GalecallersBoon) then return "Use GalecallersBoon" end
+      end
     end
 
     -- Lightning Shield if we have it talented!
@@ -351,6 +398,11 @@ local function APL ()
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
     end
+    
+    -- actions.priority+=/the_unbound_force,if=buff.reckless_force.up|time<5
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or HL.CombatTime() < 5) then
+      if HR.Cast(TheUnboundForce) then return "the_unbound_force"; end
+    end
 
     -- actions.priority+=/lava_lash,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack=10&active_enemies=1&variable.freezerburn_enabled&variable.furyCheck_LL
     if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and Cache.EnemiesCount[10] == 1 and freezerburn_enabled() and furyCheck_LL()) then
@@ -384,6 +436,16 @@ local function APL ()
     -- actions.priority+=/sundering,if=active_enemies>=3
     if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() and (Cache.EnemiesCount[10] >= 3) then
       if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
+    end
+    
+    -- actions.priority+=/focused_azerite_beam,if=active_enemies>=3
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[10] >= 3) then
+      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+    end
+    
+    -- actions.priority+=/purifying_blast,if=active_enemies>=3
+    if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[10] >= 3) then
+      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
     end
 
     -- actions.priority+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
@@ -448,16 +510,33 @@ local function APL ()
     -- # Attempt to sync your DPS potion with a cooldown, unless the target is about to die.
     -- actions.cds+=/potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
     -- We already roughly handle this toward the beginning.
+    
+    -- actions.cds+=/guardian_of_azeroth
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+    end
+    
+    -- actions.cds+=/memory_of_lucid_dreams
+    if S.MemoryOfLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+    end
 
     -- actions.cds+=/feral_spirit
     if S.FeralSpirit:IsCastableP() and Settings.Shaman.Enhancement.EnableFS then
       if HR.Cast(S.FeralSpirit, Settings.Shaman.Enhancement.GCDasOffGCD.FeralSpirit) then return "Cast FeralSpirit" end
+    end
+    
+    -- actions.cds+=/blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
     end
 
     -- actions.cds+=/ascendance,if=cooldown.strike.remains>0
     if S.Ascendance:IsCastableP() and ((S.WindStrike:CooldownRemainsP() > 0 or S.StormStrike:CooldownRemainsP() > 0)) then
       if HR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Cast Ascendance" end
     end
+    
+    -- actions.cds+=/use_items
 
     -- actions.cds+=/earth_elemental
     if S.EarthElemental:IsCastableP() and Settings.Shaman.Enhancement.EnableEE then
@@ -557,6 +636,26 @@ local function APL ()
     -- actions.filler=sundering
     if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() then
       if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
+    end
+    
+    -- actions.filler+=/focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+    end
+    
+    -- actions.filler+=/purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+    end
+    
+    -- actions.filler+=/concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+    end
+    
+    -- actions.filler+=/worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
     end
 
     -- actions.filler+=/crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
