@@ -55,7 +55,32 @@ Spell.Mage.Frost = {
   GlacialSpikeBuff                      = Spell(199844),
   SplittingIce                          = Spell(56377),
   FreezingRain                          = Spell(240555),
-  Counterspell                          = Spell(2139)
+  Counterspell                          = Spell(2139),
+  BloodOfTheEnemy                       = Spell(297108),
+  BloodOfTheEnemy2                      = Spell(298273),
+  BloodOfTheEnemy3                      = Spell(298277),
+  MemoryOfLucidDreams                   = Spell(298357),
+  MemoryOfLucidDreams2                  = Spell(299372),
+  MemoryOfLucidDreams3                  = Spell(299374),
+  PurifyingBlast                        = Spell(295337),
+  PurifyingBlast2                       = Spell(299345),
+  PurifyingBlast3                       = Spell(299347),
+  RippleInSpace                         = Spell(302731),
+  RippleInSpace2                        = Spell(302982),
+  RippleInSpace3                        = Spell(302983),
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlame2                    = Spell(299349),
+  ConcentratedFlame3                    = Spell(299353),
+  TheUnboundForce                       = Spell(298452),
+  TheUnboundForce2                      = Spell(299376),
+  TheUnboundForce3                      = Spell(299378),
+  RecklessForce                         = Spell(302932),
+  WorldveinResonance                    = Spell(295186),
+  WorldveinResonance2                   = Spell(298628),
+  WorldveinResonance3                   = Spell(299334),
+  FocusedAzeriteBeam                    = Spell(295258),
+  FocusedAzeriteBeam2                   = Spell(299336),
+  FocusedAzeriteBeam3                   = Spell(299338)
 };
 local S = Spell.Mage.Frost;
 
@@ -115,6 +140,25 @@ end
 S.FrozenOrb.EffectID = 84721
 S.Frostbolt:RegisterInFlight()
 
+local function DetermineEssenceRanks()
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams
+  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast
+  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast
+  S.RippleInSpace = S.RippleInSpace2:IsAvailable() and S.RippleInSpace2 or S.RippleInSpace
+  S.RippleInSpace = S.RippleInSpace3:IsAvailable() and S.RippleInSpace3 or S.RippleInSpace
+  S.ConcentratedFlame = S.ConcentratedFlame2:IsAvailable() and S.ConcentratedFlame2 or S.ConcentratedFlame
+  S.ConcentratedFlame = S.ConcentratedFlame3:IsAvailable() and S.ConcentratedFlame3 or S.ConcentratedFlame
+  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce
+  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce
+  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance
+  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam
+end
+
 HL.RegisterNucleusAbility(84714, 8, 6)               -- Frost Orb
 HL.RegisterNucleusAbility(190356, 8, 6)              -- Blizzard
 HL.RegisterNucleusAbility(153595, 8, 6)              -- Comet Storm
@@ -122,10 +166,11 @@ HL.RegisterNucleusAbility(120, 12, 6)                -- Cone of Cold
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop
+  local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop, Essences
   local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   EnemiesCount = GetEnemiesCount(8)
   Precombat = function()
+    DetermineEssenceRanks()
     -- flask
     -- food
     -- augmentation
@@ -153,6 +198,40 @@ local function APL()
       end
     end
   end
+  Essences = function()
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+    end
+    -- memory_of_lucid_dreams,if=buff.icicles.stack<2
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) < 2) then
+      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+    end
+    -- blood_of_the_enemy,if=buff.icicles.stack=5&buff.brain_freeze.react|active_enemies>4
+    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffP(S.BrainFreezeBuff) or EnemiesCount > 4) then
+      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+    end
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+    end
+    -- the_unbound_force,if=buff.reckless_force.up
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+    end
+  end
   Aoe = function()
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() then
@@ -162,6 +241,8 @@ local function APL()
     if S.Blizzard:IsCastableP() then
       if HR.Cast(S.Blizzard) then return "blizzard 18"; end
     end
+    -- call_action_list,name=essences
+    local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     -- comet_storm
     if S.CometStorm:IsCastableP() then
       if HR.Cast(S.CometStorm) then return "comet_storm 20"; end
@@ -281,6 +362,8 @@ local function APL()
     if S.Flurry:IsCastableP() and (Player:PrevGCDP(1, S.Frostbolt) and bool(Player:BuffStackP(S.BrainFreezeBuff)) and (not S.GlacialSpike:IsAvailable() or Player:BuffStackP(S.IciclesBuff) < 4)) then
       if HR.Cast(S.Flurry) then return "flurry 143"; end
     end
+    -- call_action_list,name=essences
+    local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() then
       if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 153"; end
