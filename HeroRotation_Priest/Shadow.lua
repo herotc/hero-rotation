@@ -53,7 +53,31 @@ Spell.Priest.Shadow = {
   LegacyOfTheVoid                       = Spell(193225),
   FortressOfTheMind                     = Spell(193195),
   ShadowWordVoid                        = Spell(205351),
-  Silence                               = Spell(15487)
+  Silence                               = Spell(15487),
+  BloodOfTheEnemy                       = Spell(297108),
+  BloodOfTheEnemy2                      = Spell(298273),
+  BloodOfTheEnemy3                      = Spell(298277),
+  GuardianOfAzeroth                     = Spell(295840),
+  GuardianOfAzeroth2                    = Spell(299355),
+  GuardianOfAzeroth3                    = Spell(299358),
+  FocusedAzeriteBeam                    = Spell(295258),
+  FocusedAzeriteBeam2                   = Spell(299336),
+  FocusedAzeriteBeam3                   = Spell(299338),
+  PurifyingBlast                        = Spell(295337),
+  PurifyingBlast2                       = Spell(299345),
+  PurifyingBlast3                       = Spell(299347),
+  TheUnboundForce                       = Spell(298452),
+  TheUnboundForce2                      = Spell(299376),
+  TheUnboundForce3                      = Spell(299378),
+  RippleInSpace                         = Spell(302731),
+  RippleInSpace2                        = Spell(302982),
+  RippleInSpace3                        = Spell(302983),
+  WorldveinResonance                    = Spell(295186),
+  WorldveinResonance2                   = Spell(298628),
+  WorldveinResonance3                   = Spell(299334),
+  MemoryOfLucidDreams                   = Spell(298357),
+  MemoryOfLucidDreams2                  = Spell(299372),
+  MemoryOfLucidDreams3                  = Spell(299374)
 };
 local S = Spell.Priest.Shadow;
 
@@ -156,6 +180,25 @@ local function EvaluateCycleMindSear169(TargetUnit)
   return EnemiesCount > 1
 end
 
+local function DetermineEssenceRanks()
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy
+  S.GuardianOfAzeroth = S.GuardianOfAzeroth2:IsAvailable() and S.GuardianOfAzeroth2 or S.GuardianOfAzeroth
+  S.GuardianOfAzeroth = S.GuardianOfAzeroth3:IsAvailable() and S.GuardianOfAzeroth3 or S.GuardianOfAzeroth
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam
+  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast
+  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast
+  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce
+  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce
+  S.RippleInSpace = S.RippleInSpace2:IsAvailable() and S.RippleInSpace2 or S.RippleInSpace
+  S.RippleInSpace = S.RippleInSpace3:IsAvailable() and S.RippleInSpace3 or S.RippleInSpace
+  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance
+  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams
+end
+
 HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption
 HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
 HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
@@ -166,6 +209,7 @@ local function APL()
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- For CastCycle calls
   Precombat = function()
+    DetermineEssenceRanks()
     if Everyone.TargetIsValid() then
       -- flask
       -- food
@@ -236,6 +280,10 @@ local function APL()
     if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 78"; end
     end
+    -- memory_of_lucid_dreams,if=buff.voidform.stack>(20+5*buff.bloodlust.up)&insanity<=50
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.VoidformBuff) > (20 + 5 * num(Player:HasHeroism())) and Player:Insanity() <= 50) then
+      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+    end
     -- shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
     if S.ShadowWordDeath:IsReadyP() then
       if HR.CastCycle(S.ShadowWordDeath, 40, EvaluateCycleShadowWordDeath84) then return "shadow_word_death 88" end
@@ -305,6 +353,10 @@ local function APL()
     -- void_bolt
     if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 182"; end
+    end
+    -- memory_of_lucid_dreams,if=buff.voidform.stack>(20+5*buff.bloodlust.up)&insanity<=50
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.VoidformBuff) > (20 + 5 * num(Player:HasHeroism())) and Player:Insanity() <= 50) then
+      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
     end
     -- mind_sear,if=buff.harvested_thoughts.up&cooldown.void_bolt.remains>=1.5&azerite.searing_dialogue.rank>=1
     if S.MindSear:IsCastableP() and (Player:BuffP(S.HarvestedThoughtsBuff) and S.VoidBolt:CooldownRemainsP() >= 1.5 and S.SearingDialogue:AzeriteRank() >= 1) then
@@ -382,6 +434,34 @@ local function APL()
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     if (true) then
       VarDotsUp = num(Target:DebuffP(S.ShadowWordPainDebuff) and Target:DebuffP(S.VampiricTouchDebuff))
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+    end
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
     end
     -- berserking
     if S.Berserking:IsCastableP() and HR.CDsON() then
