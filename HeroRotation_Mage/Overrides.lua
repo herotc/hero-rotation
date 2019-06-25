@@ -173,7 +173,7 @@
       if self == SpellFire.RuneofPower then
         return BaseCheck and not Player:IsCasting(SpellFire.RuneofPower)
       elseif self == SpellFire.DragonsBreath then
-        return BaseCheck and (Cache.EnemiesCount[10] >= 1)
+        return BaseCheck
       else
         return BaseCheck
       end
