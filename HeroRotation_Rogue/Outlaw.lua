@@ -64,6 +64,34 @@ Spell.Rogue.Outlaw = {
   SnakeEyesPower                  = Spell(275846),
   SnakeEyesBuff                   = Spell(275863),
   KeepYourWitsBuff                = Spell(288988),
+  -- Essences
+  BloodOfTheEnemy       = Spell(297108),
+  BloodOfTheEnemy2      = Spell(298273),
+  BloodOfTheEnemy3      = Spell(298277),
+  ConcentratedFlame     = Spell(295373),
+  ConcentratedFlame2    = Spell(299349),
+  ConcentratedFlame3    = Spell(299353),
+  GuardianOfAzeroth     = Spell(295840),
+  GuardianOfAzeroth2    = Spell(299355),
+  GuardianOfAzeroth3    = Spell(299358),
+  FocusedAzeriteBeam    = Spell(295258),
+  FocusedAzeriteBeam2   = Spell(299336),
+  FocusedAzeriteBeam3   = Spell(299338),
+  PurifyingBlast        = Spell(295337),
+  PurifyingBlast2       = Spell(299345),
+  PurifyingBlast3       = Spell(299347),
+  TheUnboundForce       = Spell(298452),
+  TheUnboundForce2      = Spell(299376),
+  TheUnboundForce3      = Spell(299378),
+  RippleInSpace         = Spell(302731),
+  RippleInSpace2        = Spell(302982),
+  RippleInSpace3        = Spell(302983),
+  WorldveinResonance    = Spell(295186),
+  WorldveinResonance2   = Spell(298628),
+  WorldveinResonance3   = Spell(299334),
+  MemoryOfLucidDreams   = Spell(298357),
+  MemoryOfLucidDreams2  = Spell(299372),
+  MemoryOfLucidDreams3  = Spell(299374),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -242,6 +270,27 @@ local function EnergyTimeToMaxRounded ()
   return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10;
 end
 
+local function DetermineEssenceRanks()
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy;
+  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy;
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams;
+  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams;
+  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast;
+  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast;
+  S.RippleInSpace = S.RippleInSpace2:IsAvailable() and S.RippleInSpace2 or S.RippleInSpace;
+  S.RippleInSpace = S.RippleInSpace3:IsAvailable() and S.RippleInSpace3 or S.RippleInSpace;
+  S.ConcentratedFlame = S.ConcentratedFlame2:IsAvailable() and S.ConcentratedFlame2 or S.ConcentratedFlame;
+  S.ConcentratedFlame = S.ConcentratedFlame3:IsAvailable() and S.ConcentratedFlame3 or S.ConcentratedFlame;
+  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce;
+  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce;
+  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance;
+  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance;
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam;
+  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam;
+  S.GuardianOfAzeroth = S.GuardianOfAzeroth2:IsAvailable() and S.GuardianOfAzeroth2 or S.GuardianOfAzeroth;
+  S.GuardianOfAzeroth = S.GuardianOfAzeroth3:IsAvailable() and S.GuardianOfAzeroth3 or S.GuardianOfAzeroth;
+end
+
 local function MythicDungeon ()
   -- Sapped Soul
   if HL.MythicDungeon() == "Sapped Soul" then
@@ -356,8 +405,52 @@ local function CDs ()
           if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld"; end
         end
       end
+      -- actions.cds+=/call_action_list,name=essences
+      ShouldReturn = Essences();
+      if ShouldReturn then return ShouldReturn; end
     end
   end
+end
+
+-- # Essences
+local function Essences ()
+  -- blood_of_the_enemy
+  if S.BloodOfTheEnemy:IsCastableP() then
+    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Blood Of The Enemy"; end
+  end
+  -- concentrated_flame
+  if S.ConcentratedFlame:IsCastableP() then
+    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Concentrated Flame"; end
+  end
+  -- guardian_of_azeroth
+  if S.GuardianOfAzeroth:IsCastableP() then
+    if HR.Cast(S.GuardianOfAzeroth) then return "Cast Guardian Of Azeroth"; end
+  end
+  -- focused_azerite_beam
+  if S.FocusedAzeriteBeam:IsCastableP() then
+    if HR.Cast(S.FocusedAzeriteBeam) then return "Cast Focused Azerite Beam"; end
+  end
+  -- purifying_blast
+  if S.PurifyingBlast:IsCastableP() then
+    if HR.Cast(S.PurifyingBlast) then return "Cast Purifying Blast"; end
+  end
+  -- the_unbound_force
+  if S.TheUnboundForce:IsCastableP() then
+    if HR.Cast(S.TheUnboundForce) then return "Cast The Unbound Force"; end
+  end
+  -- ripple_in_space
+  if S.RippleInSpace:IsCastableP() then
+    if HR.Cast(S.RippleInSpace) then return "Cast Ripple In Space"; end
+  end
+  -- worldvein_resonance
+  if S.WorldveinResonance:IsCastableP() then
+    if HR.Cast(S.WorldveinResonance) then return "Cast Worldvein Resonance"; end
+  end
+  -- memory_of_lucid_dreams,if=energy<45
+  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 45 then
+    if HR.Cast(S.MemoryOfLucidDreams) then return "Cast Memory Of Lucid Dreams"; end
+  end
+  return false;
 end
 
 local function Stealth ()
@@ -402,8 +495,8 @@ local function Finish ()
 end
 
 local function Build ()
-  -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up|energy<45)
-  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 25 or Player:BuffP(S.DeadshotBuff) or Player:EnergyPredicted() < 45) then
+  -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<10|buff.deadshot.up|energy<45)
+  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 10 or Player:BuffP(S.DeadshotBuff) or Player:EnergyPredicted() < 45) then
     if HR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
   end
   -- actions.build+=/sinister_strike
@@ -423,6 +516,8 @@ local function APL ()
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6;
   HL.GetEnemies(BladeFlurryRange);
   HL.GetEnemies("Melee");
+
+  DetermineEssenceRanks();
 
   -- Defensives
   -- Crimson Vial
@@ -503,7 +598,7 @@ local function APL ()
     if ShouldReturn then return "Build: " .. ShouldReturn; end
     -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
     if S.ArcaneTorrent:IsCastableP(S.SinisterStrike) and Player:EnergyDeficitPredicted() > 15 + Player:EnergyRegen() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Arcane Torrent"; end
     end
     -- actions+=/arcane_pulse
     if S.ArcanePulse:IsCastableP(S.SinisterStrike) then
@@ -523,7 +618,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2019-04-13
+-- Last Update: 2019-06-26
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -545,9 +640,9 @@ HR.SetAPL(260, APL);
 -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
 -- # Reroll for 2+ buffs or Ruthless Precision with Deadshot or Ace up your Sleeve.
 -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
--- # Always reroll for 2+ buffs with Snake Eyes.
+-- # 2+ Snake Eyes: Always reroll for 2+ buffs.
 -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
--- # Do not reroll with 2+ stacks of the Snake Eyes buff (1+ stack with Broadside up).
+-- # 2+ Snake Eyes: Do not reroll with 2+ stacks of the Snake Eyes buff (1+ stack with Broadside up).
 -- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
 -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
@@ -578,6 +673,18 @@ HR.SetAPL(260, APL);
 -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
+-- actions.cds+=/call_action_list,name=essences
+--
+-- # Essences
+-- actions.essences=concentrated_flame
+-- actions.essences+=/blood_of_the_enemy
+-- actions.essences+=/guardian_of_azeroth
+-- actions.essences+=/focused_azerite_beam
+-- actions.essences+=/purifying_blast
+-- actions.essences+=/the_unbound_force
+-- actions.essences+=/ripple_in_space
+-- actions.essences+=/worldvein_resonance
+-- actions.essences+=/memory_of_lucid_dreams,if=energy<45
 --
 -- # Stealth
 -- actions.stealth=ambush
@@ -593,5 +700,5 @@ HR.SetAPL(260, APL);
 --
 -- # Builders
 -- # Use Pistol Shot if the Oppotunity buff is up. Avoid using when Keep Your Wits stacks are high unless the Deadshot buff is also up.
--- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<25|buff.deadshot.up|energy<45)
+-- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<10|buff.deadshot.up|energy<45)
 -- actions.build+=/sinister_strike
