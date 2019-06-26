@@ -313,6 +313,47 @@ local function TrainingScenario ()
   end
 end
 
+-- # Essences
+local function Essences ()
+  -- blood_of_the_enemy
+  if S.BloodOfTheEnemy:IsCastableP() then
+    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Blood Of The Enemy"; end
+  end
+  -- concentrated_flame
+  if S.ConcentratedFlame:IsCastableP() then
+    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Concentrated Flame"; end
+  end
+  -- guardian_of_azeroth
+  if S.GuardianOfAzeroth:IsCastableP() then
+    if HR.Cast(S.GuardianOfAzeroth) then return "Cast Guardian Of Azeroth"; end
+  end
+  -- focused_azerite_beam
+  if S.FocusedAzeriteBeam:IsCastableP() then
+    if HR.Cast(S.FocusedAzeriteBeam) then return "Cast Focused Azerite Beam"; end
+  end
+  -- purifying_blast
+  if S.PurifyingBlast:IsCastableP() then
+    if HR.Cast(S.PurifyingBlast) then return "Cast Purifying Blast"; end
+  end
+  -- the_unbound_force
+  if S.TheUnboundForce:IsCastableP() then
+    if HR.Cast(S.TheUnboundForce) then return "Cast The Unbound Force"; end
+  end
+  -- ripple_in_space
+  if S.RippleInSpace:IsCastableP() then
+    if HR.Cast(S.RippleInSpace) then return "Cast Ripple In Space"; end
+  end
+  -- worldvein_resonance
+  if S.WorldveinResonance:IsCastableP() then
+    if HR.Cast(S.WorldveinResonance) then return "Cast Worldvein Resonance"; end
+  end
+  -- memory_of_lucid_dreams,if=energy<45
+  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 45 then
+    if HR.Cast(S.MemoryOfLucidDreams) then return "Cast Memory Of Lucid Dreams"; end
+  end
+  return false;
+end
+
 local function CDs ()
   -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
   -- TODO: Add Potion
@@ -413,47 +454,6 @@ local function CDs ()
       end
     end
   end
-end
-
--- # Essences
-local function Essences ()
-  -- blood_of_the_enemy
-  if S.BloodOfTheEnemy:IsCastableP() then
-    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Blood Of The Enemy"; end
-  end
-  -- concentrated_flame
-  if S.ConcentratedFlame:IsCastableP() then
-    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Concentrated Flame"; end
-  end
-  -- guardian_of_azeroth
-  if S.GuardianOfAzeroth:IsCastableP() then
-    if HR.Cast(S.GuardianOfAzeroth) then return "Cast Guardian Of Azeroth"; end
-  end
-  -- focused_azerite_beam
-  if S.FocusedAzeriteBeam:IsCastableP() then
-    if HR.Cast(S.FocusedAzeriteBeam) then return "Cast Focused Azerite Beam"; end
-  end
-  -- purifying_blast
-  if S.PurifyingBlast:IsCastableP() then
-    if HR.Cast(S.PurifyingBlast) then return "Cast Purifying Blast"; end
-  end
-  -- the_unbound_force
-  if S.TheUnboundForce:IsCastableP() then
-    if HR.Cast(S.TheUnboundForce) then return "Cast The Unbound Force"; end
-  end
-  -- ripple_in_space
-  if S.RippleInSpace:IsCastableP() then
-    if HR.Cast(S.RippleInSpace) then return "Cast Ripple In Space"; end
-  end
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastableP() then
-    if HR.Cast(S.WorldveinResonance) then return "Cast Worldvein Resonance"; end
-  end
-  -- memory_of_lucid_dreams,if=energy<45
-  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 45 then
-    if HR.Cast(S.MemoryOfLucidDreams) then return "Cast Memory Of Lucid Dreams"; end
-  end
-  return false;
 end
 
 local function Stealth ()
