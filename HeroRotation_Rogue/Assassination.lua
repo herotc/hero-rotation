@@ -389,6 +389,12 @@ local function CDs ()
       end
     end
 
+    -- actions.cds+=/call_action_list,name=essences,if=dot.rupture.ticking
+    if HR.CDsON() and Target:DebuffP(S.Rupture) then
+      ShouldReturn = Essences();
+      if ShouldReturn then return ShouldReturn; end
+    end
+
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
     if S.MarkedforDeath:IsCastable() then
       if Target:FilteredTimeToDie("<", Player:ComboPointsDeficit() * 1.5) then
@@ -454,9 +460,6 @@ local function CDs ()
       if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) then
         if HR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
       end
-      -- actions.cds+=/call_action_list,name=essences
-      ShouldReturn = Essences();
-      if ShouldReturn then return ShouldReturn; end
     end
   end
   return false;
@@ -852,6 +855,8 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 --
+-- actions.cds+=/call_action_list,name=essences,if=dot.rupture.ticking
+--
 -- # Cooldowns
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
@@ -885,7 +890,6 @@ HR.SetAPL(259, APL);
 -- # Exsanguinate when both Rupture and Garrote are up for long enough
 -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
 -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
--- actions.cds+=/call_action_list,name=essences
 --
 -- # Essences
 -- actions.essences=concentrated_flame

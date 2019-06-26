@@ -453,6 +453,11 @@ local function CDs ()
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance (during Tornado)"; end
       end
     end
+    -- actions.cds+=/call_action_list,name=essences,if=dot.nightblade.ticking
+    if Target:DebuffP(S.Nightblade) then
+      ShouldReturn = Essences();
+      if ShouldReturn then return ShouldReturn; end
+    end
     -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
     if S.SymbolsofDeath:IsCastable() and Target:DebuffP(S.Nightblade)
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or Cache.EnemiesCount[10] < 3 or not S.ShurikenTornado:CooldownUp()) then
@@ -490,9 +495,6 @@ local function CDs ()
       if S.ShadowDance:IsCastable() and MayBurnShadowDance() and not Player:BuffP(S.ShadowDanceBuff) and Target:FilteredTimeToDie("<=", 5 + num(S.Subterfuge:IsAvailable())) then
         if StealthMacro(S.ShadowDance) then return "Shadow Dance Macro"; end
       end
-      -- actions.cds+=/call_action_list,name=essences
-      ShouldReturn = Essences();
-      if ShouldReturn then return ShouldReturn; end
     end
   end
   return false;
@@ -868,6 +870,7 @@ HR.SetAPL(261, APL);
 -- actions.cds+=/shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+-- actions.cds+=/call_action_list,name=essences,if=dot.nightblade.ticking
 -- # Use Symbols on cooldown (after first Nightblade) unless we are going to pop Tornado and do not have Shadow Focus.
 -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
@@ -880,7 +883,6 @@ HR.SetAPL(261, APL);
 -- # At 3+ with Shadow Focus use Tornado with SoD already up.
 -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled&!raid_event.adds.up
--- actions.cds+=/call_action_list,name=essences
 --
 -- # Essences
 -- actions.essences=concentrated_flame

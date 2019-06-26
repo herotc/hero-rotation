@@ -356,6 +356,12 @@ local function CDs ()
       end
     end
 
+    -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
+    if HR.CDsON() and not Player:IsStealthedP(true, true) then
+      ShouldReturn = Essences();
+      if ShouldReturn then return ShouldReturn; end
+    end
+
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
     if S.MarkedforDeath:IsCastable() then
       -- Note: Increased the SimC condition by 50% since we are slower.
@@ -405,9 +411,6 @@ local function CDs ()
           if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld"; end
         end
       end
-      -- actions.cds+=/call_action_list,name=essences
-      ShouldReturn = Essences();
-      if ShouldReturn then return ShouldReturn; end
     end
   end
 end
@@ -660,6 +663,7 @@ HR.SetAPL(260, APL);
 -- actions.cds=potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
+-- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
@@ -673,7 +677,6 @@ HR.SetAPL(260, APL);
 -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
--- actions.cds+=/call_action_list,name=essences
 --
 -- # Essences
 -- actions.essences=concentrated_flame
