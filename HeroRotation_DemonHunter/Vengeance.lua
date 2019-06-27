@@ -2,57 +2,65 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local HL = HeroLib;
-local Cache = HeroCache;
-local Unit = HL.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = HL.Spell;
-local Item = HL.Item;
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR = HeroRotation;
+local HR         = HeroRotation
 -- Lua
 local pairs = pairs;
 
 
 -- APL Local Vars
 -- Commons
-  local Everyone = HR.Commons.Everyone;
+local Everyone = HR.Commons.Everyone;
 -- Spell
-  if not Spell.DemonHunter then Spell.DemonHunter = {}; end
-  Spell.DemonHunter.Vengeance = {
-    -- Abilities
-    Frailty             = Spell(247456),
-    ImmolationAura      = Spell(178740),
-    InfernalStrike      = Spell(189110),
-    Shear               = Spell(203782),
-    SigilofFlame,       -- Dynamic
-    SigilofFlameNoCS    = Spell(204596),
-    SigilofFlameCS      = Spell(204513),
-    SigilofFlameDebuff  = Spell(204598),
-    SoulCleave          = Spell(228477),
-    SoulFragments       = Spell(203981),
-    ThrowGlaive         = Spell(204157),
-    -- Defensive
-    DemonSpikes         = Spell(203720),
-    DemonSpikesBuff     = Spell(203819),
-    FieryBrand          = Spell(204021),
-    FieryBrandDebuff    = Spell(207771),
-    Torment             = Spell(185245),
-    -- Talents
-    CharredFlesh        = Spell(264002),
-    ConcentratedSigils  = Spell(207666),
-    Felblade            = Spell(232893),
-    FelDevastation      = Spell(212084),
-    Fracture            = Spell(263642),
-    SoulBarrier         = Spell(263648),
-    SpiritBomb          = Spell(247454),
-    SpiritBombDebuff    = Spell(247456),
-    -- Utility
-    Disrupt             = Spell(183752),
-    Metamorphosis       = Spell(187827),
-  };
-  local S = Spell.DemonHunter.Vengeance;
+if not Spell.DemonHunter then Spell.DemonHunter = {}; end
+Spell.DemonHunter.Vengeance = {
+  -- Abilities
+  Frailty                               = Spell(247456),
+  ImmolationAura                        = Spell(178740),
+  InfernalStrike                        = Spell(189110),
+  Shear                                 = Spell(203782),
+  --SigilofFlame,                         -- Dynamic
+  --SigilofFlameNoCS                      = Spell(204596),
+  --SigilofFlameCS                        = Spell(204513),
+  SigilofFlame                          = MultiSpell(204596, 204513),
+  SigilofFlameDebuff                    = Spell(204598),
+  SoulCleave                            = Spell(228477),
+  SoulFragments                         = Spell(203981),
+  ThrowGlaive                           = Spell(204157),
+  -- Defensive
+  DemonSpikes                           = Spell(203720),
+  DemonSpikesBuff                       = Spell(203819),
+  FieryBrand                            = Spell(204021),
+  FieryBrandDebuff                      = Spell(207771),
+  Torment                               = Spell(185245),
+  -- Talents
+  CharredFlesh                          = Spell(264002),
+  ConcentratedSigils                    = Spell(207666),
+  Felblade                              = Spell(232893),
+  FelDevastation                        = Spell(212084),
+  Fracture                              = Spell(263642),
+  SoulBarrier                           = Spell(263648),
+  SpiritBomb                            = Spell(247454),
+  SpiritBombDebuff                      = Spell(247456),
+  -- Utility
+  Disrupt                               = Spell(183752),
+  Metamorphosis                         = Spell(187827),
+  -- Essences
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334)
+};
+local S = Spell.DemonHunter.Vengeance;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
@@ -222,6 +230,22 @@ local function APL ()
     if S.ImmolationAura:IsCastable() and IsInAoERange and Player:Pain() <= 90 then
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
     end
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastable() then
+      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastable() then
+      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastable() then
+      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+    end
+    -- memory_of_lucid_dreams
+    if S.MemoryOfLucidDreams:IsCastable() then
+      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+    end
     -- actions+=/felblade,if=pain<=70
     if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then
       if HR.Cast(S.Felblade) then return "Cast Felblade"; end
@@ -254,7 +278,7 @@ local function APL ()
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Module Tracking Updates
-  S.SigilofFlame = S.ConcentratedSigils:IsAvailable() and S.SigilofFlameCS or S.SigilofFlameNoCS;
+  --S.SigilofFlame = S.ConcentratedSigils:IsAvailable() and S.SigilofFlameCS or S.SigilofFlameNoCS;
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
   UpdateSoulFragments();
   UpdateIsInMeleeRange();
@@ -288,44 +312,3 @@ local function APL ()
 end
 
 HR.SetAPL(581, APL);
-
---- ======= SIMC =======
---- Last Update: 08/22/2018
-
---[[
-
-# Executed every time the actor is available.
-actions=auto_attack
-actions+=/consume_magic
-actions+=/call_action_list,name=brand,if=talent.charred_flesh.enabled
-actions+=/call_action_list,name=defensives
-actions+=/call_action_list,name=normal
-
-# Fiery Brand Rotation
-actions.brand=sigil_of_flame,if=cooldown.fiery_brand.remains<2
-actions.brand+=/infernal_strike,if=cooldown.fiery_brand.remains=0
-actions.brand+=/fiery_brand
-actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
-actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
-actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
-actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
-
-# Defensives
-actions.defensives=demon_spikes
-actions.defensives+=/metamorphosis
-actions.defensives+=/fiery_brand
-
-# Normal Rotation
-actions.normal=infernal_strike
-actions.normal+=/spirit_bomb,if=soul_fragments>=4
-actions.normal+=/soul_cleave,if=!talent.spirit_bomb.enabled
-actions.normal+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
-actions.normal+=/immolation_aura,if=pain<=90
-actions.normal+=/felblade,if=pain<=70
-actions.normal+=/fracture,if=soul_fragments<=3
-actions.normal+=/fel_devastation
-actions.normal+=/sigil_of_flame
-actions.normal+=/shear
-actions.normal+=/throw_glaive
-
---]]
