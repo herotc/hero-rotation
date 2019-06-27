@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -50,7 +51,10 @@ Spell.Warrior.Protection = {
   VictoryRush                           = Spell(34428),
   ImpendingVictory                      = Spell(202168),
   Pummel                                = Spell(6552),
-  IntimidatingShout                     = Spell(5246)
+  IntimidatingShout                     = Spell(5246),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
 };
 local S = Spell.Warrior.Protection;
 
@@ -153,6 +157,18 @@ local function APL()
       -- potion
       if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      end
+      -- memory_of_lucid_dreams
+      if S.MemoryOfLucidDreams:IsCastableP() then
+        if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      end
+      -- guardian_of_azeroth
+      if S.GuardianOfAzeroth:IsCastableP() then
+        if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+      end
+      -- focused_azerite_beam
+      if S.FocusedAzeriteBeam:IsCastableP() then
+        if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
       end
     end
   end
