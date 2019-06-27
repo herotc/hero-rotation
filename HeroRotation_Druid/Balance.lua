@@ -284,11 +284,7 @@ local function APL()
     end
     -- Interrupt
     Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false);
-    -- potion,if=buff.ca_inc.remains>6&active_enemies=1
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6 and EnemiesCount == 1) then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 47"; end
-    end
-    -- potion,name=battle_potion_of_intellect,if=buff.ca_inc.remains>6
+    -- potion,if=buff.ca_inc.remains>6
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6) then
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 57"; end
     end
