@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -54,7 +55,11 @@ Spell.Druid.Guardian = {
   WildChargeTalent                      = Spell(102401),
   WildChargeBear                        = Spell(16979),
   SurvivalInstincts                     = Spell(61336),
-  SkullBash                             = Spell(106839)
+  SkullBash                             = Spell(106839),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  Conflict                              = MultiSpell(303823, 304088, 304121),
+  HeartEssence                          = Spell(298554),
+  SharpenedClawsBuff                    = Spell(279943)
 };
 local S = Spell.Druid.Guardian;
 
@@ -142,6 +147,10 @@ local function APL()
     -- flask
     -- food
     -- augmentation
+    -- memory_of_lucid_dreams
+    if S.MemoryOfLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Guardian.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    end
     -- bear_form
     if S.BearForm:IsCastableP() and Player:BuffDownP(S.BearForm) then
       if HR.Cast(S.BearForm) then return "bear_form 3"; end
@@ -156,6 +165,10 @@ local function APL()
     -- potion
     if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 10"; end
+    end
+    -- heart_essence
+    if S.HeartEssence:IsCastableP() then
+      if HR.Cast(S.HeartEssence, Settings.Guardian.GCDasOffGCD.Essences) then return "heart_essence"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
@@ -208,6 +221,10 @@ local function APL()
         if HR.Cast(S.BristlingFur) then return "bristling_fur 32"; end
       end
     end
+    -- incarnation,if=(dot.moonfire.ticking|active_enemies>1)&dot.thrash_bear.ticking
+    if S.Incarnation:IsReadyP() and ((Target:DebuffP(S.MoonfireDebuff) or EnemiesCount > 1) and Target:DebuffP(S.ThrashBearDebuff)) then
+      if HR.Cast(S.Incarnation) then return "incarnation 33"; end
+    end
     -- use_items
   end
   -- call precombat
@@ -230,6 +247,10 @@ local function APL()
     if S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and EnemiesCount < 4) then
       if HR.Cast(S.Maul) then return "maul 41"; end
     end
+    -- maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
+    if S.Maul:IsReadyP() and (S.Conflict:IsAvailable() and Player:BuffDownP(S.SharpenedClawsBuff)) then
+      if HR.Cast(S.Maul) then return "maul 42"; end
+    end
     -- ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
     if S.Ironfur:IsCastableP() and (S.Ironfur:Cost() == 0 or (Player:Rage() > S.Ironfur:Cost() and S.LayeredMane:AzeriteEnabled() and EnemiesCount > 2)) then
       if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur 49"; end
@@ -244,10 +265,6 @@ local function APL()
     -- moonfire,target_if=dot.moonfire.refreshable&active_enemies<2
     if S.Moonfire:IsCastableP() then
       if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire88) then return "moonfire 100" end
-    end
-    -- incarnation
-    if S.Incarnation:IsCastableP() then
-      if HR.Cast(S.Incarnation) then return "incarnation 101"; end
     end
     -- thrash,if=(buff.incarnation.down&active_enemies>1)|(buff.incarnation.up&active_enemies>4)
     if Thrash():IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 1) or (Player:BuffP(S.IncarnationBuff) and EnemiesCount > 4)) then
@@ -272,10 +289,6 @@ local function APL()
     -- maul
     if S.Maul:IsReadyP() and (not IsTanking or (Player:HealthPercentage() >= 80 and Player:Rage() > 85)) then
       if HR.Cast(S.Maul) then return "maul 154"; end
-    end
-    -- moonfire,if=azerite.power_of_the_moon.rank>1&active_enemies=1
-    if S.Moonfire:IsCastableP() and (S.PoweroftheMoon:AzeriteRank() > 1 and EnemiesCount == 1) then
-      if HR.Cast(S.Moonfire) then return "moonfire 156"; end
     end
     -- swipe
     if Swipe():IsCastableP() then
