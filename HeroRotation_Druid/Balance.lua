@@ -331,43 +331,43 @@ local function APL()
     -- use_items,if=cooldown.ca_inc.remains>30
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
     if S.BloodOfTheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Balance.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- memory_of_lucid_dreams,if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)&(astral_power<40|cooldown.ca_inc.remains>30)&!buff.ca_inc.up
     if S.MemoryOfLucidDreams:IsCastableP() and (Target:DebuffRemainsP(S.SunfireDebuff) > 10 and (not S.StellarFlare:IsAvailable() or Target:DebuffRemainsP(S.StellarFlareDebuff) > 10) and (FutureAstralPower() < 40 or CaInc():CooldownRemainsP() > 30) and not Player:BuffP(CaInc())) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Balance.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Balance.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, Settings.Balance.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Balance.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|time<5
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or HL.CombatTime() < 5) then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Balance.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Balance.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Balance.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- guardian_of_azeroth
     if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Balance.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- thorns
     if S.Thorns:IsCastableP() then
-      if HR.Cast(S.Thorns) then return "thorns"; end
+      if HR.Cast(S.Thorns, Settings.Balance.GCDasOffGCD.Essences) then return "thorns"; end
     end
     -- warrior_of_elune
     if S.WarriorofElune:IsCastableP() then

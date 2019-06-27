@@ -167,35 +167,35 @@ local function APL()
   Essences = function()
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Frost.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- memory_of_lucid_dreams,if=buff.icicles.stack<2
     if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) < 2) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Frost.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy,if=buff.icicles.stack=5&buff.brain_freeze.react|active_enemies>4
     if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffP(S.BrainFreezeBuff) or EnemiesCount > 4) then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Frost.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Frost.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, Settings.Frost.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Frost.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Frost.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Frost.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
   end
   Aoe = function()

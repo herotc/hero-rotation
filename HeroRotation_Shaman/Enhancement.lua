@@ -366,7 +366,7 @@ local function APL ()
 
     -- actions.priority+=/the_unbound_force,if=buff.reckless_force.up|time<5
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or HL.CombatTime() < 5) then
-      if HR.Cast(TheUnboundForce) then return "the_unbound_force"; end
+      if HR.Cast(TheUnboundForce, Settings.Enhancement.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
 
     -- actions.priority+=/lava_lash,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack=10&active_enemies=1&variable.freezerburn_enabled&variable.furyCheck_LL
@@ -405,12 +405,12 @@ local function APL ()
 
     -- actions.priority+=/focused_azerite_beam,if=active_enemies>=3
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[10] >= 3) then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Enhancement.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
 
     -- actions.priority+=/purifying_blast,if=active_enemies>=3
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[10] >= 3) then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Enhancement.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
 
     -- actions.priority+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
@@ -478,12 +478,12 @@ local function APL ()
 
     -- actions.cds+=/guardian_of_azeroth
     if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Enhancement.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
 
     -- actions.cds+=/memory_of_lucid_dreams
     if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Enhancement.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
 
     -- actions.cds+=/feral_spirit
@@ -493,7 +493,7 @@ local function APL ()
 
     -- actions.cds+=/blood_of_the_enemy
     if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Enhancement.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
 
     -- actions.cds+=/ascendance,if=cooldown.strike.remains>0
@@ -605,22 +605,22 @@ local function APL ()
 
     -- actions.filler+=/focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Enhancement.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
 
     -- actions.filler+=/purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Enhancement.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
 
     -- actions.filler+=/concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Enhancement.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
 
     -- actions.filler+=/worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Enhancement.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
 
     -- actions.filler+=/crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL

@@ -44,6 +44,7 @@
         ForceofNature = true,
         FuryofElune = true,
         Starfall = false,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -59,6 +60,7 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         CatForm = true,
+        Essences = true,
         -- RegrowthHeal = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
@@ -89,6 +91,7 @@
       GCDasOffGCD = {
         FrenziedRegen = true,
         LunarBeam = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

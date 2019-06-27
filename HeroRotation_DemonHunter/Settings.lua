@@ -38,6 +38,9 @@
         DemonSpikes = true,
         InfernalStrike = false,
         FieryBrand = false,
+      },
+      GCDasOffGCD = {
+        Essences = true,
       }
     },
     Havoc = {
@@ -50,6 +53,7 @@
       GCDasOffGCD = {
         -- Abilities
         Nemesis = true,
+        Essences = true,
       },
     }
   };

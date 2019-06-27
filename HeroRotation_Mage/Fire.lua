@@ -290,15 +290,15 @@ local function APL()
     end
     -- blood_of_the_enemy
     if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy) then return ""; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return ""; end
     end
     -- memory_of_lucid_dreams
     if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams) then return ""; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Fire.GCDasOffGCD.Essences) then return ""; end
     end
     -- guardian_of_azeroth
     if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth) then return ""; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Fire.GCDasOffGCD.Essences) then return ""; end
     end
     -- rune_of_power,if=buff.combustion.down
     if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
@@ -507,27 +507,27 @@ local function APL()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Fire.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Fire.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Fire.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, Settings.Fire.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
     -- the_unbound_force
     if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Fire.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Fire.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down
     if S.RuneofPower:IsCastableP() and (S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > S.RuneofPower:FullRechargeTimeP() or S.RuneofPower:CooldownRemainsP() > combustion_rop_cutoff and Player:BuffDownP(S.CombustionBuff) or Target:TimeToDie() < S.Combustion:CooldownRemainsP() and Player:BuffDownP(S.CombustionBuff)) then

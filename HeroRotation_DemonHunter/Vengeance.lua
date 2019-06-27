@@ -232,19 +232,19 @@ local function APL ()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Vengeance.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastable() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, Settings.Vengeance.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastable() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Vengeance.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams
     if S.MemoryOfLucidDreams:IsCastable() then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Vengeance.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- actions+=/felblade,if=pain<=70
     if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then

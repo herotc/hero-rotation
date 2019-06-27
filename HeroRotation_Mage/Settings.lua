@@ -41,6 +41,7 @@
         IcyVeins = true,
         MirrorImage = true,
         FrozenOrb = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -54,6 +55,7 @@
       GCDasOffGCD = {
         -- Abilities
         RuneofPower = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -68,6 +70,7 @@
         -- Abilities
         RuneofPower = true,
         ArcanePower = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

@@ -229,19 +229,19 @@ local function APL()
     end
     -- thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
     if S.Thorns:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.Thorns) then return "thorns"; end
+      if HR.Cast(S.Thorns, Settings.Feral.GCDasOffGCD.Essences) then return "thorns"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Feral.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- memory_of_lucid_dreams,if=buff.tigers_fury.up&buff.berserk.down
     if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffP(S.TigersFuryBuff) and Player:BuffDownP(S.BerserkBuff)) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Feral.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy,if=buff.tigers_fury.up
     if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Feral.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- feral_frenzy,if=combo_points=0
     if S.FeralFrenzy:IsCastableP() and (Player:ComboPoints() == 0) then
@@ -249,15 +249,15 @@ local function APL()
     end
     -- focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Feral.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Feral.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- heart_essence,if=buff.tigers_fury.up
     if S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.HeartEssence) then return "heart_essence"; end
+      if HR.Cast(S.HeartEssence, Settings.Feral.GCDasOffGCD.Essences) then return "heart_essence"; end
     end
     -- incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
     if S.Incarnation:IsCastableP() and HR.CDsON() and (Player:EnergyPredicted() >= 30 and (S.TigersFury:CooldownRemainsP() > 15 or Player:BuffP(S.TigersFuryBuff))) then

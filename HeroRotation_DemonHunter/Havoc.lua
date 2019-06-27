@@ -187,39 +187,39 @@ local function APL()
   Essences = function()
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Havoc.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy
     if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
     if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Havoc.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Havoc.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Havoc.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- the_unbound_force
     if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Havoc.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, Settings.Havoc.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Havoc.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
     if S.MemoryOfLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Havoc.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
   end
   Cooldown = function()

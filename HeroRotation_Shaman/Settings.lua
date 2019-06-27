@@ -38,6 +38,7 @@
         FeralSpirit = false,
         Sundering = false,
         Ascendance = false,
+        Essences = true,
       },
       EnableFS = true,
       EnableEE = false
@@ -52,6 +53,7 @@
         EarthElemental = true,
         FireElemental = true,
         Ascendance = true,
+        Essences = true,
       },
       EnableEE = true,
       EnableFE = true,
