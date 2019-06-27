@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -54,30 +55,16 @@ Spell.Priest.Shadow = {
   FortressOfTheMind                     = Spell(193195),
   ShadowWordVoid                        = Spell(205351),
   Silence                               = Spell(15487),
-  BloodOfTheEnemy                       = Spell(297108),
-  BloodOfTheEnemy2                      = Spell(298273),
-  BloodOfTheEnemy3                      = Spell(298277),
-  GuardianOfAzeroth                     = Spell(295840),
-  GuardianOfAzeroth2                    = Spell(299355),
-  GuardianOfAzeroth3                    = Spell(299358),
-  FocusedAzeriteBeam                    = Spell(295258),
-  FocusedAzeriteBeam2                   = Spell(299336),
-  FocusedAzeriteBeam3                   = Spell(299338),
-  PurifyingBlast                        = Spell(295337),
-  PurifyingBlast2                       = Spell(299345),
-  PurifyingBlast3                       = Spell(299347),
-  TheUnboundForce                       = Spell(298452),
-  TheUnboundForce2                      = Spell(299376),
-  TheUnboundForce3                      = Spell(299378),
-  RippleInSpace                         = Spell(302731),
-  RippleInSpace2                        = Spell(302982),
-  RippleInSpace3                        = Spell(302983),
-  WorldveinResonance                    = Spell(295186),
-  WorldveinResonance2                   = Spell(298628),
-  WorldveinResonance3                   = Spell(299334),
-  MemoryOfLucidDreams                   = Spell(298357),
-  MemoryOfLucidDreams2                  = Spell(299372),
-  MemoryOfLucidDreams3                  = Spell(299374)
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932)
 };
 local S = Spell.Priest.Shadow;
 
@@ -180,25 +167,6 @@ local function EvaluateCycleMindSear169(TargetUnit)
   return EnemiesCount > 1
 end
 
-local function DetermineEssenceRanks()
-  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy
-  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy
-  S.GuardianOfAzeroth = S.GuardianOfAzeroth2:IsAvailable() and S.GuardianOfAzeroth2 or S.GuardianOfAzeroth
-  S.GuardianOfAzeroth = S.GuardianOfAzeroth3:IsAvailable() and S.GuardianOfAzeroth3 or S.GuardianOfAzeroth
-  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam
-  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam
-  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast
-  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast
-  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce
-  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce
-  S.RippleInSpace = S.RippleInSpace2:IsAvailable() and S.RippleInSpace2 or S.RippleInSpace
-  S.RippleInSpace = S.RippleInSpace3:IsAvailable() and S.RippleInSpace3 or S.RippleInSpace
-  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance
-  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance
-  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams
-  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams
-end
-
 HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption
 HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
 HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
@@ -209,7 +177,6 @@ local function APL()
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- For CastCycle calls
   Precombat = function()
-    DetermineEssenceRanks()
     if Everyone.TargetIsValid() then
       -- flask
       -- food
