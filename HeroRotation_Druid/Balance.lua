@@ -13,7 +13,7 @@ local Spell      = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
