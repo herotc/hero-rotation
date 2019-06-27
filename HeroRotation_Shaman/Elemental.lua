@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 local Shaman = HR.Commons.Shaman
 
 --- ============================ CONTENT ===========================
@@ -62,7 +63,17 @@ Spell.Shaman.Elemental = {
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
   Fireblood                             = Spell(265221),
-  AncestralCall                         = Spell(274738)
+  AncestralCall                         = Spell(274738),
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932),
 };
 local S = Spell.Shaman.Elemental;
 
@@ -409,6 +420,42 @@ local function APL()
     end
     -- earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(cooldown.fire_elemental.remains<120&!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120&talent.storm_elemental.enabled)
     -- use_items
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Settings.Elemental.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.CasT(S.BloodOfTheEnemy, Settings.Elemental.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Elemental.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    end
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Elemental.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast, Settings.Elemental.GCDasOffGCD.Essences) then return "purifying_blast"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce, Settings.Elemental.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+    end
+    -- memory_of_lucid_dreams
+    if S.MemoryOfLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Elemental.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.RippleInSpace, Settings.Elemental.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance, Settings.Elemental.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+    end
     -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
     if S.BloodFury:IsCastableP() and HR.CDsON() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 611"; end
