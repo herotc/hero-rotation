@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -64,7 +65,19 @@ Spell.Druid.Feral = {
   ClearcastingBuff                      = Spell(135700),
   Shred                                 = Spell(5221),
   SkullBash                             = Spell(106839),
-  ShadowmeldBuff                        = Spell(58984)
+  ShadowmeldBuff                        = Spell(58984),
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932),
+  Thorns                                = Spell(236696),
+  HeartEssence                          = Spell(298554)
 };
 local S = Spell.Druid.Feral;
 
@@ -214,15 +227,43 @@ local function APL()
     if S.Berserking:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 38"; end
     end
+    -- thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
+    if S.Thorns:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
+      if HR.Cast(S.Thorns) then return "thorns"; end
+    end
+    -- the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force"; end
+    end
+    -- memory_of_lucid_dreams,if=buff.tigers_fury.up&buff.berserk.down
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffP(S.TigersFuryBuff) and Player:BuffDownP(S.BerserkBuff)) then
+      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+    end
+    -- blood_of_the_enemy,if=buff.tigers_fury.up
+    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy"; end
+    end
     -- feral_frenzy,if=combo_points=0
     if S.FeralFrenzy:IsCastableP() and (Player:ComboPoints() == 0) then
       if HR.Cast(S.FeralFrenzy) then return "feral_frenzy 40"; end
+    end
+    -- focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
+      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
+    end
+    -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
+    if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
+      if HR.Cast(S.PurifyingBlast) then return "purifying_blast"; end
+    end
+    -- heart_essence,if=buff.tigers_fury.up
+    if S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.HeartEssence) then return "heart_essence"; end
     end
     -- incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
     if S.Incarnation:IsCastableP() and HR.CDsON() and (Player:EnergyPredicted() >= 30 and (S.TigersFury:CooldownRemainsP() > 15 or Player:BuffP(S.TigersFuryBuff))) then
       if HR.Cast(S.Incarnation, Settings.Feral.OffGCDasOffGCD.Incarnation) then return "incarnation 42"; end
     end
-    -- potion,name=battle_potion_of_agility,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
+    -- potion,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
     if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions and (Target:TimeToDie() < 65 or (Target:TimeToDie() < 180 and (Player:BuffP(S.BerserkBuff) or Player:BuffP(S.IncarnationBuff)))) then
       if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 48"; end
     end
