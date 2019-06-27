@@ -42,11 +42,11 @@ Spell.Druid.Guardian = {
   Moonfire                              = Spell(8921),
   MoonfireDebuff                        = Spell(164812),
   Incarnation                           = Spell(102558),
-  ThrashCat                             = Spell(106830),
-  ThrashBear                            = Spell(77758),
+  --ThrashCat                             = Spell(106830),
+  ThrashBear                            = Spell(77758, 106830),
   IncarnationBuff                       = Spell(102558),
-  SwipeCat                              = Spell(106785),
-  SwipeBear                             = Spell(213771),
+  --SwipeCat                              = Spell(106785),
+  SwipeBear                             = Spell(213771, 106785),
   Mangle                                = Spell(33917),
   GalacticGuardianBuff                  = Spell(213708),
   PoweroftheMoon                        = Spell(273367),
@@ -99,7 +99,7 @@ local function bool(val)
   return val ~= 0
 end
 
-local function Swipe()
+--[[local function Swipe()
   if Player:Buff(S.CatForm) then
     return S.SwipeCat;
   else
@@ -113,7 +113,7 @@ local function Thrash()
   else
     return S.ThrashBear;
   end
-end
+end]]
 
 local function EvaluateCyclePulverize77(TargetUnit)
   return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and not Player:BuffP(S.PulverizeBuff)
@@ -267,12 +267,12 @@ local function APL()
       if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire88) then return "moonfire 100" end
     end
     -- thrash,if=(buff.incarnation.down&active_enemies>1)|(buff.incarnation.up&active_enemies>4)
-    if Thrash():IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 1) or (Player:BuffP(S.IncarnationBuff) and EnemiesCount > 4)) then
-      if HR.Cast(Thrash()) then return "thrash 103"; end
+    if S.Thrash:IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 1) or (Player:BuffP(S.IncarnationBuff) and EnemiesCount > 4)) then
+      if HR.Cast(S.Thrash) then return "thrash 103"; end
     end
     -- swipe,if=buff.incarnation.down&active_enemies>4
-    if Swipe():IsCastableP() and (Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 4) then
-      if HR.Cast(Swipe()) then return "swipe 121"; end
+    if S.Swipe:IsCastableP() and (Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 4) then
+      if HR.Cast(S.Swipe) then return "swipe 121"; end
     end
     -- mangle,if=dot.thrash_bear.ticking
     if S.Mangle:IsCastableP() and (Target:DebuffP(S.ThrashBearDebuff)) then
@@ -283,16 +283,16 @@ local function APL()
       if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire139) then return "moonfire 151" end
     end
     -- thrash
-    if Thrash():IsCastableP() then
-      if HR.Cast(Thrash()) then return "thrash 152"; end
+    if S.Thrash:IsCastableP() then
+      if HR.Cast(S.Thrash) then return "thrash 152"; end
     end
     -- maul
     if S.Maul:IsReadyP() and (not IsTanking or (Player:HealthPercentage() >= 80 and Player:Rage() > 85)) then
       if HR.Cast(S.Maul) then return "maul 154"; end
     end
     -- swipe
-    if Swipe():IsCastableP() then
-      if HR.Cast(Swipe()) then return "swipe 168"; end
+    if S.Swipe:IsCastableP() then
+      if HR.Cast(S.Swipe) then return "swipe 168"; end
     end
   end
 end
