@@ -37,6 +37,7 @@
         DeadlyCalm = false,
         Charge = true,
         Avatar = true,
+        Essences = true,
       },
       OffGCDasOffGCD = {
         -- Abilities
@@ -56,6 +57,7 @@
         DragonRoar = false,
         Recklessness = false,
         Siegebreaker = false,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -75,7 +77,8 @@
       GCDasOffGCD = {
         Avatar            = true,
         DemoralizingShout = true,
-        LastStand         = true
+        LastStand         = true,
+        Essences          = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
