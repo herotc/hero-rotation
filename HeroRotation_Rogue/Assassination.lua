@@ -359,8 +359,8 @@ local Interrupts = {
 -- APL Action Lists (and Variables)
 -- # Essences
 local function Essences ()
-  -- blood_of_the_enemy
-  if S.BloodOfTheEnemy:IsCastableP() then
+  -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up|debuff.vendetta.remains<=10)|target.time_to_die<=10
+  if S.BloodOfTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable() or Target:DebuffP(S.ToxicBladeDebuff) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
     if HR.Cast(S.BloodOfTheEnemy) then return "Cast Blood Of The Enemy"; end
   end
   -- concentrated_flame
@@ -429,8 +429,8 @@ local function CDs ()
       end
     end
 
-    -- actions.cds+=/call_action_list,name=essences,if=dot.rupture.ticking
-    if HR.CDsON() and Target:DebuffP(S.Rupture) then
+    -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
+    if HR.CDsON() and not Player:IsStealthedP(true, true) and Target:DebuffP(S.Rupture) and MasterAssassinRemains() <= 0 then
       ShouldReturn = Essences();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -805,7 +805,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-06-26
+-- Last Update: 2019-06-27
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -855,7 +855,7 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 --
--- actions.cds+=/call_action_list,name=essences,if=dot.rupture.ticking
+-- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
 --
 -- # Cooldowns
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
@@ -893,7 +893,7 @@ HR.SetAPL(259, APL);
 --
 -- # Essences
 -- actions.essences=concentrated_flame
--- actions.essences+=/blood_of_the_enemy
+-- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up|debuff.vendetta.remains<=10)|target.time_to_die<=10
 -- actions.essences+=/guardian_of_azeroth
 -- actions.essences+=/focused_azerite_beam
 -- actions.essences+=/purifying_blast

@@ -315,8 +315,8 @@ end
 
 -- # Essences
 local function Essences ()
-  -- blood_of_the_enemy
-  if S.BloodOfTheEnemy:IsCastableP() then
+  -- blood_of_the_enemy,if=variable.blade_flurry_sync
+  if S.BloodOfTheEnemy:IsCastableP() and Blade_Flurry_Sync() then
     if HR.Cast(S.BloodOfTheEnemy) then return "Cast Blood Of The Enemy"; end
   end
   -- concentrated_flame
@@ -621,7 +621,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2019-06-26
+-- Last Update: 2019-06-27
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -680,7 +680,7 @@ HR.SetAPL(260, APL);
 --
 -- # Essences
 -- actions.essences=concentrated_flame
--- actions.essences+=/blood_of_the_enemy
+-- actions.essences+=/blood_of_the_enemy,if=variable.blade_flurry_sync
 -- actions.essences+=/guardian_of_azeroth
 -- actions.essences+=/focused_azerite_beam
 -- actions.essences+=/purifying_blast

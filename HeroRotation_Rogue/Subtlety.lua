@@ -494,8 +494,8 @@ local function CDs ()
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance (during Tornado)"; end
       end
     end
-    -- actions.cds+=/call_action_list,name=essences,if=dot.nightblade.ticking
-    if Target:DebuffP(S.Nightblade) then
+    -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking
+    if not Player:IsStealthedP(true, true) and Target:DebuffP(S.Nightblade) then
       ShouldReturn = Essences();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -820,7 +820,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-06-26
+-- Last Update: 2019-06-27
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -870,7 +870,7 @@ HR.SetAPL(261, APL);
 -- actions.cds+=/shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
--- actions.cds+=/call_action_list,name=essences,if=dot.nightblade.ticking
+-- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking
 -- # Use Symbols on cooldown (after first Nightblade) unless we are going to pop Tornado and do not have Shadow Focus.
 -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
