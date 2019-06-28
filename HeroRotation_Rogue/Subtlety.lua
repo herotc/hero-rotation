@@ -457,8 +457,8 @@ local function Essences ()
   if S.WorldveinResonance:IsCastableP() then
     if HR.Cast(S.WorldveinResonance) then return "Cast Worldvein Resonance"; end
   end
-  -- memory_of_lucid_dreams,if=energy<40
-  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 40 then
+  -- memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
+  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 40 and Player:BuffP(S.SymbolsofDeath) then
     if HR.Cast(S.MemoryOfLucidDreams) then return "Cast Memory Of Lucid Dreams"; end
   end
   return false;
@@ -820,7 +820,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-06-27
+-- Last Update: 2019-06-28
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -893,7 +893,7 @@ HR.SetAPL(261, APL);
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance
--- actions.essences+=/memory_of_lucid_dreams,if=energy<40
+-- actions.essences+=/memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
 --
 -- # Stealth Cooldowns
 -- # Helper Variable
