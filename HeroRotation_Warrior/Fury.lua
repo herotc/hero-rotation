@@ -162,7 +162,7 @@ local function APL()
       if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return "siegebreaker 18"; end
     end
     -- rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
-    if S.Rampage:IsReadyP() and ((Player:BuffP(S.RecklessnessBuff) Player:BuffP(S.MemoryOfLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
+    if S.Rampage:IsReadyP() and ((Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryOfLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
       if HR.Cast(S.Rampage) then return "rampage 20"; end
     end
     -- execute
@@ -277,7 +277,7 @@ local function APL()
       if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
     end
     -- use_item,name=ramping_amplitude_gigavolt_engine
-    if I.RampingAmplitudeGigavoltEngine:IsCastableP() then
+    if I.RampingAmplitudeGigavoltEngine:IsReady() then
       if HR.Cast(I.RampingAmplitudeGigavoltEngine) then return "ramping_amplitude_gigavolt_engine"; end
     end
     -- blood_fury,if=buff.recklessness.up

@@ -455,7 +455,7 @@ local function APL()
     -- concentrated_flame,if=!debuff.colossus_smash.up&!buff.test_of_might.up&dot.concentrated_flame_burn.remains=0
     -- Need debuff spell ID for ConcentratedFlame higher ranks
     if S.ConcentratedFlame:IsCastableP() and (not Target:DebuffP(S.ColossusSmashDebuff) and not Player:BuffP(S.TestofMightBuff)) then
-      If HR.Cast(S.ConcentratedFlame, Settings.Arms.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Arms.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
