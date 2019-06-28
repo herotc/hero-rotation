@@ -45,6 +45,7 @@
         SummonPet = false,
         SpittingCobra = false,
         Stampede = false,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -64,6 +65,7 @@
         Trueshot = false,
         HuntersMark = false,
         DoubleTap = false,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -81,6 +83,7 @@
         SummonPet = false,
         CoordinatedAssault = true,
         Harpoon = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

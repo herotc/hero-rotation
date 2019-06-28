@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -52,6 +53,17 @@ Spell.Hunter.BeastMastery = {
   Intimidation                          = Spell(19577),
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
+  -- Essences
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932),
   -- Misc
   PoolFocus                             = Spell(9999000010),
 };
@@ -143,6 +155,18 @@ local function APL()
       if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
       end
+      -- worldvein_resonance
+      if S.WorldveinResonance:IsCastableP() then
+        if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      end
+      -- guardian_of_azeroth
+      if S.GuardianOfAzeroth:IsCastableP() then
+        if HR.Cast(S.GuardianOfAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      end
+      -- memory_of_lucid_dreams
+      if S.MemoryOfLucidDreams:IsCastableP() then
+        if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      end
       -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
       if S.AspectoftheWild:IsCastableP() and Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled()) then
         if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
@@ -177,6 +201,22 @@ local function APL()
     -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
     if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable()) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 68"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+    end
+    -- memory_of_lucid_dreams
+    if S.MemoryOfLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
   end
   Cleave = function()
@@ -228,6 +268,26 @@ local function APL()
     if S.BarbedShot:IsCastableP() and (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
       if HR.Cast(S.BarbedShot) then return "barbed_shot 124"; end
     end
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
     -- multishot,if=azerite.rapid_reload.enabled&active_enemies>2
     if S.Multishot:IsCastableP() and (S.RapidReload:AzeriteEnabled() and EnemiesCount > 2) then
       if HR.Cast(S.Multishot) then return "multishot 140"; end
@@ -278,6 +338,26 @@ local function APL()
     if S.BarbedShot:IsCastableP() and (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
       if HR.Cast(S.BarbedShot) then return "barbed_shot 200"; end
     end
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce, Setting.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
     -- barrage
     if S.Barrage:IsReadyP() then
       if HR.Cast(S.Barrage) then return "barrage 216"; end
@@ -288,8 +368,8 @@ local function APL()
     if Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
       if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
     end
-    -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd)&cooldown.kill_command.remains>1
-    if S.CobraShot:IsCastableP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost() or S.KillCommand:CooldownRemainsP() > 1 + GCDMax) and S.KillCommand:CooldownRemainsP() > 1) then
+    -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1
+    if S.CobraShot:IsCastableP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost() or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryOfLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
       if HR.Cast(S.CobraShot) then return "cobra_shot 218"; end
     end
     -- spitting_cobra
