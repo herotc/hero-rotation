@@ -3,17 +3,18 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
-local Mage   = HR.Commons.Mage
+local HR         = HeroRotation
+local Mage       = HR.Commons.Mage
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -58,8 +59,19 @@ Spell.Mage.Arcane = {
   Amplification                         = Spell(236628),
   ArcanePummeling                       = Spell(270669),
   Supernova                             = Spell(157980),
-  Blink                                 = Spell(1953),
-  Shimmer                               = Spell(212653)
+  Counterspell                          = Spell(2139),
+  --Shimmer                               = Spell(212653),
+  Blink                                 = MultiSpell(1953, 212653),
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932),
 };
 local S = Spell.Mage.Arcane;
 
@@ -176,8 +188,8 @@ HL.RegisterNucleusAbility(44425, 10, 6)              -- Arcane Barrage
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Burn, Conserve, Movement
-  local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
+  local Precombat, Burn, Conserve, Essences, Movement
+  --local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   EnemiesCount = GetEnemiesCount(10)
   Precombat = function()
     -- flask
@@ -362,10 +374,48 @@ local function APL()
       if HR.Cast(S.ArcaneBarrage) then return "arcane_barrage 335"; end
     end
   end
+  Essences = function()
+    -- blood_of_the_enemy,if=burn_phase&buff.arcane_power.down&buff.rune_of_power.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack|time_to_die<cooldown.arcane_power.remains
+    if S.BloodOfTheEnemy:IsCastableP() and (BurnPhase:On() and Player:BuffDownP(S.ArcanePowerBuff) and Player:BuffDownP(S.RuneofPowerBuff) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Arcane.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    end
+    -- concentrated_flame,line_cd=6,if=buff.rune_of_power.down&buff.arcane_power.down&(!burn_phase|time_to_die<cooldown.arcane_power.remains)&mana.time_to_max>=execute_time
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff) and (not BurnPhase:On() or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) and Player:ManaTimeToMax() >= S.ConcentratedFlame:ExecuteTime()) then
+      if HR.Cast(S.ConcentratedFlame, Settings.Arcane.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+    end
+    -- focused_azerite_beam,if=buff.rune_of_power.down&buff.arcane_power.down
+    if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Arcane.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- guardian_of_azeroth,if=buff.rune_of_power.down&buff.arcane_power.down
+    if S.GuardianOfAzeroth:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Arcane.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    end
+    -- purifying_blast,if=buff.rune_of_power.down&buff.arcane_power.down
+    if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+      if HR.Cast(S.PurifyingBlast, Settings.Arcane.GCDasOffGCD.Essences) then return "purifying_blast"; end
+    end
+    -- ripple_in_space,if=buff.rune_of_power.down&buff.arcane_power.down
+    if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+      if HR.Cast(S.RippleInSpace, Settings.Arcane.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+    end
+    -- the_unbound_force,if=buff.rune_of_power.down&buff.arcane_power.down
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
+      if HR.Cast(S.TheUnboundForce, Settings.Arcane.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+    end
+    -- memory_of_lucid_dreams,if=!burn_phase&buff.arcane_power.down&cooldown.arcane_power.remains&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(!talent.rune_of_power.enabled|action.rune_of_power.charges)|time_to_die<cooldown.arcane_power.remains
+    if S.MemoryOfLucidDreams:IsCastableP() and (not BurnPhase:On() and Player:BuffDownP(S.ArcanePowerBuff) and bool(S.ArcanePower:CooldownRemainsP()) and Player:ArcaneCharges() == Player:ArcaneChargesMax() and (not S.RuneofPower:IsAvailable() or bool(S.RuneofPower:Charges())) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Arcane.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    end
+    -- worldvein_resonance,if=burn_phase&buff.arcane_power.down&buff.rune_of_power.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack|time_to_die<cooldown.arcane_power.remains
+    if S.WorldveinResonance:IsCastableP() and (BurnPhase:On() and Player:BuffDownP(S.ArcanePowerBuff) and Player:BuffDownP(S.RuneofPowerBuff) and Player:ArcaneCharges() == Player:ArcaneChargesMax() or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+      if HR.Cast(S.WorldveinResonance, Settings.Arcane.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+    end
+  end
   Movement = function()
     -- blink_any,if=movement.distance>=10
-    if BlinkAny:IsCastableP() and (not Target:IsInRange(S.ArcaneBlast:MaximumRange())) then
-      if HR.Cast(BlinkAny) then return "blink_any 337"; end
+    if S.Blink:IsCastableP() and (not Target:IsInRange(S.ArcaneBlast:MaximumRange())) then
+      if HR.Cast(S.Blink) then return "blink_any 337"; end
     end
     -- presence_of_mind
     if S.PresenceofMind:IsCastableP() and HR.CDsON() then
@@ -389,7 +439,12 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    -- counterspell,if=target.debuff.casting.react
+    -- counterspell
+    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
+    -- call_action_list,name=essences
+    if (true) then
+      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length
     if HR.CDsON() and (BurnPhase:On() or Target:TimeToDie() < VarAverageBurnLength) then
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
