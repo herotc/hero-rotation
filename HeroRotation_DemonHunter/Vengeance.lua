@@ -268,7 +268,7 @@ local function APL ()
       if HR.Cast(S.Shear) then return "Cast Shear"; end
     end
     -- actions+=/throw_glaive
-    if S.ThrowGlaive:IsCastable(S.ThrowGlaive) then
+    if S.ThrowGlaive:IsCastable(30) then
       if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OOR)"; end
     end
   end
