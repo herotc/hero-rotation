@@ -48,6 +48,7 @@ Spell.Hunter.Marksmanship = {
   SerpentSting                          = Spell(271788),
   SerpentStingDebuff                    = Spell(271788),
   ArcaneShot                            = Spell(185358),
+  MasterMarksman                        = Spell(260309),
   MasterMarksmanBuff                    = Spell(269576),
   PreciseShotsBuff                      = Spell(260242),
   IntheRhythm                           = Spell(264198),
@@ -124,6 +125,10 @@ local function bool(val)
   return val ~= 0
 end
 
+local function MasterMarksmanBuffCheck()
+  return (Player:BuffP(S.MasterMarksmanBuff) or (Player:IsCasting(S.AimedShot) and S.MasterMarksman:IsAvailable()))
+end
+
 HL.RegisterNucleusAbility(257620, 10, 6)               -- Multi-Shot
 HL.RegisterNucleusAbility(120360, 40, 6)               -- Barrage
 
@@ -181,19 +186,19 @@ local function APL()
       if HR.Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap 50"; end
     end
     -- berserking,if=buff.trueshot.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<13
-    if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.Berserking:Cooldown() + S.Berserking:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 13) then
+    if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.Berserking:CooldownRemainsP() + S.Berserking:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 13) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 86"; end
     end
     -- blood_fury,if=buff.trueshot.up&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.BloodFury:Cooldown() + S.BloodFury:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 16) then
+    if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.BloodFury:CooldownRemainsP() + S.BloodFury:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 16) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 90"; end
     end
     -- ancestral_call,if=buff.trueshot.up&(target.time_to_die>cooldown.ancestral_call.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<16
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.AncestralCall:Cooldown() + S.AncestralCall:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 16) then
+    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.AncestralCall:CooldownRemainsP() + S.AncestralCall:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 16) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 94"; end
     end
     -- fireblood,if=buff.trueshot.up&(target.time_to_die>cooldown.fireblood.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<9
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.Fireblood:Cooldown() + S.Fireblood:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 9) then
+    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(S.TrueshotBuff) and (Target:TimeToDie() > S.Fireblood:CooldownRemainsP() + S.Fireblood:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 9) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 98"; end
     end
     -- lights_judgment
@@ -221,7 +226,7 @@ local function APL()
       if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 104"; end
     end
     -- trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
-    if S.Trueshot:IsCastableP() and (Player:Focus() > 60 and (Player:BuffDownP(S.PreciseShotsBuff) and S.RapidFire:CooldownRemainsP() > 0 and Target:TimeToDie() > S.Trueshot:Cooldown() + S.Trueshot:BaseDuration() or Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable()) or Target:TimeToDie() < 15) then
+    if S.Trueshot:IsCastableP() and (Player:Focus() > 60 and (Player:BuffDownP(S.PreciseShotsBuff) and S.RapidFire:CooldownRemainsP() > 0 and Target:TimeToDie() > S.Trueshot:CooldownRemainsP() + S.Trueshot:BaseDuration() or Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable()) or Target:TimeToDie() < 15) then
       if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot 112"; end
     end
   end
@@ -247,7 +252,7 @@ local function APL()
       if HR.Cast(S.RapidFire) then return "rapid_fire 152"; end
     end
     -- arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&!buff.memory_of_lucid_dreams.up
-    if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and Player:BuffP(S.MasterMarksmanBuff) and not Player:BuffP(S.MemoryOfLucidDreams)) then
+    if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and MasterMarksmanBuffCheck() and not Player:BuffP(S.MemoryOfLucidDreams)) then
       if HR.Cast(S.ArcaneShot) then return "arcane_shot 158"; end
     end
     -- aimed_shot,if=buff.trueshot.up|(buff.double_tap.down|ca_execute)&buff.precise_shots.down|full_recharge_time<cast_time
@@ -255,7 +260,7 @@ local function APL()
       if HR.Cast(S.AimedShot) then return "aimed_shot 170"; end
     end
     -- arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&buff.memory_of_lucid_dreams.up
-    if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and Player:BuffP(S.MasterMarksmanBuff) and Player:BuffP(S.MemoryOfLucidDreams)) then
+    if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and MasterMarksmanBuffCheck() and Player:BuffP(S.MemoryOfLucidDreams)) then
       if HR.Cast(S.ArcaneShot) then return "arcane_shot 176"; end
     end
     -- piercing_shot
@@ -283,7 +288,7 @@ local function APL()
       if HR.Cast(S.TheUnboundForce, Settings.Marksmanship.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
-    if S.ArcaneShot:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) and (Player:BuffP(S.PreciseShotsBuff) and (Player:Focus() > 41 or Player:BuffP(S.MasterMarksmanBuff)) or (Player:Focus() > 50 and S.FocusedFire:IsAvailable() or Player:Focus() > 75) and (S.Trueshot:CooldownRemainsP() > 5 or Player:Focus() > 80) or Target:TimeToDie() < 5)) then
+    if S.ArcaneShot:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) and (Player:BuffP(S.PreciseShotsBuff) and (Player:Focus() > 41 or MasterMarksmanBuffCheck()) or (Player:Focus() > 50 and S.FocusedFire:IsAvailable() or Player:Focus() > 75) and (S.Trueshot:CooldownRemainsP() > 5 or Player:Focus() > 80) or Target:TimeToDie() < 5)) then
       if HR.Cast(S.ArcaneShot) then return "arcane_shot 200"; end
     end
     -- steady_shot
