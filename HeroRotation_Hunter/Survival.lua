@@ -50,6 +50,7 @@ Spell.Hunter.Survival = {
   BerserkingBuff                        = Spell(26297),
   BloodFuryBuff                         = Spell(20572),
   AspectoftheEagle                      = Spell(186289),
+  Exhilaration                          = Spell(109304),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -59,7 +60,7 @@ Spell.Hunter.Survival = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForceBuff                     = Spell(302932)
+  RecklessForceBuff                     = Spell(302932),
   Carve                                 = Spell(187708),
   GuerrillaTactics                      = Spell(264332),
   LatentPoisonDebuff                    = Spell(273286),
@@ -396,20 +397,20 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Survival.GCDasOffGCD.Essences) then return "focused_azerite_beam 322"; end
     end
     -- memory_of_lucid_dreams,if=buff.coordinated_assault.up
-    if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 324"; end
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 324"; end
     end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
-    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
+    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
       if HR.Cast(S.PurifyingBlast, Settings.Survival.GCDasOffGCD.Essences) then return "purifying_blast 332"; end
     end
     -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 334"; end
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 334"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
