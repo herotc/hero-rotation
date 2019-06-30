@@ -85,30 +85,10 @@ local StunInterrupts = {
 };
 
 -- Variables
-local VarOpenerDone = 0;
 local VarDsCastable = 0;
 local VarHow = 0;
-local Opener1 = 0;
-local Opener2 = 0;
-local Opener3 = 0;
-local Opener4 = 0;
-local Opener5 = 0;
-local Opener6 = 0;
-local Opener7 = 0;
-local Opener8 = 0;
-local Opener9 = 0;
 
 HL:RegisterForEvent(function()
-  VarOpenerDone = 0
-  Opener1 = 0
-  Opener2 = 0
-  Opener3 = 0
-  Opener4 = 0
-  Opener5 = 0
-  Opener6 = 0
-  Opener7 = 0
-  Opener8 = 0
-  Opener9 = 0
   VarDsCastable = 0
   VarHow = 0
 end, "PLAYER_REGEN_ENABLED")
@@ -130,7 +110,7 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Cooldowns, Finishers, Generators, Opener
+  local Precombat, Cooldowns, Finishers, Generators
   local PlayerGCD = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
@@ -293,11 +273,11 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(5, S.Rebuke, Rebuke, StunInterrupts);
     -- call_action_list,name=cooldowns
-    if VarOpenerDone == 1 and HR.CDsON() then
+    if HR.CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=generators
-    if VarOpenerDone == 1 then
+    if (true) then
       local ShouldReturn = Generators(); if ShouldReturn then return ShouldReturn; end
     end
   end
