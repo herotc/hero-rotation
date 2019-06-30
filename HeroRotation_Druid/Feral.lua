@@ -77,7 +77,9 @@ Spell.Druid.Feral = {
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932),
   Thorns                                = Spell(236696),
-  HeartEssence                          = Spell(298554)
+  HeartEssence                          = Spell(298554),
+  -- Icon for pulling enery
+  PoolEnergy                            = Spell(9999000010)
 };
 local S = Spell.Druid.Feral;
 
@@ -320,6 +322,10 @@ local function APL()
     if S.FerociousBiteMaxEnergy:IsReadyP() and Player:ComboPoints() > 0 then
       if HR.Cast(S.FerociousBiteMaxEnergy) then return "ferocious_bite 168"; end
     end
+    -- Pool if nothing else to do
+    if (true) then
+      if HR.Cast(S.PoolEnergy) then return "pool_resource"; end
+    end
   end
   Generators = function()
     -- regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&combo_points=4&dot.rake.remains<4
@@ -409,6 +415,10 @@ local function APL()
     if S.Shred:IsCastableP() and (Target:DebuffRemainsP(S.RakeDebuff) > (S.Shred:Cost() + S.Rake:Cost() - Player:EnergyPredicted()) / Player:EnergyRegen() or bool(Player:BuffStackP(S.ClearcastingBuff))) then
       if HR.Cast(S.Shred) then return "shred 347"; end
     end
+    -- Pool if nothing else to do
+    if (true) then
+      if HR.Cast(S.PoolEnergy) then return "pool_resource"; end
+    end
   end
   Opener = function()
     -- tigers_fury
@@ -476,6 +486,10 @@ local function APL()
     -- run_action_list,name=generators
     if (true) then
       return Generators();
+    end
+    -- Pool if nothing else to do
+    if (true) then
+      if HR.Cast(S.PoolEnergy) then return "pool_resource"; end
     end
   end
 end
