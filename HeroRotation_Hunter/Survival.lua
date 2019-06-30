@@ -26,14 +26,17 @@ Spell.Hunter.Survival = {
   SteelTrapDebuff                       = Spell(162487),
   SteelTrap                             = Spell(162488),
   Harpoon                               = Spell(190925),
-  MongooseBite                          = Spell(259387),
+  MongooseBite                          = MultiSpell(259387, 265888),
   CoordinatedAssaultBuff                = Spell(266779),
   BlurofTalonsBuff                      = Spell(277969),
-  RaptorStrike                          = Spell(186270),
+  RaptorStrike                          = MultiSpell(186270, 265189),
   FlankingStrike                        = Spell(269751),
   KillCommand                           = Spell(259489),
-  WildfireBomb                          = Spell(259495),
+  WildfireBomb                          = MultiSpell(259495, 270335, 270323, 271045),
   WildfireBombDebuff                    = Spell(269747),
+  ShrapnelBomb                          = Spell(270335),
+  PheromoneBomb                         = Spell(270323),
+  VolatileBomb                          = Spell(271045),
   SerpentSting                          = Spell(259491),
   SerpentStingDebuff                    = Spell(259491),
   MongooseFuryBuff                      = Spell(259388),
@@ -121,39 +124,6 @@ local function bool(val)
   return val ~= 0
 end
 
-S.WildfireBombNormal  = Spell(259495)
-S.ShrapnelBomb        = Spell(270335)
-S.PheromoneBomb       = Spell(270323)
-S.VolatileBomb        = Spell(271045)
-
-local WildfireInfusions = {
-  S.ShrapnelBomb,
-  S.PheromoneBomb,
-  S.VolatileBomb,
-}
-
-local function CurrentWildfireInfusion ()
-  if S.WildfireInfusion:IsAvailable() then
-    for _, infusion in pairs(WildfireInfusions) do
-      if infusion:IsLearned() then return infusion end
-    end
-  end
-  return S.WildfireBombNormal
-end
-
-S.RaptorStrikeNormal  = Spell(186270)
-S.RaptorStrikeEagle   = Spell(265189)
-S.MongooseBiteNormal  = Spell(259387)
-S.MongooseBiteEagle   = Spell(265888)
-
-local function CurrentRaptorStrike ()
-  return S.RaptorStrikeEagle:IsLearned() and S.RaptorStrikeEagle or S.RaptorStrikeNormal
-end
-
-local function CurrentMongooseBite ()
-  return S.MongooseBiteEagle:IsLearned() and S.MongooseBiteEagle or S.MongooseBiteNormal
-end
-
 local function EvaluateTargetIfFilterMongooseBite396(TargetUnit)
   return TargetUnit:DebuffStackP(S.LatentPoisonDebuff)
 end
@@ -204,9 +174,6 @@ local function APL()
   local Precombat, Apst, Apwfi, Cds, Cleave, St, Wfi
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-  S.WildfireBomb = CurrentWildfireInfusion()
-  S.RaptorStrike = CurrentRaptorStrike()
-  S.MongooseBite = CurrentMongooseBite()
   Precombat = function()
     -- flask
     -- augmentation

@@ -59,7 +59,7 @@ end
 local OldSVIsCastableP
 OldSVIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self.SpellID == SpellSV.MongooseBiteNormal.SpellID or self.SpellID == SpellSV.RaptorStrikeNormal.SepllID then
+  if self.SpellID == 259387 or self.SpellID == 186270 then
     return OldSVIsCastableP(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
   else
     local BaseCheck = OldSVIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
