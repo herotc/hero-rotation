@@ -169,8 +169,8 @@ local function APL()
     if S.FocusedAzeriteBeam:IsCastableP() then
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Frost.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
-    -- memory_of_lucid_dreams,if=buff.icicles.stack<2
-    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) < 2) then
+    -- memory_of_lucid_dreams,if=buff.icicles.stack<2&cooldown.frozen_orb.remains>execute_time&!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) < 2 and S.FrozenOrb:CooldownRemainsP() > S.MemoryOfLucidDreams:ExecuteTime() and not S.FrozenOrb:InFlight() and Player:FrozenOrbGroundAoeRemains() == 0) then
       if HR.Cast(S.MemoryOfLucidDreams, Settings.Frost.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy,if=buff.icicles.stack=5&buff.brain_freeze.react|!talent.glacial_spike.enabled|active_enemies>4
