@@ -39,7 +39,6 @@ Spell.DeathKnight.Unholy = {
   UnholyFrenzyBuff                      = Spell(207289),
   DarkTransformation                    = Spell(63560),
   SummonGargoyle                        = MultiSpell(49206, 207349),
-  --DarkArbiter                           = Spell(207349),
   UnholyFrenzy                          = Spell(207289),
   MagusoftheDead                        = Spell(288417),
   SoulReaper                            = Spell(130736),
@@ -53,7 +52,17 @@ Spell.DeathKnight.Unholy = {
   VirulentPlagueDebuff                  = Spell(191587),
   DeathStrike                           = Spell(49998),
   DeathStrikeBuff                       = Spell(101568),
-  MindFreeze                            = Spell(47528)
+  MindFreeze                            = Spell(47528),
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -124,7 +133,7 @@ HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Aoe, Cooldowns, Generic
+  local Precombat, Aoe, Cooldowns, Essences, Generic
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   local no_heal = not DeathStrikeHeal()
@@ -261,6 +270,41 @@ local function APL()
       if HR.Cast(S.UnholyBlight) then return "unholy_blight 172"; end
     end
   end
+  Essences = function()
+    -- memory_of_lucid_dreams,if=rune.time_to_1>gcd&runic_power<40
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:RuneTimeToX(1) > Player:GCD() and Player:RunicPower() < 40) then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Unholy.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    end
+    -- blood_of_the_enemy,if=(cooldown.death_and_decay.remains&spell_targets.death_and_decay>1)|(cooldown.defile.remains&spell_targets.defile>1)|(cooldown.apocalypse.remains&cooldown.death_and_decay.ready)
+    if S.BloodOfTheEnemy:IsCastableP() and ((bool(S.DeathandDecay:CooldownRemainsP()) and Cache.EnemiesCount[8] > 1) or (bool(S.Defile:CooldownRemainsP()) and Cache.EnemiesCount[8] > 1) or (bool(S.Apocalypse:CooldownRemainsP()) and S.DeathandDecay:IsCastableP())) then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Unholy.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    end
+    -- guardian_of_azeroth,if=cooldown.apocalypse.ready
+    if S.GuardianOfAzeroth:IsCastableP() and (S.Apocalypse:IsCastableP()) then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Unholy.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    end
+    -- focused_azerite_beam,if=!death_and_decay.ticking
+    if S.FocusedAzeriteBeam:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Unholy.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- concentrated_flame,if=dot.concentrated_flame_burn.remains=0
+    -- Need to confirm DoT Spell ID
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Settings.Unholy.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+    end
+    -- purifying_blast,if=!death_and_decay.ticking
+    if S.PurifyingBlast:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+      if HR.Cast(S.PurifyingBlast, Settings.Unholy.GCDasOffGCD.Essences) then return "purifying_blast"; end
+    end
+    -- worldvein_resonance,if=!death_and_decay.ticking
+    if S.WorldveinResonance:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+      if HR.Cast(S.WorldveinResonance, Settings.Unholy.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+    end
+    -- ripple_in_space,if=!death_and_decay.ticking
+    if S.RippleInSpace:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+      if HR.Cast(S.RippleInSpace, Settings.Unholy.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+    end
+  end
   Generic = function()
     -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
     if S.DeathCoil:IsUsableP() and (bool(Player:BuffStackP(S.SuddenDoomBuff)) and not bool(VarPoolingForGargoyle) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
@@ -358,6 +402,10 @@ local function APL()
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsCastableP() then
       if HR.CastCycle(S.Outbreak, 30, EvaluateCycleOutbreak303) then return "outbreak 307" end
+    end
+    -- call_action_list,name=essences
+    if (true) then
+      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cooldowns
     if (true) then
