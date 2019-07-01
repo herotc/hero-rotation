@@ -489,6 +489,10 @@ local function APL()
     if S.MongooseBite:IsReadyP() and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffRemainsP(S.CoordinatedAssaultBuff) < 1.5 * Player:GCD() or Player:BuffP(S.BlurofTalonsBuff) and Player:BuffRemainsP(S.BlurofTalonsBuff) < 1.5 * Player:GCD())) then
       if HR.Cast(S.MongooseBite) then return "mongoose_bite 567"; end
     end
+    -- kill_command,if=focus+cast_regen<focus.max
+    if S.KillCommand:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 15 < Player:FocusMax()) then
+      if HR.Cast(S.KillCommand) then return "kill_command 568"; end
+    end
     -- steel_trap,if=focus+cast_regen<focus.max
     if S.SteelTrap:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.SteelTrap:ExecuteTime()) < Player:FocusMax()) then
       if HR.Cast(S.SteelTrap) then return "steel_trap 577"; end
@@ -645,9 +649,9 @@ local function APL()
     if (Cache.EnemiesCount[8] < 3 and S.AlphaPredator:IsAvailable() and S.WildfireInfusion:IsAvailable()) then
       local ShouldReturn = Apwfi(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=apwfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
+    -- call_action_list,name=wfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
     if (Cache.EnemiesCount[8] < 3 and not S.AlphaPredator:IsAvailable() and S.WildfireInfusion:IsAvailable()) then
-      local ShouldReturn = Apwfi(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Wfi(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cleave,if=active_enemies>1
     if (Cache.EnemiesCount[8] > 1) then
