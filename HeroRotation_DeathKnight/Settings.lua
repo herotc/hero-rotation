@@ -36,7 +36,8 @@ HR.GUISettings.APL.DeathKnight = {
       FrostwyrmsFury = true,
       PillarofFrost = true,
       EmpowerRuneWeapon = true,
-      BreathofSindragosa = true
+      BreathofSindragosa = true,
+      Essences = true,
     },
   },
   Unholy = {
@@ -46,6 +47,7 @@ HR.GUISettings.APL.DeathKnight = {
       ArmyoftheDead = true,
       DeathandDecay = false,
       UnholyFrenzy = true,
+      Essences = true,
     }
   },
   Blood = {
@@ -62,7 +64,8 @@ HR.GUISettings.APL.DeathKnight = {
     GCDasOffGCD = {
       -- Abilities
       Blooddrinker = true,
-      Bonestorm = true
+      Bonestorm = true,
+      Essences = true,
     },
     OffGCDasOffGCD = {
       DancingRuneWeapon = true,
