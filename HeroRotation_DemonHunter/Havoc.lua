@@ -255,7 +255,7 @@ local function APL()
       if HR.Cast(S.DarkSlash) then return "dark_slash 61"; end
     end
     -- annihilation,if=debuff.dark_slash.up
-    if S.Annihilation:IsCastableP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then
+    if S.Annihilation:IsReadyP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then
       if HR.Cast(S.Annihilation) then return "annihilation 67"; end
     end
     -- chaos_strike,if=debuff.dark_slash.up
@@ -265,7 +265,7 @@ local function APL()
   end
   Demonic = function()
     -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsCastableP() and IsInMeleeRange() and (bool(VarBladeDance)) then
+    if S.DeathSweep:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
       if HR.Cast(S.DeathSweep) then return "death_sweep 75"; end
     end
     -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
@@ -285,7 +285,7 @@ local function APL()
       if HR.Cast(S.ImmolationAura) then return "immolation_aura 109"; end
     end
     -- annihilation,if=!variable.pooling_for_blade_dance
-    if S.Annihilation:IsCastableP() and IsInMeleeRange() and (not bool(VarPoolingForBladeDance)) then
+    if S.Annihilation:IsReadyP() and IsInMeleeRange() and (not bool(VarPoolingForBladeDance)) then
       if HR.Cast(S.Annihilation) then return "annihilation 111"; end
     end
     -- felblade,if=fury.deficit>=40
@@ -335,7 +335,7 @@ local function APL()
       if HR.Cast(S.FelBarrage) then return "fel_barrage 165"; end
     end
     -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsCastableP() and IsInMeleeRange() and (bool(VarBladeDance)) then
+    if S.DeathSweep:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
       if HR.Cast(S.DeathSweep) then return "death_sweep 175"; end
     end
     -- immolation_aura
@@ -359,7 +359,7 @@ local function APL()
       if HR.Cast(S.EyeBeam) then return "eye_beam 201"; end
     end
     -- annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
-    if S.Annihilation:IsCastableP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
+    if S.Annihilation:IsReadyP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
       if HR.Cast(S.Annihilation) then return "annihilation 211"; end
     end
     -- chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
