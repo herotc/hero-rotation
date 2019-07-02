@@ -140,11 +140,11 @@ local function APL()
       if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 10"; end
     end
     -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Cache.EnemiesCount[5] >= 2 or (not (Cache.EnemiesCount[30] > 1) or 10000000000 > 75)) then
+    if S.LightsJudgment:IsCastableP() then
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 18"; end
     end
     -- fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10) then
+    if S.Fireblood:IsCastableP() and (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
     end
     -- shield_of_vengeance,if=buff.seething_rage.down&buff.memory_of_lucid_dreams.down
@@ -208,6 +208,10 @@ local function APL()
     -- templars_verdict,if=(!talent.crusade.enabled&cooldown.avenging_wrath.remains>gcd*3|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*2|cooldown.avenging_wrath.remains>gcd*3&cooldown.avenging_wrath.remains<10|buff.crusade.up&buff.crusade.stack<10)
     if S.TemplarsVerdict:IsReadyP() and ((not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemainsP() > PlayerGCD * 3 or S.Crusade:CooldownRemainsP() > PlayerGCD * 3) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemainsP() > PlayerGCD * 2 or S.AvengingWrath:CooldownRemainsP() > PlayerGCD * 3 and S.AvengingWrath:CooldownRemainsP() < 10 or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) < 10)) then
       if HR.Cast(S.TemplarsVerdict) then return "templars_verdict 92"; end
+    end
+    -- templars_verdict fallback, in case the user is saving AW/Crusade/ExecutionSentence
+    if S.TemplarsVerdict:IsReadyP() and (not HR.CDsON()) then
+      if HR.Cast(S.TemplarsVerdict) then return "templars_verdict 93"; end
     end
   end
   Generators = function()
