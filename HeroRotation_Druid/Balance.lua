@@ -362,7 +362,7 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Balance.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() then
+    if S.GuardianOfAzeroth:IsCastableP() and (not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) then
       if HR.Cast(S.GuardianOfAzeroth, Settings.Balance.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- thorns
