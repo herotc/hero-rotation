@@ -361,39 +361,39 @@ local Interrupts = {
 local function Essences ()
   -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up|debuff.vendetta.remains<=10)|target.time_to_die<=10
   if S.BloodOfTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable() or Target:DebuffP(S.ToxicBladeDebuff) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
-    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Blood Of The Enemy"; end
+    HR.CastSuggested(S.BloodOfTheEnemy);
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
-    if HR.Cast(S.BloodOfTheEnemy) then return "Cast Concentrated Flame"; end
+    HR.CastSuggested(S.BloodOfTheEnemy);
   end
   -- guardian_of_azeroth
   if S.GuardianOfAzeroth:IsCastableP() then
-    if HR.Cast(S.GuardianOfAzeroth) then return "Cast Guardian Of Azeroth"; end
+    HR.CastSuggested(S.GuardianOfAzeroth);
   end
   -- focused_azerite_beam
   if S.FocusedAzeriteBeam:IsCastableP() then
-    if HR.Cast(S.FocusedAzeriteBeam) then return "Cast Focused Azerite Beam"; end
+    HR.CastSuggested(S.FocusedAzeriteBeam);
   end
   -- purifying_blast
   if S.PurifyingBlast:IsCastableP() then
-    if HR.Cast(S.PurifyingBlast) then return "Cast Purifying Blast"; end
+    HR.CastSuggested(S.PurifyingBlast);
   end
   -- the_unbound_force
   if S.TheUnboundForce:IsCastableP() then
-    if HR.Cast(S.TheUnboundForce) then return "Cast The Unbound Force"; end
+    HR.CastSuggested(S.TheUnboundForce);
   end
   -- ripple_in_space
   if S.RippleInSpace:IsCastableP() then
-    if HR.Cast(S.RippleInSpace) then return "Cast Ripple In Space"; end
+    HR.CastSuggested(S.RippleInSpace);
   end
   -- worldvein_resonance
   if S.WorldveinResonance:IsCastableP() then
-    if HR.Cast(S.WorldveinResonance) then return "Cast Worldvein Resonance"; end
+    HR.CastSuggested(S.WorldveinResonance);
   end
   -- memory_of_lucid_dreams,if=energy<50
   if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 then
-    if HR.Cast(S.MemoryOfLucidDreams) then return "Cast Memory Of Lucid Dreams"; end
+    HR.CastSuggested(S.MemoryOfLucidDreams);
   end
   return false;
 end
