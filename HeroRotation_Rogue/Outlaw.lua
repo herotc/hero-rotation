@@ -320,7 +320,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.BloodOfTheEnemy);
     else
-      if HR.Cast(S.BloodOfTheEnemy, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast BloodOfTheEnemy"; end
+      if HR.Cast(S.BloodOfTheEnemy, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast BloodOfTheEnemy"; end
     end
   end
   -- concentrated_flame
@@ -328,7 +328,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.ConcentratedFlame);
     else
-      if HR.Cast(S.ConcentratedFlame, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast ConcentratedFlame"; end
+      if HR.Cast(S.ConcentratedFlame, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast ConcentratedFlame"; end
     end
   end
   -- guardian_of_azeroth
@@ -336,7 +336,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.GuardianOfAzeroth);
     else
-      if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast GuardianOfAzeroth"; end
+      if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
     end
   end
   -- focused_azerite_beam
@@ -344,7 +344,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.FocusedAzeriteBeam);
     else
-      if HR.Cast(S.FocusedAzeriteBeam, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast FocusedAzeriteBeam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast FocusedAzeriteBeam"; end
     end
   end
   -- purifying_blast
@@ -352,7 +352,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.PurifyingBlast);
     else
-      if HR.Cast(S.PurifyingBlast, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast PurifyingBlast"; end
+      if HR.Cast(S.PurifyingBlast, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast PurifyingBlast"; end
     end
   end
   -- the_unbound_force
@@ -360,7 +360,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.TheUnboundForce);
     else
-      if HR.Cast(S.TheUnboundForce, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast TheUnboundForce"; end
+      if HR.Cast(S.TheUnboundForce, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast TheUnboundForce"; end
     end
   end
   -- ripple_in_space
@@ -368,7 +368,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.RippleInSpace);
     else
-      if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast RippleInSpace"; end
+      if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast RippleInSpace"; end
     end
   end
   -- worldvein_resonance
@@ -376,7 +376,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.WorldveinResonance);
     else
-      if HR.Cast(S.WorldveinResonance, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast WorldveinResonance"; end
+      if HR.Cast(S.WorldveinResonance, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast WorldveinResonance"; end
     end
   end
   -- memory_of_lucid_dreams,if=energy<45
@@ -384,7 +384,7 @@ local function Essences ()
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.MemoryOfLucidDreams);
     else
-      if HR.Cast(S.MemoryOfLucidDreams, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast MemoryOfLucidDreams"; end
+      if HR.Cast(S.MemoryOfLucidDreams, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast MemoryOfLucidDreams"; end
     end
   end
   return false;
