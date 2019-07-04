@@ -361,39 +361,75 @@ local Interrupts = {
 local function Essences ()
   -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up|debuff.vendetta.remains<=10)|target.time_to_die<=10
   if S.BloodOfTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable() or Target:DebuffP(S.ToxicBladeDebuff) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
-    HR.CastSuggested(S.BloodOfTheEnemy);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.BloodOfTheEnemy);
+    else
+      if HR.Cast(S.BloodOfTheEnemy, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast BloodOfTheEnemy"; end
+    end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
-    HR.CastSuggested(S.BloodOfTheEnemy);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.ConcentratedFlame);
+    else
+      if HR.Cast(S.ConcentratedFlame, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast ConcentratedFlame"; end
+    end
   end
   -- guardian_of_azeroth
   if S.GuardianOfAzeroth:IsCastableP() then
-    HR.CastSuggested(S.GuardianOfAzeroth);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.GuardianOfAzeroth);
+    else
+      if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast GuardianOfAzeroth"; end
+    end
   end
   -- focused_azerite_beam
   if S.FocusedAzeriteBeam:IsCastableP() then
-    HR.CastSuggested(S.FocusedAzeriteBeam);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.FocusedAzeriteBeam);
+    else
+      if HR.Cast(S.FocusedAzeriteBeam, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast FocusedAzeriteBeam"; end
+    end
   end
   -- purifying_blast
   if S.PurifyingBlast:IsCastableP() then
-    HR.CastSuggested(S.PurifyingBlast);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.PurifyingBlast);
+    else
+      if HR.Cast(S.PurifyingBlast, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast PurifyingBlast"; end
+    end
   end
   -- the_unbound_force
   if S.TheUnboundForce:IsCastableP() then
-    HR.CastSuggested(S.TheUnboundForce);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.TheUnboundForce);
+    else
+      if HR.Cast(S.TheUnboundForce, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast TheUnboundForce"; end
+    end
   end
   -- ripple_in_space
   if S.RippleInSpace:IsCastableP() then
-    HR.CastSuggested(S.RippleInSpace);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.RippleInSpace);
+    else
+      if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast RippleInSpace"; end
+    end
   end
   -- worldvein_resonance
   if S.WorldveinResonance:IsCastableP() then
-    HR.CastSuggested(S.WorldveinResonance);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.WorldveinResonance);
+    else
+      if HR.Cast(S.WorldveinResonance, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast WorldveinResonance"; end
+    end
   end
   -- memory_of_lucid_dreams,if=energy<50
   if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 then
-    HR.CastSuggested(S.MemoryOfLucidDreams);
+    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
+      HR.CastSuggested(S.MemoryOfLucidDreams);
+    else
+      if HR.Cast(S.MemoryOfLucidDreams, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then "Cast MemoryOfLucidDreams"; end
+    end
   end
   return false;
 end
