@@ -150,10 +150,6 @@ local function APL()
       if S.GuardianOfAzeroth:IsCastableP() then
         if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
       end
-      -- focused_azerite_beam
-      if S.FocusedAzeriteBeam:IsCastableP() then
-        if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
-      end
     end
   end
   Execute = function()

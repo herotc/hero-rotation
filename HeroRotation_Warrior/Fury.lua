@@ -140,10 +140,6 @@ local function APL()
       if S.GuardianOfAzeroth:IsCastableP() then
         if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
       end
-      -- focused_azerite_beam
-      if S.FocusedAzeriteBeam:IsCastableP() then
-        if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam"; end
-      end
       -- recklessness,if=!talent.furious_slash.enabled
       if S.Recklessness:IsCastableP() and (not S.FuriousSlash:IsAvailable()) then
         if HR.Cast(S.Recklessness) then return "recklessness precombat"; end
