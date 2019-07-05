@@ -68,6 +68,8 @@ Spell.Hunter.Marksmanship = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  Lifeblood                             = MultiSpell(295137, 305694),
+  RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.Hunter.Marksmanship;
@@ -205,8 +207,8 @@ local function APL()
     if S.LightsJudgment:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 102"; end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=buff.lifeblood.stack<4
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.Lifeblood) < 4) then
       if HR.Cast(S.WorldveinResonance, Settings.Marksmanship.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=cooldown.trueshot.remains<15
@@ -283,8 +285,8 @@ local function APL()
     if S.BloodOfTheEnemy:IsCastableP() then
       if HR.Cast(S.BloodOfTheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
       if HR.Cast(S.TheUnboundForce, Settings.Marksmanship.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
@@ -341,8 +343,8 @@ local function APL()
     if S.BloodOfTheEnemy:IsCastableP() then
       if HR.Cast(S.BloodOfTheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
       if HR.Cast(S.TheUnboundForce, Settings.Marksmanship.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- piercing_shot
