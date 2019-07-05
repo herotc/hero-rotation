@@ -71,7 +71,8 @@ local S = Spell.Priest.Shadow;
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
-  BattlePotionofIntellect          = Item(163222)
+  BattlePotionofIntellect          = Item(163222),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Priest.Shadow;
 
@@ -457,6 +458,10 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
+    -- use_item,name=pocketsized_computation_device,if=equipped.167555
+    if I.PocketsizedComputationDevice:IsReady() then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 282"; end
+    end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 283"; end
