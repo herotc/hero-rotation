@@ -54,6 +54,7 @@ Spell.Mage.Fire = {
   SearingTouch                          = Spell(269644),
   AlexstraszasFury                      = Spell(235870),
   Kindling                              = Spell(155148),
+  Counterspell                          = Spell(2139),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
