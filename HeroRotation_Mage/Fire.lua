@@ -56,7 +56,6 @@ Spell.Mage.Fire = {
   Kindling                              = Spell(155148),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  MemoryOfLucidDreamsMinor              = MultiSpell(298268, 299371, 299373),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
@@ -301,15 +300,15 @@ local function APL()
     end
     -- blood_of_the_enemy
     if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy 244"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
     end
     -- memory_of_lucid_dreams
     if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams 246"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Fire.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 246"; end
     end
     -- guardian_of_azeroth
     if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth 248"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Fire.GCDasOffGCD.Essences) then return "guardian_of_azeroth 248"; end
     end
     -- rune_of_power,if=buff.combustion.down
     if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
@@ -364,7 +363,7 @@ local function APL()
       if HR.Cast(S.Pyroblast) then return "pyroblast 330"; end
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=essence.memory_of_lucid_dreams.enabled&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
-    if S.FireBlast:IsCastableP() and (S.MemoryOfLucidDreamsMinor:IsAvailable() and ((Player:BuffP(S.CombustionBuff) and (Player:BuffP(S.HeatingUpBuff) and not S.Pyroblast:InFlight() and not Player:IsCasting(S.Scorch)) or (Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not S.Pyroblast:InFlight())))) then
+    if S.FireBlast:IsCastableP() and (S.MemoryOfLucidDreams:IsAvailable() and ((Player:BuffP(S.CombustionBuff) and (Player:BuffP(S.HeatingUpBuff) and not S.Pyroblast:InFlight() and not Player:IsCasting(S.Scorch)) or (Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not S.Pyroblast:InFlight())))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 334"; end
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!essence.memory_of_lucid_dreams.enabled&(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
@@ -532,27 +531,27 @@ local function APL()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame 795"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Fire.GCDasOffGCD.Essences) then return "concentrated_flame 795"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 797"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Fire.GCDasOffGCD.Essences) then return "focused_azerite_beam 797"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast 799"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Fire.GCDasOffGCD.Essences) then return "purifying_blast 799"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space 801"; end
+      if HR.Cast(S.RippleInSpace, Settings.Fire.GCDasOffGCD.Essences) then return "ripple_in_space 801"; end
     end
     -- the_unbound_force
     if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force 803"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Fire.GCDasOffGCD.Essences) then return "the_unbound_force 803"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance 805"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Fire.GCDasOffGCD.Essences) then return "worldvein_resonance 805"; end
     end
     -- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down
     if S.RuneofPower:IsCastableP() and (S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > S.RuneofPower:FullRechargeTimeP() or S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff and Player:BuffDownP(S.CombustionBuff) or Target:TimeToDie() < S.Combustion:CooldownRemainsP() and Player:BuffDownP(S.CombustionBuff)) then
