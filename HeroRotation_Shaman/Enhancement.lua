@@ -339,7 +339,7 @@ local function APL ()
     -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
     if Player:Buff(S.AscendanceBuff) then
       -- actions.asc=crash_lightning,if=!buff.crash_lightning.up&active_enemies>1&variable.furyCheck_CL
-      if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1 and furyCheck_CL() then
+      if S.CrashLightning:IsReadyP("Melee", true) and not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1 and furyCheck_CL() then
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       end
 
@@ -349,14 +349,14 @@ local function APL ()
       end
 
       -- actions.asc+=/windstrike
-      if S.WindStrike:IsCastableP(30) and Player:Maelstrom() >= S.WindStrike:Cost() then
+      if S.WindStrike:IsReadyP(30) then
         if HR.Cast(S.WindStrike) then return "Cast WindStrike" end
       end
     end
 
     -- actions+=/call_action_list,name=priority
     -- actions.priority=crash_lightning,if=active_enemies>=(8-(talent.forceful_winds.enabled*3))&variable.freezerburn_enabled&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() then
+    if S.CrashLightning:IsReadyP("Melee", true) then
       if S.ForcefulWinds:IsAvailable() and (Cache.EnemiesCount[10] >= (8 - 3)) and freezerburn_enabled() and furyCheck_CL() then
         if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
       elseif S.ForcefulWinds:IsAvailable() and (Cache.EnemiesCount[10] >= 8) and freezerburn_enabled() and furyCheck_CL() then
@@ -370,20 +370,18 @@ local function APL ()
     end
 
     -- actions.priority+=/lava_lash,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack=10&active_enemies=1&variable.freezerburn_enabled&variable.furyCheck_LL
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and Cache.EnemiesCount[10] == 1 and freezerburn_enabled() and furyCheck_LL()) then
+    if S.LavaLash:IsReadyP("Melee") and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and Cache.EnemiesCount[10] == 1 and freezerburn_enabled() and furyCheck_LL()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions.priority+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>1&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
+    if S.CrashLightning:IsReadyP("Melee", true) and (not Player:Buff(S.CrashLightningBuff) and Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.priority+=/fury_of_air,if=!buff.fury_of_air.up&maelstrom>=20&spell_targets.fury_of_air_damage>=(1+variable.freezerburn_enabled)
-    if S.FuryOfAir:IsCastableP(10, true) and Player:Maelstrom() >= S.FuryOfAir:Cost() then
-      if not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() >= 20 and Cache.EnemiesCount[10] >= 2 then
-        if HR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
-      end
+    if S.FuryOfAir:IsReadyP(10, true) and (not Player:Buff(S.FuryOfAirBuff) and Player:Maelstrom() >= 20 and Cache.EnemiesCount[10] >= 2) then
+      if HR.Cast(S.FuryOfAir) then return "Cast FuryOfAir" end
     end
 
     -- actions.priority+=/fury_of_air,if=buff.fury_of_air.up&&spell_targets.fury_of_air_damage<(1+variable.freezerburn_enabled)
@@ -399,7 +397,7 @@ local function APL ()
     end
 
     -- actions.priority+=/sundering,if=active_enemies>=3
-    if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() and (Cache.EnemiesCount[10] >= 3) then
+    if S.Sundering:IsReadyP(10) and (Cache.EnemiesCount[10] >= 3) then
       if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
     end
 
@@ -420,7 +418,7 @@ local function APL ()
 
     -- # With Natural Harmony, elevate the priority of elemental attacks in order to maintain the buffs when they're about to expire.
     -- actions.priority+=/frostbrand,if=(azerite.natural_harmony.enabled&buff.natural_harmony_frost.remains<=2*gcd)&talent.hailstorm.enabled&variable.furyCheck_FB
-    if S.Frostbrand:IsCastableP(20) and Player:Maelstrom() >= S.Frostbrand:Cost() and ((S.NaturalHarmony:AzeriteEnabled() and Player:BuffRemainsP(S.NaturalHarmonyFrostBuff) <= 2 * Player:GCDRemains()) and S.Hailstorm:IsAvailable() and furyCheck_FB()) then
+    if S.Frostbrand:IsReadyP(20) and ((S.NaturalHarmony:AzeriteEnabled() and Player:BuffRemainsP(S.NaturalHarmonyFrostBuff) <= 2 * Player:GCDRemains()) and S.Hailstorm:IsAvailable() and furyCheck_FB()) then
       if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
     end
 
@@ -442,7 +440,7 @@ local function APL ()
       end
 
       -- actions.maintenance+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck_FB
-      if S.Frostbrand:IsCastableP(20) and Player:Maelstrom() >= S.Frostbrand:Cost() and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck_FB()) then
+      if S.Frostbrand:IsReadyP(20) and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck_FB()) then
         if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
       end
     end
@@ -510,27 +508,27 @@ local function APL ()
 
     -- actions+=/call_action_list,name=freezerburn_core,if=variable.freezerburn_enabled
     -- actions.freezerburn_core=lava_lash,target_if=max:debuff.primal_primer.stack,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack=10&variable.furyCheck_LL&variable.CLPool_LL
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and S.PrimalPrimer:AzeriteRank() >= 2 and furyCheck_LL() and CLPool_LL()) then
+    if S.LavaLash:IsReadyP("Melee") and (Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and S.PrimalPrimer:AzeriteRank() >= 2 and furyCheck_LL() and CLPool_LL()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions.freezerburn_core+=/earthen_spike,if=variable.furyCheck_ES
-    if S.EarthenSpike:IsCastableP(10) and Player:Maelstrom() >= S.EarthenSpike:Cost() and (furyCheck_ES()) then
+    if S.EarthenSpike:IsReadyP(10) and (furyCheck_ES()) then
       if HR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
     end
 
     -- actions.freezerburn_core+=/stormstrike,cycle_targets=1,if=active_enemies>1&azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&variable.furyCheck_SS
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Cache.EnemiesCount[10] > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
+    if S.StormStrike:IsReadyP("Melee") and (Cache.EnemiesCount[10] > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.freezerburn_core+=/stormstrike,if=buff.stormbringer.up|(active_enemies>1&buff.gathering_storms.up&variable.furyCheck_SS)
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
+    if S.StormStrike:IsReadyP("Melee") and (Player:Buff(S.StormbringerBuff) or (Cache.EnemiesCount[10] > 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.freezerburn_core+=/crash_lightning,if=active_enemies>=3&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (Cache.EnemiesCount[10] > 3 and furyCheck_CL()) then
+    if S.CrashLightning:IsReadyP("Melee", true) and (Cache.EnemiesCount[10] > 3 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
@@ -540,38 +538,38 @@ local function APL ()
     end
 
     -- actions.freezerburn_core+=/lava_lash,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack>7&variable.furyCheck_LL&variable.CLPool_LL
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimer) > 7 and furyCheck_LL() and CLPool_LL()) then
+    if S.LavaLash:IsReadyP("Melee") and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStack(S.PrimalPrimer) > 7 and furyCheck_LL() and CLPool_LL()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions.freezerburn_core+=/stormstrike,if=variable.OCPool_SS&variable.furyCheck_SS&variable.CLPool_SS
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (OCPool_SS() and furyCheck_SS() and CLPool_SS()) then
+    if S.StormStrike:IsReadyP("Melee") and (OCPool_SS() and furyCheck_SS() and CLPool_SS()) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.freezerburn_core+=/lava_lash,if=debuff.primal_primer.stack=10&variable.furyCheck_LL
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and furyCheck_LL()) then
+    if S.LavaLash:IsReadyP("Melee") and (Target:DebuffStack(S.PrimalPrimerDebuff) == 10 and furyCheck_LL()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions+=/call_action_list,name=default_core,if=!variable.freezerburn_enabled
     -- actions.default_core=earthen_spike,if=variable.furyCheck_ES
-    if S.EarthenSpike:IsCastableP(10) and Player:Maelstrom() >= S.EarthenSpike:Cost() and (furyCheck_ES()) then
+    if S.EarthenSpike:IsReadyP(10) and (furyCheck_ES()) then
       if HR.Cast(S.EarthenSpike) then return "Cast EarthenSpike" end
     end
 
     -- actions.default_core+=/stormstrike,cycle_targets=1,if=active_enemies>1&azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&variable.furyCheck_SS
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Cache.EnemiesCount[10] > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
+    if S.StormStrike:IsReadyP("Melee") and (Cache.EnemiesCount[10] > 1 and S.LightningConduit:AzeriteEnabled() and not Target:Debuff(S.LightningConduitDebuff) and furyCheck_SS()) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.default_core+=/stormstrike,if=buff.stormbringer.up|(active_enemies>1&buff.gathering_storms.up&variable.furyCheck_SS)
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (Player:Buff(S.StormbringerBuff) or (Cache.EnemiesCount[10] >= 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
+    if S.StormStrike:IsReadyP("Melee") and (Player:Buff(S.StormbringerBuff) or (Cache.EnemiesCount[10] >= 1 and Player:Buff(S.GatheringStormsBuff) and furyCheck_SS())) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
     -- actions.default_core+=/crash_lightning,if=active_enemies>=3&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (Cache.EnemiesCount[10] > 3 and furyCheck_CL()) then
+    if S.CrashLightning:IsReadyP("Melee", true) and (Cache.EnemiesCount[10] > 3 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
@@ -581,7 +579,7 @@ local function APL ()
     end
 
     -- actions.default_core+=/stormstrike,if=variable.OCPool_SS&variable.furyCheck_SS
-    if S.StormStrike:IsCastableP("Melee") and Player:Maelstrom() >= S.StormStrike:Cost() and (OCPool_SS() and furyCheck_SS()) then
+    if S.StormStrike:IsReadyP("Melee") and (OCPool_SS() and furyCheck_SS()) then
       if HR.Cast(S.StormStrike) then return "Cast StormStrike" end
     end
 
@@ -593,13 +591,13 @@ local function APL ()
       end
 
       -- actions.maintenance+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck_FB
-      if S.Frostbrand:IsCastableP(20) and Player:Maelstrom() >= S.Frostbrand:Cost() and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck_FB()) then
+      if S.Frostbrand:IsReadyP(20) and (S.Hailstorm:IsAvailable() and not Player:Buff(S.FrostbrandBuff) and furyCheck_FB()) then
         if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
       end
     end
 
-    -- actions.filler=sundering
-    if S.Sundering:IsCastableP(10) and Player:Maelstrom() >= S.Sundering:Cost() then
+    -- actions.filler=sundering,if=active_enemies<3
+    if S.Sundering:IsReadyP(10) and (Cache.EnemiesCount[10] > 3) then
       if HR.Cast(S.Sundering, Settings.Shaman.Enhancement.GCDasOffGCD.Sundering) then return "Cast Sundering" end
     end
 
@@ -624,7 +622,7 @@ local function APL ()
     end
 
     -- actions.filler+=/crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
+    if S.CrashLightning:IsReadyP("Melee", true) and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
@@ -634,12 +632,12 @@ local function APL ()
     end
 
     -- actions.filler+=/lava_lash,if=!azerite.primal_primer.enabled&talent.hot_hand.enabled&buff.hot_hand.react
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (not S.PrimalPrimer:AzeriteEnabled() and S.HotHand:IsAvailable()) then
+    if S.LavaLash:IsReadyP("Melee") and (not S.PrimalPrimer:AzeriteEnabled() and S.HotHand:IsAvailable()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
     -- actions.filler+=/crash_lightning,if=active_enemies>1&variable.furyCheck_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
+    if S.CrashLightning:IsReadyP("Melee", true) and (Cache.EnemiesCount[10] > 1 and furyCheck_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
@@ -649,12 +647,12 @@ local function APL ()
     end
 
     -- actions.filler+=/crash_lightning,if=talent.crashing_storm.enabled&variable.OCPool_CL
-    if S.CrashLightning:IsCastableP("Melee", true) and Player:Maelstrom() >= S.CrashLightning:Cost() and (S.CrashingStorm:IsAvailable() and OCPool_CL()) then
+    if S.CrashLightning:IsReadyP("Melee", true) and (S.CrashingStorm:IsAvailable() and OCPool_CL()) then
       if HR.Cast(S.CrashLightning) then return "Cast CrashLightning" end
     end
 
     -- actions.filler+=/lava_lash,if=variable.OCPool_LL&variable.furyCheck_LL
-    if S.LavaLash:IsCastableP("Melee") and Player:Maelstrom() >= S.LavaLash:Cost() and (OCPool_LL() and furyCheck_LL()) then
+    if S.LavaLash:IsReadyP("Melee") and (OCPool_LL() and furyCheck_LL()) then
       if HR.Cast(S.LavaLash) then return "Cast LavaLash" end
     end
 
@@ -664,7 +662,7 @@ local function APL ()
     end
 
     -- actions.filler+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8+gcd&variable.furyCheck_FB
-    if S.Frostbrand:IsCastableP(20) and Player:Maelstrom() >= S.Frostbrand:Cost() and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < (4.8 + Player:GCDRemains()) and furyCheck_FB()) then
+    if S.Frostbrand:IsReadyP(20) and (S.Hailstorm:IsAvailable() and Player:BuffRemainsP(S.FrostbrandBuff) < (4.8 + Player:GCDRemains()) and furyCheck_FB()) then
       if HR.Cast(S.Frostbrand) then return "Cast Frostbrand" end
     end
 
