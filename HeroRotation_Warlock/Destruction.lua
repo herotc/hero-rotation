@@ -249,11 +249,11 @@ local function APL()
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 98"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Destruction.GCDasOffGCD.Essences) then return "focused_azerite_beam 98"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast 100"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Destruction.GCDasOffGCD.Essences) then return "purifying_blast 100"; end
     end
     -- havoc,cycle_targets=1,if=!(target=self.target)&(!talent.grimoire_of_supremacy.enabled|!talent.inferno.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
     if S.Havoc:IsCastableP() then
@@ -278,7 +278,7 @@ local function APL()
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
     -- Need ConcentratedFlame DoT Spell ID
     if S.ConcentratedFlame:IsCastableP() and (EnemiesCount < 5) then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame 143"; end
+      if HR.Cast(S.ConcentratedFlame, Settings.Destruction.GCDasOffGCD.Essences) then return "concentrated_flame 143"; end
     end
     -- incinerate
     if S.Incinerate:IsCastableP() then
@@ -296,7 +296,7 @@ local function APL()
     end
     -- guardian_of_azeroth,if=pet.infernal.active
     if S.GuardianOfAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150) then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth 177"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 177"; end
     end
     -- dark_soul_instability,if=pet.infernal.active&pet.infernal.remains<=20
     if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and Player:BuffRemainsP(S.DarkSoulInstabilityBuff) <= 20) then
@@ -304,7 +304,7 @@ local function APL()
     end
     -- memory_of_lucid_dreams,if=pet.infernal.active&pet.infernal.remains<=20
     if S.MemoryOfLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and S.SummonInfernal:CooldownRemainsP() <= 170) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams 187"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 187"; end
     end
     -- summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
     if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() > S.SummonInfernal:BaseDuration() + 30) then
@@ -312,7 +312,7 @@ local function APL()
     end
     -- guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
     if S.GuardianOfAzeroth:IsCastableP() and (HL.CombatTime() > 30 and Target:TimeToDie() > S.GuardianOfAzeroth:BaseDuration() + 30) then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth 197"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 197"; end
     end
     -- summon_infernal,if=talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains>target.time_to_die
     if S.SummonInfernal:IsCastableP() and (S.DarkSoulInstability:IsAvailable() and S.DarkSoulInstability:CooldownRemainsP() > Target:TimeToDie()) then
@@ -320,7 +320,7 @@ local function APL()
     end
     -- guardian_of_azeroth,if=cooldown.summon_infernal.remains>target.time_to_die
     if S.GuardianOfAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth 207"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 207"; end
     end
     -- dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die
     if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
@@ -328,7 +328,7 @@ local function APL()
     end
     -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die
     if S.MemoryOfLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams 215"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 215"; end
     end
     -- summon_infernal,if=target.time_to_die<30
     if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() < 30) then
@@ -336,7 +336,7 @@ local function APL()
     end
     -- guardian_of_azeroth,if=target.time_to_die<30
     if S.GuardianOfAzeroth:IsCastableP() and (Target:TimeToDie() < 30) then
-      if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth 221"; end
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 221"; end
     end
     -- dark_soul_instability,if=target.time_to_die<20
     if S.DarkSoulInstability:IsCastableP() and (Target:TimeToDie() < 20) then
@@ -344,19 +344,19 @@ local function APL()
     end
     -- memory_of_lucid_dreams,if=target.time_to_die<20
     if S.MemoryOfLucidDreams:IsCastableP() and (Target:TimeToDie() < 20) then
-      if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams 225"; end
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 225"; end
     end
     -- blood_of_the_enemy
     if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy) then return "blood_of_the_enemy 227"; end
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Destruction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 227"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance 229"; end
+      if HR.Cast(S.WorldveinResonance, Settings.Destruction.GCDasOffGCD.Essences) then return "worldvein_resonance 229"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space 231"; end
+      if HR.Cast(S.RippleInSpace, Settings.Destruction.GCDasOffGCD.Essences) then return "ripple_in_space 231"; end
     end
     -- potion,if=pet.infernal.active|target.time_to_die<30
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (S.SummonInfernal:CooldownRemainsP() > 150 or Target:TimeToDie() < 30) then
@@ -433,19 +433,19 @@ local function APL()
     end
     -- focused_azerite_beam,if=!pet.infernal.active|!talent.grimoire_of_supremacy.enabled
     if S.FocusedAzeriteBeam:IsCastableP() and (not S.SummonInfernal:CooldownRemainsP() > 150 or not S.GrimoireofSupremacy:IsAvailable()) then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 378"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Destruction.GCDasOffGCD.Essences) then return "focused_azerite_beam 378"; end
     end
     -- the_unbound_force,if=buff.reckless_force.react
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force 382"; end
+      if HR.Cast(S.TheUnboundForce, Settings.Destruction.GCDasOffGCD.Essences) then return "the_unbound_force 382"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast 386"; end
+      if HR.Cast(S.PurifyingBlast, Settings.Destruction.GCDasOffGCD.Essences) then return "purifying_blast 386"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
-    if S.ConcentratedFlame:IsCastableP() and (not Target:DebuffP(S.ConcentratedFlameBurnDebuff) and not S.ConcentratedFlame:InFlight()) then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame 388"; end
+    if S.ConcentratedFlame:IsCastableP() and then
+      if HR.Cast(S.ConcentratedFlame, Settings.Destruction.GCDasOffGCD.Essences) then return "concentrated_flame 388"; end
     end
     -- channel_demonfire
     if S.ChannelDemonfire:IsCastableP() then
