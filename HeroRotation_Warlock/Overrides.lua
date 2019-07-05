@@ -156,6 +156,24 @@
   , 266);
 
 -- Destruction, ID: 267
+local DestroOldSpellIsCastableP
+  DestroOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local RangeOK = true;
+      if Range then
+        local RangeUnit = ThisUnit or Target;
+        RangeOK = RangeUnit:IsInRange( Range, AoESpell );
+      end
+      local BaseCheck = DestroOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      if self == SpellDestro.SummonPet then
+        return BaseCheck and not Pet:IsActive()
+      elseif self == SpellDestro.Cataclysm then
+        return BaseCheck and not Player:IsCasting(SpellDestro.Cataclysm)
+      else
+        return BaseCheck
+      end
+    end
+  , 267);
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",

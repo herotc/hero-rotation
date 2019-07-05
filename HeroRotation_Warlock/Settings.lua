@@ -34,7 +34,7 @@
     },
     Destruction = {
       UnendingResolveHP = 20,
-      ShowPoPP = false,
+      UseSplashData = true,
       SpellType="Auto",--Green fire override {"Auto","Orange","Green"}
       Sephuz = {
         ShadowFury = false,
@@ -120,6 +120,7 @@
   -- CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.ForcePet", {"No", "Infernal", "DoomGuard"}, "Force a specific pet", "Force the addon to show you a specific pet instead of the one the rotation propose.");
   CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.UsePotions", "Show Potions", "Enable this if you want it to show you to use Potions.");
   -- Destruction
+  CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
   CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType", {"Auto","Orange","Green"}, "Spell icons", "Define what icons you want to appear.");
   CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction");
