@@ -82,10 +82,9 @@ local S = Spell.Druid.Balance;
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
   BattlePotionofIntellect          = Item(163222),
-  BalefireBranch                   = Item(159630),
-  DreadGladiatorsBadge             = Item(161902),
-  AzurethosSingedPlumage           = Item(161377),
-  TidestormCodex                   = Item(165576)
+  TidestormCodex                   = Item(165576),
+  AzsharasFontofPower              = Item(169314),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Druid.Balance;
 
@@ -312,21 +311,21 @@ local function APL()
     if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 81"; end
     end
-    -- use_item,name=balefire_branch,if=equipped.159630&cooldown.ca_inc.remains>30
-    if I.BalefireBranch:IsReady() and (I.BalefireBranch:IsEquipped() and CaInc():CooldownRemainsP() > 30) then
-      if HR.CastSuggested(I.BalefireBranch) then return "balefire_branch 85"; end
+    -- use_item,name=azsharas_font_of_power,if=equipped.169314&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    if I.AzsharasFontofPower:IsReady() and (Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff))) then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 101"; end
     end
-    -- use_item,name=dread_gladiators_badge,if=equipped.161902&cooldown.ca_inc.remains>30
-    if I.DreadGladiatorsBadge:IsReady() and (I.DreadGladiatorsBadge:IsEquipped() and CaInc():CooldownRemainsP() > 30) then
-      if HR.CastSuggested(I.DreadGladiatorsBadge) then return "dread_gladiators_badge 91"; end
-    end
-    -- use_item,name=azurethos_singed_plumage,if=equipped.161377&cooldown.ca_inc.remains>30
-    if I.AzurethosSingedPlumage:IsReady() and (I.AzurethosSingedPlumage:IsEquipped() and CaInc():CooldownRemainsP() > 30) then
-      if HR.CastSuggested(I.AzurethosSingedPlumage) then return "azurethos_singed_plumage 97"; end
+    -- guardian_of_azeroth,if=(!talent.starlord.enabled|buff.starlord.up)&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    if S.GuardianOfAzeroth:IsCastableP() and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff))) then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Balance.GCDasOffGCD.Essences) then return "guardian_of_azeroth 102"; end
     end
     -- use_item,name=tidestorm_codex,if=equipped.165576
     if I.TidestormCodex:IsReady() and (I.TidestormCodex:IsEquipped()) then
       if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 103"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=equipped.167555&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    if I.PocketsizedComputationDevice:IsReady() and (Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff))) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 104"; end
     end
     -- use_items,if=cooldown.ca_inc.remains>30
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
@@ -360,10 +359,6 @@ local function APL()
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Balance.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
-    end
-    -- guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() and (not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Balance.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- thorns
     if S.Thorns:IsCastableP() then
