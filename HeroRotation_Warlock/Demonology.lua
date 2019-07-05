@@ -3,17 +3,18 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
-local Warlock = HR.Commons.Warlock
+local HR         = HeroRotation
+local Warlock    = HR.Commons.Warlock
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -54,7 +55,17 @@ Spell.Warlock.Demonology = {
   ShadowsBite                           = Spell(272944),
   ShadowsBiteBuff                       = Spell(272945),
   SpellLock                             = Spell(19647),
-  AxeToss                               = Spell(89766)
+  AxeToss                               = Spell(89766),
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932)
 };
 local S = Spell.Warlock.Demonology;
 
@@ -67,6 +78,7 @@ local I = Item.Warlock.Demonology;
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local EnemiesCount;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -118,10 +130,10 @@ local function DemonicTyrantTime()
   return HL.GuardiansTable.DemonicTyrantDuration or 0
 end
 
-
 local function EvaluateCycleDoom198(TargetUnit)
   return TargetUnit:DebuffRefreshableCP(S.DoomDebuff)
 end
+
 local function ImpsSpawnedDuring(miliseconds)
   local ImpSpawned = 0
   local SpellCastTime = ( miliseconds / 1000 ) * Player:SpellHaste()
@@ -138,11 +150,31 @@ local function ImpsSpawnedDuring(miliseconds)
 
   return ImpSpawned
 end
+
+local function GetEnemiesCount(range)
+  -- Unit Update - Update differently depending on if splash data is being used
+  if HR.AoEON() then
+    if Settings.Demonology.UseSplashData then
+      HL.GetEnemies(range, nil, true, Target)
+      return Cache.EnemiesCount[range]
+    else
+      UpdateRanges()
+      Everyone.AoEToggleEnemiesUpdate()
+      return Cache.EnemiesCount[40]
+    end
+  else
+    return 1
+  end
+end
+
+HL.RegisterNucleusAbility(105174, 8, 6)               -- Hand of Gul'dan
+HL.RegisterNucleusAbility(196277, 8, 6)               -- Implosion
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, BuildAShard, DconOpener, Implosion, NetherPortal, NetherPortalActive, NetherPortalBuilding
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
+  EnemiesCount = GetEnemiesCount(8)
+  HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
   Warlock.UpdatePetTable()
   Warlock.UpdateSoulShards()
   Precombat = function()
@@ -167,6 +199,10 @@ local function APL()
     end
   end
   BuildAShard = function()
+    -- memory_of_lucid_dreams,if=soul_shard<2
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:SoulShardsP() < 2) then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Demonology.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams build_a_shard"; end
+    end
     -- soul_strike,if=!talent.demonic_consumption.enabled|time>15|prev_gcd.1.hand_of_guldan&!buff.bloodlust.remains
     if S.SoulStrike:IsCastableP() and (not S.DemonicConsumption:IsAvailable() or HL.CombatTime() > 15 or Player:PrevGCDP(1, S.HandofGuldan) and not Player:HasHeroism()) then
       if HR.Cast(S.SoulStrike) then return "soul_strike 14"; end
@@ -268,12 +304,29 @@ local function APL()
       if HR.Cast(S.Demonbolt) then return "demonbolt 162"; end
     end
     -- summon_vilefiend,if=(cooldown.summon_demonic_tyrant.remains>40&spell_targets.implosion<=2)|cooldown.summon_demonic_tyrant.remains<12
-    if S.SummonVilefiend:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() > 40 and Cache.EnemiesCount[40] <= 2) or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
+    if S.SummonVilefiend:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() > 40 and EnemiesCount <= 2) or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
       if HR.Cast(S.SummonVilefiend) then return "summon_vilefiend 172"; end
     end
     -- bilescourge_bombers,if=cooldown.summon_demonic_tyrant.remains>9
     if S.BilescourgeBombers:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 9) then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 178"; end
+    end
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Demonology.GCDasOffGCD.Essences) then return "focused_azerite_beam implosion"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast, Settings.Demonology.GCDasOffGCD.Essences) then return "purifying_blast implosion"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy implosion"; end
+    end
+    -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&spell_targets.implosion<5
+    -- Need Spell ID for ConcentratedFlame DoT
+    if S.ConcentratedFlame:IsCastableP() and (EnemiesCount < 5) then
+      if HR.Cast(S.ConcentratedFlame, Settings.Demonology.GCDasOffGCD.Essences) then return "concentrated_flame implosion"; end
     end
     -- soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
     if S.SoulStrike:IsCastableP() and (Player:SoulShardsP() < 5 and Player:BuffStackP(S.DemonicCoreBuff) <= 2) then
@@ -394,6 +447,14 @@ local function APL()
     if S.Fireblood:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 333"; end
     end
+    -- worldvein_resonance,if=pet.demonic_tyrant.active|target.time_to_die<=15
+    if S.WorldveinResonance:IsCastableP() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+      if HR.Cast(S.WorldveinResonance, Settings.Demonology.GCDasOffGCD.Essences) then return "worldvein_resonance 334"; end
+    end
+    -- ripple_in_space,if=pet.demonic_tyrant.active|target.time_to_die<=15
+    if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+      if HR.Cast(S.RippleInSpace, Settings.Demonology.GCDasOffGCD.Essences) then return "ripple_in_space 335"; end
+    end
     -- call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
     if (S.DemonicConsumption:IsAvailable() and HL.CombatTime() < 30 and not bool(S.SummonDemonicTyrant:CooldownRemainsP())) then
       local ShouldReturn = DconOpener(); if ShouldReturn then return ShouldReturn; end
@@ -411,24 +472,28 @@ local function APL()
       if HR.Cast(S.Implosion) then return "implosion 359"; end
     end
     -- doom,if=!ticking&time_to_die>30&spell_targets.implosion<2
-    if S.Doom:IsCastableP() and (not Target:DebuffP(S.DoomDebuff) and Target:TimeToDie() > 30 and Cache.EnemiesCount[40] < 2) then
+    if S.Doom:IsCastableP() and (not Target:DebuffP(S.DoomDebuff) and Target:TimeToDie() > 30 and EnemiesCount < 2) then
       if HR.Cast(S.Doom) then return "doom 375"; end
     end
     -- bilescourge_bombers,if=azerite.explosive_potential.rank>0&time<10&spell_targets.implosion<2&buff.dreadstalkers.remains&talent.nether_portal.enabled
-    if S.BilescourgeBombers:IsReadyP() and (S.ExplosivePotential:AzeriteRank() > 0 and HL.CombatTime() < 10 and Cache.EnemiesCount[40] < 2 and DreadStalkersTime() > 0 and S.NetherPortal:IsAvailable()) then
+    if S.BilescourgeBombers:IsReadyP() and (S.ExplosivePotential:AzeriteRank() > 0 and HL.CombatTime() < 10 and EnemiesCount < 2 and DreadStalkersTime() > 0 and S.NetherPortal:IsAvailable()) then
       if HR.Cast(S.BilescourgeBombers) then return "bilescourge_bombers 389"; end
     end
     -- demonic_strength,if=(buff.wild_imps.stack<6|buff.demonic_power.up)|spell_targets.implosion<2
-    if S.DemonicStrength:IsReadyP() and ((WildImpsCount() < 6 or Player:BuffP(S.DemonicPowerBuff)) or Cache.EnemiesCount[40] < 2) then
+    if S.DemonicStrength:IsReadyP() and ((WildImpsCount() < 6 or Player:BuffP(S.DemonicPowerBuff)) or EnemiesCount < 2) then
       if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 397"; end
     end
     -- call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
-    if (S.NetherPortal:IsAvailable() and Cache.EnemiesCount[40] <= 2) then
+    if (S.NetherPortal:IsAvailable() and EnemiesCount <= 2) then
       local ShouldReturn = NetherPortal(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=implosion,if=spell_targets.implosion>1
-    if (Cache.EnemiesCount[40] > 1) then
+    if (EnemiesCount > 1) then
       local ShouldReturn = Implosion(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- guardian_of_azeroth,if=pet.demonic_tyrant.active|target.time_to_die<=30
+    if S.GuardianOfAzeroth:IsCastableP() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 30) then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Demonology.GCDasOffGCD.Essences) then return "guardian_of_azeroth 408"; end
     end
     -- grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
     if S.GrimoireFelguard:IsReadyP() and ((Target:TimeToDie() > 120 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemainsP() + 15 or S.SummonDemonicTyrant:CooldownRemainsP() < 13)) then
@@ -441,6 +506,10 @@ local function APL()
     -- call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
     if S.CallDreadstalkers:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() < 9 and bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or (S.SummonDemonicTyrant:CooldownRemainsP() < 11 and not bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or S.SummonDemonicTyrant:CooldownRemainsP() > 14) then
       if HR.Cast(S.CallDreadstalkers) then return "call_dreadstalkers 421"; end
+    end
+    -- the_unbound_force,if=buff.reckless_force.react
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+      if HR.Cast(S.TheUnboundForce, Settings.Demonology.GCDasOffGCD.Essences) then return "the_unbound_force 422"; end
     end
     -- bilescourge_bombers
     if S.BilescourgeBombers:IsReadyP() then
@@ -455,7 +524,7 @@ local function APL()
       if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant 445"; end
     end
     -- power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
-    if S.PowerSiphon:IsCastableP() and (WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 and Player:BuffDownP(S.DemonicPowerBuff) and Cache.EnemiesCount[40] < 2) then
+    if S.PowerSiphon:IsCastableP() and (WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 and Player:BuffDownP(S.DemonicPowerBuff) and EnemiesCount < 2) then
       if HR.Cast(S.PowerSiphon) then return "power_siphon 455"; end
     end
     -- doom,if=talent.doom.enabled&refreshable&time_to_die>(dot.doom.remains+30)
@@ -473,6 +542,19 @@ local function APL()
     -- demonbolt,if=soul_shard<=3&buff.demonic_core.up&((cooldown.summon_demonic_tyrant.remains<6|cooldown.summon_demonic_tyrant.remains>22&!azerite.shadows_bite.enabled)|buff.demonic_core.stack>=3|buff.demonic_core.remains<5|time_to_die<25|buff.shadows_bite.remains)
     if S.Demonbolt:IsCastableP() and (Player:SoulShardsP() <= 3 and Player:BuffP(S.DemonicCoreBuff) and ((S.SummonDemonicTyrant:CooldownRemainsP() < 6 or S.SummonDemonicTyrant:CooldownRemainsP() > 22 and not S.ShadowsBite:AzeriteEnabled()) or Player:BuffStackP(S.DemonicCoreBuff) >= 3 or Player:BuffRemainsP(S.DemonicCoreBuff) < 5 or Target:TimeToDie() < 25 or bool(Player:BuffRemainsP(S.ShadowsBiteBuff)))) then
       if HR.Cast(S.Demonbolt) then return "demonbolt 503"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast, Settings.Demonology.GCDasOffGCD.Essences) then return "purifying_blast 504"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy 505"; end
+    end
+    -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!pet.demonic_tyrant.active
+    -- Need ConcentratedFlame DoT Spell ID
+    if S.ConcentratedFlame:IsCastableP() and (DemonicTyrantTime() == 0) then
+      if HR.Cast(S.ConcentratedFlame, Settings.Demonology.GCDasOffGCD.Essences) then return "concentrated_flame 506"; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then

@@ -51,6 +51,7 @@
         DimensionalRift = true,
         SummonImp = true,
         GrimoireImp = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -61,6 +62,7 @@
     },
     Demonology = {
       UnendingResolveHP = 20,
+      UseSplashData = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -69,6 +71,7 @@
         SummonDemonicTyrant = false,
         DemonicStrength = false,
         NetherPortal = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -94,6 +97,7 @@
         SummonPet = true,
         GrimoireOfSacrifice = true,
         PhantomSingularity = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
@@ -126,6 +130,7 @@
   CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.SingeMagic", "Sephuz: Show Singe Magic", "Enable this if you want it to show you when to use Singe Magic (Imp spell) to proc Sephuz's Secret (only when equipped).");
   CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.SpellLock", "Sephuz: Show Spell Lock", "Enable this if you want it to show you when to use Spell Lock (Felhunter spell) to proc Sephuz's Secret (only when equipped).");
   -- Demonology
+  CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
   CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology");
   CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowBPoI", "Show Battle Potion of Intellect", "Enable this if you want it to show you when to use Battle Potion of Intellect.");
