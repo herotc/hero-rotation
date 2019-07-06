@@ -29,7 +29,7 @@
       end
       local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
       if self == SpellAffli.SummonPet then
-          return BaseCheck and not (Pet:IsActive() or Player:BuffP(SpellAffli.GrimoireofSacrificeBuff))
+        return BaseCheck and not (Pet:IsActive() or Player:BuffP(SpellAffli.GrimoireofSacrificeBuff))
       else
         return BaseCheck
       end
@@ -42,10 +42,8 @@
       if not Player:IsCasting() then
         return Shard
       else
-        if Player:IsCasting(SpellAffli.UnstableAffliction)
-            or Player:IsCasting(SpellAffli.SeedOfCorruption) then
-          return Shard - 1
-        elseif Player:IsCasting(SpellAffli.SummonPet) then
+        if Player:IsCasting(SpellAffli.UnstableAffliction) or Player:IsCasting(SpellAffli.SeedOfCorruption) 
+          or Player:IsCasting(SpellAffli.VileTaint) or Player:IsCasting(SpellAffli.SummonPet) then
           return Shard - 1
         else
           return Shard
