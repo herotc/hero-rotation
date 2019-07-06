@@ -3,17 +3,19 @@
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
-local HL = HeroLib;
-local Cache = HeroCache;
-local Unit = HL.Unit;
-local Player = Unit.Player;
-local Target = Unit.Target;
-local Spell = HL.Spell;
-local Item = HL.Item;
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR = HeroRotation;
+local HR         = HeroRotation
 -- Lua
-local pairs = pairs;
+local pairs      = pairs;
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -87,6 +89,18 @@ Spell.Monk.Windwalker = {
   -- Azerite Traits
   SwiftRoundhouse                  = Spell(277669),
   SwiftRoundhouseBuff              = Spell(278710),
+  
+  -- Essences
+  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForce                         = Spell(302932),
 
     -- Misc
     PoolEnergy                    = Spell(9999000010),
@@ -168,7 +182,7 @@ HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
 --- ======= MAIN =======
 -- APL Main
 local function APL ()
-  local Precombat, Cooldowns, SingleTarget, Serenity, Aoe
+  local Precombat, Essences, Cooldowns, SingleTarget, Serenity, Aoe
   -- Unit Update
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
@@ -184,6 +198,46 @@ local function APL ()
       if S.ChiWave:IsReadyP() then
         if HR.Cast(S.ChiWave) then return "Cast Pre-Combat Chi Wave"; end
       end
+    end
+  end
+  
+  -- Essences --
+  Essences = function()
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Settings.Windwalker.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodOfTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Windwalker.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Windwalker.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    end
+    -- focused_azerite_beam
+    if S.FocusedAzeriteBeam:IsCastableP() then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Windwalker.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    end
+    -- purifying_blast
+    if S.PurifyingBlast:IsCastableP() then
+      if HR.Cast(S.PurifyingBlast, Settings.Windwalker.GCDasOffGCD.Essences) then return "purifying_blast"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce, Settings.Windwalker.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.RippleInSpace, Settings.Windwalker.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance, Settings.Windwalker.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+    end
+    -- memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
+    if S.MemoryOfLucidDreams:IsCastableP() and (Player:Energy() < 40 and Player:BuffP(S.StormEarthAndFire)) then
+      if HR.Cast(S.MemoryOfLucidDreams, Settings.Windwalker.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
   end
 
@@ -234,6 +288,10 @@ local function APL ()
       (S.RisingSunKick:CooldownRemainsP() <= 2 or Target:TimeToDie() <= 12) then
       if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then 
         return "Cast Cooldown Serenity"; end
+    end
+    -- call_action_list,name=essences
+    if (true) then
+      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
   end
 

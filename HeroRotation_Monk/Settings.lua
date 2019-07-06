@@ -61,6 +61,7 @@
         InvokeXuenTheWhiteTiger = true,
         TouchOfDeath            = true,
         Serenity                = true,
+        Essences                = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
