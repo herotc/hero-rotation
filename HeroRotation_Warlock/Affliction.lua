@@ -290,7 +290,7 @@ local function EvaluateTargetIfFilterVileTaint856(TargetUnit)
 end
 
 local function EvaluateTargetIfVileTaint859(TargetUnit)
-  return HL.CombatTime() > 15 and TargetUnit:TimeToDie() >= 10
+  return HL.CombatTime() > 15 and TargetUnit:TimeToDie() >= 10 and (S.SummonDarkglare:CooldownRemainsP() > 30 or S.SummonDarkglare:CooldownRemainsP() < 10 and Target:DebuffRemainsP(S.CorruptionDebuff) >= 10 and (Target:DebuffRemainsP(S.SiphonLifeDebuff) >= 10 or not S.SiphonLife:IsAvailable()))
 end
 
 local function EvaluateTargetIfFilterUnstableAffliction865(TargetUnit)
@@ -574,10 +574,6 @@ local function APL()
     if S.Deathbolt:IsCastableP() and (bool(S.SummonDarkglare:CooldownRemainsP()) and EnemiesCount == 1 and (not S.VisionOfPerfectionMinor:IsAvailable() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 30)) then
       if HR.Cast(S.Deathbolt) then return "deathbolt 734"; end
     end
-    -- guardian_of_azeroth,if=pet.darkglare.active
-    if S.GuardianOfAzeroth:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Affliction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 742"; end
-    end
     -- the_unbound_force,if=buff.reckless_force.remains
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
       if HR.Cast(S.TheUnboundForce, Settings.Affliction.GCDasOffGCD.Essences) then return "the_unbound_force 744"; end
@@ -610,10 +606,6 @@ local function APL()
     if S.PhantomSingularity:IsCastableP() then
       if HR.CastTargetIf(S.PhantomSingularity, 40, "max", EvaluateTargetIfFilterPhantomSingularity841, EvaluateTargetIfPhantomSingularity850) then return "phantom_singularity 852" end
     end
-    -- vile_taint,target_if=max:target.time_to_die,if=time>15&target.time_to_die>=10
-    if S.VileTaint:IsCastableP() then
-      if HR.CastTargetIf(S.VileTaint, 40, "max", EvaluateTargetIfFilterVileTaint856, EvaluateTargetIfVileTaint859) then return "vile_taint 861" end
-    end
     -- unstable_affliction,target_if=min:contagion,if=!variable.use_seed&soul_shard=5
     if S.UnstableAffliction:IsReadyP() then
       if HR.CastTargetIf(S.UnstableAffliction, 40, "min", EvaluateTargetIfFilterUnstableAffliction865, EvaluateTargetIfUnstableAffliction870) then return "unstable_affliction 872" end
@@ -625,6 +617,10 @@ local function APL()
     -- call_action_list,name=dots
     if (true) then
       local ShouldReturn = Dots(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- vile_taint,target_if=max:target.time_to_die,if=time>15&target.time_to_die>=10&(cooldown.summon_darkglare.remains>30|cooldown.summon_darkglare.remains<10&dot.agony.remains>=10&dot.corruption.remains>=10&(dot.siphon_life.remains>=10|!talent.siphon_life.enabled))
+    if S.VileTaint:IsCastableP() then
+      if HR.CastTargetIf(S.VileTaint, 40, "max", EvaluateTargetIfFilterVileTaint856, EvaluateTargetIfVileTaint859) then return "vile_taint 861" end
     end
     -- use_item,name=azsharas_font_of_power,if=time<=3
     if I.AzsharasFontofPower:IsReady() and (HL.CombatTime() <= 3) then
@@ -638,8 +634,12 @@ local function APL()
     if S.VileTaint:IsCastableP() and (HL.CombatTime() < 15) then
       if HR.Cast(S.VileTaint) then return "vile_taint 883"; end
     end
-    -- dark_soul,if=cooldown.summon_darkglare.remains<10&dot.phantom_singularity.remains|target.time_to_die<20+gcd|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up
-    if S.DarkSoul:IsCastableP() and HR.CDsON() and (S.SummonDarkglare:CooldownRemainsP() < 10 and Target:DebuffP(S.PhantomSingularityDebuff) or Target:TimeToDie() < 20 + Player:GCD() or EnemiesCount > 1) then
+    -- guardian_of_azeroth,if=cooldown.summon_darkglare.remains<15&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
+    if S.GuardianOfAzeroth:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() < 15 and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.VileTaint) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 30 + Player:GCD()) then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Affliction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 884"; end
+    end
+    -- dark_soul,if=cooldown.summon_darkglare.remains<10&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<20+gcd|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up
+    if S.DarkSoul:IsCastableP() and HR.CDsON() and (S.SummonDarkglare:CooldownRemainsP() < 10 and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 20 + Player:GCD() or EnemiesCount > 1) then
       if HR.Cast(S.DarkSoul, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "dark_soul 885"; end
     end
     -- berserking
