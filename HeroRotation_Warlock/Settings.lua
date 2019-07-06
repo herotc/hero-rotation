@@ -81,7 +81,7 @@
     },
     Affliction = {
       -- UnendingResolveHP = 20,
-      ShowPoPP = false,
+      UseSplashData = true,
       -- Sephuz = {
       --   HowlOfTerror = false,
       --   MortalCoil = false,
@@ -136,6 +136,7 @@
   CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology");
   CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowBPoI", "Show Battle Potion of Intellect", "Enable this if you want it to show you when to use Battle Potion of Intellect.");
   -- Affliction
+  CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction");
   -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.HowlOfTerror", "Sephuz: Show Howl Of Terror", "Enable this if you want it to show you when to use Howl Of Terror to proc Sephuz's Secret (only when equipped).");
   -- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
