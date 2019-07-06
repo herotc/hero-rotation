@@ -444,7 +444,7 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.Destruction.GCDasOffGCD.Essences) then return "purifying_blast 386"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
-    if S.ConcentratedFlame:IsCastableP() and then
+    if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, Settings.Destruction.GCDasOffGCD.Essences) then return "concentrated_flame 388"; end
     end
     -- channel_demonfire
