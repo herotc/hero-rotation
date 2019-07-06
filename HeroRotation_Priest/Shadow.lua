@@ -180,9 +180,6 @@ HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
 local function APL()
   local Precombat, Cleave, Single
   local InsanityDrain = InsanityDrain()
-  if Everyone.TargetIsValid() then
-    print("Insanity Drain: " .. InsanityDrain)
-  end
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- For CastCycle calls
   Precombat = function()
