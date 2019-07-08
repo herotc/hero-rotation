@@ -535,9 +535,18 @@ local function CDs ()
       ShouldReturn = Essences();
       if ShouldReturn then return ShouldReturn; end
     end
-    -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
+    -- actions.cds+=/shuriken_tornado,if=energy>=60&dot.nightblade.ticking&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
+    if S.ShurikenTornado:IsCastableP() and Target:DebuffP(S.Nightblade) and S.SymbolsofDeath:CooldownUp() and S.ShadowDance:Charges() >= 1 then
+      -- actions.cds+=/pool_resource,for_next=1,if=!talent.shadow_focus.enabled
+      if Player:Energy() >= 60 then
+        if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado"; end
+      elseif not S.ShadowFocus:IsAvailable() then
+        if HR.Cast(S.PoolEnergy) then return "Pool for Shuriken Tornado"; end
+      end
+    end
+    -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
     if S.SymbolsofDeath:IsCastable() and Target:DebuffP(S.Nightblade)
-      and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or Cache.EnemiesCount[10] < 3 or not S.ShurikenTornado:CooldownUp()) then
+      and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or S.ShurikenTornado:CooldownRemainsP() > 2) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death"; end
     end
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit
@@ -560,12 +569,8 @@ local function CDs ()
         and Player:ComboPointsDeficit() >= 2 + num(Player:IsStealthedP(true, true)) then
         if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades"; end
       end
-      -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&!talent.shadow_focus.enabled&dot.nightblade.ticking&!stealthed.all&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
-      if S.ShurikenTornado:IsCastableP() and Cache.EnemiesCount[10] >= 3 and not S.ShadowFocus:IsAvailable() and Target:DebuffP(S.Nightblade) and not Player:IsStealthedP(true, true) and S.SymbolsofDeath:CooldownUp() and S.ShadowDance:Charges() >= 1 then
-        if HR.Cast(S.ShurikenTornado) then return "Shuriken Tornado into SoD and Dance"; end
-      end
-      -- actions.cds+=/shuriken_tornado,if=spell_targets>=3&talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
-      if S.ShurikenTornado:IsCastableP() and Cache.EnemiesCount[10] >= 3 and S.ShadowFocus:IsAvailable() and Target:DebuffP(S.Nightblade) and Player:BuffP(S.SymbolsofDeath) then
+      -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
+      if S.ShurikenTornado:IsCastableP() and S.ShadowFocus:IsAvailable() and Target:DebuffP(S.Nightblade) and Player:BuffP(S.SymbolsofDeath) then
         if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado (SF)"; end
       end
       -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled
@@ -856,7 +861,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-06-28
+-- Last Update: 2019-07-08
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -907,17 +912,19 @@ HR.SetAPL(261, APL);
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking
+-- # Pool for Tornado pre-SoD with ShD ready when not running SF.
+-- actions.cds+=/pool_resource,for_next=1,if=!talent.shadow_focus.enabled
+-- # Use Tornado pre SoD when we have the energy whether from pooling without SF or just generally.
+-- actions.cds+=/shuriken_tornado,if=energy>=60&dot.nightblade.ticking&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
 -- # Use Symbols on cooldown (after first Nightblade) unless we are going to pop Tornado and do not have Shadow Focus.
--- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
+-- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP and no stealth.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.all&combo_points.deficit>=cp_max_spend
 -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
--- # At 3+ without Shadow Focus use Tornado with SoD and Dance ready. We will pop those before the first storm comes in.
--- actions.cds+=/shuriken_tornado,if=spell_targets>=3&!talent.shadow_focus.enabled&dot.nightblade.ticking&!stealthed.all&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
--- # At 3+ with Shadow Focus use Tornado with SoD already up.
--- actions.cds+=/shuriken_tornado,if=spell_targets>=3&talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
+-- # With SF, if not already done, use Tornado with SoD up.
+-- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled&!raid_event.adds.up
 --
 -- # Essences
