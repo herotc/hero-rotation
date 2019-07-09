@@ -62,7 +62,8 @@ Spell.Warrior.Fury = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
   CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
-  RecklessForce                         = Spell(302932)
+  RecklessForce                         = Spell(302932),
+  RazorCoralDebuff                      = Spell(303568)
 };
 local S = Spell.Warrior.Fury;
 
@@ -70,7 +71,7 @@ local S = Spell.Warrior.Fury;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
   BattlePotionofStrength           = Item(163224),
-  RampingAmplitudeGigavoltEngine   = Item(165580)
+  AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.Warrior.Fury;
 
@@ -272,9 +273,13 @@ local function APL()
     if S.Whirlwind:IsCastableP() and (Cache.EnemiesCount[8] > 1 and not Player:BuffP(S.MeatCleaverBuff)) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
     end
-    -- use_item,name=ramping_amplitude_gigavolt_engine
-    if I.RampingAmplitudeGigavoltEngine:IsReady() then
-      if HR.Cast(I.RampingAmplitudeGigavoltEngine) then return "ramping_amplitude_gigavolt_engine"; end
+    -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|prev_gcd.1.memory_of_lucid_dreams|(prev_gcd.1.recklessness&!essence.memory_of_lucid_dreams.major)
+    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:PrevGCDP(1, S.MemoryOfLucidDreams) or (Player:PrevGCDP(1, S.Recklessness) and not S.MemoryOfLucidDreams:IsAvailable())) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 115"; end
+    end
+    -- use_item,name=ashvanes_razor_coral
+    if I.AshvanesRazorCoral:IsReady() then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 116"; end
     end
     -- blood_fury,if=buff.recklessness.up
     if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
