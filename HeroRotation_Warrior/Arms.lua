@@ -79,7 +79,8 @@ local S = Spell.Warrior.Arms;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
-  BattlePotionofStrength           = Item(163224)
+  BattlePotionofStrength           = Item(163224),
+  VisionofDemise                   = Item(169307)
 };
 local I = Item.Warrior.Arms;
 
@@ -419,6 +420,10 @@ local function APL()
     -- ancestral_call,if=debuff.colossus_smash.up
     if S.AncestralCall:IsCastableP() and HR.CDsON() and (Target:DebuffP(S.ColossusSmashDebuff)) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
+    end
+    -- use_item,name=vision_of_demise
+    if I.VisionofDemise:IsReady() then
+      if HR.CastSuggested(I.VisionofDemise) then return "vision_of_demise"; end
     end
     -- avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)
     if S.Avatar:IsCastableP() and HR.CDsON() and (S.ColossusSmash:CooldownRemainsP() < 8 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 8)) then
