@@ -64,7 +64,8 @@ Spell.Mage.Fire = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932)
+  RecklessForce                         = Spell(302932),
+  CyclotronicBlast                      = Spell(167672)
 };
 local S = Spell.Mage.Fire;
 
@@ -73,7 +74,8 @@ if not Item.Mage then Item.Mage = {} end
 Item.Mage.Fire = {
   BattlePotionofIntellect          = Item(163222),
   TidestormCodex                   = Item(165576),
-  MalformedHeraldsLegwraps         = Item(167835)
+  MalformedHeraldsLegwraps         = Item(167835),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Mage.Fire;
 
@@ -503,6 +505,10 @@ local function APL()
     if I.TidestormCodex:IsReady() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
       if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 774"; end
     end
+    -- use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&(cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20)
+    if I.PocketsizedComputationDevice:IsReady() and ((not S.CyclotronicBlast:IsAvailable() or bool(S.CyclotronicBlast:CooldownRemainsP())) and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20)) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 775"; end
+    end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
     if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
       if HR.Cast(S.Scorch) then return "scorch 780"; end
@@ -518,6 +524,10 @@ local function APL()
   end
   Trinkets = function()
     -- use_items
+    -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
+    if I.PocketsizedComputationDevice:IsReady() and (not bool(S.CyclotronicBlast:CooldownRemainsP())) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device trinkets"; end
+    end
   end
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then
