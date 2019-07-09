@@ -72,6 +72,7 @@ Spell.Mage.Arcane = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932),
+  CyclotronicBlast                      = Spell(167672)
 };
 local S = Spell.Mage.Arcane;
 
@@ -79,7 +80,8 @@ local S = Spell.Mage.Arcane;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
   BattlePotionofIntellect          = Item(163222),
-  TidestormCodex                   = Item(165576)
+  TidestormCodex                   = Item(165576),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Mage.Arcane;
 
@@ -267,6 +269,10 @@ local function APL()
       if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power 88"; end
     end
     -- use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
+    -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration&(buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains)
+    if I.PocketsizedComputationDevice:IsReady() and (not bool(S.CyclotronicBlast:CooldownRemainsP()) and (Player:BuffP(S.ArcanePowerBuff) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP())) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 90"; end
+    end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 91"; end
@@ -344,6 +350,10 @@ local function APL()
     -- use_item,name=tidestorm_codex,if=buff.rune_of_power.down&!buff.arcane_power.react&cooldown.arcane_power.remains>20
     if I.TidestormCodex:IsReady() and (Player:BuffDownP(S.RuneofPowerBuff) and not bool(Player:BuffStackP(S.ArcanePowerBuff)) and S.ArcanePower:CooldownRemainsP() > 20) then
       if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 249"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.rune_of_power.down&!buff.arcane_power.react&cooldown.arcane_power.remains>20
+    if I.PocketsizedComputationDevice:IsReady() and ((not S.CyclotronicBlast:IsAvailable() or bool(S.CyclotronicBlast:CooldownRemainsP())) and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff) and S.ArcanePower:CooldownRemainsP() > 20) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 250"; end
     end
     -- rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|full_recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
     if S.RuneofPower:IsCastableP() and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() and (S.RuneofPower:FullRechargeTimeP() <= S.RuneofPower:ExecuteTime() or S.RuneofPower:FullRechargeTimeP() <= S.ArcanePower:CooldownRemainsP() or Target:TimeToDie() <= S.ArcanePower:CooldownRemainsP())) then
