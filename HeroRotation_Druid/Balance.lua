@@ -84,7 +84,8 @@ Item.Druid.Balance = {
   BattlePotionofIntellect          = Item(163222),
   TidestormCodex                   = Item(165576),
   AzsharasFontofPower              = Item(169314),
-  PocketsizedComputationDevice     = Item(167555)
+  PocketsizedComputationDevice     = Item(167555),
+  ShiverVenomRelic                 = Item(168905)
 };
 local I = Item.Druid.Balance;
 
@@ -287,29 +288,9 @@ local function APL()
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6) then
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 57"; end
     end
-    -- blood_fury,if=buff.ca_inc.up
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 61"; end
-    end
     -- berserking,if=buff.ca_inc.up
     if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 65"; end
-    end
-    -- arcane_torrent,if=buff.ca_inc.up
-    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 69"; end
-    end
-    -- lights_judgment,if=buff.ca_inc.up
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 73"; end
-    end
-    -- fireblood,if=buff.ca_inc.up
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 77"; end
-    end
-    -- ancestral_call,if=buff.ca_inc.up
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 81"; end
     end
     -- use_item,name=azsharas_font_of_power,if=equipped.169314&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if I.AzsharasFontofPower:IsReady() and (Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff))) then
@@ -326,6 +307,10 @@ local function APL()
     -- use_item,name=pocketsized_computation_device,if=equipped.167555&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if I.PocketsizedComputationDevice:IsReady() and (Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff))) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 104"; end
+    end
+    -- use_item,name=shiver_venom_relic,if=equipped.168905&cooldown.ca_inc.remains>30&!buff.ca_inc.up
+    if I.ShiverVenomRelic:IsReady() and (CaInc():CooldownRemainsP() > 30 and not Player:BuffP(CaInc())) then
+      if HR.CastSuggested(I.ShiverVenomRelic) then return "shiver_venom_relic 105"; end
     end
     -- use_items,if=cooldown.ca_inc.remains>30
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
