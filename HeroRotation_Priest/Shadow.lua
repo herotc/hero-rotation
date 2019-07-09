@@ -285,6 +285,10 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
+    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.stack<15|(current_insanity_drain*gcd.max*4)>insanity)
+    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffStackP(S.VoidformBuff) < 15 or (InsanityDrain * Player:GCD() * 4) > Player:Insanity()) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device cleave"; end
+    end
     -- shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
     if S.ShadowWordDeath:IsReadyP() then
       if HR.CastCycle(S.ShadowWordDeath, 40, EvaluateCycleShadowWordDeath84) then return "shadow_word_death 88" end
@@ -387,6 +391,10 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
+    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.stack<15|(current_insanity_drain*gcd.max*4)>insanity)
+    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffStackP(S.VoidformBuff) < 15 or (InsanityDrain * Player:GCD() * 4) > Player:Insanity()) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device cleave"; end
+    end
     -- mind_sear,if=buff.harvested_thoughts.up&cooldown.void_bolt.remains>=1.5&azerite.searing_dialogue.rank>=1
     if S.MindSear:IsCastableP() and (Player:BuffP(S.HarvestedThoughtsBuff) and S.VoidBolt:CooldownRemainsP() >= 1.5 and S.SearingDialogue:AzeriteRank() >= 1) then
       if HR.Cast(S.MindSear) then return "mind_sear 184"; end
@@ -455,10 +463,6 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
-    -- use_item,name=pocketsized_computation_device,if=equipped.167555
-    if I.PocketsizedComputationDevice:IsReady() then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 282"; end
-    end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
     if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 283"; end
