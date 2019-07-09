@@ -66,7 +66,8 @@ Spell.Mage.Frost = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932)
+  RecklessForce                         = Spell(302932),
+  CyclotronicBlast                      = Spell(167672)
 };
 local S = Spell.Mage.Frost;
 
@@ -74,7 +75,8 @@ local S = Spell.Mage.Frost;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
   ProlongedPower                   = Item(142117),
-  TidestormCodex                   = Item(165576)
+  TidestormCodex                   = Item(165576),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Mage.Frost;
 
@@ -245,6 +247,10 @@ local function APL()
     if I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.TidestormCodex) then return "tidestorm_codex 49"; end
     end
+    -- use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
+    if I.PocketsizedComputationDevice:IsReady() and ((not S.CyclotronicBlast:IsAvailable() or bool(S.CyclotronicBlast:CooldownRemainsP())) and Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device aoe"; end
+    end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
       if HR.Cast(S.Frostbolt) then return "frostbolt 50"; end
@@ -284,6 +290,10 @@ local function APL()
       if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 96"; end
     end
     -- use_items
+    -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
+    if I.PocketsizedComputationDevice:IsReady() and (not bool(S.CyclotronicBlast:CooldownRemainsP())) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 100"; end
+    end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 101"; end
@@ -373,6 +383,10 @@ local function APL()
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
     if I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.TidestormCodex) then return "tidestorm_codex 218"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
+    if I.PocketsizedComputationDevice:IsReady() and ((not S.CyclotronicBlast:IsAvailable() or bool(S.CyclotronicBlast:CooldownRemainsP())) and Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device single"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
