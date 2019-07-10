@@ -24,10 +24,12 @@ local tableinsert = table.insert;
   if not Spell.Rogue then Spell.Rogue = {}; end
   Spell.Rogue.Subtlety = {
     -- Racials
+    AncestralCall                         = Spell(274738),
     ArcanePulse                           = Spell(260364),
     ArcaneTorrent                         = Spell(50613),
     Berserking                            = Spell(26297),
     BloodFury                             = Spell(20572),
+    Fireblood                             = Spell(265221),
     LightsJudgment                        = Spell(255647),
     Shadowmeld                            = Spell(58984),
     -- Abilities
@@ -516,6 +518,14 @@ local function CDs ()
         -- actions.cds+=/berserking,if=stealthed.rogue
         if S.Berserking:IsCastable() then
           if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
+        end
+        -- actions.cds+=/fireblood,if=stealthed.rogue
+        if S.Fireblood:IsCastable() then
+          if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+        end
+        -- actions.cds+=/ancestral_call,if=stealthed.rogue
+        if S.AncestralCall:IsCastable() then
+          if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
         end
       end
     end
