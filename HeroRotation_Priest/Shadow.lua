@@ -55,6 +55,7 @@ Spell.Priest.Shadow = {
   FortressOfTheMind                     = Spell(193195),
   ShadowWordVoid                        = Spell(205351),
   Silence                               = Spell(15487),
+  ChorusofInsanity                      = Spell(278661),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -72,7 +73,8 @@ local S = Spell.Priest.Shadow;
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   BattlePotionofIntellect          = Item(163222),
-  PocketsizedComputationDevice     = Item(167555)
+  PocketsizedComputationDevice     = Item(167555),
+  AzsharasFontofPower              = Item(169314)
 };
 local I = Item.Priest.Shadow;
 
@@ -253,6 +255,10 @@ local function APL()
     if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 78"; end
     end
+    -- use_item,name=azsharas_font_of_power,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
+    if I.AzsharasFontofPower:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power cleave"; end
+    end
     -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(25+5*buff.bloodlust.up)|(current_insanity_drain*gcd.max*3)>insanity
     if S.MemoryOfLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (25 + 5 * num(Player:HasHeroism())) or (InsanityDrain * Player:GCD() * 3) > Player:Insanity()) then
       if HR.Cast(S.MemoryOfLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
@@ -285,8 +291,8 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
-    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.stack<15|(current_insanity_drain*gcd.max*4)>insanity)
-    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffStackP(S.VoidformBuff) < 15 or (InsanityDrain * Player:GCD() * 4) > Player:Insanity()) then
+    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
+    if I.PocketsizedComputationDevice:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device cleave"; end
     end
     -- shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
@@ -359,6 +365,10 @@ local function APL()
     if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 182"; end
     end
+    -- use_item,name=azsharas_font_of_power,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
+    if I.AzsharasFontofPower:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power single"; end
+    end
     -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(25+5*buff.bloodlust.up)|(current_insanity_drain*gcd.max*3)>insanity
     if S.MemoryOfLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (25 + 5 * num(Player:HasHeroism())) or (InsanityDrain * Player:GCD() * 3) > Player:Insanity()) then
       if HR.Cast(S.MemoryOfLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
@@ -391,9 +401,9 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
-    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.stack<15|(current_insanity_drain*gcd.max*4)>insanity)
-    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffStackP(S.VoidformBuff) < 15 or (InsanityDrain * Player:GCD() * 4) > Player:Insanity()) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device cleave"; end
+    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
+    if I.PocketsizedComputationDevice:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device single"; end
     end
     -- mind_sear,if=buff.harvested_thoughts.up&cooldown.void_bolt.remains>=1.5&azerite.searing_dialogue.rank>=1
     if S.MindSear:IsCastableP() and (Player:BuffP(S.HarvestedThoughtsBuff) and S.VoidBolt:CooldownRemainsP() >= 1.5 and S.SearingDialogue:AzeriteRank() >= 1) then
