@@ -57,6 +57,7 @@ Spell.Mage.Frost = {
   SplittingIce                          = Spell(56377),
   FreezingRain                          = Spell(240555),
   Counterspell                          = Spell(2139),
+  IncantersFlow                         = Spell(1463),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -167,36 +168,36 @@ local function APL()
     end
   end
   Essences = function()
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
+    -- focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
+    if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Frost.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
-    -- memory_of_lucid_dreams,if=buff.icicles.stack<2&cooldown.frozen_orb.remains>execute_time&!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
-    if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) < 2 and S.FrozenOrb:CooldownRemainsP() > S.MemoryOfLucidDreams:ExecuteTime() and not S.FrozenOrb:InFlight() and Player:FrozenOrbGroundAoeRemains() == 0) then
+    -- memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10
+    if S.MemoryOfLucidDreams:IsCastableP() and (EnemiesCount < 5 and (Player:BuffStackP(S.IciclesBuff) <= 1 or not S.GlacialSpike:IsAvailable()) and S.FrozenOrb:CooldownRemainsP() > 10) then
       if HR.Cast(S.MemoryOfLucidDreams, Settings.Frost.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
-    -- blood_of_the_enemy,if=buff.icicles.stack=5&buff.brain_freeze.react|!talent.glacial_spike.enabled|active_enemies>4
-    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffP(S.BrainFreezeBuff) or not S.GlacialSpike:IsAvailable() or EnemiesCount > 4) then
+    -- blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
+    if S.BloodOfTheEnemy:IsCastableP() and ((S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) == 5 and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt))) or ((EnemiesCount > 3 or not S.GlacialSpike:IsAvailable()) and (Player:PrevGCDP(1, S.FrozenOrb) or Player:FrozenOrbGroundAoeRemains() > 5))) then
       if HR.Cast(S.BloodOfTheEnemy, Settings.Frost.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastableP() then
+    -- purifying_blast,if=buff.rune_of_power.down|active_enemies>3
+    if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
       if HR.Cast(S.PurifyingBlast, Settings.Frost.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastableP() then
+    -- ripple_in_space,if=buff.rune_of_power.down|active_enemies>3
+    if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
       if HR.Cast(S.RippleInSpace, Settings.Frost.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
-    -- concentrated_flame
-    if S.ConcentratedFlame:IsCastableP() then
+    -- concentrated_flame,line_cd=6,if=buff.rune_of_power.down
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(S.ConcentratedFlame, Settings.Frost.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
       if HR.Cast(S.TheUnboundForce, Settings.Frost.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=buff.rune_of_power.down|active_enemies>3
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
       if HR.Cast(S.WorldveinResonance, Settings.Frost.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
   end
@@ -330,17 +331,13 @@ local function APL()
     if S.IceNova:IsCastableP() and (S.IceNova:CooldownUpP() and Target:DebuffP(S.WintersChillDebuff)) then
       if HR.Cast(S.IceNova) then return "ice_nova 117"; end
     end
-    -- flurry,if=talent.ebonbolt.enabled&prev_gcd.1.ebonbolt&(!talent.glacial_spike.enabled|buff.icicles.stack<4|buff.brain_freeze.react)
-    if S.Flurry:IsCastableP() and (S.Ebonbolt:IsAvailable() and Player:PrevGCDP(1, S.Ebonbolt) and (not S.GlacialSpike:IsAvailable() or Player:BuffStackP(S.IciclesBuff) < 4 or bool(Player:BuffStackP(S.BrainFreezeBuff)))) then
+    -- flurry,if=talent.ebonbolt.enabled&prev_gcd.1.ebonbolt&buff.brain_freeze.react
+    if S.Flurry:IsCastableP() and (S.Ebonbolt:IsAvailable() and Player:PrevGCDP(1, S.Ebonbolt) and bool(Player:BuffStackP(S.BrainFreezeBuff))) then
       if HR.Cast(S.Flurry) then return "flurry 123"; end
     end
-    -- flurry,if=talent.glacial_spike.enabled&prev_gcd.1.glacial_spike&buff.brain_freeze.react
-    if S.Flurry:IsCastableP() and (S.GlacialSpike:IsAvailable() and Player:PrevGCDP(1, S.GlacialSpike) and bool(Player:BuffStackP(S.BrainFreezeBuff))) then
+    -- flurry,if=prev_gcd.1.glacial_spike&buff.brain_freeze.react
+    if S.Flurry:IsCastableP() and (Player:PrevGCDP(1, S.GlacialSpike) and bool(Player:BuffStackP(S.BrainFreezeBuff))) then
       if HR.Cast(S.Flurry) then return "flurry 135"; end
-    end
-    -- flurry,if=prev_gcd.1.frostbolt&buff.brain_freeze.react&(!talent.glacial_spike.enabled|buff.icicles.stack<4)
-    if S.Flurry:IsCastableP() and (Player:PrevGCDP(1, S.Frostbolt) and bool(Player:BuffStackP(S.BrainFreezeBuff)) and (not S.GlacialSpike:IsAvailable() or Player:BuffStackP(S.IciclesBuff) < 4)) then
-      if HR.Cast(S.Flurry) then return "flurry 143"; end
     end
     -- call_action_list,name=essences
     local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
@@ -348,37 +345,30 @@ local function APL()
     if S.FrozenOrb:IsCastableP() then
       if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 153"; end
     end
-    -- blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
-    if S.Blizzard:IsCastableP() and (EnemiesCount > 2 or EnemiesCount > 1 and S.Blizzard:CastTime() == 0 and Player:BuffStackP(S.FingersofFrostBuff) < 2) then
+    -- blizzard,if=active_enemies>2|active_enemies>1&cast_time=0
+    if S.Blizzard:IsCastableP() and (EnemiesCount > 2 or EnemiesCount > 1 and S.Blizzard:CastTime() == 0) then
       if HR.Cast(S.Blizzard) then return "blizzard 155"; end
     end
-    -- ice_lance,if=buff.fingers_of_frost.react
-    if S.IceLance:IsCastableP() and (bool(Player:BuffStackP(S.FingersofFrostBuff))) then
+    -- ice_lance,if=buff.fingers_of_frost.react&talent.splitting_ice.enabled&active_enemies>1
+    if S.IceLance:IsCastableP() and (bool(Player:BuffStackP(S.FingersofFrostBuff)) and S.SplittingIce:IsAvailable() and EnemiesCount > 1) then
       if HR.Cast(S.IceLance) then return "ice_lance 175"; end
     end
     -- comet_storm
     if S.CometStorm:IsCastableP() then
       if HR.Cast(S.CometStorm) then return "comet_storm 179"; end
     end
-    -- ebonbolt
-    if S.Ebonbolt:IsCastableP() then
+    -- ebonbolt,if=buff.icicles.stack=5&!buff.brain_freeze.react&buff.memory_of_lucid_dreams.down
+    if S.Ebonbolt:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffDownP(S.BrainFreezeBuff) and Player:BuffDownP(S.MemoryOfLucidDreams)) then
       if HR.Cast(S.Ebonbolt) then return "ebonbolt 181"; end
     end
-    -- ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
-    if S.RayofFrost:IsCastableP() and (not S.FrozenOrb:InFlight() and Player:FrozenOrbGroundAoeRemains() == 0) then
-      if HR.Cast(S.RayofFrost) then return "ray_of_frost 183"; end
-    end
-    -- blizzard,if=cast_time=0|active_enemies>1
-    if S.Blizzard:IsCastableP() and (S.Blizzard:CastTime() == 0 or EnemiesCount > 1) then
-      if HR.Cast(S.Blizzard) then return "blizzard 189"; end
-    end
-    -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
-    if S.GlacialSpike:IsCastableP() and (bool(Player:BuffStackP(S.BrainFreezeBuff)) or Player:PrevGCDP(1, S.Ebonbolt) or EnemiesCount > 1 and S.SplittingIce:IsAvailable()) then
-      if HR.Cast(S.GlacialSpike) then return "glacial_spike 201"; end
+    -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
+    -- TODO: Add handling for the Incanter's Flow conditions
+    if S.GlacialSpike:IsReadyP() and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt)) then
+      if HR.Cast(S.GlacialSpike) then return "glacial_spike 182"; end
     end
     -- ice_nova
     if S.IceNova:IsCastableP() then
-      if HR.Cast(S.IceNova) then return "ice_nova 217"; end
+      if HR.Cast(S.IceNova) then return "ice_nova 183"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
     if I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
@@ -418,10 +408,6 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- counterspell
     Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
-    -- ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
-    if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and not bool(Player:BuffStackP(S.FingersofFrostBuff))) then
-      if HR.Cast(S.IceLance) then return "ice_lance 285"; end
-    end
     -- call_action_list,name=cooldowns
     if HR.CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
