@@ -71,7 +71,8 @@ local S = Spell.Warlock.Destruction;
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Destruction = {
   BattlePotionofIntellect          = Item(163222),
-  AzsharasFontofPower              = Item(169314)
+  AzsharasFontofPower              = Item(169314),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Warlock.Destruction;
 
@@ -375,6 +376,10 @@ local function APL()
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 247"; end
     end
     -- use_items,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
+    -- use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5
+    if I.PocketsizedComputationDevice:IsReady() and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 248"; end
+    end
   end
   Havoc = function()
     -- conflagrate,if=buff.backdraft.down&soul_shard>=1&soul_shard<=4
