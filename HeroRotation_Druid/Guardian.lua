@@ -66,7 +66,7 @@ local S = Spell.Druid.Guardian;
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Guardian = {
-  BattlePotionofAgility            = Item(163223)
+  PotionofFocusedResolve                = Item(168506)
 };
 local I = Item.Druid.Guardian;
 
@@ -157,14 +157,14 @@ local function APL()
     end
     -- snapshot_stats
     -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 8"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 8"; end
     end
   end
   Cooldowns = function()
     -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 10"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 10"; end
     end
     -- heart_essence
     if S.HeartEssence:IsCastableP() then

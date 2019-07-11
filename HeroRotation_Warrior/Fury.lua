@@ -70,7 +70,7 @@ local S = Spell.Warrior.Fury;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
-  BattlePotionofStrength           = Item(163224),
+  PotionofUnbridledFury            = Item(169299),
   AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.Warrior.Fury;
@@ -130,8 +130,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryOfLucidDreams:IsCastableP() then
@@ -217,8 +217,8 @@ local function APL()
       return Movement();
     end
     -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 84"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
     end
     -- furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
     if S.FuriousSlash:IsCastableP() and (S.FuriousSlash:IsAvailable() and (Player:BuffStackP(S.FuriousSlashBuff) < 3 or Player:BuffRemainsP(S.FuriousSlashBuff) < 3 or (S.Recklessness:CooldownRemainsP() < 3 and Player:BuffRemainsP(S.FuriousSlashBuff) < 9))) then

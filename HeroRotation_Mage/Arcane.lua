@@ -79,7 +79,7 @@ local S = Spell.Mage.Arcane;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
-  BattlePotionofIntellect          = Item(163222),
+  PotionofFocusedResolve           = Item(168506),
   TidestormCodex                   = Item(165576),
   PocketsizedComputationDevice     = Item(167555)
 };
@@ -215,8 +215,8 @@ local function APL()
       if HR.Cast(S.MirrorImage) then return "mirror_image 16"; end
     end
     -- potion
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 18"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_intellect 18"; end
     end
     -- arcane_blast
     if S.ArcaneBlast:IsReadyP() then
@@ -290,8 +290,8 @@ local function APL()
       if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 97"; end
     end
     -- potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc")))) then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 117"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc")))) then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_intellect 117"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))
     if S.ArcaneOrb:IsCastableP() and (Player:ArcaneChargesP() == 0 or (EnemiesCount < 3 or (EnemiesCount < 2 and S.Resonance:IsAvailable()))) then

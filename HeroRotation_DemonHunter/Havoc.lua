@@ -70,7 +70,7 @@ local S = Spell.DemonHunter.Havoc;
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Havoc = {
-  BattlePotionofAgility                       = Item(163223),
+  PotionofFocusedResolve                      = Item(168506),
   VariableIntensityGigavoltOscillatingReactor = Item(165572)
 };
 local I = Item.DemonHunter.Havoc;
@@ -172,8 +172,8 @@ local function APL()
     -- food
     -- snapshot_stats
     -- potion
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 4"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 4"; end
     end
     -- Immolation Aura
     if S.ImmolationAura:IsCastableP() then
@@ -237,8 +237,8 @@ local function APL()
       if HR.Cast(S.Nemesis, Settings.Havoc.GCDasOffGCD.Nemesis) then return "nemesis 51"; end
     end
     -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 55"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 55"; end
     end
     -- use_item,name=variable_intensity_gigavolt_oscillating_reactor
     if I.VariableIntensityGigavoltOscillatingReactor:IsReady() then

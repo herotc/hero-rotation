@@ -81,7 +81,7 @@ local S = Spell.Druid.Balance;
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
-  BattlePotionofIntellect          = Item(163222),
+  PotionofUnbridledFury            = Item(169299),
   TidestormCodex                   = Item(165576),
   AzsharasFontofPower              = Item(169314),
   PocketsizedComputationDevice     = Item(167555),
@@ -258,8 +258,8 @@ local function APL()
     end
     -- snapshot_stats
     -- potion
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 42"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
     end
     -- solar_wrath
     if S.SolarWrath:IsCastableP() then
@@ -285,8 +285,8 @@ local function APL()
     -- Interrupt
     Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false);
     -- potion,if=buff.ca_inc.remains>6
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6) then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 57"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 57"; end
     end
     -- berserking,if=buff.ca_inc.up
     if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then

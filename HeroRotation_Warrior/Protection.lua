@@ -61,7 +61,7 @@ local S = Spell.Warrior.Protection;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Protection = {
-  BattlePotionofStrength           = Item(163224),
+  SuperiorBattlePotionofStrength   = Item(168500),
   GrongsPrimalRage                 = Item(165574)
 };
 local I = Item.Warrior.Protection;
@@ -155,8 +155,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 4"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryOfLucidDreams:IsCastableP() then
@@ -308,8 +308,8 @@ local function APL()
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 101"; end
     end
     -- potion,if=buff.avatar.up|target.time_to_die<25
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 103"; end
+    if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
+      if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 103"; end
     end
     if Player:HealthPercentage() < 30 and S.VictoryRush:IsReady() then
       if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end

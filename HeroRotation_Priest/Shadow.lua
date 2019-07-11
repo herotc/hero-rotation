@@ -72,7 +72,7 @@ local S = Spell.Priest.Shadow;
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
-  BattlePotionofIntellect          = Item(163222),
+  PotionofUnbridledFury            = Item(169299),
   PocketsizedComputationDevice     = Item(167555),
   AzsharasFontofPower              = Item(169314)
 };
@@ -191,8 +191,8 @@ local function APL()
       -- augmentation
       -- snapshot_stats
       -- potion
-      if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 4"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 4"; end
       end
       -- variable,name=mind_blast_targets,op=set,value=floor((4.5+azerite.whispers_of_the_damned.rank)%(1+0.27*azerite.searing_dialogue.rank))
       if (true) then
@@ -474,8 +474,8 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false);
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 283"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 283"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     if (true) then

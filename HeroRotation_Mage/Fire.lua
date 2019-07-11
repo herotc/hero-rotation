@@ -73,7 +73,7 @@ local S = Spell.Mage.Fire;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Fire = {
-  BattlePotionofIntellect          = Item(163222),
+  PotionofUnbridledFury            = Item(169299),
   TidestormCodex                   = Item(165576),
   MalformedHeraldsLegwraps         = Item(167835),
   PocketsizedComputationDevice     = Item(167555)
@@ -180,8 +180,8 @@ local function APL()
         if HR.Cast(S.MirrorImage) then return "mirror_image 10"; end
       end
       -- potion
-      if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 12"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 12"; end
       end
       -- pyroblast
       if S.Pyroblast:IsCastableP() then
@@ -225,8 +225,8 @@ local function APL()
       if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 110"; end
     end
     -- potion
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 130"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 130"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
@@ -331,8 +331,8 @@ local function APL()
       if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 282"; end
     end
     -- potion
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 288"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 288"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then

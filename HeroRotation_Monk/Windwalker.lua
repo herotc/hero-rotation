@@ -113,7 +113,7 @@ local S = Spell.Monk.Windwalker;
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Windwalker = {
-  
+  PotionofUnbridledFury                = Item(169299)
 };
 local I = Item.Monk.Windwalker;
 
@@ -147,6 +147,10 @@ local function APL ()
 
   -- Pre Combat --
   Precombat = function()
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
+    end
     -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
     if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
       if HR.Cast(S.ChiBurst) then return "Cast Pre-Combat Chi Burst"; end
@@ -382,6 +386,10 @@ local function APL ()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
+    -- potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
+    if I.PotionofUnbridledFury:IsReady() and (Player:BuffP(S.Serenity) or Player:BuffP(S.StormEarthAndFire) or (not S.Serenity:IsAvailable()) or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
+    end
     -- actions+=/call_action_list,name=serenity,if=buff.serenity.up
     if Player:BuffP(S.Serenity) then
       local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end

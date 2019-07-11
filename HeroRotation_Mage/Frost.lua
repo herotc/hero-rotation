@@ -75,7 +75,7 @@ local S = Spell.Mage.Frost;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
-  ProlongedPower                   = Item(142117),
+  PotionofUnbridledFury            = Item(169299),
   TidestormCodex                   = Item(165576),
   PocketsizedComputationDevice     = Item(167555)
 };
@@ -158,8 +158,8 @@ local function APL()
         if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 10"; end
       end
       -- potion
-      if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 12"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "prolonged_power 12"; end
       end
       -- frostbolt
       if S.Frostbolt:IsCastableP() then
@@ -287,8 +287,8 @@ local function APL()
       local ShouldReturn = TalentRop(); if ShouldReturn then return ShouldReturn; end
     end
     -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<30
-    if I.ProlongedPower:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
-      if HR.CastSuggested(I.ProlongedPower) then return "prolonged_power 96"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "prolonged_power 96"; end
     end
     -- use_items
     -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration

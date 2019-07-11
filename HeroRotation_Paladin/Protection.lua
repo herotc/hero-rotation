@@ -57,8 +57,7 @@
   -- Items
   if not Item.Paladin then Item.Paladin = {}; end
   Item.Paladin.Protection = {
-    -- Legendaries
-
+    PotionofUnbridledFury    = Item(169299)
   };
   local I = Item.Paladin.Protection;
   -- Rotation Var

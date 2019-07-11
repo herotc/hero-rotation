@@ -65,7 +65,7 @@ local S = Spell.Paladin.Retribution;
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Retribution = {
-  BattlePotionofStrength           = Item(163224),
+  PotionofFocusedResolve           = Item(168506),
   AshvanesRazorCoral               = Item(169311),
   AzsharasFontofPower              = Item(169314)
 };
@@ -123,8 +123,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_strength 4"; end
       end
       -- arcane_torrent,if=!talent.wake_of_ashes.enabled
       if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (not S.WakeofAshes:IsAvailable()) then
@@ -134,8 +134,8 @@ local function APL()
   end
   Cooldowns = function()
     -- potion,if=buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffRemainsP(S.CrusadeBuff) < 25) then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 10"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffRemainsP(S.CrusadeBuff) < 25) then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_strength 10"; end
     end
     -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
     if S.LightsJudgment:IsCastableP() then

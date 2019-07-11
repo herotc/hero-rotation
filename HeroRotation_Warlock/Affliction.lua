@@ -80,7 +80,7 @@ local S = Spell.Warlock.Affliction;
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Affliction = {
-  BattlePotionofIntellect          = Item(163222),
+  PotionofFocusedResolve           = Item(168506),
   AzsharasFontofPower              = Item(169314),
   PocketsizedComputationDevice     = Item(167555)
 };
@@ -326,8 +326,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 14"; end
+      if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_intellect 14"; end
       end
       -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
       if S.SeedofCorruption:IsCastableP() and Player:DebuffDownP(S.SeedofCorruptionDebuff) and (EnemiesCount >= 3) then
@@ -349,8 +349,8 @@ local function APL()
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 30"; end
     end
     -- potion,if=(talent.dark_soul_misery.enabled&cooldown.summon_darkglare.up&cooldown.dark_soul.up)|cooldown.summon_darkglare.up|target.time_to_die<30
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and ((S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownUpP() and S.DarkSoul:CooldownUpP()) or S.SummonDarkglare:CooldownUpP() or Target:TimeToDie() < 30) then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 40"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and ((S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownUpP() and S.DarkSoul:CooldownUpP()) or S.SummonDarkglare:CooldownUpP() or Target:TimeToDie() < 30) then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_intellect 40"; end
     end
     -- use_items,if=cooldown.summon_darkglare.remains>70|time_to_die<20|((buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains)&!cooldown.summon_darkglare.remains)
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)

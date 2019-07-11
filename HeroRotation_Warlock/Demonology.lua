@@ -72,7 +72,7 @@ local S = Spell.Warlock.Demonology;
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
-  BattlePotionofIntellect          = Item(163222)
+  PotionofUnbridledFury        = Item(169299)
 };
 local I = Item.Warlock.Demonology;
 
@@ -189,8 +189,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 10"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 10"; end
       end
       -- demonbolt
       if S.Demonbolt:IsCastableP() then
@@ -431,8 +431,8 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts);
     -- potion,if=pet.demonic_tyrant.active&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
-    if I.BattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
-      if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 322"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 322"; end
     end
     -- use_items,if=pet.demonic_tyrant.active|target.time_to_die<=15
     -- berserking,if=pet.demonic_tyrant.active|target.time_to_die<=15

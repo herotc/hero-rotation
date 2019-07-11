@@ -79,7 +79,7 @@ local S = Spell.Warrior.Arms;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
-  BattlePotionofStrength           = Item(163224),
+  PotionofUnbridledFury            = Item(169299),
   VisionofDemise                   = Item(169307)
 };
 local I = Item.Warrior.Arms;
@@ -140,8 +140,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryOfLucidDreams:IsCastableP() then
@@ -394,8 +394,8 @@ local function APL()
     Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
     -- auto_attack
     -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 354"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 354"; end
     end
     -- blood_fury,if=debuff.colossus_smash.up
     if S.BloodFury:IsCastableP() and HR.CDsON() and (Target:DebuffP(S.ColossusSmashDebuff)) then
