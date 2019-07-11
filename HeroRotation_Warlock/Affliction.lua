@@ -81,7 +81,8 @@ local S = Spell.Warlock.Affliction;
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Affliction = {
   BattlePotionofIntellect          = Item(163222),
-  AzsharasFontofPower              = Item(169314)
+  AzsharasFontofPower              = Item(169314),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Warlock.Affliction;
 
@@ -343,8 +344,8 @@ local function APL()
     end
   end
   Cooldowns = function()
-    -- use_item,name=azsharas_font_of_power,if=(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains<4*spell_haste|!cooldown.phantom_singularity.remains)&cooldown.summon_darkglare.remains<15*spell_haste
-    if I.AzsharasFontofPower:IsReady() and ((not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemainsP() < 4 * Player:SpellHaste() or not bool(S.PhantomSingularity:CooldownRemainsP())) and S.SummonDarkglare:CooldownRemainsP() < 15 * Player:SpellHaste()) then
+    -- use_item,name=azsharas_font_of_power,if=(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains<4*spell_haste|!cooldown.phantom_singularity.remains)&cooldown.summon_darkglare.remains<15*spell_haste&dot.agony.remains&dot.corruption.remains&(dot.siphon_life.remains|!talent.siphon_life.enabled)
+    if I.AzsharasFontofPower:IsReady() and ((not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemainsP() < 4 * Player:SpellHaste() or not bool(S.PhantomSingularity:CooldownRemainsP())) and S.SummonDarkglare:CooldownRemainsP() < 15 * Player:SpellHaste() and Target:DebuffP(S.AgonyDebuff) and Target:DebuffP(S.CorruptionDebuff) and (Target:DebuffP(S.SiphonLifeDebuff) or not S.SiphonLife:IsAvailable())) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 30"; end
     end
     -- potion,if=(talent.dark_soul_misery.enabled&cooldown.summon_darkglare.up&cooldown.dark_soul.up)|cooldown.summon_darkglare.up|target.time_to_die<30
@@ -352,6 +353,10 @@ local function APL()
       if HR.CastSuggested(I.BattlePotionofIntellect) then return "battle_potion_of_intellect 40"; end
     end
     -- use_items,if=cooldown.summon_darkglare.remains>70|time_to_die<20|((buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains)&!cooldown.summon_darkglare.remains)
+    -- use_item,name=pocketsized_computation_device,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+    if I.PocketsizedComputationDevice:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 50"; end
+    end
     -- fireblood,if=!cooldown.summon_darkglare.up
     if S.Fireblood:IsCastableP() and HR.CDsON() and (not S.SummonDarkglare:CooldownUpP()) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 51"; end
@@ -364,8 +369,8 @@ local function APL()
     if S.MemoryOfLucidDreams:IsCastableP() and (HL.CombatTime() > 30) then
       if HR.Cast(S.MemoryOfLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 59"; end
     end
-    -- blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
+    -- blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
+    if S.BloodOfTheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodOfTheEnemy:ID() == 297108) then
       if HR.Cast(S.BloodOfTheEnemy, Settings.Affliction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 61"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
