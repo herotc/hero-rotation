@@ -99,6 +99,7 @@ local tableinsert = table.insert;
     WorldveinResonance    = Spell(295186),
     WorldveinResonance2   = Spell(298628),
     WorldveinResonance3   = Spell(299334),
+    LifebloodBuff         = Spell(295137),
     MemoryOfLucidDreams   = Spell(298357),
     MemoryOfLucidDreams2  = Spell(299372),
     MemoryOfLucidDreams3  = Spell(299374),
@@ -249,9 +250,8 @@ end
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffP(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
 
-  -- actions.finish=eviscerate,if=talent.shadow_focus.enabled&buff.nights_vengeance.up&spell_targets.shuriken_storm>=2+3*talent.secret_technique.enabled
-  if S.Eviscerate:IsCastable() and IsInMeleeRange() and S.ShadowFocus:IsAvailable() and Player:BuffP(S.NightsVengeanceBuff)
-    and Cache.EnemiesCount[10] >= 2 + 3 * num(S.SecretTechnique:IsAvailable()) then
+  -- actions.finish=eviscerate,if=buff.nights_vengeance.up
+  if S.Eviscerate:IsCastable() and IsInMeleeRange() and Player:BuffP(S.NightsVengeanceBuff) then
     if ReturnSpellOnly then
       return S.Eviscerate;
     else
@@ -451,8 +451,8 @@ local function Essences ()
       if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
     end
   end
-  -- focused_azerite_beam
-  if S.FocusedAzeriteBeam:IsCastableP() then
+  -- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up
+  if S.FocusedAzeriteBeam:IsCastableP() and not S.SymbolsofDeath:CooldownUp() and not Player:BuffP(S.SymbolsofDeath) then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.FocusedAzeriteBeam);
     else
@@ -483,8 +483,8 @@ local function Essences ()
       if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast RippleInSpace"; end
     end
   end
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastableP() then
+  -- worldvein_resonance,if=buff.lifeblood.stack<3
+  if S.WorldveinResonance:IsCastableP() and Player:BuffStackP(S.LifebloodBuff) < 3 then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.WorldveinResonance);
     else
@@ -871,7 +871,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-07-08
+-- Last Update: 2019-07-11
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -941,11 +941,11 @@ HR.SetAPL(261, APL);
 -- actions.essences=concentrated_flame
 -- actions.essences+=/blood_of_the_enemy
 -- actions.essences+=/guardian_of_azeroth
--- actions.essences+=/focused_azerite_beam
+-- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up
 -- actions.essences+=/purifying_blast
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
--- actions.essences+=/worldvein_resonance
+-- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
 --
 -- # Stealth Cooldowns
@@ -982,8 +982,8 @@ HR.SetAPL(261, APL);
 -- actions.stealthed+=/shadowstrike
 --
 -- # Finishers
--- # Eviscerate highest priority at 2+ targets with Shadow Focus (5+ with Secret Technique in addition) and Night's Vengeance up.
--- actions.finish=eviscerate,if=talent.shadow_focus.enabled&buff.nights_vengeance.up&spell_targets.shuriken_storm>=2+3*talent.secret_technique.enabled
+-- # Eviscerate has highest priority with Night's Vengeance up.
+-- actions.finish=eviscerate,if=buff.nights_vengeance.up
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2
 -- # Multidotting outside Dance on targets that will live for the duration of Nightblade, refresh during pandemic. Multidot as long as 2+ targets do not have Nightblade up with Replicating Shadows (unless you have Night's Vengeance too).

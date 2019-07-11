@@ -87,6 +87,7 @@ Spell.Rogue.Assassination = {
   WorldveinResonance    = Spell(295186),
   WorldveinResonance2   = Spell(298628),
   WorldveinResonance3   = Spell(299334),
+  LifebloodBuff         = Spell(295137),
   MemoryOfLucidDreams   = Spell(298357),
   MemoryOfLucidDreams2  = Spell(299372),
   MemoryOfLucidDreams3  = Spell(299374),
@@ -417,8 +418,8 @@ local function Essences ()
       if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast RippleInSpace"; end
     end
   end
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastableP() then
+  -- worldvein_resonance,if=buff.lifeblood.stack<3
+  if S.WorldveinResonance:IsCastableP() and Player:BuffStackP(S.LifebloodBuff) < 3 then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.WorldveinResonance);
     else
@@ -851,7 +852,8 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-06-27
+-- Last Update: 2019-07-11
+-- NOTE: Still misses Prio improvements from Koji plus some stuff after.
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -945,7 +947,7 @@ HR.SetAPL(259, APL);
 -- actions.essences+=/purifying_blast
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
--- actions.essences+=/worldvein_resonance
+-- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<50
 --
 -- # Damage over time abilities
