@@ -25,6 +25,7 @@ Spell.Paladin.Retribution = {
   ArcaneTorrent                         = Spell(50613),
   WakeofAshes                           = Spell(255937),
   AvengingWrathBuff                     = Spell(31884),
+  AvengingWrathCritBuff                 = Spell(294027),
   CrusadeBuff                           = Spell(231895),
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
@@ -58,7 +59,8 @@ Spell.Paladin.Retribution = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932),
-  SeethingRageBuff                      = Spell(297126)
+  SeethingRageBuff                      = Spell(297126),
+  RazorCoralDebuff                      = Spell(303568)
 };
 local S = Spell.Paladin.Retribution;
 
@@ -133,8 +135,8 @@ local function APL()
     end
   end
   Cooldowns = function()
-    -- potion,if=buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffRemainsP(S.CrusadeBuff) < 25) then
+    -- potion,if=(cooldown.guardian_of_azeroth.remains>90|!essence.condensed_lifeforce.major)&(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25)
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and ((S.GuardianOfAzeroth:CooldownRemainsP() > 90 or not S.GuardianOfAzeroth:IsAvailable()) and (Player:HasHeroism() or Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffRemainsP(S.CrusadeBuff) < 25)) then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_strength 10"; end
     end
     -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
@@ -149,8 +151,8 @@ local function APL()
     if S.ShieldofVengeance:IsCastableP() and Settings.Retribution.ShieldofVengeance and (Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.MemoryOfLucidDreams)) then
       if HR.CastLeft(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=(cooldown.avenging_wrath.remains>=8|cooldown.crusade.remains>=8|buff.crusade.stack=10)
-    if I.AshvanesRazorCoral:IsReady() and (S.AvengingWrath:CooldownRemainsP() >= 8 or S.Crusade:CooldownRemainsP() >= 8 or Player:BuffStackP(S.CrusadeBuff) == 10) then
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.avenging_wrath.remains>=20|buff.crusade.up&buff.crusade.stack=10&buff.crusade.remains>15
+    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then reutrn "ashvanes_razor_coral"; end
     end
     -- the_unbound_force,if=time<=2|buff.reckless_force.up
@@ -195,9 +197,9 @@ local function APL()
     if (true) then
       VarWingsPool = num(not I.AzsharasFontofPower:IsEquipped() and (not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemainsP() > PlayerGCD * 3 or S.Crusade:CooldownRemainsP() > PlayerGCD * 3) or I.AzsharasFontofPower:IsEquipped() and (not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemainsP() > PlayerGCD * 6 or S.Crusade:CooldownRemainsP() > PlayerGCD * 6))
     end
-    -- variable,name=ds_castable,value=spell_targets.divine_storm>=2&!talent.righteous_verdict.enabled|spell_targets.divine_storm>=3&talent.righteous_verdict.enabled
+    -- variable,name=ds_castable,value=spell_targets.divine_storm>=2&!talent.righteous_verdict.enabled|spell_targets.divine_storm>=3&talent.righteous_verdict.enabled|buff.empyrean_power.up&debuff.judgment.down&buff.divine_purpose.down&buff.avenging_wrath_autocrit.down
     if (true) then
-      VarDsCastable = num(Cache.EnemiesCount[8] >= 2 and not S.RighteousVerdict:IsAvailable() or Cache.EnemiesCount[8] >= 3 and S.RighteousVerdict:IsAvailable())
+      VarDsCastable = num(Cache.EnemiesCount[8] >= 2 and not S.RighteousVerdict:IsAvailable() or Cache.EnemiesCount[8] >= 3 and S.RighteousVerdict:IsAvailable() or Player:BuffP(S.EmpyreanPowerBuff) and Target:DebuffDownP(S.JudgmentDebuff) and Player:BuffDownP(S.DivinePurposeBuff) and Player:BuffDownP(S.AvengingWrathCritBuff))
     end
     -- inquisition,if=buff.avenging_wrath.down&(buff.inquisition.down|buff.inquisition.remains<8&holy_power>=3|talent.execution_sentence.enabled&cooldown.execution_sentence.remains<10&buff.inquisition.remains<15|cooldown.avenging_wrath.remains<15&buff.inquisition.remains<20&holy_power>=3)
     if S.Inquisition:IsReadyP() and (Player:BuffDownP(S.InquisitionBuff) and (Player:BuffDownP(S.InquisitionBuff) or Player:BuffRemainsP(S.InquisitionBuff) < 8 and Player:HolyPower() >= 3 or S.ExecutionSentence:IsAvailable() and S.ExecutionSentence:CooldownRemainsP() < 10 and Player:BuffRemainsP(S.InquisitionBuff) < 15 or S.AvengingWrath:CooldownRemainsP() < 15 and Player:BuffRemainsP(S.InquisitionBuff) < 20 and Player:HolyPower() >= 3)) then
