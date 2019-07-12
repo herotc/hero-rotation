@@ -451,8 +451,8 @@ local function Essences ()
       if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
     end
   end
-  -- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up
-  if S.FocusedAzeriteBeam:IsCastableP() and not S.SymbolsofDeath:CooldownUp() and not Player:BuffP(S.SymbolsofDeath) then
+  -- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
+  if S.FocusedAzeriteBeam:IsCastableP() and not S.SymbolsofDeath:CooldownUp() and not Player:BuffP(S.SymbolsofDeath) and Player:EnergyDeficitPredicted() >= 30 then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.FocusedAzeriteBeam);
     else
@@ -941,7 +941,7 @@ HR.SetAPL(261, APL);
 -- actions.essences=concentrated_flame
 -- actions.essences+=/blood_of_the_enemy
 -- actions.essences+=/guardian_of_azeroth
--- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up
+-- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
 -- actions.essences+=/purifying_blast
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space

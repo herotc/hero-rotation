@@ -413,8 +413,8 @@ local function Essences ()
       if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
     end
   end
-  -- focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
-  if S.FocusedAzeriteBeam:IsCastableP() then
+  -- focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
+  if S.FocusedAzeriteBeam:IsCastableP() and Player:EnergyPredicted() < 70 then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.FocusedAzeriteBeam);
     else
@@ -910,7 +910,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-07-11
+-- Last Update: 2019-07-12
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1001,7 +1001,7 @@ HR.SetAPL(259, APL);
 -- # Always use Blood with Vendetta up. Also use with TB up before a finisher (if talented) as long as it runs for 10s during Vendetta.
 -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
 -- actions.essences+=/guardian_of_azeroth
--- actions.essences+=/focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
+-- actions.essences+=/focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
 -- actions.essences+=/purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
