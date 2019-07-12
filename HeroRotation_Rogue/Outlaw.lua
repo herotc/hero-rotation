@@ -8,6 +8,7 @@ local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = HL.Spell;
+local MultiSpell = HL.MultiSpell
 local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
@@ -65,34 +66,35 @@ Spell.Rogue.Outlaw = {
   SnakeEyesBuff                   = Spell(275863),
   KeepYourWitsBuff                = Spell(288988),
   -- Essences
-  BloodOfTheEnemy       = Spell(297108),
-  BloodOfTheEnemy2      = Spell(298273),
-  BloodOfTheEnemy3      = Spell(298277),
-  ConcentratedFlame     = Spell(295373),
-  ConcentratedFlame2    = Spell(299349),
-  ConcentratedFlame3    = Spell(299353),
-  GuardianOfAzeroth     = Spell(295840),
-  GuardianOfAzeroth2    = Spell(299355),
-  GuardianOfAzeroth3    = Spell(299358),
-  FocusedAzeriteBeam    = Spell(295258),
-  FocusedAzeriteBeam2   = Spell(299336),
-  FocusedAzeriteBeam3   = Spell(299338),
-  PurifyingBlast        = Spell(295337),
-  PurifyingBlast2       = Spell(299345),
-  PurifyingBlast3       = Spell(299347),
-  TheUnboundForce       = Spell(298452),
-  TheUnboundForce2      = Spell(299376),
-  TheUnboundForce3      = Spell(299378),
-  RippleInSpace         = Spell(302731),
-  RippleInSpace2        = Spell(302982),
-  RippleInSpace3        = Spell(302983),
-  WorldveinResonance    = Spell(295186),
-  WorldveinResonance2   = Spell(298628),
-  WorldveinResonance3   = Spell(299334),
-  LifebloodBuff         = Spell(295137),
-  MemoryOfLucidDreams   = Spell(298357),
-  MemoryOfLucidDreams2  = Spell(299372),
-  MemoryOfLucidDreams3  = Spell(299374),
+  BloodOfTheEnemy                 = Spell(297108),
+  BloodOfTheEnemy2                = Spell(298273),
+  BloodOfTheEnemy3                = Spell(298277),
+  ConcentratedFlame               = Spell(295373),
+  ConcentratedFlame2              = Spell(299349),
+  ConcentratedFlame3              = Spell(299353),
+  GuardianOfAzeroth               = Spell(295840),
+  GuardianOfAzeroth2              = Spell(299355),
+  GuardianOfAzeroth3              = Spell(299358),
+  FocusedAzeriteBeam              = Spell(295258),
+  FocusedAzeriteBeam2             = Spell(299336),
+  FocusedAzeriteBeam3             = Spell(299338),
+  PurifyingBlast                  = Spell(295337),
+  PurifyingBlast2                 = Spell(299345),
+  PurifyingBlast3                 = Spell(299347),
+  TheUnboundForce                 = Spell(298452),
+  TheUnboundForce2                = Spell(299376),
+  TheUnboundForce3                = Spell(299378),
+  RippleInSpace                   = Spell(302731),
+  RippleInSpace2                  = Spell(302982),
+  RippleInSpace3                  = Spell(302983),
+  WorldveinResonance              = Spell(295186),
+  WorldveinResonance2             = Spell(298628),
+  WorldveinResonance3             = Spell(299334),
+  LifebloodBuff                   = Spell(295137),
+  MemoryOfLucidDreams             = Spell(298357),
+  MemoryOfLucidDreams2            = Spell(299372),
+  MemoryOfLucidDreams3            = Spell(299374),
+  LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -105,7 +107,9 @@ Spell.Rogue.Outlaw = {
   GrandMelee                      = Spell(193358),
   RuthlessPrecision               = Spell(193357),
   SkullandCrossbones              = Spell(199603),
-  TrueBearing                     = Spell(193359)
+  TrueBearing                     = Spell(193359),
+  -- Misc
+  VigorTrinketBuff      = Spell(287916),
 };
 local S = Spell.Rogue.Outlaw;
 
@@ -116,6 +120,8 @@ Item.Rogue.Outlaw = {
   GalecallersBoon       = Item(159614, {13, 14}),
   InvocationOfYulon     = Item(165568, {13, 14}),
   LustrousGoldenPlumage = Item(159617, {13, 14}),
+  ComputationDevice     = Item(167555, {13, 14}),
+  VigorTrinket          = Item(165572, {13, 14}),
 };
 local I = Item.Rogue.Outlaw;
 
@@ -431,6 +437,15 @@ local function CDs ()
       end
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
         HR.CastSuggested(I.InvocationOfYulon);
+      end
+      -- if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
+      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
+        and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
+          HR.CastSuggested(I.ComputationDevice);
+      end
+      -- Emulate SimC default behavior to use at max stacks
+      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
+        HR.CastSuggested(I.VigorTrinket);
       end
     end
 

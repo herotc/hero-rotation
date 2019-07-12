@@ -8,6 +8,7 @@ local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = HL.Spell;
+local MultiSpell = HL.MultiSpell
 local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
@@ -62,10 +63,12 @@ Spell.Rogue.Assassination = {
   DoubleDose            = Spell(273007),
   EchoingBlades         = Spell(287649),
   ShroudedSuffocation   = Spell(278666),
+  ScentOfBlood          = Spell(277679),
   -- Essences
   BloodOfTheEnemy       = Spell(297108),
   BloodOfTheEnemy2      = Spell(298273),
   BloodOfTheEnemy3      = Spell(298277),
+  SeethingRageBuff      = Spell(297126),
   ConcentratedFlame     = Spell(295373),
   ConcentratedFlame2    = Spell(299349),
   ConcentratedFlame3    = Spell(299353),
@@ -91,6 +94,7 @@ Spell.Rogue.Assassination = {
   MemoryOfLucidDreams   = Spell(298357),
   MemoryOfLucidDreams2  = Spell(299372),
   MemoryOfLucidDreams3  = Spell(299374),
+  LucidDreamsBuff       = MultiSpell(298357, 299372, 299374),
   -- Defensive
   CrimsonVial           = Spell(185311),
   Feint                 = Spell(1966),
@@ -105,6 +109,7 @@ Spell.Rogue.Assassination = {
   WoundPoisonDebuff     = Spell(8680),
   -- Misc
   TheDreadlordsDeceit   = Spell(208693),
+  VigorTrinketBuff      = Spell(287916),
   PoolEnergy            = Spell(9999000010)
 };
 local S = Spell.Rogue.Assassination;
@@ -115,6 +120,8 @@ Item.Rogue.Assassination = {
   GalecallersBoon       = Item(159614, {13, 14}),
   InvocationOfYulon     = Item(165568, {13, 14}),
   LustrousGoldenPlumage = Item(159617, {13, 14}),
+  ComputationDevice     = Item(167555, {13, 14}),
+  VigorTrinket          = Item(165572, {13, 14}),
 };
 local I = Item.Rogue.Assassination;
 
@@ -173,8 +180,9 @@ S.Rupture:RegisterPMultiplier(
 local ShouldReturn; -- Used to get the return string
 local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste();
 local Stealth;
-local RuptureThreshold, CrimsonTempestThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
-local ComboPoints, ComboPointsDeficit, Energy_Regen_Combined;
+local RuptureThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
+local ComboPoints, ComboPointsDeficit, Energy_Regen_Combined, PoisonedBleeds;
+local PriorityRotation;
 
 -- GUI Settings
 local Settings = {
@@ -185,6 +193,24 @@ local Settings = {
 
 local function num(val)
   if val then return 1 else return 0 end
+end
+
+-- Check if the Priority Rotation variable should be set
+local function UsePriorityRotation()
+  if Cache.EnemiesCount[10] < 2 then
+    return false
+  end
+  if Settings.Assassination.UsePriorityRotation == "Always" then
+    return true
+  end
+  if Settings.Assassination.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
+    return true
+  end
+  -- Zul Mythic
+  if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
+    return true
+  end
+  return false
 end
 
 -- Handle CastLeftNameplate Suggestions for DoT Spells
@@ -362,8 +388,9 @@ local Interrupts = {
 -- APL Action Lists (and Variables)
 -- # Essences
 local function Essences ()
-  -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up|debuff.vendetta.remains<=10)|target.time_to_die<=10
-  if S.BloodOfTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable() or Target:DebuffP(S.ToxicBladeDebuff) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
+  -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
+  if S.BloodOfTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable()
+    or (Target:DebuffP(S.ToxicBladeDebuff) and Player:ComboPointsDeficit() <= 1) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.BloodOfTheEnemy);
     else
@@ -386,7 +413,7 @@ local function Essences ()
       if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
     end
   end
-  -- focused_azerite_beam
+  -- focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
   if S.FocusedAzeriteBeam:IsCastableP() then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.FocusedAzeriteBeam);
@@ -394,7 +421,7 @@ local function Essences ()
       if HR.Cast(S.FocusedAzeriteBeam, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast FocusedAzeriteBeam"; end
     end
   end
-  -- purifying_blast
+  -- purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
   if S.PurifyingBlast:IsCastableP() then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.PurifyingBlast);
@@ -474,6 +501,15 @@ local function CDs ()
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
         HR.CastSuggested(I.InvocationOfYulon);
       end
+      -- if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
+      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and MasterAssassinRemains() <= 0 and not Target:DebuffP(S.Vendetta)
+        and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:Energy() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
+          HR.CastSuggested(I.ComputationDevice);
+      end
+      -- Emulate SimC default behavior to use at max stacks
+      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
+        HR.CastSuggested(I.VigorTrinket);
+      end
     end
 
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
@@ -491,6 +527,7 @@ local function CDs ()
         HR.CastSuggested(S.MarkedforDeath);
       end
     end
+
     if HR.CDsON() then
       -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)
       if S.Vendetta:IsCastable() and not Player:IsStealthedP(true, false) and Target:DebuffP(S.Rupture) and not Target:DebuffP(S.Vendetta)
@@ -518,7 +555,7 @@ local function CDs ()
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
         if not VanishSuggested and S.Subterfuge:IsAvailable() and not Player:IsStealthedP(true, false)
           and S.Garrote:CooldownUp() and (VarSSVanishCondition or not S.ShroudedSuffocation:AzeriteEnabled() and Target:DebuffRefreshableP(S.Garrote, 5.4))
-          and ComboPointsDeficit >= min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * Cache.EnemiesCount[10], 4) then
+          and ComboPointsDeficit >= math.min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * Cache.EnemiesCount[10], 4) then
           -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
           if Player:EnergyPredicted() < 45 then
             if HR.Cast(S.PoolEnergy) then return "Pool for Vanish (Subterfuge)"; end
@@ -526,11 +563,11 @@ local function CDs ()
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
           VanishSuggested = true;
         end
-        -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3
+        -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&(!essence.blood_of_the_enemy.major|buff.seething_rage.up)
         if not VanishSuggested and S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0
-          and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) and Target:DebuffRemainsP(S.Garrote) > 3 then
+          and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) and Target:DebuffRemainsP(S.Garrote) > 3
+          and (not S.BloodOfTheEnemy:IsAvailable() or Player:BuffP(S.SeethingRageBuff)) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
-          VanishSuggested = true;
         end
       end
       -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
@@ -618,37 +655,47 @@ local function Stealthed ()
 end
 -- # Damage over time abilities
 local function Dot ()
+  local SkipCycleGarrote, SkipCycleRupture, SkipRupture
+  if PriorityRotation and Cache.EnemiesCount[10] > 3 then
+    -- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&spell_targets.fan_of_knives>3&(dot.garrote.remains<cooldown.garrote.duration|poisoned_bleeds>5)
+    SkipCycleGarrote = Target:DebuffRemainsP(S.Garrote) < 6 or PoisonedBleeds > 5
+    -- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&spell_targets.fan_of_knives>3&(debuff.toxic_blade.up|(poisoned_bleeds>5&!azerite.scent_of_blood.enabled))
+    SkipCycleRupture = Target:DebuffP(S.ToxicBladeDebuff) or (PoisonedBleeds > 5 and not S.ScentOfBlood:AzeriteEnabled())
+  end
+  -- actions.dot+=/variable,name=skip_rupture,value=debuff.vendetta.up&debuff.toxic_blade.up&dot.rupture.remains>2
+  SkipRupture = Target:DebuffP(S.Vendetta) and Target:DebuffP(S.ToxicBladeDebuff) and Target:DebuffRemainsP(S.Rupture) > 2
+
   -- actions.dot=rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
   if HR.CDsON() and S.Rupture:IsCastable("Melee") and ComboPoints > 0 and S.Exsanguinate:IsAvailable()
     and ((ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
       or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (ComboPoints >= 2)))) then
     if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
   end
-  -- actions.dot+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains>4&spell_targets.fan_of_knives<=1|target.time_to_die-remains>12)&(master_assassin_remains=0|!ticking)
-  local function EmpoweredDotRefresh()
-    return Cache.EnemiesCount[10] >= 3 + num(S.ShroudedSuffocation:AzeriteEnabled())
-  end
+  -- actions.dot+=/garrote,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>4&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
+  -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>12&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
+  local EmpoweredDotRefresh = Cache.EnemiesCount[10] >= 3 + num(S.ShroudedSuffocation:AzeriteEnabled())
   if S.Garrote:IsCastable() and (Settings.Assassination.AlwaysSuggestGarrote or not S.Subterfuge:IsAvailable()
     or not HR.CDsON() or not (S.Vanish:CooldownUp() and S.Vendetta:CooldownRemainsP() <= 4))
-    and ComboPointsDeficit >= 1 + 3 * num(S.ShroudedSuffocation:AzeriteEnabled() and S.Vanish:CooldownUp()) then
+    and (ComboPointsDeficit >= 1 + 3 * num(S.ShroudedSuffocation:AzeriteEnabled() and S.Vanish:CooldownUp())) then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
-        and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote) <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh())
-        and (not HL.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5 and EmpoweredDotRefresh())
+        and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote)
+          <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
+        and (not HL.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5 and EmpoweredDotRefresh)
         and not SSBuffed(TargetUnit)
-        and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold) and (MasterAssassinRemains() <= 0 or not Target:DebuffP(S.Garrote));
+        and (MasterAssassinRemains() <= 0 or not Target:DebuffP(S.Garrote) and S.ShroudedSuffocation:AzeriteEnabled())
+        and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
     end
-    local ttdval = Cache.EnemiesCount[10] <= 1 and 4 or 12;
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target)
-      and (Target:FilteredTimeToDie(">", ttdval, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
+      and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
       -- actions.maintain+=/pool_resource,for_next=1
       if Player:EnergyPredicted() < 45 then
         if HR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
       end
       if HR.Cast(S.Garrote) then return "Cast Garrote (Refresh)"; end
     end
-    if HR.AoEON() then
-      SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, ttdval);
+    if HR.AoEON() and not SkipCycleGarrote then
+      SuggestCycleDoT(S.Garrote, Evaluate_Garrote_Target, 12);
     end
   end
   -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
@@ -656,19 +703,21 @@ local function Dot ()
     and Target:DebuffRemainsP(S.CrimsonTempest) < 2 + num(Cache.EnemiesCount[10] >= 5) then
     if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
   end
-  -- actions.dot+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
-  if ComboPoints >= 4 then
+  -- actions.dot+=/rupture,if=!variable.skip_rupture&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
+  -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
+  if not SkipRupture and ComboPoints >= 4 then
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
-        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture) <= (HL.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh())
-        and (not HL.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2 and EmpoweredDotRefresh())
+        and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture)
+          <= (HL.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
+        and (not HL.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2 and EmpoweredDotRefresh)
         and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold);
     end
     if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target)
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
       if HR.Cast(S.Rupture) then return "Cast Rupture (Refresh)"; end
     end
-    if HR.AoEON() then
+    if HR.AoEON() and not SkipCycleRupture then
       SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4);
     end
   end
@@ -693,19 +742,23 @@ local function Direct ()
   -------------------------------------------------------------------
   -------------------------------------------------------------------
 
-  -- actions.direct+=/fan_of_knives,if=variable.use_filler&azerite.echoing_blades.enabled&spell_targets.fan_of_knives>=2
-  if S.FanofKnives:IsCastable("Melee") and S.EchoingBlades:AzeriteEnabled() and Cache.EnemiesCount[10] >= 2 then
-    if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (Echoing Blades)"; end
-  end
-  -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
-  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Cache.EnemiesCount[10] >= 4 + num(Player:IsStealthedP(true, false)) + num(S.DoubleDose:AzeriteRank() > 2) or Player:BuffStack(S.TheDreadlordsDeceit) >= 29) then
-    if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
-  end
-  -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
-  if HR.AoEON() and S.FanofKnives:IsCastable("Melee") and Player:BuffP(S.DeadlyPoison) and Cache.EnemiesCount[10] >= 3 then
-    for _, CycleUnit in pairs(Cache.Enemies[10]) do
-      if not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
-        if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (DP Refresh)"; end
+  if S.FanofKnives:IsCastable("Melee") then
+    -- actions.direct+=/fan_of_knives,if=variable.use_filler&azerite.echoing_blades.enabled&spell_targets.fan_of_knives>=2
+    if S.EchoingBlades:AzeriteEnabled() and Cache.EnemiesCount[10] >= 2 then
+      if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (Echoing Blades)"; end
+    end
+    -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|(!priority_rotation&spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue))
+    if HR.AoEON() and (Player:BuffStack(S.HiddenBladesBuff) >= 19 or Player:BuffStack(S.TheDreadlordsDeceit) >= 29
+      or not PriorityRotation and Cache.EnemiesCount[10] >= 4 + num(Player:IsStealthedP(true, false)) + num(S.DoubleDose:AzeriteRank() > 2)) then
+      if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives"; end
+    end
+    -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
+    if HR.AoEON() and Player:BuffP(S.DeadlyPoison) and Cache.EnemiesCount[10] >= 3 then
+      for _, CycleUnit in pairs(Cache.Enemies[10]) do
+        -- Note: The APL does not do this due to target_if mechanics, but since we are cycling we should check to see if the unit has a bleed
+        if (CycleUnit:DebuffP(S.Garrote) or CycleUnit:DebuffP(S.Rupture)) and not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
+          if HR.Cast(S.FanofKnives) then return "Cast Fan of Knives (DP Refresh)"; end
+        end
       end
     end
   end
@@ -715,8 +768,10 @@ local function Direct ()
   end
   -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
   if S.Mutilate:IsCastable("Melee") and Cache.EnemiesCount[10] == 2 then
+    local TargetGUID = Target:GUID();
     for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
-      if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
+      -- Note: The APL does not do this due to target_if mechanics, but since we are cycling we should check to see if the unit has a bleed
+      if CycleUnit:GUID() ~= TargetGUID and (CycleUnit:DebuffP(S.Garrote) or CycleUnit:DebuffP(S.Rupture)) and not CycleUnit:DebuffP(S.DeadlyPoisonDebuff) then
         HR.CastLeftNameplate(CycleUnit, S.Mutilate);
         break;
       end
@@ -744,9 +799,9 @@ local function APL ()
   ComboPoints = Player:ComboPoints();
   ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints;
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3;
-  CrimsonTempestThreshold = (2 + ComboPoints * 2) * 0.3;
   RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   GarroteDMGThreshold = S.Mutilate:Damage()*Settings.Assassination.MutilateDMGOffset; -- Used as TTD Not Valid fallback since it's a generator.
+  PriorityRotation = UsePriorityRotation();
   DetermineEssenceRanks();
 
   -- Defensives
@@ -806,16 +861,19 @@ local function APL ()
     Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
 
     -- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
-    Energy_Regen_Combined = Player:EnergyRegen() + Rogue.PoisonedBleeds() * 7 / (2 * Player:SpellHaste());
+    PoisonedBleeds = Rogue.PoisonedBleeds()
+    Energy_Regen_Combined = Player:EnergyRegen() + PoisonedBleeds * 7 / (2 * Player:SpellHaste());
 
     -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
     if Player:IsStealthedP(true, false) then
       ShouldReturn = Stealthed();
       if ShouldReturn then return ShouldReturn .. " (Stealthed)"; end
     end
-    -- actions+=/call_action_list,name=cds
-    ShouldReturn = CDs();
-    if ShouldReturn then return ShouldReturn; end
+    -- actions+=/call_action_list,name=cds,if=!talent.master_assassin.enabled|dot.garrote.ticking
+    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) then
+      ShouldReturn = CDs();
+      if ShouldReturn then return ShouldReturn; end
+    end
     -- actions+=/call_action_list,name=dot
     ShouldReturn = Dot();
     if ShouldReturn then return ShouldReturn; end
@@ -853,7 +911,6 @@ end
 HR.SetAPL(259, APL);
 
 -- Last Update: 2019-07-11
--- NOTE: Still misses Prio improvements from Koji plus some stuff after.
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -864,20 +921,20 @@ HR.SetAPL(259, APL);
 -- actions.precombat+=/stealth
 -- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
---
+
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
 -- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
 -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
 -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
--- actions+=/call_action_list,name=cds
+-- actions+=/call_action_list,name=cds,if=!talent.master_assassin.enabled|dot.garrote.ticking
 -- actions+=/call_action_list,name=dot
 -- actions+=/call_action_list,name=direct
 -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
---
+
 -- # Stealthed Actions
 -- # Nighstalker, or Subt+Exsg on 1T: Snapshot Rupture
 -- actions.stealthed=rupture,if=combo_points>=4&(talent.nightstalker.enabled|talent.subterfuge.enabled&(talent.exsanguinate.enabled&cooldown.exsanguinate.remains<=2|!ticking)&variable.single_target)&target.time_to_die-remains>6
@@ -895,16 +952,16 @@ HR.SetAPL(259, APL);
 -- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
 -- actions.stealthed+=/pool_resource,for_next=1
 -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
---
+
 -- # Potion
 -- actions.cds=potion,if=buff.bloodlust.react|debuff.vendetta.up
---
+
 -- # Racials
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
---
+
 -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
---
+
 -- # Cooldowns
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
@@ -914,7 +971,7 @@ HR.SetAPL(259, APL);
 -- # - With Subterfuge talent and Shrouded Suffocation power, always use with buffed Garrote. After first vanish against 6+ targets.
 -- # - With Nightstalker and Exsanguinate, use up to 5s (3s with DS) before Vanish combo.
 -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)
---
+
 -- # Vanish with Exsg + (Nightstalker, or Subterfuge only on 1T): Maximum CP and Exsg ready for next GCD
 -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&variable.single_target)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
 -- # Vanish with Nightstalker + No Exsg: Maximum CP and Vendetta up
@@ -929,46 +986,56 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
 -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
--- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range
--- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3
---
+-- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range, during Blood essenz if available.
+-- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&(!essence.blood_of_the_enemy.major|buff.seething_rage.up)
+
 -- # Shadowmeld for Shrouded Suffocation
 -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
---
+
 -- # Exsanguinate when both Rupture and Garrote are up for long enough
 -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
 -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
---
+
 -- # Essences
 -- actions.essences=concentrated_flame
--- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up|debuff.vendetta.remains<=10)|target.time_to_die<=10
+-- # Always use Blood with Vendetta up. Also use with TB up before a finisher (if talented) as long as it runs for 10s during Vendetta.
+-- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
 -- actions.essences+=/guardian_of_azeroth
--- actions.essences+=/focused_azerite_beam
--- actions.essences+=/purifying_blast
+-- actions.essences+=/focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
+-- actions.essences+=/purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<50
---
+
 -- # Damage over time abilities
+-- # Limit Garrotes on non-primary targets for the priority rotation if 5+ bleeds are already up
+-- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&spell_targets.fan_of_knives>3&(dot.garrote.remains<cooldown.garrote.duration|poisoned_bleeds>5)
+-- # Limit Ruptures on non-primary targets for the priority rotation if 5+ bleeds are already up
+-- actions.dot+=/variable,name=skip_cycle_rupture,value=priority_rotation&spell_targets.fan_of_knives>3&(debuff.toxic_blade.up|(poisoned_bleeds>5&!azerite.scent_of_blood.enabled))
+-- # Limit Ruptures if Vendetta+Toxic Blade is up and we have 2+ seconds left on the Rupture DoT
+-- actions.dot+=/variable,name=skip_rupture,value=debuff.vendetta.up&debuff.toxic_blade.up&dot.rupture.remains>2
 -- # Special Rupture setup for Exsg
--- actions.dot=rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
+-- actions.dot+=/rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
 -- # Garrote upkeep, also tries to use it as a special generator for the last CP before a finisher
 -- actions.dot+=/pool_resource,for_next=1
--- actions.dot+=/garrote,cycle_targets=1,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains>4&spell_targets.fan_of_knives<=1|target.time_to_die-remains>12)&(master_assassin_remains=0|!ticking)
+-- actions.dot+=/garrote,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>4&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
+-- actions.dot+=/pool_resource,for_next=1
+-- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>12&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
 -- # Crimson Tempest only on multiple targets at 4+ CP when running out in 2s (up to 4 targets) or 3s (5+ targets)
 -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
 -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
--- actions.dot+=/rupture,cycle_targets=1,if=combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
---
+-- actions.dot+=/rupture,if=!variable.skip_rupture&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
+-- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
+
 -- # Direct damage abilities
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
 -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
 -- actions.direct+=/variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target
 -- # With Echoing Blades, Fan of Knives at 2+ targets.
 -- actions.direct+=/fan_of_knives,if=variable.use_filler&azerite.echoing_blades.enabled&spell_targets.fan_of_knives>=2
--- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ (5+ with Double Dose) targets.
--- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue)
+-- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ (5+ with Double Dose) targets, unless using priority rotation.
+-- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|(!priority_rotation&spell_targets.fan_of_knives>=4+(azerite.double_dose.rank>2)+stealthed.rogue))
 -- # Fan of Knives to apply Deadly Poison if inactive on any target at 3 targets.
 -- actions.direct+=/fan_of_knives,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives>=3
 -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled&!azerite.double_dose.enabled)
