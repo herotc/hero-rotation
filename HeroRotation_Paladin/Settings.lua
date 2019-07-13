@@ -31,6 +31,7 @@
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
+        AvengingWrath = true,
         Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
@@ -38,9 +39,6 @@
         -- Racials
         ArcaneTorrent = true,
         -- Abilities
-        AvengingWrath = true,
-        HandoftheProtector = true,
-        LightoftheProtector = true,
         ShieldoftheRighteous = true,
       }
     },
