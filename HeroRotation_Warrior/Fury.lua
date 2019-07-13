@@ -63,7 +63,8 @@ Spell.Warrior.Fury = {
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
   CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
   RecklessForce                         = Spell(302932),
-  RazorCoralDebuff                      = Spell(303568)
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565)
 };
 local S = Spell.Warrior.Fury;
 
@@ -212,7 +213,7 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
     -- run_action_list,name=movement,if=movement.distance>5
-    -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+    -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap)) then
       return Movement();
     end
@@ -265,21 +266,17 @@ local function APL()
     if S.MemoryOfLucidDreams:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff)) then
       if HR.Cast(S.MemoryOfLucidDreams, Settings.Fury.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
-    -- recklessness,if=!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up
-    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() or S.GuardianOfAzeroth:CooldownRemainsP() > 20 or Player:BuffP(S.GuardianOfAzeroth)) then
+    -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
+    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() and not S.BloodOfTheEnemy:IsAvailable() or S.GuardianOfAzeroth:CooldownRemainsP() > 20 or Player:BuffP(S.GuardianOfAzeroth) or S.BloodOfTheEnemy:CooldownRemainsP() < Player:GCD()) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
     if S.Whirlwind:IsCastableP() and (Cache.EnemiesCount[8] > 1 and not Player:BuffP(S.MeatCleaverBuff)) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|prev_gcd.1.memory_of_lucid_dreams|(prev_gcd.1.recklessness&!essence.memory_of_lucid_dreams.major)
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:PrevGCDP(1, S.MemoryOfLucidDreams) or (Player:PrevGCDP(1, S.Recklessness) and not S.MemoryOfLucidDreams:IsAvailable())) then
+    -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryOfLucidDreams) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianOfAzeroth) or not S.MemoryOfLucidDreams:IsAvailable() and not S.GuardianOfAzeroth:IsAvailable()))) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 115"; end
-    end
-    -- use_item,name=ashvanes_razor_coral
-    if I.AshvanesRazorCoral:IsReady() then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 116"; end
     end
     -- blood_fury,if=buff.recklessness.up
     if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
