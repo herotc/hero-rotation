@@ -398,57 +398,7 @@ local function Essences ()
 end
 
 local function CDs ()
-  -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
-  -- TODO: Add Potion
-
   if Target:IsInRange(S.SinisterStrike) then
-    -- Racials
-    if HR.CDsON() then
-      -- actions.cds+=/blood_fury
-      if S.BloodFury:IsCastable() then
-        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
-      end
-      -- actions.cds+=/berserking
-      if S.Berserking:IsCastable() then
-        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
-      end
-      -- actions.cds+=/fireblood
-      if S.Fireblood:IsCastable() then
-        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
-      end
-      -- actions.cds+=/ancestral_call
-      if S.AncestralCall:IsCastable() then
-        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
-      end
-      -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
-      if S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) and EnergyTimeToMaxRounded() > 1 then
-        if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush"; end
-      end
-    end
-
-    -- Trinkets
-    -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
-    if Settings.Commons.UseTrinkets then
-      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
-        HR.CastSuggested(I.GalecallersBoon);
-      end
-      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() then
-        HR.CastSuggested(I.LustrousGoldenPlumage);
-      end
-      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
-        HR.CastSuggested(I.InvocationOfYulon);
-      end
-      -- if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
-      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
-        and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
-          HR.CastSuggested(I.ComputationDevice);
-      end
-      -- Emulate SimC default behavior to use at max stacks
-      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-        HR.CastSuggested(I.VigorTrinket);
-      end
-    end
-
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
     if HR.CDsON() and not Player:IsStealthedP(true, true) then
       ShouldReturn = Essences();
@@ -503,6 +453,55 @@ local function CDs ()
         if S.Shadowmeld:IsCastable() and Ambush_Condition() then
           if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld"; end
         end
+      end
+    end
+
+    -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
+
+    -- Trinkets
+    -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+    if Settings.Commons.UseTrinkets then
+      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
+        HR.CastSuggested(I.GalecallersBoon);
+      end
+      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() then
+        HR.CastSuggested(I.LustrousGoldenPlumage);
+      end
+      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
+        HR.CastSuggested(I.InvocationOfYulon);
+      end
+      -- if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
+      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
+        and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
+          HR.CastSuggested(I.ComputationDevice);
+      end
+      -- Emulate SimC default behavior to use at max stacks
+      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
+        HR.CastSuggested(I.VigorTrinket);
+      end
+    end
+
+    -- Racials
+    if HR.CDsON() then
+      -- actions.cds+=/blood_fury
+      if S.BloodFury:IsCastable() then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
+      end
+      -- actions.cds+=/berserking
+      if S.Berserking:IsCastable() then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
+      end
+      -- actions.cds+=/fireblood
+      if S.Fireblood:IsCastable() then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+      end
+      -- actions.cds+=/ancestral_call
+      if S.AncestralCall:IsCastable() then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
+      end
+      -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
+      if S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) and EnergyTimeToMaxRounded() > 1 then
+        if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush"; end
       end
     end
   end

@@ -466,52 +466,6 @@ end
 -- # Cooldowns
 local function CDs ()
   if Target:IsInRange("Melee") then
-    -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
-
-    -- Racials
-    if HR.CDsON() and Target:Debuff(S.Vendetta) then
-      -- actions.cds+=/blood_fury,if=debuff.vendetta.up
-      if S.BloodFury:IsCastable() then
-        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
-      end
-      -- actions.cds+=/berserking,if=debuff.vendetta.up
-      if S.Berserking:IsCastable() then
-        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
-      end
-      -- actions.cds+=/fireblood,if=debuff.vendetta.up
-      if S.Fireblood:IsCastable() then
-        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
-      end
-      -- actions.cds+=/ancestral_call,if=debuff.vendetta.up
-      if S.AncestralCall:IsCastable() then
-        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
-      end
-    end
-
-    -- Trinkets
-    if Settings.Commons.UseTrinkets then
-      -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
-      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and S.Vendetta:CooldownRemains() > 45 then
-        HR.CastSuggested(I.GalecallersBoon);
-      end
-      -- use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
-      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and Target:Debuff(S.Vendetta) then
-        HR.CastSuggested(I.LustrousGoldenPlumage);
-      end
-      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
-        HR.CastSuggested(I.InvocationOfYulon);
-      end
-      -- if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
-      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and MasterAssassinRemains() <= 0 and not Target:DebuffP(S.Vendetta)
-        and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:Energy() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
-          HR.CastSuggested(I.ComputationDevice);
-      end
-      -- Emulate SimC default behavior to use at max stacks
-      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-        HR.CastSuggested(I.VigorTrinket);
-      end
-    end
-
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
     if HR.CDsON() and not Player:IsStealthedP(true, true) and Target:DebuffP(S.Rupture) and MasterAssassinRemains() <= 0 then
       ShouldReturn = Essences();
@@ -583,6 +537,52 @@ local function CDs ()
       -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
       if S.ToxicBlade:IsCastable("Melee") and Target:DebuffP(S.Rupture) then
         if HR.Cast(S.ToxicBlade) then return "Cast Toxic Blade"; end
+      end
+    end
+
+    -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|debuff.vendetta.up&cooldown.vanish.remains<5
+
+    -- Trinkets
+    if Settings.Commons.UseTrinkets then
+      -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
+      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and S.Vendetta:CooldownRemains() > 45 then
+        HR.CastSuggested(I.GalecallersBoon);
+      end
+      -- use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
+      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and Target:Debuff(S.Vendetta) then
+        HR.CastSuggested(I.LustrousGoldenPlumage);
+      end
+      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
+        HR.CastSuggested(I.InvocationOfYulon);
+      end
+      -- if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
+      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and MasterAssassinRemains() <= 0 and not Target:DebuffP(S.Vendetta)
+        and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:Energy() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
+          HR.CastSuggested(I.ComputationDevice);
+      end
+      -- Emulate SimC default behavior to use at max stacks
+      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
+        HR.CastSuggested(I.VigorTrinket);
+      end
+    end
+
+    -- Racials
+    if HR.CDsON() and Target:Debuff(S.Vendetta) then
+      -- actions.cds+=/blood_fury,if=debuff.vendetta.up
+      if S.BloodFury:IsCastable() then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
+      end
+      -- actions.cds+=/berserking,if=debuff.vendetta.up
+      if S.Berserking:IsCastable() then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
+      end
+      -- actions.cds+=/fireblood,if=debuff.vendetta.up
+      if S.Fireblood:IsCastable() then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+      end
+      -- actions.cds+=/ancestral_call,if=debuff.vendetta.up
+      if S.AncestralCall:IsCastable() then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
       end
     end
   end
