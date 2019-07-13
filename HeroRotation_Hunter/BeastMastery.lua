@@ -74,7 +74,7 @@ local S = Spell.Hunter.BeastMastery;
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
-  BattlePotionofAgility            = Item(163223)
+  PotionofUnbridledFury            = Item(169299)
 };
 local I = Item.Hunter.BeastMastery;
 
@@ -154,8 +154,8 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- potion
-      if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 6"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 6"; end
       end
       -- worldvein_resonance
       if S.WorldveinResonance:IsCastableP() then
@@ -201,8 +201,8 @@ local function APL()
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 60"; end
     end
     -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
-    if I.BattlePotionofAgility:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable()) or Target:TimeToDie() < 25) then
-      if HR.CastSuggested(I.BattlePotionofAgility) then return "battle_potion_of_agility 68"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable()) or Target:TimeToDie() < 25) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 68"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.Lifeblood) < 4) then
