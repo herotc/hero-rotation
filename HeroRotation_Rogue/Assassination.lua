@@ -453,8 +453,8 @@ local function Essences ()
       if HR.Cast(S.WorldveinResonance, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast WorldveinResonance"; end
     end
   end
-  -- memory_of_lucid_dreams,if=energy<50
-  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 then
+  -- memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
+  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 and not S.Vendetta:CooldownUp() then
     if Settings.Commons.EssenceDisplayStyle == "Suggested" then
       HR.CastSuggested(S.MemoryOfLucidDreams);
     else
@@ -910,7 +910,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-07-12
+-- Last Update: 2019-07-13
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -921,7 +921,7 @@ HR.SetAPL(259, APL);
 -- actions.precombat+=/stealth
 -- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
-
+--
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
@@ -934,7 +934,7 @@ HR.SetAPL(259, APL);
 -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
-
+--
 -- # Stealthed Actions
 -- # Nighstalker, or Subt+Exsg on 1T: Snapshot Rupture
 -- actions.stealthed=rupture,if=combo_points>=4&(talent.nightstalker.enabled|talent.subterfuge.enabled&(talent.exsanguinate.enabled&cooldown.exsanguinate.remains<=2|!ticking)&variable.single_target)&target.time_to_die-remains>6
@@ -952,17 +952,9 @@ HR.SetAPL(259, APL);
 -- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
 -- actions.stealthed+=/pool_resource,for_next=1
 -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
-
--- # Potion
--- actions.cds=potion,if=buff.bloodlust.react|debuff.vendetta.up
-
--- # Racials
--- actions.cds+=/blood_fury,if=debuff.vendetta.up
--- actions.cds+=/berserking,if=debuff.vendetta.up
-
--- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
-
+--
 -- # Cooldowns
+-- actions.cds=call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit*1.5|combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
@@ -971,7 +963,7 @@ HR.SetAPL(259, APL);
 -- # - With Subterfuge talent and Shrouded Suffocation power, always use with buffed Garrote. After first vanish against 6+ targets.
 -- # - With Nightstalker and Exsanguinate, use up to 5s (3s with DS) before Vanish combo.
 -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)
-
+--
 -- # Vanish with Exsg + (Nightstalker, or Subterfuge only on 1T): Maximum CP and Exsg ready for next GCD
 -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&variable.single_target)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
 -- # Vanish with Nightstalker + No Exsg: Maximum CP and Vendetta up
@@ -988,14 +980,18 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
 -- # Vanish with Master Assasin: No stealth and no active MA buff, Rupture not in refresh range, during Blood essenz if available.
 -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&(!essence.blood_of_the_enemy.major|buff.seething_rage.up)
-
+--
 -- # Shadowmeld for Shrouded Suffocation
 -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
-
+--
 -- # Exsanguinate when both Rupture and Garrote are up for long enough
 -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
 -- actions.cds+=/toxic_blade,if=dot.rupture.ticking
-
+--
+-- actions.cds+=/potion,if=buff.bloodlust.react|debuff.vendetta.up
+-- actions.cds+=/blood_fury,if=debuff.vendetta.up
+-- actions.cds+=/berserking,if=debuff.vendetta.up
+--
 -- # Essences
 -- actions.essences=concentrated_flame
 -- # Always use Blood with Vendetta up. Also use with TB up before a finisher (if talented) as long as it runs for 10s during Vendetta.
@@ -1006,8 +1002,8 @@ HR.SetAPL(259, APL);
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
--- actions.essences+=/memory_of_lucid_dreams,if=energy<50
-
+-- actions.essences+=/memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
+--
 -- # Damage over time abilities
 -- # Limit Garrotes on non-primary targets for the priority rotation if 5+ bleeds are already up
 -- actions.dot=variable,name=skip_cycle_garrote,value=priority_rotation&spell_targets.fan_of_knives>3&(dot.garrote.remains<cooldown.garrote.duration|poisoned_bleeds>5)
@@ -1027,7 +1023,7 @@ HR.SetAPL(259, APL);
 -- # Keep up Rupture at 4+ on all targets (when living long enough and not snapshot)
 -- actions.dot+=/rupture,if=!variable.skip_rupture&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
 -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
-
+--
 -- # Direct damage abilities
 -- # Envenom at 4+ (5+ with DS) CP. Immediately on 2+ targets, with Vendetta, or with TB; otherwise wait for some energy. Also wait if Exsg combo is coming up.
 -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|!variable.single_target)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
