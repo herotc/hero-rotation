@@ -779,10 +779,10 @@ local function APL ()
         if ShouldReturn then return "Stealth CDs: " .. ShouldReturn; end
       end
 
-      -- actions+=/nightblade,if=azerite.nights_vengeance.enabled&spell_targets.shuriken_storm<2&(cooldown.symbols_of_death.remains<=3|(buff.symbols_of_death.up&!stealthed.all&azerite.nights_vengeance.rank>=3))&!buff.nights_vengeance.up&combo_points>=2
+      -- actions+=/nightblade,if=azerite.nights_vengeance.enabled&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(buff.symbols_of_death.remains>3&!stealthed.all&azerite.nights_vengeance.rank>=3))&!buff.nights_vengeance.up&combo_points>=2
       if S.Nightblade:IsCastableP() and IsInMeleeRange()
-        and S.NightsVengeancePower:AzeriteEnabled() and Cache.EnemiesCount[10] < 2
-        and (S.SymbolsofDeath:CooldownRemainsP() <= 3 or (Player:BuffP(S.SymbolsofDeath) and not Player:IsStealthedP(true, true) and S.NightsVengeancePower:AzeriteRank() >=3 ))
+        and S.NightsVengeancePower:AzeriteEnabled() and (Cache.EnemiesCount[10] < 2 or UsePriorityRotation())
+        and (S.SymbolsofDeath:CooldownRemainsP() <= 3 or (Player:BuffRemainsP(S.SymbolsofDeath) > 3 and not Player:IsStealthedP(true, true) and S.NightsVengeancePower:AzeriteRank() >=3 ))
         and not Player:BuffP(S.NightsVengeanceBuff) and Player:ComboPoints() >= 2 then
         if HR.Cast(S.Nightblade) then return "Cast Nightblade (Nights Vengeance)"; end
       end
@@ -835,7 +835,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-07-11
+-- Last Update: 2019-07-15
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -865,7 +865,7 @@ HR.SetAPL(261, APL);
 -- # Consider using a Stealth CD when reaching the energy threshold
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
 -- # Night's Vengeance: Nightblade before Symbols at low CP to combine early refresh with getting the buff up. Also low CP during Symbols outside Dance with 3 NV.
--- actions+=/nightblade,if=azerite.nights_vengeance.enabled&spell_targets.shuriken_storm<2&(cooldown.symbols_of_death.remains<=3|(buff.symbols_of_death.up&!stealthed.all&azerite.nights_vengeance.rank>=3))&!buff.nights_vengeance.up&combo_points>=2
+-- actions+=/nightblade,if=azerite.nights_vengeance.enabled&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(buff.symbols_of_death.remains>3&!stealthed.all&azerite.nights_vengeance.rank>=3))&!buff.nights_vengeance.up&combo_points>=2
 -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
 -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
 -- # With DS also finish at 4+ against exactly 4 targets (outside stealth)
@@ -878,11 +878,8 @@ HR.SetAPL(261, APL);
 -- actions+=/lights_judgment
 --
 -- # Cooldowns
--- actions.cds=potion,if=buff.bloodlust.react|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
--- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
--- actions.cds+=/berserking,if=buff.symbols_of_death.up
 -- # Use Dance off-gcd before the first Shuriken Storm from Tornado comes in.
--- actions.cds+=/shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+-- actions.cds=shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking
@@ -900,13 +897,16 @@ HR.SetAPL(261, APL);
 -- # With SF, if not already done, use Tornado with SoD up.
 -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled&!raid_event.adds.up
+-- actions.cds+=/potion,if=buff.bloodlust.react|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
+-- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
+-- actions.cds+=/berserking,if=buff.symbols_of_death.up
 --
 -- # Essences
 -- actions.essences=concentrated_flame
 -- actions.essences+=/blood_of_the_enemy
 -- actions.essences+=/guardian_of_azeroth
 -- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
--- actions.essences+=/purifying_blast
+-- actions.essences+=/purifying_blast,if=spell_targets.shuriken_storm>=2|raid_event.adds.in>60
 -- actions.essences+=/the_unbound_force
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
