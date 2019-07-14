@@ -429,75 +429,39 @@ end
 local function Essences ()
   -- blood_of_the_enemy
   if S.BloodOfTheEnemy:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.BloodOfTheEnemy);
-    else
-      if HR.Cast(S.BloodOfTheEnemy, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast BloodOfTheEnemy"; end
-    end
+    if HR.Cast(S.BloodOfTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodOfTheEnemy"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.ConcentratedFlame);
-    else
-      if HR.Cast(S.ConcentratedFlame, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast ConcentratedFlame"; end
-    end
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast ConcentratedFlame"; end
   end
   -- guardian_of_azeroth
   if S.GuardianOfAzeroth:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.GuardianOfAzeroth);
-    else
-      if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
-    end
+    if HR.Cast(S.GuardianOfAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianOfAzeroth"; end
   end
   -- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
   if S.FocusedAzeriteBeam:IsCastableP() and not S.SymbolsofDeath:CooldownUp() and not Player:BuffP(S.SymbolsofDeath) and Player:EnergyDeficitPredicted() >= 30 then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.FocusedAzeriteBeam);
-    else
-      if HR.Cast(S.FocusedAzeriteBeam, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast FocusedAzeriteBeam"; end
-    end
+    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast FocusedAzeriteBeam"; end
   end
   -- purifying_blast
   if S.PurifyingBlast:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.PurifyingBlast);
-    else
-      if HR.Cast(S.PurifyingBlast, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast PurifyingBlast"; end
-    end
+    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast PurifyingBlast"; end
   end
   -- the_unbound_force
   if S.TheUnboundForce:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.TheUnboundForce);
-    else
-      if HR.Cast(S.TheUnboundForce, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast TheUnboundForce"; end
-    end
+    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast TheUnboundForce"; end
   end
   -- ripple_in_space
   if S.RippleInSpace:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.RippleInSpace);
-    else
-      if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast RippleInSpace"; end
-    end
+    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast RippleInSpace"; end
   end
   -- worldvein_resonance,if=buff.lifeblood.stack<3
   if S.WorldveinResonance:IsCastableP() and Player:BuffStackP(S.LifebloodBuff) < 3 then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.WorldveinResonance);
-    else
-      if HR.Cast(S.WorldveinResonance, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast WorldveinResonance"; end
-    end
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
   if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 40 and Player:BuffP(S.SymbolsofDeath) then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.MemoryOfLucidDreams);
-    else
-      if HR.Cast(S.MemoryOfLucidDreams, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast MemoryOfLucidDreams"; end
-    end
+    if HR.Cast(S.MemoryOfLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryOfLucidDreams"; end
   end
   return false;
 end

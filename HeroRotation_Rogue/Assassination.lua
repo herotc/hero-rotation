@@ -391,75 +391,39 @@ local function Essences ()
   -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
   if S.BloodOfTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable()
     or (Target:DebuffP(S.ToxicBladeDebuff) and Player:ComboPointsDeficit() <= 1) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.BloodOfTheEnemy);
-    else
-      if HR.Cast(S.BloodOfTheEnemy, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast BloodOfTheEnemy"; end
-    end
+    if HR.Cast(S.BloodOfTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodOfTheEnemy"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.ConcentratedFlame);
-    else
-      if HR.Cast(S.ConcentratedFlame, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast ConcentratedFlame"; end
-    end
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast ConcentratedFlame"; end
   end
   -- guardian_of_azeroth
   if S.GuardianOfAzeroth:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.GuardianOfAzeroth);
-    else
-      if HR.Cast(S.GuardianOfAzeroth, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast GuardianOfAzeroth"; end
-    end
+    if HR.Cast(S.GuardianOfAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianOfAzeroth"; end
   end
   -- focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
   if S.FocusedAzeriteBeam:IsCastableP() and Player:EnergyPredicted() < 70 then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.FocusedAzeriteBeam);
-    else
-      if HR.Cast(S.FocusedAzeriteBeam, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast FocusedAzeriteBeam"; end
-    end
+    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast FocusedAzeriteBeam"; end
   end
   -- purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
   if S.PurifyingBlast:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.PurifyingBlast);
-    else
-      if HR.Cast(S.PurifyingBlast, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast PurifyingBlast"; end
-    end
+    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast PurifyingBlast"; end
   end
   -- the_unbound_force
   if S.TheUnboundForce:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.TheUnboundForce);
-    else
-      if HR.Cast(S.TheUnboundForce, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast TheUnboundForce"; end
-    end
+    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast TheUnboundForce"; end
   end
   -- ripple_in_space
   if S.RippleInSpace:IsCastableP() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.RippleInSpace);
-    else
-      if HR.Cast(S.RippleInSpace, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast RippleInSpace"; end
-    end
+    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast RippleInSpace"; end
   end
   -- worldvein_resonance,if=buff.lifeblood.stack<3
   if S.WorldveinResonance:IsCastableP() and Player:BuffStackP(S.LifebloodBuff) < 3 then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.WorldveinResonance);
-    else
-      if HR.Cast(S.WorldveinResonance, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast WorldveinResonance"; end
-    end
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
   if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 and not S.Vendetta:CooldownUp() then
-    if Settings.Commons.EssenceDisplayStyle == "Suggested" then
-      HR.CastSuggested(S.MemoryOfLucidDreams);
-    else
-      if HR.Cast(S.MemoryOfLucidDreams, (Settings.Commons.EssenceDisplayStyle == "Cooldown")) then return "Cast MemoryOfLucidDreams"; end
-    end
+    if HR.Cast(S.MemoryOfLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryOfLucidDreams"; end
   end
   return false;
 end
@@ -546,23 +510,23 @@ local function CDs ()
     if Settings.Commons.UseTrinkets then
       -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
       if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and S.Vendetta:CooldownRemains() > 45 then
-        HR.CastSuggested(I.GalecallersBoon);
+        HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
       if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and Target:Debuff(S.Vendetta) then
-        HR.CastSuggested(I.LustrousGoldenPlumage);
+        HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle);
       end
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
-        HR.CastSuggested(I.InvocationOfYulon);
+        HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
       if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and MasterAssassinRemains() <= 0 and not Target:DebuffP(S.Vendetta)
         and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:EnergyPredicted() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
-          HR.CastSuggested(I.ComputationDevice);
+        HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- Emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-        HR.CastSuggested(I.VigorTrinket);
+        HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle);
       end
     end
 

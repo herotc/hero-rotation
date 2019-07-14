@@ -82,16 +82,18 @@
   end
   -- Main Cast
   HR.CastOffGCDOffset = 1;
-  function HR.Cast (Object, OffGCD)
+  function HR.Cast (Object, OffGCD, DisplayStyle)
     local ObjectTexture = HR.GetTexture(Object);
     local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(ObjectTexture);
-    if OffGCD then
+    if OffGCD or DisplayStyle == "Cooldown" then
       if HR.CastOffGCDOffset <= 2 then
         HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
         HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = HL.GetTime();
         return false;
       end
+    elseif DisplayStyle == "Suggested" then
+      HR.CastSuggested(Object);
     else
       local PoolResource = 9999000010
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();

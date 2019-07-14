@@ -24,6 +24,8 @@
       StealthOOC = true,
       -- Trinkets
       UseTrinkets = true,
+      TrinketDisplayStyle = "Suggested",
+      -- Essences
       EssenceDisplayStyle = "Suggested",
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -128,6 +130,7 @@
   CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, "Feint HP", "Set the Feint HP threshold.");
   CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.");
   CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
+  CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
   CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
   CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons");
   -- Assassination
