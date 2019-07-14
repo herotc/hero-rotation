@@ -78,7 +78,8 @@ local S = Spell.Hunter.Marksmanship;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Marksmanship = {
   PotionofUnbridledFury            = Item(169299),
-  GalecallersBoon                  = Item(159614)
+  GalecallersBoon                  = Item(159614),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Hunter.Marksmanship;
 
@@ -383,6 +384,10 @@ local function APL()
     -- use_item,name=galecallers_boon,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<10
     if I.GalecallersBoon:IsReady() and (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 10) then
       if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up|target.time_to_die<5
+    if I.PocketsizedComputationDevice.IsReady() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 5) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
     -- call_action_list,name=cds
