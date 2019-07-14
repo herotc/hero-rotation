@@ -109,7 +109,8 @@ Spell.Rogue.Outlaw = {
   SkullandCrossbones              = Spell(199603),
   TrueBearing                     = Spell(193359),
   -- Misc
-  VigorTrinketBuff      = Spell(287916),
+  VigorTrinketBuff                = Spell(287916),
+  RazorCoralDebuff                = Spell(303568),
 };
 local S = Spell.Rogue.Outlaw;
 
@@ -122,6 +123,8 @@ Item.Rogue.Outlaw = {
   LustrousGoldenPlumage = Item(159617, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
+  FontOfPower           = Item(169314, {13, 14}),
+  RazorCoral            = Item(169311, {13, 14}),
 };
 local I = Item.Rogue.Outlaw;
 
@@ -434,6 +437,11 @@ local function CDs ()
       if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
         and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
         HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+      end
+      -- if=debuff.razor_coral_debuff.down|buff.adrenaline_rush.up&(target.health.pct<30|target.time_to_die<60)
+      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
+        or Target:BuffP(S.AdrenalineRush) and (Target:HealthPercentage() < 31 or Target:FilteredTimeToDie("<", 60))) then
+        HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- Emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then

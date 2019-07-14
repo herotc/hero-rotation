@@ -110,6 +110,7 @@ Spell.Rogue.Assassination = {
   -- Misc
   TheDreadlordsDeceit   = Spell(208693),
   VigorTrinketBuff      = Spell(287916),
+  RazorCoralDebuff      = Spell(303568),
   PoolEnergy            = Spell(9999000010)
 };
 local S = Spell.Rogue.Assassination;
@@ -122,6 +123,8 @@ Item.Rogue.Assassination = {
   LustrousGoldenPlumage = Item(159617, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
+  FontOfPower           = Item(169314, {13, 14}),
+  RazorCoral            = Item(169311, {13, 14}),
 };
 local I = Item.Rogue.Assassination;
 
@@ -524,7 +527,12 @@ local function CDs ()
         and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:EnergyPredicted() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
         HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
       end
-      -- Emulate SimC default behavior to use at max stacks
+      -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20
+      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
+        or Target:DebuffRemainsP(S.Vendetta) > 10 or Target:FilteredTimeToDie("<", 20)) then
+        HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+      end
+      -- V.I.G.O.R. trinket, emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
         HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle);
       end
@@ -828,13 +836,22 @@ local function APL ()
     PoisonedBleeds = Rogue.PoisonedBleeds()
     Energy_Regen_Combined = Player:EnergyRegen() + PoisonedBleeds * 7 / (2 * Player:SpellHaste());
 
+    -- Special Font of Power Handling
+    if Settings.Commons.UseTrinkets then
+      -- use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10&!debuff.vendetta.up&!debuff.toxic_blade.up
+      if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and MasterAssassinRemains() <= 0
+        and S.Vendetta:CooldownRemains() < 10 and not Target:DebuffP(S.Vendetta) and not Target:DebuffP(S.ToxicBladeDebuff) then
+        HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+      end
+    end
+
     -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
     if Player:IsStealthedP(true, false) then
       ShouldReturn = Stealthed();
       if ShouldReturn then return ShouldReturn .. " (Stealthed)"; end
     end
-    -- actions+=/call_action_list,name=cds,if=!talent.master_assassin.enabled|dot.garrote.ticking
-    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) then
+    -- actions+=/call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!trinket.azsharas_font_of_power.cooldown.up)
+    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) and (not I.FontOfPower:IsEquipped() or not I.FontOfPower:IsReady()) then
       ShouldReturn = CDs();
       if ShouldReturn then return ShouldReturn; end
     end
