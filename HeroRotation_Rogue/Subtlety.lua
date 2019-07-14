@@ -982,8 +982,9 @@ HR.SetAPL(261, APL);
 -- actions.stealthed+=/shadowstrike
 --
 -- # Finishers
+-- actions.finish=pool_resource,for_next=1
 -- # Eviscerate has highest priority with Night's Vengeance up.
--- actions.finish=eviscerate,if=buff.nights_vengeance.up
+-- actions.finish+=/eviscerate,if=buff.nights_vengeance.up
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2
 -- # Multidotting outside Dance on targets that will live for the duration of Nightblade, refresh during pandemic. Multidot as long as 2+ targets do not have Nightblade up with Replicating Shadows (unless you have Night's Vengeance too).
