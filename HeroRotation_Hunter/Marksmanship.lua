@@ -385,6 +385,10 @@ local function APL()
     if I.GalecallersBoon:IsReady() and (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 10) then
       if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
     end
+    -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up|target.time_to_die<5
+    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 5) then
+      if Hr.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
+    end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
     -- call_action_list,name=cds
     if (true) then
