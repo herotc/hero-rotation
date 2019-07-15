@@ -65,14 +65,17 @@ Spell.Warlock.Demonology = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932)
+  VisionOfPerfection                    = MultiSpell(296325, 299368, 299370),
+  RecklessForce                         = Spell(302932),
+  Lifeblood                             = MultiSpell(295137, 305694),
 };
 local S = Spell.Warlock.Demonology;
 
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
-  PotionofUnbridledFury        = Item(169299)
+  PotionofUnbridledFury        = Item(169299),
+  AzsharasFontofPower          = Item(169314)
 };
 local I = Item.Warlock.Demonology;
 
@@ -224,6 +227,10 @@ local function APL()
     -- doom,line_cd=30
     if S.Doom:IsCastableP() and (Target:DebuffRefreshableCP(S.DoomDebuff)) then
       if HR.Cast(S.Doom) then return "doom 34"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianOfAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianOfAzeroth, Settings.Demonology.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- hand_of_guldan,if=prev_gcd.1.hand_of_guldan&soul_shard>0&prev_gcd.2.soul_strike
     if S.HandofGuldan:IsCastableP() and (Player:PrevGCDP(1, S.HandofGuldan) and Player:SoulShardsP() > 0 and Player:PrevGCDP(2, S.SoulStrike)) then
@@ -430,34 +437,46 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts);
-    -- potion,if=pet.demonic_tyrant.active&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
+    -- potion,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 322"; end
     end
-    -- use_items,if=pet.demonic_tyrant.active|target.time_to_die<=15
-    -- berserking,if=pet.demonic_tyrant.active|target.time_to_die<=15
-    if S.Berserking:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+    -- use_item,name=azsharas_font_of_power,if=cooldown.summon_demonic_tyrant.remains<=20
+    if I.AzsharasFontofPower:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() <= 20) then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
+    end
+    -- use_items,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+    -- berserking,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+    if S.Berserking:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 329"; end
     end
-    -- blood_fury,if=pet.demonic_tyrant.active|target.time_to_die<=15
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+    -- blood_fury,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+    if S.BloodFury:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 331"; end
     end
-    -- fireblood,if=pet.demonic_tyrant.active|target.time_to_die<=15
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+    -- fireblood,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+    if S.Fireblood:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 333"; end
     end
-    -- worldvein_resonance,if=pet.demonic_tyrant.active|target.time_to_die<=15
-    if S.WorldveinResonance:IsCastableP() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+    -- blood_of_the_enemy,if=pet.demonic_tyrant.active&pet.demonic_tyrant.remains<=15-gcd*3&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)
+    if S.BloodOfTheEnemy:IsCastableP() and (DemonicTyrantTime() > 0 and DemonicTyrantTime() <= 15 - Player:GCD() * 3 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5)) then
+      if HR.Cast(S.BloodOfTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    end
+    -- worldvein_resonance,if=buff.lifeblood.stack<3&(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.Lifeblood) < 3 and (DemonicTyrantTime() > 0 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15)) then
       if HR.Cast(S.WorldveinResonance, Settings.Demonology.GCDasOffGCD.Essences) then return "worldvein_resonance 334"; end
     end
-    -- ripple_in_space,if=pet.demonic_tyrant.active|target.time_to_die<=15
-    if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 15) then
+    -- ripple_in_space,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+    if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 and (not S.VisionOfPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.RippleInSpace, Settings.Demonology.GCDasOffGCD.Essences) then return "ripple_in_space 335"; end
     end
     -- call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
     if (S.DemonicConsumption:IsAvailable() and HL.CombatTime() < 30 and not bool(S.SummonDemonicTyrant:CooldownRemainsP())) then
       local ShouldReturn = DconOpener(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- use_item,name=azsharas_font_of_power,if=talent.grimoire_felguard.enabled&(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15)|target.time_to_die<=35
+    if I.AzsharasFontofPower:IsReady() and (S.GrimoireFelguard:IsAvailable() and (Target:TimeToDie() > 120 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemainsP() + 15) or Target:TimeToDie() <= 35) then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
     end
     -- hand_of_guldan,if=azerite.explosive_potential.rank&time<5&soul_shard>2&buff.explosive_potential.down&buff.wild_imps.stack<3&!prev_gcd.1.hand_of_guldan&&!prev_gcd.2.hand_of_guldan
     if S.HandofGuldan:IsCastableP() and (bool(S.ExplosivePotential:AzeriteRank()) and HL.CombatTime() < 5 and Player:SoulShardsP() > 2 and Player:BuffDownP(S.ExplosivePotentialBuff) and WildImpsCount() < 3 and not Player:PrevGCDP(1, S.HandofGuldan) and not Player:PrevGCDP(2, S.HandofGuldan)) then
@@ -491,8 +510,8 @@ local function APL()
     if (EnemiesCount > 1) then
       local ShouldReturn = Implosion(); if ShouldReturn then return ShouldReturn; end
     end
-    -- guardian_of_azeroth,if=pet.demonic_tyrant.active|target.time_to_die<=30
-    if S.GuardianOfAzeroth:IsCastableP() and (DemonicTyrantTime() > 0 or Target:TimeToDie() <= 30) then
+    -- guardian_of_azeroth,if=cooldown.summon_demonic_tyrant.remains<=15|target.time_to_die<=30
+    if S.GuardianOfAzeroth:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() <= 15 or Target:TimeToDie() <= 30) then
       if HR.Cast(S.GuardianOfAzeroth, Settings.Demonology.GCDasOffGCD.Essences) then return "guardian_of_azeroth 408"; end
     end
     -- grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
