@@ -433,6 +433,9 @@ local function CDs ()
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
         HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle);
       end
+      if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
+        HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+      end
       -- if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
       if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
         and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
