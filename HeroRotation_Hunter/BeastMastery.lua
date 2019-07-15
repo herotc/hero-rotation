@@ -50,10 +50,13 @@ Spell.Hunter.BeastMastery = {
   DireBeast                             = Spell(120679),
   CobraShot                             = Spell(193455),
   SpittingCobra                         = Spell(194407),
+  OneWithThePack                        = Spell(199528),
   Intimidation                          = Spell(19577),
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
   RazorCoralDebuff                      = Spell(303568),
+  DanceofDeath                          = Spell(274441),
+  DanceofDeathBuff                      = Spell(274443),
   -- Essences
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
@@ -67,6 +70,7 @@ Spell.Hunter.BeastMastery = {
   Lifeblood                             = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForce                         = Spell(302932),
+  CyclotronicBlast                      = Spell(167672),
   -- Misc
   PoolFocus                             = Spell(9999000010),
 };
@@ -76,7 +80,8 @@ local S = Spell.Hunter.BeastMastery;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311)
+  AshvanesRazorCoral               = Item(169311),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Hunter.BeastMastery;
 
@@ -128,6 +133,22 @@ local function bool(val)
   return val ~= 0
 end
 
+local function EvaluateTargetIfFilterBarbedShot74(TargetUnit)
+  return TargetUnit:DebuffRemainsP(S.BarbedShot)
+end
+
+local function EvaluateTargetIfBarbedShot75(TargetUnit)
+  return (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() + 0.150)
+end
+
+local function EvaluateTargetIfBarbedShot85(TargetUnit)
+  return (S.BarbedShot:FullRechargeTimeP() < Player:GCD() + 0.150 and bool(S.BestialWrath:CooldownRemainsP()))
+end
+
+local function EvaluateTargetIfBarbedShot123(TargetUnit)
+  return (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - Player:GCD() + 0.150 and S.PrimalInstincts:AzeriteEnabled() or S.BarbedShot:ChargesFractionalP() > 1.4 or Target:TimeToDie() < 9)
+end
+
 -- Register Splash Data Nucleus Abilities
 HL.RegisterNucleusAbility(2643, 8, 6)               -- Multi-Shot
 HL.RegisterNucleusAbility(194392, 8, 6)             -- Volley
@@ -144,6 +165,7 @@ local function APL()
   -- BM APL uses a lot of gcd.max specific timing that is slightly tight for real-world suggestions
   GCDMax = Player:GCD() + 0.150
   EnemiesCount = GetEnemiesCount(8)
+  HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
 
   Precombat = function()
     -- flask
@@ -171,12 +193,16 @@ local function APL()
       if S.MemoryOfLucidDreams:IsCastableP() then
         if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
+      -- focused_azerite_beam,if=!raid_event.invulnerable.exists
+      if S.FocusedAzeriteBeam:IsCastableP() then
+        if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      end
       -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
-      if S.AspectoftheWild:IsCastableP() and Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled()) then
+      if S.AspectoftheWild:IsCastableP() and (Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled())) then
         if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
       end
-      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
-      if S.BestialWrath:IsCastableP() and Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) then
+      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
+      if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) and (not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
       end
     end
@@ -224,17 +250,17 @@ local function APL()
     end
   end
   Cleave = function()
-    -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-    if S.BarbedShot:IsCastableP() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax) then
-      if HR.Cast(S.BarbedShot) then return "barbed_shot 76"; end
+    -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
+    if S.BarbedShot:IsCastableP() then
+      if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot75) then return "barbed_shot 76"; end
     end
     -- multishot,if=gcd.max-pet.cat.buff.beast_cleave.remains>0.25
     if S.Multishot:IsCastableP() and (GCDMax - Pet:BuffRemainsP(S.BeastCleaveBuff) > 0.25) then
       if HR.Cast(S.Multishot) then return "multishot 82"; end
     end
-    -- barbed_shot,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
-    if S.BarbedShot:IsCastableP() and (S.BarbedShot:FullRechargeTimeP() < GCDMax and bool(S.BestialWrath:CooldownRemainsP())) then
-      if HR.Cast(S.BarbedShot) then return "barbed_shot 86"; end
+    -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
+    if S.BarbedShot:IsCastableP() then
+      if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot85) then return "barbed_shot 86"; end
     end
     -- aspect_of_the_wild
     if S.AspectoftheWild:IsCastableP() then
@@ -244,8 +270,8 @@ local function APL()
     if S.Stampede:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:TimeToDie() < 15) then
       if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede) then return "stampede 96"; end
     end
-    -- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15
-    if S.BestialWrath:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() > 20 or Target:TimeToDie() < 15) then
+    -- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|talent.one_with_the_pack.enabled|target.time_to_die<15
+    if S.BestialWrath:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() > 20 or S.OneWithThePack:IsAvailable() or Target:TimeToDie() < 15) then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 102"; end
     end
     -- chimaera_shot
@@ -268,9 +294,9 @@ local function APL()
     if S.DireBeast:IsCastableP() then
       if HR.Cast(S.DireBeast) then return "dire_beast 122"; end
     end
-    -- barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9
-    if S.BarbedShot:IsCastableP() and (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
-      if HR.Cast(S.BarbedShot) then return "barbed_shot 124"; end
+    -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
+    if S.BarbedShot:IsCastableP() then
+      if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot123) then return "barbed_shot 124"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
@@ -288,8 +314,8 @@ local function APL()
     if S.BloodOfTheEnemy:IsCastableP() then
       if HR.Cast(S.BloodOfTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
       if HR.Cast(S.TheUnboundForce, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- multishot,if=azerite.rapid_reload.enabled&active_enemies>2
@@ -306,24 +332,28 @@ local function APL()
     end
   end
   St = function()
-    -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max|full_recharge_time<gcd.max&cooldown.bestial_wrath.remains|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd
-    if S.BarbedShot:IsCastableP() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax or S.BarbedShot:FullRechargeTimeP() < GCDMax and bool(S.BestialWrath:CooldownRemainsP()) or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < GCDMax) then
+    -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<gcd|full_recharge_time<gcd&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd)
+    if S.BarbedShot:IsCastableP() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) < Player:GCD() and (S.BarbedShot:FullRechargeTimeP() < Player:GCD() or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < Player:GCD())) then
       if HR.Cast(S.BarbedShot) then return "barbed_shot 164"; end
     end
-    -- aspect_of_the_wild
-    if S.AspectoftheWild:IsCastableP() then
+    -- aspect_of_the_wild,if=cooldown.barbed_shot.charges<2|pet.cat.buff.frenzy.stack>2|!azerite.primal_instincts.enabled
+    if S.AspectoftheWild:IsCastableP() and (S.BarbedShot:ChargesP() < 2 or Pet:BuffStackP(S.FrenzyBuff) > 2 or not S.PrimalInstincts:AzeriteEnabled()) then
       if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 180"; end
-    end
-    -- a_murder_of_crows
-    if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 182"; end
     end
     -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
     if S.Stampede:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:TimeToDie() < 15) then
-      if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede) then return "stampede 184"; end
+      if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede) then return "stampede 182"; end
     end
-    -- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15
-    if S.BestialWrath:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() > 20 or Target:TimeToDie() < 15) then
+    -- a_murder_of_crows,if=cooldown.bestial_wrath.remains
+    if S.AMurderofCrows:IsCastableP() and (bool(S.BestialWrath:CooldownRemainsP())) then
+      if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 183"; end
+    end
+    -- focused_azerite_beam,if=buff.bestial_wrath.down
+    if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff)) then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam 184"; end
+    end
+    -- bestial_wrath
+    if S.BestialWrath:IsCastableP() then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 190"; end
     end
     -- kill_command
@@ -338,13 +368,9 @@ local function APL()
     if S.DireBeast:IsCastableP() then
       if HR.Cast(S.DireBeast) then return "dire_beast 198"; end
     end
-    -- barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9
-    if S.BarbedShot:IsCastableP() and (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
+    -- barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|azerite.dance_of_death.rank>1&buff.dance_of_death.down&crit_pct_current>40|target.time_to_die<9
+    if S.BarbedShot:IsCastableP() and (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or S.DanceofDeath:AzeriteRank() > 1 and Player:BuffDownP(S.DanceofDeathBuff) and Player:CritChancePct() > 40 or Target:TimeToDie() < 9) then
       if HR.Cast(S.BarbedShot) then return "barbed_shot 200"; end
-    end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
@@ -379,6 +405,10 @@ local function APL()
     -- spitting_cobra
     if S.SpittingCobra:IsCastableP() then
       if HR.Cast(S.SpittingCobra, Settings.BeastMastery.GCDasOffGCD.SpittingCobra) then return "spitting_cobra 234"; end
+    end
+    -- barbed_shot,if=charges_fractional>1.4
+    if S.BarbedShot:IsCastableP() and (S.BarbedShot:ChargesFractionalP() > 1.4) then
+      if HR.Cast(S.BarbedShot) then return "barbed_shot 235"; end
     end
   end
   -- call precombat
