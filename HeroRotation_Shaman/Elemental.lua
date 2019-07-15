@@ -415,6 +415,7 @@ local function APL()
     if S.TotemMastery:IsCastableP() and (S.TotemMastery:IsAvailable() and not Player:BuffP(S.ResonanceTotemBuff)) then
       if HR.Cast(S.TotemMastery) then return "totem_mastery 585"; end
     end
+    -- use_items
     -- fire_elemental,if=!talent.storm_elemental.enabled
     if S.FireElemental:IsCastableP() and HR.CDsON() and (not S.StormElemental:IsAvailable()) then
       if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "fire_elemental 591"; end
@@ -424,7 +425,6 @@ local function APL()
       if HR.Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental 595"; end
     end
     -- earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(cooldown.fire_elemental.remains<120&!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120&talent.storm_elemental.enabled)
-    -- use_items
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, Settings.Elemental.GCDasOffGCD.Essences) then return "concentrated_flame"; end
