@@ -54,6 +54,7 @@ Spell.DemonHunter.Havoc = {
   Disrupt                               = Spell(183752),
   FelEruption                           = Spell(211881),
   ChaosNova                             = Spell(179057),
+  RazorCoralDebuff                      = Spell(303568),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -63,6 +64,7 @@ Spell.DemonHunter.Havoc = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  Lifeblood                             = MultiSpell(295137, 305694),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.DemonHunter.Havoc;
@@ -70,8 +72,9 @@ local S = Spell.DemonHunter.Havoc;
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Havoc = {
-  PotionofFocusedResolve                      = Item(168506),
-  VariableIntensityGigavoltOscillatingReactor = Item(165572)
+  PotionofFocusedResolve           = Item(168506),
+  AshvanesRazorCoral               = Item(169311),
+  DribblingInkpod                  = Item(169319)
 };
 local I = Item.DemonHunter.Havoc;
 
@@ -189,20 +192,20 @@ local function APL()
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, Settings.Havoc.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
-    -- blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
+    -- blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
+    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
       if HR.Cast(S.BloodOfTheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
     if S.GuardianOfAzeroth:IsCastableP() then
       if HR.Cast(S.GuardianOfAzeroth, Settings.Havoc.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
+    -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Havoc.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastableP() then
+    -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
+    if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
       if HR.Cast(S.PurifyingBlast, Settings.Havoc.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- the_unbound_force
@@ -213,8 +216,8 @@ local function APL()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, Settings.Havoc.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=buff.lifeblood.stack<3
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.Lifeblood) < 3) then
       if HR.Cast(S.WorldveinResonance, Settings.Havoc.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
@@ -240,9 +243,9 @@ local function APL()
     if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 55"; end
     end
-    -- use_item,name=variable_intensity_gigavolt_oscillating_reactor
-    if I.VariableIntensityGigavoltOscillatingReactor:IsReady() then
-      if HR.CastSuggested(I.VariableIntensityGigavoltOscillatingReactor) then return "variable_intensity_gigavolt_oscillating_reactor 59"; end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod&(buff.metamorphosis.remains>20|target.time_to_die<20))|(equipped.dribbling_inkpod&target.health.pct<31)
+    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() and (Player:BuffRemainsP(S.MetamorphosisBuff) > 20 or Target:TimeToDie() < 20)) or (I.DribblingInkpod:IsEquipped() and Target:HealthPercentage() < 31)) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
     end
     -- call_action_list,name=essences
     if (true) then
