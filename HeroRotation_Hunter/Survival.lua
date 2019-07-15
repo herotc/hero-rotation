@@ -75,14 +75,16 @@ Spell.Hunter.Survival = {
   TermsofEngagement                     = Spell(265895),
   VipersVenom                           = Spell(268501),
   AlphaPredator                         = Spell(269737),
-  ArcaneTorrent                         = Spell(50613)
+  ArcaneTorrent                         = Spell(50613),
+  RazorCoralDebuff                      = Spell(303568)
 };
 local S = Spell.Hunter.Survival;
 
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Survival = {
-  PotionofUnbridledFury            = Item(169299)
+  PotionofUnbridledFury            = Item(169299),
+  AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.Hunter.Survival;
 
@@ -358,6 +360,10 @@ local function APL()
     -- aspect_of_the_eagle,if=target.distance>=6
     if S.AspectoftheEagle:IsCastableP() and HR.CDsON() and (not Target:IsInRange(8) and Target:IsInRange(40)) then
       if HR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return "aspect_of_the_eagle 320"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsReady() and (Player:BuffP(S.MemoryOfLucidDreams) or Player:BuffP(S.GuardianOfAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
