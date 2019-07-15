@@ -53,6 +53,7 @@ Spell.Hunter.BeastMastery = {
   Intimidation                          = Spell(19577),
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
+  RazorCoralDebuff                      = Spell(303568),
   -- Essences
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
@@ -74,7 +75,8 @@ local S = Spell.Hunter.BeastMastery;
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
-  PotionofUnbridledFury            = Item(169299)
+  PotionofUnbridledFury            = Item(169299),
+  AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.Hunter.BeastMastery;
 
@@ -392,6 +394,10 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items
+    -- use_item,name=ashvanes_razor_coral,if=buff.aspect_of_the_wild.remains>15|debuff.razor_coral_debuff.down|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsReady() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 15 or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
+    end
     -- call_action_list,name=cds
     if (true) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
