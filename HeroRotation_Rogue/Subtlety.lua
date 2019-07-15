@@ -18,165 +18,171 @@ local tableinsert = table.insert;
 
 --- APL Local Vars
 -- Commons
-  local Everyone = HR.Commons.Everyone;
-  local Rogue = HR.Commons.Rogue;
+local Everyone = HR.Commons.Everyone;
+local Rogue = HR.Commons.Rogue;
 -- Spells
-  if not Spell.Rogue then Spell.Rogue = {}; end
-  Spell.Rogue.Subtlety = {
-    -- Racials
-    AncestralCall                         = Spell(274738),
-    ArcanePulse                           = Spell(260364),
-    ArcaneTorrent                         = Spell(50613),
-    Berserking                            = Spell(26297),
-    BloodFury                             = Spell(20572),
-    Fireblood                             = Spell(265221),
-    LightsJudgment                        = Spell(255647),
-    Shadowmeld                            = Spell(58984),
-    -- Abilities
-    Backstab                              = Spell(53),
-    Eviscerate                            = Spell(196819),
-    Nightblade                            = Spell(195452),
-    ShadowBlades                          = Spell(121471),
-    ShurikenComboBuff                     = Spell(245640),
-    ShadowDance                           = Spell(185313),
-    ShadowDanceBuff                       = Spell(185422),
-    Shadowstrike                          = Spell(185438),
-    ShurikenStorm                         = Spell(197835),
-    ShurikenToss                          = Spell(114014),
-    Stealth                               = Spell(1784),
-    Stealth2                              = Spell(115191), -- w/ Subterfuge Talent
-    SymbolsofDeath                        = Spell(212283),
-    Vanish                                = Spell(1856),
-    VanishBuff                            = Spell(11327),
-    VanishBuff2                           = Spell(115193), -- w/ Subterfuge Talent
-    -- Talents
-    Alacrity                              = Spell(193539),
-    DarkShadow                            = Spell(245687),
-    DeeperStratagem                       = Spell(193531),
-    EnvelopingShadows                     = Spell(238104),
-    FindWeakness                          = Spell(91023),
-    FindWeaknessDebuff                    = Spell(91021),
-    Gloomblade                            = Spell(200758),
-    MarkedforDeath                        = Spell(137619),
-    MasterofShadows                       = Spell(196976),
-    Nightstalker                          = Spell(14062),
-    SecretTechnique                       = Spell(280719),
-    ShadowFocus                           = Spell(108209),
-    ShurikenTornado                       = Spell(277925),
-    Subterfuge                            = Spell(108208),
-    Vigor                                 = Spell(14983),
-    Weaponmaster                          = Spell(193537),
-    -- Azerite Traits
-    BladeInTheShadows                     = Spell(275896),
-    Inevitability                         = Spell(278683),
-    NightsVengeancePower                  = Spell(273418),
-    NightsVengeanceBuff                   = Spell(273424),
-    Perforate                             = Spell(277673),
-    ReplicatingShadows                    = Spell(286121),
-    TheFirstDance                         = Spell(278681),
-    -- Essences
-    BloodOfTheEnemy       = Spell(297108),
-    BloodOfTheEnemy2      = Spell(298273),
-    BloodOfTheEnemy3      = Spell(298277),
-    ConcentratedFlame     = Spell(295373),
-    ConcentratedFlame2    = Spell(299349),
-    ConcentratedFlame3    = Spell(299353),
-    GuardianOfAzeroth     = Spell(295840),
-    GuardianOfAzeroth2    = Spell(299355),
-    GuardianOfAzeroth3    = Spell(299358),
-    FocusedAzeriteBeam    = Spell(295258),
-    FocusedAzeriteBeam2   = Spell(299336),
-    FocusedAzeriteBeam3   = Spell(299338),
-    PurifyingBlast        = Spell(295337),
-    PurifyingBlast2       = Spell(299345),
-    PurifyingBlast3       = Spell(299347),
-    TheUnboundForce       = Spell(298452),
-    TheUnboundForce2      = Spell(299376),
-    TheUnboundForce3      = Spell(299378),
-    RippleInSpace         = Spell(302731),
-    RippleInSpace2        = Spell(302982),
-    RippleInSpace3        = Spell(302983),
-    WorldveinResonance    = Spell(295186),
-    WorldveinResonance2   = Spell(298628),
-    WorldveinResonance3   = Spell(299334),
-    LifebloodBuff         = Spell(295137),
-    MemoryOfLucidDreams   = Spell(298357),
-    MemoryOfLucidDreams2  = Spell(299372),
-    MemoryOfLucidDreams3  = Spell(299374),
-    -- Defensive
-    CrimsonVial                           = Spell(185311),
-    Feint                                 = Spell(1966),
-    -- Utility
-    Blind                                 = Spell(2094),
-    CheapShot                             = Spell(1833),
-    Kick                                  = Spell(1766),
-    KidneyShot                            = Spell(408),
-    Sprint                                = Spell(2983),
-    -- Misc
-    TheDreadlordsDeceit                   = Spell(228224),
-    PoolEnergy                            = Spell(9999000010)
-  };
-  local S = Spell.Rogue.Subtlety;
-  S.Eviscerate:RegisterDamage(
-    -- Eviscerate DMG Formula (Pre-Mitigation):
-    --- Player Modifier
-      -- AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * NS_M * DS_M * DSh_M * SoD_M * ShC_M * Mastery_M * Versa_M
-    --- Target Modifier
-      -- NB_M
-    function ()
-      return
-        --- Player Modifier
-          -- Attack Power
-          Player:AttackPowerDamageMod() *
-          -- Combo Points
-          Rogue.CPSpend() *
-          -- Eviscerate R1 AP Coef
-          0.16074 *
-          -- Eviscerate R2 Multiplier
-          1.5 *
-          -- Aura Multiplier (SpellID: 137035)
-          1.28 *
-          -- Nightstalker Multiplier
-          (S.Nightstalker:IsAvailable() and Player:IsStealthedP(true) and 1.12 or 1) *
-          -- Deeper Stratagem Multiplier
-          (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
-          -- Dark Shadow Multiplier
-          (S.DarkShadow:IsAvailable() and Player:BuffP(S.ShadowDanceBuff) and 1.25 or 1) *
-          -- Symbols of Death Multiplier
-          (Player:BuffP(S.SymbolsofDeath) and 1.15 or 1) *
-          -- Shuriken Combo Multiplier
-          (Player:BuffP(S.ShurikenComboBuff) and (1 + Player:Buff(S.ShurikenComboBuff, 16) / 100) or 1) *
-          -- Mastery Finisher Multiplier
-          (1 + Player:MasteryPct() / 100) *
-          -- Versatility Damage Multiplier
-          (1 + Player:VersatilityDmgPct() / 100) *
-        --- Target Modifier
-          -- Nightblade Multiplier
-          (Target:DebuffP(S.Nightblade) and 1.15 or 1);
-    end
-  );
-  S.Nightblade:RegisterPMultiplier(
-    {function ()
-      return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.12 or 1;
-    end}
-  );
+if not Spell.Rogue then Spell.Rogue = {}; end
+Spell.Rogue.Subtlety = {
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  Shadowmeld                            = Spell(58984),
+  -- Abilities
+  Backstab                              = Spell(53),
+  Eviscerate                            = Spell(196819),
+  Nightblade                            = Spell(195452),
+  ShadowBlades                          = Spell(121471),
+  ShadowDance                           = Spell(185313),
+  ShadowDanceBuff                       = Spell(185422),
+  Shadowstrike                          = Spell(185438),
+  ShurikenStorm                         = Spell(197835),
+  ShurikenToss                          = Spell(114014),
+  Stealth                               = Spell(1784),
+  Stealth2                              = Spell(115191), -- w/ Subterfuge Talent
+  SymbolsofDeath                        = Spell(212283),
+  Vanish                                = Spell(1856),
+  VanishBuff                            = Spell(11327),
+  VanishBuff2                           = Spell(115193), -- w/ Subterfuge Talent
+  -- Talents
+  Alacrity                              = Spell(193539),
+  DarkShadow                            = Spell(245687),
+  DeeperStratagem                       = Spell(193531),
+  EnvelopingShadows                     = Spell(238104),
+  FindWeakness                          = Spell(91023),
+  FindWeaknessDebuff                    = Spell(91021),
+  Gloomblade                            = Spell(200758),
+  MarkedforDeath                        = Spell(137619),
+  MasterofShadows                       = Spell(196976),
+  Nightstalker                          = Spell(14062),
+  SecretTechnique                       = Spell(280719),
+  ShadowFocus                           = Spell(108209),
+  ShurikenTornado                       = Spell(277925),
+  Subterfuge                            = Spell(108208),
+  Vigor                                 = Spell(14983),
+  Weaponmaster                          = Spell(193537),
+  -- Azerite Traits
+  BladeInTheShadows                     = Spell(275896),
+  Inevitability                         = Spell(278683),
+  NightsVengeancePower                  = Spell(273418),
+  NightsVengeanceBuff                   = Spell(273424),
+  Perforate                             = Spell(277673),
+  ReplicatingShadows                    = Spell(286121),
+  TheFirstDance                         = Spell(278681),
+  -- Essences
+  BloodOfTheEnemy                       = Spell(297108),
+  BloodOfTheEnemy2                      = Spell(298273),
+  BloodOfTheEnemy3                      = Spell(298277),
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlame2                    = Spell(299349),
+  ConcentratedFlame3                    = Spell(299353),
+  GuardianOfAzeroth                     = Spell(295840),
+  GuardianOfAzeroth2                    = Spell(299355),
+  GuardianOfAzeroth3                    = Spell(299358),
+  FocusedAzeriteBeam                    = Spell(295258),
+  FocusedAzeriteBeam2                   = Spell(299336),
+  FocusedAzeriteBeam3                   = Spell(299338),
+  PurifyingBlast                        = Spell(295337),
+  PurifyingBlast2                       = Spell(299345),
+  PurifyingBlast3                       = Spell(299347),
+  TheUnboundForce                       = Spell(298452),
+  TheUnboundForce2                      = Spell(299376),
+  TheUnboundForce3                      = Spell(299378),
+  RippleInSpace                         = Spell(302731),
+  RippleInSpace2                        = Spell(302982),
+  RippleInSpace3                        = Spell(302983),
+  WorldveinResonance                    = Spell(295186),
+  WorldveinResonance2                   = Spell(298628),
+  WorldveinResonance3                   = Spell(299334),
+  LifebloodBuff                         = Spell(295137),
+  MemoryOfLucidDreams                   = Spell(298357),
+  MemoryOfLucidDreams2                  = Spell(299372),
+  MemoryOfLucidDreams3                  = Spell(299374),
+  -- Defensive
+  CrimsonVial                           = Spell(185311),
+  Feint                                 = Spell(1966),
+  -- Utility
+  Blind                                 = Spell(2094),
+  CheapShot                             = Spell(1833),
+  Kick                                  = Spell(1766),
+  KidneyShot                            = Spell(408),
+  Sprint                                = Spell(2983),
+  -- Misc
+  VigorTrinketBuff                      = Spell(287916),
+  RazorCoralDebuff                      = Spell(303568),
+  TheDreadlordsDeceit                   = Spell(228224),
+  PoolEnergy                            = Spell(9999000010)
+};
+local S = Spell.Rogue.Subtlety;
+S.Eviscerate:RegisterDamage(
+  -- Eviscerate DMG Formula (Pre-Mitigation):
+  --- Player Modifier
+    -- AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * NS_M * DS_M * DSh_M * SoD_M * ShC_M * Mastery_M * Versa_M
+  --- Target Modifier
+    -- NB_M
+  function ()
+    return
+      --- Player Modifier
+        -- Attack Power
+        Player:AttackPowerDamageMod() *
+        -- Combo Points
+        Rogue.CPSpend() *
+        -- Eviscerate R1 AP Coef
+        0.176 *
+        -- Eviscerate R2 Multiplier
+        1.5 *
+        -- Aura Multiplier (SpellID: 137035)
+        1.21 *
+        -- Nightstalker Multiplier
+        (S.Nightstalker:IsAvailable() and Player:IsStealthedP(true) and 1.12 or 1) *
+        -- Deeper Stratagem Multiplier
+        (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
+        -- Dark Shadow Multiplier
+        (S.DarkShadow:IsAvailable() and Player:BuffP(S.ShadowDanceBuff) and 1.25 or 1) *
+        -- Symbols of Death Multiplier
+        (Player:BuffP(S.SymbolsofDeath) and 1.15 or 1) *
+        -- Mastery Finisher Multiplier
+        (1 + Player:MasteryPct() / 100) *
+        -- Versatility Damage Multiplier
+        (1 + Player:VersatilityDmgPct() / 100) *
+      --- Target Modifier
+        -- Nightblade Multiplier
+        (Target:DebuffP(S.Nightblade) and 1.15 or 1);
+  end
+);
+S.Nightblade:RegisterPMultiplier(
+  {function ()
+    return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.12 or 1;
+  end}
+);
 -- Items
-  if not Item.Rogue then Item.Rogue = {}; end
-  Item.Rogue.Subtlety = {
-    -- Nothing here yet
-  };
-  local I = Item.Rogue.Subtlety;
-  local AoETrinkets = { };
+if not Item.Rogue then Item.Rogue = {}; end
+Item.Rogue.Subtlety = {
+  -- Trinkets
+  GalecallersBoon       = Item(159614, {13, 14}),
+  InvocationOfYulon     = Item(165568, {13, 14}),
+  LustrousGoldenPlumage = Item(159617, {13, 14}),
+  ComputationDevice     = Item(167555, {13, 14}),
+  VigorTrinket          = Item(165572, {13, 14}),
+  FontOfPower           = Item(169314, {13, 14}),
+  RazorCoral            = Item(169311, {13, 14}),
+};
+local I = Item.Rogue.Subtlety;
+local AoETrinkets = { };
 
 -- Rotation Var
-  local ShouldReturn; -- Used to get the return string
-  local Stealth, VanishBuff;
+local ShouldReturn; -- Used to get the return string
+local Stealth, VanishBuff;
 -- GUI Settings
-  local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.Rogue.Commons,
-    Subtlety = HR.GUISettings.APL.Rogue.Subtlety
-  };
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Rogue.Commons,
+  Subtlety = HR.GUISettings.APL.Rogue.Subtlety
+};
 
 local function DetermineEssenceRanks()
   S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy;
@@ -469,31 +475,6 @@ end
 -- # Cooldowns
 local function CDs ()
   if IsInMeleeRange() then
-    if HR.CDsON() then
-      -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|(buff.vanish.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=30))
-      -- TODO: Add Potion Suggestion
-
-      -- Racials
-      if Player:IsStealthedP(true, false) then
-        -- actions.cds+=/blood_fury,if=stealthed.rogue
-        if S.BloodFury:IsCastable() then
-          if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
-        end
-        -- actions.cds+=/berserking,if=stealthed.rogue
-        if S.Berserking:IsCastable() then
-          if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
-        end
-        -- actions.cds+=/fireblood,if=stealthed.rogue
-        if S.Fireblood:IsCastable() then
-          if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
-        end
-        -- actions.cds+=/ancestral_call,if=stealthed.rogue
-        if S.AncestralCall:IsCastable() then
-          if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
-        end
-      end
-    end
-
     if Player:Buff(S.ShurikenTornado) then
       -- actions.cds+=/shadow_dance,off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
       if not Player:Buff(S.SymbolsofDeath) and not Player:Buff(S.ShadowDance) then
@@ -550,6 +531,62 @@ local function CDs ()
       -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled
       if S.ShadowDance:IsCastable() and MayBurnShadowDance() and not Player:BuffP(S.ShadowDanceBuff) and Target:FilteredTimeToDie("<=", 5 + num(S.Subterfuge:IsAvailable())) then
         if StealthMacro(S.ShadowDance) then return "Shadow Dance Macro"; end
+      end
+
+      -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|(buff.vanish.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=30))
+      -- TODO: Add Potion Suggestion
+
+      -- Racials
+      if Player:IsStealthedP(true, false) then
+        -- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
+        if S.BloodFury:IsCastable() and Player:BuffP(S.SymbolsofDeath) then
+          if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Blood Fury"; end
+        end
+        -- actions.cds+=/berserking,if=buff.symbols_of_death.up
+        if S.Berserking:IsCastable() and Player:BuffP(S.SymbolsofDeath) then
+          if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Berserking"; end
+        end
+        -- actions.cds+=/fireblood,if=buff.symbols_of_death.up
+        if S.Fireblood:IsCastable() and Player:BuffP(S.SymbolsofDeath) then
+          if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+        end
+        -- actions.cds+=/ancestral_call,if=buff.symbols_of_death.up
+        if S.AncestralCall:IsCastable() and Player:BuffP(S.SymbolsofDeath) then
+          if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
+        end
+      end
+
+      -- Trinkets
+      -- actions.cds+=/use_items,if=buff.symbols_of_death.up|target.time_to_die<20
+      if Settings.Commons.UseTrinkets then
+        local DefaultTrinketCondition = Player:BuffP(S.SymbolsofDeath) or Target:FilteredTimeToDie("<", 20);
+        if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and DefaultTrinketCondition then
+          HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and DefaultTrinketCondition then
+          HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() and DefaultTrinketCondition then
+          HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
+        if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and not Player:BuffP(S.SymbolsofDeath) and S.SymbolsofDeath:CooldownRemainsP() < 10 then
+          HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        -- if=!stealthed.all&dot.nightblade.ticking&!buff.symbols_of_death.up&energy.deficit>=30
+        if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
+          and Target:DebuffP(S.Nightblade) and not Player:BuffP(S.SymbolsofDeath) and Player:EnergyDeficitPredicted() >= 30 then
+          HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        -- if=debuff.razor_coral_debuff.down|buff.symbols_of_death.up&(target.health.pct<30|target.time_to_die<60)
+        if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
+          or Target:BuffP(S.SymbolsofDeath) and (Target:HealthPercentage() < 31 or Target:FilteredTimeToDie("<", 60))) then
+          HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        -- Emulate SimC default behavior to use at max stacks
+        if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
+          HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle);
+        end
       end
     end
   end
@@ -897,9 +934,19 @@ HR.SetAPL(261, APL);
 -- # With SF, if not already done, use Tornado with SoD up.
 -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled&!raid_event.adds.up
+--
 -- actions.cds+=/potion,if=buff.bloodlust.react|buff.symbols_of_death.up&(buff.shadow_blades.up|cooldown.shadow_blades.remains<=10)
 -- actions.cds+=/blood_fury,if=buff.symbols_of_death.up
 -- actions.cds+=/berserking,if=buff.symbols_of_death.up
+-- actions.cds+=/fireblood,if=buff.symbols_of_death.up
+-- actions.cds+=/ancestral_call,if=buff.symbols_of_death.up
+--
+-- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=!stealthed.all&dot.nightblade.ticking&!buff.symbols_of_death.up&energy.deficit>=30
+-- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.symbols_of_death.up&(target.health.pct<30|target.time_to_die<60)
+-- actions.cds+=/use_item,name=mydas_talisman
+-- # Default fallback for usable items: Use with Symbols of Death.
+-- actions.cds+=/use_items,if=buff.symbols_of_death.up|target.time_to_die<20
 --
 -- # Essences
 -- actions.essences=concentrated_flame
