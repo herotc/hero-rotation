@@ -55,15 +55,15 @@ Spell.DemonHunter.Havoc = {
   FelEruption                           = Spell(211881),
   ChaosNova                             = Spell(179057),
   RazorCoralDebuff                      = Spell(303568),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   Lifeblood                             = MultiSpell(295137, 305694),
   RecklessForce                         = Spell(302932)
 };
@@ -193,12 +193,12 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Havoc.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
-    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Havoc.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Havoc.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
@@ -221,8 +221,8 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, Settings.Havoc.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
-    if S.MemoryOfLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Havoc.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Havoc.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
   end
   Cooldown = function()

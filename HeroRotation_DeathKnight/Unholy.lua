@@ -53,15 +53,15 @@ Spell.DeathKnight.Unholy = {
   DeathStrike                           = Spell(49998),
   DeathStrikeBuff                       = Spell(101568),
   MindFreeze                            = Spell(47528),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.DeathKnight.Unholy;
@@ -272,16 +272,16 @@ local function APL()
   end
   Essences = function()
     -- memory_of_lucid_dreams,if=rune.time_to_1>gcd&runic_power<40
-    if S.MemoryOfLucidDreams:IsCastableP() and (Player:RuneTimeToX(1) > Player:GCD() and Player:RunicPower() < 40) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Unholy.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (Player:RuneTimeToX(1) > Player:GCD() and Player:RunicPower() < 40) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Unholy.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy,if=(cooldown.death_and_decay.remains&spell_targets.death_and_decay>1)|(cooldown.defile.remains&spell_targets.defile>1)|(cooldown.apocalypse.remains&cooldown.death_and_decay.ready)
-    if S.BloodOfTheEnemy:IsCastableP() and ((bool(S.DeathandDecay:CooldownRemainsP()) and Cache.EnemiesCount[8] > 1) or (bool(S.Defile:CooldownRemainsP()) and Cache.EnemiesCount[8] > 1) or (bool(S.Apocalypse:CooldownRemainsP()) and S.DeathandDecay:IsCastableP())) then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Unholy.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodofTheEnemy:IsCastableP() and ((bool(S.DeathandDecay:CooldownRemainsP()) and Cache.EnemiesCount[8] > 1) or (bool(S.Defile:CooldownRemainsP()) and Cache.EnemiesCount[8] > 1) or (bool(S.Apocalypse:CooldownRemainsP()) and S.DeathandDecay:IsCastableP())) then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Unholy.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth,if=cooldown.apocalypse.ready
-    if S.GuardianOfAzeroth:IsCastableP() and (S.Apocalypse:IsCastableP()) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Unholy.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    if S.GuardianofAzeroth:IsCastableP() and (S.Apocalypse:IsCastableP()) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Unholy.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=!death_and_decay.ticking
     if S.FocusedAzeriteBeam:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then

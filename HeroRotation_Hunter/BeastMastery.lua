@@ -58,15 +58,15 @@ Spell.Hunter.BeastMastery = {
   DanceofDeath                          = Spell(274441),
   DanceofDeathBuff                      = Spell(274443),
   -- Essences
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   Lifeblood                             = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForce                         = Spell(302932),
@@ -186,12 +186,12 @@ local function APL()
         if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
       end
       -- guardian_of_azeroth
-      if S.GuardianOfAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianOfAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      if S.GuardianofAzeroth:IsCastableP() then
+        if HR.Cast(S.GuardianofAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
       end
       -- memory_of_lucid_dreams
-      if S.MemoryOfLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if S.MemoryofLucidDreams:IsCastableP() then
+        if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
       -- use_item,name=pocketsized_computation_device,if=!raid_event.invulnerable.exists
       if I.PocketsizedComputationDevice:IsReady() then
@@ -241,16 +241,16 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, Settings.BeastMastery.GCDasOffGCD.Essences) then return "ripple_in_space"; end
     end
     -- memory_of_lucid_dreams
-    if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
   end
   Cleave = function()
@@ -315,8 +315,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    if S.BloodofTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodofTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
@@ -385,8 +385,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    if S.BloodofTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodofTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
@@ -403,7 +403,7 @@ local function APL()
       if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
     end
     -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1
-    if S.CobraShot:IsCastableP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost() or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryOfLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
+    if S.CobraShot:IsCastableP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost() or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryofLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
       if HR.Cast(S.CobraShot) then return "cobra_shot 218"; end
     end
     -- spitting_cobra

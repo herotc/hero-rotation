@@ -63,15 +63,15 @@ Spell.Warrior.Arms = {
   Massacre                              = Spell(281001),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.Warrior.Arms;
@@ -144,18 +144,18 @@ local function APL()
         if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
       end
       -- memory_of_lucid_dreams
-      if S.MemoryOfLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if S.MemoryofLucidDreams:IsCastableP() then
+        if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams"; end
       end
       -- guardian_of_azeroth
-      if S.GuardianOfAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+      if S.GuardianofAzeroth:IsCastableP() then
+        if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth"; end
       end
     end
   end
   Execute = function()
     -- skullsplitter,if=rage<60&buff.deadly_calm.down&buff.memory_of_lucid_dreams.down
-    if S.Skullsplitter:IsCastableP() and (Player:Rage() < 60 and Player:BuffDownP(S.DeadlyCalmBuff) and Player:BuffDownP(S.MemoryOfLucidDreams)) then
+    if S.Skullsplitter:IsCastableP() and (Player:Rage() < 60 and Player:BuffDownP(S.DeadlyCalmBuff) and Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.Cast(S.Skullsplitter) then return "skullsplitter 6"; end
     end
     -- ravager,if=!buff.deadly_calm.up&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
@@ -163,11 +163,11 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 12"; end
     end
     -- colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.ColossusSmash:IsCastableP() and (not S.MemoryOfLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryOfLucidDreams) or S.MemoryOfLucidDreams:CooldownRemainsP() > 10)) then
+    if S.ColossusSmash:IsCastableP() and (not S.MemoryofLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
       if HR.Cast(S.ColossusSmash) then return "colossus_smash 22"; end
     end
     -- warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.Warbreaker:IsCastableP() and HR.CDsON() and (not S.MemoryOfLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryOfLucidDreams) or S.MemoryOfLucidDreams:CooldownRemainsP() > 10)) then
+    if S.Warbreaker:IsCastableP() and HR.CDsON() and (not S.MemoryofLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
       if HR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker 26"; end
     end
     -- deadly_calm
@@ -175,7 +175,7 @@ local function APL()
       if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 30"; end
     end
     -- bladestorm,if=!buff.memory_of_lucid_dreams.up&buff.test_of_might.up&rage<30&!buff.deadly_calm.up
-    if S.Bladestorm:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.MemoryOfLucidDreams) and Player:BuffP(S.TestofMightBuff) and Player:Rage() < 30 and Player:BuffDownP(S.DeadlyCalmBuff)) then
+    if S.Bladestorm:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.MemoryofLucidDreams) and Player:BuffP(S.TestofMightBuff) and Player:Rage() < 30 and Player:BuffDownP(S.DeadlyCalmBuff)) then
       if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 32"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
@@ -183,7 +183,7 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 36"; end
     end
     -- slam,if=buff.crushing_assault.up&buff.memory_of_lucid_dreams.down
-    if S.Slam:IsReadyP() and (Player:BuffP(S.CrushingAssaultBuff) and Player:BuffDownP(S.MemoryOfLucidDreams)) then
+    if S.Slam:IsReadyP() and (Player:BuffP(S.CrushingAssaultBuff) and Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.Cast(S.Slam) then return "slam 38"; end
     end
     -- mortal_strike,if=buff.overpower.stack=2&talent.dreadnaught.enabled|buff.executioners_precision.stack=2
@@ -191,7 +191,7 @@ local function APL()
       if HR.Cast(S.MortalStrike) then return "mortal_strike 42"; end
     end
     -- execute,if=buff.memory_of_lucid_dreams.up|buff.deadly_calm.up
-    if S.Execute:IsCastableP() and (Player:BuffP(S.MemoryOfLucidDreams) or Player:BuffP(S.DeadlyCalmBuff)) then
+    if S.Execute:IsCastableP() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DeadlyCalmBuff)) then
       if HR.Cast(S.Execute) then return "execute 50"; end
     end
     -- overpower
@@ -325,7 +325,7 @@ local function APL()
       if HR.Cast(S.Rend) then return "rend 256"; end
     end
     -- skullsplitter,if=rage<60&buff.deadly_calm.down&buff.memory_of_lucid_dreams.down
-    if S.Skullsplitter:IsCastableP() and (Player:Rage() < 60 and Player:BuffDownP(S.DeadlyCalmBuff) and Player:BuffDownP(S.MemoryOfLucidDreams)) then
+    if S.Skullsplitter:IsCastableP() and (Player:Rage() < 60 and Player:BuffDownP(S.DeadlyCalmBuff) and Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.Cast(S.Skullsplitter) then return "skullsplitter 272"; end
     end
     -- ravager,if=!buff.deadly_calm.up&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
@@ -333,11 +333,11 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 278"; end
     end
     -- colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.ColossusSmash:IsCastableP() and (not S.MemoryOfLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryOfLucidDreams) or S.MemoryOfLucidDreams:CooldownRemainsP() > 10)) then
+    if S.ColossusSmash:IsCastableP() and (not S.MemoryofLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
       if HR.Cast(S.ColossusSmash) then return "colossus_smash 288"; end
     end
     -- warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.Warbreaker:IsCastableP() and HR.CDsON() and (not S.MemoryOfLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryOfLucidDreams) or S.MemoryOfLucidDreams:CooldownRemainsP() > 10)) then
+    if S.Warbreaker:IsCastableP() and HR.CDsON() and (not S.MemoryofLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
       if HR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker 292"; end
     end
     -- deadly_calm
@@ -349,7 +349,7 @@ local function APL()
       if HR.Cast(S.Execute) then return "execute 298"; end
     end
     -- bladestorm,if=cooldown.mortal_strike.remains&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down
-    if S.Bladestorm:IsCastableP() and HR.CDsON() and (bool(S.MortalStrike:CooldownRemainsP()) and (not S.DeadlyCalm:IsAvailable() or Player:BuffDownP(S.DeadlyCalmBuff)) and ((Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff)) and Player:BuffDownP(S.MemoryOfLucidDreams)) then
+    if S.Bladestorm:IsCastableP() and HR.CDsON() and (bool(S.MortalStrike:CooldownRemainsP()) and (not S.DeadlyCalm:IsAvailable() or Player:BuffDownP(S.DeadlyCalmBuff)) and ((Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff)) and Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 302"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
@@ -357,7 +357,7 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 316"; end
     end
     -- overpower,if=rage<30&buff.memory_of_lucid_dreams.up&debuff.colossus_smash.up
-    if S.Overpower:IsCastableP() and (Player:Rage() < 30 and Player:BuffP(S.MemoryOfLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff)) then
+    if S.Overpower:IsCastableP() and (Player:Rage() < 30 and Player:BuffP(S.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff)) then
       if HR.Cast(S.Overpower) then return "overpower 318"; end
     end
     -- mortal_strike
@@ -365,7 +365,7 @@ local function APL()
       if HR.Cast(S.MortalStrike) then return "mortal_strike 322"; end
     end
     -- whirlwind,if=talent.fervor_of_battle.enabled&(buff.memory_of_lucid_dreams.up|buff.deadly_calm.up)
-    if S.Whirlwind:IsReadyP() and (S.FervorofBattle:IsAvailable() and (Player:BuffP(S.MemoryOfLucidDreams) or Player:BuffP(S.DeadlyCalmBuff))) then
+    if S.Whirlwind:IsReadyP() and (S.FervorofBattle:IsAvailable() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DeadlyCalmBuff))) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 324"; end
     end
     -- overpower
@@ -434,8 +434,8 @@ local function APL()
       if HR.Cast(S.SweepingStrikes) then return "sweeping_strikes 390"; end
     end
     -- blood_of_the_enemy,if=buff.test_of_might.up|(debuff.colossus_smash.up&!azerite.test_of_might.enabled)
-    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.TestofMightBuff) or (Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:IsAvailable())) then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Arms.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.TestofMightBuff) or (Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:IsAvailable())) then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Arms.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast,if=!debuff.colossus_smash.up&!buff.test_of_might.up
     if S.PurifyingBlast:IsCastableP() and (not Target:DebuffP(S.ColossusSmashDebuff) and not Player:BuffP(S.TestofMightBuff)) then
@@ -463,12 +463,12 @@ local function APL()
       if HR.Cast(S.TheUnboundForce, Settings.Arms.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- guardian_of_azeroth,if=cooldown.colossus_smash.remains<10
-    if S.GuardianOfAzeroth:IsCastableP() and (S.ColossusSmash:CooldownRemainsP() < 10) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Arms.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    if S.GuardianofAzeroth:IsCastableP() and (S.ColossusSmash:CooldownRemainsP() < 10) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Arms.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- memory_of_lucid_dreams,if=cooldown.colossus_smash.remains<3
-    if S.MemoryOfLucidDreams:IsCastableP() and (S.ColossusSmash:CooldownRemainsP() < 3) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Arms.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (S.ColossusSmash:CooldownRemainsP() < 3) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Arms.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- run_action_list,name=hac,if=raid_event.adds.exists
     if (Cache.EnemiesCount[8] > 1) then

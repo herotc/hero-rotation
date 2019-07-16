@@ -55,7 +55,7 @@ Spell.DemonHunter.Vengeance = {
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
   -- Essences
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334)
@@ -243,8 +243,8 @@ local function APL ()
       if HR.Cast(S.WorldveinResonance, Settings.Vengeance.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams
-    if S.MemoryOfLucidDreams:IsCastable() then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Vengeance.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastable() then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Vengeance.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- actions+=/felblade,if=pain<=70
     if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then

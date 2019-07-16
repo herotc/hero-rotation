@@ -63,16 +63,16 @@ Spell.Warlock.Affliction = {
   ActiveUasBuff                         = Spell(233490),
   PhantomSingularityDebuff              = Spell(205179),
   Berserking                            = Spell(26297),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
-  VisionOfPerfectionMinor               = MultiSpell(296320, 299367, 299369),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  VisionofPerfectionMinor               = MultiSpell(296320, 299367, 299369),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.Warlock.Affliction;
@@ -283,7 +283,7 @@ local function EvaluateTargetIfFilterPhantomSingularity841(TargetUnit)
 end
 
 local function EvaluateTargetIfPhantomSingularity850(TargetUnit)
-  return HL.CombatTime() > 35 and TargetUnit:TimeToDie() > 16 * Player:SpellHaste() and (not S.VisionOfPerfectionMinor:IsAvailable() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 45 or S.SummonDarkglare:CooldownRemainsP() < 15 * Player:SpellHaste())
+  return HL.CombatTime() > 35 and TargetUnit:TimeToDie() > 16 * Player:SpellHaste() and (not S.VisionofPerfectionMinor:IsAvailable() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 45 or S.SummonDarkglare:CooldownRemainsP() < 15 * Player:SpellHaste())
 end
 
 local function EvaluateTargetIfFilterVileTaint856(TargetUnit)
@@ -366,12 +366,12 @@ local function APL()
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 55"; end
     end
     -- memory_of_lucid_dreams,if=time>30
-    if S.MemoryOfLucidDreams:IsCastableP() and (HL.CombatTime() > 30) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 59"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (HL.CombatTime() > 30) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 59"; end
     end
     -- blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
-    if S.BloodOfTheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodOfTheEnemy:ID() == 297108) then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Affliction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 61"; end
+    if S.BloodofTheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodofTheEnemy:ID() == 297108) then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Affliction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 61"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
@@ -576,7 +576,7 @@ local function APL()
       if HR.Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare 716"; end
     end
     -- deathbolt,if=cooldown.summon_darkglare.remains&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&(!essence.vision_of_perfection.minor&!azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains>30)
-    if S.Deathbolt:IsCastableP() and (bool(S.SummonDarkglare:CooldownRemainsP()) and EnemiesCount == 1 and (not S.VisionOfPerfectionMinor:IsAvailable() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 30)) then
+    if S.Deathbolt:IsCastableP() and (bool(S.SummonDarkglare:CooldownRemainsP()) and EnemiesCount == 1 and (not S.VisionofPerfectionMinor:IsAvailable() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 30)) then
       if HR.Cast(S.Deathbolt) then return "deathbolt 734"; end
     end
     -- the_unbound_force,if=buff.reckless_force.remains
@@ -588,8 +588,8 @@ local function APL()
       if HR.CastTargetIf(S.Agony, 40, "min", EvaluateTargetIfFilterAgony751, EvaluateTargetIfAgony768) then return "agony 770" end
     end
     -- memory_of_lucid_dreams,if=time<30
-    if S.MemoryOfLucidDreams:IsCastableP() and (HL.CombatTime() < 30) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 771"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (HL.CombatTime() < 30) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 771"; end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.summon_darkglare.remains<10
     if I.AzsharasFontofPower:IsReady() and (S.SummonDarkglare:CooldownRemainsP() < 10) then
@@ -640,8 +640,8 @@ local function APL()
       if HR.Cast(S.VileTaint) then return "vile_taint 883"; end
     end
     -- guardian_of_azeroth,if=cooldown.summon_darkglare.remains<15&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
-    if S.GuardianOfAzeroth:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() < 15 and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.VileTaint) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 30 + Player:GCD()) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Affliction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 884"; end
+    if S.GuardianofAzeroth:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() < 15 and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.VileTaint) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 30 + Player:GCD()) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Affliction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 884"; end
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains<10&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<20+gcd|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up
     if S.DarkSoul:IsCastableP() and HR.CDsON() and (S.SummonDarkglare:CooldownRemainsP() < 10 and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 20 + Player:GCD() or EnemiesCount > 1) then

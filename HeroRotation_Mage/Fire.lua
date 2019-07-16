@@ -55,16 +55,16 @@ Spell.Mage.Fire = {
   AlexstraszasFury                      = Spell(235870),
   Kindling                              = Spell(155148),
   Counterspell                          = Spell(2139),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  MemoryOfLucidDreamsMinor              = MultiSpell(298268, 299371, 299373),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  MemoryofLucidDreamsMinor              = MultiSpell(298268, 299371, 299373),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932),
   CyclotronicBlast                      = Spell(167672)
 };
@@ -309,20 +309,20 @@ local function APL()
       if HR.CastSuggested(I.HyperthreadWristwraps) then return "hyperthread_wristwraps"; end
     end
     -- blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
+    if S.BloodofTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
     end
     -- guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Fire.GCDasOffGCD.Essences) then return "guardian_of_azeroth 248"; end
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Fire.GCDasOffGCD.Essences) then return "guardian_of_azeroth 248"; end
     end
     -- call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled&!essence.memory_of_lucid_dreams.major
-    if (S.BlasterMaster:AzeriteEnabled() and S.FlameOn:IsAvailable() and not S.MemoryOfLucidDreams:IsAvailable()) then
+    if (S.BlasterMaster:AzeriteEnabled() and S.FlameOn:IsAvailable() and not S.MemoryofLucidDreams:IsAvailable()) then
       local ShouldReturn = BmCombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- memory_of_lucid_dreams
-    if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Fire.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 246"; end
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Fire.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 246"; end
     end
     -- rune_of_power,if=buff.combustion.down
     if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
@@ -333,11 +333,11 @@ local function APL()
       local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
     end
     -- combustion,use_off_gcd=1,use_while_casting=1,if=!essence.memory_of_lucid_dreams.major&(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
-    if S.Combustion:IsCastableP() and HR.CDsON() and (not S.MemoryOfLucidDreams:IsAvailable() and (not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable()) and ((S.Meteor:InFlight() and S.Meteor:TimeSinceLastCast() >= 2.5) or not S.Meteor:IsAvailable()) and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
+    if S.Combustion:IsCastableP() and HR.CDsON() and (not S.MemoryofLucidDreams:IsAvailable() and (not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable()) and ((S.Meteor:InFlight() and S.Meteor:TimeSinceLastCast() >= 2.5) or not S.Meteor:IsAvailable()) and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
       if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 262"; end
     end
     -- combustion,use_off_gcd=1,use_while_casting=1,if=essence.memory_of_lucid_dreams.major&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
-    if S.Combustion:IsCastableP() and HR.CDsON() and (S.MemoryOfLucidDreams:IsAvailable() and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
+    if S.Combustion:IsCastableP() and HR.CDsON() and (S.MemoryofLucidDreams:IsAvailable() and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
       if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 282"; end
     end
     -- potion
@@ -377,11 +377,11 @@ local function APL()
       if HR.Cast(S.Pyroblast) then return "pyroblast 330"; end
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=essence.memory_of_lucid_dreams.major&(charges_fractional>1.3|buff.blaster_master.remains<0.5|buff.combustion.remains<buff.blaster_master.duration|!azerite.blaster_master.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
-    if S.FireBlast:IsCastableP() and (S.MemoryOfLucidDreams:IsAvailable() and (S.FireBlast:ChargesFractional() > 1.3 or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5 or Player:BuffRemainsP(S.CombustionBuff) < S.BlasterMasterBuff:BaseDuration() or not S.BlasterMaster:AzeriteEnabled()) and ((Player:BuffP(S.CombustionBuff) and (Player:BuffP(S.HeatingUpBuff) and not S.Pyroblast:InFlight() and not Player:IsCasting(S.Scorch)) or (Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not S.Pyroblast:InFlight())))) then
+    if S.FireBlast:IsCastableP() and (S.MemoryofLucidDreams:IsAvailable() and (S.FireBlast:ChargesFractional() > 1.3 or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5 or Player:BuffRemainsP(S.CombustionBuff) < S.BlasterMasterBuff:BaseDuration() or not S.BlasterMaster:AzeriteEnabled()) and ((Player:BuffP(S.CombustionBuff) and (Player:BuffP(S.HeatingUpBuff) and not S.Pyroblast:InFlight() and not Player:IsCasting(S.Scorch)) or (Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not S.Pyroblast:InFlight())))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 334"; end
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!essence.memory_of_lucid_dreams.major&(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
-    if S.FireBlast:IsCastableP() and (not S.MemoryOfLucidDreams:IsAvailable() and (not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable()) and ((Player:BuffP(S.CombustionBuff) and (Player:BuffP(S.HeatingUpBuff) and not S.Pyroblast:InFlight() and not Player:IsCasting(S.Scorch)) or (Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not S.Pyroblast:InFlight())))) then
+    if S.FireBlast:IsCastableP() and (not S.MemoryofLucidDreams:IsAvailable() and (not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable()) and ((Player:BuffP(S.CombustionBuff) and (Player:BuffP(S.HeatingUpBuff) and not S.Pyroblast:InFlight() and not Player:IsCasting(S.Scorch)) or (Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not S.Pyroblast:InFlight())))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 360"; end
     end
     -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up
@@ -584,7 +584,7 @@ local function APL()
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- fire_blast,use_while_casting=1,use_off_gcd=1,if=(essence.memory_of_lucid_dreams.major|essence.memory_of_lucid_dreams.minor&azerite.blaster_master.enabled)&charges=max_charges&!buff.hot_streak.react&!(buff.heating_up.react&(buff.combustion.up&(action.fireball.in_flight|action.pyroblast.in_flight|action.scorch.executing)|target.health.pct<=30&action.scorch.executing))&!(!buff.heating_up.react&!buff.hot_streak.react&buff.combustion.down&(action.fireball.in_flight|action.pyroblast.in_flight))
-    if S.FireBlast:IsCastableP() and ((S.MemoryOfLucidDreams:IsAvailable() or S.MemoryOfLucidDreamsMinor:IsAvailable() and S.BlasterMaster:AzeriteEnabled()) and S.FireBlast:ChargesP() == S.FireBlast:MaxCharges() and not Player:BuffP(S.HotStreakBuff) and not (Player:BuffP(S.HeatingUpBuff) and (Player:BuffP(S.CombustionBuff) and (S.Fireball:InFlight() or S.Pyroblast:InFlight() or Player:IsCasting(S.Scorch)) or Target:HealthPercentage() <= 30 and Player:IsCasting(S.Scorch))) and not (not Player:BuffP(S.HeatingUpBuff) and not Player:BuffP(S.HotStreakBuff) and Player:BuffDownP(S.CombustionBuff) and (S.Fireball:InFlight() or S.Pyroblast:InFlight()))) then
+    if S.FireBlast:IsCastableP() and ((S.MemoryofLucidDreams:IsAvailable() or S.MemoryofLucidDreamsMinor:IsAvailable() and S.BlasterMaster:AzeriteEnabled()) and S.FireBlast:ChargesP() == S.FireBlast:MaxCharges() and not Player:BuffP(S.HotStreakBuff) and not (Player:BuffP(S.HeatingUpBuff) and (Player:BuffP(S.CombustionBuff) and (S.Fireball:InFlight() or S.Pyroblast:InFlight() or Player:IsCasting(S.Scorch)) or Target:HealthPercentage() <= 30 and Player:IsCasting(S.Scorch))) and not (not Player:BuffP(S.HeatingUpBuff) and not Player:BuffP(S.HotStreakBuff) and Player:BuffDownP(S.CombustionBuff) and (S.Fireball:InFlight() or S.Pyroblast:InFlight()))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 830"; end
     end
     -- call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down

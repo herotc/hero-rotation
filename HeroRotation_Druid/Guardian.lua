@@ -42,10 +42,8 @@ Spell.Druid.Guardian = {
   Moonfire                              = Spell(8921),
   MoonfireDebuff                        = Spell(164812),
   Incarnation                           = Spell(102558),
-  --ThrashCat                             = Spell(106830),
-  Thrash                                = MultiSpell(77758, 106830),
   IncarnationBuff                       = Spell(102558),
-  --SwipeCat                              = Spell(106785),
+  Thrash                                = MultiSpell(77758, 106830),
   Swipe                                 = MultiSpell(213771, 106785),
   Mangle                                = Spell(33917),
   GalacticGuardianBuff                  = Spell(213708),
@@ -56,7 +54,7 @@ Spell.Druid.Guardian = {
   WildChargeBear                        = Spell(16979),
   SurvivalInstincts                     = Spell(61336),
   SkullBash                             = Spell(106839),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   Conflict                              = MultiSpell(303823, 304088, 304121),
   HeartEssence                          = Spell(298554),
   SharpenedClawsBuff                    = Spell(279943)
@@ -99,22 +97,6 @@ local function bool(val)
   return val ~= 0
 end
 
---[[local function Swipe()
-  if Player:Buff(S.CatForm) then
-    return S.SwipeCat;
-  else
-    return S.SwipeBear;
-  end
-end
-
-local function Thrash()
-  if Player:Buff(S.CatForm) then
-    return S.ThrashCat;
-  else
-    return S.ThrashBear;
-  end
-end]]
-
 local function EvaluateCyclePulverize77(TargetUnit)
   return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and not Player:BuffP(S.PulverizeBuff)
 end
@@ -148,8 +130,8 @@ local function APL()
     -- food
     -- augmentation
     -- memory_of_lucid_dreams
-    if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Guardian.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Guardian.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- bear_form
     if S.BearForm:IsCastableP() and Player:BuffDownP(S.BearForm) then

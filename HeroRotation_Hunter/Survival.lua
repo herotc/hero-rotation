@@ -54,15 +54,15 @@ Spell.Hunter.Survival = {
   BloodFuryBuff                         = Spell(20572),
   AspectoftheEagle                      = Spell(186289),
   Exhilaration                          = Spell(109304),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
   Carve                                 = Spell(187708),
   GuerrillaTactics                      = Spell(264332),
@@ -222,7 +222,7 @@ local function APL()
       if HR.Cast(S.SteelTrap) then return "steel_trap 54"; end
     end
     -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up)
-    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.MemoryOfLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.CoordinatedAssaultBuff))) then
+    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.CoordinatedAssaultBuff))) then
       if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 64"; end
     end
     -- serpent_sting,if=!dot.serpent_sting.ticking&!buff.coordinated_assault.up
@@ -362,7 +362,7 @@ local function APL()
       if HR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return "aspect_of_the_eagle 320"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsReady() and (Player:BuffP(S.MemoryOfLucidDreams) or Player:BuffP(S.GuardianOfAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+    if I.AshvanesRazorCoral:IsReady() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
     end
     -- focused_azerite_beam
@@ -370,20 +370,20 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Survival.GCDasOffGCD.Essences) then return "focused_azerite_beam 322"; end
     end
     -- memory_of_lucid_dreams,if=focus<focus.max-30&buff.coordinated_assault.up
-    if S.MemoryOfLucidDreams:IsCastableP() and (Player:FocusDeficit() > 30 and Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 324"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (Player:FocusDeficit() > 30 and Player:BuffP(S.CoordinatedAssaultBuff)) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 324"; end
     end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
-    if S.BloodOfTheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
+    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
       if HR.Cast(S.PurifyingBlast, Settings.Survival.GCDasOffGCD.Essences) then return "purifying_blast 332"; end
     end
     -- guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 334"; end
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 334"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
@@ -504,7 +504,7 @@ local function APL()
       if HR.Cast(S.SteelTrap) then return "steel_trap 577"; end
     end
     -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up)
-    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.MemoryOfLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.CoordinatedAssaultBuff))) then
+    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or not Target:DebuffP(S.WildfireBombDebuff) and not Player:BuffP(S.CoordinatedAssaultBuff))) then
       if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 587"; end
     end
     -- mongoose_bite,if=buff.mongoose_fury.stack>5&!cooldown.coordinated_assault.remains

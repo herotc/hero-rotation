@@ -54,15 +54,15 @@ Spell.Warlock.Destruction = {
   CrashingChaos                         = Spell(277644),
   Eradication                           = Spell(196412),
   EradicationDebuff                     = Spell(196414),
-  BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.Warlock.Destruction;
@@ -292,64 +292,64 @@ local function APL()
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 159"; end
     end
     -- summon_infernal,if=cooldown.dark_soul_instability.ready|cooldown.memory_of_lucid_dreams.ready|(!talent.dark_soul_instability.enabled&!essence.memory_of_lucid_dreams.major)|cooldown.dark_soul_instability.remains<=10|cooldown.memory_of_lucid_dreams.remains<=10
-    if S.SummonInfernal:IsCastableP() and (S.DarkSoulInstability:CooldownUpP() or S.MemoryOfLucidDreams:CooldownUpP() or (not S.DarkSoulInstability:IsAvailable() and not S.MemoryOfLucidDreams:IsAvailable()) or S.DarkSoulInstability:CooldownRemainsP() <= 10 or S.MemoryOfLucidDreams:CooldownRemainsP() <= 10) then
+    if S.SummonInfernal:IsCastableP() and (S.DarkSoulInstability:CooldownUpP() or S.MemoryofLucidDreams:CooldownUpP() or (not S.DarkSoulInstability:IsAvailable() and not S.MemoryofLucidDreams:IsAvailable()) or S.DarkSoulInstability:CooldownRemainsP() <= 10 or S.MemoryofLucidDreams:CooldownRemainsP() <= 10) then
       if HR.Cast(S.SummonInfernal) then return "summon_infernal 165"; end
     end
     -- guardian_of_azeroth,if=pet.infernal.active
-    if S.GuardianOfAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 177"; end
+    if S.GuardianofAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 177"; end
     end
     -- dark_soul_instability,if=pet.infernal.active&pet.infernal.remains<=20
     if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and Player:BuffRemainsP(S.DarkSoulInstabilityBuff) <= 20) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 179"; end
     end
     -- memory_of_lucid_dreams,if=pet.infernal.active&pet.infernal.remains<=20
-    if S.MemoryOfLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and S.SummonInfernal:CooldownRemainsP() <= 170) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 187"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and S.SummonInfernal:CooldownRemainsP() <= 170) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 187"; end
     end
     -- summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
     if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() > S.SummonInfernal:BaseDuration() + 30) then
       if HR.Cast(S.SummonInfernal) then return "summon_infernal 193"; end
     end
     -- guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
-    if S.GuardianOfAzeroth:IsCastableP() and (HL.CombatTime() > 30 and Target:TimeToDie() > S.GuardianOfAzeroth:BaseDuration() + 30) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 197"; end
+    if S.GuardianofAzeroth:IsCastableP() and (HL.CombatTime() > 30 and Target:TimeToDie() > S.GuardianofAzeroth:BaseDuration() + 30) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 197"; end
     end
     -- summon_infernal,if=talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains>target.time_to_die
     if S.SummonInfernal:IsCastableP() and (S.DarkSoulInstability:IsAvailable() and S.DarkSoulInstability:CooldownRemainsP() > Target:TimeToDie()) then
       if HR.Cast(S.SummonInfernal) then return "summon_infernal 201"; end
     end
     -- guardian_of_azeroth,if=cooldown.summon_infernal.remains>target.time_to_die
-    if S.GuardianOfAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 207"; end
+    if S.GuardianofAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 207"; end
     end
     -- dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die
     if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 211"; end
     end
     -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die
-    if S.MemoryOfLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 215"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 215"; end
     end
     -- summon_infernal,if=target.time_to_die<30
     if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() < 30) then
       if HR.Cast(S.SummonInfernal) then return "summon_infernal 219"; end
     end
     -- guardian_of_azeroth,if=target.time_to_die<30
-    if S.GuardianOfAzeroth:IsCastableP() and (Target:TimeToDie() < 30) then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 221"; end
+    if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() < 30) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 221"; end
     end
     -- dark_soul_instability,if=target.time_to_die<20
     if S.DarkSoulInstability:IsCastableP() and (Target:TimeToDie() < 20) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 223"; end
     end
     -- memory_of_lucid_dreams,if=target.time_to_die<20
-    if S.MemoryOfLucidDreams:IsCastableP() and (Target:TimeToDie() < 20) then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 225"; end
+    if S.MemoryofLucidDreams:IsCastableP() and (Target:TimeToDie() < 20) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 225"; end
     end
     -- blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Destruction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 227"; end
+    if S.BloodofTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Destruction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 227"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
@@ -364,15 +364,15 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 233"; end
     end
     -- berserking,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-    if S.Berserking:IsCastableP() and HR.CDsON() and (S.SummonInfernal:CooldownRemainsP() > 150 or bool(Player:BuffRemainsP(S.MemoryOfLucidDreamsBuff)) or Player:BuffP(S.DarkSoulInstabilityBuff) or Target:TimeToDie() < 30) then
+    if S.Berserking:IsCastableP() and HR.CDsON() and (S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DarkSoulInstabilityBuff) or Target:TimeToDie() < 30) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 235"; end
     end
     -- blood_fury,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.MemoryOfLucidDreamsBuff) or Player:BuffP(S.DarkSoulInstabilityBuff) or Target:TimeToDie() < 30) then
+    if S.BloodFury:IsCastableP() and HR.CDsON() and (S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DarkSoulInstabilityBuff) or Target:TimeToDie() < 30) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 241"; end
     end
     -- fireblood,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.MemoryOfLucidDreamsBuff) or Player:BuffP(S.DarkSoulInstabilityBuff) or Target:TimeToDie() < 30) then
+    if S.Fireblood:IsCastableP() and HR.CDsON() and (S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DarkSoulInstabilityBuff) or Target:TimeToDie() < 30) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 247"; end
     end
     -- use_items,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30

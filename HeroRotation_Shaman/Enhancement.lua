@@ -96,15 +96,15 @@ Spell.Shaman.Enhancement = {
   DFRBuff               = Spell(224001),
 
   -- BfA Essences
-  BloodOfTheEnemy       = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams   = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast        = MultiSpell(295337, 299345, 299347),
   ConcentratedFlame     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce       = MultiSpell(298452, 299376, 299378),
   RecklessForce         = Spell(302932),
   WorldveinResonance    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth     = MultiSpell(295840, 299355, 299358),
 
   -- Misc
   PoolFocus             = Spell(9999000010),
@@ -475,13 +475,13 @@ local function APL ()
     -- We already roughly handle this toward the beginning.
 
     -- actions.cds+=/guardian_of_azeroth
-    if S.GuardianOfAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianOfAzeroth, Settings.Enhancement.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Enhancement.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
 
     -- actions.cds+=/memory_of_lucid_dreams
-    if S.MemoryOfLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryOfLucidDreams, Settings.Enhancement.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Enhancement.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
 
     -- actions.cds+=/feral_spirit
@@ -490,8 +490,8 @@ local function APL ()
     end
 
     -- actions.cds+=/blood_of_the_enemy
-    if S.BloodOfTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodOfTheEnemy, Settings.Enhancement.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodofTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Enhancement.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
 
     -- actions.cds+=/ascendance,if=cooldown.strike.remains>0

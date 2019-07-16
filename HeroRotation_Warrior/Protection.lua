@@ -52,9 +52,9 @@ Spell.Warrior.Protection = {
   ImpendingVictory                      = Spell(202168),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
-  MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth                     = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
 };
 local S = Spell.Warrior.Protection;
 
@@ -159,12 +159,12 @@ local function APL()
         if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 4"; end
       end
       -- memory_of_lucid_dreams
-      if S.MemoryOfLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryOfLucidDreams) then return "memory_of_lucid_dreams"; end
+      if S.MemoryofLucidDreams:IsCastableP() then
+        if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams"; end
       end
       -- guardian_of_azeroth
-      if S.GuardianOfAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianOfAzeroth) then return "guardian_of_azeroth"; end
+      if S.GuardianofAzeroth:IsCastableP() then
+        if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth"; end
       end
     end
   end
