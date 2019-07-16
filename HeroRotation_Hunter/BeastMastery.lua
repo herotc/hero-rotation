@@ -193,6 +193,10 @@ local function APL()
       if S.MemoryOfLucidDreams:IsCastableP() then
         if HR.Cast(S.MemoryOfLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
+      -- use_item,name=pocketsized_computation_device,if=!raid_event.invulnerable.exists
+      if I.PocketsizedComputationDevice:IsReady() then
+        if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device precombat"; end
+      end
       -- focused_azerite_beam,if=!raid_event.invulnerable.exists
       if S.FocusedAzeriteBeam:IsCastableP() then
         if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
@@ -201,8 +205,8 @@ local function APL()
       if S.AspectoftheWild:IsCastableP() and (Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled())) then
         if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
       end
-      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
-      if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) and (not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
+      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&(!essence.essence_of_the_focusing_iris.major)&(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
+      if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) and (not S.FocusedAzeriteBeam:IsAvailable()) and (not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
       end
     end
