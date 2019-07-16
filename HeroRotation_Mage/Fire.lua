@@ -516,8 +516,8 @@ local function APL()
     if I.TidestormCodex:IsReady() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
       if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 774"; end
     end
-    -- use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&(cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20)
-    if I.PocketsizedComputationDevice:IsReady() and ((not S.CyclotronicBlast:IsAvailable() or bool(S.CyclotronicBlast:CooldownRemainsP())) and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20)) then
+    -- use_item,effect_name=cyclotronic_blast,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
+    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 775"; end
     end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
@@ -535,10 +535,6 @@ local function APL()
   end
   Trinkets = function()
     -- use_items
-    -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
-    if I.PocketsizedComputationDevice:IsReady() and (not bool(S.CyclotronicBlast:CooldownRemainsP())) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device trinkets"; end
-    end
   end
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then
