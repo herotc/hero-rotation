@@ -65,6 +65,7 @@ Spell.Druid.Balance = {
   Renewal                               = Spell(108238),
   SolarBeam                             = Spell(78675),
   ShiverVenomDebuff                     = Spell(301624),
+  CyclotronicBlast                      = Spell(167672),
   BloodOfTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryOfLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -205,19 +206,23 @@ local function DoTsUp()
 end
 
 local function EvaluateCycleAzsharasFontofPower59(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (I.AzsharasFontofPower:IsEquipped() and not Player:BuffP(CaInc()))
+  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (I.AzsharasFontofPower:IsEquipped() and Player:BuffDownP(CaInc()))
 end
 
 local function EvaluateCycleGuardianofAzeroth78(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and not Player:BuffP(CaInc()))
+  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and Player:BuffDownP(CaInc()))
 end
 
 local function EvaluateCyclePocketsizedComputationDevice103(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (I.PocketsizedComputationDevice:IsEquipped() and not Player:BuffP(CaInc()))
+  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (I.PocketsizedComputationDevice:IsEquipped() and Player:BuffDownP(CaInc()))
+end
+
+local function EvaluateCycleShiverVenomRelic104(TargetUnit)
+  return (Player:BuffDownP(CaInc()) and TargetUnit:DebuffStackP(S.ShiverVenomDebuff) >= 5)
 end
 
 local function EvaluateCycleMemoryofLucidDreams135(TargetUnit)
-  return (TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 10 and TargetUnit:DebuffRemainsP(S.MoonfireDebuff) > 10 and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffRemainsP(S.StellarFlareDebuff) > 10)) and (not Player:BuffP(CaInc()) and (FutureAstralPower() < 25 or S.CaInc:CooldownRemainsP() > 30))
+  return (TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 10 and TargetUnit:DebuffRemainsP(S.MoonfireDebuff) > 10 and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffRemainsP(S.StellarFlareDebuff) > 10)) and (Player:BuffDownP(CaInc()) and (FutureAstralPower() < 25 or S.CaInc:CooldownRemainsP() > 30))
 end
 
 local function EvaluateCycleTheUnboundForce160(TargetUnit)
@@ -225,27 +230,19 @@ local function EvaluateCycleTheUnboundForce160(TargetUnit)
 end
 
 local function EvaluateCycleFocusedAzeriteBeam179(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not bool(VarAzSs) or not Player:BuffP(CaInc())))
-end
-
-local function EvaluateCycleIncarnation210(TargetUnit)
-  return (TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 8 and TargetUnit:DebuffRemainsP(S.MoonfireDebuff) > 12 and (TargetUnit:DebuffRemainsP(S.StellarFlareDebuff) > 6 or not S.StellarFlare:IsAvailable())) and (not Player:BuffP(CaInc()) and (Player:BuffP(S.MemoryOfLucidDreams) or ((S.MemoryOfLucidDreams:CooldownRemainsP() > 20 or not S.MemoryOfLucidDreams:IsAvailable()) and AP_Check)) and (Player:BuffP(S.MemoryOfLucidDreams) or AP_Check))
-end
-
-local function EvaluateCycleCelestialAlignment233(TargetUnit)
-  return ((TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 2 and TargetUnit:DebuffP(S.MoonfireDebuff) and (TargetUnit:DebuffP(S.StellarFlareDebuff) or not S.StellarFlare:IsAvailable()))) and (not Player:BuffP(CaInc()) and (Player:BuffP(S.MemoryOfLucidDreams) or ((S.MemoryOfLucidDreams:CooldownRemainsP() > 20 or not S.MemoryOfLucidDreams:IsAvailable()) and AP_Check)) and (not S.LivelySpirit:AzeriteEnabled() or Player:BuffP(S.LivelySpiritBuff)))
+  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not bool(VarAzSs) or Player:BuffDownP(CaInc())))
 end
 
 local function EvaluateCycleSunfire250(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.SunfireDebuff)) and (AP_Check(S.Sunfire) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) * EnemiesCount >= math.ceil (math.floor (2 / EnemiesCount) * 1.5) + 2 * EnemiesCount and (EnemiesCount > 1 + num(S.TwinMoons:IsAvailable()) or TargetUnit:DebuffP(S.MoonfireDebuff)) and (not bool(VarAzSs) or not Player:BuffP(CaInc()) or not Player:PrevGCDP(1, S.Sunfire)) and (Player:BuffRemainsP(CaInc()) > TargetUnit:DebuffRemainsP(S.SunfireDebuff) or not Player:BuffP(CaInc())))
+  return (TargetUnit:DebuffRefreshableCP(S.SunfireDebuff)) and (AP_Check(S.Sunfire) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) * EnemiesCount >= math.ceil (math.floor (2 / EnemiesCount) * 1.5) + 2 * EnemiesCount and (EnemiesCount > 1 + num(S.TwinMoons:IsAvailable()) or TargetUnit:DebuffP(S.MoonfireDebuff)) and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Sunfire)) and (Player:BuffRemainsP(CaInc()) > TargetUnit:DebuffRemainsP(S.SunfireDebuff) or Player:BuffDownP(CaInc())))
 end
 
 local function EvaluateCycleMoonfire313(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff)) and (AP_Check(S.Moonfire) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) * EnemiesCount >= 6 and (not bool(VarAzSs) or not Player:BuffP(CaInc()) or not Player:PrevGCDP(1, S.Moonfire)) and (Player:BuffRemainsP(CaInc()) > TargetUnit:DebuffRemainsP(S.MoonfireDebuff) or not Player:BuffP(CaInc())))
+  return (TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff)) and (AP_Check(S.Moonfire) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) * EnemiesCount >= 6 and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Moonfire)) and (Player:BuffRemainsP(CaInc()) > TargetUnit:DebuffRemainsP(S.MoonfireDebuff) or Player:BuffDownP(CaInc())))
 end
 
 local function EvaluateCycleStellarFlare348(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.StellarFlareDebuff)) and (AP_Check(S.StellarFlare) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) >= 5 and (not bool(VarAzSs) or not Player:BuffP(CaInc()) or not Player:PrevGCDP(1, S.StellarFlare)) and not Player:IsCasting(S.StellarFlare))
+  return (TargetUnit:DebuffRefreshableCP(S.StellarFlareDebuff)) and (AP_Check(S.StellarFlare) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) >= 5 and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.StellarFlare)) and not Player:IsCasting(S.StellarFlare))
 end
 
 HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
@@ -290,7 +287,7 @@ local function APL()
       VarSfTargets = VarSfTargets - 1
     end
     -- moonkin_form
-    if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) then
+    if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) then
       if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
     end
     -- snapshot_stats
@@ -298,13 +295,13 @@ local function APL()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
     end
-    -- solar_wrath
+    -- solar_wrath,if=!bfa.font_of_power_precombat_channel
     if S.SolarWrath:IsCastableP() then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
     end
   end
   -- Moonkin Form OOC, if setting is true
-  if S.MoonkinForm:IsCastableP() and not Player:Buff(S.MoonkinForm) and Settings.Balance.ShowMoonkinFormOOC then
+  if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) and Settings.Balance.ShowMoonkinFormOOC then
     if HR.Cast(S.MoonkinForm) then return "moonkin_form ooc"; end
   end
   -- call precombat
@@ -329,7 +326,7 @@ local function APL()
     if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 65"; end
     end
-    -- use_item,name=azsharas_font_of_power,if=equipped.169314&!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    -- use_item,name=azsharas_font_of_power,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if I.AzsharasFontofPower:IsReady() then
       if HR.CastCycle(I.AzsharasFontofPower, 40, EvaluateCycleAzsharasFontofPower59) then return "azsharas_font_of_power 73" end
     end
@@ -337,19 +334,14 @@ local function APL()
     if S.GuardianOfAzeroth:IsCastableP() then
       if HR.CastCycle(S.GuardianOfAzeroth, 40, EvaluateCycleGuardianofAzeroth78) then return "guardian_of_azeroth 94" end
     end
-    -- use_item,name=tidestorm_codex,if=equipped.165576
-    if I.TidestormCodex:IsReady() and (I.TidestormCodex:IsEquipped()) then
-      if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 103"; end
-    end
-    -- use_item,name=pocketsized_computation_device,if=equipped.167555&!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if I.PocketsizedComputationDevice:IsReady() then
+    -- use_item,effect_name=cyclotronic_blast,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
       if HR.CastCycle(I.PocketsizedComputationDevice, 40, EvaluateCyclePocketsizedComputationDevice103) then return "pocketsized_computation_device 117" end
     end
-    -- use_item,name=shiver_venom_relic,if=equipped.168905&cooldown.ca_inc.remains>30&!buff.ca_inc.up&dot.shiver_venom.stack>=5
-    if I.ShiverVenomRelic:IsReady() and (CaInc():CooldownRemainsP() > 30 and not Player:BuffP(CaInc()) and Target:DebuffStack(S.ShiverVenomDebuff) >= 5) then
-      if HR.CastSuggested(I.ShiverVenomRelic) then return "shiver_venom_relic 105"; end
+    -- use_item,name=shiver_venom_relicif=!buff.ca_inc.up,target_if=dot.shiver_venom.stack>=5
+    if I.ShiverVenomRelic:IsReady() then
+      if HR.CastCycle(I.ShiverVenomRelic, 40, EvaluateCycleShiverVenomRelic104) then return "shiver_venom_relic 105"; end
     end
-    -- use_items,if=cooldown.ca_inc.remains>30
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
     if S.BloodOfTheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
       if HR.Cast(S.BloodOfTheEnemy, Settings.Balance.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
@@ -386,6 +378,9 @@ local function APL()
     if S.Thorns:IsCastableP() then
       if HR.Cast(S.Thorns, Settings.Balance.GCDasOffGCD.Essences) then return "thorns"; end
     end
+    -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up
+    -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up
+    -- use_items
     -- warrior_of_elune
     if S.WarriorofElune:IsCastableP() then
       if HR.Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune 108"; end
@@ -395,12 +390,12 @@ local function APL()
       if HR.Cast(S.Innervate) then return "innervate 110"; end
     end
     -- incarnation,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check))&(buff.memory_of_lucid_dreams.up|ap_check),target_if=dot.sunfire.remains>8&dot.moonfire.remains>12&(dot.stellar_flare.remains>6|!talent.stellar_flare.enabled)
-    if S.Incarnation:IsCastableP() then
-      if HR.CastCycle(S.Incarnation, 40, EvaluateCycleIncarnation210) then return "incarnation 228" end
+    if S.Incarnation:IsCastableP() and (Player:BuffDownP(CaInc()) and (Player:BuffP(S.MemoryOfLucidDreams) or ((S.MemoryOfLucidDreams:CooldownRemainsP() > 20 or not S.MemoryOfLucidDreams:IsAvailable()) and AP_Check)) and (Player:BuffP(S.MemoryOfLucidDreams) or AP_Check) and (Target:DebuffRemainsP(S.SunfireDebuff) > 8 and Target:DebuffRemainsP(S.MoonfireDebuff) > 12 and (Target:DebuffRemainsP(S.StellarFlareDebuff) > 6 or not S.StellarFlare:IsAvailable()))) then
+      if HR.Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return "incarnation 228" end
     end
     -- celestial_alignment,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check))&(!azerite.lively_spirit.enabled|buff.lively_spirit.up),target_if=(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
-    if S.CelestialAlignment:IsCastableP() then
-      if HR.CastCycle(S.CelestialAlignment, 40, EvaluateCycleCelestialAlignment233) then return "celestial_alignment 253" end
+    if S.CelestialAlignment:IsCastableP() and (Player:BuffDownP(CaInc()) and (Player:BuffP(S.MemoryOfLucidDreams) or ((S.MemoryOfLucidDreams:CooldownRemainsP() > 20 or not S.MemoryOfLucidDreams:IsAvailable()) and AP_Check)) and (not S.LivelySpirit:AzeriteEnabled() or Player:BuffP(S.LivelySpiritBuff)) and (Target:DebuffRemainsP(S.SunfireDebuff) > 2 and Target:DebuffP(S.MoonfireDebuff) and (Target:DebuffP(S.StellarFlareDebuff) or not S.StellarFlare:IsAvailable()))) then
+      if HR.Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return "celestial_alignment 253" end
     end
     -- fury_of_elune,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&solar_wrath.ap_check
     if S.FuryofElune:IsCastableP() and ((Player:BuffP(CaInc()) or CaInc():CooldownRemainsP() > 30) and AP_Check(S.SolarWrath)) then
@@ -419,7 +414,7 @@ local function APL()
       if HR.Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall) then return "starfall 164"; end
     end
     -- starsurge,if=(talent.starlord.enabled&(buff.starlord.stack<3|buff.starlord.remains>=5&buff.arcanic_pulsar.stack<8)|!talent.starlord.enabled&(buff.arcanic_pulsar.stack<8|buff.ca_inc.up))&spell_targets.starfall<variable.sf_targets&buff.lunar_empowerment.stack+buff.solar_empowerment.stack<4&buff.solar_empowerment.stack<3&buff.lunar_empowerment.stack<3&(!variable.az_ss|!buff.ca_inc.up|!prev.starsurge)|target.time_to_die<=execute_time*astral_power%40|!solar_wrath.ap_check
-    if S.Starsurge:IsReadyP() and ((S.Starlord:IsAvailable() and (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 5 and Player:BuffStackP(S.ArcanicPulsarBuff) < 8) or not S.Starlord:IsAvailable() and (Player:BuffStackP(S.ArcanicPulsarBuff) < 8 or Player:BuffP(CaInc()))) and EnemiesCount < VarSfTargets and Player:BuffStackP(S.LunarEmpowermentBuff) + Player:BuffStackP(S.SolarEmpowermentBuff) < 4 and Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and Player:BuffStackP(S.LunarEmpowermentBuff) < 3 and (not bool(VarAzSs) or not Player:BuffP(CaInc()) or not Player:PrevGCDP(1, S.Starsurge)) or Target:TimeToDie() <= S.Starsurge:ExecuteTime() * FutureAstralPower() / 40 or not AP_Check(S.SolarWrath)) then
+    if S.Starsurge:IsReadyP() and ((S.Starlord:IsAvailable() and (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 5 and Player:BuffStackP(S.ArcanicPulsarBuff) < 8) or not S.Starlord:IsAvailable() and (Player:BuffStackP(S.ArcanicPulsarBuff) < 8 or Player:BuffP(CaInc()))) and EnemiesCount < VarSfTargets and Player:BuffStackP(S.LunarEmpowermentBuff) + Player:BuffStackP(S.SolarEmpowermentBuff) < 4 and Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and Player:BuffStackP(S.LunarEmpowermentBuff) < 3 and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Starsurge)) or Target:TimeToDie() <= S.Starsurge:ExecuteTime() * FutureAstralPower() / 40 or not AP_Check(S.SolarWrath)) then
       if HR.Cast(S.Starsurge) then return "starsurge 188"; end
     end
     -- sunfire,if=buff.ca_inc.up&buff.ca_inc.remains<gcd.max&variable.az_ss&dot.moonfire.remains>remains
@@ -455,11 +450,11 @@ local function APL()
       if HR.Cast(S.FullMoon) then return "full_moon 365"; end
     end
     -- lunar_strike,if=buff.solar_empowerment.stack<3&(ap_check|buff.lunar_empowerment.stack=3)&((buff.warrior_of_elune.up|buff.lunar_empowerment.up|spell_targets>=2&!buff.solar_empowerment.up)&(!variable.az_ss|!buff.ca_inc.up)|variable.az_ss&buff.ca_inc.up&prev.solar_wrath)
-    if S.LunarStrike:IsCastableP() and (Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and (AP_Check(S.LunarStrike) or Player:BuffStackP(S.LunarEmpowermentBuff) == 3) and ((Player:BuffP(S.WarriorofEluneBuff) or Player:BuffP(S.LunarEmpowermentBuff) or EnemiesCount >= 2 and not Player:BuffP(S.SolarEmpowermentBuff)) and (not bool(VarAzSs) or not Player:BuffP(CaInc())) or bool(VarAzSs) and Player:BuffP(CaInc()) and Player:PrevGCDP(1, S.SolarWrath))) then
+    if S.LunarStrike:IsCastableP() and (Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and (AP_Check(S.LunarStrike) or Player:BuffStackP(S.LunarEmpowermentBuff) == 3) and ((Player:BuffP(S.WarriorofEluneBuff) or Player:BuffP(S.LunarEmpowermentBuff) or EnemiesCount >= 2 and Player:BuffDownP(S.SolarEmpowermentBuff)) and (not bool(VarAzSs) or Player:BuffDownP(CaInc())) or bool(VarAzSs) and Player:BuffP(CaInc()) and Player:PrevGCDP(1, S.SolarWrath))) then
       if HR.Cast(S.LunarStrike) then return "lunar_strike 367"; end
     end
     -- solar_wrath,if=variable.az_ss<3|!buff.ca_inc.up|!prev.solar_wrath
-    if S.SolarWrath:IsCastableP() and (VarAzSs < 3 or not Player:BuffP(CaInc()) or not Player:PrevGCDP(1, S.SolarWrath)) then
+    if S.SolarWrath:IsCastableP() and (VarAzSs < 3 or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.SolarWrath)) then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 393"; end
     end
     -- sunfire
