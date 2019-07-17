@@ -388,23 +388,23 @@ local function APL()
     end
     -- use_item,name=rotcrusted_voodoo_doll,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
     if I.RotcrustedVoodooDoll:IsReady() and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.CastSuggested(I.RotcrustedVoodooDoll) then return "pocketsized_computation_device 248"; end
+      if HR.CastSuggested(I.RotcrustedVoodooDoll) then return "rotcrusted_voodoo_doll 249"; end
     end
     -- use_item,name=shiver_venom_relic,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
     if I.ShiverVenomRelic:IsReady() and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.CastSuggested(I.ShiverVenomRelic) then return "pocketsized_computation_device 248"; end
+      if HR.CastSuggested(I.ShiverVenomRelic) then return "shiver_venom_relic 250"; end
     end
     -- use_item,name=aquipotent_nautilus,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
     if I.AquipotentNautilus:IsReady() and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.CastSuggested(I.AquipotentNautilus) then return "pocketsized_computation_device 248"; end
+      if HR.CastSuggested(I.AquipotentNautilus) then return "aquipotent_nautilus 251"; end
     end
     -- use_item,name=tidestorm_codex,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
     if I.TidestormCodex:IsReady() and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.CastSuggested(I.TidestormCodex) then return "pocketsized_computation_device 248"; end
+      if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 252"; end
     end
     -- use_item,name=vial_of_storms,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
     if I.VialofStorms:IsReady() and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.CastSuggested(I.VialofStorms) then return "pocketsized_computation_device 248"; end
+      if HR.CastSuggested(I.VialofStorms) then return "vial_of_storms 253"; end
     end
   end
   Havoc = function()
