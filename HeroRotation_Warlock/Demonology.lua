@@ -56,6 +56,7 @@ Spell.Warlock.Demonology = {
   ShadowsBiteBuff                       = Spell(272945),
   SpellLock                             = Spell(19647),
   AxeToss                               = Spell(89766),
+  ShiverVenomDebuff                     = Spell(301624),
   BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -74,8 +75,14 @@ local S = Spell.Warlock.Demonology;
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
-  PotionofUnbridledFury        = Item(169299),
-  AzsharasFontofPower          = Item(169314)
+  PotionofUnbridledFury            = Item(169299),
+  AzsharasFontofPower              = Item(169314),
+  PocketsizedComputationDevice     = Item(167555),
+  RotcrustedVoodooDoll             = Item(159624),
+  ShiverVenomRelic                 = Item(168905),
+  AquipotentNautilus               = Item(169305),
+  TidestormCodex                   = Item(165576),
+  VialofStorms                     = Item(158224)
 };
 local I = Item.Warlock.Demonology;
 
@@ -469,6 +476,30 @@ local function APL()
     -- ripple_in_space,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
     if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.RippleInSpace, Settings.Demonology.GCDasOffGCD.Essences) then return "ripple_in_space 335"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
+    if I.PocketsizedComputationDevice:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 20 and S.SummonDemonicTyrant:CooldownRemainsP() <= S.SummonDemonicTyrant:Cooldown() - 15 or Target:TimeToDie() <= 30) then
+      if HR.Cast(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
+    end
+    -- use_item,name=rotcrusted_voodoo_doll,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+    if I.RotcrustedVoodooDoll:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+      if HR.Cast(I.RotcrustedVoodooDoll) then return "rotcrusted_voodoo_doll"; end
+    end
+    -- use_item,name=shiver_venom_relic,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+    if I.ShiverVenomRelic:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+      if HR.Cast(I.ShiverVenomRelic) then return "shiver_venom_relic"; end
+    end
+    -- use_item,name=aquipotent_nautilus,if=(cooldown.summon_demonic_tyrant.remains>=255|target.time_to_die<=30)
+    if I.AquipotentNautilus:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+      if HR.Cast(I.AquipotentNautilus) then return "aquipotent_nautilus"; end
+    end
+    -- use_item,name=tidestorm_codex,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+    if I.TidestormCodex:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+      if HR.Cast(I.TidestormCodex) then return "tidestorm_codex"; end
+    end
+    -- use_item,name=vial_of_storms,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
+    if I.VialofStorms:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+      if HR.Cast(I.VialofStorms) then return "vial_of_storms"; end
     end
     -- call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
     if (S.DemonicConsumption:IsAvailable() and HL.CombatTime() < 30 and not bool(S.SummonDemonicTyrant:CooldownRemainsP())) then
