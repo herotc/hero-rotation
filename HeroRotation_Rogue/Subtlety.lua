@@ -477,11 +477,11 @@ local function CDs ()
   if IsInMeleeRange() then
     if Player:Buff(S.ShurikenTornado) then
       -- actions.cds+=/shadow_dance,off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
-      if not Player:Buff(S.SymbolsofDeath) and not Player:Buff(S.ShadowDance) then
+      if S.SymbolsofDeath:IsCastable() and S.ShadowDance:IsCastable() and not Player:Buff(S.SymbolsofDeath) and not Player:Buff(S.ShadowDance) then
         if HR.CastQueue(S.SymbolsofDeath, S.ShadowDance) then return "Dance + Symbols (during Tornado)"; end
-      elseif not Player:Buff(S.SymbolsofDeath) then
+      elseif S.SymbolsofDeath:IsCastable() and not Player:Buff(S.SymbolsofDeath) then
         if HR.Cast(S.SymbolsofDeath) then return "Cast Symbols of Death (during Tornado)"; end
-      elseif not Player:Buff(S.ShadowDanceBuff) then
+      elseif S.ShadowDance:IsCastable() and not Player:Buff(S.ShadowDanceBuff) then
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance (during Tornado)"; end
       end
     end
