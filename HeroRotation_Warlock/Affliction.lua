@@ -209,7 +209,7 @@ local function EvaluateTargetIfFilterSiphonLife254(TargetUnit)
 end
 
 local function EvaluateTargetIfSiphonLife293(TargetUnit)
-  return (S.SiphonLifeDebuff:ActiveDot() < 8 - num(S.CreepingDeath:IsAvailable()) - EnemiesCount) and TargetUnit:TimeToDie() > 10 and TargetUnit:DebuffRefreshableCP(S.SiphonLifeDebuff) and (not bool(TargetUnit:DebuffRemainsP(S.SiphonLifeDebuff)) and EnemiesCount == 1 or S.SummonDarkglare:CooldownRemainsP() > Player:SoulShardsP() * S.UnstableAffliction:ExecuteTime())
+  return (S.SiphonLifeDebuff:ActiveDot() < 8 - num(S.CreepingDeath:IsAvailable()) - EnemiesCount) and TargetUnit:TimeToDie() > 10 and TargetUnit:DebuffRefreshableCP(S.SiphonLifeDebuff) and (TargetUnit:DebuffDownP(S.SiphonLifeDebuff) and EnemiesCount == 1 or S.SummonDarkglare:CooldownRemainsP() > Player:SoulShardsP() * S.UnstableAffliction:ExecuteTime())
 end
 
 local function EvaluateCycleCorruption300(TargetUnit)
@@ -225,7 +225,7 @@ local function EvaluateTargetIfFilterDrainSoul485(TargetUnit)
 end
 
 local function EvaluateTargetIfDrainSoul498(TargetUnit)
-  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and not bool(TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff))
+  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and TargetUnit:DebuffDownP(S.ShadowEmbraceDebuff)
 end
 
 local function EvaluateTargetIfFilterDrainSoul504(TargetUnit)
@@ -237,7 +237,7 @@ local function EvaluateTargetIfDrainSoul515(TargetUnit)
 end
 
 local function EvaluateCycleShadowBolt524(TargetUnit)
-  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and not bool(TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff)) and not S.ShadowBolt:InFlight()
+  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and TargetUnit:DebuffDownP(S.ShadowEmbraceDebuff) and not S.ShadowBolt:InFlight()
 end
 
 local function EvaluateTargetIfFilterShadowBolt540(TargetUnit)
@@ -273,7 +273,7 @@ local function EvaluateTargetIfFilterDrainSoul787(TargetUnit)
 end
 
 local function EvaluateTargetIfDrainSoul802(TargetUnit)
-  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and bool(TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff)) and TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff) <= Player:GCD() * 2
+  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and TargetUnit:DebuffP(S.ShadowEmbraceDebuff) and TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff) <= Player:GCD() * 2
 end
 
 local function EvaluateTargetIfFilterShadowBolt808(TargetUnit)
@@ -281,7 +281,7 @@ local function EvaluateTargetIfFilterShadowBolt808(TargetUnit)
 end
 
 local function EvaluateTargetIfShadowBolt835(TargetUnit)
-  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and bool(TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff)) and TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff) <= S.ShadowBolt:ExecuteTime() * 2 + S.ShadowBolt:TravelTime() and not S.ShadowBolt:InFlight()
+  return S.ShadowEmbrace:IsAvailable() and bool(VarMaintainSe) and TargetUnit:DebuffP(S.ShadowEmbraceDebuff) and TargetUnit:DebuffRemainsP(S.ShadowEmbraceDebuff) <= S.ShadowBolt:ExecuteTime() * 2 + S.ShadowBolt:TravelTime() and not S.ShadowBolt:InFlight()
 end
 
 local function EvaluateTargetIfFilterPhantomSingularity841(TargetUnit)
@@ -462,7 +462,7 @@ local function APL()
       if HR.Cast(S.Deathbolt) then return "deathbolt 381"; end
     end
     -- shadow_bolt,if=buff.movement.up&buff.nightfall.remains
-    if S.ShadowBolt:IsCastableP() and (Player:IsMoving() and bool(Player:BuffRemainsP(S.NightfallBuff))) then
+    if S.ShadowBolt:IsCastableP() and (Player:IsMoving() and Player:BuffP(S.NightfallBuff)) then
       if HR.Cast(S.ShadowBolt) then return "shadow_bolt 387"; end
     end
     -- agony,if=buff.movement.up&!(talent.siphon_life.enabled&(prev_gcd.1.agony&prev_gcd.2.agony&prev_gcd.3.agony)|prev_gcd.1.agony)
@@ -617,9 +617,22 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() and (HL.CombatTime() < 30) then
       if HR.Cast(S.MemoryofLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 771"; end
     end
+    -- # Temporary fix to make sure azshara's font doesn't break darkglare usage.
+    -- agony,line_cd=30,if=cooldown.summon_darkglare.remains<=15&equipped.169314
+    if S.Agony:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() <= 15 and I.AzsharasFontofPower:IsEquipped()) then
+      if HR.Cast(S.Agony) then return "agony 772"; end
+    end
+    -- corruption,line_cd=30,if=cooldown.summon_darkglare.remains<=15&equipped.169314&!talent.absolute_corruption.enabled&(talent.siphon_life.enabled|spell_targets.seed_of_corruption_aoe>1&spell_targets.seed_of_corruption_aoe<=3)
+    if S.Corruption:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() <= 15 and I.AzsharasFontofPower:IsEquipped() and not S.AbsoluteCorruption:IsAvailable() and (S.SiphonLife:IsAvailable() or EnemiesCount > 1 and EnemiesCount <= 3)) then
+      if HR.Cast(S.Corruption) then return "corruption 773"; end
+    end
+    -- siphon_life,line_cd=30,if=cooldown.summon_darkglare.remains<=15&equipped.169314
+    if S.SiphonLife:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() <= 15 and I.AzsharasFontofPower:IsEquipped()) then
+      if HR.Cast(S.SiphonLife) then return "siphon_life 774"; end
+    end
     -- use_item,name=azsharas_font_of_power,if=cooldown.summon_darkglare.remains<10
     if I.AzsharasFontofPower:IsReady() and (S.SummonDarkglare:CooldownRemainsP() < 10) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 773"; end
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 775"; end
     end
     -- unstable_affliction,target_if=!contagion&target.time_to_die<=8
     if S.UnstableAffliction:IsReadyP() then
