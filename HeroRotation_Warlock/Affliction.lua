@@ -383,8 +383,8 @@ local function APL()
     if I.RotcrustedVoodooDoll:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
       if HR.CastSuggested(I.RotcrustedVoodooDoll) then return "rotcrusted_voodoo_doll"; end
     end
-    -- use_item,name=shiver_venom_relic,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)&dot.shiver_venom.stack=5
-    if I.ShiverVenomRelic:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable()) and Target:DebuffStackP(S.ShiverVenomDebuff) == 5) then
+    -- use_item,name=shiver_venom_relic,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
+    if I.ShiverVenomRelic:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
       if HR.CastSuggested(I.ShiverVenomRelic) then return "rotcrusted_voodoo_doll"; end
     end
     -- use_item,name=aquipotent_nautilus,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
