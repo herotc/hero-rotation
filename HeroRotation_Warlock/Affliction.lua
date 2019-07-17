@@ -385,19 +385,19 @@ local function APL()
     end
     -- use_item,name=shiver_venom_relic,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.ShiverVenomRelic:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.ShiverVenomRelic) then return "rotcrusted_voodoo_doll"; end
+      if HR.CastSuggested(I.ShiverVenomRelic) then return "shiver_venom_relic"; end
     end
     -- use_item,name=aquipotent_nautilus,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.AquipotentNautilus:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.AquipotentNautilus) then return "rotcrusted_voodoo_doll"; end
+      if HR.CastSuggested(I.AquipotentNautilus) then return "aquipotent_nautilus"; end
     end
     -- use_item,name=tidestorm_codex,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.TidestormCodex:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.TidestormCodex) then return "rotcrusted_voodoo_doll"; end
+      if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex"; end
     end
     -- use_item,name=vial_of_storms,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.VialofStorms:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.VialofStorms) then return "rotcrusted_voodoo_doll"; end
+      if HR.CastSuggested(I.VialofStorms) then return "vial_of_storms"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
