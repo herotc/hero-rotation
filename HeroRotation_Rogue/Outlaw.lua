@@ -66,15 +66,15 @@ Spell.Rogue.Outlaw = {
   SnakeEyesBuff                   = Spell(275863),
   KeepYourWitsBuff                = Spell(288988),
   -- Essences
-  BloodOfTheEnemy                 = MultiSpell(297108, 298273, 298277),
-  MemoryOfLucidDreams             = MultiSpell(298357, 299372, 299374),
+  BloodofTheEnemy                 = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams             = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                  = MultiSpell(295337, 299345, 299347),
   RippleInSpace                   = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame               = MultiSpell(295373, 299349, 299353),
   TheUnboundForce                 = MultiSpell(298452, 299376, 299378),
   WorldveinResonance              = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam              = MultiSpell(295258, 299336, 299338),
-  GuardianOfAzeroth               = MultiSpell(295840, 299355, 299358),
+  GuardianofAzeroth               = MultiSpell(295840, 299355, 299358),
   LifebloodBuff                   = Spell(295137),
   LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   -- Defensive
@@ -287,16 +287,16 @@ end
 -- # Essences
 local function Essences ()
   -- blood_of_the_enemy,if=variable.blade_flurry_sync
-  if S.BloodOfTheEnemy:IsCastableP() and Blade_Flurry_Sync() then
-    if HR.Cast(S.BloodOfTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodOfTheEnemy"; end
+  if S.BloodofTheEnemy:IsCastableP() and Blade_Flurry_Sync() then
+    if HR.Cast(S.BloodofTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodofTheEnemy"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast ConcentratedFlame"; end
   end
   -- guardian_of_azeroth
-  if S.GuardianOfAzeroth:IsCastableP() then
-    if HR.Cast(S.GuardianOfAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianOfAzeroth"; end
+  if S.GuardianofAzeroth:IsCastableP() then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth"; end
   end
   -- focused_azerite_beam
   if S.FocusedAzeriteBeam:IsCastableP() then
@@ -319,8 +319,8 @@ local function Essences ()
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<45
-  if S.MemoryOfLucidDreams:IsCastableP() and Player:EnergyPredicted() < 45 then
-    if HR.Cast(S.MemoryOfLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryOfLucidDreams"; end
+  if S.MemoryofLucidDreams:IsCastableP() and Player:EnergyPredicted() < 45 then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
   end
   return false;
 end
