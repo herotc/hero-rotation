@@ -75,7 +75,7 @@ Spell.Druid.Feral = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   Thorns                                = Spell(236696),
   HeartEssence                          = Spell(298554),
   -- Icon for pulling enery
@@ -234,7 +234,7 @@ local function APL()
       if HR.Cast(S.Thorns, Settings.Feral.GCDasOffGCD.Essences) then return "thorns"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffP(S.TigersFuryBuff)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffP(S.TigersFuryBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Feral.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- memory_of_lucid_dreams,if=buff.tigers_fury.up&buff.berserk.down

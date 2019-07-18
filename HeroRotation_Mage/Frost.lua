@@ -67,7 +67,7 @@ Spell.Mage.Frost = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   CyclotronicBlast                      = Spell(167672)
 };
 local S = Spell.Mage.Frost;
@@ -193,7 +193,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Frost.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Frost.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- worldvein_resonance,if=buff.rune_of_power.down|active_enemies>3

@@ -64,7 +64,7 @@ Spell.Warlock.Destruction = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932)
+  RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.Warlock.Destruction;
 
@@ -467,7 +467,7 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Destruction.GCDasOffGCD.Essences) then return "focused_azerite_beam 378"; end
     end
     -- the_unbound_force,if=buff.reckless_force.react
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Destruction.GCDasOffGCD.Essences) then return "the_unbound_force 382"; end
     end
     -- purifying_blast
@@ -503,7 +503,7 @@ local function APL()
       VarPoolSoulShards = num(EnemiesCount > 1 and S.Havoc:CooldownRemainsP() <= 10 or S.SummonInfernal:CooldownRemainsP() <= 20 and (S.GrimoireofSupremacy:IsAvailable() or S.DarkSoulInstability:IsAvailable() and S.DarkSoulInstability:CooldownRemainsP() <= 20) or S.DarkSoulInstability:IsAvailable() and S.DarkSoulInstability:CooldownRemainsP() <= 20 and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() or S.SummonInfernal:CooldownRemainsP() + S.SummonInfernal:BaseDuration() > Target:TimeToDie()))
     end
     -- chaos_bolt,if=(talent.grimoire_of_supremacy.enabled|azerite.crashing_chaos.enabled)&pet.infernal.active|buff.dark_soul_instability.up|buff.reckless_force.react&buff.reckless_force.remains>cast_time
-    if S.ChaosBolt:IsReadyP() and ((S.GrimoireofSupremacy:IsAvailable() or S.CrashingChaos:AzeriteEnabled()) and S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.DarkSoulInstabilityBuff) or Player:BuffP(S.RecklessForce) and Player:BuffRemainsP(S.RecklessForce) > S.ChaosBolt:CastTime()) then
+    if S.ChaosBolt:IsReadyP() and ((S.GrimoireofSupremacy:IsAvailable() or S.CrashingChaos:AzeriteEnabled()) and S.SummonInfernal:CooldownRemainsP() > 150 or Player:BuffP(S.DarkSoulInstabilityBuff) or Player:BuffP(S.RecklessForceBuff) and Player:BuffRemainsP(S.RecklessForceBuff) > S.ChaosBolt:CastTime()) then
       if HR.Cast(S.ChaosBolt) then return "chaos_bolt 471"; end
     end
     -- chaos_bolt,if=!variable.pool_soul_shards&!talent.eradication.enabled

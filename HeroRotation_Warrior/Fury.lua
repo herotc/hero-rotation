@@ -62,7 +62,7 @@ Spell.Warrior.Fury = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565)
 };
@@ -255,7 +255,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Fury.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Fury.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- guardian_of_azeroth,if=!buff.recklessness.up

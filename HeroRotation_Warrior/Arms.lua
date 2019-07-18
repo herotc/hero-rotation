@@ -72,7 +72,7 @@ Spell.Warrior.Arms = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932)
+  RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.Warrior.Arms;
 
@@ -459,7 +459,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Arms.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Arms.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- guardian_of_azeroth,if=cooldown.colossus_smash.remains<10

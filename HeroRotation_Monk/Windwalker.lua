@@ -100,7 +100,7 @@ Spell.Monk.Windwalker = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   
   -- PvP Abilities
   ReverseHarm                           = Spell(287771),

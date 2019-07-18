@@ -76,7 +76,7 @@ Spell.Druid.Balance = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   Thorns                                = Spell(236696)
 };
 local S = Spell.Druid.Balance;
@@ -227,7 +227,7 @@ local function EvaluateCycleMemoryofLucidDreams135(TargetUnit)
 end
 
 local function EvaluateCycleTheUnboundForce160(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (Player:BuffP(S.RecklessForce))
+  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (Player:BuffP(S.RecklessForceBuff))
 end
 
 local function EvaluateCycleFocusedAzeriteBeam179(TargetUnit)

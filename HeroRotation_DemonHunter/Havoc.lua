@@ -65,7 +65,7 @@ Spell.DemonHunter.Havoc = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   Lifeblood                             = MultiSpell(295137, 305694),
-  RecklessForce                         = Spell(302932)
+  RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.DemonHunter.Havoc;
 

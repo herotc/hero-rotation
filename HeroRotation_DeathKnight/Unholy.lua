@@ -64,7 +64,7 @@ Spell.DeathKnight.Unholy = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RecklessForce                         = Spell(302932)
+  RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -287,7 +287,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, Settings.Unholy.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
       if HR.Cast(S.TheUnboundForce, Settings.Unholy.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- focused_azerite_beam,if=!death_and_decay.ticking

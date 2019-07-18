@@ -69,7 +69,7 @@ Spell.DeathKnight.Frost = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   ChillStreak                           = Spell(305392),
   PoolRange                             = Spell(9999000010)
 };
@@ -479,7 +479,7 @@ local function APL()
       if HR.Cast(S.ChillStreak, Settings.Frost.GCDasOffGCD.Essences) then return "chill_streak"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
       if HR.Cast(S.TheUnboundForce, Settings.Frost.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- focused_azerite_beam,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up

@@ -101,7 +101,7 @@ Spell.Shaman.Enhancement = {
   PurifyingBlast        = MultiSpell(295337, 299345, 299347),
   ConcentratedFlame     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce       = MultiSpell(298452, 299376, 299378),
-  RecklessForce         = Spell(302932),
+  RecklessForceBuff     = Spell(302932),
   WorldveinResonance    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth     = MultiSpell(295840, 299355, 299358),
@@ -365,7 +365,7 @@ local function APL ()
     end
 
     -- actions.priority+=/the_unbound_force,if=buff.reckless_force.up|time<5
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce) or HL.CombatTime() < 5) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or HL.CombatTime() < 5) then
       if HR.Cast(TheUnboundForce, Settings.Enhancement.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
 

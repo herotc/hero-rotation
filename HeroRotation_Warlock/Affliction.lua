@@ -74,7 +74,7 @@ Spell.Warlock.Affliction = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfectionMinor               = MultiSpell(296320, 299367, 299369),
-  RecklessForce                         = Spell(302932)
+  RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.Warlock.Affliction;
 
@@ -610,7 +610,7 @@ local function APL()
       if HR.Cast(S.Deathbolt) then return "deathbolt 734"; end
     end
     -- the_unbound_force,if=buff.reckless_force.remains
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Affliction.GCDasOffGCD.Essences) then return "the_unbound_force 744"; end
     end
     -- agony,target_if=min:dot.agony.remains,if=remains<=gcd+action.shadow_bolt.execute_time&target.time_to_die>8

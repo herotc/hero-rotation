@@ -67,7 +67,7 @@ Spell.Warlock.Demonology = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
-  RecklessForce                         = Spell(302932),
+  RecklessForceBuff                     = Spell(302932),
   Lifeblood                             = MultiSpell(295137, 305694),
 };
 local S = Spell.Warlock.Demonology;
@@ -558,7 +558,7 @@ local function APL()
       if HR.Cast(S.CallDreadstalkers) then return "call_dreadstalkers 421"; end
     end
     -- the_unbound_force,if=buff.reckless_force.react
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForce)) then
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, Settings.Demonology.GCDasOffGCD.Essences) then return "the_unbound_force 422"; end
     end
     -- bilescourge_bombers
