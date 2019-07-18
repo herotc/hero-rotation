@@ -66,6 +66,7 @@ Spell.Druid.Balance = {
   SolarBeam                             = Spell(78675),
   ShiverVenomDebuff                     = Spell(301624),
   CyclotronicBlast                      = Spell(167672),
+  AzsharasFontofPowerBuff               = Spell(296962),
   BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -295,9 +296,14 @@ local function APL()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
     end
-    -- solar_wrath,if=!bfa.font_of_power_precombat_channel
-    if S.SolarWrath:IsCastableP() then
+    -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=7.0
+    if S.SolarWrath:IsCastableP() and (not I.AzsharasFontofPower:IsEquipped() or Player:BuffP(S.AzsharasFontofPowerBuff)) then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
+    end
+    -- HeroRotation extra line to force AzsharasFontofPower channel, so above Solar Wrath can be shown
+    -- Main icon instead of CastSuggested, as nothing would be in main icon otherwise
+    if I.AzsharasFontofPower:IsCastableP() and (Player:BuffDownP(S.AzsharasFontofPowerBuff)) then
+      if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
   end
   -- Moonkin Form OOC, if setting is true
@@ -318,10 +324,14 @@ local function APL()
     end
     -- Interrupt
     Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false);
-    -- potion,if=buff.ca_inc.remains>6
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(CaInc()) > 6) then
+    -- potion,if=buff.celestial_alignment.remains>13|buff.incarnation.remains>16.5
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.CelestialAlignment) > 13 or Player:BuffRemainsP(S.Incarnation) > 16.5) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 57"; end
     end
+    -- Not including the below 3 lines, as it appears to be a SimC-specific hack that shouldn't be needed in HR
+    -- # Precombat Hack
+    -- solar_wrath,precombat=1,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=5.5
+    -- starsurge,precombat=1,if=talent.natures_balance.enabled
     -- berserking,if=buff.ca_inc.up
     if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 65"; end
@@ -389,21 +399,21 @@ local function APL()
     if S.Innervate:IsCastableP() and HR.CDsON() and (S.LivelySpirit:AzeriteEnabled() and (S.Incarnation:CooldownRemainsP() < 2 or S.CelestialAlignment:CooldownRemainsP() < 12)) then
       if HR.Cast(S.Innervate) then return "innervate 110"; end
     end
+    -- force_of_nature,if=(variable.az_ss&!buff.ca_inc.up|!variable.az_ss&(buff.ca_inc.up|cooldown.ca_inc.remains>30))&ap_check
+    if S.ForceofNature:IsCastableP() and ((bool(VarAzSs) and Player:BuffDownP(CaInc()) or not bool(VarAzSs) and (Player:BuffP(CaInc()) or CaInc():CooldownRemainsP() > 30)) and AP_Check(S.ForceofNature)) then
+      if HR.Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature 1111"; end
+    end
     -- incarnation,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check))&(buff.memory_of_lucid_dreams.up|ap_check),target_if=dot.sunfire.remains>8&dot.moonfire.remains>12&(dot.stellar_flare.remains>6|!talent.stellar_flare.enabled)
-    if S.Incarnation:IsCastableP() and (Player:BuffDownP(CaInc()) and (Player:BuffP(S.MemoryofLucidDreams) or ((S.MemoryofLucidDreams:CooldownRemainsP() > 20 or not S.MemoryofLucidDreams:IsAvailable()) and AP_Check)) and (Player:BuffP(S.MemoryofLucidDreams) or AP_Check) and (Target:DebuffRemainsP(S.SunfireDebuff) > 8 and Target:DebuffRemainsP(S.MoonfireDebuff) > 12 and (Target:DebuffRemainsP(S.StellarFlareDebuff) > 6 or not S.StellarFlare:IsAvailable()))) then
+    if S.Incarnation:IsCastableP() and (Player:BuffDownP(CaInc()) and (Player:BuffP(S.MemoryofLucidDreams) or ((S.MemoryofLucidDreams:CooldownRemainsP() > 20 or not S.MemoryofLucidDreams:IsAvailable()) and AP_Check(S.Incarnation))) and (Player:BuffP(S.MemoryofLucidDreams) or AP_Check(S.Incarnation)) and (Target:DebuffRemainsP(S.SunfireDebuff) > 8 and Target:DebuffRemainsP(S.MoonfireDebuff) > 12 and (Target:DebuffRemainsP(S.StellarFlareDebuff) > 6 or not S.StellarFlare:IsAvailable()))) then
       if HR.Cast(S.Incarnation, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return "incarnation 228" end
     end
-    -- celestial_alignment,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check))&(!azerite.lively_spirit.enabled|buff.lively_spirit.up),target_if=(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
-    if S.CelestialAlignment:IsCastableP() and (Player:BuffDownP(CaInc()) and (Player:BuffP(S.MemoryofLucidDreams) or ((S.MemoryofLucidDreams:CooldownRemainsP() > 20 or not S.MemoryofLucidDreams:IsAvailable()) and AP_Check)) and (not S.LivelySpirit:AzeriteEnabled() or Player:BuffP(S.LivelySpiritBuff)) and (Target:DebuffRemainsP(S.SunfireDebuff) > 2 and Target:DebuffP(S.MoonfireDebuff) and (Target:DebuffP(S.StellarFlareDebuff) or not S.StellarFlare:IsAvailable()))) then
+    -- celestial_alignment,if=!buff.ca_inc.up&(!talent.starlord.enabled|buff.starlord.up)&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check))&(!azerite.lively_spirit.enabled|buff.lively_spirit.up),target_if=(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
+    if S.CelestialAlignment:IsCastableP() and (Player:BuffDownP(CaInc()) and (not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and (Player:BuffP(S.MemoryofLucidDreams) or ((S.MemoryofLucidDreams:CooldownRemainsP() > 20 or not S.MemoryofLucidDreams:IsAvailable()) and AP_Check(S.CelestialAlignment))) and (not S.LivelySpirit:AzeriteEnabled() or Player:BuffP(S.LivelySpiritBuff)) and (Target:DebuffRemainsP(S.SunfireDebuff) > 2 and Target:DebuffP(S.MoonfireDebuff) and (Target:DebuffP(S.StellarFlareDebuff) or not S.StellarFlare:IsAvailable()))) then
       if HR.Cast(S.CelestialAlignment, Settings.Balance.GCDasOffGCD.CelestialAlignment) then return "celestial_alignment 253" end
     end
     -- fury_of_elune,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&solar_wrath.ap_check
     if S.FuryofElune:IsCastableP() and ((Player:BuffP(CaInc()) or CaInc():CooldownRemainsP() > 30) and AP_Check(S.SolarWrath)) then
       if HR.Cast(S.FuryofElune, Settings.Balance.GCDasOffGCD.FuryofElune) then return "fury_of_elune 146"; end
-    end
-    -- force_of_nature,if=(buff.ca_inc.up|cooldown.ca_inc.remains>30)&ap_check
-    if S.ForceofNature:IsCastableP() and ((Player:BuffP(CaInc()) or CaInc():CooldownRemainsP() > 30) and AP_Check(S.ForceofNature)) then
-      if HR.Cast(S.ForceofNature, Settings.Balance.GCDasOffGCD.ForceofNature) then return "force_of_nature 152"; end
     end
     -- cancel_buff,name=starlord,if=buff.starlord.remains<3&!solar_wrath.ap_check
     -- if (Player:BuffRemainsP(S.StarlordBuff) < 3 and not bool(solar_wrath.ap_check)) then
