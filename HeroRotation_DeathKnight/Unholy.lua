@@ -62,6 +62,8 @@ Spell.DeathKnight.Unholy = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
+  RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForce                         = Spell(302932)
 };
 local S = Spell.DeathKnight.Unholy;
@@ -74,7 +76,8 @@ Item.DeathKnight.Unholy = {
   BygoneBeeAlmanac                 = Item(163936),
   JesHowler                        = Item(159627),
   GalecallersBeak                  = Item(161379),
-  GrongsPrimalRage                 = Item(165574)
+  GrongsPrimalRage                 = Item(165574),
+  VisionofDemise                   = Item(169307)
 };
 local I = Item.DeathKnight.Unholy;
 
@@ -283,6 +286,10 @@ local function APL()
     if S.GuardianofAzeroth:IsCastableP() and (S.Apocalypse:IsCastableP()) then
       if HR.Cast(S.GuardianofAzeroth, Settings.Unholy.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(RecklessForce) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
+      if HR.Cast(S.TheUnboundForce, Settings.Unholy.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+    end
     -- focused_azerite_beam,if=!death_and_decay.ticking
     if S.FocusedAzeriteBeam:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Unholy.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
@@ -374,7 +381,11 @@ local function APL()
     if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable()) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 256"; end
     end
-    -- use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine
+    -- use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine|!equipped.vision_of_demise
+    -- use_item,name=vision_of_demise,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&essence.vision_of_perfection.enabled)|buff.unholy_frenzy.up|pet.gargoyle.active
+    if I.VisionofDemise:IsReady() and ((S.Apocalypse:CooldownUpP() and Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and S.VisionofPerfection:IsAvailable()) or Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
+      if HR.CastSuggested(I.VisionofDemise) then return "vision_of_demise 262"; end
+    end
     -- use_item,name=ramping_amplitude_gigavolt_engine,if=cooldown.apocalypse.remains<2|talent.army_of_the_damned.enabled|raid_event.adds.in<5
     if I.RampingAmplitudeGigavoltEngine:IsReady() and (S.Apocalypse:CooldownRemainsP() < 2 or S.ArmyoftheDamned:IsAvailable()) then
       if HR.CastSuggested(I.RampingAmplitudeGigavoltEngine) then return "ramping_amplitude_gigavolt_engine 263"; end
