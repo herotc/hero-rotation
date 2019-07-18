@@ -8,7 +8,7 @@ local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = HL.Spell;
-local MultiSpell = HL.MultiSpell
+local MultiSpell = HL.MultiSpell;
 local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
@@ -65,35 +65,19 @@ Spell.Rogue.Assassination = {
   ShroudedSuffocation   = Spell(278666),
   ScentOfBlood          = Spell(277679),
   -- Essences
-  BloodOfTheEnemy       = Spell(297108),
-  BloodOfTheEnemy2      = Spell(298273),
-  BloodOfTheEnemy3      = Spell(298277),
+  BloodOfTheEnemy       = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam    = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth     = MultiSpell(295840, 299355, 299358),
   BloodOfTheEnemyDebuff = Spell(297108),
-  ConcentratedFlame     = Spell(295373),
-  ConcentratedFlame2    = Spell(299349),
-  ConcentratedFlame3    = Spell(299353),
-  GuardianOfAzeroth     = Spell(295840),
-  GuardianOfAzeroth2    = Spell(299355),
-  GuardianOfAzeroth3    = Spell(299358),
-  FocusedAzeriteBeam    = Spell(295258),
-  FocusedAzeriteBeam2   = Spell(299336),
-  FocusedAzeriteBeam3   = Spell(299338),
-  PurifyingBlast        = Spell(295337),
-  PurifyingBlast2       = Spell(299345),
-  PurifyingBlast3       = Spell(299347),
-  TheUnboundForce       = Spell(298452),
-  TheUnboundForce2      = Spell(299376),
-  TheUnboundForce3      = Spell(299378),
-  RippleInSpace         = Spell(302731),
-  RippleInSpace2        = Spell(302982),
-  RippleInSpace3        = Spell(302983),
-  WorldveinResonance    = Spell(295186),
-  WorldveinResonance2   = Spell(298628),
-  WorldveinResonance3   = Spell(299334),
+  RecklessForceBuff     = Spell(302932),
+  RecklessForceCounter  = Spell(302917),
   LifebloodBuff         = Spell(295137),
-  MemoryOfLucidDreams   = Spell(298357),
-  MemoryOfLucidDreams2  = Spell(299372),
-  MemoryOfLucidDreams3  = Spell(299374),
   LucidDreamsBuff       = MultiSpell(298357, 299372, 299374),
   -- Defensive
   CrimsonVial           = Spell(185311),
@@ -331,27 +315,6 @@ local function SSBuffedTargetsAbovePandemic()
   return count;
 end
 
-local function DetermineEssenceRanks()
-  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy;
-  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy;
-  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams;
-  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams;
-  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast;
-  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast;
-  S.RippleInSpace = S.RippleInSpace2:IsAvailable() and S.RippleInSpace2 or S.RippleInSpace;
-  S.RippleInSpace = S.RippleInSpace3:IsAvailable() and S.RippleInSpace3 or S.RippleInSpace;
-  S.ConcentratedFlame = S.ConcentratedFlame2:IsAvailable() and S.ConcentratedFlame2 or S.ConcentratedFlame;
-  S.ConcentratedFlame = S.ConcentratedFlame3:IsAvailable() and S.ConcentratedFlame3 or S.ConcentratedFlame;
-  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce;
-  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce;
-  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance;
-  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance;
-  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam;
-  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam;
-  S.GuardianOfAzeroth = S.GuardianOfAzeroth2:IsAvailable() and S.GuardianOfAzeroth2 or S.GuardianOfAzeroth;
-  S.GuardianOfAzeroth = S.GuardianOfAzeroth3:IsAvailable() and S.GuardianOfAzeroth3 or S.GuardianOfAzeroth;
-end
-
 local MythicDungeon;
 do
   local SappedSoulSpells = {
@@ -412,8 +375,8 @@ local function Essences ()
   if S.PurifyingBlast:IsCastableP() then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast PurifyingBlast"; end
   end
-  -- the_unbound_force
-  if S.TheUnboundForce:IsCastableP() then
+  -- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+  if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
     if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast TheUnboundForce"; end
   end
   -- ripple_in_space
@@ -774,7 +737,6 @@ local function APL ()
   RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   GarroteDMGThreshold = S.Mutilate:Damage()*Settings.Assassination.MutilateDMGOffset; -- Used as TTD Not Valid fallback since it's a generator.
   PriorityRotation = UsePriorityRotation();
-  DetermineEssenceRanks();
 
   -- Defensives
   -- Crimson Vial
@@ -891,7 +853,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-07-13
+-- Last Update: 2019-07-18
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -980,7 +942,7 @@ HR.SetAPL(259, APL);
 -- actions.essences+=/guardian_of_azeroth
 -- actions.essences+=/focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
 -- actions.essences+=/purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
--- actions.essences+=/the_unbound_force
+-- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up

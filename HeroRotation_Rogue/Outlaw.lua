@@ -8,7 +8,7 @@ local Unit = HL.Unit;
 local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = HL.Spell;
-local MultiSpell = HL.MultiSpell
+local MultiSpell = HL.MultiSpell;
 local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
@@ -66,34 +66,16 @@ Spell.Rogue.Outlaw = {
   SnakeEyesBuff                   = Spell(275863),
   KeepYourWitsBuff                = Spell(288988),
   -- Essences
-  BloodOfTheEnemy                 = Spell(297108),
-  BloodOfTheEnemy2                = Spell(298273),
-  BloodOfTheEnemy3                = Spell(298277),
-  ConcentratedFlame               = Spell(295373),
-  ConcentratedFlame2              = Spell(299349),
-  ConcentratedFlame3              = Spell(299353),
-  GuardianOfAzeroth               = Spell(295840),
-  GuardianOfAzeroth2              = Spell(299355),
-  GuardianOfAzeroth3              = Spell(299358),
-  FocusedAzeriteBeam              = Spell(295258),
-  FocusedAzeriteBeam2             = Spell(299336),
-  FocusedAzeriteBeam3             = Spell(299338),
-  PurifyingBlast                  = Spell(295337),
-  PurifyingBlast2                 = Spell(299345),
-  PurifyingBlast3                 = Spell(299347),
-  TheUnboundForce                 = Spell(298452),
-  TheUnboundForce2                = Spell(299376),
-  TheUnboundForce3                = Spell(299378),
-  RippleInSpace                   = Spell(302731),
-  RippleInSpace2                  = Spell(302982),
-  RippleInSpace3                  = Spell(302983),
-  WorldveinResonance              = Spell(295186),
-  WorldveinResonance2             = Spell(298628),
-  WorldveinResonance3             = Spell(299334),
+  BloodOfTheEnemy                 = MultiSpell(297108, 298273, 298277),
+  MemoryOfLucidDreams             = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                  = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                   = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame               = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                 = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance              = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam              = MultiSpell(295258, 299336, 299338),
+  GuardianOfAzeroth               = MultiSpell(295840, 299355, 299358),
   LifebloodBuff                   = Spell(295137),
-  MemoryOfLucidDreams             = Spell(298357),
-  MemoryOfLucidDreams2            = Spell(299372),
-  MemoryOfLucidDreams3            = Spell(299374),
   LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   -- Defensive
   CrimsonVial                     = Spell(185311),
@@ -278,27 +260,6 @@ end
 local function EnergyTimeToMaxRounded ()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
   return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10;
-end
-
-local function DetermineEssenceRanks()
-  S.BloodOfTheEnemy = S.BloodOfTheEnemy2:IsAvailable() and S.BloodOfTheEnemy2 or S.BloodOfTheEnemy;
-  S.BloodOfTheEnemy = S.BloodOfTheEnemy3:IsAvailable() and S.BloodOfTheEnemy3 or S.BloodOfTheEnemy;
-  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams2:IsAvailable() and S.MemoryOfLucidDreams2 or S.MemoryOfLucidDreams;
-  S.MemoryOfLucidDreams = S.MemoryOfLucidDreams3:IsAvailable() and S.MemoryOfLucidDreams3 or S.MemoryOfLucidDreams;
-  S.PurifyingBlast = S.PurifyingBlast2:IsAvailable() and S.PurifyingBlast2 or S.PurifyingBlast;
-  S.PurifyingBlast = S.PurifyingBlast3:IsAvailable() and S.PurifyingBlast3 or S.PurifyingBlast;
-  S.RippleInSpace = S.RippleInSpace2:IsAvailable() and S.RippleInSpace2 or S.RippleInSpace;
-  S.RippleInSpace = S.RippleInSpace3:IsAvailable() and S.RippleInSpace3 or S.RippleInSpace;
-  S.ConcentratedFlame = S.ConcentratedFlame2:IsAvailable() and S.ConcentratedFlame2 or S.ConcentratedFlame;
-  S.ConcentratedFlame = S.ConcentratedFlame3:IsAvailable() and S.ConcentratedFlame3 or S.ConcentratedFlame;
-  S.TheUnboundForce = S.TheUnboundForce2:IsAvailable() and S.TheUnboundForce2 or S.TheUnboundForce;
-  S.TheUnboundForce = S.TheUnboundForce3:IsAvailable() and S.TheUnboundForce3 or S.TheUnboundForce;
-  S.WorldveinResonance = S.WorldveinResonance2:IsAvailable() and S.WorldveinResonance2 or S.WorldveinResonance;
-  S.WorldveinResonance = S.WorldveinResonance3:IsAvailable() and S.WorldveinResonance3 or S.WorldveinResonance;
-  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam2:IsAvailable() and S.FocusedAzeriteBeam2 or S.FocusedAzeriteBeam;
-  S.FocusedAzeriteBeam = S.FocusedAzeriteBeam3:IsAvailable() and S.FocusedAzeriteBeam3 or S.FocusedAzeriteBeam;
-  S.GuardianOfAzeroth = S.GuardianOfAzeroth2:IsAvailable() and S.GuardianOfAzeroth2 or S.GuardianOfAzeroth;
-  S.GuardianOfAzeroth = S.GuardianOfAzeroth3:IsAvailable() and S.GuardianOfAzeroth3 or S.GuardianOfAzeroth;
 end
 
 local function MythicDungeon ()
@@ -541,8 +502,6 @@ local function APL ()
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6;
   HL.GetEnemies(BladeFlurryRange);
   HL.GetEnemies("Melee");
-
-  DetermineEssenceRanks();
 
   -- Defensives
   -- Crimson Vial
