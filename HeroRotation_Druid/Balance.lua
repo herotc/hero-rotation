@@ -224,7 +224,7 @@ local function EvaluateCycleShiverVenomRelic104(TargetUnit)
 end
 
 local function EvaluateCycleMemoryofLucidDreams135(TargetUnit)
-  return (TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 10 and TargetUnit:DebuffRemainsP(S.MoonfireDebuff) > 10 and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffRemainsP(S.StellarFlareDebuff) > 10)) and (Player:BuffDownP(CaInc()) and (FutureAstralPower() < 25 or S.CaInc:CooldownRemainsP() > 30))
+  return (TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 10 and TargetUnit:DebuffRemainsP(S.MoonfireDebuff) > 10 and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffRemainsP(S.StellarFlareDebuff) > 10)) and (Player:BuffDownP(CaInc()) and (FutureAstralPower() < 25 or CaInc():CooldownRemainsP() > 30))
 end
 
 local function EvaluateCycleTheUnboundForce160(TargetUnit)
