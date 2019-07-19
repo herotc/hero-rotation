@@ -68,7 +68,7 @@ Spell.Hunter.Marksmanship = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  Lifeblood                             = MultiSpell(295137, 305694),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368)
@@ -210,7 +210,7 @@ local function APL()
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 102"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4&!buff.trueshot.up
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.Lifeblood) < 4 and Player:BuffDownP(S.TrueshotBuff)) then
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4 and Player:BuffDownP(S.TrueshotBuff)) then
       if HR.Cast(S.WorldveinResonance, Settings.Marksmanship.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=(ca_execute|target.time_to_die>210)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<30
