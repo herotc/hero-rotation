@@ -298,7 +298,7 @@ local function APL()
     end
     -- use_item,name=azsharas_font_of_power
     -- Main icon instead of CastSuggested, as nothing would be in main icon otherwise
-    if I.AzsharasFontofPower:IsCastableP() then
+    if I.AzsharasFontofPower:IsReady() then
       if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
     -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=7.0
