@@ -303,8 +303,13 @@ local function APL()
       if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
     -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=7.0
+    -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=5.5
     if S.SolarWrath:IsCastableP() and (not I.AzsharasFontofPower:IsEquipped() or Player:BuffP(S.AzsharasFontofPowerBuff)) then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
+    end
+    -- starsurge,if=talent.natures_balance.enabled
+    if S.Starsurge:IsReadyP() and (S.NaturesBalance:IsAvailable()) then
+      if HR.Cast(S.Starsurge) then return "starsurge 45"; end
     end
   end
   -- Moonkin Form OOC, if setting is true
@@ -329,10 +334,6 @@ local function APL()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.CelestialAlignment) > 13 or Player:BuffRemainsP(S.Incarnation) > 16.5) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 57"; end
     end
-    -- Not including the below 3 lines, as it appears to be a SimC-specific hack that shouldn't be needed in HR
-    -- # Precombat Hack
-    -- solar_wrath,precombat=1,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=5.5
-    -- starsurge,precombat=1,if=talent.natures_balance.enabled
     -- berserking,if=buff.ca_inc.up
     if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(CaInc())) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 65"; end
