@@ -56,6 +56,7 @@ Spell.Priest.Shadow = {
   ShadowWordVoid                        = Spell(205351),
   Silence                               = Spell(15487),
   ChorusofInsanity                      = Spell(278661),
+  CyclotronicBlast                      = Spell(167672),
   BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -65,6 +66,7 @@ Spell.Priest.Shadow = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368)
 };
@@ -156,7 +158,7 @@ local function EvaluateCycleMindBlast103(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordPain114(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > ((num(true) - 1.2 + 3.3 * EnemiesCount) * VarSwpTraitRanksCheck * (1 - 0.012 * S.SearingDialogue:AzeriteRank() * EnemiesCount))) and (not S.Misery:IsAvailable())
+  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > ((-1.2 + 3.3 * EnemiesCount) * VarSwpTraitRanksCheck * (1 - 0.012 * S.SearingDialogue:AzeriteRank() * EnemiesCount))) and (not S.Misery:IsAvailable())
 end
 
 local function EvaluateCycleVampiricTouch133(TargetUnit)
@@ -181,7 +183,7 @@ HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Cleave, Single
+  local Precombat, Cds, Cleave, CritCds, Single
   local InsanityDrain = InsanityDrain()
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- For CastCycle calls
@@ -196,30 +198,24 @@ local function APL()
         if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 4"; end
       end
       -- variable,name=mind_blast_targets,op=set,value=floor((4.5+azerite.whispers_of_the_damned.rank)%(1+0.27*azerite.searing_dialogue.rank))
-      if (true) then
-        VarMindBlastTargets = math.floor ((4.5 + S.WhispersoftheDamned:AzeriteRank()) / (1 + 0.27 * S.SearingDialogue:AzeriteRank()))
-      end
+      VarMindBlastTargets = math.floor ((4.5 + S.WhispersoftheDamned:AzeriteRank()) / (1 + 0.27 * S.SearingDialogue:AzeriteRank()))
       -- variable,name=swp_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank+0.2*azerite.thought_harvester.rank)*(1-0.09*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
-      if (true) then
-        VarSwpTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() + 0.2 * S.ThoughtHarvester:AzeriteRank()) * (1 - 0.09 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
-      end
+      VarSwpTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() + 0.2 * S.ThoughtHarvester:AzeriteRank()) * (1 - 0.09 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
       -- variable,name=vt_trait_ranks_check,op=set,value=(1-0.04*azerite.thought_harvester.rank-0.05*azerite.spiteful_apparitions.rank)
-      if (true) then
-        VarVtTraitRanksCheck = (1 - 0.04 * S.ThoughtHarvester:AzeriteRank() - 0.05 * S.SpitefulApparitions:AzeriteRank())
-      end
+      VarVtTraitRanksCheck = (1 - 0.04 * S.ThoughtHarvester:AzeriteRank() - 0.05 * S.SpitefulApparitions:AzeriteRank())
       -- variable,name=vt_mis_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank-0.03*azerite.thought_harvester.rank-0.055*azerite.spiteful_apparitions.rank)*(1-0.027*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
-      if (true) then
-        VarVtMisTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() - 0.03 * S.ThoughtHarvester:AzeriteRank() - 0.055 * S.SpitefulApparitions:AzeriteRank()) * (1 - 0.027 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
-      end
+      VarVtMisTraitRanksCheck = (1 - 0.07 * S.DeathThroes:AzeriteRank() - 0.03 * S.ThoughtHarvester:AzeriteRank() - 0.055 * S.SpitefulApparitions:AzeriteRank()) * (1 - 0.027 * S.ThoughtHarvester:AzeriteRank() * S.SearingDialogue:AzeriteRank())
       -- variable,name=vt_mis_sd_check,op=set,value=1-0.014*azerite.searing_dialogue.rank
-      if (true) then
-        VarVtMisSdCheck = 1 - 0.014 * S.SearingDialogue:AzeriteRank()
-      end
+      VarVtMisSdCheck = 1 - 0.014 * S.SearingDialogue:AzeriteRank()
       -- Mindbender management
       S.Mindbender = S.MindbenderTalent:IsAvailable() and S.MindbenderTalent or S.Shadowfiend
       -- shadowform,if=!buff.shadowform.up
       if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (not Player:BuffP(S.ShadowformBuff)) then
         if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 44"; end
+      end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 50"; end
       end
       -- mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
       if S.MindBlast:IsReadyP() and Everyone.TargetIsValid() and (EnemiesCount < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.MindBlast) then
@@ -234,6 +230,49 @@ local function APL()
         if HR.Cast(S.VampiricTouch) then return "vampiric_touch 54"; end
       end
     end
+  end
+  Cds = function()
+    -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(25+5*buff.bloodlust.up)|(current_insanity_drain*gcd.max*3)>insanity
+    if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (25 + 5 * num(Player:HasHeroism())) or (InsanityDrain * Player:GCD * 3) > Player:Insanity()) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams cds"; end
+    end
+    -- blood_of_the_enemy
+    if S.BloodofTheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodofTheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy cds"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Shadow.GCDasOffGCD.Essences) then return "guardian_of_azeroth cds"; end
+    end
+    -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
+    if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2) then
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Shadow.GCDasOffGCD.Essences) then return "focused_azerite_beam cds"; end
+    end
+    -- purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
+    if S.PurifyingBlast:IsCastableP() and (EnemiesCount >= 2) then
+      if HR.Cast(S.PurifyingBlast, Settings.Shadow.GCDasOffGCD.Essences) then return "purifying_blast cds"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce, Settings.Shadow.GCDasOffGCD.Essences) then return "the_unbound_force cds"; end
+    end
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Settings.Shadow.GCDasOffGCD.Essences) then return "concentrated_flame cds"; end
+    end
+    -- ripple_in_space
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.RippleInSpace, Settings.Shadow.GCDasOffGCD.Essences) then return "ripple_in_space cds"; end
+    end
+    -- worldvein_resonance,if=buff.lifeblood.stack<3
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff)) then
+      if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance cds"; end
+    end
+    -- call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
+    if ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or not S.ChorusofInsanity:AzeriteEnabled()) then
+      local ShouldReturn = CritCds(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- use_items
   end
   Cleave = function()
     -- void_eruption
@@ -256,46 +295,8 @@ local function APL()
     if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 78"; end
     end
-    -- use_item,name=azsharas_font_of_power,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
-    if I.AzsharasFontofPower:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power cleave"; end
-    end
-    -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(25+5*buff.bloodlust.up)|(current_insanity_drain*gcd.max*3)>insanity
-    if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (25 + 5 * num(Player:HasHeroism())) or (InsanityDrain * Player:GCD() * 3) > Player:Insanity()) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
-    end
-    -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
-    end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Shadow.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
-    end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Shadow.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
-    end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.Shadow.GCDasOffGCD.Essences) then return "purifying_blast"; end
-    end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce, Settings.Shadow.GCDasOffGCD.Essences) then return "the_unbound_force"; end
-    end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Shadow.GCDasOffGCD.Essences) then return "ripple_in_space"; end
-    end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
-    end
-    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
-    if I.PocketsizedComputationDevice:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device cleave"; end
-    end
+    -- call_action_list,name=cds
+    local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     -- shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
     if S.ShadowWordDeath:IsReadyP() then
       if HR.CastCycle(S.ShadowWordDeath, 40, EvaluateCycleShadowWordDeath84) then return "shadow_word_death 88" end
@@ -353,6 +354,16 @@ local function APL()
       if HR.Cast(S.ShadowWordPain) then return "shadow_word_pain 174"; end
     end
   end
+  CritCds = function()
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsReady() then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power critcds"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast
+    if I.PocketsizedComputationDevice:IsReady() and S.CyclotonicBlast:IsAvailable() then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device critcds"; end
+    end
+  end
   Single = function()
     -- void_eruption
     if S.VoidEruption:IsReadyP() and Player:Insanity() >= InsanityThreshold() and not Player:IsCasting(S.VoidEruption) then
@@ -366,46 +377,8 @@ local function APL()
     if S.VoidBolt:IsReadyP() or Player:IsCasting(S.VoidEruption) then
       if HR.Cast(S.VoidBolt) then return "void_bolt 182"; end
     end
-    -- use_item,name=azsharas_font_of_power,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
-    if I.AzsharasFontofPower:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power single"; end
-    end
-    -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(25+5*buff.bloodlust.up)|(current_insanity_drain*gcd.max*3)>insanity
-    if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (25 + 5 * num(Player:HasHeroism())) or (InsanityDrain * Player:GCD() * 3) > Player:Insanity()) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
-    end
-    -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
-    end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Shadow.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
-    end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Shadow.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
-    end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.Shadow.GCDasOffGCD.Essences) then return "purifying_blast"; end
-    end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce, Settings.Shadow.GCDasOffGCD.Essences) then return "the_unbound_force"; end
-    end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Shadow.GCDasOffGCD.Essences) then return "ripple_in_space"; end
-    end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
-    end
-    -- use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
-    if I.PocketsizedComputationDevice:IsReady() and ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or S.ChorusofInsanity:AzeriteRank() == 0) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device single"; end
-    end
+    -- call_action_list,name=cds
+    local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     -- mind_sear,if=buff.harvested_thoughts.up&cooldown.void_bolt.remains>=1.5&azerite.searing_dialogue.rank>=1
     if S.MindSear:IsCastableP() and (Player:BuffP(S.HarvestedThoughtsBuff) and S.VoidBolt:CooldownRemainsP() >= 1.5 and S.SearingDialogue:AzeriteRank() >= 1) then
       if HR.Cast(S.MindSear) then return "mind_sear 184"; end
@@ -479,20 +452,18 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 283"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
-    if (true) then
-      VarDotsUp = num(Target:DebuffP(S.ShadowWordPainDebuff) and Target:DebuffP(S.VampiricTouchDebuff))
-    end
+    VarDotsUp = num(Target:DebuffP(S.ShadowWordPainDebuff) and Target:DebuffP(S.VampiricTouchDebuff))
     -- berserking
     if S.Berserking:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 271"; end
     end
     -- run_action_list,name=cleave,if=active_enemies>1
     if (EnemiesCount > 1) then
-      return Cleave();
+      local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single,if=active_enemies=1
-    if (true) then
-      return Single();
+    if (EnemiesCount == 1) then
+      local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
   end
 end
