@@ -55,6 +55,7 @@ Spell.DemonHunter.Havoc = {
   FelEruption                           = Spell(211881),
   ChaosNova                             = Spell(179057),
   RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565),
   BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -65,6 +66,7 @@ Spell.DemonHunter.Havoc = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   Lifeblood                             = MultiSpell(295137, 305694),
+  RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.DemonHunter.Havoc;
@@ -196,8 +198,8 @@ local function APL()
     if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
       if HR.Cast(S.BloodofTheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
+    -- guardian_of_azeroth,if=buff.metamorphosis.up|target.time_to_die<=30
+    if S.GuardianofAzeroth:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 30) then
       if HR.Cast(S.GuardianofAzeroth, Settings.Havoc.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
@@ -208,8 +210,8 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
       if HR.Cast(S.PurifyingBlast, Settings.Havoc.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
       if HR.Cast(S.TheUnboundForce, Settings.Havoc.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- ripple_in_space
@@ -243,8 +245,8 @@ local function APL()
     if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 55"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod&(buff.metamorphosis.remains>20|target.time_to_die<20))|(equipped.dribbling_inkpod&target.health.pct<31)
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() and (Player:BuffRemainsP(S.MetamorphosisBuff) > 20 or Target:TimeToDie() < 20)) or (I.DribblingInkpod:IsEquipped() and Target:HealthPercentage() < 31)) then
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.ConductiveInkDebuff) or Player:BuffRemainsP(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
     end
     -- call_action_list,name=essences
