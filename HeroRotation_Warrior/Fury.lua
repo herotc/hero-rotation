@@ -62,6 +62,7 @@ Spell.Warrior.Fury = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
+  ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932),
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565)
@@ -250,8 +251,7 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Fury.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
-    -- Need spell ID for ConcentratedFlame DoT
-    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, Settings.Fury.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up

@@ -74,6 +74,7 @@ Spell.Warlock.Affliction = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfectionMinor               = MultiSpell(296320, 299367, 299369),
+  ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.Warlock.Affliction;
@@ -187,6 +188,7 @@ end
 
 S.ShadowBolt:RegisterInFlight()
 S.SeedofCorruption:RegisterInFlight()
+S.ConcentratedFlame:RegisterInFlight()
 
 local function EvaluateTargetIfFilterAgony160(TargetUnit)
   return TargetUnit:DebuffRemainsP(S.AgonyDebuff)
@@ -510,7 +512,7 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.Affliction.GCDasOffGCD.Essences) then return "purifying_blast 465"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
-    if S.ConcentratedFlame:IsCastableP() then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) then
       if HR.Cast(S.ConcentratedFlame, Settings.Affliction.GCDasOffGCD.Essences) then return "concentrated_flame 467"; end
     end
     -- drain_soul,interrupt_global=1,chain=1,interrupt=1,cycle_targets=1,if=target.time_to_die<=gcd

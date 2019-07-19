@@ -67,8 +67,9 @@ Spell.Warlock.Demonology = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
-  RecklessForceBuff                     = Spell(302932),
   Lifeblood                             = MultiSpell(295137, 305694),
+  ConcentratedFlameBurn                 = Spell(295368),
+  RecklessForceBuff                     = Spell(302932),
 };
 local S = Spell.Warlock.Demonology;
 
@@ -111,6 +112,7 @@ local function UpdateRanges()
 end
 
 S.HandofGuldan:RegisterInFlight()
+S.ConcentratedFlame:RegisterInFlight()
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -338,8 +340,7 @@ local function APL()
       if HR.Cast(S.BloodofTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy implosion"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&spell_targets.implosion<5
-    -- Need Spell ID for ConcentratedFlame DoT
-    if S.ConcentratedFlame:IsCastableP() and (EnemiesCount < 5) then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
       if HR.Cast(S.ConcentratedFlame, Settings.Demonology.GCDasOffGCD.Essences) then return "concentrated_flame implosion"; end
     end
     -- soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
@@ -602,8 +603,7 @@ local function APL()
       if HR.Cast(S.BloodofTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy 505"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!pet.demonic_tyrant.active
-    -- Need ConcentratedFlame DoT Spell ID
-    if S.ConcentratedFlame:IsCastableP() and (DemonicTyrantTime() == 0) then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and DemonicTyrantTime() == 0) then
       if HR.Cast(S.ConcentratedFlame, Settings.Demonology.GCDasOffGCD.Essences) then return "concentrated_flame 506"; end
     end
     -- call_action_list,name=build_a_shard

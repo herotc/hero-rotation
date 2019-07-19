@@ -64,6 +64,7 @@ Spell.Warlock.Destruction = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.Warlock.Destruction;
@@ -283,8 +284,7 @@ local function APL()
       if HR.Cast(S.Shadowburn) then return "shadowburn 139"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
-    -- Need ConcentratedFlame DoT Spell ID
-    if S.ConcentratedFlame:IsCastableP() and (EnemiesCount < 5) then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
       if HR.Cast(S.ConcentratedFlame, Settings.Destruction.GCDasOffGCD.Essences) then return "concentrated_flame 143"; end
     end
     -- incinerate
@@ -475,7 +475,7 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.Destruction.GCDasOffGCD.Essences) then return "purifying_blast 386"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
-    if S.ConcentratedFlame:IsCastableP() then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) then
       if HR.Cast(S.ConcentratedFlame, Settings.Destruction.GCDasOffGCD.Essences) then return "concentrated_flame 388"; end
     end
     -- channel_demonfire

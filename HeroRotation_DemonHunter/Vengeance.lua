@@ -58,7 +58,8 @@ Spell.DemonHunter.Vengeance = {
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334)
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  ConcentratedFlameBurn                 = Spell(295368),
 };
 local S = Spell.DemonHunter.Vengeance;
 

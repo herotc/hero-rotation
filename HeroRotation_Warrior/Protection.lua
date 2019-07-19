@@ -64,6 +64,7 @@ Spell.Warrior.Protection = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   AnimaofDeath                          = MultiSpell(294926, 300002, 300003),
   AnimaofLife                           = MultiSpell(294964, 300004, 300005),
+  ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
 local S = Spell.Warrior.Protection;

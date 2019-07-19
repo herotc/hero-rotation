@@ -59,6 +59,7 @@ Spell.Paladin.Retribution = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   SeethingRageBuff                      = Spell(297126),
   RazorCoralDebuff                      = Spell(303568)
 };

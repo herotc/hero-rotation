@@ -87,6 +87,7 @@ Spell.Rogue.Subtlety = {
   RecklessForceBuff                     = Spell(302932),
   RecklessForceCounter                  = Spell(302917),
   LifebloodBuff                         = Spell(295137),
+  ConcentratedFlameBurn                 = Spell(295368),
   -- Defensive
   CrimsonVial                           = Spell(185311),
   Feint                                 = Spell(1966),

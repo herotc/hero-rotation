@@ -101,10 +101,11 @@ Spell.Shaman.Enhancement = {
   PurifyingBlast        = MultiSpell(295337, 299345, 299347),
   ConcentratedFlame     = MultiSpell(295373, 299349, 299353),
   TheUnboundForce       = MultiSpell(298452, 299376, 299378),
-  RecklessForceBuff     = Spell(302932),
   WorldveinResonance    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth     = MultiSpell(295840, 299355, 299358),
+  RecklessForceBuff     = Spell(302932),
+  ConcentratedFlameBurn = Spell(295368),
 
   -- Misc
   PoolFocus             = Spell(9999000010),

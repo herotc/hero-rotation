@@ -70,7 +70,8 @@ Spell.Hunter.Marksmanship = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   Lifeblood                             = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RecklessForceBuff                     = Spell(302932)
+  RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368)
 };
 local S = Spell.Hunter.Marksmanship;
 

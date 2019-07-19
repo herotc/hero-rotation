@@ -70,6 +70,7 @@ Spell.Hunter.BeastMastery = {
   Lifeblood                             = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   -- Trinket Effects
   CyclotronicBlast                      = Spell(167672),
   -- Misc
@@ -125,6 +126,8 @@ local function GetEnemiesCount(range)
     return 1
   end
 end
+
+S.ConcentratedFlame:RegisterInFlight()
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -342,7 +345,7 @@ local function APL()
       if HR.Cast(S.BarbedShot) then return "barbed_shot 164"; end
     end
     -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.bestial_wrath.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
-    if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
+    if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
       if HR.Cast(S.ConcentratedFlame, Settings.BeastMastery.GCDasOffGCD.Essences) then return "concentrated_flame 165"; end
     end
     -- aspect_of_the_wild,if=cooldown.barbed_shot.charges<2|pet.cat.buff.frenzy.stack>2|!azerite.primal_instincts.enabled

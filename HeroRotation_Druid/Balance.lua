@@ -77,6 +77,7 @@ Spell.Druid.Balance = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696)
 };
 local S = Spell.Druid.Balance;

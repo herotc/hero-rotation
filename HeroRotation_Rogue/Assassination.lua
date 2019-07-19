@@ -79,6 +79,7 @@ Spell.Rogue.Assassination = {
   RecklessForceCounter  = Spell(302917),
   LifebloodBuff         = Spell(295137),
   LucidDreamsBuff       = MultiSpell(298357, 299372, 299374),
+  ConcentratedFlameBurn = Spell(295368),
   -- Defensive
   CrimsonVial           = Spell(185311),
   Feint                 = Spell(1966),

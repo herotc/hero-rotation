@@ -76,6 +76,7 @@ Spell.Druid.Feral = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696),
   HeartEssence                          = Spell(298554),
   -- Icon for pulling enery

@@ -70,6 +70,7 @@ Spell.DeathKnight.Frost = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   ChillStreak                           = Spell(305392),
   PoolRange                             = Spell(9999000010)
 };
@@ -487,8 +488,7 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Frost.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- concentrated_flame,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&dot.concentrated_flame_burn.remains=0
-    -- Need to get Spell ID for DoT
-    if S.ConcentratedFlame:IsCastableP() and (not Player:BuffP(S.PillarofFrostBuff) and not Player:BuffP(S.BreathofSindragosa)) then
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.PillarofFrostBuff) and Player:BuffDownP(S.BreathofSindragosa) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, Settings.Frost.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- purifying_blast,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up

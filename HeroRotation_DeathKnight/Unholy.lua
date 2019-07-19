@@ -64,7 +64,8 @@ Spell.DeathKnight.Unholy = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RecklessForceBuff                     = Spell(302932)
+  RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -295,8 +296,7 @@ local function APL()
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Unholy.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- concentrated_flame,if=dot.concentrated_flame_burn.remains=0
-    -- Need to confirm DoT Spell ID
-    if S.ConcentratedFlame:IsCastableP() then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, Settings.Unholy.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- purifying_blast,if=!death_and_decay.ticking

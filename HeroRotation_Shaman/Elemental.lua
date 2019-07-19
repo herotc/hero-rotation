@@ -74,6 +74,7 @@ Spell.Shaman.Elemental = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   LightningLasso                        = Spell(305483)
 };
 local S = Spell.Shaman.Elemental;
