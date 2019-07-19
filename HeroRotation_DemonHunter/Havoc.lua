@@ -330,7 +330,7 @@ local function APL()
   Normal = function()
     -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
     if S.VengefulRetreat:IsCastableP("Melee", true) and (S.Momentum:IsAvailable() and Player:BuffDownP(S.PreparedBuff) and HL.CombatTime() > 1) then
-      if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 149"; end
+      if HR.Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat 149"; end
     end
     -- fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
     if S.FelRush:IsCastableP(20, true) and ((bool(VarWaitingForMomentum) or S.FelMastery:IsAvailable()) and ConserveFelRush()) then
