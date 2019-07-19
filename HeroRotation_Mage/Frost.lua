@@ -345,13 +345,9 @@ local function APL()
     if S.FrozenOrb:IsCastableP() then
       if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 153"; end
     end
-    -- blizzard,if=active_enemies>2|active_enemies>1&cast_time=0
-    if S.Blizzard:IsCastableP() and (EnemiesCount > 2 or EnemiesCount > 1 and S.Blizzard:CastTime() == 0) then
+    -- blizzard,if=active_enemies>2|active_enemies>1&!talent.splitting_ice.enabled
+    if S.Blizzard:IsCastableP() and (EnemiesCount > 2 or EnemiesCount > 1 and not S.SplittingIce:IsAvailable()) then
       if HR.Cast(S.Blizzard) then return "blizzard 155"; end
-    end
-    -- ice_lance,if=buff.fingers_of_frost.react&talent.splitting_ice.enabled&active_enemies>1
-    if S.IceLance:IsCastableP() and (bool(Player:BuffStackP(S.FingersofFrostBuff)) and S.SplittingIce:IsAvailable() and EnemiesCount > 1) then
-      if HR.Cast(S.IceLance) then return "ice_lance 175"; end
     end
     -- comet_storm
     if S.CometStorm:IsCastableP() then
