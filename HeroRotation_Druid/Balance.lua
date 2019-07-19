@@ -296,14 +296,14 @@ local function APL()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
     end
+    -- use_item,name=azsharas_font_of_power
+    -- Main icon instead of CastSuggested, as nothing would be in main icon otherwise
+    if I.AzsharasFontofPower:IsCastableP() then
+      if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
+    end
     -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=7.0
     if S.SolarWrath:IsCastableP() and (not I.AzsharasFontofPower:IsEquipped() or Player:BuffP(S.AzsharasFontofPowerBuff)) then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
-    end
-    -- HeroRotation extra line to force AzsharasFontofPower channel, so above Solar Wrath can be shown
-    -- Main icon instead of CastSuggested, as nothing would be in main icon otherwise
-    if I.AzsharasFontofPower:IsCastableP() and (Player:BuffDownP(S.AzsharasFontofPowerBuff)) then
-      if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
   end
   -- Moonkin Form OOC, if setting is true
