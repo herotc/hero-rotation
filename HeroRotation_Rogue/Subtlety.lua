@@ -97,6 +97,7 @@ Spell.Rogue.Subtlety = {
   KidneyShot                            = Spell(408),
   Sprint                                = Spell(2983),
   -- Misc
+  ConductiveInkDebuff                   = Spell(302565),
   VigorTrinketBuff                      = Spell(287916),
   RazorCoralDebuff                      = Spell(303568),
   TheDreadlordsDeceit                   = Spell(228224),
@@ -548,9 +549,9 @@ local function CDs ()
           and Target:DebuffP(S.Nightblade) and not Player:BuffP(S.SymbolsofDeath) and Player:EnergyDeficitPredicted() >= 30 then
           HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
         end
-        -- if=debuff.razor_coral_debuff.down|buff.symbols_of_death.up&(target.health.pct<30|target.time_to_die<60)
+        -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.symbols_of_death.up|debuff.conductive_ink_debuff.up)&(target.health.pct<31|target.time_to_die<60)
         if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
-          or Target:BuffP(S.SymbolsofDeath) and (Target:HealthPercentage() < 31 or Target:FilteredTimeToDie("<", 60))) then
+          or (Player:BuffP(S.SymbolsofDeath) or Target:DebuffP(S.ConductiveInkDebuff)) and (Target:HealthPercentage() < 31 or Target:FilteredTimeToDie("<", 60))) then
           HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
         end
         -- Emulate SimC default behavior to use at max stacks
@@ -786,11 +787,12 @@ local function APL ()
         if ShouldReturn then return "Stealth CDs: " .. ShouldReturn; end
       end
 
-      -- actions+=/nightblade,if=azerite.nights_vengeance.enabled&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(buff.symbols_of_death.remains>3&!stealthed.all&azerite.nights_vengeance.rank>=3))&!buff.nights_vengeance.up&combo_points>=2
+      -- if=azerite.nights_vengeance.enabled&!buff.nights_vengeance.up&combo_points>=2&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(azerite.nights_vengeance.rank>=3&buff.symbols_of_death.remains>3&!stealthed.all&cooldown.shadow_dance.charges_fractional>=0.9))
       if S.Nightblade:IsCastableP() and IsInMeleeRange()
-        and S.NightsVengeancePower:AzeriteEnabled() and (Cache.EnemiesCount[10] < 2 or UsePriorityRotation())
-        and (S.SymbolsofDeath:CooldownRemainsP() <= 3 or (Player:BuffRemainsP(S.SymbolsofDeath) > 3 and not Player:IsStealthedP(true, true) and S.NightsVengeancePower:AzeriteRank() >=3 ))
-        and not Player:BuffP(S.NightsVengeanceBuff) and Player:ComboPoints() >= 2 then
+        and S.NightsVengeancePower:AzeriteEnabled() and not Player:BuffP(S.NightsVengeanceBuff) and Player:ComboPoints() >= 2
+        and (Cache.EnemiesCount[10] < 2 or UsePriorityRotation())
+        and (S.SymbolsofDeath:CooldownRemainsP() <= 3 or (S.NightsVengeancePower:AzeriteRank() >= 3 and Player:BuffRemainsP(S.SymbolsofDeath) > 3 and not Player:IsStealthedP(true, true) and S.ShadowDance:ChargesFractional() >= 0.9))
+         then
         if HR.Cast(S.Nightblade) then return "Cast Nightblade (Nights Vengeance)"; end
       end
 
@@ -842,7 +844,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-07-18
+-- Last Update: 2019-07-19
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -871,8 +873,8 @@ HR.SetAPL(261, APL);
 -- actions+=/variable,name=stealth_threshold,value=25+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+talent.shadow_focus.enabled*20+talent.alacrity.enabled*10+15*(spell_targets.shuriken_storm>=3)
 -- # Consider using a Stealth CD when reaching the energy threshold
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
--- # Night's Vengeance: Nightblade before Symbols at low CP to combine early refresh with getting the buff up. Also low CP during Symbols outside Dance with 3 NV.
--- actions+=/nightblade,if=azerite.nights_vengeance.enabled&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(buff.symbols_of_death.remains>3&!stealthed.all&azerite.nights_vengeance.rank>=3))&!buff.nights_vengeance.up&combo_points>=2
+-- # Night's Vengeance: Nightblade before Symbols at low CP to combine early refresh with getting the buff up. Also low CP during Symbols between Dances with 3 NV.
+-- actions+=/nightblade,if=azerite.nights_vengeance.enabled&!buff.nights_vengeance.up&combo_points>=2&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(azerite.nights_vengeance.rank>=3&buff.symbols_of_death.remains>3&!stealthed.all&cooldown.shadow_dance.charges_fractional>=0.9))
 -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
 -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
 -- # With DS also finish at 4+ against exactly 4 targets (outside stealth)
@@ -913,7 +915,7 @@ HR.SetAPL(261, APL);
 --
 -- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=!stealthed.all&dot.nightblade.ticking&!buff.symbols_of_death.up&energy.deficit>=30
 -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
--- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.symbols_of_death.up&(target.health.pct<30|target.time_to_die<60)
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.symbols_of_death.up|debuff.conductive_ink_debuff.up)&(target.health.pct<31|target.time_to_die<60)
 -- actions.cds+=/use_item,name=mydas_talisman
 -- # Default fallback for usable items: Use with Symbols of Death.
 -- actions.cds+=/use_items,if=buff.symbols_of_death.up|target.time_to_die<20
