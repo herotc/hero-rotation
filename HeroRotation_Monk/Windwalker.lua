@@ -336,10 +336,6 @@ local function APL ()
     if S.RisingSunKick:IsReadyP() then
       if HR.Cast(S.RisingSunKick) then return "Cast Single Target Rising Sun Kick"; end
     end
-    -- actions.st+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&buff.dance_of_chiji.up
-    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and Player:BuffP(S.DanceOfChijiBuff)) then 
-      if HR.Cast(S.SpinningCraneKick) then return "Cast AoE Spinning Crane Kick"; end
-    end
     -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
     if S.RushingJadeWind:IsReadyP() and (Player:BuffDownP(S.RushingJadeWind) and Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.RushingJadeWind) then return "Cast Single Target Rushing Jade Wind"; end
@@ -355,6 +351,10 @@ local function APL ()
     -- actions.st+=/energizing_elixir,if=chi<=3&energy<50
     if S.EnergizingElixir:IsReadyP() and (Player:Chi() <= 3 and Player:EnergyPredicted() < 50) then
       if HR.Cast(S.EnergizingElixir) then return "Cast Single Target Energizing Elixir"; end
+    end
+    -- actions.st+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&buff.dance_of_chiji.up
+    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and Player:BuffP(S.DanceOfChijiBuff)) then 
+      if HR.Cast(S.SpinningCraneKick) then return "Cast AoE Spinning Crane Kick"; end
     end
     -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>3|chi>=3)&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm)|(azerite.swift_roundhouse.rank>=2&active_enemies=1))&buff.swift_roundhouse.stack<2
     if S.BlackoutKick:IsReadyP() and (not Player:PrevGCD(1, S.BlackoutKick) and (S.RisingSunKick:CooldownRemainsP() > 3 or Player:Chi() >= 3) and (S.FistsOfFury:CooldownRemainsP() > 4 or Player:Chi() >= 4 or (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm)) or (S.SwiftRoundhouse:AzeriteRank() >= 2 and Cache.EnemiesCount[5] == 1)) and Player:BuffStack(S.SwiftRoundhouseBuff) < 2) then
@@ -393,6 +393,10 @@ local function APL ()
     -- actions+=/call_action_list,name=serenity,if=buff.serenity.up
     if Player:BuffP(S.Serenity) then
       local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- reverse_harm,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2))&chi.max-chi>=2
+    if S.ReverseHarm:IsReadyP() and ((Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2)) and Player:ChiDeficit() >= 2) then
+      if HR.Cast(S.ReverseHarm) then return "Cast Everyone Reverse Harm"; end
     end
     -- actions+=/fist_of_the_white_tiger,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2))&chi.max-chi>=3
     if S.FistOfTheWhiteTiger:IsReadyP() and ((Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2)) and Player:ChiDeficit() >= 3) then
