@@ -490,7 +490,7 @@ local function APL()
     if I.ShiverVenomRelic:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.ShiverVenomRelic) then return "shiver_venom_relic"; end
     end
-    -- use_item,name=aquipotent_nautilus,if=(cooldown.summon_demonic_tyrant.remains>=255|target.time_to_die<=30)
+    -- use_item,name=aquipotent_nautilus,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
     if I.AquipotentNautilus:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.AquipotentNautilus) then return "aquipotent_nautilus"; end
     end
