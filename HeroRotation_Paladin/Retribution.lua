@@ -154,8 +154,8 @@ local function APL()
     if S.ShieldofVengeance:IsCastableP() and Settings.Retribution.ShieldofVengeance and (Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.CastLeft(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.avenging_wrath.remains>=20&(cooldown.guardian_of_azeroth.remains>90|target.time_to_die<30)|buff.crusade.up&buff.crusade.stack=10&buff.crusade.remains>15&(cooldown.guardian_of_azeroth.remains>90||target.time_to_die<30)
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.AvengingWrath) >= 20 and ((not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 90) or Target:TimeToDie() < 30) or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15 and ((not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 90) or Target:TimeToDie() < 30)) then
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.avenging_wrath.remains>=20|buff.crusade.stack=10&buff.crusade.remains>15)&(cooldown.guardian_of_azeroth.remains>90|target.time_to_die<30|!essence.condensed_lifeforce.major)
+    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) and (S.GuardianofAzeroth:CooldownRemainsP() > 90 or Target:TimeToDie() < 30 or not S.GuardianofAzeroth:IsAvailable())) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then reutrn "ashvanes_razor_coral"; end
     end
     -- the_unbound_force,if=time<=2|buff.reckless_force.up
