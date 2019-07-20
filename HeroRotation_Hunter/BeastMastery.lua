@@ -83,7 +83,8 @@ if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
   PotionofUnbridledFury            = Item(169299),
   AshvanesRazorCoral               = Item(169311),
-  PocketsizedComputationDevice     = Item(167555)
+  PocketsizedComputationDevice     = Item(167555),
+  AzsharasFontofPower              = Item(169314)
 };
 local I = Item.Hunter.BeastMastery;
 
@@ -197,6 +198,10 @@ local function APL()
       if S.MemoryofLucidDreams:IsCastableP() then
         if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
+      end
       -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
       if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
         if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast precombat"; end
@@ -205,12 +210,12 @@ local function APL()
       if S.FocusedAzeriteBeam:IsCastableP() then
         if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
       end
-      -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
-      if S.AspectoftheWild:IsCastableP() and (Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled())) then
+      -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
+      if S.AspectoftheWild:IsCastableP() and (not S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
         if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
       end
-      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&(!essence.essence_of_the_focusing_iris.major)&(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
-      if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and (S.PrimalInstincts:AzeriteEnabled()) and (not S.FocusedAzeriteBeam:IsAvailable()) and (not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
+      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
+      if S.BestialWrath:IsCastableP() and (S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
       end
     end
@@ -432,8 +437,8 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items
-    -- use_item,effect_name=cyclotronic_blast
-    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
+    -- use_item,effect_name=cyclotronic_blast,if=!buff.bestial_wrath.up
+    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable()  and (Player:BuffDownP(S.BestialWrathBuff)) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.aspect_of_the_wild.remains>15|debuff.razor_coral_debuff.down|target.time_to_die<20
