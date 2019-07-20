@@ -302,9 +302,9 @@ local function APL()
     if I.AzsharasFontofPower:IsReady() then
       if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
-    -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=7.0
-    -- solar_wrath,if=!equipped.azsharas_font_of_power|!bfa.font_of_power_precombat_channel|bfa.font_of_power_precombat_channel>=5.5
-    if S.SolarWrath:IsCastableP() and (not I.AzsharasFontofPower:IsEquipped() or Player:BuffP(S.AzsharasFontofPowerBuff)) then
+    -- solar_wrath
+    -- solar_wrath
+    if S.SolarWrath:IsCastableP() then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
     end
     -- starsurge,if=talent.natures_balance.enabled
