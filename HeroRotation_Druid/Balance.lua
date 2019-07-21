@@ -293,22 +293,25 @@ local function APL()
       if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
     end
     -- snapshot_stats
-    -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
-    end
     -- use_item,name=azsharas_font_of_power
     -- Main icon instead of CastSuggested, as nothing would be in main icon otherwise
     if I.AzsharasFontofPower:IsReady() then
       if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
+    -- potion,dynamic_prepot=1
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
+    end
     -- solar_wrath
+    if S.SolarWrath:IsCastableP() and (not Player:PrevGCDP(1, S.SolarWrath) and not Player:PrevGCDP(2, S.SolarWrath)) then
+      if HR.Cast(S.SolarWrath) then return "solar_wrath 43"; end
+    end
     -- solar_wrath
-    if S.SolarWrath:IsCastableP() then
+    if S.SolarWrath:IsCastableP() and (Player:PrevGCDP(1, S.SolarWrath) and not Player:PrevGCDP(2, S.SolarWrath)) then
       if HR.Cast(S.SolarWrath) then return "solar_wrath 44"; end
     end
-    -- starsurge,if=talent.natures_balance.enabled
-    if S.Starsurge:IsReadyP() and (S.NaturesBalance:IsAvailable()) then
+    -- starsurge
+    if S.Starsurge:IsReadyP() then
       if HR.Cast(S.Starsurge) then return "starsurge 45"; end
     end
   end
