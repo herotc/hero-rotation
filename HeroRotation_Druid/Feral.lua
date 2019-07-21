@@ -207,7 +207,7 @@ local function APL()
         if HR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "prowl 19"; end
       end
       -- snapshot_stats
-      -- potion
+      -- potion,dynamic_prepot=1
       if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 24"; end
       end
