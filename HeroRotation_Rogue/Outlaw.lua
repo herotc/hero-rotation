@@ -410,7 +410,7 @@ local function CDs ()
       -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
       if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
         not Target:DebuffP(S.RazorCoralDebuff)
-        or Target:DebuffP(S.ConductiveInkDebuff) & Target:HealthPercentage() < 31
+        or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31
         or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 20 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or
           Target:FilteredTimeToDie("<", 60)) and Player:BuffRemainsP(S.AdrenalineRush) > 18
       ) then
