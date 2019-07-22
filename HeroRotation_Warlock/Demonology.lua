@@ -488,7 +488,7 @@ local function APL()
       if HR.Cast(S.RippleInSpace, Settings.Demonology.GCDasOffGCD.Essences) then return "ripple_in_space 335"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
-    if I.PocketsizedComputationDevice:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 20 and S.SummonDemonicTyrant:CooldownRemainsP() <= S.SummonDemonicTyrant:Cooldown() - 15 or Target:TimeToDie() <= 30) then
+    if I.PocketsizedComputationDevice:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 20 and S.SummonDemonicTyrant:CooldownRemainsP() <= 75 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
     end
     -- use_item,name=rotcrusted_voodoo_doll,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
