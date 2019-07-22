@@ -78,6 +78,9 @@ Spell.Rogue.Outlaw = {
   LifebloodBuff                   = Spell(295137),
   LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   ConcentratedFlameBurn           = Spell(295368),
+  BloodofTheEnemyDebuff           = Spell(297108),
+  RecklessForceBuff               = Spell(302932),
+  RecklessForceCounter            = Spell(302917),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -92,6 +95,7 @@ Spell.Rogue.Outlaw = {
   SkullandCrossbones              = Spell(199603),
   TrueBearing                     = Spell(193359),
   -- Misc
+  ConductiveInkDebuff             = Spell(302565),
   VigorTrinketBuff                = Spell(287916),
   RazorCoralDebuff                = Spell(303568),
 };
@@ -307,8 +311,8 @@ local function Essences ()
   if S.PurifyingBlast:IsCastableP() then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast PurifyingBlast"; end
   end
-  -- the_unbound_force
-  if S.TheUnboundForce:IsCastableP() then
+  -- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+  if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
     if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast TheUnboundForce"; end
   end
   -- ripple_in_space
@@ -403,9 +407,13 @@ local function CDs ()
         and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
         HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
       end
-      -- if=debuff.razor_coral_debuff.down|buff.adrenaline_rush.up&(target.health.pct<30|target.time_to_die<60)
-      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
-        or Target:BuffP(S.AdrenalineRush) and (Target:HealthPercentage() < 31 or Target:FilteredTimeToDie("<", 60))) then
+      -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
+      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
+        not Target:DebuffP(S.RazorCoralDebuff)
+        or Target:DebuffP(S.ConductiveInkDebuff) & Target:HealthPercentage() < 31
+        or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 20 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or
+          Target:FilteredTimeToDie("<", 60)) and Player:BuffRemainsP(S.AdrenalineRush) > 18
+      ) then
         HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- Emulate SimC default behavior to use at max stacks
@@ -516,11 +524,23 @@ local function APL ()
   if not Player:AffectingCombat() then
     -- Precombat CDs
     if HR.CDsON() then
-      if Settings.Outlaw.PrecombatAR and Everyone.TargetIsValid() then
+      if Everyone.TargetIsValid() then
         if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
         end
-        if S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) then
+        local usingTrinket = false;
+        -- actions.precombat+=/use_item,name=azsharas_font_of_power
+        if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
+          usingTrinket = true;
+          HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        -- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
+        if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() then
+          usingTrinket = true;
+          HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+        end
+        -- AR
+        if Settings.Outlaw.PrecombatAR and not usingTrinket and S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) then
           if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (OOC)"; end
         end
       end
@@ -603,7 +623,7 @@ end
 
 HR.SetAPL(260, APL);
 
--- Last Update: 2019-07-11
+-- Last Update: 2019-07-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -611,12 +631,14 @@ HR.SetAPL(260, APL);
 -- actions.precombat+=/food
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
--- actions.precombat+=/stealth
 -- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>40
+-- actions.precombat+=/stealth,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
 -- actions.precombat+=/roll_the_bones,precombat_seconds=2
 -- actions.precombat+=/slice_and_dice,precombat_seconds=2
--- actions.precombat+=/adrenaline_rush,precombat_seconds=1
+-- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
+-- actions.precombat+=/use_item,name=azsharas_font_of_power
+-- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
 --
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
@@ -642,10 +664,7 @@ HR.SetAPL(260, APL);
 -- actions+=/lights_judgment
 --
 -- # Cooldowns
--- actions.cds=potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
--- actions.cds+=/blood_fury
--- actions.cds+=/berserking
--- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
+-- actions.cds=call_action_list,name=essences,if=!stealthed.all
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
@@ -660,13 +679,26 @@ HR.SetAPL(260, APL);
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
 --
+-- actions.cds+=/potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
+-- actions.cds+=/blood_fury
+-- actions.cds+=/berserking
+-- actions.cds+=/fireblood
+-- actions.cds+=/ancestral_call
+--
+-- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
+-- # Very roughly rule of thumbified maths below: Use for Inkpod crit, otherwise with AR at 20+ stacks or 10+ with also Blood up.
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
+-- # Default fallback for usable items.
+-- actions.cds+=/use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+--
+--
 -- # Essences
 -- actions.essences=concentrated_flame
 -- actions.essences+=/blood_of_the_enemy,if=variable.blade_flurry_sync
 -- actions.essences+=/guardian_of_azeroth
--- actions.essences+=/focused_azerite_beam
--- actions.essences+=/purifying_blast
--- actions.essences+=/the_unbound_force
+-- actions.essences+=/focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
+-- actions.essences+=/purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
+-- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<45

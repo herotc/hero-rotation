@@ -777,6 +777,10 @@ local function APL ()
         if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() and Everyone.TargetIsValid() then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
         end
+        -- actions.precombat+=/use_item,name=azsharas_font_of_power
+        if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
+          HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+        end
       end
     end
   end
@@ -854,7 +858,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-07-18
+-- Last Update: 2019-07-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -865,14 +869,16 @@ HR.SetAPL(259, APL);
 -- actions.precombat+=/stealth
 -- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>15
+-- actions.precombat+=/use_item,name=azsharas_font_of_power
 --
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
 -- actions+=/variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
 -- actions+=/variable,name=single_target,value=spell_targets.fan_of_knives<2
+-- actions+=/use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10&!debuff.vendetta.up&!debuff.toxic_blade.up
 -- actions+=/call_action_list,name=stealthed,if=stealthed.rogue
--- actions+=/call_action_list,name=cds,if=!talent.master_assassin.enabled|dot.garrote.ticking
+-- actions+=/call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!cooldown.latent_arcana.up)
 -- actions+=/call_action_list,name=dot
 -- actions+=/call_action_list,name=direct
 -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
@@ -935,6 +941,18 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/potion,if=buff.bloodlust.react|debuff.vendetta.up
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
+-- actions.cds+=/fireblood,if=debuff.vendetta.up
+-- actions.cds+=/ancestral_call,if=debuff.vendetta.up
+--
+-- actions.cds+=/use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20+cooldown.latent_arcana.remains
+-- actions.cds+=/use_item,name=lurkers_insidious_gift,if=debuff.vendetta.up
+-- actions.cds+=/use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
+-- actions.cds+=/use_item,effect_name=gladiators_medallion,if=debuff.vendetta.up
+-- actions.cds+=/use_item,effect_name=gladiators_badge,if=debuff.vendetta.up
+-- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
+-- # Default fallback for usable items: Use on cooldown.
+-- actions.cds+=/use_items
 --
 -- # Essences
 -- actions.essences=concentrated_flame

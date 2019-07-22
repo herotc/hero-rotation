@@ -84,6 +84,7 @@ Spell.Rogue.Subtlety = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  BloodofTheEnemyDebuff                 = Spell(297108),
   RecklessForceBuff                     = Spell(302932),
   RecklessForceCounter                  = Spell(302917),
   LifebloodBuff                         = Spell(295137),
@@ -550,9 +551,13 @@ local function CDs ()
           and Target:DebuffP(S.Nightblade) and not Player:BuffP(S.SymbolsofDeath) and Player:EnergyDeficitPredicted() >= 30 then
           HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
         end
-        -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.symbols_of_death.up|debuff.conductive_ink_debuff.up)&(target.health.pct<31|target.time_to_die<60)
-        if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
-          or (Player:BuffP(S.SymbolsofDeath) or Target:DebuffP(S.ConductiveInkDebuff)) and (Target:HealthPercentage() < 31 or Target:FilteredTimeToDie("<", 60))) then
+        -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.symbols_of_death.remains>8
+        if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
+          not Target:DebuffP(S.RazorCoralDebuff)
+          or Target:DebuffP(S.ConductiveInkDebuff) & Target:HealthPercentage() < 31
+          or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or
+            Target:FilteredTimeToDie("<", 40)) and Player:BuffRemainsP(S.SymbolsofDeath) > 8
+        ) then
           HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
         end
         -- Emulate SimC default behavior to use at max stacks
@@ -705,6 +710,10 @@ local function APL ()
           if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
             if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
           end
+          -- actions.precombat+=/use_item,name=azsharas_font_of_power
+          if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
+            HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+          end
           if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
             if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades (OOC)"; end
           end
@@ -845,7 +854,7 @@ end
 
 HR.SetAPL(261, APL);
 
--- Last Update: 2019-07-19
+-- Last Update: 2019-07-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -857,6 +866,7 @@ HR.SetAPL(261, APL);
 -- actions.precombat+=/marked_for_death,precombat_seconds=15
 -- actions.precombat+=/shadow_blades,precombat_seconds=1
 -- actions.precombat+=/potion
+-- actions.precombat+=/use_item,name=azsharas_font_of_power
 --
 -- # Check CDs at first
 -- # Restealth if possible (no vulnerable enemies in combat)
@@ -916,7 +926,8 @@ HR.SetAPL(261, APL);
 --
 -- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=!stealthed.all&dot.nightblade.ticking&!buff.symbols_of_death.up&energy.deficit>=30
 -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
--- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.symbols_of_death.up|debuff.conductive_ink_debuff.up)&(target.health.pct<31|target.time_to_die<60)
+-- # Very roughly rule of thumbified maths below: Use for Inkpod crit, otherwise with SoD at 25+ stacks or 15+ with also Blood up.
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.symbols_of_death.remains>8
 -- actions.cds+=/use_item,name=mydas_talisman
 -- # Default fallback for usable items: Use with Symbols of Death.
 -- actions.cds+=/use_items,if=buff.symbols_of_death.up|target.time_to_die<20
