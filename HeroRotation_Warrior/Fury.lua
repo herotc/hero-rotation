@@ -157,47 +157,47 @@ local function APL()
   end
   SingleTarget = function()
     -- siegebreaker
-    if S.Siegebreaker:IsCastableP() and HR.CDsON() then
+    if S.Siegebreaker:IsCastableP("Melee") and HR.CDsON() then
       if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return "siegebreaker 18"; end
     end
     -- rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
-    if S.Rampage:IsReadyP() and ((Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryofLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
+    if S.Rampage:IsReadyP("Melee") and ((Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryofLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
       if HR.Cast(S.Rampage) then return "rampage 20"; end
     end
     -- execute
-    if S.Execute:IsCastableP() then
+    if S.Execute:IsCastableP("Melee") then
       if HR.Cast(S.Execute) then return "execute 34"; end
     end
     -- bladestorm,if=prev_gcd.1.rampage
-    if S.Bladestorm:IsCastableP() and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
+    if S.Bladestorm:IsCastableP("Melee") and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
       if HR.Cast(S.Bladestorm) then return "bladestorm 37"; end
     end
     -- bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
-    if S.Bloodthirst:IsCastableP() and (Player:BuffDownP(S.EnrageBuff) or S.ColdSteelHotBlood:AzeriteRank() > 1) then
+    if S.Bloodthirst:IsCastableP("Melee") and (Player:BuffDownP(S.EnrageBuff) or S.ColdSteelHotBlood:AzeriteRank() > 1) then
       if HR.Cast(S.Bloodthirst) then return "bloodthirst 38"; end
     end
     -- dragon_roar,if=buff.enrage.up
-    if S.DragonRoar:IsCastableP() and HR.CDsON() and (Player:BuffP(S.EnrageBuff)) then
+    if S.DragonRoar:IsCastableP(12) and HR.CDsON() and (Player:BuffP(S.EnrageBuff)) then
       if HR.Cast(S.DragonRoar) then return "dragon_roar 39"; end
     end
     -- raging_blow,if=charges=2
-    if S.RagingBlow:IsCastableP() and (S.RagingBlow:ChargesP() == 2) then
+    if S.RagingBlow:IsCastableP("Melee") and (S.RagingBlow:ChargesP() == 2) then
       if HR.Cast(S.RagingBlow) then return "raging_blow 42"; end
     end
     -- bloodthirst
-    if S.Bloodthirst:IsCastableP() then
+    if S.Bloodthirst:IsCastableP("Melee") then
       if HR.Cast(S.Bloodthirst) then return "bloodthirst 48"; end
     end
     -- raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
-    if S.RagingBlow:IsCastableP() and (S.Carnage:IsAvailable() or (S.Massacre:IsAvailable() and Player:Rage() < 80) or (S.FrothingBerserker:IsAvailable() and Player:Rage() < 90)) then
+    if S.RagingBlow:IsCastableP("Melee") and (S.Carnage:IsAvailable() or (S.Massacre:IsAvailable() and Player:Rage() < 80) or (S.FrothingBerserker:IsAvailable() and Player:Rage() < 90)) then
       if HR.Cast(S.RagingBlow) then return "raging_blow 62"; end
     end
     -- furious_slash,if=talent.furious_slash.enabled
-    if S.FuriousSlash:IsCastableP() and (S.FuriousSlash:IsAvailable()) then
+    if S.FuriousSlash:IsCastableP("Melee") and (S.FuriousSlash:IsAvailable()) then
       if HR.Cast(S.FuriousSlash) then return "furious_slash 70"; end
     end
     -- whirlwind
-    if S.Whirlwind:IsCastableP() then
+    if S.Whirlwind:IsCastableP("Melee") then
       if HR.Cast(S.Whirlwind) then return "whirlwind 74"; end
     end
   end
@@ -215,7 +215,7 @@ local function APL()
     Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
     -- run_action_list,name=movement,if=movement.distance>5
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
-    if ((not Target:IsInRange("Melee")) and Target:IsInRange(S.HeroicLeap)) then
+    if ((not Target:IsInRange("Melee")) and Target:IsInRange(40)) then
       return Movement();
     end
     -- potion
@@ -223,11 +223,11 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
     end
     -- furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
-    if S.FuriousSlash:IsCastableP() and (S.FuriousSlash:IsAvailable() and (Player:BuffStackP(S.FuriousSlashBuff) < 3 or Player:BuffRemainsP(S.FuriousSlashBuff) < 3 or (S.Recklessness:CooldownRemainsP() < 3 and Player:BuffRemainsP(S.FuriousSlashBuff) < 9))) then
+    if S.FuriousSlash:IsCastableP("Melee") and (S.FuriousSlash:IsAvailable() and (Player:BuffStackP(S.FuriousSlashBuff) < 3 or Player:BuffRemainsP(S.FuriousSlashBuff) < 3 or (S.Recklessness:CooldownRemainsP() < 3 and Player:BuffRemainsP(S.FuriousSlashBuff) < 9))) then
       if HR.Cast(S.FuriousSlash) then return "furious_slash 86"; end
     end
     -- rampage,if=cooldown.recklessness.remains<3
-    if S.Rampage:IsReadyP() and (S.Recklessness:CooldownRemainsP() < 3) then
+    if S.Rampage:IsReadyP("Melee") and (S.Recklessness:CooldownRemainsP() < 3) then
       if HR.Cast(S.Rampage) then return "rampage 108"; end
     end
     -- blood_of_the_enemy,if=buff.recklessness.up
@@ -271,7 +271,7 @@ local function APL()
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
-    if S.Whirlwind:IsCastableP() and (Cache.EnemiesCount[8] > 1 and not Player:BuffP(S.MeatCleaverBuff)) then
+    if S.Whirlwind:IsCastableP("Melee") and (Cache.EnemiesCount[8] > 1 and not Player:BuffP(S.MeatCleaverBuff)) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
