@@ -115,6 +115,9 @@ Item.Rogue.Outlaw = {
 };
 local I = Item.Rogue.Outlaw;
 
+S.RazorCoralDebuff:RegisterAuraTracking();
+S.ConductiveInkDebuff:RegisterAuraTracking();
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local BladeFlurryRange = 6;
@@ -408,13 +411,24 @@ local function CDs ()
         HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
-      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
-        not Target:DebuffP(S.RazorCoralDebuff)
-        or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31
-        or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 20 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or
-          Target:FilteredTimeToDie("<", 60)) and Player:BuffRemainsP(S.AdrenalineRush) > 18
-      ) then
-        HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
+        local CastRazorCoral;
+        if S.RazorCoralDebuff:ActiveCount() == 0 then
+          CastRazorCoral = true;
+        else
+          local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
+          if ConductiveInkUnit then
+            -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
+            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 31 or Target:FilteredTimeToDie("<", 20) or
+              (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
+          else
+            CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
+              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or Target:FilteredTimeToDie("<", 20);
+          end
+        end
+        if CastRazorCoral then
+          HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+        end
       end
       -- Emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
