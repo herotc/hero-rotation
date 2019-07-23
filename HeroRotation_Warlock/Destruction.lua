@@ -195,9 +195,6 @@ local function APL()
   local Precombat, Aoe, Cds, Havoc
   EnemiesCount = GetEnemiesCount(10)
   HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
-  if Everyone.TargetIsValid() then
-    print(EnemiesCount)
-  end
   Precombat = function()
     -- flask
     -- food
