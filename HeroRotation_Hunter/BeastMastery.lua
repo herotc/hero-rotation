@@ -58,7 +58,7 @@ Spell.Hunter.BeastMastery = {
   DanceofDeath                          = Spell(274441),
   DanceofDeathBuff                      = Spell(274443),
   -- Essences
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -324,8 +324,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
@@ -398,8 +398,8 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
     end
     -- barrage
     if S.Barrage:IsReadyP() then

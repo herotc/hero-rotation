@@ -67,7 +67,7 @@ Spell.Druid.Balance = {
   ShiverVenomDebuff                     = Spell(301624),
   CyclotronicBlast                      = Spell(167672),
   AzsharasFontofPowerBuff               = Spell(296962),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -358,8 +358,8 @@ local function APL()
       if HR.CastCycle(I.ShiverVenomRelic, 40, EvaluateCycleShiverVenomRelic104) then return "shiver_venom_relic 105"; end
     end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
-    if S.BloodofTheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Balance.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Balance.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- memory_of_lucid_dreams,if=!buff.ca_inc.up&(astral_power<25|cooldown.ca_inc.remains>30),target_if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)
     if S.MemoryofLucidDreams:IsCastableP() then

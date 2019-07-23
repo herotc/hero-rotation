@@ -54,7 +54,7 @@ Spell.Hunter.Survival = {
   BloodFuryBuff                         = Spell(20572),
   AspectoftheEagle                      = Spell(186289),
   Exhilaration                          = Spell(109304),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -375,8 +375,8 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 324"; end
     end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then

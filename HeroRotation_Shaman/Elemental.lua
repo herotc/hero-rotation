@@ -64,7 +64,7 @@ Spell.Shaman.Elemental = {
   Berserking                            = Spell(26297),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -431,8 +431,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Elemental.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.CasT(S.BloodofTheEnemy, Settings.Elemental.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.CasT(S.BloodoftheEnemy, Settings.Elemental.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then

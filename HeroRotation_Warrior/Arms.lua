@@ -63,7 +63,7 @@ Spell.Warrior.Arms = {
   Massacre                              = Spell(281001),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -435,8 +435,8 @@ local function APL()
       if HR.Cast(S.SweepingStrikes) then return "sweeping_strikes 390"; end
     end
     -- blood_of_the_enemy,if=buff.test_of_might.up|(debuff.colossus_smash.up&!azerite.test_of_might.enabled)
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.TestofMightBuff) or (Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:IsAvailable())) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Arms.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TestofMightBuff) or (Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:IsAvailable())) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Arms.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast,if=!debuff.colossus_smash.up&!buff.test_of_might.up
     if S.PurifyingBlast:IsCastableP() and (not Target:DebuffP(S.ColossusSmashDebuff) and not Player:BuffP(S.TestofMightBuff)) then

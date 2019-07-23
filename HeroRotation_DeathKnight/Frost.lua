@@ -59,7 +59,7 @@ Spell.DeathKnight.Frost = {
   IcyCitadelBuff                        = Spell(272719),
   MindFreeze                            = Spell(47528),
   CyclotronicBlast                      = Spell(167672),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -468,8 +468,8 @@ local function APL()
   end
   Essences = function()
     -- blood_of_the_enemy,if=buff.pillar_of_frost.remains<10&cooldown.breath_of_sindragosa.remains|buff.pillar_of_frost.remains<10&!talent.breath_of_sindragosa.enabled
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and bool(S.BreathofSindragosa:CooldownRemainsP()) or Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and not S.BreathofSindragosa:IsAvailable()) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Frost.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and bool(S.BreathofSindragosa:CooldownRemainsP()) or Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and not S.BreathofSindragosa:IsAvailable()) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Frost.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then

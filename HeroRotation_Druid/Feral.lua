@@ -66,7 +66,7 @@ Spell.Druid.Feral = {
   Shred                                 = Spell(5221),
   SkullBash                             = Spell(106839),
   ShadowmeldBuff                        = Spell(58984),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -243,8 +243,8 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, Settings.Feral.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy,if=buff.tigers_fury.up
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Feral.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Feral.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- feral_frenzy,if=combo_points=0
     if S.FeralFrenzy:IsCastableP() and (Player:ComboPoints() == 0) then

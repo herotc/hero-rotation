@@ -65,7 +65,7 @@ Spell.Rogue.Assassination = {
   ShroudedSuffocation   = Spell(278666),
   ScentOfBlood          = Spell(277679),
   -- Essences
-  BloodofTheEnemy       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast        = MultiSpell(295337, 299345, 299347),
   RippleInSpace         = MultiSpell(302731, 302982, 302983),
@@ -74,7 +74,7 @@ Spell.Rogue.Assassination = {
   WorldveinResonance    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth     = MultiSpell(295840, 299355, 299358),
-  BloodofTheEnemyDebuff = Spell(297108),
+  BloodoftheEnemyDebuff = Spell(297108),
   RecklessForceBuff     = Spell(302932),
   RecklessForceCounter  = Spell(302917),
   LifebloodBuff         = Spell(295137),
@@ -356,9 +356,9 @@ local Interrupts = {
 -- # Essences
 local function Essences ()
   -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
-  if S.BloodofTheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable()
+  if S.BloodoftheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable()
     or (Target:DebuffP(S.ToxicBladeDebuff) and Player:ComboPointsDeficit() <= 1) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
-    if HR.Cast(S.BloodofTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodofTheEnemy"; end
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
@@ -451,7 +451,7 @@ local function CDs ()
         -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&(!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up)
         if not VanishSuggested and S.MasterAssassin:IsAvailable() and not Player:IsStealthedP(true, false) and MasterAssassinRemains() <= 0
           and not Target:DebuffRefreshableP(S.Rupture, RuptureThreshold) and Target:DebuffRemainsP(S.Garrote) > 3
-          and (not S.BloodofTheEnemy:IsAvailable() or Target:DebuffP(S.BloodofTheEnemyDebuff)) then
+          and (not S.BloodoftheEnemy:IsAvailable() or Target:DebuffP(S.BloodoftheEnemyDebuff)) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Master Assassin)"; end
         end
       end

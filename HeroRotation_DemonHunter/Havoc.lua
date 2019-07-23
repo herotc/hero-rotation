@@ -56,7 +56,7 @@ Spell.DemonHunter.Havoc = {
   ChaosNova                             = Spell(179057),
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -196,8 +196,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Havoc.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth,if=buff.metamorphosis.up|target.time_to_die<=30
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 30) then

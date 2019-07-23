@@ -59,7 +59,7 @@ Spell.Hunter.Marksmanship = {
   Multishot                             = Spell(257620),
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -256,8 +256,8 @@ local function APL()
       if HR.Cast(S.RapidFire) then return "rapid_fire 152"; end
     end
     -- blood_of_the_enemy,if=buff.trueshot.up&(buff.unerring_vision.stack>4|!azerite.unerring_vision.enabled)|target.time_to_die<11
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffStackP(S.UnerringVisionBuff) > 4 or not S.UnerringVision:AzeriteEnabled()) or Target:TimeToDie() < 11) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy st"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffStackP(S.UnerringVisionBuff) > 4 or not S.UnerringVision:AzeriteEnabled()) or Target:TimeToDie() < 11) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy st"; end
     end
     -- focused_azerite_beam,if=!buff.trueshot.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff)) then
@@ -342,8 +342,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, Settings.Marksmanship.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
@@ -383,7 +383,7 @@ local function APL()
       if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major.rank3|debuff.blood_of_the_enemy.up|target.time_to_die<5
-    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodofTheEnemy:ID() == "298277" or Target:DebuffP(S.BloodofTheEnemy) or Target:TimeToDie() < 5) then
+    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodoftheEnemy:ID() == "298277" or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
       if Hr.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20

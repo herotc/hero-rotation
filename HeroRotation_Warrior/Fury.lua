@@ -52,7 +52,7 @@ Spell.Warrior.Fury = {
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
   ColdSteelHotBlood                     = Spell(288080),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -231,8 +231,8 @@ local function APL()
       if HR.Cast(S.Rampage) then return "rampage 108"; end
     end
     -- blood_of_the_enemy,if=buff.recklessness.up
-    if S.BloodofTheEnemy:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Fury.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Fury.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
@@ -267,7 +267,7 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, Settings.Fury.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
-    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() and not S.BloodofTheEnemy:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 20 or Player:BuffP(S.GuardianofAzeroth) or S.BloodofTheEnemy:CooldownRemainsP() < Player:GCD()) then
+    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() and not S.BloodoftheEnemy:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 20 or Player:BuffP(S.GuardianofAzeroth) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up

@@ -57,7 +57,7 @@ Spell.Priest.Shadow = {
   Silence                               = Spell(15487),
   ChorusofInsanity                      = Spell(278661),
   CyclotronicBlast                      = Spell(167672),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -237,8 +237,8 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams cds"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy cds"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy cds"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then

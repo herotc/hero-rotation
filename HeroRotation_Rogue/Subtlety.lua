@@ -75,7 +75,7 @@ Spell.Rogue.Subtlety = {
   ReplicatingShadows                    = Spell(286121),
   TheFirstDance                         = Spell(278681),
   -- Essences
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -84,7 +84,7 @@ Spell.Rogue.Subtlety = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  BloodofTheEnemyDebuff                 = Spell(297108),
+  BloodoftheEnemyDebuff                 = Spell(297108),
   RecklessForceBuff                     = Spell(302932),
   RecklessForceCounter                  = Spell(302917),
   LifebloodBuff                         = Spell(295137),
@@ -407,8 +407,8 @@ end
 -- # Essences
 local function Essences ()
   -- blood_of_the_enemy
-  if S.BloodofTheEnemy:IsCastableP() then
-    if HR.Cast(S.BloodofTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodofTheEnemy"; end
+  if S.BloodoftheEnemy:IsCastableP() then
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
@@ -555,7 +555,7 @@ local function CDs ()
         if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
           not Target:DebuffP(S.RazorCoralDebuff)
           or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31
-          or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or
+          or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or
             Target:FilteredTimeToDie("<", 40)) and Player:BuffRemainsP(S.SymbolsofDeath) > 8
         ) then
           HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);

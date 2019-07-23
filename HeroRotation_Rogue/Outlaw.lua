@@ -66,7 +66,7 @@ Spell.Rogue.Outlaw = {
   SnakeEyesBuff                   = Spell(275863),
   KeepYourWitsBuff                = Spell(288988),
   -- Essences
-  BloodofTheEnemy                 = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                 = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams             = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                  = MultiSpell(295337, 299345, 299347),
   RippleInSpace                   = MultiSpell(302731, 302982, 302983),
@@ -78,7 +78,7 @@ Spell.Rogue.Outlaw = {
   LifebloodBuff                   = Spell(295137),
   LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   ConcentratedFlameBurn           = Spell(295368),
-  BloodofTheEnemyDebuff           = Spell(297108),
+  BloodoftheEnemyDebuff           = Spell(297108),
   RecklessForceBuff               = Spell(302932),
   RecklessForceCounter            = Spell(302917),
   -- Defensive
@@ -295,8 +295,8 @@ end
 -- # Essences
 local function Essences ()
   -- blood_of_the_enemy,if=variable.blade_flurry_sync
-  if S.BloodofTheEnemy:IsCastableP() and Blade_Flurry_Sync() then
-    if HR.Cast(S.BloodofTheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodofTheEnemy"; end
+  if S.BloodoftheEnemy:IsCastableP() and Blade_Flurry_Sync() then
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
@@ -422,7 +422,7 @@ local function CDs ()
             CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 31 or Target:FilteredTimeToDie("<", 20) or
               (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
           else
-            CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodofTheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
+            CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
               and Player:BuffRemainsP(S.AdrenalineRush) > 18 or Target:FilteredTimeToDie("<", 20);
           end
         end

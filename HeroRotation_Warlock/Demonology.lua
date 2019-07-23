@@ -57,7 +57,7 @@ Spell.Warlock.Demonology = {
   SpellLock                             = Spell(19647),
   AxeToss                               = Spell(89766),
   ShiverVenomDebuff                     = Spell(301624),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -337,8 +337,8 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.Demonology.GCDasOffGCD.Essences) then return "purifying_blast implosion"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy implosion"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy implosion"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&spell_targets.implosion<5
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
@@ -476,8 +476,8 @@ local function APL()
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 333"; end
     end
     -- blood_of_the_enemy,if=pet.demonic_tyrant.active&pet.demonic_tyrant.remains<=15-gcd*3&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)
-    if S.BloodofTheEnemy:IsCastableP() and (DemonicTyrantTime() > 0 and DemonicTyrantTime() <= 15 - Player:GCD() * 3 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5)) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+    if S.BloodoftheEnemy:IsCastableP() and (DemonicTyrantTime() > 0 and DemonicTyrantTime() <= 15 - Player:GCD() * 3 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5)) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3&(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3 and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15)) then
@@ -608,8 +608,8 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.Demonology.GCDasOffGCD.Essences) then return "purifying_blast 504"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy 505"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Demonology.GCDasOffGCD.Essences) then return "blood_of_the_enemy 505"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!pet.demonic_tyrant.active
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and DemonicTyrantTime() == 0) then

@@ -55,7 +55,7 @@ Spell.Mage.Fire = {
   AlexstraszasFury                      = Spell(235870),
   Kindling                              = Spell(155148),
   Counterspell                          = Spell(2139),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   MemoryofLucidDreamsMinor              = MultiSpell(298268, 299371, 299373),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -310,8 +310,8 @@ local function APL()
       if HR.CastSuggested(I.HyperthreadWristwraps) then return "hyperthread_wristwraps"; end
     end
     -- blood_of_the_enemy
-    if S.BloodofTheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
+    if S.BloodoftheEnemy:IsCastableP() then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then

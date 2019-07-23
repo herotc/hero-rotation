@@ -64,7 +64,7 @@ Spell.Warlock.Affliction = {
   PhantomSingularityDebuff              = Spell(205179),
   Berserking                            = Spell(26297),
   ShiverVenomDebuff                     = Spell(301624),
-  BloodofTheEnemy                       = MultiSpell(297108, 298273, 298277),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
@@ -384,8 +384,8 @@ local function APL()
       if HR.Cast(S.DarkSoul) then return "dark_soul 60"; end
     end
     -- blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
-    if S.BloodofTheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodofTheEnemy:ID() == 297108) then
-      if HR.Cast(S.BloodofTheEnemy, Settings.Affliction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 61"; end
+    if S.BloodoftheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodoftheEnemy:ID() == 297108) then
+      if HR.Cast(S.BloodoftheEnemy, Settings.Affliction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 61"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.PocketsizedComputationDevice:IsReady() and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
