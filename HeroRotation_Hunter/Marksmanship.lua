@@ -80,7 +80,8 @@ if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Marksmanship = {
   PotionofUnbridledFury            = Item(169299),
   GalecallersBoon                  = Item(159614),
-  PocketsizedComputationDevice     = Item(167555)
+  PocketsizedComputationDevice     = Item(167555),
+  AzsharasFontofPower              = Item(169314)
 };
 local I = Item.Hunter.Marksmanship;
 
@@ -120,6 +121,7 @@ local function GetEnemiesCount(range)
 end
 
 S.SerpentSting:RegisterInFlight()
+S.ConcentratedFlame:RegisterInFlight()
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -169,6 +171,10 @@ local function APL()
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
         if HR.Cast(S.MemoryofLucidDreams, Settings.Marksmanship.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
       end
       -- trueshot,precast_time=1.5,if=active_enemies>2
       if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (EnemiesCount > 2) then
@@ -225,8 +231,8 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff)) then
       if HR.Cast(S.MemoryofLucidDreams, Settings.Marksmanship.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
-    -- potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|target.time_to_die<25
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.TrueshotBuff) and Player:HasHeroism() or Player:BuffP(S.TrueshotBuff) and ((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) and S.CarefulAim:IsAvailable()) or Target:TimeToDie() < 25) then
+    -- potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.TrueshotBuff) and Player:HasHeroism() or Player:BuffP(S.TrueshotBuff) and ((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) and S.CarefulAim:IsAvailable()) or Target:TimeToDie() < 61) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 104"; end
     end
     -- trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
@@ -259,8 +265,8 @@ local function APL()
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffStackP(S.UnerringVisionBuff) > 4 or not S.UnerringVision:AzeriteEnabled()) or Target:TimeToDie() < 11) then
       if HR.Cast(S.BloodoftheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy st"; end
     end
-    -- focused_azerite_beam,if=!buff.trueshot.up
-    if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff)) then
+    -- focused_azerite_beam,if=!buff.trueshot.up|target.time_to_die<5
+    if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 5) then
       if HR.Cast(S.FocusedAzeriteBeam, Settings.Marksmanship.GCDasOffGCD.Essences) then return "focused_azerite_beam st"; end
     end
     -- arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&!buff.memory_of_lucid_dreams.up
@@ -279,16 +285,16 @@ local function APL()
     if S.PiercingShot:IsCastableP() then
       if HR.Cast(S.PiercingShot) then return "piercing_shot 198"; end
     end
-    -- purifying_blast,if=!buff.trueshot.up
-    if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff)) then
+    -- purifying_blast,if=!buff.trueshot.up|target.time_to_die<8
+    if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 8) then
       if HR.Cast(S.PurifyingBlast, Settings.Marksmanship.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
-    -- concentrated_flame,if=!buff.trueshot.up
-    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff)) then
+    -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.trueshot.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
+    if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.TrueshotBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
       if HR.Cast(S.ConcentratedFlame, Settings.Marksmanship.GCDasOffGCD.Essences) then return "concentrated_flame"; end
     end
-    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10 or Target:TimeToDie() < 5) then
       if HR.Cast(S.TheUnboundForce, Settings.Marksmanship.GCDasOffGCD.Essences) then return "the_unbound_force"; end
     end
     -- arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
