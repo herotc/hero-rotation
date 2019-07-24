@@ -77,7 +77,8 @@ Spell.Hunter.Survival = {
   VipersVenom                           = Spell(268501),
   AlphaPredator                         = Spell(269737),
   ArcaneTorrent                         = Spell(50613),
-  RazorCoralDebuff                      = Spell(303568)
+  RazorCoralDebuff                      = Spell(303568),
+  CyclotronicBlast                      = Spell(167672)
 };
 local S = Spell.Hunter.Survival;
 
@@ -85,7 +86,9 @@ local S = Spell.Hunter.Survival;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Survival = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311)
+  AshvanesRazorCoral               = Item(169311),
+  PocketsizedComputationDevice     = Item(167555),
+  GalecallersBoon                  = Item(159614)
 };
 local I = Item.Hunter.Survival;
 
@@ -198,6 +201,11 @@ local function APL()
       -- harpoon
       if S.Harpoon:IsCastableP() then
         if HR.Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon) then return "harpoon 12"; end
+      end
+      -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
+      -- Using main icon, since this is the last item in Precombat
+      if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
+        if HR.Cast(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 13"; end
       end
     end
   end
@@ -354,8 +362,8 @@ local function APL()
     if S.Berserking:IsCastableP() and HR.CDsON() and (S.CoordinatedAssault:CooldownRemainsP() > 60 or Target:TimeToDie() < 13) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 298"; end
     end
-    -- potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|time_to_die<26
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll") and not Player:IsRace("Orc")) or Target:TimeToDie() < 26) then
+    -- potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll") and not Player:IsRace("Orc")) or Target:TimeToDie() < 61) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 308"; end
     end
     -- aspect_of_the_eagle,if=target.distance>=6
@@ -365,6 +373,10 @@ local function APL()
     -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
     if I.AshvanesRazorCoral:IsReady() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
+    end
+    -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&!talent.wildfire_infusion.enabled
+    if I.GalecallersBoon:IsReady() and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(S.CyclotronicBlast:CooldownRemainsP()) or not S.MemoryofLucidDreams:IsAvailable() and not S.WildfireInfusion:IsAvailable()) then
+      if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
