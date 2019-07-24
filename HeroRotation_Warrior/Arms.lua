@@ -37,7 +37,7 @@ Spell.Warrior.Arms = {
   OverpowerBuff                         = Spell(7384),
   Dreadnaught                           = Spell(262150),
   ExecutionersPrecisionBuff             = Spell(242188),
-  Execute                               = Spell(163201),
+  Execute                               = MultiSpell(163201, 281000),
   Overpower                             = Spell(7384),
   SweepingStrikesBuff                   = Spell(260708),
   TestofMight                           = Spell(275529),
@@ -116,13 +116,6 @@ local function bool(val)
   return val ~= 0
 end
 
-S.ExecuteDefault    = Spell(163201)
-S.ExecuteMassacre   = Spell(281000)
-
-local function UpdateExecuteID()
-    S.Execute = S.Massacre:IsAvailable() and S.ExecuteMassacre or S.ExecuteDefault
-end
-
 HL.RegisterNucleusAbility(152277, 8, 6)               -- Ravager
 HL.RegisterNucleusAbility(227847, 8, 6)               -- Bladestorm
 HL.RegisterNucleusAbility(845, 8, 6)                  -- Cleave
@@ -133,7 +126,6 @@ local function APL()
   local Precombat, Execute, FiveTarget, Hac, SingleTarget
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-  UpdateExecuteID()
   Precombat = function()
     -- flask
     -- food
@@ -234,7 +226,7 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 94"; end
     end
     -- execute,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|(buff.sudden_death.react|buff.stone_heart.react)&(buff.sweeping_strikes.up|cooldown.sweeping_strikes.remains>8)
-    if S.Execute:IsCastableP() and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or (bool(Player:BuffStackP(S.SuddenDeathBuff)) or bool(Player:BuffStackP(S.StoneHeartBuff))) and (Player:BuffP(S.SweepingStrikesBuff) or S.SweepingStrikes:CooldownRemainsP() > 8)) then
+    if S.Execute:IsCastableP() and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or (Player:BuffP(S.SuddenDeathBuff) or Player:BuffP(S.StoneHeartBuff)) and (Player:BuffP(S.SweepingStrikesBuff) or S.SweepingStrikes:CooldownRemainsP() > 8)) then
       if HR.Cast(S.Execute) then return "execute 96"; end
     end
     -- mortal_strike,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sweeping_strikes.up&buff.overpower.stack=2&(talent.dreadnaught.enabled|buff.executioners_precision.stack=2)
@@ -296,15 +288,15 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 220"; end
     end
     -- execute,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sudden_death.react
-    if S.Execute:IsCastableP() and (not (Cache.EnemiesCount[8] > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or bool(Player:BuffStackP(S.SuddenDeathBuff))) then
+    if S.Execute:IsCastableP() and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or Player:BuffStackP(S.SuddenDeathBuff)) then
       if HR.Cast(S.Execute) then return "execute 222"; end
     end
     -- mortal_strike,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)
-    if S.MortalStrike:IsReadyP() and (not (Cache.EnemiesCount[8] > 1) or (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2)) then
+    if S.MortalStrike:IsReadyP() and (not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) then
       if HR.Cast(S.MortalStrike) then return "mortal_strike 232"; end
     end
     -- whirlwind,if=raid_event.adds.up
-    if S.Whirlwind:IsReadyP() and (Cache.EnemiesCount[8] > 1) then
+    if S.Whirlwind:IsReadyP() then
       if HR.Cast(S.Whirlwind) then return "whirlwind 240"; end
     end
     -- overpower
@@ -316,7 +308,7 @@ local function APL()
       if HR.Cast(S.Whirlwind) then return "whirlwind 246"; end
     end
     -- slam,if=!talent.fervor_of_battle.enabled&!raid_event.adds.up
-    if S.Slam:IsReadyP() and (not S.FervorofBattle:IsAvailable() and not (Cache.EnemiesCount[8] > 1)) then
+    if S.Slam:IsReadyP() and (not S.FervorofBattle:IsAvailable()) then
       if HR.Cast(S.Slam) then return "slam 250"; end
     end
   end
@@ -346,7 +338,7 @@ local function APL()
       if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 296"; end
     end
     -- execute,if=buff.sudden_death.react
-    if S.Execute:IsCastableP() and (bool(Player:BuffStackP(S.SuddenDeathBuff))) then
+    if S.Execute:IsCastableP() and (Player:BuffP(S.SuddenDeathBuff)) then
       if HR.Cast(S.Execute) then return "execute 298"; end
     end
     -- bladestorm,if=cooldown.mortal_strike.remains&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down
