@@ -354,8 +354,8 @@ local function APL()
     if S.CometStorm:IsCastableP() then
       if HR.Cast(S.CometStorm) then return "comet_storm 179"; end
     end
-    -- ebonbolt,if=buff.icicles.stack=5&!buff.brain_freeze.react&buff.memory_of_lucid_dreams.down
-    if S.Ebonbolt:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffDownP(S.BrainFreezeBuff) and Player:BuffDownP(S.MemoryofLucidDreams)) then
+    -- ebonbolt,if=buff.icicles.stack=5&!buff.brain_freeze.react
+    if S.Ebonbolt:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffDownP(S.BrainFreezeBuff)) then
       if HR.Cast(S.Ebonbolt) then return "ebonbolt 181"; end
     end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
