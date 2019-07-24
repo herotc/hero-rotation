@@ -492,7 +492,7 @@ local function CDs ()
         HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
       end
       -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20
-      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff)
+      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (not Target:DebuffP(S.RazorCoralDebuff)
         or Target:DebuffRemainsP(S.Vendetta) > 10 or Target:FilteredTimeToDie("<", 20)) then
         HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
       end
