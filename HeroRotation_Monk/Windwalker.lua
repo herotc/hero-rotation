@@ -233,7 +233,7 @@ local function APL ()
       if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return "Cast Cooldown Touch of Death"; end
     end
     -- actions.cd+=/storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(cooldown.fists_of_fury.remains<=6&chi>=3&cooldown.rising_sun_kick.remains<=1)|target.time_to_die<=15
-    if HR.CDsON() and S.StormEarthAndFire:IsReadyP() and (not Player:BuffP(S.StormEarthAndFire) and (S.StormEarthAndFire:ChargesP() == 2 or S.FistsOfFury:CooldownRemainsP() <= 6) and Player:Chi() >= 3 and (S.RisingSunKick:CooldownRemainsP() <= 1 or Target:TimeToDie() <= 15)) then
+    if HR.CDsON() and S.StormEarthAndFire:IsReadyP() and (not Player:BuffP(S.StormEarthAndFire) and (S.StormEarthAndFire:ChargesP() == 2 or (S.FistsOfFury:CooldownRemainsP() <= 6 and Player:Chi() >= 3 and S.RisingSunKick:CooldownRemainsP() <= 1) or Target:TimeToDie() <= 15)) then
       if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.GCDasOffGCD.Serenity) then return "Cast Cooldown Storm, Earth and Fire"; end
     end
     -- actions.cd+=/serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
