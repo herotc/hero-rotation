@@ -192,7 +192,7 @@ local function APL()
   end
   Aoe = function()
     -- thunder_clap
-    if S.ThunderClap:IsCastableP() then
+    if S.ThunderClap:IsCastableP(8) then
       if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
     end
     -- memory_of_lucid_dreams,if=buff.avatar.down
@@ -200,7 +200,7 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, Settings.Protection.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 7"; end
     end
     -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
+    if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
     end
     -- anima_of_death,if=buff.last_stand.up
@@ -208,15 +208,15 @@ local function APL()
       if HR.Cast(S.AnimaofDeath, Settings.Protection.GCDasOffGCD.Essences) then return "anima_of_death 9"; end
     end
     -- dragon_roar
-    if S.DragonRoar:IsCastableP() and HR.CDsON() then
+    if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
       if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
+    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 14"; end
     end
     -- ravager
-    if S.Ravager:IsCastableP() then
+    if S.Ravager:IsCastableP(40) then
       if HR.Cast(S.Ravager) then return "ravager 16"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
@@ -224,17 +224,17 @@ local function APL()
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 18"; end
     end
     -- shield_slam
-    if S.ShieldSlam:IsCastableP() then
+    if S.ShieldSlam:IsCastableP("Melee") then
       if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
     end
 	-- devastate
-    if S.Devastate:IsCastableP() then
+    if S.Devastate:IsCastableP("Melee") then
       if HR.Cast(S.Devastate) then return "devastate 80"; end
     end
   end
   St = function()
     -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
-    if S.ThunderClap:IsCastableP() and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
+    if S.ThunderClap:IsCastableP(8) and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
       if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
@@ -242,15 +242,15 @@ local function APL()
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 32"; end
     end
     -- shield_slam,if=buff.shield_block.up
-    if S.ShieldSlam:IsCastableP() and (Player:BuffP(S.ShieldBlockBuff)) then
+    if S.ShieldSlam:IsCastableP("Melee") and (Player:BuffP(S.ShieldBlockBuff)) then
       if HR.Cast(S.ShieldSlam) then return "shield_slam 44"; end
     end
     -- thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
-    if S.ThunderClap:IsCastableP() and ((S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff))) then
+    if S.ThunderClap:IsCastableP(8) and ((S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff))) then
       if HR.Cast(S.ThunderClap) then return "thunder_clap 54"; end
     end
     -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP() and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
+    if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
       if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
     end
     -- anima_of_death,if=buff.last_stand.up
@@ -258,7 +258,7 @@ local function APL()
       if HR.Cast(S.AnimaofDeath, Settings.Protection.GCDasOffGCD.Essences) then return "anima_of_death 61"; end
     end
     -- shield_slam
-    if S.ShieldSlam:IsCastableP() then
+    if S.ShieldSlam:IsCastableP("Melee") then
       if HR.Cast(S.ShieldSlam) then return "shield_slam 70"; end
     end
     -- use_item,name=ashvanes_razor_coral,target_if=debuff.razor_coral_debuff.stack=0
@@ -270,23 +270,23 @@ local function APL()
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 72"; end
     end
     -- dragon_roar
-    if S.DragonRoar:IsCastableP() and HR.CDsON() then
+    if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
       if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 73"; end
     end
     -- thunder_clap
-    if S.ThunderClap:IsCastableP() then
+    if S.ThunderClap:IsCastableP(8) then
       if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP() and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
+    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 76"; end
     end
     -- ravager
-    if S.Ravager:IsCastableP() then
+    if S.Ravager:IsCastableP(40) then
       if HR.Cast(S.Ravager) then return "ravager 78"; end
     end
     -- devastate
-    if S.Devastate:IsCastableP() then
+    if S.Devastate:IsCastableP("Melee") then
       if HR.Cast(S.Devastate) then return "devastate 80"; end
     end
   end
@@ -303,7 +303,7 @@ local function APL()
     Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
     -- auto_attack
     -- intercept,if=time=0
-    if S.Intercept:IsCastableP() and (HL.CombatTime() == 0 and not Target:IsInRange(8)) then
+    if S.Intercept:IsCastableP(25) and (HL.CombatTime() == 0 and not Target:IsInRange(8)) then
       if HR.Cast(S.Intercept) then return "intercept 84"; end
     end
     -- use_items,if=cooldown.avatar.remains>20
@@ -339,10 +339,10 @@ local function APL()
     if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 103"; end
     end
-    if Player:HealthPercentage() < 30 and S.VictoryRush:IsReady() then
+    if Player:HealthPercentage() < 30 and S.VictoryRush:IsReady("Melee") then
       if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
     end
-    if Player:HealthPercentage() < 30 and S.ImpendingVictory:IsReadyP() then
+    if Player:HealthPercentage() < 30 and S.ImpendingVictory:IsReadyP("Melee") then
       if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
     end
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
