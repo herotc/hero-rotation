@@ -35,7 +35,8 @@
         Bladestorm = false,
         Ravager = false,
         DeadlyCalm = false,
-        Charge = true,
+        HeroicLeap = false,
+        Charge = false,
         Avatar = true,
         Essences = true,
       },
@@ -47,9 +48,6 @@
     },
 
     Fury = {
-      ShowPoOW = false,
-      ShowPoPP = false,
-      ShowBPoS = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -57,15 +55,14 @@
         DragonRoar = false,
         Recklessness = false,
         Siegebreaker = false,
+        HeroicLeap = false,
+        Charge = false,
         Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
         -- Items
-        PotionoftheOldWar = true,
-        PotionOfProlongedPower = true,
-        UmbralMoonglaives = true,
       }
     },
 

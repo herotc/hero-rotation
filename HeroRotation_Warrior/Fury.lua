@@ -152,7 +152,7 @@ local function APL()
   Movement = function()
     -- heroic_leap
     if S.HeroicLeap:IsCastableP() then
-      if HR.Cast(S.HeroicLeap) then return "heroic_leap 16"; end
+      if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 16"; end
     end
   end
   SingleTarget = function()
@@ -208,7 +208,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- auto_attack
     -- charge
-    if S.Charge:IsCastableP() then
+    if S.Charge:IsReadyP() and S.Charge:ChargesP() >= 1 then
       if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge) then return "charge 78"; end
     end
     -- Interrupts
