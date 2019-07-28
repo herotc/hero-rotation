@@ -199,11 +199,11 @@ local function APL()
         if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
       end
       -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-      if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
+      if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
         if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast precombat"; end
       end
       -- focused_azerite_beam,if=!raid_event.invulnerable.exists
@@ -438,11 +438,11 @@ local function APL()
     -- auto_shot
     -- use_items
     -- use_item,effect_name=cyclotronic_blast,if=!buff.bestial_wrath.up
-    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable()  and (Player:BuffDownP(S.BestialWrathBuff)) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable()  and (Player:BuffDownP(S.BestialWrathBuff)) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.aspect_of_the_wild.remains>15|debuff.razor_coral_debuff.down|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsReady() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 15 or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 15 or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
     end
     -- call_action_list,name=cds

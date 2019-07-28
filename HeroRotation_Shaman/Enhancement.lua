@@ -249,7 +249,7 @@ local function APL()
         if HR.Cast(S.LightningShield) then return "lightning_shield 6"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 8"; end
       end
       -- rockbiter,if=maelstrom<15&time<gcd
@@ -279,7 +279,7 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 37"; end
     end
     -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 41"; end
     end
     -- blood_fury,if=variable.cooldown_sync
@@ -320,15 +320,15 @@ local function APL()
       if HR.Cast(S.Ascendance) then return "ascendance 69"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(target.time_to_die<20&debuff.razor_coral_debuff.stack>2)
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuffDebuff) or (Target:TimeToDie() < 20 and Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2)) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuffDebuff) or (Target:TimeToDie() < 20 and Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2)) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 73"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>2&debuff.conductive_ink_debuff.down&(buff.ascendance.remains>10|buff.molten_weapon.remains>10|buff.crackling_surge.remains>10|buff.icy_edge.remains>10|debuff.earthen_spike.remains>6)
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2 and Target:DebuffDownP(S.ConductiveInkDebuffDebuff) and (Player:BuffRemainsP(S.AscendanceBuff) > 10 or Player:BuffRemainsP(S.MoltenWeaponBuff) > 10 or Player:BuffRemainsP(S.CracklingSurgeBuff) > 10 or Player:BuffRemainsP(S.IcyEdgeBuff) > 10 or Target:DebuffRemainsP(S.EarthenSpikeDebuff) > 6)) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2 and Target:DebuffDownP(S.ConductiveInkDebuffDebuff) and (Player:BuffRemainsP(S.AscendanceBuff) > 10 or Player:BuffRemainsP(S.MoltenWeaponBuff) > 10 or Player:BuffRemainsP(S.CracklingSurgeBuff) > 10 or Player:BuffRemainsP(S.IcyEdgeBuff) > 10 or Target:DebuffRemainsP(S.EarthenSpikeDebuff) > 6)) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 79"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=(debuff.conductive_ink_debuff.up|buff.ascendance.remains>10|buff.molten_weapon.remains>10|buff.crackling_surge.remains>10|buff.icy_edge.remains>10|debuff.earthen_spike.remains>6)&target.health.pct<31
-    if I.AshvanesRazorCoral:IsReady() and ((Target:DebuffP(S.ConductiveInkDebuffDebuff) or Player:BuffRemainsP(S.AscendanceBuff) > 10 or Player:BuffRemainsP(S.MoltenWeaponBuff) > 10 or Player:BuffRemainsP(S.CracklingSurgeBuff) > 10 or Player:BuffRemainsP(S.IcyEdgeBuff) > 10 or Target:DebuffRemainsP(S.EarthenSpikeDebuff) > 6) and Target:HealthPercentage() < 31) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and ((Target:DebuffP(S.ConductiveInkDebuffDebuff) or Player:BuffRemainsP(S.AscendanceBuff) > 10 or Player:BuffRemainsP(S.MoltenWeaponBuff) > 10 or Player:BuffRemainsP(S.CracklingSurgeBuff) > 10 or Player:BuffRemainsP(S.IcyEdgeBuff) > 10 or Target:DebuffRemainsP(S.EarthenSpikeDebuff) > 6) and Target:HealthPercentage() < 31) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 95"; end
     end
     -- use_items

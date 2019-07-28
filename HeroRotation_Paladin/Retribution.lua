@@ -155,7 +155,7 @@ local function APL()
       if HR.CastLeft(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.avenging_wrath.remains>=20|buff.crusade.stack=10&buff.crusade.remains>15)&(cooldown.guardian_of_azeroth.remains>90|target.time_to_die<30|!essence.condensed_lifeforce.major)
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) and (S.GuardianofAzeroth:CooldownRemainsP() > 90 or Target:TimeToDie() < 30 or not S.GuardianofAzeroth:IsAvailable())) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) and (S.GuardianofAzeroth:CooldownRemainsP() > 90 or Target:TimeToDie() < 30 or not S.GuardianofAzeroth:IsAvailable())) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then reutrn "ashvanes_razor_coral"; end
     end
     -- the_unbound_force,if=time<=2|buff.reckless_force.up
@@ -187,7 +187,7 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, Settings.Retribution.GCDasOffGCD.Essences) then return "purifying_blast"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(buff.avenging_wrath.down|buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
-    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and ((Player:BuffDownP(S.AvengingWrathBuff) or Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and ((Player:BuffDownP(S.AvengingWrathBuff) or Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
     end
     -- avenging_wrath,if=(!talent.inquisition.enabled|buff.inquisition.up)&holy_power>=3

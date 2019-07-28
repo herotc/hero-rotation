@@ -247,7 +247,7 @@ local function APL()
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 55"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.ConductiveInkDebuff) or Player:BuffRemainsP(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.ConductiveInkDebuff) or Player:BuffRemainsP(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
     end
     -- call_action_list,name=essences

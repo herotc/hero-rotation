@@ -214,7 +214,7 @@ local function APL()
         if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 44"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 50"; end
       end
       -- mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
@@ -356,11 +356,11 @@ local function APL()
   end
   CritCds = function()
     -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power critcds"; end
     end
     -- use_item,effect_name=cyclotronic_blast
-    if I.PocketsizedComputationDevice:IsReady() and S.CyclotonicBlast:IsAvailable() then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotonicBlast:IsAvailable() then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device critcds"; end
     end
   end

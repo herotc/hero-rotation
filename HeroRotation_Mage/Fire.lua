@@ -302,11 +302,11 @@ local function APL()
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 234"; end
     end
     -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
     end
     -- use_item,name=hyperthread_wristwraps,if=buff.combustion.up&action.fire_blast.charges_fractional<1.2
-    if I.HyperthreadWristwraps:IsReady() and (Player:BuffP(S.CombustionBuff) and S.FireBlast:ChargesFractionalP() < 1.2) then
+    if I.HyperthreadWristwraps:IsEquipped() and I.HyperthreadWristwraps:IsReady() and (Player:BuffP(S.CombustionBuff) and S.FireBlast:ChargesFractionalP() < 1.2) then
       if HR.CastSuggested(I.HyperthreadWristwraps) then return "hyperthread_wristwraps"; end
     end
     -- blood_of_the_enemy
@@ -514,11 +514,11 @@ local function APL()
       if HR.Cast(S.DragonsBreath) then return "dragons_breath 766"; end
     end
     -- use_item,name=tidestorm_codex,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
-    if I.TidestormCodex:IsReady() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
+    if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
       if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex 774"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
-    if I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (S.Combustion:CooldownRemainsP() > 20 or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > 20) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 775"; end
     end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
@@ -577,7 +577,7 @@ local function APL()
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 807"; end
     end
     -- use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>55
-    if I.MalformedHeraldsLegwraps:IsReady() and (S.Combustion:CooldownRemainsP() > 55) then
+    if I.MalformedHeraldsLegwraps:IsEquipped() and I.MalformedHeraldsLegwraps:IsReady() and (S.Combustion:CooldownRemainsP() > 55) then
       if HR.CastSuggested(I.MalformedHeraldsLegwraps) then return "malformed_heralds_legwraps 827"; end
     end
     -- call_action_list,name=combustion_phase,if=(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up

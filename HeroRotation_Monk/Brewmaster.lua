@@ -191,7 +191,7 @@ local function APL()
       ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- Invocation of Yu'lon
-    if I.InvocationOfYulon:IsReady() then
+    if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
       if HR.CastSuggested(I.InvocationOfYulon) then return ""; end
     end
     -- potion

@@ -114,7 +114,7 @@ local function APL()
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 12"; end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.seraphim.remains<=10|!talent.seraphim.enabled
-    if I.AzsharasFontofPower:IsReady() and (S.Seraphim:CooldownRemainsP() <= 10 or not S.Seraphim:IsAvailable()) then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (S.Seraphim:CooldownRemainsP() <= 10 or not S.Seraphim:IsAvailable()) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 16"; end
     end
     -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
@@ -135,15 +135,15 @@ local function APL()
     end
     -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
     -- use_item,name=grongs_primal_rage,if=((cooldown.judgment.full_recharge_time>4|(!talent.crusaders_judgment.enabled&prev_gcd.1.judgment))&cooldown.avengers_shield.remains>4&buff.seraphim.remains>4)|(buff.seraphim.remains<4)
-    if I.GrongsPrimalRage:IsReady() and (((S.Judgment:FullRechargeTimeP() > 4 or (not S.CrusadersJudgment:IsAvailable() and Player:PrevGCDP(1, S.Judgment))) and S.AvengersShield:CooldownRemainsP() > 4 and Player:BuffRemainsP(S.SeraphimBuff) > 4) or (Player:BuffRemainsP(S.SeraphimBuff) < 4)) then
+    if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and (((S.Judgment:FullRechargeTimeP() > 4 or (not S.CrusadersJudgment:IsAvailable() and Player:PrevGCDP(1, S.Judgment))) and S.AvengersShield:CooldownRemainsP() > 4 and Player:BuffRemainsP(S.SeraphimBuff) > 4) or (Player:BuffRemainsP(S.SeraphimBuff) < 4)) then
       if HR.CastSuggested(I.GrongsPrimalRage) then return "grongs_primal_rage 43"; end
     end
     -- use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
-    if I.MerekthasFang:IsReady() and (not Player:BuffP(S.AvengingWrathBuff) and (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable())) then
+    if I.MerekthasFang:IsEquipped() and I.MerekthasFang:IsReady() and (not Player:BuffP(S.AvengingWrathBuff) and (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable())) then
       if HR.CastSuggested(I.MerekthasFang) then return "merekthas_fang 57"; end
     end
     -- use_item,name=razdunks_big_red_button
-    if I.RazdunksBigRedButton:IsReady() then
+    if I.RazdunksBigRedButton:IsEquipped() and I.RazdunksBigRedButton:IsReady() then
       if HR.CastSuggested(I.RazdunksBigRedButton) then return "razdunks_big_red_button 65"; end
     end
   end

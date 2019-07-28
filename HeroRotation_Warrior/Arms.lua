@@ -425,7 +425,7 @@ local function APL()
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
     end
     -- use_item,name=vision_of_demise
-    if I.VisionofDemise:IsReady() then
+    if I.VisionofDemise:IsEquipped() and I.VisionofDemise:IsReady() then
       if HR.CastSuggested(I.VisionofDemise) then return "vision_of_demise"; end
     end
     -- avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)

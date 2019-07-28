@@ -415,7 +415,7 @@ local function APL()
   end
   NetherPortalBuilding = function()
     -- use_item,name=azsharas_font_of_power,if=cooldown.nether_portal.remains<=5*spell_haste
-    if I.AzsharasFontofPower:IsReady() and (S.NetherPortal:CooldownRemainsP() <= 5 * Player:SpellHaste()) then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (S.NetherPortal:CooldownRemainsP() <= 5 * Player:SpellHaste()) then
       if HR.CastSuggested(I.AzsharasFontofPower) then reutrn "azsharas_font_of_power 295"; end
     end
     -- guardian_of_azeroth,if=!cooldown.nether_portal.remains&soul_shard>=5
@@ -459,7 +459,7 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 322"; end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.summon_demonic_tyrant.remains<=20&!talent.nether_portal.enabled
-    if I.AzsharasFontofPower:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() <= 20 and not S.NetherPortal:IsAvailable()) then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() <= 20 and not S.NetherPortal:IsAvailable()) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
     end
     -- use_items,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
@@ -488,27 +488,27 @@ local function APL()
       if HR.Cast(S.RippleInSpace, Settings.Demonology.GCDasOffGCD.Essences) then return "ripple_in_space 335"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
-    if I.PocketsizedComputationDevice:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 20 and S.SummonDemonicTyrant:CooldownRemainsP() <= 75 or Target:TimeToDie() <= 30) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 20 and S.SummonDemonicTyrant:CooldownRemainsP() <= 75 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
     end
     -- use_item,name=rotcrusted_voodoo_doll,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
-    if I.RotcrustedVoodooDoll:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+    if I.RotcrustedVoodooDoll:IsEquipped() and I.RotcrustedVoodooDoll:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.RotcrustedVoodooDoll) then return "rotcrusted_voodoo_doll"; end
     end
     -- use_item,name=shiver_venom_relic,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
-    if I.ShiverVenomRelic:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+    if I.ShiverVenomRelic:IsEquipped() and I.ShiverVenomRelic:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.ShiverVenomRelic) then return "shiver_venom_relic"; end
     end
     -- use_item,name=aquipotent_nautilus,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
-    if I.AquipotentNautilus:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+    if I.AquipotentNautilus:IsEquipped() and I.AquipotentNautilus:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.AquipotentNautilus) then return "aquipotent_nautilus"; end
     end
     -- use_item,name=tidestorm_codex,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
-    if I.TidestormCodex:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+    if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.TidestormCodex) then return "tidestorm_codex"; end
     end
     -- use_item,name=vial_of_storms,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
-    if I.VialofStorms:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
+    if I.VialofStorms:IsEquipped() and I.VialofStorms:IsReady() and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(I.VialofStorms) then return "vial_of_storms"; end
     end
     -- call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
@@ -516,7 +516,7 @@ local function APL()
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_item,name=azsharas_font_of_power,if=(time>30|!talent.nether_portal.enabled)&talent.grimoire_felguard.enabled&(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15)|target.time_to_die<=35
-    if I.AzsharasFontofPower:IsReady() and ((HL.CombatTime() > 30 or not S.NetherPortal:IsAvailable()) and S.GrimoireFelguard:IsAvailable() and (Target:TimeToDie() > 120 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemainsP() + 15) or Target:TimeToDie() <= 35) then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and ((HL.CombatTime() > 30 or not S.NetherPortal:IsAvailable()) and S.GrimoireFelguard:IsAvailable() and (Target:TimeToDie() > 120 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemainsP() + 15) or Target:TimeToDie() <= 35) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
     end
     -- hand_of_guldan,if=azerite.explosive_potential.rank&time<5&soul_shard>2&buff.explosive_potential.down&buff.wild_imps.stack<3&!prev_gcd.1.hand_of_guldan&&!prev_gcd.2.hand_of_guldan

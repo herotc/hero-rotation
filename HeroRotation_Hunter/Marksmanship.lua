@@ -173,7 +173,7 @@ local function APL()
         if HR.Cast(S.MemoryofLucidDreams, Settings.Marksmanship.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
       end
       -- trueshot,precast_time=1.5,if=active_enemies>2
@@ -385,11 +385,11 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false);
     -- auto_shot
     -- use_item,name=galecallers_boon,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<10
-    if I.GalecallersBoon:IsReady() and (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 10) then
+    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 10) then
       if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major.rank3|debuff.blood_of_the_enemy.up|target.time_to_die<5
-    if I.PocketsizedComputationDevice:IsReady() and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodoftheEnemy:ID() == "298277" or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodoftheEnemy:ID() == "298277" or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
       if Hr.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
