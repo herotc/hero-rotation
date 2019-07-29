@@ -186,6 +186,10 @@ local function APL()
       if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 6"; end
       end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
+      end
       -- worldvein_resonance
       if S.WorldveinResonance:IsCastableP() then
         if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
@@ -198,11 +202,8 @@ local function APL()
       if S.MemoryofLucidDreams:IsCastableP() then
         if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
       end
-      -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
-      end
-      -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
+      -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists&(trinket.1.has_cooldown+trinket.2.has_cooldown<2|equipped.variable_intensity_gigavolt_oscillating_reactor)
+      -- Needs to be updated to the 2nd half of the condition
       if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
         if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast precombat"; end
       end
@@ -210,12 +211,12 @@ local function APL()
       if S.FocusedAzeriteBeam:IsCastableP() then
         if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
       end
-      -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
-      if S.AspectoftheWild:IsCastableP() and (not S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
+      -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
+      if S.AspectoftheWild:IsCastableP() and (not S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not S.CyclotronicBlast:IsAvailable())) then
         if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
       end
-      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
-      if S.BestialWrath:IsCastableP() and (S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not I.PocketsizedComputationDevice:IsEquipped() or S.CyclotronicBlast:CooldownUpP())) then
+      -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
+      if S.BestialWrath:IsCastableP() and (S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not S.CyclotronicBlast:IsAvailable())) then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
       end
     end
@@ -437,13 +438,13 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items
-    -- use_item,effect_name=cyclotronic_blast,if=!buff.bestial_wrath.up
-    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable()  and (Player:BuffDownP(S.BestialWrathBuff)) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=buff.aspect_of_the_wild.remains>15|debuff.razor_coral_debuff.down|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 15 or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.up)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffP(S.RazorCoralDebuff) and (Player:PrevGCDP(1, S.AspectoftheWild) or not S.CyclotronicBlast:IsAvailable() and Player:BuffP(S.AspectoftheWildBuff)) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(S.CyclotronicBlast:CooldownRemainsP() + 4 < Target:TimeToDie()))) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable()  and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
     end
     -- call_action_list,name=cds
     if (true) then
