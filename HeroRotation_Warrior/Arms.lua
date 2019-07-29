@@ -64,6 +64,8 @@ Spell.Warrior.Arms = {
   Massacre                              = Spell(281001),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -82,7 +84,8 @@ local S = Spell.Warrior.Arms;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
   PotionofUnbridledFury            = Item(169299),
-  VisionofDemise                   = Item(169307)
+  AzsharasFontofPower              = Item(169314),
+  AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.Warrior.Arms;
 
@@ -133,9 +136,9 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
@@ -144,6 +147,10 @@ local function APL()
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
         if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth"; end
+      end
+      -- potion
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
       end
     end
   end
@@ -424,9 +431,9 @@ local function APL()
     if S.AncestralCall:IsCastableP() and HR.CDsON() and (Target:DebuffP(S.ColossusSmashDebuff)) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
     end
-    -- use_item,name=vision_of_demise
-    if I.VisionofDemise:IsEquipped() and I.VisionofDemise:IsReady() then
-      if HR.CastSuggested(I.VisionofDemise) then return "vision_of_demise"; end
+    -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|(prev_gcd.1.colossus_smash&!essence.memory_of_lucid_dreams.major))
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or (Player:PrevGCD(1, S.ColossusSmash) and not S.MemoryofLucidDreams:IsAvailable()))) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 381"; end
     end
     -- avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)
     if S.Avatar:IsCastableP() and HR.CDsON() and (S.ColossusSmash:CooldownRemainsP() < 8 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 8)) then
