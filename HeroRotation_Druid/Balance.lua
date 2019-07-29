@@ -260,6 +260,7 @@ local function APL()
     -- flask
     -- food
     -- augmentation
+    -- snapshot_stats
     -- variable,name=az_ss,value=azerite.streaking_stars.rank
     if (true) then
       VarAzSs = S.StreakingStars:AzeriteRank()
@@ -292,9 +293,7 @@ local function APL()
     if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) then
       if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
     end
-    -- snapshot_stats
     -- use_item,name=azsharas_font_of_power
-    -- Main icon instead of CastSuggested, as nothing would be in main icon otherwise
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
       if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
