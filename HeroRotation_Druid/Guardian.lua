@@ -129,6 +129,7 @@ local function APL()
     -- flask
     -- food
     -- augmentation
+    -- snapshot_stats
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastableP() then
       if HR.Cast(S.MemoryofLucidDreams, Settings.Guardian.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
@@ -137,7 +138,6 @@ local function APL()
     if S.BearForm:IsCastableP() and Player:BuffDownP(S.BearForm) then
       if HR.Cast(S.BearForm) then return "bear_form 3"; end
     end
-    -- snapshot_stats
     -- potion
     if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 8"; end
