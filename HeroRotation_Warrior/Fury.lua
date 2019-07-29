@@ -73,7 +73,8 @@ local S = Spell.Warrior.Fury;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311)
+  AshvanesRazorCoral               = Item(169311),
+  AzsharasFontofPower              = Item(169314)
 };
 local I = Item.Warrior.Fury;
 
@@ -131,9 +132,9 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
@@ -143,9 +144,13 @@ local function APL()
       if S.GuardianofAzeroth:IsCastableP() then
         if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth"; end
       end
-      -- recklessness,if=!talent.furious_slash.enabled
-      if S.Recklessness:IsCastableP() and (not S.FuriousSlash:IsAvailable()) then
+      -- recklessness
+      if S.Recklessness:IsCastableP() then
         if HR.Cast(S.Recklessness) then return "recklessness precombat"; end
+      end
+      -- potion
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
       end
     end
   end
@@ -167,6 +172,10 @@ local function APL()
     -- execute
     if S.Execute:IsCastableP("Melee") then
       if HR.Cast(S.Execute) then return "execute 34"; end
+    end
+    -- furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
+    if S.FuriousSlash:IsCastableP() and (not Player:HasHeroism() and Player:BuffRemainsP(S.FuriousSlashBuff) < 3) then
+      if HR.Cast(S.FuriousSlash) then return "furious_slash 36"; end
     end
     -- bladestorm,if=prev_gcd.1.rampage
     if S.Bladestorm:IsCastableP("Melee") and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
@@ -221,10 +230,6 @@ local function APL()
     -- potion
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
-    end
-    -- furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
-    if S.FuriousSlash:IsCastableP("Melee") and (S.FuriousSlash:IsAvailable() and (Player:BuffStackP(S.FuriousSlashBuff) < 3 or Player:BuffRemainsP(S.FuriousSlashBuff) < 3 or (S.Recklessness:CooldownRemainsP() < 3 and Player:BuffRemainsP(S.FuriousSlashBuff) < 9))) then
-      if HR.Cast(S.FuriousSlash) then return "furious_slash 86"; end
     end
     -- rampage,if=cooldown.recklessness.remains<3
     if S.Rampage:IsReadyP("Melee") and (S.Recklessness:CooldownRemainsP() < 3) then
