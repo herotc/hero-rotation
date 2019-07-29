@@ -53,6 +53,7 @@ Spell.DeathKnight.Unholy = {
   DeathStrike                           = Spell(49998),
   DeathStrikeBuff                       = Spell(101568),
   MindFreeze                            = Spell(47528),
+  RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -78,7 +79,9 @@ Item.DeathKnight.Unholy = {
   JesHowler                        = Item(159627),
   GalecallersBeak                  = Item(161379),
   GrongsPrimalRage                 = Item(165574),
-  VisionofDemise                   = Item(169307)
+  VisionofDemise                   = Item(169307),
+  AzsharasFontofPower              = Item(169314),
+  AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.DeathKnight.Unholy;
 
@@ -155,8 +158,12 @@ local function APL()
     if S.RaiseDead:IsCastableP() then
       if HR.CastSuggested(S.RaiseDead) then return "raise_dead 6"; end
     end
-    -- army_of_the_dead,delay=2
     if Everyone.TargetIsValid() then
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
+      end
+      -- army_of_the_dead,delay=2
       if S.ArmyoftheDead:IsCastableP() then
         if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 8"; end
       end
@@ -382,6 +389,14 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 256"; end
     end
     -- use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine|!equipped.vision_of_demise
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack<1
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 260"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&debuff.razor_coral_debuff.stack>=1)|buff.unholy_frenzy.up
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and ((S.Apocalypse:CooldownUpP() and Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and Target:DebuffStackP(S.RazorCoralDebuff) >= 1) or Player:BuffP(S.UnholyFrenzyBuff)) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 261"; end
+    end
     -- use_item,name=vision_of_demise,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&essence.vision_of_perfection.enabled)|buff.unholy_frenzy.up|pet.gargoyle.active
     if I.VisionofDemise:IsEquipped() and I.VisionofDemise:IsReady() and ((S.Apocalypse:CooldownUpP() and Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and S.VisionofPerfection:IsAvailable()) or Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
       if HR.CastSuggested(I.VisionofDemise) then return "vision_of_demise 262"; end
