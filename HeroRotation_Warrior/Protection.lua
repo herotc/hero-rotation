@@ -74,7 +74,8 @@ if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Protection = {
   SuperiorBattlePotionofStrength   = Item(168500),
   GrongsPrimalRage                 = Item(165574),
-  AshvanesRazorCoral               = Item(169311)
+  AshvanesRazorCoral               = Item(169311),
+  AzsharasFontofPower              = Item(169314)
 };
 local I = Item.Warrior.Protection;
 
@@ -166,17 +167,21 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- potion
-      if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams"; end
+        if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams precombat"; end
       end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth"; end
+        if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth precombat"; end
+      end
+      -- potion
+      if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength precombat"; end
       end
     end
   end
