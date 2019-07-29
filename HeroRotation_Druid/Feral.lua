@@ -66,6 +66,10 @@ Spell.Druid.Feral = {
   Shred                                 = Spell(5221),
   SkullBash                             = Spell(106839),
   ShadowmeldBuff                        = Spell(58984),
+  JungleFury                            = Spell(274424),
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565),
+  CyclotronicBlast                      = Spell(167672),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -87,7 +91,10 @@ local S = Spell.Druid.Feral;
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Feral = {
-  PotionofFocusedResolve                = Item(168506)
+  PotionofFocusedResolve                = Item(168506),
+  AzsharasFontofPower                   = Item(169314),
+  AshvanesRazorCoral                    = Item(169311),
+  PocketsizedComputationDevice          = Item(167555)
 };
 local I = Item.Druid.Feral;
 
@@ -185,11 +192,8 @@ local function APL()
     -- flask
     -- food
     -- augmentation
+    -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- regrowth,if=talent.bloodtalons.enabled
-      if S.Regrowth:IsCastableP() and (S.Bloodtalons:IsAvailable()) then
-        if HR.Cast(S.Regrowth) then return "regrowth 3"; end
-      end
       -- variable,name=use_thrash,value=0
       if (true) then
         VarUseThrash = 0
@@ -197,6 +201,14 @@ local function APL()
       -- variable,name=use_thrash,value=2,if=azerite.wild_fleshrending.enabled
       if (S.WildFleshrending:AzeriteEnabled()) then
         VarUseThrash = 2
+      end
+      -- regrowth,if=talent.bloodtalons.enabled
+      if S.Regrowth:IsCastableP() and (S.Bloodtalons:IsAvailable()) then
+        if HR.Cast(S.Regrowth) then return "regrowth 3"; end
+      end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 10"; end
       end
       -- cat_form
       if S.CatForm:IsCastableP() and Player:BuffDownP(S.CatFormBuff) then
@@ -206,7 +218,6 @@ local function APL()
       if S.Prowl:IsCastableP() and Player:BuffDownP(S.ProwlBuff) then
         if HR.Cast(S.Prowl, Settings.Feral.OffGCDasOffGCD.Prowl) then return "prowl 19"; end
       end
-      -- snapshot_stats
       -- potion,dynamic_prepot=1
       if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 24"; end
@@ -274,7 +285,23 @@ local function APL()
     if S.Shadowmeld:IsCastableP() and HR.CDsON() and (Player:ComboPoints() < 5 and Player:EnergyPredicted() >= S.Rake:Cost() and Target:PMultiplier(S.Rake) < 2.1 and Player:BuffP(S.TigersFuryBuff) and (Player:BuffP(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (not S.Incarnation:IsAvailable() or S.Incarnation:CooldownRemainsP() > 18) and not Player:BuffP(S.IncarnationBuff)) then
       if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld 58"; end
     end
-    -- use_items
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) < 1.5 or Target:DebuffDownP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemy)) or Target:TimeToDie() < 40) and Player:BuffRemainsP(S.TigersFuryBuff) > 10) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
+    if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 60"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
+    if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 61"; end
+    end
+    -- use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (Player:EnergyDeficitPredicted() >= 50) then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 62"; end
+    end
+    -- use_items,if=buff.tigers_fury.up|target.time_to_die<20
   end
   Finishers = function()
     -- pool_resource,for_next=1
@@ -360,7 +387,8 @@ local function APL()
       end
     end
     -- pool_resource,for_next=1
-    -- swipe_cat,if=buff.scent_of_blood.up
+    -- swipe_cat,if=buff.scent_of_blood.up|(action.swipe_cat.damage*spell_targets.swipe_cat>(action.rake.damage+(action.rake_bleed.tick_damage*5)))
+    -- TODO: Create RegisterDamage entries for this condition
     if S.SwipeCat:IsCastableP() and (Player:BuffP(S.ScentofBloodBuff)) then
       if S.SwipeCat:IsUsablePPool() then
         if HR.Cast(S.SwipeCat) then return "swipe_cat 217"; end
