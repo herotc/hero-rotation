@@ -477,28 +477,28 @@ local function CDs ()
     if Settings.Commons.UseTrinkets then
       -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
       if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and S.Vendetta:CooldownRemains() > 45 then
-        HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Galecallers Boon"; end
       end
       -- use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
       if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and Target:Debuff(S.Vendetta) then
-        HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Golden Plumage"; end
       end
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
-        HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Invocation of Yulon"; end
       end
       -- if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
       if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and MasterAssassinRemains() <= 0 and not Target:DebuffP(S.Vendetta)
         and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:EnergyPredicted() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
-        HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device"; end
       end
       -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20
       if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (not Target:DebuffP(S.RazorCoralDebuff)
         or Target:DebuffRemainsP(S.Vendetta) > 10 or Target:FilteredTimeToDie("<", 20)) then
-        HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Razor Coral"; end
       end
       -- V.I.G.O.R. trinket, emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-        HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Vigor Trinket"; end
       end
     end
 
@@ -779,7 +779,7 @@ local function APL ()
         end
         -- actions.precombat+=/use_item,name=azsharas_font_of_power
         if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
-          HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Use Font of Power (OOC)"; end
         end
       end
     end
@@ -808,7 +808,7 @@ local function APL ()
       -- use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10&!debuff.vendetta.up&!debuff.toxic_blade.up
       if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and MasterAssassinRemains() <= 0
         and S.Vendetta:CooldownRemains() < 10 and not Target:DebuffP(S.Vendetta) and not Target:DebuffP(S.ToxicBladeDebuff) then
-        HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Use Font of Power (OOC)"; end
       end
     end
 

@@ -534,22 +534,22 @@ local function CDs ()
       if Settings.Commons.UseTrinkets then
         local DefaultTrinketCondition = Player:BuffP(S.SymbolsofDeath) or Target:FilteredTimeToDie("<", 20);
         if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and DefaultTrinketCondition then
-          HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast GalecallersBoon"; end
         end
         if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and DefaultTrinketCondition then
-          HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast LustrousGoldenPlumage"; end
         end
         if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() and DefaultTrinketCondition then
-          HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast InvocationOfYulon"; end
         end
         -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
         if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and not Player:BuffP(S.SymbolsofDeath) and S.SymbolsofDeath:CooldownRemainsP() < 10 then
-          HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast FontOfPower"; end
         end
         -- if=!stealthed.all&dot.nightblade.ticking&!buff.symbols_of_death.up&energy.deficit>=30
         if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
           and Target:DebuffP(S.Nightblade) and not Player:BuffP(S.SymbolsofDeath) and Player:EnergyDeficitPredicted() >= 30 then
-          HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast ComputationDevice"; end
         end
         -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.symbols_of_death.remains>8
         if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
@@ -558,11 +558,11 @@ local function CDs ()
           or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or
             Target:FilteredTimeToDie("<", 40)) and Player:BuffRemainsP(S.SymbolsofDeath) > 8
         ) then
-          HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast RazorCoral"; end
         end
         -- Emulate SimC default behavior to use at max stacks
         if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-          HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket"; end
         end
       end
     end
@@ -712,7 +712,7 @@ local function APL ()
           end
           -- actions.precombat+=/use_item,name=azsharas_font_of_power
           if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
-            HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+            if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Font of Power"; end
           end
           if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
             if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades (OOC)"; end

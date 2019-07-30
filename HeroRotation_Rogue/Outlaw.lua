@@ -394,21 +394,21 @@ local function CDs ()
     -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
     if Settings.Commons.UseTrinkets then
       if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
-        HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast GalecallersBoon"; end
       end
       if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() then
-        HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast LustrousGoldenPlumage"; end
       end
       if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
-        HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast InvocationOfYulon"; end
       end
       if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
-        HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast FontOfPower"; end
       end
       -- if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
       if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:IsStealthedP(true, true)
         and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
-        HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast ComputationDevice"; end
       end
       -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
       if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
@@ -427,12 +427,12 @@ local function CDs ()
           end
         end
         if CastRazorCoral then
-          HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast RazorCoral"; end
         end
       end
       -- Emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-        HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle);
+        if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket"; end
       end
     end
 
@@ -546,12 +546,12 @@ local function APL ()
         -- actions.precombat+=/use_item,name=azsharas_font_of_power
         if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
           usingTrinket = true;
-          HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Font of Power"; end
         end
         -- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
         if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() then
           usingTrinket = true;
-          HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle);
+          if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device"; end
         end
         -- AR
         if Settings.Outlaw.PrecombatAR and not usingTrinket and S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) then
