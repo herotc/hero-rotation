@@ -208,6 +208,8 @@ local function APL ()
     if HR.CDsON() and S.InvokeXuentheWhiteTiger:IsReadyP() then
       if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger) then return "Cast Cooldown Invoke Xuen the White Tiger"; end
     end
+    -- use_item,slot=trinket1
+    -- use_item,slot=trinket2
     -- actions.cd+=/blood_fury
     if HR.CDsON() and S.BloodFury:IsReadyP() then
       if HR.CastSuggested(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Blood Fury"; end
