@@ -14,8 +14,6 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
--- LUA
-local mathmod    = math.mod
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
