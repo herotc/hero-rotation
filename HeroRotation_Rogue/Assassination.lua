@@ -491,9 +491,9 @@ local function CDs ()
         and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:EnergyPredicted() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
         if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device"; end
       end
-      -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20
+      -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20
       if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (not Target:DebuffP(S.RazorCoralDebuff)
-        or Target:DebuffRemainsP(S.Vendetta) > 10 or Target:FilteredTimeToDie("<", 20)) then
+        or Target:DebuffRemainsP(S.Vendetta) > 10 - 4 * num(I.FontOfPower:IsEquipped()) or Target:FilteredTimeToDie("<", 20)) then
         if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Razor Coral"; end
       end
       -- V.I.G.O.R. trinket, emulate SimC default behavior to use at max stacks
@@ -858,7 +858,7 @@ end
 
 HR.SetAPL(259, APL);
 
--- Last Update: 2019-07-22
+-- Last Update: 2019-07-30
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -945,7 +945,7 @@ HR.SetAPL(259, APL);
 -- actions.cds+=/ancestral_call,if=debuff.vendetta.up
 --
 -- actions.cds+=/use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
--- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20+cooldown.latent_arcana.remains
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20+cooldown.latent_arcana.remains
 -- actions.cds+=/use_item,name=lurkers_insidious_gift,if=debuff.vendetta.up
 -- actions.cds+=/use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
 -- actions.cds+=/use_item,effect_name=gladiators_medallion,if=debuff.vendetta.up
