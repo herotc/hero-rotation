@@ -170,7 +170,7 @@ local function APL()
       if HR.Cast(S.Rampage) then return "rampage 20"; end
     end
     -- execute
-    if S.Execute:IsCastableP("Melee") then
+    if S.Execute:IsReadyP("Melee") then
       if HR.Cast(S.Execute) then return "execute 34"; end
     end
     -- furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
