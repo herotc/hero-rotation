@@ -276,7 +276,7 @@ local function APL()
     end
     -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
     if S.EyeBeam:IsReadyP(20) then
-      if HR.Cast(S.EyeBeam) then return "eye_beam 79"; end
+      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 79"; end
     end
     -- fel_barrage,if=((!cooldown.eye_beam.up|buff.metamorphosis.up)&raid_event.adds.in>30)|active_enemies>desired_targets
     if S.FelBarrage:IsCastableP() and IsInMeleeRange() and ((not S.EyeBeam:CooldownUpP() or Player:BuffP(S.MetamorphosisBuff)) or Cache.EnemiesCount[8] > 1) then
@@ -350,7 +350,7 @@ local function APL()
     end
     -- eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
     if S.EyeBeam:IsReadyP(20) and (Cache.EnemiesCount[20] > 1 and not bool(VarWaitingForMomentum)) then
-      if HR.Cast(S.EyeBeam) then return "eye_beam 181"; end
+      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 181"; end
     end
     -- blade_dance,if=variable.blade_dance
     if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
@@ -362,7 +362,7 @@ local function APL()
     end
     -- eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_dark_slash&raid_event.adds.in>cooldown
     if S.EyeBeam:IsReadyP(20) and (not S.BlindFury:IsAvailable() and not bool(VarWaitingForDarkSlash)) then
-      if HR.Cast(S.EyeBeam) then return "eye_beam 201"; end
+      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 201"; end
     end
     -- annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
     if S.Annihilation:IsReadyP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
@@ -374,7 +374,7 @@ local function APL()
     end
     -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
     if S.EyeBeam:IsReadyP(20) and (S.BlindFury:IsAvailable()) then
-      if HR.Cast(S.EyeBeam) then return "eye_beam 235"; end
+      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 235"; end
     end
     -- demons_bite
     if S.DemonsBite:IsCastableP() and IsInMeleeRange() then

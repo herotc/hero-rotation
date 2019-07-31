@@ -53,6 +53,7 @@
       },
       GCDasOffGCD = {
         -- Abilities
+        EyeBeam = false,
         Nemesis = true,
         Essences = true,
       },
