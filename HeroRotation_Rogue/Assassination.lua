@@ -492,7 +492,7 @@ local function CDs ()
         if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device"; end
       end
       -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20
-      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (not Target:DebuffP(S.RazorCoralDebuff)
+      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (S.RazorCoralDebuff:ActiveCount() == 0
         or Target:DebuffRemainsP(S.Vendetta) > 10 - 4 * num(I.FontOfPower:IsEquipped()) or Target:FilteredTimeToDie("<", 20)) then
         if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Razor Coral"; end
       end
@@ -719,8 +719,17 @@ local function Direct ()
   end
   return false;
 end
+
+local Initialized = false;
+
 -- APL Main
 local function APL ()
+  -- Only run once once this spec is set active
+  if not Initialized then
+    Initialized = true;
+    S.RazorCoralDebuff:RegisterAuraTracking();
+  end
+
   -- Spell ID Changes check
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
 

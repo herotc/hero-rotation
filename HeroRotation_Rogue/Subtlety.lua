@@ -553,13 +553,24 @@ local function CDs ()
           if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast ComputationDevice"; end
         end
         -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.symbols_of_death.remains>8
-        if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (
-          not Target:DebuffP(S.RazorCoralDebuff)
-          or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 32 and Target:HealthPercentage() >= 30
-          or not Target:DebuffP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or
-            Target:FilteredTimeToDie("<", 40)) and Player:BuffRemainsP(S.SymbolsofDeath) > 8
-        ) then
-          if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast RazorCoral"; end
+        if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
+          local CastRazorCoral;
+          if S.RazorCoralDebuff:ActiveCount() == 0 then
+            CastRazorCoral = true;
+          else
+            local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
+            if ConductiveInkUnit then
+              -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
+              CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or Target:FilteredTimeToDie("<", 20) or
+                (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
+            else
+              CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 40))
+                and Player:BuffRemainsP(S.SymbolsofDeath) > 8;
+            end
+          end
+          if CastRazorCoral then
+            if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast RazorCoral"; end
+          end
         end
         -- Emulate SimC default behavior to use at max stacks
         if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
@@ -671,8 +682,17 @@ local Interrupts = {
   {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthedP(true, true); end}
 };
 
+local Initialized = false;
+
 -- APL Main
 local function APL ()
+  -- Only run once once this spec is set active
+  if not Initialized then
+    Initialized = true;
+    S.RazorCoralDebuff:RegisterAuraTracking();
+    S.ConductiveInkDebuff:RegisterAuraTracking();
+  end
+
   -- Spell ID Changes check
   if S.Subterfuge:IsAvailable() then
     Stealth = S.Stealth2;

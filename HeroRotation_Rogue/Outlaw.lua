@@ -115,9 +115,6 @@ Item.Rogue.Outlaw = {
 };
 local I = Item.Rogue.Outlaw;
 
-S.RazorCoralDebuff:RegisterAuraTracking();
-S.ConductiveInkDebuff:RegisterAuraTracking();
-
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local BladeFlurryRange = 6;
@@ -437,7 +434,7 @@ local function CDs ()
               (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
           else
             CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
-              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or Target:FilteredTimeToDie("<", 20);
+              and Player:BuffRemainsP(S.AdrenalineRush) > 18;
           end
         end
         if CastRazorCoral then
@@ -529,8 +526,17 @@ local Interrupts = {
   {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
 };
 
+local Initialized = false;
+
 -- APL Main
 local function APL ()
+  -- Only run once once this spec is set active
+  if not Initialized then
+    Initialized = true;
+    S.RazorCoralDebuff:RegisterAuraTracking();
+    S.ConductiveInkDebuff:RegisterAuraTracking();
+  end
+
   -- Unit Update
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6;
   HL.GetEnemies(BladeFlurryRange);
