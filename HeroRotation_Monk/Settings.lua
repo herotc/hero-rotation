@@ -43,6 +43,7 @@
       GCDasOffGCD = {
         -- Abilities
         InvokeNiuzaotheBlackOx = true,
+        Essences = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {

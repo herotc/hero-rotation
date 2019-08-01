@@ -52,6 +52,19 @@ Spell.Monk.Brewmaster = {
   HeavyStagger                          = Spell(124273),
   ModerateStagger                       = Spell(124274),
   LightStagger                          = Spell(124275),
+  ExpelHarm                             = Spell(115072),
+  -- Essences
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
   -- Misc
   PoolEnergy                            = Spell(9999000010)
 };
@@ -240,6 +253,10 @@ local function APL()
     if S.TigerPalm:IsCastableP("Melee") and (S.InvokeNiuzaotheBlackOx:IsAvailable() or S.SpecialDelivery:IsAvailable()) and Player:BuffP(S.BlackoutComboBuff) then
       if HR.Cast(S.TigerPalm) then return ""; end
     end
+    -- expel_harm,if=buff.gift_of_the_ox.stack>4
+    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() > 4) then
+      if HR.Cast(S.ExpelHarm) then return ""; end
+    end
     -- blackout_strike
     if S.BlackoutStrike:IsCastableP("Melee") then
       if HR.Cast(S.BlackoutStrike) then return ""; end
@@ -247,6 +264,14 @@ local function APL()
     -- keg_smash
     if S.KegSmash:IsCastableP(25) then
       if HR.Cast(S.KegSmash) then return ""; end
+    end
+    -- concentrated_flame
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, Settings.Brewmaster.GCDasOffGCD.Essences) then return ""; end
+    end
+    -- expel_harm,if=buff.gift_of_the_ox.stack>=3
+    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 3) then
+      if HR.Cast(S.ExpelHarm) then return ""; end
     end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down
     if S.RushingJadeWind:IsCastableP() and Player:BuffDownP(S.RushingJadeWind) then
@@ -263,6 +288,10 @@ local function APL()
     -- chi_wave
     if S.ChiWave:IsCastableP(25) then
       if HR.Cast(S.ChiWave) then return ""; end
+    end
+    -- expel_harm,if=buff.gift_of_the_ox.stack>=2
+    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 2) then
+      if HR.Cast(S.ExpelHarm) then return ""; end
     end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
     if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 65) then
