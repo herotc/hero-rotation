@@ -37,7 +37,22 @@ Spell.Paladin.Protection = {
   AvengersValorBuff                     = Spell(197561),
   BlessedHammer                         = Spell(204019),
   HammeroftheRighteous                  = Spell(53595),
-  Rebuke                                = Spell(96231)
+  Rebuke                                = Spell(96231),
+  RazorCoralDebuff                      = Spell(303568),
+  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
+  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
+  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
+  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  AnimaofDeath                          = MultiSpell(294926, 300002, 300003),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
+  HeartEssence                          = Spell(298554),
+  RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368)
 };
 local S = Spell.Paladin.Protection;
 
@@ -48,7 +63,9 @@ Item.Paladin.Protection = {
   AzsharasFontofPower              = Item(169314),
   GrongsPrimalRage                 = Item(165574),
   MerekthasFang                    = Item(158367),
-  RazdunksBigRedButton             = Item(159611)
+  RazdunksBigRedButton             = Item(159611),
+  AshvanesRazorCoral               = Item(169311),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Paladin.Protection;
 
@@ -117,6 +134,10 @@ local function APL()
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (S.Seraphim:CooldownRemainsP() <= 10 or not S.Seraphim:IsAvailable()) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 16"; end
     end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>7&buff.avenging_wrath.up
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffStackP(S.RazorCoralDebuff) > 7 and Player:BuffP(S.AvengingWrathBuff)) then
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 18"; end
+    end
     -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
     if S.Seraphim:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() >= 2) then
       if HR.Cast(S.Seraphim) then return "seraphim 22"; end
@@ -124,6 +145,10 @@ local function APL()
     -- avenging_wrath,if=buff.seraphim.up|cooldown.seraphim.remains<2|!talent.seraphim.enabled
     if S.AvengingWrath:IsCastableP() and HR.CDsON() and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() < 2 or not S.Seraphim:IsAvailable()) then
       if HR.Cast(S.AvengingWrath, Settings.Protection.GCDasOffGCD.AvengingWrath) then return "avenging_wrath 26"; end
+    end
+    -- memory_of_lucid_dreams,if=!talent.seraphim.enabled|cooldown.seraphim.remains<=gcd|buff.seraphim.up
+    if S.MemoryofLucidDreams:IsCastableP() and (not S.Seraphim:IsAvailable() or S.Seraphim:CooldownRemainsP() <= Player:GCD() or Player:BuffP(S.SeraphimBuff)) then
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Protection.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 28"; end
     end
     -- bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
     if S.BastionofLight:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() <= 0.5) then
@@ -134,9 +159,13 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 38"; end
     end
     -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
-    -- use_item,name=grongs_primal_rage,if=((cooldown.judgment.full_recharge_time>4|(!talent.crusaders_judgment.enabled&prev_gcd.1.judgment))&cooldown.avengers_shield.remains>4&buff.seraphim.remains>4)|(buff.seraphim.remains<4)
-    if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and (((S.Judgment:FullRechargeTimeP() > 4 or (not S.CrusadersJudgment:IsAvailable() and Player:PrevGCDP(1, S.Judgment))) and S.AvengersShield:CooldownRemainsP() > 4 and Player:BuffRemainsP(S.SeraphimBuff) > 4) or (Player:BuffRemainsP(S.SeraphimBuff) < 4)) then
+    -- use_item,name=grongs_primal_rage,if=cooldown.judgment.full_recharge_time>4&cooldown.avengers_shield.remains>4&(buff.seraphim.up|cooldown.seraphim.remains+4+gcd>expected_combat_length-time)&consecration.up
+    if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and (S.Judgment:FullRechargeTimeP() > 4 and S.AvengersShield:CooldownRemainsP() > 4 and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() + 4 + Player:GCD() > Target:TimeToDie()) and Player:BuffP(S.ConsecrationBuff)) then
       if HR.CastSuggested(I.GrongsPrimalRage) then return "grongs_primal_rage 43"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=cooldown.judgment.full_recharge_time>4*spell_haste&cooldown.avengers_shield.remains>4*spell_haste&(!equipped.grongs_primal_rage|!trinket.grongs_primal_rage.cooldown.up)&consecration.up
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and (S.Judgment:FullRechargeTimeP() > 4 * Player:SpellHaste() and S.AvengersShield:CooldownRemainsP() > 4 * Player:SpellHaste() and (not I.GrongsPrimalRage:IsEquipped() or not I.GrongsPrimalRage:IsReady()) and Player:BuffP(S.ConsecrationBuff)) then
+      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
     end
     -- use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
     if I.MerekthasFang:IsEquipped() and I.MerekthasFang:IsReady() and (not Player:BuffP(S.AvengingWrathBuff) and (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable())) then
@@ -158,6 +187,10 @@ local function APL()
     -- call_action_list,name=cooldowns
     if (true) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- worldvein_resonance,if=buff.lifeblood.stack<3
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
+      if HR.Cast(S.WorldveinResonance, Settings.Protection.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
     end
     -- shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
     if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengersValorBuff) and S.ShieldoftheRighteous:ChargesFractionalP() >= 2.5) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
@@ -191,9 +224,17 @@ local function APL()
     if S.Judgment:IsCastableP() and (S.Judgment:CooldownUpP() or not S.CrusadersJudgment:IsAvailable()) then
       if HR.Cast(S.Judgment) then return "judgment 129"; end
     end
+    -- concentrated_flame,if=buff.seraphim.up&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffP(S.SeraphimBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or (S.ConcentratedFlame:ID() == 295373 or S.ConcentratedFlame:ID() == 299349)) then
+      if HR.Cast(S.ConcentratedFlame, Settings.Protection.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+    end
     -- lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 137"; end
+    end
+    -- anima_of_death
+    if S.AnimaofDeath:IsCastableP() then
+      if HR.Cast(S.AnimaofDeath, Settings.Protection.GCDasOffGCD.Essences) then return "anima_of_death"; end
     end
     -- blessed_hammer,strikes=3
     if S.BlessedHammer:IsCastableP() then
@@ -206,6 +247,10 @@ local function APL()
     -- consecration
     if S.Consecration:IsCastableP() then
       if HR.Cast(S.Consecration) then return "consecration 147"; end
+    end
+    -- heart_essence,if=!essence.the_crucible_of_flame.major|!essence.worldvein_resonance.major|!essence.anima_of_life_and_death.major|!essence.memory_of_lucid_dreams.major
+    if S.HeartEssence:IsCastableP() and (not S.ConcentratedFlame:IsAvailable() or not S.WorldveinResonance:IsAvailable() or not S.AnimaofDeath:IsAvailable() or not S.MemoryofLucidDreams:IsAvailable()) then
+      if HR.Cast(S.HeartEssence, Settings.Protection.GCDasOffGCD.Essences) then return "heart_essence"; end
     end
   end
 end
