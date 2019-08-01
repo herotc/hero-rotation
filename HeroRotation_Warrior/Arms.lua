@@ -198,7 +198,7 @@ local function APL()
       if HR.Cast(S.MortalStrike) then return "mortal_strike 42"; end
     end
     -- execute,if=buff.memory_of_lucid_dreams.up|buff.deadly_calm.up
-    if S.Execute:IsReadyP("Melee") and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DeadlyCalmBuff)) then
+    if S.Execute:IsReady("Melee") and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.DeadlyCalmBuff)) then
       if HR.Cast(S.Execute) then return "execute 50"; end
     end
     -- overpower
@@ -206,7 +206,7 @@ local function APL()
       if HR.Cast(S.Overpower) then return "overpower 54"; end
     end
     -- execute
-    if S.Execute:IsReadyP("Melee") then
+    if S.Execute:IsReady("Melee") then
       if HR.Cast(S.Execute) then return "execute 56"; end
     end
   end
@@ -240,7 +240,7 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 94"; end
     end
     -- execute,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|(buff.sudden_death.react|buff.stone_heart.react)&(buff.sweeping_strikes.up|cooldown.sweeping_strikes.remains>8)
-    if S.Execute:IsReadyP("Melee") and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or (Player:BuffP(S.SuddenDeathBuff) or Player:BuffP(S.StoneHeartBuff)) and (Player:BuffP(S.SweepingStrikesBuff) or S.SweepingStrikes:CooldownRemainsP() > 8)) then
+    if S.Execute:IsReady("Melee") and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or (Player:BuffP(S.SuddenDeathBuff) or Player:BuffP(S.StoneHeartBuff)) and (Player:BuffP(S.SweepingStrikesBuff) or S.SweepingStrikes:CooldownRemainsP() > 8)) then
       if HR.Cast(S.Execute) then return "execute 96"; end
     end
     -- mortal_strike,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sweeping_strikes.up&buff.overpower.stack=2&(talent.dreadnaught.enabled|buff.executioners_precision.stack=2)
@@ -302,7 +302,7 @@ local function APL()
       if HR.Cast(S.Cleave) then return "cleave 220"; end
     end
     -- execute,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sudden_death.react
-    if S.Execute:IsReadyP("Melee") and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or Player:BuffStackP(S.SuddenDeathBuff)) then
+    if S.Execute:IsReady("Melee") and ((not S.Cleave:IsAvailable() and Target:DebuffRemainsP(S.DeepWoundsDebuff) < 2) or Player:BuffStackP(S.SuddenDeathBuff)) then
       if HR.Cast(S.Execute) then return "execute 222"; end
     end
     -- mortal_strike,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)
@@ -352,7 +352,7 @@ local function APL()
       if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm 296"; end
     end
     -- execute,if=buff.sudden_death.react
-    if S.Execute:IsReadyP("Melee") and (Player:BuffP(S.SuddenDeathBuff)) then
+    if S.Execute:IsReady("Melee") and (Player:BuffP(S.SuddenDeathBuff)) then
       if HR.Cast(S.Execute) then return "execute 298"; end
     end
     -- bladestorm,if=cooldown.mortal_strike.remains&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down
