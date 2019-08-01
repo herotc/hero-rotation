@@ -255,10 +255,6 @@ local function APL()
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 234"; end
     end
-    -- living_bomb,if=buff.combustion.down&active_enemies>1
-    if S.LivingBomb:IsReadyP() and (Player:BuffDownP(S.CombustionBuff) and EnemiesCount > 1) then
-      if HR.Cast (S.LivingBomb) then return "living_bomb 235"; end
-    end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
@@ -271,7 +267,7 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() then
       if HR.Cast(S.MemoryofLucidDreams, Settings.Fire.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 246"; end
     end
-    -- fire_blast,use_while_casting=1,use_off_gcd=1,if=charges>=1&((action.fire_blast.charges_fractional+(buff.combustion.remains-buff.blaster_master.duration)%cooldown.fire_blast.duration-(buff.combustion.remains)%(buff.blaster_master.duration-0.5))>=0|!azerite.blaster_master.enabled|!talent.flame_on.enabled|buff.combustion.remains<=buff.blaster_master.duration|buff.blaster_master.remains<0.5|equipped.hyperthread_wristwraps&cooldown.hyperthread_wristwraps.remains<5)&buff.combustion.up&(!action.scorch.executing&!action.pyroblast.in_flight&buff.heating_up.up|action.scorch.executing&buff.hot_streak.down&(buff.heating_up.down|azerite.blaster_master.enabled)|azerite.blaster_master.enabled&talent.flame_on.enabled&action.pyroblast.in_flight&buff.heating_up.down&buff.hot_streak.down)
+    -- fire_blast,use_while_casting=1,use_off_gcd=1,if=charges>=1&((action.fire_blast.charges_fractional+(buff.combustion.remains-buff.blaster_master.duration)%cooldown.fire_blast.duration-(buff.combustion.remains)%(buff.blaster_master.duration-0.5))>=0|!azerite.blaster_master.enabled|!talent.flame_on.enabled|buff.combustion.remains<=buff.blaster_master.duration|buff.blaster_master.remains<0.5|equipped.hyperthread_wristwraps&cooldown.hyperthread_wristwraps_300142.remains<5)&buff.combustion.up&(!action.scorch.executing&!action.pyroblast.in_flight&buff.heating_up.up|action.scorch.executing&buff.hot_streak.down&(buff.heating_up.down|azerite.blaster_master.enabled)|azerite.blaster_master.enabled&talent.flame_on.enabled&action.pyroblast.in_flight&buff.heating_up.down&buff.hot_streak.down)
     if S.FireBlast:IsReady() and (S.FireBlast:ChargesP() >= 1 and ((S.FireBlast:ChargesFractional() + (Player:BuffRemainsP(S.CombustionBuff) - S.BlasterMasterBuff:BaseDuration()) % S.FireBlast:Cooldown() - (Player:BuffRemainsP(S.CombustionBuff)) % (S.BlasterMasterBuff:BaseDuration() - 0.5)) >= 0 or not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable() or Player:BuffRemainsP(S.CombustionBuff) <= S.BlasterMasterBuff:BaseDuration() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5 or I.HyperthreadWristwraps:IsEquipped() and I.HyperthreadWristwraps:CooldownRemains() < 5) and Player:BuffP(S.Combustion) and (not Player:IsCasting(S.Scorch) and not S.Pyroblast:InFlight() and Player:BuffP(S.HeatingUpBuff) or Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HotStreakBuff) and (Player:BuffDownP(S.HeatingUpBuff) or S.BlasterMaster:AzeriteEnabled()) or S.BlasterMaster:AzeriteEnabled() and S.FlameOn:IsAvailable() and S.Pyroblast:InFlight() and Player:BuffP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
       if HR.Cast(S.Scorch) then return "scorch 247"; end
     end
@@ -283,12 +279,12 @@ local function APL()
     if S.FireBlast:IsReady() and (S.BlasterMaster:AzeriteEnabled() and S.FlameOn:IsAvailable() and Player:BuffDownP(S.BlasterMasterBuff) and (S.RuneofPower:IsAvailable() and Player:IsCasting(S.RuneofPower) and Player:CastRemains() < 0.6 or (S.Combustion:IsReady() or Player:BuffP(S.CombustionBuff)) and not S.RuneofPower:IsAvailable() and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())) then
       if HR.Cast(S.FireBlast) then return "fire_blast 255"; end
     end
-    -- call_action_list,name=active_talents,if=azerite.blaster_master.enabled&talent.flame_on.enabled&(essence.memory_of_lucid_dreams.major&buff.blaster_master.stack>=3|!essence.memory_of_lucid_dreams.major|equipped.hyperthread_wristwraps)|!azerite.blaster_master.enabled|!talent.flame_on.enabled
-    if (S.BlasterMaster:AzeriteEnabled() and S.FlameOn:IsAvailable() and (S.MemoryofLucidDreams:IsAvailable() and Player:BuffStackP(S.BlasterMasterBuff) >= 3 or not S.MemoryofLucidDreams:IsAvailable() or I.HyperthreadWristwraps:IsEquipped()) or not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable()) then
+    -- call_action_list,name=active_talents
+    if (true) then
       local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
     end
-    -- combustion,use_off_gcd=1,use_while_casting=1,if=(buff.rune_of_power.up|!talent.rune_of_power.enabled)&(action.meteor.in_flight&action.meteor.in_flight_remains<=0.5|(talent.rune_of_power.enabled|!talent.rune_of_power.enabled&action.scorch.executing)&(azerite.blaster_master.enabled&essence.memory_of_lucid_dreams.major&!equipped.hyperthread_wristwraps|!talent.meteor.enabled))
-    if S.Combustion:IsCastableP() and ((Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable()) and (S.Meteor:InFlight() and S.Meteor:TimeSinceLastCast() > 2.5 or (S.RuneofPower:IsAvailable() or not S.RuneofPower:IsAvailable() and Player:IsCasting(S.Scorch)) and (S.BlasterMaster:AzeriteEnabled() and S.MemoryofLucidDreams:IsAvailable() and not I.HyperthreadWristwraps:IsEquipped() or not S.Meteor:IsAvailable()))) then
+    -- combustion,use_off_gcd=1,use_while_casting=1,if=((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
+    if S.Combustion:IsCastableP() and (((S.Meteor:InFlight() and S.Meteor:TimeSinceLastCast() >= 2.5) or not S.Meteor:IsAvailable()) and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
       if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 265"; end
     end
     -- potion
