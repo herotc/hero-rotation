@@ -418,7 +418,7 @@ local function CDs ()
       if S.Vendetta:IsCastable() and not Player:IsStealthedP(true, false) and Target:DebuffP(S.Rupture) and not Target:DebuffP(S.Vendetta)
         and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) > 1 and (Cache.EnemiesCount[10] < 6 or not S.Vanish:CooldownUpP()))
         and (not S.Nightstalker:IsAvailable() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() < 5 - 2 * num(S.DeeperStratagem:IsAvailable()))
-        and (not I.FontOfPower:IsEquipped() or S.ShroudedSuffocation:AzeriteEnabled() or S.RazorCoralDebuff:ActiveCount() == 0 or I.RazorCoral:CooldownRemainsP() < 10 and S.ToxicBlade:CooldownRemainsP() <= 1) then
+        and (not I.FontOfPower:IsEquipped() or S.ShroudedSuffocation:AzeriteEnabled() or S.RazorCoralDebuff:ActiveCount() == 0 or I.RazorCoral:CooldownRemains() < 10 and S.ToxicBlade:CooldownRemainsP() <= 1) then
         if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
       end
       if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
