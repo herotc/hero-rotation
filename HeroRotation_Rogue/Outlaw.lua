@@ -430,11 +430,11 @@ local function CDs ()
           local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
           if ConductiveInkUnit then
             -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
-            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or Target:FilteredTimeToDie("<", 20) or
+            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20)) or
               (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
           else
             CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
-              and Player:BuffRemainsP(S.AdrenalineRush) > 18;
+              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20));
           end
         end
         if CastRazorCoral then
@@ -465,8 +465,8 @@ local function CDs ()
       if S.AncestralCall:IsCastable() then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
       end
+      end
     end
-  end
 end
 
 local function Stealth ()
