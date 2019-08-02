@@ -3,16 +3,17 @@
 -- Addon
 local addonName, addonTable = ...
 -- HeroLib
-local HL     = HeroLib
-local Cache  = HeroCache
-local Unit   = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet    = Unit.Pet
-local Spell  = HL.Spell
-local Item   = HL.Item
+local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
+local Spell      = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item       = HL.Item
 -- HeroRotation
-local HR     = HeroRotation
+local HR         = HeroRotation
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
