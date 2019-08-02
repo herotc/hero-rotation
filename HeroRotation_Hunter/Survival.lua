@@ -171,11 +171,6 @@ local function EvaluateTargetIfFilterRaptorStrike537(TargetUnit)
   return TargetUnit:DebuffStackP(S.LatentPoisonDebuff)
 end
 
-HL.RegisterNucleusAbility(187708, 8, 6)                           -- Carve
-HL.RegisterNucleusAbility(212436, 8, 6)                           -- Butchery
-HL.RegisterNucleusAbility({259495, 270335, 270323, 271045}, 8, 6) -- Bombs
-HL.RegisterNucleusAbility(259391, 40, 6)                          -- Chakrams
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Apst, Apwfi, Cds, Cleave, St, Wfi
@@ -688,4 +683,11 @@ local function APL()
   end
 end
 
-HR.SetAPL(255, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(187708, 8, 6)                           -- Carve
+  HL.RegisterNucleusAbility(212436, 8, 6)                           -- Butchery
+  HL.RegisterNucleusAbility({259495, 270335, 270323, 271045}, 8, 6) -- Bombs
+  HL.RegisterNucleusAbility(259391, 40, 6)                          -- Chakrams
+end
+
+HR.SetAPL(255, APL, Init)

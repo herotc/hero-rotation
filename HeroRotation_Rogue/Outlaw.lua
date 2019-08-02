@@ -526,17 +526,8 @@ local Interrupts = {
   {S.Blind, "Cast Blind (Interrupt)", function () return true; end},
 };
 
-local Initialized = false;
-
 -- APL Main
 local function APL ()
-  -- Only run once once this spec is set active
-  if not Initialized then
-    Initialized = true;
-    S.RazorCoralDebuff:RegisterAuraTracking();
-    S.ConductiveInkDebuff:RegisterAuraTracking();
-  end
-
   -- Unit Update
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6;
   HL.GetEnemies(BladeFlurryRange);
@@ -651,7 +642,12 @@ local function APL ()
   end
 end
 
-HR.SetAPL(260, APL);
+local function Init ()
+  S.RazorCoralDebuff:RegisterAuraTracking();
+  S.ConductiveInkDebuff:RegisterAuraTracking();
+end
+
+HR.SetAPL(260, APL, Init);
 
 -- Last Update: 2019-08-01
 

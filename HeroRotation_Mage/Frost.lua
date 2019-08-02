@@ -130,11 +130,6 @@ end
 S.FrozenOrb.EffectID = 84721
 S.Frostbolt:RegisterInFlight()
 
-HL.RegisterNucleusAbility(84714, 8, 6)               -- Frost Orb
-HL.RegisterNucleusAbility(190356, 8, 6)              -- Blizzard
-HL.RegisterNucleusAbility(153595, 8, 6)              -- Comet Storm
-HL.RegisterNucleusAbility(120, 12, 6)                -- Cone of Cold
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop, Essences
@@ -420,4 +415,11 @@ local function APL()
   end
 end
 
-HR.SetAPL(64, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(84714, 8, 6)               -- Frost Orb
+  HL.RegisterNucleusAbility(190356, 8, 6)              -- Blizzard
+  HL.RegisterNucleusAbility(153595, 8, 6)              -- Comet Storm
+  HL.RegisterNucleusAbility(120, 12, 6)                -- Cone of Cold
+end
+
+HR.SetAPL(64, APL, Init)

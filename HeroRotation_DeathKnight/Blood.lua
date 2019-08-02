@@ -88,10 +88,6 @@ local function UpdateRanges()
   end
 end
 
-HL.RegisterNucleusAbility(50842, 10, 6)               -- Blood Boil
-HL.RegisterNucleusAbility(194844, 8, 6)               -- Bonestorm
-HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
-
 --- ======= MAIN =======
 local function APL ()
   -- Unit Update
@@ -232,4 +228,10 @@ local function APL ()
   end
 end
 
-HR.SetAPL(250,APL);
+local function Init ()
+  HL.RegisterNucleusAbility(50842, 10, 6)               -- Blood Boil
+  HL.RegisterNucleusAbility(194844, 8, 6)               -- Bonestorm
+  HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
+end
+
+HR.SetAPL(250, APL, Init);

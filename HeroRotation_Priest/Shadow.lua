@@ -177,10 +177,6 @@ local function InsanityDrain()
   return (Player:BuffP(S.VoidformBuff)) and (math.ceil(5 + Player:BuffStackP(S.VoidformBuff) * 0.68)) or 0
 end
 
-HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption
-HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
-HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cds, Cleave, CritCds, Single
@@ -468,4 +464,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(258, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption
+  HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
+  HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
+end
+
+HR.SetAPL(258, APL, Init)

@@ -154,14 +154,6 @@ local function EvaluateTargetIfBarbedShot123(TargetUnit)
   return (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - Player:GCD() + 0.150 and S.PrimalInstincts:AzeriteEnabled() or S.BarbedShot:ChargesFractionalP() > 1.4 or Target:TimeToDie() < 9)
 end
 
--- Register Splash Data Nucleus Abilities
-HL.RegisterNucleusAbility(2643, 8, 6)               -- Multi-Shot
-HL.RegisterNucleusAbility(194392, 8, 6)             -- Volley
-HL.RegisterNucleusAbility({171454, 171457}, 8, 6)   -- Chimaera Shot
-HL.RegisterNucleusAbility(118459, 10, 6)            -- Beast Cleave
-HL.RegisterNucleusAbility(201754, 10, 6)            -- Stomp
-HL.RegisterNucleusAbility(271686, 3, 6)             -- Head My Call
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cds, Cleave, St
@@ -462,4 +454,14 @@ local function APL()
   end
 end
 
-HR.SetAPL(253, APL)
+local function Init ()
+  -- Register Splash Data Nucleus Abilities
+  HL.RegisterNucleusAbility(2643, 8, 6)               -- Multi-Shot
+  HL.RegisterNucleusAbility(194392, 8, 6)             -- Volley
+  HL.RegisterNucleusAbility({171454, 171457}, 8, 6)   -- Chimaera Shot
+  HL.RegisterNucleusAbility(118459, 10, 6)            -- Beast Cleave
+  HL.RegisterNucleusAbility(201754, 10, 6)            -- Stomp
+  HL.RegisterNucleusAbility(271686, 3, 6)             -- Head My Call
+end
+
+HR.SetAPL(253, APL, Init)

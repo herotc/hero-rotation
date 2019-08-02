@@ -120,11 +120,6 @@ local function bool(val)
   return val ~= 0
 end
 
-HL.RegisterNucleusAbility(152277, 8, 6)               -- Ravager
-HL.RegisterNucleusAbility(227847, 8, 6)               -- Bladestorm
-HL.RegisterNucleusAbility(845, 8, 6)                  -- Cleave
-HL.RegisterNucleusAbility(1680, 8, 6)                 -- Whirlwind
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Movement, Execute, FiveTarget, Hac, SingleTarget
@@ -498,4 +493,11 @@ local function APL()
   end
 end
 
-HR.SetAPL(71, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(152277, 8, 6)               -- Ravager
+  HL.RegisterNucleusAbility(227847, 8, 6)               -- Bladestorm
+  HL.RegisterNucleusAbility(845, 8, 6)                  -- Cleave
+  HL.RegisterNucleusAbility(1680, 8, 6)                 -- Whirlwind
+end
+
+HR.SetAPL(71, APL, Init)

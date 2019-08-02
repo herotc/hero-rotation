@@ -109,9 +109,6 @@ local function EvaluateCycleMoonfire139(TargetUnit)
   return Player:BuffP(S.GalacticGuardianBuff) and EnemiesCount < 2
 end
 
-HL.RegisterNucleusAbility(77758, 8, 6)               -- Thrash (Bear)
-HL.RegisterNucleusAbility(213771, 8, 6)              -- Swipe (Bear)
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldowns
@@ -279,4 +276,9 @@ local function APL()
   end
 end
 
-HR.SetAPL(104, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(77758, 8, 6)               -- Thrash (Bear)
+  HL.RegisterNucleusAbility(213771, 8, 6)              -- Swipe (Bear)
+end
+
+HR.SetAPL(104, APL, Init)

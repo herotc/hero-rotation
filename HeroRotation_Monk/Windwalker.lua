@@ -132,11 +132,6 @@ local function UpdateRanges()
   end
 end
 
-HL.RegisterNucleusAbility(113656, 8, 6)               -- Fists of Fury
-HL.RegisterNucleusAbility(101546, 8, 6)               -- Spinning Crane Kick
-HL.RegisterNucleusAbility(261715, 8, 6)               -- Rushing Jade Wind
-HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
-
 -- Action Lists --
 --- ======= MAIN =======
 -- APL Main
@@ -425,4 +420,12 @@ local function APL ()
     if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
-HR.SetAPL(269, APL);
+
+local function Init ()
+  HL.RegisterNucleusAbility(113656, 8, 6)               -- Fists of Fury
+  HL.RegisterNucleusAbility(101546, 8, 6)               -- Spinning Crane Kick
+  HL.RegisterNucleusAbility(261715, 8, 6)               -- Rushing Jade Wind
+  HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
+end
+
+HR.SetAPL(269, APL, Init);

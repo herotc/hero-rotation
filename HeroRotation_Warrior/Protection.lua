@@ -150,11 +150,6 @@ local function offensiveRage()
   end
 end
 
-HL.RegisterNucleusAbility(6343, 8, 6)               -- Thunder Clap
-HL.RegisterNucleusAbility(118000, 12, 6)            -- Dragon Roar
-HL.RegisterNucleusAbility(6572, 8, 6)               -- Revenge
-HL.RegisterNucleusAbility(228920, 8, 6)             -- Ravager
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, St, Defensive
@@ -389,4 +384,11 @@ local function APL()
   end
 end
 
-HR.SetAPL(73, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(6343, 8, 6)               -- Thunder Clap
+  HL.RegisterNucleusAbility(118000, 12, 6)            -- Dragon Roar
+  HL.RegisterNucleusAbility(6572, 8, 6)               -- Revenge
+  HL.RegisterNucleusAbility(228920, 8, 6)             -- Ravager
+end
+
+HR.SetAPL(73, APL, Init)

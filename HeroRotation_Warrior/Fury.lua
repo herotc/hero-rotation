@@ -116,10 +116,6 @@ end
   --S.Execute = S.Massacre:IsAvailable() and S.ExecuteMassacre or S.ExecuteDefault
 --end
 
-HL.RegisterNucleusAbility(46924, 8, 6)               -- Bladestorm
-HL.RegisterNucleusAbility(118000, 12, 6)             -- Dragon Roar
-HL.RegisterNucleusAbility(190411, 8, 6)              -- Whirlwind
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Movement, SingleTarget
@@ -310,4 +306,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(72, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(46924, 8, 6)               -- Bladestorm
+  HL.RegisterNucleusAbility(118000, 12, 6)             -- Dragon Roar
+  HL.RegisterNucleusAbility(190411, 8, 6)              -- Whirlwind
+end
+
+HR.SetAPL(72, APL, Init)

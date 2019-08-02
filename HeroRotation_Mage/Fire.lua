@@ -184,13 +184,6 @@ function S.Firestarter:ActiveRemains()
     return S.Firestarter:IsAvailable() and ((Target:HealthPercentage() > 90) and Target:TimeToX(90, 3) or 0) or 0
 end
 
-HL.RegisterNucleusAbility(157981, 8, 6)               -- Blast Wave
-HL.RegisterNucleusAbility(153561, 8, 6)               -- Meteor
-HL.RegisterNucleusAbility(31661, 8, 6)                -- Dragon's Breath
-HL.RegisterNucleusAbility(44457, 10, 6)               -- Living Bomb
-HL.RegisterNucleusAbility(2120, 8, 6)                 -- Flamestrike
-HL.RegisterNucleusAbility(257541, 8, 6)               -- Phoenix Flames
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, ActiveTalents, CombustionPhase, ItemsCombustion, ItemsHighPriority, ItemsLowPriority, RopPhase, StandardRotation
@@ -676,4 +669,13 @@ local function APL()
   end
 end
 
-HR.SetAPL(63, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(157981, 8, 6)               -- Blast Wave
+  HL.RegisterNucleusAbility(153561, 8, 6)               -- Meteor
+  HL.RegisterNucleusAbility(31661, 8, 6)                -- Dragon's Breath
+  HL.RegisterNucleusAbility(44457, 10, 6)               -- Living Bomb
+  HL.RegisterNucleusAbility(2120, 8, 6)                 -- Flamestrike
+  HL.RegisterNucleusAbility(257541, 8, 6)               -- Phoenix Flames
+end
+
+HR.SetAPL(63, APL, Init)

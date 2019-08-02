@@ -179,9 +179,6 @@ local function GetEnemiesCount(range)
   end
 end
 
-HL.RegisterNucleusAbility(105174, 8, 6)               -- Hand of Gul'dan
-HL.RegisterNucleusAbility(196277, 8, 6)               -- Implosion
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, BuildAShard, Opener, Implosion, NetherPortal, NetherPortalActive, NetherPortalBuilding
@@ -622,4 +619,9 @@ local function APL()
   end
 end
 
-HR.SetAPL(266, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(105174, 8, 6)               -- Hand of Gul'dan
+  HL.RegisterNucleusAbility(196277, 8, 6)               -- Implosion
+end
+
+HR.SetAPL(266, APL, Init)

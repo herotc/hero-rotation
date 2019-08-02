@@ -134,10 +134,6 @@ local function EvaluateCycleOutbreak303(TargetUnit)
   return TargetUnit:DebuffRemainsP(S.VirulentPlagueDebuff) <= Player:GCD()
 end
 
-HL.RegisterNucleusAbility(152280, 8, 6)               -- Defile
-HL.RegisterNucleusAbility(115989, 8, 6)               -- Unholy Blight
-HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cooldowns, Essences, Generic
@@ -448,4 +444,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(252, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(152280, 8, 6)               -- Defile
+  HL.RegisterNucleusAbility(115989, 8, 6)               -- Unholy Blight
+  HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
+end
+
+HR.SetAPL(252, APL, Init)

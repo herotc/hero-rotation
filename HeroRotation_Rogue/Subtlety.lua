@@ -682,17 +682,8 @@ local Interrupts = {
   {S.CheapShot, "Cast Cheap Shot (Interrupt)", function () return Player:IsStealthedP(true, true); end}
 };
 
-local Initialized = false;
-
 -- APL Main
 local function APL ()
-  -- Only run once once this spec is set active
-  if not Initialized then
-    Initialized = true;
-    S.RazorCoralDebuff:RegisterAuraTracking();
-    S.ConductiveInkDebuff:RegisterAuraTracking();
-  end
-
   -- Spell ID Changes check
   if S.Subterfuge:IsAvailable() then
     Stealth = S.Stealth2;
@@ -873,7 +864,12 @@ local function APL ()
     end
 end
 
-HR.SetAPL(261, APL);
+local function Init ()
+  S.RazorCoralDebuff:RegisterAuraTracking();
+  S.ConductiveInkDebuff:RegisterAuraTracking();
+end
+
+HR.SetAPL(261, APL, Init);
 
 -- Last Update: 2019-08-01
 

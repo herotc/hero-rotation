@@ -311,8 +311,6 @@ local function EvaluateTargetIfUnstableAffliction870(TargetUnit)
   return not bool(VarUseSeed) and Player:SoulShardsP() == 5
 end
 
-HL.RegisterNucleusAbility(27285, 10, 6)               -- Seed Explosion
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldowns, DbRefresh, Dots, Fillers, Spenders
@@ -709,4 +707,8 @@ local function APL()
   end
 end
 
-HR.SetAPL(265, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(27285, 10, 6)               -- Seed Explosion
+end
+
+HR.SetAPL(265, APL, Init)

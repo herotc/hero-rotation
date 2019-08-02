@@ -154,10 +154,6 @@ local function EvaluateCycleFlameShock562(TargetUnit)
   return TargetUnit:DebuffRefreshableCP(S.FlameShockDebuff)
 end
 
-HL.RegisterNucleusAbility(188443, 10, 6)               -- Chain Lightning
-HL.RegisterNucleusAbility(61882, 8, 6)                 -- Earthquake
-HL.RegisterNucleusAbility(192222, 8, 6)                -- Liquid Magma Totem
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, SingleTarget
@@ -489,4 +485,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(262, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(188443, 10, 6)               -- Chain Lightning
+  HL.RegisterNucleusAbility(61882, 8, 6)                 -- Earthquake
+  HL.RegisterNucleusAbility(192222, 8, 6)                -- Liquid Magma Totem
+end
+
+HR.SetAPL(262, APL, Init)

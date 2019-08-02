@@ -720,16 +720,8 @@ local function Direct ()
   return false;
 end
 
-local Initialized = false;
-
 -- APL Main
 local function APL ()
-  -- Only run once once this spec is set active
-  if not Initialized then
-    Initialized = true;
-    S.RazorCoralDebuff:RegisterAuraTracking();
-  end
-
   -- Spell ID Changes check
   Stealth = S.Subterfuge:IsAvailable() and S.Stealth2 or S.Stealth; -- w/ or w/o Subterfuge Talent
 
@@ -865,7 +857,11 @@ local function APL ()
   end
 end
 
-HR.SetAPL(259, APL);
+local function Init ()
+  S.RazorCoralDebuff:RegisterAuraTracking();
+end
+
+HR.SetAPL(259, APL, Init);
 
 -- Last Update: 2019-08-01
 

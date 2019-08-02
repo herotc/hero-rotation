@@ -131,10 +131,6 @@ local function DeathStrikeHeal()
   return (Settings.General.SoloMode and Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP) and true or false;
 end
 
-HL.RegisterNucleusAbility(196770, 8, 6)               -- Remorseless Winter
-HL.RegisterNucleusAbility(207230, 8, 6)               -- Frostscythe
-HL.RegisterNucleusAbility(49184, 10, 6)               -- Howling Blast
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, VarOoUE, Aoe, BosPooling, BosTicking, ColdHeart, Cooldowns, Essences, Obliteration, Standard
@@ -665,4 +661,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(251, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(196770, 8, 6)               -- Remorseless Winter
+  HL.RegisterNucleusAbility(207230, 8, 6)               -- Frostscythe
+  HL.RegisterNucleusAbility(49184, 10, 6)               -- Howling Blast
+end
+
+HR.SetAPL(251, APL, Init)

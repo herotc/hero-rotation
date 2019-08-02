@@ -135,9 +135,6 @@ local function MasterMarksmanBuffCheck()
   return (Player:BuffP(S.MasterMarksmanBuff) or (Player:IsCasting(S.AimedShot) and S.MasterMarksman:IsAvailable()))
 end
 
-HL.RegisterNucleusAbility(257620, 10, 6)               -- Multi-Shot
-HL.RegisterNucleusAbility(120360, 40, 6)               -- Barrage
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cds, St, Trickshots
@@ -408,4 +405,9 @@ local function APL()
   end
 end
 
-HR.SetAPL(254, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(257620, 10, 6)               -- Multi-Shot
+  HL.RegisterNucleusAbility(120360, 40, 6)               -- Barrage
+end
+
+HR.SetAPL(254, APL, Init)

@@ -382,11 +382,17 @@
             end
             HR.MainFrame:SetScript("OnUpdate", HR.Pulse);
             -- Spec Registers
-              -- Spells
-              Player:RegisterListenedSpells(SpecID);
-              -- Enums Filters
-              Player:FilterTriggerGCD(SpecID);
-              Spell:FilterProjectileSpeed(SpecID);
+            -- Spells
+            Player:RegisterListenedSpells(SpecID);
+            HL.UnregisterAuraTracking();
+            HL.UnregisterNucleusAbilities();
+            -- Enums Filters
+            Player:FilterTriggerGCD(SpecID);
+            Spell:FilterProjectileSpeed(SpecID);
+            -- Module Init Function
+            if HR.APLInits[SpecID] then
+              HR.APLInits[SpecID]();
+            end
             -- Special Checks
             if GetCVar("nameplateShowEnemies") ~= "1" then
               HR.Print("It looks like enemy nameplates are disabled, you should enable them in order to get proper AoE rotation.");

@@ -34,8 +34,10 @@
 
   -- Defines the APL
   HR.APLs = {};
-  function HR.SetAPL (Spec, APL)
+  HR.APLInits = {};
+  function HR.SetAPL (Spec, APL, APLInit)
     HR.APLs[Spec] = APL;
+    HR.APLInits[Spec] = APLInit;
   end
 
   -- Get the texture (and cache it until next reload).

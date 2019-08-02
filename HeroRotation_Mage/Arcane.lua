@@ -187,9 +187,6 @@ function Player:ArcaneChargesP()
   return math.min(self:ArcaneCharges() + num(self:IsCasting(S.ArcaneBlast)),4)
 end
 
-HL.RegisterNucleusAbility(1449, 10, 6)               -- Arcane Explosion
-HL.RegisterNucleusAbility(44425, 10, 6)              -- Arcane Barrage
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Burn, Conserve, Essences, Movement
@@ -476,4 +473,9 @@ local function APL()
   end
 end
 
-HR.SetAPL(62, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(1449, 10, 6)               -- Arcane Explosion
+  HL.RegisterNucleusAbility(44425, 10, 6)              -- Arcane Barrage
+end
+
+HR.SetAPL(62, APL, Init)

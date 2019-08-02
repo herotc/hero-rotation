@@ -247,10 +247,6 @@ local function EvaluateCycleStellarFlare348(TargetUnit)
   return (TargetUnit:DebuffRefreshableCP(S.StellarFlareDebuff)) and (AP_Check(S.StellarFlare) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) >= 5 and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.StellarFlare)) and not Player:IsCasting(S.StellarFlare))
 end
 
-HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
-HL.RegisterNucleusAbility(191037, 15, 6)              -- Starfall
-HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat
@@ -478,4 +474,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(102, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
+  HL.RegisterNucleusAbility(191037, 15, 6)              -- Starfall
+  HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
+end
+
+HR.SetAPL(102, APL, Init)

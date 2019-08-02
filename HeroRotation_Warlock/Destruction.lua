@@ -186,10 +186,6 @@ local function EvaluateCycleHavoc402(TargetUnit)
   return not (TargetUnit == Target) and (TargetUnit:DebuffRemainsP(S.ImmolateDebuff) > S.ImmolateDebuff:BaseDuration() * 0.5 or not S.InternalCombustion:IsAvailable()) and (not S.SummonInfernal:CooldownUpP() or not S.GrimoireofSupremacy:IsAvailable() or S.GrimoireofSupremacy:IsAvailable() and TargetUnit:DebuffRemainsP(S.HavocDebuff) <= 10)
 end
 
-HL.RegisterNucleusAbility(42223, 8, 6)               -- Rain of Fire
-HL.RegisterNucleusAbility(152108, 8, 6)              -- Cataclysm
-HL.RegisterNucleusAbility(22703, 10, 6)               -- Summon Infernal
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Aoe, Cds, Havoc
@@ -526,4 +522,10 @@ local function APL()
   end
 end
 
-HR.SetAPL(267, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(42223, 8, 6)               -- Rain of Fire
+  HL.RegisterNucleusAbility(152108, 8, 6)              -- Cataclysm
+  HL.RegisterNucleusAbility(22703, 10, 6)               -- Summon Infernal
+end
+
+HR.SetAPL(267, APL, Init)

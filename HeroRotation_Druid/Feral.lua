@@ -178,11 +178,6 @@ local function EvaluateCycleFerociousBite418(TargetUnit)
   return TargetUnit:DebuffP(S.RipDebuff) and TargetUnit:DebuffRemainsP(S.RipDebuff) < 3 and TargetUnit:TimeToDie() > 10 and (S.Sabertooth:IsAvailable())
 end
 
-HL.RegisterNucleusAbility(285381, 8, 6)               -- Primal Wrath
-HL.RegisterNucleusAbility(202028, 8, 6)               -- Brutal Slash
-HL.RegisterNucleusAbility(106830, 8, 6)               -- Thrash (Cat)
-HL.RegisterNucleusAbility(106785, 8, 6)               -- Swipe (Cat)
-
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldowns, Finishers, Generators, Opener
@@ -523,4 +518,11 @@ local function APL()
   end
 end
 
-HR.SetAPL(103, APL)
+local function Init ()
+  HL.RegisterNucleusAbility(285381, 8, 6)               -- Primal Wrath
+  HL.RegisterNucleusAbility(202028, 8, 6)               -- Brutal Slash
+  HL.RegisterNucleusAbility(106830, 8, 6)               -- Thrash (Cat)
+  HL.RegisterNucleusAbility(106785, 8, 6)               -- Swipe (Cat)
+end
+
+HR.SetAPL(103, APL, Init)
