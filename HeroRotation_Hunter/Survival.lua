@@ -89,7 +89,8 @@ Item.Hunter.Survival = {
   PotionofUnbridledFury            = Item(169299),
   AshvanesRazorCoral               = Item(169311),
   PocketsizedComputationDevice     = Item(167555),
-  GalecallersBoon                  = Item(159614)
+  GalecallersBoon                  = Item(159614),
+  AzsharasFontofPower              = Item(169314)
 };
 local I = Item.Hunter.Survival;
 
@@ -190,18 +191,25 @@ local function APL()
       if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 6"; end
       end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
+      end
+      -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
+      if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
+        if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 8"; end
+      end
+      -- guardian_of_azeroth
+      if S.GuardianofAzeroth:IsCastableP() then
+        if HR.Cast(S.GuardianofAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 9"; end
+      end
       -- steel_trap
       if S.SteelTrap:IsCastableP() and Player:DebuffDownP(S.SteelTrapDebuff) then
-        if HR.Cast(S.SteelTrap) then return "steel_trap 8"; end
+        if HR.Cast(S.SteelTrap) then return "steel_trap 10"; end
       end
       -- harpoon
       if S.Harpoon:IsCastableP() then
         if HR.Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon) then return "harpoon 12"; end
-      end
-      -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-      -- Using main icon, since this is the last item in Precombat
-      if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
-        if HR.Cast(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 13"; end
       end
     end
   end
@@ -368,19 +376,23 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
+      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 321"; end
     end
-    -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&!talent.wildfire_infusion.enabled
-    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(S.CyclotronicBlast:CooldownRemainsP()) or not S.MemoryofLucidDreams:IsAvailable() and not S.WildfireInfusion:IsAvailable()) then
-      if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
+    -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
+    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(S.CyclotronicBlast:CooldownRemainsP()) or not S.MemoryofLucidDreams:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP())) then
+      if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon 322"; end
+    end
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 323"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Survival.GCDasOffGCD.Essences) then return "focused_azerite_beam 322"; end
+      if HR.Cast(S.FocusedAzeriteBeam, Settings.Survival.GCDasOffGCD.Essences) then return "focused_azerite_beam 324"; end
     end
     -- memory_of_lucid_dreams,if=focus<focus.max-30&buff.coordinated_assault.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:FocusDeficit() > 30 and Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 324"; end
+      if HR.Cast(S.MemoryofLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 325"; end
     end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
