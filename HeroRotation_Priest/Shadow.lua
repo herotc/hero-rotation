@@ -236,8 +236,8 @@ local function APL()
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy cds"; end
     end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
+    -- guardian_of_azeroth,if=buff.voidform.stack>15
+    if S.GuardianofAzeroth:IsCastableP() and (Player:BuffStackP(S.VoidformBuff) > 15) then
       if HR.Cast(S.GuardianofAzeroth, Settings.Shadow.GCDasOffGCD.Essences) then return "guardian_of_azeroth cds"; end
     end
     -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
