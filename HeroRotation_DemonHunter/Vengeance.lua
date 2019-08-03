@@ -1,4 +1,5 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...;
 -- HeroLib
@@ -13,13 +14,11 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
--- Lua
-local pairs = pairs;
 
+--- ============================ CONTENT ===========================
+--- ======= APL LOCALS =======
+-- luacheck: max_line_length 9999
 
--- APL Local Vars
--- Commons
-local Everyone = HR.Commons.Everyone;
 -- Spell
 if not Spell.DemonHunter then Spell.DemonHunter = {}; end
 Spell.DemonHunter.Vengeance = {
@@ -63,12 +62,34 @@ Spell.DemonHunter.Vengeance = {
 };
 local S = Spell.DemonHunter.Vengeance;
 
+-- Items
+if not Item.DemonHunter then Item.DemonHunter = {} end
+Item.DemonHunter.Vengeance = {
+  SuperiorSteelskinPotion       = Item(168501),
+  AzsharasFontofPower           = Item(169314)
+};
+local I = Item.DemonHunter.Vengeance;
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local CleaveRangeID = tostring(S.Disrupt:ID()); -- 20y range
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment;
-local IsTanking;
 local IsInMeleeRange, IsInAoERange;
+
+-- GUI Settings
+local Everyone = HR.Commons.Everyone;
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.DemonHunter.Commons,
+  Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
+};
+
+local EnemyRanges = {40, 30, 8}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
+  end
+end
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()
@@ -130,18 +151,37 @@ local function UpdateIsInMeleeRange()
   IsInAoERange = IsInMeleeRange or Cache.EnemiesCount[8] > 0;
 end
 
--- GUI Settings
-  local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.DemonHunter.Commons,
-    Vengeance = HR.GUISettings.APL.DemonHunter.Vengeance
-  };
-
 -- APL Main
 local function APL ()
-  local function Defensives()
-    local ActiveMitigationNeeded = Player:ActiveMitigationNeeded();
-
+  local Precombat, Brand, Defensives, Normal
+  local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  UpdateRanges()
+  Everyone.AoEToggleEnemiesUpdate()
+  UpdateSoulFragments();
+  UpdateIsInMeleeRange();
+  Precombat = function()
+    -- flask
+    -- augmentation
+    -- food
+    -- snapshot_stats
+    -- potion
+    if I.SuperiorSteelskinPotion:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.SuperiorSteelskinPotion) then return "superior_steelskin_potion precombat"; end
+    end
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
+    end
+    -- First attacks
+    if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
+      if HR.Cast(S.InfernalStrike) then return "infernal_strike precombat"; end
+    end
+    if S.ImmolationAura:IsCastable() and IsInMeleeRange then
+      if HR.Cast(S.ImmolationAura) then return "immolation_aura precombat"; end
+    end
+  end
+  Defensives = function()
     -- Demon Spikes
     if S.DemonSpikes:IsCastable("Melee") and not Player:Buff(S.DemonSpikesBuff) then
       if S.DemonSpikes:ChargesFractional() > 1.9 then
@@ -150,85 +190,63 @@ local function APL ()
         if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes (Danger)"; end
       end
     end
-    
     -- Metamorphosis
-    if S.Metamorphosis:IsCastable("Melee") and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold then
+    if S.Metamorphosis:IsCastable("Melee") and (Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold) then
       HR.CastSuggested(S.Metamorphosis);
     end
-
     -- Fiery Brand
-    if S.FieryBrand:IsCastable() and not Player:Buff(S.FieryBrand)
-      and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
+    if S.FieryBrand:IsCastable() and not Target:DebuffP(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
       if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand) then return "Cast Fiery Brand"; end
     end
   end
-
-  local function Brand()
+  Brand = function()
     if Settings.Vengeance.BrandForDamage then
       -- actions.brand+=/sigil_of_flame,if=cooldown.fiery_brand.remains<2
-      if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
-        and S.FieryBrand:CooldownRemainsP() < 2 then
+      if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (S.FieryBrand:CooldownRemainsP() < 2) then
         if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand Soon)"; end
       end
       -- actions.brand+=/infernal_strike,if=cooldown.fiery_brand.remains=0
-      if S.InfernalStrike:IsCastable() and S.FieryBrand:IsReady() then
+      if S.InfernalStrike:IsCastable() and (S.FieryBrand:IsReady()) then
         if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand Soon)"; end
       end
       -- actions.brand+=/fiery_brand
-      if IsInMeleeRange and S.FieryBrand:IsCastable() then
+      if S.FieryBrand:IsCastable() and IsInMeleeRange then
         if HR.Cast(S.FieryBrand) then return "Cast Fiery Brand (Brand)"; end
       end
     end
-
-    -- Shared condition below: if=dot.fiery_brand.ticking
-    if not Target:DebuffP(S.FieryBrandDebuff) then
-      return;
+    -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
+    if S.ImmolationAura:IsCastable() and IsInMeleeRange and (not Target:DebuffP(S.FieryBrandDebuff)) then
+      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
     end
-
-    if IsInMeleeRange then
-      -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
-      if S.ImmolationAura:IsCastable() then
-        if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
-      end
-      -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
-      if S.FelDevastation:IsCastable() then
-        if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
-      end
+    -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
+    if S.FelDevastation:IsCastable() and IsInMeleeRange and (not Target:DebuffP(S.FieryBrandDebuff)) then
+      if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
     end
-
     -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
-    if S.InfernalStrike:IsCastable()
-      and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (not Target:DebuffP(S.FieryBrandDebuff)) then
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand)"; end
     end
     -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
-    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (not Target:DebuffP(S.FieryBrandDebuff)) then
       if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
     end
   end
-
-  local function Normal()
+  Normal = function()
     -- actions+=/infernal_strike
-    if S.InfernalStrike:IsCastable() and not (S.CharredFlesh:IsAvailable() and Settings.Vengeance.BrandForDamage)
-      and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+    if S.InfernalStrike:IsCastable() and not (S.CharredFlesh:IsAvailable() and Settings.Vengeance.BrandForDamage) and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
     end
     -- actions+=/spirit_bomb,if=soul_fragments>=4
-    -- Note: Use IsAvailable() here since IsCastable() can't predict properly since Spirit Bomb is not usable with 0 fragments
-    if S.SpiritBomb:IsAvailable() and IsInAoERange and SoulFragments >= 4 then
+    if S.SpiritBomb:IsReady() and IsInAoERange and SoulFragments >= 4 then
       if HR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
     end
     -- actions+=/soul_cleave,if=!talent.spirit_bomb.enabled
     -- actions+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
-    if S.SoulCleave:IsReady() then
-      if not S.SpiritBomb:IsAvailable() then
-        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
-      elseif SoulFragments == 0 then
-        if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave (Spirit Bomb)"; end
-      end
+    if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() or (S.SpiritBomb:IsAvailable() and SoulFragments == 0)) then
+      if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
     end
     -- actions+=/immolation_aura,if=pain<=90
-    if S.ImmolationAura:IsCastable() and IsInAoERange and Player:Pain() <= 90 then
+    if S.ImmolationAura:IsCastable() and IsInAoERange and (Player:Pain() <= 90) then
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
     end
     -- concentrated_flame
@@ -248,11 +266,11 @@ local function APL ()
       if HR.Cast(S.MemoryofLucidDreams, Settings.Vengeance.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
     end
     -- actions+=/felblade,if=pain<=70
-    if S.Felblade:IsCastable(S.Felblade) and Player:Pain() <= 70 then
+    if S.Felblade:IsCastable(15) and (Player:Pain() <= 70) then
       if HR.Cast(S.Felblade) then return "Cast Felblade"; end
     end
     -- actions+=/fracture,if=soul_fragments<=3
-    if S.Fracture:IsCastable() and IsInMeleeRange and SoulFragments <= 3 then
+    if S.Fracture:IsCastable() and IsInMeleeRange and (SoulFragments <= 3) then
       if HR.Cast(S.Fracture) then return "Cast Fracture"; end
     end
     -- actions+=/fel_devastation
@@ -260,12 +278,11 @@ local function APL ()
       if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
     end
     -- actions+=/sigil_of_flame
-    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable())
-      and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
       if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
     end
     -- actions+=/shear
-    if IsInMeleeRange and S.Shear:IsReady() then
+    if S.Shear:IsReady() and IsInMeleeRange then
       if HR.Cast(S.Shear) then return "Cast Shear"; end
     end
     -- actions+=/throw_glaive
@@ -274,42 +291,38 @@ local function APL ()
     end
   end
 
-  -- Unit Update
-  HL.GetEnemies(8, true); -- Sigil of Flame & Spirit Bomb
-  Everyone.AoEToggleEnemiesUpdate();
-
-  -- Module Tracking Updates
-  --S.SigilofFlame = S.ConcentratedSigils:IsAvailable() and S.SigilofFlameCS or S.SigilofFlameNoCS;
-  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-  UpdateSoulFragments();
-  UpdateIsInMeleeRange();
-
-  --- Out of Combat
-  if not Player:AffectingCombat() then
-    -- Flask
-    -- Food
-    -- Rune
-    -- PrePot w/ DBM Count
-    if Everyone.TargetIsValid() then
-      return Normal();
-    end
-    return;
-  end
-
-  --- Defensives
-  if (IsTanking or not Player:HealingAbsorbed()) then
-    ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
-  end
-
-  --- In Combat
   if Everyone.TargetIsValid() then
+    -- Precombat
+    if not Player:AffectingCombat() then
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- auto_attack
+    -- consume_magic
     -- Interrupts
     Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false);
+    -- call_action_list,name=brand,if=talent.charred_flesh.enabled
     if S.CharredFlesh:IsAvailable() then
-      ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
     end
-    return Normal();
+    -- call_action_list,name=defensives
+    if (IsTanking or not Player:HealingAbsorbed()) then
+      local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=normal
+    if (true) then
+      local ShouldReturn = Normal(); if ShouldReturn then return ShouldReturn; end
+    end
   end
+end
+
+local function Init ()
+  -- Register Splash Data Nucleus Abilities
+  HL.RegisterNucleusAbility(247454, 8, 6)               -- Spirit Bomb
+  HL.RegisterNucleusAbility(189110, 6, 6)               -- Infernal Strike
+  HL.RegisterNucleusAbility(178740, 8, 6)               -- Immolation Aura
+  HL.RegisterNucleusAbility(228477, 5, 6)               -- Soul Cleave
+  HL.RegisterNucleusAbility(204157, 10, 6)              -- Throw Glaive
+  HL.RegisterNucleusAbility(204513, 8, 6)               -- Sigil of Flame
 end
 
 HR.SetAPL(581, APL);
