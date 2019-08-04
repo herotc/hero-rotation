@@ -200,7 +200,7 @@ local function APL()
       if HR.Cast(S.SummonPet) then return "summon_pet 3"; end
     end
     -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-    if S.GrimoireofSacrifice:IsCastableP() and (S.GrimoireofSacrifice:IsAvailable()) then
+    if S.GrimoireofSacrifice:IsReadyP() then
       if HR.Cast(S.GrimoireofSacrifice) then return "grimoire_of_sacrifice 5"; end
     end
     -- snapshot_stats
@@ -299,7 +299,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 177"; end
     end
     -- dark_soul_instability,if=pet.infernal.active&pet.infernal.remains<=20
-    if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and Player:BuffRemainsP(S.DarkSoulInstabilityBuff) <= 20) then
+    if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > 150 and S.SummonInfernal:CooldownRemainsP() <= 170) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 179"; end
     end
     -- memory_of_lucid_dreams,if=pet.infernal.active&pet.infernal.remains<=20
@@ -322,12 +322,12 @@ local function APL()
     if S.GuardianofAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
       if HR.Cast(S.GuardianofAzeroth, Settings.Destruction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 207"; end
     end
-    -- dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die
-    if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
+    -- dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<=20
+    if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and (S.SummonInfernal:CooldownRemainsP() > 150 and S.SummonInfernal:CooldownRemainsP() <= 170)) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 211"; end
     end
-    -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die
-    if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
+    -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<=20
+    if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and (S.SummonInfernal:CooldownRemainsP() > 150 and S.SummonInfernal:CooldownRemainsP() <= 170)) then
       if HR.Cast(S.MemoryofLucidDreams, Settings.Destruction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 215"; end
     end
     -- summon_infernal,if=target.time_to_die<30
