@@ -181,7 +181,7 @@ end
 local function APL()
   local Precombat, Cds, Cleave, CritCds, Single
   local InsanityDrain = InsanityDrain()
-  EnemiesCount = GetEnemiesCount(8)
+  EnemiesCount = GetEnemiesCount(10)
   HL.GetEnemies(40) -- For CastCycle calls
   Precombat = function()
     if Everyone.TargetIsValid() then
