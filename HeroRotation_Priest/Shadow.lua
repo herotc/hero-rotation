@@ -465,8 +465,11 @@ local function APL()
 end
 
 local function Init ()
-  HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption
+  HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption 1st Bolt
+  HL.RegisterNucleusAbility(228261, 10, 6)               -- Void Eruption 2nd Bolt
   HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
+  HL.RegisterNucleusAbility(49821, 10, 6)                -- Mind Sear 2nd ID
+  HL.RegisterNucleusAbility(263346, 10, 6)               -- Dark Void
   HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
 end
 
