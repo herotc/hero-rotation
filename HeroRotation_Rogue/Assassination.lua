@@ -14,6 +14,7 @@ local Item = HL.Item;
 local HR = HeroRotation;
 -- Lua
 local pairs = pairs;
+local mathfloor = math.floor;
 
 --- APL Local Vars
 -- Commons
@@ -361,12 +362,20 @@ local function Essences ()
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame,if=energy.time_to_max>1&!debuff.vendetta.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
-  if S.ConcentratedFlame:IsCastableP() and Player:EnergyTimeToMaxPredicted() > 1 and not Target:DebuffP(S.Vendetta) and (not Target:DebuffP(S.ConcentratedFlameBurn) and not Player:PrevGCD(1, S.ConcentratedFlame) or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() + Player:GCDRemains()) then
+  if S.ConcentratedFlame:IsCastableP() and Player:EnergyTimeToMaxPredicted() > 1 and not Target:DebuffP(S.Vendetta) and (not Target:DebuffP(S.ConcentratedFlameBurn)
+    and not Player:PrevGCD(1, S.ConcentratedFlame) or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() + Player:GCDRemains()) then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast ConcentratedFlame"; end
   end
-  -- guardian_of_azeroth
   if S.GuardianofAzeroth:IsCastableP() then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth"; end
+    -- guardian_of_azeroth,if=cooldown.vendetta.remains<3|debuff.vendetta.up|target.time_to_die<30
+    if S.Vendetta:CooldownRemainsP() < 3 or Target:DebuffP(S.Vendetta) or Target:BossFilteredTimeToDie("<", 30) then
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth Synced"; end
+    elseif not Target:BossTimeToDieIsNotValid() then
+      -- guardian_of_azeroth,if=floor((target.time_to_die-30)%cooldown)>floor((target.time_to_die-30-cooldown.vendetta.remains)%cooldown)
+      if mathfloor(Target:BossTimeToDie() - 30 / 180) > mathfloor((Target:BossTimeToDie() - 30 - S.Vendetta:CooldownRemainsP()) / 180) then
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth Desynced"; end
+      end
+    end
   end
   -- focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
   if S.FocusedAzeriteBeam:IsCastableP() and Player:EnergyPredicted() < 70 then
@@ -965,7 +974,9 @@ HR.SetAPL(259, APL, Init);
 -- actions.essences=concentrated_flame,if=energy.time_to_max>1&!debuff.vendetta.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
 -- # Always use Blood with Vendetta up. Also use with TB up before a finisher (if talented) as long as it runs for 10s during Vendetta.
 -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
--- actions.essences+=/guardian_of_azeroth
+-- # Attempt to align Guardian with Vendetta as long as it won't result in losing a full-value cast over the remaining duration of the fight
+-- actions.essences+=/guardian_of_azeroth,if=cooldown.vendetta.remains<3|debuff.vendetta.up|target.time_to_die<30
+-- actions.essences+=/guardian_of_azeroth,if=floor((target.time_to_die-30)%cooldown)>floor((target.time_to_die-30-cooldown.vendetta.remains)%cooldown)
 -- actions.essences+=/focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
 -- actions.essences+=/purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
 -- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
