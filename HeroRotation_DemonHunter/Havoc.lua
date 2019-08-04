@@ -247,7 +247,7 @@ local function APL()
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 55"; end
     end
     -- use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
-    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownUpP) then
+    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownUpP()) then
       if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon 56"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
