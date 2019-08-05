@@ -216,7 +216,7 @@ local function APL()
       end
       -- snapshot_stats
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 9"; end
       end
       -- mirror_image
@@ -579,7 +579,7 @@ local function APL()
       if HR.Cast(S.DragonsBreath) then return "dragons_breath 766"; end
     end
     -- call_action_list,name=items_low_priority
-    if (HR.CDsON()) then
+    if (Settings.Commons.UseTrinkets) then
       local ShouldReturn = ItemsLowPriority(); if ShouldReturn then return ShouldReturn; end
     end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
@@ -603,7 +603,7 @@ local function APL()
     -- counterspell
     Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
     -- call_action_list,name=items_high_priority
-    if (HR.CDsON()) then
+    if (Settings.Commons.UseTrinkets) then
       local ShouldReturn = ItemsHighPriority(); if ShouldReturn then return ShouldReturn; end
     end
     -- mirror_image,if=buff.combustion.down

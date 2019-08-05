@@ -17,7 +17,8 @@
   -- All settings here should be moved into the GUI someday.
   HR.GUISettings.APL.Monk = {
     Commons = {
-      UsePotions = false,
+      UseTrinkets = true,
+      UsePotions = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -81,6 +82,7 @@
   local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster");
   -- Monk
   CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
+  CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   
   -- Windwalker

@@ -143,7 +143,7 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.Enabled.Potions then
+    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
       if HR.Cast(I.BattlePotionofStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
     end
     -- variable,name=other_on_use_equipped,value=(equipped.notorious_gladiators_badge|equipped.sinister_gladiators_badge|equipped.sinister_gladiators_medallion|equipped.vial_of_animated_blood|equipped.first_mates_spyglass|equipped.jes_howler|equipped.notorious_gladiators_medallion)
@@ -370,55 +370,57 @@ local function APL()
     end
   end
   Cooldowns = function()
-    -- use_item,name=azsharas_font_of_power,if=(cooldown.empowered_rune_weapon.ready&!variable.other_on_use_equipped)|(cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and ((S.EmpowerRuneWeapon:CooldownUpP() and not bool(VarOoUE)) or (S.PillarofFrost:CooldownRemainsP() <= 10 and bool(VarOoUE))) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return ""; end
-    end
-    -- use_item,name=lurkers_insidious_gift,if=talent.breath_of_sindragosa.enabled&((cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)|(buff.pillar_of_frost.up&!variable.other_on_use_equipped))|(buff.pillar_of_frost.up&!talent.breath_of_sindragosa.enabled)
-    if I.LurkersInsidiousGift:IsEquipped() and I.LurkersInsidiousGift:IsReady() and (S.BreathofSindragosa:IsAvailable() and ((S.PillarofFrost:CooldownRemainsP() <= 10 and bool(VarOoUE)) or (Player:BuffP(S.PillarofFrostBuff) and not bool(VarOoUE))) or (Player:BuffP(S.PillarofFrostBuff) and not S.BreathofSindragosa:IsAvailable())) then
-      if HR.CastSuggested(I.LurkersInsidiousGift) then return ""; end
-    end
-    -- use_item,name=cyclotronic_blast,if=!buff.pillar_of_frost.up
-    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffDownP(S.PillarofFrostBuff)) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return ""; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>110|cooldown.breath_of_sindragosa.remains>90|time<50|target.1.time_to_die<21
-    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 110 or S.BreathofSindragosa:CooldownRemainsP() > 90 or HL.CombatTime() < 50 or Target:TimeToDie() < 21) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return ""; end
-    end
-    -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
-    if Settings.Commons.Enabled.Trinkets and (S.PillarofFrost:CooldownUpP() or S.PillarofFrost:CooldownRemainsP() > 20) and (not S.BreathofSindragosa:IsAvailable() or S.EmpowerRuneWeaponBuff:CooldownRemainsP() > 95) then
-      -- use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
-      if I.JesHowler:IsEquipped() and I.JesHowler:IsReady() and ((I.LurkersInsidiousGift:IsEquipped() and Player:BuffP(S.PillarofFrostBuff)) or (not I.LurkersInsidiousGift:IsEquipped() and Player:BuffRemainsP(S.PillarofFrostBuff) < 12 and Player:BuffP(S.PillarofFrostBuff))) then
-        if HR.CastSuggested(I.JesHowler) then return ""; end
+    if (Settings.Commons.UseTrinkets) then
+      -- use_item,name=azsharas_font_of_power,if=(cooldown.empowered_rune_weapon.ready&!variable.other_on_use_equipped)|(cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and ((S.EmpowerRuneWeapon:CooldownUpP() and not bool(VarOoUE)) or (S.PillarofFrost:CooldownRemainsP() <= 10 and bool(VarOoUE))) then
+        if HR.CastSuggested(I.AzsharasFontofPower) then return ""; end
       end
-      -- use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
-      -- Two lines, since Horde and Alliance versions of the trinket have different IDs
-      if I.KnotofAncientFuryAlliance:IsEquipped() and I.KnotofAncientFuryAlliance:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
-        if HR.CastSuggested(I.KnotofAncientFuryAlliance) then return ""; end
+      -- use_item,name=lurkers_insidious_gift,if=talent.breath_of_sindragosa.enabled&((cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)|(buff.pillar_of_frost.up&!variable.other_on_use_equipped))|(buff.pillar_of_frost.up&!talent.breath_of_sindragosa.enabled)
+      if I.LurkersInsidiousGift:IsEquipped() and I.LurkersInsidiousGift:IsReady() and (S.BreathofSindragosa:IsAvailable() and ((S.PillarofFrost:CooldownRemainsP() <= 10 and bool(VarOoUE)) or (Player:BuffP(S.PillarofFrostBuff) and not bool(VarOoUE))) or (Player:BuffP(S.PillarofFrostBuff) and not S.BreathofSindragosa:IsAvailable())) then
+        if HR.CastSuggested(I.LurkersInsidiousGift) then return ""; end
       end
-      if I.KnotofAncientFuryHorde:IsEquipped() and I.KnotofAncientFuryHorde:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
-        if HR.CastSuggested(I.KnotofAncientFuryHorde) then return ""; end
+      -- use_item,name=cyclotronic_blast,if=!buff.pillar_of_frost.up
+      if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffDownP(S.PillarofFrostBuff)) then
+        if HR.CastSuggested(I.PocketsizedComputationDevice) then return ""; end
       end
-      -- use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
-      if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and (Player:Rune() <= 3 and Player:BuffDownP(S.PillarofFrostBuff) and (Player:BuffDownP(S.BreathofSindragosa) or not S.BreathofSindragosa:IsAvailable())) then
-        if HR.CastSuggested(I.GrongsPrimalRage) then return ""; end
+      -- use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>110|cooldown.breath_of_sindragosa.remains>90|time<50|target.1.time_to_die<21
+      if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 110 or S.BreathofSindragosa:CooldownRemainsP() > 90 or HL.CombatTime() < 50 or Target:TimeToDie() < 21) then
+        if HR.CastSuggested(I.AshvanesRazorCoral) then return ""; end
       end
-      -- use_item,name=razdunks_big_red_button
-      if I.RazdunksBigRedButton:IsEquipped() and I.RazdunksBigRedButton:IsReady() then
-        if HR.CastSuggested(I.RazdunksBigRedButton) then return ""; end
-      end
-      -- use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
-      if I.MerekthasFang:IsEquipped() and I.MerekthasFang:IsReady() and (not Player:BuffP(S.BreathofSindragosa) and not Player:BuffP(S.PillarofFrostBuff)) then
-        if HR.CastSuggested(I.MerekthasFang) then return ""; end
-      end
-      -- use_item,name=first_mates_spyglass,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-      if I.FirstMatesSpyglass:IsEquipped() and I.FirstMatesSpyglass:IsReady() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
-        if HR.CastSuggested(I.FirstMatesSpyglass) then return ""; end
+      -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
+      if (S.PillarofFrost:CooldownUpP() or S.PillarofFrost:CooldownRemainsP() > 20) and (not S.BreathofSindragosa:IsAvailable() or S.EmpowerRuneWeaponBuff:CooldownRemainsP() > 95) then
+        -- use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
+        if I.JesHowler:IsEquipped() and I.JesHowler:IsReady() and ((I.LurkersInsidiousGift:IsEquipped() and Player:BuffP(S.PillarofFrostBuff)) or (not I.LurkersInsidiousGift:IsEquipped() and Player:BuffRemainsP(S.PillarofFrostBuff) < 12 and Player:BuffP(S.PillarofFrostBuff))) then
+          if HR.CastSuggested(I.JesHowler) then return ""; end
+        end
+        -- use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
+        -- Two lines, since Horde and Alliance versions of the trinket have different IDs
+        if I.KnotofAncientFuryAlliance:IsEquipped() and I.KnotofAncientFuryAlliance:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
+          if HR.CastSuggested(I.KnotofAncientFuryAlliance) then return ""; end
+        end
+        if I.KnotofAncientFuryHorde:IsEquipped() and I.KnotofAncientFuryHorde:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
+          if HR.CastSuggested(I.KnotofAncientFuryHorde) then return ""; end
+        end
+        -- use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
+        if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and (Player:Rune() <= 3 and Player:BuffDownP(S.PillarofFrostBuff) and (Player:BuffDownP(S.BreathofSindragosa) or not S.BreathofSindragosa:IsAvailable())) then
+          if HR.CastSuggested(I.GrongsPrimalRage) then return ""; end
+        end
+        -- use_item,name=razdunks_big_red_button
+        if I.RazdunksBigRedButton:IsEquipped() and I.RazdunksBigRedButton:IsReady() then
+          if HR.CastSuggested(I.RazdunksBigRedButton) then return ""; end
+        end
+        -- use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
+        if I.MerekthasFang:IsEquipped() and I.MerekthasFang:IsReady() and (not Player:BuffP(S.BreathofSindragosa) and not Player:BuffP(S.PillarofFrostBuff)) then
+          if HR.CastSuggested(I.MerekthasFang) then return ""; end
+        end
+        -- use_item,name=first_mates_spyglass,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+        if I.FirstMatesSpyglass:IsEquipped() and I.FirstMatesSpyglass:IsReady() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+          if HR.CastSuggested(I.FirstMatesSpyglass) then return ""; end
+        end
       end
     end
     -- potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
       if HR.Cast(I.BattlePotionofStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
     end
     -- blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up

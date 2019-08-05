@@ -17,7 +17,8 @@
   -- All settings here should be moved into the GUI someday.
   HR.GUISettings.APL.Mage = {
     Commons = {
-      UsePotions = false,
+      UseTrinkets = true,
+      UsePotions = true,
       UseTimeWarp = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
@@ -93,6 +94,7 @@
   -- Mage
   CreateARPanelOptions(CP_Mage, "APL.Mage.Commons");
   CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTimeWarp", "Use Time Warp", "Enable this if you want the addon to show you when to use Time Warp.");
+  CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   -- Arcane
   CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");

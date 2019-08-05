@@ -19,7 +19,8 @@
     Commons = {
       PetReminder = "Always",
       ForcePet = "No",
-      UsePotions = false,
+      UseTrinkets = true,
+      UsePotions = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -118,6 +119,7 @@
   CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons");
   CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.PetReminder", {"Always", "Not with Grimoire of Supremacy", "Never"}, "Pet Summon Reminder", "Whether to show a Pet Summoning Reminder for a more optimal pet if you already have an active one.");
   -- CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.ForcePet", {"No", "Infernal", "DoomGuard"}, "Force a specific pet", "Force the addon to show you a specific pet instead of the one the rotation propose.");
+  CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.UsePotions", "Show Potions", "Enable this if you want it to show you to use Potions.");
   -- Destruction
   CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");

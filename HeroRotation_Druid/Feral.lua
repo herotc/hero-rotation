@@ -202,7 +202,7 @@ local function APL()
         if HR.Cast(S.Regrowth) then return "regrowth 3"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 10"; end
       end
       -- cat_form
@@ -281,19 +281,19 @@ local function APL()
       if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld 58"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
-    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) < 1.5 or Target:DebuffDownP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemy)) or Target:TimeToDie() < 40) and Player:BuffRemainsP(S.TigersFuryBuff) > 10) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) < 1.5 or Target:DebuffDownP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemy)) or Target:TimeToDie() < 40) and Player:BuffRemainsP(S.TigersFuryBuff) > 10) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
-    if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
+    if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 60"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
-    if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
+    if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 61"; end
     end
     -- use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (Player:EnergyDeficitPredicted() >= 50) then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and (Player:EnergyDeficitPredicted() >= 50) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 62"; end
     end
     -- use_items,if=buff.tigers_fury.up|target.time_to_die<20

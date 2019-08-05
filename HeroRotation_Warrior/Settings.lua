@@ -18,6 +18,7 @@
   -- Default settings
   HR.GUISettings.APL.Warrior = {
     Commons = {
+      UseTrinkets = true,
       UsePotions = true,
       OffGCDasOffGCD = {
         Pummel = true,
@@ -98,6 +99,7 @@
 
   -- Shared Warrior settings
   CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons");
+  CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 
   -- Arms settings

@@ -18,10 +18,8 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 HR.GUISettings.APL.DeathKnight = {
   Commons = {
     UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Deathstrikes
-    Enabled = {
-      Trinkets = false,
-      Potions = false,
-    },
+    UseTrinkets = true,
+    UsePotions = true,
     OffGCDasOffGCD = {
       Trinkets = true,
       Potions = true,
@@ -84,6 +82,8 @@ local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
 
 --DeathKnight Panels
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Deathstrike on low HP", "Set the HP threshold to use DeathStrike (working only if Solo Mode is enabled).");
+CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
+CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 --Unholy Panels
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");

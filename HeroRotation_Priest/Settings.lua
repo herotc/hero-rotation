@@ -17,7 +17,8 @@
   -- All settings here should be moved into the GUI someday.
   HR.GUISettings.APL.Priest = {
     Commons = {
-      UsePotions = false,
+      UseTrinkets = true,
+      UsePotions = true,
       GCDasOffGCD = {
         -- Abilities
       },
@@ -56,11 +57,13 @@
   local ARPanel = HR.GUI.Panel;
   local CP_Priest = CreateChildPanel(ARPanel, "Priest");
   local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow");
+  
+  CreateARPanelOptions(CP_Priest, "APL.Priest.Commons");
+  CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
+  CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
 
   CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.");
-  CreateARPanelOptions(CP_Priest, "APL.Priest.Commons");
   CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
   CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow");
-  CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
   CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MindbenderUsage", {0, 30, 1}, "Shadowfiend/Mindbender usage Offset", "Number of vf stacks MB/SF will be delayed that you can push");
 

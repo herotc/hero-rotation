@@ -17,7 +17,8 @@
   -- All settings here should be moved into the GUI someday.
   HR.GUISettings.APL.Druid = {
     Commons = {
-      UsePotions = false,
+      UseTrinkets = true,
+      UsePotions = true,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         -- Abilities
@@ -112,6 +113,7 @@
   local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian");
 
   CreateARPanelOptions(CP_Druid, "APL.Druid.Commons");
+  CreatePanelOption("CheckButton", CP_Druid, "APL.Druid.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_Druid, "APL.Druid.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
   
   --Feral

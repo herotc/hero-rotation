@@ -18,7 +18,8 @@
   HR.GUISettings.APL.Hunter = {
     Commons = {
       CounterShot = false,
-      UsePotions = false,
+      UseTrinkets = true,
+      UsePotions = true,
       ExhilarationHP = 30,
       -- SoloMode Settings
       -- {Display GCD as OffGCD, ForceReturn}
@@ -107,6 +108,7 @@
   
   -- Hunter
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
+  CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
   CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
   CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
   
