@@ -452,7 +452,7 @@ local function APL()
       if HR.Cast(S.Immolate) then return "immolate 356"; end
     end
     -- call_action_list,name=cds
-    if HR.CDsON() then
+    if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- focused_azerite_beam,if=!pet.infernal.active|!talent.grimoire_of_supremacy.enabled

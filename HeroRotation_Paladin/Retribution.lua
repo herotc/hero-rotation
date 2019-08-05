@@ -292,7 +292,7 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(5, S.Rebuke, Rebuke, StunInterrupts);
     -- call_action_list,name=cooldowns
-    if HR.CDsON() then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=generators

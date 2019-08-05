@@ -338,7 +338,7 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power
       -- Using main icon, since only Haunt will be suggested precombat if equipped and that's optional
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
         if HR.Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power 15"; end
       end
       -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3&!equipped.169314
@@ -596,7 +596,7 @@ local function APL()
       VarMaintainSe = num(EnemiesCount <= 1 + num(S.WritheInAgony:IsAvailable()) + num(S.AbsoluteCorruption:IsAvailable()) * 2 + num((S.WritheInAgony:IsAvailable() and S.SowtheSeeds:IsAvailable() and EnemiesCount > 2)) + num((S.SiphonLife:IsAvailable() and not S.CreepingDeath:IsAvailable() and not S.DrainSoul:IsAvailable())))
     end
     -- call_action_list,name=cooldowns
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd&soul_shard<5
@@ -673,7 +673,7 @@ local function APL()
       if HR.CastTargetIf(S.VileTaint, 40, "max", EvaluateTargetIfFilterVileTaint856, EvaluateTargetIfVileTaint859) then return "vile_taint 861" end
     end
     -- use_item,name=azsharas_font_of_power,if=time<=3
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (HL.CombatTime() <= 3) then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() and (HL.CombatTime() <= 3) then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 879"; end
     end
     -- phantom_singularity,if=time<=35

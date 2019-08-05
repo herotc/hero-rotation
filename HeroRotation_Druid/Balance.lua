@@ -290,7 +290,7 @@ local function APL()
       if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
     end
     -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
       if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
     -- potion,dynamic_prepot=1
@@ -337,7 +337,7 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 65"; end
     end
     -- use_item,name=azsharas_font_of_power,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
       if HR.CastCycle(I.AzsharasFontofPower, 40, EvaluateCycleAzsharasFontofPower59) then return "azsharas_font_of_power 73" end
     end
     -- guardian_of_azeroth,if=(!talent.starlord.enabled|buff.starlord.up)&!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
@@ -345,11 +345,11 @@ local function APL()
       if HR.CastCycle(S.GuardianofAzeroth, 40, EvaluateCycleGuardianofAzeroth78) then return "guardian_of_azeroth 94" end
     end
     -- use_item,effect_name=cyclotronic_blast,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and HR.CDsON() then
       if HR.CastCycle(I.PocketsizedComputationDevice, 40, EvaluateCyclePocketsizedComputationDevice103) then return "pocketsized_computation_device 117" end
     end
     -- use_item,name=shiver_venom_relicif=!buff.ca_inc.up,target_if=dot.shiver_venom.stack>=5
-    if I.ShiverVenomRelic:IsEquipped() and I.ShiverVenomRelic:IsReady() then
+    if I.ShiverVenomRelic:IsEquipped() and I.ShiverVenomRelic:IsReady() and HR.CDsON() then
       if HR.CastCycle(I.ShiverVenomRelic, 40, EvaluateCycleShiverVenomRelic104) then return "shiver_venom_relic 105"; end
     end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30

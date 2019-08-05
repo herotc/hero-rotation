@@ -132,7 +132,7 @@ S.Frostbolt:RegisterInFlight()
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Aoe, Cooldowns, Movement, Single, TalentRop, Essences
+  local Precombat, Essences, Aoe, Cooldowns, Movement, Single, TalentRop
   local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   EnemiesCount = GetEnemiesCount(8)
   Precombat = function()
@@ -241,11 +241,11 @@ local function APL()
       if HR.Cast(S.ConeofCold) then return "cone_of_cold 48"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
-    if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+    if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and HR.CDsON() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.TidestormCodex) then return "tidestorm_codex 49"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
-    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and HR.CDsON() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device aoe"; end
     end
     -- frostbolt
@@ -363,11 +363,11 @@ local function APL()
       if HR.Cast(S.IceNova) then return "ice_nova 183"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
-    if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+    if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and HR.CDsON() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.TidestormCodex) then return "tidestorm_codex 218"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
-    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+    if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and HR.CDsON() and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device single"; end
     end
     -- frostbolt
@@ -401,7 +401,7 @@ local function APL()
     -- counterspell
     Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
     -- call_action_list,name=cooldowns
-    if HR.CDsON() then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4

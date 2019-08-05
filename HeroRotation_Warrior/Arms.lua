@@ -132,7 +132,7 @@ local function APL()
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
       end
       -- memory_of_lucid_dreams
@@ -427,7 +427,7 @@ local function APL()
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|(prev_gcd.1.colossus_smash&!essence.memory_of_lucid_dreams.major))
-    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or (Player:PrevGCD(1, S.ColossusSmash) and not S.MemoryofLucidDreams:IsAvailable()))) then
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and HR.CDsON() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or (Player:PrevGCD(1, S.ColossusSmash) and not S.MemoryofLucidDreams:IsAvailable()))) then
       if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 381"; end
     end
     -- avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)

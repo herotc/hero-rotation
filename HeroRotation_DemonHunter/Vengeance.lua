@@ -170,7 +170,7 @@ local function APL ()
       if HR.CastSuggested(I.SuperiorSteelskinPotion) then return "superior_steelskin_potion precombat"; end
     end
     -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
       if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
     end
     -- First attacks

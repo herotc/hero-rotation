@@ -186,7 +186,7 @@ local function APL()
       if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 6"; end
     end
     -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
       if HR.Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
     end
   end

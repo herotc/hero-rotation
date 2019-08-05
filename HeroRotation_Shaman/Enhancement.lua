@@ -245,7 +245,7 @@ local function APL()
         if HR.Cast(S.LightningShield) then return "lightning_shield 6"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 8"; end
       end
       -- rockbiter,if=maelstrom<15&time<gcd
@@ -562,7 +562,7 @@ local function APL()
       local ShouldReturn = Maintenance(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cds
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=freezerburn_core,if=variable.freezerburn_enabled

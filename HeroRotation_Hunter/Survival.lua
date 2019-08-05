@@ -192,11 +192,11 @@ local function APL()
         if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 6"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
       end
       -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-      if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() then
+      if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and HR.CDsON() then
         if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 8"; end
       end
       -- guardian_of_azeroth
@@ -653,7 +653,7 @@ local function APL()
     -- auto_attack
     -- use_items
     -- call_action_list,name=cds
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=apwfi,if=active_enemies<3&talent.chakrams.enabled&talent.alpha_predator.enabled

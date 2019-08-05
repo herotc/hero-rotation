@@ -186,7 +186,7 @@ local function APL()
     Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts);
     -- auto_attack
     -- call_action_list,name=cooldowns
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
