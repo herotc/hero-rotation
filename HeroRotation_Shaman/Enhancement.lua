@@ -298,10 +298,6 @@ local function APL()
     if S.GuardianofAzeroth:IsCastableP() then
       if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth 61"; end
     end
-    -- memory_of_lucid_dreams
-    if S.MemoryofLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams 63"; end
-    end
     -- feral_spirit
     if S.FeralSpirit:IsCastableP() then
       if HR.Cast(S.FeralSpirit) then return "feral_spirit 65"; end
@@ -381,10 +377,6 @@ local function APL()
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame 206"; end
     end
-    -- worldvein_resonance,if=buff.lifeblood.stack<4
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4) then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance 208"; end
-    end
     -- crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
     if S.CrashLightning:IsCastableP() and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[8] > 1 and bool(VarFurycheckCl)) then
       if HR.Cast(S.CrashLightning) then return "crash_lightning 212"; end
@@ -413,6 +405,10 @@ local function APL()
     if S.LavaLash:IsCastableP() and (bool(VarOcpoolLl) and bool(VarFurycheckLl)) then
       if HR.Cast(S.LavaLash) then return "lava_lash 260"; end
     end
+    -- memory_of_lucid_dreams
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams 63"; end
+    end
     -- rockbiter
     if S.Rockbiter:IsCastableP() then
       if HR.Cast(S.Rockbiter) then return "rockbiter 266"; end
@@ -424,6 +420,10 @@ local function APL()
     -- flametongue
     if S.Flametongue:IsCastableP() then
       if HR.Cast(S.Flametongue) then return "flametongue 276"; end
+    end
+    -- worldvein_resonance,if=buff.lifeblood.stack<4
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4) then
+      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance 208"; end
     end
   end
   FreezerburnCore = function()
