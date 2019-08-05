@@ -202,7 +202,7 @@ local function APL()
         if HR.Cast(S.Regrowth) then return "regrowth 3"; end
       end
       -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() then
+      if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and HR.CDsON() then
         if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 10"; end
       end
       -- cat_form
@@ -492,7 +492,7 @@ local function APL()
       if HR.Cast(S.Rake) then return "rake 406"; end
     end
     -- call_action_list,name=cooldowns
-    if (true) then
+    if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- ferocious_bite,target_if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>10&(talent.sabertooth.enabled)
