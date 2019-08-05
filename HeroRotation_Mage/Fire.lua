@@ -252,10 +252,6 @@ local function APL()
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, Settings.Fire.GCDasOffGCD.Essences) then return "blood_of_the_enemy 244"; end
     end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Fire.GCDasOffGCD.Essences) then return "guardian_of_azeroth 248"; end
-    end
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastableP() then
       if HR.Cast(S.MemoryofLucidDreams, Settings.Fire.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 246"; end
@@ -613,6 +609,10 @@ local function APL()
     -- mirror_image,if=buff.combustion.down
     if S.MirrorImage:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.MirrorImage) then return "mirror_image 791"; end
+    end
+    -- guardian_of_azeroth,if=cooldown.combustion.remains<10|target.time_to_die<cooldown.combustion.remains
+    if S.GuardianofAzeroth:IsCastableP() and (S.Combustion:CooldownRemainsP() < 10 or Target:TimeToDie() < S.Combustion:CooldownRemainsP()) then
+      if HR.Cast(S.GuardianofAzeroth, Settings.Fire.GCDasOffGCD.Essences) then return "guardian_of_azeroth 793"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
