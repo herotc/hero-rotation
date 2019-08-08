@@ -73,7 +73,7 @@ local S = Spell.DeathKnight.Unholy;
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Unholy = {
-  BattlePotionofStrength           = Item(163224),
+  PotionofUnbridledFury            = Item(169299),
   RampingAmplitudeGigavoltEngine   = Item(165580),
   BygoneBeeAlmanac                 = Item(163936),
   JesHowler                        = Item(159627),
@@ -147,8 +147,8 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 4"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
     end
     -- raise_dead
     if S.RaiseDead:IsCastableP() then
@@ -420,8 +420,8 @@ local function APL()
       end
     end
     -- potion,if=cooldown.army_of_the_dead.ready|pet.gargoyle.active|buff.unholy_frenzy.up
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (S.ArmyoftheDead:CooldownUpP() or S.SummonGargoyle:TimeSinceLastCast() <= 35 or Player:BuffP(S.UnholyFrenzyBuff)) then
-      if HR.CastSuggested(I.BattlePotionofStrength) then return "battle_potion_of_strength 293"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (S.ArmyoftheDead:CooldownUpP() or S.SummonGargoyle:TimeSinceLastCast() <= 35 or Player:BuffP(S.UnholyFrenzyBuff)) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 293"; end
     end
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsCastableP() then
