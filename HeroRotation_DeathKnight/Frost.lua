@@ -79,7 +79,7 @@ local S = Spell.DeathKnight.Frost;
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Frost = {
-  BattlePotionofStrength           = Item(163224),
+  PotionofUnbridledFury            = Item(169299),
   RazdunksBigRedButton             = Item(159611),
   MerekthasFang                    = Item(158367),
   KnotofAncientFuryAlliance        = Item(161413),
@@ -143,8 +143,8 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     -- potion
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-      if HR.Cast(I.BattlePotionofStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
     end
     -- variable,name=other_on_use_equipped,value=(equipped.notorious_gladiators_badge|equipped.sinister_gladiators_badge|equipped.sinister_gladiators_medallion|equipped.vial_of_animated_blood|equipped.first_mates_spyglass|equipped.jes_howler|equipped.notorious_gladiators_medallion)
     if (true) then
@@ -420,8 +420,8 @@ local function APL()
       end
     end
     -- potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-    if I.BattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
-      if HR.Cast(I.BattlePotionofStrength, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+      if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
     end
     -- blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
     if S.BloodFury:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
