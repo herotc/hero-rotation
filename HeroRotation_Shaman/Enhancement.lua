@@ -302,7 +302,7 @@ local function APL()
     if S.FeralSpirit:IsCastableP() then
       if HR.Cast(S.FeralSpirit) then return "feral_spirit 65"; end
     end
-    -- blood_of_the_enemy
+    -- blood_of_the_enemy,if=raid_event.adds.in>90|active_enemies>1
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy) then return "blood_of_the_enemy 67"; end
     end
@@ -353,19 +353,19 @@ local function APL()
     end
   end
   Filler = function()
-    -- sundering,if=active_enemies<3
-    if S.Sundering:IsCastableP() and (Cache.EnemiesCount[8] < 3) then
+    -- sundering,if=raid_event.adds.in>40
+    if S.Sundering:IsCastableP() then
       if HR.Cast(S.Sundering) then return "sundering 178"; end
     end
-    -- focused_azerite_beam,if=!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
+    -- focused_azerite_beam,if=raid_event.adds.in>90&!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.AscendanceBuff) and Player:BuffDownP(S.MoltenWeaponBuff) and Player:BuffDownP(S.IcyEdgeBuff) and Player:BuffDownP(S.CracklingSurgeBuff) and not Target:DebuffP(S.EarthenSpikeDebuff)) then
       if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 188"; end
     end
-    -- purifying_blast
+    -- purifying_blast,if=raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() then
       if HR.Cast(S.PurifyingBlast) then return "purifying_blast 200"; end
     end
-    -- ripple_in_space
+    -- ripple_in_space,if=raid_event.adds.in>60
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace) then return "ripple_in_space 202"; end
     end
@@ -507,16 +507,16 @@ local function APL()
     if S.Sundering:IsCastableP() and (Cache.EnemiesCount[8] >= 3 and (not bool(essence.blood_of_the_enemy.major) or (bool(essence.blood_of_the_enemy.major) and (Player:BuffP(S.SeethingRageBuff) or S.BloodoftheEnemy:CooldownRemainsP() > 40)))) then
       if HR.Cast(S.Sundering) then return "sundering 464"; end
     end
-    -- focused_azerite_beam,if=active_enemies>=3
-    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 3) then
+    -- focused_azerite_beam,if=active_enemies>1
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 478"; end
     end
-    -- purifying_blast,if=active_enemies>=3
-    if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 3) then
+    -- purifying_blast,if=active_enemies>1
+    if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.PurifyingBlast) then return "purifying_blast 486"; end
     end
-    -- ripple_in_space,if=active_enemies>=3
-    if S.RippleInSpace:IsCastableP() and (Cache.EnemiesCount[8] >= 3) then
+    -- ripple_in_space,if=active_enemies>1
+    if S.RippleInSpace:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.RippleInSpace) then return "ripple_in_space 494"; end
     end
     -- rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
