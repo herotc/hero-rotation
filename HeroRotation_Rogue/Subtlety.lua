@@ -565,7 +565,7 @@ local function CDs ()
                 (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
             else
               CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 40))
-                and Player:BuffRemainsP(S.SymbolsofDeath) > 8 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20);
+                and Player:BuffRemainsP(S.SymbolsofDeath) > 8 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20));
             end
           end
           if CastRazorCoral then
