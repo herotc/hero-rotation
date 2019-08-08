@@ -62,7 +62,7 @@ if not Item.DeathKnight then Item.DeathKnight = {}; end
   Item.DeathKnight.Blood = {
   --Legendaries
   --Potion
-  BattlePotionofStrength = Item(163224)
+  PotionofUnbridledFury = Item(169299)
 };
 local I = Item.DeathKnight.Blood;
 
