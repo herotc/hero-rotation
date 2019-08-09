@@ -156,39 +156,39 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.avenging_wrath.remains>=20|buff.crusade.stack=10&buff.crusade.remains>15)&(cooldown.guardian_of_azeroth.remains>90|target.time_to_die<30|!essence.condensed_lifeforce.major)
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) and (S.GuardianofAzeroth:CooldownRemainsP() > 90 or Target:TimeToDie() < 30 or not S.GuardianofAzeroth:IsAvailable())) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then reutrn "ashvanes_razor_coral"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then reutrn "ashvanes_razor_coral"; end
     end
     -- the_unbound_force,if=time<=2|buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (HL.CombatTime() <= 2 or Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, Settings.Retribution.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- blood_of_the_enemy,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Retribution.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth,if=!talent.crusade.enabled&(cooldown.avenging_wrath.remains<5&holy_power>=3&(buff.inquisition.up|!talent.inquisition.enabled)|cooldown.avenging_wrath.remains>=45)|(talent.crusade.enabled&cooldown.crusade.remains<gcd&holy_power>=4|holy_power>=3&time<10&talent.wake_of_ashes.enabled|cooldown.crusade.remains>=45)
     if S.GuardianofAzeroth:IsCastableP() and (not S.Crusade:IsAvailable() and (S.AvengingWrath:CooldownRemainsP() < 5 and Player:HolyPower() >= 3 and (Player:BuffP(S.InquisitionBuff) or not S.Inquisition:IsAvailable()) or S.AvengingWrath:CooldownRemainsP() >= 45) or (S.Crusade:IsAvailable() and S.Crusade:CooldownRemainsP() < PlayerGCD and Player:HolyPower() >= 4 or Player:HolyPower() >= 3 and HL.CombatTime() < 10 and S.WakeofAshes:IsAvailable() or S.Crusade:CooldownRemainsP() >= 45)) then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Retribution.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- worldvein_resonance,if=cooldown.avenging_wrath.remains<gcd&holy_power>=3|cooldown.crusade.remains<gcd&holy_power>=4|cooldown.avenging_wrath.remains>=45|cooldown.crusade.remains>=45
     if S.WorldveinResonance:IsCastableP() and (S.AvengingWrath:CooldownRemainsP() < PlayerGCD and Player:HolyPower() >= 3 or S.Crusade:CooldownRemainsP() < PlayerGCD and Player:HolyPower() >= 4 or S.AvengingWrath:CooldownRemainsP() >= 45 or S.Crusade:CooldownRemainsP() >= 45) then
-      if HR.Cast(S.WorldveinResonance, Settings.Retribution.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- focused_azerite_beam,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)&(buff.avenging_wrath.down|talent.crusade.enabled&buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
     if S.FocusedAzeriteBeam:IsCastableP() and ((Cache.EnemiesCount[8] >= 2) and (Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Retribution.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- memory_of_lucid_dreams,if=(buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10)&holy_power<=3
     if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10) and Player:HolyPower() <= 3) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Retribution.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- purifying_blast,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.PurifyingBlast, Settings.Retribution.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(buff.avenging_wrath.down|talent.crusade.enabled&buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and ((Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast"; end
     end
     -- avenging_wrath,if=(!talent.inquisition.enabled|buff.inquisition.up)&holy_power>=3
     if S.AvengingWrath:IsCastableP() and HR.CDsON() and ((not S.Inquisition:IsAvailable() or Player:BuffP(S.InquisitionBuff)) and Player:HolyPower() >= 3) then
@@ -272,7 +272,7 @@ local function APL()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Retribution.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- crusader_strike,if=holy_power<=4
     if S.CrusaderStrike:IsCastableP() and (Player:HolyPower() <= 4) then

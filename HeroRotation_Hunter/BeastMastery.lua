@@ -180,28 +180,28 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
       end
       -- worldvein_resonance
       if S.WorldveinResonance:IsCastableP() then
-        if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+        if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
       end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+        if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
       end
       -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists&(trinket.1.has_cooldown+trinket.2.has_cooldown<2|equipped.variable_intensity_gigavolt_oscillating_reactor)
       -- Needs to be updated to the 2nd half of the condition
       if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast precombat"; end
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast precombat"; end
       end
       -- focused_azerite_beam,if=!raid_event.invulnerable.exists
       if S.FocusedAzeriteBeam:IsCastableP() then
-        if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+        if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
       end
       -- aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
       if S.AspectoftheWild:IsCastableP() and (not S.PrimalInstincts:AzeriteEnabled() and not S.FocusedAzeriteBeam:IsAvailable() and (I.AzsharasFontofPower:IsEquipped() or not S.CyclotronicBlast:IsAvailable())) then
@@ -240,19 +240,19 @@ local function APL()
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4) then
-      if HR.Cast(S.WorldveinResonance, Settings.BeastMastery.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=cooldown.aspect_of_the_wild.remains<10|target.time_to_die>cooldown+duration|target.time_to_die<30
     if S.GuardianofAzeroth:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() < 10 or Target:TimeToDie() > S.GuardianofAzeroth:Cooldown() + S.GuardianofAzeroth:BaseDuration() or Target:TimeToDie() < 30) then
-      if HR.Cast(S.GuardianofAzeroth, Settings.BeastMastery.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.BeastMastery.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.BeastMastery.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
   end
   Cleave = function()
@@ -306,23 +306,23 @@ local function APL()
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
-      if HR.Cast(S.TheUnboundForce, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- multishot,if=azerite.rapid_reload.enabled&active_enemies>2
     if S.Multishot:IsCastableP() and (S.RapidReload:AzeriteEnabled() and EnemiesCount > 2) then
@@ -344,7 +344,7 @@ local function APL()
     end
     -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.bestial_wrath.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
     if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
-      if HR.Cast(S.ConcentratedFlame, Settings.BeastMastery.GCDasOffGCD.Essences) then return "concentrated_flame 165"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 165"; end
     end
     -- aspect_of_the_wild,if=cooldown.barbed_shot.charges<2|pet.cat.buff.frenzy.stack>2|!azerite.primal_instincts.enabled
     if S.AspectoftheWild:IsCastableP() and (S.BarbedShot:ChargesP() < 2 or Pet:BuffStackP(S.FrenzyBuff) > 2 or not S.PrimalInstincts:AzeriteEnabled()) then
@@ -360,11 +360,11 @@ local function APL()
     end
     -- focused_azerite_beam,if=buff.bestial_wrath.down|target.time_to_die<5
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam 184"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 184"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10 or Target:TimeToDie() < 5) then
-      if HR.Cast(S.TheUnboundForce, Settings.BeastMastery.GCDasOffGCD.Essences) then return "the_unbound_force 185"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 185"; end
     end
     -- bestial_wrath
     if S.BestialWrath:IsCastableP() then
@@ -388,11 +388,11 @@ local function APL()
     end
     -- purifying_blast,if=buff.bestial_wrath.down|target.time_to_die<8
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 8) then
-      if HR.Cast(S.PurifyingBlast, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, Settings.BeastMastery.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- barrage
     if S.Barrage:IsReadyP() then
@@ -432,11 +432,11 @@ local function APL()
     -- use_items
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.up)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.RazorCoralDebuff) and (Player:PrevGCDP(1, S.AspectoftheWild) or not S.CyclotronicBlast:IsAvailable() and Player:BuffP(S.AspectoftheWildBuff)) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(S.CyclotronicBlast:CooldownRemainsP() + 4 < Target:TimeToDie()))) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast"; end
     end
     -- call_action_list,name=cds
     if (HR.CDsON()) then

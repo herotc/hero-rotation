@@ -159,19 +159,19 @@ local function APL()
       end
       -- worldvein_resonance
       if S.WorldveinResonance:IsCastableP() then
-        if HR.Cast(S.WorldveinResonance, Settings.Marksmanship.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+        if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
       end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, Settings.Marksmanship.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryofLucidDreams, Settings.Marksmanship.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+        if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
       end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
       end
       -- trueshot,precast_time=1.5,if=active_enemies>2
       if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (EnemiesCount > 2) then
@@ -214,19 +214,19 @@ local function APL()
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4&!buff.trueshot.up
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4 and Player:BuffDownP(S.TrueshotBuff)) then
-      if HR.Cast(S.WorldveinResonance, Settings.Marksmanship.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=(ca_execute|target.time_to_die>cooldown.guardian_of_azeroth.duration+duration)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<30
     if S.GuardianofAzeroth:IsCastableP() and (((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) or Target:TimeToDie() > S.GuardianofAzeroth:Cooldown() + S.GuardianofAzeroth:BaseDuration()) and (Player:BuffP(S.TrueshotBuff) or S.Trueshot:CooldownRemainsP() < 16) or Target:TimeToDie() < 31) then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Marksmanship.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- ripple_in_space,if=cooldown.trueshot.remains<7
     if S.RippleInSpace:IsCastableP() and (S.Trueshot:CooldownRemainsP() < 7) then
-      if HR.Cast(S.RippleInSpace, Settings.Marksmanship.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- memory_of_lucid_dreams,if=!buff.trueshot.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Marksmanship.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.TrueshotBuff) and Player:HasHeroism() or Player:BuffP(S.TrueshotBuff) and ((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) and S.CarefulAim:IsAvailable()) or Target:TimeToDie() < 61) then
@@ -260,11 +260,11 @@ local function APL()
     end
     -- blood_of_the_enemy,if=buff.trueshot.up&(buff.unerring_vision.stack>4|!azerite.unerring_vision.enabled)|target.time_to_die<11
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffStackP(S.UnerringVisionBuff) > 4 or not S.UnerringVision:AzeriteEnabled()) or Target:TimeToDie() < 11) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy st"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy st"; end
     end
     -- focused_azerite_beam,if=!buff.trueshot.up|target.time_to_die<5
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 5) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Marksmanship.GCDasOffGCD.Essences) then return "focused_azerite_beam st"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam st"; end
     end
     -- arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&!buff.memory_of_lucid_dreams.up
     if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and MasterMarksmanBuffCheck() and not Player:BuffP(S.MemoryofLucidDreams)) then
@@ -284,15 +284,15 @@ local function APL()
     end
     -- purifying_blast,if=!buff.trueshot.up|target.time_to_die<8
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 8) then
-      if HR.Cast(S.PurifyingBlast, Settings.Marksmanship.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.trueshot.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
     if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.TrueshotBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
-      if HR.Cast(S.ConcentratedFlame, Settings.Marksmanship.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10 or Target:TimeToDie() < 5) then
-      if HR.Cast(S.TheUnboundForce, Settings.Marksmanship.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
     if S.ArcaneShot:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) and (Player:BuffP(S.PreciseShotsBuff) and (Player:Focus() > 41 or MasterMarksmanBuffCheck()) or (Player:Focus() > 50 and S.FocusedFire:IsAvailable() or Player:Focus() > 75) and (S.Trueshot:CooldownRemainsP() > 5 or Player:Focus() > 80) or Target:TimeToDie() < 5)) then
@@ -334,23 +334,23 @@ local function APL()
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Marksmanship.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.Marksmanship.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Marksmanship.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Marksmanship.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
-      if HR.Cast(S.TheUnboundForce, Settings.Marksmanship.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- piercing_shot
     if S.PiercingShot:IsCastableP() then
@@ -383,11 +383,11 @@ local function APL()
     -- auto_shot
     -- use_item,name=galecallers_boon,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<10
     if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 10) then
-      if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon"; end
+      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major.rank3|debuff.blood_of_the_enemy.up|target.time_to_die<5
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodoftheEnemy:ID() == "298277" or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
-      if Hr.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
+      if Hr.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
     -- call_action_list,name=cds

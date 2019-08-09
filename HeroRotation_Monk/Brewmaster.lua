@@ -206,7 +206,7 @@ local function APL()
     end
     -- Invocation of Yu'lon
     if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.InvocationOfYulon) then return ""; end
+      if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- potion
     if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
@@ -268,7 +268,7 @@ local function APL()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Brewmaster.GCDasOffGCD.Essences) then return ""; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
     if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 3) then

@@ -246,7 +246,7 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 8"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 8"; end
       end
       -- rockbiter,if=maelstrom<15&time<gcd
       if S.Rockbiter:IsCastableP() then
@@ -276,7 +276,7 @@ local function APL()
     end
     -- use_item,name=azsharas_font_of_power
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 41"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 41"; end
     end
     -- blood_fury,if=variable.cooldown_sync
     if S.BloodFury:IsCastableP() and HR.CDsON() and (bool(VarCooldownSync)) then
@@ -296,7 +296,7 @@ local function APL()
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth 61"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 61"; end
     end
     -- feral_spirit
     if S.FeralSpirit:IsCastableP() then
@@ -304,7 +304,7 @@ local function APL()
     end
     -- blood_of_the_enemy,if=raid_event.adds.in>90|active_enemies>1
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy) then return "blood_of_the_enemy 67"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 67"; end
     end
     -- ascendance,if=cooldown.strike.remains>0
     -- Storm Strike???
@@ -313,15 +313,15 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(target.time_to_die<20&debuff.razor_coral_debuff.stack>2)
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuffDebuff) or (Target:TimeToDie() < 20 and Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2)) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 73"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 73"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>2&debuff.conductive_ink_debuff.down&(buff.ascendance.remains>10|buff.molten_weapon.remains>10|buff.crackling_surge.remains>10|buff.icy_edge.remains>10|debuff.earthen_spike.remains>6)
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2 and Target:DebuffDownP(S.ConductiveInkDebuffDebuff) and (Player:BuffRemainsP(S.AscendanceBuff) > 10 or Player:BuffRemainsP(S.MoltenWeaponBuff) > 10 or Player:BuffRemainsP(S.CracklingSurgeBuff) > 10 or Player:BuffRemainsP(S.IcyEdgeBuff) > 10 or Target:DebuffRemainsP(S.EarthenSpikeDebuff) > 6)) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 79"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 79"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=(debuff.conductive_ink_debuff.up|buff.ascendance.remains>10|buff.molten_weapon.remains>10|buff.crackling_surge.remains>10|buff.icy_edge.remains>10|debuff.earthen_spike.remains>6)&target.health.pct<31
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and ((Target:DebuffP(S.ConductiveInkDebuffDebuff) or Player:BuffRemainsP(S.AscendanceBuff) > 10 or Player:BuffRemainsP(S.MoltenWeaponBuff) > 10 or Player:BuffRemainsP(S.CracklingSurgeBuff) > 10 or Player:BuffRemainsP(S.IcyEdgeBuff) > 10 or Target:DebuffRemainsP(S.EarthenSpikeDebuff) > 6) and Target:HealthPercentage() < 31) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 95"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 95"; end
     end
     -- use_items
     -- earth_elemental
@@ -359,15 +359,15 @@ local function APL()
     end
     -- focused_azerite_beam,if=raid_event.adds.in>90&!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.AscendanceBuff) and Player:BuffDownP(S.MoltenWeaponBuff) and Player:BuffDownP(S.IcyEdgeBuff) and Player:BuffDownP(S.CracklingSurgeBuff) and not Target:DebuffP(S.EarthenSpikeDebuff)) then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 188"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 188"; end
     end
     -- purifying_blast,if=raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast 200"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast 200"; end
     end
     -- ripple_in_space,if=raid_event.adds.in>60
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space 202"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 202"; end
     end
     -- thundercharge
     if S.Thundercharge:IsCastableP() then
@@ -375,7 +375,7 @@ local function APL()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame) then return "concentrated_flame 206"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 206"; end
     end
     -- crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
     if S.CrashLightning:IsCastableP() and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[8] > 1 and bool(VarFurycheckCl)) then
@@ -407,7 +407,7 @@ local function APL()
     end
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams 63"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 63"; end
     end
     -- rockbiter
     if S.Rockbiter:IsCastableP() then
@@ -423,7 +423,7 @@ local function APL()
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4) then
-      if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance 208"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 208"; end
     end
   end
   FreezerburnCore = function()
@@ -481,7 +481,7 @@ local function APL()
     end
     -- the_unbound_force,if=buff.reckless_force.up|time<5
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or HL.CombatTime() < 5) then
-      if HR.Cast(S.TheUnboundForce) then return "the_unbound_force 414"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 414"; end
     end
     -- lava_lash,if=azerite.primal_primer.rank>=2&debuff.primal_primer.stack=10&active_enemies=1&variable.freezerburn_enabled&variable.furyCheck_LL
     if S.LavaLash:IsCastableP() and (S.PrimalPrimer:AzeriteRank() >= 2 and Target:DebuffStackP(S.PrimalPrimerDebuff) == 10 and Cache.EnemiesCount[8] == 1 and bool(VarFreezerburnEnabled) and bool(VarFurycheckLl)) then
@@ -509,15 +509,15 @@ local function APL()
     end
     -- focused_azerite_beam,if=active_enemies>1
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.FocusedAzeriteBeam) then return "focused_azerite_beam 478"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 478"; end
     end
     -- purifying_blast,if=active_enemies>1
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.PurifyingBlast) then return "purifying_blast 486"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast 486"; end
     end
     -- ripple_in_space,if=active_enemies>1
     if S.RippleInSpace:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.RippleInSpace) then return "ripple_in_space 494"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 494"; end
     end
     -- rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
     if S.Rockbiter:IsCastableP() and (S.Landslide:IsAvailable() and Player:BuffDownP(S.LandslideBuff) and S.Rockbiter:ChargesFractionalP() > 1.7) then

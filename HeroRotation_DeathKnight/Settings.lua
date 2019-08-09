@@ -18,8 +18,10 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 HR.GUISettings.APL.DeathKnight = {
   Commons = {
     UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Deathstrikes
-    UseTrinkets = true,
     UsePotions = true,
+    UseTrinkets = true,
+    TrinketDisplayStyle = "Suggested",
+    EssenceDisplayStyle = "Suggested",
     OffGCDasOffGCD = {
       Trinkets = true,
       Potions = true,
@@ -35,7 +37,6 @@ HR.GUISettings.APL.DeathKnight = {
       PillarofFrost = true,
       EmpowerRuneWeapon = true,
       BreathofSindragosa = true,
-      Essences = true,
     },
   },
   Unholy = {
@@ -45,7 +46,6 @@ HR.GUISettings.APL.DeathKnight = {
       ArmyoftheDead = true,
       DeathandDecay = false,
       UnholyFrenzy = true,
-      Essences = true,
     }
   },
   Blood = {
@@ -63,7 +63,6 @@ HR.GUISettings.APL.DeathKnight = {
       -- Abilities
       Blooddrinker = true,
       Bonestorm = true,
-      Essences = true,
     },
     OffGCDasOffGCD = {
       DancingRuneWeapon = true,
@@ -82,8 +81,10 @@ local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
 
 --DeathKnight Panels
 CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Deathstrike on low HP", "Set the HP threshold to use DeathStrike (working only if Solo Mode is enabled).");
-CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
+CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
+CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 --Unholy Panels
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");

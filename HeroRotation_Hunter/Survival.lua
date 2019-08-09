@@ -193,15 +193,15 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 7"; end
       end
       -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
       if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 8"; end
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 8"; end
       end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 9"; end
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 9"; end
       end
       -- steel_trap
       if S.SteelTrap:IsCastableP() and Player:DebuffDownP(S.SteelTrapDebuff) then
@@ -376,51 +376,51 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 321"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 321"; end
     end
     -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
     if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and Settings.Commons.UseTrinkets and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(S.CyclotronicBlast:CooldownRemainsP()) or not S.MemoryofLucidDreams:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP())) then
-      if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon 322"; end
+      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 322"; end
     end
     -- use_item,name=azsharas_font_of_power
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 323"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 323"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Survival.GCDasOffGCD.Essences) then return "focused_azerite_beam 324"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 324"; end
     end
     -- memory_of_lucid_dreams,if=focus<focus.max-30&buff.coordinated_assault.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:FocusDeficit() > 30 and Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Survival.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 325"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 325"; end
     end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Survival.GCDasOffGCD.Essences) then return "blood_of_the_enemy 328"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 328"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.Survival.GCDasOffGCD.Essences) then return "purifying_blast 332"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast 332"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Survival.GCDasOffGCD.Essences) then return "guardian_of_azeroth 334"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 334"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Survival.GCDasOffGCD.Essences) then return "ripple_in_space 336"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 336"; end
     end
     -- concentrated_flame,if=full_recharge_time<1*gcd
     if S.ConcentratedFlame:IsCastableP() and (S.ConcentratedFlame:FullRechargeTimeP() < 1 * Player:GCD()) then
-      if HR.Cast(S.ConcentratedFlame, Settings.Survival.GCDasOffGCD.Essences) then return "concentrated_flame 338"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 338"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, Settings.Survival.GCDasOffGCD.Essences) then return "the_unbound_force 344"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 344"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance, Settings.Survival.GCDasOffGCD.Essences) then return "worldvein_resonance 348"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 348"; end
     end
   end
   Cleave = function()
@@ -686,7 +686,7 @@ local function APL()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Survival.GCDasOffGCD.Essences) then return "concentrated_flame 886"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 886"; end
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then

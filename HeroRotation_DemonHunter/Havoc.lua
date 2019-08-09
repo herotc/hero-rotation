@@ -193,39 +193,39 @@ local function APL()
   Essences = function()
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Havoc.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Havoc.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth,if=buff.metamorphosis.up|target.time_to_die<=30
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 30) then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Havoc.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Havoc.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.PurifyingBlast, Settings.Havoc.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
-      if HR.Cast(S.TheUnboundForce, Settings.Havoc.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Havoc.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
-      if HR.Cast(S.WorldveinResonance, Settings.Havoc.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Havoc.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
   end
   Cooldown = function()
@@ -249,19 +249,19 @@ local function APL()
     if (Settings.Commons.UseTrinkets) then
       -- use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
       if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownUpP()) then
-        if HR.CastSuggested(I.GalecallersBoon) then return "galecallers_boon 56"; end
+        if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 56"; end
       end
       -- use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
       if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffP(S.MetamorphosisBuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (not bool(VarBladeDance) or not S.BladeDance:IsReady())) then
-        if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 57"; end
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 57"; end
       end
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
       if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.ConductiveInkDebuff) or Player:BuffRemainsP(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-        if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 59"; end
       end
       -- use_item,name=azsharas_font_of_power,if=cooldown.metamorphosis.remains<10|cooldown.metamorphosis.remains>60
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (S.Metamorphosis:CooldownRemainsP() < 10 or S.Metamorphosis:CooldownRemainsP() > 60) then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 60"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 60"; end
       end
     end
     -- use_items,if=buff.metamorphosis.up

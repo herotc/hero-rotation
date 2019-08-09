@@ -373,49 +373,49 @@ local function APL()
     if (Settings.Commons.UseTrinkets) then
       -- use_item,name=azsharas_font_of_power,if=(cooldown.empowered_rune_weapon.ready&!variable.other_on_use_equipped)|(cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and ((S.EmpowerRuneWeapon:CooldownUpP() and not bool(VarOoUE)) or (S.PillarofFrost:CooldownRemainsP() <= 10 and bool(VarOoUE))) then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return ""; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_item,name=lurkers_insidious_gift,if=talent.breath_of_sindragosa.enabled&((cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)|(buff.pillar_of_frost.up&!variable.other_on_use_equipped))|(buff.pillar_of_frost.up&!talent.breath_of_sindragosa.enabled)
       if I.LurkersInsidiousGift:IsEquipped() and I.LurkersInsidiousGift:IsReady() and (S.BreathofSindragosa:IsAvailable() and ((S.PillarofFrost:CooldownRemainsP() <= 10 and bool(VarOoUE)) or (Player:BuffP(S.PillarofFrostBuff) and not bool(VarOoUE))) or (Player:BuffP(S.PillarofFrostBuff) and not S.BreathofSindragosa:IsAvailable())) then
-        if HR.CastSuggested(I.LurkersInsidiousGift) then return ""; end
+        if HR.Cast(I.LurkersInsidiousGift, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_item,name=cyclotronic_blast,if=!buff.pillar_of_frost.up
       if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffDownP(S.PillarofFrostBuff)) then
-        if HR.CastSuggested(I.PocketsizedComputationDevice) then return ""; end
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>110|cooldown.breath_of_sindragosa.remains>90|time<50|target.1.time_to_die<21
       if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 110 or S.BreathofSindragosa:CooldownRemainsP() > 90 or HL.CombatTime() < 50 or Target:TimeToDie() < 21) then
-        if HR.CastSuggested(I.AshvanesRazorCoral) then return ""; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
       if (S.PillarofFrost:CooldownUpP() or S.PillarofFrost:CooldownRemainsP() > 20) and (not S.BreathofSindragosa:IsAvailable() or S.EmpowerRuneWeaponBuff:CooldownRemainsP() > 95) then
         -- use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
         if I.JesHowler:IsEquipped() and I.JesHowler:IsReady() and ((I.LurkersInsidiousGift:IsEquipped() and Player:BuffP(S.PillarofFrostBuff)) or (not I.LurkersInsidiousGift:IsEquipped() and Player:BuffRemainsP(S.PillarofFrostBuff) < 12 and Player:BuffP(S.PillarofFrostBuff))) then
-          if HR.CastSuggested(I.JesHowler) then return ""; end
+          if HR.Cast(I.JesHowler, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
         -- use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
         -- Two lines, since Horde and Alliance versions of the trinket have different IDs
         if I.KnotofAncientFuryAlliance:IsEquipped() and I.KnotofAncientFuryAlliance:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
-          if HR.CastSuggested(I.KnotofAncientFuryAlliance) then return ""; end
+          if HR.Cast(I.KnotofAncientFuryAlliance, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
         if I.KnotofAncientFuryHorde:IsEquipped() and I.KnotofAncientFuryHorde:IsReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
-          if HR.CastSuggested(I.KnotofAncientFuryHorde) then return ""; end
+          if HR.Cast(I.KnotofAncientFuryHorde, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
         -- use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
         if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and (Player:Rune() <= 3 and Player:BuffDownP(S.PillarofFrostBuff) and (Player:BuffDownP(S.BreathofSindragosa) or not S.BreathofSindragosa:IsAvailable())) then
-          if HR.CastSuggested(I.GrongsPrimalRage) then return ""; end
+          if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
         -- use_item,name=razdunks_big_red_button
         if I.RazdunksBigRedButton:IsEquipped() and I.RazdunksBigRedButton:IsReady() then
-          if HR.CastSuggested(I.RazdunksBigRedButton) then return ""; end
+          if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
         -- use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
         if I.MerekthasFang:IsEquipped() and I.MerekthasFang:IsReady() and (not Player:BuffP(S.BreathofSindragosa) and not Player:BuffP(S.PillarofFrostBuff)) then
-          if HR.CastSuggested(I.MerekthasFang) then return ""; end
+          if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
         -- use_item,name=first_mates_spyglass,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
         if I.FirstMatesSpyglass:IsEquipped() and I.FirstMatesSpyglass:IsReady() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
-          if HR.CastSuggested(I.FirstMatesSpyglass) then return ""; end
+          if HR.Cast(I.FirstMatesSpyglass, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
       end
     end
@@ -467,43 +467,43 @@ local function APL()
   Essences = function()
     -- blood_of_the_enemy,if=buff.pillar_of_frost.remains<10&cooldown.breath_of_sindragosa.remains|buff.pillar_of_frost.remains<10&!talent.breath_of_sindragosa.enabled
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and bool(S.BreathofSindragosa:CooldownRemainsP()) or Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and not S.BreathofSindragosa:IsAvailable()) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Frost.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Frost.GCDasOffGCD.Essences) then return "guardian_of_azeroth"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- chill_streak,if=buff.pillar_of_frost.remains<5|target.1.time_to_die<5
     if S.ChillStreak:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 or Target:TimeToDie() < 5) then
-      if HR.Cast(S.ChillStreak, Settings.Frost.GCDasOffGCD.Essences) then return "chill_streak"; end
+      if HR.Cast(S.ChillStreak, nil, Settings.Commons.EssenceDisplayStyle) then return "chill_streak"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
-      if HR.Cast(S.TheUnboundForce, Settings.Frost.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- focused_azerite_beam,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
     if S.FocusedAzeriteBeam:IsCastableP() and (not Player:BuffP(S.PillarofFrostBuff) and not Player:BuffP(S.BreathofSindragosa)) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Frost.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- concentrated_flame,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.PillarofFrostBuff) and Player:BuffDownP(S.BreathofSindragosa) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-      if HR.Cast(S.ConcentratedFlame, Settings.Frost.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- purifying_blast,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
     if S.PurifyingBlast:IsCastableP() and (not Player:BuffP(S.PillarofFrostBuff) and not Player:BuffP(S.BreathofSindragosa)) then
-      if HR.Cast(S.PurifyingBlast, Settings.Frost.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- worldvein_resonance,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
     if S.WorldveinResonance:IsCastableP() and (not Player:BuffP(S.PillarofFrostBuff) and not Player:BuffP(S.BreathofSindragosa)) then
-      if HR.Cast(S.WorldveinResonance, Settings.Frost.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- ripple_in_space,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
     if S.RippleInSpace:IsCastableP() and (not Player:BuffP(S.PillarofFrostBuff) and not Player:BuffP(S.BreathofSindragosa)) then
-      if HR.Cast(S.RippleInSpace, Settings.Frost.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- memory_of_lucid_dreams,if=buff.empower_rune_weapon.remains<5&buff.breath_of_sindragosa.up|(rune.time_to_2>gcd&runic_power<50)
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffRemainsP(S.EmpowerRuneWeaponBuff) < 5 and Player:BuffP(S.BreathofSindragosa) or (Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 50)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Frost.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
   end
   Obliteration = function()

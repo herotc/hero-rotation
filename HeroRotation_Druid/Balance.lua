@@ -207,10 +207,6 @@ local function DoTsUp()
   return (Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.Sunfire) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff)))
 end
 
-local function EvaluateCycleAzsharasFontofPower59(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (I.AzsharasFontofPower:IsEquipped() and Player:BuffDownP(CaInc()))
-end
-
 local function EvaluateCycleGuardianofAzeroth78(TargetUnit)
   return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and Player:BuffDownP(CaInc()))
 end
@@ -291,7 +287,7 @@ local function APL()
     end
     -- use_item,name=azsharas_font_of_power
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(S.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
     end
     -- potion,dynamic_prepot=1
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
@@ -337,8 +333,8 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 65"; end
     end
     -- use_item,name=azsharas_font_of_power,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastCycle(I.AzsharasFontofPower, 40, EvaluateCycleAzsharasFontofPower59) then return "azsharas_font_of_power 73" end
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(CaInc()) and DoTsUp())then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 73" end
     end
     -- guardian_of_azeroth,if=(!talent.starlord.enabled|buff.starlord.up)&!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if S.GuardianofAzeroth:IsCastableP() then
@@ -354,7 +350,7 @@ local function APL()
     end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
     if S.BloodoftheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Balance.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- memory_of_lucid_dreams,if=!buff.ca_inc.up&(astral_power<25|cooldown.ca_inc.remains>30),target_if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)
     if S.MemoryofLucidDreams:IsCastableP() then
@@ -362,15 +358,15 @@ local function APL()
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.Balance.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Balance.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Balance.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if S.TheUnboundForce:IsCastableP() then
@@ -378,7 +374,7 @@ local function APL()
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance, Settings.Balance.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- focused_azerite_beam,if=(!variable.az_ss|!buff.ca_inc.up),target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if S.FocusedAzeriteBeam:IsCastableP() then
@@ -386,7 +382,7 @@ local function APL()
     end
     -- thorns
     if S.Thorns:IsCastableP() then
-      if HR.Cast(S.Thorns, Settings.Balance.GCDasOffGCD.Essences) then return "thorns"; end
+      if HR.Cast(S.Thorns, nil, Settings.Commons.EssenceDisplayStyle) then return "thorns"; end
     end
     -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up
     -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up

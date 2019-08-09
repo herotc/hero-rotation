@@ -211,7 +211,7 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 50"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 50"; end
       end
       -- mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
       if S.MindBlast:IsReadyP() and Everyone.TargetIsValid() and (EnemiesCount < 2 or S.ThoughtHarvester:AzeriteRank() == 0) and not Player:IsCasting(S.MindBlast) then
@@ -230,39 +230,39 @@ local function APL()
   Cds = function()
     -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(26+7*buff.bloodlust.up)|(current_insanity_drain*((gcd.max*2)+action.mind_blast.cast_time)>insanity
     if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (26 + 7 * num(Player:HasHeroism())) or (InsanityDrain * ((Player:GCD() * 2) + S.MindBlast:CastTime())) > Player:Insanity()) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Shadow.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams cds"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams cds"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Shadow.GCDasOffGCD.Essences) then return "blood_of_the_enemy cds"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy cds"; end
     end
     -- guardian_of_azeroth,if=buff.voidform.stack>15
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffStackP(S.VoidformBuff) > 15) then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Shadow.GCDasOffGCD.Essences) then return "guardian_of_azeroth cds"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth cds"; end
     end
     -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
     if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Shadow.GCDasOffGCD.Essences) then return "focused_azerite_beam cds"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam cds"; end
     end
     -- purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() and (EnemiesCount >= 2) then
-      if HR.Cast(S.PurifyingBlast, Settings.Shadow.GCDasOffGCD.Essences) then return "purifying_blast cds"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast cds"; end
     end
     -- the_unbound_force
     if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce, Settings.Shadow.GCDasOffGCD.Essences) then return "the_unbound_force cds"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force cds"; end
     end
     -- concentrated_flame,line_cd=6,if=time<=10|(buff.chorus_of_insanity.stack>=15&buff.voidform.up)|full_recharge_time<gcd|target.time_to_die<5
     if S.ConcentratedFlame:IsCastableP() and (HL.CombatTime() <= 10 or (Player:BuffStackP(S.ChorusofInsanity) >= 15 and Player:BuffP(S.VoidformBuff)) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
-      if HR.Cast(S.ConcentratedFlame, Settings.Shadow.GCDasOffGCD.Essences) then return "concentrated_flame cds"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame cds"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Shadow.GCDasOffGCD.Essences) then return "ripple_in_space cds"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space cds"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff)) then
-      if HR.Cast(S.WorldveinResonance, Settings.Shadow.GCDasOffGCD.Essences) then return "worldvein_resonance cds"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance cds"; end
     end
     -- call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
     if ((Player:BuffP(S.VoidformBuff) and Player:BuffStackP(S.ChorusofInsanity) > 20) or not S.ChorusofInsanity:AzeriteEnabled() and HR.CDsON()) then
@@ -355,11 +355,11 @@ local function APL()
   CritCds = function()
     -- use_item,name=azsharas_font_of_power
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power critcds"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power critcds"; end
     end
     -- use_item,effect_name=cyclotronic_blast
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and S.CyclotonicBlast:IsAvailable() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device critcds"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device critcds"; end
     end
   end
   Single = function()

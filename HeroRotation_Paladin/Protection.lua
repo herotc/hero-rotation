@@ -133,11 +133,11 @@ local function APL()
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.seraphim.remains<=10|!talent.seraphim.enabled
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and (S.Seraphim:CooldownRemainsP() <= 10 or not S.Seraphim:IsAvailable()) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 16"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 16"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>7&buff.avenging_wrath.up
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffStackP(S.RazorCoralDebuff) > 7 and Player:BuffP(S.AvengingWrathBuff)) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 18"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 18"; end
     end
     -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
     if S.Seraphim:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() >= 2) then
@@ -149,7 +149,7 @@ local function APL()
     end
     -- memory_of_lucid_dreams,if=!talent.seraphim.enabled|cooldown.seraphim.remains<=gcd|buff.seraphim.up
     if S.MemoryofLucidDreams:IsCastableP() and (not S.Seraphim:IsAvailable() or S.Seraphim:CooldownRemainsP() <= Player:GCD() or Player:BuffP(S.SeraphimBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Protection.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 28"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 28"; end
     end
     -- bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
     if S.BastionofLight:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() <= 0.5) then
@@ -162,19 +162,19 @@ local function APL()
     -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
     -- use_item,name=grongs_primal_rage,if=cooldown.judgment.full_recharge_time>4&cooldown.avengers_shield.remains>4&(buff.seraphim.up|cooldown.seraphim.remains+4+gcd>expected_combat_length-time)&consecration.up
     if I.GrongsPrimalRage:IsEquipped() and I.GrongsPrimalRage:IsReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 and S.AvengersShield:CooldownRemainsP() > 4 and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() + 4 + Player:GCD() > Target:TimeToDie()) and Player:BuffP(S.ConsecrationBuff)) then
-      if HR.CastSuggested(I.GrongsPrimalRage) then return "grongs_primal_rage 43"; end
+      if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 43"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.judgment.full_recharge_time>4*spell_haste&cooldown.avengers_shield.remains>4*spell_haste&(!equipped.grongs_primal_rage|!trinket.grongs_primal_rage.cooldown.up)&consecration.up
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 * Player:SpellHaste() and S.AvengersShield:CooldownRemainsP() > 4 * Player:SpellHaste() and (not I.GrongsPrimalRage:IsEquipped() or not I.GrongsPrimalRage:IsReady()) and Player:BuffP(S.ConsecrationBuff)) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device"; end
     end
     -- use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
     if I.MerekthasFang:IsEquipped() and I.MerekthasFang:IsReady() and Settings.Commons.UseTrinkets and (not Player:BuffP(S.AvengingWrathBuff) and (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable())) then
-      if HR.CastSuggested(I.MerekthasFang) then return "merekthas_fang 57"; end
+      if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return "merekthas_fang 57"; end
     end
     -- use_item,name=razdunks_big_red_button
     if I.RazdunksBigRedButton:IsEquipped() and I.RazdunksBigRedButton:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.RazdunksBigRedButton) then return "razdunks_big_red_button 65"; end
+      if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return "razdunks_big_red_button 65"; end
     end
   end
   -- call precombat
@@ -191,7 +191,7 @@ local function APL()
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
-      if HR.Cast(S.WorldveinResonance, Settings.Protection.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
     if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengersValorBuff) and S.ShieldoftheRighteous:ChargesFractionalP() >= 2.5) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
@@ -227,7 +227,7 @@ local function APL()
     end
     -- concentrated_flame,if=buff.seraphim.up&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffP(S.SeraphimBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or (S.ConcentratedFlame:ID() == 295373 or S.ConcentratedFlame:ID() == 299349)) then
-      if HR.Cast(S.ConcentratedFlame, Settings.Protection.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
@@ -235,7 +235,7 @@ local function APL()
     end
     -- anima_of_death
     if S.AnimaofDeath:IsCastableP() then
-      if HR.Cast(S.AnimaofDeath, Settings.Protection.GCDasOffGCD.Essences) then return "anima_of_death"; end
+      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle) then return "anima_of_death"; end
     end
     -- blessed_hammer,strikes=3
     if S.BlessedHammer:IsCastableP() then
@@ -251,7 +251,7 @@ local function APL()
     end
     -- heart_essence,if=!essence.the_crucible_of_flame.major|!essence.worldvein_resonance.major|!essence.anima_of_life_and_death.major|!essence.memory_of_lucid_dreams.major
     if S.HeartEssence:IsCastableP() and (not S.ConcentratedFlame:IsAvailable() or not S.WorldveinResonance:IsAvailable() or not S.AnimaofDeath:IsAvailable() or not S.MemoryofLucidDreams:IsAvailable()) then
-      if HR.Cast(S.HeartEssence, Settings.Protection.GCDasOffGCD.Essences) then return "heart_essence"; end
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
     end
   end
 end

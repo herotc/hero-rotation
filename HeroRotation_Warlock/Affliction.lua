@@ -339,7 +339,7 @@ local function APL()
       -- use_item,name=azsharas_font_of_power
       -- Using main icon, since only Haunt will be suggested precombat if equipped and that's optional
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power 15"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 15"; end
       end
       -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3&!equipped.169314
       if S.SeedofCorruption:IsCastableP() and Player:DebuffDownP(S.SeedofCorruptionDebuff) and (EnemiesCount >= 3 and not I.AzsharasFontofPower:IsEquipped()) then
@@ -358,7 +358,7 @@ local function APL()
   Cooldowns = function()
     -- use_item,name=azsharas_font_of_power,if=(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains<4*spell_haste|!cooldown.phantom_singularity.remains)&cooldown.summon_darkglare.remains<19*spell_haste+soul_shard*azerite.dreadful_calling.rank&dot.agony.remains&dot.corruption.remains&(dot.siphon_life.remains|!talent.siphon_life.enabled)
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and ((not S.PhantomSingularity:IsAvailable() or S.PhantomSingularity:CooldownRemainsP() < 4 * Player:SpellHaste() or S.PhantomSingularity:CooldownUpP()) and S.SummonDarkglare:CooldownRemainsP() < 19 * Player:SpellHaste() + Player:SoulShardsP() * S.DreadfulCalling:AzeriteRank() and Target:DebuffP(S.AgonyDebuff) and Target:DebuffP(S.CorruptionDebuff) and (Target:DebuffP(S.SiphonLifeDebuff) or not S.SiphonLife:IsAvailable())) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 30"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 30"; end
     end
     -- potion,if=(talent.dark_soul_misery.enabled&cooldown.summon_darkglare.up&cooldown.dark_soul.up)|cooldown.summon_darkglare.up|target.time_to_die<30
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and ((S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownUpP() and S.DarkSoul:CooldownUpP()) or S.SummonDarkglare:CooldownUpP() or Target:TimeToDie() < 30) then
@@ -375,7 +375,7 @@ local function APL()
     end
     -- memory_of_lucid_dreams,if=time>30
     if S.MemoryofLucidDreams:IsCastableP() and (HL.CombatTime() > 30) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 59"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 59"; end
     end
     -- dark_soul,if=target.time_to_die<20+gcd|talent.sow_the_seeds.enabled&cooldown.summon_darkglare.remains>=cooldown.summon_darkglare.duration-10
     if S.DarkSoul:IsReadyP() and (Target:TimeToDie() < 20 + Player:GCD() or S.SowtheSeeds:IsAvailable() and S.SummonDarkglare:CooldownRemainsP() >= S.SummonDarkglare:BaseDuration() - 10) then
@@ -383,39 +383,39 @@ local function APL()
     end
     -- blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
     if S.BloodoftheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodoftheEnemy:ID() == 297108) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Affliction.GCDasOffGCD.Essences) then return "blood_of_the_enemy 61"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 61"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "pocketsized_computation_device 50"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 50"; end
     end
     -- use_item,name=rotcrusted_voodoo_doll,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.RotcrustedVoodooDoll:IsEquipped() and I.RotcrustedVoodooDoll:IsReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.RotcrustedVoodooDoll) then return "rotcrusted_voodoo_doll"; end
+      if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle) then return "rotcrusted_voodoo_doll"; end
     end
     -- use_item,name=shiver_venom_relic,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.ShiverVenomRelic:IsEquipped() and I.ShiverVenomRelic:IsReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.ShiverVenomRelic) then return "shiver_venom_relic"; end
+      if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic"; end
     end
     -- use_item,name=aquipotent_nautilus,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.AquipotentNautilus:IsEquipped() and I.AquipotentNautilus:IsReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.AquipotentNautilus) then return "aquipotent_nautilus"; end
+      if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle) then return "aquipotent_nautilus"; end
     end
     -- use_item,name=tidestorm_codex,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.TidestormCodex:IsEquipped() and I.TidestormCodex:IsReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.TidestormCodex) then return "tidestorm_codex"; end
+      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex"; end
     end
     -- use_item,name=vial_of_storms,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
     if I.VialofStorms:IsEquipped() and I.VialofStorms:IsReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
-      if HR.CastSuggested(I.VialofStorms) then return "vial_of_storms"; end
+      if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle) then return "vial_of_storms"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
-      if HR.Cast(S.WorldveinResonance, Settings.Affliction.GCDasOffGCD.Essences) then return "worldvein_resonance 63"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 63"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, Settings.Affliction.GCDasOffGCD.Essences) then return "ripple_in_space 67"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 67"; end
     end
   end
   DbRefresh = function()
@@ -509,15 +509,15 @@ local function APL()
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Affliction.GCDasOffGCD.Essences) then return "focused_azerite_beam 463"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 463"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, Settings.Affliction.GCDasOffGCD.Essences) then return "purifying_blast 465"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast 465"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) then
-      if HR.Cast(S.ConcentratedFlame, Settings.Affliction.GCDasOffGCD.Essences) then return "concentrated_flame 467"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 467"; end
     end
     -- drain_soul,interrupt_global=1,chain=1,interrupt=1,cycle_targets=1,if=target.time_to_die<=gcd
     if S.DrainSoul:IsCastableP() then
@@ -617,7 +617,7 @@ local function APL()
     end
     -- the_unbound_force,if=buff.reckless_force.remains
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, Settings.Affliction.GCDasOffGCD.Essences) then return "the_unbound_force 744"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 744"; end
     end
     -- agony,target_if=min:dot.agony.remains,if=remains<=gcd+action.shadow_bolt.execute_time&target.time_to_die>8
     if S.Agony:IsCastableP() then
@@ -625,7 +625,7 @@ local function APL()
     end
     -- memory_of_lucid_dreams,if=time<30
     if S.MemoryofLucidDreams:IsCastableP() and (HL.CombatTime() < 30) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Affliction.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams 771"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 771"; end
     end
     -- # Temporary fix to make sure azshara's font doesn't break darkglare usage.
     -- agony,line_cd=30,if=time>30&cooldown.summon_darkglare.remains<=15&equipped.169314
@@ -674,7 +674,7 @@ local function APL()
     end
     -- use_item,name=azsharas_font_of_power,if=time<=3
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and (HL.CombatTime() <= 3) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 879"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 879"; end
     end
     -- phantom_singularity,if=time<=35
     if S.PhantomSingularity:IsCastableP() and (HL.CombatTime() <= 35) then
@@ -686,7 +686,7 @@ local function APL()
     end
     -- guardian_of_azeroth,if=cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled|(azerite.dreadful_calling.rank|essence.vision_of_perfection.rank)&time>30&target.time_to_die>=210)&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
     if S.GuardianofAzeroth:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() < 15 + Player:SoulShardsP() * num(S.DreadfulCalling:AzeriteEnabled()) or ((S.DreadfulCalling:AzeriteEnabled() or S.VisionofPerfectionMinor:IsAvailable()) and HL.CombatTime() > 30 and Target:TimeToDie() >= 210) and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.VileTaint) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 30 + Player:GCD()) then
-      if HR.Cast(S.GuardianofAzeroth, Settings.Affliction.GCDasOffGCD.Essences) then return "guardian_of_azeroth 884"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 884"; end
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<20+gcd|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up
     if S.DarkSoul:IsCastableP() and HR.CDsON() and (S.SummonDarkglare:CooldownRemainsP() < 15 + Player:SoulShardsP() * num(S.DreadfulCalling:AzeriteEnabled()) and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 20 + Player:GCD() or EnemiesCount > 1) then

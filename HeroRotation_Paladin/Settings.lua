@@ -18,6 +18,8 @@ HR.GUISettings.APL.Paladin = {
   Commons = {
     UseTrinkets = true,
     UsePotions = true,
+    TrinketDisplayStyle = "Suggested",
+    EssenceDisplayStyle = "Suggested",
     OffGCDasOffGCD = {
       Rebuke = true,
       Racials = true,
@@ -33,7 +35,6 @@ HR.GUISettings.APL.Paladin = {
     GCDasOffGCD = {
       -- Abilities
       AvengingWrath = true,
-      Essences = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -53,7 +54,6 @@ HR.GUISettings.APL.Paladin = {
       -- Abilities
       AvengingWrath = true,
       Crusade = true,
-      Essences = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -72,8 +72,10 @@ local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution");
 
 -- Shared Paladin settings
 CreateARPanelOptions(CP_Paladin, "APL.Paladin.Commons");
-CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
+CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
+CreatePanelOption("Dropdown", CP_Paladin, "APL.Paladin.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Paladin, "APL.Paladin.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 
 -- Protection
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.EyeofTyrHP", {0, 100, 1}, "Eye of Tyr HP", "Set the Eye of Tyr HP threshold.");

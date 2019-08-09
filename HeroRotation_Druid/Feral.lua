@@ -203,7 +203,7 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-        if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 10"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 10"; end
       end
       -- cat_form
       if S.CatForm:IsCastableP() and Player:BuffDownP(S.CatFormBuff) then
@@ -238,19 +238,19 @@ local function APL()
     end
     -- thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
     if S.Thorns:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.Thorns, Settings.Feral.GCDasOffGCD.Essences) then return "thorns"; end
+      if HR.Cast(S.Thorns, nil, Settings.Commons.EssenceDisplayStyle) then return "thorns"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.TheUnboundForce, Settings.Feral.GCDasOffGCD.Essences) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- memory_of_lucid_dreams,if=buff.tigers_fury.up&buff.berserk.down
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffP(S.TigersFuryBuff) and Player:BuffDownP(S.BerserkBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Feral.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy,if=buff.tigers_fury.up
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.BloodoftheEnemy, Settings.Feral.GCDasOffGCD.Essences) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- feral_frenzy,if=combo_points=0
     if S.FeralFrenzy:IsCastableP() and (Player:ComboPoints() == 0) then
@@ -258,15 +258,15 @@ local function APL()
     end
     -- focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.FocusedAzeriteBeam, Settings.Feral.GCDasOffGCD.Essences) then return "focused_azerite_beam"; end
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.PurifyingBlast, Settings.Feral.GCDasOffGCD.Essences) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- heart_essence,if=buff.tigers_fury.up
     if S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.HeartEssence, Settings.Feral.GCDasOffGCD.Essences) then return "heart_essence"; end
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
     end
     -- incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
     if S.Incarnation:IsCastableP() and HR.CDsON() and (Player:EnergyPredicted() >= 30 and (S.TigersFury:CooldownRemainsP() > 15 or Player:BuffP(S.TigersFuryBuff))) then
@@ -282,19 +282,19 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
     if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) < 1.5 or Target:DebuffDownP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemy)) or Target:TimeToDie() < 40) and Player:BuffRemainsP(S.TigersFuryBuff) > 10) then
-      if HR.CastSuggested(I.AshvanesRazorCoral) then return "ashvanes_razor_coral 59"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 59"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
     if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 60"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 60"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
     if I.PocketsizedComputationDevice:IsEquipped() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
-      if HR.CastSuggested(I.PocketsizedComputationDevice) then return "cyclotronic_blast 61"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 61"; end
     end
     -- use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and (Player:EnergyDeficitPredicted() >= 50) then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power 62"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 62"; end
     end
     -- use_items,if=buff.tigers_fury.up|target.time_to_die<20
   end

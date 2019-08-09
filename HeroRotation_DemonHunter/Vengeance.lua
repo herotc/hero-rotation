@@ -171,7 +171,7 @@ local function APL ()
     end
     -- use_item,name=azsharas_font_of_power
     if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if HR.CastSuggested(I.AzsharasFontofPower) then return "azsharas_font_of_power precombat"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
     end
     -- First attacks
     if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
@@ -251,19 +251,19 @@ local function APL ()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then
-      if HR.Cast(S.ConcentratedFlame, Settings.Vengeance.GCDasOffGCD.Essences) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastable() then
-      if HR.Cast(S.RippleInSpace, Settings.Vengeance.GCDasOffGCD.Essences) then return "ripple_in_space"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastable() then
-      if HR.Cast(S.WorldveinResonance, Settings.Vengeance.GCDasOffGCD.Essences) then return "worldvein_resonance"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastable() then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Vengeance.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- actions+=/felblade,if=pain<=70
     if S.Felblade:IsCastable(15) and (Player:Pain() <= 70) then

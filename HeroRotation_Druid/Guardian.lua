@@ -129,7 +129,7 @@ local function APL()
     -- snapshot_stats
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryofLucidDreams, Settings.Guardian.GCDasOffGCD.Essences) then return "memory_of_lucid_dreams"; end
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- bear_form
     if S.BearForm:IsCastableP() and Player:BuffDownP(S.BearForm) then
@@ -147,7 +147,7 @@ local function APL()
     end
     -- heart_essence
     if S.HeartEssence:IsCastableP() then
-      if HR.Cast(S.HeartEssence, Settings.Guardian.GCDasOffGCD.Essences) then return "heart_essence"; end
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
