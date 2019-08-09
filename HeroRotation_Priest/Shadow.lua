@@ -252,8 +252,8 @@ local function APL()
     if S.TheUnboundForce:IsCastableP() then
       if HR.Cast(S.TheUnboundForce, Settings.Shadow.GCDasOffGCD.Essences) then return "the_unbound_force cds"; end
     end
-    -- concentrated_flame
-    if S.ConcentratedFlame:IsCastableP() then
+    -- concentrated_flame,line_cd=6,if=time<=10|(buff.chorus_of_insanity.stack>=15&buff.voidform.up)|full_recharge_time<gcd|target.time_to_die<5
+    if S.ConcentratedFlame:IsCastableP() and (HL.CombatTime() <= 10 or (Player:BuffStackP(S.ChorusofInsanity) >= 15 and Player:BuffP(S.VoidformBuff)) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
       if HR.Cast(S.ConcentratedFlame, Settings.Shadow.GCDasOffGCD.Essences) then return "concentrated_flame cds"; end
     end
     -- ripple_in_space
