@@ -370,7 +370,7 @@ local function APL()
       if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand 112"; end
     end
     -- avatar
-    if S.Avatar:IsCastableP() and HR.CDsON() then
+    if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
