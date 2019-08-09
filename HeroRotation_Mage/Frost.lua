@@ -77,6 +77,7 @@ local S = Spell.Mage.Frost;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
   PotionofUnbridledFury            = Item(169299),
+  BalefireBranch                   = Item(159630),
   TidestormCodex                   = Item(165576),
   PocketsizedComputationDevice     = Item(167555)
 };
@@ -285,6 +286,10 @@ local function APL()
     -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<30
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "prolonged_power 96"; end
+    end
+    -- use_item,name=balefire_branch,if=!talent.glacial_spike.enabled|buff.brain_freeze.react&prev_gcd.1.glacial_spike
+    if I.BalefireBranch:IsEquipped() and I.BalefireBranch:IsReady() and (not S.GlacialSpike:IsAvailable() or Player:BuffP(S.BrainFreezeBuff) and Player:PrevGCDP(1, S.GlacialSpike)) then
+      if HR.CastSuggested(I.BalefireBranch) then return "balefire_branch 98"; end
     end
     -- use_items
     -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
