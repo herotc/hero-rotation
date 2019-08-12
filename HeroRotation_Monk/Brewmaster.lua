@@ -66,6 +66,7 @@ Spell.Monk.Brewmaster = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
+  HeartEssence                          = Spell(298554),
   -- Misc
   PoolEnergy                            = Spell(9999000010)
 };
@@ -266,9 +267,13 @@ local function APL()
     if S.KegSmash:IsCastableP(25) then
       if HR.Cast(S.KegSmash) then return ""; end
     end
-    -- concentrated_flame
-    if S.ConcentratedFlame:IsCastableP() then
+    -- concentrated_flame,if=dot.concentrated_flame.remains=0
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
+    end
+    -- heart_essence,if=!essence.the_crucible_of_flame.major
+    if S.HeartEssence:IsCastableP() and (not S.ConcentratedFlame:IsAvailable()) then
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
     if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 3) then
