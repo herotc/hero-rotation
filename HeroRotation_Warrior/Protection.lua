@@ -339,10 +339,10 @@ local function APL()
     if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 103"; end
     end
-    if Player:HealthPercentage() < 30 and S.VictoryRush:IsReady("Melee") then
+    if Player:HealthPercentage() < 80 and S.VictoryRush:IsReady("Melee") then
       if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
     end
-    if Player:HealthPercentage() < 30 and S.ImpendingVictory:IsReadyP("Melee") then
+    if Player:HealthPercentage() < 80 and S.ImpendingVictory:IsReadyP("Melee") then
       if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
     end
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
@@ -366,9 +366,10 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 111"; end
     end
     -- last_stand,if=cooldown.anima_of_death.remains<=2
-    if S.LastStand:IsCastableP() and (S.AnimaofDeath:CooldownRemainsP() <= 2) then
-      if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand 112"; end
-    end
+    -- mrdmnd comment - this is breaking shield block, probably need to check it against the anima equipped?
+    -- if S.LastStand:IsCastableP() and (S.AnimaofDeath:CooldownRemainsP() <= 2) then
+    --   if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand 112"; end
+    --end
     -- avatar
     if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
