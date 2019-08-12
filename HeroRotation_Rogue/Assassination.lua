@@ -820,7 +820,7 @@ local function APL ()
       -- use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10+10*equipped.ashvanes_razor_coral&!debuff.vendetta.up&!debuff.toxic_blade.up
       if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and MasterAssassinRemains() <= 0
         and S.Vendetta:CooldownRemains() < 10 + 10 * num(I.RazorCoral:IsEquipped()) and not Target:DebuffP(S.Vendetta) and not Target:DebuffP(S.ToxicBladeDebuff) then
-        if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Use Font of Power (OOC)"; end
+        if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Use Font of Power"; end
       end
     end
 
