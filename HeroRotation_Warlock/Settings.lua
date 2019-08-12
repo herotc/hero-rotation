@@ -111,18 +111,11 @@ CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.UseSpl
 CreatePanelOption("Slider", CP_Destruction, "APL.Warlock.Destruction.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
 CreatePanelOption("Dropdown", CP_Destruction, "APL.Warlock.Destruction.SpellType", {"Auto","Orange","Green"}, "Spell icons", "Define what icons you want to appear.");
 CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction");
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.ShadowFury", "Sephuz: Show Shadow Fury", "Enable this if you want it to show you when to use Shadow Fury to proc Sephuz's Secret (only when equipped).");
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.MortalCoil", "Sephuz: Show Mortal Coil", "Enable this if you want it to show you when to use Mortal Coil to proc Sephuz's Secret (only when equipped).");
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.Fear", "Sephuz: Show Fear", "Enable this if you want it to show you when to use Fear to proc Sephuz's Secret (only when equipped).");
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.SingeMagic", "Sephuz: Show Singe Magic", "Enable this if you want it to show you when to use Singe Magic (Imp spell) to proc Sephuz's Secret (only when equipped).");
-CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.Sephuz.SpellLock", "Sephuz: Show Spell Lock", "Enable this if you want it to show you when to use Spell Lock (Felhunter spell) to proc Sephuz's Secret (only when equipped).");
 
 -- Demonology
 CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.");
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology");
-CreatePanelOption("CheckButton", CP_Demonology, "APL.Warlock.Demonology.ShowBPoI", "Show Battle Potion of Intellect", "Enable this if you want it to show you when to use Battle Potion of Intellect.");
 
 -- Affliction
 CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
