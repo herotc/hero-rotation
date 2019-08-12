@@ -130,12 +130,23 @@ local function num(val)
   if val then return 1 else return 0 end
 end
 
+local function EnergyTimeToMaxRounded ()
+  -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
+  return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10;
+end
+
+local function EnergyPredictedRounded ()
+  -- Round to the nearesth int to reduce prediction instability on very high regen rates
+  return math.floor(Player:EnergyPredicted() + 0.5);
+end
+
 -- APL Action Lists (and Variables)
 local SappedSoulSpells = {
   {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(S.SinisterStrike); end},
   {S.Feint, "Cast Feint (Sapped Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sapped Soul)", function () return true; end}
 };
+
 local RtB_BuffsList = {
   S.Broadside,
   S.BuriedTreasure,
@@ -258,7 +269,7 @@ end
 local function Ambush_Condition ()
   -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
   return Player:ComboPointsDeficit() >= 2 + 2 * ((S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:CooldownRemainsP() < 1) and 1 or 0)
-    + (Player:Buff(S.Broadside) and 1 or 0) and Player:EnergyPredicted() > 60 and not Player:Buff(S.SkullandCrossbones) and not Player:BuffP(S.KeepYourWitsBuff);
+    + (Player:Buff(S.Broadside) and 1 or 0) and EnergyPredictedRounded() > 60 and not Player:Buff(S.SkullandCrossbones) and not Player:BuffP(S.KeepYourWitsBuff);
 end
 -- actions+=/variable,name=bte_condition,value=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
 local function BtECondition ()
@@ -268,11 +279,6 @@ end
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 local function Blade_Flurry_Sync ()
   return not HR.AoEON() or Cache.EnemiesCount[BladeFlurryRange] < 2 or Player:BuffP(S.BladeFlurry)
-end
-
-local function EnergyTimeToMaxRounded ()
-  -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
-  return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10;
 end
 
 local function MythicDungeon ()
@@ -304,7 +310,8 @@ local function Essences ()
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
-  if S.ConcentratedFlame:IsCastableP() and Player:EnergyTimeToMaxPredicted() > 1 and not Player:BuffP(S.BladeFlurry) and (not Target:DebuffP(S.ConcentratedFlameBurn) and not Player:PrevGCD(1, S.ConcentratedFlame) or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() + Player:GCDRemains()) then
+  if S.ConcentratedFlame:IsCastableP() and EnergyTimeToMaxRounded() > 1 and not Player:BuffP(S.BladeFlurry) and (not Target:DebuffP(S.ConcentratedFlameBurn)
+    and not Player:PrevGCD(1, S.ConcentratedFlame) or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() + Player:GCDRemains()) then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast ConcentratedFlame"; end
   end
   -- guardian_of_azeroth
@@ -332,7 +339,7 @@ local function Essences ()
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<45
-  if S.MemoryofLucidDreams:IsCastableP() and Player:EnergyPredicted() < 45 then
+  if S.MemoryofLucidDreams:IsCastableP() and EnergyPredictedRounded() < 45 then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
   end
   return false;
@@ -377,7 +384,7 @@ local function CDs ()
           if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike"; end
         end
         -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
-        if S.KillingSpree:IsCastableP(10) and (EnergyTimeToMaxRounded() > 5 or Player:EnergyPredicted() < 15) then
+        if S.KillingSpree:IsCastableP(10) and (EnergyTimeToMaxRounded() > 5 or EnergyPredictedRounded() < 15) then
           if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree"; end
         end
         -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
@@ -430,11 +437,11 @@ local function CDs ()
           local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
           if ConductiveInkUnit then
             -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
-            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20)) or
+            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or Target:BossFilteredTimeToDie("<", 20) or
               (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
           else
             CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
-              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20));
+              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or Target:BossFilteredTimeToDie("<", 20);
           end
         end
         if CastRazorCoral then
@@ -465,8 +472,8 @@ local function CDs ()
       if S.AncestralCall:IsCastable() then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
       end
-      end
     end
+  end
 end
 
 local function Stealth ()
@@ -512,7 +519,7 @@ end
 
 local function Build ()
   -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<10|buff.deadshot.up|energy<45)
-  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 10 or Player:BuffP(S.DeadshotBuff) or Player:EnergyPredicted() < 45) then
+  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 10 or Player:BuffP(S.DeadshotBuff) or EnergyPredictedRounded() < 45) then
     if HR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
   end
   -- actions.build+=/sinister_strike
