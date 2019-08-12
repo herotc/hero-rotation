@@ -540,8 +540,8 @@ local function APL()
     if S.Havoc:IsCastableP() then
       if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc402) then return "havoc 422" end
     end
-    -- call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&essence.memory_of_lucid_dreams.major&pet.infernal.active
-    if (S.GrimoireofSupremacy:IsAvailable() and S.MemoryofLucidDreams:IsAvailable() and InfernalActive) then
+    -- call_action_list,name=gosup_infernal,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active
+    if (S.GrimoireofSupremacy:IsAvailable() and InfernalActive) then
       local ShouldReturn = GoSupInfernal(); if ShouldReturn then return ShouldReturn; end
     end
     -- variable,name=pool_soul_shards,value=active_enemies>1&cooldown.havoc.remains<=10|cooldown.summon_infernal.remains<=15&(talent.grimoire_of_supremacy.enabled|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=15)|talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains<=15&(cooldown.summon_infernal.remains>target.time_to_die|cooldown.summon_infernal.remains+cooldown.summon_infernal.duration>target.time_to_die)
