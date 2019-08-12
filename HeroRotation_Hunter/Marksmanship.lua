@@ -59,6 +59,7 @@ Spell.Hunter.Marksmanship = {
   Multishot                             = Spell(257620),
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
+  RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -79,9 +80,9 @@ local S = Spell.Hunter.Marksmanship;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Marksmanship = {
   PotionofUnbridledFury            = Item(169299),
-  GalecallersBoon                  = Item(159614),
   PocketsizedComputationDevice     = Item(167555),
-  AzsharasFontofPower              = Item(169314)
+  AzsharasFontofPower              = Item(169314),
+  AshvanesRazorCoral               = Item(169311)
 };
 local I = Item.Hunter.Marksmanship;
 
@@ -381,9 +382,13 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false);
     -- auto_shot
-    -- use_item,name=galecallers_boon,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<10
-    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 10) then
-      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon"; end
+    -- use_item,name=azsharas_font_of_power,if=cooldown.trueshot.remains<18|target.time_to_die<40
+    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets and (S.Trueshot:CooldownRemainsP() < 18 or Target:TimeToDie() < 40) then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=buff.trueshot.up&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major.rank3&ca_execute)|debuff.razor_coral_debuff.down|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TrueshotBuff) and ((S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) or not Spell(299358):IsAvailable() and (Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80)) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major.rank3|debuff.blood_of_the_enemy.up|target.time_to_die<5
     if I.PocketsizedComputationDevice:IsEquipped() and I.PocketsizedComputationDevice:IsReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodoftheEnemy:ID() == "298277" or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
