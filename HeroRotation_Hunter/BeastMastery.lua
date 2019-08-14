@@ -460,7 +460,7 @@ local function Init ()
   HL.RegisterNucleusAbility(194392, 8, 6)             -- Volley
   HL.RegisterNucleusAbility({171454, 171457}, 8, 6)   -- Chimaera Shot
   HL.RegisterNucleusAbility(118459, 10, 6)            -- Beast Cleave
-  HL.RegisterNucleusAbility(201754, 10, 6)            -- Stomp
+  HL.RegisterNucleusAbility(201754, 8, 6)            -- Stomp
   HL.RegisterNucleusAbility(271686, 3, 6)             -- Head My Call
 end
 
