@@ -285,6 +285,10 @@ local function APL ()
     if S.Shear:IsReady() and IsInMeleeRange then
       if HR.Cast(S.Shear) then return "Cast Shear"; end
     end
+    -- Manually adding Fracture as a fallback, in cases of Fracture without Spirit Bomb and not enough energy to Soul Cleave
+    if S.Fracture:IsCastable() and IsInMeleeRange then
+      if HR.Cast(S.Fracture) then return "Cast Fracture"; end
+    end
     -- actions+=/throw_glaive
     if S.ThrowGlaive:IsCastable(30) then
       if HR.Cast(S.ThrowGlaive) then return "Cast Throw Glaive (OOR)"; end
