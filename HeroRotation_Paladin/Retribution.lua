@@ -251,7 +251,7 @@ local function APL()
       if HR.Cast(S.Judgment) then return "judgment 128"; end
     end
     -- hammer_of_wrath,if=holy_power<=4
-    if S.HammerofWrath:IsReadyP() and (Player:HolyPower() <= 4) then
+    if S.HammerofWrath:IsReady() and (Player:HolyPower() <= 4) then
       if HR.Cast(S.HammerofWrath) then return "hammer_of_wrath 134"; end
     end
     -- consecration,if=holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2
