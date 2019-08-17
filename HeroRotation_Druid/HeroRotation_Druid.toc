@@ -1,4 +1,4 @@
-## Interface: 80100
+## Interface: 80200
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFFF7D0ADruid|r]
 ## Author: Aethys, KutiKuti
