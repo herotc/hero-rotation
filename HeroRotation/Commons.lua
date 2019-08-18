@@ -68,8 +68,12 @@
     end
   end
   
+  function Commons.PSCDEquipped ()
+    return (HL.Equipment[13] == 167555 or HL.Equipment[14] == 167555)
+  end
+  
   function Commons.PSCDEquipReady ()
-    return ((HL.Equipment[13] == 167555 or HL.Equipment[14] == 167555) and HL.Item(167555):IsReady())
+    return (Commons.PSCDEquipped() and HL.Item(167555):IsReady())
   end
   
   function Commons.CyclotronicBlastReady ()
