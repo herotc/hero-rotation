@@ -101,6 +101,8 @@ local StunInterrupts = {
   {S.ChaosNova, "Cast Chaos Nova (Interrupt)", function () return true; end},
 };
 
+S.ConcentratedFlame:RegisterInFlight()
+
 -- Variables
 local VarPoolingForMeta = 0;
 local VarWaitingForNemesis = 0;
@@ -190,8 +192,8 @@ local function APL()
     end
   end
   Essences = function()
-    -- concentrated_flame
-    if S.ConcentratedFlame:IsCastableP() then
+    -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
@@ -448,7 +450,7 @@ local function APL()
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
     
-    -- pick_up_fragment,if=fury.deficit>=35
+    -- pick_up_fragment,if=fury.deficit>=35&(!azerite.eyes_of_rage.enabled|cooldown.eye_beam.remains>1.4)
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
     
     -- call_action_list,name=dark_slash,if=talent.dark_slash.enabled&(variable.waiting_for_dark_slash|debuff.dark_slash.up)
