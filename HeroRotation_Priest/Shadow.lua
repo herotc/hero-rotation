@@ -358,7 +358,7 @@ local function APL()
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power critcds"; end
     end
     -- use_item,effect_name=cyclotronic_blast
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotonicBlast:IsAvailable() and Settings.Commons.UseTrinkets then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device critcds"; end
     end
   end

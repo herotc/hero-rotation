@@ -211,10 +211,6 @@ local function EvaluateCycleGuardianofAzeroth78(TargetUnit)
   return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and Player:BuffDownP(CaInc()))
 end
 
-local function EvaluateCyclePocketsizedComputationDevice103(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (I.PocketsizedComputationDevice:IsEquipped() and Player:BuffDownP(CaInc()))
-end
-
 local function EvaluateCycleShiverVenomRelic104(TargetUnit)
   return (Player:BuffDownP(CaInc()) and TargetUnit:DebuffStackP(S.ShiverVenomDebuff) >= 5)
 end
@@ -341,8 +337,8 @@ local function APL()
       if HR.CastCycle(S.GuardianofAzeroth, 40, EvaluateCycleGuardianofAzeroth78) then return "guardian_of_azeroth 94" end
     end
     -- use_item,effect_name=cyclotronic_blast,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets then
-      if HR.CastCycle(I.PocketsizedComputationDevice, 40, EvaluateCyclePocketsizedComputationDevice103) then return "pocketsized_computation_device 117" end
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and DoTsUp() then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 117" end
     end
     -- use_item,name=shiver_venom_relicif=!buff.ca_inc.up,target_if=dot.shiver_venom.stack>=5
     if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets then

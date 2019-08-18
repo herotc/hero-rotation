@@ -246,7 +246,7 @@ local function APL()
       if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex 49"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device aoe"; end
     end
     -- frostbolt
@@ -293,7 +293,7 @@ local function APL()
     end
     -- use_items
     -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
-    if I.PocketsizedComputationDevice:IsEquipReady() and Settings.Commons.UseTrinkets and (not bool(S.CyclotronicBlast:CooldownRemainsP())) then
+    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 100"; end
     end
     -- blood_fury
@@ -372,7 +372,7 @@ local function APL()
       if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex 218"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device single"; end
     end
     -- frostbolt

@@ -187,7 +187,7 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(buff.avenging_wrath.down|talent.crusade.enabled&buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and ((Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and ((Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast"; end
     end
     -- avenging_wrath,if=(!talent.inquisition.enabled|buff.inquisition.up)&holy_power>=3

@@ -285,11 +285,11 @@ local function APL()
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 59"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 60"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 61"; end
     end
     -- use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50

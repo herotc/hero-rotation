@@ -441,7 +441,7 @@ local function APL()
       if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic high_priority"; end
     end
     -- use_item,effect_name=harmonic_dematerializer
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.HarmonicDematerializer:IsAvailable() then
+    if Everyone.PSCDEquipReady() and S.HarmonicDematerializer:IsAvailable() then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "harmonic_dematerializer high_priority"; end
     end
     -- use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>=55&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff
@@ -467,7 +467,7 @@ local function APL()
       if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex low_priority"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=cooldown.combustion.remains>variable.on_use_cutoff|talent.firestarter.enabled&firestarter.remains>variable.on_use_cutoff
-    if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > VarOnUseCutoff) then
+    if Everyone.CyclotronicBlastReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > VarOnUseCutoff) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast low_priority"; end
     end
   end

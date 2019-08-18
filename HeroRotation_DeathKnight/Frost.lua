@@ -58,7 +58,6 @@ Spell.DeathKnight.Frost = {
   IcyCitadel                            = Spell(272718),
   IcyCitadelBuff                        = Spell(272719),
   MindFreeze                            = Spell(47528),
-  CyclotronicBlast                      = Spell(167672),
   RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
@@ -385,7 +384,7 @@ local function APL()
         if HR.Cast(I.LurkersInsidiousGift, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_item,name=cyclotronic_blast,if=!buff.pillar_of_frost.up
-      if I.PocketsizedComputationDevice:IsEquipReady() and S.CyclotronicBlast:IsAvailable() and (Player:BuffDownP(S.PillarofFrostBuff)) then
+      if Everyone.CyclotronicBlastReady() and (Player:BuffDownP(S.PillarofFrostBuff)) then
         if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
