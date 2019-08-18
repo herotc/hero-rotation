@@ -264,6 +264,10 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
+    -- probably not optimal, definitely not optimal with rank 3
+    if S.ConcentratedFlame:IsCastableP() then
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+    end
     -- heart_essence,if=buff.tigers_fury.up
     if S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
