@@ -53,11 +53,15 @@ Spell.DemonHunter.Vengeance = {
   -- Utility
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
+  -- Trinket Effects
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565),
   -- Essences
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
   ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
 };
 local S = Spell.DemonHunter.Vengeance;
@@ -67,6 +71,7 @@ if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Vengeance = {
   SuperiorSteelskinPotion          = Item(168501),
   AzsharasFontofPower              = Item(169314),
+  AshvanesRazorCoral               = Item(169311),
   PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.DemonHunter.Vengeance;
@@ -91,6 +96,8 @@ local function UpdateRanges()
     HL.GetEnemies(i);
   end
 end
+
+S.ConcentratedFlame:RegisterInFlight()
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()
@@ -154,7 +161,7 @@ end
 
 -- APL Main
 local function APL ()
-  local Precombat, Brand, Defensives, Normal
+  local Precombat, Defensives, Brand, Cooldowns, Normal
   local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
   UpdateRanges()
@@ -236,6 +243,34 @@ local function APL ()
       if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
     end
   end
+  Cooldowns = function()
+    -- potion
+    if I.SuperiorSteelskinPotion:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.SuperiorSteelskinPotion) then return "superior_steelskin_potion cooldowns"; end
+    end
+    -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+    if S.ConcentratedFlame:IsCastable() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame cooldowns"; end
+    end
+    -- worldvein_resonance,if=buff.lifeblood.stack<3
+    if S.WorldveinResonance:IsCastable() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance cooldowns"; end
+    end
+    -- memory_of_lucid_dreams
+    if S.MemoryofLucidDreams:IsCastable() then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams cooldowns"; end
+    end
+    -- heart_essence
+    -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
+    if Everyone.CyclotronicBlastReady() and (Player:BuffDownP(S.MemoryofLucidDreams)) then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast cooldowns"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral cooldowns"; end
+    end
+    -- use_items
+  end
   Normal = function()
     -- actions+=/infernal_strike
     if S.InfernalStrike:IsCastable() and not (S.CharredFlesh:IsAvailable() and Settings.Vengeance.BrandForDamage) and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
@@ -253,10 +288,6 @@ local function APL ()
     -- actions+=/immolation_aura,if=pain<=90
     if S.ImmolationAura:IsCastable() and IsInAoERange and (Player:Pain() <= 90) then
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
-    end
-    -- Cyclotronic Blast
-    if Everyone.CyclotronicBlastReady() then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "PSCD Test"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then
@@ -320,6 +351,10 @@ local function APL ()
     -- call_action_list,name=defensives
     if (IsTanking or not Player:HealingAbsorbed()) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=cooldowns
+    if (HR.CDsON()) then
+      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=normal
     if (true) then
