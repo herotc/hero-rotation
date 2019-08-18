@@ -67,3 +67,19 @@
       end
     end
   end
+  
+  function Commons.PSCDEquipReady ()
+    return ((HL.Equipment[13] == 167555 or HL.Equipment[14] == 167555) and HL.Item(167555):IsReady())
+  end
+  
+  function Commons.CyclotronicBlastReady ()
+    local PSCDString = ""
+    if HL.Equipment[13] == 167555 then
+      PSCDString = GetInventoryItemLink("player", 13)
+    elseif HL.Equipment[14] == 167555 then
+      PSCDString = GetInventoryItemLink("player", 14)
+    else
+      return false
+    end
+    return (Commons.PSCDEquipReady() and string.match(PSCDString, "167672"))
+  end
