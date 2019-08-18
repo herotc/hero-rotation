@@ -173,8 +173,8 @@ local function APL()
     -- food
     -- snapshot_stats
     -- potion
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 4"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
     end
     -- Immolation Aura
     if S.ImmolationAura:IsCastableP() then
@@ -242,8 +242,8 @@ local function APL()
       if HR.Cast(S.Nemesis, Settings.Havoc.GCDasOffGCD.Nemesis) then return "nemesis 51"; end
     end
     -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
-      if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 55"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 55"; end
     end
     if (Settings.Commons.UseTrinkets) then
       -- use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
