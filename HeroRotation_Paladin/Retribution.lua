@@ -49,7 +49,6 @@ Spell.Paladin.Retribution = {
   CrusaderStrike                        = Spell(35395),
   Rebuke                                = Spell(96231),
   HammerofJustice                       = Spell(853),
-  CyclotronicBlast                      = Spell(167672),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),

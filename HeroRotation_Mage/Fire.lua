@@ -67,7 +67,6 @@ Spell.Mage.Fire = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
-  CyclotronicBlast                      = Spell(167672),
   HarmonicDematerializer                = Spell(293512)
 };
 local S = Spell.Mage.Fire;

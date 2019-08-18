@@ -56,7 +56,6 @@ Spell.Priest.Shadow = {
   ShadowWordVoid                        = Spell(205351),
   Silence                               = Spell(15487),
   ChorusofInsanity                      = Spell(278661),
-  CyclotronicBlast                      = Spell(167672),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),

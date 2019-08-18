@@ -65,7 +65,6 @@ Spell.Druid.Balance = {
   Renewal                               = Spell(108238),
   SolarBeam                             = Spell(78675),
   ShiverVenomDebuff                     = Spell(301624),
-  CyclotronicBlast                      = Spell(167672),
   AzsharasFontofPowerBuff               = Spell(296962),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
