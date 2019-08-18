@@ -75,7 +75,7 @@ local S = Spell.DemonHunter.Havoc;
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Havoc = {
-  PotionofFocusedResolve           = Item(168506),
+  PotionofUnbridledFury            = Item(169299),
   AshvanesRazorCoral               = Item(169311),
   DribblingInkpod                  = Item(169319),
   AzsharasFontofPower              = Item(169314),
