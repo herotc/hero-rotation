@@ -514,7 +514,7 @@ local function APL()
       if HR.Cast(S.TotemMastery) then return "totem_mastery 460"; end
     end
     -- sundering,if=active_enemies>=3&(!essence.blood_of_the_enemy.major|(essence.blood_of_the_enemy.major&(buff.seething_rage.up|cooldown.blood_of_the_enemy.remains>40)))
-    if S.Sundering:IsCastableP() and (Cache.EnemiesCount[8] >= 3 and (not bool(essence.blood_of_the_enemy.major) or (bool(essence.blood_of_the_enemy.major) and (Player:BuffP(S.SeethingRageBuff) or S.BloodoftheEnemy:CooldownRemainsP() > 40)))) then
+    if S.Sundering:IsCastableP() and (Cache.EnemiesCount[8] >= 3 and (not S.BloodoftheEnemy:IsAvailable() or (S.BloodoftheEnemy:IsAvailable() and (Player:BuffP(S.SeethingRageBuff) or S.BloodoftheEnemy:CooldownRemainsP() > 40)))) then
       if HR.Cast(S.Sundering) then return "sundering 464"; end
     end
     -- focused_azerite_beam,if=active_enemies>1
