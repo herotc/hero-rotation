@@ -310,7 +310,7 @@ local function APL()
     end
     -- feral_spirit
     if S.FeralSpirit:IsCastableP() then
-      if HR.Cast(S.FeralSpirit) then return "feral_spirit 65"; end
+      if HR.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit 65"; end
     end
     -- blood_of_the_enemy,if=raid_event.adds.in>90|active_enemies>1
     if S.BloodoftheEnemy:IsCastableP() then
@@ -319,7 +319,7 @@ local function APL()
     -- ascendance,if=cooldown.strike.remains>0
     -- Storm Strike???
     if S.Ascendance:IsCastableP() and (S.Stormstrike:CooldownRemainsP() > 0) then
-      if HR.Cast(S.Ascendance) then return "ascendance 69"; end
+      if HR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "ascendance 69"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(target.time_to_die<20&debuff.razor_coral_debuff.stack>2)
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuffDebuff) or (Target:TimeToDie() < 20 and Target:DebuffStackP(S.RazorCoralDebuffDebuff) > 2)) then
@@ -365,7 +365,7 @@ local function APL()
   Filler = function()
     -- sundering,if=raid_event.adds.in>40
     if S.Sundering:IsCastableP() then
-      if HR.Cast(S.Sundering) then return "sundering 178"; end
+      if HR.Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering) then return "sundering 178"; end
     end
     -- focused_azerite_beam,if=raid_event.adds.in>90&!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.AscendanceBuff) and Player:BuffDownP(S.MoltenWeaponBuff) and Player:BuffDownP(S.IcyEdgeBuff) and Player:BuffDownP(S.CracklingSurgeBuff) and not Target:DebuffP(S.EarthenSpikeDebuff)) then
@@ -515,7 +515,7 @@ local function APL()
     end
     -- sundering,if=active_enemies>=3&(!essence.blood_of_the_enemy.major|(essence.blood_of_the_enemy.major&(buff.seething_rage.up|cooldown.blood_of_the_enemy.remains>40)))
     if S.Sundering:IsCastableP() and (Cache.EnemiesCount[8] >= 3 and (not S.BloodoftheEnemy:IsAvailable() or (S.BloodoftheEnemy:IsAvailable() and (Player:BuffP(S.SeethingRageBuff) or S.BloodoftheEnemy:CooldownRemainsP() > 40)))) then
-      if HR.Cast(S.Sundering) then return "sundering 464"; end
+      if HR.Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering) then return "sundering 464"; end
     end
     -- focused_azerite_beam,if=active_enemies>1
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
