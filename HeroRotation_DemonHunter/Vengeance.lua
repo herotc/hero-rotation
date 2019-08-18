@@ -65,8 +65,9 @@ local S = Spell.DemonHunter.Vengeance;
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Vengeance = {
-  SuperiorSteelskinPotion       = Item(168501),
-  AzsharasFontofPower           = Item(169314)
+  SuperiorSteelskinPotion          = Item(168501),
+  AzsharasFontofPower              = Item(169314),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.DemonHunter.Vengeance;
 
@@ -173,6 +174,10 @@ local function APL ()
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
     end
+    -- Cyclotronic Blast
+    if Everyone.CyclotronicBlastReady() then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "PSCD Test"; end
+    end
     -- First attacks
     if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
       if HR.Cast(S.InfernalStrike) then return "infernal_strike precombat"; end
@@ -248,6 +253,10 @@ local function APL ()
     -- actions+=/immolation_aura,if=pain<=90
     if S.ImmolationAura:IsCastable() and IsInAoERange and (Player:Pain() <= 90) then
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura"; end
+    end
+    -- Cyclotronic Blast
+    if Everyone.CyclotronicBlastReady() then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "PSCD Test"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then
