@@ -130,6 +130,10 @@ local function APL()
       if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_strength 4"; end
       end
+      -- use_item,name=azsharas_font_of_power
+      if I.AzsharasFontofPower:IsEquipReady() then
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.EssenceDisplayStyle) then return "azsharas_font_of_power 5"; end
+      end
       -- arcane_torrent,if=!talent.wake_of_ashes.enabled
       if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (not S.WakeofAshes:IsAvailable()) then
         if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 6"; end
@@ -173,8 +177,8 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() and (S.AvengingWrath:CooldownRemainsP() < PlayerGCD and Player:HolyPower() >= 3 or S.Crusade:CooldownRemainsP() < PlayerGCD and Player:HolyPower() >= 4 or S.AvengingWrath:CooldownRemainsP() >= 45 or S.Crusade:CooldownRemainsP() >= 45) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
-    -- focused_azerite_beam,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)&(buff.avenging_wrath.down|talent.crusade.enabled&buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
-    if S.FocusedAzeriteBeam:IsCastableP() and ((Cache.EnemiesCount[8] >= 2) and (Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
+    -- focused_azerite_beam,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)&!(buff.avenging_wrath.up|buff.crusade.up)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
+    if S.FocusedAzeriteBeam:IsCastableP() and ((Cache.EnemiesCount[8] >= 2) and not (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- memory_of_lucid_dreams,if=(buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10)&holy_power<=3
@@ -185,8 +189,8 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
-    -- use_item,effect_name=cyclotronic_blast,if=(buff.avenging_wrath.down|talent.crusade.enabled&buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
-    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and ((Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
+    -- use_item,effect_name=cyclotronic_blast,if=!(buff.avenging_wrath.up|buff.crusade.up)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (not (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast"; end
     end
     -- avenging_wrath,if=(!talent.inquisition.enabled|buff.inquisition.up)&holy_power>=3
@@ -229,9 +233,9 @@ local function APL()
     end
   end
   Generators = function()
-    -- variable,name=HoW,value=(!talent.hammer_of_wrath.enabled|target.health.pct>=20&(buff.avenging_wrath.down|talent.crusade.enabled&buff.crusade.down))
+    -- variable,name=HoW,value=(!talent.hammer_of_wrath.enabled|target.health.pct>=20&!(buff.avenging_wrath.up|buff.crusade.up))
     if (true) then
-      VarHow = num((not S.HammerofWrath:IsAvailable() or Target:HealthPercentage() >= 20 and (Player:BuffDownP(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and Player:BuffDownP(S.CrusadeBuff))))
+      VarHow = num((not S.HammerofWrath:IsAvailable() or Target:HealthPercentage() >= 20 and not (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff))))
     end
     -- call_action_list,name=finishers,if=holy_power>=5|buff.memory_of_lucid_dreams.up|buff.seething_rage.up|buff.inquisition.down&holy_power>=3
     if (Player:HolyPower() >= 5 or Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.SeethingRageBuff) or Player:BuffDownP(S.InquisitionBuff) and Player:HolyPower() >= 3) then
