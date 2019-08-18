@@ -309,7 +309,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 61"; end
     end
     -- feral_spirit
-    if S.FeralSpirit:IsCastableP() then
+    if S.FeralSpirit:IsCastableP() and Settings.Enhancement.EnableFS then
       if HR.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit 65"; end
     end
     -- blood_of_the_enemy,if=raid_event.adds.in>90|active_enemies>1
