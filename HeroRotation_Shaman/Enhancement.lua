@@ -68,7 +68,6 @@ Spell.Shaman.Enhancement = {
   FuryofAir                             = Spell(197211),
   FuryofAirBuff                         = Spell(197211),
   TotemMastery                          = Spell(262395),
-  ResonanceTotemBuff                    = Spell(262419),
   NaturalHarmony                        = Spell(278697),
   NaturalHarmonyFrostBuff               = Spell(279029),
   NaturalHarmonyFireBuff                = Spell(279028),
@@ -159,6 +158,16 @@ local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
   end
+end
+
+local function ResonanceTotemTime()
+  for index=1,4 do
+    local _, totemName, startTime, duration = GetTotemInfo(index)
+    if totemName == "Totem Mastery" then
+      return (floor(startTime + duration - GetTime() + 0.5)) or 0
+    end
+  end
+  return 0
 end
 
 local function num(val)
@@ -510,7 +519,7 @@ local function APL()
       if HR.Cast(S.FuryofAir) then return "fury_of_air 454"; end
     end
     -- totem_mastery,if=buff.resonance_totem.remains<=2*gcd
-    if S.TotemMastery:IsCastableP() and (Player:BuffRemainsP(S.ResonanceTotemBuff) <= 2 * Player:GCD()) then
+    if S.TotemMastery:IsCastableP() and (ResonanceTotemTime() <= 2 * Player:GCD()) then
       if HR.Cast(S.TotemMastery) then return "totem_mastery 460"; end
     end
     -- sundering,if=active_enemies>=3&(!essence.blood_of_the_enemy.major|(essence.blood_of_the_enemy.major&(buff.seething_rage.up|cooldown.blood_of_the_enemy.remains>40)))
