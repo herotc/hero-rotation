@@ -20,6 +20,8 @@ HR.GUISettings.APL.Hunter = {
     CounterShot = false,
     UseTrinkets = true,
     UsePotions = true,
+    TrinketDisplayStyle = "Suggested",
+    EssenceDisplayStyle = "Suggested",
     ExhilarationHP = 30,
     -- SoloMode Settings
     -- {Display GCD as OffGCD, ForceReturn}
@@ -46,7 +48,6 @@ HR.GUISettings.APL.Hunter = {
       SummonPet = false,
       SpittingCobra = false,
       Stampede = false,
-      Essences = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -66,7 +67,6 @@ HR.GUISettings.APL.Hunter = {
       Trueshot = false,
       HuntersMark = false,
       DoubleTap = false,
-      Essences = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -84,7 +84,6 @@ HR.GUISettings.APL.Hunter = {
       SummonPet = false,
       CoordinatedAssault = true,
       Harpoon = true,
-      Essences = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

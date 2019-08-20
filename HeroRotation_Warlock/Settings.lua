@@ -81,7 +81,6 @@ HR.GUISettings.APL.Warlock = {
       SummonPet = true,
       GrimoireOfSacrifice = true,
       PhantomSingularity = true,
-      Essences = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
