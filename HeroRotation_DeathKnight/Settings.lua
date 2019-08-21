@@ -40,6 +40,7 @@ HR.GUISettings.APL.DeathKnight = {
     },
   },
   Unholy = {
+    AotDOff = true,
     GCDasOffGCD = {
       -- Abilities
       DarkTransformation = true,
@@ -86,10 +87,14 @@ CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTri
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
+
 --Unholy Panels
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.AotDOff", "Disable AotD Checks", "Enable this to option to remove ability checks against Army of the Dead. This can help smooth out the rotation if not using Army on cooldown.");
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
+
 --Frost Panels
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
+
 --Blood Panels
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ConsumptionSuggested", "Suggested: Consumption", "Suggest (Left Top icon) Consumption if Consumption is not enabled.");
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it (supports Quaking).");
