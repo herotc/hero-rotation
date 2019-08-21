@@ -89,7 +89,8 @@ Item.Hunter.Survival = {
   AshvanesRazorCoral               = Item(169311),
   PocketsizedComputationDevice     = Item(167555),
   GalecallersBoon                  = Item(159614),
-  AzsharasFontofPower              = Item(169314)
+  AzsharasFontofPower              = Item(169314),
+  DribblingInkpod                  = Item(169319)
 };
 local I = Item.Hunter.Survival;
 
@@ -373,8 +374,8 @@ local function APL()
     if S.AspectoftheEagle:IsCastableP() and HR.CDsON() and (not Target:IsInRange(8) and Target:IsInRange(40)) then
       if HR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return "aspect_of_the_eagle 320"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzeroth) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+    -- use_item,name=ashvanes_razor_coral,if=equipped.dribbling_inkpod&(debuff.razor_coral_debuff.down|time_to_pct_30<1|(health.pct<30&buff.guardian_of_azeroth.up|buff.memory_of_lucid_dreams.up))|(!equipped.dribbling_inkpod&(buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up)|debuff.razor_coral_debuff.down)|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (I.DribblingInkpod:IsEquipped() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToX(30) < 1 or (Target:HealthPercentage() < 30 and (S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) or Player:BuffP(S.MemoryofLucidDreams))) or (not I.DribblingInkpod:IsEquipped() and (Player:BuffP(S.MemoryofLucidDreams) or (S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150)) or Target:DebuffDownP(S.RazorCoralDebuff)) or Target:TimeToDie() < 20) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 321"; end
     end
     -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
