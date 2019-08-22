@@ -211,7 +211,7 @@ local function EvaluateCycleGuardianofAzeroth78(TargetUnit)
 end
 
 local function EvaluateCycleShiverVenomRelic104(TargetUnit)
-  return (Player:BuffDownP(CaInc()) and TargetUnit:DebuffStackP(S.ShiverVenomDebuff) >= 5)
+  return (Player:BuffDownP(CaInc()) and not Player:HasHeroism() and TargetUnit:DebuffStackP(S.ShiverVenomDebuff) >= 5)
 end
 
 local function EvaluateCycleMemoryofLucidDreams135(TargetUnit)
@@ -339,7 +339,7 @@ local function APL()
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and DoTsUp() then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 117" end
     end
-    -- use_item,name=shiver_venom_relicif=!buff.ca_inc.up,target_if=dot.shiver_venom.stack>=5
+    -- use_item,name=shiver_venom_relic,if=!buff.ca_inc.up&!buff.bloodlust.up,target_if=dot.shiver_venom.stack>=5
     if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets then
       if HR.CastCycle(I.ShiverVenomRelic, 40, EvaluateCycleShiverVenomRelic104) then return "shiver_venom_relic 105"; end
     end
