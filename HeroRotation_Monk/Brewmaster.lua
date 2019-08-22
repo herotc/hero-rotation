@@ -75,8 +75,8 @@ local S = Spell.Monk.Brewmaster;
 -- Items
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
-  BattlePotionOfAgility = Item(163223),
-  InvocationOfYulon     = Item(165568),
+  SuperiorBattlePotionOfAgility = Item(168489),
+  InvocationOfYulon             = Item(165568),
 };
 local I = Item.Monk.Brewmaster;
 
@@ -192,8 +192,8 @@ local function APL()
   --- Out of Combat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     -- potion
-    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+    if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.SuperiorBattlePotionOfAgility) then return ""; end
     end
   end
 
@@ -210,8 +210,8 @@ local function APL()
       if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- potion
-    if I.BattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.BattlePotionOfAgility) then return ""; end
+    if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.SuperiorBattlePotionOfAgility) then return ""; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
