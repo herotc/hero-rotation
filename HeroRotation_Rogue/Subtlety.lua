@@ -275,16 +275,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
       end
     end
   end
-  -- actions.finish+=/secret_technique,if=buff.symbols_of_death.up&(!talent.dark_shadow.enabled|buff.shadow_dance.up)
-  if S.SecretTechnique:IsCastable() and Player:BuffP(S.SymbolsofDeath) and (not S.DarkShadow:IsAvailable() or ShadowDanceBuff) then
-    if ReturnSpellOnly then
-      return S.SecretTechnique;
-    else
-      if HR.Cast(S.SecretTechnique) then return "Cast Secret Technique"; end
-    end
-  end
-  -- actions.finish+=/secret_technique,if=spell_targets.shuriken_storm>=2+talent.dark_shadow.enabled+talent.nightstalker.enabled
-  if S.SecretTechnique:IsCastable() and Cache.EnemiesCount[10] >= 2 + num(S.DarkShadow:IsAvailable()) + num(S.Nightstalker:IsAvailable()) then
+  -- actions.finish+=/secret_technique
+  if S.SecretTechnique:IsCastable() then
     if ReturnSpellOnly then
       return S.SecretTechnique;
     else
@@ -872,7 +864,7 @@ end
 
 HR.SetAPL(261, APL, Init);
 
--- Last Update: 2019-08-09
+-- Last Update: 2019-08-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1008,10 +1000,7 @@ HR.SetAPL(261, APL, Init);
 -- actions.finish+=/nightblade,cycle_targets=1,if=!variable.use_priority_rotation&spell_targets.shuriken_storm>=2&(azerite.nights_vengeance.enabled|!azerite.replicating_shadows.enabled|spell_targets.shuriken_storm-active_dot.nightblade>=2)&!buff.shadow_dance.up&target.time_to_die>=(5+(2*combo_points))&refreshable
 -- # Refresh Nightblade early if it will expire during Symbols. Do that refresh if SoD gets ready in the next 5s.
 -- actions.finish+=/nightblade,if=remains<cooldown.symbols_of_death.remains+10&cooldown.symbols_of_death.remains<=5&target.time_to_die-remains>cooldown.symbols_of_death.remains+5
--- # Secret Technique during Symbols. With Dark Shadow only during Shadow Dance (until threshold in next line).
--- actions.finish+=/secret_technique,if=buff.symbols_of_death.up&(!talent.dark_shadow.enabled|buff.shadow_dance.up)
--- # With enough targets always use SecTec on CD.
--- actions.finish+=/secret_technique,if=spell_targets.shuriken_storm>=2+talent.dark_shadow.enabled+talent.nightstalker.enabled
+-- actions.finish+=/secret_technique
 -- actions.finish+=/eviscerate
 --
 -- # Builders
