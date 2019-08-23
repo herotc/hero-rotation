@@ -186,7 +186,7 @@ local function APL()
       if HR.Cast(S.HowlingBlast) then return ""; end
     end
     -- frostscythe,if=buff.killing_machine.up
-    if S.Frostscythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:BuffP(S.KillingMachineBuff)) then
+    if S.Frostscythe:IsCastableP() and (Player:BuffP(S.KillingMachineBuff)) then
       if HR.Cast(S.Frostscythe) then return ""; end
     end
     -- glacial_advance,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
@@ -206,7 +206,7 @@ local function APL()
       if HR.Cast(S.RemorselessWinter) then return ""; end
     end
     -- frostscythe
-    if S.Frostscythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 then
+    if S.Frostscythe:IsCastableP() then
       if HR.Cast(S.Frostscythe) then return ""; end
     end
     -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>(25+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
@@ -586,7 +586,7 @@ local function APL()
       if HR.Cast(S.FrostStrike) then return ""; end
     end
     -- frostscythe,if=buff.killing_machine.up&rune.time_to_4>=gcd
-    if S.Frostscythe:IsCastableP() and Cache.EnemiesCount[8] >= 1 and (Player:BuffP(S.KillingMachineBuff) and Player:RuneTimeToX(4) >= Player:GCD()) then
+    if S.Frostscythe:IsCastableP() and (Player:BuffP(S.KillingMachineBuff) and Player:RuneTimeToX(4) >= Player:GCD()) then
       if HR.Cast(S.Frostscythe) then return ""; end
     end
     -- obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
