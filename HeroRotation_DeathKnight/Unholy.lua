@@ -244,7 +244,7 @@ local function APL()
       if HR.Cast(S.Apocalypse) then return "apocalypse 115"; end
     end
     -- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
-    if S.DarkTransformation:IsCastableP() and (not (Cache.EnemiesCount[8] > 1)) then
+    if S.DarkTransformation:IsCastableP() then
       if HR.Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation 119"; end
     end
     -- summon_gargoyle,if=runic_power.deficit<14
