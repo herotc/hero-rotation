@@ -374,6 +374,10 @@ local function APL()
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device single"; end
     end
+    -- Manual addition of Ice Lance with FoF proc if not using Glacial Spike
+    if S.IceLance:IsCastableP() and (not S.GlacialSpike:IsAvailable() and Player:BuffP(S.FingersofFrostBuff)) then
+      if HR.Cast(S.IceLance) then return "ice_lance 218"; end
+    end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
       if HR.Cast(S.Frostbolt) then return "frostbolt 219"; end
