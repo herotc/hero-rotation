@@ -558,12 +558,12 @@ local function APL ()
         end
         local usingTrinket = false;
         -- actions.precombat+=/use_item,name=azsharas_font_of_power
-        if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
+        if Settings.Commons.UseTrinkets and I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
           usingTrinket = true;
           if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Font of Power"; end
         end
         -- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-        if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() then
+        if Settings.Commons.UseTrinkets and I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() then
           usingTrinket = true;
           if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device"; end
         end

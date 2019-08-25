@@ -716,7 +716,7 @@ local function APL ()
             if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)"; end
           end
           -- actions.precombat+=/use_item,name=azsharas_font_of_power
-          if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
+          if Settings.Commons.UseTrinkets and I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
             if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Font of Power"; end
           end
           if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
