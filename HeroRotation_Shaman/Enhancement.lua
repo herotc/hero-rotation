@@ -163,7 +163,7 @@ end
 local function ResonanceTotemTime()
   for index=1,4 do
     local _, totemName, startTime, duration = GetTotemInfo(index)
-    if totemName == "Totem Mastery" then
+    if totemName == S.TotemMastery:Name() then
       return (floor(startTime + duration - GetTime() + 0.5)) or 0
     end
   end
