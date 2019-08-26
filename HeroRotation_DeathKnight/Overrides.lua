@@ -28,6 +28,8 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldUHIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellUnholy.RaiseDead then
     return (not Pet:IsActive()) and BaseCheck
+  elseif self == SpellUnholy.DarkTransformation then
+    return (Pet:IsActive()) and BaseCheck
   else
     return BaseCheck
   end
