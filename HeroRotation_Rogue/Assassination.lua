@@ -830,7 +830,7 @@ local function APL ()
       if ShouldReturn then return ShouldReturn .. " (Stealthed)"; end
     end
     -- actions+=/call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!trinket.azsharas_font_of_power.cooldown.up)
-    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) and (not Settings.Commons.UseTrinkets not I.FontOfPower:IsEquipped() or not I.FontOfPower:IsReady()) then
+    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) and (not Settings.Commons.UseTrinkets or not I.FontOfPower:IsEquipped() or not I.FontOfPower:IsReady()) then
       ShouldReturn = CDs();
       if ShouldReturn then return ShouldReturn; end
     end
