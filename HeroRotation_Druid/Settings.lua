@@ -37,6 +37,7 @@ HR.GUISettings.APL.Druid = {
     BarkskinHP = 50,
     RenewalHP = 40,
     ShowMoonkinFormOOC = true,
+    ShowInnervate = true,
     ShowPotion = false,
     UseSplashData = true,
     -- {Display GCD as OffGCD, ForceReturn}
@@ -130,6 +131,7 @@ CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.UseSplashData", 
 CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.");
 CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
+CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowInnervate", "Show Innervate in Rotation", "Enable this if you would like the addon to suggest when to use Innervate.");
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPotion", "Show Potion", "Enable this if you want the addon to show you when to use a potion.");
 CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
 
