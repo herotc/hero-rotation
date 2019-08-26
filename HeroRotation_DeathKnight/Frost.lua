@@ -388,39 +388,37 @@ local function APL()
         if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
       -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
-      if (S.PillarofFrost:CooldownUpP() or S.PillarofFrost:CooldownRemainsP() > 20) and (not S.BreathofSindragosa:IsAvailable() or S.EmpowerRuneWeaponBuff:CooldownRemainsP() > 95) then
-        -- use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>90&debuff.razor_coral_debuff.up&variable.other_on_use_equipped|buff.breath_of_sindragosa.up&debuff.razor_coral_debuff.up&!variable.other_on_use_equipped|buff.empower_rune_weapon.up&debuff.razor_coral_debuff.up&!talent.breath_of_sindragosa.enabled|target.1.time_to_die<21
-        if I.AshvanesRazorCoral:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 90 and Target:DebuffP(S.RazorCoralDebuff) and bool(VarOoUE) or Player:BuffP(S.BreathofSindragosa) and Target:DebuffP(S.RazorCoralDebuff) and not bool(VarOoUE) or Player:BuffP(S.EmpowerRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < 21) then
-          if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        -- use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
-        if I.JesHowler:IsEquipReady() and ((I.LurkersInsidiousGift:IsEquipped() and Player:BuffP(S.PillarofFrostBuff)) or (not I.LurkersInsidiousGift:IsEquipped() and Player:BuffRemainsP(S.PillarofFrostBuff) < 12 and Player:BuffP(S.PillarofFrostBuff))) then
-          if HR.Cast(I.JesHowler, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        -- use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
-        -- Two lines, since Horde and Alliance versions of the trinket have different IDs
-        if I.KnotofAncientFuryAlliance:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
-          if HR.Cast(I.KnotofAncientFuryAlliance, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        if I.KnotofAncientFuryHorde:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
-          if HR.Cast(I.KnotofAncientFuryHorde, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        -- use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
-        if I.GrongsPrimalRage:IsEquipReady() and (Player:Rune() <= 3 and Player:BuffDownP(S.PillarofFrostBuff) and (Player:BuffDownP(S.BreathofSindragosa) or not S.BreathofSindragosa:IsAvailable())) then
-          if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        -- use_item,name=razdunks_big_red_button
-        if I.RazdunksBigRedButton:IsEquipReady() then
-          if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        -- use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
-        if I.MerekthasFang:IsEquipReady() and (not Player:BuffP(S.BreathofSindragosa) and not Player:BuffP(S.PillarofFrostBuff)) then
-          if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
-        -- use_item,name=first_mates_spyglass,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-        if I.FirstMatesSpyglass:IsEquipReady() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
-          if HR.Cast(I.FirstMatesSpyglass, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-        end
+      -- use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>90&debuff.razor_coral_debuff.up&variable.other_on_use_equipped|buff.breath_of_sindragosa.up&debuff.razor_coral_debuff.up&!variable.other_on_use_equipped|buff.empower_rune_weapon.up&debuff.razor_coral_debuff.up&!talent.breath_of_sindragosa.enabled|target.1.time_to_die<21
+      if I.AshvanesRazorCoral:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 90 and Target:DebuffP(S.RazorCoralDebuff) and bool(VarOoUE) or Player:BuffP(S.BreathofSindragosa) and Target:DebuffP(S.RazorCoralDebuff) and not bool(VarOoUE) or Player:BuffP(S.EmpowerRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < 21) then
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
+      if I.JesHowler:IsEquipReady() and ((I.LurkersInsidiousGift:IsEquipped() and Player:BuffP(S.PillarofFrostBuff)) or (not I.LurkersInsidiousGift:IsEquipped() and Player:BuffRemainsP(S.PillarofFrostBuff) < 12 and Player:BuffP(S.PillarofFrostBuff))) then
+        if HR.Cast(I.JesHowler, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
+      -- Two lines, since Horde and Alliance versions of the trinket have different IDs
+      if I.KnotofAncientFuryAlliance:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
+        if HR.Cast(I.KnotofAncientFuryAlliance, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      if I.KnotofAncientFuryHorde:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 40) then
+        if HR.Cast(I.KnotofAncientFuryHorde, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
+      if I.GrongsPrimalRage:IsEquipReady() and (Player:Rune() <= 3 and Player:BuffDownP(S.PillarofFrostBuff) and (Player:BuffDownP(S.BreathofSindragosa) or not S.BreathofSindragosa:IsAvailable())) then
+        if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=razdunks_big_red_button
+      if I.RazdunksBigRedButton:IsEquipReady() then
+        if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
+      if I.MerekthasFang:IsEquipReady() and (not Player:BuffP(S.BreathofSindragosa) and not Player:BuffP(S.PillarofFrostBuff)) then
+        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=first_mates_spyglass,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+      if I.FirstMatesSpyglass:IsEquipReady() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+        if HR.Cast(I.FirstMatesSpyglass, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
       end
     end
     -- potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
