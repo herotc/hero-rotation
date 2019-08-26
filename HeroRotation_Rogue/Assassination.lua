@@ -427,7 +427,7 @@ local function CDs ()
       if S.Vendetta:IsCastable() and not Player:IsStealthedP(true, false) and Target:DebuffP(S.Rupture) and not Target:DebuffP(S.Vendetta)
         and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) > 1 and (Cache.EnemiesCount[10] < 6 or not S.Vanish:CooldownUpP()))
         and (not S.Nightstalker:IsAvailable() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() < 5 - 2 * num(S.DeeperStratagem:IsAvailable()))
-        and (not I.FontOfPower:IsEquipped() or S.ShroudedSuffocation:AzeriteEnabled() or S.RazorCoralDebuff:ActiveCount() == 0 or I.RazorCoral:CooldownRemains() < 10 and S.ToxicBlade:CooldownRemainsP() <= 1) then
+        and (not Settings.Commons.UseTrinkets or not I.FontOfPower:IsEquipped() or S.ShroudedSuffocation:AzeriteEnabled() or S.RazorCoralDebuff:ActiveCount() == 0 or I.RazorCoral:CooldownRemains() < 10 and S.ToxicBlade:CooldownRemainsP() <= 1) then
         if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta"; end
       end
       if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
@@ -830,7 +830,7 @@ local function APL ()
       if ShouldReturn then return ShouldReturn .. " (Stealthed)"; end
     end
     -- actions+=/call_action_list,name=cds,if=(!talent.master_assassin.enabled|dot.garrote.ticking)&(!equipped.azsharas_font_of_power|!trinket.azsharas_font_of_power.cooldown.up)
-    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) and (not I.FontOfPower:IsEquipped() or not I.FontOfPower:IsReady()) then
+    if not S.MasterAssassin:IsAvailable() or Target:DebuffP(S.Garrote) and (not Settings.Commons.UseTrinkets not I.FontOfPower:IsEquipped() or not I.FontOfPower:IsReady()) then
       ShouldReturn = CDs();
       if ShouldReturn then return ShouldReturn; end
     end
