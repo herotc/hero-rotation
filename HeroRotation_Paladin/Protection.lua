@@ -122,7 +122,7 @@ local function APL()
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-        if HR.Cast(S.LightsJudgment) then return "lights_judgment 10"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 10"; end
       end
     end
   end
@@ -207,7 +207,7 @@ local function APL()
     end
     -- lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffP(S.SeraphimBuff) and Player:BuffRemainsP(S.SeraphimBuff) < 3) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 103"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 103"; end
     end
     -- consecration,if=!consecration.up
     if S.Consecration:IsCastableP() and (Player:BuffDownP(S.ConsecrationBuff)) then
@@ -231,7 +231,7 @@ local function APL()
     end
     -- lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 137"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 137"; end
     end
     -- anima_of_death
     if S.AnimaofDeath:IsCastableP() then
