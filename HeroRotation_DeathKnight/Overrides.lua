@@ -29,7 +29,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellUnholy.RaiseDead then
     return (not Pet:IsActive()) and BaseCheck
   elseif self == SpellUnholy.DarkTransformation then
-    return (Pet:IsActive()) and BaseCheck
+    return (Pet:IsActive() and Pet:NPCID() == 26125) and BaseCheck
   else
     return BaseCheck
   end
