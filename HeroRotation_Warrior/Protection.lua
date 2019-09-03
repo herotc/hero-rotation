@@ -361,8 +361,8 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 110"; end
     end
-    -- concentrated_flame,if=buff.avatar.down
-    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff)) then
+    -- concentrated_flame,if=buff.avatar.down&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or S.ConcentratedFlame:ID() ~= 299353) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 111"; end
     end
     -- last_stand,if=cooldown.anima_of_death.remains<=2
