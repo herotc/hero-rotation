@@ -150,7 +150,7 @@ local function EvaluateTargetIfRisingSunKick2(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick(TargetUnit)
-  return (not Player:PrevGCD(1, S.BlackoutKick) and (S.FistsOfFury:CooldownRemainsP() > 4 or Player:Chi() >= 4 or (Player:Chi() == 2 and Player:PrevGCD(S.TigerPalm))))
+  return (not Player:PrevGCD(1, S.BlackoutKick) and (S.FistsOfFury:CooldownRemainsP() > 4 or Player:Chi() >= 4 or (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm))))
 end
 
 local function EvaluateTargetIfTigerPalm(TargetUnit)
