@@ -23,7 +23,7 @@ OldHavocIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldHavocIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if Player:InstanceInfo(8) == 2164 then
-    return BaseCheck and (Player:DebuffDownP(RepeatPerformanceDebuff) or Player:DebuffP(RepeatPerformanceDebuff) and not Player:PrevGCDP(1, self))
+    return BaseCheck and (Player:DebuffDown(RepeatPerformanceDebuff) or Player:Debuff(RepeatPerformanceDebuff) and not Player:PrevGCD(1, self))
   else
     return BaseCheck
   end
@@ -35,7 +35,7 @@ OldHavocIsReadyP = HL.AddCoreOverride ("Spell.IsReadyP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldHavocIsReadyP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if Player:InstanceInfo(8) == 2164 then
-    return BaseCheck and (Player:DebuffDownP(RepeatPerformanceDebuff) or Player:DebuffP(RepeatPerformanceDebuff) and not Player:PrevGCDP(1, self))
+    return BaseCheck and (Player:DebuffDown(RepeatPerformanceDebuff) or Player:Debuff(RepeatPerformanceDebuff) and not Player:PrevGCD(1, self))
   else
     return BaseCheck
   end
@@ -48,7 +48,7 @@ OldVengIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldVengIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if Player:InstanceInfo(8) == 2164 then
-    return BaseCheck and (Player:DebuffDownP(RepeatPerformanceDebuff) or Player:DebuffP(RepeatPerformanceDebuff) and not Player:PrevGCDP(1, self))
+    return BaseCheck and (Player:DebuffDown(RepeatPerformanceDebuff) or Player:Debuff(RepeatPerformanceDebuff) and not Player:PrevGCD(1, self))
   else
     return BaseCheck
   end
@@ -60,7 +60,7 @@ OldVengIsReady = HL.AddCoreOverride ("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldVengIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if Player:InstanceInfo(8) == 2164 then
-    return BaseCheck and (Player:DebuffDownP(RepeatPerformanceDebuff) or Player:DebuffP(RepeatPerformanceDebuff) and not Player:PrevGCDP(1, self))
+    return BaseCheck and (Player:DebuffDown(RepeatPerformanceDebuff) or Player:Debuff(RepeatPerformanceDebuff) and not Player:PrevGCD(1, self))
   else
     return BaseCheck
   end
