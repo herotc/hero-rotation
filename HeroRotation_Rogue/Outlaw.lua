@@ -620,7 +620,7 @@ local function APL ()
     ShouldReturn = CDs();
     if ShouldReturn then return "CDs: " .. ShouldReturn; end
     -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up|!buff.roll_the_bones.up)
-    if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffP(S.Broadside)) + num(Player:BuffP(S.Opportunity))) * num(S.QuickDraw:IsAvailable() and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemainsP() > 1)) * num(S.AceUpYourSleeve:AzeriteRank() < 2 or not S.BetweenTheEyes:CooldownUpP() or RtB_Buffs() < 1) then
+    if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffP(S.Broadside)) + num(Player:BuffP(S.Opportunity))) * num(S.QuickDraw:IsAvailable() and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemainsP() > 1)) * num(S.AceUpYourSleeve:AzeriteRank() < 2 or not S.BetweentheEyes:CooldownUpP() or RtB_Buffs() < 1) then
       ShouldReturn = Finish();
       if ShouldReturn then return "Finish: " .. ShouldReturn; end
       -- run_action_list forces the return
