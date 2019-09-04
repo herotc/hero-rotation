@@ -124,6 +124,10 @@ local function APL()
       if S.LightsJudgment:IsCastableP() and HR.CDsON() then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 10"; end
       end
+      -- Manual Add: Avenger's Shield, if pulling at range
+      if S.AvengersShield:IsCastableP() then
+        if HR.Cast(S.AvengersShield) then return "avengers_shield 11"; end
+      end
     end
   end
   Cooldowns = function()
@@ -210,7 +214,7 @@ local function APL()
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 103"; end
     end
     -- consecration,if=!consecration.up
-    if S.Consecration:IsCastableP() and (Player:BuffDownP(S.ConsecrationBuff) and Cache.EnemiesCount[8] > 0) then
+    if S.Consecration:IsCastableP() and (Player:BuffDownP(S.ConsecrationBuff)) then
       if HR.Cast(S.Consecration) then return "consecration 109"; end
     end
     -- judgment,if=(cooldown.judgment.remains<gcd&cooldown.judgment.charges_fractional>1&cooldown_react)|!talent.crusaders_judgment.enabled
@@ -246,7 +250,7 @@ local function APL()
       if HR.Cast(S.HammeroftheRighteous) then return "hammer_of_the_righteous 145"; end
     end
     -- consecration
-    if S.Consecration:IsCastableP() and (Cache.EnemiesCount[8] > 0) then
+    if S.Consecration:IsCastableP() then
       if HR.Cast(S.Consecration) then return "consecration 147"; end
     end
     -- heart_essence,if=!(essence.the_crucible_of_flame.major|essence.worldvein_resonance.major|essence.anima_of_life_and_death.major|essence.memory_of_lucid_dreams.major)

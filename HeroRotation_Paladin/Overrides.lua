@@ -19,6 +19,16 @@
 -- Holy, ID: 65
 
 -- Protection, ID: 66
+local OldProtIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldProtIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellProtection.Consecration then
+    return BaseCheck and (Cache.EnemiesCount[8] > 0)
+  else
+    return BaseCheck
+  end
+end
+, 66);
 
 -- Retribution, ID: 70
 
