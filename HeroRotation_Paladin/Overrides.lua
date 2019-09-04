@@ -19,7 +19,8 @@
 -- Holy, ID: 65
 
 -- Protection, ID: 66
-local OldProtIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+local OldProtIsCastableP
+OldProtIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldProtIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellProtection.Consecration then
