@@ -244,7 +244,7 @@ local function APL()
   end
   CombustionPhase = function()
     -- lights_judgment,if=buff.combustion.down
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.CombustionBuff)) then
+    if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.LightsJudgment) then return "lights_judgment 234"; end
     end
     -- blood_of_the_enemy
@@ -280,19 +280,19 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 288"; end
     end
     -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
+    if S.BloodFury:IsCastableP() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 290"; end
     end
     -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
+    if S.Berserking:IsCastableP() then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 292"; end
     end
     -- fireblood
-    if S.Fireblood:IsCastableP() and HR.CDsON() then
+    if S.Fireblood:IsCastableP() then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 294"; end
     end
     -- ancestral_call
-    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+    if S.AncestralCall:IsCastableP() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 296"; end
     end
     -- flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react&!azerite.blaster_master.enabled
