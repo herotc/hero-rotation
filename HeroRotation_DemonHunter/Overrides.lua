@@ -13,12 +13,12 @@ local HR      = HeroRotation;
 -- Spells
 local SpellHavoc              = Spell.DemonHunter.Havoc;
 local SpellVengeance          = Spell.DemonHunter.Vengeance;
-local RepeatPerformanceDebuff = Spell(304409);
+--local RepeatPerformanceDebuff = Spell(304409);
 -- Lua
 
 --- ============================ CONTENT ============================
 -- Havoc, ID: 577
-local OldHavocIsCastableP
+--[[local OldHavocIsCastableP
 OldHavocIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldHavocIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
@@ -40,10 +40,10 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return BaseCheck
   end
 end
-, 577);
+, 577);]]
 
 -- Vengeance, ID: 581
-local OldVengIsCastable
+--[[local OldVengIsCastable
 OldVengIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldVengIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
@@ -65,7 +65,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return BaseCheck
   end
 end
-, 581);
+, 581);]]
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP", 
