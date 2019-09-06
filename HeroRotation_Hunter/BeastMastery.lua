@@ -230,7 +230,7 @@ local function APL()
     end
     -- lights_judgment,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains>gcd.max|!pet.cat.buff.frenzy.up
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) > GCDMax or not Pet:BuffP(S.FrenzyBuff)) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 60"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 60"; end
     end
     -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable()) or Target:TimeToDie() < 61) then

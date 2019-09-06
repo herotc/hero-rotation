@@ -252,7 +252,7 @@ local function APL()
     end
     -- lights_judgment,if=buff.arcane_power.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.ArcanePowerBuff)) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 72"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 72"; end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.arcane_power.remains<5|time_to_die<cooldown.arcane_power.remains
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.ArcanePower:CooldownRemainsP() < 5 or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then

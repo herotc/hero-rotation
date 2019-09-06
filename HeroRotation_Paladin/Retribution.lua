@@ -147,7 +147,7 @@ local function APL()
     end
     -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
     if S.LightsJudgment:IsCastableP() then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 18"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 18"; end
     end
     -- fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
     if S.Fireblood:IsCastableP() and (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff) and Player:BuffStackP(S.CrusadeBuff) == 10) then

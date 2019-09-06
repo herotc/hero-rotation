@@ -245,7 +245,7 @@ local function APL()
   CombustionPhase = function()
     -- lights_judgment,if=buff.combustion.down
     if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 234"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 234"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then

@@ -360,7 +360,7 @@ local function APL()
     end
     -- lights_judgment
     if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 296"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 296"; end
     end
     -- berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
     if S.Berserking:IsCastableP() and HR.CDsON() and (S.CoordinatedAssault:CooldownRemainsP() > 60 or Target:TimeToDie() < 13) then

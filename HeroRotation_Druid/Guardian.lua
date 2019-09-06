@@ -163,7 +163,7 @@ local function APL()
     end
     -- lights_judgment
     if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 18"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 18"; end
     end
     -- fireblood
     if S.Fireblood:IsCastableP() and HR.CDsON() then

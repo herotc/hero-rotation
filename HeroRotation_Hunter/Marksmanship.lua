@@ -211,7 +211,7 @@ local function APL()
     end
     -- lights_judgment
     if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 102"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 102"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4&!buff.trueshot.up
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4 and Player:BuffDownP(S.TrueshotBuff)) then
