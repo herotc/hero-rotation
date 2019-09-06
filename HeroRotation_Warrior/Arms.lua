@@ -416,7 +416,7 @@ local function APL()
     end
     -- lights_judgment,if=debuff.colossus_smash.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Target:DebuffDownP(S.ColossusSmashDebuff)) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 370"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 370"; end
     end
     -- fireblood,if=debuff.colossus_smash.up
     if S.Fireblood:IsCastableP() and HR.CDsON() and (Target:DebuffP(S.ColossusSmashDebuff)) then

@@ -289,7 +289,7 @@ local function APL()
     end
     -- lights_judgment,if=buff.recklessness.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.RecklessnessBuff)) then
-      if HR.Cast(S.LightsJudgment) then return "lights_judgment 126"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 126"; end
     end
     -- fireblood
     if S.Fireblood:IsCastableP() and HR.CDsON() then
