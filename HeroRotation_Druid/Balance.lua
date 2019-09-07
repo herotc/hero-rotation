@@ -332,24 +332,24 @@ local function APL()
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 73" end
     end
     -- guardian_of_azeroth,if=(!talent.starlord.enabled|buff.starlord.up)&!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if S.GuardianofAzeroth:IsCastableP() then
-      if HR.CastCycle(S.GuardianofAzeroth, 40, EvaluateCycleGuardianofAzeroth78) then return "guardian_of_azeroth 94" end
+    if S.GuardianofAzeroth:IsCastableP() and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and not Player:BuffP(CaInc()) and DoTsUp()) then
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 94" end
     end
     -- use_item,effect_name=cyclotronic_blast,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and DoTsUp() then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 117" end
     end
     -- use_item,name=shiver_venom_relic,if=!buff.ca_inc.up&!buff.bloodlust.up,target_if=dot.shiver_venom.stack>=5
-    if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.CastCycle(I.ShiverVenomRelic, 40, EvaluateCycleShiverVenomRelic104) then return "shiver_venom_relic 105"; end
+    if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(CaInc()) and not Player:HasHeroism() and Target:DebuffStackP(S.ShiverVenomDebuff)) then
+      if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic 105"; end
     end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
     if S.BloodoftheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- memory_of_lucid_dreams,if=!buff.ca_inc.up&(astral_power<25|cooldown.ca_inc.remains>30),target_if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)
-    if S.MemoryofLucidDreams:IsCastableP() then
-      if HR.CastCycle(S.MemoryofLucidDreams, 40, EvaluateCycleMemoryofLucidDreams135) then return "memory_of_lucid_dreams 149" end
+    if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(CaInc()) and (Player:AstralPower() < 25 or CaInc():CooldownRemainsP() > 30) and DoTsUp()) then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 149" end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
@@ -364,16 +364,16 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if S.TheUnboundForce:IsCastableP() then
-      if HR.CastCycle(S.TheUnboundForce, 40, EvaluateCycleTheUnboundForce160) then return "the_unbound_force 172" end
+    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) and DoTsUp()) then
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 172" end
     end
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- focused_azerite_beam,if=(!variable.az_ss|!buff.ca_inc.up),target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.CastCycle(S.FocusedAzeriteBeam, 40, EvaluateCycleFocusedAzeriteBeam179) then return "focused_azerite_beam 193" end
+    if S.FocusedAzeriteBeam:IsCastableP() and ((not bool(VarAzSs) or Player:BuffDownP(CaInc())) and DoTsUp()) then
+      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 193" end
     end
     -- thorns
     if S.Thorns:IsCastableP() then
