@@ -315,6 +315,10 @@ local function APL()
     if S.DeathCoil:IsUsableP() and (bool(Player:BuffStackP(S.SuddenDoomBuff)) and not bool(VarPoolingForGargoyle) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
       if HR.Cast(S.DeathCoil) then return "death_coil 174"; end
     end
+    -- Manually added: Multiple target Epidemic in place of below Death Coil
+    if S.Epidemic:IsReadyP() and ((Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and not bool(VarPoolingForGargoyle)) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
+      if HR.Cast(S.Epidemic) then return "epidemic 173"; end
+    end
     -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and not bool(VarPoolingForGargoyle)) then
       if HR.Cast(S.DeathCoil) then return "death_coil 180"; end
@@ -335,6 +339,10 @@ local function APL()
     if S.ClawingShadows:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
       if HR.Cast(S.ClawingShadows) then return "clawing_shadows 208"; end
     end
+    -- Manually added: Multiple target Epidemic if close to capping RP
+    if S.Epidemic:IsReadyP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
+      if HR.Cast(S.Epidemic) then return "epidemic 173"; end
+    end
     -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
       if HR.Cast(S.DeathCoil) then return "death_coil 218"; end
@@ -342,6 +350,10 @@ local function APL()
     -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not Player:BuffP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
       if HR.Cast(S.FesteringStrike) then return "festering_strike 222"; end
+    end
+    -- Manually added: Multiple target Epidemic filler to burn RP
+    if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
+      if HR.Cast(S.Epidemic) then return "epidemic 173"; end
     end
     -- death_coil,if=!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (not bool(VarPoolingForGargoyle)) then
@@ -445,6 +457,7 @@ local function APL()
 end
 
 local function Init ()
+  S.VirulentPlagueDebuff:RegisterAuraTracking();
   HL.RegisterNucleusAbility(152280, 8, 6)               -- Defile
   HL.RegisterNucleusAbility(115989, 8, 6)               -- Unholy Blight
   HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
