@@ -206,26 +206,6 @@ local function DoTsUp()
   return (Target:DebuffP(S.MoonfireDebuff) and Target:DebuffP(S.Sunfire) and (not S.StellarFlare:IsAvailable() or Target:DebuffP(S.StellarFlareDebuff)))
 end
 
-local function EvaluateCycleGuardianofAzeroth78(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and Player:BuffDownP(CaInc()))
-end
-
-local function EvaluateCycleShiverVenomRelic104(TargetUnit)
-  return (Player:BuffDownP(CaInc()) and not Player:HasHeroism() and TargetUnit:DebuffStackP(S.ShiverVenomDebuff) >= 5)
-end
-
-local function EvaluateCycleMemoryofLucidDreams135(TargetUnit)
-  return (TargetUnit:DebuffRemainsP(S.SunfireDebuff) > 10 and TargetUnit:DebuffRemainsP(S.MoonfireDebuff) > 10 and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffRemainsP(S.StellarFlareDebuff) > 10)) and (Player:BuffDownP(CaInc()) and (FutureAstralPower() < 25 or CaInc():CooldownRemainsP() > 30))
-end
-
-local function EvaluateCycleTheUnboundForce160(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and (Player:BuffP(S.RecklessForceBuff))
-end
-
-local function EvaluateCycleFocusedAzeriteBeam179(TargetUnit)
-  return (TargetUnit:DebuffP(S.MoonfireDebuff) and TargetUnit:DebuffP(S.SunfireDebuff) and (not S.StellarFlare:IsAvailable() or TargetUnit:DebuffP(S.StellarFlareDebuff))) and ((not bool(VarAzSs) or Player:BuffDownP(CaInc())))
-end
-
 local function EvaluateCycleSunfire250(TargetUnit)
   return (TargetUnit:DebuffRefreshableCP(S.SunfireDebuff)) and (AP_Check(S.Sunfire) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) * EnemiesCount >= math.ceil (math.floor (2 / EnemiesCount) * 1.5) + 2 * EnemiesCount and (EnemiesCount > 1 + num(S.TwinMoons:IsAvailable()) or TargetUnit:DebuffP(S.MoonfireDebuff)) and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Sunfire)) and (Player:BuffRemainsP(CaInc()) > TargetUnit:DebuffRemainsP(S.SunfireDebuff) or Player:BuffDownP(CaInc())))
 end
@@ -332,7 +312,7 @@ local function APL()
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 73" end
     end
     -- guardian_of_azeroth,if=(!talent.starlord.enabled|buff.starlord.up)&!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if S.GuardianofAzeroth:IsCastableP() and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and not Player:BuffP(CaInc()) and DoTsUp()) then
+    if S.GuardianofAzeroth:IsCastableP() and ((not S.Starlord:IsAvailable() or Player:BuffP(S.StarlordBuff)) and Player:BuffDownP(CaInc()) and DoTsUp()) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 94" end
     end
     -- use_item,effect_name=cyclotronic_blast,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
