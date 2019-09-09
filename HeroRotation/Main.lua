@@ -27,7 +27,7 @@
 
   local function ModMasque(Frame, Disabled)
     if Disabled then
-      Frame.__MSQ_NormalTexture:Hide();
+      Frame.__MSQ_Normal:Hide();
       Frame.Texture:SetAllPoints( Frame );
       if Frame.CooldownFrame then
         Frame.CooldownFrame:SetAllPoints( Frame );
@@ -42,7 +42,7 @@
       end
     end
   end
-  local function MasqueUpdate( Addon, Group, SkinID, Gloss, Backdrop, Colors, Disabled )
+  local function MasqueUpdate( Addon, Group, SkinID, Backdrop, Shadow, Gloss, Colors, Disabled )
     if Addon==HR and MasqueGroups and MasqueFrameList then
       local k = MasqueFrameList[Group];
       if k then
