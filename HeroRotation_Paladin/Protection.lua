@@ -138,10 +138,10 @@ local function APL()
     end
     if Target:IsInRange(10) and not Player:HealingAbsorbed() then
       if S.HandoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP) then
-        if HR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return "hand_of_the_protector defensive"; end
+        if HR.Cast(S.HandoftheProtector, Settings.Protection.GCDasOffGCD.HandoftheProtector) then return "hand_of_the_protector defensive"; end
       end
       if S.LightoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP) then
-        if HR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return "light_of_the_protector defensive"; end
+        if HR.Cast(S.LightoftheProtector, Settings.Protection.GCDasOffGCD.LightoftheProtector) then return "light_of_the_protector defensive"; end
       end
     end
   end

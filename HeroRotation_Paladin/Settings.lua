@@ -27,7 +27,6 @@ HR.GUISettings.APL.Paladin = {
   },
   Protection = {
     -- CDs HP %
-    EyeofTyrHP = 60,
     HandoftheProtectorHP = 80,
     LightoftheProtectorHP = 80,
     ShieldoftheRighteousHP = 60,
@@ -36,6 +35,8 @@ HR.GUISettings.APL.Paladin = {
     GCDasOffGCD = {
       -- Abilities
       AvengingWrath = true,
+      HandoftheProtector = true,
+      LightoftheProtector = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -43,8 +44,6 @@ HR.GUISettings.APL.Paladin = {
       ArcaneTorrent = true,
       -- Abilities
       ShieldoftheRighteous = true,
-      HandoftheProtector = true,
-      LightoftheProtector = true,
     }
   },
   Retribution = {
