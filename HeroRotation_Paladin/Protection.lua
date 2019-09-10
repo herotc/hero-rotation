@@ -204,6 +204,10 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts);
     -- auto_attack
+    -- Manually added: Defensives
+    if (true) then
+      local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=cooldowns
     if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
