@@ -31,6 +31,7 @@ HR.GUISettings.APL.Paladin = {
     HandoftheProtectorHP = 80,
     LightoftheProtectorHP = 80,
     ShieldoftheRighteousHP = 60,
+    UseSotROffensively = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -42,6 +43,8 @@ HR.GUISettings.APL.Paladin = {
       ArcaneTorrent = true,
       -- Abilities
       ShieldoftheRighteous = true,
+      HandoftheProtector = true,
+      LightoftheProtector = true,
     }
   },
   Retribution = {
@@ -82,7 +85,9 @@ CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.EyeofTyrHP", 
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.HandoftheProtectorHP", {0, 100, 1}, "Hand of the Protector HP", "Set the Hand of the Protector HP threshold.");
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.LightoftheProtectorHP", {0, 100, 1}, "Light of the Protector HP", "Set the Light of the Protector HP threshold.");
 CreatePanelOption("Slider", CP_Protection, "APL.Paladin.Protection.ShieldoftheRighteousHP", {0, 100, 1}, "Shield of the Righteous HP", "Set the Shield of the Righteous HP threshold.");
+CreatePanelOption("CheckButton", CP_Protection, "APL.Paladin.Protection.UseSotROffensively", "Use SotR Offensively", "Enable this setting if you want the addon to suggest Shield of the Righteous as an offensive ability.");
 CreateARPanelOptions(CP_Protection, "APL.Paladin.Protection");
+
 -- Retribution
 -- CreatePanelOption("Slider", CP_Retribution, "APL.Paladin.Retribution.SoloJusticarDP", {0, 100, 1}, "Solo Justicar's Vengeance with Divine Purpose proc HP", "Set the solo Justicar's Vengeance with Divine Purpose proc HP threshold.");
 -- CreatePanelOption("Slider", CP_Retribution, "APL.Paladin.Retribution.SoloJusticar5HP", {0, 100, 1}, "Solo Justicar's Vengeance with 5 Holy Power HP", "Set the solo Justicar's Vengeance with 5 Holy Power HP threshold.");

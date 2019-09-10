@@ -38,6 +38,8 @@ Spell.Paladin.Protection = {
   AvengersValorBuff                     = Spell(197561),
   BlessedHammer                         = Spell(204019),
   HammeroftheRighteous                  = Spell(53595),
+  LightoftheProtector                   = Spell(184092),
+  HandoftheProtector                    = Spell(213652),
   Rebuke                                = Spell(96231),
   RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
@@ -103,7 +105,7 @@ local StunInterrupts = {
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Cooldowns
+  local Precombat, Defensives, Cooldowns
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -127,6 +129,19 @@ local function APL()
       -- Manual Add: Avenger's Shield, if pulling at range
       if S.AvengersShield:IsCastableP() then
         if HR.Cast(S.AvengersShield) then return "avengers_shield 11"; end
+      end
+    end
+  end
+  Defensives = function()
+    if S.ShieldoftheRighteous:IsCastableP() and (Player:BuffRefreshable(S.ShieldoftheRighteous, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65))) then
+      if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
+    end
+    if Target:IsInRange(10) and not Player:HealingAbsorbed() then
+      if S.HandoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP) then
+        if HR.Cast(S.HandoftheProtector, Settings.Protection.OffGCDasOffGCD.HandoftheProtector) then return "hand_of_the_protector defensive"; end
+      end
+      if S.LightoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP) then
+        if HR.Cast(S.LightoftheProtector, Settings.Protection.OffGCDasOffGCD.LightoftheProtector) then return "light_of_the_protector defensive"; end
       end
     end
   end
@@ -202,11 +217,11 @@ local function APL()
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous 71"; end
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&!talent.seraphim.enabled)|buff.seraphim.up&buff.avengers_valor.up
-    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff)) then
+    if S.ShieldoftheRighteous:IsCastableP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff)) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous 81"; end
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&buff.avenging_wrath.remains<4&!talent.seraphim.enabled)|(buff.seraphim.remains<4&buff.seraphim.up)
-    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
+    if S.ShieldoftheRighteous:IsCastableP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous 91"; end
     end
     -- lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
