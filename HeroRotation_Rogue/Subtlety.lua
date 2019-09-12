@@ -578,9 +578,9 @@ end
 -- # Stealth Cooldowns
 local function Stealth_CDs ()
   if IsInMeleeRange() then
-    -- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
+    -- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1&cooldown.symbols_of_death.remains>=3
     if HR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-      and not ShD_Threshold() and Player:ComboPointsDeficit() > 1 and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 then
+      and not ShD_Threshold() and Player:ComboPointsDeficit() > 1 and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 and S.SymbolsofDeath:CooldownRemainsP() >= 3 then
       if StealthMacro(S.Vanish) then return "Vanish Macro"; end
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
@@ -864,7 +864,7 @@ end
 
 HR.SetAPL(261, APL, Init);
 
--- Last Update: 2019-08-22
+-- Last Update: 2019-09-12
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -957,7 +957,7 @@ HR.SetAPL(261, APL, Init);
 -- # Helper Variable
 -- actions.stealth_cds=variable,name=shd_threshold,value=cooldown.shadow_dance.charges_fractional>=1.75
 -- # Vanish unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
--- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
+-- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1&cooldown.symbols_of_death.remains>=3
 -- # Pool for Shadowmeld + Shadowstrike unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
