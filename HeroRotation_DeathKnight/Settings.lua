@@ -50,24 +50,16 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Blood = {
-    ConsumptionSuggested = true,
+    ConsumptionDisplayStyle = "Suggested",
     PoolDuringBlooddrinker = false,
-    UmbilicusEternus = 0,
-    Enabled = {
-      -- Racials
-      ArcaneTorrent = true,
-      -- Abilities
-      Consumption = true,
-      DancingRuneWeapon = true
-    },
     GCDasOffGCD = {
       -- Abilities
       Blooddrinker = true,
       Bonestorm = true,
+      Tombstone = true
     },
     OffGCDasOffGCD = {
-      DancingRuneWeapon = true,
-      ArcaneTorrent = true
+      DancingRuneWeapon = true
     }
   }
 };
@@ -96,7 +88,6 @@ CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
 
 --Blood Panels
-CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.ConsumptionSuggested", "Suggested: Consumption", "Suggest (Left Top icon) Consumption if Consumption is not enabled.");
+CreatePanelOption("Dropdown", CP_Blood, "APL.DeathKnight.Blood.ConsumptionDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Consumption Display Style", "Define which icon display style to use for Consumption.");
 CreatePanelOption("CheckButton", CP_Blood, "APL.DeathKnight.Blood.PoolDuringBlooddrinker", "Pool: Blooddrinker", "Display the 'Pool' icon whenever you're channeling Blooddrinker as long as you shouldn't interrupt it (supports Quaking).");
-CreatePanelOption("Slider", CP_Blood, "APL.DeathKnight.Blood.UmbilicusEternus", { 0, 2, 0.1 }, "Cancel: Umbilicus Eternus Remains", "Set the duration you want to start to show the Umbilicus Eternus cancel. Set to 0 to disable it.");
 CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood");
