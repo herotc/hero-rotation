@@ -75,8 +75,9 @@ local S = Spell.Monk.Brewmaster;
 -- Items
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
-  SuperiorBattlePotionOfAgility = Item(168489),
-  InvocationOfYulon             = Item(165568),
+  SuperiorBattlePotionOfAgility    = Item(168489),
+  AshvanesRazorCoral               = Item(169311),
+  PocketsizedComputationDevice     = Item(167555)
 };
 local I = Item.Monk.Brewmaster;
 
@@ -205,9 +206,13 @@ local function APL()
     if IsTanking then
       ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
-    -- Invocation of Yu'lon
-    if I.InvocationOfYulon:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+    -- use_item,name=pocketsized_computation_device
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+    end
+    -- use_item,name=ashvanes_razor_coral
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- potion
     if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
