@@ -65,10 +65,10 @@ if not Item.DeathKnight then Item.DeathKnight = {}; end
   Item.DeathKnight.Blood = {
   --Potion
   PotionofUnbridledFury            = Item(169299),
-  GrongsPrimalRage                 = Item(165574),
-  RazdunksBigRedButton             = Item(159611),
-  MerekthasFang                    = Item(158367),
-  AshvanesRazorCoral               = Item(169311)
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
+  RazdunksBigRedButton             = Item(159611, {13, 14}),
+  MerekthasFang                    = Item(158367, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.DeathKnight.Blood;
 

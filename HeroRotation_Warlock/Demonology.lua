@@ -77,13 +77,13 @@ local S = Spell.Warlock.Demonology;
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
   PotionofUnbridledFury            = Item(169299),
-  AzsharasFontofPower              = Item(169314),
-  PocketsizedComputationDevice     = Item(167555),
-  RotcrustedVoodooDoll             = Item(159624),
-  ShiverVenomRelic                 = Item(168905),
-  AquipotentNautilus               = Item(169305),
-  TidestormCodex                   = Item(165576),
-  VialofStorms                     = Item(158224)
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  RotcrustedVoodooDoll             = Item(159624, {13, 14}),
+  ShiverVenomRelic                 = Item(168905, {13, 14}),
+  AquipotentNautilus               = Item(169305, {13, 14}),
+  TidestormCodex                   = Item(165576, {13, 14}),
+  VialofStorms                     = Item(158224, {13, 14})
 };
 local I = Item.Warlock.Demonology;
 

@@ -80,9 +80,9 @@ local S = Spell.Hunter.Marksmanship;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Marksmanship = {
   PotionofUnbridledFury            = Item(169299),
-  PocketsizedComputationDevice     = Item(167555),
-  AzsharasFontofPower              = Item(169314),
-  AshvanesRazorCoral               = Item(169311)
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.Hunter.Marksmanship;
 

@@ -76,9 +76,9 @@ local S = Spell.Mage.Frost;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
   PotionofUnbridledFury            = Item(169299),
-  BalefireBranch                   = Item(159630),
-  TidestormCodex                   = Item(165576),
-  PocketsizedComputationDevice     = Item(167555)
+  BalefireBranch                   = Item(159630, {13, 14}),
+  TidestormCodex                   = Item(165576, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14})
 };
 local I = Item.Mage.Frost;
 

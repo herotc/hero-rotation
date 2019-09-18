@@ -73,9 +73,9 @@ local S = Spell.Warrior.Protection;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Protection = {
   SuperiorBattlePotionofStrength   = Item(168500),
-  GrongsPrimalRage                 = Item(165574),
-  AshvanesRazorCoral               = Item(169311),
-  AzsharasFontofPower              = Item(169314)
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Warrior.Protection;
 

@@ -100,8 +100,8 @@ local S = Spell.Shaman.Enhancement;
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
   PotionofUnbridledFury            = Item(169299),
-  AzsharasFontofPower              = Item(169314),
-  AshvanesRazorCoral               = Item(169311)
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.Shaman.Enhancement;
 

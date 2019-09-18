@@ -86,11 +86,11 @@ local S = Spell.Hunter.Survival;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.Survival = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311),
-  PocketsizedComputationDevice     = Item(167555),
-  GalecallersBoon                  = Item(159614),
-  AzsharasFontofPower              = Item(169314),
-  DribblingInkpod                  = Item(169319)
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  GalecallersBoon                  = Item(159614, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  DribblingInkpod                  = Item(169319, {13, 14})
 };
 local I = Item.Hunter.Survival;
 

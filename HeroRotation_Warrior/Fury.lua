@@ -73,8 +73,8 @@ local S = Spell.Warrior.Fury;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311),
-  AzsharasFontofPower              = Item(169314)
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Warrior.Fury;
 

@@ -75,8 +75,8 @@ local S = Spell.Priest.Shadow;
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   PotionofUnbridledFury            = Item(169299),
-  PocketsizedComputationDevice     = Item(167555),
-  AzsharasFontofPower              = Item(169314)
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Priest.Shadow;
 

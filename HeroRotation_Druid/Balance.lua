@@ -85,10 +85,10 @@ local S = Spell.Druid.Balance;
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
   PotionofUnbridledFury            = Item(169299),
-  TidestormCodex                   = Item(165576),
-  AzsharasFontofPower              = Item(169314),
-  PocketsizedComputationDevice     = Item(167555),
-  ShiverVenomRelic                 = Item(168905)
+  TidestormCodex                   = Item(165576, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  ShiverVenomRelic                 = Item(168905, {13, 14})
 };
 local I = Item.Druid.Balance;
 

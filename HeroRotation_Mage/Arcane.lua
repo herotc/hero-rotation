@@ -80,9 +80,9 @@ local S = Spell.Mage.Arcane;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
   PotionofFocusedResolve           = Item(168506),
-  TidestormCodex                   = Item(165576),
-  PocketsizedComputationDevice     = Item(167555),
-  AzsharasFontofPower              = Item(169314)
+  TidestormCodex                   = Item(165576, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Mage.Arcane;
 

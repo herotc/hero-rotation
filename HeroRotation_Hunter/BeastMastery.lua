@@ -80,9 +80,9 @@ local S = Spell.Hunter.BeastMastery;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311),
-  PocketsizedComputationDevice     = Item(167555),
-  AzsharasFontofPower              = Item(169314)
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Hunter.BeastMastery;
 

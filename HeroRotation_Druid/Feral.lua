@@ -91,9 +91,9 @@ local S = Spell.Druid.Feral;
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Feral = {
   PotionofFocusedResolve                = Item(168506),
-  AzsharasFontofPower                   = Item(169314),
-  AshvanesRazorCoral                    = Item(169311),
-  PocketsizedComputationDevice          = Item(167555)
+  AzsharasFontofPower                   = Item(169314, {13, 14}),
+  AshvanesRazorCoral                    = Item(169311, {13, 14}),
+  PocketsizedComputationDevice          = Item(167555, {13, 14})
 };
 local I = Item.Druid.Feral;
 

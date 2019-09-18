@@ -74,14 +74,14 @@ local S = Spell.DeathKnight.Unholy;
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Unholy = {
   PotionofUnbridledFury            = Item(169299),
-  RampingAmplitudeGigavoltEngine   = Item(165580),
-  BygoneBeeAlmanac                 = Item(163936),
-  JesHowler                        = Item(159627),
-  GalecallersBeak                  = Item(161379),
-  GrongsPrimalRage                 = Item(165574),
-  VisionofDemise                   = Item(169307),
-  AzsharasFontofPower              = Item(169314),
-  AshvanesRazorCoral               = Item(169311)
+  RampingAmplitudeGigavoltEngine   = Item(165580, {13, 14}),
+  BygoneBeeAlmanac                 = Item(163936, {13, 14}),
+  JesHowler                        = Item(159627, {13, 14}),
+  GalecallersBeak                  = Item(161379, {13, 14}),
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
+  VisionofDemise                   = Item(169307, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.DeathKnight.Unholy;
 

@@ -63,12 +63,12 @@ local S = Spell.Paladin.Protection;
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Protection = {
   PotionofUnbridledFury            = Item(169299),
-  AzsharasFontofPower              = Item(169314),
-  GrongsPrimalRage                 = Item(165574),
-  MerekthasFang                    = Item(158367),
-  RazdunksBigRedButton             = Item(159611),
-  AshvanesRazorCoral               = Item(169311),
-  PocketsizedComputationDevice     = Item(167555)
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
+  MerekthasFang                    = Item(158367, {13, 14}),
+  RazdunksBigRedButton             = Item(159611, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14})
 };
 local I = Item.Paladin.Protection;
 
