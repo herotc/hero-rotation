@@ -67,6 +67,9 @@ Spell.Monk.Brewmaster = {
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   HeartEssence                          = Spell(298554),
+  -- Trinket Effects
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565),
   -- Misc
   PoolEnergy                            = Spell(9999000010)
 };
@@ -76,8 +79,8 @@ local S = Spell.Monk.Brewmaster;
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
   SuperiorBattlePotionOfAgility    = Item(168489),
-  AshvanesRazorCoral               = Item(169311),
-  PocketsizedComputationDevice     = Item(167555)
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14})
 };
 local I = Item.Monk.Brewmaster;
 
@@ -206,13 +209,14 @@ local function APL()
     if IsTanking then
       ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
-    -- use_item,name=pocketsized_computation_device
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+    end
+    -- use_items
+    -- Manually placing PSCD here
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-    end
-    -- use_item,name=ashvanes_razor_coral
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- potion
     if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
