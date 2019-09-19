@@ -388,7 +388,7 @@ local function CDs ()
           if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree"; end
         end
         -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
-        if S.BladeRush:IsCastableP(S.SinisterStrike) and EnergyTimeToMaxRounded() > 1 then
+        if S.BladeRush:IsCastableP(S.SinisterStrike) and EnergyTimeToMaxRounded() > 1 and not Player:BuffP(S.Opportunity) then
           if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush"; end
         end
       end
