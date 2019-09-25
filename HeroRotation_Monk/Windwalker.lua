@@ -523,6 +523,7 @@ local function APL ()
     -- touch_of_death,if=!equipped.cyclotronic_blast&equipped.dribbling_inkpod&target.time_to_die>9&(target.time_to_pct_30.remains>=130|target.time_to_pct_30.remains<8)
     if S.TouchOfDeath:IsReadyP() and (not I.PocketsizedComputationDevice:IsEquipped() and I.DribblingInkpod:IsEquipped() and Target:TimeToDie() > 9 and (Target:TimeToX(30) >= 130 or Target:TimeToX(30) < 8)) then
       if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return "Cast ToD Touch of Death 2"; end
+    end
     -- touch_of_death,if=!equipped.cyclotronic_blast&!equipped.dribbling_inkpod&target.time_to_die>9
     if S.TouchOfDeath:IsReadyP() and (not I.PocketsizedComputationDevice:IsEquipped() and not I.DribblingInkpod:IsEquipped() and Target:TimeToDie() > 9) then
       if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return "Cast ToD Touch of Death 3"; end
