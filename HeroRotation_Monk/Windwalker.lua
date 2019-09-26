@@ -363,11 +363,11 @@ local function APL ()
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Focused Azerite Beam"; end
     end
     -- use_item,name=pocketsized_computation_device,if=dot.touch_of_death.remains
-    if Everyone.CyclotronicBlastReady() and (Target:DebuffP(S.TouchOfDeath)) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.TouchOfDeath)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cooldown Cyclotronic Blast"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=((equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>=20)|!equipped.cyclotronic_blast)&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&buff.storm_earth_and_fire.remains>13|target.time_to_die<21)
-    if I.AshvanesRazorCoral:IsEquipReady() and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemainsP() >= 20) or not Everyone.PSCDEquipped()) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() < 21)) then
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemainsP() >= 20) or not Everyone.PSCDEquipped()) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() < 21)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cooldown Ashvane's Razor Coral"; end
     end
     -- actions.cd+=/serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
