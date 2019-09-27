@@ -200,8 +200,8 @@ local function APL()
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
-    -- guardian_of_azeroth,if=buff.metamorphosis.up|target.time_to_die<=30
-    if S.GuardianofAzeroth:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 30) then
+    -- guardian_of_azeroth,if=(buff.metamorphosis.up&cooldown.metamorphosis.ready)|buff.metamorphosis.remains>25|target.time_to_die<=30
+    if S.GuardianofAzeroth:IsCastableP() and ((Player:BuffP(S.MetamorphosisBuff) and S.Metamorphosis:CooldownUpP()) or Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() <= 30) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
