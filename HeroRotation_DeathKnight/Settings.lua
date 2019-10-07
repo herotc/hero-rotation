@@ -30,6 +30,8 @@ HR.GUISettings.APL.DeathKnight = {
     }
   },
   Frost = {
+    DisableBoSPooling = false,
+    BoSDisplayStyle = "Suggested",
     GCDasOffGCD = {
       -- Abilities
       HornofWinter = true,
@@ -81,10 +83,12 @@ CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.EssenceDi
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 
 --Unholy Panels
-CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.AotDOff", "Disable AotD Checks", "Enable this to option to remove ability checks against Army of the Dead. This can help smooth out the rotation if not using Army on cooldown.");
+CreatePanelOption("CheckButton", CP_Unholy, "APL.DeathKnight.Unholy.AotDOff", "Disable AotD Checks", "Enable this option to remove ability checks against Army of the Dead. This can help smooth out the rotation if not using Army on cooldown.");
 CreateARPanelOptions(CP_Unholy, "APL.DeathKnight.Unholy");
 
 --Frost Panels
+CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.DisableBoSPooling", "Disable BoS Pooling", "Enable this option to bypass the BoS Pooling function.");
+CreatePanelOption("Dropdown", CP_Frost, "APL.DeathKnight.Frost.BoSDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Breath of Sindragosa Display Style", "Define which icon display style to use for active Breath of Sindragosa.");
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost");
 
 --Blood Panels
