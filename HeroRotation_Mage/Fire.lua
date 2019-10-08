@@ -324,7 +324,7 @@ local function APL()
       if HR.Cast(S.LivingBomb) then return "living_bomb 410"; end
     end
     -- dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
-    if S.DragonsBreath:IsCastableP() and (Player:BuffRemainsP(S.CombustionBuff) < Player:GCD() and Player:BuffP(S.CombustionBuff)) then
+    if S.DragonsBreath:IsCastableP(12) and (Player:BuffRemainsP(S.CombustionBuff) < Player:GCD() and Player:BuffP(S.CombustionBuff)) then
       if HR.Cast(S.DragonsBreath) then return "dragons_breath 420"; end
     end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
@@ -516,7 +516,7 @@ local function APL()
       if HR.Cast(S.Scorch) then return "scorch 552"; end
     end
     -- dragons_breath,if=active_enemies>2
-    if S.DragonsBreath:IsCastableP() and (EnemiesCount > 2) then
+    if S.DragonsBreath:IsCastableP(12) and (EnemiesCount > 2) then
       if HR.Cast(S.DragonsBreath) then return "dragons_breath 556"; end
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(cooldown.combustion.remains>0&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
@@ -578,7 +578,7 @@ local function APL()
       local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
     end
     -- dragons_breath,if=active_enemies>1
-    if S.DragonsBreath:IsCastableP() and (EnemiesCount > 1) then
+    if S.DragonsBreath:IsCastableP(12) and (EnemiesCount > 1) then
       if HR.Cast(S.DragonsBreath) then return "dragons_breath 766"; end
     end
     -- call_action_list,name=items_low_priority
