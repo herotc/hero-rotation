@@ -128,6 +128,7 @@ local VarTotalBurns = 0;
 local VarAverageBurnLength = 0;
 
 HL:RegisterForEvent(function()
+  VarFontDoubleOnUse = 0
   VarConserveMana = 0
   VarTotalBurns = 0
   VarAverageBurnLength = 0
@@ -187,7 +188,7 @@ function BurnPhase:Stop()
 end
 
 function BurnPhase:On()
-  return self.state or (not Player:AffectingCombat() and Player:IsCasting() and ((S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0)))))
+  return self.state or (not Player:AffectingCombat() and Player:IsCasting() and (S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0))))
 end
 
 function BurnPhase:Duration()
@@ -236,6 +237,10 @@ local function APL()
       VarFontDoubleOnUse = num(I.AzsharasFontofPower:IsEquipped() and (I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.IgnitionMagesFuse:IsEquipped() or I.TzanesBarkspines:IsEquipped() or I.AzurethoseSingedPlumage:IsEquipped() or I.AncientKnotofWisdomAlliance:IsEquipped() or I.AncientKnotofWisdomHorde:IsEquipped() or I.ShockbitersFang:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.BalefireBranch:IsEquipped()))
     end
     -- snapshot_stats
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsEquipReady() then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 114"; end
+    end
     -- mirror_image
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.MirrorImage) then return "mirror_image 115"; end
@@ -267,7 +272,7 @@ local function APL()
       if HR.Cast(S.ChargedUp) then return "charged_up 201"; end
     end
     -- mirror_image
-    if S.MirrorImage:IsCastableP() and HR.CDsON() then
+    if S.MirrorImage:IsCastableP() then
       if HR.Cast(S.MirrorImage) then return "mirror_image 203"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
@@ -279,7 +284,7 @@ local function APL()
       if HR.Cast(S.ArcaneBlast) then return "arcane_blast 207"; end
     end
     -- lights_judgment,if=buff.arcane_power.down
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.ArcanePowerBuff)) then
+    if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.ArcanePowerBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 209"; end
     end
     -- rune_of_power,if=!buff.arcane_power.up&(mana.pct>=50|cooldown.arcane_power.remains=0)&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
@@ -287,28 +292,28 @@ local function APL()
       if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "rune_of_power 211"; end
     end
     -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
+    if S.Berserking:IsCastableP() then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 213"; end
     end
     -- arcane_power
-    if S.ArcanePower:IsCastableP() and HR.CDsON() then
+    if S.ArcanePower:IsCastableP() then
       if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power 215"; end
     end
     -- use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
     -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
+    if S.BloodFury:IsCastableP() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 217"; end
     end
     -- fireblood
-    if S.Fireblood:IsCastableP() and HR.CDsON() then
+    if S.Fireblood:IsCastableP() then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 219"; end
     end
     -- ancestral_call
-    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+    if S.AncestralCall:IsCastableP() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 221"; end
     end
     -- presence_of_mind,if=(talent.rune_of_power.enabled&buff.rune_of_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time)|buff.arcane_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
-    if S.PresenceofMind:IsCastableP() and HR.CDsON() and ((S.RuneofPower:IsAvailable() and Player:BuffRemainsP(S.RuneofPowerBuff) <= PresenceOfMindMax() * S.ArcaneBlast:ExecuteTime()) or Player:BuffRemainsP(S.ArcanePowerBuff) <= PresenceOfMindMax() * S.ArcaneBlast:ExecuteTime()) then
+    if S.PresenceofMind:IsCastableP() and ((S.RuneofPower:IsAvailable() and Player:BuffRemainsP(S.RuneofPowerBuff) <= PresenceOfMindMax() * S.ArcaneBlast:ExecuteTime()) or Player:BuffRemainsP(S.ArcanePowerBuff) <= PresenceOfMindMax() * S.ArcaneBlast:ExecuteTime()) then
       if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 223"; end
     end
     -- potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
