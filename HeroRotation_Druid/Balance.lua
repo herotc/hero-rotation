@@ -320,7 +320,7 @@ local function APL()
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 117" end
     end
     -- use_item,name=shiver_venom_relic,if=!buff.ca_inc.up&!buff.bloodlust.up,target_if=dot.shiver_venom.stack>=5
-    if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(CaInc()) and not Player:HasHeroism() and Target:DebuffStackP(S.ShiverVenomDebuff)) then
+    if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(CaInc()) and not Player:HasHeroism() and Target:DebuffStackP(S.ShiverVenomDebuff) >= 5) then
       if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic 105"; end
     end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
