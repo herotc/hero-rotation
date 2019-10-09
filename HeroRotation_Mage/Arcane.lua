@@ -269,7 +269,7 @@ local function APL()
     end
     -- charged_up,if=buff.arcane_charge.stack<=1
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1) then
-      if HR.Cast(S.ChargedUp) then return "charged_up 201"; end
+      if HR.Cast(S.ChargedUp, Settings.Arcane.GCDasOffGCD.ChargedUp) then return "charged_up 201"; end
     end
     -- mirror_image
     if S.MirrorImage:IsCastableP() then
@@ -361,7 +361,7 @@ local function APL()
     end
     -- charged_up,if=buff.arcane_charge.stack=0
     if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() == 0) then
-      if HR.Cast(S.ChargedUp) then return "charged_up 303"; end
+      if HR.Cast(S.ChargedUp, Settings.Arcane.GCDasOffGCD.ChargedUp) then return "charged_up 303"; end
     end
     -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
     if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or not Target:DebuffP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then

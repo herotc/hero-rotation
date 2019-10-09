@@ -71,6 +71,7 @@ HR.GUISettings.APL.Mage = {
       -- Abilities
       RuneofPower = true,
       ArcanePower = true,
+      ChargedUp = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
