@@ -197,71 +197,7 @@ local function APL ()
     end
   end
   
-  -- Rskless --
-  Rskless = function()
-    -- whirling_dragon_punch
-    if S.WhirlingDragonPunch:IsReady() then
-      if HR.Cast(S.WhirlingDragonPunch) then return "whirling_dragon_punch rskless"; end
-    end
-    -- fists_of_fury
-    if S.FistsOfFury:IsReadyP() then
-      if HR.Cast(S.FistsOfFury) then return "fists_of_fury rskless"; end
-    end
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=buff.storm_earth_and_fire.up|cooldown.whirling_dragon_punch.remains<4
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "rising_sun_kick rskless"; end
-    end
-    -- rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
-    if S.RushingJadeWind:IsReadyP() and (Player:BuffDownP(S.RushingJadeWind) and Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.RushingJadeWind) then return "rushing_jade_wind rskless"; end
-    end
-    -- reverse_harm,if=chi.max-chi>=2
-    if S.ReverseHarm:IsReadyP() and Player:ChiDeficit() >= 2 and Player:HealthPercentage() < 92 then
-      if HR.Cast(S.ReverseHarm) then return "reverse_harm rskless"; end
-    end
-    -- fist_of_the_white_tiger,if=chi<=2
-    if S.FistOfTheWhiteTiger:IsReadyP() and (Player:Chi() <= 2) then
-      if HR.Cast(S.FistOfTheWhiteTiger) then return "fist_of_the_white_tiger rskless"; end
-    end
-    -- energizing_elixir,if=chi<=3&energy<50
-    if S.EnergizingElixir:IsCastableP() and (Player:Chi() <= 3 and Player:Energy() < 50) then
-      if HR.Cast(S.EnergizingElixir) then return "energizing_elixir rskless"; end
-    end
-    -- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.react
-    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and Player:BuffP(S.DanceOfChijiBuff)) then
-      if HR.Cast(S.SpinningCraneKick) then return "spinning_crane_kick rskless"; end
-    end
-    -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm))
-    if S.BlackoutKick:IsReadyP() then
-      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "blackout_kick rskless"; end
-    end
-    -- chi_wave
-    if S.ChiWave:IsReadyP() then
-      if HR.Cast(S.ChiWave) then return "chi_wave rskless"; end
-    end
-    -- chi_burst,if=chi.max-chi>=1&active_enemies=1|chi.max-chi>=2
-    if S.ChiBurst:IsCastableP() and (Player:ChiDeficit() >= 1 and Cache.EnemiesCount[8] == 1 or Player:ChiDeficit() >= 2) then
-      if HR.Cast(S.ChiBurst) then return "chi_burst rskless"; end
-    end
-    -- flying_serpent_kick,if=prev_gcd.1.blackout_kick&chi>3,interrupt=1
-    if S.FlyingSerpentKick:IsCastableP() and (Player:PrevGCD(1, S.BlackoutKick) and Player:Chi() > 3) then
-      if HR.Cast(S.FlyingSerpentKick) then return "flying_serpent_kick rskless"; end
-    end
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi<2
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick2) then return "rising_sun_kick rskless"; end
-    end
-    -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2
-    if S.TigerPalm:IsCastableP() then
-      if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "tiger_palm rskless"; end
-    end
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane) then return "rising_sun_kick rskless"; end
-    end
-  end
-
-  -- Cooldowns --
+   -- Cooldowns --
   Cooldowns = function()
     -- actions.cd=invoke_xuen_the_white_tiger
     if HR.CDsON() and S.InvokeXuentheWhiteTiger:IsReadyP() then
@@ -345,12 +281,77 @@ local function APL ()
     end
     -- use_items,if=(equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20)|!equipped.cyclotronic_blast
   end
+  
+  -- Rskless --
+  Rskless = function()
+    -- whirling_dragon_punch
+    if S.WhirlingDragonPunch:IsReady() then
+      if HR.Cast(S.WhirlingDragonPunch) then return "whirling_dragon_punch rskless"; end
+    end
+    -- fists_of_fury
+    if S.FistsOfFury:IsReadyP() then
+      if HR.Cast(S.FistsOfFury) then return "fists_of_fury rskless"; end
+    end
+    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=buff.storm_earth_and_fire.up|cooldown.whirling_dragon_punch.remains<4
+    if S.RisingSunKick:IsReadyP() then
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "rising_sun_kick rskless"; end
+    end
+    -- rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
+    if S.RushingJadeWind:IsReadyP() and (Player:BuffDownP(S.RushingJadeWind) and Cache.EnemiesCount[8] > 1) then
+      if HR.Cast(S.RushingJadeWind) then return "rushing_jade_wind rskless"; end
+    end
+    -- reverse_harm,if=chi.max-chi>=2
+    if S.ReverseHarm:IsReadyP() and Player:ChiDeficit() >= 2 and Player:HealthPercentage() < 92 then
+      if HR.Cast(S.ReverseHarm) then return "reverse_harm rskless"; end
+    end
+    -- fist_of_the_white_tiger,if=chi<=2
+    if S.FistOfTheWhiteTiger:IsReadyP() and (Player:Chi() <= 2) then
+      if HR.Cast(S.FistOfTheWhiteTiger) then return "fist_of_the_white_tiger rskless"; end
+    end
+    -- energizing_elixir,if=chi<=3&energy<50
+    if S.EnergizingElixir:IsCastableP() and (Player:Chi() <= 3 and Player:Energy() < 50) then
+      if HR.Cast(S.EnergizingElixir) then return "energizing_elixir rskless"; end
+    end
+    -- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.react
+    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and Player:BuffP(S.DanceOfChijiBuff)) then
+      if HR.Cast(S.SpinningCraneKick) then return "spinning_crane_kick rskless"; end
+    end
+    -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm))
+    if S.BlackoutKick:IsReadyP() then
+      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "blackout_kick rskless"; end
+    end
+    -- chi_wave
+    if S.ChiWave:IsReadyP() then
+      if HR.Cast(S.ChiWave) then return "chi_wave rskless"; end
+    end
+    -- chi_burst,if=chi.max-chi>=1&active_enemies=1|chi.max-chi>=2
+    if S.ChiBurst:IsCastableP() and (Player:ChiDeficit() >= 1 and Cache.EnemiesCount[8] == 1 or Player:ChiDeficit() >= 2) then
+      if HR.Cast(S.ChiBurst) then return "chi_burst rskless"; end
+    end
+    -- flying_serpent_kick,if=prev_gcd.1.blackout_kick&chi>3,interrupt=1
+    if S.FlyingSerpentKick:IsCastableP() and (Player:PrevGCD(1, S.BlackoutKick) and Player:Chi() > 3) then
+      if HR.Cast(S.FlyingSerpentKick) then return "flying_serpent_kick rskless"; end
+    end
+    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi<2
+    if S.RisingSunKick:IsReadyP() then
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick2) then return "rising_sun_kick rskless"; end
+    end
+    -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2
+    if S.TigerPalm:IsCastableP() then
+      if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "tiger_palm rskless"; end
+    end
+    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
+    if S.RisingSunKick:IsReadyP() then
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane) then return "rising_sun_kick rskless"; end
+    end
+  end
+
 
   -- Serenity --
   Serenity = function()
     -- actions.serenity=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
     if S.RisingSunKick:IsReadyP() and (Cache.EnemiesCount[5] < 3 or Player:PrevGCD(1,S.SpinningCraneKick)) then
-      if HR.Cast(S.RisingSunKick) then return "Cast Serenity Rising Sun Kick"; end
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick2) then return "rising_sun_kick rskless"; end
     end
     -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick&!azerite.swift_roundhouse.enabled)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
     if S.FistsOfFury:IsReadyP() and ((Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or Player:BuffRemainsP(S.Serenity) < 1 or (Cache.EnemiesCount[8] > 1 and Cache.EnemiesCount[8] < 5)) then
@@ -370,7 +371,7 @@ local function APL ()
   Aoe = function()
     -- actions.aoe=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
     if S.RisingSunKick:IsReadyP() and ((S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 5) and S.FistsOfFury:CooldownRemainsP() > 3) then
-      if HR.Cast(S.RisingSunKick) then return "Cast AoE Rising Sun Kick"; end
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "rising_sun_kick rskless"; end
     end
     -- actions.aoe=whirling_dragon_punch
     if S.WhirlingDragonPunch:IsReady() then
@@ -406,7 +407,7 @@ local function APL ()
     end
     -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|!combo_break)
     if S.TigerPalm:IsReadyP() and (Player:ChiDeficit() >= 2 and (not S.HitCombo:IsAvailable() or not Player:PrevGCD(1, S.TigerPalm))) then
-      if HR.Cast(S.TigerPalm) then return "Cast AoE Tiger Palm"; end
+      if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "tiger_palm rskless"; end
     end
     -- actions.st+=/chi_wave,if=!combo_break
     if S.ChiWave:IsReadyP() and (not Player:PrevGCD(1, S.ChiWave)) then
@@ -415,7 +416,7 @@ local function APL ()
     -- actions.aoe+=/flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
     -- actions.aoe+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|(talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi<4))
     if S.BlackoutKick:IsReadyP() and (not Player:PrevGCD(1, S.BlackoutKick) and (Player:BuffP(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 4))) then
-      if HR.Cast(S.BlackoutKick) then return "Cast AoE Blackout Kick"; end
+      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "blackout_kick rskless"; end
     end
   end
 
@@ -502,6 +503,7 @@ local function APL ()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
+	
     -- potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.Serenity) or Player:BuffP(S.StormEarthAndFire) or (not S.Serenity:IsAvailable()) or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
@@ -510,6 +512,8 @@ local function APL ()
     if Player:BuffP(S.Serenity) then
       local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
     end
+	
+	-- prevent energy cap, where possible
     -- reverse_harm,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2))&chi.max-chi>=2
     if S.ReverseHarm:IsReadyP() and Player:HealthPercentage() < 92 and ((Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2)) and Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "Cast Everyone Reverse Harm"; end
@@ -522,14 +526,17 @@ local function APL ()
     if S.TigerPalm:IsReadyP() and (not Player:PrevGCD(1, S.TigerPalm) and (Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2) or (Player:EnergyTimeToMaxPredicted() < 4 and S.FistsOfFury:CooldownRemainsP() < 1.5)) and Player:ChiDeficit() >= 2 and Target:DebuffDownP(S.TouchOfDeath)) then
       if HR.Cast(S.TigerPalm) then return "Cast Everyone Tiger Palm"; end
     end
+	
     -- chi_wave,if=!talent.fist_of_the_white_tiger.enabled&time<=3
     if S.ChiWave:IsReadyP() and (not S.FistOfTheWhiteTiger:IsAvailable() and HL.CombatTime() <= 3) then
       if HR.Cast(S.ChiWave) then return "Cast Everyone Chi Wave"; end
     end
+	
     -- actions.st=call_action_list,name=cd
     if (true) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
+	
     -- call_action_list,name=rskless,if=active_enemies<3&azerite.open_palm_strikes.enabled&!azerite.glory_of_the_dawn.enabled
     if (Cache.EnemiesCount[8] < 3 and S.OpenPalmStrikes:AzeriteEnabled() and not S.GloryoftheDawn:AzeriteEnabled()) then
       local ShouldReturn = Rskless(); if ShouldReturn then return ShouldReturn; end
