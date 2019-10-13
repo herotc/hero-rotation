@@ -542,7 +542,7 @@ local function APL ()
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
     -- potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-    if I.PotionofUnbridledFury:IsReady() and (Player:BuffP(S.Serenity) or Player:BuffP(S.StormEarthAndFire) or (not S.Serenity:IsAvailable()) or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.Serenity) or Player:BuffP(S.StormEarthAndFire) or (not S.Serenity:IsAvailable()) or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
     -- actions+=/call_action_list,name=serenity,if=buff.serenity.up
