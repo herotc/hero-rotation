@@ -163,6 +163,10 @@ local function EvaluateTargetIfTigerPalm(TargetUnit)
   return (not Player:PrevGCD(1, S.TigerPalm) and Player:ChiDeficit() >= 2)
 end
 
+local function EvaluateTargetIfReverseHarm(TargetUnit)
+  return (Player:ChiDeficit() >= 2 and Player:HealthPercentage() < 92)
+end
+
 -- Action Lists --
 --- ======= MAIN =======
 -- APL Main
