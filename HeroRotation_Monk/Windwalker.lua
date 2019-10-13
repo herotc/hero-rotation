@@ -163,9 +163,6 @@ local function EvaluateTargetIfTigerPalm(TargetUnit)
   return (not Player:PrevGCD(1, S.TigerPalm) and Player:ChiDeficit() >= 2)
 end
 
-local function EvaluateTargetIfReverseHarm(TargetUnit)
-  return (Player:ChiDeficit() >= 2 and Player:HealthPercentage() < 92)
-end
 
 -- Action Lists --
 --- ======= MAIN =======
@@ -259,7 +256,7 @@ local function APL ()
       if HR.Cast(S.RushingJadeWind) then return "rushing_jade_wind rskless"; end
     end
     -- reverse_harm,if=chi.max-chi>=2
-    if S.ReverseHarm:IsReady() and Player:HealthPercentage() < 92 and (Player:ChiDeficit() >= 2) then
+    if S.ReverseHarm:IsReadyP() and Player:ChiDeficit() >= 2 and Player:HealthPercentage() < 92 then
       if HR.Cast(S.ReverseHarm) then return "reverse_harm rskless"; end
     end
     -- fist_of_the_white_tiger,if=chi<=2
