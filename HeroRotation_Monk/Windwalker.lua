@@ -255,7 +255,7 @@ local function APL ()
       if HR.Cast(S.RushingJadeWind) then return "rushing_jade_wind rskless"; end
     end
     -- reverse_harm,if=chi.max-chi>=2
-    if S.ReverseHarm:IsReady() and (Player:ChiDeficit() >= 2) then
+    if S.ReverseHarm:IsReady() and Player:HealthPercentage() < 92 and (Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "reverse_harm rskless"; end
     end
     -- fist_of_the_white_tiger,if=chi<=2
@@ -432,7 +432,7 @@ local function APL ()
       if HR.Cast(S.SpinningCraneKick) then return "Cast AoE Spinning Crane Kick"; end
     end
     -- actions.aoe+=/reverse_harm,if=chi.max-chi>=2
-    if S.ReverseHarm:IsReady() and (Player:ChiDeficit() >= 2) then
+    if S.ReverseHarm:IsReady() and Player:HealthPercentage() < 92 and (Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "Cast Reverse Harm"; end
     end
     -- actions.aoe+=/chi_burst,if=chi<=3
@@ -481,7 +481,7 @@ local function APL ()
       if HR.Cast(S.RushingJadeWind) then return "Cast Single Target Rushing Jade Wind"; end
     end
     -- actions.st+=/reverse_harm,if=chi.max-chi>=2
-    if S.ReverseHarm:IsReady() and (Player:ChiDeficit() >= 2) then
+    if S.ReverseHarm:IsReady() and Player:HealthPercentage() < 92 and (Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "Cast Reverse Harm"; end
     end
     -- actions.st+=/fist_of_the_white_tiger,if=chi<=2
@@ -550,7 +550,7 @@ local function APL ()
       local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
     end
     -- reverse_harm,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2))&chi.max-chi>=2
-    if S.ReverseHarm:IsReadyP() and ((Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2)) and Player:ChiDeficit() >= 2) then
+    if S.ReverseHarm:IsReadyP() and Player:HealthPercentage() < 92 and ((Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2)) and Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "Cast Everyone Reverse Harm"; end
     end
     -- fist_of_the_white_tiger,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2)|(energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5))&chi.max-chi>=3
