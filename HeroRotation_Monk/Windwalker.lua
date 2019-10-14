@@ -237,7 +237,7 @@ local function APL ()
     end
     -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(cooldown.fists_of_fury.remains<=9&chi>=3&cooldown.whirling_dragon_punch.remains<=14&cooldown.touch_of_death.remains>=90)|target.time_to_die<=15|dot.touch_of_death.remains
     if S.StormEarthAndFire:IsReadyP() and (S.StormEarthAndFire:Charges() == 2 or (S.FistsOfFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 14 and S.TouchOfDeath:CooldownRemainsP() >= 90) or Target:TimeToDie() <= 15 or Target:DebuffP(S.TouchOfDeath)) then
-      if HR.Cast(S.StormEarthAndFire) then return "Cast Cooldown Storm, Earth, and Fire"; end
+      if HR.Cast(S.StormEarthAndFire, true) then return "Cast Cooldown Storm, Earth, and Fire"; end
     end
     -- concentrated_flame,if=dot.concentrated_flame_burn.remains<=2
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffRemainsP(S.ConcentratedFlameBurn) <= 2) then
