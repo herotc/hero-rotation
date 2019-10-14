@@ -320,7 +320,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
-  if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and (Player:BuffP(VanishBuff) or S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3)) then
+  if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and (VanishBuffCheck or S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/gloomblade,if=azerite.perforate.rank>=2&spell_targets.shuriken_storm<=2
