@@ -357,8 +357,16 @@ local function APL ()
     if S.FistsOfFury:IsReadyP() and ((Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or Player:BuffRemainsP(S.Serenity) < 1 or (Cache.EnemiesCount[8] > 1 and Cache.EnemiesCount[8] < 5)) then
       if HR.Cast(S.FistsOfFury) then return "Cast Serenity Fists of Fury"; end
     end
-    -- actions.serenity+=/spinning_crane_kick,if=combo_strike&(active_enemies>=3|(active_enemies=2&prev_gcd.1.blackout_kick))
-    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and (Cache.EnemiesCount[8] >= 3 or (Cache.EnemiesCount[8] == 2 and Player:PrevGCD(1, S.BlackoutKick)))) then
+    -- actions.serenity+=/fist_of_the_white_tiger,if=talent.hit_combo.enabled&energy.time_to_max<2&prev_gcd.1.blackout_kick&chi<=2
+    if S.FistOfTheWhiteTiger:IsReadyP() and (S.HitCombo:IsAvailable() and Player:EnergyTimeToMaxPredicted() < 2 and Player:PrevGCD(1, S.BlackoutKick) and Player:Chi() <= 2) then
+      if HR.Cast(S.FistOfTheWhiteTiger) then return "Cast Serenity Fist of the White Tiger"; end
+    end
+    -- actions.serenity+=/tiger_palm,if=talent.hit_combo.enabled&energy.time_to_max<1&prev_gcd.1.blackout_kick&chi.max-chi>=2
+    if S.TigerPalm:IsReadyP() and (S.HitCombo:IsAvailable() and Player:EnergyTimeToMaxPredicted() < 1 and Player:PrevGCD(1, S.BlackoutKick) and Player:ChiDeficit() >= 2) then
+      if HR.Cast(S.TigerPalm) then return "Cast Serenity Tiger Palm"; end
+    end
+    -- actions.serenity+=/spinning_crane_kick,if=combo_strike&(active_enemies>=3|(talent.hit_combo.enabled&prev_gcd.1.blackout_kick)|(active_enemies=2&prev_gcd.1.blackout_kick))
+    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and (Cache.EnemiesCount[8] >= 3 or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.BlackoutKick)) or (Cache.EnemiesCount[8] == 2 and Player:PrevGCD(1, S.BlackoutKick)))) then
       if HR.Cast(S.SpinningCraneKick) then return "Cast Serenity Spinning Crane Kick"; end
     end
     -- actions.serenity+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains
