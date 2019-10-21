@@ -57,14 +57,17 @@ Spell.Druid.Guardian = {
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   Conflict                              = MultiSpell(303823, 304088, 304121),
   HeartEssence                          = Spell(298554),
-  SharpenedClawsBuff                    = Spell(279943)
+  SharpenedClawsBuff                    = Spell(279943),
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565)
 };
 local S = Spell.Druid.Guardian;
 
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Guardian = {
-  PotionofFocusedResolve                = Item(168506)
+  PotionofFocusedResolve           = Item(168506),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.Druid.Guardian;
 
@@ -203,6 +206,10 @@ local function APL()
     -- incarnation,if=(dot.moonfire.ticking|active_enemies>1)&dot.thrash_bear.ticking
     if S.Incarnation:IsReadyP() and ((Target:DebuffP(S.MoonfireDebuff) or EnemiesCount > 1) and Target:DebuffP(S.ThrashBearDebuff)) then
       if HR.Cast(S.Incarnation) then return "incarnation 33"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 35"; end
     end
     -- use_items
   end
