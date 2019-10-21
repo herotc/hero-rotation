@@ -443,7 +443,7 @@ local function APL()
     -- variable,name=waiting_for_dark_slash,value=talent.dark_slash.enabled&!variable.pooling_for_blade_dance&!variable.pooling_for_meta&cooldown.dark_slash.up
     VarWaitingForDarkSlash = num(S.DarkSlash:IsAvailable() and not bool(VarPoolingForBladeDance) and not bool(VarPoolingForMeta) and S.DarkSlash:CooldownUpP())
     -- variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
-    VarWaitingForMomentum = num(S.Momentum:IsAvailable() and not Player:BuffP(S.MomentumBuff))
+    VarWaitingForMomentum = num(S.Momentum:IsAvailable() and Player:BuffDownP(S.MomentumBuff))
     
     -- call_action_list,name=cooldown,if=gcd.remains=0
     if HR.CDsON() then

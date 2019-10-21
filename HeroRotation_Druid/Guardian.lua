@@ -101,7 +101,7 @@ local function bool(val)
 end
 
 local function EvaluateCyclePulverize77(TargetUnit)
-  return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and not Player:BuffP(S.PulverizeBuff)
+  return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and Player:BuffDownP(S.PulverizeBuff)
 end
 
 local function EvaluateCycleMoonfire88(TargetUnit)
@@ -179,10 +179,10 @@ local function APL()
     -- Defensives and Bristling Fur
     if IsTanking and Player:BuffP(S.BearForm) then
       if Player:HealthPercentage() < Settings.Guardian.FrenziedRegenHP and S.FrenziedRegeneration:IsCastableP() and Player:Rage() > 10
-        and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
+        and Player:BuffDown(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
         if HR.Cast(S.FrenziedRegeneration, Settings.Guardian.GCDasOffGCD.FrenziedRegen) then return "frenzied_regen defensive"; end
       end
-      if S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (not Player:Buff(S.Ironfur) 
+      if S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (Player:BuffDown(S.Ironfur) 
         or (Player:BuffStack(S.Ironfur) < 2 and Player:BuffRefreshableP(S.Ironfur, 2.4))) then
         if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur defensive"; end
       end

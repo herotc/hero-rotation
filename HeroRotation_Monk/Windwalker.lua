@@ -268,7 +268,7 @@ local function APL ()
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cooldown Ashvane's Razor Coral"; end
     end
     -- actions.cd+=/serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
-    if HR.CDsON() and S.Serenity:IsReadyP() and (not Player:BuffP(S.Serenity) and (S.RisingSunKick:CooldownRemainsP() <= 2 or Target:TimeToDie() <= 12)) then
+    if HR.CDsON() and S.Serenity:IsReadyP() and (Player:BuffDownP(S.Serenity) and (S.RisingSunKick:CooldownRemainsP() <= 2 or Target:TimeToDie() <= 12)) then
       if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then return "Cast Cooldown Serenity"; end
     end
     -- memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up

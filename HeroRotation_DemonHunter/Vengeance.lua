@@ -195,7 +195,7 @@ local function APL ()
   end
   Defensives = function()
     -- Demon Spikes
-    if S.DemonSpikes:IsCastable("Melee") and not Player:Buff(S.DemonSpikesBuff) then
+    if S.DemonSpikes:IsCastable("Melee") and Player:BuffDownP(S.DemonSpikesBuff) then
       if S.DemonSpikes:ChargesFractional() > 1.9 then
         if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "Cast Demon Spikes (Capped)"; end
       elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
@@ -207,7 +207,7 @@ local function APL ()
       HR.CastSuggested(S.Metamorphosis);
     end
     -- Fiery Brand
-    if S.FieryBrand:IsCastable() and not Target:DebuffP(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
+    if S.FieryBrand:IsCastable() and Target:DebuffDownP(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
       if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand) then return "Cast Fiery Brand"; end
     end
   end
@@ -227,19 +227,19 @@ local function APL ()
       end
     end
     -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
-    if S.ImmolationAura:IsCastable() and IsInMeleeRange and (not Target:DebuffP(S.FieryBrandDebuff)) then
+    if S.ImmolationAura:IsCastable() and IsInMeleeRange and (Target:DebuffDownP(S.FieryBrandDebuff)) then
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
     end
     -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
-    if S.FelDevastation:IsCastable() and IsInMeleeRange and (not Target:DebuffP(S.FieryBrandDebuff)) then
+    if S.FelDevastation:IsCastable() and IsInMeleeRange and (Target:DebuffDownP(S.FieryBrandDebuff)) then
       if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
     end
     -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
-    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (not Target:DebuffP(S.FieryBrandDebuff)) then
+    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand)"; end
     end
     -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
-    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (not Target:DebuffP(S.FieryBrandDebuff)) then
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
       if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
     end
   end

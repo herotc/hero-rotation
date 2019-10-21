@@ -140,7 +140,7 @@ local function APL ()
   end
   Defensives = function()
     -- Rune Tap Emergency
-    if S.RuneTap:IsReady() and Player:HealthPercentage() <= 40 and Player:Rune() >= 3 and S.RuneTap:Charges() > 1 and not Player:Buff(S.RuneTap) then
+    if S.RuneTap:IsReady() and Player:HealthPercentage() <= 40 and Player:Rune() >= 3 and S.RuneTap:Charges() > 1 and Player:BuffDown(S.RuneTap) then
       if HR.Cast(S.RuneTap, true) then return ""; end
     end
     -- Active Mitigation

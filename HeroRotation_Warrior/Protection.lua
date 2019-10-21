@@ -181,11 +181,11 @@ local function APL()
     end
   end
   Defensive = function()
-    if S.ShieldBlock:IsReadyP() and (((not Player:Buff(S.ShieldBlockBuff)) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
-      (not Player:Buff(S.LastStandBuff)) and Player:Rage() >= 30) then
+    if S.ShieldBlock:IsReadyP() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemains(S.ShieldBlockBuff) <= gcdTime + (gcdTime * 0.5)) and 
+      Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30) then
         if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block defensive" end
     end
-    if S.LastStand:IsCastableP() and ((not Player:Buff(S.ShieldBlockBuff)) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
+    if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
       and S.ShieldBlock:RechargeP() > (gcdTime * 2)) then
         if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
     end
