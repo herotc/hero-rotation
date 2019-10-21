@@ -296,8 +296,8 @@ local function APL()
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Pooling"; end
   end
   BosTicking = function()
-    -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power<=30&!talent.frostscythe.enabled
-    if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPower() <= 30 and not S.Frostscythe:IsAvailable()) then
+    -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power<=32&!talent.frostscythe.enabled
+    if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPower() <= 32 and not S.Frostscythe:IsAvailable()) then
       if HR.Cast(S.Obliterate) then return "obliterate 201"; end
     end
     -- obliterate,if=runic_power<=32
@@ -344,8 +344,8 @@ local function APL()
     if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() > 25 or Player:Rune() > 3) then
       if HR.Cast(S.Obliterate) then return "obliterate 223"; end
     end
-    -- arcane_torrent,if=runic_power.deficit>20
-    if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 20) then
+    -- arcane_torrent,if=runic_power.deficit>50
+    if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 50) then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 225"; end
     end
     -- wait for resources
