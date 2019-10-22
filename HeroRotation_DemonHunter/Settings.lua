@@ -47,6 +47,7 @@ HR.GUISettings.APL.DemonHunter = {
   Havoc = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     FelRushDisplayStyle = "Main Icon",
+    UseFABST = false,
     OffGCDasOffGCD = {
       -- Abilities
       Metamorphosis = true,
@@ -80,5 +81,6 @@ CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.Conser
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance");
 
 CreatePanelOption("Dropdown", CP_Havoc, "APL.DemonHunter.Havoc.FelRushDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Fel Rush Display Style", "Define which icon display style to use for Fel Rush.");
+CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
 CreatePanelOption("CheckButton", CP_Havoc, "APL.DemonHunter.Havoc.ConserveFelRush", "Conserve Fel Rush", "Save at least 1 Fel Rush charge for mobility.");
 CreateARPanelOptions(CP_Havoc, "APL.DemonHunter.Havoc");

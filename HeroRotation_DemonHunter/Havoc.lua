@@ -205,7 +205,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or Settings.Havoc.UseFABST) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
