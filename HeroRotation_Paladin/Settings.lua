@@ -51,6 +51,7 @@ HR.GUISettings.APL.Paladin = {
     -- SoloJusticarDP = 80, -- % HP threshold to use Justicar's Vengeance with Divine Purpose proc.
     -- SoloJusticar5HP = 60, -- % HP threshold to use Justicar's Vengeance with 5 Holy Power.
     ShieldofVengeance = true,
+    UseFABST = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -90,4 +91,5 @@ CreateARPanelOptions(CP_Protection, "APL.Paladin.Protection");
 -- CreatePanelOption("Slider", CP_Retribution, "APL.Paladin.Retribution.SoloJusticarDP", {0, 100, 1}, "Solo Justicar's Vengeance with Divine Purpose proc HP", "Set the solo Justicar's Vengeance with Divine Purpose proc HP threshold.");
 -- CreatePanelOption("Slider", CP_Retribution, "APL.Paladin.Retribution.SoloJusticar5HP", {0, 100, 1}, "Solo Justicar's Vengeance with 5 Holy Power HP", "Set the solo Justicar's Vengeance with 5 Holy Power HP threshold.");
 CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.ShieldofVengeance", "Shield of Vengeance", "Enable this to show Shield of Vengeance in your DPS rotation.");
+CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution");

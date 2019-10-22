@@ -178,7 +178,7 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- focused_azerite_beam,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)&!(buff.avenging_wrath.up|buff.crusade.up)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
-    if S.FocusedAzeriteBeam:IsCastableP() and ((Cache.EnemiesCount[8] >= 2) and not (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
+    if S.FocusedAzeriteBeam:IsCastableP() and ((Cache.EnemiesCount[8] >= 2 or Settings.Retribution.UseFABST) and not (Player:BuffP(S.AvengingWrathBuff) or Player:BuffP(S.CrusadeBuff)) and (S.BladeofJustice:CooldownRemainsP() > PlayerGCD * 3 and S.Judgment:CooldownRemainsP() > PlayerGCD * 3)) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- memory_of_lucid_dreams,if=(buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10)&holy_power<=3
