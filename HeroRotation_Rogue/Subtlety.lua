@@ -302,6 +302,11 @@ end
 -- # Stealthed Rotation
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Stealthed (ReturnSpellOnly, StealthSpell)
+  local PredictedCP = Player:ComboPoints()
+  if S.TheFirstDance:AzeriteEnabled() and StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
+    PredictedCP = math.min(PredictedCP + 2, Rogue.CPMaxSpend())
+  end
+  local PredictedCPDeficit = Player:ComboPointsMax() - PredictedCP
   local StealthBuff = Player:Buff(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   local VanishBuffCheck = Player:Buff(VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
   -- actions.stealthed=shadowstrike,if=(talent.find_weakness.enabled|spell_targets.shuriken_storm<3)&(buff.stealth.up|buff.vanish.up)
@@ -316,11 +321,11 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
   -- DONE IN DEFAULT PART!
   -- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
-  if Cache.EnemiesCount[10] == 4 and Player:ComboPoints() >= 4 then
+  if Cache.EnemiesCount[10] == 4 and PredictedCP >= 4 then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
-  if Player:ComboPointsDeficit() <= 1 - num(S.DeeperStratagem:IsAvailable() and (VanishBuffCheck or S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3)) then
+  if PredictedCPDeficit <= 1 - num(S.DeeperStratagem:IsAvailable() and (VanishBuffCheck or S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3)) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/gloomblade,if=azerite.perforate.rank>=2&spell_targets.shuriken_storm<=2
@@ -398,8 +403,8 @@ end
 
 -- # Essences
 local function Essences ()
-  -- blood_of_the_enemy,if=cooldown.symbols_of_death.up|target.time_to_die<=10
-  if S.BloodoftheEnemy:IsCastableP() and (S.SymbolsofDeath:CooldownUpP() or Target:FilteredTimeToDie("<=", 10)) then
+  -- blood_of_the_enemy,if=!cooldown.shadow_blades.up&cooldown.symbols_of_death.up|target.time_to_die<=10
+  if S.BloodoftheEnemy:IsCastableP() and (not S.ShadowBlades:CooldownUpP() and S.SymbolsofDeath:CooldownUpP() or Target:FilteredTimeToDie("<=", 10)) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame,if=energy.time_to_max>1&!buff.symbols_of_death.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
@@ -464,8 +469,8 @@ local function CDs ()
         if HR.Cast(S.PoolEnergy) then return "Pool for Shuriken Tornado"; end
       end
     end
-    -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
-    if S.SymbolsofDeath:IsCastable() and Target:DebuffP(S.Nightblade)
+    -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&!cooldown.shadow_blades.up&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
+    if S.SymbolsofDeath:IsCastable() and Target:DebuffP(S.Nightblade) and (not S.ShadowBlades:CooldownUpP() or not HR.CDsON())
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or S.ShurikenTornado:CooldownRemainsP() > 2)
       and (not S.BloodoftheEnemy:IsAvailable() or S.BloodoftheEnemy:CooldownRemainsP() > 2)
       and (S.NightsVengeancePower:AzeriteRank() < 2 or Player:BuffP(S.NightsVengeanceBuff)) then
@@ -486,9 +491,9 @@ local function CDs ()
       if Settings.Subtlety.STMfDAsDPSCD and S.MarkedforDeath:IsCastable() and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
         if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death"; end
       end
-      -- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
+      -- actions.cds+=/shadow_blades,if=!stealthed.all&dot.nightblade.ticking&combo_points.deficit>=2
       if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades)
-        and Player:ComboPointsDeficit() >= 2 + num(Player:IsStealthedP(true, true)) then
+        and not Player:IsStealthedP(true, true) and Target:DebuffP(S.Nightblade) and Player:ComboPointsDeficit() >= 2 then
         if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades"; end
       end
       -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
@@ -719,9 +724,6 @@ local function APL ()
           if Settings.Commons.UseTrinkets and I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
             if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Font of Power"; end
           end
-          if S.ShadowBlades:IsCastable() and not Player:Buff(S.ShadowBlades) then
-            if HR.Cast(S.ShadowBlades, Settings.Subtlety.GCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades (OOC)"; end
-          end
         end
         if Player:IsStealthedP(true, true) then
           ShouldReturn = Stealthed();
@@ -864,7 +866,7 @@ end
 
 HR.SetAPL(261, APL, Init);
 
--- Last Update: 2019-09-12
+-- Last Update: 2019-10-22
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -874,7 +876,6 @@ HR.SetAPL(261, APL, Init);
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/stealth
 -- actions.precombat+=/marked_for_death,precombat_seconds=15
--- actions.precombat+=/shadow_blades,precombat_seconds=1
 -- actions.precombat+=/potion
 -- actions.precombat+=/use_item,name=azsharas_font_of_power
 --
@@ -918,12 +919,12 @@ HR.SetAPL(261, APL, Init);
 -- # Use Tornado pre SoD when we have the energy whether from pooling without SF or just generally.
 -- actions.cds+=/shuriken_tornado,if=energy>=60&dot.nightblade.ticking&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
 -- # Use Symbols on cooldown (after first Nightblade) unless we are going to pop Tornado and do not have Shadow Focus.
--- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
+-- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&!cooldown.shadow_blades.up&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or not stealthed without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP and no stealth.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.all&combo_points.deficit>=cp_max_spend
--- actions.cds+=/shadow_blades,if=combo_points.deficit>=2+stealthed.all
+-- actions.cds+=/shadow_blades,if=!stealthed.all&dot.nightblade.ticking&combo_points.deficit>=2
 -- # With SF, if not already done, use Tornado with SoD up.
 -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&dot.nightblade.ticking&buff.symbols_of_death.up
 -- actions.cds+=/shadow_dance,if=!buff.shadow_dance.up&target.time_to_die<=5+talent.subterfuge.enabled&!raid_event.adds.up
@@ -944,7 +945,7 @@ HR.SetAPL(261, APL, Init);
 --
 -- # Essences
 -- actions.essences=concentrated_flame,if=energy.time_to_max>1&!buff.symbols_of_death.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
--- actions.essences+=/blood_of_the_enemy,if=cooldown.symbols_of_death.up|target.time_to_die<=10
+-- actions.essences+=/blood_of_the_enemy,if=!cooldown.shadow_blades.up&cooldown.symbols_of_death.up|target.time_to_die<=10
 -- actions.essences+=/guardian_of_azeroth
 -- actions.essences+=/focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
 -- actions.essences+=/purifying_blast,if=spell_targets.shuriken_storm>=2|raid_event.adds.in>60
