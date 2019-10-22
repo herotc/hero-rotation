@@ -60,6 +60,7 @@ HR.GUISettings.APL.Druid = {
     RegrowthHP = 0,
     RenewalHP = 0,
     SurvivalInstinctsHP = 0,
+    UseFABST = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       CatForm = true,
@@ -122,6 +123,7 @@ CreatePanelOption("Dropdown", CP_Druid, "APL.Druid.Commons.EssenceDisplayStyle",
 -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
 -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
 -- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
+CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
 CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
 -- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
 -- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");

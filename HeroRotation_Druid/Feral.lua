@@ -256,7 +256,7 @@ local function APL()
       if HR.Cast(S.FeralFrenzy) then return "feral_frenzy 40"; end
     end
     -- focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
-    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1 or Settings.Feral.UseFABST) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
