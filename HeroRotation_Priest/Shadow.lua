@@ -240,7 +240,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth cds"; end
     end
     -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-    if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2 or Settings.Shadow.UseFABST) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam cds"; end
     end
     -- purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
