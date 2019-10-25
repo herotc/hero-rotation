@@ -306,7 +306,7 @@
       [102]   = "HeroRotation_Druid",         -- Balance
       [103]   = "HeroRotation_Druid",         -- Feral
       [104]   = "HeroRotation_Druid",         -- Guardian
-      [105]   = false,                          -- Restoration
+      [105]   = "HeroRotation_Druid",         -- Restoration
     -- Hunter
       [253]   = "HeroRotation_Hunter",        -- Beast Mastery
       [254]   = "HeroRotation_Hunter",        -- Marksmanship

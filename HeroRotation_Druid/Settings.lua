@@ -102,6 +102,9 @@ HR.GUISettings.APL.Druid = {
       SurvivalInstincts = true,
     }
   },
+  Restoration = {
+    UseSplashData = true
+  },
 };
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -112,6 +115,7 @@ local CP_Druid = CreateChildPanel(ARPanel, "Druid");
 local CP_Balance = CreateChildPanel(CP_Druid, "Balance");
 local CP_Feral = CreateChildPanel(CP_Druid, "Feral");
 local CP_Guardian = CreateChildPanel(CP_Druid, "Guardian");
+local CP_Restoration = CreateChildPanel(CP_Druid, "Restoration");
 
 CreateARPanelOptions(CP_Druid, "APL.Druid.Commons");
 CreatePanelOption("CheckButton", CP_Druid, "APL.Druid.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
@@ -144,3 +148,7 @@ CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.LunarBeamHP", {0, 1
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.FrenziedRegenHP", {0, 100, 1}, "Frenzied Regeneration HP", "Set the Frenzied Regeneration HP threshold.");
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BristlingFurRage", {0, 100, 1}, "Bristling Fur Rage", "Set the Bristling Fur Rage threshold.");
+
+-- Restoration
+CreatePanelOption("CheckButton", CP_Restoration, "APL.Druid.Restoration.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
+CreateARPanelOptions(CP_Restoration, "APL.Druid.Restoration");
