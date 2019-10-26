@@ -55,6 +55,7 @@ Spell.Hunter.Survival = {
   AspectoftheEagle                      = Spell(186289),
   Exhilaration                          = Spell(109304),
   Muzzle                                = Spell(187707),
+  Intimidation                          = Spell(19577),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
