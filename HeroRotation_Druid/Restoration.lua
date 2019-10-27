@@ -154,7 +154,7 @@ local function APL()
       end
       -- prowl
       if S.Prowl:IsCastableP() and (Player:BuffP(S.CatFormBuff)) then
-        if HR.Cast(S.Prowl) then return "prowl 3"; end
+        if HR.Cast(S.Prowl, Settings.Restoration.GCDasOffGCD.Prowl) then return "prowl 3"; end
       end
       -- potion
       if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then

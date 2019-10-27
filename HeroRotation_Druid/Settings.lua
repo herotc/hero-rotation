@@ -104,6 +104,9 @@ HR.GUISettings.APL.Druid = {
   },
   Restoration = {
     UseSplashData = true
+    GCDasOffGCD = {
+      Prowl = true,
+    }
   },
 };
 
