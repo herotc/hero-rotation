@@ -196,6 +196,8 @@ local function APL()
     if S.ArcaneIntellect:IsCastableP() and Player:BuffDownP(S.ArcaneIntellectBuff, true) then
       if HR.Cast(S.ArcaneIntellect) then return "arcane_intellect 3"; end
     end
+    -- variable,name=disable_combustion,op=reset
+    -- Above is ignored, as we're using a settings variable
     if Everyone.TargetIsValid() then
       -- variable,name=combustion_rop_cutoff,op=set,value=60
       if (true) then
@@ -233,12 +235,12 @@ local function APL()
     end
   end
   ActiveTalents = function()
-    -- living_bomb,if=active_enemies>1&buff.combustion.down&(cooldown.combustion.remains>cooldown.living_bomb.duration|cooldown.combustion.ready)
-    if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (S.Combustion:CooldownRemainsP() > S.LivingBomb:BaseDuration() or S.Combustion:CooldownUpP())) then
+    -- living_bomb,if=active_enemies>1&buff.combustion.down&(cooldown.combustion.remains>cooldown.living_bomb.duration|cooldown.combustion.ready|variable.disable_combustion)
+    if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (S.Combustion:CooldownRemainsP() > S.LivingBomb:BaseDuration() or S.Combustion:CooldownUpP() or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.LivingBomb) then return "living_bomb 16"; end
     end
-    -- meteor,if=buff.rune_of_power.up&(firestarter.remains>cooldown.meteor.duration|!firestarter.active)|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|(cooldown.meteor.duration<cooldown.combustion.remains|cooldown.combustion.ready)&!talent.rune_of_power.enabled&(cooldown.meteor.duration<firestarter.remains|!talent.firestarter.enabled|!firestarter.active)
-    if S.Meteor:IsCastableP() and (Player:BuffP(S.RuneofPowerBuff) and (S.Firestarter:ActiveRemains() > S.Meteor:BaseDuration() or not bool(S.Firestarter:ActiveStatus())) or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:ChargesP() < 1 or (S.Meteor:BaseDuration() < S.Combustion:CooldownRemainsP() or S.Combustion:CooldownUpP()) and not S.RuneofPower:IsAvailable() and (S.Meteor:BaseDuration() < S.Firestarter:ActiveRemains() or not S.Firestarter:IsAvailable() or not bool(S.Firestarter:ActiveStatus()))) then
+    -- meteor,if=buff.rune_of_power.up&(firestarter.remains>cooldown.meteor.duration|!firestarter.active)|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|(cooldown.meteor.duration<cooldown.combustion.remains|cooldown.combustion.ready|variable.disable_combustion)&!talent.rune_of_power.enabled&(cooldown.meteor.duration<firestarter.remains|!talent.firestarter.enabled|!firestarter.active)
+    if S.Meteor:IsCastableP() and (Player:BuffP(S.RuneofPowerBuff) and (S.Firestarter:ActiveRemains() > S.Meteor:BaseDuration() or not bool(S.Firestarter:ActiveStatus())) or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:ChargesP() < 1 or (S.Meteor:BaseDuration() < S.Combustion:CooldownRemainsP() or S.Combustion:CooldownUpP() or Settings.Fire.DisableCombustion) and not S.RuneofPower:IsAvailable() and (S.Meteor:BaseDuration() < S.Firestarter:ActiveRemains() or not S.Firestarter:IsAvailable() or not bool(S.Firestarter:ActiveStatus()))) then
       if HR.Cast(S.Meteor) then return "meteor 32"; end
     end
   end
@@ -418,55 +420,55 @@ local function APL()
     end
   end
   ItemsHighPriority = function()
-    -- call_action_list,name=items_combustion,if=(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
-    if ((S.RuneofPower:IsAvailable() and S.Combustion:CooldownRemainsP() <= S.RuneofPower:CastTime() or S.Combustion:IsReadyP()) and not bool(S.Firestarter:ActiveStatus()) or Player:BuffP(S.CombustionBuff)) then
+    -- call_action_list,name=items_combustion,if=!variable.disable_combustion&(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
+    if (not Settings.Fire.DisableCombustion and (S.RuneofPower:IsAvailable() and S.Combustion:CooldownRemainsP() <= S.RuneofPower:CastTime() or S.Combustion:IsReadyP()) and not bool(S.Firestarter:ActiveStatus()) or Player:BuffP(S.CombustionBuff)) then
       local ShouldReturn = ItemsCombustion(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_items
-    -- use_item,name=azsharas_font_of_power,if=cooldown.combustion.remains<=5+15*variable.font_double_on_use
-    if I.AzsharasFontofPower:IsEquipReady() and (S.Combustion:CooldownRemainsP() <= 5 + 15 * VarFontDoubleOnUse) then
+    -- use_item,name=azsharas_font_of_power,if=cooldown.combustion.remains<=5+15*variable.font_double_on_use&!variable.disable_combustion
+    if I.AzsharasFontofPower:IsEquipReady() and (S.Combustion:CooldownRemainsP() <= 5 + 15 * VarFontDoubleOnUse and not Settings.Fire.DisableCombustion) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power high_priority"; end
     end
-    -- use_item,name=rotcrusted_voodoo_doll,if=cooldown.combustion.remains>variable.on_use_cutoff
-    if I.RotcrustedVoodooDoll:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    -- use_item,name=rotcrusted_voodoo_doll,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
+    if I.RotcrustedVoodooDoll:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle) then return "rotcrusted_voodoo_doll high_priority"; end
     end
-    -- use_item,name=aquipotent_nautilus,if=cooldown.combustion.remains>variable.on_use_cutoff
-    if I.AquipotentNautilus:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    -- use_item,name=aquipotent_nautilus,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
+    if I.AquipotentNautilus:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle) then return "aquipotent_nautilus high_priority"; end
     end
-    -- use_item,name=shiver_venom_relic,if=cooldown.combustion.remains>variable.on_use_cutoff
-    if I.ShiverVenomRelic:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    -- use_item,name=shiver_venom_relic,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
+    if I.ShiverVenomRelic:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic high_priority"; end
     end
     -- use_item,effect_name=harmonic_dematerializer
     if Everyone.PSCDEquipReady() and S.HarmonicDematerializer:IsAvailable() then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "harmonic_dematerializer high_priority"; end
     end
-    -- use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>=55&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff
-    if I.MalformedHeraldsLegwraps:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 55 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    -- use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>=55&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
+    if I.MalformedHeraldsLegwraps:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 55 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.MalformedHeraldsLegwraps, nil, Settings.Commons.TrinketDisplayStyle) then return "malformed_heralds_legwraps high_priority"; end
     end
-    -- use_item,name=ancient_knot_of_wisdom,if=cooldown.combustion.remains>=55&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff
+    -- use_item,name=ancient_knot_of_wisdom,if=cooldown.combustion.remains>=55&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
     -- Two conditions, since the horde and alliance trinkets have different IDs
-    if I.AncientKnotofWisdomAlliance:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 55 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    if I.AncientKnotofWisdomAlliance:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 55 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.AncientKnotofWisdomAlliance, nil, Settings.Commons.TrinketDisplayStyle) then return "ancient_knot_of_wisdom high_priority"; end
     end
-    if I.AncientKnotofWisdomHorde:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 55 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    if I.AncientKnotofWisdomHorde:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 55 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.AncientKnotofWisdomHorde, nil, Settings.Commons.TrinketDisplayStyle) then return "ancient_knot_of_wisdom high_priority"; end
     end
-    -- use_item,name=neural_synapse_enhancer,if=cooldown.combustion.remains>=45&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff
-    if I.NeuralSynapseEnhancer:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 45 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff) then
+    -- use_item,name=neural_synapse_enhancer,if=cooldown.combustion.remains>=45&buff.combustion.down&cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
+    if I.NeuralSynapseEnhancer:IsEquipReady() and (S.Combustion:CooldownRemainsP() >= 45 and Player:BuffDownP(S.CombustionBuff) and S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.NeuralSynapseEnhancer, nil, Settings.Commons.TrinketDisplayStyle) then return "neural_synapse_enhancer high_priority"; end
     end
   end
   ItemsLowPriority = function()
-    -- use_item,name=tidestorm_codex,if=cooldown.combustion.remains>variable.on_use_cutoff|talent.firestarter.enabled&firestarter.remains>variable.on_use_cutoff
-    if I.TidestormCodex:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > VarOnUseCutoff) then
+    -- use_item,name=tidestorm_codex,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion|talent.firestarter.enabled&firestarter.remains>variable.on_use_cutoff
+    if I.TidestormCodex:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > VarOnUseCutoff) then
       if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex low_priority"; end
     end
-    -- use_item,effect_name=cyclotronic_blast,if=cooldown.combustion.remains>variable.on_use_cutoff|talent.firestarter.enabled&firestarter.remains>variable.on_use_cutoff
-    if Everyone.CyclotronicBlastReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > VarOnUseCutoff) then
+    -- use_item,effect_name=cyclotronic_blast,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion|talent.firestarter.enabled&firestarter.remains>variable.on_use_cutoff
+    if Everyone.CyclotronicBlastReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion or S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > VarOnUseCutoff) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast low_priority"; end
     end
   end
@@ -483,8 +485,8 @@ local function APL()
     if S.Pyroblast:IsCastableP() and (Player:BuffP(S.HotStreakBuff)) then
       if HR.Cast(S.Pyroblast) then return "pyroblast 450"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&cooldown.combustion.remains>0)&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
-    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and S.Combustion:CooldownRemainsP() > 0) and (Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not Player:PrevOffGCDP(1, S.FireBlast) and (S.FireBlast:ChargesP() >= 2 or (S.PhoenixFlames:ChargesP() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30)))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&(cooldown.combustion.remains>0|variable.disable_combustion))&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
+    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and (S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion)) and (Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not Player:PrevOffGCDP(1, S.FireBlast) and (S.FireBlast:ChargesP() >= 2 or (S.PhoenixFlames:ChargesP() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30)))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 454"; end
     end
     -- call_action_list,name=active_talents
@@ -495,12 +497,12 @@ local function APL()
     if S.Pyroblast:IsCastableP() and (Player:BuffP(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemainsP(S.PyroclasmBuff) and Player:BuffRemainsP(S.RuneofPowerBuff) > S.Pyroblast:CastTime()) then
       if HR.Cast(S.Pyroblast) then return "pyroblast 486"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&cooldown.combustion.remains>0)&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
-    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and S.Combustion:CooldownRemainsP() > 0) and (Player:BuffP(S.HeatingUpBuff) and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&(cooldown.combustion.remains>0|variable.disable_combustion))&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
+    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and (S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion)) and (Player:BuffP(S.HeatingUpBuff) and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 502"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&cooldown.combustion.remains>0)&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
-    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and S.Combustion:CooldownRemainsP() > 0) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&(cooldown.combustion.remains>0|variable.disable_combustion))&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and (S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion)) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 512"; end
     end
     -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&(!talent.flame_patch.enabled|active_enemies=1)
@@ -519,8 +521,8 @@ local function APL()
     if S.DragonsBreath:IsCastableP(12) and (EnemiesCount > 2) then
       if HR.Cast(S.DragonsBreath) then return "dragons_breath 556"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(cooldown.combustion.remains>0&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
-    if S.FireBlast:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (S.Combustion:CooldownRemainsP() > 0 and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&((cooldown.combustion.remains>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
+    if S.FireBlast:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and ((S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
       if HR.Cast(S.FireBlast) then return "fire_blast 562"; end
     end
     -- flamestrike,if=talent.flame_patch.enabled&active_enemies>2|active_enemies>5
@@ -557,12 +559,12 @@ local function APL()
     if S.Pyroblast:IsCastableP() and (Player:BuffP(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemainsP(S.PyroclasmBuff)) then
       if HR.Cast(S.Pyroblast) then return "pyroblast 626"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0&buff.rune_of_power.down&!firestarter.active)&!talent.kindling.enabled&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&(buff.heating_up.react))|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight)))
-    if S.FireBlast:IsCastableP() and ((S.Combustion:CooldownRemainsP() > 0 and Player:BuffDownP(S.RuneofPowerBuff) and not bool(S.Firestarter:ActiveStatus())) and not S.Kindling:IsAvailable() and not bool(VarFireBlastPooling) and (((Player:IsCasting(S.Fireball) or Player:IsCasting(S.Pyroblast)) and (Player:BuffP(S.HeatingUpBuff))) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HotStreakBuff) and Player:BuffDownP(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=((cooldown.combustion.remains>0|variable.disable_combustion)&buff.rune_of_power.down&!firestarter.active)&!talent.kindling.enabled&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&(buff.heating_up.react))|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight)))
+    if S.FireBlast:IsCastableP() and (((S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion) and Player:BuffDownP(S.RuneofPowerBuff) and not bool(S.Firestarter:ActiveStatus())) and not S.Kindling:IsAvailable() and not bool(VarFireBlastPooling) and (((Player:IsCasting(S.Fireball) or Player:IsCasting(S.Pyroblast)) and (Player:BuffP(S.HeatingUpBuff))) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HotStreakBuff) and Player:BuffDownP(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())))) then
       if HR.Cast(S.FireBlast) then return "fire_blast 636"; end
     end
-    -- fire_blast,if=talent.kindling.enabled&buff.heating_up.react&!firestarter.active&(cooldown.combustion.remains>full_recharge_time+2+talent.kindling.enabled|(!talent.rune_of_power.enabled|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1)&cooldown.combustion.remains>target.time_to_die)
-    if S.FireBlast:IsCastableP() and (S.Kindling:IsAvailable() and Player:BuffP(S.HeatingUpBuff) and not bool(S.Firestarter:ActiveStatus()) and (S.Combustion:CooldownRemainsP() > S.FireBlast:FullRechargeTimeP() + 2 + num(S.Kindling:IsAvailable()) or (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:ChargesP() < 1) and S.Combustion:CooldownRemainsP() > Target:TimeToDie())) then
+    -- fire_blast,if=talent.kindling.enabled&buff.heating_up.react&!firestarter.active&(cooldown.combustion.remains>full_recharge_time+2+talent.kindling.enabled|variable.disable_combustion|(!talent.rune_of_power.enabled|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1)&cooldown.combustion.remains>target.time_to_die)
+    if S.FireBlast:IsCastableP() and (S.Kindling:IsAvailable() and Player:BuffP(S.HeatingUpBuff) and not bool(S.Firestarter:ActiveStatus()) and (S.Combustion:CooldownRemainsP() > S.FireBlast:FullRechargeTimeP() + 2 + num(S.Kindling:IsAvailable()) or Settings.Fire.DisableCombustion or (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:ChargesP() < 1) and S.Combustion:CooldownRemainsP() > Target:TimeToDie())) then
       if HR.Cast(S.FireBlast) then return "fire_blast 696"; end
     end
     -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&((talent.flame_patch.enabled&active_enemies=1&!firestarter.active)|(active_enemies<4&!talent.flame_patch.enabled))
@@ -589,8 +591,8 @@ local function APL()
     if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
       if HR.Cast(S.Scorch) then return "scorch 780"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>9)&(cooldown.combustion.remains>0&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
-    if S.FireBlast:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 9) and (S.Combustion:CooldownRemainsP() > 0 and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>9)&((cooldown.combustion.remains>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
+    if S.FireBlast:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 9) and ((S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
       if HR.Cast(S.FireBlast) then return "fire_blast 781"; end
     end
     -- flamestrike,if=talent.flame_patch.enabled&active_enemies>2|active_enemies>9
@@ -649,12 +651,12 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 805"; end
     end
-    -- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down
-    if S.RuneofPower:IsCastableP() and (S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > S.RuneofPower:FullRechargeTimeP() or S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff and Player:BuffDownP(S.CombustionBuff) or Target:TimeToDie() < S.Combustion:CooldownRemainsP() and Player:BuffDownP(S.CombustionBuff)) then
+    -- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down|variable.disable_combustion
+    if S.RuneofPower:IsCastableP() and (S.Firestarter:IsAvailable() and S.Firestarter:ActiveRemains() > S.RuneofPower:FullRechargeTimeP() or S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff and Player:BuffDownP(S.CombustionBuff) or Target:TimeToDie() < S.Combustion:CooldownRemainsP() and Player:BuffDownP(S.CombustionBuff) or Settings.Fire.DisableCombustion) then
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 807"; end
     end
-    -- call_action_list,name=combustion_phase,if=(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
-    if HR.CDsON() and ((S.RuneofPower:IsAvailable() and S.Combustion:CooldownRemainsP() <= S.RuneofPower:CastTime() or S.Combustion:CooldownUpP()) and not bool(S.Firestarter:ActiveStatus()) or Player:BuffP(S.CombustionBuff)) then
+    -- call_action_list,name=combustion_phase,if=!variable.disable_combustion&(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
+    if HR.CDsON() and (not Settings.Fire.DisableCombustion and (S.RuneofPower:IsAvailable() and S.Combustion:CooldownRemainsP() <= S.RuneofPower:CastTime() or S.Combustion:CooldownUpP()) and not bool(S.Firestarter:ActiveStatus()) or Player:BuffP(S.CombustionBuff)) then
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- fire_blast,use_while_casting=1,use_off_gcd=1,if=(essence.memory_of_lucid_dreams.major|essence.memory_of_lucid_dreams.minor&azerite.blaster_master.enabled)&charges=max_charges&!buff.hot_streak.react&!(buff.heating_up.react&(buff.combustion.up&(action.fireball.in_flight|action.pyroblast.in_flight|action.scorch.executing)|target.health.pct<=30&action.scorch.executing))&!(!buff.heating_up.react&!buff.hot_streak.react&buff.combustion.down&(action.fireball.in_flight|action.pyroblast.in_flight))
@@ -669,13 +671,13 @@ local function APL()
     if (Player:BuffP(S.RuneofPowerBuff) and Player:BuffDownP(S.CombustionBuff)) then
       local ShouldReturn = RopPhase(); if ShouldReturn then return ShouldReturn; end
     end
-    -- variable,name=fire_blast_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.fire_blast.full_recharge_time&(cooldown.combustion.remains>variable.combustion_rop_cutoff|firestarter.active)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled&!firestarter.active&cooldown.combustion.remains<target.time_to_die|talent.firestarter.enabled&firestarter.active&firestarter.remains<cooldown.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled
+    -- variable,name=fire_blast_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.fire_blast.full_recharge_time&(cooldown.combustion.remains>variable.combustion_rop_cutoff|variable.disable_combustion|firestarter.active)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|!variable.disable_combustion&cooldown.combustion.remains<action.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled&!firestarter.active&cooldown.combustion.remains<target.time_to_die|talent.firestarter.enabled&firestarter.active&firestarter.remains<cooldown.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled
     if (true) then
-      VarFireBlastPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.FireBlast:FullRechargeTimeP() and (S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff or bool(S.Firestarter:ActiveStatus())) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:ChargesP() > 0) or S.Combustion:CooldownRemainsP() < S.FireBlast:FullRechargeTimeP() + S.FireBlast:BaseDuration() * num(S.BlasterMaster:AzeriteEnabled()) and not bool(S.Firestarter:ActiveStatus()) and S.Combustion:CooldownRemainsP() < Target:TimeToDie() or S.Firestarter:IsAvailable() and bool(S.Firestarter:ActiveStatus()) and S.Firestarter:ActiveRemains() < S.FireBlast:FullRechargeTimeP() + S.FireBlast:BaseDuration() * num(S.BlasterMaster:AzeriteEnabled()))
+      VarFireBlastPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.FireBlast:FullRechargeTimeP() and (S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff or Settings.Fire.DisableCombustion or bool(S.Firestarter:ActiveStatus())) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:ChargesP() > 0) or not Settings.Fire.DisableCombustion and S.Combustion:CooldownRemainsP() < S.FireBlast:FullRechargeTimeP() + S.FireBlast:BaseDuration() * num(S.BlasterMaster:AzeriteEnabled()) and not bool(S.Firestarter:ActiveStatus()) and S.Combustion:CooldownRemainsP() < Target:TimeToDie() or S.Firestarter:IsAvailable() and bool(S.Firestarter:ActiveStatus()) and S.Firestarter:ActiveRemains() < S.FireBlast:FullRechargeTimeP() + S.FireBlast:BaseDuration() * num(S.BlasterMaster:AzeriteEnabled()))
     end
-    -- variable,name=phoenix_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.phoenix_flames.full_recharge_time&cooldown.combustion.remains>variable.combustion_rop_cutoff&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.phoenix_flames.full_recharge_time&cooldown.combustion.remains<target.time_to_die
+    -- variable,name=phoenix_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.phoenix_flames.full_recharge_time&(cooldown.combustion.remains>variable.combustion_rop_cutoff|variable.disable_combustion)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|!variable.disable_combustion&cooldown.combustion.remains<action.phoenix_flames.full_recharge_time&cooldown.combustion.remains<target.time_to_die
     if (true) then
-      VarPhoenixPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.PhoenixFlames:FullRechargeTimeP() and S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:ChargesP() > 0) or S.Combustion:CooldownRemainsP() < S.PhoenixFlames:FullRechargeTimeP() and S.Combustion:CooldownRemainsP() < Target:TimeToDie())
+      VarPhoenixPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.PhoenixFlames:FullRechargeTimeP() and (S.Combustion:CooldownRemainsP() > VarCombustionRopCutoff or Settings.Fire.DisableCombustion) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:ChargesP() > 0) or not Settings.Fire.DisableCombustion and S.Combustion:CooldownRemainsP() < S.PhoenixFlames:FullRechargeTimeP() and S.Combustion:CooldownRemainsP() < Target:TimeToDie())
     end
     -- call_action_list,name=standard_rotation
     if (true) then

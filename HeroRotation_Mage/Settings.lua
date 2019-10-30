@@ -53,6 +53,7 @@ HR.GUISettings.APL.Mage = {
   },
   Fire = {
     UseSplashData = true,
+    DisableCombustion = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -103,6 +104,7 @@ CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseSplashData", "Us
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
 -- Fire
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
+CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.DisableCombustion", "Disable Combustion", "Disable the usage of Combustion within the Fire rotation.");
 CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
 -- Frost
 CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
