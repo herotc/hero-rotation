@@ -119,7 +119,7 @@ local function bool(val)
 end
 
 local function DeathStrikeHeal()
-  return (Settings.General.SoloMode and Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP) and true or false;
+  return (Settings.General.SoloMode and (Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP or Player:HealthPercentage() < Settings.Commons.UseDarkSuccorHP and Player:BuffP(S.DeathStrikeBuff))) and true or false;
 end
 
 local function EvaluateCycleFesteringStrike40(TargetUnit)
@@ -368,13 +368,9 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false);
-    -- use DeathStrike on low HP in Solo Mode
-    if not no_heal and S.DeathStrike:IsReadyP("Melee") then
-      if HR.Cast(S.DeathStrike) then return ""; end
-    end
-    -- use DeathStrike with Proc in Solo Mode
-    if Settings.General.SoloMode and S.DeathStrike:IsReadyP("Melee") and Player:BuffP(S.DeathStrikeBuff) then
-      if HR.Cast(S.DeathStrike) then return ""; end
+    -- use DeathStrike on low HP or with proc in Solo Mode
+    if S.DeathStrike:IsReadyP("Melee") and not no_heal then
+      if HR.Cast(S.DeathStrike) then return "death_strike low hp or proc"; end
     end
     -- auto_attack
     -- variable,name=pooling_for_gargoyle,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle.enabled
