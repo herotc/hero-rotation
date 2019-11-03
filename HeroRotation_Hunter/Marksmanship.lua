@@ -218,7 +218,7 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=(ca_execute|target.time_to_die>cooldown.guardian_of_azeroth.duration+duration)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<30
-    if S.GuardianofAzeroth:IsCastableP() and (((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) or Target:TimeToDie() > S.GuardianofAzeroth:Cooldown() + S.GuardianofAzeroth:BaseDuration()) and (Player:BuffP(S.TrueshotBuff) or S.Trueshot:CooldownRemainsP() < 16) or Target:TimeToDie() < 31) then
+    if S.GuardianofAzeroth:IsCastableP() and (((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) or Target:TimeToDie() > S.GuardianofAzeroth:Cooldown() + 30) and (Player:BuffP(S.TrueshotBuff) or S.Trueshot:CooldownRemainsP() < 16) or Target:TimeToDie() < 31) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- ripple_in_space,if=cooldown.trueshot.remains<7
