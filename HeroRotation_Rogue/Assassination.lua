@@ -824,7 +824,7 @@ local function APL ()
     -- Rune
     -- PrePot w/ Bossmod Countdown
     -- Opener
-    if Everyone.TargetIsValid() and Target:IsInRange("Melee") then
+    if Everyone.TargetIsValid() then
       -- Precombat CDs
       if HR.CDsON() then
         if S.MarkedforDeath:IsCastableP() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() and Everyone.TargetIsValid() then
