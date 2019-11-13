@@ -522,7 +522,7 @@ local function CDs ()
           and S.Garrote:CooldownUpP() and (VarSSVanishCondition or not S.ShroudedSuffocation:AzeriteEnabled() and Target:DebuffRefreshableP(S.Garrote, 5.4))
           and ComboPointsDeficit >= math.min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * Cache.EnemiesCount[10], 4) then
           -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
-          if Player:EnergyPredicted() < 45 then
+          if not Settings.Assassination.NoPooling and Player:EnergyPredicted() < 45 then
             if HR.Cast(S.PoolEnergy) then return "Pool for Vanish (Subterfuge)"; end
           end
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Subterfuge)"; end
@@ -634,7 +634,7 @@ local function Stealthed ()
     -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
     if S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 1 and Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 5+4*Rogue.CPMaxSpend() then
       -- actions.stealthed+=/pool_resource,for_next=1
-      if Player:EnergyPredicted() < 45 then
+      if not Settings.Assassination.NoPooling and Player:EnergyPredicted() < 45 then
         if HR.Cast(S.PoolEnergy) then return "Pool for Garrote (Exsanguinate)"; end
       end
       if HR.Cast(S.Garrote) then return "Cast Garrote (Exsanguinate)"; end
@@ -677,7 +677,7 @@ local function Dot ()
     if Target:IsInRange("Melee") and Evaluate_Garrote_Target(Target)
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Garrote)) or Target:TimeToDieIsNotValid()) then
       -- actions.maintain+=/pool_resource,for_next=1
-      if Player:EnergyPredicted() < 45 then
+      if not Settings.Assassination.NoPooling and Player:EnergyPredicted() < 45 then
         if HR.Cast(S.PoolEnergy) then return "Pool for Garrote (ST)"; end
       end
       if HR.Cast(S.Garrote) then return "Cast Garrote (Refresh)"; end
@@ -715,7 +715,7 @@ end
 local function Direct ()
   -- actions.direct=envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
   if S.Envenom:IsCastable("Melee") and ComboPoints >= 4 + (S.DeeperStratagem:IsAvailable() and 1 or 0)
-    and (Target:DebuffP(S.Vendetta) or Target:DebuffP(S.ToxicBladeDebuff) or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined or Cache.EnemiesCount[10] >= 2)
+    and (Target:DebuffP(S.Vendetta) or Target:DebuffP(S.ToxicBladeDebuff) or Player:EnergyDeficitPredicted() <= 25 + Energy_Regen_Combined or Cache.EnemiesCount[10] >= 2 or Settings.Assassination.NoPooling)
     and (not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemainsP() > 2 or not HR.CDsON()) then
     if HR.Cast(S.Envenom) then return "Cast Envenom"; end
   end
