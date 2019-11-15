@@ -64,6 +64,7 @@ Spell.Monk.Brewmaster = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  SuppressingPulse                      = MultiSpell(293031, 300009, 300010),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   HeartEssence                          = Spell(298554),
@@ -145,10 +146,13 @@ end
 BrMAddToPool, BrMGetNormalStagger = BrMMakeTempAdder()
 
 local function ShouldPurify ()
+  local BrewMaxCharges = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
   local NormalizedStagger = BrMGetNormalStagger();
   local NextStaggerTick = GetNextTick();
   local NStaggerPct = NextStaggerTick > 0 and NextStaggerTick/Player:MaxHealth() or 0;
   local ProgressPct = NormalizedStagger > 0 and Player:Stagger()/NormalizedStagger or 0;
+  if HL.CombatTime() <= 9 then return false end;
+  if S.Brews:ChargesFractional() >= BrewMaxCharges - 0.2 then return true end;
   if NStaggerPct > 0.015 and ProgressPct > 0 then
     if NStaggerPct <= 0.03 then -- Yellow (> 80%)
       return Settings.Brewmaster.Purify.Low and ProgressPct > 0.8 or false;
@@ -160,6 +164,11 @@ local function ShouldPurify ()
       return true;
     end
   end
+end
+
+-- compute healing available from orbs, only 
+local function HealingSphereHealingAvailable()
+	return 1.5 * Player:AttackPowerDamageMod() * (1 + Player:VersatilityDmgPct()/100) * S.ExpelHarm:Count()
 end
 
 --- ======= ACTION LISTS =======
@@ -174,6 +183,9 @@ local function APL()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
   local function Defensives()
+    if S.SuppressingPulse:IsCastableP() then
+	  if HR.Cast(S.SuppressingPulse, true) then return "suppressing pulse"; end
+	end
     -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
     -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
     -- Note: Extra handling of the charge management only while tanking.
@@ -265,7 +277,7 @@ local function APL()
       if HR.Cast(S.TigerPalm) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>4
-    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() > 4) then
+    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() > 4) and Player:Health() + HealingSphereHealingAvailable() < Player:MaxHealth() then
       if HR.Cast(S.ExpelHarm) then return ""; end
     end
     -- blackout_strike
@@ -285,7 +297,7 @@ local function APL()
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
-    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 3) then
+    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 3) and Player:Health() + HealingSphereHealingAvailable() < Player:MaxHealth() then
       if HR.Cast(S.ExpelHarm) then return ""; end
     end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down
@@ -305,7 +317,7 @@ local function APL()
       if HR.Cast(S.ChiWave) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=2
-    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 2) then
+    if S.ExpelHarm:IsReadyP() and (S.ExpelHarm:Count() >= 2) and Player:Health() + HealingSphereHealingAvailable() < Player:MaxHealth() then
       if HR.Cast(S.ExpelHarm) then return ""; end
     end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
