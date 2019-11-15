@@ -116,15 +116,11 @@ CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.ExhilarationHP", {0, 
 -- Beast Mastery
 CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
-CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
-CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.CounterShotSephuz", "Use Counter Shot for Sephuz", "Enable this if you want it to show you when to use Counter Shot to proc Sephuz's Secret (only when equipped). ");
-CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.IntimidationShotSephuz", "Use Intimidation for Sephuz", "Enable this if you want it to show you when to use Intimidation to proc Sephuz's Secret (only when equipped). ");
 
 -- Marksmanship
 CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
-CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
 CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseLoneWolf", "Use Lone Wolf", "Enable this if you want to use Lone Wolf and not be notified to summon a pet.");
-CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.EnableMovementRotation", "Enable Movement Rotation", "Enable this to show a special rotation while Moving. The optimal standing ability will be shown as a suggestion.");
+CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
 
 -- -- Survival
 CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")

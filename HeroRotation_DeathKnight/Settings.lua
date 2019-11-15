@@ -17,7 +17,8 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.DeathKnight = {
   Commons = {
-    UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Deathstrikes
+    UseDeathStrikeHP = 60, -- % HP threshold to try to heal with Death Strike
+    UseDarkSuccorHP = 80, -- % HP threshold to use Dark Succor's free Death Strike
     UsePotions = true,
     UseTrinkets = true,
     TrinketDisplayStyle = "Suggested",
@@ -75,7 +76,8 @@ local CP_Frost = CreateChildPanel(CP_Deathknight, "Frost");
 local CP_Blood = CreateChildPanel(CP_Deathknight, "Blood");
 
 --DeathKnight Panels
-CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Deathstrike on low HP", "Set the HP threshold to use DeathStrike (working only if Solo Mode is enabled).");
+CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDeathStrikeHP", { 1, 100, 1 }, "Use Death Strike on Low HP", "Set the HP threshold to use Death Strike (working only if Solo Mode is enabled).");
+CreatePanelOption("Slider", CP_Deathknight, "APL.DeathKnight.Commons.UseDarkSuccorHP", { 1, 100, 1 }, "Use Death Strike to Consume Dark Succor", "Set the HP threshold to use Death Strike to Consume Dark Succor (working only if Solo Mode is enabled).");
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation");
 CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");

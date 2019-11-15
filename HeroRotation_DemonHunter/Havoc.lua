@@ -35,7 +35,7 @@ Spell.DemonHunter.Havoc = {
   DarkSlashDebuff                       = Spell(258860),
   ChaosStrike                           = Spell(162794),
   DeathSweep                            = Spell(210152),
-  FelBarrage                            = Spell(211053),
+  FelBarrage                            = Spell(258925),
   RevolvingBlades                       = Spell(279581),
   ImmolationAura                        = Spell(258920),
   Felblade                              = Spell(232893),
@@ -205,7 +205,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or Settings.Havoc.UseFABST) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
@@ -443,7 +443,7 @@ local function APL()
     -- variable,name=waiting_for_dark_slash,value=talent.dark_slash.enabled&!variable.pooling_for_blade_dance&!variable.pooling_for_meta&cooldown.dark_slash.up
     VarWaitingForDarkSlash = num(S.DarkSlash:IsAvailable() and not bool(VarPoolingForBladeDance) and not bool(VarPoolingForMeta) and S.DarkSlash:CooldownUpP())
     -- variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
-    VarWaitingForMomentum = num(S.Momentum:IsAvailable() and not Player:BuffP(S.MomentumBuff))
+    VarWaitingForMomentum = num(S.Momentum:IsAvailable() and Player:BuffDownP(S.MomentumBuff))
     
     -- call_action_list,name=cooldown,if=gcd.remains=0
     if HR.CDsON() then

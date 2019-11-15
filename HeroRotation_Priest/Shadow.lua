@@ -205,7 +205,7 @@ local function APL()
       -- Mindbender management
       S.Mindbender = S.MindbenderTalent:IsAvailable() and S.MindbenderTalent or S.Shadowfiend
       -- shadowform,if=!buff.shadowform.up
-      if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (not Player:BuffP(S.ShadowformBuff)) then
+      if S.Shadowform:IsCastableP() and Player:BuffDownP(S.ShadowformBuff) and (Player:BuffDownP(S.ShadowformBuff)) then
         if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 44"; end
       end
       -- use_item,name=azsharas_font_of_power
@@ -240,7 +240,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth cds"; end
     end
     -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-    if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2 or Settings.Shadow.UseFABST) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam cds"; end
     end
     -- purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
@@ -279,7 +279,7 @@ local function APL()
       if HR.Cast(S.DarkAscension) then return "dark_ascension 60"; end
     end
     -- vampiric_touch,if=!ticking&azerite.thought_harvester.rank>=1
-    if S.VampiricTouch:IsCastableP() and (not Target:DebuffP(S.VampiricTouchDebuff) and S.ThoughtHarvester:AzeriteRank() >= 1) and not Player:IsCasting(S.VampiricTouch) then
+    if S.VampiricTouch:IsCastableP() and (Target:DebuffDownP(S.VampiricTouchDebuff) and S.ThoughtHarvester:AzeriteRank() >= 1) and not Player:IsCasting(S.VampiricTouch) then
       if HR.Cast(S.VampiricTouch) then return "vampiric_touch 64"; end
     end
     -- mind_sear,if=buff.harvested_thoughts.up
@@ -399,7 +399,7 @@ local function APL()
       if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender) then return "mindbender 206"; end
     end
     -- shadow_word_death,if=!buff.voidform.up|(cooldown.shadow_word_death.charges=2&buff.voidform.stack<15)
-    if S.ShadowWordDeath:IsReadyP() and (not Player:BuffP(S.VoidformBuff) or (S.ShadowWordDeath:ChargesP() == 2 and Player:BuffStackP(S.VoidformBuff) < 15)) and Target:HealthPercentage() < ExecuteRange () then
+    if S.ShadowWordDeath:IsReadyP() and (Player:BuffDownP(S.VoidformBuff) or (S.ShadowWordDeath:ChargesP() == 2 and Player:BuffStackP(S.VoidformBuff) < 15)) and Target:HealthPercentage() < ExecuteRange () then
       if HR.Cast(S.ShadowWordDeath) then return "shadow_word_death 212"; end
     end
     -- shadow_crash,if=raid_event.adds.in>5&raid_event.adds.duration<20

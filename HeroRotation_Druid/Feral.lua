@@ -158,11 +158,11 @@ local function EvaluateCyclePrimalWrath106(TargetUnit)
 end
 
 local function EvaluateCycleRip115(TargetUnit)
-  return not TargetUnit:DebuffP(S.RipDebuff) or (TargetUnit:DebuffRemainsP(S.RipDebuff) <= S.RipDebuff:BaseDuration() * 0.3) and (not S.Sabertooth:IsAvailable()) or (TargetUnit:DebuffRemainsP(S.RipDebuff) <= S.RipDebuff:BaseDuration() * 0.8 and Player:PMultiplier(S.Rip) > TargetUnit:PMultiplier(S.Rip)) and TargetUnit:TimeToDie() > 8
+  return TargetUnit:DebuffDownP(S.RipDebuff) or (TargetUnit:DebuffRemainsP(S.RipDebuff) <= S.RipDebuff:BaseDuration() * 0.3) and (not S.Sabertooth:IsAvailable()) or (TargetUnit:DebuffRemainsP(S.RipDebuff) <= S.RipDebuff:BaseDuration() * 0.8 and Player:PMultiplier(S.Rip) > TargetUnit:PMultiplier(S.Rip)) and TargetUnit:TimeToDie() > 8
 end
 
 local function EvaluateCycleRake228(TargetUnit)
-  return not TargetUnit:DebuffP(S.RakeDebuff) or (not S.Bloodtalons:IsAvailable() and TargetUnit:DebuffRemainsP(S.RakeDebuff) < S.RakeDebuff:BaseDuration() * 0.3) and TargetUnit:TimeToDie() > 4
+  return TargetUnit:DebuffDownP(S.RakeDebuff) or (not S.Bloodtalons:IsAvailable() and TargetUnit:DebuffRemainsP(S.RakeDebuff) < S.RakeDebuff:BaseDuration() * 0.3) and TargetUnit:TimeToDie() > 4
 end
 
 local function EvaluateCycleRake257(TargetUnit)
@@ -256,7 +256,7 @@ local function APL()
       if HR.Cast(S.FeralFrenzy) then return "feral_frenzy 40"; end
     end
     -- focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
-    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1 or Settings.Feral.UseFABST) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
@@ -280,7 +280,7 @@ local function APL()
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 48"; end
     end
     -- shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
-    if S.Shadowmeld:IsCastableP() and HR.CDsON() and (Player:ComboPoints() < 5 and Player:EnergyPredicted() >= S.Rake:Cost() and Target:PMultiplier(S.Rake) < 2.1 and Player:BuffP(S.TigersFuryBuff) and (Player:BuffP(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (not S.Incarnation:IsAvailable() or S.Incarnation:CooldownRemainsP() > 18) and not Player:BuffP(S.IncarnationBuff)) then
+    if S.Shadowmeld:IsCastableP() and HR.CDsON() and (Player:ComboPoints() < 5 and Player:EnergyPredicted() >= S.Rake:Cost() and Target:PMultiplier(S.Rake) < 2.1 and Player:BuffP(S.TigersFuryBuff) and (Player:BuffP(S.BloodtalonsBuff) or not S.Bloodtalons:IsAvailable()) and (not S.Incarnation:IsAvailable() or S.Incarnation:CooldownRemainsP() > 18) and Player:BuffDownP(S.IncarnationBuff)) then
       if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "shadowmeld 58"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
@@ -418,7 +418,7 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- thrash_cat,if=refreshable&((variable.use_thrash=2&(!buff.incarnation.up|azerite.wild_fleshrending.enabled))|spell_targets.thrash_cat>1)
-    if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (not Player:BuffP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or Cache.EnemiesCount[8] > 1)) then
+    if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or Cache.EnemiesCount[8] > 1)) then
       if S.ThrashCat:IsUsablePPool() then
         if HR.Cast(S.ThrashCat) then return "thrash_cat 312"; end
       else
@@ -426,7 +426,7 @@ local function APL()
       end
     end
     -- thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react&(!buff.incarnation.up|azerite.wild_fleshrending.enabled)
-    if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and VarUseThrash == 1 and bool(Player:BuffStackP(S.ClearcastingBuff)) and (not Player:BuffP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) then
+    if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and VarUseThrash == 1 and bool(Player:BuffStackP(S.ClearcastingBuff)) and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) then
       if HR.Cast(S.ThrashCat) then return "thrash_cat 327"; end
     end
     -- pool_resource,for_next=1
@@ -453,7 +453,7 @@ local function APL()
       if HR.Cast(S.TigersFury, Settings.Feral.OffGCDasOffGCD.TigersFury) then return "tigers_fury 363"; end
     end
     -- rake,if=!ticking|buff.prowl.up
-    if S.Rake:IsCastableP() and (not Target:DebuffP(S.RakeDebuff) or Player:BuffP(S.ProwlBuff)) then
+    if S.Rake:IsCastableP() and (Target:DebuffDownP(S.RakeDebuff) or Player:BuffP(S.ProwlBuff)) then
       if HR.Cast(S.Rake) then return "rake 365"; end
     end
     -- variable,name=opener_done,value=dot.rip.ticking
@@ -462,15 +462,15 @@ local function APL()
     end
     -- wait,sec=0.001,if=dot.rip.ticking
     -- moonfire_cat,if=!ticking
-    if S.MoonfireCat:IsCastableP() and (not Target:DebuffP(S.MoonfireCatDebuff)) then
+    if S.MoonfireCat:IsCastableP() and (Target:DebuffDownP(S.MoonfireCatDebuff)) then
       if HR.Cast(S.MoonfireCat) then return "moonfire_cat 380"; end
     end
     -- rip,if=!ticking
     -- Manual addition: Use Primal Wrath if >= 2 targets or Rip if only 1 target
-    if S.PrimalWrath:IsCastableP() and (S.PrimalWrath:IsAvailable() and not Target:DebuffP(S.RipDebuff) and Cache.EnemiesCount[8] >= 2) then
+    if S.PrimalWrath:IsCastableP() and (S.PrimalWrath:IsAvailable() and Target:DebuffDownP(S.RipDebuff) and Cache.EnemiesCount[8] >= 2) then
       if HR.Cast(S.PrimalWrath) then return "primal_wrath opener"; end
     end
-    if S.Rip:IsCastableP() and (not Target:DebuffP(S.RipDebuff)) then
+    if S.Rip:IsCastableP() and (Target:DebuffDownP(S.RipDebuff)) then
       if HR.Cast(S.Rip) then return "rip 388"; end
     end
   end
@@ -487,7 +487,7 @@ local function APL()
       return Opener();
     end
     -- cat_form,if=!buff.cat_form.up
-    if S.CatForm:IsCastableP() and (not Player:BuffP(S.CatFormBuff)) then
+    if S.CatForm:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
       if HR.Cast(S.CatForm, Settings.Feral.GCDasOffGCD.CatForm) then return "cat_form 402"; end
     end
     -- rake,if=buff.prowl.up|buff.shadowmeld.up
@@ -503,7 +503,7 @@ local function APL()
       if HR.CastCycle(S.FerociousBite, 8, EvaluateCycleFerociousBite418) then return "ferocious_bite 426" end
     end
     -- regrowth,if=combo_points=5&buff.predatory_swiftness.up&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8)
-    if S.Regrowth:IsCastableP() and (Player:ComboPoints() == 5 and Player:BuffP(S.PredatorySwiftnessBuff) and S.Bloodtalons:IsAvailable() and Player:BuffDownP(S.BloodtalonsBuff) and (not Player:BuffP(S.IncarnationBuff) or Target:DebuffRemainsP(S.RipDebuff) < 8)) then
+    if S.Regrowth:IsCastableP() and (Player:ComboPoints() == 5 and Player:BuffP(S.PredatorySwiftnessBuff) and S.Bloodtalons:IsAvailable() and Player:BuffDownP(S.BloodtalonsBuff) and (Player:BuffDownP(S.IncarnationBuff) or Target:DebuffRemainsP(S.RipDebuff) < 8)) then
       if HR.Cast(S.Regrowth) then return "regrowth 427"; end
     end
     -- run_action_list,name=finishers,if=combo_points>4

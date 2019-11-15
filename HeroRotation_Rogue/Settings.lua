@@ -58,6 +58,8 @@
       AlwaysSuggestGarrote = false,
       -- Use Priority Rotation
       UsePriorityRotation = "Never",
+      -- Do not pool, this option only exists because people keep nagging me about it
+      NoPooling = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
         Vendetta = true,
@@ -141,6 +143,7 @@
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
   CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.AlwaysSuggestGarrote", "Always Suggest Garrote", "Don't prevent Garrote suggestions when using Subterfuge and Vanish is ready. These should ideally be synced, but can be useful if holding Vanish for specific fights.");
   CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", {"Never", "On Bosses", "Always"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)");
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.NoPooling", "No Pooling", "If you want to ignore energy thresholds. No warranty.");
   CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
   -- Outlaw
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.\n(SimC highly recommended!)");

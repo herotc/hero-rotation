@@ -119,7 +119,7 @@ local function bool(val)
 end
 
 local function DeathStrikeHeal()
-  return (Settings.General.SoloMode and Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP) and true or false;
+  return (Settings.General.SoloMode and (Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP or Player:HealthPercentage() < Settings.Commons.UseDarkSuccorHP and Player:BuffP(S.DeathStrikeBuff))) and true or false;
 end
 
 local function EvaluateCycleFesteringStrike40(TargetUnit)
@@ -174,7 +174,8 @@ local function APL()
       if HR.Cast(S.Defile) then return "defile 14"; end
     end
     -- epidemic,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
-    if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:Rune() < 2 and not bool(VarPoolingForGargoyle)) then
+    -- Added check to ensure at least 2 targets have Plague
+    if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:Rune() < 2 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
       if HR.Cast(S.Epidemic) then return "epidemic 16"; end
     end
     -- death_coil,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
@@ -190,7 +191,8 @@ local function APL()
       if HR.Cast(S.ClawingShadows) then return "clawing_shadows 28"; end
     end
     -- epidemic,if=!variable.pooling_for_gargoyle
-    if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle)) then
+    -- Added check to ensure at least 2 targets have Plague
+    if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
       if HR.Cast(S.Epidemic) then return "epidemic 32"; end
     end
     -- festering_strike,target_if=debuff.festering_wound.stack<=1&cooldown.death_and_decay.remains
@@ -226,7 +228,7 @@ local function APL()
       if HR.Cast(S.DeathCoil) then return "death_coil 91"; end
     end
     -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-    if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not Player:BuffP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
+    if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
       if HR.Cast(S.FesteringStrike) then return "festering_strike 95"; end
     end
     -- death_coil,if=!variable.pooling_for_gargoyle
@@ -290,7 +292,7 @@ local function APL()
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
     -- focused_azerite_beam,if=!death_and_decay.ticking
-    if S.FocusedAzeriteBeam:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+    if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- concentrated_flame,if=dot.concentrated_flame_burn.remains=0
@@ -298,15 +300,15 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- purifying_blast,if=!death_and_decay.ticking
-    if S.PurifyingBlast:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+    if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- worldvein_resonance,if=!death_and_decay.ticking
-    if S.WorldveinResonance:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- ripple_in_space,if=!death_and_decay.ticking
-    if S.RippleInSpace:IsCastableP() and (not Player:BuffP(S.DeathandDecayBuff)) then
+    if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
   end
@@ -348,7 +350,7 @@ local function APL()
       if HR.Cast(S.DeathCoil) then return "death_coil 218"; end
     end
     -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-    if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not Player:BuffP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
+    if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
       if HR.Cast(S.FesteringStrike) then return "festering_strike 222"; end
     end
     -- Manually added: Multiple target Epidemic filler to burn RP
@@ -366,13 +368,9 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false);
-    -- use DeathStrike on low HP in Solo Mode
-    if not no_heal and S.DeathStrike:IsReadyP("Melee") then
-      if HR.Cast(S.DeathStrike) then return ""; end
-    end
-    -- use DeathStrike with Proc in Solo Mode
-    if Settings.General.SoloMode and S.DeathStrike:IsReadyP("Melee") and Player:BuffP(S.DeathStrikeBuff) then
-      if HR.Cast(S.DeathStrike) then return ""; end
+    -- use DeathStrike on low HP or with proc in Solo Mode
+    if S.DeathStrike:IsReadyP("Melee") and not no_heal then
+      if HR.Cast(S.DeathStrike) then return "death_strike low hp or proc"; end
     end
     -- auto_attack
     -- variable,name=pooling_for_gargoyle,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle.enabled

@@ -35,6 +35,7 @@ HR.GUISettings.APL.Priest = {
     DispersionHP = 10,
     MindbenderUsage = 0,
     UseSplashData = true,
+    UseFABST = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -68,4 +69,5 @@ CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.EssenceDisplayStyle
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.");
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow");
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MindbenderUsage", {0, 30, 1}, "Shadowfiend/Mindbender usage Offset", "Number of vf stacks MB/SF will be delayed that you can push");

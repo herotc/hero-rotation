@@ -57,14 +57,17 @@ Spell.Druid.Guardian = {
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   Conflict                              = MultiSpell(303823, 304088, 304121),
   HeartEssence                          = Spell(298554),
-  SharpenedClawsBuff                    = Spell(279943)
+  SharpenedClawsBuff                    = Spell(279943),
+  RazorCoralDebuff                      = Spell(303568),
+  ConductiveInkDebuff                   = Spell(302565)
 };
 local S = Spell.Druid.Guardian;
 
 -- Items
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Guardian = {
-  PotionofFocusedResolve                = Item(168506)
+  PotionofFocusedResolve           = Item(168506),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.Druid.Guardian;
 
@@ -98,7 +101,7 @@ local function bool(val)
 end
 
 local function EvaluateCyclePulverize77(TargetUnit)
-  return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and not Player:BuffP(S.PulverizeBuff)
+  return TargetUnit:DebuffStackP(S.ThrashBearDebuff) == 3 and Player:BuffDownP(S.PulverizeBuff)
 end
 
 local function EvaluateCycleMoonfire88(TargetUnit)
@@ -176,10 +179,10 @@ local function APL()
     -- Defensives and Bristling Fur
     if IsTanking and Player:BuffP(S.BearForm) then
       if Player:HealthPercentage() < Settings.Guardian.FrenziedRegenHP and S.FrenziedRegeneration:IsCastableP() and Player:Rage() > 10
-        and not Player:Buff(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
+        and Player:BuffDown(S.FrenziedRegeneration) and not Player:HealingAbsorbed() then
         if HR.Cast(S.FrenziedRegeneration, Settings.Guardian.GCDasOffGCD.FrenziedRegen) then return "frenzied_regen defensive"; end
       end
-      if S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (not Player:Buff(S.Ironfur) 
+      if S.Ironfur:IsCastableP() and Player:Rage() >= S.Ironfur:Cost() + 1 and IsTanking and (Player:BuffDown(S.Ironfur) 
         or (Player:BuffStack(S.Ironfur) < 2 and Player:BuffRefreshableP(S.Ironfur, 2.4))) then
         if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur defensive"; end
       end
@@ -203,6 +206,10 @@ local function APL()
     -- incarnation,if=(dot.moonfire.ticking|active_enemies>1)&dot.thrash_bear.ticking
     if S.Incarnation:IsReadyP() and ((Target:DebuffP(S.MoonfireDebuff) or EnemiesCount > 1) and Target:DebuffP(S.ThrashBearDebuff)) then
       if HR.Cast(S.Incarnation) then return "incarnation 33"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 35"; end
     end
     -- use_items
   end
