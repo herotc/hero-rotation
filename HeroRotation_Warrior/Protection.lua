@@ -238,7 +238,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
     end
     -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) then
+    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) and not Player:BuffRemains(S.LastStandBuff) then
       if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 32"; end
     end
     -- shield_slam,if=buff.shield_block.up
