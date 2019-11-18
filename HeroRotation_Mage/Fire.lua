@@ -216,8 +216,8 @@ local function APL()
         VarOnUseCutoff = 20 * num(bool(VarCombustionOnUse) and not bool(VarFontDoubleOnUse)) + 40 * VarFontDoubleOnUse + 25 * num(I.AzsharasFontofPower:IsEquipped() and not bool(VarFontDoubleOnUse))
       end
       -- snapshot_stats
-      -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
+      -- use_item,name=azsharas_font_of_power,if=!variable.disable_combustion
+      if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and not Settings.Fire.DisableCombustion then
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 9"; end
       end
       -- mirror_image
@@ -249,6 +249,10 @@ local function APL()
     if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 234"; end
     end
+    -- living_bomb,if=active_enemies>1&buff.combustion.down
+    if S.LivingBomb:IsReadyP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff)) then
+      if HR.Cast(S.LivingBomb) then return "living_bomb 242"; end
+    end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 244"; end
@@ -265,8 +269,8 @@ local function APL()
     if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 250"; end
     end
-    -- fire_blast,use_while_casting=1,if=azerite.blaster_master.enabled&essence.memory_of_lucid_dreams.major&talent.meteor.enabled&talent.flame_on.enabled&buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(cooldown.combustion.ready|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight)
-    if S.FireBlast:IsReady() and (S.BlasterMaster:AzeriteEnabled() and S.MemoryofLucidDreams:IsAvailable() and S.Meteor:IsAvailable() and S.FlameOn:IsAvailable() and Player:BuffDownP(S.BlasterMasterBuff) and (S.RuneofPower:IsAvailable() and Player:IsCasting(S.RuneofPower) and Player:CastRemains() < 0.6 or (S.Combustion:IsReady() or Player:BuffP(S.CombustionBuff)) and not S.RuneofPower:IsAvailable() and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())) then
+    -- fire_blast,use_while_casting=1,if=azerite.blaster_master.enabled&(essence.memory_of_lucid_dreams.major|!essence.memory_of_lucid_dreams.minor)&talent.meteor.enabled&talent.flame_on.enabled&buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(cooldown.combustion.ready|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight)
+    if S.FireBlast:IsReady() and (S.BlasterMaster:AzeriteEnabled() and (S.MemoryofLucidDreams:IsAvailable() or not S.MemoryofLucidDreamsMinor:IsAvailable()) and S.Meteor:IsAvailable() and S.FlameOn:IsAvailable() and Player:BuffDownP(S.BlasterMasterBuff) and (S.RuneofPower:IsAvailable() and Player:IsCasting(S.RuneofPower) and Player:CastRemains() < 0.6 or (S.Combustion:IsReady() or Player:BuffP(S.CombustionBuff)) and not S.RuneofPower:IsAvailable() and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())) then
       if HR.Cast(S.FireBlast) then return "fire_blast 255"; end
     end
     -- call_action_list,name=active_talents
@@ -591,8 +595,8 @@ local function APL()
     if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
       if HR.Cast(S.Scorch) then return "scorch 780"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>9)&((cooldown.combustion.remains>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
-    if S.FireBlast:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 9) and ((S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(talent.flame_patch.enabled&active_enemies>2|active_enemies>9)&((cooldown.combustion.remains>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
+    if S.FireBlast:IsCastableP() and (not bool(VarFireBlastPooling) and (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 9) and ((S.Combustion:CooldownRemainsP() > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
       if HR.Cast(S.FireBlast) then return "fire_blast 781"; end
     end
     -- flamestrike,if=talent.flame_patch.enabled&active_enemies>2|active_enemies>9
@@ -623,8 +627,8 @@ local function APL()
     if S.MirrorImage:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.MirrorImage) then return "mirror_image 791"; end
     end
-    -- guardian_of_azeroth,if=cooldown.combustion.remains<10|target.time_to_die<cooldown.combustion.remains
-    if S.GuardianofAzeroth:IsCastableP() and (S.Combustion:CooldownRemainsP() < 10 or Target:TimeToDie() < S.Combustion:CooldownRemainsP()) then
+    -- guardian_of_azeroth,if=(cooldown.combustion.remains<10|target.time_to_die<cooldown.combustion.remains)&!variable.disable_combustion
+    if S.GuardianofAzeroth:IsCastableP() and ((S.Combustion:CooldownRemainsP() < 10 or Target:TimeToDie() < S.Combustion:CooldownRemainsP()) and not Settings.Fire.DisableCombustion) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 793"; end
     end
     -- concentrated_flame
