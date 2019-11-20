@@ -38,7 +38,6 @@ HR.GUISettings.APL.Druid = {
     RenewalHP = 40,
     ShowMoonkinFormOOC = true,
     ShowInnervate = true,
-    ShowPotion = false,
     UseSplashData = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -57,9 +56,6 @@ HR.GUISettings.APL.Druid = {
     }
   },
   Feral = {
-    RegrowthHP = 0,
-    RenewalHP = 0,
-    SurvivalInstinctsHP = 0,
     UseFABST = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -69,19 +65,10 @@ HR.GUISettings.APL.Druid = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       --Abilities
-      -- Renewal = true,
-      -- SurvivalInstincts = true,
       Prowl = true,
-      -- ElunesGuidance = true,
-      WildCharge = true,
       TigersFury = true,
       Berserk = true,
       Incarnation = true,
-    },
-    StealthMacro = {
-      -- Abilities
-      -- Shadowmeld = true,
-      -- JungleStalker = true,
     }
   },
   Guardian = {
@@ -127,13 +114,8 @@ CreatePanelOption("Dropdown", CP_Druid, "APL.Druid.Commons.TrinketDisplayStyle",
 CreatePanelOption("Dropdown", CP_Druid, "APL.Druid.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 
 --Feral
--- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RegrowthHP", {0, 100, 1}, "Regrowth HP", "Set the Regrowth HP threshold.");
--- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
--- CreatePanelOption("Slider", CP_Feral, "APL.Druid.Feral.SurvivalInstinctsHP", {0, 100, 1}, "Survival Instincts HP", "Set the Survival Instincts HP threshold.");
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
 CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
--- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
--- CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.StealthMacro.JungleStalker", "Stealth Combo - Jungle Stalker", "Allow suggesting Jungle Stalker stealth ability combos (recommended)");
 
 --Balance
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
@@ -141,7 +123,6 @@ CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkskinHP", {0, 100,
 CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowInnervate", "Show Innervate in Rotation", "Enable this if you would like the addon to suggest when to use Innervate.");
-CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowPotion", "Show Potion", "Enable this if you want the addon to show you when to use a potion.");
 CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
 
 --Guardian
