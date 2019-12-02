@@ -152,7 +152,7 @@ local function ShouldPurify ()
   local NStaggerPct = NextStaggerTick > 0 and NextStaggerTick/Player:MaxHealth() or 0;
   local ProgressPct = NormalizedStagger > 0 and Player:Stagger()/NormalizedStagger or 0;
   if HL.CombatTime() <= 9 then return false end;
-  if S.Brews:ChargesFractional() >= BrewMaxCharges - 0.2 then return true end;
+  if S.Brews:ChargesFractional() >= BrewMaxCharges - 0.2 and Player:BuffRemains(S.IronskinBrewBuff) > 18 then return true end;
   if NStaggerPct > 0.015 and ProgressPct > 0 then
     if NStaggerPct <= 0.03 then -- Yellow (> 80%)
       return Settings.Brewmaster.Purify.Low and ProgressPct > 0.8 or false;
