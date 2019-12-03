@@ -140,6 +140,11 @@ local function GetEnemiesCount(range)
   end
 end
 
+HL:RegisterForEvent(function()
+  S.SeedofCorruption:RegisterInFlight();
+  S.ConcentratedFlame:RegisterInFlight();
+  S.ShadowBolt:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
 S.SeedofCorruption:RegisterInFlight()
 S.ConcentratedFlame:RegisterInFlight()
 S.ShadowBolt:RegisterInFlight()

@@ -117,6 +117,9 @@ local function GetEnemiesCount(range)
   end
 end
 
+HL:RegisterForEvent(function()
+  S.FrozenOrb:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
 S.FrozenOrb:RegisterInFlight()
 
 local function num(val)

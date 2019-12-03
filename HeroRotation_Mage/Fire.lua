@@ -168,12 +168,20 @@ local function bool(val)
   return val ~= 0
 end
 
+HL:RegisterForEvent(function()
+  S.Pyroblast:RegisterInFlight();
+  S.Fireball:RegisterInFlight();
+  S.Meteor:RegisterInFlight();
+  S.PhoenixFlames:RegisterInFlight();
+  S.Pyroblast:RegisterInFlight(S.CombustionBuff);
+  S.Fireball:RegisterInFlight(S.CombustionBuff);
+end, "LEARNED_SPELL_IN_TAB")
 S.Pyroblast:RegisterInFlight()
 S.Fireball:RegisterInFlight()
 S.Meteor:RegisterInFlight()
-S.PhoenixFlames:RegisterInFlight();
-S.Pyroblast:RegisterInFlight(S.CombustionBuff);
-S.Fireball:RegisterInFlight(S.CombustionBuff);
+S.PhoenixFlames:RegisterInFlight()
+S.Pyroblast:RegisterInFlight(S.CombustionBuff)
+S.Fireball:RegisterInFlight(S.CombustionBuff)
 
 function S.Firestarter:ActiveStatus()
     return (S.Firestarter:IsAvailable() and (Target:HealthPercentage() > 90)) and 1 or 0

@@ -101,7 +101,10 @@ local StunInterrupts = {
   {S.ChaosNova, "Cast Chaos Nova (Interrupt)", function () return true; end},
 };
 
-S.ConcentratedFlame:RegisterInFlight()
+HL:RegisterForEvent(function()
+  S.ConcentratedFlame:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
+S.ConcentratedFlame:RegisterInFlight();
 
 -- Variables
 local VarPoolingForMeta = 0;

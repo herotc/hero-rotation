@@ -126,6 +126,10 @@ local function GetEnemiesCount(range)
   end
 end
 
+HL:RegisterForEvent(function()
+  S.ConcentratedFlame:RegisterInFlight();
+  S.ChaosBolt:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
 S.ConcentratedFlame:RegisterInFlight()
 S.ChaosBolt:RegisterInFlight()
 

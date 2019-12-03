@@ -27,9 +27,6 @@ Spell.DemonHunter.Vengeance = {
   ImmolationAura                        = Spell(178740),
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
-  --SigilofFlame,                         -- Dynamic
-  --SigilofFlameNoCS                      = Spell(204596),
-  --SigilofFlameCS                        = Spell(204513),
   SigilofFlame                          = MultiSpell(204596, 204513),
   SigilofFlameDebuff                    = Spell(204598),
   SoulCleave                            = Spell(228477),
@@ -97,7 +94,10 @@ local function UpdateRanges()
   end
 end
 
-S.ConcentratedFlame:RegisterInFlight()
+HL:RegisterForEvent(function()
+  S.ConcentratedFlame:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
+S.ConcentratedFlame:RegisterInFlight();
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()

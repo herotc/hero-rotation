@@ -111,6 +111,10 @@ local function UpdateRanges()
   end
 end
 
+HL:RegisterForEvent(function()
+  S.HandofGuldan:RegisterInFlight();
+  S.ConcentratedFlame:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
 S.HandofGuldan:RegisterInFlight()
 S.ConcentratedFlame:RegisterInFlight()
 
