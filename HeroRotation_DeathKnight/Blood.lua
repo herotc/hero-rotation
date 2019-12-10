@@ -22,9 +22,13 @@ local HR         = HeroRotation
 if not Spell.DeathKnight then Spell.DeathKnight = {}; end
 Spell.DeathKnight.Blood = {
   -- Racials
+  AncestralCall         = Spell(274738),
+  ArcanePulse           = Spell(260364),
   ArcaneTorrent         = Spell(50613),
   Berserking            = Spell(26297),
   BloodFury             = Spell(20572),
+  Fireblood             = Spell(265221),
+  LightsJudgment        = Spell(255647),
   -- Abilities
   Asphyxiate            = Spell(221562),
   BloodBoil             = Spell(50842),
@@ -52,6 +56,7 @@ Spell.DeathKnight.Blood = {
   RuneTap               = Spell(194679),
   Tombstone             = Spell(219809),
   TombstoneBuff         = Spell(219809),
+  UnholyStrengthBuff    = Spell(53365),
   VampiricBlood         = Spell(55233),
   -- Trinket Effects
   RazorCoralDebuff      = Spell(303568),
@@ -256,13 +261,31 @@ local function APL ()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool During Blooddrinker"; end
     end
     -- auto_attack
-    -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
-    if S.BloodFury:IsCastable() and HR.CDsON() and Cache.EnemiesCount[10] >= 1 and (S.DancingRuneWeapon:CooldownUpP() and (not S.Blooddrinker:CooldownUpP() or not S.Blooddrinker:IsAvailable())) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- berserking
-    if S.Berserking:IsCastable() and HR.CDsON() and Cache.EnemiesCount[10] >= 1 then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    if HR.CDsON() then
+      -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
+      if S.BloodFury:IsCastable() and Cache.EnemiesCount[10] >= 1 and (S.DancingRuneWeapon:CooldownUpP() and (not S.Blooddrinker:CooldownUpP() or not S.Blooddrinker:IsAvailable())) then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- berserking
+      if S.Berserking:IsCastable() and Cache.EnemiesCount[10] >= 1 then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
+      if S.ArcanePulse:IsCastable() and (Cache.EnemiesCount[10] >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
+        if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- lights_judgment,if=buff.unholy_strength.up
+      if S.LightsJudgment:IsCastable() and (Player:BuffP(S.UnholyStrengthBuff)) then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- ancestral_call
+      if S.AncestralCall:IsCastable() then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- fireblood
+      if S.Fireblood:IsCastable() then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
     end
     -- use_items,if=cooldown.dancing_rune_weapon.remains>90
     -- use_item,name=razdunks_big_red_button
