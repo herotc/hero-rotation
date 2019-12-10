@@ -50,6 +50,7 @@ Spell.DeathKnight.Frost = {
   FrozenPulse                           = Spell(194909),
   FrostFeverDebuff                      = Spell(55095),
   IcyTalonsBuff                         = Spell(194879),
+  Icecap                                = Spell(207126),
   Obliteration                          = Spell(281238),
   DeathStrike                           = Spell(49998),
   DeathStrikeBuff                       = Spell(101568),
@@ -360,21 +361,29 @@ local function APL()
     if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.SeethingRageBuff) < Player:GCD()) and Player:BuffP(S.SeethingRageBuff)) then
       if HR.Cast(S.ChainsofIce) then return "chains_of_ice 303"; end
     end
-    -- chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)
-    if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() * (1 + num(S.FrostwyrmsFury:CooldownUpP())) or Player:BuffRemainsP(S.PillarofFrostBuff) < Player:RuneTimeToX(3)) and Player:BuffP(S.PillarofFrostBuff) and (S.IcyCitadel:AzeriteRank() <= 1 or Player:BuffP(S.BreathofSindragosa))) then
+    -- chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)&!talent.icecap.enabled
+    if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() * (1 + num(S.FrostwyrmsFury:CooldownUpP())) or Player:BuffRemainsP(S.PillarofFrostBuff) < Player:RuneTimeToX(3)) and Player:BuffP(S.PillarofFrostBuff) and (S.IcyCitadel:AzeriteRank() <= 1 or Player:BuffP(S.BreathofSindragosa)) and not S.Icecap:IsAvailable()) then
       if HR.Cast(S.ChainsofIce) then return "chains_of_ice 305"; end
     end
-    -- chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)
-    if S.ChainsofIce:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 8 and Player:BuffRemainsP(S.UnholyStrengthBuff) < Player:GCD() * (1 + num(S.FrostwyrmsFury:CooldownUpP())) and Player:BuffP(S.UnholyStrengthBuff) and Player:BuffP(S.PillarofFrostBuff) and (S.IcyCitadel:AzeriteRank() <= 1 or Player:BuffP(S.BreathofSindragosa))) then
+    -- chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)&!talent.icecap.enabled
+    if S.ChainsofIce:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 8 and Player:BuffRemainsP(S.UnholyStrengthBuff) < Player:GCD() * (1 + num(S.FrostwyrmsFury:CooldownUpP())) and Player:BuffP(S.UnholyStrengthBuff) and Player:BuffP(S.PillarofFrostBuff) and (S.IcyCitadel:AzeriteRank() <= 1 or Player:BuffP(S.BreathofSindragosa)) and not S.Icecap:IsAvailable()) then
       if HR.Cast(S.ChainsofIce) then return "chains_of_ice 307"; end
     end
-    -- chains_of_ice,if=(buff.icy_citadel.remains<4|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up
-    if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.IcyCitadelBuff) < 4 or Player:BuffRemainsP(S.IcyCitadelBuff) < Player:RuneTimeToX(3)) and Player:BuffP(S.IcyCitadelBuff) and S.IcyCitadel:AzeriteRank() >= 2 and Player:BuffDownP(S.BreathofSindragosa)) then
+    -- chains_of_ice,if=(buff.icy_citadel.remains<4|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up&!talent.icecap.enabled
+    if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.IcyCitadelBuff) < 4 or Player:BuffRemainsP(S.IcyCitadelBuff) < Player:RuneTimeToX(3)) and Player:BuffP(S.IcyCitadelBuff) and S.IcyCitadel:AzeriteRank() >= 2 and Player:BuffDownP(S.BreathofSindragosa) and not S.Icecap:IsAvailable()) then
       if HR.Cast(S.ChainsofIce) then return "chains_of_ice 309"; end
     end
-    -- chains_of_ice,if=buff.icy_citadel.up&buff.unholy_strength.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up
-    if S.ChainsofIce:IsCastableP() and (Player:BuffP(S.IcyCitadelBuff) and Player:BuffP(S.UnholyStrengthBuff) and S.IcyCitadel:AzeriteRank() >= 2 and Player:BuffDownP(S.BreathofSindragosa)) then
+    -- chains_of_ice,if=buff.icy_citadel.up&buff.unholy_strength.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up&!talent.icecap.enabled
+    if S.ChainsofIce:IsCastableP() and (Player:BuffP(S.IcyCitadelBuff) and Player:BuffP(S.UnholyStrengthBuff) and S.IcyCitadel:AzeriteRank() >= 2 and Player:BuffDownP(S.BreathofSindragosa) and not S.Icecap:IsAvailable()) then
       if HR.Cast(S.ChainsofIce) then return "chains_of_ice 311"; end
+    end
+    -- chains_of_ice,if=buff.pillar_of_frost.remains<4&talent.icecap.enabled&buff.cold_heart.stack>=18&azerite.icy_citadel.rank<=1
+    if S.ChainsofIce:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 4 and S.Icecap:IsAvailable() and Player:BuffStackP(S.ColdHeartBuff) >= 18 and S.IcyCitadel:AzeriteRank() <= 1) then
+      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 313"; end
+    end
+    -- chains_of_ice,if=buff.pillar_of_frost.up&talent.icecap.enabled&azerite.icy_citadel.rank>=2&(buff.cold_heart.stack>=19&buff.icy_citadel.remains<gcd|buff.unholy_strength.up&buff.cold_heart.stack>=18)
+    if S.ChainsofIce:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and S.Icecap:IsAvailable() and S.IcyCitadel:AzeriteRank() >= 2 and (Player:BuffStackP(S.ColdHeartBuff) >= 19 and Player:BuffRemainsP(S.IcyCitadelBuff) < Player:GCD() or Player:BuffP(S.UnholyStrengthBuff) and Player:BuffStackP(S.ColdHeartBuff) >= 18)) then
+      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 315"; end
     end
   end
   Cooldowns = function()
