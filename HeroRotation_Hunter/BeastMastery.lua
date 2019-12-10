@@ -235,8 +235,8 @@ local function APL()
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) > GCDMax or Pet:BuffDownP(S.FrenzyBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 60"; end
     end
-    -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable()) or Target:TimeToDie() < 61) then
+    -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and Target:HealthPercentage() < 35 or Target:TimeToDie() < 61) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 68"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<4
@@ -347,16 +347,16 @@ local function APL()
     if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 165"; end
     end
-    -- aspect_of_the_wild,if=cooldown.barbed_shot.charges<2|pet.cat.buff.frenzy.stack>2|!azerite.primal_instincts.enabled
-    if S.AspectoftheWild:IsCastableP() and HR.CDsON() and (S.BarbedShot:ChargesP() < 2 or Pet:BuffStackP(S.FrenzyBuff) > 2 or not S.PrimalInstincts:AzeriteEnabled()) then
+    -- aspect_of_the_wild,if=cooldown.barbed_shot.charges<1|!azerite.primal_instincts.enabled
+    if S.AspectoftheWild:IsCastableP() and HR.CDsON() and (S.BarbedShot:ChargesP() < 1 or not S.PrimalInstincts:AzeriteEnabled()) then
       if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 180"; end
     end
     -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
     if S.Stampede:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:TimeToDie() < 15) then
       if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede) then return "stampede 182"; end
     end
-    -- a_murder_of_crows,if=cooldown.bestial_wrath.remains
-    if S.AMurderofCrows:IsCastableP() and (bool(S.BestialWrath:CooldownRemainsP())) then
+    -- a_murder_of_crows
+    if S.AMurderofCrows:IsCastableP() then
       if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 183"; end
     end
     -- focused_azerite_beam,if=buff.bestial_wrath.down|target.time_to_die<5
@@ -367,9 +367,17 @@ local function APL()
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10 or Target:TimeToDie() < 5) then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 185"; end
     end
-    -- bestial_wrath
-    if S.BestialWrath:IsCastableP() then
+    -- bestial_wrath,if=!buff.bestial_wrath.up&cooldown.aspect_of_the_wild.remains>15|target.time_to_die<15+gcd
+    if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and S.AspectoftheWild:CooldownRemainsP() > 15 or Target:TimeToDie() < 15 + GCDMax) then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 190"; end
+    end
+    -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd&crit_pct_current>40
+    if S.BarbedShot:IsCastableP() and (S.DanceofDeath:AzeriteRank() > 1 and Player:BuffRemainsP(S.DanceofDeathBuff) < GCDMax and Player:CritChancePct() > 40) then
+      if HR.Cast(S.BarbedShot) then return "barbed_shot 192"; end
+    end
+    -- blood_of_the_enemy,if=buff.aspect_of_the_wild.remains>10+gcd|target.time_to_die<10+gcd
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 10 + GCDMax or Target:TimeToDie() < 10 + GCDMax) then
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 193"; end
     end
     -- kill_command
     if S.KillCommand:IsCastableP() then
@@ -383,8 +391,8 @@ local function APL()
     if S.DireBeast:IsCastableP() then
       if HR.Cast(S.DireBeast) then return "dire_beast 198"; end
     end
-    -- barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|azerite.dance_of_death.rank>1&buff.dance_of_death.down&crit_pct_current>40|target.time_to_die<9
-    if S.BarbedShot:IsCastableP() and (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or S.DanceofDeath:AzeriteRank() > 1 and Player:BuffDownP(S.DanceofDeathBuff) and Player:CritChancePct() > 40 or Target:TimeToDie() < 9) then
+    -- barbed_shot,if=talent.one_with_the_pack.enabled&charges_fractional>1.5|charges_fractional>1.8|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9
+    if S.BarbedShot:IsCastableP() and (S.OneWithThePack:IsAvailable() and S.BarbedShot:ChargesFractionalP() > 1.5 or S.BarbedShot:ChargesFractionalP() > 1.8 or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
       if HR.Cast(S.BarbedShot) then return "barbed_shot 200"; end
     end
     -- purifying_blast,if=buff.bestial_wrath.down|target.time_to_die<8
@@ -413,8 +421,8 @@ local function APL()
     if S.SpittingCobra:IsCastableP() then
       if HR.Cast(S.SpittingCobra, Settings.BeastMastery.GCDasOffGCD.SpittingCobra) then return "spitting_cobra 234"; end
     end
-    -- barbed_shot,if=charges_fractional>1.4
-    if S.BarbedShot:IsCastableP() and (S.BarbedShot:ChargesFractionalP() > 1.4) then
+    -- barbed_shot,if=pet.cat.buff.frenzy.duration-gcd>full_recharge_time
+    if S.BarbedShot:IsCastableP() and (S.FrenzyBuff:BaseDuration() - GCDMax > S.BarbedShot:FullRechargeTimeP()) then
       if HR.Cast(S.BarbedShot) then return "barbed_shot 235"; end
     end
   end
@@ -431,8 +439,12 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.up)&(target.health.pct<35|!essence.condensed_lifeforce.major)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.RazorCoralDebuff) and (Player:PrevGCDP(1, S.AspectoftheWild) or not Everyone.PSCDEquipped() and Player:BuffP(S.AspectoftheWildBuff)) and (Target:HealthPercentage() < 35 or not S.GuardianofAzeroth:IsAvailable()) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(I.PocketsizedComputationDevice:CooldownRemains() + 4 < Target:TimeToDie()))) then
+    -- use_item,name=azsharas_font_of_power,if=target.time_to_die>10
+    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() > 10) then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.remains>5)&(target.health.pct<35|!essence.condensed_lifeforce.major|!talent.killer_instinct.enabled)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.RazorCoralDebuff) and (Player:PrevGCDP(1, S.AspectoftheWild) or not Everyone.PSCDEquipped() and Player:BuffRemainsP(S.AspectoftheWildBuff) > 5) and (Target:HealthPercentage() < 35 or not S.GuardianofAzeroth:IsAvailable() or not S.KillerInstinct:IsAvailable()) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(I.PocketsizedComputationDevice:CooldownRemains() + 4 < Target:TimeToDie()))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
