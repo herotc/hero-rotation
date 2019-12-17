@@ -110,9 +110,21 @@ local VarAzAp = 0;
 local VarSfTargets = 0;
 
 HL:RegisterForEvent(function()
-  VarAzSs = 0
-  VarAzAp = 0
-  VarSfTargets = 0
+  VarAzSs = S.StreakingStars:AzeriteRank()
+  VarAzAp = S.ArcanicPulsar:AzeriteRank()
+  VarSfTargets = 4
+  if (S.ArcanicPulsar:AzeriteEnabled()) then
+    VarSfTargets = VarSfTargets + 1
+  end
+  if (S.Starlord:IsAvailable()) then
+    VarSfTargets = VarSfTargets + 1
+  end
+  if (S.StreakingStars:AzeriteRank() > 2 and S.ArcanicPulsar:AzeriteEnabled()) then
+    VarSfTargets = VarSfTargets + 1
+  end
+  if (not S.TwinMoons:IsAvailable()) then
+    VarSfTargets = VarSfTargets - 1
+  end
 end, "PLAYER_REGEN_ENABLED")
 
 local EnemyRanges = {40, 15, 8}
