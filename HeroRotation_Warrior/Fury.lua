@@ -142,7 +142,7 @@ local function APL()
       end
       -- recklessness
       if S.Recklessness:IsCastableP() then
-        if HR.Cast(S.Recklessness) then return "recklessness precombat"; end
+        if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat"; end
       end
       -- potion
       if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
@@ -175,7 +175,7 @@ local function APL()
     end
     -- bladestorm,if=prev_gcd.1.rampage
     if S.Bladestorm:IsCastableP("Melee") and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
-      if HR.Cast(S.Bladestorm) then return "bladestorm 37"; end
+      if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm) then return "bladestorm 37"; end
     end
     -- bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
     if S.Bloodthirst:IsCastableP("Melee") and (Player:BuffDownP(S.EnrageBuff) or S.ColdSteelHotBlood:AzeriteRank() > 1) then
@@ -183,7 +183,7 @@ local function APL()
     end
     -- dragon_roar,if=buff.enrage.up
     if S.DragonRoar:IsCastableP(12) and HR.CDsON() and (Player:BuffP(S.EnrageBuff)) then
-      if HR.Cast(S.DragonRoar) then return "dragon_roar 39"; end
+      if HR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return "dragon_roar 39"; end
     end
     -- raging_blow,if=charges=2
     if S.RagingBlow:IsCastableP("Melee") and (S.RagingBlow:ChargesP() == 2) then
