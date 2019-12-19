@@ -35,7 +35,6 @@ HR.GUISettings.APL.Warrior = {
       Warbreaker = false,
       Bladestorm = false,
       Ravager = false,
-      DeadlyCalm = false,
       HeroicLeap = false,
       Charge = false,
       Avatar = true,
