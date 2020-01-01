@@ -56,7 +56,8 @@ Spell.DemonHunter.Vengeance = {
   -- Essences
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlame                     = Spell(295373),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
