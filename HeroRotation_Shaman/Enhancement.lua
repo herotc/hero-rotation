@@ -416,8 +416,8 @@ local function APL()
     if S.Rockbiter:IsCastableP() and (Player:Maelstrom() < 70 and Player:BuffDownP(S.StrengthofEarthBuff)) then
       if HR.Cast(S.Rockbiter) then return "rockbiter 250"; end
     end
-    -- crash_lightning,if=talent.crashing_storm.enabled&variable.OCPool_CL
-    if S.CrashLightning:IsReadyP() and (S.CrashingStorm:IsAvailable() and bool(VarOcpoolCl)) then
+    -- crash_lightning,if=(talent.crashing_storm.enabled|talent.forceful_winds.enabled)&variable.OCPool_CL
+    if S.CrashLightning:IsReadyP() and ((S.CrashingStorm:IsAvailable() or S.ForcefulWinds:IsAvailable()) and bool(VarOcpoolCl)) then
       if HR.Cast(S.CrashLightning) then return "crash_lightning 254"; end
     end
     -- lava_lash,if=variable.OCPool_LL&variable.furyCheck_LL
