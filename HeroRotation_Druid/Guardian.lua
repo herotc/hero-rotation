@@ -46,6 +46,7 @@ Spell.Druid.Guardian = {
   Thrash                                = MultiSpell(77758, 106830),
   Swipe                                 = MultiSpell(213771, 106785),
   Mangle                                = Spell(33917),
+  GalacticGuardian                      = Spell(203964),
   GalacticGuardianBuff                  = Spell(213708),
   PoweroftheMoon                        = Spell(273367),
   FrenziedRegeneration                  = Spell(22842),
@@ -177,7 +178,7 @@ local function APL()
       if HR.Cast(S.Mangle) then return "mangle 59"; end
     end
     -- moonfire,target_if=buff.galactic_guardian.up&active_enemies=1|dot.moonfire.refreshable
-    if S.Moonfire:IsCastableP() and (Player:BuffP(S.GalacticGuardianBuff) and Cache.EnemiesCount[8] == 1 or Target:DebuffRefreshableCP(S.Moonfire)) then
+    if S.Moonfire:IsCastableP() and (Player:BuffP(S.GalacticGuardianBuff) and Cache.EnemiesCount[8] == 1 or Target:DebuffRefreshableCP(S.MoonfireDebuff)) then
       if HR.Cast(S.Moonfire) then return "moonfire 61"; end
     end
     -- maul
@@ -229,7 +230,7 @@ local function APL()
       if HR.Cast(S.Thrash) then return "thrash 95"; end
     end
     -- mangle,if=buff.incarnation.up&active_enemies=3&dot.thrash_bear.ticking
-    if S.Mangle:IsCastableP() and (Player:BuffP(S.IncarnationBuff) Cache.EnemiesCount[8] == 3 and Target:DebuffP(S.ThrashBearDebuff)) then
+    if S.Mangle:IsCastableP() and (Player:BuffP(S.IncarnationBuff) and Cache.EnemiesCount[8] == 3 and Target:DebuffP(S.ThrashBearDebuff)) then
       if HR.Cast(S.Mangle) then return "mangle 97"; end
     end
     -- moonfire,if=dot.moonfire.refreshable&active_enemies<=4
