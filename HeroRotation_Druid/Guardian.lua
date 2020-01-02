@@ -54,8 +54,14 @@ Spell.Druid.Guardian = {
   WildChargeBear                        = Spell(16979),
   SurvivalInstincts                     = Spell(61336),
   SkullBash                             = Spell(106839),
+  AnimaofDeath                          = MultiSpell(294926, 300002, 300003),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   Conflict                              = MultiSpell(303823, 304088, 304121),
+  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
+  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlameBurn                 = Spell(295368),
   HeartEssence                          = Spell(298554),
   SharpenedClawsBuff                    = Spell(279943),
   RazorCoralDebuff                      = Spell(303568),
@@ -67,7 +73,8 @@ local S = Spell.Druid.Guardian;
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Guardian = {
   PotionofFocusedResolve           = Item(168506),
-  AshvanesRazorCoral               = Item(169311, {13, 14})
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14})
 };
 local I = Item.Druid.Guardian;
 
@@ -92,6 +99,11 @@ local function UpdateRanges()
   end
 end
 
+HL:RegisterForEvent(function()
+  S.ConcentratedFlame:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
+S.ConcentratedFlame:RegisterInFlight();
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -114,7 +126,7 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Cooldowns
+  local Precombat, Cleave, Essences, Multi, Cooldowns
   -- Determine ranges
   if S.BalanceAffinity:IsAvailable() then
     AoERadius = 11
@@ -143,14 +155,96 @@ local function APL()
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 8"; end
     end
   end
+  Cleave = function()
+    -- maul,if=rage.deficit<=10
+    if S.Maul:IsReadyP() and (Player:RageDeficit() <= 10) then
+      if HR.Cast(S.Maul) then return "maul 51"; end
+    end
+    -- ironfur,if=cost<=0
+    if S.Ironfur:IsReadyP() and (S.Ironfur:Cost() <= 0) then
+      if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur 53"; end
+    end
+    -- pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
+    if S.Pulverize:IsReadyP() and (Target:DebuffStackP(S.ThrashBearDebuff) == 3) then
+      if HR.Cast(S.Pulverize) then return "pulverize 55"; end
+    end
+    -- moonfire,target_if=!dot.moonfire.ticking
+    if S.Moonfire:IsCastableP() and (Target:DebuffDownP(S.MoonfireDebuff)) then
+      if HR.Cast(S.Moonfire) then return "moonfire 57"; end
+    end
+    -- mangle,if=dot.thrash_bear.ticking
+    if S.Mangle:IsCastableP() and (Target:DebuffP(S.ThrashBearDebuff)) then
+      if HR.Cast(S.Mangle) then return "mangle 59"; end
+    end
+    -- moonfire,target_if=buff.galactic_guardian.up&active_enemies=1|dot.moonfire.refreshable
+    if S.Moonfire:IsCastableP() and (Player:BuffP(S.GalacticGuardianBuff) and Cache.EnemiesCount[8] == 1 or Target:DebuffRefreshableCP(S.Moonfire)) then
+      if HR.Cast(S.Moonfire) then return "moonfire 61"; end
+    end
+    -- maul
+    if S.Maul:IsReadyP() then
+      if HR.Cast(S.Maul) then return "maul 63"; end
+    end
+    -- thrash
+    if S.Thrash:IsCastableP() then
+      if HR.Cast(S.Thrash) then return "thrash 65"; end
+    end
+    -- swipe
+    if S.Swipe:IsCastableP() then
+      if HR.Cast(S.Swipe) then return "swipe 67"; end
+    end
+  end
+  Essences = function()
+    -- concentrated_flame,if=essence.the_crucible_of_flame.major&((!dot.concentrated_flame_burn.ticking&!action.concentrated_flame_missile.in_flight)^time_to_die<=7)
+    if S.ConcentratedFlame:IsCastableP() and ((Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or Target:TimeToDie() <= 7) then
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 71"; end
+    end
+    -- anima_of_death,if=essence.anima_of_life_and_death.major
+    if S.AnimaofDeath:IsCastableP() then
+      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle) then return "anima_of_death 73"; end
+    end
+    -- memory_of_lucid_dreams,if=essence.memory_of_lucid_dreams.major
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 75"; end
+    end
+    -- worldvein_resonance,if=essence.worldvein_resonance.major
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 77"; end
+    end
+    -- ripple_in_space,if=essence.ripple_in_space.major
+    if S.RippleInSpace:IsCastableP() then
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 79"; end
+    end
+  end
+  Multi = function()
+    -- maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
+    if S.Maul:IsReadyP() and (not S.Conflict:IsAvailable() and Player:BuffDownP(S.SharpenedClawsBuff)) then
+      if HR.Cast(S.Maul) then return "maul 91"; end
+    end
+    -- ironfur,if=(rage>=cost&azerite.layered_mane.enabled)|rage.deficit<10
+    if S.Ironfur:IsReadyP() and (S.LayeredMane:AzeriteEnabled() or Player:RageDeficit() < 10) then
+      if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur 93"; end
+    end
+    -- thrash,if=(buff.incarnation.up&active_enemies>=4)|cooldown.thrash_bear.up
+    if S.Thrash:IsCastableP() and ((Player:BuffP(S.IncarnationBuff) and Cache.EnemiesCount[8] >= 4) or S.Thrash:CooldownUpP()) then
+      if HR.Cast(S.Thrash) then return "thrash 95"; end
+    end
+    -- mangle,if=buff.incarnation.up&active_enemies=3&dot.thrash_bear.ticking
+    if S.Mangle:IsCastableP() and (Player:BuffP(S.IncarnationBuff) Cache.EnemiesCount[8] == 3 and Target:DebuffP(S.ThrashBearDebuff)) then
+      if HR.Cast(S.Mangle) then return "mangle 97"; end
+    end
+    -- moonfire,if=dot.moonfire.refreshable&active_enemies<=4
+    if S.Moonfire:IsCastableP() and (Target:DebuffRefreshableCP(S.MoonfireDebuff) and Cache.EnemiesCount[8] <= 4) then
+      if HR.Cast(S.Moonfire) then return "moonfire 98"; end
+    end
+    -- swipe,if=buff.incarnation.down
+    if S.Swipe:IsCastableP() and (Player:BuffDownP(S.IncarnationBuff)) then
+      if HR.Cast(S.Swipe) then return "swipe 99"; end
+    end
+  end
   Cooldowns = function()
     -- potion
     if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 10"; end
-    end
-    -- heart_essence
-    if S.HeartEssence:IsCastableP() then
-      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
@@ -207,9 +301,13 @@ local function APL()
     if S.Incarnation:IsReadyP() and ((Target:DebuffP(S.MoonfireDebuff) or EnemiesCount > 1) and Target:DebuffP(S.ThrashBearDebuff)) then
       if HR.Cast(S.Incarnation) then return "incarnation 33"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+    -- use_item,name=ashvanes_razor_coral,if=((equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>25&debuff.razor_coral_debuff.down)|debuff.razor_coral_debuff.down|(debuff.razor_coral_debuff.up&debuff.conductive_ink_debuff.up&target.time_to_pct_30<=2)|(debuff.razor_coral_debuff.up&time_to_die<=20))
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemainsP() > 25 and Target:DebuffDownP(S.RazorCoralDebuff)) or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.RazorCoralDebuff) and Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) <= 2) or (Target:DebuffP(S.RazorCoralDebuff) and Target:TimeToDie() <= 20))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 35"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 37"; end
     end
     -- use_items
   end
@@ -229,56 +327,17 @@ local function APL()
     if (true) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- maul,if=rage.deficit<10&active_enemies<4
-    if S.Maul:IsReadyP() and (Player:RageDeficit() < 10 and EnemiesCount < 4) then
-      if HR.Cast(S.Maul) then return "maul 41"; end
+    -- call_action_list,name=essences
+    if (true) then
+      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
-    -- maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
-    if S.Maul:IsReadyP() and (S.Conflict:IsAvailable() and Player:BuffDownP(S.SharpenedClawsBuff)) then
-      if HR.Cast(S.Maul) then return "maul 42"; end
+    -- call_action_list,name=cleave,if=active_enemies<=2
+    if (Cache.EnemiesCount[8] <= 2) then
+      local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
-    -- ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
-    if S.Ironfur:IsCastableP() and (S.Ironfur:Cost() == 0 or (Player:Rage() > S.Ironfur:Cost() and S.LayeredMane:AzeriteEnabled() and EnemiesCount > 2)) then
-      if HR.Cast(S.Ironfur, Settings.Guardian.OffGCDasOffGCD.Ironfur) then return "ironfur 49"; end
-    end
-    -- pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
-    if S.Pulverize:IsCastableP() then
-      if HR.CastCycle(S.Pulverize, AoERadius, EvaluateCyclePulverize77) then return "pulverize 83" end
-    end
-    if S.Pulverize:IsCastableP() and Target:DebuffStackP(S.ThrashBearDebuff) == 3 then
-      if HR.Cast(S.Pulverize) then return "pulverize 84"; end
-    end
-    -- moonfire,target_if=dot.moonfire.refreshable&active_enemies<2
-    if S.Moonfire:IsCastableP() then
-      if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire88) then return "moonfire 100" end
-    end
-    -- thrash,if=(buff.incarnation.down&active_enemies>1)|(buff.incarnation.up&active_enemies>4)
-    if S.Thrash:IsCastableP() and ((Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 1) or (Player:BuffP(S.IncarnationBuff) and EnemiesCount > 4)) then
-      if HR.Cast(S.Thrash) then return "thrash 103"; end
-    end
-    -- swipe,if=buff.incarnation.down&active_enemies>4
-    if S.Swipe:IsCastableP() and (Player:BuffDownP(S.IncarnationBuff) and EnemiesCount > 4) then
-      if HR.Cast(S.Swipe) then return "swipe 121"; end
-    end
-    -- mangle,if=dot.thrash_bear.ticking
-    if S.Mangle:IsCastableP() and (Target:DebuffP(S.ThrashBearDebuff)) then
-      if HR.Cast(S.Mangle) then return "mangle 131"; end
-    end
-    -- moonfire,target_if=buff.galactic_guardian.up&active_enemies<2
-    if S.Moonfire:IsCastableP() then
-      if HR.CastCycle(S.Moonfire, AoERadius, EvaluateCycleMoonfire139) then return "moonfire 151" end
-    end
-    -- thrash
-    if S.Thrash:IsCastableP() then
-      if HR.Cast(S.Thrash) then return "thrash 152"; end
-    end
-    -- maul
-    if S.Maul:IsReadyP() and (not IsTanking or (Player:HealthPercentage() >= 80 and Player:Rage() > 85)) then
-      if HR.Cast(S.Maul) then return "maul 154"; end
-    end
-    -- swipe
-    if S.Swipe:IsCastableP() then
-      if HR.Cast(S.Swipe) then return "swipe 168"; end
+    -- call_action_list,name=multi,if=active_enemies>=3
+    if (Cache.EnemiesCount[8] >= 3) then
+      local ShouldReturn = Multi(); if ShouldReturn then return ShouldReturn; end
     end
   end
 end
