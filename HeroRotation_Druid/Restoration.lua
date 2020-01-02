@@ -51,7 +51,8 @@ Spell.Druid.Restoration = {
   SwipeCat                              = Spell(213764),
   Shred                                 = Spell(5221),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
   Pool                                  = Spell(9999000010)
 };

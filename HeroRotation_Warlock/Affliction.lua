@@ -68,7 +68,8 @@ Spell.Warlock.Affliction = {
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
   RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  ConcentratedFlame                     = Spell(295373),
   TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
@@ -191,10 +192,6 @@ local function Contagion()
   end
   return MaximumDuration
 end
-
-S.ShadowBolt:RegisterInFlight()
-S.SeedofCorruption:RegisterInFlight()
-S.ConcentratedFlame:RegisterInFlight()
 
 local function EvaluateTargetIfFilterAgony160(TargetUnit)
   return TargetUnit:DebuffRemainsP(S.AgonyDebuff)
