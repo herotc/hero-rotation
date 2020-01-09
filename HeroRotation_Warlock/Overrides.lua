@@ -97,15 +97,26 @@ DemoOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
     end
     local BaseCheck = DemoOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDemo.SummonPet then
-      return BaseCheck and not Pet:IsActive()
-    elseif self == SpellDemo.SummonVilefiend then
-      return BaseCheck and not Player:IsCasting(SpellDemo.SummonVilefiend) and Player:SoulShardsP() > 0
+      return BaseCheck and not Pet:IsActive() and Player:SoulShardsP() > 0
+    else
+      return BaseCheck
+    end
+  end
+, 266);
+
+local DemoOldSpellIsReadyP
+DemoOldSpellIsReadyP = HL.AddCoreOverride ("Spell.IsReadyP", 
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local RangeOK = true;
+    if Range then
+      local RangeUnit = ThisUnit or Target;
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell );
+    end
+    local BaseCheck = DemoOldSpellIsReadyP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellDemo.SummonVilefiend then
+      return BaseCheck and not Player:IsCasting(SpellDemo.SummonVilefiend)
     elseif self == SpellDemo.CallDreadstalkers then
-      return BaseCheck and not Player:IsCasting(SpellDemo.CallDreadstalkers) and (Player:SoulShardsP() > 1 or (Player:SoulShardsP() > 0 and Player:BuffP(SpellDemo.DemonicCallingBuff)))
-    elseif self == SpellDemo.BilescourgeBombers then
-      return BaseCheck and Player:SoulShardsP() > 1
-    elseif self == SpellDemo.NetherPortal or self == SpellDemo.GrimoireFelguard then
-      return BaseCheck and Player:SoulShardsP() > 0
+      return BaseCheck and not Player:IsCasting(SpellDemo.CallDreadstalkers)
     else
       return BaseCheck
     end

@@ -196,7 +196,7 @@ local function APL()
     -- food
     -- augmentation
     -- summon_pet
-    if S.SummonPet:IsReadyP() then
+    if S.SummonPet:IsCastableP() then
       if HR.Cast(S.SummonPet, Settings.Demonology.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
     end
     -- inner_demons,if=talent.inner_demons.enabled
