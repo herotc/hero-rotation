@@ -139,12 +139,12 @@
     self:Show();
   end
   -- Change Icon
-  function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable, RangeCheck)
+  function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable, OutofRange)
     -- Texture
     self.Texture:SetTexture(Texture);
     if HR.GUISettings.General.NotEnoughManaEnabled and not Usable then
       self.Texture:SetGradient("HORIZONTAL", 0.5, 0.5, 1.0, 0.5, 0.5, 1.0);
-    elseif RangeCheck then
+    elseif OutofRange then
       self.Texture:SetGradient("HORIZONTAL", 1.0, 0.5, 0.5, 1.0, 0.5, 0.5);
     else
       self.Texture:SetGradient("HORIZONTAL", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);

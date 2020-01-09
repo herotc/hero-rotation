@@ -99,8 +99,8 @@
     else
       local PoolResource = 9999000010
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
-      local IsInRange = RangeCheck and not Target:IsInRange(Object) or false
-      HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, IsInRange);
+      local OutofRange = RangeCheck and not Target:IsInRange(Object) or false
+      HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, OutofRange);
       GCDDisplay();
       Object.LastDisplayTime = HL.GetTime();
       return true;
