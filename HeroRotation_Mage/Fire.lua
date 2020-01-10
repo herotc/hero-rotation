@@ -68,7 +68,8 @@ Spell.Mage.Fire = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
-  HarmonicDematerializer                = Spell(293512)
+  HarmonicDematerializer                = Spell(293512),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710)
 };
 local S = Spell.Mage.Fire;
 
@@ -76,6 +77,8 @@ local S = Spell.Mage.Fire;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Fire = {
   PotionofUnbridledFury            = Item(169299),
+  ManifestoofMadness               = Item(174103, {13, 14}),
+  ForbiddenObsidianClaw            = Item(173944, {13, 14}),
   TidestormCodex                   = Item(165576, {13, 14}),
   MalformedHeraldsLegwraps         = Item(167835),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
@@ -212,17 +215,17 @@ local function APL()
       if (true) then
         VarCombustionRopCutoff = 60
       end
-      -- variable,name=combustion_on_use,op=set,value=equipped.gladiators_badge|equipped.gladiators_medallion|equipped.ignition_mages_fuse|equipped.tzanes_barkspines|equipped.azurethos_singed_plumage|equipped.ancient_knot_of_wisdom|equipped.shockbiters_fang|equipped.neural_synapse_enhancer|equipped.balefire_branch
+      -- variable,name=combustion_on_use,op=set,value=equipped.manifesto_of_madness|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.ignition_mages_fuse|equipped.tzanes_barkspines|equipped.azurethos_singed_plumage|equipped.ancient_knot_of_wisdom|equipped.shockbiters_fang|equipped.neural_synapse_enhancer|equipped.balefire_branch
       if (true) then
-        VarCombustionOnUse = num(I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.IgnitionMagesFuse:IsEquipped() or I.TzanesBarkspines:IsEquipped() or I.AzurethoseSingedPlumage:IsEquipped() or I.AncientKnotofWisdomAlliance:IsEquipped() or I.AncientKnotofWisdomHorde:IsEquipped() or I.ShockbitersFang:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.BalefireBranch:IsEquipped())
+        VarCombustionOnUse = num(I.ManifestoofMadness:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.IgnitionMagesFuse:IsEquipped() or I.TzanesBarkspines:IsEquipped() or I.AzurethoseSingedPlumage:IsEquipped() or I.AncientKnotofWisdomAlliance:IsEquipped() or I.AncientKnotofWisdomHorde:IsEquipped() or I.ShockbitersFang:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.BalefireBranch:IsEquipped())
       end
       -- variable,name=font_double_on_use,op=set,value=equipped.azsharas_font_of_power&variable.combustion_on_use
       if (true) then
         VarFontDoubleOnUse = num(I.AzsharasFontofPower:IsEquipped() and bool(VarCombustionOnUse))
       end
-      -- variable,name=on_use_cutoff,op=set,value=20*variable.combustion_on_use&!variable.font_double_on_use+40*variable.font_double_on_use+25*equipped.azsharas_font_of_power&!variable.font_double_on_use
+      -- variable,name=on_use_cutoff,op=set,value=20*variable.combustion_on_use&!variable.font_double_on_use+40*variable.font_double_on_use+25*equipped.azsharas_font_of_power&!variable.font_double_on_use+8*equipped.manifesto_of_madness&!variable.font_double_on_use
       if (true) then
-        VarOnUseCutoff = 20 * num(bool(VarCombustionOnUse) and not bool(VarFontDoubleOnUse)) + 40 * VarFontDoubleOnUse + 25 * num(I.AzsharasFontofPower:IsEquipped() and not bool(VarFontDoubleOnUse))
+        VarOnUseCutoff = 20 * num(bool(VarCombustionOnUse) and not bool(VarFontDoubleOnUse)) + 40 * VarFontDoubleOnUse + 25 * num(I.AzsharasFontofPower:IsEquipped() and not bool(VarFontDoubleOnUse)) + 8 * num(I.ManifestoofMadness:IsEquipped() and not bool(VarFontDoubleOnUse))
       end
       -- snapshot_stats
       -- use_item,name=azsharas_font_of_power,if=!variable.disable_combustion
@@ -356,6 +359,11 @@ local function APL()
     if I.HyperthreadWristwraps:IsEquipReady() and (Player:BuffP(S.CombustionBuff) and S.FireBlast:Charges() == 0 and S.FireBlast:RechargeP() > Player:GCD()) then
       if HR.Cast(I.HyperthreadWristwraps, nil, Settings.Commons.TrinketDisplayStyle) then return "hyperthread_wristwraps combustion"; end
     end
+    -- use_item,name=manifesto_of_madness
+    if I.ManifestoofMadness:IsEquipReady() then
+      if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness combustion"; end
+    end
+    -- cancel_buff,use_off_gcd=1,name=manifesto_of_madness_chapter_one,if=buff.combustion.up|action.meteor.in_flight&action.meteor.in_flight_remains<=0.5
     -- use_item,use_off_gcd=1,name=azurethos_singed_plumage,if=buff.combustion.up|action.meteor.in_flight&action.meteor.in_flight_remains<=0.5
     if I.AzurethoseSingedPlumage:IsEquipReady() and (Player:BuffP(S.CombustionBuff) or S.Meteor:InFlight() and Player:PrevGCDP(1, S.Meteor)) then
       if HR.Cast(I.AzurethoseSingedPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "azurethos_singed_plumage combustion"; end
@@ -438,6 +446,10 @@ local function APL()
       local ShouldReturn = ItemsCombustion(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_items
+    -- use_item,name=manifesto_of_madness,if=!equipped.azsharas_font_of_power&cooldown.combustion.remains<8
+    if I.ManifestoofMadness:IsEquipReady() and (not I.AzsharasFontofPower:IsEquipped() and S.Combustion:CooldownRemainsP() < 8) then
+      if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness high_priority"; end
+    end
     -- use_item,name=azsharas_font_of_power,if=cooldown.combustion.remains<=5+15*variable.font_double_on_use&!variable.disable_combustion
     if I.AzsharasFontofPower:IsEquipReady() and (S.Combustion:CooldownRemainsP() <= 5 + 15 * VarFontDoubleOnUse and not Settings.Fire.DisableCombustion) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power high_priority"; end
@@ -453,6 +465,10 @@ local function APL()
     -- use_item,name=shiver_venom_relic,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
     if I.ShiverVenomRelic:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
       if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic high_priority"; end
+    end
+    -- use_item,name=forbidden_obsidian_claw,if=cooldown.combustion.remains>variable.on_use_cutoff|variable.disable_combustion
+    if I.ForbiddenObsidianClaw:IsEquipReady() and (S.Combustion:CooldownRemainsP() > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+      if HR.Cast(I.ForbiddenObsidianClaw, nil, Settings.Commons.TrinketDisplayStyle) then return "forbidden_obsidian_claw high_priority"; end
     end
     -- use_item,effect_name=harmonic_dematerializer
     if Everyone.PSCDEquipReady() and S.HarmonicDematerializer:IsAvailable() then
@@ -643,6 +659,10 @@ local function APL()
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 795"; end
+    end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 796"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
