@@ -248,10 +248,6 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (EnemiesCount >= 2) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast cds"; end
     end
-    -- the_unbound_force
-    if S.TheUnboundForce:IsCastableP() then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force cds"; end
-    end
     -- concentrated_flame,line_cd=6,if=time<=10|(buff.chorus_of_insanity.stack>=15&buff.voidform.up)|full_recharge_time<gcd|target.time_to_die<5
     if S.ConcentratedFlame:IsCastableP() and (HL.CombatTime() <= 10 or (Player:BuffStackP(S.ChorusofInsanity) >= 15 and Player:BuffP(S.VoidformBuff)) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame cds"; end
@@ -364,6 +360,10 @@ local function APL()
     -- use_item,effect_name=cyclotronic_blast
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device critcds"; end
+    end
+    -- the_unbound_force
+    if S.TheUnboundForce:IsCastableP() then
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force cds"; end
     end
   end
   Single = function()
