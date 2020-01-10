@@ -127,12 +127,14 @@ local VarFontDoubleOnUse = 0;
 local VarConserveMana = 0;
 local VarTotalBurns = 0;
 local VarAverageBurnLength = 0;
+local VarFontPrecombatChannel = 0;
 
 HL:RegisterForEvent(function()
   VarFontDoubleOnUse = 0
   VarConserveMana = 0
   VarTotalBurns = 0
   VarAverageBurnLength = 0
+  VarFontPrecombatChannel = 0
 end, "PLAYER_REGEN_ENABLED")
 
 local EnemyRanges = {40, 10}
@@ -236,6 +238,10 @@ local function APL()
     -- variable,name=font_double_on_use,op=set,value=equipped.azsharas_font_of_power&(equipped.gladiators_badge|equipped.gladiators_medallion|equipped.ignition_mages_fuse|equipped.tzanes_barkspines|equipped.azurethos_singed_plumage|equipped.ancient_knot_of_wisdom|equipped.shockbiters_fang|equipped.neural_synapse_enhancer|equipped.balefire_branch)
     if (true) then
       VarFontDoubleOnUse = num(I.AzsharasFontofPower:IsEquipped() and (I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.IgnitionMagesFuse:IsEquipped() or I.TzanesBarkspines:IsEquipped() or I.AzurethoseSingedPlumage:IsEquipped() or I.AncientKnotofWisdomAlliance:IsEquipped() or I.AncientKnotofWisdomHorde:IsEquipped() or I.ShockbitersFang:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.BalefireBranch:IsEquipped()))
+    end
+    -- variable,name=font_of_power_precombat_channel,op=set,value=12,if=variable.font_double_on_use&variable.font_of_power_precombat_channel=0
+    if (bool(VarFontDoubleOnUse) and VarFontPrecombatChannel == 0) then
+      VarFontPrecombatChannel = 12
     end
     -- snapshot_stats
     -- use_item,name=azsharas_font_of_power
