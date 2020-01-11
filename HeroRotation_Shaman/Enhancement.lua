@@ -88,6 +88,7 @@ Spell.Shaman.Enhancement = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceBuff                     = Spell(302932),
   RecklessForceCounter                  = Spell(302917),
@@ -289,6 +290,10 @@ local function APL()
   end
   Cds = function()
     -- bloodlust,if=azerite.ancestral_resonance.enabled
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 36"; end
+    end
     -- berserking,if=variable.cooldown_sync
     if S.Berserking:IsCastableP() and HR.CDsON() and (bool(VarCooldownSync)) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 37"; end
@@ -396,6 +401,10 @@ local function APL()
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 206"; end
     end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 208"; end
+    end
     -- crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
     if S.CrashLightning:IsReadyP() and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[8] > 1 and bool(VarFurycheckCl)) then
       if HR.Cast(S.CrashLightning) then return "crash_lightning 212"; end
@@ -439,10 +448,6 @@ local function APL()
     -- flametongue
     if S.Flametongue:IsCastableP() then
       if HR.Cast(S.Flametongue) then return "flametongue 276"; end
-    end
-    -- worldvein_resonance,if=buff.lifeblood.stack<4
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 4) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 208"; end
     end
   end
   FreezerburnCore = function()
