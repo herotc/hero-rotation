@@ -75,6 +75,7 @@ Spell.Rogue.Assassination = {
   WorldveinResonance    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames         = MultiSpell(310690, 310705, 310710),
   BloodoftheEnemyDebuff = Spell(297108),
   RecklessForceBuff     = Spell(302932),
   RecklessForceCounter  = Spell(302917),
@@ -393,13 +394,17 @@ local function Essences ()
   if S.RippleInSpace:IsCastableP() then
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast RippleInSpace"; end
   end
-  -- worldvein_resonance,if=buff.lifeblood.stack<3
-  if S.WorldveinResonance:IsCastableP() and Player:BuffStackP(S.LifebloodBuff) < 3 then
+  -- worldvein_resonance
+  if S.WorldveinResonance:IsCastableP() then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
   if S.MemoryofLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 and not S.Vendetta:CooldownUpP() then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
+  end
+  -- reaping_flames
+  if S.ReapingFlames:IsCastableP() then
+    if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Reaping Flames"; end
   end
   return false;
 end
@@ -906,7 +911,7 @@ end
 
 HR.SetAPL(259, APL, Init);
 
--- Last Update: 2019-11-04
+-- Last Update: 2020-01-12
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1027,8 +1032,9 @@ HR.SetAPL(259, APL, Init);
 -- actions.essences+=/purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
 -- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
 -- actions.essences+=/ripple_in_space
--- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
+-- actions.essences+=/worldvein_resonance
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
+-- actions.essences+=/reaping_flames
 
 -- # Stealthed Actions
 -- # Nighstalker, or Subt+Exsg on 1T: Snapshot Rupture

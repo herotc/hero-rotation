@@ -75,6 +75,7 @@ Spell.Rogue.Outlaw = {
   WorldveinResonance              = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam              = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth               = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                   = MultiSpell(310690, 310705, 310710),
   LifebloodBuff                   = Spell(295137),
   LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   ConcentratedFlameBurn           = Spell(295368),
@@ -334,13 +335,17 @@ local function Essences ()
   if S.RippleInSpace:IsCastableP() then
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast RippleInSpace"; end
   end
-  -- worldvein_resonance,if=buff.lifeblood.stack<3
-  if S.WorldveinResonance:IsCastableP() and Player:BuffStackP(S.LifebloodBuff) < 3 then
+  -- worldvein_resonance
+  if S.WorldveinResonance:IsCastableP() then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<45
   if S.MemoryofLucidDreams:IsCastableP() and EnergyPredictedRounded() < 45 then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
+  end
+  -- reaping_flames
+  if S.ReapingFlames:IsCastableP() then
+    if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Reaping Flames"; end
   end
   return false;
 end
@@ -656,7 +661,7 @@ end
 
 HR.SetAPL(260, APL, Init);
 
--- Last Update: 2019-09-02
+-- Last Update: 2020-01-12
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -737,8 +742,9 @@ HR.SetAPL(260, APL, Init);
 -- actions.essences+=/purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
 -- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
 -- actions.essences+=/ripple_in_space
--- actions.essences+=/worldvein_resonance,if=buff.lifeblood.stack<3
+-- actions.essences+=/worldvein_resonance
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<45
+-- actions.essences+=/reaping_flames
 --
 -- # Stealth
 -- actions.stealth=ambush
