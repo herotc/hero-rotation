@@ -226,10 +226,6 @@ local function APL ()
     if HR.CDsON() and S.BloodFury:IsReadyP() then
       if HR.CastSuggested(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Blood Fury"; end
     end
-    -- berserking,if=target.time_to_die>183|dot.touch_of_death.remains|target.time_to_die<13
-    if HR.CDsON() and S.Berserking:IsReadyP() and (Target:TimeToDie() > 183 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 13) then
-      if HR.CastSuggested(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Berserking"; end
-    end
     -- arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
     if S.ArcaneTorrent:IsReadyP() and (Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5) then
       if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Arcane Torrent"; end
@@ -254,7 +250,7 @@ local function APL ()
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Blood of the Enemy"; end
     end
-    -- use_item,if=equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20|!equipped.cyclotronic_blast
+    -- use_items,if=equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20|!equipped.cyclotronic_blast
     -- ancestral_call,if=dot.touch_of_death.remains|target.time_to_die<16
     if S.AncestralCall:IsCastableP() and (Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 16) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
@@ -266,6 +262,10 @@ local function APL ()
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&(cooldown.concentrated_flame.remains<=cooldown.touch_of_death.remains&(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains)&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&buff.storm_earth_and_fire.down|dot.touch_of_death.remains)|target.time_to_die<8
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and (S.ConcentratedFlame:CooldownRemainsP() <= S.TouchOfDeath:CooldownRemainsP() and (S.WhirlingDragonPunch:IsAvailable() and not S.WhirlingDragonPunch:CooldownUpP()) and not S.RisingSunKick:CooldownUpP() and not S.FistsOfFury:CooldownUpP() and Player:BuffDownP(S.StormEarthAndFire) or Target:DebuffP(S.TouchOfDeath)) or Target:TimeToDie() < 8) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Concentrated Flame"; end
+    end
+    -- berserking,if=target.time_to_die>183|dot.touch_of_death.remains|target.time_to_die<13
+    if HR.CDsON() and S.Berserking:IsReadyP() and (Target:TimeToDie() > 183 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 13) then
+      if HR.CastSuggested(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Berserking"; end
     end
     -- use_item,name=pocketsized_computation_device,if=dot.touch_of_death.remains
     if Everyone.CyclotronicBlastReady() and (Target:DebuffP(S.TouchOfDeath)) then
