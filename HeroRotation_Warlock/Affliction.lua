@@ -411,8 +411,8 @@ local function APL()
     if I.VialofStorms:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDarkglare:CooldownRemainsP() >= 25 and (bool(S.Deathbolt:CooldownRemainsP()) or not S.Deathbolt:IsAvailable())) then
       if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle, true) then return "vial_of_storms"; end
     end
-    -- worldvein_resonance,if=buff.lifeblood.stack<3
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 63"; end
     end
     -- ripple_in_space

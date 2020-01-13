@@ -224,8 +224,8 @@ local function APL()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
-    -- worldvein_resonance,if=buff.lifeblood.stack<3
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up

@@ -260,8 +260,8 @@ local function APL()
     if S.ReapingFlames:IsCastableP() then
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames cds"; end
     end
-    -- worldvein_resonance,if=buff.lifeblood.stack<3
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff)) then
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance cds"; end
     end
     -- call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
