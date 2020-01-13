@@ -62,6 +62,7 @@ Spell.Warrior.Fury = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932),
   RazorCoralDebuff                      = Spell(303568),
@@ -130,15 +131,19 @@ local function APL()
     if Everyone.TargetIsValid() then
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
+      end
+      -- worldvein_resonance
+      if S.WorldveinResonance:IsCastableP() then
+        if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance precombat"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
+        if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams precombat"; end
       end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth precombat"; end
       end
       -- recklessness
       if S.Recklessness:IsCastableP() then
@@ -146,7 +151,7 @@ local function APL()
       end
       -- potion
       if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion precombat"; end
       end
     end
   end
@@ -223,8 +228,8 @@ local function APL()
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(40)) then
       return Movement();
     end
-    -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+    -- potion,if=buff.guardian_of_azeroth.up|(!essence.condensed_lifeforce.major&target.time_to_die=60)
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and ((S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) or (not S.GuardianofAzeroth:IsAvailable() and Target:TimeToDie == 60)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
     end
     -- rampage,if=cooldown.recklessness.remains<3
@@ -251,6 +256,10 @@ local function APL()
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
+    -- reaping_flames,if=!buff.recklessness.up&!buff.siegebreaker.up
+    if S.ReapingFlames:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
+    end
     -- concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
@@ -259,44 +268,44 @@ local function APL()
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
-    -- guardian_of_azeroth,if=!buff.recklessness.up
-    if S.GuardianofAzeroth:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff)) then
+    -- guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
+    if S.GuardianofAzeroth:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and (Target:TimeToDie() > 195 or Target:HealthPercentage() < 20)) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- memory_of_lucid_dreams,if=!buff.recklessness.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
-    -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
-    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() and not S.BloodoftheEnemy:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 20 or Player:BuffP(S.GuardianofAzeroth) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
+    -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>1|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
+    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() and not S.BloodoftheEnemy:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 1 or Player:BuffP(S.GuardianofAzeroth) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
     if S.Whirlwind:IsCastableP("Melee") and (Cache.EnemiesCount[8] > 1 and Player:BuffDownP(S.MeatCleaverBuff)) then
       if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzeroth) or not S.MemoryofLucidDreams:IsAvailable() and not S.GuardianofAzeroth:IsAvailable()))) then
+    -- use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() < 20 or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzeroth) or not S.MemoryofLucidDreams:IsAvailable() and not S.GuardianofAzeroth:IsAvailable()))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 115"; end
     end
-    -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
+    -- blood_fury,if=buff.recklessness.up
+    if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 118"; end
     end
-    -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
+    -- berserking,if=buff.recklessness.up
+    if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
     end
     -- lights_judgment,if=buff.recklessness.down
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.RecklessnessBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 126"; end
     end
-    -- fireblood
-    if S.Fireblood:IsCastableP() and HR.CDsON() then
+    -- fireblood,if=buff.recklessness.up
+    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 130"; end
     end
-    -- ancestral_call
-    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+    -- ancestral_call,if=buff.recklessness.up
+    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 134"; end
     end
     -- run_action_list,name=single_target
