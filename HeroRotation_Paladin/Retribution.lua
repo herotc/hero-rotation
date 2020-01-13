@@ -58,6 +58,7 @@ Spell.Paladin.Retribution = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   SeethingRageBuff                      = Spell(297126),
@@ -276,6 +277,10 @@ local function APL()
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+    end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
     end
     -- crusader_strike,if=holy_power<=4
     if S.CrusaderStrike:IsCastableP() and (Player:HolyPower() <= 4) then
