@@ -105,6 +105,8 @@ Spell.Monk.Windwalker = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   
@@ -123,11 +125,16 @@ local S = Spell.Monk.Windwalker;
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Windwalker = {
   PotionofUnbridledFury                = Item(169299),
+  LustrousGoldenPlumage                = Item(159617, {13, 14}),
   DribblingInkpod                      = Item(169319, {13, 14}),
   PocketsizedComputationDevice         = Item(167555, {13, 14}),
   AshvanesRazorCoral                   = Item(169311, {13, 14})
 };
 local I = Item.Monk.Windwalker;
+
+-- Rotation Var
+local ShouldReturn;
+local VarCoralDoubleTodOnUse;
 
 -- GUI Settings
 local Settings = {
@@ -179,6 +186,10 @@ local function APL ()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
+    -- variable,name=coral_double_tod_on_use,op=set,value=equipped.ashvanes_razor_coral&(equipped.cyclotronic_blast|equipped.lustrous_golden_plumage)
+    if (true) then
+      VarCoralDoubleTodOnUse = bool(I.AshvanesRazorCoral:IsEquipped() and (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped()))
+    end
     -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
     if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
       if HR.Cast(S.ChiBurst) then return "Cast Pre-Combat Chi Burst"; end
@@ -199,53 +210,74 @@ local function APL ()
   
    -- Cooldowns --
   Cooldowns = function()
-    -- actions.cd=invoke_xuen_the_white_tiger
+    -- invoke_xuen_the_white_tiger
     if HR.CDsON() and S.InvokeXuentheWhiteTiger:IsReadyP() then
       if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuentheWhiteTiger) then return "Cast Cooldown Invoke Xuen the White Tiger"; end
     end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
+    -- guardian_of_azeroth,if=target.time_to_die>185|(!equipped.dribbling_inkpod|equipped.cyclotronic_blast|target.health.pct<30)&cooldown.touch_of_death.remains<=14|equipped.dribbling_inkpod&target.time_to_pct_30.remains<20|target.time_to_die<35
+    if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() > 185 or (not I.DribblingInkpod:IsEquipped() or Everyone.PSCDEquipped() or Target:HealthPercentage() < 30) and S.TouchOfDeath:CooldownRemainsP() <= 14 or I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 20 or Target:TimeToDie() < 35) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Guardian of Azeroth"; end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=cooldown.touch_of_death.remains>58|cooldown.touch_of_death.remains<2|target.time_to_die<20
+    if S.WorldveinResonance:IsCastableP() and (S.TouchOfDeath:CooldownRemainsP() > 58 or S.TouchOfDeath:CooldownRemainsP() < 2 or Target:TimeToDie() < 20) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Worldvein Resonance"; end
     end
-    -- actions.cd+=/blood_fury
+    -- blood_fury
     if HR.CDsON() and S.BloodFury:IsReadyP() then
       if HR.CastSuggested(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Blood Fury"; end
     end
-    -- actions.cd+=/berserking
-    if HR.CDsON() and S.Berserking:IsReadyP() then
+    -- berserking,if=target.time_to_die>183|dot.touch_of_death.remains|target.time_to_die<13
+    if HR.CDsON() and S.Berserking:IsReadyP() and (Target:TimeToDie() > 183 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 13) then
       if HR.CastSuggested(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Berserking"; end
     end
-    -- actions.cd+=/arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
+    -- arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
     if S.ArcaneTorrent:IsReadyP() and (Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5) then
       if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Arcane Torrent"; end
     end
-    -- actions.cd+=/fireblood
+    -- fireblood
     if HR.CDsON() and S.Fireblood:IsReadyP() then
       if HR.CastSuggested(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Fireblood"; end
     end
-    -- actions.cd+=/ancestral_call
+    -- ancestral_call
     if HR.CDsON() and S.AncestralCall:IsReadyP() then
       if HR.CastSuggested(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Ancestral Call"; end
     end
     -- call_action_list,name=tod
     if (true) then
-      local ShouldReturn = ToD(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = ToD(); if ShouldReturn then return ShouldReturn; end
     end
-    -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(cooldown.fists_of_fury.remains<=9&chi>=3&cooldown.whirling_dragon_punch.remains<=14&cooldown.touch_of_death.remains>=90)|target.time_to_die<=15|dot.touch_of_death.remains
-    if S.StormEarthAndFire:IsReadyP() and (S.StormEarthAndFire:Charges() == 2 or (S.FistsOfFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 14 and S.TouchOfDeath:CooldownRemainsP() >= 90) or Target:TimeToDie() <= 15 or Target:DebuffP(S.TouchOfDeath)) then
+    -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(!essence.worldvein_resonance.major|(buff.worldvein_resonance.up|cooldown.worldvein_resonance.remains>cooldown.storm_earth_and_fire.full_recharge_time))&(cooldown.touch_of_death.remains>cooldown.storm_earth_and_fire.full_recharge_time|cooldown.touch_of_death.remains>target.time_to_die)&cooldown.fists_of_fury.remains<=9&chi>=3&cooldown.whirling_dragon_punch.remains<=13|dot.touch_of_death.remains|target.time_to_die<20
+    if S.StormEarthAndFire:IsReadyP() and (S.StormEarthAndFire:Charges() == 2 or (not S.WorldveinResonance:IsAvailable() or (Player:BuffP(S.LifebloodBuff) or S.WorldveinResonance:CooldownRemainsP() > S.StormEarthAndFire:FullRechargeTime())) and (S.TouchOfDeath:CooldownRemainsP() > S.StormEarthAndFire:FullRechargeTime() or S.TouchOfDeath:CooldownRemainsP() > Target:TimeToDie()) and S.FistsOfFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 13 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 20) then
       if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.GCDasOffGCD.StormEarthAndFire) then return "Cast Cooldown Storm, Earth, and Fire"; end
     end
-    -- concentrated_flame,if=dot.concentrated_flame_burn.remains<=2
-    if S.ConcentratedFlame:IsCastableP() and (Player:BuffRemainsP(S.ConcentratedFlameBurn) <= 2) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Concentrated Flame"; end
-    end
-    -- blood_of_the_enemy
+    -- blood_of_the_enemy,if=dot.touch_of_death.remains|target.time_to_die<12
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Blood of the Enemy"; end
+    end
+    -- use_item,if=equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20|!equipped.cyclotronic_blast
+    -- ancestral_call,if=dot.touch_of_death.remains|target.time_to_die<16
+    if S.AncestralCall:IsCastableP() and (Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 16) then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
+    end
+    -- fireblood,if=dot.touch_of_death.remains|target.time_to_die<9
+    if S.Fireblood:IsCastableP() and (Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 9) then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+    end
+    -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&(cooldown.concentrated_flame.remains<=cooldown.touch_of_death.remains&(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains)&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&buff.storm_earth_and_fire.down|dot.touch_of_death.remains)|target.time_to_die<8
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and (S.ConcentratedFlame:CooldownRemainsP() <= S.TouchOfDeath:CooldownRemainsP() and (S.WhirlingDragonPunch:IsAvailable() and not S.WhirlingDragonPunch:CooldownUpP()) and not S.RisingSunKick:CooldownUpP() and not S.FistsOfFury:CooldownUpP() and Player:BuffDownP(S.StormEarthAndFire) or Target:DebuffP(S.TouchOfDeath)) or Target:TimeToDie() < 8) then
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Concentrated Flame"; end
+    end
+    -- use_item,name=pocketsized_computation_device,if=dot.touch_of_death.remains
+    if Everyone.CyclotronicBlastReady() and (Target:DebuffP(S.TouchOfDeath)) then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cyclotronic Blast"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=variable.coral_double_tod_on_use&cooldown.touch_of_death.remains>=23&(debuff.razor_coral_debuff.down|buff.storm_earth_and_fire.remains>13|target.time_to_die-cooldown.touch_of_death.remains<40&cooldown.touch_of_death.remains<23|target.time_to_die<25)
+    if I.AshvanesRazorCoral:IsCastableP() and (bool(VarCoralDoubleTodOnUse) and S.TouchOfDeath:CooldownRemainsP() >= 23 and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() - S.TouchOfDeath:CooldownRemainsP() < 40 and S.TouchOfDeath:CooldownRemainsP() < 23 or Target:TimeToDie() < 25)) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=!variable.coral_double_tod_on_use&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(dot.touch_of_death.remains|cooldown.touch_of_death.remains+9>target.time_to_die&buff.storm_earth_and_fire.up|target.time_to_die<25))
+    if I.AshvanesRazorCoral:IsCastableP() and (not bool(VarCoralDoubleTodOnUse) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchOfDeath) or S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire) or Target:TimeToDie() < 25))) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
     -- the_unbound_force
     if S.TheUnboundForce:IsCastableP() then
@@ -255,19 +287,15 @@ local function APL ()
     if S.PurifyingBlast:IsCastableP() then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Purifying Blast"; end
     end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Reaping Flames"; end
+    end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Focused Azerite Beam"; end
     end
-    -- use_item,name=pocketsized_computation_device,if=dot.touch_of_death.remains
-    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.TouchOfDeath)) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cooldown Cyclotronic Blast"; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=((equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>=20)|!equipped.cyclotronic_blast)&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&buff.storm_earth_and_fire.remains>13|target.time_to_die<21)
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemains() >= 20) or not Everyone.PSCDEquipped()) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() < 21)) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cooldown Ashvane's Razor Coral"; end
-    end
-    -- actions.cd+=/serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
+    -- serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
     if HR.CDsON() and S.Serenity:IsReadyP() and (Player:BuffDownP(S.Serenity) and (S.RisingSunKick:CooldownRemainsP() <= 2 or Target:TimeToDie() <= 12)) then
       if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then return "Cast Cooldown Serenity"; end
     end
@@ -279,73 +307,7 @@ local function APL ()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Ripple In Space"; end
     end
-    -- use_items,if=(equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20)|!equipped.cyclotronic_blast
   end
-  
-  -- Rskless --
-  Rskless = function()
-    -- whirling_dragon_punch
-    if S.WhirlingDragonPunch:IsReady() then
-      if HR.Cast(S.WhirlingDragonPunch) then return "whirling_dragon_punch rskless"; end
-    end
-    -- fists_of_fury
-    if S.FistsOfFury:IsReadyP() then
-      if HR.Cast(S.FistsOfFury) then return "fists_of_fury rskless"; end
-    end
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=buff.storm_earth_and_fire.up|cooldown.whirling_dragon_punch.remains<4
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "rising_sun_kick rskless"; end
-    end
-    -- rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
-    if S.RushingJadeWind:IsReadyP() and (Player:BuffDownP(S.RushingJadeWind) and Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.RushingJadeWind) then return "rushing_jade_wind rskless"; end
-    end
-    -- reverse_harm,if=chi.max-chi>=2
-    if S.ReverseHarm:IsReadyP() and Player:ChiDeficit() >= 2 and Player:HealthPercentage() < 92 then
-      if HR.Cast(S.ReverseHarm) then return "reverse_harm rskless"; end
-    end
-    -- fist_of_the_white_tiger,if=chi<=2
-    if S.FistOfTheWhiteTiger:IsReadyP() and (Player:Chi() <= 2) then
-      if HR.Cast(S.FistOfTheWhiteTiger) then return "fist_of_the_white_tiger rskless"; end
-    end
-    -- energizing_elixir,if=chi<=3&energy<50
-    if S.EnergizingElixir:IsCastableP() and (Player:Chi() <= 3 and Player:Energy() < 50) then
-      if HR.Cast(S.EnergizingElixir) then return "energizing_elixir rskless"; end
-    end
-    -- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.react
-    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and Player:BuffP(S.DanceOfChijiBuff)) then
-      if HR.Cast(S.SpinningCraneKick) then return "spinning_crane_kick rskless"; end
-    end
-    -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm))
-    if S.BlackoutKick:IsReadyP() then
-      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "blackout_kick rskless"; end
-    end
-    -- chi_wave
-    if S.ChiWave:IsReadyP() then
-      if HR.Cast(S.ChiWave) then return "chi_wave rskless"; end
-    end
-    -- chi_burst,if=chi.max-chi>=1&active_enemies=1|chi.max-chi>=2
-    if S.ChiBurst:IsCastableP() and (Player:ChiDeficit() >= 1 and Cache.EnemiesCount[8] == 1 or Player:ChiDeficit() >= 2) then
-      if HR.Cast(S.ChiBurst) then return "chi_burst rskless"; end
-    end
-    -- flying_serpent_kick,if=prev_gcd.1.blackout_kick&chi>3,interrupt=1
-    if S.FlyingSerpentKick:IsCastableP() and (Player:PrevGCD(1, S.BlackoutKick) and Player:Chi() > 3) then
-      if HR.Cast(S.FlyingSerpentKick) then return "flying_serpent_kick rskless"; end
-    end
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi<2
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick2) then return "rising_sun_kick rskless"; end
-    end
-    -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2
-    if S.TigerPalm:IsCastableP() then
-      if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "tiger_palm rskless"; end
-    end
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane) then return "rising_sun_kick rskless"; end
-    end
-  end
-
 
   -- Serenity --
   Serenity = function()
@@ -434,13 +396,13 @@ local function APL ()
     if S.WhirlingDragonPunch:IsReady() then
       if HR.Cast(S.WhirlingDragonPunch) then return "Cast Single Target Whirling Dragon Punch"; end
     end
-    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi>=5
-    if S.RisingSunKick:IsReadyP() and (Player:Chi() >= 5) then
-      if HR.Cast(S.RisingSunKick) then return "Cast Single Target Rising Sun Kick"; end
-    end
     -- actions.st+=/fists_of_fury,if=energy.time_to_max>3
     if S.FistsOfFury:IsReadyP() and (Player:EnergyTimeToMaxPredicted() > 3) then
       if HR.Cast(S.FistsOfFury) then return "Cast Single Target Fists of Fury"; end
+    end
+    -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi>=5
+    if S.RisingSunKick:IsReadyP() and (Player:Chi() >= 5) then
+      if HR.Cast(S.RisingSunKick) then return "Cast Single Target Rising Sun Kick"; end
     end
     -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
     if S.RisingSunKick:IsReadyP() then
@@ -486,8 +448,8 @@ local function APL ()
   end
   
   ToD = function()
-    -- touch_of_death,if=equipped.cyclotronic_blast&target.time_to_die>9&cooldown.cyclotronic_blast.remains<=2
-    if S.TouchOfDeath:IsReadyP() and (Everyone.PSCDEquipped() and Target:TimeToDie() > 9 and I.PocketsizedComputationDevice:CooldownRemains() <= 2) then
+    -- touch_of_death,if=equipped.cyclotronic_blast&target.time_to_die>9&cooldown.cyclotronic_blast.remains<=1
+    if S.TouchOfDeath:IsReadyP() and (Everyone.PSCDEquipped() and Target:TimeToDie() > 9 and I.PocketsizedComputationDevice:CooldownRemains() <= 1) then
       if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath) then return "Cast ToD Touch of Death 1"; end
     end
     -- touch_of_death,if=!equipped.cyclotronic_blast&equipped.dribbling_inkpod&target.time_to_die>9&(target.time_to_pct_30.remains>=130|target.time_to_pct_30.remains<8)
@@ -503,7 +465,7 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     if Everyone.TargetIsValid() then
-      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
   end
 
@@ -512,13 +474,13 @@ local function APL ()
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
 	
-    -- potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.Serenity) or Player:BuffP(S.StormEarthAndFire) or (not S.Serenity:IsAvailable()) or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
+    -- potion,if=buff.serenity.up|dot.touch_of_death.remains|!talent.serenity.enabled&trinket.proc.agility.react|buff.bloodlust.react|target.time_to_die<=60
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.Serenity) or Target:DebuffP(S.TouchOfDeath) or not S.Serenity:IsAvailable() or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
     -- actions+=/call_action_list,name=serenity,if=buff.serenity.up
     if Player:BuffP(S.Serenity) then
-      local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
     end
 	
 	-- prevent energy cap, where possible
@@ -542,20 +504,15 @@ local function APL ()
 	
     -- actions.st=call_action_list,name=cd
     if (true) then
-      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
-    end
-	
-    -- call_action_list,name=rskless,if=active_enemies<3&azerite.open_palm_strikes.enabled&!azerite.glory_of_the_dawn.enabled
-    if (Cache.EnemiesCount[8] < 3 and S.OpenPalmStrikes:AzeriteEnabled() and not S.GloryoftheDawn:AzeriteEnabled()) then
-      local ShouldReturn = Rskless(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- actions+=/call_action_list,name=st,if=active_enemies<3
     if Cache.EnemiesCount[8] < 3 then
-      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
     end;
     -- actions+=/call_action_list,name=aoe,if=active_enemies>=3
     if Cache.EnemiesCount[8] >= 3 then
-      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
