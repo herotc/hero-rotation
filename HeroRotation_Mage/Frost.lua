@@ -58,6 +58,7 @@ Spell.Mage.Frost = {
   FreezingRain                          = Spell(240555),
   Counterspell                          = Spell(2139),
   IncantersFlow                         = Spell(1463),
+  IncantersFlowBuff                     = Spell(116267),
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
   PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
@@ -87,6 +88,8 @@ local I = Item.Mage.Frost;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;
+local IFStacks = 0;
+local IFStacksOld = 0;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -366,14 +369,19 @@ local function APL()
     if S.Ebonbolt:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffDownP(S.BrainFreezeBuff)) then
       if HR.Cast(S.Ebonbolt) then return "ebonbolt 181"; end
     end
+    -- ice_lance,if=buff.brain_freeze.react&(buff.fingers_of_frost.react|prev_gcd.1.flurry)&(buff.icicles.max_stack-buff.icicles.stack)*action.frostbolt.execute_time+action.glacial_spike.cast_time+action.glacial_spike.travel_time<incanters_flow_time_to.5.any
+    -- TODO: Add handling for the Incanter's Flow conditions
+    if S.IceLance:IsCastableP() and (Player:BuffP(S.BrainFreezeBuff) and (Player:BuffP(S.FingersofFrostBuff) or Player:PrevGCDP(1, S.Flurry))) then
+      if HR.Cast(S.IceLance) then return "ice_lance 182"; end
+    end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
     -- TODO: Add handling for the Incanter's Flow conditions
     if S.GlacialSpike:IsReadyP() and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt)) then
-      if HR.Cast(S.GlacialSpike) then return "glacial_spike 182"; end
+      if HR.Cast(S.GlacialSpike) then return "glacial_spike 183"; end
     end
     -- ice_nova
     if S.IceNova:IsCastableP() then
-      if HR.Cast(S.IceNova) then return "ice_nova 183"; end
+      if HR.Cast(S.IceNova) then return "ice_nova 184"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
     if I.TidestormCodex:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
@@ -385,11 +393,11 @@ local function APL()
     end
     -- Manual addition of Ice Lance with FoF proc if not using Glacial Spike
     if S.IceLance:IsCastableP() and (not S.GlacialSpike:IsAvailable() and Player:BuffP(S.FingersofFrostBuff)) then
-      if HR.Cast(S.IceLance) then return "ice_lance 218"; end
+      if HR.Cast(S.IceLance) then return "ice_lance 222"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
-      if HR.Cast(S.Frostbolt) then return "frostbolt 219"; end
+      if HR.Cast(S.Frostbolt) then return "frostbolt 224"; end
     end
     -- call_action_list,name=movement
     -- if (true) then
