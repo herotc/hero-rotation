@@ -166,6 +166,10 @@ local function APL()
       if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
       end
+      -- worldvein_resonance
+      if S.WorldveinResonance:IsCastableP() then
+        if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance precombat"; end
+      end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
         if HR.Cast(S.MemoryofLucidDreams) then return "memory_of_lucid_dreams precombat"; end
