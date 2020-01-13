@@ -402,8 +402,8 @@ local function Essences ()
   if S.MemoryofLucidDreams:IsCastableP() and Player:EnergyPredicted() < 50 and not S.Vendetta:CooldownUpP() then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
   end
-  -- reaping_flames
-  if S.ReapingFlames:IsCastableP() then
+  -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+  if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
     if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Reaping Flames"; end
   end
   return false;
@@ -911,7 +911,7 @@ end
 
 HR.SetAPL(259, APL, Init);
 
--- Last Update: 2020-01-12
+-- Last Update: 2020-01-13
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1034,7 +1034,7 @@ HR.SetAPL(259, APL, Init);
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
--- actions.essences+=/reaping_flames
+-- actions.essences+=/reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
 
 -- # Stealthed Actions
 -- # Nighstalker, or Subt+Exsg on 1T: Snapshot Rupture

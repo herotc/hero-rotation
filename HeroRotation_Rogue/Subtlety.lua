@@ -440,8 +440,8 @@ local function Essences ()
   if S.MemoryofLucidDreams:IsCastableP() and Player:EnergyPredicted() < 40 and Player:BuffP(S.SymbolsofDeath) then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
   end
-  -- reaping_flames
-  if S.ReapingFlames:IsCastableP() then
+  -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+  if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
     if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Reaping Flames"; end
   end
   return false;
@@ -871,7 +871,7 @@ end
 
 HR.SetAPL(261, APL, Init);
 
--- Last Update: 2020-01-12
+-- Last Update: 2020-01-13
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -958,7 +958,7 @@ HR.SetAPL(261, APL, Init);
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance,if=cooldown.symbols_of_death.remains<5|target.time_to_die<18
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
--- actions.essences+=/reaping_flames
+-- actions.essences+=/reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
 --
 -- # Stealth Cooldowns
 -- # Helper Variable
