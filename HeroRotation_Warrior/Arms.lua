@@ -75,6 +75,7 @@ Spell.Warrior.Arms = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
@@ -134,6 +135,10 @@ local function APL()
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
+      end
+      -- worldvein_resonance
+      if S.WorldveinResonance:IsCastableP() then
+        if HR.Cast(S.WorldveinResonance) then return "worldvein_resonance"; end
       end
       -- memory_of_lucid_dreams
       if S.MemoryofLucidDreams:IsCastableP() then
@@ -457,6 +462,10 @@ local function APL()
     -- focused_azerite_beam,if=!debuff.colossus_smash.up&!buff.test_of_might.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff)) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
+    end
+    -- reaping_flames,if=!debuff.colossus_smash.up&!buff.test_of_might.up
+    if S.ReapingFlames:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff)) then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
     end
     -- concentrated_flame,if=!debuff.colossus_smash.up&!buff.test_of_might.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
