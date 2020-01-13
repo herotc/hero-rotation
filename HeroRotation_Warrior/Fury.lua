@@ -229,7 +229,7 @@ local function APL()
       return Movement();
     end
     -- potion,if=buff.guardian_of_azeroth.up|(!essence.condensed_lifeforce.major&target.time_to_die=60)
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and ((S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) or (not S.GuardianofAzeroth:IsAvailable() and Target:TimeToDie == 60)) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and ((S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) or (not S.GuardianofAzeroth:IsAvailable() and Target:TimeToDie() == 60)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
     end
     -- rampage,if=cooldown.recklessness.remains<3
