@@ -378,7 +378,7 @@ local function APL ()
     -- actions.aoe+=/flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
     -- actions.aoe+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|(talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi<4))
     if S.BlackoutKick:IsReadyP() and (not Player:PrevGCD(1, S.BlackoutKick) and (Player:BuffP(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 4))) then
-      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "Cast AoiE Blackout Kick"; end
+      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "Cast AoE Blackout Kick"; end
     end
   end
 
