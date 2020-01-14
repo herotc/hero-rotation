@@ -175,7 +175,7 @@ end
 --- ======= MAIN =======
 -- APL Main
 local function APL ()
-  local Precombat, Rskless, Cooldowns, SingleTarget, Serenity, Aoe, ToD
+  local Precombat, Cooldowns, SingleTarget, Serenity, Aoe, ToD
   -- Unit Update
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
@@ -230,14 +230,6 @@ local function APL ()
     if S.ArcaneTorrent:IsReadyP() and (Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5) then
       if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Arcane Torrent"; end
     end
-    -- fireblood
-    if HR.CDsON() and S.Fireblood:IsReadyP() then
-      if HR.CastSuggested(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Fireblood"; end
-    end
-    -- ancestral_call
-    if HR.CDsON() and S.AncestralCall:IsReadyP() then
-      if HR.CastSuggested(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Ancestral Call"; end
-    end
     -- call_action_list,name=tod
     if (true) then
       ShouldReturn = ToD(); if ShouldReturn then return ShouldReturn; end
@@ -253,15 +245,15 @@ local function APL ()
     -- use_items,if=equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20|!equipped.cyclotronic_blast
     -- ancestral_call,if=dot.touch_of_death.remains|target.time_to_die<16
     if S.AncestralCall:IsCastableP() and (Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 16) then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Ancestral Call"; end
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Ancestral Call"; end
     end
     -- fireblood,if=dot.touch_of_death.remains|target.time_to_die<9
     if S.Fireblood:IsCastableP() and (Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 9) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Fireblood"; end
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Coooldown Fireblood"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&(cooldown.concentrated_flame.remains<=cooldown.touch_of_death.remains&(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains)&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&buff.storm_earth_and_fire.down|dot.touch_of_death.remains)|target.time_to_die<8
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and (S.ConcentratedFlame:CooldownRemainsP() <= S.TouchOfDeath:CooldownRemainsP() and (S.WhirlingDragonPunch:IsAvailable() and not S.WhirlingDragonPunch:CooldownUpP()) and not S.RisingSunKick:CooldownUpP() and not S.FistsOfFury:CooldownUpP() and Player:BuffDownP(S.StormEarthAndFire) or Target:DebuffP(S.TouchOfDeath)) or Target:TimeToDie() < 8) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Concentrated Flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Concentrated Flame"; end
     end
     -- berserking,if=target.time_to_die>183|dot.touch_of_death.remains|target.time_to_die<13
     if HR.CDsON() and S.Berserking:IsReadyP() and (Target:TimeToDie() > 183 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 13) then
@@ -313,7 +305,7 @@ local function APL ()
   Serenity = function()
     -- actions.serenity=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
     if S.RisingSunKick:IsReadyP() and (Cache.EnemiesCount[5] < 3 or Player:PrevGCD(1,S.SpinningCraneKick)) then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick2) then return "rising_sun_kick rskless"; end
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick2) then return "Cast Serentiy Rising Sun Kick"; end
     end
     -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick&!azerite.swift_roundhouse.enabled)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
     if S.FistsOfFury:IsReadyP() and ((Player:HasHeroismP() and Player:PrevGCD(1,S.RisingSunKick) and not S.SwiftRoundhouse:AzeriteEnabled()) or Player:BuffRemainsP(S.Serenity) < 1 or (Cache.EnemiesCount[8] > 1 and Cache.EnemiesCount[8] < 5)) then
@@ -341,7 +333,7 @@ local function APL ()
   Aoe = function()
     -- actions.aoe=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
     if S.RisingSunKick:IsReadyP() and ((S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 5) and S.FistsOfFury:CooldownRemainsP() > 3) then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "rising_sun_kick rskless"; end
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "Cast AoE Rising Sun Kick"; end
     end
     -- actions.aoe=whirling_dragon_punch
     if S.WhirlingDragonPunch:IsReady() then
@@ -377,7 +369,7 @@ local function APL ()
     end
     -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|!combo_break)
     if S.TigerPalm:IsReadyP() and (Player:ChiDeficit() >= 2 and (not S.HitCombo:IsAvailable() or not Player:PrevGCD(1, S.TigerPalm))) then
-      if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "tiger_palm rskless"; end
+      if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "Cast AoE Tiger Palm"; end
     end
     -- actions.st+=/chi_wave,if=!combo_break
     if S.ChiWave:IsReadyP() and (not Player:PrevGCD(1, S.ChiWave)) then
@@ -386,7 +378,7 @@ local function APL ()
     -- actions.aoe+=/flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
     -- actions.aoe+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|(talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi<4))
     if S.BlackoutKick:IsReadyP() and (not Player:PrevGCD(1, S.BlackoutKick) and (Player:BuffP(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 4))) then
-      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "blackout_kick rskless"; end
+      if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "Cast AoiE Blackout Kick"; end
     end
   end
 
