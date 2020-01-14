@@ -66,6 +66,7 @@ Spell.DemonHunter.Havoc = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
@@ -224,13 +225,17 @@ local function APL()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=buff.metamorphosis.up
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff)) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
+    end
+    -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+    if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
     end
   end
   Cooldown = function()
