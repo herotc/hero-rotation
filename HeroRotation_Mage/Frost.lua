@@ -88,8 +88,7 @@ local I = Item.Mage.Frost;
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;
-local IFStacks = 0;
-local IFStacksOld = 0;
+local Mage = HR.Commons.Mage
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -143,6 +142,7 @@ local function APL()
   local Precombat, Essences, Aoe, Cooldowns, Movement, Single, TalentRop
   local BlinkAny = S.Shimmer:IsAvailable() and S.Shimmer or S.Blink
   EnemiesCount = GetEnemiesCount(8)
+  Mage.IFTracker()
   Precombat = function()
     -- flask
     -- food
@@ -371,12 +371,12 @@ local function APL()
     end
     -- ice_lance,if=buff.brain_freeze.react&(buff.fingers_of_frost.react|prev_gcd.1.flurry)&(buff.icicles.max_stack-buff.icicles.stack)*action.frostbolt.execute_time+action.glacial_spike.cast_time+action.glacial_spike.travel_time<incanters_flow_time_to.5.any
     -- TODO: Add handling for the Incanter's Flow conditions
-    if S.IceLance:IsCastableP() and (Player:BuffP(S.BrainFreezeBuff) and (Player:BuffP(S.FingersofFrostBuff) or Player:PrevGCDP(1, S.Flurry))) then
+    if S.IceLance:IsCastableP() and (S.GlacialSpike:IsAvailable() and S.IncantersFlow:IsAvailable() and Player:BuffP(S.BrainFreezeBuff) and (Player:BuffP(S.FingersofFrostBuff) or Player:PrevGCDP(1, S.Flurry)) and (5 - Player:BuffStackP(S.IciclesBuff)) * S.Frostbolt:ExecuteTime() + S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() < Mage.IFTimeToX(5, "any")) then
       if HR.Cast(S.IceLance) then return "ice_lance 182"; end
     end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
     -- TODO: Add handling for the Incanter's Flow conditions
-    if S.GlacialSpike:IsReadyP() and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt)) then
+    if S.GlacialSpike:IsReadyP() and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt) or S.IncantersFlow:IsAvailable() and S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() > Mage.IFTimeToX(5, "up") and S.GlacialSpike:CastTime() and S.GlacialSpike:TravelTime() < Mage.IFTimetoX(4, "down")) then
       if HR.Cast(S.GlacialSpike) then return "glacial_spike 183"; end
     end
     -- ice_nova
