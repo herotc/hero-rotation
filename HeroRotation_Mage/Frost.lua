@@ -48,6 +48,7 @@ Spell.Mage.Frost = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   Shimmer                               = Spell(212653),
   Blink                                 = Spell(1953),
   IceFloes                              = Spell(108839),
@@ -326,6 +327,10 @@ local function APL()
     -- ancestral_call
     if S.AncestralCall:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 109"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 111"; end
     end
   end
   Movement = function()
