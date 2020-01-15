@@ -36,6 +36,8 @@ Spell.Monk.Windwalker = {
   QuakingPalm                           = Spell(107079),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  LightsJudgment                        = Spell(255647),
+  BagofTricks                           = Spell(312411),
 
   -- Abilities
   TigerPalm                             = Spell(100780),
@@ -128,7 +130,22 @@ Item.Monk.Windwalker = {
   LustrousGoldenPlumage                = Item(159617, {13, 14}),
   DribblingInkpod                      = Item(169319, {13, 14}),
   PocketsizedComputationDevice         = Item(167555, {13, 14}),
-  AshvanesRazorCoral                   = Item(169311, {13, 14})
+  AshvanesRazorCoral                   = Item(169311, {13, 14}),
+  -- Gladiator Badges/Medallions
+  NotoriousAspirantsBadge              = Item(167528, {13, 14}),
+  NotoriousGladiatorsBadge             = Item(167380, {13, 14}),
+  SinisterGladiatorsBadge              = Item(165058, {13, 14}),
+  SinisterAspirantsBadge               = Item(165223, {13, 14}),
+  DreadGladiatorsBadge                 = Item(161902, {13, 14}),
+  DreadAspirantsBadge                  = Item(162966, {13, 14}),
+  DreadCombatantsInsignia              = Item(161676, {13, 14}),
+  NotoriousAspirantsMedallion          = Item(167525, {13, 14}),
+  NotoriousGladiatorsMedallion         = Item(167377, {13, 14}),
+  SinisterGladiatorsMedallion          = Item(165055, {13, 14}),
+  SinisterAspirantsMedallion           = Item(165220, {13, 14}),
+  DreadGladiatorsMedallion             = Item(161674, {13, 14}),
+  DreadAspirantsMedallion              = Item(162897, {13, 14}),
+  DreadCombatantsMedallion             = Item(161811, {13, 14}),
 };
 local I = Item.Monk.Windwalker;
 
@@ -189,19 +206,23 @@ local function APL ()
 
   -- Pre Combat --
   Precombat = function()
+    -- flask
+    -- food
+    -- augmentation
+    -- snapshot_stats
     -- potion
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
-    -- variable,name=coral_double_tod_on_use,op=set,value=equipped.ashvanes_razor_coral&(equipped.cyclotronic_blast|equipped.lustrous_golden_plumage)
+    -- variable,name=coral_double_tod_on_use,op=set,value=equipped.ashvanes_razor_coral&(equipped.cyclotronic_blast|equipped.lustrous_golden_plumage|equipped.gladiators_badge|equipped.gladiators_medallion)
     if (true) then
-      VarCoralDoubleTodOnUse = num(I.AshvanesRazorCoral:IsEquipped() and (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped()))
+      VarCoralDoubleTodOnUse = num(I.AshvanesRazorCoral:IsEquipped() and (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped()))
     end
-    -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
+    -- chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
     if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
       if HR.Cast(S.ChiBurst) then return "Cast Pre-Combat Chi Burst"; end
     end
-    -- actions.precombat+=/chi_wave,if=talent.fist_of_the_white_tiger.enabled
+    -- chi_wave,if=talent.fist_of_the_white_tiger.enabled
     if S.ChiWave:IsReadyP() then
       if HR.Cast(S.ChiWave) then return "Cast Pre-Combat Chi Wave"; end
     end
@@ -236,6 +257,14 @@ local function APL ()
     -- arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
     if S.ArcaneTorrent:IsReadyP() and (Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() > 0.5) then
       if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Arcane Torrent"; end
+    end
+    -- lights_judgment
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Light's Judgment"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks"; end
     end
     -- call_action_list,name=tod
     if (true) then
@@ -274,8 +303,8 @@ local function APL ()
     if I.AshvanesRazorCoral:IsEquipReady() and (bool(VarCoralDoubleTodOnUse) and S.TouchOfDeath:CooldownRemainsP() >= 23 and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() - S.TouchOfDeath:CooldownRemainsP() < 40 and S.TouchOfDeath:CooldownRemainsP() < 23 or Target:TimeToDie() < 25)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=!variable.coral_double_tod_on_use&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(dot.touch_of_death.remains|cooldown.touch_of_death.remains+9>target.time_to_die&buff.storm_earth_and_fire.up|target.time_to_die<25))
-    if I.AshvanesRazorCoral:IsEquipReady() and (not bool(VarCoralDoubleTodOnUse) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchOfDeath) or S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire) or Target:TimeToDie() < 25))) then
+    -- use_item,name=ashvanes_razor_coral,if=!variable.coral_double_tod_on_use&(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(debuff.razor_coral_debuff.down|dot.touch_of_death.remains|(cooldown.touch_of_death.remains+9>target.time_to_die&buff.storm_earth_and_fire.up)|target.time_to_die<21)
+    if I.AshvanesRazorCoral:IsEquipReady() and (not bool(VarCoralDoubleTodOnUse) and (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.TouchOfDeath) or (S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire)) or Target:TimeToDie() < 21)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
     -- the_unbound_force
@@ -338,43 +367,43 @@ local function APL ()
 
   -- Area of Effect --
   Aoe = function()
-    -- actions.aoe=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
+    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
     if S.RisingSunKick:IsReadyP() and ((S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 5) and S.FistsOfFury:CooldownRemainsP() > 3) then
       if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfRisingSunKick) then return "Cast AoE Rising Sun Kick"; end
     end
-    -- actions.aoe=whirling_dragon_punch
+    -- whirling_dragon_punch
     if S.WhirlingDragonPunch:IsReady() then
       if HR.Cast(S.WhirlingDragonPunch) then return "Cast AoE Whirling Dragon Punch"; end
     end
-    -- actions.aoe+=/energizing_elixir,if=!prev_gcd.1.tiger_palm&chi<=1&energy<50
+    -- energizing_elixir,if=!prev_gcd.1.tiger_palm&chi<=1&energy<50
     if S.EnergizingElixir:IsReadyP() and (not Player:PrevGCD(1, S.TigerPalm) and Player:Chi() <= 1 and Player:EnergyPredicted() < 50) then
       if HR.Cast(S.EnergizingElixir) then return "Cast AoE Energizing Elixir"; end
     end
-    -- actions.aoe+=/fists_of_fury,if=energy.time_to_max>3
+    -- fists_of_fury,if=energy.time_to_max>3
     if S.FistsOfFury:IsReadyP() and (Player:EnergyTimeToMaxPredicted() > 3) then
       if HR.Cast(S.FistsOfFury) then return "Cast AoE Fists of Fury"; end
     end
-    -- actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.down
+    -- rushing_jade_wind,if=buff.rushing_jade_wind.down
      if S.RushingJadeWind:IsReadyP() and (Player:BuffDownP(S.RushingJadeWind)) then
       if HR.Cast(S.RushingJadeWind) then return "Cast AoE Rushing Jade Wind"; end
     end
-    -- actions.aoe+=/spinning_crane_kick,if=combo_strike&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
+    -- spinning_crane_kick,if=combo_strike&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
     if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsOfFury:CooldownRemainsP() > 6) and (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemainsP() > 2)) or Player:EnergyTimeToMaxPredicted() <= 3)) then
       if HR.Cast(S.SpinningCraneKick) then return "Cast AoE Spinning Crane Kick"; end
     end
-    -- actions.aoe+=/reverse_harm,if=chi.max-chi>=2
+    -- reverse_harm,if=chi.max-chi>=2
     if S.ReverseHarm:IsReady() and Player:HealthPercentage() < 92 and (Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "Cast Reverse Harm"; end
     end
-    -- actions.aoe+=/chi_burst,if=chi<=3
+    -- chi_burst,if=chi<=3
     if S.ChiBurst:IsReadyP() and (Player:ChiDeficit() <= 3) then
       if HR.Cast(S.ChiBurst) then return "Cast AoE Chi Burst"; end
     end  
-    -- actions.aoe+=/fist_of_the_white_tiger,if=chi.max-chi>=3
+    -- fist_of_the_white_tiger,if=chi.max-chi>=3
     if S.FistOfTheWhiteTiger:IsReadyP() and (Player:ChiDeficit() >= 3) then
       if HR.Cast(S.FistOfTheWhiteTiger) then return "Cast AoE Fist of the White Tiger"; end
     end
-    -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|!combo_break)
+    -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|!combo_break)
     if S.TigerPalm:IsReadyP() and (Player:ChiDeficit() >= 2 and (not S.HitCombo:IsAvailable() or not Player:PrevGCD(1, S.TigerPalm))) then
       if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfTigerPalm) then return "Cast AoE Tiger Palm"; end
     end
@@ -382,8 +411,8 @@ local function APL ()
     if S.ChiWave:IsReadyP() and (not Player:PrevGCD(1, S.ChiWave)) then
       if HR.Cast(S.ChiWave) then return "Cast AoE Chi Wave"; end
     end
-    -- actions.aoe+=/flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
-    -- actions.aoe+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|(talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi<4))
+    -- flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
+    -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|(talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi<4))
     if S.BlackoutKick:IsReadyP() and (not Player:PrevGCD(1, S.BlackoutKick) and (Player:BuffP(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and Player:Chi() < 4))) then
       if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane, EvaluateTargetIfBlackoutKick) then return "Cast AoE Blackout Kick"; end
     end
@@ -470,19 +499,18 @@ local function APL ()
 
   -- In Combat
   if Everyone.TargetIsValid() then
+    -- auto_attack
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
-	
+    -- touch_of_karma,interval=90,pct_health=0.5
     -- potion,if=buff.serenity.up|dot.touch_of_death.remains|!talent.serenity.enabled&trinket.proc.agility.react|buff.bloodlust.react|target.time_to_die<=60
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.Serenity) or Target:DebuffP(S.TouchOfDeath) or not S.Serenity:IsAvailable() or Player:HasHeroismP() or Target:TimeToDie() <= 60) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
-    -- actions+=/call_action_list,name=serenity,if=buff.serenity.up
+    -- call_action_list,name=serenity,if=buff.serenity.up
     if Player:BuffP(S.Serenity) then
       ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
     end
-	
-	-- prevent energy cap, where possible
     -- reverse_harm,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2))&chi.max-chi>=2
     if S.ReverseHarm:IsReadyP() and Player:HealthPercentage() < 92 and ((Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2)) and Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm) then return "Cast Everyone Reverse Harm"; end
@@ -495,12 +523,10 @@ local function APL ()
     if S.TigerPalm:IsReadyP() and (not Player:PrevGCD(1, S.TigerPalm) and (Player:EnergyTimeToMaxPredicted() < 1 or (S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2) or (Player:EnergyTimeToMaxPredicted() < 4 and S.FistsOfFury:CooldownRemainsP() < 1.5)) and Player:ChiDeficit() >= 2 and Target:DebuffDownP(S.TouchOfDeath)) then
       if HR.Cast(S.TigerPalm) then return "Cast Everyone Tiger Palm"; end
     end
-	
     -- chi_wave,if=!talent.fist_of_the_white_tiger.enabled&time<=3
     if S.ChiWave:IsReadyP() and (not S.FistOfTheWhiteTiger:IsAvailable() and HL.CombatTime() <= 3) then
       if HR.Cast(S.ChiWave) then return "Cast Everyone Chi Wave"; end
     end
-	
     -- actions.st=call_action_list,name=cd
     if (true) then
       ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
