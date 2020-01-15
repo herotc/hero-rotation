@@ -30,6 +30,7 @@ Spell.Druid.Guardian = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   Barkskin                              = Spell(22812),
   LunarBeam                             = Spell(204066),
   BristlingFur                          = Spell(155835),
@@ -270,6 +271,10 @@ local function APL()
     -- ancestral_call
     if S.AncestralCall:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 22"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 24"; end
     end
     -- Defensives and Bristling Fur
     if IsTanking and Player:BuffP(S.BearForm) then
