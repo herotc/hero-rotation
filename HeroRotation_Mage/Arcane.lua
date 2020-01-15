@@ -46,6 +46,7 @@ Spell.Mage.Arcane = {
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   PresenceofMind                        = Spell(205025),
   PresenceofMindBuff                    = Spell(205025),
   BerserkingBuff                        = Spell(26297),
@@ -319,6 +320,10 @@ local function APL()
     -- ancestral_call
     if S.AncestralCall:IsCastableP() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 221"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 222"; end
     end
     -- presence_of_mind,if=(talent.rune_of_power.enabled&buff.rune_of_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time)|buff.arcane_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
     -- Manually added requirement that buffs have >0 time remaining and added 0.5s to the calculations to account for lag and player reaction
