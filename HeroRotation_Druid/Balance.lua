@@ -75,6 +75,7 @@ Spell.Druid.Balance = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696)
@@ -141,6 +142,11 @@ end
 local function bool(val)
   return val ~= 0
 end
+
+HL:RegisterForEvent(function()
+  S.ConcentratedFlame:RegisterInFlight();
+end, "LEARNED_SPELL_IN_TAB")
+S.ConcentratedFlame:RegisterInFlight()
 
 local function FutureAstralPower()
   local AstralPower=Player:AstralPower()
@@ -351,17 +357,21 @@ local function APL()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
-    -- concentrated_flame
-    if S.ConcentratedFlame:IsCastableP() then
+    -- concentrated_flame,if=(!buff.ca_inc.up|stack=2)&!action.concentrated_flame_missile.in_flight,target_if=!dot.concentrated_flame_burn.ticking
+    if S.ConcentratedFlame:IsCastableP() and ((Player:BuffDownP(CaInc()) or S.ConcentratedFlame:ChargesP() == 2) and not S.ConcentratedFlame:InFlight() and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
-    -- the_unbound_force,if=buff.reckless_force.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) and DoTsUp()) then
+    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<5,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    if S.TheUnboundForce:IsCastableP() and ((Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceBuff) < 5)and DoTsUp()) then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 172" end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=!buff.ca_inc.up,target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(CaInc()) and DoTsUp()) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
+    end
+    -- reaping_flames,if=!buff.ca_inc.up
+    if S.ReapingFlames:IsCastableP() and (Player:BuffDownP(CaInc())) then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 191"; end
     end
     -- focused_azerite_beam,if=(!variable.az_ss|!buff.ca_inc.up),target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if S.FocusedAzeriteBeam:IsCastableP() and ((not bool(VarAzSs) or Player:BuffDownP(CaInc())) and DoTsUp()) then
