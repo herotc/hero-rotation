@@ -60,6 +60,7 @@ Spell.Warrior.Arms = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   Avatar                                = Spell(107574),
   Massacre                              = Spell(281001),
   Pummel                                = Spell(6552),
@@ -430,6 +431,10 @@ local function APL()
     -- ancestral_call,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
     if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
+    end
+    -- bag_of_tricks,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
+    if S.BagofTricks:IsCastableP() and HR.CDsON() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 379"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<20.1&buff.memory_of_lucid_dreams.up&cooldown.memory_of_lucid_dreams.remains<117)|(target.health.pct<30.1&debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major)|(!debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)|target.time_to_die<30
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 20.1 and Player:BuffP(S.MemoryofLucidDreams) and S.MemoryofLucidDreams:CooldownRemainsP() < 117) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff) and not S.MemoryofLucidDreams:IsAvailable()) or (Target:DebuffDownP(S.ConductiveInkDebuff) and not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff)) or Target:TimeToDie() < 30) then
