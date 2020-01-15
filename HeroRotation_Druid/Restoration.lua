@@ -28,6 +28,7 @@ Spell.Druid.Restoration = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   BalanceAffinity                       = Spell(197632),
   FeralAffinity                         = Spell(197490),
   CatForm                               = Spell(768),
@@ -286,6 +287,10 @@ local function APL()
       -- ancestral_call
       if S.AncestralCall:IsCastableP() then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 41"; end
+      end
+      -- bag_of_tricks
+      if S.BagofTricks:IsCastableP() then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 42"; end
       end
     end
     -- use_item,effect_name=cyclotronic_blast,if=!buff.prowl.up&!buff.shadowmeld.up
