@@ -65,6 +65,7 @@ Spell.Hunter.Survival = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   Carve                                 = Spell(187708),
@@ -78,6 +79,7 @@ Spell.Hunter.Survival = {
   TermsofEngagement                     = Spell(265895),
   VipersVenom                           = Spell(268501),
   AlphaPredator                         = Spell(269737),
+  BirdsofPrey                           = Spell(260331),
   ArcaneTorrent                         = Spell(50613),
   RazorCoralDebuff                      = Spell(303568)
 };
@@ -173,6 +175,18 @@ local function EvaluateTargetIfFilterRaptorStrike537(TargetUnit)
   return TargetUnit:DebuffStackP(S.LatentPoisonDebuff)
 end
 
+local function EvaluateTargetIfKillCommand543(TargetUnit)
+  return (S.KillCommand:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax())
+end
+
+local function EvaluateTargetIfKillCommand545(TargetUnit)
+  return (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() and (Player:BuffStackP(S.MongooseFuryBuff) < 5 or Player:Focus() < S.MongooseBite:Cost()))
+end
+
+local function EvaluateTargetIfKillCommand547(TargetUnit)
+  return (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 15 < Player:FocusMax())
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Apst, Apwfi, Cds, Cleave, St, Wfi
@@ -188,21 +202,25 @@ local function APL()
     end
     -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 6"; end
-      end
       -- use_item,name=azsharas_font_of_power
       if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 7"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 4"; end
       end
       -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
       if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 8"; end
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 5"; end
       end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 9"; end
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 6"; end
+      end
+      -- worldvein_resonance
+      if S.WorldveinResonance:IsCastableP() then
+        if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 7"; end
+      end
+      -- potion
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 8"; end
       end
       -- steel_trap
       if S.SteelTrap:IsCastableP() and Player:DebuffDownP(S.SteelTrapDebuff) then
@@ -227,25 +245,25 @@ local function APL()
     if S.FlankingStrike:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.FlankingStrike:ExecuteTime()) < Player:FocusMax()) then
       if HR.Cast(S.FlankingStrike) then return "flanking_strike 34"; end
     end
-    -- kill_command,if=full_recharge_time<1.5*gcd&focus+cast_regen<focus.max-10
-    if S.KillCommand:IsCastableP() and (S.KillCommand:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() - 10) then
-      if HR.Cast(S.KillCommand) then return "kill_command 42"; end
+    -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<1.5*gcd&focus+cast_regen<focus.max
+    if S.KillCommand:IsCastableP() then
+      if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand543) then return "kill_command 42"; end
     end
     -- steel_trap,if=focus+cast_regen<focus.max
     if S.SteelTrap:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.SteelTrap:ExecuteTime()) < Player:FocusMax()) then
       if HR.Cast(S.SteelTrap) then return "steel_trap 54"; end
     end
-    -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up|!dot.wildfire_bomb.ticking&buff.mongoose_fury.stack<1)
-    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffStackP(S.MongooseFuryBuff) < 1)) then
+    -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up|!dot.wildfire_bomb.ticking&buff.mongoose_fury.stack<1)|time_to_die<18&!dot.wildfire_bomb.ticking
+    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffStackP(S.MongooseFuryBuff) < 1) or Target:TimeToDie() < 18 and Target:DebuffDownP(S.WildfireBombDebuff)) then
       if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 64"; end
     end
     -- serpent_sting,if=!dot.serpent_sting.ticking&!buff.coordinated_assault.up
     if S.SerpentSting:IsReadyP() and (Target:DebuffDownP(S.SerpentStingDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff)) then
       if HR.Cast(S.SerpentSting) then return "serpent_sting 90"; end
     end
-    -- kill_command,if=focus+cast_regen<focus.max&(buff.mongoose_fury.stack<5|focus<action.mongoose_bite.cost)
-    if S.KillCommand:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() and (Player:BuffStackP(S.MongooseFuryBuff) < 5 or Player:Focus() < S.MongooseBite:Cost())) then
-      if HR.Cast(S.KillCommand) then return "kill_command 96"; end
+    -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(buff.mongoose_fury.stack<5|focus<action.mongoose_bite.cost)
+    if S.KillCommand:IsCastableP() then
+      if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand545) then return "kill_command 96"; end
     end
     -- serpent_sting,if=refreshable&!buff.coordinated_assault.up&buff.mongoose_fury.stack<5
     if S.SerpentSting:IsReadyP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) and Player:BuffStackP(S.MongooseFuryBuff) < 5) then
@@ -423,6 +441,10 @@ local function APL()
     if S.WorldveinResonance:IsCastableP() then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 348"; end
     end
+    -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+    if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 350"; end
+    end
   end
   Cleave = function()
     -- variable,name=carve_cdr,op=setif,value=active_enemies,value_else=5,condition=active_enemies<5
@@ -517,16 +539,16 @@ local function APL()
     if S.MongooseBite:IsReadyP() and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffRemainsP(S.CoordinatedAssaultBuff) < 1.5 * Player:GCD() or Player:BuffP(S.BlurofTalonsBuff) and Player:BuffRemainsP(S.BlurofTalonsBuff) < 1.5 * Player:GCD())) then
       if HR.Cast(S.MongooseBite) then return "mongoose_bite 567"; end
     end
-    -- kill_command,if=focus+cast_regen<focus.max
-    if S.KillCommand:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 15 < Player:FocusMax()) then
-      if HR.Cast(S.KillCommand) then return "kill_command 568"; end
+    -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
+    if S.KillCommand:IsCastableP() then
+      if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand547) then return "kill_command 568"; end
     end
     -- steel_trap,if=focus+cast_regen<focus.max
     if S.SteelTrap:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.SteelTrap:ExecuteTime()) < Player:FocusMax()) then
       if HR.Cast(S.SteelTrap) then return "steel_trap 577"; end
     end
-    -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up|!dot.wildfire_bomb.ticking&buff.mongoose_fury.stack<1)
-    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffStackP(S.MongooseFuryBuff) < 1)) then
+    -- wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up|!dot.wildfire_bomb.ticking&buff.mongoose_fury.stack<1)|time_to_die<18&!dot.wildfire_bomb.ticking
+    if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffStackP(S.MongooseFuryBuff) < 1) or Target:TimeToDie() < 18 and Target:DebuffDownP(S.WildfireBombDebuff)) then
       if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 587"; end
     end
     -- mongoose_bite,if=buff.mongoose_fury.stack>5&!cooldown.coordinated_assault.remains
@@ -657,6 +679,10 @@ local function APL()
     if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
+    -- mongoose_bite,if=talent.alpha_predator.enabled&target.time_to_die<10|target.time_to_die<5
+    if S.MongooseBite:IsReadyP() and (S.AlphaPredator:IsAvailable() and Target:TimeToDie() < 10 or Target:TimeToDie() < 5) then
+      if HR.Cast(S.MongooseBite) then return "mongoose_bite 999"; end
+    end
     -- call_action_list,name=apwfi,if=active_enemies<3&talent.chakrams.enabled&talent.alpha_predator.enabled
     if (Cache.EnemiesCount[8] < 3 and S.Chakrams:IsAvailable() and S.AlphaPredator:IsAvailable()) then
       local ShouldReturn = Apwfi(); if ShouldReturn then return ShouldReturn; end
@@ -681,8 +707,8 @@ local function APL()
     if (Cache.EnemiesCount[8] < 3 and not S.AlphaPredator:IsAvailable() and S.WildfireInfusion:IsAvailable()) then
       local ShouldReturn = Wfi(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=cleave,if=active_enemies>1
-    if (Cache.EnemiesCount[8] > 1) then
+    -- call_action_list,name=cleave,if=active_enemies>1&!talent.birds_of_prey.enabled|active_enemies>2
+    if (Cache.EnemiesCount[8] > 1 and not S.BirdsofPrey:IsAvailable() or Cache.EnemiesCount[8] > 2) then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
     -- concentrated_flame
