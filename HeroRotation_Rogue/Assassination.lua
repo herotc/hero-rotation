@@ -27,6 +27,7 @@ Spell.Rogue.Assassination = {
   AncestralCall         = Spell(274738),
   ArcanePulse           = Spell(260364),
   ArcaneTorrent         = Spell(25046),
+  BagofTricks           = Spell(312411),
   Berserking            = Spell(26297),
   BloodFury             = Spell(20572),
   Fireblood             = Spell(265221),
@@ -891,6 +892,10 @@ local function APL ()
       if S.LightsJudgment:IsCastableP("Melee") then
         if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
       end
+      -- actions+=/bag_of_tricks
+      if S.BagofTricks:IsCastableP("Melee") then
+        if HR.Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Bag of Tricks"; end
+      end
     end
     -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
     if S.PoisonedKnife:IsCastable(30) and not Player:IsStealthedP(true, true)
@@ -911,7 +916,7 @@ end
 
 HR.SetAPL(259, APL, Init);
 
--- Last Update: 2020-01-13
+-- Last Update: 2020-01-16
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -937,6 +942,7 @@ HR.SetAPL(259, APL, Init);
 -- actions+=/arcane_torrent,if=energy.deficit>=15+variable.energy_regen_combined
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
+-- actions+=/bag_of_tricks
 
 -- # Cooldowns
 -- actions.cds=use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&(cooldown.vendetta.remains<?cooldown.toxic_blade.remains)<10+10*equipped.ashvanes_razor_coral&!debuff.vendetta.up&!debuff.toxic_blade.up

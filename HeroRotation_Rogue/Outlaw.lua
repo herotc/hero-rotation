@@ -30,6 +30,7 @@ Spell.Rogue.Outlaw = {
   AncestralCall                   = Spell(274738),
   ArcanePulse                     = Spell(260364),
   ArcaneTorrent                   = Spell(25046),
+  BagofTricks                     = Spell(312411),
   Berserking                      = Spell(26297),
   BloodFury                       = Spell(20572),
   Fireblood                       = Spell(265221),
@@ -646,6 +647,10 @@ local function APL ()
     if S.LightsJudgment:IsCastableP(S.SinisterStrike) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Lights Judgment"; end
     end
+    -- actions+=/bag_of_tricks
+    if S.BagofTricks:IsCastableP("Melee") then
+      if HR.Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials) then return "Cast Bag of Tricks"; end
+    end
     -- OutofRange Pistol Shot
     if not Target:IsInRange(BladeFlurryRange) and S.PistolShot:IsCastable(20) and not Player:IsStealthedP(true, true)
       and Player:EnergyDeficitPredicted() < 25 and (Player:ComboPointsDeficit() >= 1 or EnergyTimeToMaxRounded() <= 1.2) then
@@ -661,7 +666,7 @@ end
 
 HR.SetAPL(260, APL, Init);
 
--- Last Update: 2020-01-13
+-- Last Update: 2020-01-16
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -703,6 +708,7 @@ HR.SetAPL(260, APL, Init);
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
+-- actions+=/bag_of_tricks
 --
 -- # Cooldowns
 -- actions.cds=call_action_list,name=essences,if=!stealthed.all
