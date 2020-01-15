@@ -49,6 +49,7 @@ Spell.Warrior.Fury = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
   ColdSteelHotBlood                     = Spell(288080),
@@ -307,6 +308,10 @@ local function APL()
     -- ancestral_call,if=buff.recklessness.up
     if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 134"; end
+    end
+    -- bag_of_tricks,if=buff.recklessness.up
+    if S.BagofTricks:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 136"; end
     end
     -- run_action_list,name=single_target
     if (true) then
