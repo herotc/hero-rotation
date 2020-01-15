@@ -264,11 +264,11 @@ local function APL ()
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Cyclotronic Blast"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=variable.coral_double_tod_on_use&cooldown.touch_of_death.remains>=23&(debuff.razor_coral_debuff.down|buff.storm_earth_and_fire.remains>13|target.time_to_die-cooldown.touch_of_death.remains<40&cooldown.touch_of_death.remains<23|target.time_to_die<25)
-    if I.AshvanesRazorCoral:IsCastableP() and (bool(VarCoralDoubleTodOnUse) and S.TouchOfDeath:CooldownRemainsP() >= 23 and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() - S.TouchOfDeath:CooldownRemainsP() < 40 and S.TouchOfDeath:CooldownRemainsP() < 23 or Target:TimeToDie() < 25)) then
+    if I.AshvanesRazorCoral:IsEquipReady() and (bool(VarCoralDoubleTodOnUse) and S.TouchOfDeath:CooldownRemainsP() >= 23 and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() - S.TouchOfDeath:CooldownRemainsP() < 40 and S.TouchOfDeath:CooldownRemainsP() < 23 or Target:TimeToDie() < 25)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=!variable.coral_double_tod_on_use&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(dot.touch_of_death.remains|cooldown.touch_of_death.remains+9>target.time_to_die&buff.storm_earth_and_fire.up|target.time_to_die<25))
-    if I.AshvanesRazorCoral:IsCastableP() and (not bool(VarCoralDoubleTodOnUse) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchOfDeath) or S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire) or Target:TimeToDie() < 25))) then
+    if I.AshvanesRazorCoral:IsEquipReady() and (not bool(VarCoralDoubleTodOnUse) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchOfDeath) or S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire) or Target:TimeToDie() < 25))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
     -- the_unbound_force
