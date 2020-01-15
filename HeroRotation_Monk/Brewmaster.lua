@@ -22,7 +22,9 @@ local HR = HeroRotation
 -- Spells
 if not Spell.Monk then Spell.Monk = {} end
 Spell.Monk.Brewmaster = {
+  AncestralCall                         = Spell(274738),
   ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BlackoutCombo                         = Spell(196736),
   BlackoutComboBuff                     = Spell(228563),
@@ -36,7 +38,9 @@ Spell.Monk.Brewmaster = {
   ChiWave                               = Spell(115098),
   DampenHarm                            = Spell(122278),
   DampenHarmBuff                        = Spell(122278),
+  ExpelHarm                             = Spell(115072),
   ExplodingKeg                          = Spell(214326),
+  Fireblood                             = Spell(265221),
   FortifyingBrew                        = Spell(115203),
   FortifyingBrewBuff                    = Spell(115203),
   InvokeNiuzaotheBlackOx                = Spell(132578),
@@ -44,16 +48,17 @@ Spell.Monk.Brewmaster = {
   IronskinBrewBuff                      = Spell(215479),
   KegSmash                              = Spell(121253),
   LightBrewing                          = Spell(196721),
+  LightsJudgment                        = Spell(255647),
   PotentKick                            = Spell(213047),
   PurifyingBrew                         = Spell(119582),
   RushingJadeWind                       = Spell(116847),
+  SpearHandStrike                       = Spell(116705),
   SpecialDelivery                       = Spell(196730),
   TigerPalm                             = Spell(100780),
-  SpearHandStrike                       = Spell(116705),
+  -- Stagger Levels
   HeavyStagger                          = Spell(124273),
   ModerateStagger                       = Spell(124274),
   LightStagger                          = Spell(124275),
-  ExpelHarm                             = Spell(115072),
   -- Essences
   BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
   MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
@@ -168,7 +173,7 @@ end
 
 -- compute healing available from orbs, only 
 local function HealingSphereHealingAvailable()
-	return 1.5 * Player:AttackPowerDamageMod() * (1 + Player:VersatilityDmgPct()/100) * S.ExpelHarm:Count()
+  return 1.5 * Player:AttackPowerDamageMod() * (1 + Player:VersatilityDmgPct()/100) * S.ExpelHarm:Count()
 end
 
 --- ======= ACTION LISTS =======
@@ -184,8 +189,8 @@ local function APL()
 
   local function Defensives()
     if S.SuppressingPulse:IsCastableP() then
-	  if HR.Cast(S.SuppressingPulse, true) then return "suppressing pulse"; end
-	end
+      if HR.Cast(S.SuppressingPulse, true) then return "suppressing pulse"; end
+    end
     -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
     -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
     -- Note: Extra handling of the charge management only while tanking.
@@ -207,14 +212,27 @@ local function APL()
 
   --- Out of Combat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
+    -- flask
+    -- food
+    -- augmentation
+    -- snapshot_stats
     -- potion
     if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.SuperiorBattlePotionOfAgility) then return ""; end
+    end
+    -- chi_burst
+    if S.ChiBurst:IsCastableP(10) then
+      if HR.Cast(S.ChiBurst) then return ""; end
+    end
+    -- chi_wave
+    if S.ChiWave:IsCastableP(25) then
+      if HR.Cast(S.ChiWave) then return ""; end
     end
   end
 
   --- In Combat
   if Everyone.TargetIsValid() then
+    -- auto_attack
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
     -- Defensives
@@ -236,15 +254,28 @@ local function APL()
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BloodFury, Settings.Brewmaster.OffGCDasOffGCD.BloodFury) then return ""; end
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- berserking
     if S.Berserking:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Berserking, Settings.Brewmaster.OffGCDasOffGCD.Berserking) then return ""; end
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
     end
     -- lights_judgment
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
     -- fireblood
+    if S.Fireblood:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
     -- ancestral_call
+    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+    end
     -- invoke_niuzao_the_black_ox
     if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and HR.CDsON() and Target:TimeToDie() > 25 then
       if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
