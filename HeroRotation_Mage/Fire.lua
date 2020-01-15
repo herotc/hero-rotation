@@ -42,6 +42,7 @@ Spell.Mage.Fire = {
   Berserking                            = Spell(26297),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   Scorch                                = Spell(2948),
   HeatingUpBuff                         = Spell(48107),
   HotStreakBuff                         = Spell(48108),
@@ -312,6 +313,10 @@ local function APL()
     -- ancestral_call
     if S.AncestralCall:IsCastableP() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 296"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 298"; end
     end
     -- flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react&!azerite.blaster_master.enabled
     if S.Flamestrike:IsCastableP() and (((S.FlamePatch:IsAvailable() and EnemiesCount > 2) or EnemiesCount > 6) and Player:BuffP(S.HotStreakBuff) and not S.BlasterMaster:AzeriteEnabled()) then
