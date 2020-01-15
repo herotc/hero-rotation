@@ -153,10 +153,6 @@ local function APL()
     -- food
     -- snapshot_stats
     if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 12"; end
-      end
       -- hunters_mark
       if S.HuntersMark:IsCastableP() and Target:DebuffDown(S.HuntersMarkDebuff) then
         if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark) then return "hunters_mark 14"; end
@@ -184,6 +180,10 @@ local function APL()
       -- trueshot,precast_time=1.5,if=active_enemies>2
       if S.Trueshot:IsCastableP() and Player:BuffDownP(S.TrueshotBuff) and (EnemiesCount > 2) then
         if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot 20"; end
+      end
+      -- potion
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 12"; end
       end
       -- aimed_shot,if=active_enemies<3
       if S.AimedShot:IsReadyP() and (EnemiesCount < 3) then
