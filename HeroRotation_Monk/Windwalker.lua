@@ -170,6 +170,13 @@ local function EvaluateTargetIfTigerPalm(TargetUnit)
   return (not Player:PrevGCD(1, S.TigerPalm) and Player:ChiDeficit() >= 2)
 end
 
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
 
 -- Action Lists --
 --- ======= MAIN =======
@@ -188,7 +195,7 @@ local function APL ()
     end
     -- variable,name=coral_double_tod_on_use,op=set,value=equipped.ashvanes_razor_coral&(equipped.cyclotronic_blast|equipped.lustrous_golden_plumage)
     if (true) then
-      VarCoralDoubleTodOnUse = bool(I.AshvanesRazorCoral:IsEquipped() and (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped()))
+      VarCoralDoubleTodOnUse = num(I.AshvanesRazorCoral:IsEquipped() and (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped()))
     end
     -- actions.precombat+=/chi_burst,if=(!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled)
     if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
