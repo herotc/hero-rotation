@@ -44,6 +44,7 @@ Spell.Warrior.Protection = {
   LightsJudgment                        = Spell(255647),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   IgnorePain                            = Spell(190456),
   Avatar                                = Spell(107574),
   LastStand                             = Spell(12975),
@@ -338,6 +339,10 @@ local function APL()
     -- ancestral_call
     if S.AncestralCall:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 101"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 102"; end
     end
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
