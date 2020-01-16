@@ -303,8 +303,8 @@ local function APL ()
     if I.AshvanesRazorCoral:IsEquipReady() and (bool(VarCoralDoubleTodOnUse) and S.TouchOfDeath:CooldownRemainsP() >= 23 and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthAndFire) > 13 or Target:TimeToDie() - S.TouchOfDeath:CooldownRemainsP() < 40 and S.TouchOfDeath:CooldownRemainsP() < 23 or Target:TimeToDie() < 25)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=!variable.coral_double_tod_on_use&(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(debuff.razor_coral_debuff.down|dot.touch_of_death.remains|(cooldown.touch_of_death.remains+9>target.time_to_die&buff.storm_earth_and_fire.up)|target.time_to_die<21)
-    if I.AshvanesRazorCoral:IsEquipReady() and (not bool(VarCoralDoubleTodOnUse) and (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.TouchOfDeath) or (S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire)) or Target:TimeToDie() < 21)) then
+    -- use_item,name=ashvanes_razor_coral,if=!variable.coral_double_tod_on_use&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(dot.touch_of_death.remains|cooldown.touch_of_death.remains+9>target.time_to_die&buff.storm_earth_and_fire.up|target.time_to_die<25))
+    if I.AshvanesRazorCoral:IsEquipReady() and (not bool(VarCoralDoubleTodOnUse) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchOfDeath) or S.TouchOfDeath:CooldownRemainsP() + 9 > Target:TimeToDie() and Player:BuffP(S.StormEarthAndFire) or Target:TimeToDie() < 25))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Ashvane Razor Coral"; end
     end
     -- the_unbound_force
