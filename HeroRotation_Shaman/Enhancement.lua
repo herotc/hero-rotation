@@ -33,6 +33,7 @@ Spell.Shaman.Enhancement = {
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   AscendanceBuff                        = Spell(114051),
   Ascendance                            = Spell(114051),
   FeralSpirit                           = Spell(51533),
@@ -404,6 +405,10 @@ local function APL()
     -- reaping_flames
     if S.ReapingFlames:IsCastableP() then
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 208"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 210"; end
     end
     -- crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
     if S.CrashLightning:IsReadyP() and (S.ForcefulWinds:IsAvailable() and Cache.EnemiesCount[8] > 1 and bool(VarFurycheckCl)) then
