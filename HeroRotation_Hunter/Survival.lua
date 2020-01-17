@@ -120,7 +120,7 @@ HL:RegisterForEvent(function()
   VarCarveCdr = 0
 end, "PLAYER_REGEN_ENABLED")
 
-local EnemyRanges = {8}
+local EnemyRanges = {8, 50}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
