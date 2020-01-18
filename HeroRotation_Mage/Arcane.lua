@@ -296,6 +296,10 @@ local function APL()
     if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.ArcanePowerBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 209"; end
     end
+    -- bag_of_tricks,if=buff.arcane_power.down
+    if S.BagofTricks:IsCastableP() and (Player:BuffDownP(S.ArcanePowerBuff)) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 222"; end
+    end
     -- rune_of_power,if=!buff.arcane_power.up&(mana.pct>=50|cooldown.arcane_power.remains=0)&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
     if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.ArcanePowerBuff) and (Player:ManaPercentageP() >= 50 or S.ArcanePower:CooldownRemainsP() == 0) and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
       if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneofPower) then return "rune_of_power 211"; end
