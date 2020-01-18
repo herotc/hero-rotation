@@ -42,6 +42,11 @@ Spell.DeathKnight.Frost = {
   EmpowerRuneWeaponBuff                 = Spell(47568),
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
+  ArcanePulse                           = Spell(260364),
+  LightsJudgment                        = Spell(255647),
+  Fireblood                             = Spell(265221),
+  AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   EmpowerRuneWeapon                     = Spell(47568),
   BreathofSindragosa                    = Spell(152279),
   ColdHeart                             = Spell(281208),
@@ -69,6 +74,7 @@ Spell.DeathKnight.Frost = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
   SeethingRageBuff                      = Spell(297126),
@@ -433,10 +439,6 @@ local function APL()
       if I.MerekthasFang:IsEquipReady() and (Player:BuffDownP(S.BreathofSindragosa) and Player:BuffDownP(S.PillarofFrostBuff)) then
         if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return "merekthas_fang 419"; end
       end
-      -- use_item,name=first_mates_spyglass,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-      if I.FirstMatesSpyglass:IsEquipReady() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
-        if HR.Cast(I.FirstMatesSpyglass, nil, Settings.Commons.TrinketDisplayStyle) then return "first_mates_spyglass 421"; end
-      end
     end
     -- potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
@@ -450,21 +452,41 @@ local function APL()
     if S.Berserking:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff)) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 427"; end
     end
+    -- arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
+    if S.ArcanePulse:IsCastableP() and ((Player:BuffDownP(S.PillarofFrostBuff) and Cache.EnemiesCount[8] >= 2) or Player:BuffDownP(S.PillarofFrostBuff) and (6 - Player:Rune() >= 5 and Player:RunicPowerDeficit() >= 60)) then
+      if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_pulse 428"; end
+    end
+    -- lights_judgment,if=buff.pillar_of_frost.up
+    if S.LightsJudgment:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff)) then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 429"; end
+    end
+    -- ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+    if S.AncestralCall:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 430"; end
+    end
+    -- fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
+    if S.Fireblood:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) <= 8 and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 431"; end
+    end
+    -- bag_of_tricks,if=buff.pillar_of_frost.up&(buff.pillar_of_frost.remains<5&talent.cold_heart.enabled|!talent.cold_heart.enabled&buff.pillar_of_frost.remains<3)|buff.seething_rage.up
+    if S.BagofTricks:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 and S.ColdHeart:IsAvailable() or not S.ColdHeart:IsAvailable() and Player:BuffRemainsP(S.PillarofFrostBuff) < 3) or Player:BuffP(S.SeethingRageBuff)) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 432"; end
+    end
     -- pillar_of_frost,if=cooldown.empower_rune_weapon.remains|talent.icecap.enabled
     if S.PillarofFrost:IsCastableP() and (bool(S.EmpowerRuneWeapon:CooldownRemainsP()) or S.Icecap:IsAvailable()) then
-      if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarofFrost) then return "pillar_of_frost 429"; end
+      if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarofFrost) then return "pillar_of_frost 433"; end
     end
     -- breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
     if S.BreathofSindragosa:IsCastableP() and (bool(S.EmpowerRuneWeapon:CooldownRemainsP()) and bool(S.PillarofFrost:CooldownRemainsP())) then
-      if HR.Cast(S.BreathofSindragosa, nil, Settings.Frost.BoSDisplayStyle) then return "breath_of_sindragosa 431"; end
+      if HR.Cast(S.BreathofSindragosa, nil, Settings.Frost.BoSDisplayStyle) then return "breath_of_sindragosa 434"; end
     end
     -- empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.obliteration.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.1.time_to_die<20
     if S.EmpowerRuneWeapon:IsCastableP() and (S.PillarofFrost:CooldownUpP() and S.Obliteration:IsAvailable() and Player:RuneTimeToX(5) > Player:GCD() and Player:RunicPowerDeficit() >= 10 or Target:TimeToDie() < 20) then
-      if HR.Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon 433"; end
+      if HR.Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon 435"; end
     end
     -- empower_rune_weapon,if=(cooldown.pillar_of_frost.ready|target.1.time_to_die<20)&talent.breath_of_sindragosa.enabled&runic_power>60
     if S.EmpowerRuneWeapon:IsCastableP() and ((S.PillarofFrost:CooldownUpP() or Target:TimeToDie() < 20) and S.BreathofSindragosa:IsAvailable() and Player:RunicPower() > 60) then
-      if HR.Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon 435"; end
+      if HR.Cast(S.EmpowerRuneWeapon, Settings.Frost.GCDasOffGCD.EmpowerRuneWeapon) then return "empower_rune_weapon 436"; end
     end
     -- empower_rune_weapon,if=talent.icecap.enabled&rune<3
     if S.EmpowerRuneWeapon:IsCastableP() and (S.Icecap:IsAvailable() and Player:Rune() < 3) then
@@ -527,6 +549,10 @@ local function APL()
     -- memory_of_lucid_dreams,if=buff.empower_rune_weapon.remains<5&buff.breath_of_sindragosa.up|(rune.time_to_2>gcd&runic_power<50)
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffRemainsP(S.EmpowerRuneWeaponBuff) < 5 and Player:BuffP(S.BreathofSindragosa) or (Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 50)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 519"; end
+    end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 521"; end
     end
   end
   Obliteration = function()
