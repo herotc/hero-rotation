@@ -262,6 +262,10 @@ local function APL()
     if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 234"; end
     end
+    -- bag_of_tricks,if=buff.combustion.down
+    if S.BagofTricks:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 298"; end
+    end
     -- living_bomb,if=active_enemies>1&buff.combustion.down
     if S.LivingBomb:IsReadyP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff)) then
       if HR.Cast(S.LivingBomb) then return "living_bomb 242"; end
@@ -313,10 +317,6 @@ local function APL()
     -- ancestral_call
     if S.AncestralCall:IsCastableP() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 296"; end
-    end
-    -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 298"; end
     end
     -- flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react&!azerite.blaster_master.enabled
     if S.Flamestrike:IsCastableP() and (((S.FlamePatch:IsAvailable() and EnemiesCount > 2) or EnemiesCount > 6) and Player:BuffP(S.HotStreakBuff) and not S.BlasterMaster:AzeriteEnabled()) then
