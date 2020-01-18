@@ -49,6 +49,7 @@ Spell.DeathKnight.Unholy = {
   Berserking                            = Spell(26297),
   LightsJudgment                        = Spell(255647),
   AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
   ArcanePulse                           = Spell(260364),
   Fireblood                             = Spell(265221),
   UnholyStrengthBuff                    = Spell(53365),
@@ -71,6 +72,7 @@ Spell.DeathKnight.Unholy = {
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
   VisionofPerfectionMinor               = MultiSpell(296320, 299367, 299369),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368)
@@ -310,13 +312,21 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
-    -- worldvein_resonance,if=!death_and_decay.ticking
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
+    -- worldvein_resonance,if=talent.army_of_the_damned.enabled&essence.vision_of_perfection.minor&buff.unholy_strength.up|essence.vision_of_perfection.minor&pet.apoc_ghoul.active|talent.army_of_the_damned.enabled&pet.apoc_ghoul.active&cooldown.army_of_the_dead.remains>60|talent.army_of_the_damned.enabled&pet.army_ghoul.active
+    if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and S.VisionofPerfectionMinor:IsAvailable() and Player:BuffP(S.UnholyStrengthBuff) or S.VisionofPerfectionMinor:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance with AotDamned"; end
+    end
+    -- worldvein_resonance,if=!death_and_decay.ticking&buff.unholy_strength.up&!essence.vision_of_perfection.minor&!talent.army_of_the_damned.enabled|target.time_to_die<cooldown.apocalypse.remains
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff) and Player:BuffP(S.UnholyStrengthBuff) and not S.VisionofPerfectionMinor:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToDie() < S.Apocalypse:CooldownRemainsP()) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance without AotDamned"; end
     end
     -- ripple_in_space,if=!death_and_decay.ticking
     if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
+    end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
     end
   end
   Generic = function()
@@ -411,6 +421,10 @@ local function APL()
     -- fireblood,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
     if S.Fireblood:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 260"; end
+    end
+    -- bag_of_tricks,if=buff.unholy_strength.up|buff.festermight.remains<gcd
+    if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD()) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 260.5"; end
     end
     if (Settings.Commons.UseTrinkets) then
       -- use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine|!equipped.vision_of_demise
