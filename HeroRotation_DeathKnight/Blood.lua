@@ -29,6 +29,7 @@ Spell.DeathKnight.Blood = {
   BloodFury             = Spell(20572),
   Fireblood             = Spell(265221),
   LightsJudgment        = Spell(255647),
+  BagofTricks           = Spell(312411),
   -- Abilities
   Asphyxiate            = Spell(221562),
   BloodBoil             = Spell(50842),
@@ -73,7 +74,8 @@ if not Item.DeathKnight then Item.DeathKnight = {}; end
   GrongsPrimalRage                 = Item(165574, {13, 14}),
   RazdunksBigRedButton             = Item(159611, {13, 14}),
   MerekthasFang                    = Item(158367, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14})
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  DribblingInkpod                  = Item(169319, {13, 14}),
 };
 local I = Item.DeathKnight.Blood;
 
@@ -286,6 +288,9 @@ local function APL ()
       if S.Fireblood:IsCastable() then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
+      if S.BagofTricks:IsCastable() then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
     end
     -- use_items,if=cooldown.dancing_rune_weapon.remains>90
     -- use_item,name=razdunks_big_red_button
@@ -300,8 +305,12 @@ local function APL ()
     if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=buff.dancing_rune_weapon.up&debuff.razor_coral_debuff.up
-    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.DancingRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff)) then
+    -- use_item,name=ashvanes_razor_coral,if=target.health.pct<31&equipped.dribbling_inkpod
+    if I.AshvanesRazorCoral:IsEquipReady() and (Target:HealthPercentage() < 31 and S.DribblingInkpod:IsEquipped()) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=buff.dancing_rune_weapon.up&debuff.razor_coral_debuff.up&!equipped.dribbling_inkpod
+    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.DancingRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not I.DribblingInkpod:IsEquipped()) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- potion,if=buff.dancing_rune_weapon.up
