@@ -265,30 +265,30 @@ local function APL ()
     -- auto_attack
     if HR.CDsON() then
       -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
-      if S.BloodFury:IsCastable() and HR.CDsON() and Cache.EnemiesCount[10] >= 1 and (S.DancingRuneWeapon:CooldownUpP() and (not S.Blooddrinker:CooldownUpP() or not S.Blooddrinker:IsAvailable())) then
+      if S.BloodFury:IsCastable() and Cache.EnemiesCount[10] >= 1 and (S.DancingRuneWeapon:CooldownUpP() and (not S.Blooddrinker:CooldownUpP() or not S.Blooddrinker:IsAvailable())) then
         if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- berserking
-      if S.Berserking:IsCastable() and HR.CDsON() and Cache.EnemiesCount[10] >= 1 then
+      if S.Berserking:IsCastable() and Cache.EnemiesCount[10] >= 1 then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
-      if S.ArcanePulse:IsCastable() and HR.CDsON() and (Cache.EnemiesCount[10] >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
+      if S.ArcanePulse:IsCastable() and (Cache.EnemiesCount[10] >= 2 or Player:Rune() < 1 and Player:RunicPowerDeficit() > 60) then
         if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- lights_judgment,if=buff.unholy_strength.up
-      if S.LightsJudgment:IsCastable() and HR.CDsON() and (Player:BuffP(S.UnholyStrengthBuff)) then
+      if S.LightsJudgment:IsCastable() and (Player:BuffP(S.UnholyStrengthBuff)) then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- ancestral_call
-      if S.AncestralCall:IsCastable() and HR.CDsON() then
+      if S.AncestralCall:IsCastable() then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- fireblood
-      if S.Fireblood:IsCastable() and HR.CDsON() then
+      if S.Fireblood:IsCastable() then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
-      if S.BagofTricks:IsCastable() and HR.CDsON() then
+      if S.BagofTricks:IsCastable() then
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
     end
