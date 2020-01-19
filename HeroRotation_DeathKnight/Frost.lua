@@ -242,7 +242,7 @@ local function APL()
       if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter 43"; end
     end
     -- arcane_torrent
-    if S.ArcaneTorrent:IsCastableP() then
+    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 45"; end
     end
   end
@@ -352,7 +352,7 @@ local function APL()
       if HR.Cast(S.Obliterate) then return "obliterate 223"; end
     end
     -- arcane_torrent,if=runic_power.deficit>50
-    if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 50) then
+    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (Player:RunicPowerDeficit() > 50) then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 225"; end
     end
     -- wait for resources
@@ -445,31 +445,31 @@ local function APL()
       if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion 423"; end
     end
     -- blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-    if S.BloodFury:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+    if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 425"; end
     end
     -- berserking,if=buff.pillar_of_frost.up
-    if S.Berserking:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff)) then
+    if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.PillarofFrostBuff)) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 427"; end
     end
     -- arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
-    if S.ArcanePulse:IsCastableP() and ((Player:BuffDownP(S.PillarofFrostBuff) and Cache.EnemiesCount[8] >= 2) or Player:BuffDownP(S.PillarofFrostBuff) and (6 - Player:Rune() >= 5 and Player:RunicPowerDeficit() >= 60)) then
+    if S.ArcanePulse:IsCastableP() and HR.CDsON() and ((Player:BuffDownP(S.PillarofFrostBuff) and Cache.EnemiesCount[8] >= 2) or Player:BuffDownP(S.PillarofFrostBuff) and (6 - Player:Rune() >= 5 and Player:RunicPowerDeficit() >= 60)) then
       if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_pulse 428"; end
     end
     -- lights_judgment,if=buff.pillar_of_frost.up
-    if S.LightsJudgment:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff)) then
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffP(S.PillarofFrostBuff)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 429"; end
     end
     -- ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
-    if S.AncestralCall:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 430"; end
     end
     -- fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
-    if S.Fireblood:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) <= 8 and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
+    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffRemainsP(S.PillarofFrostBuff) <= 8 and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 431"; end
     end
     -- bag_of_tricks,if=buff.pillar_of_frost.up&(buff.pillar_of_frost.remains<5&talent.cold_heart.enabled|!talent.cold_heart.enabled&buff.pillar_of_frost.remains<3)|buff.seething_rage.up
-    if S.BagofTricks:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 and S.ColdHeart:IsAvailable() or not S.ColdHeart:IsAvailable() and Player:BuffRemainsP(S.PillarofFrostBuff) < 3) or Player:BuffP(S.SeethingRageBuff)) then
+    if S.BagofTricks:IsCastableP() and HR.CDsON() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 and S.ColdHeart:IsAvailable() or not S.ColdHeart:IsAvailable() and Player:BuffRemainsP(S.PillarofFrostBuff) < 3) or Player:BuffP(S.SeethingRageBuff)) then
       if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 432"; end
     end
     -- pillar_of_frost,if=cooldown.empower_rune_weapon.remains|talent.icecap.enabled
@@ -651,7 +651,7 @@ local function APL()
       if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter 717"; end
     end
     -- arcane_torrent
-    if S.ArcaneTorrent:IsCastableP() then
+    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 719"; end
     end
   end

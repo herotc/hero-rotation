@@ -280,11 +280,11 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- icy_veins
-    if S.IcyVeins:IsCastableP() and HR.CDsON() then
+    if S.IcyVeins:IsCastableP() then
       if HR.Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins 56"; end
     end
     -- mirror_image
-    if S.MirrorImage:IsCastableP() and HR.CDsON() then
+    if S.MirrorImage:IsCastableP() then
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 58"; end
     end
     -- rune_of_power,if=prev_gcd.1.frozen_orb|target.time_to_die>10+cast_time&target.time_to_die<20
@@ -309,27 +309,27 @@ local function APL()
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 100"; end
     end
     -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
+    if S.BloodFury:IsCastableP() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 101"; end
     end
     -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
+    if S.Berserking:IsCastableP() then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 103"; end
     end
     -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+    if S.LightsJudgment:IsCastableP() then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 105"; end
     end
     -- fireblood
-    if S.Fireblood:IsCastableP() and HR.CDsON() then
+    if S.Fireblood:IsCastableP() then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 107"; end
     end
     -- ancestral_call
-    if S.AncestralCall:IsCastableP() and HR.CDsON() then
+    if S.AncestralCall:IsCastableP() then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 109"; end
     end
     -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+    if S.BagofTricks:IsCastableP() then
       if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 111"; end
     end
   end

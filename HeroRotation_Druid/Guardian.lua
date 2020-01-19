@@ -253,33 +253,35 @@ local function APL()
     if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_agility 10"; end
     end
-    -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 12"; end
-    end
-    -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 14"; end
-    end
-    -- arcane_torrent
-    if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 16"; end
-    end
-    -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 18"; end
-    end
-    -- fireblood
-    if S.Fireblood:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 20"; end
-    end
-    -- ancestral_call
-    if S.AncestralCall:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 22"; end
-    end
-    -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 24"; end
+    if (HR.CDsON()) then
+      -- blood_fury
+      if S.BloodFury:IsCastableP() then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 12"; end
+      end
+      -- berserking
+      if S.Berserking:IsCastableP() then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 14"; end
+      end
+      -- arcane_torrent
+      if S.ArcaneTorrent:IsCastableP() then
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 16"; end
+      end
+      -- lights_judgment
+      if S.LightsJudgment:IsCastableP() then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 18"; end
+      end
+      -- fireblood
+      if S.Fireblood:IsCastableP() then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 20"; end
+      end
+      -- ancestral_call
+      if S.AncestralCall:IsCastableP() then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 22"; end
+      end
+      -- bag_of_tricks
+      if S.BagofTricks:IsCastableP() then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 24"; end
+      end
     end
     -- Defensives and Bristling Fur
     if IsTanking and Player:BuffP(S.BearForm) then

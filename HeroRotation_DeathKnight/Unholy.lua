@@ -407,23 +407,23 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 256"; end
     end
     -- lights_judgment,if=(buff.unholy_strength.up&buff.festermight.remains<=5)|active_enemies>=2&(buff.unholy_strength.up|buff.festermight.remains<=5)
-    if S.LightsJudgment:IsCastableP() and ((Player:BuffP(S.UnholyStrengthBuff) and Player:BuffRemainsP(S.FestermightBuff) <= 5) or Cache.EnemiesCount[8] >= 2 and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) <= 5)) then
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() and ((Player:BuffP(S.UnholyStrengthBuff) and Player:BuffRemainsP(S.FestermightBuff) <= 5) or Cache.EnemiesCount[8] >= 2 and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) <= 5)) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 257"; end
     end
     -- ancestral_call,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
-    if S.AncestralCall:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
+    if S.AncestralCall:IsCastableP() and HR.CDsON() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 258"; end
     end
     -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
-    if S.ArcanePulse:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
+    if S.ArcanePulse:IsCastableP() and HR.CDsON() and (Cache.EnemiesCount[8] >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
       if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_pulse 259"; end
     end
     -- fireblood,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
-    if S.Fireblood:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
+    if S.Fireblood:IsCastableP() and HR.CDsON() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 260"; end
     end
     -- bag_of_tricks,if=buff.unholy_strength.up|buff.festermight.remains<gcd
-    if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD()) then
+    if S.BagofTricks:IsCastableP() and HR.CDsON() and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD()) then
       if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 260.5"; end
     end
     if (Settings.Commons.UseTrinkets) then

@@ -252,33 +252,35 @@ local function APL()
     if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.SuperiorBattlePotionOfAgility) then return ""; end
     end
-    -- blood_fury
-    if S.BloodFury:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- fireblood
-    if S.Fireblood:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- ancestral_call
-    if S.AncestralCall:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
-    end
-    -- invoke_niuzao_the_black_ox
-    if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and HR.CDsON() and Target:TimeToDie() > 25 then
-      if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
+    if (HR.CDsON()) then
+      -- blood_fury
+      if S.BloodFury:IsCastableP() then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- berserking
+      if S.Berserking:IsCastableP() then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- lights_judgment
+      if S.LightsJudgment:IsCastableP() then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- fireblood
+      if S.Fireblood:IsCastableP() then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- ancestral_call
+      if S.AncestralCall:IsCastableP() then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- bag_of_tricks
+      if S.BagofTricks:IsCastableP() then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+      end
+      -- invoke_niuzao_the_black_ox
+      if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and Target:TimeToDie() > 25 then
+        if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return ""; end
+      end
     end
     -- black_ox_brew,if=cooldown.brews.charges_fractional<0.5
     if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.5 then

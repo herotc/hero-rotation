@@ -241,7 +241,7 @@ local function APL()
       if HR.CastCycle(S.Immolate, 40, EvaluateCycleImmolate46) then return "immolate 64" end
     end
     -- call_action_list,name=cds
-    if HR.CDsON() then
+    if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
     -- havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
@@ -379,15 +379,15 @@ local function APL()
       if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.TrinketDisplayStyle) then return "battle_potion_of_intellect 233"; end
     end
     -- berserking,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.Berserking:IsCastableP() and HR.CDsON() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if S.Berserking:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 235"; end
     end
     -- blood_fury,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if S.BloodFury:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 241"; end
     end
     -- fireblood,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if S.Fireblood:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 247"; end
     end
     -- use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20

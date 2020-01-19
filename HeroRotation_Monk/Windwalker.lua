@@ -239,7 +239,7 @@ local function APL ()
    -- Cooldowns --
   Cooldowns = function()
     -- invoke_xuen_the_white_tiger
-    if HR.CDsON() and S.InvokeXuentheWhiteTiger:IsReadyP() then
+    if S.InvokeXuentheWhiteTiger:IsReadyP() then
       if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuentheWhiteTiger) then return "Cast Cooldown Invoke Xuen the White Tiger"; end
     end
     -- guardian_of_azeroth,if=target.time_to_die>185|(!equipped.dribbling_inkpod|equipped.cyclotronic_blast|target.health.pct<30)&cooldown.touch_of_death.remains<=14|equipped.dribbling_inkpod&target.time_to_pct_30.remains<20|target.time_to_die<35
@@ -251,7 +251,7 @@ local function APL ()
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Worldvein Resonance"; end
     end
     -- blood_fury
-    if HR.CDsON() and S.BloodFury:IsReadyP() then
+    if S.BloodFury:IsReadyP() then
       if HR.CastSuggested(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Blood Fury"; end
     end
     -- arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
@@ -259,11 +259,11 @@ local function APL ()
       if HR.CastSuggested(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Arcane Torrent"; end
     end
     -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+    if S.LightsJudgment:IsCastableP() then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Light's Judgment"; end
     end
     -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+    if S.BagofTricks:IsCastableP() then
       if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Bag of Tricks"; end
     end
     -- call_action_list,name=tod
@@ -292,7 +292,7 @@ local function APL ()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Concentrated Flame"; end
     end
     -- berserking,if=target.time_to_die>183|dot.touch_of_death.remains|target.time_to_die<13
-    if HR.CDsON() and S.Berserking:IsReadyP() and (Target:TimeToDie() > 183 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 13) then
+    if S.Berserking:IsReadyP() and (Target:TimeToDie() > 183 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 13) then
       if HR.CastSuggested(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Berserking"; end
     end
     -- use_item,name=pocketsized_computation_device,if=dot.touch_of_death.remains
@@ -324,7 +324,7 @@ local function APL ()
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Focused Azerite Beam"; end
     end
     -- serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
-    if HR.CDsON() and S.Serenity:IsReadyP() and (Player:BuffDownP(S.Serenity) and (S.RisingSunKick:CooldownRemainsP() <= 2 or Target:TimeToDie() <= 12)) then
+    if S.Serenity:IsReadyP() and (Player:BuffDownP(S.Serenity) and (S.RisingSunKick:CooldownRemainsP() <= 2 or Target:TimeToDie() <= 12)) then
       if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then return "Cast Cooldown Serenity"; end
     end
     -- memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
@@ -528,7 +528,7 @@ local function APL ()
       if HR.Cast(S.ChiWave) then return "Cast Everyone Chi Wave"; end
     end
     -- actions.st=call_action_list,name=cd
-    if (true) then
+    if (HR.CDsON()) then
       ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- actions+=/call_action_list,name=st,if=active_enemies<3

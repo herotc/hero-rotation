@@ -296,7 +296,7 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 36"; end
     end
     -- berserking,if=variable.cooldown_sync
-    if S.Berserking:IsCastableP() and HR.CDsON() and (bool(VarCooldownSync)) then
+    if S.Berserking:IsCastableP() and (bool(VarCooldownSync)) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 37"; end
     end
     -- use_item,name=azsharas_font_of_power
@@ -304,15 +304,15 @@ local function APL()
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 41"; end
     end
     -- blood_fury,if=variable.cooldown_sync
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (bool(VarCooldownSync)) then
+    if S.BloodFury:IsCastableP() and (bool(VarCooldownSync)) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 43"; end
     end
     -- fireblood,if=variable.cooldown_sync
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (bool(VarCooldownSync)) then
+    if S.Fireblood:IsCastableP() and (bool(VarCooldownSync)) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 47"; end
     end
     -- ancestral_call,if=variable.cooldown_sync
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (bool(VarCooldownSync)) then
+    if S.AncestralCall:IsCastableP() and (bool(VarCooldownSync)) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 51"; end
     end
     -- potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
@@ -407,7 +407,7 @@ local function APL()
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 208"; end
     end
     -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() then
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 210"; end
     end
     -- crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL

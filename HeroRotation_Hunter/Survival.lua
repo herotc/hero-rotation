@@ -367,23 +367,23 @@ local function APL()
   end
   Cds = function()
     -- blood_fury,if=cooldown.coordinated_assault.remains>30
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (S.CoordinatedAssault:CooldownRemainsP() > 30) then
+    if S.BloodFury:IsCastableP() and (S.CoordinatedAssault:CooldownRemainsP() > 30) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 284"; end
     end
     -- ancestral_call,if=cooldown.coordinated_assault.remains>30
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (S.CoordinatedAssault:CooldownRemainsP() > 30) then
+    if S.AncestralCall:IsCastableP() and (S.CoordinatedAssault:CooldownRemainsP() > 30) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 288"; end
     end
     -- fireblood,if=cooldown.coordinated_assault.remains>30
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (S.CoordinatedAssault:CooldownRemainsP() > 30) then
+    if S.Fireblood:IsCastableP() and (S.CoordinatedAssault:CooldownRemainsP() > 30) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 292"; end
     end
     -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+    if S.LightsJudgment:IsCastableP() then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 296"; end
     end
     -- berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
-    if S.Berserking:IsCastableP() and HR.CDsON() and (S.CoordinatedAssault:CooldownRemainsP() > 60 or Target:TimeToDie() < 13) then
+    if S.Berserking:IsCastableP() and (S.CoordinatedAssault:CooldownRemainsP() > 60 or Target:TimeToDie() < 13) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 298"; end
     end
     -- potion,if=buff.guardian_of_azeroth.up&(buff.berserking.up|buff.blood_fury.up|!race.troll)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)|!essence.condensed_lifeforce.major&buff.coordinated_assault.up
@@ -391,7 +391,7 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 308"; end
     end
     -- aspect_of_the_eagle,if=target.distance>=6
-    if S.AspectoftheEagle:IsCastableP() and HR.CDsON() and (not Target:IsInRange(8) and Target:IsInRange(40)) then
+    if S.AspectoftheEagle:IsCastableP() and (not Target:IsInRange(8) and Target:IsInRange(40)) then
       if HR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return "aspect_of_the_eagle 320"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=equipped.dribbling_inkpod&(debuff.razor_coral_debuff.down|time_to_pct_30<1|(health.pct<30&buff.guardian_of_azeroth.up|buff.memory_of_lucid_dreams.up))|(!equipped.dribbling_inkpod&(buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up&cooldown.guardian_of_azeroth.remains>175)|debuff.razor_coral_debuff.down)|target.time_to_die<20

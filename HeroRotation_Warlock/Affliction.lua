@@ -368,11 +368,11 @@ local function APL()
     end
     -- use_items,if=cooldown.summon_darkglare.remains>70|time_to_die<20|((buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains)&!cooldown.summon_darkglare.remains)
     -- fireblood,if=!cooldown.summon_darkglare.up
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (not S.SummonDarkglare:CooldownUpP()) then
+    if S.Fireblood:IsCastableP() and (not S.SummonDarkglare:CooldownUpP()) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 51"; end
     end
     -- blood_fury,if=!cooldown.summon_darkglare.up
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (not S.SummonDarkglare:CooldownUpP()) then
+    if S.BloodFury:IsCastableP() and (not S.SummonDarkglare:CooldownUpP()) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 55"; end
     end
     -- memory_of_lucid_dreams,if=time>30

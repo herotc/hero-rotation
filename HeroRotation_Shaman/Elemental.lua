@@ -608,25 +608,27 @@ local function APL()
     if S.StormElemental:IsCastableP() and (S.StormElemental:IsAvailable() and (not S.Stormkeeper:CooldownUpP() or not S.Stormkeeper:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP()) and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff) or Target:TimeToDie() < 32) and (not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
       if HR.Cast(S.StormElemental, Settings.Elemental.StormElemental) then return "storm_elemental 605"; end
     end
-    -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 611"; end
-    end
-    -- berserking,if=!talent.ascendance.enabled|buff.ascendance.up
-    if S.Berserking:IsCastableP() and HR.CDsON() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff)) then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 619"; end
-    end
-    -- fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 625"; end
-    end
-    -- ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 633"; end
-    end
-    -- bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
-    if S.BagofTricks:IsCastableP() and HR.CDsON() and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff)) then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 635"; end
+    if (HR.CDsON()) then
+      -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+      if S.BloodFury:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 611"; end
+      end
+      -- berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+      if S.Berserking:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff)) then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 619"; end
+      end
+      -- fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+      if S.Fireblood:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 625"; end
+      end
+      -- ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+      if S.AncestralCall:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffP(S.AscendanceBuff) or S.Ascendance:CooldownRemainsP() > 50) then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 633"; end
+      end
+      -- bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
+      if S.BagofTricks:IsCastableP() and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff)) then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 635"; end
+      end
     end
     -- run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
     if (EnemiesCount > 2) then

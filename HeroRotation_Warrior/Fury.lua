@@ -289,29 +289,31 @@ local function APL()
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() < 20 or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzeroth) or not S.MemoryofLucidDreams:IsAvailable() and not S.GuardianofAzeroth:IsAvailable()))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 115"; end
     end
-    -- blood_fury,if=buff.recklessness.up
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 118"; end
-    end
-    -- berserking,if=buff.recklessness.up
-    if S.Berserking:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
-    end
-    -- lights_judgment,if=buff.recklessness.down
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.RecklessnessBuff)) then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 126"; end
-    end
-    -- fireblood,if=buff.recklessness.up
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 130"; end
-    end
-    -- ancestral_call,if=buff.recklessness.up
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 134"; end
-    end
-    -- bag_of_tricks,if=buff.recklessness.up
-    if S.BagofTricks:IsCastableP() and HR.CDsON() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 136"; end
+    if (HR.CDsON()) then
+      -- blood_fury,if=buff.recklessness.up
+      if S.BloodFury:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 118"; end
+      end
+      -- berserking,if=buff.recklessness.up
+      if S.Berserking:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
+      end
+      -- lights_judgment,if=buff.recklessness.down
+      if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff)) then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 126"; end
+      end
+      -- fireblood,if=buff.recklessness.up
+      if S.Fireblood:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 130"; end
+      end
+      -- ancestral_call,if=buff.recklessness.up
+      if S.AncestralCall:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 134"; end
+      end
+      -- bag_of_tricks,if=buff.recklessness.up
+      if S.BagofTricks:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 136"; end
+      end
     end
     -- run_action_list,name=single_target
     if (true) then
