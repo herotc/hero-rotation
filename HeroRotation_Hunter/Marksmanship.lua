@@ -41,6 +41,7 @@ Spell.Hunter.Marksmanship = {
   AncestralCall                         = Spell(274738),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
+  BagofTricks                           = Spell(312411),
   CarefulAim                            = Spell(260228),
   ExplosiveShot                         = Spell(212431),
   Barrage                               = Spell(120360),
@@ -220,6 +221,10 @@ local function APL()
     -- lights_judgment
     if S.LightsJudgment:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 102"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks"; end
     end
     -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
     if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then

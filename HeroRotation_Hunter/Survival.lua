@@ -50,6 +50,7 @@ Spell.Hunter.Survival = {
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
   Berserking                            = Spell(26297),
+  BagofTricks                           = Spell(312411),
   BerserkingBuff                        = Spell(26297),
   BloodFuryBuff                         = Spell(20572),
   AspectoftheEagle                      = Spell(186289),
@@ -718,6 +719,10 @@ local function APL()
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 888"; end
+    end
+    -- bag_of_tricks
+    if S.BagofTricks:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 890"; end
     end
   end
 end
