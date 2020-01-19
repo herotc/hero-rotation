@@ -77,6 +77,7 @@ HR.GUISettings.APL.Druid = {
     SurvivalInstinctsHP = 30,
     FrenziedRegenHP = 70,
     BristlingFurRage = 50,
+    UseRageDefensively = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       FrenziedRegen = true,
@@ -127,6 +128,7 @@ CreateARPanelOptions(CP_Balance, "APL.Druid.Balance");
 
 --Guardian
 CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian");
+CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseRageDefensively", "Use Rage Defensively", "Only suggest Maul if not actively tanking or about to cap rage.");
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.");
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.LunarBeamHP", {0, 100, 1}, "Lunar Beam HP", "Set the Lunar Beam HP threshold.");
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.FrenziedRegenHP", {0, 100, 1}, "Frenzied Regeneration HP", "Set the Frenzied Regeneration HP threshold.");

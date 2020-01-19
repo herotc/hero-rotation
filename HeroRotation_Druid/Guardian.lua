@@ -85,6 +85,7 @@ local ShouldReturn; -- Used to get the return string
 local IsTanking;
 local AoERadius; -- Range variables
 local EnemiesCount;
+local UseMaul;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -139,6 +140,10 @@ local function APL()
   Everyone.AoEToggleEnemiesUpdate()
   EnemiesCount = Cache.EnemiesCount[AoERadius]
   IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
+  UseMaul = false
+  if (not Settings.Guardian.UseRageDefensively or (Settings.Guardian.UseRageDefensively and (not IsTanking or Player:RageDeficit() <= 10))) then
+    UseMaul = true
+  end
   Precombat = function()
     -- flask
     -- food
@@ -159,7 +164,7 @@ local function APL()
   end
   Cleave = function()
     -- maul,if=rage.deficit<=10
-    if S.Maul:IsReadyP() and (Player:RageDeficit() <= 10) then
+    if S.Maul:IsReadyP() and UseMaul and (Player:RageDeficit() <= 10) then
       if HR.Cast(S.Maul) then return "maul 51"; end
     end
     -- ironfur,if=cost<=0
@@ -183,7 +188,7 @@ local function APL()
       if HR.Cast(S.Moonfire) then return "moonfire 61"; end
     end
     -- maul
-    if S.Maul:IsReadyP() then
+    if S.Maul:IsReadyP() and UseMaul then
       if HR.Cast(S.Maul) then return "maul 63"; end
     end
     -- thrash
@@ -219,7 +224,7 @@ local function APL()
   end
   Multi = function()
     -- maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
-    if S.Maul:IsReadyP() and (not S.Conflict:IsAvailable() and Player:BuffDownP(S.SharpenedClawsBuff)) then
+    if S.Maul:IsReadyP() and UseMaul and (not S.Conflict:IsAvailable() and Player:BuffDownP(S.SharpenedClawsBuff)) then
       if HR.Cast(S.Maul) then return "maul 91"; end
     end
     -- ironfur,if=(rage>=cost&azerite.layered_mane.enabled)|rage.deficit<10
