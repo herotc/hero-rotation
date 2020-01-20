@@ -434,7 +434,7 @@ local function Essences ()
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast RippleInSpace"; end
   end
   -- worldvein_resonance,if=cooldown.symbols_of_death.remains<5|target.time_to_die<18
-  if S.WorldveinResonance:IsCastableP() and S.SymbolsofDeath:CooldownRemainsP() < 5 or Target:FilteredTimeToDie("<=", 18) then
+  if S.WorldveinResonance:IsCastableP() and (S.SymbolsofDeath:CooldownRemainsP() < 5 or Target:FilteredTimeToDie("<=", 18)) then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance"; end
   end
   -- memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
