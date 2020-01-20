@@ -278,7 +278,7 @@ local function APL ()
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Cooldown Blood of the Enemy"; end
     end
-    -- use_items,if=equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains<=20|!equipped.cyclotronic_blast
+    -- use_items,if=equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>=20|!equipped.cyclotronic_blast
     -- ancestral_call,if=dot.touch_of_death.remains|target.time_to_die<16
     if S.AncestralCall:IsCastableP() and (Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 16) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Cooldown Ancestral Call"; end
