@@ -65,6 +65,7 @@ Spell.Warlock.Destruction = {
   WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
@@ -318,6 +319,10 @@ local function APL()
     if S.DarkSoulInstability:IsCastableP() and (InfernalActive and (InfernalRemains < 20.5 or InfernalRemains < 22 and Player:SoulShardsP() >= 3.6 or not S.GrimoireofSupremacy:IsAvailable())) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 179"; end
     end
+    -- worldvein_resonance,if=pet.infernal.active&(pet.infernal.remains<18.5|pet.infernal.remains<20&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
+    if S.WorldveinResonance:IsCastableP() and (InfernalActive and (InfernalRemains < 18.5 or InfernalRemains < 20 and Player:SoulShardsP() >= 3.6 or not S.GrimoireofSupremacy)) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 185"; end
+    end
     -- memory_of_lucid_dreams,if=pet.infernal.active&(pet.infernal.remains<15.5|soul_shard<3.5&(buff.dark_soul_instability.up|!talent.grimoire_of_supremacy.enabled&dot.immolate.remains>12))
     if S.MemoryofLucidDreams:IsCastableP() and (InfernalActive and (InfernalRemains < 15.5 or Player:SoulShardsP() < 3.5 and (Player:BuffP(S.DarkSoulInstabilityBuff) or not S.GrimoireofSupremacy:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) > 12))) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 187"; end
@@ -342,6 +347,10 @@ local function APL()
     if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and InfernalRemains < 20.5) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 211"; end
     end
+    -- worldvein_resonance,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<18.5
+    if S.WorldveinResonance:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and InfernalRemains < 18.5) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 213"; end
+    end
     -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die&(pet.infernal.remains<15.5|buff.dark_soul_instability.up&soul_shard<3)
     if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and (InfernalRemains < 15.5 or Player:BuffP(S.DarkSoulInstabilityBuff) and Player:SoulShardsP() < 3)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 215"; end
@@ -358,6 +367,10 @@ local function APL()
     if S.DarkSoulInstability:IsCastableP() and (Target:TimeToDie() < 21 and Target:TimeToDie() > 4) then
       if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 223"; end
     end
+    -- worldvein_resonance,if=target.time_to_die<19&target.time_to_die>4
+    if S.WorldveinResonance:IsCastableP() and (Target:TimeToDie() < 19 and Target:TimeToDie() > 4) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 224"; end
+    end
     -- memory_of_lucid_dreams,if=target.time_to_die<16&target.time_to_die>6
     if S.MemoryofLucidDreams:IsCastableP() and (Target:TimeToDie() < 16 and Target:TimeToDie() > 6) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 225"; end
@@ -366,8 +379,8 @@ local function APL()
     if S.BloodoftheEnemy:IsCastableP() then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 227"; end
     end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
+    -- worldvein_resonance,if=cooldown.summon_infernal.remains>=60-12&!pet.infernal.active
+    if S.WorldveinResonance:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() >= 48 and not InfernalActive) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 229"; end
     end
     -- ripple_in_space
@@ -536,6 +549,10 @@ local function APL()
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame 388"; end
+    end
+    -- reaping_flames
+    if S.ReapingFlames:IsCastableP() then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, true) then return "reaping_flames 390"; end
     end
     -- channel_demonfire
     if S.ChannelDemonfire:IsCastableP() then
