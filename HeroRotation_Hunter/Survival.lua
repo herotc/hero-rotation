@@ -552,10 +552,6 @@ local function APL()
     if S.WildfireBomb:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() and Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) or Target:DebuffDownP(S.WildfireBombDebuff) and Player:BuffStackP(S.MongooseFuryBuff) < 1) or Target:TimeToDie() < 18 and Target:DebuffDownP(S.WildfireBombDebuff)) then
       if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 587"; end
     end
-    -- mongoose_bite,if=buff.mongoose_fury.stack>5&!cooldown.coordinated_assault.remains
-    if S.MongooseBite:IsReadyP() and (Player:BuffStackP(S.MongooseFuryBuff) > 5 and S.CoordinatedAssault:CooldownUpP()) then
-      if HR.Cast(S.MongooseBite) then return "mongoose_bite 613"; end
-    end
     -- serpent_sting,if=buff.vipers_venom.up&dot.serpent_sting.remains<4*gcd|dot.serpent_sting.refreshable&!buff.coordinated_assault.up
     if S.SerpentSting:IsReadyP() and (Player:BuffP(S.VipersVenomBuff) and Target:DebuffRemainsP(S.SerpentStingDebuff) < 4 * Player:GCD() or Target:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff)) then
       if HR.Cast(S.SerpentSting) then return "serpent_sting 619"; end
