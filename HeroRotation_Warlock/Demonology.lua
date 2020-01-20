@@ -68,6 +68,7 @@ Spell.Warlock.Demonology = {
   FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
   GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
   VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
+  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932),
@@ -456,9 +457,13 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts);
+    -- implosion,if=azerite.explosive_potential.enabled&talent.demonic_consumption.enabled&prev_gcd.1.summon_demonic_tyrant
+    if S.Implosion:IsCastableP() and (S.ExplosivePotential:AzeriteEnabled() and S.DemonicConsumption:IsAvailable() and Player:PrevGCDP(1, S.SummonDemonicTyrant)) then
+      if HR.Cast(S.Implosion, nil, nil, true) then return "implosion 320"; end
+    end
     -- potion,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 322"; end
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 322"; end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.summon_demonic_tyrant.remains<=20&!talent.nether_portal.enabled
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() <= 20 and not S.NetherPortal:IsAvailable()) then
@@ -616,6 +621,10 @@ local function APL()
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!pet.demonic_tyrant.active
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and DemonicTyrantTime() == 0) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame 506"; end
+    end
+    -- reaping_flames,if=!pet.demonic_tyrant.active
+    if S.ReapingFlames:IsCastableP() and (DemonicTyrantTime() == 0) then
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, true) then return "reaping_flames 508"; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then
