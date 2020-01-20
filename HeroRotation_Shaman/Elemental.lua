@@ -216,7 +216,7 @@ local function APL()
   Aoe = function()
     -- stormkeeper,if=talent.stormkeeper.enabled
     if S.Stormkeeper:IsCastableP() and (S.Stormkeeper:IsAvailable()) then
-      if HR.Cast(S.Stormkeeper) then return "stormkeeper 39"; end
+      if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper 39"; end
     end
     -- flame_shock,target_if=refreshable&(spell_targets.chain_lightning<(5-!talent.totem_mastery.enabled)|!talent.storm_elemental.enabled&(cooldown.fire_elemental.remains>(cooldown.storm_elemental.duration-30+14*spell_haste)|cooldown.fire_elemental.remains<(24-14*spell_haste)))&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<cooldown.storm_elemental.duration-30|spell_targets.chain_lightning=3&buff.wind_gust.stack<14)
     if S.FlameShock:IsCastableP() then
@@ -298,7 +298,7 @@ local function APL()
     end
     -- stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(!talent.surge_of_power.enabled|buff.surge_of_power.up|maelstrom>=44)
     if S.Stormkeeper:IsCastableP() and (S.Stormkeeper:IsAvailable() and EnemiesCount < 3 and (not S.SurgeofPower:IsAvailable() or Player:BuffP(S.SurgeofPowerBuff) or Player:Maelstrom() >= 44)) then
-      if HR.Cast(S.Stormkeeper) then return "stormkeeper 710"; end
+      if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.) then return "stormkeeper 710"; end
     end
     -- liquid_magma_totem,if=talent.liquid_magma_totem.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
     if S.LiquidMagmaTotem:IsCastableP() and (S.LiquidMagmaTotem:IsAvailable() and EnemiesCount < 3) then
@@ -427,7 +427,7 @@ local function APL()
     end
     -- stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(!talent.surge_of_power.enabled|buff.surge_of_power.up|maelstrom>=44)
     if S.Stormkeeper:IsCastableP() and (S.Stormkeeper:IsAvailable() and ((EnemiesCount - 1) < 3) and (not S.SurgeofPower:IsAvailable() or Player:BuffP(S.SurgeofPowerBuff) or Player:Maelstrom() >= 44)) then
-      if HR.Cast(S.Stormkeeper) then return "stormkeeper 236"; end
+      if HR.Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.) then return "stormkeeper 236"; end
     end
     -- liquid_magma_totem,if=talent.liquid_magma_totem.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
     if S.LiquidMagmaTotem:IsCastableP() and (S.LiquidMagmaTotem:IsAvailable() and ((EnemiesCount - 1) < 3)) then
@@ -574,7 +574,7 @@ local function APL()
     end
     -- fire_elemental,if=!talent.storm_elemental.enabled&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
     if S.FireElemental:IsCastableP() and (not S.StormElemental:IsAvailable() and (not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
-      if HR.Cast(S.FireElemental, Settings.Elemental.FireElemental) then return "fire_elemental 595"; end
+      if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "fire_elemental 595"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
@@ -606,7 +606,7 @@ local function APL()
     end
     -- storm_elemental,if=talent.storm_elemental.enabled&(!cooldown.stormkeeper.up|!talent.stormkeeper.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)&(!talent.ascendance.enabled|!buff.ascendance.up|expected_combat_length-time<32)&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
     if S.StormElemental:IsCastableP() and (S.StormElemental:IsAvailable() and (not S.Stormkeeper:CooldownUpP() or not S.Stormkeeper:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP()) and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff) or Target:TimeToDie() < 32) and (not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
-      if HR.Cast(S.StormElemental, Settings.Elemental.StormElemental) then return "storm_elemental 605"; end
+      if HR.Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental 605"; end
     end
     if (HR.CDsON()) then
       -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
