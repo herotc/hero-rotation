@@ -423,8 +423,8 @@ local function APL()
       if S.Fireblood:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 260"; end
       end
-      -- bag_of_tricks,if=buff.unholy_strength.up|buff.festermight.remains<gcd
-      if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD()) then
+      -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1|buff.festermight.remains<gcd&active_enemies=1
+      if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) and Cache.EnemiesCount[8] == 1 or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD() and Cache.EnemiesCount[8] == 1) then
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 260.5"; end
       end
     end
