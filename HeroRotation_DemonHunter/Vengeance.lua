@@ -39,6 +39,7 @@ Spell.DemonHunter.Vengeance = {
   FieryBrandDebuff                      = Spell(207771),
   Torment                               = Spell(185245),
   -- Talents
+  FlameCrash                            = Spell(227322),
   CharredFlesh                          = Spell(264002),
   ConcentratedSigils                    = Spell(207666),
   Felblade                              = Spell(232893),
@@ -67,7 +68,7 @@ local S = Spell.DemonHunter.Vengeance;
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Vengeance = {
-  SuperiorSteelskinPotion          = Item(168501),
+  PotionofUnbridledFury            = Item(169299),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14})
@@ -175,8 +176,8 @@ local function APL ()
     -- food
     -- snapshot_stats
     -- potion
-    if I.SuperiorSteelskinPotion:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.SuperiorSteelskinPotion) then return "superior_steelskin_potion precombat"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury precombat"; end
     end
     -- use_item,name=azsharas_font_of_power
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
@@ -246,8 +247,8 @@ local function APL ()
   end
   Cooldowns = function()
     -- potion
-    if I.SuperiorSteelskinPotion:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.SuperiorSteelskinPotion) then return "superior_steelskin_potion cooldowns"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury cooldowns"; end
     end
     -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
     if S.ConcentratedFlame:IsCastable() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
@@ -273,17 +274,20 @@ local function APL ()
     -- use_items
   end
   Normal = function()
-    -- actions+=/infernal_strike
-    if S.InfernalStrike:IsCastable() and not (S.CharredFlesh:IsAvailable() and Settings.Vengeance.BrandForDamage) and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+    -- actions+=/infernal_strike,if=(!talent.flame_crash.enabled|(dot.sigil_of_flame.remains<3&!action.infernal_strike.sigil_placed))
+    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (not S.FlameCrash:IsAvailable() or (Target:DebuffRemainsP(S.SigilofFlameDebuff) < 3 and S.InfernalStrike:TimeSinceLastCast() > 2)) then
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
     end
-    -- actions+=/spirit_bomb,if=soul_fragments>=4
-    if S.SpiritBomb:IsReady() and IsInAoERange and SoulFragments >= 4 then
+    -- actions+=/spirit_bomb,if=((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4)
+    if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffP(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4) then
       if HR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
     end
-    -- actions+=/soul_cleave,if=!talent.spirit_bomb.enabled
+    -- actions+=/soul_cleave,if=(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4))
+    if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() and ((Player:BuffP(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4)) then
+      if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
+    end
     -- actions+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
-    if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() or (S.SpiritBomb:IsAvailable() and SoulFragments == 0)) then
+    if S.SoulCleave:IsReady() and (S.SpiritBomb:IsAvailable() and SoulFragments == 0) then
       if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
     end
     -- actions+=/immolation_aura,if=pain<=90
