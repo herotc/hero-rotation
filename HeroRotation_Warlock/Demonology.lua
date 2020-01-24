@@ -457,10 +457,6 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     Everyone.Interrupt(40, S.SpellLock, Settings.Commons.OffGCDasOffGCD.SpellLock, StunInterrupts);
-    -- implosion,if=azerite.explosive_potential.enabled&talent.demonic_consumption.enabled&prev_gcd.1.summon_demonic_tyrant
-    if S.Implosion:IsCastableP() and (S.ExplosivePotential:AzeriteEnabled() and S.DemonicConsumption:IsAvailable() and Player:PrevGCDP(1, S.SummonDemonicTyrant)) then
-      if HR.Cast(S.Implosion, nil, nil, true) then return "implosion 320"; end
-    end
     -- potion,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 322"; end
