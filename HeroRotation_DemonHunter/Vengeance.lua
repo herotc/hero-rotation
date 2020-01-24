@@ -102,6 +102,11 @@ local function UpdateRanges()
 end
 
 HL:RegisterForEvent(function()
+  AEMajor      = HL.Spell:MajorEssence();
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
+
+HL:RegisterForEvent(function()
   S.ConcentratedFlame:RegisterInFlight();
 end, "LEARNED_SPELL_IN_TAB")
 S.ConcentratedFlame:RegisterInFlight();
