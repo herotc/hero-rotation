@@ -19,7 +19,6 @@ local Mage       = HR.Commons.Mage
 -- Azerite Essence Setup
 local AE         = HL.Enum.AzeriteEssences
 local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
