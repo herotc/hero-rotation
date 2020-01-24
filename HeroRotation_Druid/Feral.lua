@@ -122,6 +122,11 @@ HL:RegisterForEvent(function()
   VarOpenerDone = 0
 end, "PLAYER_REGEN_ENABLED")
 
+HL:RegisterForEvent(function()
+  AEMajor        = HL.Spell:MajorEssence();
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
+
 local EnemyRanges = {40, 8, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
