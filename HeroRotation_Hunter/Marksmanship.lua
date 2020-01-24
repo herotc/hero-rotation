@@ -236,7 +236,7 @@ local function APL()
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
     end
     -- worldvein_resonance,if=(trinket.azsharas_font_of_power.cooldown.remains>20|!equipped.azsharas_font_of_power|target.time_to_die<trinket.azsharas_font_of_power.cooldown.duration+34&target.health.pct>20)&(cooldown.trueshot.remains_guess<3|(essence.vision_of_perfection.minor&target.time_to_die>cooldown+buff.worldvein_resonance.duration))|target.time_to_die<20
-    if S.WorldveinResonance:IsCastableP() and ((I.AzsharasFontofPower:CooldownRemainsP() > 20 or not I.AzsharasFontofPower:IsEquipped() or Target:TimeToDie() < 154 and Target:HealthPercentage() > 20) and (S.Trueshot:CooldownRemainsP() < 3 or (S.VisionofPerfectionMinor:IsAvailable() and Target:TimeToDie() > S.WorldveinResonance:Cooldown() + 18)) or Target:TimeToDie() < 20) then
+    if S.WorldveinResonance:IsCastableP() and ((I.AzsharasFontofPower:CooldownRemainsP() > 20 or not I.AzsharasFontofPower:IsEquipped() or Target:TimeToDie() < 154 and Target:HealthPercentage() > 20) and (S.Trueshot:CooldownRemainsP() < 3 or (S.VisionofPerfectionMinor:IsLearned() and Target:TimeToDie() > S.WorldveinResonance:Cooldown() + 18)) or Target:TimeToDie() < 20) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=(ca_execute|target.time_to_die>cooldown+30)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<30
