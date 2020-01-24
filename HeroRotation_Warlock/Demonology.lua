@@ -462,7 +462,7 @@ local function APL()
       if HR.Cast(S.Implosion, nil, nil, true) then return "implosion 320"; end
     end
     -- potion,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)&(!talent.nether_portal.enabled|cooldown.nether_portal.remains>160)|target.time_to_die<30
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) and (not S.NetherPortal:IsAvailable() or S.NetherPortal:CooldownRemainsP() > 160) or Target:TimeToDie() < 30) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 322"; end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.summon_demonic_tyrant.remains<=20&!talent.nether_portal.enabled
@@ -471,27 +471,27 @@ local function APL()
     end
     -- use_items,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
     -- berserking,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
-    if S.Berserking:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
+    if S.Berserking:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 329"; end
     end
     -- blood_fury,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
-    if S.BloodFury:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
+    if S.BloodFury:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 331"; end
     end
     -- fireblood,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
+    if S.Fireblood:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 333"; end
     end
     -- blood_of_the_enemy,if=pet.demonic_tyrant.active&pet.demonic_tyrant.remains<=15-gcd*3&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)
-    if S.BloodoftheEnemy:IsCastableP() and (DemonicTyrantTime() > 0 and DemonicTyrantTime() <= 15 - Player:GCD() * 3 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5)) then
+    if S.BloodoftheEnemy:IsCastableP() and (DemonicTyrantTime() > 0 and DemonicTyrantTime() <= 15 - Player:GCD() * 3 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5)) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- worldvein_resonance,if=(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
-    if S.WorldveinResonance:IsCastableP() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
+    if S.WorldveinResonance:IsCastableP() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 334"; end
     end
     -- ripple_in_space,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
-    if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsAvailable() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
+    if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 and (not S.VisionofPerfection:IsLearned() or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle, true) then return "ripple_in_space 335"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
