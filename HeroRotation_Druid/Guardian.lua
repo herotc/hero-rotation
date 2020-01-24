@@ -68,7 +68,6 @@ Spell.Druid.Guardian = {
   RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
-  HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
   SharpenedClawsBuff                    = Spell(279943),
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565)
