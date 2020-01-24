@@ -47,7 +47,6 @@ Spell.Druid.Feral = {
   Rake                                  = Spell(1822),
   RakeDebuff                            = Spell(155722),
   SavageRoar                            = Spell(52610),
-  PoolResource                          = Spell(9999000010),
   SavageRoarBuff                        = Spell(52610),
   PrimalWrath                           = Spell(285381),
   RipDebuff                             = Spell(1079),
@@ -87,8 +86,8 @@ Spell.Druid.Feral = {
   ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696),
   HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
-  -- Icon for pulling enery
-  PoolEnergy                            = Spell(9999000010)
+  -- Icon for pooling energy
+  PoolResource                          = Spell(9999000010)
 };
 local S = Spell.Druid.Feral;
 
@@ -360,7 +359,7 @@ local function APL()
     end
     -- Pool if nothing else to do
     if (true) then
-      if HR.Cast(S.PoolEnergy) then return "pool_resource"; end
+      if HR.Cast(S.PoolResource) then return "pool_resource"; end
     end
   end
   Generators = function()
@@ -454,7 +453,7 @@ local function APL()
     end
     -- Pool if nothing else to do
     if (true) then
-      if HR.Cast(S.PoolEnergy) then return "pool_resource"; end
+      if HR.Cast(S.PoolResource) then return "pool_resource"; end
     end
   end
   Opener = function()
@@ -526,7 +525,7 @@ local function APL()
     end
     -- Pool if nothing else to do
     if (true) then
-      if HR.Cast(S.PoolEnergy) then return "pool_resource"; end
+      if HR.Cast(S.PoolResource) then return "pool_resource"; end
     end
   end
 end
