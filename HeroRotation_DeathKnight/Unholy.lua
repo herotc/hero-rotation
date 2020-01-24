@@ -263,7 +263,7 @@ local function APL()
       if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle 123"; end
     end
     -- unholy_frenzy,if=essence.vision_of_perfection.enabled|(essence.condensed_lifeforce.enabled&pet.apoc_ghoul.active)|debuff.festering_wound.stack<4&!(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled)|cooldown.apocalypse.remains<2&(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled)
-    if S.UnholyFrenzy:IsCastableP() and (S.VisionofPerfection:IsAvailable() or (S.GuardianofAzeroth:IsAvailable() and S.Apocalypse:CooldownRemainsP() > 75) or Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not (I.RampingAmplitudeGigavoltEngine:IsEquipped() or S.MagusoftheDead:AzeriteEnabled()) or S.Apocalypse:CooldownRemainsP() < 2 and (I.RampingAmplitudeGigavoltEngine:IsEquipped() or S.MagusoftheDead:AzeriteEnabled())) then
+    if S.UnholyFrenzy:IsCastableP() and (S.VisionofPerfection:IsLearned() or (S.GuardianofAzeroth:IsAvailable() and S.Apocalypse:CooldownRemainsP() > 75) or Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not (I.RampingAmplitudeGigavoltEngine:IsEquipped() or S.MagusoftheDead:AzeriteEnabled()) or S.Apocalypse:CooldownRemainsP() < 2 and (I.RampingAmplitudeGigavoltEngine:IsEquipped() or S.MagusoftheDead:AzeriteEnabled())) then
       if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 139"; end
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
@@ -313,11 +313,11 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- worldvein_resonance,if=talent.army_of_the_damned.enabled&essence.vision_of_perfection.minor&buff.unholy_strength.up|essence.vision_of_perfection.minor&pet.apoc_ghoul.active|talent.army_of_the_damned.enabled&pet.apoc_ghoul.active&cooldown.army_of_the_dead.remains>60|talent.army_of_the_damned.enabled&pet.army_ghoul.active
-    if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and S.VisionofPerfectionMinor:IsAvailable() and Player:BuffP(S.UnholyStrengthBuff) or S.VisionofPerfectionMinor:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15) then
+    if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and S.VisionofPerfectionMinor:IsLearned() and Player:BuffP(S.UnholyStrengthBuff) or S.VisionofPerfectionMinor:IsLearned() and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance with AotDamned"; end
     end
     -- worldvein_resonance,if=!death_and_decay.ticking&buff.unholy_strength.up&!essence.vision_of_perfection.minor&!talent.army_of_the_damned.enabled|target.time_to_die<cooldown.apocalypse.remains
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff) and Player:BuffP(S.UnholyStrengthBuff) and not S.VisionofPerfectionMinor:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToDie() < S.Apocalypse:CooldownRemainsP()) then
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff) and Player:BuffP(S.UnholyStrengthBuff) and not S.VisionofPerfectionMinor:IsLearned() and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToDie() < S.Apocalypse:CooldownRemainsP()) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance without AotDamned"; end
     end
     -- ripple_in_space,if=!death_and_decay.ticking
@@ -434,11 +434,11 @@ local function APL()
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 261"; end
       end
       -- use_item,name=azsharas_font_of_power,if=(essence.vision_of_perfection.enabled&!talent.unholy_frenzy.enabled)|(!essence.condensed_lifeforce.major&!essence.vision_of_perfection.enabled)
-      if I.AzsharasFontofPower:IsEquipReady() and ((S.VisionofPerfectionMinor:IsAvailable() and not S.UnholyFrenzy:IsAvailable()) or (not S.GuardianofAzeroth:IsAvailable() and not S.VisionofPerfectionMinor:IsAvailable())) then
+      if I.AzsharasFontofPower:IsEquipReady() and ((S.VisionofPerfectionMinor:IsLearned() and not S.UnholyFrenzy:IsAvailable()) or (not S.GuardianofAzeroth:IsAvailable() and not S.VisionofPerfectionMinor:IsLearned())) then
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 262"; end
       end
       -- use_item,name=azsharas_font_of_power,if=cooldown.apocalypse.remains<14&(essence.condensed_lifeforce.major|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled)
-      if I.AzsharasFontofPower:IsEquipReady() and (S.Apocalypse:CooldownRemainsP() < 14 and (S.GuardianofAzeroth:IsAvailable() or S.VisionofPerfectionMinor:IsAvailable() and S.UnholyFrenzy:IsAvailable())) then
+      if I.AzsharasFontofPower:IsEquipReady() and (S.Apocalypse:CooldownRemainsP() < 14 and (S.GuardianofAzeroth:IsAvailable() or S.VisionofPerfectionMinor:IsLearned() and S.UnholyFrenzy:IsAvailable())) then
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 263"; end
       end
       -- use_item,name=azsharas_font_of_power,if=target.1.time_to_die<cooldown.apocalypse.remains+34
@@ -462,7 +462,7 @@ local function APL()
         if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 268"; end
       end
       -- use_item,name=vision_of_demise,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&essence.vision_of_perfection.enabled)|buff.unholy_frenzy.up|pet.gargoyle.active
-      if I.VisionofDemise:IsEquipReady() and ((S.Apocalypse:CooldownUpP() and Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and S.VisionofPerfection:IsAvailable()) or Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
+      if I.VisionofDemise:IsEquipReady() and ((S.Apocalypse:CooldownUpP() and Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and S.VisionofPerfection:IsLearned()) or Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
         if HR.Cast(I.VisionofDemise, nil, Settings.Commons.TrinketDisplayStyle) then return "vision_of_demise 269"; end
       end
       -- use_item,name=ramping_amplitude_gigavolt_engine,if=cooldown.apocalypse.remains<2|talent.army_of_the_damned.enabled|raid_event.adds.in<5
