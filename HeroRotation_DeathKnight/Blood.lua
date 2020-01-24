@@ -111,6 +111,11 @@ local function UpdateRanges()
   end
 end
 
+HL:RegisterForEvent(function()
+  AEMajor      = HL.Spell:MajorEssence();
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
+
 local function num(val)
   if val then return 1 else return 0 end
 end
