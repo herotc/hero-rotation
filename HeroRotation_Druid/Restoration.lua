@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -51,8 +56,7 @@ Spell.Druid.Restoration = {
   FerociousBite                         = Spell(22568),
   SwipeCat                              = Spell(213764),
   Shred                                 = Spell(5221),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  MemoryofLucidDreams                   = Spell(298357),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
   Pool                                  = Spell(9999000010)

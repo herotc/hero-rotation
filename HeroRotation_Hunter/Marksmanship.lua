@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -61,21 +66,18 @@ Spell.Hunter.Marksmanship = {
   CounterShot                           = Spell(147362),
   Exhilaration                          = Spell(109304),
   RazorCoralDebuff                      = Spell(303568),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  VisionofPerfection                    = MultiSpell(296325, 299368, 299370),
-  VisionofPerfectionMinor               = MultiSpell(296320, 299367, 299369),
-  SparkofInspiration                    = MultiSpell(311203, 311302, 311303),
-  SparkofInspirationMinor               = MultiSpell(311210, 311304, 311306),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  VisionofPerfection                    = Spell(296325),
+  SparkofInspiration                    = Spell(311203),
+  ReapingFlames                         = Spell(310690),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
@@ -236,7 +238,7 @@ local function APL()
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
     end
     -- worldvein_resonance,if=(trinket.azsharas_font_of_power.cooldown.remains>20|!equipped.azsharas_font_of_power|target.time_to_die<trinket.azsharas_font_of_power.cooldown.duration+34&target.health.pct>20)&(cooldown.trueshot.remains_guess<3|(essence.vision_of_perfection.minor&target.time_to_die>cooldown+buff.worldvein_resonance.duration))|target.time_to_die<20
-    if S.WorldveinResonance:IsCastableP() and ((I.AzsharasFontofPower:CooldownRemainsP() > 20 or not I.AzsharasFontofPower:IsEquipped() or Target:TimeToDie() < 154 and Target:HealthPercentage() > 20) and (S.Trueshot:CooldownRemainsP() < 3 or (S.VisionofPerfectionMinor:IsLearned() and Target:TimeToDie() > S.WorldveinResonance:Cooldown() + 18)) or Target:TimeToDie() < 20) then
+    if S.WorldveinResonance:IsCastableP() and ((I.AzsharasFontofPower:CooldownRemainsP() > 20 or not I.AzsharasFontofPower:IsEquipped() or Target:TimeToDie() < 154 and Target:HealthPercentage() > 20) and (S.Trueshot:CooldownRemainsP() < 3 or (Spell:EssenceEnabled(AE.VisionofPerfection) and Target:TimeToDie() > S.WorldveinResonance:Cooldown() + 18)) or Target:TimeToDie() < 20) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- guardian_of_azeroth,if=(ca_execute|target.time_to_die>cooldown+30)&(buff.trueshot.up|cooldown.trueshot.remains<16)|target.time_to_die<30
@@ -421,11 +423,11 @@ local function APL()
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.trueshot.up&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major&target.health.pct<20)|debuff.razor_coral_debuff.down|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.TrueshotBuff) and (S.GuardianofAzeroth:CooldownRemainsP() > 150 or not S.GuardianofAzeroth:IsAvailable() and Target:HealthPercentage() < 20) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.TrueshotBuff) and (S.GuardianofAzeroth:CooldownRemainsP() > 150 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:HealthPercentage() < 20) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up|target.time_to_die<5
-    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.TrueshotBuff) and not S.BloodoftheEnemy:IsAvailable() or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
+    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.TrueshotBuff) and not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
       if Hr.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20

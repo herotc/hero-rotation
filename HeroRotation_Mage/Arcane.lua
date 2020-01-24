@@ -16,6 +16,11 @@ local Item       = HL.Item
 local HR         = HeroRotation
 local Mage       = HR.Commons.Mage
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -63,17 +68,16 @@ Spell.Mage.Arcane = {
   Counterspell                          = Spell(2139),
   --Shimmer                               = Spell(212653),
   Blink                                 = MultiSpell(1953, 212653),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368)
 };
@@ -335,7 +339,7 @@ local function APL()
       if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 223"; end
     end
     -- potion,if=buff.arcane_power.up&((!essence.condensed_lifeforce.major|essence.condensed_lifeforce.rank<2)&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))|buff.guardian_of_azeroth.up)|target.time_to_die<cooldown.arcane_power.remains
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and ((not S.CondensedLifeforce:IsAvailable() or S.GuardianofAzeroth:ID() == "295840") and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc"))) or S.GuardianofAzeroth:CooldownRemainsP() > 20) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and ((not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Spell:EssenceRank(AE.CondensedLifeForce) < 2) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc"))) or S.GuardianofAzeroth:CooldownRemainsP() > 20) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
       if HR.Cast(I.PotionofFocusedResolve, nil, Settings.Commons.TrinketDisplayStyle) then return "battle_potion_of_intellect 225"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))

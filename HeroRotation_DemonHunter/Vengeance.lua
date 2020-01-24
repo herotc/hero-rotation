@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -55,11 +60,11 @@ Spell.DemonHunter.Vengeance = {
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
   -- Essences
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
+  MemoryofLucidDreams                   = Spell(298357),
+  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
+  WorldveinResonance                    = Spell(295186, 298628, 299334),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
 };
@@ -263,6 +268,9 @@ local function APL ()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams cooldowns"; end
     end
     -- heart_essence
+    if S.HeartEssence:IsCastable() then
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence cooldowns"; end
+    end
     -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
     if Everyone.CyclotronicBlastReady() and (Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast cooldowns"; end

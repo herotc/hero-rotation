@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
 
@@ -61,6 +66,8 @@ Spell.DeathKnight.Blood = {
   VampiricBlood         = Spell(55233),
   -- Trinket Effects
   RazorCoralDebuff      = Spell(303568),
+  -- Essences
+  HeartEssence          = Spell(AESpellIDs[AEMajor.ID]),
   -- Misc
   Pool                  = Spell(9999000010)
 };
@@ -185,7 +192,9 @@ local function APL ()
       if HR.Cast(S.Marrowrend) then return ""; end
     end
     -- heart_essence,if=!buff.dancing_rune_weapon.up
-    -- TODO: Make heart_essence work
+    if S.HeartEssence:IsCastable() and (Player:BuffDownP(S.DancingRuneWeaponBuff)) then
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
+    end
     -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
     if S.BloodBoil:IsCastable() and Cache.EnemiesCount[10] >= 1 and (S.BloodBoil:ChargesFractionalP() >= 1.8 and (Player:BuffStackP(S.HemostasisBuff) <= (5 - Cache.EnemiesCount[10]) or Cache.EnemiesCount[10] > 2)) then
       if HR.Cast(S.BloodBoil) then return ""; end

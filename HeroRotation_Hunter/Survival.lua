@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -57,16 +62,16 @@ Spell.Hunter.Survival = {
   Exhilaration                          = Spell(109304),
   Muzzle                                = Spell(187707),
   Intimidation                          = Spell(19577),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   Carve                                 = Spell(187708),
@@ -387,7 +392,7 @@ local function APL()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 298"; end
     end
     -- potion,if=buff.guardian_of_azeroth.up&(buff.berserking.up|buff.blood_fury.up|!race.troll)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)|!essence.condensed_lifeforce.major&buff.coordinated_assault.up
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (S.GuardianofAzeroth:CooldownRemainsP() > 150 and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll")) or Target:TimeToDie() < 61 or not S.GuardianofAzeroth:IsAvailable() and Player:BuffP(S.CoordinatedAssaultBuff)) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (S.GuardianofAzeroth:CooldownRemainsP() > 150 and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not Player:IsRace("Troll")) or Target:TimeToDie() < 61 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Player:BuffP(S.CoordinatedAssaultBuff)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 308"; end
     end
     -- aspect_of_the_eagle,if=target.distance>=6
@@ -399,7 +404,7 @@ local function APL()
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 321"; end
     end
     -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
-    if I.GalecallersBoon:IsEquipReady() and Settings.Commons.UseTrinkets and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(I.PocketsizedComputationDevice:CooldownRemains()) or not S.MemoryofLucidDreams:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP())) then
+    if I.GalecallersBoon:IsEquipReady() and Settings.Commons.UseTrinkets and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(I.PocketsizedComputationDevice:CooldownRemains()) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and bool(S.CoordinatedAssault:CooldownRemainsP())) then
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 322"; end
     end
     -- use_item,name=azsharas_font_of_power

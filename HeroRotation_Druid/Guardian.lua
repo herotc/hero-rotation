@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -56,15 +61,14 @@ Spell.Druid.Guardian = {
   WildChargeBear                        = Spell(16979),
   SurvivalInstincts                     = Spell(61336),
   SkullBash                             = Spell(106839),
-  AnimaofDeath                          = MultiSpell(294926, 300002, 300003),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  Conflict                              = MultiSpell(303823, 304088, 304121),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  AnimaofDeath                          = Spell(294926),
+  MemoryofLucidDreams                   = Spell(298357),
+  Conflict                              = Spell(303823),
+  WorldveinResonance                    = Spell(295186),
+  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
-  HeartEssence                          = Spell(298554),
+  HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
   SharpenedClawsBuff                    = Spell(279943),
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565)
@@ -224,7 +228,7 @@ local function APL()
   end
   Multi = function()
     -- maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
-    if S.Maul:IsReadyP() and UseMaul and (not S.Conflict:IsAvailable() and Player:BuffDownP(S.SharpenedClawsBuff)) then
+    if S.Maul:IsReadyP() and UseMaul and (Spell:MajorEssenceEnabled(AE.ConflictandStrife) and Player:BuffDownP(S.SharpenedClawsBuff)) then
       if HR.Cast(S.Maul) then return "maul 91"; end
     end
     -- ironfur,if=(rage>=cost&azerite.layered_mane.enabled)|rage.deficit<10
