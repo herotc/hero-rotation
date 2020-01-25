@@ -85,7 +85,9 @@ Spell.Druid.Feral = {
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696),
-  HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
+  if AEMajor ~= nil then
+    HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
+  end
   -- Icon for pooling energy
   PoolResource                          = Spell(9999000010)
 };

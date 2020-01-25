@@ -60,7 +60,9 @@ Spell.DemonHunter.Vengeance = {
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
   -- Essences
-  HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
+  if AEMajor ~= nil then
+    HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
+  end
   MemoryofLucidDreams                   = Spell(298357),
   RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),

@@ -67,7 +67,9 @@ Spell.DeathKnight.Blood = {
   -- Trinket Effects
   RazorCoralDebuff      = Spell(303568),
   -- Essences
-  HeartEssence          = Spell(AESpellIDs[AEMajor.ID]),
+  if AEMajor ~= nil then
+    HeartEssence          = Spell(AESpellIDs[AEMajor.ID]),
+  end
   -- Misc
   Pool                  = Spell(9999000010)
 };
