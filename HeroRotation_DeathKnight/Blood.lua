@@ -66,14 +66,13 @@ Spell.DeathKnight.Blood = {
   VampiricBlood         = Spell(55233),
   -- Trinket Effects
   RazorCoralDebuff      = Spell(303568),
-  -- Essences
-  if AEMajor ~= nil then
-    HeartEssence          = Spell(AESpellIDs[AEMajor.ID]),
-  end
   -- Misc
   Pool                  = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Blood;
+if AEMajor ~= nil then
+  S.HeartEssence          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {}; end

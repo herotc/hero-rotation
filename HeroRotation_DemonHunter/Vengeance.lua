@@ -60,9 +60,6 @@ Spell.DemonHunter.Vengeance = {
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
   -- Essences
-  if AEMajor ~= nil then
-    HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
-  end
   MemoryofLucidDreams                   = Spell(298357),
   RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
@@ -71,6 +68,9 @@ Spell.DemonHunter.Vengeance = {
   ConcentratedFlameBurn                 = Spell(295368),
 };
 local S = Spell.DemonHunter.Vengeance;
+if AEMajor ~= nil then
+  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end

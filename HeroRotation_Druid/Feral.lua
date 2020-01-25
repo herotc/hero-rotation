@@ -85,13 +85,13 @@ Spell.Druid.Feral = {
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696),
-  if AEMajor ~= nil then
-    HeartEssence                          = Spell(AESpellIDs[AEMajor.ID]),
-  end
   -- Icon for pooling energy
   PoolResource                          = Spell(9999000010)
 };
 local S = Spell.Druid.Feral;
+if AEMajor ~= nil then
+  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Items
 if not Item.Druid then Item.Druid = {} end
