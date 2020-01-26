@@ -385,8 +385,8 @@ local function APL()
     if S.Thorns:IsCastableP() then
       if HR.Cast(S.Thorns, nil, Settings.Commons.EssenceDisplayStyle) then return "thorns"; end
     end
-    -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up
-    -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up
+    -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up|target.1.time_to_die<20
+    -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up|target.1.time_to_die<20
     -- use_items
     -- warrior_of_elune
     if S.WarriorofElune:IsCastableP() then
