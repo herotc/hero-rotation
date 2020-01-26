@@ -563,6 +563,10 @@ local function APL()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Target:TimeToDie() < 60 or S.GuardianofAzeroth:CooldownRemainsP() <30) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 577"; end
     end
+    -- flame_shock,if=!ticking&spell_targets.chainlightning<4&(cooldown.storm_elemental.remains<cooldown.storm_elemental.duration-30|buff.wind_gust.stack<14)
+    if S.FlameShock:IsCastableP() and (Target:DebuffDownP(S.FlameShockDebuff) and EnemiesCount < 4 and (S.StormElemental:CooldownRemainsP() < 120 or Player:BuffStackP(S.WindGustBuff) < 14)) then
+      if HR.Cast(S.FlameShock) then return "flame_shock 583"; end
+    end
     -- totem_mastery,if=talent.totem_mastery.enabled&buff.resonance_totem.remains<2
     if S.TotemMastery:IsReadyP() and (S.TotemMastery:IsAvailable() and Player:BuffDownP(S.ResonanceTotemBuff)) then
       if HR.Cast(S.TotemMastery) then return "totem_mastery 585"; end
