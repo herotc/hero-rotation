@@ -105,8 +105,8 @@ Item.DeathKnight.Frost = {
   -- "Other On Use"
   NotoriousGladiatorsBadge         = Item(167380, {13, 14}),
   NotoriousGladiatorsMedallion     = Item(167377, {13, 14}),
-  SinisterGladiatorsBadge          = Item(165058, {13, 14}),
-  SinisterGladiatorsMedallion      = Item(165055, {13, 14}),
+  CorruptedGladiatorsBadge         = Item(172669, {13, 14}),
+  CorruptedGladiatorsMedallion     = Item(172666, {13, 14}),
   VialofAnimatedBlood              = Item(159625, {13, 14}),
   JesHowler                        = Item(159627, {13, 14})
 };
@@ -162,9 +162,9 @@ local function APL()
     if I.AzsharasFontofPower:IsEquipReady() then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
     end
-    -- variable,name=other_on_use_equipped,value=(equipped.notorious_gladiators_badge|equipped.sinister_gladiators_badge|equipped.sinister_gladiators_medallion|equipped.vial_of_animated_blood|equipped.first_mates_spyglass|equipped.jes_howler|equipped.notorious_gladiators_medallion|equipped.ashvanes_razor_coral)
+    -- variable,name=other_on_use_equipped,value=(equipped.notorious_gladiators_badge|equipped.corrupted_gladiators_badge|equipped.corrupted_gladiators_medallion|equipped.vial_of_animated_blood|equipped.first_mates_spyglass|equipped.jes_howler|equipped.notorious_gladiators_medallion|equipped.ashvanes_razor_coral)
     if (true) then
-      VarOoUE = (I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.VialofAnimatedBlood:IsEquipped() or I.FirstMatesSpyglass:IsEquipped() or I.JesHowler:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.AshvanesRazorCoral:IsEquipped())
+      VarOoUE = (I.NotoriousGladiatorsBadge:IsEquipped() or I.CorruptedGladiatorsBadge:IsEquipped() or I.CorruptedGladiatorsMedallion:IsEquipped() or I.VialofAnimatedBlood:IsEquipped() or I.FirstMatesSpyglass:IsEquipped() or I.JesHowler:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.AshvanesRazorCoral:IsEquipped())
     end
     -- opener
     if Everyone.TargetIsValid() then
