@@ -15,6 +15,10 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -64,18 +68,16 @@ Spell.Warlock.Affliction = {
   PhantomSingularityDebuff              = Spell(205179),
   Berserking                            = Spell(26297),
   ShiverVenomDebuff                     = Spell(301624),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  VisionofPerfectionMinor               = MultiSpell(296320, 299367, 299369),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
@@ -295,7 +297,7 @@ local function EvaluateTargetIfFilterPhantomSingularity841(TargetUnit)
 end
 
 local function EvaluateTargetIfPhantomSingularity850(TargetUnit)
-  return HL.CombatTime() > 35 and TargetUnit:TimeToDie() > 16 * Player:SpellHaste() and (not S.VisionofPerfectionMinor:IsLearned() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 45 + Player:SoulShardsP() * S.DreadfulCalling:AzeriteRank() or S.SummonDarkglare:CooldownRemainsP() < 15 * Player:SpellHaste() + Player:SoulShardsP() * S.DreadfulCalling:AzeriteRank())
+  return HL.CombatTime() > 35 and TargetUnit:TimeToDie() > 16 * Player:SpellHaste() and (not Spell:EssenceEnabled(AE.VisionofPerfection) and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 45 + Player:SoulShardsP() * S.DreadfulCalling:AzeriteRank() or S.SummonDarkglare:CooldownRemainsP() < 15 * Player:SpellHaste() + Player:SoulShardsP() * S.DreadfulCalling:AzeriteRank())
 end
 
 local function EvaluateTargetIfFilterVileTaint856(TargetUnit)
@@ -389,7 +391,7 @@ local function APL()
       if HR.Cast(S.DarkSoul) then return "dark_soul 60"; end
     end
     -- blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
-    if S.BloodoftheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and not S.BloodoftheEnemy:ID() == 297108) then
+    if S.BloodoftheEnemy:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() > 160 or (S.Deathbolt:CooldownUpP() or not S.Deathbolt:IsAvailable()) and S.SummonDarkglare:CooldownRemainsP() >= 80 and Spell:EssenceRank(AE.BloodoftheEnemy) > 1) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 61"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_darkglare.remains>=25&(cooldown.deathbolt.remains|!talent.deathbolt.enabled)
@@ -619,7 +621,7 @@ local function APL()
       if HR.Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "summon_darkglare 716"; end
     end
     -- deathbolt,if=cooldown.summon_darkglare.remains&spell_targets.seed_of_corruption_aoe=1+raid_event.invulnerable.up&(!essence.vision_of_perfection.minor&!azerite.dreadful_calling.rank|cooldown.summon_darkglare.remains>30)
-    if S.Deathbolt:IsCastableP() and (bool(S.SummonDarkglare:CooldownRemainsP()) and EnemiesCount == 1 and (not S.VisionofPerfectionMinor:IsLearned() and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 30)) then
+    if S.Deathbolt:IsCastableP() and (bool(S.SummonDarkglare:CooldownRemainsP()) and EnemiesCount == 1 and (not Spell:EssenceEnabled(AE.VisionofPerfection) and not bool(S.DreadfulCalling:AzeriteRank()) or S.SummonDarkglare:CooldownRemainsP() > 30)) then
       if HR.Cast(S.Deathbolt, nil, nil, true) then return "deathbolt 734"; end
     end
     -- the_unbound_force,if=buff.reckless_force.remains
@@ -691,8 +693,8 @@ local function APL()
     if S.VileTaint:IsCastableP() and (HL.CombatTime() < 15) then
       if HR.Cast(S.VileTaint, nil, nil, true) then return "vile_taint 883"; end
     end
-    -- guardian_of_azeroth,if=cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled|(azerite.dreadful_calling.rank|essence.vision_of_perfection.rank)&time>30&target.time_to_die>=210)&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
-    if S.GuardianofAzeroth:IsCastableP() and (S.SummonDarkglare:CooldownRemainsP() < 15 + Player:SoulShardsP() * num(S.DreadfulCalling:AzeriteEnabled()) or ((S.DreadfulCalling:AzeriteEnabled() or S.VisionofPerfectionMinor:IsLearned()) and HL.CombatTime() > 30 and Target:TimeToDie() >= 210) and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.VileTaint) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 30 + Player:GCD()) then
+    -- guardian_of_azeroth,if=(cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled|(azerite.dreadful_calling.rank|essence.vision_of_perfection.rank)&time>30&target.time_to_die>=210)&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<30+gcd
+    if S.GuardianofAzeroth:IsCastableP() and ((S.SummonDarkglare:CooldownRemainsP() < 15 + Player:SoulShardsP() * num(S.DreadfulCalling:AzeriteEnabled()) or (S.DreadfulCalling:AzeriteEnabled() or Spell:EssenceEnabled(AE.VisionofPerfection)) and HL.CombatTime() > 30 and Target:TimeToDie() >= 210) and (Target:DebuffP(S.PhantomSingularityDebuff) or Target:DebuffP(S.VileTaint) or not S.PhantomSingularity:IsAvailable() and not S.VileTaint:IsAvailable()) or Target:TimeToDie() < 30 + Player:GCD()) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle, true) then return "guardian_of_azeroth 884"; end
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains<15+soul_shard*azerite.dreadful_calling.enabled&(dot.phantom_singularity.remains|dot.vile_taint.remains|!talent.phantom_singularity.enabled&!talent.vile_taint.enabled)|target.time_to_die<20+gcd|spell_targets.seed_of_corruption_aoe>1+raid_event.invulnerable.up

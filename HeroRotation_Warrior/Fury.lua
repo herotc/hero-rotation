@@ -15,6 +15,10 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -53,17 +57,16 @@ Spell.Warrior.Fury = {
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
   ColdSteelHotBlood                     = Spell(288080),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  CondensedLifeforce                    = MultiSpell(295834, 299354, 299357),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932),
   RazorCoralDebuff                      = Spell(303568),
@@ -230,7 +233,7 @@ local function APL()
       return Movement();
     end
     -- potion,if=buff.guardian_of_azeroth.up|(!essence.condensed_lifeforce.major&target.time_to_die=60)
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and ((S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) or (not S.GuardianofAzeroth:IsAvailable() and Target:TimeToDie() == 60)) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and ((Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and S.GuardianofAzeroth:CooldownRemainsP() > 150) or (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:TimeToDie() == 60)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
     end
     -- rampage,if=cooldown.recklessness.remains<3
@@ -278,7 +281,7 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>1|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
-    if S.Recklessness:IsCastableP() and HR.CDsON() and (not S.CondensedLifeforce:IsAvailable() and not S.BloodoftheEnemy:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 1 or Player:BuffP(S.GuardianofAzeroth) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
+    if S.Recklessness:IsCastableP() and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or S.GuardianofAzeroth:CooldownRemainsP() > 1 or Player:BuffP(S.GuardianofAzeroth) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
@@ -286,7 +289,7 @@ local function APL()
       if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() < 20 or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzeroth) or not S.MemoryofLucidDreams:IsAvailable() and not S.GuardianofAzeroth:IsAvailable()))) then
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() < 20 or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzeroth) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and not Spell:MajorEssenceEnabled(AE.CondensedLifeForce)))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 115"; end
     end
     if (HR.CDsON()) then

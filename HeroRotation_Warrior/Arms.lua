@@ -15,6 +15,10 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -67,16 +71,16 @@ Spell.Warrior.Arms = {
   IntimidatingShout                     = Spell(5246),
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
@@ -171,11 +175,11 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 12"; end
     end
     -- colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.ColossusSmash:IsCastableP("Melee") and (not S.MemoryofLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
+    if S.ColossusSmash:IsCastableP("Melee") and (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
       if HR.Cast(S.ColossusSmash) then return "colossus_smash 22"; end
     end
     -- warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() and (not S.MemoryofLucidDreams:IsAvailable() or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
+    if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
       if HR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker 26"; end
     end
     -- deadly_calm
@@ -405,16 +409,16 @@ local function APL()
       return Movement();
     end
     -- potion,if=target.health.pct<21&buff.memory_of_lucid_dreams.up|!essence.memory_of_lucid_dreams.major
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Target:HealthPercentage() < 21 and Player:BuffP(S.MemoryofLucidDreams) or not S.MemoryofLucidDreams:IsAvailable()) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Target:HealthPercentage() < 21 and Player:BuffP(S.MemoryofLucidDreams) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 354"; end
     end
     if (HR.CDsON()) then
       -- blood_fury,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-      if S.BloodFury:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
+      if S.BloodFury:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
         if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 356"; end
       end
       -- berserking,if=buff.memory_of_lucid_dreams.up|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-      if S.Berserking:IsCastableP() and (Player:BuffP(S.MemoryofLucidDreams) or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
+      if S.Berserking:IsCastableP() and (Player:BuffP(S.MemoryofLucidDreams) or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 360"; end
       end
       -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&buff.memory_of_lucid_dreams.down&rage<50
@@ -426,20 +430,20 @@ local function APL()
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 370"; end
       end
       -- fireblood,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-      if S.Fireblood:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
+      if S.Fireblood:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 374"; end
       end
       -- ancestral_call,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-      if S.AncestralCall:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
+      if S.AncestralCall:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
       end
       -- bag_of_tricks,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-      if S.BagofTricks:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff))) then
+      if S.BagofTricks:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 379"; end
       end
     end
     -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<20.1&buff.memory_of_lucid_dreams.up&cooldown.memory_of_lucid_dreams.remains<117)|(target.health.pct<30.1&debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major)|(!debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)|target.time_to_die<30
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 20.1 and Player:BuffP(S.MemoryofLucidDreams) and S.MemoryofLucidDreams:CooldownRemainsP() < 117) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff) and not S.MemoryofLucidDreams:IsAvailable()) or (Target:DebuffDownP(S.ConductiveInkDebuff) and not S.MemoryofLucidDreams:IsAvailable() and Target:DebuffP(S.ColossusSmashDebuff)) or Target:TimeToDie() < 30) then
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 20.1 and Player:BuffP(S.MemoryofLucidDreams) and S.MemoryofLucidDreams:CooldownRemainsP() < 117) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff) and not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff)) or Target:TimeToDie() < 30) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 381"; end
     end
     -- avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)

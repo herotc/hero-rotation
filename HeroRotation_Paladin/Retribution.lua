@@ -15,6 +15,10 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -49,16 +53,16 @@ Spell.Paladin.Retribution = {
   CrusaderStrike                        = Spell(35395),
   Rebuke                                = Spell(96231),
   HammerofJustice                       = Spell(853),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   SeethingRageBuff                      = Spell(297126),
@@ -143,7 +147,7 @@ local function APL()
   end
   Cooldowns = function()
     -- potion,if=(cooldown.guardian_of_azeroth.remains>90|!essence.condensed_lifeforce.major)&(buff.bloodlust.react|buff.avenging_wrath.up&buff.avenging_wrath.remains>18|buff.crusade.up&buff.crusade.remains<25)
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and ((S.GuardianofAzeroth:CooldownRemainsP() > 90 or not S.GuardianofAzeroth:IsAvailable()) and (Player:HasHeroism() or Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) > 18 or Player:BuffP(S.CrusadeBuff) and Player:BuffRemainsP(S.CrusadeBuff) < 25)) then
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and ((S.GuardianofAzeroth:CooldownRemainsP() > 90 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce)) and (Player:HasHeroism() or Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) > 18 or Player:BuffP(S.CrusadeBuff) and Player:BuffRemainsP(S.CrusadeBuff) < 25)) then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_strength 10"; end
     end
     -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
@@ -159,7 +163,7 @@ local function APL()
       if HR.CastLeft(S.ShieldofVengeance) then return "shield_of_vengeance 30"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.avenging_wrath.remains>=20|buff.crusade.stack=10&buff.crusade.remains>15)&(cooldown.guardian_of_azeroth.remains>90|target.time_to_die<30|!essence.condensed_lifeforce.major)
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) and (S.GuardianofAzeroth:CooldownRemainsP() > 90 or Target:TimeToDie() < 30 or not S.GuardianofAzeroth:IsAvailable())) then
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Player:BuffRemainsP(S.AvengingWrath) >= 20 or Player:BuffStackP(S.CrusadeBuff) == 10 and Player:BuffRemainsP(S.CrusadeBuff) > 15) and (S.GuardianofAzeroth:CooldownRemainsP() > 90 or Target:TimeToDie() < 30 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then reutrn "ashvanes_razor_coral"; end
     end
     -- the_unbound_force,if=time<=2|buff.reckless_force.up

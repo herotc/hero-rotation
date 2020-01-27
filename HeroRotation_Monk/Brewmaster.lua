@@ -15,6 +15,11 @@ local Item = HL.Item
 -- HeroRotation
 local HR = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -60,19 +65,18 @@ Spell.Monk.Brewmaster = {
   ModerateStagger                       = Spell(124274),
   LightStagger                          = Spell(124275),
   -- Essences
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  SuppressingPulse                      = MultiSpell(293031, 300009, 300010),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  SuppressingPulse                      = Spell(293031),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
-  HeartEssence                          = Spell(298554),
   -- Trinket Effects
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
@@ -80,6 +84,9 @@ Spell.Monk.Brewmaster = {
   PoolEnergy                            = Spell(9999000010)
 };
 local S = Spell.Monk.Brewmaster;
+if AEMajor ~= nil then
+  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Items
 if not Item.Monk then Item.Monk = {} end
@@ -101,6 +108,11 @@ local Settings = {
   Commons = HR.GUISettings.APL.Monk.Commons,
   Brewmaster = HR.GUISettings.APL.Monk.Brewmaster
 };
+
+HL:RegisterForEvent(function()
+  AEMajor        = HL.Spell:MajorEssence();
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 -- Array of the 3 stagger levels
 local staggerDebuffs = {
@@ -326,7 +338,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- heart_essence,if=!essence.the_crucible_of_flame.major
-    if S.HeartEssence:IsCastableP() and (not S.ConcentratedFlame:IsAvailable()) then
+    if S.HeartEssence:IsCastableP() and (not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3

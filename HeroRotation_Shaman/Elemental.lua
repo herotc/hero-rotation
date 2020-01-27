@@ -18,6 +18,10 @@ local Shaman     = HR.Commons.Shaman
 -- LUA
 local floor      = math.floor
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -69,16 +73,16 @@ Spell.Shaman.Elemental = {
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   LightningLasso                        = Spell(305483)
@@ -577,7 +581,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- fire_elemental,if=!talent.storm_elemental.enabled&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
-    if S.FireElemental:IsCastableP() and (not S.StormElemental:IsAvailable() and (not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
+    if S.FireElemental:IsCastableP() and (not S.StormElemental:IsAvailable() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
       if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental) then return "fire_elemental 595"; end
     end
     -- focused_azerite_beam
@@ -609,7 +613,7 @@ local function APL()
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- storm_elemental,if=talent.storm_elemental.enabled&(!cooldown.stormkeeper.up|!talent.stormkeeper.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)&(!talent.ascendance.enabled|!buff.ascendance.up|expected_combat_length-time<32)&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
-    if S.StormElemental:IsCastableP() and (S.StormElemental:IsAvailable() and (not S.Stormkeeper:CooldownUpP() or not S.Stormkeeper:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP()) and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff) or Target:TimeToDie() < 32) and (not S.GuardianofAzeroth:IsAvailable() or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
+    if S.StormElemental:IsCastableP() and (S.StormElemental:IsAvailable() and (not S.Stormkeeper:CooldownUpP() or not S.Stormkeeper:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP()) and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff) or Target:TimeToDie() < 32) and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
       if HR.Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental) then return "storm_elemental 605"; end
     end
     if (HR.CDsON()) then

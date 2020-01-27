@@ -15,6 +15,11 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -42,22 +47,24 @@ Spell.Paladin.Protection = {
   HandoftheProtector                    = Spell(213652),
   Rebuke                                = Spell(96231),
   RazorCoralDebuff                      = Spell(303568),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  AnimaofDeath                          = MultiSpell(294926, 300002, 300003),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  AnimaofDeath                          = Spell(294926),
   LifebloodBuff                         = MultiSpell(295137, 305694),
-  HeartEssence                          = Spell(298554),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368)
 };
 local S = Spell.Paladin.Protection;
+if AEMajor ~= nil then
+  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
@@ -89,6 +96,11 @@ local function UpdateRanges()
     HL.GetEnemies(i);
   end
 end
+
+HL:RegisterForEvent(function()
+  AEMajor        = HL.Spell:MajorEssence();
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -249,7 +261,7 @@ local function APL()
       if HR.Cast(S.Judgment) then return "judgment 129"; end
     end
     -- concentrated_flame,if=(!talent.seraphim.enabled|buff.seraphim.up)&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
-    if S.ConcentratedFlame:IsCastableP() and ((not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) and Target:DebuffDownP(S.ConcentratedFlameBurn) or (S.ConcentratedFlame:ID() == 295373 or S.ConcentratedFlame:ID() == 299349)) then
+    if S.ConcentratedFlame:IsCastableP() and ((not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) and Target:DebuffDownP(S.ConcentratedFlameBurn) or Spell:EssenceRank(AE.TheCrucibleofFlame) < 3) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
@@ -273,7 +285,7 @@ local function APL()
       if HR.Cast(S.Consecration) then return "consecration 147"; end
     end
     -- heart_essence,if=!(essence.the_crucible_of_flame.major|essence.worldvein_resonance.major|essence.anima_of_life_and_death.major|essence.memory_of_lucid_dreams.major)
-    if S.HeartEssence:IsCastableP() and (not (S.ConcentratedFlame:IsAvailable() or S.WorldveinResonance:IsAvailable() or S.AnimaofDeath:IsAvailable() or S.MemoryofLucidDreams:IsAvailable())) then
+    if S.HeartEssence:IsCastableP() and (not (Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame) or Spell:MajorEssenceEnabled(AE.WorldveinResonance) or Spell:MajorEssenceEnabled(AE.AnimaofLifeandDeath) or Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams))) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
     end
   end

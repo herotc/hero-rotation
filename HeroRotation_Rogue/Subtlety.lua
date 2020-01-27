@@ -21,6 +21,9 @@ local tableinsert = table.insert;
 -- Commons
 local Everyone = HR.Commons.Everyone;
 local Rogue = HR.Commons.Rogue;
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences;
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs;
 -- Spells
 if not Spell.Rogue then Spell.Rogue = {}; end
 Spell.Rogue.Subtlety = {
@@ -76,16 +79,16 @@ Spell.Rogue.Subtlety = {
   ReplicatingShadows                    = Spell(286121),
   TheFirstDance                         = Spell(278681),
   -- Essences
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   BloodoftheEnemyDebuff                 = Spell(297108),
   RecklessForceBuff                     = Spell(302932),
   RecklessForceCounter                  = Spell(302917),
@@ -478,7 +481,7 @@ local function CDs ()
     -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&!cooldown.shadow_blades.up&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
     if S.SymbolsofDeath:IsCastable() and Target:DebuffP(S.Nightblade) and (not S.ShadowBlades:CooldownUpP() or not HR.CDsON())
       and (not S.ShurikenTornado:IsAvailable() or S.ShadowFocus:IsAvailable() or S.ShurikenTornado:CooldownRemainsP() > 2)
-      and (not S.BloodoftheEnemy:IsAvailable() or S.BloodoftheEnemy:CooldownRemainsP() > 2)
+      and (not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or S.BloodoftheEnemy:CooldownRemainsP() > 2)
       and (S.NightsVengeancePower:AzeriteRank() < 2 or Player:BuffP(S.NightsVengeanceBuff)) then
       if HR.Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then return "Cast Symbols of Death"; end
     end

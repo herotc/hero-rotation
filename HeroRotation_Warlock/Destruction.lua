@@ -15,6 +15,10 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -55,17 +59,16 @@ Spell.Warlock.Destruction = {
   Eradication                           = Spell(196412),
   EradicationDebuff                     = Spell(196414),
   ShiverVenomDebuff                     = Spell(301624),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlameMajor                = MultiSpell(295373, 299349, 299353),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
@@ -392,15 +395,15 @@ local function APL()
       if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.TrinketDisplayStyle) then return "battle_potion_of_intellect 233"; end
     end
     -- berserking,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.Berserking:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if S.Berserking:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 235"; end
     end
     -- blood_fury,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.BloodFury:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if S.BloodFury:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 241"; end
     end
     -- fireblood,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.Fireblood:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not S.MemoryofLucidDreams:IsAvailable() or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if S.Fireblood:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 247"; end
     end
     -- use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20

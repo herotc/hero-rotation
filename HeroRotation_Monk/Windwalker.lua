@@ -17,6 +17,10 @@ local HR         = HeroRotation
 -- Lua
 local pairs      = pairs;
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
 local Everyone = HR.Commons.Everyone;
@@ -98,16 +102,16 @@ Spell.Monk.Windwalker = {
   GloryoftheDawn                        = Spell(288634),
   
   -- Essences
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                         = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  ReapingFlames                         = Spell(310690),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
@@ -271,7 +275,7 @@ local function APL ()
       ShouldReturn = ToD(); if ShouldReturn then return ShouldReturn; end
     end
     -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(!essence.worldvein_resonance.major|(buff.worldvein_resonance.up|cooldown.worldvein_resonance.remains>cooldown.storm_earth_and_fire.full_recharge_time))&(cooldown.touch_of_death.remains>cooldown.storm_earth_and_fire.full_recharge_time|cooldown.touch_of_death.remains>target.time_to_die)&cooldown.fists_of_fury.remains<=9&chi>=3&cooldown.whirling_dragon_punch.remains<=13|dot.touch_of_death.remains|target.time_to_die<20
-    if S.StormEarthAndFire:IsReadyP() and (S.StormEarthAndFire:Charges() == 2 or (not S.WorldveinResonance:IsAvailable() or (Player:BuffP(S.LifebloodBuff) or S.WorldveinResonance:CooldownRemainsP() > S.StormEarthAndFire:FullRechargeTime())) and (S.TouchOfDeath:CooldownRemainsP() > S.StormEarthAndFire:FullRechargeTime() or S.TouchOfDeath:CooldownRemainsP() > Target:TimeToDie()) and S.FistsOfFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 13 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 20) then
+    if S.StormEarthAndFire:IsReadyP() and (S.StormEarthAndFire:Charges() == 2 or (not Spell:MajorEssenceEnabled(AE.WorldveinResonance) or (Player:BuffP(S.LifebloodBuff) or S.WorldveinResonance:CooldownRemainsP() > S.StormEarthAndFire:FullRechargeTime())) and (S.TouchOfDeath:CooldownRemainsP() > S.StormEarthAndFire:FullRechargeTime() or S.TouchOfDeath:CooldownRemainsP() > Target:TimeToDie()) and S.FistsOfFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 13 or Target:DebuffP(S.TouchOfDeath) or Target:TimeToDie() < 20) then
       if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.GCDasOffGCD.StormEarthAndFire) then return "Cast Cooldown Storm, Earth, and Fire"; end
     end
     -- blood_of_the_enemy,if=dot.touch_of_death.remains|target.time_to_die<12

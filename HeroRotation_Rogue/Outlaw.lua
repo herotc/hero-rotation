@@ -22,6 +22,9 @@ local tostring = tostring;
 -- Commons
 local Everyone = HR.Commons.Everyone;
 local Rogue = HR.Commons.Rogue;
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences;
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs;
 
 -- Spells
 if not Spell.Rogue then Spell.Rogue = {}; end
@@ -67,16 +70,16 @@ Spell.Rogue.Outlaw = {
   SnakeEyesBuff                   = Spell(275863),
   KeepYourWitsBuff                = Spell(288988),
   -- Essences
-  BloodoftheEnemy                 = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams             = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                  = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                   = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame               = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                 = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance              = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam              = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth               = MultiSpell(295840, 299355, 299358),
-  ReapingFlames                   = MultiSpell(310690, 310705, 310710),
+  BloodoftheEnemy                 = Spell(297108),
+  MemoryofLucidDreams             = Spell(298357),
+  PurifyingBlast                  = Spell(295337),
+  RippleInSpace                   = Spell(302731),
+  ConcentratedFlame               = Spell(295373),
+  TheUnboundForce                 = Spell(298452),
+  WorldveinResonance              = Spell(295186),
+  FocusedAzeriteBeam              = Spell(295258),
+  GuardianofAzeroth               = Spell(295840),
+  ReapingFlames                   = Spell(310690),
   LifebloodBuff                   = Spell(295137),
   LucidDreamsBuff                 = MultiSpell(298357, 299372, 299374),
   ConcentratedFlameBurn           = Spell(295368),

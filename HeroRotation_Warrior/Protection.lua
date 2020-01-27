@@ -15,6 +15,10 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
+-- Azerite Essence Setup
+local AE         = HL.Enum.AzeriteEssences
+local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -54,17 +58,16 @@ Spell.Warrior.Protection = {
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
   RazorCoralDebuff                      = Spell(303568),
-  BloodoftheEnemy                       = MultiSpell(297108, 298273, 298277),
-  MemoryofLucidDreams                   = MultiSpell(298357, 299372, 299374),
-  PurifyingBlast                        = MultiSpell(295337, 299345, 299347),
-  RippleInSpace                         = MultiSpell(302731, 302982, 302983),
-  ConcentratedFlame                     = MultiSpell(295373, 299349, 299353),
-  TheUnboundForce                       = MultiSpell(298452, 299376, 299378),
-  WorldveinResonance                    = MultiSpell(295186, 298628, 299334),
-  FocusedAzeriteBeam                    = MultiSpell(295258, 299336, 299338),
-  GuardianofAzeroth                     = MultiSpell(295840, 299355, 299358),
-  AnimaofDeath                          = MultiSpell(294926, 300002, 300003),
-  AnimaofLife                           = MultiSpell(294964, 300004, 300005),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  AnimaofDeath                          = Spell(294926),
   ConcentratedFlameBurn                 = Spell(295368),
   RecklessForceBuff                     = Spell(302932)
 };
@@ -373,14 +376,13 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 110"; end
     end
     -- concentrated_flame,if=buff.avatar.down&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
-    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or S.ConcentratedFlame:ID() ~= 299353) then
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or Spell:EssenceRank(AE.TheCrucibleofFlame) < 3) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 111"; end
     end
     -- last_stand,if=cooldown.anima_of_death.remains<=2
-    -- mrdmnd comment - this is breaking shield block, probably need to check it against the anima equipped?
-    -- if S.LastStand:IsCastableP() and (S.AnimaofDeath:CooldownRemainsP() <= 2) then
-    --   if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand 112"; end
-    --end
+    if S.LastStand:IsCastableP() and (Spell:MajorEssenceEnabled(AE.AnimaofLifeandDeath) and S.AnimaofDeath:CooldownRemainsP() <= 2) then
+      if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand 112"; end
+    end
     -- avatar
     if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
