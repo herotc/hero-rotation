@@ -338,7 +338,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- heart_essence,if=!essence.the_crucible_of_flame.major
-    if S.HeartEssence:IsCastableP() and (not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) then
+    if S.HeartEssence ~= nil and S.HeartEssence:IsCastableP() and (not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3

@@ -275,7 +275,7 @@ local function APL ()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams cooldowns"; end
     end
     -- heart_essence
-    if S.HeartEssence:IsCastable() then
+    if S.HeartEssence ~= nil and S.HeartEssence:IsCastable() then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence cooldowns"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
