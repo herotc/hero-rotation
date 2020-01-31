@@ -178,6 +178,7 @@ local function APL ()
   local Precombat, Defensives, Brand, Cooldowns, Normal
   local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   UpdateSoulFragments();
@@ -275,7 +276,7 @@ local function APL ()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams cooldowns"; end
     end
     -- heart_essence
-    if S.HeartEssence ~= nil and S.HeartEssence:IsCastable() then
+    if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence cooldowns"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down

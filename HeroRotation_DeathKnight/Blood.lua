@@ -138,6 +138,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL ()
   local Precombat, Defensives, Standard
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   -- Get count of units without Blood Plague
@@ -198,7 +199,7 @@ local function APL ()
       if HR.Cast(S.Marrowrend) then return ""; end
     end
     -- heart_essence,if=!buff.dancing_rune_weapon.up
-    if S.HeartEssence ~= nil and S.HeartEssence:IsCastable() and (Player:BuffDownP(S.DancingRuneWeaponBuff)) then
+    if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() and (Player:BuffDownP(S.DancingRuneWeaponBuff)) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)

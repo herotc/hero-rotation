@@ -191,6 +191,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldowns, Finishers, Generators, Opener
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -279,7 +280,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- heart_essence,if=buff.tigers_fury.up
-    if S.HeartEssence ~= nil and S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+    if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
     end
     -- incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)

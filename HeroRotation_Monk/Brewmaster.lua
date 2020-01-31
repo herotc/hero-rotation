@@ -198,6 +198,7 @@ local function APL()
   local BrewMaxCharge = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
   local IronskinDuration = 7;
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid));
 
   local function Defensives()
     if S.SuppressingPulse:IsCastableP() then
@@ -338,7 +339,7 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- heart_essence,if=!essence.the_crucible_of_flame.major
-    if S.HeartEssence ~= nil and S.HeartEssence:IsCastableP() and (not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) then
+    if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastableP() and (not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) then
       if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
