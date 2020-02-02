@@ -76,6 +76,7 @@ Spell.Mage.Arcane = {
   WorldveinResonance                    = Spell(295186),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
+  GuardianofAzerothBuff                 = Spell(295855),
   ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368)
@@ -338,7 +339,7 @@ local function APL()
       if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 223"; end
     end
     -- potion,if=buff.arcane_power.up&((!essence.condensed_lifeforce.major|essence.condensed_lifeforce.rank<2)&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))|buff.guardian_of_azeroth.up)|target.time_to_die<cooldown.arcane_power.remains
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and ((not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Spell:EssenceRank(AE.CondensedLifeForce) < 2) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc"))) or S.GuardianofAzeroth:CooldownRemainsP() > 20) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.ArcanePowerBuff) and ((not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Spell:EssenceRank(AE.CondensedLifeForce) < 2) and (Player:BuffP(S.BerserkingBuff) or Player:BuffP(S.BloodFuryBuff) or not (Player:IsRace("Troll") or Player:IsRace("Orc"))) or Player:BuffP(S.GuardianofAzerothBuff)) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
       if HR.Cast(I.PotionofFocusedResolve, nil, Settings.Commons.TrinketDisplayStyle) then return "battle_potion_of_intellect 225"; end
     end
     -- arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))

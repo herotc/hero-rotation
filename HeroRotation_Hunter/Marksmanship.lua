@@ -74,6 +74,7 @@ Spell.Hunter.Marksmanship = {
   WorldveinResonance                    = Spell(295186),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
+  GuardianofAzerothBuff                 = Spell(295855),
   VisionofPerfection                    = Spell(296325),
   SparkofInspiration                    = Spell(311203),
   ReapingFlames                         = Spell(310690),
@@ -422,7 +423,7 @@ local function APL()
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.trueshot.up&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major&target.health.pct<20)|debuff.razor_coral_debuff.down|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.TrueshotBuff) and (S.GuardianofAzeroth:CooldownRemainsP() > 150 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:HealthPercentage() < 20) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
+    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffP(S.GuardianofAzerothBuff) or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:HealthPercentage() < 20) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up|target.time_to_die<5
