@@ -425,8 +425,8 @@ local function APL()
       if S.ArcaneTorrent:IsCastableP() and (S.MortalStrike:CooldownRemainsP() > 1.5 and Player:BuffDownP(S.MemoryofLucidDreams) and Player:Rage() < 50) then
         if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 364"; end
       end
-      -- lights_judgment,if=debuff.colossus_smash.down
-      if S.LightsJudgment:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff)) then
+      -- lights_judgment,if=debuff.colossus_smash.down&buff.memory_of_lucid_dreams.down&cooldown.mortal_strike.remains
+      if S.LightsJudgment:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and not S.MortalStrike:CooldownUpP()) then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 370"; end
       end
       -- fireblood,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
@@ -437,8 +437,8 @@ local function APL()
       if S.AncestralCall:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 378"; end
       end
-      -- bag_of_tricks,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
-      if S.BagofTricks:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
+      -- bag_of_tricks,if=debuff.colossus_smash.down&buff.memory_of_lucid_dreams.down&cooldown.mortal_strike.remains
+      if S.BagofTricks:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and not S.MortalStrike:CooldownUpP()) then
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 379"; end
       end
     end
