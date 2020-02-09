@@ -302,8 +302,8 @@ local function APL()
       if S.Berserking:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
       end
-      -- lights_judgment,if=buff.recklessness.down
-      if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff)) then
+      -- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
+      if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 126"; end
       end
       -- fireblood,if=buff.recklessness.up
@@ -314,8 +314,8 @@ local function APL()
       if S.AncestralCall:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 134"; end
       end
-      -- bag_of_tricks,if=buff.recklessness.up
-      if S.BagofTricks:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+      -- bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
+      if S.BagofTricks:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and Target:DebuffDownP(S.SiegebreakerDebuff) and Player:BuffP(S.EnrageBuff)) then
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 136"; end
       end
     end
