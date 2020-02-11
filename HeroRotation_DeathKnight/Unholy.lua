@@ -316,7 +316,7 @@ local function APL()
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- worldvein_resonance,if=talent.army_of_the_damned.enabled&essence.vision_of_perfection.minor&buff.unholy_strength.up|essence.vision_of_perfection.minor&pet.apoc_ghoul.active|talent.army_of_the_damned.enabled&pet.apoc_ghoul.active&cooldown.army_of_the_dead.remains>60|talent.army_of_the_damned.enabled&pet.army_ghoul.active
-    if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and Spell:EssenceEnabled(AE.VisionofPerfection) and Player:BuffP(S.UnholyStrengthBuff) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15) then
+    if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and Spell:EssenceEnabled(AE.VisionofPerfection) and Player:BuffP(S.UnholyStrengthBuff) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.ArmyoftheDead:TimeSinceLastCast() <= 30) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance with AotDamned"; end
     end
     -- worldvein_resonance,if=!death_and_decay.ticking&buff.unholy_strength.up&!essence.vision_of_perfection.minor&!talent.army_of_the_damned.enabled|target.time_to_die<cooldown.apocalypse.remains
