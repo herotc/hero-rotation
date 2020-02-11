@@ -77,7 +77,8 @@ Spell.DeathKnight.Unholy = {
   ReapingFlames                         = Spell(310690),
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368)
+  ConcentratedFlameBurn                 = Spell(295368),
+  PoolResources                         = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -511,6 +512,10 @@ local function APL()
     -- call_action_list,name=generic
     if (true) then
       local ShouldReturn = Generic(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Add pool resources icon if nothing else to do
+    if (true) then
+      if HR.Cast(S.PoolResources) then return "pool_resources"; end
     end
   end
 end
