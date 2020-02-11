@@ -266,7 +266,7 @@ local function APL()
       if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle 123"; end
     end
     -- unholy_frenzy,if=essence.vision_of_perfection.enabled&pet.apoc_ghoul.active|debuff.festering_wound.stack<4&(!azerite.magus_of_the_dead.enabled|azerite.magus_of_the_dead.enabled&pet.apoc_ghoul.active)
-    if S.UnholyFrenzy:IsCastableP() and (Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:CooldownRemainsP() > 75 or Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and (not S.MagusoftheDead:AzeriteEnabled() or S.MagusoftheDead:AzeriteEnabled() and S.Apocalypse:CooldownRemainsP() > 75)) then
+    if S.UnholyFrenzy:IsCastableP() and (Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:TimeSinceLastCast() <= 15 or Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and (not S.MagusoftheDead:AzeriteEnabled() or S.MagusoftheDead:AzeriteEnabled() and S.Apocalypse:TimeSinceLastCast() <= 15)) then
       if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 139"; end
     end
     -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
