@@ -148,15 +148,13 @@ local function APL ()
     -- food
     -- augmentation
     -- snapshot_stats
-    if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
-      end
-      -- Manually Added: Death's Caress for ranged pulling
-      if S.DeathsCaress:IsReady() then
-        if HR.Cast(S.DeathsCaress) then return ""; end
-      end
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
+    end
+    -- Manually Added: Death's Caress for ranged pulling
+    if S.DeathsCaress:IsReady() then
+      if HR.Cast(S.DeathsCaress) then return ""; end
     end
   end
   Defensives = function()
@@ -251,7 +249,7 @@ local function APL ()
       if HR.Cast(S.HeartStrike) then return ""; end
     end
     -- use_item,name=grongs_primal_rage
-    if I.GrongsPrimalRage:IsEquipReady() then
+    if I.GrongsPrimalRage:IsEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- rune_strike
@@ -264,7 +262,7 @@ local function APL ()
     end
   end
   -- call precombat
-  if not Player:AffectingCombat() then
+  if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
@@ -281,11 +279,11 @@ local function APL ()
     -- auto_attack
     if HR.CDsON() then
       -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
-      if S.BloodFury:IsCastable() and Cache.EnemiesCount[10] >= 1 and (S.DancingRuneWeapon:CooldownUpP() and (not S.Blooddrinker:CooldownUpP() or not S.Blooddrinker:IsAvailable())) then
+      if S.BloodFury:IsCastable() and Target:IsInRange("Melee") and (S.DancingRuneWeapon:CooldownUpP() and (not S.Blooddrinker:CooldownUpP() or not S.Blooddrinker:IsAvailable())) then
         if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- berserking
-      if S.Berserking:IsCastable() and Cache.EnemiesCount[10] >= 1 then
+      if S.Berserking:IsCastable() and Target:IsInRange("Melee") then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       -- arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
@@ -309,25 +307,27 @@ local function APL ()
       end
     end
     -- use_items,if=cooldown.dancing_rune_weapon.remains>90
-    -- use_item,name=razdunks_big_red_button
-    if I.RazdunksBigRedButton:IsEquipReady() then
-      if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-    end
-    -- use_item,name=merekthas_fang
-    if I.MerekthasFang:IsEquipReady() then
-      if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
-    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=target.health.pct<31&equipped.dribbling_inkpod
-    if I.AshvanesRazorCoral:IsEquipReady() and (Target:HealthPercentage() < 31 and S.DribblingInkpod:IsEquipped()) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=buff.dancing_rune_weapon.up&debuff.razor_coral_debuff.up&!equipped.dribbling_inkpod
-    if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.DancingRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not I.DribblingInkpod:IsEquipped()) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+    if Settings.Commons.UseTrinkets then
+      -- use_item,name=razdunks_big_red_button
+      if I.RazdunksBigRedButton:IsEquipReady() then
+        if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=merekthas_fang
+      if I.MerekthasFang:IsEquipReady() then
+        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
+      if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=ashvanes_razor_coral,if=target.health.pct<31&equipped.dribbling_inkpod
+      if I.AshvanesRazorCoral:IsEquipReady() and (Target:HealthPercentage() < 31 and S.DribblingInkpod:IsEquipped()) then
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
+      -- use_item,name=ashvanes_razor_coral,if=buff.dancing_rune_weapon.up&debuff.razor_coral_debuff.up&!equipped.dribbling_inkpod
+      if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.DancingRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not I.DribblingInkpod:IsEquipped()) then
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      end
     end
     -- potion,if=buff.dancing_rune_weapon.up
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.DancingRuneWeaponBuff)) then
