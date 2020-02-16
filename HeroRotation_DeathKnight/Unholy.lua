@@ -507,7 +507,7 @@ local function APL()
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
     if (Cache.EnemiesCount[8] >= 2) then
-      return Aoe();
+      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=generic
     if (true) then
