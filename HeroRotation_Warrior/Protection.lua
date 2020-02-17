@@ -76,7 +76,7 @@ local S = Spell.Warrior.Protection;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Protection = {
-  SuperiorBattlePotionofStrength   = Item(168500),
+  PotionofUnbridledFury            = Item(169299),
   GrongsPrimalRage                 = Item(165574, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14})
@@ -183,8 +183,8 @@ local function APL()
         if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth precombat"; end
       end
       -- potion
-      if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength precombat"; end
+      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury precombat"; end
       end
     end
   end
@@ -350,8 +350,8 @@ local function APL()
       end
     end
     -- potion,if=buff.avatar.up|target.time_to_die<25
-    if I.SuperiorBattlePotionofStrength:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
-      if HR.CastSuggested(I.SuperiorBattlePotionofStrength) then return "battle_potion_of_strength 103"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 103"; end
     end
     if Player:HealthPercentage() < 80 and S.VictoryRush:IsReady("Melee") then
       if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
