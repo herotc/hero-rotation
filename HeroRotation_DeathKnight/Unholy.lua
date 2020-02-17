@@ -253,8 +253,8 @@ local function APL()
     if S.ArmyoftheDead:IsCastableP() then
       if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 113"; end
     end
-    -- apocalypse,if=debuff.festering_wound.stack>=4&(!essence.vision_of_perfection.enabled|essence.vision_of_perfection.enabled&(talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains<=3|!talent.unholy_frenzy.enabled))
-    if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or Spell:EssenceEnabled(AE.VisionofPerfection) and (S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() <= 3 or not S.UnholyFrenzy:IsAvailable()))) then
+    -- apocalypse,if=debuff.festering_wound.stack>=4&(active_enemies>=2|!essence.vision_of_perfection.enabled|essence.vision_of_perfection.enabled&(talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains<=3|!talent.unholy_frenzy.enabled))
+    if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and (Cache.EnemiesCount[8] >= 2 or not Spell:EssenceEnabled(AE.VisionofPerfection) or Spell:EssenceEnabled(AE.VisionofPerfection) and (S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() <= 3 or not S.UnholyFrenzy:IsAvailable()))) then
       if HR.Cast(S.Apocalypse) then return "apocalypse 115"; end
     end
     -- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
