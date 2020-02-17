@@ -91,7 +91,7 @@ end
 -- Items
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
-  SuperiorBattlePotionOfAgility    = Item(168489),
+  PotionofUnbridledFury            = Item(169299),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14})
 };
@@ -230,8 +230,8 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     -- potion
-    if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.SuperiorBattlePotionOfAgility) then return ""; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return ""; end
     end
     -- chi_burst
     if S.ChiBurst:IsCastableP(10) then
@@ -262,8 +262,8 @@ local function APL()
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- potion
-    if I.SuperiorBattlePotionOfAgility:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.SuperiorBattlePotionOfAgility) then return ""; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return ""; end
     end
     if (HR.CDsON()) then
       -- blood_fury
