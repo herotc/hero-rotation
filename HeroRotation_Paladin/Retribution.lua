@@ -233,7 +233,7 @@ local function APL()
       if HR.Cast(S.TemplarsVerdict) then return "templars_verdict 92"; end
     end
     -- templars_verdict fallback, in case the user is saving AW/Crusade/ExecutionSentence
-    if S.TemplarsVerdict:IsReadyP() and (not HR.CDsON()) then
+    if S.TemplarsVerdict:IsReadyP() and Settings.Retribution.AllowDelayedAW then
       if HR.Cast(S.TemplarsVerdict) then return "templars_verdict 93"; end
     end
   end
