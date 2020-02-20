@@ -18,7 +18,6 @@ local HR         = HeroRotation
 -- Azerite Essence Setup
 local AE         = HL.Enum.AzeriteEssences
 local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -80,6 +79,7 @@ Spell.Druid.Feral = {
   ConcentratedFlame                     = Spell(295373),
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
+  ReapingFlames                         = Spell(310690),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
   RecklessForceBuff                     = Spell(302932),
@@ -89,9 +89,6 @@ Spell.Druid.Feral = {
   PoolResource                          = Spell(9999000010)
 };
 local S = Spell.Druid.Feral;
-if AEMajor ~= nil then
-  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Items
 if not Item.Druid then Item.Druid = {} end
@@ -117,16 +114,13 @@ local Settings = {
 -- Variables
 local VarUseThrash = 0;
 local VarOpenerDone = 0;
+local VarReapingDelay = 0;
 
 HL:RegisterForEvent(function()
   VarUseThrash = 0
   VarOpenerDone = 0
+  VarReapingDelay = 0
 end, "PLAYER_REGEN_ENABLED")
-
-HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence();
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 local EnemyRanges = {40, 8, 5}
 local function UpdateRanges()
@@ -141,6 +135,16 @@ end
 
 local function bool(val)
   return val ~= 0
+end
+
+local function LowestTTD()
+  local lowTTD = 0
+  for _, CycleUnit in pairs(Cache.Enemies[8]) do
+    if (lowTTD == 0 or CycleUnit:TimeToDie() < lowTTD) then
+      lowTTD = CycleUnit:TimeToDie()
+    end
+  end
+  return lowTTD
 end
 
 S.FerociousBiteMaxEnergy.CustomCost = {
@@ -188,10 +192,13 @@ local function EvaluateCycleFerociousBite418(TargetUnit)
   return TargetUnit:DebuffP(S.RipDebuff) and TargetUnit:DebuffRemainsP(S.RipDebuff) < 3 and TargetUnit:TimeToDie() > 10 and (S.Sabertooth:IsAvailable())
 end
 
+local function EvaluateCycleReapingFlames420(TargetUnit)
+  return TargetUnit:TimeToDie() < 1.5 or ((TargetUnit:HealthPercentage() > 80 or TargetUnit:HealthPercentage() <= 20) and VarReapingDelay > 29) or (TargetUnit:TimeToX(20) > 30 and VarReapingDelay > 44)
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Cooldowns, Finishers, Generators, Opener
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   Precombat = function()
@@ -275,13 +282,25 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
-    -- Manually added concentrated_flame
-    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn)) then
+    -- guardian_of_azeroth,if=buff.tigers_fury.up
+    if S.GuardianofAzeroth:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
+    end
+    -- concentrated_flame,if=buff.tigers_fury.up
+    if S.ConcentratedFlame:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
-    -- heart_essence,if=buff.tigers_fury.up
-    if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence"; end
+    -- ripple_in_space,if=buff.tigers_fury.up
+    if S.RippleInSpace:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
+    end
+    -- worldvein_resonance,if=buff.tigers_fury.up
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
+    end
+    -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&variable.reaping_delay>29)|(target.time_to_pct_20>30&variable.reaping_delay>44)
+    if S.ReapingFlames:IsCastableP() then
+      if HR.CastCycle(S.ReapingFlames, 8, EvaluateCycleReapingFlames420) then return "reaping_flames 41"; end
     end
     -- incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
     if S.Incarnation:IsCastableP() and HR.CDsON() and (Player:EnergyPredicted() >= 30 and (S.TigersFury:CooldownRemainsP() > 15 or Player:BuffP(S.TigersFuryBuff))) then
@@ -505,6 +524,14 @@ local function APL()
     -- rake,if=buff.prowl.up|buff.shadowmeld.up
     if S.Rake:IsCastableP() and (Player:BuffP(S.ProwlBuff) or Player:BuffP(S.ShadowmeldBuff)) then
       if HR.Cast(S.Rake) then return "rake 406"; end
+    end
+    -- variable,name=reaping_delay,value=target.time_to_die,if=variable.reaping_delay=0
+    if (VarReapingDelay == 0) then
+      VarReapingDelay = Target:TimeToDie()
+    end
+    -- cycling_variable,name=reaping_delay,op=min,value=target.time_to_die
+    if (true) then
+      VarReapingDelay = LowestTTD()
     end
     -- call_action_list,name=cooldowns
     if (HR.CDsON()) then
