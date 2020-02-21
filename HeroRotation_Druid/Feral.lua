@@ -260,7 +260,7 @@ local function APL()
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, true) then return "the_unbound_force"; end
     end
     -- memory_of_lucid_dreams,if=buff.tigers_fury.up&buff.berserk.down
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffP(S.TigersFuryBuff) and Player:BuffDownP(S.BerserkBuff)) then
@@ -268,11 +268,11 @@ local function APL()
     end
     -- blood_of_the_enemy,if=buff.tigers_fury.up
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- feral_frenzy,if=combo_points=0
     if S.FeralFrenzy:IsCastableP() and (Player:ComboPoints() == 0) then
-      if HR.Cast(S.FeralFrenzy) then return "feral_frenzy 40"; end
+      if HR.Cast(S.FeralFrenzy, nil, nil, true) then return "feral_frenzy 40"; end
     end
     -- focused_azerite_beam,if=active_enemies>desired_targets|(raid_event.adds.in>90&energy.deficit>=50)
     if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] > 1 or Settings.Feral.UseFABST) then
@@ -280,7 +280,7 @@ local function APL()
     end
     -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
     if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, true) then return "purifying_blast"; end
     end
     -- guardian_of_azeroth,if=buff.tigers_fury.up
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
@@ -288,7 +288,7 @@ local function APL()
     end
     -- concentrated_flame,if=buff.tigers_fury.up
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame"; end
     end
     -- ripple_in_space,if=buff.tigers_fury.up
     if S.RippleInSpace:IsCastableP() and (Player:BuffP(S.TigersFuryBuff)) then
@@ -316,15 +316,15 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.time_to_pct_30<1.5|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.tigers_fury.remains>10
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) < 1.5 or Target:DebuffDownP(S.ConductiveInkDebuff) and (Target:DebuffStackP(S.RazorCoralDebuff) >= 25 - 10 * num(Target:DebuffP(S.BloodoftheEnemy)) or Target:TimeToDie() < 40) and Player:BuffRemainsP(S.TigersFuryBuff) > 10) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 59"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 59"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=(energy.deficit>=energy.regen*3)&buff.tigers_fury.down&!azerite.jungle_fury.enabled
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and ((Player:EnergyDeficitPredicted() >= Player:EnergyRegen() * 3) and Player:BuffDownP(S.TigersFuryBuff) and not S.JungleFury:AzeriteEnabled()) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 60"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 60"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.tigers_fury.up&azerite.jungle_fury.enabled
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.TigersFuryBuff) and S.JungleFury:AzeriteEnabled()) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 61"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 61"; end
     end
     -- use_item,effect_name=azsharas_font_of_power,if=energy.deficit>=50
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:EnergyDeficitPredicted() >= 50) then
@@ -370,14 +370,14 @@ local function APL()
     -- maim,if=buff.iron_jaws.up
     if S.Maim:IsCastableP() and (Player:BuffP(S.IronJawsBuff)) then
       if S.Maim:IsUsablePPool() then
-        if HR.Cast(S.Maim) then return "maim 163"; end
+        if HR.Cast(S.Maim, nil, nil, true) then return "maim 163"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 164"; end
       end
     end
     -- ferocious_bite,max_energy=1
     if S.FerociousBiteMaxEnergy:IsReadyP() and Player:ComboPoints() > 0 then
-      if HR.Cast(S.FerociousBiteMaxEnergy) then return "ferocious_bite 168"; end
+      if HR.Cast(S.FerociousBiteMaxEnergy, nil, nil, true) then return "ferocious_bite 168"; end
     end
     -- Pool if nothing else to do
     if (true) then
@@ -395,13 +395,13 @@ local function APL()
     end
     -- brutal_slash,if=spell_targets.brutal_slash>desired_targets
     if S.BrutalSlash:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.BrutalSlash) then return "brutal_slash 196"; end
+      if HR.Cast(S.BrutalSlash, nil, nil, true) then return "brutal_slash 196"; end
     end
     -- pool_resource,for_next=1
     -- thrash_cat,if=(refreshable)&(spell_targets.thrash_cat>2)
     if S.ThrashCat:IsCastableP() and ((Target:DebuffRefreshableCP(S.ThrashCatDebuff)) and (Cache.EnemiesCount[8] > 2)) then
       if S.ThrashCat:IsUsablePPool() then
-        if HR.Cast(S.ThrashCat) then return "thrash_cat 199"; end
+        if HR.Cast(S.ThrashCat, nil, nil, true) then return "thrash_cat 199"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 200"; end
       end
@@ -410,7 +410,7 @@ local function APL()
     -- thrash_cat,if=(talent.scent_of_blood.enabled&buff.scent_of_blood.down)&spell_targets.thrash_cat>3
     if S.ThrashCat:IsCastableP() and ((S.ScentofBlood:IsAvailable() and Player:BuffDownP(S.ScentofBloodBuff)) and Cache.EnemiesCount[8] > 3) then
       if S.ThrashCat:IsUsablePPool() then
-        if HR.Cast(S.ThrashCat) then return "thrash_cat 209"; end
+        if HR.Cast(S.ThrashCat, nil, nil, true) then return "thrash_cat 209"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 210"; end
       end
@@ -420,7 +420,7 @@ local function APL()
     -- TODO: Create RegisterDamage entries for this condition
     if S.SwipeCat:IsCastableP() and (Player:BuffP(S.ScentofBloodBuff)) then
       if S.SwipeCat:IsUsablePPool() then
-        if HR.Cast(S.SwipeCat) then return "swipe_cat 217"; end
+        if HR.Cast(S.SwipeCat, nil, nil, true) then return "swipe_cat 217"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 218"; end
       end
@@ -437,11 +437,11 @@ local function APL()
     end
     -- moonfire_cat,if=buff.bloodtalons.up&buff.predatory_swiftness.down&combo_points<5
     if S.MoonfireCat:IsCastableP() and (Player:BuffP(S.BloodtalonsBuff) and Player:BuffDownP(S.PredatorySwiftnessBuff) and Player:ComboPoints() < 5) then
-      if HR.Cast(S.MoonfireCat) then return "moonfire_cat 276"; end
+      if HR.Cast(S.MoonfireCat, nil, nil, true) then return "moonfire_cat 276"; end
     end
     -- brutal_slash,if=(buff.tigers_fury.up&(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time))
     if S.BrutalSlash:IsCastableP() and ((Player:BuffP(S.TigersFuryBuff) and (10000000000 > (1 + S.BrutalSlash:MaxCharges() - S.BrutalSlash:ChargesFractionalP()) * S.BrutalSlash:RechargeP()))) then
-      if HR.Cast(S.BrutalSlash) then return "brutal_slash 282"; end
+      if HR.Cast(S.BrutalSlash, nil, nil, true) then return "brutal_slash 282"; end
     end
     -- moonfire_cat,target_if=refreshable
     if S.MoonfireCat:IsCastableP() then
@@ -451,27 +451,27 @@ local function APL()
     -- thrash_cat,if=refreshable&((variable.use_thrash=2&(!buff.incarnation.up|azerite.wild_fleshrending.enabled))|spell_targets.thrash_cat>1)
     if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or Cache.EnemiesCount[8] > 1)) then
       if S.ThrashCat:IsUsablePPool() then
-        if HR.Cast(S.ThrashCat) then return "thrash_cat 312"; end
+        if HR.Cast(S.ThrashCat, nil, nil, true) then return "thrash_cat 312"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 313"; end
       end
     end
     -- thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react&(!buff.incarnation.up|azerite.wild_fleshrending.enabled)
     if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and VarUseThrash == 1 and bool(Player:BuffStackP(S.ClearcastingBuff)) and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) then
-      if HR.Cast(S.ThrashCat) then return "thrash_cat 327"; end
+      if HR.Cast(S.ThrashCat, nil, nil, true) then return "thrash_cat 327"; end
     end
     -- pool_resource,for_next=1
     -- swipe_cat,if=spell_targets.swipe_cat>1
     if S.SwipeCat:IsCastableP() and (Cache.EnemiesCount[8] > 1) then
       if S.SwipeCat:IsUsablePPool() then
-        if HR.Cast(S.SwipeCat) then return "swipe_cat 344"; end
+        if HR.Cast(S.SwipeCat, nil, nil, true) then return "swipe_cat 344"; end
       else
         if HR.Cast(S.PoolResource) then return "pool_resource 345"; end
       end
     end
     -- shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
     if S.Shred:IsCastableP() and (Target:DebuffRemainsP(S.RakeDebuff) > (S.Shred:Cost() + S.Rake:Cost() - Player:EnergyPredicted()) / Player:EnergyRegen() or bool(Player:BuffStackP(S.ClearcastingBuff))) then
-      if HR.Cast(S.Shred) then return "shred 347"; end
+      if HR.Cast(S.Shred, nil, nil, true) then return "shred 347"; end
     end
     -- Pool if nothing else to do
     if (true) then
@@ -485,7 +485,7 @@ local function APL()
     end
     -- rake,if=!ticking|buff.prowl.up
     if S.Rake:IsCastableP() and (Target:DebuffDownP(S.RakeDebuff) or Player:BuffP(S.ProwlBuff)) then
-      if HR.Cast(S.Rake) then return "rake 365"; end
+      if HR.Cast(S.Rake, nil, nil, true) then return "rake 365"; end
     end
     -- variable,name=opener_done,value=dot.rip.ticking
     if (true) then
@@ -494,15 +494,15 @@ local function APL()
     -- wait,sec=0.001,if=dot.rip.ticking
     -- moonfire_cat,if=!ticking
     if S.MoonfireCat:IsCastableP() and (Target:DebuffDownP(S.MoonfireCatDebuff)) then
-      if HR.Cast(S.MoonfireCat) then return "moonfire_cat 380"; end
+      if HR.Cast(S.MoonfireCat, nil, nil, true) then return "moonfire_cat 380"; end
     end
     -- rip,if=!ticking
     -- Manual addition: Use Primal Wrath if >= 2 targets or Rip if only 1 target
     if S.PrimalWrath:IsCastableP() and (S.PrimalWrath:IsAvailable() and Target:DebuffDownP(S.RipDebuff) and Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.PrimalWrath) then return "primal_wrath opener"; end
+      if HR.Cast(S.PrimalWrath, nil, nil, true) then return "primal_wrath opener"; end
     end
     if S.Rip:IsCastableP() and (Target:DebuffDownP(S.RipDebuff)) then
-      if HR.Cast(S.Rip) then return "rip 388"; end
+      if HR.Cast(S.Rip, nil, nil, true) then return "rip 388"; end
     end
   end
   -- call precombat
@@ -523,7 +523,7 @@ local function APL()
     end
     -- rake,if=buff.prowl.up|buff.shadowmeld.up
     if S.Rake:IsCastableP() and (Player:BuffP(S.ProwlBuff) or Player:BuffP(S.ShadowmeldBuff)) then
-      if HR.Cast(S.Rake) then return "rake 406"; end
+      if HR.Cast(S.Rake, nil, nil, true) then return "rake 406"; end
     end
     -- variable,name=reaping_delay,value=target.time_to_die,if=variable.reaping_delay=0
     if (VarReapingDelay == 0) then

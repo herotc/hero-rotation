@@ -168,7 +168,7 @@ local function APL()
     end
     -- opener
     if Everyone.TargetIsValid() then
-      if S.BreathofSindragosa:IsAvailable() and S.Obliterate:IsCastableP("Melee") then
+      if S.Obliterate:IsCastableP("Melee") and (S.BreathofSindragosa:IsAvailable()) then
         if HR.Cast(S.Obliterate) then return "obliterate precombat"; end
       end
       if S.HowlingBlast:IsCastableP(30, true) and (Target:DebuffDownP(S.FrostFeverDebuff)) then
@@ -179,11 +179,11 @@ local function APL()
   Aoe = function()
     -- remorseless_winter,if=talent.gathering_storm.enabled|(azerite.frozen_tempest.rank&spell_targets.remorseless_winter>=3&!buff.rime.up)
     if S.RemorselessWinter:IsCastableP() and (S.GatheringStorm:IsAvailable() or (bool(S.FrozenTempest:AzeriteRank()) and Cache.EnemiesCount[8] >= 3 and Player:BuffDownP(S.RimeBuff))) then
-      if HR.Cast(S.RemorselessWinter) then return "remorseless_winter 11"; end
+      if HR.Cast(S.RemorselessWinter, nil, nil, 8) then return "remorseless_winter 11"; end
     end
     -- glacial_advance,if=talent.frostscythe.enabled
     if no_heal and S.GlacialAdvance:IsReadyP() and (S.Frostscythe:IsAvailable()) then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 13"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 13"; end
     end
     -- frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled&!talent.frostscythe.enabled
     if no_heal and S.FrostStrike:IsReadyP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and S.RemorselessWinter:CooldownRemainsP() <= 2 * Player:GCD() and S.GatheringStorm:IsAvailable() and not S.Frostscythe:IsAvailable()) then
@@ -199,11 +199,11 @@ local function APL()
     end
     -- frostscythe,if=buff.killing_machine.up
     if S.Frostscythe:IsCastableP() and (Player:BuffP(S.KillingMachineBuff)) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 21"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 21"; end
     end
     -- glacial_advance,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
     if no_heal and S.GlacialAdvance:IsReadyP() and (Player:RunicPowerDeficit() < (15 + num(S.RunicAttenuation:IsAvailable()) * 3)) then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 23"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 23"; end
     end
     -- frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit<(15+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
     if no_heal and S.FrostStrike:IsReadyP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPowerDeficit() < (15 + num(S.RunicAttenuation:IsAvailable()) * 3) and not S.Frostscythe:IsAvailable()) then
@@ -215,11 +215,11 @@ local function APL()
     end
     -- remorseless_winter
     if S.RemorselessWinter:IsCastableP() then
-      if HR.Cast(S.RemorselessWinter) then return "remorseless_winter 29"; end
+      if HR.Cast(S.RemorselessWinter, nil, nil, 8) then return "remorseless_winter 29"; end
     end
     -- frostscythe
     if S.Frostscythe:IsCastableP() then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 31"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 31"; end
     end
     -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>(25+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
     if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPowerDeficit() > (25 + num(S.RunicAttenuation:IsAvailable()) * 3) and not S.Frostscythe:IsAvailable()) then
@@ -231,7 +231,7 @@ local function APL()
     end
     -- glacial_advance
     if no_heal and S.GlacialAdvance:IsReadyP() then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 37"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 37"; end
     end
     -- frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&!talent.frostscythe.enabled
     if no_heal and S.FrostStrike:IsReadyP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and not S.Frostscythe:IsAvailable()) then
@@ -247,7 +247,7 @@ local function APL()
     end
     -- arcane_torrent
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 45"; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 45"; end
     end
   end
   BosPooling = function()
@@ -265,7 +265,7 @@ local function APL()
     end
     -- glacial_advance,if=runic_power.deficit<20&spell_targets.glacial_advance>=2&cooldown.pillar_of_frost.remains>5
     if no_heal and S.GlacialAdvance:IsReadyP() and (Player:RunicPowerDeficit() < 20 and Cache.EnemiesCount[10] >= 2 and S.PillarofFrost:CooldownRemainsP() > 5) then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 107"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 107"; end
     end
     -- frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit<20&!talent.frostscythe.enabled&cooldown.pillar_of_frost.remains>5
     if no_heal and S.FrostStrike:IsReadyP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPowerDeficit() < 20 and not S.Frostscythe:IsAvailable() and S.PillarofFrost:CooldownRemainsP() > 5) then
@@ -277,11 +277,11 @@ local function APL()
     end
     -- frostscythe,if=buff.killing_machine.up&runic_power.deficit>(15+talent.runic_attenuation.enabled*3)&spell_targets.frostscythe>=2
     if S.Frostscythe:IsCastableP() and (Player:BuffP(S.KillingMachineBuff) and Player:RunicPowerDeficit() > (15 + num(S.RunicAttenuation:IsAvailable()) * 3) and Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 113"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 113"; end
     end
     -- frostscythe,if=runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)&spell_targets.frostscythe>=2
     if S.Frostscythe:IsCastableP() and (Player:RunicPowerDeficit() >= (35 + num(S.RunicAttenuation:IsAvailable()) * 3) and Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 115"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 115"; end
     end
     -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
     if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPowerDeficit() >= (35 + num(S.RunicAttenuation:IsAvailable()) * 3) and not S.Frostscythe:IsAvailable()) then
@@ -293,7 +293,7 @@ local function APL()
     end
     -- glacial_advance,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&spell_targets.glacial_advance>=2
     if no_heal and S.GlacialAdvance:IsReadyP() and (S.PillarofFrost:CooldownRemainsP() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40 and Cache.EnemiesCount[10] >= 2) then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 121"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 121"; end
     end
     -- frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&!talent.frostscythe.enabled
     if no_heal and S.FrostStrike:IsReadyP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and S.PillarofFrost:CooldownRemainsP() > Player:RuneTimeToX(4) and Player:RunicPowerDeficit() < 40 and not S.Frostscythe:IsAvailable()) then
@@ -317,7 +317,7 @@ local function APL()
     end
     -- remorseless_winter,if=talent.gathering_storm.enabled
     if S.RemorselessWinter:IsCastableP() and (S.GatheringStorm:IsAvailable()) then
-      if HR.Cast(S.RemorselessWinter) then return "remorseless_winter 205"; end
+      if HR.Cast(S.RemorselessWinter, nil, nil, 8) then return "remorseless_winter 205"; end
     end
     -- howling_blast,if=buff.rime.up
     if S.HowlingBlast:IsCastableP(30, true) and (Player:BuffP(S.RimeBuff)) then
@@ -333,7 +333,7 @@ local function APL()
     end
     -- frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2
     if S.Frostscythe:IsCastableP() and (Player:BuffP(S.KillingMachineBuff) and Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 213"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 213"; end
     end
     -- horn_of_winter,if=runic_power.deficit>=32&rune.time_to_3>gcd
     if S.HornofWinter:IsCastableP() and (Player:RunicPowerDeficit() >= 30 and Player:RuneTimeToX(3) > Player:GCD()) then
@@ -341,11 +341,11 @@ local function APL()
     end
     -- remorseless_winter
     if S.RemorselessWinter:IsCastableP() then
-      if HR.Cast(S.RemorselessWinter) then return "remorseless_winter 217"; end
+      if HR.Cast(S.RemorselessWinter, nil, nil, 8) then return "remorseless_winter 217"; end
     end
     -- frostscythe,if=spell_targets.frostscythe>=2
     if S.Frostscythe:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 219"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 219"; end
     end
     -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>25|rune>3&!talent.frostscythe.enabled
     if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and Player:RunicPowerDeficit() > 25 or Player:Rune() > 3 and not S.Frostscythe:IsAvailable()) then
@@ -357,7 +357,7 @@ local function APL()
     end
     -- arcane_torrent,if=runic_power.deficit>50
     if S.ArcaneTorrent:IsCastableP() and HR.CDsON() and (Player:RunicPowerDeficit() > 50) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 225"; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 225"; end
     end
     -- wait for resources
     if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Ticking"; end
@@ -365,35 +365,35 @@ local function APL()
   ColdHeart = function()
     -- chains_of_ice,if=buff.cold_heart.stack>5&target.time_to_die<gcd
     if S.ChainsofIce:IsCastableP() and (Player:BuffStackP(S.ColdHeartBuff) > 5 and Target:TimeToDie() < Player:GCD()) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 301"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 301"; end
     end
     -- chains_of_ice,if=(buff.seething_rage.remains<gcd)&buff.seething_rage.up
     if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.SeethingRageBuff) < Player:GCD()) and Player:BuffP(S.SeethingRageBuff)) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 303"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 303"; end
     end
     -- chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)&!talent.icecap.enabled
     if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() * (1 + num(S.FrostwyrmsFury:CooldownUpP())) or Player:BuffRemainsP(S.PillarofFrostBuff) < Player:RuneTimeToX(3)) and Player:BuffP(S.PillarofFrostBuff) and (S.IcyCitadel:AzeriteRank() <= 1 or Player:BuffP(S.BreathofSindragosa)) and not S.Icecap:IsAvailable()) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 305"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 305"; end
     end
     -- chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&(azerite.icy_citadel.rank<=1|buff.breath_of_sindragosa.up)&!talent.icecap.enabled
     if S.ChainsofIce:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 8 and Player:BuffRemainsP(S.UnholyStrengthBuff) < Player:GCD() * (1 + num(S.FrostwyrmsFury:CooldownUpP())) and Player:BuffP(S.UnholyStrengthBuff) and Player:BuffP(S.PillarofFrostBuff) and (S.IcyCitadel:AzeriteRank() <= 1 or Player:BuffP(S.BreathofSindragosa)) and not S.Icecap:IsAvailable()) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 307"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 307"; end
     end
     -- chains_of_ice,if=(buff.icy_citadel.remains<4|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up&!talent.icecap.enabled
     if S.ChainsofIce:IsCastableP() and ((Player:BuffRemainsP(S.IcyCitadelBuff) < 4 or Player:BuffRemainsP(S.IcyCitadelBuff) < Player:RuneTimeToX(3)) and Player:BuffP(S.IcyCitadelBuff) and S.IcyCitadel:AzeriteRank() >= 2 and Player:BuffDownP(S.BreathofSindragosa) and not S.Icecap:IsAvailable()) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 309"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 309"; end
     end
     -- chains_of_ice,if=buff.icy_citadel.up&buff.unholy_strength.up&azerite.icy_citadel.rank>=2&!buff.breath_of_sindragosa.up&!talent.icecap.enabled
     if S.ChainsofIce:IsCastableP() and (Player:BuffP(S.IcyCitadelBuff) and Player:BuffP(S.UnholyStrengthBuff) and S.IcyCitadel:AzeriteRank() >= 2 and Player:BuffDownP(S.BreathofSindragosa) and not S.Icecap:IsAvailable()) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 311"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 311"; end
     end
     -- chains_of_ice,if=buff.pillar_of_frost.remains<4&buff.pillar_of_frost.up&talent.icecap.enabled&buff.cold_heart.stack>=18&azerite.icy_citadel.rank<=1
     if S.ChainsofIce:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 4 and Player:BuffP(S.PillarofFrostBuff) and S.Icecap:IsAvailable() and Player:BuffStackP(S.ColdHeartBuff) >= 18 and S.IcyCitadel:AzeriteRank() <= 1) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 313"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 313"; end
     end
     -- chains_of_ice,if=buff.pillar_of_frost.up&talent.icecap.enabled&azerite.icy_citadel.rank>=2&(buff.cold_heart.stack>=19&buff.icy_citadel.remains<gcd&buff.icy_citadel.up|buff.unholy_strength.up&buff.cold_heart.stack>=18)
     if S.ChainsofIce:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and S.Icecap:IsAvailable() and S.IcyCitadel:AzeriteRank() >= 2 and (Player:BuffStackP(S.ColdHeartBuff) >= 19 and Player:BuffRemainsP(S.IcyCitadelBuff) < Player:GCD() and Player:BuffP(S.IcyCitadelBuff) or Player:BuffP(S.UnholyStrengthBuff) and Player:BuffStackP(S.ColdHeartBuff) >= 18)) then
-      if HR.Cast(S.ChainsofIce) then return "chains_of_ice 315"; end
+      if HR.Cast(S.ChainsofIce, nil, nil, true) then return "chains_of_ice 315"; end
     end
   end
   Cooldowns = function()
@@ -408,16 +408,16 @@ local function APL()
       end
       -- use_item,name=cyclotronic_blast,if=!buff.pillar_of_frost.up
       if Everyone.CyclotronicBlastReady() and (Player:BuffDownP(S.PillarofFrostBuff)) then
-        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 405"; end
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 405"; end
       end
       -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
       if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 407"; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 407"; end
       end
       -- use_item,name=ashvanes_razor_coral,if=cooldown.empower_rune_weapon.remains>90&debuff.razor_coral_debuff.up&variable.other_on_use_equipped|buff.breath_of_sindragosa.up&debuff.razor_coral_debuff.up&!variable.other_on_use_equipped|buff.empower_rune_weapon.up&debuff.razor_coral_debuff.up&!talent.breath_of_sindragosa.enabled|target.1.time_to_die<21
       if I.AshvanesRazorCoral:IsEquipReady() and (S.EmpowerRuneWeapon:CooldownRemainsP() > 90 and Target:DebuffP(S.RazorCoralDebuff) and bool(VarOoUE) or Player:BuffP(S.BreathofSindragosa) and Target:DebuffP(S.RazorCoralDebuff) and not bool(VarOoUE) or Player:BuffP(S.EmpowerRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not S.BreathofSindragosa:IsAvailable() or Target:TimeToDie() < 21) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 409"; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 409"; end
       end
       -- use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
       if I.JesHowler:IsEquipReady() and ((I.LurkersInsidiousGift:IsEquipped() and Player:BuffP(S.PillarofFrostBuff)) or (not I.LurkersInsidiousGift:IsEquipped() and Player:BuffRemainsP(S.PillarofFrostBuff) < 12 and Player:BuffP(S.PillarofFrostBuff))) then
@@ -437,11 +437,11 @@ local function APL()
       end
       -- use_item,name=razdunks_big_red_button
       if I.RazdunksBigRedButton:IsEquipReady() then
-        if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return "razdunks_big_red_button 419"; end
+        if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "razdunks_big_red_button 419"; end
       end
       -- use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
       if I.MerekthasFang:IsEquipReady() and (Player:BuffDownP(S.BreathofSindragosa) and Player:BuffDownP(S.PillarofFrostBuff)) then
-        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return "merekthas_fang 419"; end
+        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle, 20) then return "merekthas_fang 419"; end
       end
     end
     -- potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -458,11 +458,11 @@ local function APL()
     end
     -- arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
     if S.ArcanePulse:IsCastableP() and ((Player:BuffDownP(S.PillarofFrostBuff) and Cache.EnemiesCount[8] >= 2) or Player:BuffDownP(S.PillarofFrostBuff) and (6 - Player:Rune() >= 5 and Player:RunicPowerDeficit() >= 60)) then
-      if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_pulse 428"; end
+      if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_pulse 428"; end
     end
     -- lights_judgment,if=buff.pillar_of_frost.up
     if S.LightsJudgment:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff)) then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 429"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "lights_judgment 429"; end
     end
     -- ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
     if S.AncestralCall:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and Player:BuffP(S.EmpowerRuneWeaponBuff)) then
@@ -474,7 +474,7 @@ local function APL()
     end
     -- bag_of_tricks,if=buff.pillar_of_frost.up&(buff.pillar_of_frost.remains<5&talent.cold_heart.enabled|!talent.cold_heart.enabled&buff.pillar_of_frost.remains<3)&active_enemies=1|buff.seething_rage.up&active_enemies=1
     if S.BagofTricks:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 and S.ColdHeart:IsAvailable() or not S.ColdHeart:IsAvailable() and Player:BuffRemainsP(S.PillarofFrostBuff) < 3) and Cache.EnemiesCount[8] == 1 or Player:BuffP(S.SeethingRageBuff) and Cache.EnemiesCount[8] == 1) then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 432"; end
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "bag_of_tricks 432"; end
     end
     -- pillar_of_frost,if=cooldown.empower_rune_weapon.remains|talent.icecap.enabled
     if S.PillarofFrost:IsCastableP() and (bool(S.EmpowerRuneWeapon:CooldownRemainsP()) or S.Icecap:IsAvailable()) then
@@ -482,7 +482,7 @@ local function APL()
     end
     -- breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
     if S.BreathofSindragosa:IsCastableP() and (bool(S.EmpowerRuneWeapon:CooldownRemainsP()) and bool(S.PillarofFrost:CooldownRemainsP())) then
-      if HR.Cast(S.BreathofSindragosa, nil, Settings.Frost.BoSDisplayStyle) then return "breath_of_sindragosa 434"; end
+      if HR.Cast(S.BreathofSindragosa, nil, Settings.Frost.BoSDisplayStyle, 12) then return "breath_of_sindragosa 434"; end
     end
     -- empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.obliteration.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.1.time_to_die<20
     if S.EmpowerRuneWeapon:IsCastableP() and (S.PillarofFrost:CooldownUpP() and S.Obliteration:IsAvailable() and Player:RuneTimeToX(5) > Player:GCD() and Player:RunicPowerDeficit() >= 10 or Target:TimeToDie() < 20) then
@@ -502,21 +502,21 @@ local function APL()
     end
     -- frostwyrms_fury,if=(buff.pillar_of_frost.up&azerite.icy_citadel.rank<=1&(buff.pillar_of_frost.remains<=gcd|buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))
     if S.FrostwyrmsFury:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and S.IcyCitadel:AzeriteRank() <= 1 and (Player:BuffRemainsP(S.PillarofFrostBuff) <= Player:GCD() or Player:BuffRemainsP(S.UnholyStrengthBuff) <= Player:GCD() and Player:BuffP(S.UnholyStrengthBuff))) then
-      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury) then return "frostwyrms_fury 437"; end
+      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, 40) then return "frostwyrms_fury 437"; end
     end
     -- frostwyrms_fury,if=(buff.icy_citadel.up&!talent.icecap.enabled&(buff.unholy_strength.up|buff.icy_citadel.remains<=gcd))|buff.icy_citadel.up&buff.icy_citadel.remains<=gcd&talent.icecap.enabled&buff.pillar_of_frost.up
     if S.FrostwyrmsFury:IsCastableP() and ((Player:BuffP(S.IcyCitadelBuff) and not S.Icecap:IsAvailable() and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.IcyCitadelBuff) <= Player:GCD())) or Player:BuffP(S.IcyCitadelBuff) and Player:BuffRemainsP(S.IcyCitadelBuff) <= Player:GCD() and S.Icecap:IsAvailable() and Player:BuffP(S.PillarofFrostBuff)) then
-      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury) then return "frostwyrms_fury 439"; end
+      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, 40) then return "frostwyrms_fury 439"; end
     end
     -- frostwyrms_fury,if=target.1.time_to_die<gcd|(target.1.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
     if S.FrostwyrmsFury:IsCastableP() and (Target:TimeToDie() < Player:GCD() or (Target:TimeToDie() < S.PillarofFrost:CooldownRemainsP() and Player:BuffP(S.UnholyStrengthBuff))) then
-      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury) then return "frostwyrms_fury 441"; end
+      if HR.Cast(S.FrostwyrmsFury, Settings.Frost.GCDasOffGCD.FrostwyrmsFury, nil, 40) then return "frostwyrms_fury 441"; end
     end
   end
   Essences = function()
     -- blood_of_the_enemy,if=buff.pillar_of_frost.up&(buff.pillar_of_frost.remains<10&(buff.breath_of_sindragosa.up|talent.obliteration.enabled|talent.icecap.enabled&!azerite.icy_citadel.enabled)|buff.icy_citadel.up&talent.icecap.enabled)
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and (Player:BuffP(S.BreathofSindragosa) or S.Obliteration:IsAvailable() or S.Icecap:IsAvailable() and not S.IcyCitadel:AzeriteEnabled()) or Player:BuffP(S.IcyCitadelBuff) and S.Icecap:IsAvailable())) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 501"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 501"; end
     end
     -- guardian_of_azeroth,if=!talent.icecap.enabled|talent.icecap.enabled&azerite.icy_citadel.enabled&buff.pillar_of_frost.remains<6&buff.pillar_of_frost.up|talent.icecap.enabled&!azerite.icy_citadel.enabled
     if S.GuardianofAzeroth:IsCastableP() and (not S.Icecap:IsAvailable() or S.Icecap:IsAvailable() and S.IcyCitadel:AzeriteEnabled() and Player:BuffRemainsP(S.PillarofFrostBuff) < 6 and Player:BuffP(S.PillarofFrostBuff) or S.Icecap:IsAvailable() and not S.IcyCitadel:AzeriteEnabled()) then
@@ -524,11 +524,11 @@ local function APL()
     end
     -- chill_streak,if=buff.pillar_of_frost.remains<5&buff.pillar_of_frost.up|target.1.time_to_die<5
     if S.ChillStreak:IsCastableP() and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 and Player:BuffP(S.PillarofFrostBuff) or Target:TimeToDie() < 5) then
-      if HR.Cast(S.ChillStreak, nil, Settings.Commons.EssenceDisplayStyle) then return "chill_streak 505"; end
+      if HR.Cast(S.ChillStreak, nil, Settings.Commons.EssenceDisplayStyle, true) then return "chill_streak 505"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force 507"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, true) then return "the_unbound_force 507"; end
     end
     -- focused_azerite_beam,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.PillarofFrostBuff) and Player:BuffDownP(S.BreathofSindragosa)) then
@@ -536,11 +536,11 @@ local function APL()
     end
     -- concentrated_flame,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.PillarofFrostBuff) and Player:BuffDownP(S.BreathofSindragosa) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 511"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame 511"; end
     end
     -- purifying_blast,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.PillarofFrostBuff) and Player:BuffDownP(S.BreathofSindragosa)) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast 513"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, true) then return "purifying_blast 513"; end
     end
     -- worldvein_resonance,if=buff.pillar_of_frost.up|buff.empower_rune_weapon.up|cooldown.breath_of_sindragosa.remains>60+15
     if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) or Player:BuffP(S.EmpowerRuneWeaponBuff) or S.BreathofSindragosa:CooldownRemainsP() > 75) then
@@ -556,13 +556,13 @@ local function APL()
     end
     -- reaping_flames
     if S.ReapingFlames:IsCastableP() then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 521"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, true) then return "reaping_flames 521"; end
     end
   end
   Obliteration = function()
     -- remorseless_winter,if=talent.gathering_storm.enabled
     if S.RemorselessWinter:IsCastableP() and (S.GatheringStorm:IsAvailable()) then
-      if HR.Cast(S.RemorselessWinter) then return "remorseless_winter 601"; end
+      if HR.Cast(S.RemorselessWinter, nil, nil, 8) then return "remorseless_winter 601"; end
     end
     -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&!talent.frostscythe.enabled&!buff.rime.up&spell_targets.howling_blast>=3
     if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and not S.Frostscythe:IsAvailable() and Player:BuffDownP(S.RimeBuff) and Cache.EnemiesCount[10] >= 3) then
@@ -574,7 +574,7 @@ local function APL()
     end
     -- frostscythe,if=(buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance)))&spell_targets.frostscythe>=2
     if S.Frostscythe:IsCastableP() and ((bool(Player:BuffStackP(S.KillingMachineBuff)) or (Player:BuffP(S.KillingMachineBuff) and (Player:PrevGCDP(1, S.FrostStrike) or Player:PrevGCDP(1, S.HowlingBlast) or Player:PrevGCDP(1, S.GlacialAdvance)))) and Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 607"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 607"; end
     end
     -- obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance))
     if S.Obliterate:IsCastableP("Melee") and ((Target:DebuffStackP(S.RazoriceDebuff) < 5 or Target:DebuffRemainsP(S.RazoriceDebuff) < 10) and bool(Player:BuffStackP(S.KillingMachineBuff)) or (Player:BuffP(S.KillingMachineBuff) and (Player:PrevGCDP(1, S.FrostStrike) or Player:PrevGCDP(1, S.HowlingBlast) or Player:PrevGCDP(1, S.GlacialAdvance)))) then
@@ -586,7 +586,7 @@ local function APL()
     end
     -- glacial_advance,if=(!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd)&spell_targets.glacial_advance>=2
     if no_heal and S.GlacialAdvance:IsReadyP() and ((Player:BuffDownP(S.RimeBuff) or Player:RunicPowerDeficit() < 10 or Player:RuneTimeToX(2) > Player:GCD()) and Cache.EnemiesCount[10] >= 2) then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 613"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 613"; end
     end
     -- howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
     if S.HowlingBlast:IsCastableP(30, true) and (Player:BuffP(S.RimeBuff) and Cache.EnemiesCount[10] >= 2) then
@@ -616,7 +616,7 @@ local function APL()
   Standard = function()
     -- remorseless_winter
     if S.RemorselessWinter:IsCastableP() then
-      if HR.Cast(S.RemorselessWinter) then return "remorseless_winter 701"; end
+      if HR.Cast(S.RemorselessWinter, nil, nil, 8) then return "remorseless_winter 701"; end
     end
     -- frost_strike,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled
     if no_heal and S.FrostStrike:IsReadyP("Melee") and (S.RemorselessWinter:CooldownRemainsP() <= 2 * Player:GCD() and S.GatheringStorm:IsAvailable()) then
@@ -640,7 +640,7 @@ local function APL()
     end
     -- frostscythe,if=buff.killing_machine.up&rune.time_to_4>=gcd
     if S.Frostscythe:IsCastableP() and (Player:BuffP(S.KillingMachineBuff) and Player:RuneTimeToX(4) >= Player:GCD()) then
-      if HR.Cast(S.Frostscythe) then return "frostscythe 711"; end
+      if HR.Cast(S.Frostscythe, nil, nil, 8) then return "frostscythe 711"; end
     end
     -- obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
     if S.Obliterate:IsCastableP("Melee") and (Player:RunicPowerDeficit() > (25 + num(S.RunicAttenuation:IsAvailable()) * 3)) then
@@ -677,7 +677,7 @@ local function APL()
     end
     -- glacial_advance,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&spell_targets.glacial_advance>=2&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
     if no_heal and S.GlacialAdvance:IsReadyP() and (Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffP(S.IcyTalonsBuff) and Cache.EnemiesCount[10] >= 2 and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then
-      if HR.Cast(S.GlacialAdvance) then return "glacial_advance 3"; end
+      if HR.Cast(S.GlacialAdvance, nil, nil, 100) then return "glacial_advance 3"; end
     end
     -- frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
     if no_heal and S.FrostStrike:IsReadyP("Melee") and (Player:BuffRemainsP(S.IcyTalonsBuff) <= Player:GCD() and Player:BuffP(S.IcyTalonsBuff) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemainsP() > 15)) then

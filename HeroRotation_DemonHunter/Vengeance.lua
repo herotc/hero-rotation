@@ -198,11 +198,11 @@ local function APL ()
     end
     -- Cyclotronic Blast
     if Everyone.CyclotronicBlastReady() then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "PSCD Test"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "PSCD Test"; end
     end
     -- First attacks
     if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
-      if HR.Cast(S.InfernalStrike) then return "infernal_strike precombat"; end
+      if HR.Cast(S.InfernalStrike, nil, nil, true) then return "infernal_strike precombat"; end
     end
     if S.ImmolationAura:IsCastable() and IsInMeleeRange then
       if HR.Cast(S.ImmolationAura) then return "immolation_aura precombat"; end
@@ -219,22 +219,22 @@ local function APL ()
     end
     -- Metamorphosis
     if S.Metamorphosis:IsCastable("Melee") and (Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold) then
-      HR.CastSuggested(S.Metamorphosis);
+      if HR.CastSuggested(S.Metamorphosis) then return "Cast Metamorphosis"; end
     end
     -- Fiery Brand
     if S.FieryBrand:IsCastable() and Target:DebuffDownP(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
-      if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand) then return "Cast Fiery Brand"; end
+      if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, true) then return "Cast Fiery Brand"; end
     end
   end
   Brand = function()
     if Settings.Vengeance.BrandForDamage then
       -- actions.brand+=/sigil_of_flame,if=cooldown.fiery_brand.remains<2
       if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (S.FieryBrand:CooldownRemainsP() < 2) then
-        if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand Soon)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, true) then return "Cast Sigil of Flame (Brand Soon)"; end
       end
       -- actions.brand+=/infernal_strike,if=cooldown.fiery_brand.remains=0
       if S.InfernalStrike:IsCastable() and (S.FieryBrand:IsReady()) then
-        if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand Soon)"; end
+        if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, true) then return "Cast Infernal Strike (Brand Soon)"; end
       end
       -- actions.brand+=/fiery_brand
       if S.FieryBrand:IsCastable() and IsInMeleeRange then
@@ -251,11 +251,11 @@ local function APL ()
     end
     -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
     if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike (Brand)"; end
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, true) then return "Cast Infernal Strike (Brand)"; end
     end
     -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, true) then return "Cast Sigil of Flame (Brand)"; end
     end
   end
   Cooldowns = function()
@@ -265,7 +265,7 @@ local function APL ()
     end
     -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
     if S.ConcentratedFlame:IsCastable() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame cooldowns"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame cooldowns"; end
     end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastable() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
@@ -281,18 +281,18 @@ local function APL ()
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
     if Everyone.CyclotronicBlastReady() and (Player:BuffDownP(S.MemoryofLucidDreams)) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast cooldowns"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast cooldowns"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
     if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral cooldowns"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral cooldowns"; end
     end
     -- use_items
   end
   Normal = function()
     -- actions+=/infernal_strike,if=(!talent.flame_crash.enabled|(dot.sigil_of_flame.remains<3&!action.infernal_strike.sigil_placed))
     if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (not S.FlameCrash:IsAvailable() or (Target:DebuffRemainsP(S.SigilofFlameDebuff) < 3 and S.InfernalStrike:TimeSinceLastCast() > 2)) then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike) then return "Cast Infernal Strike"; end
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, true) then return "Cast Infernal Strike"; end
     end
     -- actions+=/spirit_bomb,if=((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4)
     if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffP(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4) then
@@ -300,11 +300,11 @@ local function APL ()
     end
     -- actions+=/soul_cleave,if=(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4))
     if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() and ((Player:BuffP(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4)) then
-      if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
+      if HR.Cast(S.SoulCleave, nil, nil, true) then return "Cast Soul Cleave"; end
     end
     -- actions+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
     if S.SoulCleave:IsReady() and (S.SpiritBomb:IsAvailable() and SoulFragments == 0) then
-      if HR.Cast(S.SoulCleave) then return "Cast Soul Cleave"; end
+      if HR.Cast(S.SoulCleave, nil, nil, true) then return "Cast Soul Cleave"; end
     end
     -- actions+=/immolation_aura,if=pain<=90
     if S.ImmolationAura:IsCastable() and IsInAoERange and (Player:Pain() <= 90) then
@@ -312,7 +312,7 @@ local function APL ()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastable() then
@@ -340,7 +340,7 @@ local function APL ()
     end
     -- actions+=/sigil_of_flame
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
-      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, true) then return "Cast Sigil of Flame"; end
     end
     -- actions+=/shear
     if S.Shear:IsReady() and IsInMeleeRange then

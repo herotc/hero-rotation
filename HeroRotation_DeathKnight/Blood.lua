@@ -154,7 +154,7 @@ local function APL ()
     end
     -- Manually Added: Death's Caress for ranged pulling
     if S.DeathsCaress:IsReady() then
-      if HR.Cast(S.DeathsCaress) then return ""; end
+      if HR.Cast(S.DeathsCaress, nil, nil, true) then return ""; end
     end
   end
   Defensives = function()
@@ -202,7 +202,7 @@ local function APL ()
     end
     -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
     if S.BloodBoil:IsCastable() and Cache.EnemiesCount[10] >= 1 and (S.BloodBoil:ChargesFractionalP() >= 1.8 and (Player:BuffStackP(S.HemostasisBuff) <= (5 - Cache.EnemiesCount[10]) or Cache.EnemiesCount[10] > 2)) then
-      if HR.Cast(S.BloodBoil) then return ""; end
+      if HR.Cast(S.BloodBoil, nil, nil, 10) then return ""; end
     end
     -- marrowrend,if=buff.bone_shield.stack<5&talent.ossuary.enabled&runic_power.deficit>=15
     if S.Marrowrend:IsCastable("Melee") and (Player:BuffStackP(S.BoneShield) < 5 and S.Ossuary:IsAvailable() and Player:RunicPowerDeficit() >= 15) then
@@ -230,7 +230,7 @@ local function APL ()
     end
     -- blood_boil,if=buff.dancing_rune_weapon.up
     if S.BloodBoil:IsCastable() and Cache.EnemiesCount[10] >= 1 and (Player:BuffP(S.DancingRuneWeaponBuff)) then
-      if HR.Cast(S.BloodBoil) then return ""; end
+      if HR.Cast(S.BloodBoil, nil, nil, 10) then return ""; end
     end
     -- death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
     if S.DeathandDecay:IsReady() and Cache.EnemiesCount[10] >= 1 and (Player:BuffP(S.CrimsonScourge) or S.RapidDecomposition:IsAvailable() or Cache.EnemiesCount[10] >= 2) then
@@ -242,7 +242,7 @@ local function APL ()
     end
     -- blood_boil
     if S.BloodBoil:IsCastable() and Cache.EnemiesCount[10] >= 1 then
-      if HR.Cast(S.BloodBoil) then return ""; end
+      if HR.Cast(S.BloodBoil, nil, nil, 10) then return ""; end
     end
     -- heart_strike,if=rune.time_to_3<gcd|buff.bone_shield.stack>6
     if S.HeartStrike:IsReady("Melee") and (Player:RuneTimeToX(3) < Player:GCD() or Player:BuffStackP(S.BoneShield) > 6) then
@@ -292,7 +292,7 @@ local function APL ()
       end
       -- lights_judgment,if=buff.unholy_strength.up
       if S.LightsJudgment:IsCastable() and (Player:BuffP(S.UnholyStrengthBuff)) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return ""; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
@@ -303,30 +303,30 @@ local function APL ()
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       if S.BagofTricks:IsCastable() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return ""; end
       end
     end
     -- use_items,if=cooldown.dancing_rune_weapon.remains>90
     if Settings.Commons.UseTrinkets then
       -- use_item,name=razdunks_big_red_button
       if I.RazdunksBigRedButton:IsEquipReady() then
-        if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+        if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle, 40) then return ""; end
       end
       -- use_item,name=merekthas_fang
       if I.MerekthasFang:IsEquipReady() then
-        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle, 20) then return ""; end
       end
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
       if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return ""; end
       end
       -- use_item,name=ashvanes_razor_coral,if=target.health.pct<31&equipped.dribbling_inkpod
       if I.AshvanesRazorCoral:IsEquipReady() and (Target:HealthPercentage() < 31 and S.DribblingInkpod:IsEquipped()) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return ""; end
       end
       -- use_item,name=ashvanes_razor_coral,if=buff.dancing_rune_weapon.up&debuff.razor_coral_debuff.up&!equipped.dribbling_inkpod
       if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.DancingRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not I.DribblingInkpod:IsEquipped()) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return ""; end
       end
     end
     -- potion,if=buff.dancing_rune_weapon.up
