@@ -175,8 +175,8 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 12"; end
     end
     -- colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
-    if S.ColossusSmash:IsCastableP("Melee") and (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
-      if HR.Cast(S.ColossusSmash) then return "colossus_smash 22"; end
+    if S.ColossusSmash:IsCastableP("Melee") and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
+      if HR.Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash 22"; end
     end
     -- warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
     if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or (Player:BuffP(S.MemoryofLucidDreams) or S.MemoryofLucidDreams:CooldownRemainsP() > 10)) then
@@ -225,8 +225,8 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 64"; end
     end
     -- colossus_smash,if=debuff.colossus_smash.down
-    if S.ColossusSmash:IsCastableP("Melee") and (Target:DebuffDownP(S.ColossusSmashDebuff)) then
-      if HR.Cast(S.ColossusSmash) then return "colossus_smash 70"; end
+    if S.ColossusSmash:IsCastableP("Melee") and HR.CDsON() and (Target:DebuffDownP(S.ColossusSmashDebuff)) then
+      if HR.Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash 70"; end
     end
     -- warbreaker,if=debuff.colossus_smash.down
     if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() and (Target:DebuffDownP(S.ColossusSmashDebuff)) then
@@ -287,8 +287,8 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 178"; end
     end
     -- colossus_smash,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled)
-    if S.ColossusSmash:IsCastableP("Melee") and ((Cache.EnemiesCount[8] > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
-      if HR.Cast(S.ColossusSmash) then return "colossus_smash 188"; end
+    if S.ColossusSmash:IsCastableP("Melee") and HR.CDsON() and ((Cache.EnemiesCount[8] > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
+      if HR.Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash 188"; end
     end
     -- warbreaker,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled)
     if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() and ((Cache.EnemiesCount[8] > 1) or 10000000000 > 40 or (10000000000 > 20 and S.AngerManagement:IsAvailable())) then
@@ -345,11 +345,11 @@ local function APL()
       if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 278"; end
     end
     -- colossus_smash
-    if S.ColossusSmash:IsCastableP("Melee") then
-      if HR.Cast(S.ColossusSmash) then return "colossus_smash 288"; end
+    if S.ColossusSmash:IsCastableP("Melee") and HR.CDsON() then
+      if HR.Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash 288"; end
     end
     -- warbreaker
-    if S.Warbreaker:IsCastableP("Melee") then
+    if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() then
       if HR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker 292"; end
     end
     -- deadly_calm

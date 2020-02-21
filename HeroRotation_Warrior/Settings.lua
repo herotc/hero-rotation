@@ -32,6 +32,7 @@ HR.GUISettings.APL.Warrior = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      ColossusSmash = false,
       Warbreaker = false,
       Bladestorm = false,
       Ravager = false,
