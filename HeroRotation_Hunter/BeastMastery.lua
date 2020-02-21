@@ -262,10 +262,6 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
-    -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks"; end
-    end
     -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
     if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
@@ -398,6 +394,10 @@ local function APL()
     if S.KillCommand:IsCastableP() then
       if HR.Cast(S.KillCommand) then return "kill_command 194"; end
     end
+    -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
+    if S.BagofTricks:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks"; end
+    end
     -- chimaera_shot
     if S.ChimaeraShot:IsCastableP() then
       if HR.Cast(S.ChimaeraShot) then return "chimaera_shot 196"; end
@@ -453,13 +453,13 @@ local function APL()
     -- Interrupts
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
-    -- use_items
+    -- use_items,if=prev_gcd.1.aspect_of_the_wild|target.time_to_die<20
     -- use_item,name=azsharas_font_of_power,if=cooldown.aspect_of_the_wild.remains_guess<15&target.time_to_die>10
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.AspectoftheWild:CooldownRemainsP() < 15 and Target:TimeToDie() > 10) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(!equipped.azsharas_font_of_power|trinket.azsharas_font_of_power.cooldown.remains>86|essence.blood_of_the_enemy.major)&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.remains>5)&(!essence.condensed_lifeforce.major|buff.guardian_of_azeroth.up)&(target.health.pct<35|!essence.condensed_lifeforce.major|!talent.killer_instinct.enabled)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.RazorCoralDebuff) and (not I.AzsharasFontofPower:IsEquipped() or I.AzsharasFontofPower:CooldownRemains() > 86 or Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and (Player:PrevGCDP(1, S.AspectoftheWild) or not Everyone.PSCDEquipped() and Player:BuffRemainsP(S.AspectoftheWildBuff) > 5) and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Player:BuffP(S.GuardianofAzerothBuff)) and (Target:HealthPercentage() < 35 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or not S.KillerInstinct:IsAvailable()) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(I.PocketsizedComputationDevice:CooldownRemains() + 4 < Target:TimeToDie()))) then
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(!equipped.azsharas_font_of_power|trinket.azsharas_font_of_power.cooldown.remains>86|essence.blood_of_the_enemy.major)&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.remains>9)&(!essence.condensed_lifeforce.major|buff.guardian_of_azeroth.up)&(target.health.pct<35|!essence.condensed_lifeforce.major|!talent.killer_instinct.enabled)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.RazorCoralDebuff) and (not I.AzsharasFontofPower:IsEquipped() or I.AzsharasFontofPower:CooldownRemains() > 86 or Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and (Player:PrevGCDP(1, S.AspectoftheWild) or not Everyone.PSCDEquipped() and Player:BuffRemainsP(S.AspectoftheWildBuff) > 9) and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Player:BuffP(S.GuardianofAzerothBuff)) and (Target:HealthPercentage() < 35 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or not S.KillerInstinct:IsAvailable()) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(I.PocketsizedComputationDevice:CooldownRemains() + 4 < Target:TimeToDie()))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
