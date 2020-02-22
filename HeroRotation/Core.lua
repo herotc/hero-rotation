@@ -103,6 +103,8 @@
       if RangeCheck ~= nil then
         if type(RangeCheck) == "number" then
           OutofRange = not Target:IsInRange(RangeCheck)
+        elseif (type(RangeCheck) == "string" and RangeCheck == "Melee") then
+          OutofRange = not Target:IsInRange("Melee")
         else
           OutofRange = not Target:IsInRange(Object)
         end
