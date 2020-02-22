@@ -753,6 +753,7 @@ local function Init ()
   HL.RegisterNucleusAbility(44457, 10, 6)               -- Living Bomb
   HL.RegisterNucleusAbility(2120, 8, 6)                 -- Flamestrike
   HL.RegisterNucleusAbility(257541, 8, 6)               -- Phoenix Flames
+  HL.RegisterNucleusAbility(12654, 8, 6)                -- AoE Ignite
 end
 
 HR.SetAPL(63, APL, Init)
