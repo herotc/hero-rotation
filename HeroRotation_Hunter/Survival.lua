@@ -681,8 +681,8 @@ local function APL()
     if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
     end
-    -- mongoose_bite,if=talent.alpha_predator.enabled&target.time_to_die<10|target.time_to_die<5
-    if S.MongooseBite:IsReadyP() and (S.AlphaPredator:IsAvailable() and Target:TimeToDie() < 10 or Target:TimeToDie() < 5) then
+    -- mongoose_bite,if=active_enemies=1&(talent.alpha_predator.enabled&target.time_to_die<10|target.time_to_die<5)
+    if S.MongooseBite:IsReadyP() and (Cache.EnemiesCount[8] == 1 and (S.AlphaPredator:IsAvailable() and Target:TimeToDie() < 10 or Target:TimeToDie() < 5)) then
       if HR.Cast(S.MongooseBite) then return "mongoose_bite 999"; end
     end
     -- call_action_list,name=apwfi,if=active_enemies<3&talent.chakrams.enabled&talent.alpha_predator.enabled
