@@ -192,15 +192,15 @@ local function APL()
     end
     -- death_coil,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:BuffP(S.DeathandDecayBuff) and Player:Rune() < 2 and not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 20"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 20"; end
     end
     -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
     if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and bool(S.Apocalypse:CooldownRemainsP())) then
-      if HR.Cast(S.ScourgeStrike, nil, nil, true) then return "scourge_strike 24"; end
+      if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 24"; end
     end
     -- clawing_shadows,if=death_and_decay.ticking&cooldown.apocalypse.remains
     if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and bool(S.Apocalypse:CooldownRemainsP())) then
-      if HR.Cast(S.ClawingShadows, nil, nil, true) then return "clawing_shadows 28"; end
+      if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 28"; end
     end
     -- epidemic,if=!variable.pooling_for_gargoyle
     -- Added check to ensure at least 2 targets have Plague
@@ -213,39 +213,39 @@ local function APL()
     end
     -- festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
     if S.FesteringStrike:IsCastableP() and (S.BurstingSores:IsAvailable() and Cache.EnemiesCount[8] >= 2 and Target:DebuffStackP(S.FesteringWoundDebuff) <= 1) then
-      if HR.Cast(S.FesteringStrike, nil, nil, true) then return "festering_strike 47"; end
+      if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 47"; end
     end
     -- death_coil,if=buff.sudden_doom.react&rune.deficit>=4
     if S.DeathCoil:IsUsableP() and (bool(Player:BuffStackP(S.SuddenDoomBuff)) and Player:Rune() <= 2) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 53"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 53"; end
     end
     -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
     if S.DeathCoil:IsUsableP() and (bool(Player:BuffStackP(S.SuddenDoomBuff)) and not bool(VarPoolingForGargoyle) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 57"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 57"; end
     end
     -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 63"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 63"; end
     end
     -- scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.ScourgeStrike:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
-      if HR.Cast(S.ScourgeStrike, nil, nil, true) then return "scourge_strike 71"; end
+      if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 71"; end
     end
     -- clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.ClawingShadows:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemainsP() > 5) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
-      if HR.Cast(S.ClawingShadows, nil, nil, true) then return "clawing_shadows 81"; end
+      if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 81"; end
     end
     -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 91"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 91"; end
     end
     -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
-      if HR.Cast(S.FesteringStrike, nil, nil, true) then return "festering_strike 95"; end
+      if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 95"; end
     end
     -- death_coil,if=!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 109"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 109"; end
     end
   end
   Cooldowns = function()
@@ -279,11 +279,11 @@ local function APL()
     end
     -- soul_reaper,if=(!raid_event.adds.exists|raid_event.adds.in>20)&rune<=(1-buff.unholy_frenzy.up)
     if S.SoulReaper:IsCastableP() and ((not (Cache.EnemiesCount[8] > 1)) and Player:Rune() <= (1 - num(Player:BuffP(S.UnholyFrenzyBuff)))) then
-      if HR.Cast(S.SoulReaper, nil, nil, true) then return "soul_reaper 166"; end
+      if HR.Cast(S.SoulReaper, nil, nil, "Melee") then return "soul_reaper 166"; end
     end
     -- unholy_blight
     if S.UnholyBlight:IsCastableP() then
-      if HR.Cast(S.UnholyBlight, nil, nil, true) then return "unholy_blight 172"; end
+      if HR.Cast(S.UnholyBlight, nil, nil, 10) then return "unholy_blight 172"; end
     end
   end
   Essences = function()
@@ -301,7 +301,7 @@ local function APL()
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, true) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
     -- focused_azerite_beam,if=!death_and_decay.ticking
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
@@ -309,11 +309,11 @@ local function APL()
     end
     -- concentrated_flame,if=dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- purifying_blast,if=!death_and_decay.ticking
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, true) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
     -- worldvein_resonance,if=talent.army_of_the_damned.enabled&essence.vision_of_perfection.minor&buff.unholy_strength.up|essence.vision_of_perfection.minor&pet.apoc_ghoul.active|talent.army_of_the_damned.enabled&pet.apoc_ghoul.active&cooldown.army_of_the_dead.remains>60|talent.army_of_the_damned.enabled&pet.army_ghoul.active
     if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and Spell:EssenceEnabled(AE.VisionofPerfection) and Player:BuffP(S.UnholyStrengthBuff) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.ArmyoftheDead:TimeSinceLastCast() <= 30) then
@@ -329,13 +329,13 @@ local function APL()
     end
     -- reaping_flames
     if S.ReapingFlames:IsCastableP() then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, true) then return "reaping_flames"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
     end
   end
   Generic = function()
     -- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
     if S.DeathCoil:IsUsableP() and (bool(Player:BuffStackP(S.SuddenDoomBuff)) and not bool(VarPoolingForGargoyle) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 174"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 174"; end
     end
     -- Manually added: Multiple target Epidemic in place of below Death Coil
     if S.Epidemic:IsReadyP() and ((Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and not bool(VarPoolingForGargoyle)) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
@@ -343,7 +343,7 @@ local function APL()
     end
     -- death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 14 and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 180"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 180"; end
     end
     -- death_and_decay,if=talent.pestilence.enabled&cooldown.apocalypse.remains
     if S.DeathandDecay:IsCastableP() and (S.Pestilence:IsAvailable() and bool(S.Apocalypse:CooldownRemainsP())) then
@@ -355,11 +355,11 @@ local function APL()
     end
     -- scourge_strike,if=((debuff.festering_wound.up&(cooldown.apocalypse.remains>5&(!essence.vision_of_perfection.enabled|!talent.unholy_frenzy.enabled)|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains>6))|debuff.festering_wound.stack>4)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.ScourgeStrike:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and (S.Apocalypse:CooldownRemainsP() > 5 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.UnholyFrenzy:IsAvailable()) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() > 6)) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
-      if HR.Cast(S.ScourgeStrike, nil, nil, true) then return "scourge_strike 198"; end
+      if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 198"; end
     end
     -- clawing_shadows,if=((debuff.festering_wound.up&(cooldown.apocalypse.remains>5&(!essence.vision_of_perfection.enabled|!talent.unholy_frenzy.enabled)|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains>6))|debuff.festering_wound.stack>4)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.ClawingShadows:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and (S.Apocalypse:CooldownRemainsP() > 5 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.UnholyFrenzy:IsAvailable()) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() > 6)) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
-      if HR.Cast(S.ClawingShadows, nil, nil, true) then return "clawing_shadows 208"; end
+      if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 208"; end
     end
     -- Manually added: Multiple target Epidemic if close to capping RP
     if S.Epidemic:IsReadyP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
@@ -367,11 +367,11 @@ local function APL()
     end
     -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 218"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 218"; end
     end
     -- festering_strike,if=debuff.festering_wound.stack<4&(cooldown.apocalypse.remains<3&(!essence.vision_of_perfection.enabled|!talent.unholy_frenzy.enabled|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains<7))|debuff.festering_wound.stack<1&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
     if S.FesteringStrike:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and (S.Apocalypse:CooldownRemainsP() < 3 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.UnholyFrenzy:IsAvailable() or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() < 7)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1 and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
-      if HR.Cast(S.FesteringStrike, nil, nil, true) then return "festering_strike 222"; end
+      if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 222"; end
     end
     -- Manually added: Multiple target Epidemic filler to burn RP
     if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
@@ -379,7 +379,7 @@ local function APL()
     end
     -- death_coil,if=!variable.pooling_for_gargoyle
     if S.DeathCoil:IsUsableP() and (not bool(VarPoolingForGargoyle)) then
-      if HR.Cast(S.DeathCoil, nil, nil, true) then return "death_coil 236"; end
+      if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 236"; end
     end
   end
   -- call precombat
@@ -412,7 +412,7 @@ local function APL()
       end
       -- lights_judgment,if=(buff.unholy_strength.up&buff.festermight.remains<=5)|active_enemies>=2&(buff.unholy_strength.up|buff.festermight.remains<=5)
       if S.LightsJudgment:IsCastableP() and ((Player:BuffP(S.UnholyStrengthBuff) and Player:BuffRemainsP(S.FestermightBuff) <= 5) or Cache.EnemiesCount[8] >= 2 and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) <= 5)) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "lights_judgment 257"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 257"; end
       end
       -- ancestral_call,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
       if S.AncestralCall:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
@@ -428,7 +428,7 @@ local function APL()
       end
       -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1|buff.festermight.remains<gcd&active_enemies=1
       if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) and Cache.EnemiesCount[8] == 1 or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD() and Cache.EnemiesCount[8] == 1) then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "bag_of_tricks 260.5"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 260.5"; end
       end
     end
     if (Settings.Commons.UseTrinkets) then

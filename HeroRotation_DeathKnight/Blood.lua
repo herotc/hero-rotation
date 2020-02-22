@@ -154,7 +154,7 @@ local function APL ()
     end
     -- Manually Added: Death's Caress for ranged pulling
     if S.DeathsCaress:IsReady() then
-      if HR.Cast(S.DeathsCaress, nil, nil, true) then return ""; end
+      if HR.Cast(S.DeathsCaress, nil, nil, 30) then return ""; end
     end
   end
   Defensives = function()
@@ -292,7 +292,7 @@ local function APL ()
       end
       -- lights_judgment,if=buff.unholy_strength.up
       if S.LightsJudgment:IsCastable() and (Player:BuffP(S.UnholyStrengthBuff)) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return ""; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return ""; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
@@ -303,7 +303,7 @@ local function APL ()
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
       end
       if S.BagofTricks:IsCastable() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return ""; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return ""; end
       end
     end
     -- use_items,if=cooldown.dancing_rune_weapon.remains>90

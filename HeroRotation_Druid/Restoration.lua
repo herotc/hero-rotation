@@ -170,7 +170,7 @@ local function APL()
       end
       -- Manually add Rake opener
       if S.Rake:IsReadyP() and (Player:IsStealthed(true, false)) then
-        if HR.Cast(S.Rake, nil, nil, true) then return "rake 7"; end
+        if HR.Cast(S.Rake, nil, nil, "Melee") then return "rake 7"; end
       end
     else
       -- potion
@@ -179,7 +179,7 @@ local function APL()
       end
       -- Manually add Solar Wrath for non-cat
       if S.SolarWrath:IsCastableP() then
-        if HR.Cast(S.SolarWrath, nil, nil, true) then return "solar_wrath 11"; end
+        if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 11"; end
       end
     end
   end
@@ -198,22 +198,22 @@ local function APL()
     end
     -- starsurge
     if S.Starsurge:IsReadyP() then
-      if HR.Cast(S.Starsurge, nil, nil, true) then return "starsurge 107"; end
+      if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 107"; end
     end
     -- lunar_strike,if=buff.lunar_empowerment.up|spell_targets>1
     if S.LunarStrike:IsReadyP() and (Player:BuffP(S.LunarEmpowerment) or EnemiesCountLR > 1) then
-      if HR.Cast(S.LunarStrike, nil, nil, true) then return "lunar_strike 109"; end
+      if HR.Cast(S.LunarStrike, nil, nil, 40) then return "lunar_strike 109"; end
     end
     -- solar_wrath
     if S.SolarWrath:IsCastableP() then
-      if HR.Cast(S.SolarWrath, nil, nil, true) then return "solar_wrath 111"; end
+      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 111"; end
     end
   end
   Feral = function()
     -- rake,if=buff.shadowmeld.up|buff.prowl.up
     -- Manually added DebuffDownP requirement to avoid double Rake opener
     if S.Rake:IsReadyP() and (not Player:IsStealthed(true, true) and Target:DebuffDownP(S.RakeDebuff)) then
-      if HR.Cast(S.Rake, nil, nil, true) then return "rake 201"; end
+      if HR.Cast(S.Rake, nil, nil, "Melee") then return "rake 201"; end
     end
     -- auto_attack
     -- sunfire,target_if=refreshable
@@ -226,7 +226,7 @@ local function APL()
     end
     -- sunfire,if=prev_gcd.1.moonfire&remains<duration*0.8
     if S.Sunfire:IsReadyP() and (Player:PrevGCDP(1, S.Moonfire) and Target:DebuffRemainsP(S.SunfireDebuff) < S.SunfireDebuff:BaseDuration() * 0.8) then
-      if HR.Cast(S.Sunfire, nil, nil, true) then return "sunfire 207"; end
+      if HR.Cast(S.Sunfire, nil, nil, 40) then return "sunfire 207"; end
     end
     -- cat_form,if=!buff.cat_form.up&energy>50
     if S.CatForm:IsCastableP() and (Player:BuffDownP(S.CatFormBuff) and Player:Energy() > 50) then
@@ -234,11 +234,11 @@ local function APL()
     end
     -- solar_wrath,if=!buff.cat_form.up
     if S.SolarWrath:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
-      if HR.Cast(S.SolarWrath, nil, nil, true) then return "solar_wrath 211"; end
+      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 211"; end
     end
     -- ferocious_bite,if=(combo_points>3&target.1.time_to_die<3)|(combo_points=5&energy>=50&dot.rip.remains>10)&spell_targets.swipe_cat<5
     if S.FerociousBite:IsReadyP() and ((Player:ComboPoints() > 3 and Target:TimeToDie() < 3) or (Player:ComboPoints() == 5 and Player:Energy() >= 50 and Target:DebuffRemainsP(S.RipDebuff) > 10) and EnemiesCount < 5) then
-      if HR.Cast(S.FerociousBite, nil, nil, true) then return "ferocious_bite 213"; end
+      if HR.Cast(S.FerociousBite, nil, nil, "Melee") then return "ferocious_bite 213"; end
     end
     -- rip,target_if=(refreshable&(combo_points=5&time_to_die>remains+24|(remains+combo_points*4<time_to_die&remains+4+combo_points*4>time_to_die)))|combo_points=5&energy>90&remains<=10
     if S.Rip:IsReadyP() then
@@ -250,11 +250,11 @@ local function APL()
     end
     -- swipe_cat,if=spell_targets.swipe_cat>=2
     if S.SwipeCat:IsReadyP() and (EnemiesCount >= 2) then
-      if HR.Cast(S.SwipeCat, nil, nil, true) then return "swipe_cat 219"; end
+      if HR.Cast(S.SwipeCat, nil, nil, 8) then return "swipe_cat 219"; end
     end
     -- shred,if=combo_points<5|energy>90
     if S.Shred:IsReadyP() and (Player:ComboPoints() < 5 or Player:Energy() > 90) then
-      if HR.Cast(S.Shred, nil, nil, true) then return "shred 221"; end
+      if HR.Cast(S.Shred, nil, nil, "Melee") then return "shred 221"; end
     end
     -- Give Pool icon if waiting on energy
     if (true) then
@@ -281,7 +281,7 @@ local function APL()
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastableP() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "lights_judgment 37"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 37"; end
       end
       -- fireblood
       if S.Fireblood:IsCastableP() then
@@ -293,7 +293,7 @@ local function APL()
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastableP() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "bag_of_tricks 42"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 42"; end
       end
     end
     -- use_item,effect_name=cyclotronic_blast,if=!buff.prowl.up&!buff.shadowmeld.up
@@ -311,7 +311,7 @@ local function APL()
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!buff.shadowmeld.up&!buff.prowl.up
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and not Player:IsStealthed(true, true)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame 49"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 49"; end
     end
     -- run_action_list,name=feral,if=talent.feral_affinity.enabled
     if (S.FeralAffinity:IsAvailable()) then
@@ -332,7 +332,7 @@ local function APL()
     -- solar_wrath
     -- Manually add Cat Form check to ensure it's not asking to come out of cat for only a split second
     if S.SolarWrath:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
-      if HR.Cast(S.SolarWrath, nil, nil, true) then return "solar_wrath 55"; end
+      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 55"; end
     end
   end
 end

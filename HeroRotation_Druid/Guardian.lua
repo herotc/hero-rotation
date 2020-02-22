@@ -167,7 +167,7 @@ local function APL()
   Cleave = function()
     -- maul,if=rage.deficit<=10
     if S.Maul:IsReadyP() and UseMaul and (Player:RageDeficit() <= 10) then
-      if HR.Cast(S.Maul, nil, nil, true) then return "maul 51"; end
+      if HR.Cast(S.Maul, nil, nil, "Melee") then return "maul 51"; end
     end
     -- ironfur,if=cost<=0
     if S.Ironfur:IsReadyP() and (S.Ironfur:Cost() <= 0) then
@@ -175,37 +175,37 @@ local function APL()
     end
     -- pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
     if S.Pulverize:IsReadyP() and (Target:DebuffStackP(S.ThrashBearDebuff) == 3) then
-      if HR.Cast(S.Pulverize, nil, nil, true) then return "pulverize 55"; end
+      if HR.Cast(S.Pulverize, nil, nil, "Melee") then return "pulverize 55"; end
     end
     -- moonfire,target_if=!dot.moonfire.ticking
     if S.Moonfire:IsCastableP() and (Target:DebuffDownP(S.MoonfireDebuff)) then
-      if HR.Cast(S.Moonfire, nil, nil, true) then return "moonfire 57"; end
+      if HR.Cast(S.Moonfire, nil, nil, 40) then return "moonfire 57"; end
     end
     -- mangle,if=dot.thrash_bear.ticking
     if S.Mangle:IsCastableP() and (Target:DebuffP(S.ThrashBearDebuff)) then
-      if HR.Cast(S.Mangle, nil, nil, true) then return "mangle 59"; end
+      if HR.Cast(S.Mangle, nil, nil, "Melee") then return "mangle 59"; end
     end
     -- moonfire,target_if=buff.galactic_guardian.up&active_enemies=1|dot.moonfire.refreshable
     if S.Moonfire:IsCastableP() and (Player:BuffP(S.GalacticGuardianBuff) and Cache.EnemiesCount[8] == 1 or Target:DebuffRefreshableCP(S.MoonfireDebuff)) then
-      if HR.Cast(S.Moonfire, nil, nil, true) then return "moonfire 61"; end
+      if HR.Cast(S.Moonfire, nil, nil, 40) then return "moonfire 61"; end
     end
     -- maul
     if S.Maul:IsReadyP() and UseMaul then
-      if HR.Cast(S.Maul, nil, nil, true) then return "maul 63"; end
+      if HR.Cast(S.Maul, nil, nil, "Melee") then return "maul 63"; end
     end
     -- thrash
     if S.Thrash:IsCastableP() then
-      if HR.Cast(S.Thrash, nil, nil, true) then return "thrash 65"; end
+      if HR.Cast(S.Thrash, nil, nil, 8) then return "thrash 65"; end
     end
     -- swipe
     if S.Swipe:IsCastableP() then
-      if HR.Cast(S.Swipe, nil, nil, true) then return "swipe 67"; end
+      if HR.Cast(S.Swipe, nil, nil, 8) then return "swipe 67"; end
     end
   end
   Essences = function()
     -- concentrated_flame,if=essence.the_crucible_of_flame.major&((!dot.concentrated_flame_burn.ticking&!action.concentrated_flame_missile.in_flight)^time_to_die<=7)
     if S.ConcentratedFlame:IsCastableP() and ((Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or Target:TimeToDie() <= 7) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame 71"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 71"; end
     end
     -- anima_of_death,if=essence.anima_of_life_and_death.major
     if S.AnimaofDeath:IsCastableP() then
@@ -227,7 +227,7 @@ local function APL()
   Multi = function()
     -- maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
     if S.Maul:IsReadyP() and UseMaul and (Spell:MajorEssenceEnabled(AE.ConflictandStrife) and Player:BuffDownP(S.SharpenedClawsBuff)) then
-      if HR.Cast(S.Maul, nil, nil, true) then return "maul 91"; end
+      if HR.Cast(S.Maul, nil, nil, "Melee") then return "maul 91"; end
     end
     -- ironfur,if=(rage>=cost&azerite.layered_mane.enabled)|rage.deficit<10
     if S.Ironfur:IsReadyP() and (S.LayeredMane:AzeriteEnabled() or Player:RageDeficit() < 10) then
@@ -235,19 +235,19 @@ local function APL()
     end
     -- thrash,if=(buff.incarnation.up&active_enemies>=4)|cooldown.thrash_bear.up
     if S.Thrash:IsCastableP() and ((Player:BuffP(S.IncarnationBuff) and Cache.EnemiesCount[8] >= 4) or S.Thrash:CooldownUpP()) then
-      if HR.Cast(S.Thrash, nil, nil, true) then return "thrash 95"; end
+      if HR.Cast(S.Thrash, nil, nil, 8) then return "thrash 95"; end
     end
     -- mangle,if=buff.incarnation.up&active_enemies=3&dot.thrash_bear.ticking
     if S.Mangle:IsCastableP() and (Player:BuffP(S.IncarnationBuff) and Cache.EnemiesCount[8] == 3 and Target:DebuffP(S.ThrashBearDebuff)) then
-      if HR.Cast(S.Mangle, nil, nil, true) then return "mangle 97"; end
+      if HR.Cast(S.Mangle, nil, nil, "Melee") then return "mangle 97"; end
     end
     -- moonfire,if=dot.moonfire.refreshable&active_enemies<=4
     if S.Moonfire:IsCastableP() and (Target:DebuffRefreshableCP(S.MoonfireDebuff) and Cache.EnemiesCount[8] <= 4) then
-      if HR.Cast(S.Moonfire, nil, nil, true) then return "moonfire 98"; end
+      if HR.Cast(S.Moonfire, nil, nil, 40) then return "moonfire 98"; end
     end
     -- swipe,if=buff.incarnation.down
     if S.Swipe:IsCastableP() and (Player:BuffDownP(S.IncarnationBuff)) then
-      if HR.Cast(S.Swipe, nil, nil, true) then return "swipe 99"; end
+      if HR.Cast(S.Swipe, nil, nil, 8) then return "swipe 99"; end
     end
   end
   Cooldowns = function()
@@ -270,7 +270,7 @@ local function APL()
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastableP() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "lights_judgment 18"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 18"; end
       end
       -- fireblood
       if S.Fireblood:IsCastableP() then
@@ -282,7 +282,7 @@ local function APL()
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastableP() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, true) then return "bag_of_tricks 24"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 24"; end
       end
     end
     -- Defensives and Bristling Fur
@@ -301,7 +301,7 @@ local function APL()
       end
       -- lunar_beam,if=buff.bear_form.up
       if S.LunarBeam:IsCastableP() and Player:HealthPercentage() < Settings.Guardian.LunarBeamHP then
-        if HR.Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam, nil, true) then return "lunar_beam 28"; end
+        if HR.Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam, nil, 40) then return "lunar_beam 28"; end
       end
       -- Survival Instincts
       if S.SurvivalInstincts:IsCastableP() and Player:HealthPercentage() < Settings.Guardian.SurvivalInstinctsHP then
@@ -333,7 +333,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Charge if out of range
     if S.WildChargeTalent:IsAvailable() and S.WildChargeBear:IsCastableP() and not Target:IsInRange(AoERadius) and Target:IsInRange(25) then
-      if HR.Cast(S.WildChargeBear, nil, nil, true) then return "wild_charge in_combat"; end
+      if HR.Cast(S.WildChargeBear, nil, nil, 25) then return "wild_charge in_combat"; end
     end
     -- Interrupts
     Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
