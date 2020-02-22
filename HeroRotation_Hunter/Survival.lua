@@ -415,10 +415,6 @@ local function APL()
     if S.FocusedAzeriteBeam:IsCastableP() then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 324"; end
     end
-    -- memory_of_lucid_dreams,if=focus<focus.max-30&buff.coordinated_assault.up
-    if S.MemoryofLucidDreams:IsCastableP() and (Player:FocusDeficit() > 30 and Player:BuffP(S.CoordinatedAssaultBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 325"; end
-    end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 328"; end
@@ -450,6 +446,22 @@ local function APL()
     -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
     if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames 350"; end
+    end
+    -- serpent_sting,if=refreshable&buff.vipers_venom.up&!cooldown.memory_of_lucid_dreams.remains
+    if S.SerpentSting:IsReadyP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffP(S.VipersVenomBuff) and S.MemoryofLucidDreams:CooldownUpP()) then
+      if HR.Cast(S.SerpentSting) then return "serpent_sting 352"; end
+    end
+    -- mongoose_bite,if=!cooldown.memory_of_lucid_dreams.remains
+    if S.MongooseBite:IsReadyP() and (S.MemoryofLucidDreams:CooldownUpP()) then
+      if HR.Cast(S.MongooseBite) then return "mongoose_bite 354"; end
+    end
+    -- wildfire_bomb,if=full_recharge_time<1.5*gcd&focus<action.mongoose_bite.cost&!cooldown.memory_of_lucid_dreams.remains
+    if S.WildfireBomb:IsCastableP() and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() < S.MongooseBite:Cost() and S.MemoryofLucidDreams:CooldownUpP()) then
+      if HR.Cast(S.WildfireBomb) then return "wildfire_bomb 356"; end
+    end
+    -- memory_of_lucid_dreams,if=focus<action.mongoose_bite.cost&buff.coordinated_assault.up
+    if S.MemoryofLucidDreams:IsCastableP() and (Player:Focus() < S.MongooseBite:Cost() and Player:BuffP(S.CoordinatedAssaultBuff)) then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 358"; end
     end
   end
   Cleave = function()
