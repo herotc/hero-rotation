@@ -205,12 +205,13 @@ local function APL()
       if HR.Cast(S.SuppressingPulse, true) then return "suppressing pulse"; end
     end
     -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
-    -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
+    -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3&buff.ironskin_brew.remains<15
     -- Note: Extra handling of the charge management only while tanking.
     --       "- (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)"
+    -- TODO: See if this can be optimized
     if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
         and S.Brews:ChargesFractional() >= BrewMaxCharge - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 0.5 and 0.5 or 0) or 0)
-        and Player:BuffRemains(S.IronskinBrewBuff) <= IronskinDuration * 2 then
+        and S.BlackOxBrew:CooldownRemainsP() < 3 and Player:BuffRemains(S.IronskinBrewBuff) < 15 then
       if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return ""; end
     end
     -- purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
