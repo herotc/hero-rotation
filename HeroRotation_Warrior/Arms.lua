@@ -89,7 +89,7 @@ local S = Spell.Warrior.Arms;
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofFocusedResolve           = Item(168506),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14})
 };
@@ -154,8 +154,8 @@ local function APL()
         if HR.Cast(S.GuardianofAzeroth) then return "guardian_of_azeroth"; end
       end
       -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 4"; end
+      if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion 4"; end
       end
     end
   end
@@ -409,8 +409,8 @@ local function APL()
       return Movement();
     end
     -- potion,if=target.health.pct<21&buff.memory_of_lucid_dreams.up|!essence.memory_of_lucid_dreams.major
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Target:HealthPercentage() < 21 and Player:BuffP(S.MemoryofLucidDreams) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams)) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 354"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Target:HealthPercentage() < 21 and Player:BuffP(S.MemoryofLucidDreams) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams)) then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion 354"; end
     end
     if (HR.CDsON()) then
       -- blood_fury,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
