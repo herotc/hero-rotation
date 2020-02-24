@@ -171,7 +171,7 @@ local function APL()
       end
       -- frostbolt
       if S.Frostbolt:IsCastableP() then
-        if HR.Cast(S.Frostbolt) then return "frostbolt 14"; end
+        if HR.Cast(S.Frostbolt, nil, nil, 40) then return "frostbolt 14"; end
       end
     end
   end
@@ -186,11 +186,11 @@ local function APL()
     end
     -- blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
     if S.BloodoftheEnemy:IsCastableP() and ((S.GlacialSpike:IsAvailable() and Player:BuffStackP(S.IciclesBuff) == 5 and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt))) or ((EnemiesCount > 3 or not S.GlacialSpike:IsAvailable()) and (Player:PrevGCDP(1, S.FrozenOrb) or Player:FrozenOrbGroundAoeRemains() > 5))) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast,if=buff.rune_of_power.down|active_enemies>3
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
     -- ripple_in_space,if=buff.rune_of_power.down|active_enemies>3
     if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
@@ -198,15 +198,15 @@ local function APL()
     end
     -- concentrated_flame,line_cd=6,if=buff.rune_of_power.down
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- reaping_flames,if=buff.rune_of_power.down
     if S.ReapingFlames:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff)) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
     -- worldvein_resonance,if=buff.rune_of_power.down|active_enemies>3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) or EnemiesCount > 3) then
@@ -216,57 +216,57 @@ local function APL()
   Aoe = function()
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() then
-      if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 16"; end
+      if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, 40) then return "frozen_orb 16"; end
     end
     -- blizzard
     if S.Blizzard:IsCastableP() then
-      if HR.Cast(S.Blizzard) then return "blizzard 18"; end
+      if HR.Cast(S.Blizzard, nil, nil, 40) then return "blizzard 18"; end
     end
     -- call_action_list,name=essences
     local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     -- comet_storm
     if S.CometStorm:IsCastableP() then
-      if HR.Cast(S.CometStorm) then return "comet_storm 20"; end
+      if HR.Cast(S.CometStorm, nil, nil, 40) then return "comet_storm 20"; end
     end
     -- ice_nova
     if S.IceNova:IsCastableP() then
-      if HR.Cast(S.IceNova) then return "ice_nova 22"; end
+      if HR.Cast(S.IceNova, nil, nil, 40) then return "ice_nova 22"; end
     end
     -- flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.frostbolt&(buff.icicles.stack<4|!talent.glacial_spike.enabled)|prev_gcd.1.glacial_spike)
     if S.Flurry:IsCastableP() and (Player:PrevGCDP(1, S.Ebonbolt) or bool(Player:BuffStackP(S.BrainFreezeBuff)) and (Player:PrevGCDP(1, S.Frostbolt) and (Player:BuffStackP(S.IciclesBuff) < 4 or not S.GlacialSpike:IsAvailable()) or Player:PrevGCDP(1, S.GlacialSpike))) then
-      if HR.Cast(S.Flurry) then return "flurry 24"; end
+      if HR.Cast(S.Flurry, nil, nil, 40) then return "flurry 24"; end
     end
     -- ice_lance,if=buff.fingers_of_frost.react
     if S.IceLance:IsCastableP() and (bool(Player:BuffStackP(S.FingersofFrostBuff))) then
-      if HR.Cast(S.IceLance) then return "ice_lance 38"; end
+      if HR.Cast(S.IceLance, nil, nil, 40) then return "ice_lance 38"; end
     end
     -- ray_of_frost
     if S.RayofFrost:IsCastableP() then
-      if HR.Cast(S.RayofFrost) then return "ray_of_frost 42"; end
+      if HR.Cast(S.RayofFrost, nil, nil, 40) then return "ray_of_frost 42"; end
     end
     -- ebonbolt
     if S.Ebonbolt:IsCastableP() then
-      if HR.Cast(S.Ebonbolt) then return "ebonbolt 44"; end
+      if HR.Cast(S.Ebonbolt, nil, nil, 40) then return "ebonbolt 44"; end
     end
     -- glacial_spike
     if S.GlacialSpike:IsCastableP() then
-      if HR.Cast(S.GlacialSpike) then return "glacial_spike 46"; end
+      if HR.Cast(S.GlacialSpike, nil, nil, 40) then return "glacial_spike 46"; end
     end
     -- cone_of_cold
     if S.ConeofCold:IsCastableP() and (EnemiesCount >= 1) then
-      if HR.Cast(S.ConeofCold) then return "cone_of_cold 48"; end
+      if HR.Cast(S.ConeofCold, nil, nil, 12) then return "cone_of_cold 48"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
     if I.TidestormCodex:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
-      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex 49"; end
+      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex 49"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device aoe"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device aoe"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
-      if HR.Cast(S.Frostbolt) then return "frostbolt 50"; end
+      if HR.Cast(S.Frostbolt, nil, nil, 40) then return "frostbolt 50"; end
     end
     -- call_action_list,name=movement
     if (true) then
@@ -274,7 +274,7 @@ local function APL()
     end
     -- ice_lance
     if S.IceLance:IsCastableP() then
-      if HR.Cast(S.IceLance) then return "ice_lance 54"; end
+      if HR.Cast(S.IceLance, nil, nil, 40) then return "ice_lance 54"; end
     end
   end
   Cooldowns = function()
@@ -309,7 +309,7 @@ local function APL()
     -- use_items
     -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
     if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device 100"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 100"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() then
@@ -321,7 +321,7 @@ local function APL()
     end
     -- lights_judgment
     if S.LightsJudgment:IsCastableP() then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 105"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 105"; end
     end
     -- fireblood
     if S.Fireblood:IsCastableP() then
@@ -333,7 +333,7 @@ local function APL()
     end
     -- bag_of_tricks
     if S.BagofTricks:IsCastableP() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 111"; end
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 111"; end
     end
   end
   Movement = function()
@@ -349,61 +349,61 @@ local function APL()
   Single = function()
     -- ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
     if S.IceNova:IsCastableP() and (S.IceNova:CooldownUpP() and Target:DebuffP(S.WintersChillDebuff)) then
-      if HR.Cast(S.IceNova) then return "ice_nova 117"; end
+      if HR.Cast(S.IceNova, nil, nil, 40) then return "ice_nova 117"; end
     end
     -- flurry,if=talent.ebonbolt.enabled&prev_gcd.1.ebonbolt&buff.brain_freeze.react
     if S.Flurry:IsCastableP() and (S.Ebonbolt:IsAvailable() and Player:PrevGCDP(1, S.Ebonbolt) and bool(Player:BuffStackP(S.BrainFreezeBuff))) then
-      if HR.Cast(S.Flurry) then return "flurry 123"; end
+      if HR.Cast(S.Flurry, nil, nil, 40) then return "flurry 123"; end
     end
     -- flurry,if=prev_gcd.1.glacial_spike&buff.brain_freeze.react
     if S.Flurry:IsCastableP() and (Player:PrevGCDP(1, S.GlacialSpike) and bool(Player:BuffStackP(S.BrainFreezeBuff))) then
-      if HR.Cast(S.Flurry) then return "flurry 135"; end
+      if HR.Cast(S.Flurry, nil, nil, 40) then return "flurry 135"; end
     end
     -- call_action_list,name=essences
     local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     -- frozen_orb
     if S.FrozenOrb:IsCastableP() then
-      if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb) then return "frozen_orb 153"; end
+      if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, 40) then return "frozen_orb 153"; end
     end
     -- blizzard,if=active_enemies>2|active_enemies>1&!talent.splitting_ice.enabled
     if S.Blizzard:IsCastableP() and (EnemiesCount > 2 or EnemiesCount > 1 and not S.SplittingIce:IsAvailable()) then
-      if HR.Cast(S.Blizzard) then return "blizzard 155"; end
+      if HR.Cast(S.Blizzard, nil, nil, 40) then return "blizzard 155"; end
     end
     -- comet_storm
     if S.CometStorm:IsCastableP() then
-      if HR.Cast(S.CometStorm) then return "comet_storm 179"; end
+      if HR.Cast(S.CometStorm, nil, nil, 40) then return "comet_storm 179"; end
     end
     -- ebonbolt,if=buff.icicles.stack=5&!buff.brain_freeze.react
     if S.Ebonbolt:IsCastableP() and (Player:BuffStackP(S.IciclesBuff) == 5 and Player:BuffDownP(S.BrainFreezeBuff)) then
-      if HR.Cast(S.Ebonbolt) then return "ebonbolt 181"; end
+      if HR.Cast(S.Ebonbolt, nil, nil, 40) then return "ebonbolt 181"; end
     end
     -- ice_lance,if=buff.brain_freeze.react&(buff.fingers_of_frost.react|prev_gcd.1.flurry)&(buff.icicles.max_stack-buff.icicles.stack)*action.frostbolt.execute_time+action.glacial_spike.cast_time+action.glacial_spike.travel_time<incanters_flow_time_to.5.any&buff.memory_of_lucid_dreams.down
     if S.IceLance:IsCastableP() and (S.GlacialSpike:IsAvailable() and S.IncantersFlow:IsAvailable() and Player:BuffP(S.BrainFreezeBuff) and (Player:BuffP(S.FingersofFrostBuff) or Player:PrevGCDP(1, S.Flurry)) and (5 - Player:BuffStackP(S.IciclesBuff)) * S.Frostbolt:ExecuteTime() + S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() < Mage.IFTimeToX(5, "any") and Player:BuffDownP(S.MemoryofLucidDreams)) then
-      if HR.Cast(S.IceLance) then return "ice_lance 182"; end
+      if HR.Cast(S.IceLance, nil, nil, 40) then return "ice_lance 182"; end
     end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
     if S.GlacialSpike:IsReadyP() and (Player:BuffP(S.BrainFreezeBuff) or Player:PrevGCDP(1, S.Ebonbolt) or S.IncantersFlow:IsAvailable() and S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() > Mage.IFTimeToX(5, "up") and S.GlacialSpike:CastTime() and S.GlacialSpike:TravelTime() < Mage.IFTimeToX(4, "down")) then
-      if HR.Cast(S.GlacialSpike) then return "glacial_spike 183"; end
+      if HR.Cast(S.GlacialSpike, nil, nil, 40) then return "glacial_spike 183"; end
     end
     -- ice_nova
     if S.IceNova:IsCastableP() then
-      if HR.Cast(S.IceNova) then return "ice_nova 184"; end
+      if HR.Cast(S.IceNova, nil, nil, 40) then return "ice_nova 184"; end
     end
     -- use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
     if I.TidestormCodex:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
-      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle) then return "tidestorm_codex 218"; end
+      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex 218"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.IcyVeins) and Player:BuffDownP(S.RuneofPowerBuff)) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device single"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device single"; end
     end
     -- Manual addition of Ice Lance with FoF proc if not using Glacial Spike
     if S.IceLance:IsCastableP() and (not S.GlacialSpike:IsAvailable() and Player:BuffP(S.FingersofFrostBuff)) then
-      if HR.Cast(S.IceLance) then return "ice_lance 222"; end
+      if HR.Cast(S.IceLance, nil, nil, 40) then return "ice_lance 222"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastableP() then
-      if HR.Cast(S.Frostbolt) then return "frostbolt 224"; end
+      if HR.Cast(S.Frostbolt, nil, nil, 40) then return "frostbolt 224"; end
     end
     -- call_action_list,name=movement
     -- if (true) then
@@ -411,7 +411,7 @@ local function APL()
     -- end
     -- ice_lance
     if S.IceLance:IsCastableP() then
-      if HR.Cast(S.IceLance) then return "ice_lance 223"; end
+      if HR.Cast(S.IceLance, nil, nil, 40) then return "ice_lance 223"; end
     end
   end
   TalentRop = function()
