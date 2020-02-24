@@ -164,7 +164,7 @@ local function APL()
     if Everyone.TargetIsValid() then
       -- hunters_mark
       if S.HuntersMark:IsCastableP() and Target:DebuffDown(S.HuntersMarkDebuff) then
-        if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark) then return "hunters_mark 14"; end
+        if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark, nil, 60) then return "hunters_mark 14"; end
       end
       -- double_tap,precast_time=10
       if S.DoubleTap:IsCastableP() then
@@ -196,14 +196,14 @@ local function APL()
       end
       -- aimed_shot,if=active_enemies<3
       if S.AimedShot:IsReadyP() and (EnemiesCount < 3) then
-        if HR.Cast(S.AimedShot) then return "aimed_shot 38"; end
+        if HR.Cast(S.AimedShot, nil, nil, 40) then return "aimed_shot 38"; end
       end
     end
   end
   Cds = function()
     -- hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
     if S.HuntersMark:IsCastableP() and (Target:DebuffDown(S.HuntersMarkDebuff) and Player:BuffDownP(S.TrueshotBuff)) then
-      if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark) then return "hunters_mark 46"; end
+      if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark, nil, 60) then return "hunters_mark 46"; end
     end
     -- double_tap,if=cooldown.rapid_fire.remains<gcd|cooldown.rapid_fire.remains<cooldown.aimed_shot.remains|target.time_to_die<20
     if S.DoubleTap:IsCastableP() and (S.RapidFire:CooldownRemainsP() < Player:GCD() or S.RapidFire:CooldownRemainsP() < S.AimedShot:CooldownRemainsP() or Target:TimeToDie() < 20) then
@@ -227,15 +227,15 @@ local function APL()
     end
     -- lights_judgment
     if S.LightsJudgment:IsCastableP() then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 102"; end
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 102"; end
     end
     -- bag_of_tricks
     if S.BagofTricks:IsCastableP() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks"; end
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks"; end
     end
     -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
     if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
     end
     -- worldvein_resonance,if=(trinket.azsharas_font_of_power.cooldown.remains>20|!equipped.azsharas_font_of_power|target.time_to_die<trinket.azsharas_font_of_power.cooldown.duration+34&target.health.pct>20)&(cooldown.trueshot.remains_guess<3|(essence.vision_of_perfection.minor&target.time_to_die>cooldown+buff.worldvein_resonance.duration))|target.time_to_die<20
     if S.WorldveinResonance:IsCastableP() and ((I.AzsharasFontofPower:CooldownRemainsP() > 20 or not I.AzsharasFontofPower:IsEquipped() or Target:TimeToDie() < 154 and Target:HealthPercentage() > 20) and (S.Trueshot:CooldownRemainsP() < 3 or (Spell:EssenceEnabled(AE.VisionofPerfection) and Target:TimeToDie() > S.WorldveinResonance:Cooldown() + 18)) or Target:TimeToDie() < 20) then
@@ -265,27 +265,27 @@ local function APL()
   St = function()
     -- explosive_shot
     if S.ExplosiveShot:IsCastableP() then
-      if HR.Cast(S.ExplosiveShot) then return "explosive_shot 126"; end
+      if HR.Cast(S.ExplosiveShot, nil, nil, 40) then return "explosive_shot 126"; end
     end
     -- barrage,if=active_enemies>1
     if S.Barrage:IsReadyP() and (EnemiesCount > 1) then
-      if HR.Cast(S.Barrage) then return "barrage 128"; end
+      if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 128"; end
     end
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows, Settings.Marksmanship.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 136"; end
+      if HR.Cast(S.AMurderofCrows, Settings.Marksmanship.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 136"; end
     end
     -- serpent_sting,if=refreshable&!action.serpent_sting.in_flight
     if S.SerpentSting:IsCastableP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff) and not S.SerpentSting:InFlight()) then
-      if HR.Cast(S.SerpentSting) then return "serpent_sting 138"; end
+      if HR.Cast(S.SerpentSting, nil, nil, 40) then return "serpent_sting 138"; end
     end
     -- rapid_fire,if=buff.trueshot.down|focus<70
     if S.RapidFire:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Player:Focus() < 70) then
-      if HR.Cast(S.RapidFire) then return "rapid_fire 152"; end
+      if HR.Cast(S.RapidFire, nil, nil, 40) then return "rapid_fire 152"; end
     end
     -- blood_of_the_enemy,if=buff.trueshot.up&(buff.unerring_vision.stack>4|!azerite.unerring_vision.enabled)|target.time_to_die<11
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffStackP(S.UnerringVisionBuff) > 4 or not S.UnerringVision:AzeriteEnabled()) or Target:TimeToDie() < 11) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy st"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy st"; end
     end
     -- focused_azerite_beam,if=!buff.trueshot.up|target.time_to_die<5
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 5) then
@@ -293,69 +293,69 @@ local function APL()
     end
     -- arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&!buff.memory_of_lucid_dreams.up
     if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and MasterMarksmanBuffCheck() and Player:BuffDownP(S.MemoryofLucidDreams)) then
-      if HR.Cast(S.ArcaneShot) then return "arcane_shot 158"; end
+      if HR.Cast(S.ArcaneShot, nil, nil, 40) then return "arcane_shot 158"; end
     end
     -- aimed_shot,if=buff.trueshot.up|(buff.double_tap.down|ca_execute)&buff.precise_shots.down|full_recharge_time<cast_time&cooldown.trueshot.remains
     if S.AimedShot:IsReadyP() and not Player:IsMoving() and (Player:BuffP(S.TrueshotBuff) or (Player:BuffDownP(S.DoubleTap) or ((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) and S.CarefulAim:IsAvailable())) and Player:BuffDownP(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTimeP() < S.AimedShot:CastTime() and bool(S.Trueshot:CooldownRemainsP())) then
-      if HR.Cast(S.AimedShot) then return "aimed_shot 170"; end
+      if HR.Cast(S.AimedShot, nil, nil, 40) then return "aimed_shot 170"; end
     end
     -- arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&buff.memory_of_lucid_dreams.up
     if S.ArcaneShot:IsCastableP() and (Player:BuffP(S.TrueshotBuff) and MasterMarksmanBuffCheck() and Player:BuffP(S.MemoryofLucidDreams)) then
-      if HR.Cast(S.ArcaneShot) then return "arcane_shot 176"; end
+      if HR.Cast(S.ArcaneShot, nil, nil, 40) then return "arcane_shot 176"; end
     end
     -- piercing_shot
     if S.PiercingShot:IsCastableP() then
-      if HR.Cast(S.PiercingShot) then return "piercing_shot 198"; end
+      if HR.Cast(S.PiercingShot, nil, nil, 40) then return "piercing_shot 198"; end
     end
     -- purifying_blast,if=!buff.trueshot.up|target.time_to_die<8
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) or Target:TimeToDie() < 8) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
     -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.trueshot.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
     if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.TrueshotBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10 or Target:TimeToDie() < 5) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
     -- arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
     if S.ArcaneShot:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) and (Player:BuffP(S.PreciseShotsBuff) and (Player:Focus() > 41 or MasterMarksmanBuffCheck()) or (Player:Focus() > 50 and S.FocusedFire:IsAvailable() or Player:Focus() > 75) and (S.Trueshot:CooldownRemainsP() > 5 or Player:Focus() > 80) or Target:TimeToDie() < 5)) then
-      if HR.Cast(S.ArcaneShot) then return "arcane_shot 200"; end
+      if HR.Cast(S.ArcaneShot, nil, nil, 40) then return "arcane_shot 200"; end
     end
     -- steady_shot
     if S.SteadyShot:IsCastableP() then
-      if HR.Cast(S.SteadyShot) then return "steady_shot 208"; end
+      if HR.Cast(S.SteadyShot, nil, nil, 40) then return "steady_shot 208"; end
     end
   end
   Trickshots = function()
     -- barrage
     if S.Barrage:IsReadyP() then
-      if HR.Cast(S.Barrage) then return "barrage 210"; end
+      if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 210"; end
     end
     -- explosive_shot
     if S.ExplosiveShot:IsCastableP() then
-      if HR.Cast(S.ExplosiveShot) then return "explosive_shot 212"; end
+      if HR.Cast(S.ExplosiveShot, nil, nil, 40) then return "explosive_shot 212"; end
     end
     -- aimed_shot,if=buff.trick_shots.up&ca_execute&buff.double_tap.up
     if S.AimedShot:IsReadyP() and (Player:BuffP(S.TrickShotsBuff) and ((Target:HealthPercentage() < 20 or Target:HealthPercentage() > 80) and S.CarefulAim:IsAvailable()) and Player:BuffP(S.DoubleTap)) then
-      if HR.Cast(S.AimedShot) then return "aimed_shot 213"; end
+      if HR.Cast(S.AimedShot, nil, nil, 40) then return "aimed_shot 213"; end
     end
     -- rapid_fire,if=buff.trick_shots.up&(azerite.focused_fire.enabled|azerite.in_the_rhythm.rank>1|azerite.surging_shots.enabled|talent.streamline.enabled)
     if S.RapidFire:IsCastableP() and (Player:BuffP(S.TrickShotsBuff) and (S.FocusedFire:AzeriteEnabled() or S.IntheRhythm:AzeriteRank() > 1 or S.SurgingShots:AzeriteEnabled() or S.Streamline:IsAvailable())) then
-      if HR.Cast(S.RapidFire) then return "rapid_fire 214"; end
+      if HR.Cast(S.RapidFire, nil, nil, 40) then return "rapid_fire 214"; end
     end
     -- aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|cooldown.aimed_shot.full_recharge_time<action.aimed_shot.cast_time|buff.trueshot.up)
     if S.AimedShot:IsReadyP() and (Player:BuffP(S.TrickShotsBuff) and (Player:BuffDownP(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTimeP() < S.AimedShot:CastTime() or Player:BuffP(S.TrueshotBuff))) then
-      if HR.Cast(S.AimedShot) then return "aimed_shot 226"; end
+      if HR.Cast(S.AimedShot, nil, nil, 40) then return "aimed_shot 226"; end
     end
     -- rapid_fire,if=buff.trick_shots.up
     if S.RapidFire:IsCastableP() and (Player:BuffP(S.TrickShotsBuff)) then
-      if HR.Cast(S.RapidFire) then return "rapid_fire 238"; end
+      if HR.Cast(S.RapidFire, nil, nil, 40) then return "rapid_fire 238"; end
     end
     -- multishot,if=buff.trick_shots.down|buff.precise_shots.up&!buff.trueshot.up|focus>70
     if S.Multishot:IsCastableP() and (Player:BuffDownP(S.TrickShotsBuff) or Player:BuffP(S.PreciseShotsBuff) and Player:BuffDownP(S.TrueshotBuff) or Player:Focus() > 70) then
-      if HR.Cast(S.Multishot) then return "multishot 242"; end
+      if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 242"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
@@ -363,35 +363,35 @@ local function APL()
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
     -- piercing_shot
     if S.PiercingShot:IsCastableP() then
-      if HR.Cast(S.PiercingShot) then return "piercing_shot 248"; end
+      if HR.Cast(S.PiercingShot, nil, nil, 40) then return "piercing_shot 248"; end
     end
     -- a_murder_of_crows
     if S.AMurderofCrows:IsCastableP() then
-      if HR.Cast(S.AMurderofCrows, Settings.Marksmanship.GCDasOffGCD.AMurderofCrows) then return "a_murder_of_crows 250"; end
+      if HR.Cast(S.AMurderofCrows, Settings.Marksmanship.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 250"; end
     end
     -- serpent_sting,if=refreshable&!action.serpent_sting.in_flight
     if S.SerpentSting:IsCastableP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff) and not S.SerpentSting:InFlight()) then
-      if HR.Cast(S.SerpentSting) then return "serpent_sting 252"; end
+      if HR.Cast(S.SerpentSting, nil, nil, 40) then return "serpent_sting 252"; end
     end
     -- steady_shot
     if S.SteadyShot:IsCastableP() then
-      if HR.Cast(S.SteadyShot) then return "steady_shot 266"; end
+      if HR.Cast(S.SteadyShot, nil, nil, 40) then return "steady_shot 266"; end
     end
   end
   -- call precombat
@@ -424,11 +424,11 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=buff.trueshot.up&(buff.guardian_of_azeroth.up|!essence.condensed_lifeforce.major&target.health.pct<20)|debuff.razor_coral_debuff.down|target.time_to_die<20
     if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.TrueshotBuff) and (Player:BuffP(S.GuardianofAzerothBuff) or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:HealthPercentage() < 20) or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 20) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral"; end
     end
     -- use_item,name=pocketsized_computation_device,if=!buff.trueshot.up&!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up|target.time_to_die<5
     if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.TrueshotBuff) and not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or Target:DebuffP(S.BloodoftheEnemy) or Target:TimeToDie() < 5) then
-      if Hr.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "pocketsized_computation_device"; end
+      if Hr.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
     -- call_action_list,name=cds
