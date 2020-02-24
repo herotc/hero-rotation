@@ -82,7 +82,7 @@ local S = Spell.Mage.Frost;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Frost = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofFocusedResolve           = Item(168506),
   BalefireBranch                   = Item(159630, {13, 14}),
   TidestormCodex                   = Item(165576, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14})
@@ -166,8 +166,8 @@ local function APL()
         if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 10"; end
       end
       -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "prolonged_power 12"; end
+      if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion 12"; end
       end
       -- frostbolt
       if S.Frostbolt:IsCastableP() then
@@ -299,8 +299,8 @@ local function APL()
       local ShouldReturn = TalentRop(); if ShouldReturn then return ShouldReturn; end
     end
     -- potion,if=prev_gcd.1.icy_veins|target.time_to_die<30
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "prolonged_power 96"; end
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion 96"; end
     end
     -- use_item,name=balefire_branch,if=!talent.glacial_spike.enabled|buff.brain_freeze.react&prev_gcd.1.glacial_spike
     if I.BalefireBranch:IsEquipReady() and (not S.GlacialSpike:IsAvailable() or Player:BuffP(S.BrainFreezeBuff) and Player:PrevGCDP(1, S.GlacialSpike)) then
