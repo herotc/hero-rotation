@@ -100,12 +100,61 @@ Item.Druid.Feral = {
 };
 local I = Item.Druid.Feral;
 
+-- Rotation Var
+local ShouldReturn; -- Used to get the return string
+
+-- GUI Settings
+local Everyone = HR.Commons.Everyone;
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Druid.Commons,
+  Feral = HR.GUISettings.APL.Druid.Feral
+};
+
+-- Variables
+local VarUseThrash = 0;
+local VarOpenerDone = 0;
+local VarReapingDelay = 0;
+local LastRakeAP = 0;
+
+HL:RegisterForEvent(function()
+  VarUseThrash = 0
+  VarOpenerDone = 0
+  VarReapingDelay = 0
+  LastRakeAP = 0
+end, "PLAYER_REGEN_ENABLED")
+
+local EnemyRanges = {40, 8, 5}
+local function UpdateRanges()
+  for _, i in ipairs(EnemyRanges) do
+    HL.GetEnemies(i);
+  end
+end
+
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
+
+local function LowestTTD()
+  local lowTTD = 0
+  for _, CycleUnit in pairs(Cache.Enemies[8]) do
+    if (lowTTD == 0 or CycleUnit:TimeToDie() < lowTTD) then
+      lowTTD = CycleUnit:TimeToDie()
+    end
+  end
+  return lowTTD
+end
+
 local function SwipeBleedMult()
   return (Target:DebuffP(S.RipDebuff) or Target:DebuffP(S.RakeDebuff) or Target:DebuffP(S.ThrashCatDebuff)) and 1.2 or 1;
 end
 
 local function RakeBleedTick()
-  return Player:AttackPowerDamageMod() * 0.15561 * (1 + Player:VersatilityDmgPct()/100);
+  return LastRakeAP * 0.15561 * (1 + Player:VersatilityDmgPct()/100);
 end
 
 S.Rake:RegisterDamage(
@@ -165,53 +214,6 @@ S.BrutalSlash:RegisterDamage(
   end
 );
 
--- Rotation Var
-local ShouldReturn; -- Used to get the return string
-
--- GUI Settings
-local Everyone = HR.Commons.Everyone;
-local Settings = {
-  General = HR.GUISettings.General,
-  Commons = HR.GUISettings.APL.Druid.Commons,
-  Feral = HR.GUISettings.APL.Druid.Feral
-};
-
--- Variables
-local VarUseThrash = 0;
-local VarOpenerDone = 0;
-local VarReapingDelay = 0;
-
-HL:RegisterForEvent(function()
-  VarUseThrash = 0
-  VarOpenerDone = 0
-  VarReapingDelay = 0
-end, "PLAYER_REGEN_ENABLED")
-
-local EnemyRanges = {40, 8, 5}
-local function UpdateRanges()
-  for _, i in ipairs(EnemyRanges) do
-    HL.GetEnemies(i);
-  end
-end
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
-local function LowestTTD()
-  local lowTTD = 0
-  for _, CycleUnit in pairs(Cache.Enemies[8]) do
-    if (lowTTD == 0 or CycleUnit:TimeToDie() < lowTTD) then
-      lowTTD = CycleUnit:TimeToDie()
-    end
-  end
-  return lowTTD
-end
-
 S.FerociousBiteMaxEnergy.CustomCost = {
   [3] = function ()
           if (Player:BuffP(S.IncarnationBuff) or Player:BuffP(S.BerserkBuff)) then return 25
@@ -266,6 +268,9 @@ local function APL()
   local Precombat, Cooldowns, Finishers, Generators, Opener
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  if (Player:PrevGCD(1, S.Rake)) then
+    LastRakeAP = Player:AttackPowerDamageMod()
+  end
   Precombat = function()
     -- flask
     -- food
