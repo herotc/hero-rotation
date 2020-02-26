@@ -100,6 +100,71 @@ Item.Druid.Feral = {
 };
 local I = Item.Druid.Feral;
 
+local function SwipeBleedMult()
+  return (Target:DebuffP(S.RipDebuff) or Target:DebuffP(S.RakeDebuff) or Target:DebuffP(S.ThrashCatDebuff)) and 1.2 or 1;
+end
+
+local function RakeBleedTick()
+  return Player:AttackPowerDamageMod() * 0.15561 * (1 + Player:VersatilityDmgPct()/100);
+end
+
+S.Rake:RegisterDamage(
+  function()
+    return
+      -- Attack Power
+      Player:AttackPowerDamageMod() * 
+      -- Rake Modifier
+      0.18225 *
+      -- Stealth Modifier
+      (Player:IsStealthed(true, false) and 2 or 1) *
+      -- Versatility Damage Multiplier
+      (1 + Player:VersatilityDmgPct()/100);
+  end
+);
+
+S.Shred:RegisterDamage(
+  function()
+    return
+      -- Attack Power
+      Player:AttackPowerDamageMod() *
+      -- Shred Modifier
+      0.46 * 
+      ((math.min(Player:Level(), 19) * 18 + 353) / 695) *
+      -- Bleeding Bonus
+      SwipeBleedMult() *
+      -- Stealth Modifier
+      (Player:IsStealthed(true, false) and 1.3 or 1) *
+      -- Versatility Damage Multiplier
+      (1 + Player:VersatilityDmgPct()/100);
+  end
+);
+
+S.SwipeCat:RegisterDamage(
+  function()
+    return
+      -- Attack Power
+      Player:AttackPowerDamageMod() *
+      -- Swipe Modifier
+      0.2875 * 
+      -- Bleeding Bonus
+      SwipeBleedMult() *
+      -- Versatility Damage Multiplier
+      (1 + Player:VersatilityDmgPct()/100);
+  end
+);
+
+S.BrutalSlash:RegisterDamage(
+  function()
+    return
+      -- Attack Power
+      Player:AttackPowerDamageMod() * 
+      -- Brutal Slash Modifier
+      0.69 *
+      -- Versatility Damage Multiplier
+      (1 + Player:VersatilityDmgPct()/100);
+  end
+);
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 
@@ -417,8 +482,8 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- swipe_cat,if=buff.scent_of_blood.up|(action.swipe_cat.damage*spell_targets.swipe_cat>(action.rake.damage+(action.rake_bleed.tick_damage*5)))
-    -- TODO: Create RegisterDamage entries for this condition
-    if S.SwipeCat:IsCastableP() and (Player:BuffP(S.ScentofBloodBuff)) then
+    -- TODO: Clean up RakeBleedTick function, as it checks against current AP, rather than AP at the time of application
+    if S.SwipeCat:IsCastableP() and (Player:BuffP(S.ScentofBloodBuff)or (S.SwipeCat:Damage() * Cache.EnemiesCount[8] > (S.Rake:Damage() + (RakeBleedTick() * 5)))) then
       if S.SwipeCat:IsUsablePPool() then
         if HR.Cast(S.SwipeCat, nil, nil, 8) then return "swipe_cat 217"; end
       else
@@ -439,8 +504,8 @@ local function APL()
     if S.MoonfireCat:IsCastableP() and (Player:BuffP(S.BloodtalonsBuff) and Player:BuffDownP(S.PredatorySwiftnessBuff) and Player:ComboPoints() < 5) then
       if HR.Cast(S.MoonfireCat, nil, nil, 40) then return "moonfire_cat 276"; end
     end
-    -- brutal_slash,if=(buff.tigers_fury.up&(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time))
-    if S.BrutalSlash:IsCastableP() and ((Player:BuffP(S.TigersFuryBuff) and (10000000000 > (1 + S.BrutalSlash:MaxCharges() - S.BrutalSlash:ChargesFractionalP()) * S.BrutalSlash:RechargeP()))) then
+    -- brutal_slash,if=(buff.tigers_fury.up&(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time))&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
+    if S.BrutalSlash:IsCastableP() and ((Player:BuffP(S.TigersFuryBuff) and (10000000000 > (1 + S.BrutalSlash:MaxCharges() - S.BrutalSlash:ChargesFractionalP()) * S.BrutalSlash:RechargeP())) and (Cache.EnemiesCount[8] * S.BrutalSlash:Damage() % S.BrutalSlash:Cost()) > (S.Shred:Damage() % S.Shred:Cost())) then
       if HR.Cast(S.BrutalSlash, nil, nil, 8) then return "brutal_slash 282"; end
     end
     -- moonfire_cat,target_if=refreshable
