@@ -447,16 +447,16 @@ local function APL()
     if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
       if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames 350"; end
     end
-    -- serpent_sting,if=refreshable&buff.vipers_venom.up&!cooldown.memory_of_lucid_dreams.remains
-    if S.SerpentSting:IsReadyP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffP(S.VipersVenomBuff) and S.MemoryofLucidDreams:CooldownUpP()) then
+    -- serpent_sting,if=essence.memory_of_lucid_dreams.major&refreshable&buff.vipers_venom.up&!cooldown.memory_of_lucid_dreams.remains
+    if S.SerpentSting:IsReadyP() and (Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffP(S.VipersVenomBuff) and S.MemoryofLucidDreams:CooldownUpP()) then
       if HR.Cast(S.SerpentSting, nil, nil, 40) then return "serpent_sting 352"; end
     end
-    -- mongoose_bite,if=!cooldown.memory_of_lucid_dreams.remains
-    if S.MongooseBite:IsReadyP() and (S.MemoryofLucidDreams:CooldownUpP()) then
+    -- mongoose_bite,if=essence.memory_of_lucid_dreams.major&!cooldown.memory_of_lucid_dreams.remains
+    if S.MongooseBite:IsReadyP() and (Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and S.MemoryofLucidDreams:CooldownUpP()) then
       if HR.Cast(S.MongooseBite, nil, nil, "Melee") then return "mongoose_bite 354"; end
     end
-    -- wildfire_bomb,if=full_recharge_time<1.5*gcd&focus<action.mongoose_bite.cost&!cooldown.memory_of_lucid_dreams.remains
-    if S.WildfireBomb:IsCastableP() and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() < S.MongooseBite:Cost() and S.MemoryofLucidDreams:CooldownUpP()) then
+    -- wildfire_bomb,if=essence.memory_of_lucid_dreams.major&full_recharge_time<1.5*gcd&focus<action.mongoose_bite.cost&!cooldown.memory_of_lucid_dreams.remains
+    if S.WildfireBomb:IsCastableP() and (Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() < S.MongooseBite:Cost() and S.MemoryofLucidDreams:CooldownUpP()) then
       if HR.Cast(S.WildfireBomb, nil, nil, 40) then return "wildfire_bomb 356"; end
     end
     -- memory_of_lucid_dreams,if=focus<action.mongoose_bite.cost&buff.coordinated_assault.up
