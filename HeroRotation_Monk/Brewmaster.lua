@@ -198,7 +198,7 @@ local function APL()
   local BrewMaxCharge = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
   local IronskinDuration = 7;
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid));
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting));
 
   local function Defensives()
     if S.SuppressingPulse:IsCastableP() then

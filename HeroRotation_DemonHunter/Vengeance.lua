@@ -180,7 +180,7 @@ local function APL ()
   local Precombat, Defensives, Brand, Cooldowns, Normal
   local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid))
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   UpdateSoulFragments();
