@@ -212,13 +212,13 @@ local function APL()
       if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
         if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 4"; end
       end
-      -- use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-      if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 5"; end
-      end
       -- guardian_of_azeroth
       if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 6"; end
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 5"; end
+      end
+      -- coordinated_assault
+      if S.CoordinatedAssault:IsCastableP() then
+        if HR.Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, 100) then return "coordinated_assault 6"; end
       end
       -- worldvein_resonance
       if S.WorldveinResonance:IsCastableP() then
@@ -403,8 +403,8 @@ local function APL()
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (I.DribblingInkpod:IsEquipped() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToX(30) < 1 or (Target:HealthPercentage() < 30 and Player:BuffP(S.GuardianofAzerothBuff) or Player:BuffP(S.MemoryofLucidDreams))) or (not I.DribblingInkpod:IsEquipped() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzerothBuff) and S.GuardianofAzeroth:CooldownRemainsP() > 175) or Target:DebuffDownP(S.RazorCoralDebuff)) or Target:TimeToDie() < 20) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 321"; end
     end
-    -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
-    if I.GalecallersBoon:IsEquipReady() and Settings.Commons.UseTrinkets and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or bool(I.PocketsizedComputationDevice:CooldownRemains()) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and bool(S.CoordinatedAssault:CooldownRemainsP())) then
+    -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
+    if I.GalecallersBoon:IsEquipReady() and Settings.Commons.UseTrinkets and (bool(S.MemoryofLucidDreams:CooldownRemainsP()) or S.WildfireInfusion:IsAvailable() and bool(S.CoordinatedAssault:CooldownRemainsP()) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and bool(S.CoordinatedAssault:CooldownRemainsP())) then
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 322"; end
     end
     -- use_item,name=azsharas_font_of_power
@@ -560,6 +560,10 @@ local function APL()
     -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
     if S.KillCommand:IsCastableP() then
       if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand547) then return "kill_command 568"; end
+    end
+    -- serpent_sting,if=buff.vipers_venom.up&buff.vipers_venom.remains<1*gcd
+    if S.SerpentSting:IsCastableP() and (Player:BuffP(S.VipersVenomBuff) and Player:BuffRemainsP(S.VipersVenomBuff) < 1 * Player:GCD()) then
+      if HR.Cast(S.SerpentSting, nil, nil, 40) then return "serpent_sting 570"; end
     end
     -- steel_trap,if=focus+cast_regen<focus.max
     if S.SteelTrap:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.SteelTrap:ExecuteTime()) < Player:FocusMax()) then
