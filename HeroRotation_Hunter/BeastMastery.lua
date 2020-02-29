@@ -358,8 +358,8 @@ local function APL()
     if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 165"; end
     end
-    -- aspect_of_the_wild,if=cooldown.barbed_shot.charges<1|!azerite.primal_instincts.enabled
-    if S.AspectoftheWild:IsCastableP() and HR.CDsON() and (S.BarbedShot:ChargesP() < 1 or not S.PrimalInstincts:AzeriteEnabled()) then
+    -- aspect_of_the_wild,if=buff.aspect_of_the_wild.down&(cooldown.barbed_shot.charges<1|!azerite.primal_instincts.enabled)
+    if S.AspectoftheWild:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AspectoftheWildBuff) and (S.BarbedShot:ChargesP() < 1 or not S.PrimalInstincts:AzeriteEnabled())) then
       if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 180"; end
     end
     -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
@@ -382,8 +382,8 @@ local function APL()
     if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and S.AspectoftheWild:CooldownRemainsP() > 15 or Target:TimeToDie() < 15 + GCDMax) then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 190"; end
     end
-    -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd&crit_pct_current>40
-    if S.BarbedShot:IsCastableP() and (S.DanceofDeath:AzeriteRank() > 1 and Player:BuffRemainsP(S.DanceofDeathBuff) < GCDMax and Player:CritChancePct() > 40) then
+    -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd
+    if S.BarbedShot:IsCastableP() and (S.DanceofDeath:AzeriteRank() > 1 and Player:BuffRemainsP(S.DanceofDeathBuff) < GCDMax) then
       if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 192"; end
     end
     -- blood_of_the_enemy,if=buff.aspect_of_the_wild.remains>10+gcd|target.time_to_die<10+gcd
