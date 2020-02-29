@@ -487,7 +487,6 @@ local function APL()
     end
     -- pool_resource,for_next=1
     -- swipe_cat,if=buff.scent_of_blood.up|(action.swipe_cat.damage*spell_targets.swipe_cat>(action.rake.damage+(action.rake_bleed.tick_damage*5)))
-    -- TODO: Clean up RakeBleedTick function, as it checks against current AP, rather than AP at the time of application
     if S.SwipeCat:IsCastableP() and (Player:BuffP(S.ScentofBloodBuff)or (S.SwipeCat:Damage() * Cache.EnemiesCount[8] > (S.Rake:Damage() + (RakeBleedTick() * 5)))) then
       if S.SwipeCat:IsUsablePPool() then
         if HR.Cast(S.SwipeCat, nil, nil, 8) then return "swipe_cat 217"; end
