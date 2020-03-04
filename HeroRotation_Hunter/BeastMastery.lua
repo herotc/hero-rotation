@@ -378,8 +378,8 @@ local function APL()
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10 or Target:TimeToDie() < 5) then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 185"; end
     end
-    -- bestial_wrath,if=!buff.bestial_wrath.up&cooldown.aspect_of_the_wild.remains>15|target.time_to_die<15+gcd
-    if S.BestialWrath:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) and S.AspectoftheWild:CooldownRemainsP() > 15 or Target:TimeToDie() < 15 + GCDMax) then
+    -- bestial_wrath,if=talent.one_with_the_pack.enabled&buff.bestial_wrath.remains<gcd|buff.bestial_wrath.down&cooldown.aspect_of_the_wild.remains>15|target.time_to_die<15+gcd
+    if S.BestialWrath:IsCastableP() and (S.OneWithThePack:IsAvailable() and Player:BuffRemainsP(S.BestialWrathBuff) < GCDMax or Player:BuffDownP(S.BestialWrathBuff) and S.AspectoftheWild:CooldownRemainsP() > 15 or Target:TimeToDie() < 15 + GCDMax) then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 190"; end
     end
     -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd
