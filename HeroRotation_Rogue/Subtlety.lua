@@ -228,8 +228,9 @@ end
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffP(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
 
-  -- actions.finish=eviscerate,if=buff.nights_vengeance.up
-  if S.Eviscerate:IsCastable() and IsInMeleeRange() and Player:BuffP(S.NightsVengeanceBuff) then
+  -- actions.finish+=/eviscerate,if=buff.nights_vengeance.up&(spell_targets.shuriken_storm<2|variable.use_priority_rotation|!talent.secret_technique.enabled|!cooldown.secret_technique.up)
+  if S.Eviscerate:IsCastable() and IsInMeleeRange() and Player:BuffP(S.NightsVengeanceBuff)
+    and (Cache.EnemiesCount[10] < 2 or UsePriorityRotation() or not S.SecretTechnique:IsAvailable() or not S.SecretTechnique:CooldownUpP()) then
     if ReturnSpellOnly then
       return S.Eviscerate;
     else
@@ -607,8 +608,8 @@ local function Stealth_CDs ()
       end
       if StealthMacro(S.Shadowmeld) then return "Shadowmeld Macro"; end
     end
-    -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=4
-    local ShdComboPoints = Player:ComboPointsDeficit() >= 4;
+    -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=3
+    local ShdComboPoints = Player:ComboPointsDeficit() >= 3;
     -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1+2*azerite.the_first_dance.enabled,if=variable.use_priority_rotation&(talent.nightstalker.enabled|talent.dark_shadow.enabled)
     if UsePriorityRotation() and (S.Nightstalker:IsAvailable() or S.DarkShadow:IsAvailable()) then
       ShdComboPoints = Player:ComboPointsDeficit() <= 1 + 2 * num(S.TheFirstDance:AzeriteEnabled());
@@ -879,7 +880,7 @@ end
 
 HR.SetAPL(261, APL, Init);
 
--- Last Update: 2020-01-16
+-- Last Update: 2020-03-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -978,7 +979,7 @@ HR.SetAPL(261, APL, Init);
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
 -- # CP requirement: Dance at low CP by default.
--- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=4
+-- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=3
 -- # CP requirement: Dance only before finishers if we have amp talents and priority rotation.
 -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1+2*azerite.the_first_dance.enabled,if=variable.use_priority_rotation&(talent.nightstalker.enabled|talent.dark_shadow.enabled)
 -- # With Dark Shadow only Dance when Nightblade will stay up. Use during Symbols or above threshold. Wait for NV buff with 2+NV.
@@ -1008,8 +1009,8 @@ HR.SetAPL(261, APL, Init);
 --
 -- # Finishers
 -- actions.finish=pool_resource,for_next=1
--- # Eviscerate has highest priority with Night's Vengeance up.
--- actions.finish+=/eviscerate,if=buff.nights_vengeance.up
+-- # Eviscerate has highest priority with Night's Vengeance up. Exception is AoE damage when SecTec is ready.
+-- actions.finish+=/eviscerate,if=buff.nights_vengeance.up&(spell_targets.shuriken_storm<2|variable.use_priority_rotation|!talent.secret_technique.enabled|!cooldown.secret_technique.up)
 -- # Keep up Nightblade if it is about to run out. Do not use NB during Dance, if talented into Dark Shadow.
 -- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2
 -- # Multidotting outside Dance on targets that will live for the duration of Nightblade, refresh during pandemic. Multidot as long as 2+ targets do not have Nightblade up with Replicating Shadows (unless you have Night's Vengeance too).
