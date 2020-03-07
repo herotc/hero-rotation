@@ -608,8 +608,8 @@ local function Stealth_CDs ()
       end
       if StealthMacro(S.Shadowmeld) then return "Shadowmeld Macro"; end
     end
-    -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=3
-    local ShdComboPoints = Player:ComboPointsDeficit() >= 3;
+    -- # actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=4-(talent.deeper_stratagem.enabled&(azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
+    local ShdComboPoints = Player:ComboPointsDeficit() >= 4 - num(S.DeeperStratagem:IsAvailable() and (S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3));
     -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1+2*azerite.the_first_dance.enabled,if=variable.use_priority_rotation&(talent.nightstalker.enabled|talent.dark_shadow.enabled)
     if UsePriorityRotation() and (S.Nightstalker:IsAvailable() or S.DarkShadow:IsAvailable()) then
       ShdComboPoints = Player:ComboPointsDeficit() <= 1 + 2 * num(S.TheFirstDance:AzeriteEnabled());
@@ -978,8 +978,8 @@ HR.SetAPL(261, APL, Init);
 -- # Pool for Shadowmeld + Shadowstrike unless we are about to cap on Dance charges. Only when Find Weakness is about to run out.
 -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
 -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
--- # CP requirement: Dance at low CP by default.
--- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=3
+-- # CP requirement: Dance at low CP by default. (Subtraction is a copy from the stealhed finisher call for TFD handling.)
+-- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=4-(talent.deeper_stratagem.enabled&(azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
 -- # CP requirement: Dance only before finishers if we have amp talents and priority rotation.
 -- actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit<=1+2*azerite.the_first_dance.enabled,if=variable.use_priority_rotation&(talent.nightstalker.enabled|talent.dark_shadow.enabled)
 -- # With Dark Shadow only Dance when Nightblade will stay up. Use during Symbols or above threshold. Wait for NV buff with 2+NV.
