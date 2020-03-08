@@ -252,7 +252,7 @@ local function APL()
     end
     -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
     -- nemesis,if=!raid_event.adds.exists
-    if S.Nemesis:IsCastableP(50) and (not Cache.EnemiesCount[40] > 1) then
+    if S.Nemesis:IsCastableP(50) and (not (Cache.EnemiesCount[40] > 1)) then
       if HR.Cast(S.Nemesis, Settings.Havoc.GCDasOffGCD.Nemesis) then return "nemesis 51"; end
     end
     -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
