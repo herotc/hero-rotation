@@ -695,6 +695,10 @@ local function APL()
     Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts);
     -- auto_attack
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+    end
     -- call_action_list,name=cds
     if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end

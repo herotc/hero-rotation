@@ -278,10 +278,16 @@ local function APL()
       end
       -- use_item,name=azsharas_font_of_power,if=cooldown.metamorphosis.remains<10|cooldown.metamorphosis.remains>60
       if I.AzsharasFontofPower:IsEquipReady() and (S.Metamorphosis:CooldownRemainsP() < 10 or S.Metamorphosis:CooldownRemainsP() > 60) then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 60"; end
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 61"; end
       end
     end
     -- use_items,if=buff.metamorphosis.up
+    if (Player:BuffP(S.MetamorphosisBuff)) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 63"; end
+      end
+    end
     -- call_action_list,name=essences
     if (true) then
       local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
@@ -290,7 +296,7 @@ local function APL()
   DarkSlash = function()
     -- dark_slash,if=fury>=80&(!variable.blade_dance|!cooldown.blade_dance.ready)
     if S.DarkSlash:IsCastableP() and IsInMeleeRange() and (Player:Fury() >= 80 and (not bool(VarBladeDance) or not S.BladeDance:CooldownUpP())) then
-      if HR.Cast(S.DarkSlash, nil, nil, "Melee") then return "dark_slash 61"; end
+      if HR.Cast(S.DarkSlash, nil, nil, "Melee") then return "dark_slash 65"; end
     end
     -- annihilation,if=debuff.dark_slash.up
     if S.Annihilation:IsReadyP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then

@@ -308,8 +308,14 @@ local function APL ()
       if S.BagofTricks:IsCastable() then
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return ""; end
       end
+      -- use_items,if=cooldown.dancing_rune_weapon.remains>90
+      if (S.DancingRuneWeapon:CooldownRemainsP() > 90) then
+        local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+        if TrinketToUse then
+          if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+        end
+      end
     end
-    -- use_items,if=cooldown.dancing_rune_weapon.remains>90
     if Settings.Commons.UseTrinkets then
       -- use_item,name=razdunks_big_red_button
       if I.RazdunksBigRedButton:IsEquipReady() then

@@ -468,9 +468,15 @@ local function APL()
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.summon_demonic_tyrant.remains<=20&!talent.nether_portal.enabled
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() <= 20 and not S.NetherPortal:IsAvailable()) then
-      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 324"; end
     end
     -- use_items,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
+    if (DemonicTyrantTime() > 0 and (not Spell:MajorEssenceEnabled(AE.VisionofPerfection) or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 326"; end
+      end
+    end
     -- berserking,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
     if S.Berserking:IsCastableP() and HR.CDsON() and (DemonicTyrantTime() > 0 and (not Spell:MajorEssenceEnabled(AE.VisionofPerfection) or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 329"; end

@@ -301,6 +301,10 @@ local function APL ()
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral cooldowns"; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items cooldowns"; end
+    end
   end
   Normal = function()
     -- actions+=/infernal_strike,if=(!talent.flame_crash.enabled|(dot.sigil_of_flame.remains<3&!action.infernal_strike.sigil_placed))

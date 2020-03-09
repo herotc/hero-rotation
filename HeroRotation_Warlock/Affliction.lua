@@ -377,6 +377,12 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 40"; end
     end
     -- use_items,if=cooldown.summon_darkglare.remains>70|time_to_die<20|((buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)&(!talent.deathbolt.enabled|cooldown.deathbolt.remains<=gcd|!cooldown.deathbolt.remains)&!cooldown.summon_darkglare.remains)
+    if (S.SummonDarkglare:CooldownRemainsP() > 70 or Target:TimeToDie() < 20 or ((ActiveUAs() == 5 or Player:SoulShardsP() == 0) and (not S.PhantomSingularity:IsAvailable() or not S.PhantomSingularity:CooldownUpP()) and (not S.Deathbolt:IsAvailable() or S.Deathbolt:CooldownRemainsP() <= Player:GCD() or S.Deathbolt:CooldownUpP()) and S.SummonDarkglare:CooldownUpP())) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 42"; end
+      end
+    end
     -- fireblood,if=!cooldown.summon_darkglare.up
     if S.Fireblood:IsCastableP() and (not S.SummonDarkglare:CooldownUpP()) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 51"; end

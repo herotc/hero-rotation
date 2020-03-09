@@ -195,6 +195,12 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 38"; end
     end
     -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
+    if (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 40"; end
+      end
+    end
     -- use_item,name=grongs_primal_rage,if=cooldown.judgment.full_recharge_time>4&cooldown.avengers_shield.remains>4&(buff.seraphim.up|cooldown.seraphim.remains+4+gcd>expected_combat_length-time)&consecration.up
     if I.GrongsPrimalRage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 and S.AvengersShield:CooldownRemainsP() > 4 and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() + 4 + Player:GCD() > Target:TimeToDie()) and Player:BuffP(S.ConsecrationBuff)) then
       if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 43"; end

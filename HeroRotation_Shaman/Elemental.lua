@@ -579,6 +579,10 @@ local function APL()
       if HR.Cast(S.TotemMastery) then return "totem_mastery 585"; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 587"; end
+    end
     -- guardian_of_azeroth,if=dot.flame_shock.ticking&(!talent.storm_elemental.enabled&(cooldown.fire_elemental.duration-30<cooldown.fire_elemental.remains|expected_combat_length-time>190|expected_combat_length-time<32|!(cooldown.fire_elemental.remains+30<expected_combat_length-time)|cooldown.fire_elemental.remains<2)|talent.storm_elemental.enabled&(cooldown.storm_elemental.duration-30<cooldown.storm_elemental.remains|expected_combat_length-time>190|expected_combat_length-time<35|!(cooldown.storm_elemental.remains+30<expected_combat_length-time)|cooldown.storm_elemental.remains<2))
     if S.GuardianofAzeroth:IsCastableP() and (Target:DebuffP(S.FlameShockDebuff) and (not S.StormElemental:IsAvailable() and (S.FireElemental:CooldownRemainsP() > 120 or Target:TimeToDie() > 190 or Target:TimeToDie() < 32 or not (S.FireElemental:CooldownRemainsP() + 30 < Target:TimeToDie()) or S.FireElemental.CooldownRemainsP() < 2) or S.StormElemental:IsAvailable() and (S.StormElemental:CooldownRemainsP() > 120 or Target:TimeToDie() > 190 or Target:TimeToDie() < 35 or not (S.StormElemental:CooldownRemainsP() + 30 < Target:TimeToDie()) or S.StormElemental:CooldownRemainsP() < 2))) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end

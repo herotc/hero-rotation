@@ -320,7 +320,7 @@ local function APL()
       if HR.Cast(S.Incarnation) then return "incarnation 33"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=((equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>25&debuff.razor_coral_debuff.down)|debuff.razor_coral_debuff.down|(debuff.razor_coral_debuff.up&debuff.conductive_ink_debuff.up&target.time_to_pct_30<=2)|(debuff.razor_coral_debuff.up&time_to_die<=20))
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemainsP() > 25 and Target:DebuffDownP(S.RazorCoralDebuff)) or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.RazorCoralDebuff) and Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) <= 2) or (Target:DebuffP(S.RazorCoralDebuff) and Target:TimeToDie() <= 20))) then
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemains() > 25 and Target:DebuffDownP(S.RazorCoralDebuff)) or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.RazorCoralDebuff) and Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) <= 2) or (Target:DebuffP(S.RazorCoralDebuff) and Target:TimeToDie() <= 20))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 35"; end
     end
     -- use_item,effect_name=cyclotronic_blast
@@ -328,6 +328,10 @@ local function APL()
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 37"; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 39"; end
+    end
   end
   -- call precombat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then

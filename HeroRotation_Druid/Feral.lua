@@ -404,6 +404,12 @@ local function APL()
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 62"; end
     end
     -- use_items,if=buff.tigers_fury.up|target.time_to_die<20
+    if (Player:buffP(S.TigersFuryBuff) or Target:TimeToDie() < 20) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 63"; end
+      end
+    end
   end
   Finishers = function()
     -- pool_resource,for_next=1

@@ -434,6 +434,12 @@ local function APL()
       if Hr.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device"; end
     end
     -- use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
+    if (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+      end
+    end
     -- call_action_list,name=cds
     if (HR.CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end

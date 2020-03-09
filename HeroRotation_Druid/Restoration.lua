@@ -304,6 +304,10 @@ local function APL()
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 43"; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 44"; end
+    end
     -- potion
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 45"; end

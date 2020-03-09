@@ -457,6 +457,12 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items,if=prev_gcd.1.aspect_of_the_wild|target.time_to_die<20
+    if (Player:PrevGCDP(1, S.AspectoftheWild) or Target:TimeToDie() < 20) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+      end
+    end
     -- use_item,name=azsharas_font_of_power,if=cooldown.aspect_of_the_wild.remains_guess<15&target.time_to_die>10
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.AspectoftheWild:CooldownRemainsP() < 15 and Target:TimeToDie() > 10) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end

@@ -407,9 +407,15 @@ local function APL()
     end
     -- fireblood,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
     if S.Fireblood:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 247"; end
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 243"; end
     end
     -- use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20
+    if (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or InfernalRemains <= 20) or Target:TimeToDie() <= 20) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 245"; end
+      end
+    end
     -- use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
     if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, true) then return "pocketsized_computation_device 248"; end

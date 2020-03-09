@@ -472,6 +472,10 @@ local function APL()
       local ShouldReturn = ItemsCombustion(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+    end
     -- use_item,name=manifesto_of_madness,if=!equipped.azsharas_font_of_power&variable.time_to_combustion<8
     if I.ManifestoofMadness:IsEquipReady() and (not I.AzsharasFontofPower:IsEquipped() and VarTimeToCombusion < 8) then
       if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness high_priority"; end

@@ -310,6 +310,10 @@ local function APL()
       if HR.Cast(I.BalefireBranch, nil, Settings.Commons.TrinketDisplayStyle) then return "balefire_branch 98"; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 99"; end
+    end
     -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
     if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 100"; end

@@ -414,6 +414,12 @@ local function APL()
         if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 405"; end
       end
       -- use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
+      if ((S.PillarofFrost:CooldownUpP() or S.PillarofFrost:CooldownRemainsP() > 20) and (not S.BreathofSindragosa:IsAvailable() or S.EmpowerRuneWeapon:CooldownRemainsP() > 95)) then
+        local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+        if TrinketToUse then
+          if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 406"; end
+        end
+      end
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
       if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
         if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 407"; end

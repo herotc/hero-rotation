@@ -276,6 +276,10 @@ local function APL()
       local ShouldReturn = CritCds(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items cds"; end
+    end
   end
   Cleave = function()
     -- void_eruption

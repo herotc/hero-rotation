@@ -318,6 +318,12 @@ local function APL()
       if HR.Cast(S.Intercept) then return "intercept 84"; end
     end
     -- use_items,if=cooldown.avatar.remains>20
+    if (S.Avatar:CooldownRemainsP() > 20) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 86"; end
+      end
+    end
     -- use_item,name=grongs_primal_rage,if=buff.avatar.down
     if I.GrongsPrimalRage:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.AvatarBuff)) then
       if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 87"; end

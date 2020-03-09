@@ -390,6 +390,10 @@ local function APL()
     -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up|target.1.time_to_die<20
     -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up|target.1.time_to_die<20
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 195"; end
+    end
     -- warrior_of_elune
     if S.WarriorofElune:IsCastableP() then
       if HR.Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorofElune) then return "warrior_of_elune 108"; end

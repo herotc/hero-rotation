@@ -321,6 +321,12 @@ local function APL()
       if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power 215"; end
     end
     -- use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
+    if (Player:BuffP(S.ArcanePowerBuff) or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP()) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 216"; end
+      end
+    end
     -- blood_fury
     if S.BloodFury:IsCastableP() then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 217"; end

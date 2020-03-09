@@ -261,6 +261,10 @@ local function APL()
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
     end
     -- use_items
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+    end
     -- Manually placing PSCD here
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
