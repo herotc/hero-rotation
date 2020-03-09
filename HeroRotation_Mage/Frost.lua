@@ -89,6 +89,9 @@ Item.Mage.Frost = {
 };
 local I = Item.Mage.Frost;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 159630, 165576, 167555 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;

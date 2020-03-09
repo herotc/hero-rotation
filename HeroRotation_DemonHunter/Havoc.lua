@@ -89,6 +89,10 @@ Item.DemonHunter.Havoc = {
 };
 local I = Item.DemonHunter.Havoc;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169311, 169314, 159614, 167555 }
+
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

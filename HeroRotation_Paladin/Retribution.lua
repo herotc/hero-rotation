@@ -80,6 +80,9 @@ Item.Paladin.Retribution = {
 };
 local I = Item.Paladin.Retribution;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169311, 169314, 167555 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

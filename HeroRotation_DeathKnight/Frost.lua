@@ -96,13 +96,13 @@ Item.DeathKnight.Frost = {
   MerekthasFang                    = Item(158367, {13, 14}),
   KnotofAncientFuryAlliance        = Item(161413, {13, 14}),
   KnotofAncientFuryHorde           = Item(166795, {13, 14}),
-  FirstMatesSpyglass               = Item(158163, {13, 14}),
   GrongsPrimalRage                 = Item(165574, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   LurkersInsidiousGift             = Item(167866, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   -- "Other On Use"
+  FirstMatesSpyglass               = Item(158163, {13, 14}),
   NotoriousGladiatorsBadge         = Item(167380, {13, 14}),
   NotoriousGladiatorsMedallion     = Item(167377, {13, 14}),
   CorruptedGladiatorsBadge         = Item(172669, {13, 14}),
@@ -111,6 +111,9 @@ Item.DeathKnight.Frost = {
   JesHowler                        = Item(159627, {13, 14})
 };
 local I = Item.DeathKnight.Frost;
+
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 159611, 158367, 161413, 166795, 165574, 169314, 167866, 167555, 169311 }
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

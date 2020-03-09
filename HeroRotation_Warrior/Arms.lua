@@ -95,6 +95,9 @@ Item.Warrior.Arms = {
 };
 local I = Item.Warrior.Arms;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169314, 169311 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

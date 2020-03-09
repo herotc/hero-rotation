@@ -131,10 +131,11 @@ local S = Spell.Monk.Windwalker;
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Windwalker = {
   PotionofUnbridledFury                = Item(169299),
-  LustrousGoldenPlumage                = Item(159617, {13, 14}),
-  DribblingInkpod                      = Item(169319, {13, 14}),
   PocketsizedComputationDevice         = Item(167555, {13, 14}),
   AshvanesRazorCoral                   = Item(169311, {13, 14}),
+  -- For VarCoralDoubleTodOnUse
+  LustrousGoldenPlumage                = Item(159617, {13, 14}),
+  DribblingInkpod                      = Item(169319, {13, 14}),
   RemoteGuidanceDevice                 = Item(169769, {13, 14}),
   -- Gladiator Badges/Medallions
   NotoriousAspirantsBadge              = Item(167528, {13, 14}),
@@ -153,6 +154,9 @@ Item.Monk.Windwalker = {
   DreadCombatantsMedallion             = Item(161811, {13, 14}),
 };
 local I = Item.Monk.Windwalker;
+
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 167555, 169311 }
 
 -- Rotation Var
 local ShouldReturn;

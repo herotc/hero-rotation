@@ -93,6 +93,9 @@ Item.Hunter.BeastMastery = {
 };
 local I = Item.Hunter.BeastMastery;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169311, 167555, 169314 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount, GCDMax;

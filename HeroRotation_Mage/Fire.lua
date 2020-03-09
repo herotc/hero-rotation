@@ -79,17 +79,29 @@ local S = Spell.Mage.Fire;
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Fire = {
+  -- Potion
   PotionofUnbridledFury            = Item(169299),
+  -- Non-trinket items
+  HyperthreadWristwraps            = Item(168989),
+  MalformedHeraldsLegwraps         = Item(167835),
+  -- Trinkets
   ManifestoofMadness               = Item(174103, {13, 14}),
   ForbiddenObsidianClaw            = Item(173944, {13, 14}),
   TidestormCodex                   = Item(165576, {13, 14}),
-  MalformedHeraldsLegwraps         = Item(167835),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   RotcrustedVoodooDoll             = Item(159624, {13, 14}),
   AquipotentNautilus               = Item(169305, {13, 14}),
   ShiverVenomRelic                 = Item(168905, {13, 14}),
-  HyperthreadWristwraps            = Item(168989),
+  IgnitionMagesFuse                = Item(159615, {13, 14}),
+  TzanesBarkspines                 = Item(161411, {13, 14}),
+  AzurethoseSingedPlumage          = Item(161377, {13, 14}),
+  AncientKnotofWisdomAlliance      = Item(161417, {13, 14}),
+  AncientKnotofWisdomHorde         = Item(166793, {13, 14}),
+  ShockbitersFang                  = Item(169318, {13, 14}),
+  NeuralSynapseEnhancer            = Item(168973, {13, 14}),
+  BalefireBranch                   = Item(159630, {13, 14}),
+  -- PvP Badges/Medallions
   NotoriousAspirantsBadge          = Item(167528, {13, 14}),
   NotoriousGladiatorsBadge         = Item(167380, {13, 14}),
   SinisterGladiatorsBadge          = Item(165058, {13, 14}),
@@ -103,17 +115,12 @@ Item.Mage.Fire = {
   SinisterAspirantsMedallion       = Item(165220, {13, 14}),
   DreadGladiatorsMedallion         = Item(161674, {13, 14}),
   DreadAspirantsMedallion          = Item(162897, {13, 14}),
-  DreadCombatantsMedallion         = Item(161811, {13, 14}),
-  IgnitionMagesFuse                = Item(159615, {13, 14}),
-  TzanesBarkspines                 = Item(161411, {13, 14}),
-  AzurethoseSingedPlumage          = Item(161377, {13, 14}),
-  AncientKnotofWisdomAlliance      = Item(161417, {13, 14}),
-  AncientKnotofWisdomHorde         = Item(166793, {13, 14}),
-  ShockbitersFang                  = Item(169318, {13, 14}),
-  NeuralSynapseEnhancer            = Item(168973, {13, 14}),
-  BalefireBranch                   = Item(159630, {13, 14})
+  DreadCombatantsMedallion         = Item(161811, {13, 14})
 };
 local I = Item.Mage.Fire;
+
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 174103, 173944, 165576, 167555, 169314, 159624, 169305, 168905, 159615, 161411, 161377, 161417, 166793, 169318, 168973, 159630, 167528, 167380, 165058, 165223, 161902, 162966, 161676, 167525, 167377, 165055, 165220, 161674, 162897, 161811 }
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

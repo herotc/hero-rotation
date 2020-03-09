@@ -167,6 +167,9 @@ Item.Rogue.Subtlety = {
 local I = Item.Rogue.Subtlety;
 local AoETrinkets = { };
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 159614, 165568, 159617, 167555, 165572, 169314, 169311 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local Stealth, VanishBuff;

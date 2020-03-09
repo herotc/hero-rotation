@@ -119,6 +119,9 @@ Item.Rogue.Assassination = {
 };
 local I = Item.Rogue.Assassination;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 159614, 165568, 159617, 167555, 165572, 169314, 169311 }
+
 -- Spells Damage
 S.Envenom:RegisterDamage(
   -- Envenom DMG Formula:

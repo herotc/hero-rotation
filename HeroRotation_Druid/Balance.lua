@@ -90,12 +90,14 @@ local S = Spell.Druid.Balance;
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Balance = {
   PotionofUnbridledFury            = Item(169299),
-  TidestormCodex                   = Item(165576, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   ShiverVenomRelic                 = Item(168905, {13, 14})
 };
 local I = Item.Druid.Balance;
+
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169314, 167555, 168905 }
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

@@ -100,6 +100,9 @@ Item.Druid.Feral = {
 };
 local I = Item.Druid.Feral;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169314, 169311, 167555 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

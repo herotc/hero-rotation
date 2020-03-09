@@ -84,6 +84,9 @@ Item.DemonHunter.Vengeance = {
 };
 local I = Item.DemonHunter.Vengeance;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169614, 169311, 167555 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local CleaveRangeID = tostring(S.Disrupt:ID()); -- 20y range

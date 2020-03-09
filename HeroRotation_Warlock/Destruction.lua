@@ -88,6 +88,9 @@ Item.Warlock.Destruction = {
 };
 local I = Item.Warlock.Destruction;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169314, 167555, 159624, 168905, 169305, 165576, 158224 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;

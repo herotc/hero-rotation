@@ -90,7 +90,6 @@ Item.Mage.Arcane = {
   TidestormCodex                   = Item(165576, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
-  ManifestoofMadness               = Item(174103, {13, 14}),
   -- Other On Use Trinkets for VarFontDoubleOnUse
   NotoriousAspirantsBadge          = Item(167528, {13, 14}),
   NotoriousGladiatorsBadge         = Item(167380, {13, 14}),
@@ -113,9 +112,13 @@ Item.Mage.Arcane = {
   AncientKnotofWisdomHorde         = Item(166793, {13, 14}),
   ShockbitersFang                  = Item(169318, {13, 14}),
   NeuralSynapseEnhancer            = Item(168973, {13, 14}),
-  BalefireBranch                   = Item(159630, {13, 14})
+  BalefireBranch                   = Item(159630, {13, 14}),
+  ManifestoofMadness               = Item(174103, {13, 14})
 };
 local I = Item.Mage.Arcane;
+
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 165576, 167555, 169314 }
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

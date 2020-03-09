@@ -83,6 +83,9 @@ Item.Warrior.Protection = {
 };
 local I = Item.Warrior.Protection;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 165574, 169311, 169314 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

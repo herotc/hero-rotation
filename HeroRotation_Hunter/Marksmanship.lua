@@ -98,6 +98,9 @@ Item.Hunter.Marksmanship = {
 };
 local I = Item.Hunter.Marksmanship;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 167866, 159617, 159614, 167555, 169314, 169311 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;

@@ -87,6 +87,9 @@ if not Item.DeathKnight then Item.DeathKnight = {}; end
 };
 local I = Item.DeathKnight.Blood;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 165574, 159611, 158367, 169311 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local UnitsWithoutBloodPlague;

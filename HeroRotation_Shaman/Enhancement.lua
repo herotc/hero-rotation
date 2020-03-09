@@ -111,6 +111,9 @@ Item.Shaman.Enhancement = {
 };
 local I = Item.Shaman.Enhancement;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169314, 169311 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

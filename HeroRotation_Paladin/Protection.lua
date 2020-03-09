@@ -79,6 +79,9 @@ Item.Paladin.Protection = {
 };
 local I = Item.Paladin.Protection;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169314, 165574, 158367, 159611, 169311, 167555 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 

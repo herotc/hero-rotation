@@ -97,6 +97,9 @@ Item.Monk.Brewmaster = {
 };
 local I = Item.Monk.Brewmaster;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 169311, 167555 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local ForceOffGCD = {true, false};

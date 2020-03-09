@@ -97,6 +97,9 @@ Item.DeathKnight.Unholy = {
 };
 local I = Item.DeathKnight.Unholy;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = { 165580, 163936, 159627, 161379, 165574, 169307, 169314, 169311 }
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 
