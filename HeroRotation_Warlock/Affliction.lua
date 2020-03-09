@@ -380,7 +380,7 @@ local function APL()
     if (S.SummonDarkglare:CooldownRemainsP() > 70 or Target:TimeToDie() < 20 or ((ActiveUAs() == 5 or Player:SoulShardsP() == 0) and (not S.PhantomSingularity:IsAvailable() or not S.PhantomSingularity:CooldownUpP()) and (not S.Deathbolt:IsAvailable() or S.Deathbolt:CooldownRemainsP() <= Player:GCD() or S.Deathbolt:CooldownUpP()) and S.SummonDarkglare:CooldownUpP())) then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 42"; end
+        if HR.Cast(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- fireblood,if=!cooldown.summon_darkglare.up

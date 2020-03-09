@@ -439,7 +439,7 @@ local function APL()
       if (HL.CombatTime() > 20 or not I.RampingAmplitudeGigavoltEngine:IsEquipped() or not I.VisionofDemise:IsEquipped()) then
         local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
         if TrinketToUse then
-          if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 261"; end
+          if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
         end
       end
       -- use_item,name=azsharas_font_of_power,if=(essence.vision_of_perfection.enabled&!talent.unholy_frenzy.enabled)|(!essence.condensed_lifeforce.major&!essence.vision_of_perfection.enabled)

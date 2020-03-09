@@ -291,7 +291,7 @@ local function APL ()
     if (Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemains() >= 20 or not Everyone.PSCDEquipped) then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "Cast On Use Trinket"; end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- ancestral_call,if=dot.touch_of_death.remains|target.time_to_die<16

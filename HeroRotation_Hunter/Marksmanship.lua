@@ -437,7 +437,7 @@ local function APL()
     if (Player:BuffP(S.TrueshotBuff) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- call_action_list,name=cds

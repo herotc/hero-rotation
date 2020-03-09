@@ -474,7 +474,7 @@ local function APL()
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
     -- use_item,name=manifesto_of_madness,if=!equipped.azsharas_font_of_power&variable.time_to_combustion<8
     if I.ManifestoofMadness:IsEquipReady() and (not I.AzsharasFontofPower:IsEquipped() and VarTimeToCombusion < 8) then

@@ -303,7 +303,7 @@ local function APL ()
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items cooldowns"; end
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
   Normal = function()

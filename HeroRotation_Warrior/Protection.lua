@@ -321,7 +321,7 @@ local function APL()
     if (S.Avatar:CooldownRemainsP() > 20) then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 86"; end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- use_item,name=grongs_primal_rage,if=buff.avatar.down

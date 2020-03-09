@@ -697,7 +697,7 @@ local function APL()
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items"; end
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
     -- call_action_list,name=cds
     if (HR.CDsON()) then

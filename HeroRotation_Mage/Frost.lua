@@ -312,7 +312,7 @@ local function APL()
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 99"; end
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
     -- use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
     if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets then

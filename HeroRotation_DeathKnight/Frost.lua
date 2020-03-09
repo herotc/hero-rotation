@@ -417,7 +417,7 @@ local function APL()
       if ((S.PillarofFrost:CooldownUpP() or S.PillarofFrost:CooldownRemainsP() > 20) and (not S.BreathofSindragosa:IsAvailable() or S.EmpowerRuneWeapon:CooldownRemainsP() > 95)) then
         local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
         if TrinketToUse then
-          if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return "use_items 406"; end
+          if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
         end
       end
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down

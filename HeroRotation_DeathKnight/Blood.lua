@@ -312,7 +312,7 @@ local function APL ()
       if (S.DancingRuneWeapon:CooldownRemainsP() > 90) then
         local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
         if TrinketToUse then
-          if HR.Cast(Item(TrinketToUse), nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+          if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
         end
       end
     end
