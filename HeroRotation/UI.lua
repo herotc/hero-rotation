@@ -332,6 +332,22 @@
       IconFrame:Show();
     end
   end
+  -- Get Icon
+  function HR.SmallIconFrame:GetIcon (FrameID)
+    local IconFrame = self.Icon[FrameID];
+    if IconFrame and IconFrame:IsVisible() then
+      return IconFrame.Texture:GetTexture();
+    end
+    return nil;
+  end
+  -- Get Keybind
+  function HR.SmallIconFrame:GetKeybind (FrameID)
+    local IconFrame = self.Icon[FrameID];
+    if IconFrame and IconFrame:IsVisible() then
+      return IconFrame.Keybind:GetText();
+    end
+    return "";
+  end
   -- Hide Small Icons
   function HR.SmallIconFrame:HideIcons ()
     for i = 1, #self.Icon do

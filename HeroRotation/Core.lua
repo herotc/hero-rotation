@@ -75,12 +75,45 @@
 
 --- ======= CASTS =======
   local GCDSpell = Spell(61304);
-  local function GCDDisplay ()
+  local CooldownSpell, CooldownSpellDisplayTime, CooldownSpellCastDuration;
+  local function DisplayCooldown (Object, DisplayCostDeficit)
+    local StartTime, CastDuration
+
+    -- Default GCD and Casting Swirls
     if Player:IsCasting() or Player:IsChanneling() then
-      HR.MainIconFrame:SetCooldown(Player:CastStart(), Player:CastDuration());
+      StartTime = Player:CastStart()
+      CastDuration = Player:CastDuration()
     else
-      HR.MainIconFrame:SetCooldown(GCDSpell:CooldownInfo());
+      StartTime, CastDuration = GCDSpell:CooldownInfo()
     end
+
+    -- Tracking Values for Current Spell
+    if CooldownSpell ~= Object then
+      CooldownSpell = Object
+      CooldownSpellDisplayTime = HL.GetTime()
+      CooldownSpellCastDuration = 0
+  end
+
+    -- Resource Pooling Display Swirls
+    if DisplayCostDeficit then
+      local TimeToResource = Player.TimeToXResourceMap[Object:CostInfo(1, "type")](Object:Cost())
+      if TimeToResource and TimeToResource > 0 then
+        local CurrentTime = HL.GetTime()
+        -- Only display the resource-based swirl if the duration is greater than the GCD/Cast swirl
+        if TimeToResource > ((StartTime + CastDuration) - CurrentTime) then
+          local AdjustedCastDuration = CurrentTime - CooldownSpellDisplayTime + TimeToResource
+          -- 0.25s minimum, don't display an increase unless it is greater than 0.5s
+          if (CooldownSpellCastDuration == 0 and AdjustedCastDuration > 0.25) or CooldownSpellCastDuration > AdjustedCastDuration
+            or (AdjustedCastDuration - CooldownSpellCastDuration) > 0.5 then
+            CooldownSpellCastDuration = AdjustedCastDuration
+          end
+          StartTime = CooldownSpellDisplayTime
+          CastDuration = CooldownSpellCastDuration
+        end
+      end
+    end
+
+    HR.MainIconFrame:SetCooldown(StartTime, CastDuration);
   end
   -- Main Cast
   HR.CastOffGCDOffset = 1;
@@ -88,6 +121,13 @@
     local ObjectTexture = HR.GetTexture(Object);
     local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(ObjectTexture);
     if OffGCD or DisplayStyle == "Cooldown" then
+      -- If this is the second cooldown, check to ensure we don't have a duplicate icon in the first slot
+      if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
+        HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
+        HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
+        Object.LastDisplayTime = HL.GetTime();
+        return false;
+      end
       if HR.CastOffGCDOffset <= 2 then
         HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
         HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
@@ -99,6 +139,8 @@
     else
       local PoolResource = 9999000010
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
+      local ShowPooling = DisplayStyle == "Pooling"
+
       local OutofRange = false
       if RangeCheck ~= nil then
         if type(RangeCheck) == "number" then
@@ -110,7 +152,7 @@
         end
       end
       HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, OutofRange);
-      GCDDisplay();
+      DisplayCooldown(Object, ShowPooling);
       Object.LastDisplayTime = HL.GetTime();
       return true;
     end
@@ -124,6 +166,10 @@
       HR.MainIconFrame:OverlayText(Text);
     end
     return Result;
+  end
+  -- Overload for Main Cast (with resource pooling swirl)
+  function HR.CastPooling(Object, RangeCheck)
+    return HR.Cast(Object, false, "Pooling", RangeCheck)
   end
   -- Main Cast Queue
   local QueueSpellTable, QueueLength, QueueTextureTable;
@@ -140,7 +186,7 @@
                               and HL.FindKeyBinding(QueueTextureTable[i]);
     end
     HR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
-    GCDDisplay();
+    DisplayCooldown();
     return "Should Return";
   end
 
