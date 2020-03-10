@@ -110,9 +110,6 @@ local S = Spell.Rogue.Outlaw;
 if not Item.Rogue then Item.Rogue = {}; end
 Item.Rogue.Outlaw = {
   -- Trinkets
-  GalecallersBoon       = Item(159614, {13, 14}),
-  InvocationOfYulon     = Item(165568, {13, 14}),
-  LustrousGoldenPlumage = Item(159617, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
@@ -121,7 +118,12 @@ Item.Rogue.Outlaw = {
 local I = Item.Rogue.Outlaw;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 159614, 165568, 159617, 167555, 165572, 169314, 169311 }
+local OnUseExcludes = {
+  I.ComputationDevice:ID(),
+  I.VigorTrinket:ID(),
+  I.FontOfPower:ID(),
+  I.RazorCoral:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
@@ -369,8 +371,8 @@ local function CDs ()
       if ShouldReturn then return ShouldReturn; end
     end
 
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
-    if HR.CDsON() and S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) and EnergyTimeToMaxRounded() > 1 and (not I.FontOfPower:IsEquipped() or I.FontOfPower:CooldownRemains() > 20) then
+    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+    if HR.CDsON() and S.AdrenalineRush:IsCastableP() and not Player:BuffP(S.AdrenalineRush) and (not I.FontOfPower:IsEquipped() or I.FontOfPower:CooldownRemains() > 20) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush"; end
     end
 
@@ -403,8 +405,9 @@ local function CDs ()
         if S.KillingSpree:IsCastableP(10) and (EnergyTimeToMaxRounded() > 5 or EnergyPredictedRounded() < 15) then
           if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree"; end
         end
-        -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
-        if S.BladeRush:IsCastableP(S.SinisterStrike) and EnergyTimeToMaxRounded() > 1 and not Player:BuffP(S.Opportunity) then
+        -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1&(!buff.adrenaline_rush.up|energy<45)
+        if S.BladeRush:IsCastableP(S.SinisterStrike) and EnergyTimeToMaxRounded() > 1
+          and (not Player:BuffP(S.AdrenalineRush) or EnergyPredictedRounded() < 45) then
           if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush"; end
         end
       end
@@ -424,17 +427,7 @@ local function CDs ()
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
 
     -- Trinkets
-    -- actions.cds+=/use_item,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
     if Settings.Commons.UseTrinkets then
-      if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
-        if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast GalecallersBoon"; end
-      end
-      if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() then
-        if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast LustrousGoldenPlumage"; end
-      end
-      if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() then
-        if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast InvocationOfYulon"; end
-      end
       -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
       if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.BladeFlurry) and S.AdrenalineRush:CooldownRemainsP() < 15 then
         if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast FontOfPower"; end
@@ -467,6 +460,11 @@ local function CDs ()
       -- Emulate SimC default behavior to use at max stacks
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
         if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket"; end
+      end
+      -- actions.cds+=/use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse and (Player:HasHeroism() or Target:FilteredTimeToDie("<", 20) or Player:ComboPointsDeficit() <= 2) then
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
 
@@ -676,7 +674,7 @@ end
 
 HR.SetAPL(260, APL, Init);
 
--- Last Update: 2020-02-24
+-- Last Update: 2020-03-09
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -692,7 +690,7 @@ HR.SetAPL(260, APL, Init);
 -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
 -- actions.precombat+=/use_item,name=azsharas_font_of_power
 -- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
---
+
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
@@ -721,10 +719,15 @@ HR.SetAPL(260, APL, Init);
 -- actions+=/arcane_pulse
 -- actions+=/lights_judgment
 -- actions+=/bag_of_tricks
---
+
+-- # Builders
+-- # Use Pistol Shot if it won't cap combo points and the Oppotunity buff is up. Avoid using when Keep Your Wits stacks are high unless the Deadshot buff is also up.
+-- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<14|buff.deadshot.up|energy<45)
+-- actions.build+=/sinister_strike
+
 -- # Cooldowns
 -- actions.cds=call_action_list,name=essences,if=!stealthed.all
--- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+-- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
@@ -733,25 +736,22 @@ HR.SetAPL(260, APL, Init);
 -- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up&(!raid_event.adds.exists|raid_event.adds.remains>8|raid_event.adds.in>(2-cooldown.blade_flurry.charges_fractional)*25)
 -- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
 -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
--- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
+-- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1&(!buff.adrenaline_rush.up|energy<45)
 -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
---
 -- actions.cds+=/potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
 -- actions.cds+=/fireblood
 -- actions.cds+=/ancestral_call
---
 -- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
 -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
 -- # Very roughly rule of thumbified maths below: Use for Inkpod crit, otherwise with AR at 20+ stacks or 10+ with also Blood up.
 -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
 -- # Default fallback for usable items.
 -- actions.cds+=/use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
---
---
+
 -- # Essences
 -- actions.essences=concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
 -- actions.essences+=/blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition
@@ -763,10 +763,7 @@ HR.SetAPL(260, APL, Init);
 -- actions.essences+=/worldvein_resonance
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<45
 -- actions.essences+=/reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
---
--- # Stealth
--- actions.stealth=ambush
---
+
 -- # Finishers
 -- # BtE over RtB rerolls with Deadshot/Ace traits or Ruthless Precision.
 -- actions.finish=between_the_eyes,if=variable.bte_condition
@@ -775,8 +772,6 @@ HR.SetAPL(260, APL, Init);
 -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
 -- actions.finish+=/between_the_eyes,if=azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
 -- actions.finish+=/dispatch
---
--- # Builders
--- # Use Pistol Shot if the Oppotunity buff is up. Avoid using when Keep Your Wits stacks are high unless the Deadshot buff is also up.
--- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<14|buff.deadshot.up|energy<45)
--- actions.build+=/sinister_strike
+
+-- # Stealth
+-- actions.stealth=ambush

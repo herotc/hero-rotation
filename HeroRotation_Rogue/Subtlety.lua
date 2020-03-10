@@ -156,9 +156,6 @@ S.Nightblade:RegisterPMultiplier(
 if not Item.Rogue then Item.Rogue = {}; end
 Item.Rogue.Subtlety = {
   -- Trinkets
-  GalecallersBoon       = Item(159614, {13, 14}),
-  InvocationOfYulon     = Item(165568, {13, 14}),
-  LustrousGoldenPlumage = Item(159617, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
@@ -168,7 +165,12 @@ local I = Item.Rogue.Subtlety;
 local AoETrinkets = { };
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 159614, 165568, 159617, 167555, 165572, 169314, 169311 }
+local OnUseExcludes = {
+  I.ComputationDevice:ID(),
+  I.VigorTrinket:ID(),
+  I.FontOfPower:ID(),
+  I.RazorCoral:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
@@ -542,18 +544,8 @@ local function CDs ()
       end
 
       -- Trinkets
-      -- actions.cds+=/use_items,if=buff.symbols_of_death.up|target.time_to_die<20
       if Settings.Commons.UseTrinkets then
         local DefaultTrinketCondition = Player:BuffP(S.SymbolsofDeath) or Target:FilteredTimeToDie("<", 20);
-        if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and DefaultTrinketCondition then
-          if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast GalecallersBoon"; end
-        end
-        if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and DefaultTrinketCondition then
-          if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast LustrousGoldenPlumage"; end
-        end
-        if I.InvocationOfYulon:IsEquipped() and I.InvocationOfYulon:IsReady() and DefaultTrinketCondition then
-          if HR.Cast(I.InvocationOfYulon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast InvocationOfYulon"; end
-        end
         -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
         if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and not Player:BuffP(S.SymbolsofDeath) and S.SymbolsofDeath:CooldownRemainsP() < 10 then
           if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast FontOfPower"; end
@@ -586,6 +578,13 @@ local function CDs ()
         -- Emulate SimC default behavior to use at max stacks
         if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
           if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket"; end
+        end
+        -- actions.cds+=/use_items,if=buff.symbols_of_death.up|target.time_to_die<20
+        if DefaultTrinketCondition then
+          local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+          if TrinketToUse then
+            if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+          end
         end
       end
     end
