@@ -404,7 +404,7 @@ local function APL()
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 62"; end
     end
     -- use_items,if=buff.tigers_fury.up|target.time_to_die<20
-    if (Player:buffP(S.TigersFuryBuff) or Target:TimeToDie() < 20) then
+    if (Player:BuffP(S.TigersFuryBuff) or Target:TimeToDie() < 20) then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
