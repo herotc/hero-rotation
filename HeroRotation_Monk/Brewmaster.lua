@@ -239,11 +239,11 @@ local function APL()
     end
     -- chi_burst
     if S.ChiBurst:IsCastableP(10) then
-      if HR.Cast(S.ChiBurst) then return ""; end
+      if HR.Cast(S.ChiBurst, nil, nil, 40) then return ""; end
     end
     -- chi_wave
     if S.ChiWave:IsCastableP(25) then
-      if HR.Cast(S.ChiWave) then return ""; end
+      if HR.Cast(S.ChiWave, nil, nil, 40) then return ""; end
     end
   end
 
@@ -258,7 +258,7 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return ""; end
     end
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
@@ -267,7 +267,7 @@ local function APL()
     end
     -- Manually placing PSCD here
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return ""; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return ""; end
     end
     -- potion
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
@@ -284,7 +284,7 @@ local function APL()
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastableP() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, 40) then return ""; end
       end
       -- fireblood
       if S.Fireblood:IsCastableP() then
@@ -296,7 +296,7 @@ local function APL()
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastableP() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return ""; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, 40) then return ""; end
       end
       -- invoke_niuzao_the_black_ox
       if S.InvokeNiuzaotheBlackOx:IsCastableP(40) and Target:TimeToDie() > 25 then
@@ -344,7 +344,7 @@ local function APL()
     end
     -- concentrated_flame,if=dot.concentrated_flame.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return ""; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return ""; end
     end
     -- heart_essence,if=!essence.the_crucible_of_flame.major
     if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastableP() and (not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) then
@@ -380,7 +380,7 @@ local function APL()
     end
     -- arcane_torrent,if=energy<31
     if HR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
-      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent, nil, 8) then return ""; end
     end
     -- rushing_jade_wind
     if S.RushingJadeWind:IsCastableP() then

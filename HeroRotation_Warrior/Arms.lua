@@ -191,7 +191,7 @@ local function APL()
     end
     -- bladestorm,if=!buff.memory_of_lucid_dreams.up&buff.test_of_might.up&rage<30&!buff.deadly_calm.up
     if S.Bladestorm:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.MemoryofLucidDreams) and Player:BuffP(S.TestofMightBuff) and Player:Rage() < 30 and Player:BuffDownP(S.DeadlyCalmBuff)) then
-      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 32"; end
+      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, 8) then return "bladestorm 32"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
     if S.Cleave:IsReadyP("Melee") and (Cache.EnemiesCount[8] > 2) then
@@ -237,7 +237,7 @@ local function APL()
     end
     -- bladestorm,if=buff.sweeping_strikes.down&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
     if S.Bladestorm:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.SweepingStrikesBuff) and (not S.DeadlyCalm:IsAvailable() or Player:BuffDownP(S.DeadlyCalmBuff)) and ((Target:DebuffRemainsP(S.ColossusSmashDebuff) > 4.5 and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff))) then
-      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 78"; end
+      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, 8) then return "bladestorm 78"; end
     end
     -- deadly_calm
     if S.DeadlyCalm:IsCastableP() then
@@ -299,7 +299,7 @@ local function APL()
     end
     -- bladestorm,if=(debuff.colossus_smash.up&raid_event.adds.in>target.time_to_die)|raid_event.adds.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
     if S.Bladestorm:IsCastableP() and HR.CDsON() and ((Target:DebuffP(S.ColossusSmashDebuff) and 10000000000 > Target:TimeToDie()) or (Cache.EnemiesCount[8] > 1) and ((Target:DebuffRemainsP(S.ColossusSmashDebuff) > 4.5 and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff))) then
-      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 200"; end
+      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, 8) then return "bladestorm 200"; end
     end
     -- overpower,if=!raid_event.adds.up|(raid_event.adds.up&azerite.seismic_wave.enabled)
     if S.Overpower:IsCastableP("Melee") and (not (Cache.EnemiesCount[8] > 1) or ((Cache.EnemiesCount[8] > 1) and S.SeismicWave:AzeriteEnabled())) then
@@ -365,7 +365,7 @@ local function APL()
     end
     -- bladestorm,if=cooldown.mortal_strike.remains&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down&rage<40
     if S.Bladestorm:IsCastableP() and HR.CDsON() and (bool(S.MortalStrike:CooldownRemainsP()) and (not S.DeadlyCalm:IsAvailable() or Player:BuffDownP(S.DeadlyCalmBuff)) and ((Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:AzeriteEnabled()) or Player:BuffP(S.TestofMightBuff)) and Player:BuffDownP(S.MemoryofLucidDreams) and Player:Rage() < 40) then
-      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm) then return "bladestorm 302"; end
+      if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, 8) then return "bladestorm 302"; end
     end
     -- cleave,if=spell_targets.whirlwind>2
     if S.Cleave:IsReadyP("Melee") and (Cache.EnemiesCount[8] > 2) then
@@ -403,7 +403,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- charge
     if S.Charge:IsReadyP() and S.Charge:ChargesP() >= 1 then
-      if HR.Cast(S.Charge, Settings.Arms.GCDasOffGCD.Charge) then return "charge 351"; end
+      if HR.Cast(S.Charge, Settings.Arms.GCDasOffGCD.Charge, nil, 25) then return "charge 351"; end
     end
     -- Interrupts
     Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
@@ -426,11 +426,11 @@ local function APL()
       end
       -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&buff.memory_of_lucid_dreams.down&rage<50
       if S.ArcaneTorrent:IsCastableP() and (S.MortalStrike:CooldownRemainsP() > 1.5 and Player:BuffDownP(S.MemoryofLucidDreams) and Player:Rage() < 50) then
-        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 364"; end
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 364"; end
       end
       -- lights_judgment,if=debuff.colossus_smash.down&buff.memory_of_lucid_dreams.down&cooldown.mortal_strike.remains
       if S.LightsJudgment:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and not S.MortalStrike:CooldownUpP()) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 370"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 370"; end
       end
       -- fireblood,if=buff.memory_of_lucid_dreams.remains<5|(!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)
       if S.Fireblood:IsCastableP() and (Player:BuffRemainsP(S.MemoryofLucidDreams) < 5 or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff))) then
@@ -442,12 +442,12 @@ local function APL()
       end
       -- bag_of_tricks,if=debuff.colossus_smash.down&buff.memory_of_lucid_dreams.down&cooldown.mortal_strike.remains
       if S.BagofTricks:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and not S.MortalStrike:CooldownUpP()) then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 379"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 379"; end
       end
     end
     -- use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral_debuff.up|(target.health.pct<20.1&buff.memory_of_lucid_dreams.up&cooldown.memory_of_lucid_dreams.remains<117)|(target.health.pct<30.1&debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major)|(!debuff.conductive_ink_debuff.up&!essence.memory_of_lucid_dreams.major&debuff.colossus_smash.up)|target.time_to_die<30
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 20.1 and Player:BuffP(S.MemoryofLucidDreams) and S.MemoryofLucidDreams:CooldownRemainsP() < 117) or (Target:HealthPercentage() < 30.1 and Target:DebuffP(S.ConductiveInkDebuff) and not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and Target:DebuffP(S.ColossusSmashDebuff)) or Target:TimeToDie() < 30) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 381"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 381"; end
     end
     -- avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)
     if S.Avatar:IsCastableP() and HR.CDsON() and (S.ColossusSmash:CooldownRemainsP() < 8 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 8)) then
@@ -459,11 +459,11 @@ local function APL()
     end
     -- blood_of_the_enemy,if=buff.test_of_might.up|(debuff.colossus_smash.up&!azerite.test_of_might.enabled)
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.TestofMightBuff) or (Target:DebuffP(S.ColossusSmashDebuff) and not S.TestofMight:IsAvailable())) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast,if=!debuff.colossus_smash.up&!buff.test_of_might.up
     if S.PurifyingBlast:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff)) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
     -- ripple_in_space,if=!debuff.colossus_smash.up&!buff.test_of_might.up
     if S.RippleInSpace:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff)) then
@@ -479,15 +479,15 @@ local function APL()
     end
     -- reaping_flames,if=!debuff.colossus_smash.up&!buff.test_of_might.up
     if S.ReapingFlames:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff)) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
     end
     -- concentrated_flame,if=!debuff.colossus_smash.up&!buff.test_of_might.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ColossusSmashDebuff) and Player:BuffDownP(S.TestofMightBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
     -- guardian_of_azeroth,if=cooldown.colossus_smash.remains<10
     if S.GuardianofAzeroth:IsCastableP() and (S.ColossusSmash:CooldownRemainsP() < 10) then

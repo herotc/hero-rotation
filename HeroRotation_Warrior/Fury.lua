@@ -183,7 +183,7 @@ local function APL()
       if HR.Cast(S.Execute) then return "execute 34"; end
     end
     -- furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
-    if S.FuriousSlash:IsCastableP() and (not Player:HasHeroism() and Player:BuffRemainsP(S.FuriousSlashBuff) < 3) then
+    if S.FuriousSlash:IsCastableP("Melee") and (not Player:HasHeroism() and Player:BuffRemainsP(S.FuriousSlashBuff) < 3) then
       if HR.Cast(S.FuriousSlash) then return "furious_slash 36"; end
     end
     -- bladestorm,if=prev_gcd.1.rampage
@@ -246,11 +246,11 @@ local function APL()
     end
     -- blood_of_the_enemy,if=buff.recklessness.up
     if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
     -- ripple_in_space,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
@@ -266,15 +266,15 @@ local function APL()
     end
     -- reaping_flames,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.ReapingFlames:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "reaping_flames"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
     end
     -- concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
     -- guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and (Target:TimeToDie() > 195 or Target:HealthPercentage() < 20)) then
@@ -294,7 +294,7 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() < 20 or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzerothBuff) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and not Spell:MajorEssenceEnabled(AE.CondensedLifeForce)))) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 115"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 115"; end
     end
     if (HR.CDsON()) then
       -- blood_fury,if=buff.recklessness.up
@@ -307,7 +307,7 @@ local function APL()
       end
       -- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
       if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 126"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 126"; end
       end
       -- fireblood,if=buff.recklessness.up
       if S.Fireblood:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
@@ -319,7 +319,7 @@ local function APL()
       end
       -- bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
       if S.BagofTricks:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and Target:DebuffDownP(S.SiegebreakerDebuff) and Player:BuffP(S.EnrageBuff)) then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 136"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 136"; end
       end
     end
     -- run_action_list,name=single_target

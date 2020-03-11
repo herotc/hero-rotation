@@ -214,7 +214,7 @@ local function APL()
       end
       -- demonbolt
       if S.Demonbolt:IsCastableP() then
-        if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 12"; end
+        if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 12"; end
       end
     end
   end
@@ -225,34 +225,34 @@ local function APL()
     end
     -- soul_strike,if=!talent.demonic_consumption.enabled|time>15|prev_gcd.1.hand_of_guldan&!buff.bloodlust.remains
     if S.SoulStrike:IsCastableP() and (not S.DemonicConsumption:IsAvailable() or HL.CombatTime() > 15 or Player:PrevGCDP(1, S.HandofGuldan) and not Player:HasHeroism()) then
-      if HR.Cast(S.SoulStrike, nil, nil, true) then return "soul_strike 14"; end
+      if HR.Cast(S.SoulStrike, nil, nil, 50) then return "soul_strike 14"; end
     end
     -- shadow_bolt
     if S.ShadowBolt:IsCastableP() then
-      if HR.Cast(S.ShadowBolt, nil, nil, true) then return "shadow_bolt 20"; end
+      if HR.Cast(S.ShadowBolt, nil, nil, 40) then return "shadow_bolt 20"; end
     end
   end
   Opener = function()
     -- hand_of_guldan,line_cd=30,if=azerite.explosive_potential.enabled
     if S.HandofGuldan:IsReadyP() and (S.ExplosivePotential:AzeriteEnabled()) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 30"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 30"; end
     end
     -- implosion,if=azerite.explosive_potential.enabled&buff.wild_imps.stack>2&buff.explosive_potential.down
     if S.Implosion:IsReadyP() and (S.ExplosivePotential:AzeriteEnabled() and WildImpsCount() > 2 and Player:BuffDownP(S.ExplosivePotentialBuff)) then
-      if HR.Cast(S.Implosion, nil, nil, true) then return "implosion 31"; end
+      if HR.Cast(S.Implosion, nil, nil, 40) then return "implosion 31"; end
     end
     -- doom,line_cd=30
     -- Manually added DebuffDownP check to avoid getting stuck at this line
     if S.Doom:IsCastableP() and (Target:DebuffDownP(S.DoomDebuff)) then
-      if HR.Cast(S.Doom, nil, nil, true) then return "doom 32"; end
+      if HR.Cast(S.Doom, nil, nil, 40) then return "doom 32"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle, true) then return "guardian_of_azeroth 33"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 33"; end
     end
     -- hand_of_guldan,if=prev_gcd.1.hand_of_guldan&soul_shard>0&prev_gcd.2.soul_strike
     if S.HandofGuldan:IsReadyP() and (Player:PrevGCDP(1, S.HandofGuldan) and Player:SoulShardsP() > 0 and Player:PrevGCDP(2, S.SoulStrike)) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 34"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 34"; end
     end
     -- demonic_strength,if=prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&(buff.wild_imps.stack>1&action.hand_of_guldan.in_flight)
     if S.DemonicStrength:IsCastableP() and (Player:PrevGCDP(1, S.HandofGuldan) and not Player:PrevGCDP(2, S.HandofGuldan) and (WildImpsCount() > 1 and S.HandofGuldan:InFlight())) then
@@ -260,11 +260,11 @@ local function APL()
     end
     -- bilescourge_bombers
     if S.BilescourgeBombers:IsReadyP() then
-      if HR.Cast(S.BilescourgeBombers, nil, nil, true) then return "bilescourge_bombers 36"; end
+      if HR.Cast(S.BilescourgeBombers, nil, nil, 40) then return "bilescourge_bombers 36"; end
     end
     -- soul_strike,line_cd=30,if=!buff.bloodlust.remains|time>5&prev_gcd.1.hand_of_guldan
     if S.SoulStrike:IsCastableP() and (not Player:HasHeroism() or HL.CombatTime() > 5 and Player:PrevGCDP(1, S.HandofGuldan)) then
-      if HR.Cast(S.SoulStrike, nil, nil, true) then return "soul_strike 37"; end
+      if HR.Cast(S.SoulStrike, nil, nil, 50) then return "soul_strike 37"; end
     end
     -- summon_vilefiend,if=soul_shard=5
     if S.SummonVilefiend:IsReadyP() and (Player:SoulShardsP() == 5) then
@@ -272,27 +272,27 @@ local function APL()
     end
     -- grimoire_felguard,if=soul_shard=5
     if S.GrimoireFelguard:IsReadyP() and (Player:SoulShardsP() == 5) then
-      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, true) then return "grimoire_felguard 39"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, 40) then return "grimoire_felguard 39"; end
     end
     -- call_dreadstalkers,if=soul_shard=5
     if S.CallDreadstalkers:IsReadyP() and (Player:SoulShardsP() == 5) then
-      if HR.Cast(S.CallDreadstalkers, nil, nil, true) then return "call_dreadstalkers 40"; end
+      if HR.Cast(S.CallDreadstalkers, nil, nil, 40) then return "call_dreadstalkers 40"; end
     end
     -- hand_of_guldan,if=soul_shard=5
     if S.HandofGuldan:IsReadyP() and (Player:SoulShardsP() == 5) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 41"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 41"; end
     end
     -- hand_of_guldan,if=soul_shard>=3&prev_gcd.2.hand_of_guldan&time>5&(prev_gcd.1.soul_strike|!talent.soul_strike.enabled&prev_gcd.1.shadow_bolt)
     if S.HandofGuldan:IsReadyP() and (Player:SoulShardsP() >= 3 and Player:PrevGCDP(2, S.HandofGuldan) and HL.CombatTime() > 5 and (Player:PrevGCDP(1, S.SoulStrike) or not S.SoulStrike:IsAvailable() and Player:PrevGCDP(1, S.ShadowBolt))) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 42"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 42"; end
     end
     -- summon_demonic_tyrant,if=prev_gcd.1.demonic_strength|prev_gcd.1.hand_of_guldan&prev_gcd.2.hand_of_guldan|!talent.demonic_strength.enabled&buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6
     if S.SummonDemonicTyrant:IsReadyP() and (Player:PrevGCDP(1, S.DemonicStrength) or Player:PrevGCDP(1, S.HandofGuldan) and Player:PrevGCDP(2, S.HandofGuldan) or not S.DemonicStrength:IsAvailable() and WildImpsCount() + ImpsSpawnedDuring(S.SummonDemonicTyrant:CastTime()) >= 6) then
-      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, true) then return "summon_demonic_tyrant 43"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, 40) then return "summon_demonic_tyrant 43"; end
     end
     -- demonbolt,if=soul_shard<=3&buff.demonic_core.remains
     if S.Demonbolt:IsCastableP() and (Player:SoulShardsP() <= 3 and Player:BuffP(S.DemonicCoreBuff)) then
-      if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 44"; end
+      if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 44"; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then
@@ -302,31 +302,31 @@ local function APL()
   Implosion = function()
     -- implosion,if=(buff.wild_imps.stack>=6&(soul_shard<3|prev_gcd.1.call_dreadstalkers|buff.wild_imps.stack>=9|prev_gcd.1.bilescourge_bombers|(!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan))&!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&buff.demonic_power.down)|(time_to_die<3&buff.wild_imps.stack>0)|(prev_gcd.2.call_dreadstalkers&buff.wild_imps.stack>2&!talent.demonic_calling.enabled)
     if S.Implosion:IsCastableP() and ((WildImpsCount() >= 6 and (Player:SoulShardsP() < 3 or Player:PrevGCDP(1, S.CallDreadstalkers) or WildImpsCount() >= 9 or Player:PrevGCDP(1, S.BilescourgeBombers) or (not Player:PrevGCDP(1, S.HandofGuldan) and not Player:PrevGCDP(2, S.HandofGuldan))) and not Player:PrevGCDP(1, S.HandofGuldan) and not Player:PrevGCDP(2, S.HandofGuldan) and Player:BuffDownP(S.DemonicPowerBuff)) or (Target:TimeToDie() < 3 and WildImpsCount() > 0) or (Player:PrevGCDP(2, S.CallDreadstalkers) and WildImpsCount() > 2 and not S.DemonicCalling:IsAvailable())) then
-      if HR.Cast(S.Implosion, nil, nil, true) then return "implosion 96"; end
+      if HR.Cast(S.Implosion, nil, nil, 40) then return "implosion 96"; end
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
     if S.GrimoireFelguard:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() < 13) then
-      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, true) then return "grimoire_felguard 128"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, 40) then return "grimoire_felguard 128"; end
     end
     -- call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
     if S.CallDreadstalkers:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() < 9 and bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or (S.SummonDemonicTyrant:CooldownRemainsP() < 11 and Player:BuffDownP(S.DemonicCallingBuff)) or S.SummonDemonicTyrant:CooldownRemainsP() > 14) then
-      if HR.Cast(S.CallDreadstalkers, nil, nil, true) then return "call_dreadstalkers 134"; end
+      if HR.Cast(S.CallDreadstalkers, nil, nil, 40) then return "call_dreadstalkers 134"; end
     end
     -- summon_demonic_tyrant
     if S.SummonDemonicTyrant:IsCastableP() then
-      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, true) then return "summon_demonic_tyrant 146"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, 40) then return "summon_demonic_tyrant 146"; end
     end
     -- hand_of_guldan,if=soul_shard>=5
     if S.HandofGuldan:IsCastableP() and (Player:SoulShardsP() >= 5) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 148"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 148"; end
     end
     -- hand_of_guldan,if=soul_shard>=3&(((prev_gcd.2.hand_of_guldan|buff.wild_imps.stack>=3)&buff.wild_imps.stack<9)|cooldown.summon_demonic_tyrant.remains<=gcd*2|buff.demonic_power.remains>gcd*2)
     if S.HandofGuldan:IsCastableP() and (Player:SoulShardsP() >= 3 and (((Player:PrevGCDP(2, S.HandofGuldan) or WildImpsCount() >= 3) and WildImpsCount() < 9) or S.SummonDemonicTyrant:CooldownRemainsP() <= Player:GCD() * 2 or Player:BuffRemainsP(S.DemonicPowerBuff) > Player:GCD() * 2)) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 150"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 150"; end
     end
     -- demonbolt,if=prev_gcd.1.hand_of_guldan&soul_shard>=1&(buff.wild_imps.stack<=3|prev_gcd.3.hand_of_guldan)&soul_shard<4&buff.demonic_core.up
     if S.Demonbolt:IsCastableP() and (Player:PrevGCDP(1, S.HandofGuldan) and Player:SoulShardsP() >= 1 and (WildImpsCount() <= 3 or Player:PrevGCDP(3, S.HandofGuldan)) and Player:SoulShardsP() < 4 and Player:BuffP(S.DemonicCoreBuff)) then
-      if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 162"; end
+      if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 162"; end
     end
     -- summon_vilefiend,if=(cooldown.summon_demonic_tyrant.remains>40&spell_targets.implosion<=2)|cooldown.summon_demonic_tyrant.remains<12
     if S.SummonVilefiend:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() > 40 and EnemiesCount <= 2) or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
@@ -334,7 +334,7 @@ local function APL()
     end
     -- bilescourge_bombers,if=cooldown.summon_demonic_tyrant.remains>9
     if S.BilescourgeBombers:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 9) then
-      if HR.Cast(S.BilescourgeBombers, nil, nil, true) then return "bilescourge_bombers 178"; end
+      if HR.Cast(S.BilescourgeBombers, nil, nil, 40) then return "bilescourge_bombers 178"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
@@ -342,23 +342,23 @@ local function APL()
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, true) then return "purifying_blast implosion"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast implosion"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy implosion"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy implosion"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&spell_targets.implosion<5
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame implosion"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame implosion"; end
     end
     -- soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
     if S.SoulStrike:IsCastableP() and (Player:SoulShardsP() < 5 and Player:BuffStackP(S.DemonicCoreBuff) <= 2) then
-      if HR.Cast(S.SoulStrike, nil, nil, true) then return "soul_strike 182"; end
+      if HR.Cast(S.SoulStrike, nil, nil, 50) then return "soul_strike 182"; end
     end
     -- demonbolt,if=soul_shard<=3&buff.demonic_core.up&(buff.demonic_core.stack>=3|buff.demonic_core.remains<=gcd*5.7)
     if S.Demonbolt:IsCastableP() and (Player:SoulShardsP() <= 3 and Player:BuffP(S.DemonicCoreBuff) and (Player:BuffStackP(S.DemonicCoreBuff) >= 3 or Player:BuffRemainsP(S.DemonicCoreBuff) <= Player:GCD() * 5.7)) then
-      if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 186"; end
+      if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 186"; end
     end
     -- doom,cycle_targets=1,max_cycle_targets=7,if=refreshable
     if S.Doom:IsCastableP() then
@@ -382,11 +382,11 @@ local function APL()
   NetherPortalActive = function()
     -- bilescourge_bombers
     if S.BilescourgeBombers:IsReadyP() then
-      if HR.Cast(S.BilescourgeBombers, nil, nil, true) then return "bilescourge_bombers 217"; end
+      if HR.Cast(S.BilescourgeBombers, nil, nil, 40) then return "bilescourge_bombers 217"; end
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
     if S.GrimoireFelguard:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() < 13) then
-      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, true) then return "grimoire_felguard 219"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, 40) then return "grimoire_felguard 219"; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
     if S.SummonVilefiend:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 40 or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
@@ -394,7 +394,7 @@ local function APL()
     end
     -- call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
     if S.CallDreadstalkers:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() < 9 and bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or (S.SummonDemonicTyrant:CooldownRemainsP() < 11 and Player:BuffDownP(S.DemonicCallingBuff)) or S.SummonDemonicTyrant:CooldownRemainsP() > 14) then
-      if HR.Cast(S.CallDreadstalkers, nil, nil, true) then return "call_dreadstalkers 231"; end
+      if HR.Cast(S.CallDreadstalkers, nil, nil, 40) then return "call_dreadstalkers 231"; end
     end
     -- call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
     if (Player:SoulShardsP() == 1 and (S.CallDreadstalkers:CooldownRemainsP() < S.ShadowBolt:CastTime() or (S.BilescourgeBombers:IsAvailable() and S.BilescourgeBombers:CooldownRemainsP() < S.ShadowBolt:CastTime()))) then
@@ -402,19 +402,19 @@ local function APL()
     end
     -- hand_of_guldan,if=((cooldown.call_dreadstalkers.remains>action.demonbolt.cast_time)&(cooldown.call_dreadstalkers.remains>action.shadow_bolt.cast_time))&cooldown.nether_portal.remains>(165+action.hand_of_guldan.cast_time)
     if S.HandofGuldan:IsCastableP() and (Player:SoulShardsP() > 0 and ((S.CallDreadstalkers:CooldownRemainsP() > S.Demonbolt:CastTime()) and (S.CallDreadstalkers:CooldownRemainsP() > S.ShadowBolt:CastTime())) and S.NetherPortal:CooldownRemainsP() > (165 + S.HandofGuldan:CastTime())) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 259"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 259"; end
     end
     -- summon_demonic_tyrant,if=buff.nether_portal.remains<5&soul_shard=0
     if S.SummonDemonicTyrant:IsCastableP() and (Player:BuffRemainsP(S.NetherPortalBuff) < 5 and Player:SoulShardsP() == 0) then
-      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, true) then return "summon_demonic_tyrant 279"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, 40) then return "summon_demonic_tyrant 279"; end
     end
     -- summon_demonic_tyrant,if=buff.nether_portal.remains<action.summon_demonic_tyrant.cast_time+0.5
     if S.SummonDemonicTyrant:IsCastableP() and (Player:BuffRemainsP(S.NetherPortalBuff) < S.SummonDemonicTyrant:CastTime() + 0.5) then
-      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, true) then return "summon_demonic_tyrant 283"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, 40) then return "summon_demonic_tyrant 283"; end
     end
     -- demonbolt,if=buff.demonic_core.up&soul_shard<=3
     if S.Demonbolt:IsCastableP() and (Player:BuffP(S.DemonicCoreBuff) and Player:SoulShardsP() <= 3) then
-      if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 291"; end
+      if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 291"; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then
@@ -432,15 +432,15 @@ local function APL()
     end
     -- nether_portal,if=soul_shard>=5
     if S.NetherPortal:IsReadyP() and (Player:SoulShardsP() >= 5) then
-      if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, true) then return "nether_portal 297"; end
+      if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, 40) then return "nether_portal 297"; end
     end
     -- call_dreadstalkers,if=time>=30
     if S.CallDreadstalkers:IsReadyP() and (HL.CombatTime() >= 30) then
-      if HR.Cast(S.CallDreadstalkers, nil, nil, true) then return "call_dreadstalkers 303"; end
+      if HR.Cast(S.CallDreadstalkers, nil, nil, 40) then return "call_dreadstalkers 303"; end
     end
     -- hand_of_guldan,if=time>=30&cooldown.call_dreadstalkers.remains>18&soul_shard>=3
     if S.HandofGuldan:IsCastableP() and (HL.CombatTime() >= 30 and S.CallDreadstalkers:CooldownRemainsP() > 18 and Player:SoulShardsP() >= 3) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 305"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 305"; end
     end
     -- power_siphon,if=time>=30&buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&soul_shard>=3
     if S.PowerSiphon:IsCastableP() and (HL.CombatTime() >= 30 and WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 and Player:BuffDownP(S.DemonicPowerBuff) and Player:SoulShardsP() >= 3) then
@@ -448,7 +448,7 @@ local function APL()
     end
     -- hand_of_guldan,if=time>=30&soul_shard>=5
     if S.HandofGuldan:IsCastableP() and (HL.CombatTime() >= 30 and Player:SoulShardsP() >= 5) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 317"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 317"; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then
@@ -491,7 +491,7 @@ local function APL()
     end
     -- blood_of_the_enemy,if=pet.demonic_tyrant.active&pet.demonic_tyrant.remains<=15-gcd*3&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)
     if S.BloodoftheEnemy:IsCastableP() and (DemonicTyrantTime() > 0 and DemonicTyrantTime() <= 15 - Player:GCD() * 3 and (not Spell:MajorEssenceEnabled(AE.VisionofPerfection) or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5)) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- worldvein_resonance,if=(pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15)
     if S.WorldveinResonance:IsCastableP() and (DemonicTyrantTime() > 0 and (not Spell:MajorEssenceEnabled(AE.VisionofPerfection) or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
@@ -499,31 +499,31 @@ local function APL()
     end
     -- ripple_in_space,if=pet.demonic_tyrant.active&(!essence.vision_of_perfection.major|!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>=cooldown.summon_demonic_tyrant.duration-5)|target.time_to_die<=15
     if S.RippleInSpace:IsCastableP() and (DemonicTyrantTime() > 0 and (not Spell:MajorEssenceEnabled(AE.VisionofPerfection) or not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() >= S.SummonDemonicTyrant:BaseDuration() - 5) or Target:TimeToDie() <= 15) then
-      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle, true) then return "ripple_in_space 335"; end
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 335"; end
     end
     -- use_item,name=pocketsized_computation_device,if=cooldown.summon_demonic_tyrant.remains>=20&cooldown.summon_demonic_tyrant.remains<=cooldown.summon_demonic_tyrant.duration-15|target.time_to_die<=30
     if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() >= 20 and S.SummonDemonicTyrant:CooldownRemainsP() <= 75 or Target:TimeToDie() <= 30) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, true) then return "pocketsized_computation_device"; end
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device"; end
     end
     -- use_item,name=rotcrusted_voodoo_doll,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
     if I.RotcrustedVoodooDoll:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
-      if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle, true) then return "rotcrusted_voodoo_doll"; end
+      if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "rotcrusted_voodoo_doll"; end
     end
     -- use_item,name=shiver_venom_relic,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
     if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
-      if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle) then return "shiver_venom_relic"; end
+      if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "shiver_venom_relic"; end
     end
     -- use_item,name=aquipotent_nautilus,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
     if I.AquipotentNautilus:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
-      if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle, true) then return "aquipotent_nautilus"; end
+      if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "aquipotent_nautilus"; end
     end
     -- use_item,name=tidestorm_codex,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
     if I.TidestormCodex:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
-      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, true) then return "tidestorm_codex"; end
+      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex"; end
     end
     -- use_item,name=vial_of_storms,if=(cooldown.summon_demonic_tyrant.remains>=25|target.time_to_die<=30)
     if I.VialofStorms:IsEquipReady() and Settings.Commons.UseTrinkets and (S.SummonDemonicTyrant:CooldownRemainsP() >= 25 or Target:TimeToDie() <= 30) then
-      if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle, true) then return "vial_of_storms"; end
+      if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "vial_of_storms"; end
     end
     -- call_action_list,name=opener,if=!talent.nether_portal.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
     if (not S.NetherPortal:IsAvailable() and HL.CombatTime() < 30 and S.SummonDemonicTyrant:CooldownUpP()) then
@@ -535,27 +535,27 @@ local function APL()
     end
     -- hand_of_guldan,if=azerite.explosive_potential.rank&time<5&soul_shard>2&buff.explosive_potential.down&buff.wild_imps.stack<3&!prev_gcd.1.hand_of_guldan&&!prev_gcd.2.hand_of_guldan
     if S.HandofGuldan:IsCastableP() and (bool(S.ExplosivePotential:AzeriteRank()) and HL.CombatTime() < 5 and Player:SoulShardsP() > 2 and Player:BuffDownP(S.ExplosivePotentialBuff) and WildImpsCount() < 3 and not Player:PrevGCDP(1, S.HandofGuldan) and not Player:PrevGCDP(2, S.HandofGuldan)) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 341"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 341"; end
     end
     -- demonbolt,if=soul_shard<=3&buff.demonic_core.up&buff.demonic_core.stack=4
     if S.Demonbolt:IsCastableP() and (Player:SoulShardsP() <= 3 and Player:BuffP(S.DemonicCoreBuff) and Player:BuffStackP(S.DemonicCoreBuff) == 4) then
-      if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 353"; end
+      if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 353"; end
     end
     -- implosion,if=azerite.explosive_potential.rank&buff.wild_imps.stack>2&buff.explosive_potential.remains<action.shadow_bolt.execute_time&(!talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains>12)
     if S.Implosion:IsCastableP() and (bool(S.ExplosivePotential:AzeriteRank()) and WildImpsCount() > 2 and Player:BuffRemainsP(S.ExplosivePotentialBuff) < S.ShadowBolt:ExecuteTime() and (not S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() > 12)) then
-      if HR.Cast(S.Implosion, nil, nil, true) then return "implosion 359"; end
+      if HR.Cast(S.Implosion, nil, nil, 40) then return "implosion 359"; end
     end
     -- doom,if=!ticking&time_to_die>30&spell_targets.implosion<2&!buff.nether_portal.remains
     if S.Doom:IsCastableP() and (Target:DebuffDownP(S.DoomDebuff) and Target:TimeToDie() > 30 and EnemiesCount < 2 and Player:BuffDownP(S.NetherPortalBuff)) then
-      if HR.Cast(S.Doom, nil, nil, true) then return "doom 375"; end
+      if HR.Cast(S.Doom, nil, nil, 40) then return "doom 375"; end
     end
     -- bilescourge_bombers,if=azerite.explosive_potential.rank>0&time<10&spell_targets.implosion<2&buff.dreadstalkers.remains&talent.nether_portal.enabled
     if S.BilescourgeBombers:IsReadyP() and (S.ExplosivePotential:AzeriteRank() > 0 and HL.CombatTime() < 10 and EnemiesCount < 2 and DreadStalkersTime() > 0 and S.NetherPortal:IsAvailable()) then
-      if HR.Cast(S.BilescourgeBombers, nil, nil, true) then return "bilescourge_bombers 389"; end
+      if HR.Cast(S.BilescourgeBombers, nil, nil, 40) then return "bilescourge_bombers 389"; end
     end
     -- demonic_strength,if=(buff.wild_imps.stack<6|buff.demonic_power.up)|spell_targets.implosion<2
     if S.DemonicStrength:IsReadyP() and ((WildImpsCount() < 6 or Player:BuffP(S.DemonicPowerBuff)) or EnemiesCount < 2) then
-      if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength, nil, true) then return "demonic_strength 397"; end
+      if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 397"; end
     end
     -- call_action_list,name=nether_portal,if=talent.nether_portal.enabled&spell_targets.implosion<=2
     if (S.NetherPortal:IsAvailable() and EnemiesCount <= 2) then
@@ -567,11 +567,11 @@ local function APL()
     end
     -- guardian_of_azeroth,if=cooldown.summon_demonic_tyrant.remains<=15|target.time_to_die<=30
     if S.GuardianofAzeroth:IsCastableP() and (S.SummonDemonicTyrant:CooldownRemainsP() <= 15 or Target:TimeToDie() <= 30) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle, true) then return "guardian_of_azeroth 408"; end
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 408"; end
     end
     -- grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
     if S.GrimoireFelguard:IsReadyP() and ((Target:TimeToDie() > 120 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemainsP() + 15 or S.SummonDemonicTyrant:CooldownRemainsP() < 13)) then
-      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, true) then return "grimoire_felguard 409"; end
+      if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, 40) then return "grimoire_felguard 409"; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
     if S.SummonVilefiend:IsReadyP() and (S.SummonDemonicTyrant:CooldownRemainsP() > 40 or S.SummonDemonicTyrant:CooldownRemainsP() < 12) then
@@ -579,59 +579,59 @@ local function APL()
     end
     -- call_dreadstalkers,if=(cooldown.summon_demonic_tyrant.remains<9&buff.demonic_calling.remains)|(cooldown.summon_demonic_tyrant.remains<11&!buff.demonic_calling.remains)|cooldown.summon_demonic_tyrant.remains>14
     if S.CallDreadstalkers:IsReadyP() and ((S.SummonDemonicTyrant:CooldownRemainsP() < 9 and bool(Player:BuffRemainsP(S.DemonicCallingBuff))) or (S.SummonDemonicTyrant:CooldownRemainsP() < 11 and Player:BuffDownP(S.DemonicCallingBuff)) or S.SummonDemonicTyrant:CooldownRemainsP() > 14) then
-      if HR.Cast(S.CallDreadstalkers, nil, nil, true) then return "call_dreadstalkers 421"; end
+      if HR.Cast(S.CallDreadstalkers, nil, nil, 40) then return "call_dreadstalkers 421"; end
     end
     -- the_unbound_force,if=buff.reckless_force.react
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, true) then return "the_unbound_force 422"; end
+      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 422"; end
     end
     -- bilescourge_bombers
     if S.BilescourgeBombers:IsReadyP() then
-      if HR.Cast(S.BilescourgeBombers, nil, nil, true) then return "bilescourge_bombers 433"; end
+      if HR.Cast(S.BilescourgeBombers, nil, nil, 40) then return "bilescourge_bombers 433"; end
     end
     -- hand_of_guldan,if=(azerite.baleful_invocation.enabled|talent.demonic_consumption.enabled)&prev_gcd.1.hand_of_guldan&cooldown.summon_demonic_tyrant.remains<2
     if S.HandofGuldan:IsCastableP() and ((S.BalefulInvocation:AzeriteEnabled() or S.DemonicConsumption:IsAvailable()) and Player:PrevGCDP(1, S.HandofGuldan) and S.SummonDemonicTyrant:CooldownRemainsP() < 2 and Player:SoulShardsP() > 0) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 435"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 435"; end
     end
     -- summon_demonic_tyrant,if=soul_shard<3&(!talent.demonic_consumption.enabled|buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6&time_to_imps.all.remains<cast_time)|target.time_to_die<20
     if S.SummonDemonicTyrant:IsCastableP() and (Player:SoulShardsP() < 3 and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() + ImpsSpawnedDuring(2000) >= 6) or Target:TimeToDie() < 20) then
-      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, true) then return "summon_demonic_tyrant 445"; end
+      if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, 40) then return "summon_demonic_tyrant 445"; end
     end
     -- power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
     if S.PowerSiphon:IsCastableP() and (WildImpsCount() >= 2 and Player:BuffStackP(S.DemonicCoreBuff) <= 2 and Player:BuffDownP(S.DemonicPowerBuff) and EnemiesCount < 2) then
-      if HR.Cast(S.PowerSiphon, nil, nil, true) then return "power_siphon 455"; end
+      if HR.Cast(S.PowerSiphon) then return "power_siphon 455"; end
     end
     -- doom,if=talent.doom.enabled&refreshable&time_to_die>(dot.doom.remains+30)
     if S.Doom:IsCastableP() and (S.Doom:IsAvailable() and Target:DebuffRefreshableCP(S.DoomDebuff) and Target:TimeToDie() > (Target:DebuffRemainsP(S.DoomDebuff) + 30)) then
-      if HR.Cast(S.Doom, nil, nil, true) then return "doom 463"; end
+      if HR.Cast(S.Doom, nil, nil, 40) then return "doom 463"; end
     end
     -- hand_of_guldan,if=soul_shard>=5|(soul_shard>=3&cooldown.call_dreadstalkers.remains>4&(cooldown.summon_demonic_tyrant.remains>20|(cooldown.summon_demonic_tyrant.remains<gcd*2&talent.demonic_consumption.enabled|cooldown.summon_demonic_tyrant.remains<gcd*4&!talent.demonic_consumption.enabled))&(!talent.summon_vilefiend.enabled|cooldown.summon_vilefiend.remains>3))
     if S.HandofGuldan:IsCastableP() and (Player:SoulShardsP() >= 5 or (Player:SoulShardsP() >= 3 and S.CallDreadstalkers:CooldownRemainsP() > 4 and (S.SummonDemonicTyrant:CooldownRemainsP() > 20 or (S.SummonDemonicTyrant:CooldownRemainsP() < Player:GCD() * 2 and S.DemonicConsumption:IsAvailable() or S.SummonDemonicTyrant:CooldownRemainsP() < Player:GCD() * 4 and not S.DemonicConsumption:IsAvailable())) and (not S.SummonVilefiend:IsAvailable() or S.SummonVilefiend:CooldownRemainsP() > 3))) then
-      if HR.Cast(S.HandofGuldan, nil, nil, true) then return "hand_of_guldan 481"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 481"; end
     end
     -- soul_strike,if=soul_shard<5&buff.demonic_core.stack<=2
     if S.SoulStrike:IsCastableP() and (Player:SoulShardsP() < 5 and Player:BuffStackP(S.DemonicCoreBuff) <= 2) then
-      if HR.Cast(S.SoulStrike, nil, nil, true) then return "soul_strike 499"; end
+      if HR.Cast(S.SoulStrike, nil, nil, 50) then return "soul_strike 499"; end
     end
     -- demonbolt,if=soul_shard<=3&buff.demonic_core.up&((cooldown.summon_demonic_tyrant.remains<6|cooldown.summon_demonic_tyrant.remains>22&!azerite.shadows_bite.enabled)|buff.demonic_core.stack>=3|buff.demonic_core.remains<5|time_to_die<25|buff.shadows_bite.remains)
     if S.Demonbolt:IsCastableP() and (Player:SoulShardsP() <= 3 and Player:BuffP(S.DemonicCoreBuff) and ((S.SummonDemonicTyrant:CooldownRemainsP() < 6 or S.SummonDemonicTyrant:CooldownRemainsP() > 22 and not S.ShadowsBite:AzeriteEnabled()) or Player:BuffStackP(S.DemonicCoreBuff) >= 3 or Player:BuffRemainsP(S.DemonicCoreBuff) < 5 or Target:TimeToDie() < 25 or bool(Player:BuffRemainsP(S.ShadowsBiteBuff)))) then
-      if HR.Cast(S.Demonbolt, nil, nil, true) then return "demonbolt 503"; end
+      if HR.Cast(S.Demonbolt, nil, nil, 40) then return "demonbolt 503"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, true) then return "purifying_blast 504"; end
+      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 504"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy 505"; end
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 505"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&!pet.demonic_tyrant.active
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and DemonicTyrantTime() == 0) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, true) then return "concentrated_flame 506"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 506"; end
     end
     -- reaping_flames,if=!pet.demonic_tyrant.active
     if S.ReapingFlames:IsCastableP() and (DemonicTyrantTime() == 0) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, true) then return "reaping_flames 508"; end
+      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames 508"; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then

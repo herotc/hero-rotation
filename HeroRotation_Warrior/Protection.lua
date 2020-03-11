@@ -216,7 +216,7 @@ local function APL()
     end
     -- anima_of_death,if=buff.last_stand.up
     if S.AnimaofDeath:IsCastableP() and (Player:BuffP(S.LastStandBuff)) then
-      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle) then return "anima_of_death 9"; end
+      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 9"; end
     end
     -- dragon_roar
     if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
@@ -266,7 +266,7 @@ local function APL()
     end
     -- anima_of_death,if=buff.last_stand.up
     if S.AnimaofDeath:IsCastableP() and (Player:BuffP(S.LastStandBuff)) then
-      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle) then return "anima_of_death 61"; end
+      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 61"; end
     end
     -- shield_slam
     if S.ShieldSlam:IsCastableP("Melee") then
@@ -274,11 +274,11 @@ local function APL()
     end
     -- use_item,name=ashvanes_razor_coral,target_if=debuff.razor_coral_debuff.stack=0
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffStackP(S.RazorCoralDebuff) == 0) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 71"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 71"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>7&(cooldown.avatar.remains<5|buff.avatar.up)
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffStackP(S.RazorCoralDebuff) > 7 and (S.Avatar:CooldownRemainsP() < 5 or Player:BuffP(S.AvatarBuff))) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "ashvanes_razor_coral 72"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 72"; end
     end
     -- dragon_roar
     if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
@@ -339,11 +339,11 @@ local function APL()
       end
       -- arcane_torrent
       if S.ArcaneTorrent:IsCastableP() then
-        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent 95"; end
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 95"; end
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastableP() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 97"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 97"; end
       end
       -- fireblood
       if S.Fireblood:IsCastableP() then
@@ -355,7 +355,7 @@ local function APL()
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastableP() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 102"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 102"; end
       end
     end
     -- potion,if=buff.avatar.up|target.time_to_die<25
@@ -386,7 +386,7 @@ local function APL()
     end
     -- concentrated_flame,if=buff.avatar.down&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or Spell:EssenceRank(AE.TheCrucibleofFlame) < 3) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame 111"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 111"; end
     end
     -- last_stand,if=cooldown.anima_of_death.remains<=2
     if S.LastStand:IsCastableP() and (Spell:MajorEssenceEnabled(AE.AnimaofLifeandDeath) and S.AnimaofDeath:CooldownRemainsP() <= 2) then
