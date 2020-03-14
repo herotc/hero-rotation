@@ -174,6 +174,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local PoolingAbility, PoolingEnergy; -- Used to store an ability we might want to pool for as a fallback in the current situation
 local Stealth, VanishBuff;
 -- GUI Settings
 local Settings = {
@@ -185,6 +186,13 @@ local Settings = {
 -- Melee Is In Range Handler
 local function IsInMeleeRange ()
   return Target:IsInRange("Melee") and true or false;
+end
+
+local function SetPoolingAbility(PoolingSpell, EnergyThreshold)
+  if not PoolingAbility then
+    PoolingAbility = PoolingSpell
+    PoolingEnergy = EnergyThreshold or 0
+  end
 end
 
 local function MayBurnShadowDance()
@@ -299,12 +307,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     if ReturnSpellOnly then
       return S.Eviscerate;
     else
-      -- Since Eviscerate costs more than Nightblade, show pooling icon in case conditions change while gaining Energy
-      if Player:EnergyPredicted() < S.Eviscerate:Cost() then
-        if HR.Cast(S.PoolEnergy) then return "Pool for Finisher"; end
-      else
-        if HR.Cast(S.Eviscerate) then return "Cast Eviscerate"; end
-      end
+      if HR.CastPooling(S.Eviscerate) then return "Cast Eviscerate"; end
     end
   end
   return false;
@@ -386,7 +389,13 @@ end
 
 -- # Stealth Macros
 -- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
-local function StealthMacro (StealthSpell)
+local function StealthMacro (StealthSpell, EnergyThreshold)
+  -- Set the stealth spell only as a pooling fallback if we did not meet the threshold
+  if EnergyThreshold and Player:EnergyPredicted() < EnergyThreshold then
+    SetPoolingAbility(StealthSpell, EnergyThreshold)
+    return false
+  end
+
   local MacroTable = {StealthSpell};
 
   -- Handle StealthMacro GUI options
@@ -481,7 +490,7 @@ local function CDs ()
       if Player:Energy() >= 60 then
         if HR.Cast(S.ShurikenTornado) then return "Cast Shuriken Tornado"; end
       elseif not S.ShadowFocus:IsAvailable() then
-        if HR.Cast(S.PoolEnergy) then return "Pool for Shuriken Tornado"; end
+        if HR.CastPooling(S.ShurikenTornado) then return "Pool for Shuriken Tornado"; end
       end
     end
     -- actions.cds+=/symbols_of_death,if=dot.nightblade.ticking&!cooldown.shadow_blades.up&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
@@ -593,12 +602,12 @@ local function CDs ()
 end
 
 -- # Stealth Cooldowns
-local function Stealth_CDs ()
+local function Stealth_CDs (EnergyThreshold)
   if IsInMeleeRange() then
     -- actions.stealth_cds+=/vanish,if=!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1&cooldown.symbols_of_death.remains>=3
     if HR.CDsON() and S.Vanish:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
       and not ShD_Threshold() and Player:ComboPointsDeficit() > 1 and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 and S.SymbolsofDeath:CooldownRemainsP() >= 3 then
-      if StealthMacro(S.Vanish) then return "Vanish Macro"; end
+      if StealthMacro(S.Vanish, EnergyThreshold) then return "Vanish Macro"; end
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
     if HR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
@@ -606,9 +615,9 @@ local function Stealth_CDs ()
       and not ShD_Threshold() and Player:ComboPointsDeficit() > 1 and Target:DebuffRemainsP(S.FindWeaknessDebuff) < 1 then
       -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
       if Player:Energy() < 40 then
-        if HR.Cast(S.PoolEnergy) then return "Pool for Shadowmeld"; end
+        if HR.CastPooling(S.Shadowmeld, Player:EnergyTimeToX(40)) then return "Pool for Shadowmeld"; end
       end
-      if StealthMacro(S.Shadowmeld) then return "Shadowmeld Macro"; end
+      if StealthMacro(S.Shadowmeld, EnergyThreshold) then return "Shadowmeld Macro"; end
     end
     -- # actions.stealth_cds+=/variable,name=shd_combo_points,value=combo_points.deficit>=4-(talent.deeper_stratagem.enabled&(azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
     local ShdComboPoints = Player:ComboPointsDeficit() >= 4 - num(S.DeeperStratagem:IsAvailable() and (S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3));
@@ -624,32 +633,36 @@ local function Stealth_CDs ()
       and (not S.DarkShadow:IsAvailable() or Target:DebuffRemainsP(S.Nightblade) >= 5 + num(S.Subterfuge:IsAvailable()))
       and (ShD_Threshold() or Player:BuffRemainsP(S.SymbolsofDeath) >= 1.2 or (Cache.EnemiesCount[10] >= 4 and S.SymbolsofDeath:CooldownRemainsP() > 10))
       and (S.NightsVengeancePower:AzeriteRank() < 2 or Player:BuffP(S.NightsVengeanceBuff)) then
-      if StealthMacro(S.ShadowDance) then return "ShadowDance Macro 1"; end
+      if StealthMacro(S.ShadowDance, EnergyThreshold) then return "ShadowDance Macro 1"; end
     end
     -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&target.time_to_die<cooldown.symbols_of_death.remains&!raid_event.adds.up
     if (HR.CDsON() or (S.ShadowDance:ChargesFractional() >= Settings.Subtlety.ShDEcoCharge - (S.DarkShadow:IsAvailable() and 0.75 or 0)))
       and S.ShadowDance:IsCastable() and MayBurnShadowDance() and S.Vanish:TimeSinceLastDisplay() > 0.3
       and S.ShadowDance:TimeSinceLastDisplay() ~= 0 and S.Shadowmeld:TimeSinceLastDisplay() > 0.3 and S.ShadowDance:Charges() >= 1
       and ShdComboPoints and Target:TimeToDie() < S.SymbolsofDeath:CooldownRemainsP() then
-      if StealthMacro(S.ShadowDance) then return "ShadowDance Macro 2"; end
+      if StealthMacro(S.ShadowDance, EnergyThreshold) then return "ShadowDance Macro 2"; end
     end
   end
   return false;
 end
 
 -- # Builders
-local function Build ()
+local function Build (EnergyThreshold)
+  local ThresholdMet = not EnergyThreshold or Player:EnergyPredicted() >= EnergyThreshold
   -- actions.build=shuriken_storm,if=spell_targets>=2+(talent.gloomblade.enabled&azerite.perforate.rank>=2)|buff.the_dreadlords_deceit.stack>=29
   if HR.AoEON() and S.ShurikenStorm:IsCastableP() and (Cache.EnemiesCount[10] >= 2 + num(S.Gloomblade:IsAvailable() and S.Perforate:AzeriteRank() >= 2) or Player:BuffStackP(S.TheDreadlordsDeceit) >= 29) then
-    if HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
+    if ThresholdMet and HR.Cast(S.ShurikenStorm) then return "Cast Shuriken Storm"; end
+    SetPoolingAbility(S.ShurikenStorm, EnergyThreshold)
   end
   if IsInMeleeRange() then
     -- actions.build+=/gloomblade
     if S.Gloomblade:IsCastable() then
-      if HR.Cast(S.Gloomblade) then return "Cast Gloomblade"; end
+      if ThresholdMet and HR.Cast(S.Gloomblade) then return "Cast Gloomblade"; end
+      SetPoolingAbility(S.Gloomblade, EnergyThreshold)
     -- actions.build+=/backstab
     elseif S.Backstab:IsCastable() then
-      if HR.Cast(S.Backstab) then return "Cast Backstab"; end
+      if ThresholdMet and HR.Cast(S.Backstab) then return "Cast Backstab"; end
+      SetPoolingAbility(S.Backstab, EnergyThreshold)
     end
   end
   return false;
@@ -702,6 +715,9 @@ local function APL ()
     Stealth = S.Stealth;
     VanishBuff = S.VanishBuff;
   end
+  -- Reset pooling cache
+  PoolingAbility = nil
+  PoolingEnergy = 0
   -- Unit Update
   HL.GetEnemies(10, true); -- Shuriken Storm & Death from Above
   HL.GetEnemies("Melee"); -- Melee
@@ -738,12 +754,9 @@ local function APL ()
           end
         end
         if Player:IsStealthedP(true, true) then
-          ShouldReturn = Stealthed();
-          if ShouldReturn then return ShouldReturn .. " (OOC)"; end
-          if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
-            if HR.Cast(S.PoolEnergy) then return "Stealthed Pooling (OOC)"; end
-          else
-            return "Stealthed Pooling (OOC)";
+          PoolingAbility = Stealthed(true);
+          if PoolingAbility then -- To avoid pooling icon spam
+            if HR.CastPooling(PoolingAbility) then return "Stealthed Cast or Pool (OOC): "..PoolingAbility:Name(); end
           end
         elseif Player:ComboPoints() >= 5 then
           ShouldReturn = Finish();
@@ -784,11 +797,9 @@ local function APL ()
       -- # Run fully switches to the Stealthed Rotation (by doing so, it forces pooling if nothing is available).
       -- actions+=/run_action_list,name=stealthed,if=stealthed.all
       if Player:IsStealthedP(true, true) then
-        ShouldReturn = Stealthed();
-        if ShouldReturn then return "Stealthed: " .. ShouldReturn; end
-        -- run_action_list forces the return
-        if Player:EnergyPredicted() < 30 then -- To avoid pooling icon spam
-          if HR.Cast(S.PoolEnergy) then return "Stealthed Pooling"; end
+        PoolingAbility = Stealthed(true);
+        if PoolingAbility then -- To avoid pooling icon spam
+          if HR.CastPooling(PoolingAbility) then return "Cast "..PoolingAbility:Name(); end
         else
           return "Stealthed Pooling";
         end
@@ -809,12 +820,10 @@ local function APL ()
         if ShouldReturn then return "Stealth CDs: (Priority Rotation)" .. ShouldReturn; end
       end
 
-      -- # Consider using a Stealth CD when reaching the energy threshold
+      -- # Consider using a Stealth CD when reaching the energy threshold, called with params to register potential pooling
       -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
-      if Player:EnergyDeficit() <= Stealth_Threshold() then
-        local ShouldReturn = Stealth_CDs();
-        if ShouldReturn then return "Stealth CDs: " .. ShouldReturn; end
-      end
+      local ShouldReturn = Stealth_CDs(Player:EnergyMax() - Stealth_Threshold());
+      if ShouldReturn then return "Stealth CDs: " .. ShouldReturn; end
 
       -- if=azerite.nights_vengeance.enabled&!buff.nights_vengeance.up&combo_points.deficit>1&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(azerite.nights_vengeance.rank>=2&buff.symbols_of_death.remains>3&!stealthed.all&cooldown.shadow_dance.charges_fractional>=0.9))
       if S.Nightblade:IsCastableP() and IsInMeleeRange()
@@ -840,10 +849,8 @@ local function APL ()
 
       -- # Use a builder when reaching the energy threshold
       -- actions+=/call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold
-      if Player:EnergyDeficitPredicted() <= Stealth_Threshold() then
-        ShouldReturn = Build();
-        if ShouldReturn then return "Build: " .. ShouldReturn; end
-      end
+      ShouldReturn = Build(Player:EnergyMax() - Stealth_Threshold());
+      if ShouldReturn then return "Build: " .. ShouldReturn; end
 
       -- # Lowest priority in all of the APL because it causes a GCD
       -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
@@ -868,9 +875,9 @@ local function APL ()
         and Player:EnergyDeficitPredicted() < 20 and (Player:ComboPointsDeficit() >= 1 or Player:EnergyTimeToMax() <= 1.2) then
         if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end
-      -- Trick to take in consideration the Recovery Setting
-      if S.Shadowstrike:IsCastable() and IsInMeleeRange() then
-        if HR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
+      -- Show what ever was first stored for pooling
+      if PoolingAbility and PoolingAbility:IsCastable() and IsInMeleeRange() then
+        if HR.CastPooling(PoolingAbility, Player:EnergyTimeToX(PoolingEnergy)) then return "Pool towards: " .. PoolingAbility:Name() .. " at " .. PoolingEnergy; end
       end
     end
 end
