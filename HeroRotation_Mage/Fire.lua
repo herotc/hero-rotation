@@ -136,6 +136,9 @@ local Settings = {
 
 -- Variables
 local VarHoldCombustionThreshold = 0;
+local VarHotStreakFlamestrike = 0;
+local VarHardCastFlamestrike = 0;
+local VarDelayFlamestrike = 0;
 local VarCombustionRopCutoff = 0;
 local VarFireBlastPooling = 0;
 local VarPhoenixPooling = 0;
@@ -145,7 +148,10 @@ local VarTimeToCombusion = 0;
 local VarOnUseCutoff = 0;
 
 HL:RegisterForEvent(function()
-  VarHoldCombustionThreshold = 0;
+  VarHoldCombustionThreshold = 0
+  VarHotStreakFlamestrike = 0
+  VarHardCastFlamestrike = 0
+  VarDelayFlamestrike = 0
   VarCombustionRopCutoff = 0
   VarFireBlastPooling = 0
   VarPhoenixPooling = 0
@@ -244,6 +250,18 @@ local function APL()
       -- variable,name=hold_combustion_threshold,op=reset,default=20
       if (true) then
         VarHoldCombustionThreshold = 20
+      end
+      -- variable,name=hot_streak_flamestrike,op=set,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch.enabled+99*!talent.flame_patch.enabled
+      if (VarHotStreakFlamestrike == 0) then
+        VarHotStreakFlamestrike = 2 * num(S.FlamePatch:IsAvailable()) + 99 * num(not S.FlamePatch:IsAvailable())
+      end
+      -- variable,name=hard_cast_flamestrike,op=set,if=variable.hard_cast_flamestrike=0,value=3*talent.flame_patch.enabled+99*!talent.flame_patch.enabled
+      if (VarHardCastFlamestrike == 0) then
+        VarHardCastFlamestrike = 3 * num(S.FlamePatch:IsAvailable()) + 99 * num(not S.FlamePatch:IsAvailable())
+      end
+      -- variable,name=delay_flamestrike,default=25,op=reset
+      if (true) then
+        VarDelayFlamestrike = 25
       end
       -- snapshot_stats
       -- use_item,name=azsharas_font_of_power,if=!variable.disable_combustion
@@ -536,16 +554,16 @@ local function APL()
     if S.RuneofPower:IsCastableP() then
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 430"; end
     end
-    -- flamestrike,if=(talent.flame_patch.enabled&active_enemies>1|active_enemies>4)&buff.hot_streak.react
-    if S.Flamestrike:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 1 or EnemiesCount > 4) and Player:BuffP(S.HotStreakBuff)) then
+    -- flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
+    if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and Player:BuffP(S.HotStreakBuff)) then
       if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 432"; end
     end
     -- pyroblast,if=buff.hot_streak.react
     if S.Pyroblast:IsCastableP() and (Player:BuffP(S.HotStreakBuff)) then
       if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 450"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&(variable.time_to_combustion>0|variable.disable_combustion))&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
-    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) and (Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not Player:PrevOffGCDP(1, S.FireBlast) and (S.FireBlast:ChargesP() >= 2 or (S.PhoenixFlames:ChargesP() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30)))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&(!firestarter.active&(variable.time_to_combustion>0|variable.disable_combustion))&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
+    if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and (not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) and (Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff) and not Player:PrevOffGCDP(1, S.FireBlast) and (S.FireBlast:ChargesP() >= 2 or (S.PhoenixFlames:ChargesP() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30)))) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 454"; end
     end
     -- call_action_list,name=active_talents
@@ -556,16 +574,16 @@ local function APL()
     if S.Pyroblast:IsCastableP() and (Player:BuffP(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemainsP(S.PyroclasmBuff) and Player:BuffRemainsP(S.RuneofPowerBuff) > S.Pyroblast:CastTime()) then
       if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 486"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&(variable.time_to_combustion>0|variable.disable_combustion))&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
-    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) and (Player:BuffP(S.HeatingUpBuff) and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&(!firestarter.active&(variable.time_to_combustion>0|variable.disable_combustion))&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
+    if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and (not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) and (Player:BuffP(S.HeatingUpBuff) and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 502"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&(!firestarter.active&(variable.time_to_combustion>0|variable.disable_combustion))&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
-    if S.FireBlast:IsCastableP() and (not (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and (not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&(!firestarter.active&(variable.time_to_combustion>0|variable.disable_combustion))&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+    if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and (not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 512"; end
     end
-    -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&(!talent.flame_patch.enabled|active_enemies=1)
-    if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (not S.FlamePatch:IsAvailable() or EnemiesCount == 1)) then
+    -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+    if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
       if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 530"; end
     end
     -- phoenix_flames,if=!prev_gcd.1.phoenix_flames&buff.heating_up.react
@@ -580,12 +598,12 @@ local function APL()
     if S.DragonsBreath:IsCastableP() and (EnemiesCount > 2) then
       if HR.Cast(S.DragonsBreath, nil, nil, 12) then return "dragons_breath 556"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>5)&((variable.time_to_combustion>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
-    if S.FireBlast:IsCastableP() and ((S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) and ((VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&((variable.time_to_combustion>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
+    if S.FireBlast:IsCastableP() and ((EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and ((VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 562"; end
     end
-    -- flamestrike,if=talent.flame_patch.enabled&active_enemies>2|active_enemies>5
-    if S.Flamestrike:IsCastableP() and (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 5) then
+    -- flamestrike,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+    if S.Flamestrike:IsCastableP() and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 564"; end
     end
     -- fireball
@@ -594,8 +612,8 @@ local function APL()
     end
   end
   StandardRotation = function()
-    -- flamestrike,if=((talent.flame_patch.enabled&active_enemies>1&!firestarter.active)|active_enemies>4)&buff.hot_streak.react
-    if S.Flamestrike:IsCastableP() and (((S.FlamePatch:IsAvailable() and EnemiesCount > 1 and not bool(S.Firestarter:ActiveStatus())) or EnemiesCount > 4) and Player:BuffP(S.HotStreakBuff)) then
+    -- flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
+    if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and Player:BuffP(S.HotStreakBuff)) then
       if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 582"; end
     end
     -- pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
@@ -626,8 +644,8 @@ local function APL()
     if S.FireBlast:IsCastableP() and (S.Kindling:IsAvailable() and Player:BuffP(S.HeatingUpBuff) and not bool(S.Firestarter:ActiveStatus()) and (VarTimeToCombusion > S.FireBlast:FullRechargeTimeP() + 2 + num(S.Kindling:IsAvailable()) or Settings.Fire.DisableCombustion or (not S.RuneofPower:IsAvailable() or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:ChargesP() < 1) and VarTimeToCombusion > Target:TimeToDie())) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 696"; end
     end
-    -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&((talent.flame_patch.enabled&active_enemies=1&!firestarter.active)|(active_enemies<4&!talent.flame_patch.enabled))
-    if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and ((S.FlamePatch:IsAvailable() and EnemiesCount == 1 and not bool(S.Firestarter:ActiveStatus())) or (EnemiesCount < 4 and not S.FlamePatch:IsAvailable()))) then
+    -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+    if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and not (EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
       if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 726"; end
     end
     -- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling
@@ -650,12 +668,12 @@ local function APL()
     if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
       if HR.Cast(S.Scorch, nil, nil, 40) then return "scorch 780"; end
     end
-    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(talent.flame_patch.enabled&active_enemies>2|active_enemies>9)&((variable.time_to_combustion>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
-    if S.FireBlast:IsCastableP() and (not bool(VarFireBlastPooling) and (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 9) and ((VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
+    -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&((variable.time_to_combustion>0|variable.disable_combustion)&!firestarter.active)&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
+    if S.FireBlast:IsCastableP() and (not bool(VarFireBlastPooling) and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and ((VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion) and not bool(S.Firestarter:ActiveStatus())) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 781"; end
     end
-    -- flamestrike,if=talent.flame_patch.enabled&active_enemies>2|active_enemies>9
-    if S.Flamestrike:IsCastableP() and (S.FlamePatch:IsAvailable() and EnemiesCount > 2 or EnemiesCount > 9) then
+    -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion)
+    if S.Flamestrike:IsCastableP() and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 783"; end
     end
     -- fireball
