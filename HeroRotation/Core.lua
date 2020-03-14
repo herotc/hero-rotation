@@ -76,7 +76,7 @@
 --- ======= CASTS =======
   local GCDSpell = Spell(61304);
   local CooldownSpell, CooldownSpellDisplayTime, CooldownSpellCastDuration;
-  local function DisplayCooldown (Object, DisplayCostDeficit)
+  local function DisplayCooldown (Object, DisplayPoolingSwirl, CustomTime)
     local StartTime, CastDuration
 
     -- Default GCD and Casting Swirls
@@ -95,8 +95,13 @@
   end
 
     -- Resource Pooling Display Swirls
-    if DisplayCostDeficit then
-      local TimeToResource = Player.TimeToXResourceMap[Object:CostInfo(1, "type")](Object:Cost())
+    if DisplayPoolingSwirl then
+      local TimeToResource
+      if CustomTime then
+        TimeToResource = CustomTime
+      else
+        TimeToResource = Player.TimeToXResourceMap[Object:CostInfo(1, "type")](Object:Cost())
+      end
       if TimeToResource and TimeToResource > 0 then
         local CurrentTime = HL.GetTime()
         -- Only display the resource-based swirl if the duration is greater than the GCD/Cast swirl
@@ -117,7 +122,7 @@
   end
   -- Main Cast
   HR.CastOffGCDOffset = 1;
-  function HR.Cast (Object, OffGCD, DisplayStyle, RangeCheck)
+  function HR.Cast (Object, OffGCD, DisplayStyle, RangeCheck, CustomTime)
     local ObjectTexture = HR.GetTexture(Object);
     local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(ObjectTexture);
     if OffGCD or DisplayStyle == "Cooldown" then
@@ -152,7 +157,7 @@
         end
       end
       HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, OutofRange);
-      DisplayCooldown(Object, ShowPooling);
+      DisplayCooldown(Object, ShowPooling, CustomTime);
       Object.LastDisplayTime = HL.GetTime();
       return true;
     end
@@ -168,8 +173,8 @@
     return Result;
   end
   -- Overload for Main Cast (with resource pooling swirl)
-  function HR.CastPooling(Object, RangeCheck)
-    return HR.Cast(Object, false, "Pooling", RangeCheck)
+  function HR.CastPooling(Object, CustomTime, RangeCheck)
+    return HR.Cast(Object, false, "Pooling", RangeCheck, CustomTime)
   end
   -- Main Cast Queue
   local QueueSpellTable, QueueLength, QueueTextureTable;
