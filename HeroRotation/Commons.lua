@@ -17,7 +17,7 @@
   local Commons = {};
   HR.Commons.Everyone = Commons;
   local Settings = HR.GUISettings.General;
-
+  local AbilitySettings = HR.GUISettings.Abilities;
 
 --- ============================ CONTENT ============================
   -- Is the current target valid ?
@@ -67,15 +67,15 @@
       end
     end
   end
-  
+
   function Commons.PSCDEquipped ()
     return (HL.Equipment[13] == 167555 or HL.Equipment[14] == 167555)
   end
-  
+
   function Commons.PSCDEquipReady ()
     return (Commons.PSCDEquipped() and HL.Item(167555):IsReady())
   end
-  
+
   function Commons.CyclotronicBlastReady ()
     local PSCDString = ""
     if HL.Equipment[13] == 167555 then
@@ -86,4 +86,74 @@
       return false
     end
     return (Commons.PSCDEquipReady() and string.match(PSCDString, "167672"))
+  end
+
+  do
+    local S = {
+      ReapingFlames     = Spell(310690),
+      ReapingFlamesBuff = Spell(311202)
+    }
+
+    S.ReapingFlames:RegisterDamage(
+      function ()
+        -- Damage formula is based on ilevel scaling of the neck
+        -- 134.6154 coefficient * PLAYER_SPECIAL_SCALE8 damage_replace_stat * Versatility
+        local Damage = 134.6154 * Spell:EssenceScaling() * (1 + Player:VersatilityDmgPct() / 100)
+        if Player:BuffP(S.ReapingFlamesBuff) then
+          Damage = Damage * 2
+        end
+        return Damage
+      end
+    )
+
+    function Commons.ReapingFlamesCast (EssenceDisplayStyle)
+      if not S.ReapingFlames:IsCastableP() then
+        return nil
+      end
+
+      -- Reaping Flames Death Sniping
+      local BestUnit = nil
+      if AbilitySettings.ReapingFlamesSniping then
+        local BestUnitTTD, BestUnitHealth = 0, 0
+        local DamageThreshold = S.ReapingFlames:Damage()
+
+        HL.GetEnemies(AbilitySettings.ReapingFlamesSnipingRange)
+        for _, CycleUnit in pairs(Cache.Enemies[AbilitySettings.ReapingFlamesSnipingRange]) do
+          if CycleUnit:AffectingCombat() then
+            -- Prioritize HP-based sniping over duration sniping to maximize damage
+            local CycleHealth = CycleUnit:Health()
+            if CycleHealth < DamageThreshold then
+              if CycleHealth > BestUnitHealth then
+                BestUnit = CycleUnit
+                BestUnitTTD = 9999
+                BestUnitHealth = CycleHealth
+              end
+            else
+              -- If a target isn't in one-shot range, check if it's within the timer threshold
+              -- Select the longest-living target that is below 3 seconds
+              local CycleTTD = HL.OffsetRemains(CycleUnit:TimeToDie(), "Auto")
+              if CycleTTD < 2.5 and CycleTTD > BestUnitTTD then
+                BestUnit = CycleUnit
+                BestUnitTTD = CycleTTD
+                BestUnitHealth = CycleHealth
+              end
+            end
+          end
+        end
+
+        if BestUnit then
+          if BestUnit:GUID() == Target:GUID() then
+            if HR.Cast(S.ReapingFlames, nil, EssenceDisplayStyle) then return "Cast Reaping Flames Execute"; end
+          else
+            HR.CastLeftNameplate(BestUnit, S.ReapingFlames);
+          end
+        end
+      end
+
+      -- Primary Reaping Flames Logic
+      -- Don't use 45 second cooldowns if there is any potential sniping target from above
+      if (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or (Target:TimeToX(20) > 30 and not BestUnit)) then
+        if HR.Cast(S.ReapingFlames, nil, EssenceDisplayStyle) then return "Cast Reaping Flames"; end
+      end
+    end
   end

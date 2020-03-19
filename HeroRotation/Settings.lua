@@ -35,6 +35,11 @@
       ScaleUI = 1,
       ScaleButtons = 1
     },
+    Abilities = {
+      -- Reaping Flames
+      ReapingFlamesSniping = true,
+      ReapingFlamesSnipingRange = 30,
+    },
     APL = {}
   };
 
@@ -54,4 +59,9 @@
     CreatePanelOption("CheckButton", CP_General, "General.HideToggleIcons", "Hide toggle icons", "Enable if you want to hide the toggle buttons on the icon frame.", {ReloadRequired = true});
     CreatePanelOption("CheckButton", CP_General, "General.NotEnoughManaEnabled", "Not enough mana/energy", "Enable if you want a faded icon when you have not enough mana or energy.");
     CreatePanelOption("CheckButton", CP_General, "General.RotationDebugOutput", "Debug Output", "DEBUG: Enable if you want output rotation selection as text for debugging purposes.");
+
+    local CP_Abilities = CreateChildPanel(ARPanel, "Abilities");
+    CreatePanelOption("CheckButton", CP_Abilities, "Abilities.ReapingFlamesSniping", "Reaping Flames Sniping", "Use more advanced logic to suggest the ideal target to use Reaping Flames on to maximum damage and death buffs.");
+    CreatePanelOption("Slider", CP_Abilities, "Abilities.ReapingFlamesSnipingRange", { 8, 40, 1 }, "Reaping Flames Range", "Maximum range at which to show suggested nameplate casts");
+
   end
