@@ -416,9 +416,9 @@ local function Essences ()
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
   end
   -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-  if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or (Target:TimeToX(20) > 30 and not Target:TimeToDieIsNotValid())) then
-    if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast Reaping Flames"; end
-  end
+  ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
+  if ShouldReturn then return ShouldReturn; end
+  
   return false;
 end
 

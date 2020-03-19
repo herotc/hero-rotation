@@ -266,9 +266,8 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-    if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
-    end
+    ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
+    if ShouldReturn then return ShouldReturn; end
   end
   Cleave = function()
     -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max
