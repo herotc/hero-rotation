@@ -92,7 +92,7 @@
       CooldownSpell = Object
       CooldownSpellDisplayTime = HL.GetTime()
       CooldownSpellCastDuration = 0
-  end
+    end
 
     -- Resource Pooling Display Swirls
     if DisplayPoolingSwirl then
@@ -128,12 +128,6 @@
     if OffGCD or DisplayStyle == "Cooldown" then
       -- If this is the second cooldown, check to ensure we don't have a duplicate icon in the first slot
       if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
-        HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
-        HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
-        Object.LastDisplayTime = HL.GetTime();
-        return false;
-      end
-      if HR.CastOffGCDOffset <= 2 then
         HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
         HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
         Object.LastDisplayTime = HL.GetTime();
@@ -239,7 +233,9 @@
     if HR.AoEON() then
       local BestUnit, BestConditionValue = nil, nil
       for _, CycleUnit in pairs(Cache.Enemies[Range]) do
-        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and ((Condition and Condition(CycleUnit)) or not Condition) and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and CycleUnit:AffectingCombat()
+          and ((Condition and Condition(CycleUnit)) or not Condition)
+          and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
           BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
         end
       end
