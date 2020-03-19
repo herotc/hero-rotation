@@ -417,10 +417,6 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 8) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "focused_azerite_beam"; end
     end
-    -- blood_of_the_enemy
-    if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "focused_azerite_beam"; end
-    end
     -- barrage
     if S.Barrage:IsReadyP() then
       if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 216"; end
