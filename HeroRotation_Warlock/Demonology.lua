@@ -157,9 +157,9 @@ local function EvaluateCycleDoom198(TargetUnit)
   return TargetUnit:DebuffRefreshableCP(S.DoomDebuff)
 end
 
-local function ImpsSpawnedDuring(miliseconds)
+local function ImpsSpawnedDuring(SpellCastTime)
   local ImpSpawned = 0
-  local SpellCastTime = ( miliseconds / 1000 ) * Player:SpellHaste()
+  --local SpellCastTime = ( milliseconds / 1000 ) * Player:SpellHaste()
 
   if HL.GetTime() <= HL.GuardiansTable.InnerDemonsNextCast and (HL.GetTime() + SpellCastTime) >= HL.GuardiansTable.InnerDemonsNextCast then
     ImpSpawned = ImpSpawned + 1
@@ -594,7 +594,7 @@ local function APL()
       if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 435"; end
     end
     -- summon_demonic_tyrant,if=soul_shard<3&(!talent.demonic_consumption.enabled|buff.wild_imps.stack+imps_spawned_during.2000%spell_haste>=6&time_to_imps.all.remains<cast_time)|target.time_to_die<20
-    if S.SummonDemonicTyrant:IsCastableP() and (Player:SoulShardsP() < 3 and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() + ImpsSpawnedDuring(2000) >= 6) or Target:TimeToDie() < 20) then
+    if S.SummonDemonicTyrant:IsCastableP() and (Player:SoulShardsP() < 3 and (not S.DemonicConsumption:IsAvailable() or WildImpsCount() + ImpsSpawnedDuring(S.SummonDemonicTyrant:CastTime()) >= 6) or Target:TimeToDie() < 20) then
       if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, 40) then return "summon_demonic_tyrant 445"; end
     end
     -- power_siphon,if=buff.wild_imps.stack>=2&buff.demonic_core.stack<=2&buff.demonic_power.down&spell_targets.implosion<2
