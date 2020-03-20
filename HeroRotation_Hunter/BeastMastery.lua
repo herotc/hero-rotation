@@ -27,6 +27,12 @@ local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
 if not Spell.Hunter then Spell.Hunter = {} end
 Spell.Hunter.BeastMastery = {
   SummonPet                             = Spell(883),
+  SummonPet2                            = Spell(83242),
+  SummonPet3                            = Spell(83243),
+  SummonPet4                            = Spell(83244),
+  SummonPet5                            = Spell(83245),
+  MendPet                               = Spell(136),
+  RevivePet                             = Spell(982),
   AspectoftheWildBuff                   = Spell(193530),
   AspectoftheWild                       = Spell(193530),
   PrimalInstinctsBuff                   = Spell(279810),
@@ -113,6 +119,15 @@ local StunInterrupts = {
   {S.Intimidation, "Cast Intimidation (Interrupt)", function () return true; end},
 };
 
+-- Pet Spells
+local SummonPetSpells = {
+  S.SummonPet,
+  S.SummonPet2,
+  S.SummonPet3,
+  S.SummonPet4,
+  S.SummonPet5
+}
+
 local EnemyRanges = {40}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
@@ -175,14 +190,19 @@ local function APL()
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
 
+  -- Pet Management
+  if S.SummonPet:IsCastableP() then
+    if HR.Cast(SummonPetSpells[Settings.Commons.SummonPetSlot], Settings.BeastMastery.GCDasOffGCD.SummonPet) then return "summon_pet"; end
+  end
+  if Pet:IsDeadOrGhost() and S.RevivePet:IsCastableP() then
+    if HR.Cast(S.RevivePet, Settings.BeastMastery.GCDasOffGCD.RevivePet) then return "revive_pet"; end
+  end
+
   Precombat = function()
     -- flask
     -- augmentation
     -- food
     -- summon_pet
-    if S.SummonPet:IsCastableP() then
-      if HR.Cast(S.SummonPet, Settings.BeastMastery.GCDasOffGCD.SummonPet) then return "summon_pet 3"; end
-    end
     -- snapshot_stats
     if Everyone.TargetIsValid() then
       -- use_item,name=azsharas_font_of_power
@@ -422,8 +442,8 @@ local function APL()
     end
     -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
     -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
-    -- wait,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
-    if Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
+    -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
+    if Player:BuffDownP(S.BestialWrathBuff) and Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
       if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
     end
     -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1

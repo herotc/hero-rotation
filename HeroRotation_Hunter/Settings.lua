@@ -23,6 +23,7 @@ HR.GUISettings.APL.Hunter = {
     TrinketDisplayStyle = "Suggested",
     EssenceDisplayStyle = "Suggested",
     ExhilarationHP = 30,
+    SummonPetSlot = 1,
     -- SoloMode Settings
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -48,6 +49,7 @@ HR.GUISettings.APL.Hunter = {
       SummonPet = false,
       SpittingCobra = false,
       Stampede = false,
+      RevivePet = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -111,8 +113,9 @@ CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.EssenceDisplayStyle
 CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
 CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons");
 CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
+CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.SummonPetSlot", {1, 5, 1}, "Summon Pet Slot", "Which pet stable slot to suggest when summoning a pet. Visual only.");
+CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons");
 
 -- Beast Mastery
 CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
