@@ -234,7 +234,7 @@ local function APL()
   end
   Opener = function()
     -- hand_of_guldan,line_cd=30,if=azerite.explosive_potential.enabled
-    if S.HandofGuldan:IsReadyP() and (S.ExplosivePotential:AzeriteEnabled()) then
+    if S.HandofGuldan:IsReadyP() and (HL.CombatTime() < 2 and Player:SoulShardsP() > 2 and S.ExplosivePotential:AzeriteEnabled()) then
       if HR.Cast(S.HandofGuldan, nil, nil, 40) then return "hand_of_guldan 30"; end
     end
     -- implosion,if=azerite.explosive_potential.enabled&buff.wild_imps.stack>2&buff.explosive_potential.down
