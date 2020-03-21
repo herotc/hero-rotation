@@ -233,7 +233,7 @@
     if HR.AoEON() then
       local BestUnit, BestConditionValue = nil, nil
       for _, CycleUnit in pairs(Cache.Enemies[Range]) do
-        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and CycleUnit:AffectingCombat()
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
           and ((Condition and Condition(CycleUnit)) or not Condition)
           and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
           BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
