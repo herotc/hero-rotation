@@ -128,7 +128,7 @@ HL:RegisterForEvent(function()
   VarCarveCdr = 0
 end, "PLAYER_REGEN_ENABLED")
 
-local EnemyRanges = {8, 50}
+local EnemyRanges = {8, 15, 50}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -255,7 +255,7 @@ local function APL()
     end
     -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<1.5*gcd&focus+cast_regen<focus.max
     if S.KillCommand:IsCastableP() then
-      if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand543) then return "kill_command 42"; end
+      if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand543) then return "kill_command 42"; end
     end
     -- steel_trap,if=focus+cast_regen<focus.max
     if S.SteelTrap:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.SteelTrap:ExecuteTime()) < Player:FocusMax()) then
@@ -271,7 +271,7 @@ local function APL()
     end
     -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(buff.mongoose_fury.stack<5|focus<action.mongoose_bite.cost)
     if S.KillCommand:IsCastableP() then
-      if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand545) then return "kill_command 96"; end
+      if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand545) then return "kill_command 96"; end
     end
     -- serpent_sting,if=refreshable&!buff.coordinated_assault.up&buff.mongoose_fury.stack<5
     if S.SerpentSting:IsReadyP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffDownP(S.CoordinatedAssaultBuff) and Player:BuffStackP(S.MongooseFuryBuff) < 5) then
@@ -495,7 +495,7 @@ local function APL()
     end
     -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
     if S.KillCommand:IsCastableP() then
-      if HR.CastTargetIf(S.KillCommand, 8, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand426) then return "kill_command 428" end
+      if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand426) then return "kill_command 428" end
     end
     -- butchery,if=full_recharge_time<gcd|!talent.wildfire_infusion.enabled|dot.shrapnel_bomb.ticking&dot.internal_bleeding.stack<3
     if S.Butchery:IsCastableP() and (S.Butchery:FullRechargeTimeP() < Player:GCD() or not S.WildfireInfusion:IsAvailable() or Target:DebuffP(S.ShrapnelBombDebuff) and Target:DebuffStackP(S.InternalBleedingDebuff) < 3) then
@@ -561,7 +561,7 @@ local function APL()
     end
     -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
     if S.KillCommand:IsCastableP() then
-      if HR.CastTargetIf(S.KillCommand, 50, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand547) then return "kill_command 568"; end
+      if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand547) then return "kill_command 568"; end
     end
     -- serpent_sting,if=buff.vipers_venom.up&buff.vipers_venom.remains<1*gcd
     if S.SerpentSting:IsCastableP() and (Player:BuffP(S.VipersVenomBuff) and Player:BuffRemainsP(S.VipersVenomBuff) < 1 * Player:GCD()) then
