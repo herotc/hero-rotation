@@ -14,7 +14,8 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
-
+-- Lua
+local mathmax    = math.max;
 -- Azerite Essence Setup
 local AE         = HL.Enum.AzeriteEssences
 local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
@@ -26,6 +27,7 @@ local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
 -- Spells
 if not Spell.Hunter then Spell.Hunter = {} end
 Spell.Hunter.BeastMastery = {
+  -- Pet Care Abilities
   SummonPet                             = Spell(883),
   SummonPet2                            = Spell(83242),
   SummonPet3                            = Spell(83243),
@@ -33,11 +35,14 @@ Spell.Hunter.BeastMastery = {
   SummonPet5                            = Spell(83245),
   MendPet                               = Spell(136),
   RevivePet                             = Spell(982),
+  -- Player Abilities
+  AnimalCompanion                       = Spell(267116),
   AspectoftheWildBuff                   = Spell(193530),
   AspectoftheWild                       = Spell(193530),
   PrimalInstinctsBuff                   = Spell(279810),
   PrimalInstincts                       = Spell(279806),
   BestialWrathBuff                      = Spell(19574),
+  BestialWrathPetBuff                   = Spell(186254),
   BestialWrath                          = Spell(19574),
   AncestralCall                         = Spell(274738),
   Fireblood                             = Spell(265221),
@@ -107,7 +112,8 @@ local ShouldReturn; -- Used to get the return string
 local EnemiesCount, GCDMax;
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
+local Everyone = HR.Commons.Everyone
+local Hunter = HR.Commons.Hunter
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
@@ -151,6 +157,16 @@ local function GetEnemiesCount(range)
   end
 end
 
+local function UpdateGCDMax()
+  -- GCD Max + Latency Grace Period
+  -- BM APL uses a lot of gcd.max specific timing that is slightly tight for real-world suggestions
+  GCDMax = Player:GCD() + 0.150
+  -- Aspect of the Wild reduces GCD by 0.2s, before Haste modifiers are applied, reduce the benefit since Haste is applied in Player:GCD()
+  if Player:BuffP(S.AspectoftheWildBuff) then
+    GCDMax = mathmax(0.75, GCDMax - 0.2 / (1 + Player:HastePct() / 100))
+  end
+end
+
 HL:RegisterForEvent(function()
   S.ConcentratedFlame:RegisterInFlight();
 end, "LEARNED_SPELL_IN_TAB")
@@ -169,11 +185,11 @@ local function EvaluateTargetIfFilterBarbedShot74(TargetUnit)
 end
 
 local function EvaluateTargetIfBarbedShot75(TargetUnit)
-  return (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() + 0.150)
+  return (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= (Player:GCD() + 0.150))
 end
 
 local function EvaluateTargetIfBarbedShot85(TargetUnit)
-  return (S.BarbedShot:FullRechargeTimeP() < Player:GCD() + 0.150 and bool(S.BestialWrath:CooldownRemainsP()))
+  return (S.BarbedShot:FullRechargeTimeP() < (Player:GCD() + 0.150) and bool(S.BestialWrath:CooldownRemainsP()))
 end
 
 local function EvaluateTargetIfBarbedShot123(TargetUnit)
@@ -184,11 +200,9 @@ end
 local function APL()
   local Precombat, Cds, Cleave, St
 
-  -- GCD Max + Latency Grace Period
-  -- BM APL uses a lot of gcd.max specific timing that is slightly tight for real-world suggestions
-  GCDMax = Player:GCD() + 0.150
   EnemiesCount = GetEnemiesCount(8)
-  HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
+  HL.GetEnemies(40) -- Populate Cache.Enemies[40] for CastTargetIf
+  UpdateGCDMax()    -- Update the GCDMax variable
 
   -- Pet Management
   if S.SummonPet:IsCastableP() then
@@ -196,6 +210,10 @@ local function APL()
   end
   if Pet:IsDeadOrGhost() and S.RevivePet:IsCastableP() then
     if HR.Cast(S.RevivePet, Settings.BeastMastery.GCDasOffGCD.RevivePet) then return "revive_pet"; end
+  end
+  if S.AnimalCompanion:IsAvailable() and Hunter.PetTable.LastPetSpellCount == 1 and Player:AffectingCombat() then
+    -- Show a reminder that the Animal Companion has not spawned yet
+    HR.CastSuggested(S.AnimalCompanion);
   end
 
   Precombat = function()
@@ -266,7 +284,7 @@ local function APL()
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 60"; end
     end
     -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and Target:HealthPercentage() < 35 or Target:TimeToDie() < 61) then
+    if Settings.Commons.UsePotions and I.PotionofUnbridledFury:IsReady() and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and Target:HealthPercentage() < 35 or Target:TimeToDie() < 61) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 68"; end
     end
     -- worldvein_resonance,if=(prev_gcd.1.aspect_of_the_wild|cooldown.aspect_of_the_wild.remains<gcd|target.time_to_die<20)|!essence.vision_of_perfection.minor
@@ -295,7 +313,7 @@ local function APL()
       if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot75) then return "barbed_shot 76"; end
     end
     -- multishot,if=gcd.max-pet.turtle.buff.beast_cleave.remains>0.25
-    if S.Multishot:IsCastableP() and (GCDMax - Pet:BuffRemainsP(S.BeastCleaveBuff) > 0.25) then
+    if S.Multishot:IsReadyP() and Pet:BuffRemainsP(S.BeastCleaveBuff) < GCDMax then
       if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 82"; end
     end
     -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
@@ -319,7 +337,7 @@ local function APL()
       if HR.Cast(S.ChimaeraShot, nil, nil, 40) then return "chimaera_shot 106"; end
     end
     -- a_murder_of_crows
-    if S.AMurderofCrows:IsCastableP() then
+    if S.AMurderofCrows:IsReadyP() then
       if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 108"; end
     end
     -- barrage
@@ -327,11 +345,11 @@ local function APL()
       if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 110"; end
     end
     -- kill_command,if=active_enemies<4|!azerite.rapid_reload.enabled
-    if S.KillCommand:IsCastableP() and (EnemiesCount < 4 or not S.RapidReload:AzeriteEnabled()) then
+    if S.KillCommand:IsReadyP() and (EnemiesCount < 4 or not S.RapidReload:AzeriteEnabled()) then
       if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 112"; end
     end
     -- dire_beast
-    if S.DireBeast:IsCastableP() then
+    if S.DireBeast:IsReadyP() then
       if HR.Cast(S.DireBeast, nil, nil, 40) then return "dire_beast 122"; end
     end
     -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
@@ -360,11 +378,11 @@ local function APL()
     end
     -- multishot,if=azerite.rapid_reload.enabled&active_enemies>2
     if S.Multishot:IsCastableP() and (S.RapidReload:AzeriteEnabled() and EnemiesCount > 2) then
-      if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 140"; end
+      if HR.CastPooling(S.Multishot, nil, 40) then return "multishot 140"; end
     end
     -- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled)
     if S.CobraShot:IsCastableP() and (S.KillCommand:CooldownRemainsP() > Player:FocusTimeToMaxPredicted() and (EnemiesCount < 3 or not S.RapidReload:AzeriteEnabled())) then
-      if HR.Cast(S.CobraShot, nil, nil, 40) then return "cobra_shot 150"; end
+      if HR.CastPooling(S.CobraShot, nil, 40) then return "cobra_shot 150"; end
     end
     -- spitting_cobra
     if S.SpittingCobra:IsCastableP() then
@@ -389,7 +407,7 @@ local function APL()
       if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, 30) then return "stampede 182"; end
     end
     -- a_murder_of_crows
-    if S.AMurderofCrows:IsCastableP() then
+    if S.AMurderofCrows:IsReadyP() then
       if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 183"; end
     end
     -- focused_azerite_beam,if=buff.bestial_wrath.down|target.time_to_die<5
@@ -413,7 +431,7 @@ local function APL()
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 193"; end
     end
     -- kill_command
-    if S.KillCommand:IsCastableP() then
+    if S.KillCommand:IsReadyP() then
       if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 194"; end
     end
     -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
@@ -425,11 +443,12 @@ local function APL()
       if HR.Cast(S.ChimaeraShot, nil, nil, 40) then return "chimaera_shot 196"; end
     end
     -- dire_beast
-    if S.DireBeast:IsCastableP() then
+    if S.DireBeast:IsReadyP() then
       if HR.Cast(S.DireBeast, nil, nil, 40) then return "dire_beast 198"; end
     end
     -- barbed_shot,if=talent.one_with_the_pack.enabled&charges_fractional>1.5|charges_fractional>1.8|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9
-    if S.BarbedShot:IsCastableP() and (S.OneWithThePack:IsAvailable() and S.BarbedShot:ChargesFractionalP() > 1.5 or S.BarbedShot:ChargesFractionalP() > 1.8 or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
+    if S.BarbedShot:IsCastableP() and (S.OneWithThePack:IsAvailable() and S.BarbedShot:ChargesFractionalP() > 1.5 or S.BarbedShot:ChargesFractionalP() > 1.8 
+      or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
       if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 200"; end
     end
     -- purifying_blast,if=buff.bestial_wrath.down|target.time_to_die<8
@@ -440,14 +459,15 @@ local function APL()
     if S.Barrage:IsReadyP() then
       if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 216"; end
     end
-    -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
-    -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
-    -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
-    if Player:BuffDownP(S.BestialWrathBuff) and Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
-      if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
-    end
     -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1
-    if S.CobraShot:IsCastableP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost() or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryofLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
+    if S.CobraShot:IsReadyP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost()
+      or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryofLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
+      -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
+      -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
+      -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
+      if Player:BuffDownP(S.BestialWrathBuff) and Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
+        if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
+      end
       if HR.Cast(S.CobraShot, nil, nil, 40) then return "cobra_shot 218"; end
     end
     -- spitting_cobra
@@ -472,7 +492,9 @@ local function APL()
     Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
     -- auto_shot
     -- use_items,if=prev_gcd.1.aspect_of_the_wild|target.time_to_die<20
-    if (Player:PrevGCDP(1, S.AspectoftheWild) or Target:TimeToDie() < 20) then
+    -- NOTE: Above line is very non-optimal and feedback has been given to the SimC APL devs, following logic will be used for now:
+    --  if=buff.aspect_of_the_wild.remains>10|cooldown.aspect_of_the_wild.remains>60|target.time_to_die<20
+    if Player:BuffRemainsP(S.AspectoftheWildBuff) > 10 or S.AspectoftheWild:CooldownRemainsP() > 60 or Target:TimeToDie() < 20 then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
@@ -512,8 +534,10 @@ local function Init ()
   HL.RegisterNucleusAbility(194392, 8, 6)             -- Volley
   HL.RegisterNucleusAbility({171454, 171457}, 8, 6)   -- Chimaera Shot
   HL.RegisterNucleusAbility(118459, 10, 6)            -- Beast Cleave
-  HL.RegisterNucleusAbility(201754, 8, 6)            -- Stomp
+  HL.RegisterNucleusAbility(201754, 8, 6)             -- Stomp
   HL.RegisterNucleusAbility(271686, 3, 6)             -- Head My Call
+  HL.RegisterNucleusAbility(295305, 8, 6)             -- Purification Protocol (Minor)
+  HL.RegisterNucleusAbility(297108, 12, 6)            -- Blood of the Enemy (Major)
 end
 
 HR.SetAPL(253, APL, Init)

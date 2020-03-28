@@ -12,3 +12,8 @@ local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
 -- Lua
+
+-- Commons
+HR.Commons.Hunter = {};
+local Settings = HR.GUISettings.APL.Hunter.Commons;
+local Hunter = HR.Commons.Hunter;
