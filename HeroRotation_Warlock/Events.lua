@@ -133,6 +133,8 @@
       duration = 15
     },
   }
+  
+  local castDTSpell
 
     --------------------------
     ----- Destruction --------
@@ -235,31 +237,52 @@
     -- Add demon to table
     HL:RegisterForSelfCombatEvent(
       function (...)
-        local timestamp,Event,_,_,_,_,_,UnitPetGUID,_,_,_,SpellID=select(1,...)
+        local timestamp,Event,_,SourceGUID,_,_,_,UnitPetGUID,_,_,_,SpellID=select(1,...)
         local _, _, _, _, _, _, _, UnitPetID = find(UnitPetGUID, "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)")
         UnitPetID = tonumber(UnitPetID)
 
         -- Add pet
-        if (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetsData[UnitPetID]) then
+        if (Event == "SPELL_CAST_SUCCESS" and SourceGUID == UnitGUID("player") and SpellID == 265187) then
+          castDTSpell = SpellID
+        elseif (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetsData[UnitPetID]) then
           local summonedPet = PetsData[UnitPetID]
+          local petDuration
+          if summonedPet.name == "Wild Imp" then
+            HL.GuardiansTable.ImpCount = HL.GuardiansTable.ImpCount + 1
+            petDuration = summonedPet.duration
+          elseif summonedPet.name == "Felguard" then
+            HL.GuardiansTable.FelguardDuration = summonedPet.duration
+            petDuration = summonedPet.duration
+          elseif summonedPet.name == "Dreadstalker" then
+            HL.GuardiansTable.DreadstalkerDuration = summonedPet.duration
+            petDuration = summonedPet.duration
+          elseif summonedPet.name == "Demonic Tyrant" then
+            if (castDTSpell == 265187) then
+              castDTSpell = 0
+              HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration
+              petDuration = summonedPet.duration
+            else
+              -- If Vision of Perfection is the major essence
+              if (Spell:MajorEssenceEnabled(22)) then
+                if (Spell:EssenceRank(22) == 1) then
+                  HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration * 0.25
+                  petDuration = summonedPet.duration * 0.25
+                elseif (Spell:EssenceRank(22) >= 2) then
+                  HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration * 0.35
+                  petDuration = summonedPet.duration * 0.35
+                end
+              end
+            end
+          end
           local petTable = {
             ID = UnitPetGUID,
             name = summonedPet.name,
             spawnTime = GetTime(),
             ImpCasts = 5,
-            Duration = summonedPet.duration,
-            despawnTime = GetTime() + tonumber(summonedPet.duration)
+            Duration = petDuration,
+            despawnTime = GetTime() + tonumber(petDuration)
           }
           table.insert(HL.GuardiansTable.Pets,petTable)
-              if summonedPet.name == "Wild Imp" then
-            HL.GuardiansTable.ImpCount = HL.GuardiansTable.ImpCount + 1
-              elseif summonedPet.name == "Felguard" then
-                HL.GuardiansTable.FelguardDuration = summonedPet.duration
-              elseif summonedPet.name == "Dreadstalker" then
-                HL.GuardiansTable.DreadstalkerDuration = summonedPet.duration
-              elseif summonedPet.name == "Demonic Tyrant" then
-                HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration
-              end
         end
 
         -- Add 15 seconds and 7 casts to all pets when Tyrant is cast
@@ -286,6 +309,7 @@
         Warlock.UpdatePetTable()
       end
       , "SPELL_SUMMON"
+      , "SPELL_CAST_SUCCESS"
     );
 
     -- Decrement ImpCasts and Implosion Listener
