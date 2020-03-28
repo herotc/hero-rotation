@@ -265,7 +265,7 @@
         -- Add 15 seconds and 7 casts to all pets when Tyrant is cast
         if PetsData[UnitPetID] and PetsData[UnitPetID].name == "Demonic Tyrant" then
           for key, petTable in pairs(HL.GuardiansTable.Pets) do
-            if petTable then
+            if (petTable and petTable.name ~= "Demonic Tyrant") then
               petTable.despawnTime = petTable.despawnTime + 15
               petTable.ImpCasts = petTable.ImpCasts + 7
             end
