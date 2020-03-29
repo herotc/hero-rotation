@@ -123,6 +123,7 @@ local VarPoolingForBladeDance = 0;
 local VarPoolingForEyeBeam = 0;
 local VarWaitingForMomentum = 0;
 local VarWaitingForDarkSlash = 0;
+local VarReapingDelay = 0;
 
 HL:RegisterForEvent(function()
   VarPoolingForMeta = 0
@@ -132,6 +133,7 @@ HL:RegisterForEvent(function()
   VarPoolingForEyeBeam = 0
   VarWaitingForMomentum = 0
   VarWaitingForDarkSlash = 0
+  VarReapingDelay = 0
 end, "PLAYER_REGEN_ENABLED")
 
 local EnemyRanges = {40, 20, 8}
@@ -147,6 +149,16 @@ end
 
 local function bool(val)
   return val ~= 0
+end
+
+local function LowestTTD()
+  local lowTTD = 0
+  for _, CycleUnit in pairs(Cache.Enemies[8]) do
+    if (lowTTD == 0 or CycleUnit:TimeToDie() < lowTTD) then
+      lowTTD = CycleUnit:TimeToDie()
+    end
+  end
+  return lowTTD
 end
 
 local function IsInMeleeRange()
@@ -174,6 +186,10 @@ end
 
 local function ConserveFelRush()
   return not Settings.Havoc.ConserveFelRush or S.FelRush:Charges() == 2
+end
+
+local function EvaluateReapingFlames(TargetUnit)
+  return TargetUnit:TimeToDie() < 1.5 or ((TargetUnit:HealthPercentage() > 80 or TargetUnit:HealthPercentage() <= 20) and (Cache.EnemiesCount[8] == 1 or VarReapingDelay > 29)) or (TargetUnit:TimeToX(20) > 30 and (Cache.EnemiesCount[8] == 1 or VarReapingDelay > 44))
 end
 
 --- ======= ACTION LISTS =======
@@ -240,9 +256,13 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
-    -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-    if S.ReapingFlames:IsCastableP() and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
+    -- cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
+    if (Spell:MajorEssenceEnabled(AE.BreathoftheDying)) then
+      VarReapingDelay = LowestTTD()
+    end
+    -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
+    if S.ReapingFlames:IsCastableP() then
+      if HR.CastCycle(S.ReapingFlames, 40, EvaluateReapingFlames) then return "reaping_flames"; end
     end
   end
   Cooldown = function()
