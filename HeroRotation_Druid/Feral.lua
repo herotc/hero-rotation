@@ -122,13 +122,11 @@ local Settings = {
 -- Variables
 local VarUseThrash = 0;
 local VarOpenerDone = 0;
-local VarReapingDelay = 0;
 local LastRakeAP = 0;
 
 HL:RegisterForEvent(function()
   VarUseThrash = 0
   VarOpenerDone = 0
-  VarReapingDelay = 0
   LastRakeAP = 0
 end, "PLAYER_REGEN_ENABLED")
 
@@ -145,16 +143,6 @@ end
 
 local function bool(val)
   return val ~= 0
-end
-
-local function LowestTTD()
-  local lowTTD = 0
-  for _, CycleUnit in pairs(Cache.Enemies[EightRange]) do
-    if (lowTTD == 0 or CycleUnit:TimeToDie() < lowTTD) then
-      lowTTD = CycleUnit:TimeToDie()
-    end
-  end
-  return lowTTD
 end
 
 local function SwipeBleedMult()
@@ -265,10 +253,6 @@ end
 
 local function EvaluateCycleFerociousBite418(TargetUnit)
   return TargetUnit:DebuffP(S.RipDebuff) and TargetUnit:DebuffRemainsP(S.RipDebuff) < 3 and TargetUnit:TimeToDie() > 10 and (S.Sabertooth:IsAvailable())
-end
-
-local function EvaluateCycleReapingFlames420(TargetUnit)
-  return TargetUnit:TimeToDie() < 1.5 or ((TargetUnit:HealthPercentage() > 80 or TargetUnit:HealthPercentage() <= 20) and VarReapingDelay > 29) or (TargetUnit:TimeToX(20) > 30 and VarReapingDelay > 44)
 end
 
 --- ======= ACTION LISTS =======
@@ -386,8 +370,8 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&variable.reaping_delay>29)|(target.time_to_pct_20>30&variable.reaping_delay>44)
-    if S.ReapingFlames:IsCastableP() then
-      if HR.CastCycle(S.ReapingFlames, EightRange, EvaluateCycleReapingFlames420) then return "reaping_flames 41"; end
+    if (true) then
+      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
     if S.Incarnation:IsCastableP() and HR.CDsON() and (Player:EnergyPredicted() >= 30 and (S.TigersFury:CooldownRemainsP() > 15 or Player:BuffP(S.TigersFuryBuff))) then
@@ -590,9 +574,6 @@ local function APL()
       VarReapingDelay = Target:TimeToDie()
     end
     -- cycling_variable,name=reaping_delay,op=min,value=target.time_to_die
-    if (true) then
-      VarReapingDelay = LowestTTD()
-    end
     -- call_action_list,name=cooldowns
     if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
