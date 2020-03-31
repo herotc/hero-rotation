@@ -134,10 +134,18 @@ local Settings = {
   Fire = HR.GUISettings.APL.Mage.Fire
 };
 
+local function num(val)
+  if val then return 1 else return 0 end
+end
+
+local function bool(val)
+  return val ~= 0
+end
+
 -- Variables
 local VarHoldCombustionThreshold = 0;
-local VarHotStreakFlamestrike = 0;
-local VarHardCastFlamestrike = 0;
+local VarHotStreakFlamestrike = 2 * num(S.FlamePatch:IsAvailable()) + 99 * num(not S.FlamePatch:IsAvailable());
+local VarHardCastFlamestrike = 3 * num(S.FlamePatch:IsAvailable()) + 99 * num(not S.FlamePatch:IsAvailable());
 local VarDelayFlamestrike = 0;
 local VarFireBlastPooling = 0;
 local VarPhoenixPooling = 0;
@@ -149,8 +157,8 @@ local VarOnUseCutoff = 0;
 
 HL:RegisterForEvent(function()
   VarHoldCombustionThreshold = 0
-  VarHotStreakFlamestrike = 0
-  VarHardCastFlamestrike = 0
+  VarHotStreakFlamestrike = 2 * num(S.FlamePatch:IsAvailable()) + 99 * num(not S.FlamePatch:IsAvailable())
+  VarHardCastFlamestrike = 3 * num(S.FlamePatch:IsAvailable()) + 99 * num(not S.FlamePatch:IsAvailable())
   VarDelayFlamestrike = 0
   VarFireBlastPooling = 0
   VarPhoenixPooling = 0
@@ -182,14 +190,6 @@ local function GetEnemiesCount(range)
   else
     return 1
   end
-end
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
 end
 
 HL:RegisterForEvent(function()
