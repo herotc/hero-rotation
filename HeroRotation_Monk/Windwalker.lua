@@ -191,7 +191,7 @@ local function bool(val)
 end
 
 local function EvaluateTargetIfFilterMarkoftheCrane400(TargetUnit)
-  return TargetUnit:DebuffDownP(S.MarkoftheCraneDebuff)
+  return TargetUnit:DebuffRemainsP(S.MarkoftheCraneDebuff)
 end
 
 local function EvaluateTargetIfFistoftheWhiteTiger402(TargetUnit)
