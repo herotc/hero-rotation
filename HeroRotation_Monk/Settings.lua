@@ -60,9 +60,9 @@ HR.GUISettings.APL.Monk = {
     GCDasOffGCD = {
       -- Abilities
       InvokeXuentheWhiteTiger = true,
-      TouchOfDeath            = true,
+      TouchofDeath            = true,
       Serenity                = true,
-      StormEarthAndFire       = true,
+      StormEarthandFire       = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
