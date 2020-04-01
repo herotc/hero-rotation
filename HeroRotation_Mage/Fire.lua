@@ -283,7 +283,7 @@ local function APL()
   end
   ActiveTalents = function()
     -- living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0|variable.disable_combustion)
-    if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > (12 / (1 + Player:HastePct() / 100)) or VarTimeToCombusion <= 0 or Settings.Fire.DisableCombustion)) then
+    if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > 12 * Player:SpellHaste() or VarTimeToCombusion <= 0 or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.LivingBomb, nil, nil, 40) then return "living_bomb 16"; end
     end
     -- meteor,if=!variable.disable_combustion&variable.time_to_combustion<=0|(buff.rune_of_power.up|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|!talent.rune_of_power.enabled)&(cooldown.meteor.duration<variable.time_to_combustion|target.time_to_die<variable.time_to_combustion|variable.disable_combustion)
