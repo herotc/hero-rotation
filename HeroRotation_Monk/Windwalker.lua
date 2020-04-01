@@ -199,7 +199,7 @@ local function EvaluateTargetIfFistoftheWhiteTiger402(TargetUnit)
 end
 
 local function EvaluateTargetIfTigerPalm404(TargetUnit)
-  return (not Player:PrevGCD(1, S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff)) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5))
+  return (not Player:PrevGCD(1, S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff) or Cache.EnemiesCount[8] > 2) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5))
 end
 
 local function EvaluateTargetIfRisingSunKick406(TargetUnit)
@@ -235,11 +235,7 @@ local function EvaluateTargetIfBlackoutKick420(TargetUnit)
 end
 
 local function EvaluateTargetIfRisingSunKick422(TargetUnit)
-  return ((S.WhirlingDragonPunch:IsAvailable() and S.WhirlingDragonPunch:CooldownRemainsP() < 5) and S.FistsofFury:CooldownRemainsP() > 3)
-end
-
-local function EvaluateTargetIfFistsofFury424(TargetUnit)
-  return (Player:ChiDeficit() >= 3)
+  return ((S.WhirlingDragonPunch:IsAvailable() and 10 * Player:SpellHaste() > S.WhirlingDragonPunch:CooldownRemainsP() + 4) and (S.FistsofFury:CooldownRemainsP() > 3 or Player:Chi() >= 5))
 end
 
 local function EvaluateTargetIfFistoftheWhiteTiger426(TargetUnit)
@@ -634,10 +630,6 @@ local function APL ()
     end
   end
   Aoe = function()
-    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
-    if S.RisingSunKick:IsReadyP() then
-      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfRisingSunKick422) then return "rising_sun_kick 230"; end
-    end
     -- whirling_dragon_punch
     if S.WhirlingDragonPunch:IsReady() then
       if HR.Cast(S.WhirlingDragonPunch, nil, nil, 8) then return "whirling_dragon_punch 232"; end
@@ -646,24 +638,28 @@ local function APL ()
     if S.EnergizingElixir:IsReadyP() and (not Player:PrevGCD(1, S.TigerPalm) and Player:Chi() <= 1 and Player:Energy() < 50) then
       if HR.Cast(S.EnergizingElixir) then return "energizing_elixir 234"; end
     end
-    -- fists_of_fury,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
-    if S.FistsofFury:IsReadyP() then
-      if HR.CastTargetIf(S.FistsofFury, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfFistsofFury424) then return "fists_of_fury 236"; end
+    -- fists_of_fury,if=energy.time_to_max>1
+    if S.FistsofFury:IsReadyP() and (Player:EnergyTimeToMaxPredicted() > 1) then
+      if HR.Cast(S.FistsofFury, nil, nil, 8) then return "fists_of_fury 236"; end
+    end
+    -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.rising_sun_kick.duration>cooldown.whirling_dragon_punch.remains+4)&(cooldown.fists_of_fury.remains>3|chi>=5)
+    if S.RisingSunKick:IsReadyP() then
+      if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfRisingSunKick422) then return "rising_sun_kick 230"; end
     end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down
     if S.RushingJadeWind:IsReadyP() and (Player:BuffDownP(S.RushingJadeWindBuff)) then
       if HR.Cast(S.RushingJadeWind, nil, nil, 8) then return "rushing_jade_wind 238"; end
     end
-    -- spinning_crane_kick,if=combo_strike&(((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2))|energy.time_to_max<=3)
-    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsofFury:CooldownRemainsP() > 6) and (Player:Chi() >= 5 or S.FistsofFury:CooldownRemainsP() > 2)) or Player:EnergyTimeToMaxPredicted() <= 3)) then
+    -- spinning_crane_kick,if=combo_strike&(((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2))|energy.time_to_max<=3|buff.dance_of_chiji.react)
+    if S.SpinningCraneKick:IsReadyP() and (not Player:PrevGCD(1, S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsofFury:CooldownRemainsP() > 6) and (Player:Chi() >= 5 or S.FistsofFury:CooldownRemainsP() > 2)) or Player:EnergyTimeToMaxPredicted() <= 3 or Player:BuffP(S.DanceofChijiBuff))) then
       if HR.Cast(S.SpinningCraneKick, nil, nil, 8) then return "spinning_crane_kick 240"; end
     end
     -- reverse_harm,if=chi.max-chi>=2
     if S.ReverseHarm:IsReadyP() and (Player:ChiDeficit() >= 2) then
       if HR.Cast(S.ReverseHarm, nil, nil, 10) then return "reverse_harm 242"; end
     end
-    -- chi_burst,if=chi<=3
-    if S.ChiBurst:IsReadyP() and (Player:Chi() <= 3) then
+    -- chi_burst,if=chi.max-chi>=3
+    if S.ChiBurst:IsReadyP() and (Player:ChiDeficit() >= 3) then
       if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 244"; end
     end
     -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
@@ -715,7 +711,7 @@ local function APL ()
     if S.FistoftheWhiteTiger:IsReadyP() then
       if HR.CastTargetIf(S.FistoftheWhiteTiger, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfFistoftheWhiteTiger402) then return "fist_of_the_white_tiger 24"; end
     end
-    -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!combo_break&chi.max-chi>=2&(talent.serenity.enabled|!dot.touch_of_death.remains)&buff.seething_rage.down&buff.serenity.down&(energy.time_to_max<1|talent.serenity.enabled&cooldown.serenity.remains<2|!talent.serenity.enabled&cooldown.touch_of_death.remains<3&!variable.hold_tod|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
+    -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!combo_break&chi.max-chi>=2&(talent.serenity.enabled|!dot.touch_of_death.remains|active_enemies>2)&buff.seething_rage.down&buff.serenity.down&(energy.time_to_max<1|talent.serenity.enabled&cooldown.serenity.remains<2|!talent.serenity.enabled&cooldown.touch_of_death.remains<3&!variable.hold_tod|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
     if S.TigerPalm:IsReadyP() then
       if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfTigerPalm404) then return "tiger_palm 26"; end
     end
