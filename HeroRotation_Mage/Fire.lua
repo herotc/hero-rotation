@@ -283,11 +283,11 @@ local function APL()
   end
   ActiveTalents = function()
     -- living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0|variable.disable_combustion)
-    if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > S.LivingBomb:BaseDuration() or VarTimeToCombusion <= 0 or Settings.Fire.DisableCombustion)) then
+    if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > (12 / (1 + Player:HastePct() / 100)) or VarTimeToCombusion <= 0 or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.LivingBomb, nil, nil, 40) then return "living_bomb 16"; end
     end
     -- meteor,if=!variable.disable_combustion&variable.time_to_combustion<=0|(buff.rune_of_power.up|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|!talent.rune_of_power.enabled)&(cooldown.meteor.duration<variable.time_to_combustion|target.time_to_die<variable.time_to_combustion|variable.disable_combustion)
-    if S.Meteor:IsCastableP() and (not Settings.Fire.DisableCombustion and VarTimeToCombusion <= 0 or (Player:BuffP(S.RuneofPowerBuff) or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:Charges() < 1 or not S.RuneofPower:IsAvailable()) and (S.Meteor:Cooldown() < VarTimeToCombusion or Target:TimeToDie() < VarTimeToCombusion or Settings.Fire.DisableCombustion)) then
+    if S.Meteor:IsCastableP() and (not Settings.Fire.DisableCombustion and VarTimeToCombusion <= 0 or (Player:BuffP(S.RuneofPowerBuff) or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:Charges() < 1 or not S.RuneofPower:IsAvailable()) and (45 < VarTimeToCombusion or Target:TimeToDie() < VarTimeToCombusion or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.Meteor, nil, nil, 40) then return "meteor 32"; end
     end
     -- dragons_breath,if=talent.alexstraszas_fury.enabled&(buff.combustion.down&!buff.hot_streak.react|buff.combustion.up&action.fire_blast.charges<action.fire_blast.max_charges&!buff.hot_streak.react)

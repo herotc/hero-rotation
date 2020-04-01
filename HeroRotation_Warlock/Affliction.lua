@@ -396,7 +396,7 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 59"; end
     end
     -- dark_soul,if=target.time_to_die<20+gcd|talent.sow_the_seeds.enabled&cooldown.summon_darkglare.remains>=cooldown.summon_darkglare.duration-10
-    if S.DarkSoul:IsReadyP() and (Target:TimeToDie() < 20 + Player:GCD() or S.SowtheSeeds:IsAvailable() and S.SummonDarkglare:CooldownRemainsP() >= S.SummonDarkglare:BaseDuration() - 10) then
+    if S.DarkSoul:IsReadyP() and (Target:TimeToDie() < 20 + Player:GCD() or S.SowtheSeeds:IsAvailable() and S.SummonDarkglare:CooldownRemainsP() >= 170) then
       if HR.Cast(S.DarkSoul) then return "dark_soul 60"; end
     end
     -- blood_of_the_enemy,if=pet.darkglare.remains|(!cooldown.deathbolt.remains|!talent.deathbolt.enabled)&cooldown.summon_darkglare.remains>=80&essence.blood_of_the_enemy.rank>1
