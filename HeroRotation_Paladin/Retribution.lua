@@ -286,8 +286,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
     -- reaping_flames
-    if S.ReapingFlames:IsCastableP() then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
+    if (true) then
+      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- crusader_strike,if=holy_power<=4
     if S.CrusaderStrike:IsCastableP() and (Player:HolyPower() <= 4) then

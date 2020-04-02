@@ -377,7 +377,7 @@ local function APL()
     end
     -- reaping_flames,if=!buff.ca_inc.up
     if S.ReapingFlames:IsCastableP() and (Player:BuffDownP(CaInc())) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames 191"; end
+      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- focused_azerite_beam,if=(!variable.az_ss|!buff.ca_inc.up),target_if=dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
     if S.FocusedAzeriteBeam:IsCastableP() and ((not bool(VarAzSs) or Player:BuffDownP(CaInc())) and DoTsUp()) then

@@ -630,8 +630,8 @@ local function APL()
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 506"; end
     end
     -- reaping_flames,if=!pet.demonic_tyrant.active
-    if S.ReapingFlames:IsCastableP() and (DemonicTyrantTime() == 0) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames 508"; end
+    if (DemonicTyrantTime() == 0) then
+      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=build_a_shard
     if (true) then

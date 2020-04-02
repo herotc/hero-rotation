@@ -399,8 +399,8 @@ local function APL ()
         if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 84"; end
       end
       -- reaping_flames,if=buff.serenity.down
-      if S.ReapingFlames:IsCastableP() then
-        if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames 86"; end
+      if (Player:BuffDownP(S.SerenityBuff)) then
+        local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
       end
       -- focused_azerite_beam,if=buff.serenity.down
       if S.FocusedAzeriteBeam:IsCastableP() then
@@ -520,8 +520,8 @@ local function APL ()
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 146"; end
     end
     -- reaping_flames
-    if S.ReapingFlames:IsCastableP() then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames 148"; end
+    if (true) then
+      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then

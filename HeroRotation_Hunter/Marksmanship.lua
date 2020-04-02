@@ -240,8 +240,8 @@ local function APL()
       if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks"; end
     end
     -- reaping_flames,if=buff.trueshot.down&(target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30)
-    if S.ReapingFlames:IsCastableP() and (Player:BuffDownP(S.TrueshotBuff) and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30)) then
-      if HR.Cast(S.ReapingFlames, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "reaping_flames"; end
+    if (Player:BuffDownP(S.TrueshotBuff) and (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30)) then
+      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- worldvein_resonance,if=(trinket.azsharas_font_of_power.cooldown.remains>20|!equipped.azsharas_font_of_power|target.time_to_die<trinket.azsharas_font_of_power.cooldown.duration+34&target.health.pct>20)&(cooldown.trueshot.remains_guess<3|(essence.vision_of_perfection.minor&target.time_to_die>cooldown+buff.worldvein_resonance.duration))|target.time_to_die<20
     if S.WorldveinResonance:IsCastableP() and ((I.AzsharasFontofPower:CooldownRemainsP() > 20 or not I.AzsharasFontofPower:IsEquipped() or Target:TimeToDie() < 154 and Target:HealthPercentage() > 20) and (S.Trueshot:CooldownRemainsP() < 3 or (Spell:EssenceEnabled(AE.VisionofPerfection) and Target:TimeToDie() > S.WorldveinResonance:Cooldown() + 18)) or Target:TimeToDie() < 20) then
