@@ -151,6 +151,7 @@ local VarFireBlastPooling = 0;
 local VarPhoenixPooling = 0;
 local VarCombustionOnUse = 0;
 local VarFontDoubleOnUse = 0;
+local VarFontPrecombatChannel = 0;
 local VarTimeToCombusion = 0;
 local VarKindlingReduction = 0;
 local VarOnUseCutoff = 0;
@@ -164,6 +165,7 @@ HL:RegisterForEvent(function()
   VarPhoenixPooling = 0
   VarCombustionOnUse = 0
   VarFontDoubleOnUse = 0
+  VarFontPrecombatChannel = 0
   VarTimeToCombusion = 0
   VarKindlingReduction = 0
   VarOnUseCutoff = 0
@@ -238,6 +240,10 @@ local function APL()
       -- variable,name=font_double_on_use,op=set,value=equipped.azsharas_font_of_power&variable.combustion_on_use
       if (true) then
         VarFontDoubleOnUse = num(I.AzsharasFontofPower:IsEquipped() and bool(VarCombustionOnUse))
+      end
+      -- variable,name=font_of_power_precombat_channel,op=set,value=18,if=variable.font_double_on_use&!talent.firestarter.enabled&variable.font_of_power_precombat_channel=0
+      if (bool(VarFontDoubleOnUse) and not S.Firestarter:IsAvailable() and VarFontPrecombatChannel == 0) then
+        VarFontPrecombatChannel = 18
       end
       -- variable,name=on_use_cutoff,op=set,value=20*variable.combustion_on_use&!variable.font_double_on_use+40*variable.font_double_on_use+25*equipped.azsharas_font_of_power&!variable.font_double_on_use+8*equipped.manifesto_of_madness&!variable.font_double_on_use
       if (true) then
