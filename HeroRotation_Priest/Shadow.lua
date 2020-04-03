@@ -81,12 +81,13 @@ if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   PotionofUnbridledFury            = Item(169299),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  ManifestoofMadness               = Item(174103, {13, 14})
 };
 local I = Item.Priest.Shadow;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 167555, 169314 }
+local OnUseExcludes = { 167555, 169314, 174103 }
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
@@ -246,6 +247,10 @@ local function APL()
     -- guardian_of_azeroth,if=buff.voidform.stack>15
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffStackP(S.VoidformBuff) > 15) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth cds"; end
+    end
+    -- use_item,name=manifesto_of_madness,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
+    if I.ManifestoofMadness:IsEquipReady() and (EnemiesCount >= 2) then
+      if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness cds"; end
     end
     -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
     if S.FocusedAzeriteBeam:IsCastableP() and (EnemiesCount >= 2 or Settings.Shadow.UseFABST) then
