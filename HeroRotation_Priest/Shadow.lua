@@ -249,7 +249,7 @@ local function APL()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth cds"; end
     end
     -- use_item,name=manifesto_of_madness,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-    if I.ManifestoofMadness:IsEquipReady() and (EnemiesCount >= 2) then
+    if I.ManifestoofMadness:IsEquipReady() and (EnemiesCount >= 2 or Settings.Shadow.UseFABST) then
       if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness cds"; end
     end
     -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
