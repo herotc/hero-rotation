@@ -90,13 +90,16 @@ local S = Spell.Warrior.Arms;
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Arms = {
   PotionofFocusedResolve           = Item(168506),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14})
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Warrior.Arms;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169314, 169311 }
+local OnUseExcludes = {
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

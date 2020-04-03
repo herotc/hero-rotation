@@ -92,13 +92,16 @@ end
 if not Item.Monk then Item.Monk = {} end
 Item.Monk.Brewmaster = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14})
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.Monk.Brewmaster;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169311, 167555 }
+local OnUseExcludes = {
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

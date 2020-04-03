@@ -79,16 +79,22 @@ if not Item.DeathKnight then Item.DeathKnight = {}; end
   Item.DeathKnight.Blood = {
   --Potion
   PotionofUnbridledFury            = Item(169299),
-  GrongsPrimalRage                 = Item(165574, {13, 14}),
-  RazdunksBigRedButton             = Item(159611, {13, 14}),
   MerekthasFang                    = Item(158367, {13, 14}),
+  RazdunksBigRedButton             = Item(159611, {13, 14}),
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   DribblingInkpod                  = Item(169319, {13, 14}),
 };
 local I = Item.DeathKnight.Blood;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 165574, 159611, 158367, 169311 }
+local OnUseExcludes = {
+  I.MerekthasFang:ID(),
+  I.RazdunksBigRedButton:ID(),
+  I.GrongsPrimalRage:ID(),
+  I.AshvanesRazorCoral:ID(),
+  I.DribblingInkpod:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

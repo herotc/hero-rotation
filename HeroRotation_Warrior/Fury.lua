@@ -85,7 +85,10 @@ Item.Warrior.Fury = {
 local I = Item.Warrior.Fury;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169311, 169314 }
+local OnUseExcludes = {
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

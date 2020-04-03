@@ -106,13 +106,16 @@ local S = Spell.Shaman.Enhancement;
 if not Item.Shaman then Item.Shaman = {} end
 Item.Shaman.Enhancement = {
   PotionofUnbridledFury            = Item(169299),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14})
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Shaman.Enhancement;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169314, 169311 }
+local OnUseExcludes = {
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

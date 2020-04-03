@@ -77,13 +77,16 @@ local S = Spell.Druid.Guardian;
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Guardian = {
   PotionofFocusedResolve           = Item(168506),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14})
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14})
 };
 local I = Item.Druid.Guardian;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169311, 167555 }
+local OnUseExcludes = {
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

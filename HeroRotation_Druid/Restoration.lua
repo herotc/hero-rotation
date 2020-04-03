@@ -71,7 +71,9 @@ Item.Druid.Restoration = {
 local I = Item.Druid.Restoration;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 167555 }
+local OnUseExcludes = {
+  I.PocketsizedComputationDevice:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

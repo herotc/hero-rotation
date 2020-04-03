@@ -90,7 +90,11 @@ Item.Mage.Frost = {
 local I = Item.Mage.Frost;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 159630, 165576, 167555 }
+local OnUseExcludes = {
+  I.BalefireBranch:ID(),
+  I.TidestormCodex:ID(),
+  I.PocketsizedComputationDevice:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

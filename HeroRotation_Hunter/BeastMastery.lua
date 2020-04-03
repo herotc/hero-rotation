@@ -98,14 +98,18 @@ local S = Spell.Hunter.BeastMastery;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Hunter.BeastMastery;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169311, 167555, 169314 }
+local OnUseExcludes = {
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

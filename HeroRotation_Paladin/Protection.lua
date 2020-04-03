@@ -70,17 +70,24 @@ end
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Protection = {
   PotionofUnbridledFury            = Item(169299),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  GrongsPrimalRage                 = Item(165574, {13, 14}),
   MerekthasFang                    = Item(158367, {13, 14}),
   RazdunksBigRedButton             = Item(159611, {13, 14}),
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14})
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Paladin.Protection;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169314, 165574, 158367, 159611, 169311, 167555 }
+local OnUseExcludes = {
+  I.MerekthasFang:ID(),
+  I.RazdunksBigRedButton:ID(),
+  I.GrongsPrimalRage:ID(),
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

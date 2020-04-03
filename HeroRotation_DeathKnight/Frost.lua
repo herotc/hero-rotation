@@ -92,15 +92,15 @@ local S = Spell.DeathKnight.Frost;
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Frost = {
   PotionofUnbridledFury            = Item(169299),
-  RazdunksBigRedButton             = Item(159611, {13, 14}),
   MerekthasFang                    = Item(158367, {13, 14}),
+  RazdunksBigRedButton             = Item(159611, {13, 14}),
   KnotofAncientFuryAlliance        = Item(161413, {13, 14}),
-  KnotofAncientFuryHorde           = Item(166795, {13, 14}),
   GrongsPrimalRage                 = Item(165574, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  LurkersInsidiousGift             = Item(167866, {13, 14}),
+  KnotofAncientFuryHorde           = Item(166795, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  LurkersInsidiousGift             = Item(167866, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
   -- "Other On Use"
   FirstMatesSpyglass               = Item(158163, {13, 14}),
   NotoriousGladiatorsBadge         = Item(167380, {13, 14}),
@@ -113,7 +113,17 @@ Item.DeathKnight.Frost = {
 local I = Item.DeathKnight.Frost;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 159611, 158367, 161413, 166795, 165574, 169314, 167866, 167555, 169311 }
+local OnUseExcludes = {
+  I.MerekthasFang:ID(),
+  I.RazdunksBigRedButton:ID(),
+  I.KnotofAncientFuryAlliance:ID(),
+  I.GrongsPrimalRage:ID(),
+  I.KnotofAncientFuryHorde:ID(),
+  I.PocketsizedComputationDevice:ID(),
+  I.LurkersInsidiousGift:ID(),
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

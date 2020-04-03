@@ -118,7 +118,11 @@ Item.Mage.Arcane = {
 local I = Item.Mage.Arcane;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 165576, 167555, 169314 }
+local OnUseExcludes = {
+  I.TidestormCodex:ID(),
+  I.PocketsizedComputationDevice:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string

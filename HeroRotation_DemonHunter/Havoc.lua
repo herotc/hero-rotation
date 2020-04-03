@@ -81,16 +81,22 @@ local S = Spell.DemonHunter.Havoc;
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Havoc = {
   PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  DribblingInkpod                  = Item(169319, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
   GalecallersBoon                  = Item(159614, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14})
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  DribblingInkpod                  = Item(169319, {13, 14})
 };
 local I = Item.DemonHunter.Havoc;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169311, 169314, 159614, 167555 }
+local OnUseExcludes = {
+  I.GalecallersBoon:ID(),
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID(),
+  I.DribblingInkpod:ID()
+}
 
 
 -- Rotation Var

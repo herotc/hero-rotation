@@ -74,14 +74,18 @@ local S = Spell.Paladin.Retribution;
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Retribution = {
   PotionofFocusedResolve           = Item(168506),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14})
+  AzsharasFontofPower              = Item(169314, {13, 14})
 };
 local I = Item.Paladin.Retribution;
 
 -- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = { 169311, 169314, 167555 }
+local OnUseExcludes = {
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID()
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
