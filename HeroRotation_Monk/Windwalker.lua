@@ -167,8 +167,8 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn;
-local VarTodOnUse;
-local VarHoldTod;
+local VarTodOnUse = false;
+local VarHoldTod = false;
 local VarFoPPreChan = 0;
 
 -- GUI Settings
@@ -281,11 +281,11 @@ local function APL ()
     end
     -- variable,name=tod_on_use_trinket,op=set,value=equipped.cyclotronic_blast|equipped.lustrous_golden_plumage|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.remote_guidance_device
     if (true) then
-      VarTodOnUse = bool(Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.RemoteGuidanceDevice:IsEquipped())
+      VarTodOnUse = (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.RemoteGuidanceDevice:IsEquipped())
     end
     -- variable,name=hold_tod,op=set,value=cooldown.touch_of_death.remains+9>target.time_to_die|!talent.serenity.enabled&!variable.tod_on_use_trinket&equipped.dribbling_inkpod&target.time_to_pct_30.remains<130&target.time_to_pct_30.remains>8|target.time_to_die<130&target.time_to_die>cooldown.serenity.remains&cooldown.serenity.remains>2|buff.serenity.up&target.time_to_die>11
     if (true) then
-      VarHoldTod = bool(S.TouchofDeath:CooldownRemainsP() + 9 > Target:TimeToDie() or not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8 or Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemainsP() and S.Serenity:CooldownRemainsP() > 2 or Player:BuffP(S.SerenityBuff) and Target:TimeToDie() > 11)
+      VarHoldTod = (S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or (not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8) or (Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemains() and S.Serenity:CooldownRemains() > 2) or (Player:Buff(S.SerenityBuff) and Target:TimeToDie() > 11)
     end
     -- variable,name=font_of_power_precombat_channel,op=set,value=19,if=!talent.serenity.enabled&(variable.tod_on_use_trinket|equipped.ashvanes_razor_coral)
     if (not S.Serenity:IsAvailable() and (VarTodOnUse or I.AshvanesRazorCoral:IsEquipped())) then
