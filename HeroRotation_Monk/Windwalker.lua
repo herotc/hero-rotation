@@ -206,11 +206,11 @@ local function EvaluateTargetIfFilterMarkoftheCrane400(TargetUnit)
 end
 
 local function EvaluateTargetIfFistoftheWhiteTiger402(TargetUnit)
-  return (Player:ChiDeficit() >= 3 and Player:BuffDownP(S.SerenityBuff) and Player:BuffDownP(S.SeethingRageBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5))
+  return (Player:ChiDeficit() >= 3 and Player:BuffDownP(S.SerenityBuff) and Player:BuffDownP(S.SeethingRageBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not VarHoldTod or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5))
 end
 
 local function EvaluateTargetIfTigerPalm404(TargetUnit)
-  return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff) or Cache.EnemiesCount[8] > 2) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5))
+  return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff) or Cache.EnemiesCount[8] > 2) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not VarHoldTod or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5))
 end
 
 local function EvaluateTargetIfRisingSunKick406(TargetUnit)
@@ -226,7 +226,7 @@ local function EvaluateTargetIfBlackoutKick410(TargetUnit)
 end
 
 local function EvaluateTargetIfRisingSunKick412(TargetUnit)
-  return (S.TouchofDeath:CooldownRemainsP() > 2 or bool(VarHoldTod))
+  return (S.TouchofDeath:CooldownRemainsP() > 2 or VarHoldTod)
 end
 
 local function EvaluateTargetIfTigerPalm414(TargetUnit)
@@ -234,7 +234,7 @@ local function EvaluateTargetIfTigerPalm414(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick416(TargetUnit)
-  return (ComboStrike(S.BlackoutKick) and ((S.TouchofDeath:CooldownRemainsP() > 2 or bool(VarHoldTod)) and (S.RisingSunKick:CooldownRemainsP() > 2 and S.FistsofFury:CooldownRemainsP() > 2 or S.RisingSunKick:CooldownRemainsP() < 3 and S.FistsofFury:CooldownRemainsP() > 3 and Player:Chi() > 2 or S.RisingSunKick:CooldownRemainsP() > 3 and S.FistsofFury:CooldownRemainsP() < 3 and Player:Chi() > 4 or Player:Chi() > 5) or Player:BuffP(S.BlackoutKickBuff)))
+  return (ComboStrike(S.BlackoutKick) and ((S.TouchofDeath:CooldownRemainsP() > 2 or VarHoldTod) and (S.RisingSunKick:CooldownRemainsP() > 2 and S.FistsofFury:CooldownRemainsP() > 2 or S.RisingSunKick:CooldownRemainsP() < 3 and S.FistsofFury:CooldownRemainsP() > 3 and Player:Chi() > 2 or S.RisingSunKick:CooldownRemainsP() > 3 and S.FistsofFury:CooldownRemainsP() < 3 and Player:Chi() > 4 or Player:Chi() > 5) or Player:BuffP(S.BlackoutKickBuff)))
 end
 
 local function EvaluateTargetIfTigerPalm418(TargetUnit)
@@ -269,7 +269,6 @@ local function APL ()
   -- Unit Update
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-
   -- Pre Combat --
   Precombat = function()
     -- flask
@@ -282,14 +281,14 @@ local function APL ()
     end
     -- variable,name=tod_on_use_trinket,op=set,value=equipped.cyclotronic_blast|equipped.lustrous_golden_plumage|equipped.gladiators_badge|equipped.gladiators_medallion|equipped.remote_guidance_device
     if (true) then
-      VarTodOnUse = num(Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.RemoteGuidanceDevice:IsEquipped())
+      VarTodOnUse = bool(Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.RemoteGuidanceDevice:IsEquipped())
     end
     -- variable,name=hold_tod,op=set,value=cooldown.touch_of_death.remains+9>target.time_to_die|!talent.serenity.enabled&!variable.tod_on_use_trinket&equipped.dribbling_inkpod&target.time_to_pct_30.remains<130&target.time_to_pct_30.remains>8|target.time_to_die<130&target.time_to_die>cooldown.serenity.remains&cooldown.serenity.remains>2|buff.serenity.up&target.time_to_die>11
     if (true) then
-      VarHoldTod = num(S.TouchofDeath:CooldownRemainsP() + 9 > Target:TimeToDie() or not S.Serenity:IsAvailable() and not bool(VarTodOnUse) and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8 or Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemainsP() and S.Serenity:CooldownRemainsP() > 2 or Player:BuffP(S.SerenityBuff) and Target:TimeToDie() > 11)
+      VarHoldTod = bool(S.TouchofDeath:CooldownRemainsP() + 9 > Target:TimeToDie() or not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8 or Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemainsP() and S.Serenity:CooldownRemainsP() > 2 or Player:BuffP(S.SerenityBuff) and Target:TimeToDie() > 11)
     end
     -- variable,name=font_of_power_precombat_channel,op=set,value=19,if=!talent.serenity.enabled&(variable.tod_on_use_trinket|equipped.ashvanes_razor_coral)
-    if (not S.Serenity:IsAvailable() and (bool(VarTodOnUse) or I.AshvanesRazorCoral:IsEquipped())) then
+    if (not S.Serenity:IsAvailable() and (VarTodOnUse or I.AshvanesRazorCoral:IsEquipped())) then
       VarFoPPreChan = 19
     end
     -- use_item,name=azsharas_font_of_power
@@ -347,17 +346,17 @@ local function APL ()
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 54"; end
     end
     -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<25
-    if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not bool(VarHoldTod) or Target:TimeToDie() < 25) then
+    if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod or Target:TimeToDie() < 25) then
       if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 56"; end
     end
     -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<20
     -- 58
     -- touch_of_death,if=!variable.hold_tod
-    if S.TouchofDeath:IsReadyP() and (not bool(VarHoldTod)) then
+    if S.TouchofDeath:IsReadyP() and (not VarHoldTod) then
       if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 60"; end
     end
     -- use_item,name=pocketsized_computation_device,if=buff.serenity.down&(cooldown.touch_of_death.remains>10|!variable.hold_tod)|target.time_to_die<5
-    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.SerenityBuff) and (S.TouchofDeath:CooldownRemainsP() > 10 or not bool(VarHoldTod)) or Target:TimeToDie() < 5) then
+    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.SerenityBuff) and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) or Target:TimeToDie() < 5) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 62"; end
     end
     -- blood_of_the_enemy,if=buff.serenity.down&(cooldown.serenity.remains>20|cooldown.serenity.remains<2)|target.time_to_die<15
@@ -366,7 +365,7 @@ local function APL ()
     end
     if (Settings.Commons.UseTrinkets) then
       -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>10|!variable.hold_tod
-      if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not bool(VarHoldTod)) then
+      if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) then
         if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 66"; end
       end
       -- use_item,effect_name=gladiators_badge,if=cooldown.serenity.remains>20|target.time_to_die<20
@@ -376,7 +375,7 @@ local function APL ()
         if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 70"; end
       end
       -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>10|!variable.hold_tod
-      if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not bool(VarHoldTod)) then
+      if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) then
         if HR.Cast(I.WrithingSegmentofDrestagath, nil, Settings.Commons.TrinketDisplayStyle, 8) then return "writhing_segment_of_drestagath 72"; end
       end
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.serenity.remains>9|target.time_to_die<25
@@ -437,15 +436,15 @@ local function APL ()
       if HR.Cast(S.InvokeXuentheWhiteTiger, nil, nil, 40) then return "invoke_xuen_the_white_tiger 100"; end
     end
     -- use_item,name=azsharas_font_of_power,if=buff.storm_earth_and_fire.down&!dot.touch_of_death.remains&(cooldown.touch_of_death.remains<15|cooldown.touch_of_death.remains<21&(variable.tod_on_use_trinket|equipped.ashvanes_razor_coral)|variable.hold_tod|target.time_to_die<40)
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.StormEarthandFireBuff) and Target:DebuffDownP(S.TouchofDeathDebuff) and (S.TouchofDeath:CooldownRemainsP() < 15 or S.TouchofDeath:CooldownRemainsP() < 21 and (bool(VarTodOnUse) or I.AshvanesRazorCoral:IsEquipped()) or bool(VarHoldTod) or Target:TimeToDie() < 40)) then
+    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.StormEarthandFireBuff) and Target:DebuffDownP(S.TouchofDeathDebuff) and (S.TouchofDeath:CooldownRemainsP() < 15 or S.TouchofDeath:CooldownRemainsP() < 21 and (VarTodOnUse or I.AshvanesRazorCoral:IsEquipped()) or VarHoldTod or Target:TimeToDie() < 40)) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 102"; end
     end
     -- guardian_of_azeroth,if=target.time_to_die>185|!variable.hold_tod&cooldown.touch_of_death.remains<=14|target.time_to_die<35
-    if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() > 185 or not bool(VarHoldTod) and S.TouchofDeath:CooldownRemainsP() <= 14 or Target:TimeToDie() < 35) then
+    if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() > 185 or not VarHoldTod and S.TouchofDeath:CooldownRemainsP() <= 14 or Target:TimeToDie() < 35) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 104"; end
     end
     -- worldvein_resonance,if=cooldown.touch_of_death.remains>58|cooldown.touch_of_death.remains<2|variable.hold_tod|target.time_to_die<20
-    if S.WorldveinResonance:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 58 or S.TouchofDeath:CooldownRemainsP() < 2 or bool(VarHoldTod) or Target:TimeToDie() < 20) then
+    if S.WorldveinResonance:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 58 or S.TouchofDeath:CooldownRemainsP() < 2 or VarHoldTod or Target:TimeToDie() < 20) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 106"; end
     end
     -- arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
@@ -453,68 +452,68 @@ local function APL ()
       if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 108"; end
     end
     -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<25
-    if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not bool(VarHoldTod) or Target:TimeToDie() < 25) then
+    if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod or Target:TimeToDie() < 25) then
       if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 110"; end
     end
     -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<20
     -- 112
     -- touch_of_death,if=!variable.hold_tod&(!equipped.cyclotronic_blast|cooldown.cyclotronic_blast.remains<=1)&(chi>1|energy<40)
-    if S.TouchofDeath:IsReadyP() and (not bool(VarHoldTod) and (not Everyone.PSCDEquipped() or Everyone.PSCDEquipReady()) and (Player:Chi() > 1 or Player:Energy() < 40)) then
+    if S.TouchofDeath:IsReadyP() and (not VarHoldTod and (not Everyone.PSCDEquipped() or Everyone.PSCDEquipReady()) and (Player:Chi() > 1 or Player:Energy() < 40)) then
       if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 114"; end
     end
     -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|dot.touch_of_death.remains|target.time_to_die<20|(buff.worldvein_resonance.remains>10|cooldown.worldvein_resonance.remains>cooldown.storm_earth_and_fire.full_recharge_time|!essence.worldvein_resonance.major)&(cooldown.touch_of_death.remains>cooldown.storm_earth_and_fire.full_recharge_time|variable.hold_tod&!equipped.dribbling_inkpod)&cooldown.fists_of_fury.remains<=9&chi>=3&cooldown.whirling_dragon_punch.remains<=13
-    if S.StormEarthandFire:IsReadyP() and (S.StormEarthandFire:Charges() == 2 or Target:DebuffP(S.TouchofDeathDebuff) or Target:TimeToDie() < 20 or (Player:BuffRemainsP(S.LifebloodBuff) > 10 or S.WorldveinResonance:CooldownRemainsP() > S.StormEarthandFire:FullRechargeTime() or not Spell:MajorEssenceEnabled(AE.WorldveinResonance)) and (S.TouchofDeath:CooldownRemainsP() > S.StormEarthandFire:FullRechargeTime() or bool(VarHoldTod) and not I.DribblingInkpod:IsEquipped()) and S.FistsofFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 13) then
+    if S.StormEarthandFire:IsReadyP() and (S.StormEarthandFire:Charges() == 2 or Target:DebuffP(S.TouchofDeathDebuff) or Target:TimeToDie() < 20 or (Player:BuffRemainsP(S.LifebloodBuff) > 10 or S.WorldveinResonance:CooldownRemainsP() > S.StormEarthandFire:FullRechargeTime() or not Spell:MajorEssenceEnabled(AE.WorldveinResonance)) and (S.TouchofDeath:CooldownRemainsP() > S.StormEarthandFire:FullRechargeTime() or VarHoldTod and not I.DribblingInkpod:IsEquipped()) and S.FistsofFury:CooldownRemainsP() <= 9 and Player:Chi() >= 3 and S.WhirlingDragonPunch:CooldownRemainsP() <= 13) then
       if HR.Cast(S.StormEarthandFire, Settings.Windwalker.GCDasOffGCD.StormEarthandFire) then return "storm_earth_and_fire 116"; end
     end
     -- blood_of_the_enemy,if=cooldown.touch_of_death.remains>45|variable.hold_tod&cooldown.fists_of_fury.remains<2|target.time_to_die<12|target.time_to_die>100&target.time_to_die<110&(cooldown.fists_of_fury.remains<3|cooldown.whirling_dragon_punch.remains<5|cooldown.rising_sun_kick.remains<5)
-    if S.BloodoftheEnemy:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 45 or bool(VarHoldTod) and S.FistsofFury:CooldownRemainsP() < 2 or Target:TimeToDie() < 12 or Target:TimeToDie() > 100 and Target:TimeToDie() < 110 and (S.FistsofFury:CooldownRemainsP() < 3 or S.WhirlingDragonPunch:CooldownRemainsP() < 5 or S.RisingSunKick:CooldownRemainsP() < 5)) then
+    if S.BloodoftheEnemy:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 45 or VarHoldTod and S.FistsofFury:CooldownRemainsP() < 2 or Target:TimeToDie() < 12 or Target:TimeToDie() > 100 and Target:TimeToDie() < 110 and (S.FistsofFury:CooldownRemainsP() < 3 or S.WhirlingDragonPunch:CooldownRemainsP() < 5 or S.RisingSunKick:CooldownRemainsP() < 5)) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 118"; end
     end
     -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&((cooldown.concentrated_flame.remains<=cooldown.touch_of_death.remains+1|variable.hold_tod)&(!talent.whirling_dragon_punch.enabled|cooldown.whirling_dragon_punch.remains)&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&buff.storm_earth_and_fire.down|dot.touch_of_death.remains)|target.time_to_die<8
-    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and ((S.ConcentratedFlame:CooldownRemainsP() <= S.TouchofDeath:CooldownRemainsP() + 1 or bool(VarHoldTod)) and (not S.WhirlingDragonPunch:IsAvailable() or not S.WhirlingDragonPunch:CooldownUpP()) and not S.RisingSunKick:CooldownUpP() and not S.FistsofFury:CooldownUpP() and Player:BuffDownP(S.StormEarthandFireBuff) or Target:DebuffP(S.TouchofDeathDebuff)) or Target:TimeToDie() < 8) then
+    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and ((S.ConcentratedFlame:CooldownRemainsP() <= S.TouchofDeath:CooldownRemainsP() + 1 or VarHoldTod) and (not S.WhirlingDragonPunch:IsAvailable() or not S.WhirlingDragonPunch:CooldownUpP()) and not S.RisingSunKick:CooldownUpP() and not S.FistsofFury:CooldownUpP() and Player:BuffDownP(S.StormEarthandFireBuff) or Target:DebuffP(S.TouchofDeathDebuff)) or Target:TimeToDie() < 8) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 120"; end
     end
     -- blood_fury,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<20
-    if S.BloodFury:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or bool(VarHoldTod) or Target:TimeToDie() < 20) then
+    if S.BloodFury:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 20) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 122"; end
     end
     -- ancestral_call,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<20
-    if S.AncestralCall:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or bool(VarHoldTod) or Target:TimeToDie() < 20) then
+    if S.AncestralCall:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 20) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 124"; end
     end
     -- fireblood,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<10
-    if S.Fireblood:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or bool(VarHoldTod) or Target:TimeToDie() < 10) then
+    if S.Fireblood:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 10) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 126"; end
     end
     -- berserking,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<15
-    if S.Berserking:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or bool(VarHoldTod) or Target:TimeToDie() < 15) then
+    if S.Berserking:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 15) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 128"; end
     end
     if (Settings.Commons.UseTrinkets) then
       -- use_item,name=pocketsized_computation_device,if=cooldown.touch_of_death.remains>30|!variable.hold_tod
-      if Everyone.PSCDEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or not bool(VarHoldTod)) then
+      if Everyone.PSCDEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or not VarHoldTod) then
         if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 130"; end
       end
       -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>30|!variable.hold_tod
-      if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or not bool(VarHoldTod)) then
+      if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or not VarHoldTod) then
         if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 132"; end
       end
       -- use_item,effect_name=gladiators_badge,if=cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<20
       -- 134
       -- use_item,name=galecallers_boon,if=cooldown.touch_of_death.remains>55|variable.hold_tod|target.time_to_die<12
-      if I.GalecallersBoon:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 55 or bool(VarHoldTod) or Target:TimeToDie() < 12) then
+      if I.GalecallersBoon:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 55 or VarHoldTod or Target:TimeToDie() < 12) then
         if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 136"; end
       end
       -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>20|!variable.hold_tod
-      if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 20 or not bool(VarHoldTod)) then
+      if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod) then
         if HR.Cast(I.WrithingSegmentofDrestagath, nil, Settings.Commons.TrinketDisplayStyle, 8) then return "writhing_segment_of_drestagath 138"; end
       end
       -- use_item,name=ashvanes_razor_coral,if=variable.tod_on_use_trinket&(cooldown.touch_of_death.remains>21|variable.hold_tod)&(debuff.razor_coral_debuff.down|buff.storm_earth_and_fire.remains>13|target.time_to_die-cooldown.touch_of_death.remains<40&cooldown.touch_of_death.remains<25|target.time_to_die<25)
-      if I.AshvanesRazorCoral:IsEquipReady() and (bool(VarTodOnUse) and (S.TouchofDeath:CooldownRemainsP() > 21 or bool(VarHoldTod)) and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthandFireBuff) > 13 or Target:TimeToDie() - S.TouchofDeath:CooldownRemainsP() < 40 and S.TouchofDeath:CooldownRemainsP() < 25 or Target:TimeToDie() < 25)) then
+      if I.AshvanesRazorCoral:IsEquipReady() and (VarTodOnUse and (S.TouchofDeath:CooldownRemainsP() > 21 or VarHoldTod) and (Target:DebuffDownP(S.RazorCoralDebuff) or Player:BuffRemainsP(S.StormEarthandFireBuff) > 13 or Target:TimeToDie() - S.TouchofDeath:CooldownRemainsP() < 40 and S.TouchofDeath:CooldownRemainsP() < 25 or Target:TimeToDie() < 25)) then
         if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 140"; end
       end
       -- use_item,name=ashvanes_razor_coral,if=!variable.tod_on_use_trinket&(debuff.razor_coral_debuff.down|(!equipped.dribbling_inkpod|target.time_to_pct_30.remains<8)&(dot.touch_of_death.remains|cooldown.touch_of_death.remains+9>target.time_to_die)&buff.storm_earth_and_fire.up|target.time_to_die<25)
-      if I.AshvanesRazorCoral:IsEquipReady() and (not bool(VarTodOnUse) and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchofDeathDebuff) or S.TouchofDeath:CooldownRemainsP() + 9 > Target:TimeToDie()) and Player:BuffP(S.StormEarthandFireBuff) or Target:TimeToDie() < 25)) then
+      if I.AshvanesRazorCoral:IsEquipReady() and (not VarTodOnUse and (Target:DebuffDownP(S.RazorCoralDebuff) or (not I.DribblingInkpod:IsEquipped() or Target:TimeToX(30) < 8) and (Target:DebuffP(S.TouchofDeathDebuff) or S.TouchofDeath:CooldownRemainsP() + 9 > Target:TimeToDie()) and Player:BuffP(S.StormEarthandFireBuff) or Target:TimeToDie() < 25)) then
         if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 142"; end
       end
       -- call_action_list,name=use_items
@@ -599,7 +598,7 @@ local function APL ()
       if HR.Cast(S.WhirlingDragonPunch, nil, nil, 8) then return "whirling_dragon_punch 190"; end
     end
     -- fists_of_fury,if=talent.serenity.enabled|cooldown.touch_of_death.remains>6|variable.hold_tod
-    if S.FistsofFury:IsReadyP() and (S.Serenity:IsAvailable() or S.TouchofDeath:CooldownRemainsP() > 6 or bool(VarHoldTod)) then
+    if S.FistsofFury:IsReadyP() and (S.Serenity:IsAvailable() or S.TouchofDeath:CooldownRemainsP() > 6 or VarHoldTod) then
       if HR.Cast(S.FistsofFury, nil, nil, 8) then return "fists_of_fury 192"; end
     end
     -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=cooldown.touch_of_death.remains>2|variable.hold_tod
@@ -607,7 +606,7 @@ local function APL ()
       if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfRisingSunKick412) then return "rising_sun_kick 194"; end
     end
     -- Manual add to avoid main target icon problems
-    if S.RisingSunKick:IsReadyP() and (S.TouchofDeath:CooldownRemainsP() > 2 or bool(VarHoldTod)) then
+    if S.RisingSunKick:IsReadyP() and (S.TouchofDeath:CooldownRemainsP() > 2 or VarHoldTod) then
       if HR.Cast(S.RisingSunKick, nil, nil, "Melee") then return "rising_sun_kick 218"; end
     end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
@@ -655,7 +654,7 @@ local function APL ()
       if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfBlackoutKick416) then return "blackout_kick 212"; end
     end
     -- Manual add to avoid main target icon problems
-    if S.BlackoutKick:IsReadyP() and (ComboStrike(S.BlackoutKick) and ((S.TouchofDeath:CooldownRemainsP() > 2 or bool(VarHoldTod)) and (S.RisingSunKick:CooldownRemainsP() > 2 and S.FistsofFury:CooldownRemainsP() > 2 or S.RisingSunKick:CooldownRemainsP() < 3 and S.FistsofFury:CooldownRemainsP() > 3 and Player:Chi() > 2 or S.RisingSunKick:CooldownRemainsP() > 3 and S.FistsofFury:CooldownRemainsP() < 3 and Player:Chi() > 4 or Player:Chi() > 5) or Player:BuffP(S.BlackoutKickBuff))) then
+    if S.BlackoutKick:IsReadyP() and (ComboStrike(S.BlackoutKick) and ((S.TouchofDeath:CooldownRemainsP() > 2 or VarHoldTod) and (S.RisingSunKick:CooldownRemainsP() > 2 and S.FistsofFury:CooldownRemainsP() > 2 or S.RisingSunKick:CooldownRemainsP() < 3 and S.FistsofFury:CooldownRemainsP() > 3 and Player:Chi() > 2 or S.RisingSunKick:CooldownRemainsP() > 3 and S.FistsofFury:CooldownRemainsP() < 3 and Player:Chi() > 4 or Player:Chi() > 5) or Player:BuffP(S.BlackoutKickBuff))) then
       if HR.Cast(S.BlackoutKick, nil, nil, "Melee") then return "blackout_kick 224"; end
     end
     -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>1
@@ -767,7 +766,7 @@ local function APL ()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 20"; end
     end
     -- reverse_harm,if=chi.max-chi>=2&(talent.serenity.enabled|!dot.touch_of_death.remains)&buff.serenity.down&(energy.time_to_max<1|talent.serenity.enabled&cooldown.serenity.remains<2|!talent.serenity.enabled&cooldown.touch_of_death.remains<3&!variable.hold_tod|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
-    if S.ReverseHarm:IsReadyP() and (Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff)) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
+    if S.ReverseHarm:IsReadyP() and (Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff)) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not VarHoldTod or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
       if HR.Cast(S.ReverseHarm, nil, nil, 10) then return "reverse_harm 22"; end
     end
     -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3&buff.serenity.down&buff.seething_rage.down&(energy.time_to_max<1|talent.serenity.enabled&cooldown.serenity.remains<2|!talent.serenity.enabled&cooldown.touch_of_death.remains<3&!variable.hold_tod|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
@@ -775,7 +774,7 @@ local function APL ()
       if HR.CastTargetIf(S.FistoftheWhiteTiger, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfFistoftheWhiteTiger402) then return "fist_of_the_white_tiger 24"; end
     end
     -- Manual add to avoid main target icon problems
-    if S.FistoftheWhiteTiger:IsReadyP() and (Player:ChiDeficit() >= 3 and Player:BuffDownP(S.SerenityBuff) and Player:BuffDownP(S.SeethingRageBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
+    if S.FistoftheWhiteTiger:IsReadyP() and (Player:ChiDeficit() >= 3 and Player:BuffDownP(S.SerenityBuff) and Player:BuffDownP(S.SeethingRageBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not VarHoldTod or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
       if HR.Cast(S.FistoftheWhiteTiger, nil, nil, "Melee") then return "fist_of_the_white_tiger 25"; end
     end
     -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!combo_break&chi.max-chi>=2&(talent.serenity.enabled|!dot.touch_of_death.remains|active_enemies>2)&buff.seething_rage.down&buff.serenity.down&(energy.time_to_max<1|talent.serenity.enabled&cooldown.serenity.remains<2|!talent.serenity.enabled&cooldown.touch_of_death.remains<3&!variable.hold_tod|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
@@ -783,7 +782,7 @@ local function APL ()
       if HR.CastTargetIf(S.TigerPalm, 8, "min", EvaluateTargetIfFilterMarkoftheCrane400, EvaluateTargetIfTigerPalm404) then return "tiger_palm 26"; end
     end
     -- Manual add to avoid main target icon problems
-    if S.TigerPalm:IsReadyP() and (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff) or Cache.EnemiesCount[8] > 2) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not bool(VarHoldTod) or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
+    if S.TigerPalm:IsReadyP() and (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff) or Cache.EnemiesCount[8] > 2) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not VarHoldTod or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
       if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 27"; end
     end
     -- chi_wave,if=!talent.fist_of_the_white_tiger.enabled&prev_gcd.1.tiger_palm&time<=3
