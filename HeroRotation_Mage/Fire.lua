@@ -328,7 +328,7 @@ local function APL()
       if HR.Cast(S.Meteor, nil, nil, 40) then return "meteor 32"; end
     end
     -- dragons_breath,if=talent.alexstraszas_fury.enabled&(buff.combustion.down&!buff.hot_streak.react|buff.combustion.up&action.fire_blast.charges<action.fire_blast.max_charges&!buff.hot_streak.react)
-    if S.DragonsBreath:IsCastableP() and (S.AlexstraszasFury:IsAvailable() and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.HotStreakBuff) or Player:BuffP(S.CombustionBuff) and S.FireBlast:Charges() < S.FireBlast:MaxCharges() and not Player:BuffP(S.HotStreakBuff))) then
+    if S.DragonsBreath:IsCastableP(12) and (S.AlexstraszasFury:IsAvailable() and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.HotStreakBuff) or Player:BuffP(S.CombustionBuff) and S.FireBlast:Charges() < S.FireBlast:MaxCharges() and not Player:BuffP(S.HotStreakBuff))) then
       if HR.Cast(S.DragonsBreath, nil, nil, 12) then return "dragons_breath 34"; end
     end
   end
@@ -426,7 +426,7 @@ local function APL()
       if HR.Cast(S.LivingBomb, nil, nil, 40) then return "living_bomb 410"; end
     end
     -- dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
-    if S.DragonsBreath:IsCastableP() and (Player:BuffRemainsP(S.CombustionBuff) < Player:GCD() and Player:BuffP(S.CombustionBuff)) then
+    if S.DragonsBreath:IsCastableP(12) and (Player:BuffRemainsP(S.CombustionBuff) < Player:GCD() and Player:BuffP(S.CombustionBuff)) then
       if HR.Cast(S.DragonsBreath, nil, nil, 12) then return "dragons_breath 420"; end
     end
     -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
@@ -635,7 +635,7 @@ local function APL()
       if HR.Cast(S.Scorch, nil, nil, 40) then return "scorch 552"; end
     end
     -- dragons_breath,if=active_enemies>2
-    if S.DragonsBreath:IsCastableP() and (EnemiesCount > 2) then
+    if S.DragonsBreath:IsCastableP(12) and (EnemiesCount > 2) then
       if HR.Cast(S.DragonsBreath, nil, nil, 12) then return "dragons_breath 556"; end
     end
     -- flamestrike,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
@@ -689,7 +689,7 @@ local function APL()
       local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
     end
     -- dragons_breath,if=active_enemies>1
-    if S.DragonsBreath:IsCastableP() and (EnemiesCount > 1) then
+    if S.DragonsBreath:IsCastableP(12) and (EnemiesCount > 1) then
       if HR.Cast(S.DragonsBreath, nil, nil, 12) then return "dragons_breath 766"; end
     end
     -- call_action_list,name=items_low_priority
