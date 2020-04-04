@@ -284,9 +284,7 @@ local function APL ()
       VarTodOnUse = (Everyone.PSCDEquipped() or I.LustrousGoldenPlumage:IsEquipped() or I.NotoriousAspirantsBadge:IsEquipped() or I.NotoriousGladiatorsBadge:IsEquipped() or I.SinisterGladiatorsBadge:IsEquipped() or I.SinisterAspirantsBadge:IsEquipped() or I.DreadGladiatorsBadge:IsEquipped() or I.DreadAspirantsBadge:IsEquipped() or I.DreadCombatantsInsignia:IsEquipped() or I.NotoriousAspirantsMedallion:IsEquipped() or I.NotoriousGladiatorsMedallion:IsEquipped() or I.SinisterGladiatorsMedallion:IsEquipped() or I.SinisterAspirantsMedallion:IsEquipped() or I.DreadGladiatorsMedallion:IsEquipped() or I.DreadAspirantsMedallion:IsEquipped() or I.DreadCombatantsMedallion:IsEquipped() or I.RemoteGuidanceDevice:IsEquipped())
     end
     -- variable,name=hold_tod,op=set,value=cooldown.touch_of_death.remains+9>target.time_to_die|!talent.serenity.enabled&!variable.tod_on_use_trinket&equipped.dribbling_inkpod&target.time_to_pct_30.remains<130&target.time_to_pct_30.remains>8|target.time_to_die<130&target.time_to_die>cooldown.serenity.remains&cooldown.serenity.remains>2|buff.serenity.up&target.time_to_die>11
-    if (true) then
-      VarHoldTod = (S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or (not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8) or (Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemains() and S.Serenity:CooldownRemains() > 2) or (Player:Buff(S.SerenityBuff) and Target:TimeToDie() > 11)
-    end
+    -- Moved to main APL section to allow it to update every cycle
     -- variable,name=font_of_power_precombat_channel,op=set,value=19,if=!talent.serenity.enabled&(variable.tod_on_use_trinket|equipped.ashvanes_razor_coral)
     if (not S.Serenity:IsAvailable() and (VarTodOnUse or I.AshvanesRazorCoral:IsEquipped())) then
       VarFoPPreChan = 19
@@ -757,6 +755,10 @@ local function APL ()
   end
   -- In Combat
   if Everyone.TargetIsValid() then
+    -- Define VarHoldTod here instead of Precombat to allow it to use the constantly changing Target TimeToDie
+    if (true) then
+      VarHoldTod = ((S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or (not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8) or (Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemains() and S.Serenity:CooldownRemains() > 2) or (Player:Buff(S.SerenityBuff) and Target:TimeToDie() > 11))
+    end
     -- auto_attack
     -- Interrupts
     Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
