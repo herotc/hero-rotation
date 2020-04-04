@@ -757,7 +757,7 @@ local function APL ()
   if Everyone.TargetIsValid() then
     -- Define VarHoldTod here instead of Precombat to allow it to use the constantly changing Target TimeToDie
     if (true) then
-      VarHoldTod = ((S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or (not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8) or (Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemains() and S.Serenity:CooldownRemains() > 2) or (Player:Buff(S.SerenityBuff) and Target:TimeToDie() > 11))
+      VarHoldTod = ((S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or (not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8) or (Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemains() and S.Serenity:CooldownRemains() > 2) or (Player:Buff(S.SerenityBuff) and Target:TimeToDie() > 11) or Settings.Windwalker.IgnoreToD)
     end
     -- auto_attack
     -- Interrupts
