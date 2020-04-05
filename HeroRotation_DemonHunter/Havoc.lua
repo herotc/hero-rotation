@@ -98,7 +98,6 @@ local OnUseExcludes = {
   I.DribblingInkpod:ID()
 }
 
-
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 
@@ -129,6 +128,7 @@ local VarPoolingForBladeDance = 0;
 local VarPoolingForEyeBeam = 0;
 local VarWaitingForMomentum = 0;
 local VarWaitingForDarkSlash = 0;
+local VarFelBarrageSync = 0;
 
 HL:RegisterForEvent(function()
   VarPoolingForMeta = 0
@@ -138,6 +138,7 @@ HL:RegisterForEvent(function()
   VarPoolingForEyeBeam = 0
   VarWaitingForMomentum = 0
   VarWaitingForDarkSlash = 0
+  VarFelBarrageSync = 0
 end, "PLAYER_REGEN_ENABLED")
 
 local EnemyRanges = {40, 20, 8}
@@ -210,13 +211,21 @@ local function APL()
     end
   end
   Essences = function()
+    -- variable,name=fel_barrage_sync,if=talent.fel_barrage.enabled,value=cooldown.fel_barrage.ready&(((!talent.demonic.enabled|buff.metamorphosis.up)&!variable.waiting_for_momentum&raid_event.adds.in>30)|active_enemies>desired_targets)
+    if (S.FelBarrage:IsAvailable()) then
+      VarFelBarrageSync = num(S.FelBarrage:CooldownUpP() and (((not S.Demonic:IsAvailable() or Player:BuffP(S.MetamorphosisBuff)) and not bool(VarWaitingForMomentum)) or Cache.EnemiesCount[8] > 1))
+    end
     -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
     if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
-    -- blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
-    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or Target:TimeToDie() <= 10) then
+    -- blood_of_the_enemy,if=(!talent.fel_barrage.enabled|cooldown.fel_barrage.remains>45)&!variable.waiting_for_momentum&((!talent.demonic.enabled|buff.metamorphosis.up&!cooldown.blade_dance.ready)|target.time_to_die<=10)
+    if S.BloodoftheEnemy:IsCastableP() and ((not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemainsP() > 45) and not bool(VarWaitingForMomentum) and ((not S.Demonic:IsAvailable() or Player:BuffP(S.MetamorphosisBuff) and not S.BladeDance:CooldownUpP()) or Target:TimeToDie() <= 10)) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
+    end
+    -- blood_of_the_enemy,if=talent.fel_barrage.enabled&variable.fel_barrage_sync
+    if S.BloodoftheEnemy:IsCastableP() and (S.FelBarrage:IsAvailable() and bool(VarFelBarrageSync)) then
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy fel_barrage_sync"; end
     end
     -- guardian_of_azeroth,if=(buff.metamorphosis.up&cooldown.metamorphosis.ready)|buff.metamorphosis.remains>25|target.time_to_die<=30
     if S.GuardianofAzeroth:IsCastableP() and ((Player:BuffP(S.MetamorphosisBuff) and S.Metamorphosis:CooldownUpP()) or Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() <= 30) then
@@ -238,8 +247,8 @@ local function APL()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
-    -- worldvein_resonance,if=buff.metamorphosis.up
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff)) then
+    -- worldvein_resonance,if=buff.metamorphosis.up|variable.fel_barrage_sync
+    if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or bool(VarFelBarrageSync)) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
@@ -323,8 +332,8 @@ local function APL()
     if S.EyeBeam:IsReadyP(20) then
       if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 79"; end
     end
-    -- fel_barrage,if=((!cooldown.eye_beam.up|buff.metamorphosis.up)&raid_event.adds.in>30)|active_enemies>desired_targets
-    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and ((not S.EyeBeam:CooldownUpP() or Player:BuffP(S.MetamorphosisBuff)) or Cache.EnemiesCount[8] > 1) then
+    -- fel_barrage,if=(buff.metamorphosis.up&raid_event.adds.in>30)|active_enemies>desired_targets
+    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (Player:BuffP(S.MetamorphosisBuff) or Cache.EnemiesCount[8] > 1) then
       if HR.Cast(S.FelBarrage, nil, nil, 8) then return "fel_barrage 83"; end
     end
     -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
