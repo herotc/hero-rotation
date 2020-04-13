@@ -84,15 +84,16 @@
         {HR.SmallIconFrame.Icon[2], HR.GUISettings.General.BlackBorderIcon and 30 or 32, HR.GUISettings.General.BlackBorderIcon and 30 or 32},
         {HR.LeftIconFrame, 48, 48},
         {HR.SuggestedIconFrame, 32, 32},
+        {HR.MainIconPartOverlayFrame, 64, 64},
       };
-      for Key, Value in pairs(FramesToResize) do
+      for _, Value in pairs(FramesToResize) do
         Value[1]:SetWidth(Value[2]*Multiplier);
         Value[1]:SetHeight(Value[3]*Multiplier);
       end
-	  for i = 1, HR.MaxQueuedCasts do
-		HR.MainIconFrame.Part[i]:SetWidth(64*Multiplier);
-		HR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
-	  end
+      for i = 1, HR.MaxQueuedCasts do
+        HR.MainIconFrame.Part[i]:SetWidth(64*Multiplier);
+        HR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
+      end
       HR.SuggestedIconFrame:SetPoint("BOTTOM", HR.MainIconFrame, "LEFT", -HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2+(HR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
       HeroRotationDB.GUISettings["General.ScaleUI"] = Multiplier;
     end

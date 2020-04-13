@@ -324,7 +324,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   local StealthBuff = Player:Buff(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   local VanishBuffCheck = Player:Buff(VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
   -- actions.stealthed=shadowstrike,if=(talent.find_weakness.enabled|spell_targets.shuriken_storm<3)&(buff.stealth.up|buff.vanish.up)
-  if S.Shadowstrike:IsCastable() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange())
+  if S.Shadowstrike:IsCastableP() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange())
     and (S.FindWeakness:IsAvailable() or Cache.EnemiesCount[10] < 3) and (StealthBuff or VanishBuffCheck) then
     if ReturnSpellOnly then
       return S.Shadowstrike
@@ -369,7 +369,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
-  if HR.AoEON() and S.ShurikenStorm:IsCastable() and Cache.EnemiesCount[10] >= 3 then
+  if HR.AoEON() and S.ShurikenStorm:IsCastableP() and Cache.EnemiesCount[10] >= 3 then
     if ReturnSpellOnly then
       return S.ShurikenStorm
     else
@@ -377,7 +377,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.stealthed+=/shadowstrike
-  if S.Shadowstrike:IsCastable() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange()) then
+  if S.Shadowstrike:IsCastableP() and (Target:IsInRange(S.Shadowstrike) or IsInMeleeRange()) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -390,12 +390,6 @@ end
 -- # Stealth Macros
 -- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
 local function StealthMacro (StealthSpell, EnergyThreshold)
-  -- Set the stealth spell only as a pooling fallback if we did not meet the threshold
-  if EnergyThreshold and Player:EnergyPredicted() < EnergyThreshold then
-    SetPoolingAbility(StealthSpell, EnergyThreshold)
-    return false
-  end
-
   local MacroTable = {StealthSpell};
 
   -- Handle StealthMacro GUI options
@@ -412,6 +406,12 @@ local function StealthMacro (StealthSpell, EnergyThreshold)
   end
 
   tableinsert(MacroTable, Stealthed(true, StealthSpell))
+
+  -- Set the stealth spell only as a pooling fallback if we did not meet the threshold
+  if EnergyThreshold and Player:EnergyPredicted() < EnergyThreshold then
+    SetPoolingAbility(MacroTable, EnergyThreshold)
+    return false
+  end
 
    -- Note: In case DfA is adviced (which can only be a combo for ShD), we swap them to let understand it's DfA then ShD during DfA (DfA - ShD bug)
   if MacroTable[1] == S.ShadowDance and MacroTable[2] == S.DeathfromAbove then
@@ -756,7 +756,11 @@ local function APL ()
         if Player:IsStealthedP(true, true) then
           PoolingAbility = Stealthed(true);
           if PoolingAbility then -- To avoid pooling icon spam
-            if HR.CastPooling(PoolingAbility) then return "Stealthed Cast or Pool (OOC): "..PoolingAbility:Name(); end
+            if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
+              if HR.CastQueuePooling(nil, unpack(PoolingAbility)) then return "Stealthed Macro Cast or Pool (OOC): ".. PoolingAbility[1]:Name(); end
+            else
+              if HR.CastPooling(PoolingAbility) then return "Stealthed Cast or Pool (OOC): "..PoolingAbility:Name(); end
+            end
           end
         elseif Player:ComboPoints() >= 5 then
           ShouldReturn = Finish();
@@ -799,7 +803,11 @@ local function APL ()
       if Player:IsStealthedP(true, true) then
         PoolingAbility = Stealthed(true);
         if PoolingAbility then -- To avoid pooling icon spam
-          if HR.CastPooling(PoolingAbility) then return "Cast "..PoolingAbility:Name(); end
+          if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
+            if HR.CastQueuePooling(nil, unpack(PoolingAbility)) then return "Macro Cast or Pool: ".. PoolingAbility[1]:Name(); end
+          else
+            if HR.CastPooling(PoolingAbility) then return "Cast "..PoolingAbility:Name(); end
+          end
         else
           return "Stealthed Pooling";
         end
@@ -876,8 +884,12 @@ local function APL ()
         if HR.Cast(S.ShurikenToss) then return "Cast Shuriken Toss"; end
       end
       -- Show what ever was first stored for pooling
-      if PoolingAbility and PoolingAbility:IsCastable() and IsInMeleeRange() then
-        if HR.CastPooling(PoolingAbility, Player:EnergyTimeToX(PoolingEnergy)) then return "Pool towards: " .. PoolingAbility:Name() .. " at " .. PoolingEnergy; end
+      if PoolingAbility and IsInMeleeRange() then
+        if type(PoolingAbility) == "table" and #PoolingAbility > 1 then
+          if HR.CastQueuePooling(Player:EnergyTimeToX(PoolingEnergy), unpack(PoolingAbility)) then return "Macro pool towards ".. PoolingAbility[1]:Name() .. " at " .. PoolingEnergy; end
+        elseif PoolingAbility:IsCastable() then
+          if HR.CastPooling(PoolingAbility, Player:EnergyTimeToX(PoolingEnergy)) then return "Pool towards: " .. PoolingAbility:Name() .. " at " .. PoolingEnergy; end
+        end
       end
     end
 end

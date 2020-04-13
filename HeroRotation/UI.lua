@@ -101,7 +101,7 @@
     self.Texture:SetAllPoints(self);
     -- Cooldown
     self.CooldownFrame:SetAllPoints(self);
-
+    -- Multi-Cast Parts Overlay
     HR.MainIconPartOverlayFrame:SetFrameStrata(self:GetFrameStrata());
     HR.MainIconPartOverlayFrame:SetFrameLevel(self:GetFrameLevel() + 1);
     HR.MainIconPartOverlayFrame:SetWidth(64);
@@ -138,6 +138,7 @@
     -- Display
     self:Show();
   end
+
   -- Change Icon
   function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable, OutofRange)
     -- Texture
@@ -173,6 +174,12 @@
   end
   -- Set a Cooldown Frame
   function HR.MainIconFrame:SetCooldown (Start, Duration)
+    if Start == 0 or Duration == 0 then
+      self.CooldownFrame:SetCooldown(0, 0);
+      self.CooldownFrame:Hide();
+      return;
+    end
+
     self.CooldownFrame:SetCooldown(Start, Duration);
   end
   function HR.MainIconFrame:InitParts ()
@@ -209,20 +216,25 @@
   local QueuedCasts, FrameWidth;
   function HR.MainIconFrame:SetupParts (Textures, Keybinds)
     QueuedCasts = #Textures;
-    FrameWidth = (HR.MainIconPartOverlayFrame.Texture:GetWidth() / QueuedCasts) * (HeroRotationDB.GUISettings["General.ScaleUI"] or 1)
+    FrameWidth = HR.MainIconPartOverlayFrame.Texture:GetWidth() / QueuedCasts
     local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = HR.MainIconPartOverlayFrame.Texture:GetTexCoord();
     for i = 1, QueuedCasts do
       local PartFrame = self.Part[i];
-      -- Size & Position
+      -- Size and Position
       PartFrame:SetWidth(FrameWidth);
       PartFrame:SetHeight(FrameWidth*QueuedCasts);
       PartFrame:ClearAllPoints();
       local _, AnchorPoint = HR.MainIconPartOverlayFrame.Texture:GetPoint();
-      if i == HR.MaxQueuedCasts or i == QueuedCasts then
-        PartFrame:SetPoint("Center", AnchorPoint, "Center", FrameWidth/(4-QueuedCasts), 0);
+      if HR.MainIconPartOverlayFrame.__MSQ_NormalColor then
+        if i == HR.MaxQueuedCasts or i == QueuedCasts then
+          PartFrame:SetPoint("Center", AnchorPoint, "Center", FrameWidth/(4-QueuedCasts), 0);
+        else
+          PartFrame:SetPoint("Center", AnchorPoint, "Center", (FrameWidth/(4-QueuedCasts))*(i-2), 0);
+        end
       else
-        PartFrame:SetPoint("Center", AnchorPoint, "Center", (FrameWidth/(4-QueuedCasts))*(i-2), 0);
+        PartFrame:SetPoint("Left", AnchorPoint, "Left", FrameWidth*(i-1), 0);
       end
+      -- Texture and Backdrop
       PartFrame.Texture:SetTexture(Textures[i]);
       PartFrame.Texture:SetAllPoints(PartFrame);
       if PartFrame.Backdrop then

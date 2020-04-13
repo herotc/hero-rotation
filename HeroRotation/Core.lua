@@ -80,6 +80,7 @@
     local StartTime, CastDuration
 
     -- Default GCD and Casting Swirls
+    local CurrentTime = HL.GetTime()
     if Player:IsCasting() or Player:IsChanneling() then
       StartTime = Player:CastStart()
       CastDuration = Player:CastDuration()
@@ -90,7 +91,7 @@
     -- Tracking Values for Current Spell
     if CooldownSpell ~= Object then
       CooldownSpell = Object
-      CooldownSpellDisplayTime = HL.GetTime()
+      CooldownSpellDisplayTime = CurrentTime
       CooldownSpellCastDuration = 0
     end
 
@@ -103,7 +104,6 @@
         TimeToResource = Player.TimeToXResourceMap[Object:CostInfo(1, "type")](Object:Cost())
       end
       if TimeToResource and TimeToResource > 0 then
-        local CurrentTime = HL.GetTime()
         -- Only display the resource-based swirl if the duration is greater than the GCD/Cast swirl
         if TimeToResource > ((StartTime + CastDuration) - CurrentTime) then
           local AdjustedCastDuration = CurrentTime - CooldownSpellDisplayTime + TimeToResource
@@ -116,6 +116,13 @@
           CastDuration = CooldownSpellCastDuration
         end
       end
+    end
+
+    -- Reset tracking if the current cooldown is finished
+    if((StartTime + CastDuration) < CurrentTime) then
+      StartTime = 0
+      CastDuration = 0
+      CooldownSpell = nil
     end
 
     HR.MainIconFrame:SetCooldown(StartTime, CastDuration);
@@ -170,10 +177,11 @@
   function HR.CastPooling(Object, CustomTime, RangeCheck)
     return HR.Cast(Object, false, "Pooling", RangeCheck, CustomTime)
   end
-  -- Main Cast Queue
-  local QueueSpellTable, QueueLength, QueueTextureTable;
+
+  -- Queued Casting Support
+  local QueueSpellTable, QueueLength, QueueTextureTable, QueueKeybindTable;
   HR.MaxQueuedCasts = 3;
-  function HR.CastQueue (...)
+  local function DisplayQueue(...)
     QueueSpellTable = {...};
     QueueLength = mathmin(#QueueSpellTable, HR.MaxQueuedCasts);
     QueueTextureTable = {};
@@ -181,11 +189,37 @@
     for i = 1, QueueLength do
       QueueTextureTable[i] = HR.GetTexture(QueueSpellTable[i]);
       QueueSpellTable[i].LastDisplayTime = HL.GetTime();
-      QueueKeybindTable[i] = not HR.GUISettings.General.HideKeyBinds
-                              and HL.FindKeyBinding(QueueTextureTable[i]);
+      QueueKeybindTable[i] = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(QueueTextureTable[i]);
     end
+    -- Call ChangeIcon so that the main icon exists to be able to display a cooldown sweep, even though it gets overlapped
+    HR.MainIconFrame:ChangeIcon(QueueTextureTable[1], QueueKeybindTable[1], QueueSpellTable[1]:IsUsable());
     HR.MainIconFrame:SetupParts(QueueTextureTable, QueueKeybindTable);
+  end
+  -- Main Cast Queue
+  function HR.CastQueue (...)
+    DisplayQueue(...);
     DisplayCooldown();
+    return "Should Return";
+  end
+  -- Pooling Cast Queue
+  function HR.CastQueuePooling (CustomTime, ...)
+    DisplayQueue(...);
+
+    -- If there is a custom time, just pass in the first spell
+    if CustomTime then
+      DisplayCooldown(QueueSpellTable[1], true, CustomTime)
+    else
+      -- Find the largest cost in the table to use as the cooldown object
+      local CostObject, MaxCost = nil, 0;
+      for i = 1, #QueueSpellTable do
+        if QueueSpellTable[i]:Cost() > MaxCost then
+          MaxCost = QueueSpellTable[i]:Cost()
+          CostObject = QueueSpellTable[i]
+        end
+      end
+      DisplayCooldown(CostObject, true)
+    end
+
     return "Should Return";
   end
 
@@ -214,7 +248,6 @@
       return HR.Cast(Object)
     end
     if HR.AoEON() then
-      local BestUnit = nil
       local TargetGUID = Target:GUID()
       for _, CycleUnit in pairs(Cache.Enemies[Range]) do
         if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and Condition(CycleUnit) then
