@@ -59,6 +59,7 @@ HR.GUISettings.APL.DeathKnight = {
       -- Abilities
       Blooddrinker = true,
       Bonestorm = true,
+      VampiricBlood = true,
       Tombstone = true
     },
     OffGCDasOffGCD = {
