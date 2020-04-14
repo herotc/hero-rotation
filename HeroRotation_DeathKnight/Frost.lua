@@ -561,8 +561,7 @@ local function APL()
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.PillarofFrostBuff) and Player:BuffDownP(S.BreathofSindragosa)) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 513"; end
     end
-    -- worldvein_resonance,if=buff.pillar_of_frost.up|buff.empower_rune_weapon.up|cooldown.breath_of_sindragosa.remains>60+15|equipped.ineffable_truth|equipped.ineffable_truth_oh
-    -- TODO: Add corruption check
+    -- worldvein_resonance,if=buff.pillar_of_frost.up|buff.empower_rune_weapon.up|cooldown.breath_of_sindragosa.remains>60+15
     if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) or Player:BuffP(S.EmpowerRuneWeaponBuff) or S.BreathofSindragosa:CooldownRemainsP() > 75) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 515"; end
     end
@@ -574,8 +573,7 @@ local function APL()
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffRemainsP(S.EmpowerRuneWeaponBuff) < 5 and Player:BuffP(S.BreathofSindragosa) or (Player:RuneTimeToX(2) > Player:GCD() and Player:RunicPower() < 50)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 519"; end
     end
-    -- cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
-    -- reaping_flamestarget_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
+    -- reaping_flames
     if (true) then
       local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
@@ -712,13 +710,13 @@ local function APL()
     if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
-    if (Player:BuffP(S.BreathofSindragosa)) then
-      return BosTicking();
-    end
     -- run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&((cooldown.breath_of_sindragosa.remains=0&cooldown.pillar_of_frost.remains<10)|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
     if (not Settings.Frost.DisableBoSPooling and S.BreathofSindragosa:IsAvailable() and ((S.BreathofSindragosa:CooldownRemainsP() == 0 and S.PillarofFrost:CooldownRemainsP() < 10) or (S.BreathofSindragosa:CooldownRemainsP() < 20 and Target:TimeToDie() < 35))) then
       return BosPooling();
+    end
+    -- run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
+    if (Player:BuffP(S.BreathofSindragosa)) then
+      return BosTicking();
     end
     -- run_action_list,name=obliteration,if=buff.pillar_of_frost.up&talent.obliteration.enabled
     if (Player:BuffP(S.PillarofFrostBuff) and S.Obliteration:IsAvailable()) then
