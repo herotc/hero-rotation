@@ -207,7 +207,8 @@ local function APL()
       if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 16"; end
     end
     -- epidemic,if=death_and_decay.ticking&(!death_knight.fwounded_targets&talent.bursting_sores.enabled)&!variable.pooling_for_gargoyle
-    if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and (S.FesteringWoundDebuff:ActiveCount() == 0 and S.BurstingSores:IsAvailable()) and not bool(VarPoolingForGargoyle)) then
+    -- Added check to ensure at least 2 targets have Plague
+    if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and (S.FesteringWoundDebuff:ActiveCount() == 0 and S.BurstingSores:IsAvailable()) and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
       if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 18"; end
     end
     -- death_coil,if=death_and_decay.ticking&runic_power.deficit<14&!variable.pooling_for_gargoyle
@@ -360,7 +361,7 @@ local function APL()
       if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 174"; end
     end
     -- Manually added: Multiple target Epidemic in place of below Death Coil
-    if S.Epidemic:IsReadyP() and (Player:RunicPowerDeficit() < 14 and Player:RuneTimeToX(4) > Player:GCD() and not bool(VarPoolingForGargoyle)) then
+    if S.Epidemic:IsReadyP() and (Player:RunicPowerDeficit() < 14 and Player:RuneTimeToX(4) > Player:GCD() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
       if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 173"; end
     end
     -- death_coil,if=runic_power.deficit<14&rune.time_to_4>gcd&!variable.pooling_for_gargoyle
