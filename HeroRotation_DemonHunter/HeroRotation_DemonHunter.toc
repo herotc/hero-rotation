@@ -1,4 +1,4 @@
-## Interface: 80205
+## Interface: 80300
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFA330C9Demon Hunter|r]
 ## Author: Aethys, Kojiyama
