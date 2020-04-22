@@ -257,7 +257,7 @@ local function APL()
         if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
       end
       -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
-      if S.BestialWrath:IsCastableP() and (S.PrimalInstincts:AzeriteEnabled() and not Spell:MajorEssenceEnabled(AE.EssenceoftheFocusingIris) and (I.AzsharasFontofPower:IsEquipped() or not Everyone.PSCDEquipped())) then
+      if S.BestialWrath:IsCastableP() and HR.CDsON() and (S.PrimalInstincts:AzeriteEnabled() and not Spell:MajorEssenceEnabled(AE.EssenceoftheFocusingIris) and (I.AzsharasFontofPower:IsEquipped() or not Everyone.PSCDEquipped())) then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 16"; end
       end
       -- potion
@@ -334,7 +334,7 @@ local function APL()
       if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, 30) then return "stampede 96"; end
     end
     -- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|talent.one_with_the_pack.enabled|target.time_to_die<15
-    if S.BestialWrath:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() > 20 or S.OneWithThePack:IsAvailable() or Target:TimeToDie() < 15) then
+    if S.BestialWrath:IsCastableP() and HR.CDsON() and (S.AspectoftheWild:CooldownRemainsP() > 20 or S.OneWithThePack:IsAvailable() or Target:TimeToDie() < 15) then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 102"; end
     end
     -- chimaera_shot
@@ -424,7 +424,7 @@ local function APL()
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 185"; end
     end
     -- bestial_wrath,if=talent.one_with_the_pack.enabled&buff.bestial_wrath.remains<gcd|buff.bestial_wrath.down&cooldown.aspect_of_the_wild.remains>15|target.time_to_die<15+gcd
-    if S.BestialWrath:IsCastableP() and (S.OneWithThePack:IsAvailable() and Player:BuffRemainsP(S.BestialWrathBuff) < GCDMax or Player:BuffDownP(S.BestialWrathBuff) and S.AspectoftheWild:CooldownRemainsP() > 15 or Target:TimeToDie() < 15 + GCDMax) then
+    if S.BestialWrath:IsCastableP() and HR.CDsON() and (S.OneWithThePack:IsAvailable() and Player:BuffRemainsP(S.BestialWrathBuff) < GCDMax or Player:BuffDownP(S.BestialWrathBuff) and S.AspectoftheWild:CooldownRemainsP() > 15 or Target:TimeToDie() < 15 + GCDMax) then
       if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 190"; end
     end
     -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd
