@@ -119,7 +119,7 @@ CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseFABST", "Use Focu
 CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
 
 --Balance
-CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
+CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.BarkskinHP", {0, 100, 1}, "Barkskin HP", "Set the Barkskin HP threshold.");
 CreatePanelOption("Slider", CP_Balance, "APL.Druid.Balance.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the Renewal HP threshold.");
 CreatePanelOption("CheckButton", CP_Balance, "APL.Druid.Balance.ShowMoonkinFormOOC", "Show Moonkin Form Out of Combat", "Enable this if you want the addon to show you the Moonkin Form reminder out of combat.");
@@ -136,5 +136,5 @@ CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.SurvivalInstinctsHP
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.BristlingFurRage", {0, 100, 1}, "Bristling Fur Rage", "Set the Bristling Fur Rage threshold.");
 
 -- Restoration
-CreatePanelOption("CheckButton", CP_Restoration, "APL.Druid.Restoration.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
+CreatePanelOption("CheckButton", CP_Restoration, "APL.Druid.Restoration.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreateARPanelOptions(CP_Restoration, "APL.Druid.Restoration");

@@ -72,7 +72,7 @@ CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");
 CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.EnableFS", "Show Feral Spirit in rotation", "Uncheck this if you don't want to see Feral Spirit in the rotation.");
 
 -- Elemental settings
-CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.UseSplashData", "Use Splash Data for AoE", "Only count AoE enemies that are already hit by AoE abilities.");
+CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableEE", "Show Earth Elemental in rotation", "Uncheck this if you don't want to see Earth Elemental in the rotation.");
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableFE", "Show Fire Elemental in rotation", "Uncheck this if you don't want to see Fire Elemental in the rotation.");
