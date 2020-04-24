@@ -418,8 +418,8 @@ local function APL()
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 323"; end
     end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
+    -- focused_azerite_beam,if=raid_event.adds.in>90&focus<focus.max-25|(active_enemies>1&!talent.birds_of_prey.enabled|active_enemies>2)&(buff.blur_of_talons.up&buff.blur_of_talons.remains>3*gcd|!buff.blur_of_talons.up)
+    if S.FocusedAzeriteBeam:IsCastableP() and (Player:Focus() < Player:FocusMax() - 25 or (Cache.EnemiesCount[8] > 1 and not S.BirdsofPrey:IsAvailable() or Cache.EnemiesCount[8] > 2) and (Player:BuffP(S.BlurofTalonsBuff) and Player:BuffRemainsP(S.BlurofTalonsBuff) > 3 * Player:GCD() or Player:BuffDownP(S.BlurofTalonsBuff))) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 324"; end
     end
     -- blood_of_the_enemy,if=buff.coordinated_assault.up
