@@ -57,6 +57,7 @@ HR.GUISettings.APL.DemonHunter = {
       -- Abilities
       EyeBeam = false,
       Nemesis = true,
+      ThrowGlaive = false,
     },
   }
 };

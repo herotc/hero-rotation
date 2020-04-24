@@ -366,7 +366,7 @@ local function APL()
     end
     -- throw_glaive,if=buff.out_of_range.up
     if S.ThrowGlaive:IsCastableP(30) and (not IsInMeleeRange()) then
-      if HR.Cast(S.ThrowGlaive) then return "throw_glaive 135"; end
+      if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 135"; end
     end
     -- fel_rush,if=movement.distance>15|buff.out_of_range.up
     -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and ConserveFelRush()) then
@@ -378,7 +378,7 @@ local function APL()
     -- end
     -- throw_glaive,if=talent.demon_blades.enabled
     if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
-      if HR.Cast(S.ThrowGlaive) then return "throw_glaive 145"; end
+      if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 145"; end
     end
   end
   Normal = function()
@@ -452,7 +452,7 @@ local function APL()
     -- end
     -- throw_glaive,if=talent.demon_blades.enabled
     if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
-      if HR.Cast(S.ThrowGlaive) then return "throw_glaive 267"; end
+      if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 267"; end
     end
   end
 
