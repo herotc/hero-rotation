@@ -479,8 +479,8 @@ local function CDs ()
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance (during Tornado)"; end
       end
     end
-    -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking
-    if not Player:IsStealthedP(true, true) and Target:DebuffP(S.Nightblade) then
+    -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking|essence.breath_of_the_dying.major&time>=2
+    if not Player:IsStealthedP(true, true) and Target:DebuffP(S.Nightblade) or Spell:MajorEssenceEnabled(AE.BreathoftheDying) and HL.CombatTime() >= 2 then
       ShouldReturn = Essences();
       if ShouldReturn then return ShouldReturn; end
     end
@@ -949,7 +949,7 @@ HR.SetAPL(261, APL, Init);
 -- actions.cds=shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
 -- # (Unless already up because we took Shadow Focus) use Symbols off-gcd before the first Shuriken Storm from Tornado comes in.
 -- actions.cds+=/symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
--- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking
+-- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.nightblade.ticking|essence.breath_of_the_dying.major&time>=2
 -- # Pool for Tornado pre-SoD with ShD ready when not running SF.
 -- actions.cds+=/pool_resource,for_next=1,if=!talent.shadow_focus.enabled
 -- # Use Tornado pre SoD when we have the energy whether from pooling without SF or just generally.
