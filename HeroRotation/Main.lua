@@ -84,6 +84,7 @@
         {HR.SmallIconFrame.Icon[2], HR.GUISettings.General.BlackBorderIcon and 30 or 32, HR.GUISettings.General.BlackBorderIcon and 30 or 32},
         {HR.LeftIconFrame, 48, 48},
         {HR.SuggestedIconFrame, 32, 32},
+		{HR.RightSuggestedIconFrame, 32, 32},
         {HR.MainIconPartOverlayFrame, 64, 64},
       };
       for _, Value in pairs(FramesToResize) do
@@ -95,6 +96,7 @@
         HR.MainIconFrame.Part[i]:SetHeight(64*Multiplier);
       end
       HR.SuggestedIconFrame:SetPoint("BOTTOM", HR.MainIconFrame, "LEFT", -HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2+(HR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier));
+	  HR.RightSuggestedIconFrame:SetPoint("BOTTOM", HR.MainIconFrame, "RIGHT", HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2 + (HR.GUISettings.General.BlackBorderIcon and 3*Multiplier or 4*Multiplier)); -- todo matt fix this location
       HeroRotationDB.GUISettings["General.ScaleUI"] = Multiplier;
     end
     function HR.MainFrame:ResizeButtons (Multiplier)
@@ -124,6 +126,7 @@
       HR.Cast(LockSpell, {true});   -- Small Icon 2
       HR.CastLeft(LockSpell);       -- Left Icon
       HR.CastSuggested(LockSpell);  -- Suggested Icon
+	  HR.CastRightSuggested(LockSpell); -- Right Suggested Icon
       -- Unlock the UI
       for Key, Value in pairs(UIFrames) do
         Value:EnableMouse(true);
@@ -185,6 +188,7 @@
             ["Top Icons"] = HR.SmallIconFrame,
             ["Left Icon"] = HR.LeftIconFrame,
             ["Suggested Icon"] = HR.SuggestedIconFrame,
+			["Right Suggested Icon"] = HR.RightSuggestedIconFrame,
             ["Part Overlay"] = HR.MainIconPartOverlayFrame,
           };
           if not Masque then
@@ -223,6 +227,7 @@
           HR.SmallIconFrame:Init();
           HR.LeftIconFrame:Init();
           HR.SuggestedIconFrame:Init();
+		  HR.RightSuggestedIconFrame:Init();
           HR.ToggleIconFrame:Init();
           if HeroRotationDB.GUISettings["General.ScaleUI"] then
             HR.MainFrame:ResizeUI(HeroRotationDB.GUISettings["General.ScaleUI"]);
@@ -267,6 +272,7 @@
             HR.SmallIconFrame.Icon[2],
             HR.LeftIconFrame,
             HR.SuggestedIconFrame,
+			HR.RightSuggestedIconFrame,
             HR.ToggleIconFrame
           };
 

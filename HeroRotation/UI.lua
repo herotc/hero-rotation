@@ -28,6 +28,7 @@
   HR.LeftIconFrame = CreateFrame("Frame", "HeroRotation_LeftIconFrame", UIParent);
   HR.NameplateIconFrame = CreateFrame("Frame", "HeroRotation_NameplateIconFrame", UIParent);
   HR.SuggestedIconFrame = CreateFrame("Frame", "HeroRotation_SuggestedIconFrame", UIParent);
+  HR.RightSuggestedIconFrame = CreateFrame("Frame", "HeroRotation_RightSuggestedIconFrame", UIParent);
   HR.ToggleIconFrame = CreateFrame("Frame", "HeroRotation_ToggleIconFrame", UIParent);
 
 --- ======= MISC =======
@@ -52,6 +53,11 @@
     HR.SuggestedIconFrame:HideIcon();
     if HR.GUISettings.General.BlackBorderIcon then HR.SuggestedIconFrame.Backdrop:Hide(); end
     HR.CastSuggestedOffset = 1;
+	
+	-- Right Suggested Icon
+	HR.RightSuggestedIconFrame:HideIcon();
+	if HR.GUISettings.General.BlackBorderIcon then HR.RightSuggestedIconFrame.Backdrop:Hide(); end
+	HR.CastRightSuggestedOffset = 1;
 
     -- Toggle icons
     if HR.GUISettings.General.HideToggleIcons then HR.ToggleIconFrame:Hide(); end
@@ -514,6 +520,44 @@
   -- Hide Icon
   function HR.SuggestedIconFrame:HideIcon ()
     HR.SuggestedIconFrame:Hide();
+  end
+  
+--- ======= RIGHT SUGGESTED ICON =======
+  -- Init
+  function HR.RightSuggestedIconFrame:Init ()
+    -- Frame Init
+    self:SetFrameStrata(HR.MainFrame:GetFrameStrata());
+    self:SetFrameLevel(HR.MainFrame:GetFrameLevel() - 1);
+    self:SetWidth(32);
+    self:SetHeight(32);
+    self:SetPoint("BOTTOM", HR.MainIconFrame, "LEFT", HR.LeftIconFrame:GetWidth()/2, HR.LeftIconFrame:GetHeight()/2+(HR.GUISettings.General.BlackBorderIcon and 3 or 4));
+    -- Texture
+    self.Texture = self:CreateTexture(nil, "BACKGROUND");
+    -- Black Border Icon
+    if HR.GUISettings.General.BlackBorderIcon then
+      self.Texture:SetTexCoord(.08, .92, .08, .92);
+      HR:CreateBackdrop(self);
+    end
+    -- Display
+    self:Show();
+  end
+  -- Change Icon
+  function HR.RightSuggestedIconFrame:ChangeIcon (Texture)
+    -- Texture
+    self.Texture:SetTexture(Texture);
+    self.Texture:SetAllPoints(self);
+    -- Black Border Icon
+    if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
+      self.Backdrop:Show();
+    end
+    -- Display
+    if not self:IsVisible() then
+      self:Show();
+    end
+  end
+  -- Hide Icon
+  function HR.RightSuggestedIconFrame:HideIcon ()
+    HR.RightSuggestedIconFrame:Hide();
   end
 
 --- ======= TOGGLES =======

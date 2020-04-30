@@ -64,21 +64,11 @@ HR.GUISettings.APL.Warrior = {
     }
   },
   Protection = {
-    UseLastStandToFillShieldBlockDownTime = true,
-    UseShieldBlockDefensively = true,
-    UseRageDefensively = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       Avatar            = true,
       DemoralizingShout = true,
-      LastStand         = true,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-      -- Abilities
-      IgnorePain        = true,
-      ShieldBlock       = true
-    }
   },
 };
 
@@ -108,6 +98,3 @@ CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoPP", "Show Pot
 
 -- Protection settings
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
-CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseLastStandToFillShieldBlockDownTime", "Use Last Stand to fill Shield Block down time", "Enable this if you want to fill Shield Block down time with Last Stand.");
-CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseShieldBlockDefensively", "Use Shield Block purely defensively", "Enable this if you only want to use Shield Block in a defensive manner.");
-CreatePanelOption("CheckButton", CP_Protection, "APL.Warrior.Protection.UseRageDefensively", "Use Rage defensively", "Enable this to prioritize defensive use of Rage.");

@@ -1,6 +1,6 @@
--- Todo: 3/19
--- Make it so you don't spell reflect on pure magic damage bosses (Motherlode last two)
--- figure out if next global will rage cap; if so, suggest ignore pain dump
+-- Assumptions: build as tanky as possible. 
+-- TODO: 4/30
+
 
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
@@ -33,6 +33,7 @@ Spell.Warrior.Protection = {
   ThunderClap                           = Spell(6343),
   DemoralizingShout                     = Spell(1160),
   BoomingVoice                          = Spell(202743),
+  Bloodsport                            = Spell(279172),
   DragonRoar                            = Spell(118000),
   Revenge                               = Spell(6572),
   FreeRevenge                           = Spell(5302),
@@ -84,7 +85,8 @@ Item.Warrior.Protection = {
   PotionofUnbridledFury            = Item(169299),
   GrongsPrimalRage                 = Item(165574, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  LingeringPsychicShell            = Item(174277, {13, 14}),
 };
 local I = Item.Warrior.Protection;
 
@@ -92,7 +94,8 @@ local I = Item.Warrior.Protection;
 local OnUseExcludes = {
   I.GrongsPrimalRage:ID(),
   I.AshvanesRazorCoral:ID(),
-  I.AzsharasFontofPower:ID()
+  I.AzsharasFontofPower:ID(),
+  I.LingeringPsychicShell:ID()
 }
 
 -- Rotation Var
@@ -111,6 +114,7 @@ local StunInterrupts = {
   {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
 };
 
+-- Small local utility functions or helpers.
 local EnemyRanges = {8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
@@ -126,42 +130,29 @@ local function bool(val)
   return val ~= 0
 end
 
-local function isCurrentlyTanking()
-  -- is player currently tanking any enemies within 16 yard radius
-  local IsTanking = Player:IsTankingAoE(16) or Player:IsTanking(Target);
-  return IsTanking;
+local function IsCurrentlyTanking()
+  return Player:IsTankingAoE(16) or Player:IsTanking(Target);
 end
 
-local function shouldCastIp()
+local function IgnorePainWillNotCap()
   if Player:Buff(S.IgnorePain) then 
-    local castIP = tonumber((GetSpellDescription(190456):match("%d+%S+%d"):gsub("%D","")))
-    local IPCap = math.floor(castIP * 1.3);
-    local currentIp = Player:Buff(S.IgnorePain, 16, true)
-
-    -- Dont cast IP if we are currently at 50% of IP Cap remaining
-    if currentIp  < (0.5 * IPCap) then
-      return true
-    else
-      return false
-    end
+    local absorb = tonumber((GetSpellDescription(190456):match("%d+%S+%d"):gsub("%D","")))
+    return Player:Buff(S.IgnorePain, 16, true) < (0.5 * math.floor(absorb * 1.3))
   else
-    -- No IP buff currently
     return true
   end
 end
 
-local function offensiveShieldBlock()
-  return not Settings.Protection.UseShieldBlockDefensively
+-- The amount of rage above which we dump revenges, below which we conserve for ignore pain.
+local function RevengeThreshold()
+	return 60
 end
 
-local function offensiveRage()
-  return not Settings.Protection.UseRageDefensively
-end
 
 -- A bit of logic to dump rage immediately if the next spell suggested would take you past the rage threshold
 local function shouldDumpRageIntoIP(rageGenerated)
   -- pick a threshold where rage-from-damage-taken doesn't cap you
-  rageMax = 92
+  rageMax = 90
   -- make sure we have enough rage to cast IP
   if Player:Rage() >= 40 then
 	if Player:BuffRemainsP(S.MemoryofLucidDreamsBuff) > Player:GCD() then
@@ -177,7 +168,7 @@ end
 
 local function suggestRageDump(baseRageGen)
   if shouldDumpRageIntoIP(baseRageGen) then
-	if HR.CastSuggested(S.IgnorePain) then return "rage capped"; end
+	if HR.CastRightSuggested(S.IgnorePain) then return "rage capped"; end
   end
 end
 
@@ -187,6 +178,7 @@ local function APL()
   local gcdTime = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  
   Precombat = function()
     -- flask
     -- food
@@ -203,16 +195,19 @@ local function APL()
       end
     end
   end
+  
   Defensive = function()
-    if S.ShieldBlock:IsReadyP() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemains(S.ShieldBlockBuff) <= 1.5*gcdTime) and 
-      Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30) then
-        if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block defensive" end
+    if S.ShieldBlock:IsReadyP() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemainsP(S.ShieldBlockBuff) <= 1.5*gcdTime) and Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30) then
+        if HR.CastSuggested(S.ShieldBlock) then return "shield_block defensive" end
     end
-    if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and Settings.Protection.UseLastStandToFillShieldBlockDownTime
-      and S.ShieldBlock:RechargeP() > 1.5*gcdTime) then
-        if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand defensive" end
+    if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and S.ShieldBlock:RechargeP() > 1.5*gcdTime) then
+        if HR.CastSuggested(S.LastStand) then return "last_stand defensive" end
     end
+	if Player:HealthPercentage() <= 70 and I.LingeringPsychicShell:IsEquipReady() then
+		if HR.CastRightSuggested(I.LingeringPsychicShell) then return "absorb trinket defensive" end
+	end
   end
+  
   Aoe = function()
     -- thunder_clap
     if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) then
@@ -237,16 +232,12 @@ local function APL()
       if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
+    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() > RevengeThreshold()) then
       if HR.Cast(S.Revenge) then return "revenge 14"; end
     end
     -- ravager
     if S.Ravager:IsCastableP(40) then
       if HR.Cast(S.Ravager) then return "ravager 16"; end
-    end
-    -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff) and offensiveShieldBlock()) then
-      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 18"; end
     end
     -- shield_slam
     if S.ShieldSlam:IsCastableP("Melee") then
@@ -258,15 +249,12 @@ local function APL()
       if HR.Cast(S.Devastate) then return "devastate 80"; end
     end
   end
+  
   St = function()
     -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
     if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
 	  suggestRageDump(5)
       if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
-    end
-    -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
-    if S.ShieldBlock:IsReadyP() and (S.ShieldSlam:CooldownUpP() and Player:BuffDownP(S.ShieldBlockBuff)) and not Player:BuffRemains(S.LastStandBuff) then
-      if HR.Cast(S.ShieldBlock, Settings.Protection.OffGCDasOffGCD.ShieldBlock) then return "shield_block 32"; end
     end
     -- shield_slam,if=buff.shield_block.up
     if S.ShieldSlam:IsCastableP("Melee") and (Player:BuffP(S.ShieldBlockBuff)) then
@@ -302,7 +290,7 @@ local function APL()
       if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
     end
     -- revenge
-    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or offensiveRage() or Player:Rage() >= 75 or ((not isCurrentlyTanking()) and Player:Rage() >= 50)) then
+    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() >= RevengeThreshold() or ((not IsCurrentlyTanking()) and Player:Rage() >= 50)) then
       if HR.Cast(S.Revenge) then return "revenge 76"; end
     end
     -- ravager
@@ -314,13 +302,15 @@ local function APL()
       if HR.Cast(S.Devastate) then return "devastate 80"; end
     end
   end
+  
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
+  
   if Everyone.TargetIsValid() then
     -- Check defensives if tanking
-    if isCurrentlyTanking() then
+    if IsCurrentlyTanking() then
       local ShouldReturn = Defensive(); if ShouldReturn then return ShouldReturn; end
     end
     -- Interrupt
@@ -337,10 +327,7 @@ local function APL()
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
-    -- use_item,name=grongs_primal_rage,if=buff.avatar.down
-    if I.GrongsPrimalRage:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.AvatarBuff)) then
-      if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 87"; end
-    end
+	
     if (HR.CDsON()) then
       -- blood_fury
       if S.BloodFury:IsCastableP() then
@@ -371,6 +358,7 @@ local function APL()
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 102"; end
       end
     end
+	
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 103"; end
@@ -382,8 +370,8 @@ local function APL()
       if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
     end
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
-    if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and shouldCastIp() and isCurrentlyTanking()) then
-      if HR.Cast(S.IgnorePain, Settings.Protection.OffGCDasOffGCD.IgnorePain) then return "ignore_pain 107"; end
+    if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and IgnorePainWillNotCap() and IsCurrentlyTanking()) then
+      if HR.CastRightSuggested(S.IgnorePain) then return "ignore_pain 107"; end
     end
     -- worldvein_resonance,if=cooldown.avatar.remains<=2
     if S.WorldveinResonance:IsCastableP() and (S.Avatar:CooldownRemainsP() <= 2) then
@@ -393,15 +381,10 @@ local function APL()
     if S.RippleInSpace:IsCastableP() then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 109"; end
     end
-
     -- concentrated_flame,if=buff.avatar.down&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or Spell:EssenceRank(AE.TheCrucibleofFlame) < 3) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 111"; end
     end
-    -- last_stand,if=cooldown.anima_of_death.remains<=2
-    --if S.LastStand:IsCastableP() and (Spell:MajorEssenceEnabled(AE.AnimaofLifeandDeath) and S.AnimaofDeath:CooldownRemainsP() <= 2) then
-    --  if HR.Cast(S.LastStand, Settings.Protection.GCDasOffGCD.LastStand) then return "last_stand 112"; end
-    --end
     -- avatar
     if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
 	  suggestRageDump(20)

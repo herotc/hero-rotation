@@ -142,6 +142,8 @@
       end
     elseif DisplayStyle == "Suggested" then
       HR.CastSuggested(Object);
+	elseif DisplayStyle == "SuggestedRight" then
+	  HR.CastRightSuggested(Object);
     else
       local PoolResource = 9999000010
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
@@ -292,6 +294,18 @@
     end
     return false;
   end
+  
+  -- Suggested Icon (Right) Cast
+  HR.CastRightSuggestedOffset = 1;
+  function HR.CastRightSuggested (Object)
+	if HR.CastRightSuggestedOffset == 1 then
+	  HR.RightSuggestedIconFrame:ChangeIcon(HR.GetTexture(Object));
+	  HR.CastRightSuggestedOffset = HR.CastRightSuggestedOffset + 1;
+	  Object.LastDisplayTime = HL.GetTime();
+	end
+	return false;
+  end
+	
 
 --- ======= COMMANDS =======
   -- Command Handler
