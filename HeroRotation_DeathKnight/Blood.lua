@@ -101,7 +101,9 @@ local OnUseExcludes = {
   I.MerekthasFang:ID(),
   I.RazdunksBigRedButton:ID(),
   I.GrongsPrimalRage:ID(),
+  I.PocketsizedComputationDevice:ID(),
   I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID(),
   I.DribblingInkpod:ID()
 }
 
