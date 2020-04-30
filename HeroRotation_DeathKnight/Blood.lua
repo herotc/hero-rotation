@@ -27,50 +27,54 @@ local AEMajor    = HL.Spell:MajorEssence()
 if not Spell.DeathKnight then Spell.DeathKnight = {}; end
 Spell.DeathKnight.Blood = {
   -- Racials
-  AncestralCall         = Spell(274738),
-  ArcanePulse           = Spell(260364),
-  ArcaneTorrent         = Spell(50613),
-  Berserking            = Spell(26297),
-  BloodFury             = Spell(20572),
-  Fireblood             = Spell(265221),
-  LightsJudgment        = Spell(255647),
-  BagofTricks           = Spell(312411),
+  AncestralCall                         = Spell(274738),
+  ArcanePulse                           = Spell(260364),
+  ArcaneTorrent                         = Spell(50613),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  BagofTricks                           = Spell(312411),
   -- Abilities
-  Asphyxiate            = Spell(221562),
-  BloodBoil             = Spell(50842),
-  Blooddrinker          = Spell(206931),
-  BloodMirror           = Spell(206977),
-  BloodPlague           = Spell(55078),
-  BloodShield           = Spell(77535),
-  BoneShield            = Spell(195181),
-  Bonestorm             = Spell(194844),
-  Consumption           = Spell(205223),
-  CrimsonScourge        = Spell(81141),
-  DancingRuneWeapon     = Spell(49028),
-  DancingRuneWeaponBuff = Spell(81256),
-  DeathandDecay         = Spell(43265),
-  DeathsCaress          = Spell(195292),
-  DeathStrike           = Spell(49998),
-  HeartBreaker          = Spell(221536),
-  HeartStrike           = Spell(206930),
-  HemostasisBuff        = Spell(273947),
-  Marrowrend            = Spell(195182),
-  MindFreeze            = Spell(47528),
-  Ossuary               = Spell(219786),
-  RapidDecomposition    = Spell(194662),
-  RuneStrike            = Spell(210764),
-  RuneTap               = Spell(194679),
-  Tombstone             = Spell(219809),
-  TombstoneBuff         = Spell(219809),
-  UnholyStrengthBuff    = Spell(53365),
-  VampiricBlood         = Spell(55233),
+  Asphyxiate                            = Spell(221562),
+  BloodBoil                             = Spell(50842),
+  Blooddrinker                          = Spell(206931),
+  BloodMirror                           = Spell(206977),
+  BloodPlague                           = Spell(55078),
+  BloodShield                           = Spell(77535),
+  BoneShield                            = Spell(195181),
+  Bonestorm                             = Spell(194844),
+  Consumption                           = Spell(205223),
+  CrimsonScourge                        = Spell(81141),
+  DancingRuneWeapon                     = Spell(49028),
+  DancingRuneWeaponBuff                 = Spell(81256),
+  DeathandDecay                         = Spell(43265),
+  DeathsCaress                          = Spell(195292),
+  DeathStrike                           = Spell(49998),
+  HeartBreaker                          = Spell(221536),
+  HeartStrike                           = Spell(206930),
+  HemostasisBuff                        = Spell(273947),
+  Marrowrend                            = Spell(195182),
+  MindFreeze                            = Spell(47528),
+  Ossuary                               = Spell(219786),
+  RapidDecomposition                    = Spell(194662),
+  RuneStrike                            = Spell(210764),
+  RuneTap                               = Spell(194679),
+  Tombstone                             = Spell(219809),
+  TombstoneBuff                         = Spell(219809),
+  UnholyStrengthBuff                    = Spell(53365),
+  VampiricBlood                         = Spell(55233),
   -- Trinket Effects
-  RazorCoralDebuff      = Spell(303568),
+  RazorCoralDebuff                      = Spell(303568),
   -- Essences
-  ConcentratedFlame     = Spell(295373),
-  ConcentratedFlameBurn = Spell(295368),
+  AnimaofDeath                          = Spell(294926),
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlameBurn                 = Spell(295368),
+  MemoryofLucidDreams                   = Spell(298357),
+  RippleInSpace                         = Spell(302731),
+  WorldveinResonance                    = Spell(295186),
   -- Misc
-  Pool                  = Spell(9999000010)
+  Pool                                  = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Blood;
 if AEMajor ~= nil then
@@ -85,7 +89,9 @@ if not Item.DeathKnight then Item.DeathKnight = {}; end
   MerekthasFang                    = Item(158367, {13, 14}),
   RazdunksBigRedButton             = Item(159611, {13, 14}),
   GrongsPrimalRage                 = Item(165574, {13, 14}),
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
   DribblingInkpod                  = Item(169319, {13, 14}),
 };
 local I = Item.DeathKnight.Blood;
@@ -95,7 +101,9 @@ local OnUseExcludes = {
   I.MerekthasFang:ID(),
   I.RazdunksBigRedButton:ID(),
   I.GrongsPrimalRage:ID(),
+  I.PocketsizedComputationDevice:ID(),
   I.AshvanesRazorCoral:ID(),
+  I.AzsharasFontofPower:ID(),
   I.DribblingInkpod:ID()
 }
 
@@ -149,7 +157,7 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL ()
-  local Precombat, Defensives, Standard
+  local Precombat, Defensives, Essences, Standard
   local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
@@ -195,11 +203,29 @@ local function APL ()
       if HR.Cast(S.DeathStrike) then return "death_strike 32"; end
     end
   end
-  Standard = function()
-    -- concentrated_flame,if=dot.concentrated_flame_burn.remains=0&!buff.dancing_rune_weapon.up
-    if S.ConcentratedFlame:IsCastable() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and Player:BuffDownP(S.DancingRuneWeaponBuff)) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 52"; end
+  Essences = function()
+    -- concentrated_flame,if=dot.concentrated_flame_burn.remains<2&!buff.dancing_rune_weapon.up
+    if S.ConcentratedFlame:IsCastable() and (Target:DebuffRemainsP(S.ConcentratedFlameBurn) < 2 and Player:BuffDownP(S.DancingRuneWeaponBuff)) then
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 42"; end
     end
+    -- anima_of_death,if=buff.vampiric_blood.up&(raid_event.adds.exists|raid_event.adds.in>15)
+    if S.AnimaofDeath:IsCastable() and (Player:BuffP(S.VampiricBlood)) then
+      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 44"; end
+    end
+    -- memory_of_lucid_dreams,if=rune.time_to_1>gcd&runic_power<40
+    if S.MemoryofLucidDreams:IsCastable() and (Player:RuneTimeToX(1) > Player:GCD() and Player:RunicPower() < 40) then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 46"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastable() then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 48"; end
+    end
+    -- ripple_in_space,if=!buff.dancing_rune_weapon.up
+    if S.RippleInSpace:IsCastable() and (Player:BuffDownP(S.DancingRuneWeaponBuff)) then
+      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 50"; end
+    end
+  end
+  Standard = function()
     -- death_strike,if=runic_power.deficit<=10
     if S.DeathStrike:IsReady("Melee") and (Player:RunicPowerDeficit() <= 10) then
       if HR.Cast(S.DeathStrike) then return "death_strike 54"; end
@@ -335,9 +361,17 @@ local function APL ()
       if I.RazdunksBigRedButton:IsEquipReady() then
         if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "razdunks_big_red_button 136"; end
       end
+      -- use_item,name=cyclotronic_blast,if=cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>cast_time
+      if Everyone.CyclotronicBlastReady() and (not S.DancingRuneWeapon:CooldownUpP() and Player:BuffDownP(S.DancingRuneWeaponBuff) and Player:RuneTimeToX(4) > 2.5) then
+        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 137"; end
+      end
+      -- use_item,name=azsharas_font_of_power,if=(cooldown.dancing_rune_weapon.remains<5&target.time_to_die>15)|(target.time_to_die<34)
+      if I.AzsharasFontofPower:IsEquipReady() and ((S.DancingRuneWeapon:CooldownRemainsP() < 5 and Target:TimeToDie() > 15) or (Target:TimeToDie() < 34)) then
+        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 138"; end
+      end
       -- use_item,name=merekthas_fang,if=(cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>3)&!raid_event.adds.exists|raid_event.adds.in>15
       if I.MerekthasFang:IsEquipReady() and ((not S.DancingRuneWeapon:CooldownUpP() and Player:BuffDownP(S.DancingRuneWeaponBuff) and Player:RuneTimeToX(4) > 3) and Cache.EnemiesCount[8] == 1) then
-        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle, 20) then return "merekthas_fang 138"; end
+        if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle, 20) then return "merekthas_fang 139"; end
       end
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down
       if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
@@ -367,6 +401,10 @@ local function APL ()
     -- tombstone,if=buff.bone_shield.stack>=7
     if S.Tombstone:IsCastable() and (Player:BuffStackP(S.BoneShield) >= 7) then
       if HR.Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone 152"; end
+    end
+    -- call_action_list,name=essences
+    if (true) then
+      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=standard
     if (true) then

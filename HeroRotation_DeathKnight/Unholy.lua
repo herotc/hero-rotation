@@ -264,10 +264,6 @@ local function APL()
     if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff)) then
       if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 97"; end
     end
-    -- clawing_shadows,if=death_and_decay.ticking
-    if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff)) then
-      if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 99"; end
-    end
   end
   Cooldowns = function()
     -- army_of_the_dead
