@@ -73,7 +73,8 @@
       -- "SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"
       RolltheBonesLogic = "SimC",
       -- SoloMode Settings
-      RolltheBonesLeechHP = 60, -- % HP threshold to reroll for Grand Melee.
+      RolltheBonesLeechKeepHP = 60, -- % HP threshold to keep Grand Melee while solo.
+      RolltheBonesLeechRerollHP = 40, -- % HP threshold to reroll for Grand Melee while solo.
       UseDPSVanish = false, -- Use Vanish in the rotation for DPS
       PrecombatAR = true, -- Display Adrenaline Rush precombat
       KillingSpreeDisplayStyle = "Suggested",
@@ -147,7 +148,8 @@
   CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
   -- Outlaw
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.\n(SimC highly recommended!)");
-  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechHP", {1, 100, 1}, "Roll the Bones Leech HP", "Set the HP threshold before re-rolling for the leech buff (working only if Solo Mode is enabled).");
+  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechKeepHP", {1, 100, 1}, "Keep Leech HP Threshold", "Set the HP threshold for keeping the leech buff instead of rerolling normally (working only if Solo Mode is enabled and does not work in dungeons.)");
+  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechRerollHP", {1, 100, 1}, "Reroll For Leech HP Threshold", "Set the HP threshold to actively re-roll for the leech buff (working only if Solo Mode is enabled and does not work in dungeons.)");
   CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish -> Ambush for DPS.\nDisable to save Vanish for utility purposes.");
   CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.PrecombatAR", "Show Precombat Adrenaline Rush", "Display Adrenaline Rush when outside of combat with a valid target.");
   CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Killing Spree Display Style", "Define which icon display style to use for Killing Spree.");

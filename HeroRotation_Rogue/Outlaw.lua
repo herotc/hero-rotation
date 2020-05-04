@@ -13,10 +13,7 @@ local Item = HL.Item;
 -- HeroRotation
 local HR = HeroRotation;
 -- Lua
-local pairs = pairs;
-local tableconcat = table.concat;
-local tostring = tostring;
-
+local mathmin = math.min;
 
 --- APL Local Vars
 -- Commons
@@ -221,11 +218,8 @@ end
 -- RtB rerolling strategy, return true if we should reroll
 local function RtB_Reroll ()
   if not Cache.APLVar.RtB_Reroll then
-    -- Defensive Override : Grand Melee if HP < 60
-    if Settings.General.SoloMode and Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechHP then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.GrandMelee)) and true or false;
     -- 1+ Buff
-    elseif Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
+    if Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
       Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and RtB_Buffs() <= 0) and true or false;
     -- Broadside
     elseif Settings.Outlaw.RolltheBonesLogic == "Broadside" then
@@ -256,7 +250,9 @@ local function RtB_Reroll ()
       -- # Always reroll for 2+ buffs with Snake Eyes.
       -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
       -- actions+=/variable,name=rtb_reroll,op=set,if=buff.blade_flurry.up,value=rtb_buffs-buff.skull_and_crossbones.up<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up&!buff.broadside.up)
-      if Player:BuffP(S.BladeFlurry) then
+      if Player:BuffP(S.LoadedDiceBuff) then
+        Cache.APLVar.RtB_Reroll = (RtB_Buffs() - num(Player:BuffP(S.BuriedTreasure)) < 2 or RtB_BuffRemains() <= 12.6) and true or false;
+      elseif Player:BuffP(S.BladeFlurry) then
         Cache.APLVar.RtB_Reroll = (RtB_Buffs() - num(Player:BuffP(S.SkullandCrossbones)) < 2 and (Player:BuffP(S.LoadedDiceBuff) or
           (not Player:BuffP(S.GrandMelee) and not Player:BuffP(S.RuthlessPrecision) and not Player:BuffP(S.Broadside)))) and true or false;
       elseif S.SnakeEyesPower:AzeriteRank() >= 2 then
@@ -276,7 +272,19 @@ local function RtB_Reroll ()
           (not Player:BuffP(S.GrandMelee) and not Player:BuffP(S.RuthlessPrecision)))) and true or false;
       end
     end
+
+    -- Defensive Override : Grand Melee if HP < 60
+    if Everyone.IsSoloMode() then
+      if Player:BuffP(S.GrandMelee) then
+        if Player:IsTanking(Target) or Player:HealthPercentage() < mathmin(Settings.Outlaw.RolltheBonesLeechKeepHP, Settings.Outlaw.RolltheBonesLeechRerollHP) then
+          Cache.APLVar.RtB_Reroll = false
+        end
+      elseif Player:HealthPercentage() < Settings.Outlaw.RolltheBonesLeechRerollHP then
+        Cache.APLVar.RtB_Reroll = true
+      end
+    end
   end
+
   return Cache.APLVar.RtB_Reroll;
 end
 -- # Condition to use Stealth cooldowns for Ambush
@@ -513,7 +521,7 @@ local function Finish ()
     if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
   end
   -- actions.finish+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
-  if S.RolltheBones:IsCastable() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
+  if S.RolltheBones:IsCastableP() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
     if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
   end
   -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
@@ -522,8 +530,8 @@ local function Finish ()
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes"; end
   end
   -- actions.finish+=/dispatch
-  if S.Dispatch:IsCastable(S.Dispatch) then
-    if HR.Cast(S.Dispatch) then return "Cast Dispatch"; end
+  if S.Dispatch:IsCastableP(S.Dispatch) then
+    if HR.CastPooling(S.Dispatch) then return "Cast Dispatch"; end
   end
   -- OutofRange BtE
   if S.BetweentheEyes:IsCastableP(20) and not Target:IsInRange(10) then
@@ -533,12 +541,12 @@ end
 
 local function Build ()
   -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<10|buff.deadshot.up|energy<45)
-  if S.PistolShot:IsCastable(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 14 or Player:BuffP(S.DeadshotBuff) or EnergyPredictedRounded() < 45) then
+  if S.PistolShot:IsCastableP(20) and Player:BuffP(S.Opportunity) and (Player:BuffStackP(S.KeepYourWitsBuff) < 14 or Player:BuffP(S.DeadshotBuff) or EnergyPredictedRounded() < 45) then
     if HR.Cast(S.PistolShot) then return "Cast Pistol Shot"; end
   end
   -- actions.build+=/sinister_strike
-  if S.SinisterStrike:IsCastable(S.SinisterStrike) then
-    if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike"; end
+  if S.SinisterStrike:IsCastableP(S.SinisterStrike) then
+    if HR.CastPooling(S.SinisterStrike) then return "Cast Sinister Strike"; end
   end
 end
 
