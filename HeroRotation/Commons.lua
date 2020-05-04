@@ -68,6 +68,10 @@
     end
   end
 
+  function Commons.IsSoloMode()
+    return Settings.SoloMode and not Player:IsInRaid() and not Player:IsInDungeon();
+  end
+
   function Commons.PSCDEquipped ()
     return (HL.Equipment[13] == 167555 or HL.Equipment[14] == 167555)
   end
@@ -113,15 +117,18 @@
 
       -- Reaping Flames Death Sniping
       local BestUnit = nil
+      local LowestUnitTTD = 9999
       if AbilitySettings.ReapingFlamesSniping then
         local BestUnitTTD, BestUnitHealth = 0, 0
         local DamageThreshold = S.ReapingFlames:Damage()
 
         HL.GetEnemies(AbilitySettings.ReapingFlamesSnipingRange)
         for _, CycleUnit in pairs(Cache.Enemies[AbilitySettings.ReapingFlamesSnipingRange]) do
-          if CycleUnit:AffectingCombat() then
-            -- Prioritize HP-based sniping over duration sniping to maximize damage
+          if CycleUnit:AffectingCombat() and not CycleUnit:IsUserCycleBlacklisted() then
             local CycleHealth = CycleUnit:Health()
+            local CycleTTD = HL.OffsetRemains(CycleUnit:TimeToDie(), "Auto")
+
+            -- Prioritize HP-based sniping over duration sniping to maximize damage
             if CycleHealth < DamageThreshold then
               if CycleHealth > BestUnitHealth then
                 BestUnit = CycleUnit
@@ -131,12 +138,16 @@
             else
               -- If a target isn't in one-shot range, check if it's within the timer threshold
               -- Select the longest-living target that is below 3 seconds
-              local CycleTTD = HL.OffsetRemains(CycleUnit:TimeToDie(), "Auto")
               if CycleTTD < 2.5 and CycleTTD > BestUnitTTD then
                 BestUnit = CycleUnit
                 BestUnitTTD = CycleTTD
                 BestUnitHealth = CycleHealth
               end
+            end
+
+            -- Store lowest add TTD for main target logic below
+            if CycleTTD < LowestUnitTTD and CycleUnit:GUID() ~= Target:GUID() then
+              LowestUnitTTD = CycleTTD
             end
           end
         end
@@ -152,7 +163,8 @@
 
       -- Primary Reaping Flames Logic
       -- Don't use 45 second cooldowns if there is any potential sniping target from above
-      if (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or (Target:TimeToX(20) > 30 and not BestUnit)) then
+      -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
+      if ((Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20) and LowestUnitTTD > 16) or (Target:TimeToX(20) > 30 and LowestUnitTTD > 44) then
         if HR.Cast(S.ReapingFlames, nil, EssenceDisplayStyle) then return "Cast Reaping Flames"; end
       end
     end
