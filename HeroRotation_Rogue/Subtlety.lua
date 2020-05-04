@@ -242,7 +242,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffP(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
 
   -- actions.finish+=/eviscerate,if=buff.nights_vengeance.up&(spell_targets.shuriken_storm<2|variable.use_priority_rotation|!talent.secret_technique.enabled|!cooldown.secret_technique.up)
-  if S.Eviscerate:IsCastable() and IsInMeleeRange() and Player:BuffP(S.NightsVengeanceBuff)
+  if S.Eviscerate:IsReadyP() and IsInMeleeRange() and Player:BuffP(S.NightsVengeanceBuff)
     and (Cache.EnemiesCount[10] < 2 or UsePriorityRotation() or not S.SecretTechnique:IsAvailable() or not S.SecretTechnique:CooldownUpP()) then
     if ReturnSpellOnly then
       return S.Eviscerate;
@@ -251,7 +251,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
 
-  if S.Nightblade:IsCastable() then
+  if S.Nightblade:IsReadyP() then
     local NightbladeThreshold = (6+Rogue.CPSpend()*2)*0.3;
     -- actions.finish+=/nightblade,if=(!talent.dark_shadow.enabled|!buff.shadow_dance.up)&target.time_to_die-remains>6&remains<tick_time*2
     if IsInMeleeRange() and (not S.DarkShadow:IsAvailable() or not ShadowDanceBuff)
@@ -295,7 +295,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.finish+=/secret_technique
-  if S.SecretTechnique:IsCastable() then
+  if S.SecretTechnique:IsReadyP() then
     if ReturnSpellOnly then
       return S.SecretTechnique;
     else
@@ -460,8 +460,8 @@ local function Essences ()
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams"; end
   end
   -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-  ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
-  if ShouldReturn then return ShouldReturn; end
+  -- ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
+  -- if ShouldReturn then return ShouldReturn; end
   
   return false;
 end
@@ -775,6 +775,8 @@ local function APL ()
     -- In Combat
     -- MfD Sniping
     Rogue.MfDSniping(S.MarkedforDeath);
+    Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
+
     if Everyone.TargetIsValid() then
       -- Mythic Dungeon
       ShouldReturn = MythicDungeon();
