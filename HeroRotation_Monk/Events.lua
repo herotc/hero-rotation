@@ -75,20 +75,42 @@ local Item = HL.Item;
 --------------------------
 ------- Brewmaster -------
 --------------------------
+
+-- Stagger Tracker
+local StaggerSpellID = 115069;
+local BobandWeave = Spell(280515);
+local NormalizedStagger = 0;
+
+local function RegisterNormalizedStaggerAbsorb (Amount)
+  local StaggerDuration = 10 + (BobandWeave:IsAvailable() and 3 or 0);
+  NormalizedStagger = NormalizedStagger + Amount;
+  C_Timer.After(StaggerDuration, function() NormalizedStagger = NormalizedStagger - Amount; end)
+end
+
+function Player:NormalizedStagger ()
+  return NormalizedStagger;
+end
+
 HL:RegisterForCombatEvent(
   function (...)
-    dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
-    if DestGUID == Player:GUID() then -- Only worry about our events
-      local timeLimit = 10 + (Spell(280515):IsAvailable() and 3 or 0)
-      if GetSpellInfo((select(12, ...)))==(select(13, ...)) then -- Hit by spell
-        local absorbedSpell = select(12, ...)
-        if select(19, ...) == 115069 then
-          BrMAddToPool(0.75 * (select(22, ...)), timeLimit)
-        end
-      else
-        if select(16, ...) == 115069 then -- Melee swing
-          BrMAddToPool((select(19, ...)), timeLimit)
-        end
+    local args = {...}
+
+    -- Absorb is coming from a spell damage
+    if #args == 23 then
+      -- 1          2      3           4           5           6            7                8         9         10         11             12             13               14                 15                16                17                 18                     19       20         21           22
+      -- TimeStamp, Event, HideCaster, SourceGUID, SourceName, SourceFlags, SourceRaidFlags, DestGUID, DestName, DestFlags, DestRaidFlags, AbsorbSpellId, AbsorbSpellName, AbsorbSpellSchool, AbsorbSourceGUID, AbsorbSourceName, AbsorbSourceFlags, AbsorbSourceRaidFlags, SpellID, SpellName, SpellSchool, Amount
+      local _, _, _, _, _, _, _, DestGUID, _, _, _, AbsorbSpellId, AbsorbSpellName, AbsorbSpellSchool, _, _, _, _, SpellID, _, _, Amount = ...
+
+      if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
+        RegisterNormalizedStaggerAbsorb(Amount)
+      end
+    else
+      -- 1          2      3           4           5           6            7                8         9         10         11             12                13                14                 15                     16       17         18           19
+      -- TimeStamp, Event, HideCaster, SourceGUID, SourceName, SourceFlags, SourceRaidFlags, DestGUID, DestName, DestFlags, DestRaidFlags, AbsorbSourceGUID, AbsorbSourceName, AbsorbSourceFlags, AbsorbSourceRaidFlags, SpellID, SpellName, SpellSchool, Amount
+      local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
+
+      if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
+        RegisterNormalizedStaggerAbsorb(Amount)
       end
     end
   end

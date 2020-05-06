@@ -197,7 +197,7 @@ local function APL ()
     -- Bone Shield
     if S.Marrowrend:IsCastable("Melee") and (Player:BuffRemainsP(S.BoneShield) <= 6 or (Target:TimeToDie() < 5 and Player:BuffRemainsP(S.BoneShield) < 10 and Cache.EnemiesCount[8] == 1)) then
       if HR.Cast(S.Marrowrend) then return "marrowrend 30"; end
-    end 
+    end
     -- Healing
     if S.DeathStrike:IsReady("Melee") and Player:HealthPercentage() <= 50 + (Player:RunicPower() > 90 and 20 or 0) and not Player:HealingAbsorbed() then
       if HR.Cast(S.DeathStrike) then return "death_strike 32"; end
@@ -385,10 +385,6 @@ local function APL ()
       if I.AshvanesRazorCoral:IsEquipReady() and (Player:BuffP(S.DancingRuneWeaponBuff) and Target:DebuffP(S.RazorCoralDebuff) and not I.DribblingInkpod:IsEquipped()) then
         if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 144"; end
       end
-    end
-    -- vampiric_blood
-    if S.VampiricBlood:IsCastable() then
-      if HR.Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood 146"; end
     end
     -- potion,if=buff.dancing_rune_weapon.up
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.DancingRuneWeaponBuff)) then
