@@ -156,7 +156,6 @@ local function ShouldPurify (BrewMaxCharges)
   if HL.CombatTime() <= 9 then return false end;
 
   -- Do purify only if we are loosing more than 3% HP per second (1.5% * 2 since it ticks every 500ms), i.e. above Grey level
-  print(NextStaggerTick, NextStaggerTickMaxHPPct, StaggerTickPerSec, NormalizedStaggerTickPct, Player:Stagger(), StaggerDuration)
   if NextStaggerTickMaxHPPct > 0.015 and NormalizedStaggerTickPct > 0 then
     if NextStaggerTickMaxHPPct <= 0.03 then -- Yellow: 6% HP per second, only if the normalized value is > 80%
       return Settings.Brewmaster.Purify.Low and NormalizedStaggerTickPct > 0.8 or false;
