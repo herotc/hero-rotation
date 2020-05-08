@@ -406,8 +406,8 @@ local function APL()
     if S.AspectoftheEagle:IsCastableP() and (not Target:IsInRange(8) and Target:IsInRange(40)) then
       if HR.Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectoftheEagle) then return "aspect_of_the_eagle 320"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=equipped.dribbling_inkpod&(debuff.razor_coral_debuff.down|time_to_pct_30<1|(health.pct<30&buff.guardian_of_azeroth.up|buff.memory_of_lucid_dreams.up))|(!equipped.dribbling_inkpod&(buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up&cooldown.guardian_of_azeroth.remains>175)|debuff.razor_coral_debuff.down)|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (I.DribblingInkpod:IsEquipped() and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToX(30) < 1 or (Target:HealthPercentage() < 30 and Player:BuffP(S.GuardianofAzerothBuff) or Player:BuffP(S.MemoryofLucidDreams))) or (not I.DribblingInkpod:IsEquipped() and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzerothBuff) and S.GuardianofAzeroth:CooldownRemainsP() > 175) or Target:DebuffDownP(S.RazorCoralDebuff)) or Target:TimeToDie() < 20) then
+    -- use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up&target.time_to_die<cooldown.memory_of_lucid_dreams.remains+15|buff.guardian_of_azeroth.stack=5&target.time_to_die<cooldown.guardian_of_azeroth.remains+20|debuff.razor_coral_debuff.down|target.time_to_die<21|buff.worldvein_resonance.remains&target.time_to_die<cooldown.worldvein_resonance.remains+18|!talent.birds_of_prey.enabled&target.time_to_die<cooldown.coordinated_assault.remains+20&buff.coordinated_assault.remains
+    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffP(S.MemoryofLucidDreams) and Target:TimeToDie() < S.MemoryofLucidDreams:CooldownRemainsP() + 15 or Player:BuffStackP(S.GuardianofAzerothBuff) == 5 and Target:TimeToDie() < S.GuardianofAzeroth:CooldownRemainsP() + 20 or Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 21 or Player:BuffP(S.WorldveinResonance) and Target:TimeToDie() < S.WorldveinResonance:CooldownRemainsP() + 18 or not S.BirdsofPrey:IsAvailable() and Target:TimeToDie() < S.CoordinatedAssault:CooldownRemainsP() + 20 and Player:BuffP(S.CoordinatedAssaultBuff)) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 321"; end
     end
     -- use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
@@ -422,12 +422,12 @@ local function APL()
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:Focus() < Player:FocusMax() - 25 or (Cache.EnemiesCount[8] > 1 and not S.BirdsofPrey:IsAvailable() or Cache.EnemiesCount[8] > 2) and (Player:BuffP(S.BlurofTalonsBuff) and Player:BuffRemainsP(S.BlurofTalonsBuff) > 3 * Player:GCD() or Player:BuffDownP(S.BlurofTalonsBuff))) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 324"; end
     end
-    -- blood_of_the_enemy,if=buff.coordinated_assault.up
-    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.CoordinatedAssaultBuff)) then
+    -- blood_of_the_enemy,if=((raid_event.adds.remains>90|!raid_event.adds.exists)|(active_enemies>1&!talent.birds_of_prey.enabled|active_enemies>2))&focus<focus.max
+    if S.BloodoftheEnemy:IsCastableP() and (((Cache.EnemiesCount[8] == 1) or (Cache.EnemiesCount[8] > 1 and not S.BirdsofPrey:IsAvailable() or Cache.EnemiesCount[8] > 2)) and Player:Focus() < Player:FocusMax()) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 328"; end
     end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastableP() then
+    -- purifying_blast,if=((raid_event.adds.remains>60|!raid_event.adds.exists)|(active_enemies>1&!talent.birds_of_prey.enabled|active_enemies>2))&focus<focus.max
+    if S.PurifyingBlast:IsCastableP() and (((Cache.EnemiesCount[8] == 1) or (Cache.EnemiesCount[8] > 1 and not S.BirdsofPrey:IsAvailable() or Cache.EnemiesCount[8] > 2)) and Player:Focus() < Player:FocusMax()) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 332"; end
     end
     -- guardian_of_azeroth
