@@ -80,7 +80,7 @@ local S = Spell.Mage.Fire;
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Fire = {
   -- Potion
-  PotionofUnbridledFury            = Item(169299),
+  SuperiorBattlePotionofIntellect  = Item(168498),
   -- Non-trinket items
   HyperthreadWristwraps            = Item(168989),
   MalformedHeraldsLegwraps         = Item(167835),
@@ -309,8 +309,8 @@ local function APL()
         if HR.Cast(S.MirrorImage) then return "mirror_image 10"; end
       end
       -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 12"; end
+      if I.SuperiorBattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.SuperiorBattlePotionofIntellect) then return "superior_battle_potion_of_intellect 12"; end
       end
       -- pyroblast
       if S.Pyroblast:IsCastableP() then
@@ -378,8 +378,8 @@ local function APL()
       if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 265"; end
     end
     -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 288"; end
+    if I.SuperiorBattlePotionofIntellect:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.SuperiorBattlePotionofIntellect) then return "superior_battle_potion_of_intellect 288"; end
     end
     -- blood_fury
     if S.BloodFury:IsCastableP() then
