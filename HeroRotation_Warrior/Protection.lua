@@ -100,6 +100,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local gcdTime;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -145,7 +146,7 @@ end
 
 -- The amount of rage above which we dump revenges, below which we conserve for ignore pain.
 local function RevengeThreshold()
-	return 60
+  return 60
 end
 
 
@@ -155,12 +156,12 @@ local function shouldDumpRageIntoIP(rageGenerated)
   rageMax = 90
   -- make sure we have enough rage to cast IP
   if Player:Rage() >= 40 then
-	if Player:BuffRemainsP(S.MemoryofLucidDreamsBuff) > Player:GCD() then
-		-- rage gen is doubled. should dump rage into IP if rage + 2*rageGenerated >= rageMax
-		return Player:Rage() + 2*rageGenerated >= rageMax
-	else
-		return Player:Rage() + rageGenerated >= rageMax
-	end
+    if Player:BuffRemainsP(S.MemoryofLucidDreamsBuff) > Player:GCD() then
+      -- rage gen is doubled. should dump rage into IP if rage + 2*rageGenerated >= rageMax
+      return Player:Rage() + 2 * rageGenerated >= rageMax
+    else
+      return Player:Rage() + rageGenerated >= rageMax
+    end
   else
     return false
   end
@@ -168,146 +169,145 @@ end
 
 local function suggestRageDump(baseRageGen)
   if shouldDumpRageIntoIP(baseRageGen) then
-	if HR.CastRightSuggested(S.IgnorePain) then return "rage capped"; end
+    if HR.CastRightSuggested(S.IgnorePain) then return "rage capped"; end
+  end
+end
+
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
+  if Everyone.TargetIsValid() then
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
+    end
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury precombat"; end
+    end
+  end
+end
+
+local function Defensive()
+  if S.ShieldBlock:IsReadyP() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemainsP(S.ShieldBlockBuff) <= 1.5*gcdTime) and Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30) then
+    if HR.CastSuggested(S.ShieldBlock) then return "shield_block defensive" end
+  end
+  if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and S.ShieldBlock:RechargeP() > 1.5*gcdTime) then
+    if HR.CastSuggested(S.LastStand) then return "last_stand defensive" end
+  end
+  if Player:HealthPercentage() <= 70 and I.LingeringPsychicShell:IsEquipReady() then
+    if HR.CastRightSuggested(I.LingeringPsychicShell) then return "absorb trinket defensive" end
+  end
+end
+
+local function Aoe()
+  -- thunder_clap
+  if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) then
+    suggestRageDump(5)
+    if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
+  end
+  -- memory_of_lucid_dreams,if=buff.avatar.down
+  if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.AvatarBuff)) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 7"; end
+  end
+  -- demoralizing_shout,if=talent.booming_voice.enabled
+  if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
+    suggestRageDump(40)
+    if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
+  end
+  -- anima_of_death,if=buff.last_stand.up
+  if S.AnimaofDeath:IsCastableP() then
+    if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 9"; end
+  end
+  -- dragon_roar
+  if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
+    if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
+  end
+  -- revenge
+  if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() > RevengeThreshold()) then
+    if HR.Cast(S.Revenge) then return "revenge 14"; end
+  end
+  -- ravager
+  if S.Ravager:IsCastableP(40) then
+    if HR.Cast(S.Ravager) then return "ravager 16"; end
+  end
+  -- shield_slam
+  if S.ShieldSlam:IsCastableP("Melee") then
+    suggestRageDump(15)
+    if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
+  end
+  -- devastate
+  if S.Devastate:IsCastableP("Melee") then
+    if HR.Cast(S.Devastate) then return "devastate 80"; end
+  end
+end
+
+local function St()
+  -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
+  if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
+    suggestRageDump(5)
+    if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
+  end
+  -- shield_slam,if=buff.shield_block.up
+  if S.ShieldSlam:IsCastableP("Melee") and (Player:BuffP(S.ShieldBlockBuff)) then
+    suggestRageDump(15)
+    if HR.Cast(S.ShieldSlam) then return "shield_slam 44"; end
+  end
+  -- thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
+  if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and ((S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff))) then
+    suggestRageDump(5)
+    if HR.Cast(S.ThunderClap) then return "thunder_clap 54"; end
+  end
+  -- demoralizing_shout,if=talent.booming_voice.enabled
+  if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
+    suggestRageDump(40)
+    if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
+  end
+  -- anima_of_death,if=buff.last_stand.up
+  if S.AnimaofDeath:IsCastableP() then
+    if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 61"; end
+  end
+  -- shield_slam
+  if S.ShieldSlam:IsCastableP("Melee") then
+    suggestRageDump(15)
+    if HR.Cast(S.ShieldSlam) then return "shield_slam 70"; end
+  end
+  -- dragon_roar
+  if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
+    if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 73"; end
+  end
+  -- thunder_clap
+  if S.ThunderClap:IsCastableP(8) then
+    suggestRageDump(5)
+    if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
+  end
+  -- revenge
+  if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() >= RevengeThreshold() or ((not IsCurrentlyTanking()) and Player:Rage() >= 50)) then
+    if HR.Cast(S.Revenge) then return "revenge 76"; end
+  end
+  -- ravager
+  if S.Ravager:IsCastableP(40) then
+    if HR.Cast(S.Ravager) then return "ravager 78"; end
+  end
+  -- devastate
+  if S.Devastate:IsCastableP("Melee") then
+    if HR.Cast(S.Devastate) then return "devastate 80"; end
   end
 end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Aoe, St, Defensive
-  local gcdTime = Player:GCD()
+  gcdTime = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-  
-  Precombat = function()
-    -- flask
-    -- food
-    -- augmentation
-    -- snapshot_stats
-    if Everyone.TargetIsValid() then
-      -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
-      end
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury precombat"; end
-      end
-    end
-  end
-  
-  Defensive = function()
-    if S.ShieldBlock:IsReadyP() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemainsP(S.ShieldBlockBuff) <= 1.5*gcdTime) and Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30) then
-        if HR.CastSuggested(S.ShieldBlock) then return "shield_block defensive" end
-    end
-    if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and S.ShieldBlock:RechargeP() > 1.5*gcdTime) then
-        if HR.CastSuggested(S.LastStand) then return "last_stand defensive" end
-    end
-	if Player:HealthPercentage() <= 70 and I.LingeringPsychicShell:IsEquipReady() then
-		if HR.CastRightSuggested(I.LingeringPsychicShell) then return "absorb trinket defensive" end
-	end
-  end
-  
-  Aoe = function()
-    -- thunder_clap
-    if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) then
-	  suggestRageDump(5)
-      if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
-    end
-    -- memory_of_lucid_dreams,if=buff.avatar.down
-    if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.AvatarBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 7"; end
-    end
-    -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
-	  suggestRageDump(40)
-      if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
-    end
-    -- anima_of_death,if=buff.last_stand.up
-    if S.AnimaofDeath:IsCastableP() then
-      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 9"; end
-    end
-    -- dragon_roar
-    if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
-      if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
-    end
-    -- revenge
-    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() > RevengeThreshold()) then
-      if HR.Cast(S.Revenge) then return "revenge 14"; end
-    end
-    -- ravager
-    if S.Ravager:IsCastableP(40) then
-      if HR.Cast(S.Ravager) then return "ravager 16"; end
-    end
-    -- shield_slam
-    if S.ShieldSlam:IsCastableP("Melee") then
-	  suggestRageDump(15)
-      if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
-    end
-	-- devastate
-    if S.Devastate:IsCastableP("Melee") then
-      if HR.Cast(S.Devastate) then return "devastate 80"; end
-    end
-  end
-  
-  St = function()
-    -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
-    if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
-	  suggestRageDump(5)
-      if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
-    end
-    -- shield_slam,if=buff.shield_block.up
-    if S.ShieldSlam:IsCastableP("Melee") and (Player:BuffP(S.ShieldBlockBuff)) then
-	  suggestRageDump(15)
-      if HR.Cast(S.ShieldSlam) then return "shield_slam 44"; end
-    end
-    -- thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
-    if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and ((S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff))) then
-	  suggestRageDump(5)
-      if HR.Cast(S.ThunderClap) then return "thunder_clap 54"; end
-    end
-    -- demoralizing_shout,if=talent.booming_voice.enabled
-    if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
-	  suggestRageDump(40)
-      if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
-    end
-    -- anima_of_death,if=buff.last_stand.up
-    if S.AnimaofDeath:IsCastableP() then
-      if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 61"; end
-    end
-    -- shield_slam
-    if S.ShieldSlam:IsCastableP("Melee") then
-	  suggestRageDump(15)
-      if HR.Cast(S.ShieldSlam) then return "shield_slam 70"; end
-    end
-    -- dragon_roar
-    if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
-      if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 73"; end
-    end
-    -- thunder_clap
-    if S.ThunderClap:IsCastableP(8) then
-	  suggestRageDump(5)
-      if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
-    end
-    -- revenge
-    if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() >= RevengeThreshold() or ((not IsCurrentlyTanking()) and Player:Rage() >= 50)) then
-      if HR.Cast(S.Revenge) then return "revenge 76"; end
-    end
-    -- ravager
-    if S.Ravager:IsCastableP(40) then
-      if HR.Cast(S.Ravager) then return "ravager 78"; end
-    end
-    -- devastate
-    if S.Devastate:IsCastableP("Melee") then
-      if HR.Cast(S.Devastate) then return "devastate 80"; end
-    end
-  end
-  
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  
+
   if Everyone.TargetIsValid() then
     -- Check defensives if tanking
     if IsCurrentlyTanking() then
@@ -327,7 +327,7 @@ local function APL()
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
-	
+
     if (HR.CDsON()) then
       -- blood_fury
       if S.BloodFury:IsCastableP() then
@@ -358,7 +358,7 @@ local function APL()
         if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 102"; end
       end
     end
-	
+
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 103"; end
@@ -387,10 +387,10 @@ local function APL()
     end
     -- avatar
     if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
-	  suggestRageDump(20)
+    suggestRageDump(20)
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
     end
-	-- memory_of_lucid_dreams
+    -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastableP() and S.Avatar:CooldownRemainsP() > 0 then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 110"; end
     end
@@ -405,7 +405,7 @@ local function APL()
   end
 end
 
-local function Init ()
+local function Init()
   HL.RegisterNucleusAbility(6343, 8, 6)               -- Thunder Clap
   HL.RegisterNucleusAbility(118000, 12, 6)            -- Dragon Roar
   HL.RegisterNucleusAbility(6572, 8, 6)               -- Revenge

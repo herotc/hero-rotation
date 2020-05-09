@@ -121,107 +121,103 @@ local function bool(val)
   return val ~= 0
 end
 
---S.ExecuteDefault    = Spell(5308)
---S.ExecuteMassacre   = Spell(280735)
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
+  if Everyone.TargetIsValid() then
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
+    end
+    -- worldvein_resonance
+    if S.WorldveinResonance:IsCastableP() then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance precombat"; end
+    end
+    -- memory_of_lucid_dreams
+    if S.MemoryofLucidDreams:IsCastableP() then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams precombat"; end
+    end
+    -- guardian_of_azeroth
+    if S.GuardianofAzeroth:IsCastableP() then
+      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth precombat"; end
+    end
+    -- recklessness
+    if S.Recklessness:IsCastableP() then
+      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat"; end
+    end
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion precombat"; end
+    end
+  end
+end
 
---local function UpdateExecuteID()
-  --S.Execute = S.Massacre:IsAvailable() and S.ExecuteMassacre or S.ExecuteDefault
---end
+local function Movement()
+  -- heroic_leap
+  if S.HeroicLeap:IsCastableP() then
+    if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 16"; end
+  end
+end
+
+local function SingleTarget()
+  -- siegebreaker
+  if S.Siegebreaker:IsCastableP("Melee") and HR.CDsON() then
+    if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return "siegebreaker 18"; end
+  end
+  -- rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
+  if S.Rampage:IsReadyP("Melee") and ((Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryofLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
+    if HR.Cast(S.Rampage) then return "rampage 20"; end
+  end
+  -- execute
+  if S.Execute:IsReady("Melee") then
+    if HR.Cast(S.Execute) then return "execute 34"; end
+  end
+  -- furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
+  if S.FuriousSlash:IsCastableP("Melee") and (not Player:HasHeroism() and Player:BuffRemainsP(S.FuriousSlashBuff) < 3) then
+    if HR.Cast(S.FuriousSlash) then return "furious_slash 36"; end
+  end
+  -- bladestorm,if=prev_gcd.1.rampage
+  if S.Bladestorm:IsCastableP("Melee") and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
+    if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm) then return "bladestorm 37"; end
+  end
+  -- bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
+  if S.Bloodthirst:IsCastableP("Melee") and (Player:BuffDownP(S.EnrageBuff) or S.ColdSteelHotBlood:AzeriteRank() > 1) then
+    if HR.Cast(S.Bloodthirst) then return "bloodthirst 38"; end
+  end
+  -- dragon_roar,if=buff.enrage.up
+  if S.DragonRoar:IsCastableP(12) and HR.CDsON() and (Player:BuffP(S.EnrageBuff)) then
+    if HR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return "dragon_roar 39"; end
+  end
+  -- raging_blow,if=charges=2
+  if S.RagingBlow:IsCastableP("Melee") and (S.RagingBlow:ChargesP() == 2) then
+    if HR.Cast(S.RagingBlow) then return "raging_blow 42"; end
+  end
+  -- bloodthirst
+  if S.Bloodthirst:IsCastableP("Melee") then
+    if HR.Cast(S.Bloodthirst) then return "bloodthirst 48"; end
+  end
+  -- raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
+  if S.RagingBlow:IsCastableP("Melee") and (S.Carnage:IsAvailable() or (S.Massacre:IsAvailable() and Player:Rage() < 80) or (S.FrothingBerserker:IsAvailable() and Player:Rage() < 90)) then
+    if HR.Cast(S.RagingBlow) then return "raging_blow 62"; end
+  end
+  -- furious_slash,if=talent.furious_slash.enabled
+  if S.FuriousSlash:IsCastableP("Melee") and (S.FuriousSlash:IsAvailable()) then
+    if HR.Cast(S.FuriousSlash) then return "furious_slash 70"; end
+  end
+  -- whirlwind
+  if S.Whirlwind:IsCastableP("Melee") then
+    if HR.Cast(S.Whirlwind) then return "whirlwind 74"; end
+  end
+end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Movement, SingleTarget
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   --UpdateExecuteID()
-  Precombat = function()
-    -- flask
-    -- food
-    -- augmentation
-    -- snapshot_stats
-    if Everyone.TargetIsValid() then
-      -- use_item,name=azsharas_font_of_power
-      if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
-      end
-      -- worldvein_resonance
-      if S.WorldveinResonance:IsCastableP() then
-        if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance precombat"; end
-      end
-      -- memory_of_lucid_dreams
-      if S.MemoryofLucidDreams:IsCastableP() then
-        if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams precombat"; end
-      end
-      -- guardian_of_azeroth
-      if S.GuardianofAzeroth:IsCastableP() then
-        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth precombat"; end
-      end
-      -- recklessness
-      if S.Recklessness:IsCastableP() then
-        if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat"; end
-      end
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion precombat"; end
-      end
-    end
-  end
-  Movement = function()
-    -- heroic_leap
-    if S.HeroicLeap:IsCastableP() then
-      if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 16"; end
-    end
-  end
-  SingleTarget = function()
-    -- siegebreaker
-    if S.Siegebreaker:IsCastableP("Melee") and HR.CDsON() then
-      if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return "siegebreaker 18"; end
-    end
-    -- rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
-    if S.Rampage:IsReadyP("Melee") and ((Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryofLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
-      if HR.Cast(S.Rampage) then return "rampage 20"; end
-    end
-    -- execute
-    if S.Execute:IsReady("Melee") then
-      if HR.Cast(S.Execute) then return "execute 34"; end
-    end
-    -- furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
-    if S.FuriousSlash:IsCastableP("Melee") and (not Player:HasHeroism() and Player:BuffRemainsP(S.FuriousSlashBuff) < 3) then
-      if HR.Cast(S.FuriousSlash) then return "furious_slash 36"; end
-    end
-    -- bladestorm,if=prev_gcd.1.rampage
-    if S.Bladestorm:IsCastableP("Melee") and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
-      if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm) then return "bladestorm 37"; end
-    end
-    -- bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
-    if S.Bloodthirst:IsCastableP("Melee") and (Player:BuffDownP(S.EnrageBuff) or S.ColdSteelHotBlood:AzeriteRank() > 1) then
-      if HR.Cast(S.Bloodthirst) then return "bloodthirst 38"; end
-    end
-    -- dragon_roar,if=buff.enrage.up
-    if S.DragonRoar:IsCastableP(12) and HR.CDsON() and (Player:BuffP(S.EnrageBuff)) then
-      if HR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return "dragon_roar 39"; end
-    end
-    -- raging_blow,if=charges=2
-    if S.RagingBlow:IsCastableP("Melee") and (S.RagingBlow:ChargesP() == 2) then
-      if HR.Cast(S.RagingBlow) then return "raging_blow 42"; end
-    end
-    -- bloodthirst
-    if S.Bloodthirst:IsCastableP("Melee") then
-      if HR.Cast(S.Bloodthirst) then return "bloodthirst 48"; end
-    end
-    -- raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
-    if S.RagingBlow:IsCastableP("Melee") and (S.Carnage:IsAvailable() or (S.Massacre:IsAvailable() and Player:Rage() < 80) or (S.FrothingBerserker:IsAvailable() and Player:Rage() < 90)) then
-      if HR.Cast(S.RagingBlow) then return "raging_blow 62"; end
-    end
-    -- furious_slash,if=talent.furious_slash.enabled
-    if S.FuriousSlash:IsCastableP("Melee") and (S.FuriousSlash:IsAvailable()) then
-      if HR.Cast(S.FuriousSlash) then return "furious_slash 70"; end
-    end
-    -- whirlwind
-    if S.Whirlwind:IsCastableP("Melee") then
-      if HR.Cast(S.Whirlwind) then return "whirlwind 74"; end
-    end
-  end
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -332,7 +328,7 @@ local function APL()
   end
 end
 
-local function Init ()
+local function Init()
   HL.RegisterNucleusAbility(46924, 8, 6)               -- Bladestorm
   HL.RegisterNucleusAbility(118000, 12, 6)             -- Dragon Roar
   HL.RegisterNucleusAbility(190411, 8, 6)              -- Whirlwind

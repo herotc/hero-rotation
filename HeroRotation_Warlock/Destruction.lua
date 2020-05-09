@@ -207,324 +207,329 @@ local function EvaluateCycleHavoc402(TargetUnit)
   return not (TargetUnit == Target) and (TargetUnit:DebuffRemainsP(S.ImmolateDebuff) > S.ImmolateDebuff:BaseDuration() * 0.5 or not S.InternalCombustion:IsAvailable()) and (not S.SummonInfernal:CooldownUpP() or not S.GrimoireofSupremacy:IsAvailable() or S.GrimoireofSupremacy:IsAvailable() and InfernalRemains <= 10)
 end
 
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- summon_pet
+  if S.SummonPet:IsCastableP() then
+    if HR.Cast(S.SummonPet) then return "summon_pet 3"; end
+  end
+  -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+  if S.GrimoireofSacrifice:IsReadyP() then
+    if HR.Cast(S.GrimoireofSacrifice) then return "grimoire_of_sacrifice 5"; end
+  end
+  -- snapshot_stats
+  if Everyone.TargetIsValid() then
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 10"; end
+    end
+    -- soul_fire
+    if S.SoulFire:IsCastableP() then
+      if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 12"; end
+    end
+    -- incinerate,if=!talent.soul_fire.enabled
+    if S.Incinerate:IsCastableP() and (not S.SoulFire:IsAvailable()) then
+      if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 14"; end
+    end
+  end
+end
+
+local function Aoe()
+  -- rain_of_fire,if=pet.infernal.active&(buff.crashing_chaos.down|!talent.grimoire_of_supremacy.enabled)&(!cooldown.havoc.ready|active_enemies>3)
+  if S.RainofFire:IsReadyP() and (InfernalActive and (Player:BuffDownP(S.CrashingChaosBuff) or not S.GrimoireofSupremacy:IsAvailable()) and (not S.Havoc:CooldownUpP() or EnemiesCount > 3)) then
+    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 18"; end
+  end
+  -- channel_demonfire,if=dot.immolate.remains>cast_time
+  if S.ChannelDemonfire:IsCastableP() and (Target:DebuffRemainsP(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
+    if HR.Cast(S.ChannelDemonfire, nil, nil, 40) then return "channel_demonfire 34"; end
+  end
+  -- immolate,cycle_targets=1,if=remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
+  if S.Immolate:IsCastableP() then
+    if HR.CastCycle(S.Immolate, 40, EvaluateCycleImmolate46) then return "immolate 64" end
+  end
+  -- call_action_list,name=cds
+  if (HR.CDsON()) then
+    local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
+  if S.Havoc:IsCastableP() then
+    if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc71) then return "havoc 81" end
+  end
+  -- chaos_bolt,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active&(havoc_active|talent.cataclysm.enabled|talent.inferno.enabled&active_enemies<4)
+  if S.ChaosBolt:IsReadyP() and (S.GrimoireofSupremacy:IsAvailable() and InfernalActive and (bool(EnemyHasHavoc()) or S.Cataclysm:IsAvailable() or S.Inferno:IsAvailable() and EnemiesCount < 4)) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 82"; end
+  end
+  -- rain_of_fire
+  if S.RainofFire:IsReadyP() then
+    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 96"; end
+  end
+  -- focused_azerite_beam
+  if S.FocusedAzeriteBeam:IsCastableP() then
+    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 98"; end
+  end
+  -- purifying_blast
+  if S.PurifyingBlast:IsCastableP() then
+    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 100"; end
+  end
+  -- havoc,cycle_targets=1,if=!(target=self.target)&(!talent.grimoire_of_supremacy.enabled|!talent.inferno.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
+  if S.Havoc:IsCastableP() then
+    if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc106) then return "havoc 120" end
+  end
+  -- incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
+  if S.Incinerate:IsCastableP() and (S.FireandBrimstone:IsAvailable() and Player:BuffP(S.BackdraftBuff) and Player:SoulShardsP() < 5 - 0.2 * EnemiesCount) then
+    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 121"; end
+  end
+  -- soul_fire
+  if S.SoulFire:IsCastableP() then
+    if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 133"; end
+  end
+  -- conflagrate,if=buff.backdraft.down
+  if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff)) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 135"; end
+  end
+  -- shadowburn,if=!talent.fire_and_brimstone.enabled
+  if S.Shadowburn:IsCastableP() and (not S.FireandBrimstone:IsAvailable()) then
+    if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 139"; end
+  end
+  -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
+  if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 143"; end
+  end
+  -- incinerate
+  if S.Incinerate:IsCastableP() then
+    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 157"; end
+  end
+end
+
+local function Cds()
+  -- immolate,if=talent.grimoire_of_supremacy.enabled&remains<8&cooldown.summon_infernal.remains<4.5
+  if S.Immolate:IsCastableP() and (S.GrimoireofSupremacy:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) < 8 and S.SummonInfernal:CooldownRemainsP() < 4.5) then
+    if HR.Cast(S.Immolate, nil, nil, 40) then return "immolate 161"; end
+  end
+  -- conflagrate,if=talent.grimoire_of_supremacy.enabled&cooldown.summon_infernal.remains<4.5&!buff.backdraft.up&soul_shard<4.3
+  if S.Conflagrate:IsCastableP() and (S.GrimoireofSupremacy:IsAvailable() and S.SummonInfernal:CooldownRemainsP() < 4.5 and Player:BuffDownP(S.BackdraftBuff) and Player:SoulShardsP() < 4.3) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 163"; end
+  end
+  -- use_item,name=azsharas_font_of_power,if=cooldown.summon_infernal.up|cooldown.summon_infernal.remains<=4
+  if I.AzsharasFontofPower:IsEquipReady() and (S.SummonInfernal:CooldownUpP() or S.SummonInfernal:CooldownRemainsP() <= 4) then
+    if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 165"; end
+  end
+  -- summon_infernal
+  if S.SummonInfernal:IsCastableP() then
+    if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 167"; end
+  end
+  -- guardian_of_azeroth,if=pet.infernal.active
+  if S.GuardianofAzeroth:IsCastableP() and (InfernalActive) then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 177"; end
+  end
+  -- dark_soul_instability,if=pet.infernal.active&(pet.infernal.remains<20.5|pet.infernal.remains<22&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
+  if S.DarkSoulInstability:IsCastableP() and (InfernalActive and (InfernalRemains < 20.5 or InfernalRemains < 22 and Player:SoulShardsP() >= 3.6 or not S.GrimoireofSupremacy:IsAvailable())) then
+    if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 179"; end
+  end
+  -- worldvein_resonance,if=pet.infernal.active&(pet.infernal.remains<18.5|pet.infernal.remains<20&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
+  if S.WorldveinResonance:IsCastableP() and (InfernalActive and (InfernalRemains < 18.5 or InfernalRemains < 20 and Player:SoulShardsP() >= 3.6 or not S.GrimoireofSupremacy)) then
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 185"; end
+  end
+  -- memory_of_lucid_dreams,if=pet.infernal.active&(pet.infernal.remains<15.5|soul_shard<3.5&(buff.dark_soul_instability.up|!talent.grimoire_of_supremacy.enabled&dot.immolate.remains>12))
+  if S.MemoryofLucidDreams:IsCastableP() and (InfernalActive and (InfernalRemains < 15.5 or Player:SoulShardsP() < 3.5 and (Player:BuffP(S.DarkSoulInstabilityBuff) or not S.GrimoireofSupremacy:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) > 12))) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 187"; end
+  end
+  -- summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
+  if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() > 210) then
+    if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 193"; end
+  end
+  -- guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
+  if S.GuardianofAzeroth:IsCastableP() and (HL.CombatTime() > 30 and Target:TimeToDie() > 210) then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 197"; end
+  end
+  -- summon_infernal,if=talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains>target.time_to_die
+  if S.SummonInfernal:IsCastableP() and (S.DarkSoulInstability:IsAvailable() and S.DarkSoulInstability:CooldownRemainsP() > Target:TimeToDie()) then
+    if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 201"; end
+  end
+  -- guardian_of_azeroth,if=cooldown.summon_infernal.remains>target.time_to_die
+  if S.GuardianofAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 207"; end
+  end
+  -- dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<20.5
+  if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and InfernalRemains < 20.5) then
+    if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 211"; end
+  end
+  -- worldvein_resonance,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<18.5
+  if S.WorldveinResonance:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and InfernalRemains < 18.5) then
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 213"; end
+  end
+  -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die&(pet.infernal.remains<15.5|buff.dark_soul_instability.up&soul_shard<3)
+  if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and (InfernalRemains < 15.5 or Player:BuffP(S.DarkSoulInstabilityBuff) and Player:SoulShardsP() < 3)) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 215"; end
+  end
+  -- summon_infernal,if=target.time_to_die<30
+  if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() < 30) then
+    if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 219"; end
+  end
+  -- guardian_of_azeroth,if=target.time_to_die<30
+  if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() < 30) then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 221"; end
+  end
+  -- dark_soul_instability,if=target.time_to_die<21&target.time_to_die>4
+  if S.DarkSoulInstability:IsCastableP() and (Target:TimeToDie() < 21 and Target:TimeToDie() > 4) then
+    if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 223"; end
+  end
+  -- worldvein_resonance,if=target.time_to_die<19&target.time_to_die>4
+  if S.WorldveinResonance:IsCastableP() and (Target:TimeToDie() < 19 and Target:TimeToDie() > 4) then
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 224"; end
+  end
+  -- memory_of_lucid_dreams,if=target.time_to_die<16&target.time_to_die>6
+  if S.MemoryofLucidDreams:IsCastableP() and (Target:TimeToDie() < 16 and Target:TimeToDie() > 6) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 225"; end
+  end
+  -- blood_of_the_enemy
+  if S.BloodoftheEnemy:IsCastableP() then
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 227"; end
+  end
+  -- worldvein_resonance,if=cooldown.summon_infernal.remains>=60-12&!pet.infernal.active
+  if S.WorldveinResonance:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() >= 48 and not InfernalActive) then
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 229"; end
+  end
+  -- ripple_in_space
+  if S.RippleInSpace:IsCastableP() then
+    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 231"; end
+  end
+  -- potion,if=pet.infernal.active|target.time_to_die<30
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (InfernalActive or Target:TimeToDie() < 30) then
+    if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.TrinketDisplayStyle) then return "battle_potion_of_intellect 233"; end
+  end
+  -- berserking,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
+  if S.Berserking:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 235"; end
+  end
+  -- blood_fury,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
+  if S.BloodFury:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 241"; end
+  end
+  -- fireblood,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
+  if S.Fireblood:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
+    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 243"; end
+  end
+  -- use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20
+  if (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or InfernalRemains <= 20) or Target:TimeToDie() <= 20) then
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
+  -- use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+  if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
+    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 248"; end
+  end
+  -- use_item,name=rotcrusted_voodoo_doll,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+  if I.RotcrustedVoodooDoll:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
+    if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "rotcrusted_voodoo_doll 249"; end
+  end
+  -- use_item,name=shiver_venom_relic,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+  if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
+    if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "shiver_venom_relic 250"; end
+  end
+  -- use_item,name=aquipotent_nautilus,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+  if I.AquipotentNautilus:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
+    if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "aquipotent_nautilus 251"; end
+  end
+  -- use_item,name=tidestorm_codex,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+  if I.TidestormCodex:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
+    if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex 252"; end
+  end
+  -- use_item,name=vial_of_storms,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
+  if I.VialofStorms:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
+    if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "vial_of_storms 253"; end
+  end
+end
+
+local function GoSupInfernal()
+  -- rain_of_fire,if=soul_shard=5&!buff.backdraft.up&buff.memory_of_lucid_dreams.up&buff.grimoire_of_supremacy.stack<=10
+  if S.RainofFire:IsReadyP() and (Player:SoulShardsP() == 5 and Player:BuffDownP(S.BackdraftBuff) and Player:BuffP(S.MemoryofLucidDreams) and Player:BuffStackP(S.GrimoireofSupremacy) <= 10) then
+    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 600"; end
+  end
+  -- chaos_bolt,if=buff.backdraft.up
+  if S.ChaosBolt:IsReadyP() and (Player:BuffP(S.BackdraftBuff)) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 602"; end
+  end
+  -- chaos_bolt,if=soul_shard>=4.2-buff.memory_of_lucid_dreams.up
+  if S.ChaosBolt:IsReadyP() and (Player:SoulShardsP() >= 4.2 - num(Player:BuffP(S.MemoryofLucidDreams))) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 604"; end
+  end
+  -- chaos_bolt,if=!cooldown.conflagrate.up
+  if S.ChaosBolt:IsReadyP() and (not S.Conflagrate:CooldownUpP()) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 606"; end
+  end
+  -- chaos_bolt,if=cast_time<pet.infernal.remains&pet.infernal.remains<cast_time+gcd
+  if S.ChaosBolt:IsReadyP() and (S.ChaosBolt:CastTime() < InfernalRemains and InfernalRemains < S.ChaosBolt:CastTime() + Player:GCD()) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 608"; end
+  end
+  -- conflagrate,if=buff.backdraft.down&buff.memory_of_lucid_dreams.up&soul_shard>=1.3
+  if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff) and Player:BuffP(S.MemoryofLucidDreams) and Player:SoulShardsP() >= 1.3) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 610"; end
+  end
+  -- conflagrate,if=buff.backdraft.down&!buff.memory_of_lucid_dreams.up&(soul_shard>=2.8|charges_fractional>1.9&soul_shard>=1.3)
+  if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (Player:SoulShardsP() >= 2.8 or S.Conflagrate:ChargesFractionalP() > 1.9 and Player:SoulShardsP() >= 1.3)) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 612"; end
+  end
+  -- conflagrate,if=pet.infernal.remains<5
+  if S.Conflagrate:IsCastableP() and (InfernalRemains < 5) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 614"; end
+  end
+  -- conflagrate,if=charges>1
+  if S.Conflagrate:IsCastableP() and (S.Conflagrate:ChargesP() > 1) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 616"; end
+  end
+  -- soul_fire
+  if S.SoulFire:IsCastableP() then
+    if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 618"; end
+  end
+  -- shadowburn
+  if S.Shadowburn:IsCastableP() then
+    if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 620"; end
+  end
+  -- incinerate
+  if S.Incinerate:IsCastableP() then
+    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 622"; end
+  end
+end
+
+local function Havoc()
+  -- conflagrate,if=buff.backdraft.down&soul_shard>=1&soul_shard<=4
+  if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff) and Player:SoulShardsP() >= 1 and Player:SoulShardsP() <= 4) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 254"; end
+  end
+  -- immolate,if=talent.internal_combustion.enabled&remains<duration*0.5|!talent.internal_combustion.enabled&refreshable
+  if S.Immolate:IsCastableP() and (S.InternalCombustion:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) < S.ImmolateDebuff:BaseDuration() * 0.5 or not S.InternalCombustion:IsAvailable() and Target:DebuffRefreshableCP(S.ImmolateDebuff)) then
+    if HR.Cast(S.Immolate, nil, nil, 40) then return "immolate 258"; end
+  end
+  -- chaos_bolt,if=cast_time<havoc_remains
+  if S.ChaosBolt:IsReadyP() and (S.ChaosBolt:CastTime() < EnemyHasHavoc()) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 282"; end
+  end
+  -- soul_fire
+  if S.SoulFire:IsCastableP() then
+    if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 288"; end
+  end
+  -- shadowburn,if=active_enemies<3|!talent.fire_and_brimstone.enabled
+  if S.Shadowburn:IsCastableP() and (EnemiesCount < 3 or not S.FireandBrimstone:IsAvailable()) then
+    if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 290"; end
+  end
+  -- incinerate,if=cast_time<havoc_remains
+  if S.Incinerate:IsCastableP() and (S.Incinerate:CastTime() < EnemyHasHavoc()) then
+    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 302"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Aoe, Cds, GoSupInfernal, Havoc
   EnemiesCount = GetEnemiesCount(10)
   HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
   InfernalActive = (S.SummonInfernal:CooldownRemainsP() > 150) and true or false
   InfernalRemains = InfernalActive and (30 - (180 - S.SummonInfernal:CooldownRemainsP())) or 0
-  Precombat = function()
-    -- flask
-    -- food
-    -- augmentation
-    -- summon_pet
-    if S.SummonPet:IsCastableP() then
-      if HR.Cast(S.SummonPet) then return "summon_pet 3"; end
-    end
-    -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-    if S.GrimoireofSacrifice:IsReadyP() then
-      if HR.Cast(S.GrimoireofSacrifice) then return "grimoire_of_sacrifice 5"; end
-    end
-    -- snapshot_stats
-    if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 10"; end
-      end
-      -- soul_fire
-      if S.SoulFire:IsCastableP() then
-        if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 12"; end
-      end
-      -- incinerate,if=!talent.soul_fire.enabled
-      if S.Incinerate:IsCastableP() and (not S.SoulFire:IsAvailable()) then
-        if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 14"; end
-      end
-    end
-  end
-  Aoe = function()
-    -- rain_of_fire,if=pet.infernal.active&(buff.crashing_chaos.down|!talent.grimoire_of_supremacy.enabled)&(!cooldown.havoc.ready|active_enemies>3)
-    if S.RainofFire:IsReadyP() and (InfernalActive and (Player:BuffDownP(S.CrashingChaosBuff) or not S.GrimoireofSupremacy:IsAvailable()) and (not S.Havoc:CooldownUpP() or EnemiesCount > 3)) then
-      if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 18"; end
-    end
-    -- channel_demonfire,if=dot.immolate.remains>cast_time
-    if S.ChannelDemonfire:IsCastableP() and (Target:DebuffRemainsP(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
-      if HR.Cast(S.ChannelDemonfire, nil, nil, 40) then return "channel_demonfire 34"; end
-    end
-    -- immolate,cycle_targets=1,if=remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
-    if S.Immolate:IsCastableP() then
-      if HR.CastCycle(S.Immolate, 40, EvaluateCycleImmolate46) then return "immolate 64" end
-    end
-    -- call_action_list,name=cds
-    if (HR.CDsON()) then
-      local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
-    if S.Havoc:IsCastableP() then
-      if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc71) then return "havoc 81" end
-    end
-    -- chaos_bolt,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active&(havoc_active|talent.cataclysm.enabled|talent.inferno.enabled&active_enemies<4)
-    if S.ChaosBolt:IsReadyP() and (S.GrimoireofSupremacy:IsAvailable() and InfernalActive and (bool(EnemyHasHavoc()) or S.Cataclysm:IsAvailable() or S.Inferno:IsAvailable() and EnemiesCount < 4)) then
-      if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 82"; end
-    end
-    -- rain_of_fire
-    if S.RainofFire:IsReadyP() then
-      if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 96"; end
-    end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastableP() then
-      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 98"; end
-    end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastableP() then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 100"; end
-    end
-    -- havoc,cycle_targets=1,if=!(target=self.target)&(!talent.grimoire_of_supremacy.enabled|!talent.inferno.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
-    if S.Havoc:IsCastableP() then
-      if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc106) then return "havoc 120" end
-    end
-    -- incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
-    if S.Incinerate:IsCastableP() and (S.FireandBrimstone:IsAvailable() and Player:BuffP(S.BackdraftBuff) and Player:SoulShardsP() < 5 - 0.2 * EnemiesCount) then
-      if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 121"; end
-    end
-    -- soul_fire
-    if S.SoulFire:IsCastableP() then
-      if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 133"; end
-    end
-    -- conflagrate,if=buff.backdraft.down
-    if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff)) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 135"; end
-    end
-    -- shadowburn,if=!talent.fire_and_brimstone.enabled
-    if S.Shadowburn:IsCastableP() and (not S.FireandBrimstone:IsAvailable()) then
-      if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 139"; end
-    end
-    -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
-    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 143"; end
-    end
-    -- incinerate
-    if S.Incinerate:IsCastableP() then
-      if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 157"; end
-    end
-  end
-  Cds = function()
-    -- immolate,if=talent.grimoire_of_supremacy.enabled&remains<8&cooldown.summon_infernal.remains<4.5
-    if S.Immolate:IsCastableP() and (S.GrimoireofSupremacy:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) < 8 and S.SummonInfernal:CooldownRemainsP() < 4.5) then
-      if HR.Cast(S.Immolate, nil, nil, 40) then return "immolate 161"; end
-    end
-    -- conflagrate,if=talent.grimoire_of_supremacy.enabled&cooldown.summon_infernal.remains<4.5&!buff.backdraft.up&soul_shard<4.3
-    if S.Conflagrate:IsCastableP() and (S.GrimoireofSupremacy:IsAvailable() and S.SummonInfernal:CooldownRemainsP() < 4.5 and Player:BuffDownP(S.BackdraftBuff) and Player:SoulShardsP() < 4.3) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 163"; end
-    end
-    -- use_item,name=azsharas_font_of_power,if=cooldown.summon_infernal.up|cooldown.summon_infernal.remains<=4
-    if I.AzsharasFontofPower:IsEquipReady() and (S.SummonInfernal:CooldownUpP() or S.SummonInfernal:CooldownRemainsP() <= 4) then
-      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 165"; end
-    end
-    -- summon_infernal
-    if S.SummonInfernal:IsCastableP() then
-      if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 167"; end
-    end
-    -- guardian_of_azeroth,if=pet.infernal.active
-    if S.GuardianofAzeroth:IsCastableP() and (InfernalActive) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 177"; end
-    end
-    -- dark_soul_instability,if=pet.infernal.active&(pet.infernal.remains<20.5|pet.infernal.remains<22&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
-    if S.DarkSoulInstability:IsCastableP() and (InfernalActive and (InfernalRemains < 20.5 or InfernalRemains < 22 and Player:SoulShardsP() >= 3.6 or not S.GrimoireofSupremacy:IsAvailable())) then
-      if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 179"; end
-    end
-    -- worldvein_resonance,if=pet.infernal.active&(pet.infernal.remains<18.5|pet.infernal.remains<20&soul_shard>=3.6|!talent.grimoire_of_supremacy.enabled)
-    if S.WorldveinResonance:IsCastableP() and (InfernalActive and (InfernalRemains < 18.5 or InfernalRemains < 20 and Player:SoulShardsP() >= 3.6 or not S.GrimoireofSupremacy)) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 185"; end
-    end
-    -- memory_of_lucid_dreams,if=pet.infernal.active&(pet.infernal.remains<15.5|soul_shard<3.5&(buff.dark_soul_instability.up|!talent.grimoire_of_supremacy.enabled&dot.immolate.remains>12))
-    if S.MemoryofLucidDreams:IsCastableP() and (InfernalActive and (InfernalRemains < 15.5 or Player:SoulShardsP() < 3.5 and (Player:BuffP(S.DarkSoulInstabilityBuff) or not S.GrimoireofSupremacy:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) > 12))) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 187"; end
-    end
-    -- summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
-    if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() > 210) then
-      if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 193"; end
-    end
-    -- guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
-    if S.GuardianofAzeroth:IsCastableP() and (HL.CombatTime() > 30 and Target:TimeToDie() > 210) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 197"; end
-    end
-    -- summon_infernal,if=talent.dark_soul_instability.enabled&cooldown.dark_soul_instability.remains>target.time_to_die
-    if S.SummonInfernal:IsCastableP() and (S.DarkSoulInstability:IsAvailable() and S.DarkSoulInstability:CooldownRemainsP() > Target:TimeToDie()) then
-      if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 201"; end
-    end
-    -- guardian_of_azeroth,if=cooldown.summon_infernal.remains>target.time_to_die
-    if S.GuardianofAzeroth:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie()) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 207"; end
-    end
-    -- dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<20.5
-    if S.DarkSoulInstability:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and InfernalRemains < 20.5) then
-      if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 211"; end
-    end
-    -- worldvein_resonance,if=cooldown.summon_infernal.remains>target.time_to_die&pet.infernal.remains<18.5
-    if S.WorldveinResonance:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and InfernalRemains < 18.5) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 213"; end
-    end
-    -- memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die&(pet.infernal.remains<15.5|buff.dark_soul_instability.up&soul_shard<3)
-    if S.MemoryofLucidDreams:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() > Target:TimeToDie() and (InfernalRemains < 15.5 or Player:BuffP(S.DarkSoulInstabilityBuff) and Player:SoulShardsP() < 3)) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 215"; end
-    end
-    -- summon_infernal,if=target.time_to_die<30
-    if S.SummonInfernal:IsCastableP() and (Target:TimeToDie() < 30) then
-      if HR.Cast(S.SummonInfernal, nil, nil, 30) then return "summon_infernal 219"; end
-    end
-    -- guardian_of_azeroth,if=target.time_to_die<30
-    if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() < 30) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 221"; end
-    end
-    -- dark_soul_instability,if=target.time_to_die<21&target.time_to_die>4
-    if S.DarkSoulInstability:IsCastableP() and (Target:TimeToDie() < 21 and Target:TimeToDie() > 4) then
-      if HR.Cast(S.DarkSoulInstability) then return "dark_soul_instability 223"; end
-    end
-    -- worldvein_resonance,if=target.time_to_die<19&target.time_to_die>4
-    if S.WorldveinResonance:IsCastableP() and (Target:TimeToDie() < 19 and Target:TimeToDie() > 4) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 224"; end
-    end
-    -- memory_of_lucid_dreams,if=target.time_to_die<16&target.time_to_die>6
-    if S.MemoryofLucidDreams:IsCastableP() and (Target:TimeToDie() < 16 and Target:TimeToDie() > 6) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 225"; end
-    end
-    -- blood_of_the_enemy
-    if S.BloodoftheEnemy:IsCastableP() then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 227"; end
-    end
-    -- worldvein_resonance,if=cooldown.summon_infernal.remains>=60-12&!pet.infernal.active
-    if S.WorldveinResonance:IsCastableP() and (S.SummonInfernal:CooldownRemainsP() >= 48 and not InfernalActive) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 229"; end
-    end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 231"; end
-    end
-    -- potion,if=pet.infernal.active|target.time_to_die<30
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (InfernalActive or Target:TimeToDie() < 30) then
-      if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.TrinketDisplayStyle) then return "battle_potion_of_intellect 233"; end
-    end
-    -- berserking,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.Berserking:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 235"; end
-    end
-    -- blood_fury,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.BloodFury:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 241"; end
-    end
-    -- fireblood,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|(!essence.memory_of_lucid_dreams.major|buff.memory_of_lucid_dreams.remains)&(!talent.dark_soul_instability.enabled|buff.dark_soul_instability.remains))|target.time_to_die<=15
-    if S.Fireblood:IsCastableP() and (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or (not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.MemoryofLucidDreams)) and (not S.DarkSoulInstability:IsAvailable() or Player:BuffP(S.DarkSoulInstabilityBuff))) or Target:TimeToDie() <= 15) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 243"; end
-    end
-    -- use_items,if=pet.infernal.active&(!talent.grimoire_of_supremacy.enabled|pet.infernal.remains<=20)|target.time_to_die<=20
-    if (InfernalActive and (not S.GrimoireofSupremacy:IsAvailable() or InfernalRemains <= 20) or Target:TimeToDie() <= 20) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
-    end
-    -- use_item,name=pocketsized_computation_device,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 248"; end
-    end
-    -- use_item,name=rotcrusted_voodoo_doll,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-    if I.RotcrustedVoodooDoll:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "rotcrusted_voodoo_doll 249"; end
-    end
-    -- use_item,name=shiver_venom_relic,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-    if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "shiver_venom_relic 250"; end
-    end
-    -- use_item,name=aquipotent_nautilus,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-    if I.AquipotentNautilus:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "aquipotent_nautilus 251"; end
-    end
-    -- use_item,name=tidestorm_codex,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-    if I.TidestormCodex:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex 252"; end
-    end
-    -- use_item,name=vial_of_storms,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
-    if I.VialofStorms:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
-      if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "vial_of_storms 253"; end
-    end
-  end
-  GoSupInfernal = function()
-    -- rain_of_fire,if=soul_shard=5&!buff.backdraft.up&buff.memory_of_lucid_dreams.up&buff.grimoire_of_supremacy.stack<=10
-    if S.RainofFire:IsReadyP() and (Player:SoulShardsP() == 5 and Player:BuffDownP(S.BackdraftBuff) and Player:BuffP(S.MemoryofLucidDreams) and Player:BuffStackP(S.GrimoireofSupremacy) <= 10) then
-      if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 600"; end
-    end
-    -- chaos_bolt,if=buff.backdraft.up
-    if S.ChaosBolt:IsReadyP() and (Player:BuffP(S.BackdraftBuff)) then
-      if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 602"; end
-    end
-    -- chaos_bolt,if=soul_shard>=4.2-buff.memory_of_lucid_dreams.up
-    if S.ChaosBolt:IsReadyP() and (Player:SoulShardsP() >= 4.2 - num(Player:BuffP(S.MemoryofLucidDreams))) then
-      if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 604"; end
-    end
-    -- chaos_bolt,if=!cooldown.conflagrate.up
-    if S.ChaosBolt:IsReadyP() and (not S.Conflagrate:CooldownUpP()) then
-      if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 606"; end
-    end
-    -- chaos_bolt,if=cast_time<pet.infernal.remains&pet.infernal.remains<cast_time+gcd
-    if S.ChaosBolt:IsReadyP() and (S.ChaosBolt:CastTime() < InfernalRemains and InfernalRemains < S.ChaosBolt:CastTime() + Player:GCD()) then
-      if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 608"; end
-    end
-    -- conflagrate,if=buff.backdraft.down&buff.memory_of_lucid_dreams.up&soul_shard>=1.3
-    if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff) and Player:BuffP(S.MemoryofLucidDreams) and Player:SoulShardsP() >= 1.3) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 610"; end
-    end
-    -- conflagrate,if=buff.backdraft.down&!buff.memory_of_lucid_dreams.up&(soul_shard>=2.8|charges_fractional>1.9&soul_shard>=1.3)
-    if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (Player:SoulShardsP() >= 2.8 or S.Conflagrate:ChargesFractionalP() > 1.9 and Player:SoulShardsP() >= 1.3)) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 612"; end
-    end
-    -- conflagrate,if=pet.infernal.remains<5
-    if S.Conflagrate:IsCastableP() and (InfernalRemains < 5) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 614"; end
-    end
-    -- conflagrate,if=charges>1
-    if S.Conflagrate:IsCastableP() and (S.Conflagrate:ChargesP() > 1) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 616"; end
-    end
-    -- soul_fire
-    if S.SoulFire:IsCastableP() then
-      if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 618"; end
-    end
-    -- shadowburn
-    if S.Shadowburn:IsCastableP() then
-      if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 620"; end
-    end
-    -- incinerate
-    if S.Incinerate:IsCastableP() then
-      if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 622"; end
-    end
-  end
-  Havoc = function()
-    -- conflagrate,if=buff.backdraft.down&soul_shard>=1&soul_shard<=4
-    if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff) and Player:SoulShardsP() >= 1 and Player:SoulShardsP() <= 4) then
-      if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 254"; end
-    end
-    -- immolate,if=talent.internal_combustion.enabled&remains<duration*0.5|!talent.internal_combustion.enabled&refreshable
-    if S.Immolate:IsCastableP() and (S.InternalCombustion:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) < S.ImmolateDebuff:BaseDuration() * 0.5 or not S.InternalCombustion:IsAvailable() and Target:DebuffRefreshableCP(S.ImmolateDebuff)) then
-      if HR.Cast(S.Immolate, nil, nil, 40) then return "immolate 258"; end
-    end
-    -- chaos_bolt,if=cast_time<havoc_remains
-    if S.ChaosBolt:IsReadyP() and (S.ChaosBolt:CastTime() < EnemyHasHavoc()) then
-      if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 282"; end
-    end
-    -- soul_fire
-    if S.SoulFire:IsCastableP() then
-      if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 288"; end
-    end
-    -- shadowburn,if=active_enemies<3|!talent.fire_and_brimstone.enabled
-    if S.Shadowburn:IsCastableP() and (EnemiesCount < 3 or not S.FireandBrimstone:IsAvailable()) then
-      if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 290"; end
-    end
-    -- incinerate,if=cast_time<havoc_remains
-    if S.Incinerate:IsCastableP() and (S.Incinerate:CastTime() < EnemyHasHavoc()) then
-      if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 302"; end
-    end
-  end
+
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -629,7 +634,7 @@ local function APL()
   end
 end
 
-local function Init ()
+local function Init()
   HL.RegisterNucleusAbility(42223, 8, 6)               -- Rain of Fire
   HL.RegisterNucleusAbility(152108, 8, 6)              -- Cataclysm
   HL.RegisterNucleusAbility(22703, 10, 6)               -- Summon Infernal

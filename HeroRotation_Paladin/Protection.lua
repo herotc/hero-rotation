@@ -125,106 +125,109 @@ local StunInterrupts = {
   {S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end},
 };
 
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
+  if Everyone.TargetIsValid() then
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
+    end
+    -- consecration
+    if S.Consecration:IsCastableP() and Player:BuffDownP(S.ConsecrationBuff) then
+      if HR.Cast(S.Consecration, nil, nil, 8) then return "consecration 6"; end
+    end
+    -- lights_judgment
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 10"; end
+    end
+    -- Manual Add: Avenger's Shield, if pulling at range
+    if S.AvengersShield:IsCastableP() then
+      if HR.Cast(S.AvengersShield, nil, nil, 30) then return "avengers_shield 11"; end
+    end
+  end
+end
+
+local function Defensives()
+  if S.ShieldoftheRighteous:IsCastableP() and (Player:BuffRefreshable(S.ShieldoftheRighteous, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65))) then
+    if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
+  end
+  if Target:IsInRange(10) and not Player:HealingAbsorbed() then
+    if S.HandoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP) then
+      if HR.Cast(S.HandoftheProtector, Settings.Protection.GCDasOffGCD.HandoftheProtector) then return "hand_of_the_protector defensive"; end
+    end
+    if S.LightoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP) then
+      if HR.Cast(S.LightoftheProtector, Settings.Protection.GCDasOffGCD.LightoftheProtector) then return "light_of_the_protector defensive"; end
+    end
+  end
+end
+
+local function Cooldowns()
+  -- fireblood,if=buff.avenging_wrath.up
+  if S.Fireblood:IsCastableP() and (Player:BuffP(S.AvengingWrathBuff)) then
+    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 12"; end
+  end
+  -- use_item,name=azsharas_font_of_power,if=cooldown.seraphim.remains<=10|!talent.seraphim.enabled
+  if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.Seraphim:CooldownRemainsP() <= 10 or not S.Seraphim:IsAvailable()) then
+    if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 16"; end
+  end
+  -- use_item,name=ashvanes_razor_coral,if=(debuff.razor_coral_debuff.stack>7&buff.avenging_wrath.up)|debuff.razor_coral_debuff.stack=0
+  if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and ((Target:DebuffStackP(S.RazorCoralDebuff) > 7 and Player:BuffP(S.AvengingWrathBuff)) or Target:DebuffStackP(S.RazorCoralDebuff) == 0) then
+    if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 18"; end
+  end
+  -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
+  if S.Seraphim:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() >= 2) then
+    if HR.Cast(S.Seraphim) then return "seraphim 22"; end
+  end
+  -- avenging_wrath,if=buff.seraphim.up|cooldown.seraphim.remains<2|!talent.seraphim.enabled
+  if S.AvengingWrath:IsCastableP() and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() < 2 or not S.Seraphim:IsAvailable()) then
+    if HR.Cast(S.AvengingWrath, Settings.Protection.GCDasOffGCD.AvengingWrath) then return "avenging_wrath 26"; end
+  end
+  -- memory_of_lucid_dreams,if=!talent.seraphim.enabled|cooldown.seraphim.remains<=gcd|buff.seraphim.up
+  if S.MemoryofLucidDreams:IsCastableP() and (not S.Seraphim:IsAvailable() or S.Seraphim:CooldownRemainsP() <= Player:GCD() or Player:BuffP(S.SeraphimBuff)) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 28"; end
+  end
+  -- bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
+  if S.BastionofLight:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() <= 0.5) then
+    if HR.Cast(S.BastionofLight) then return "bastion_of_light 34"; end
+  end
+  -- potion,if=buff.avenging_wrath.up
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvengingWrathBuff)) then
+    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 38"; end
+  end
+  -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
+  if (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
+  -- use_item,name=grongs_primal_rage,if=cooldown.judgment.full_recharge_time>4&cooldown.avengers_shield.remains>4&(buff.seraphim.up|cooldown.seraphim.remains+4+gcd>expected_combat_length-time)&consecration.up
+  if I.GrongsPrimalRage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 and S.AvengersShield:CooldownRemainsP() > 4 and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() + 4 + Player:GCD() > Target:TimeToDie()) and Player:BuffP(S.ConsecrationBuff)) then
+    if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 43"; end
+  end
+  -- use_item,name=pocketsized_computation_device,if=cooldown.judgment.full_recharge_time>4*spell_haste&cooldown.avengers_shield.remains>4*spell_haste&(!equipped.grongs_primal_rage|!trinket.grongs_primal_rage.cooldown.up)&consecration.up
+  if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 * Player:SpellHaste() and S.AvengersShield:CooldownRemainsP() > 4 * Player:SpellHaste() and (not I.GrongsPrimalRage:IsEquipped() or not I.GrongsPrimalRage:IsReady()) and Player:BuffP(S.ConsecrationBuff)) then
+    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device"; end
+  end
+  -- use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
+  if I.MerekthasFang:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.AvengingWrathBuff) and (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable())) then
+    if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle, 20) then return "merekthas_fang 57"; end
+  end
+  -- use_item,name=razdunks_big_red_button
+  if I.RazdunksBigRedButton:IsEquipReady() and Settings.Commons.UseTrinkets then
+    if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "razdunks_big_red_button 65"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Defensives, Cooldowns
   local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-  Precombat = function()
-    -- flask
-    -- food
-    -- augmentation
-    -- snapshot_stats
-    if Everyone.TargetIsValid() then
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
-      end
-      -- consecration
-      if S.Consecration:IsCastableP() and Player:BuffDownP(S.ConsecrationBuff) then
-        if HR.Cast(S.Consecration, nil, nil, 8) then return "consecration 6"; end
-      end
-      -- lights_judgment
-      if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 10"; end
-      end
-      -- Manual Add: Avenger's Shield, if pulling at range
-      if S.AvengersShield:IsCastableP() then
-        if HR.Cast(S.AvengersShield, nil, nil, 30) then return "avengers_shield 11"; end
-      end
-    end
-  end
-  Defensives = function()
-    if S.ShieldoftheRighteous:IsCastableP() and (Player:BuffRefreshable(S.ShieldoftheRighteous, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65))) then
-      if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
-    end
-    if Target:IsInRange(10) and not Player:HealingAbsorbed() then
-      if S.HandoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP) then
-        if HR.Cast(S.HandoftheProtector, Settings.Protection.GCDasOffGCD.HandoftheProtector) then return "hand_of_the_protector defensive"; end
-      end
-      if S.LightoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP) then
-        if HR.Cast(S.LightoftheProtector, Settings.Protection.GCDasOffGCD.LightoftheProtector) then return "light_of_the_protector defensive"; end
-      end
-    end
-  end
-  Cooldowns = function()
-    -- fireblood,if=buff.avenging_wrath.up
-    if S.Fireblood:IsCastableP() and (Player:BuffP(S.AvengingWrathBuff)) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 12"; end
-    end
-    -- use_item,name=azsharas_font_of_power,if=cooldown.seraphim.remains<=10|!talent.seraphim.enabled
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.Seraphim:CooldownRemainsP() <= 10 or not S.Seraphim:IsAvailable()) then
-      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 16"; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=(debuff.razor_coral_debuff.stack>7&buff.avenging_wrath.up)|debuff.razor_coral_debuff.stack=0
-    if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and ((Target:DebuffStackP(S.RazorCoralDebuff) > 7 and Player:BuffP(S.AvengingWrathBuff)) or Target:DebuffStackP(S.RazorCoralDebuff) == 0) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 18"; end
-    end
-    -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
-    if S.Seraphim:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() >= 2) then
-      if HR.Cast(S.Seraphim) then return "seraphim 22"; end
-    end
-    -- avenging_wrath,if=buff.seraphim.up|cooldown.seraphim.remains<2|!talent.seraphim.enabled
-    if S.AvengingWrath:IsCastableP() and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() < 2 or not S.Seraphim:IsAvailable()) then
-      if HR.Cast(S.AvengingWrath, Settings.Protection.GCDasOffGCD.AvengingWrath) then return "avenging_wrath 26"; end
-    end
-    -- memory_of_lucid_dreams,if=!talent.seraphim.enabled|cooldown.seraphim.remains<=gcd|buff.seraphim.up
-    if S.MemoryofLucidDreams:IsCastableP() and (not S.Seraphim:IsAvailable() or S.Seraphim:CooldownRemainsP() <= Player:GCD() or Player:BuffP(S.SeraphimBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 28"; end
-    end
-    -- bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
-    if S.BastionofLight:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() <= 0.5) then
-      if HR.Cast(S.BastionofLight) then return "bastion_of_light 34"; end
-    end
-    -- potion,if=buff.avenging_wrath.up
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvengingWrathBuff)) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 38"; end
-    end
-    -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
-    if (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
-    end
-    -- use_item,name=grongs_primal_rage,if=cooldown.judgment.full_recharge_time>4&cooldown.avengers_shield.remains>4&(buff.seraphim.up|cooldown.seraphim.remains+4+gcd>expected_combat_length-time)&consecration.up
-    if I.GrongsPrimalRage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 and S.AvengersShield:CooldownRemainsP() > 4 and (Player:BuffP(S.SeraphimBuff) or S.Seraphim:CooldownRemainsP() + 4 + Player:GCD() > Target:TimeToDie()) and Player:BuffP(S.ConsecrationBuff)) then
-      if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 43"; end
-    end
-    -- use_item,name=pocketsized_computation_device,if=cooldown.judgment.full_recharge_time>4*spell_haste&cooldown.avengers_shield.remains>4*spell_haste&(!equipped.grongs_primal_rage|!trinket.grongs_primal_rage.cooldown.up)&consecration.up
-    if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (S.Judgment:FullRechargeTimeP() > 4 * Player:SpellHaste() and S.AvengersShield:CooldownRemainsP() > 4 * Player:SpellHaste() and (not I.GrongsPrimalRage:IsEquipped() or not I.GrongsPrimalRage:IsReady()) and Player:BuffP(S.ConsecrationBuff)) then
-      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device"; end
-    end
-    -- use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
-    if I.MerekthasFang:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.AvengingWrathBuff) and (Player:BuffP(S.SeraphimBuff) or not S.Seraphim:IsAvailable())) then
-      if HR.Cast(I.MerekthasFang, nil, Settings.Commons.TrinketDisplayStyle, 20) then return "merekthas_fang 57"; end
-    end
-    -- use_item,name=razdunks_big_red_button
-    if I.RazdunksBigRedButton:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "razdunks_big_red_button 65"; end
-    end
-  end
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
