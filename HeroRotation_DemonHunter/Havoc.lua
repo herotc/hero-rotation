@@ -183,278 +183,283 @@ local function ConserveFelRush()
   return not Settings.Havoc.ConserveFelRush or S.FelRush:Charges() == 2
 end
 
+local function Precombat()
+  -- flask
+  -- augmentation
+  -- food
+  -- snapshot_stats
+  -- potion
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
+  end
+  -- Immolation Aura
+  if S.ImmolationAura:IsCastableP() then
+    if HR.Cast(S.ImmolationAura) then return "immolation_aura 5"; end
+  end
+  -- metamorphosis,if=!azerite.chaotic_transformation.enabled
+  if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and not S.ChaoticTransformation:AzeriteEnabled()) then
+    if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 6"; end
+  end
+  -- use_item,name=azsharas_font_of_power
+  if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
+    if HR.Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
+  end
+end
+
+local function Essences()
+  -- variable,name=fel_barrage_sync,if=talent.fel_barrage.enabled,value=cooldown.fel_barrage.ready&(((!talent.demonic.enabled|buff.metamorphosis.up)&!variable.waiting_for_momentum&raid_event.adds.in>30)|active_enemies>desired_targets)
+  if (S.FelBarrage:IsAvailable()) then
+    VarFelBarrageSync = num(S.FelBarrage:CooldownUpP() and (((not S.Demonic:IsAvailable() or Player:BuffP(S.MetamorphosisBuff)) and not bool(VarWaitingForMomentum)) or Cache.EnemiesCount[8] > 1))
+  end
+  -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+  if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
+  end
+  -- blood_of_the_enemy,if=(!talent.fel_barrage.enabled|cooldown.fel_barrage.remains>45)&!variable.waiting_for_momentum&((!talent.demonic.enabled|buff.metamorphosis.up&!cooldown.blade_dance.ready)|target.time_to_die<=10)
+  if S.BloodoftheEnemy:IsCastableP() and ((not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemainsP() > 45) and not bool(VarWaitingForMomentum) and ((not S.Demonic:IsAvailable() or Player:BuffP(S.MetamorphosisBuff) and not S.BladeDance:CooldownUpP()) or Target:TimeToDie() <= 10)) then
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
+  end
+  -- blood_of_the_enemy,if=talent.fel_barrage.enabled&variable.fel_barrage_sync
+  if S.BloodoftheEnemy:IsCastableP() and (S.FelBarrage:IsAvailable() and bool(VarFelBarrageSync)) then
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy fel_barrage_sync"; end
+  end
+  -- guardian_of_azeroth,if=(buff.metamorphosis.up&cooldown.metamorphosis.ready)|buff.metamorphosis.remains>25|target.time_to_die<=30
+  if S.GuardianofAzeroth:IsCastableP() and ((Player:BuffP(S.MetamorphosisBuff) and S.Metamorphosis:CooldownUpP()) or Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() <= 30) then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
+  end
+  -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
+  if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or Settings.Havoc.UseFABST) then
+    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
+  end
+  -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
+  if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
+    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
+  end
+  -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+  if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
+    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
+  end
+  -- ripple_in_space
+  if S.RippleInSpace:IsCastableP() then
+    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
+  end
+  -- worldvein_resonance,if=buff.metamorphosis.up|variable.fel_barrage_sync
+  if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or bool(VarFelBarrageSync)) then
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
+  end
+  -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
+  if S.MemoryofLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
+  end
+  -- cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
+  -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
+  if (true) then
+    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
+  end
+end
+
+local function Cooldown()
+  -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis)|target.time_to_die<25
+  if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and not (S.Demonic:IsAvailable() or bool(VarPoolingForMeta) or bool(VarWaitingForNemesis)) or Target:TimeToDie() < 25) then
+    if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 12"; end
+  end
+  -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))
+  if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and S.Demonic:IsAvailable() and (not S.ChaoticTransformation:AzeriteEnabled() or (S.EyeBeam:CooldownRemainsP() > 12 and (not bool(VarBladeDance) or S.BladeDance:CooldownRemainsP() > Player:GCD())))) then
+    if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 20"; end
+  end
+  -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
+  -- nemesis,if=!raid_event.adds.exists
+  if S.Nemesis:IsCastableP(50) and (not (Cache.EnemiesCount[40] > 1)) then
+    if HR.Cast(S.Nemesis, Settings.Havoc.GCDasOffGCD.Nemesis) then return "nemesis 51"; end
+  end
+  -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
+    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 55"; end
+  end
+  if (Settings.Commons.UseTrinkets) then
+    -- use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
+    if I.GalecallersBoon:IsEquipReady() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownUpP()) then
+      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 56"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
+    if Everyone.CyclotronicBlastReady() and (Player:BuffP(S.MetamorphosisBuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (not bool(VarBladeDance) or not S.BladeDance:IsReady())) then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 57"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
+    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.ConductiveInkDebuff) or Player:BuffRemainsP(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 59"; end
+    end
+    -- use_item,name=azsharas_font_of_power,if=cooldown.metamorphosis.remains<10|cooldown.metamorphosis.remains>60
+    if I.AzsharasFontofPower:IsEquipReady() and (S.Metamorphosis:CooldownRemainsP() < 10 or S.Metamorphosis:CooldownRemainsP() > 60) then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 61"; end
+    end
+  end
+  -- use_items,if=buff.metamorphosis.up
+  if (Player:BuffP(S.MetamorphosisBuff)) then
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
+  -- call_action_list,name=essences
+  if (true) then
+    local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
+  end
+end
+
+local function DarkSlash()
+  -- dark_slash,if=fury>=80&(!variable.blade_dance|!cooldown.blade_dance.ready)
+  if S.DarkSlash:IsCastableP() and IsInMeleeRange() and (Player:Fury() >= 80 and (not bool(VarBladeDance) or not S.BladeDance:CooldownUpP())) then
+    if HR.Cast(S.DarkSlash, nil, nil, "Melee") then return "dark_slash 65"; end
+  end
+  -- annihilation,if=debuff.dark_slash.up
+  if S.Annihilation:IsReadyP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then
+    if HR.Cast(S.Annihilation, nil, nil, "Melee") then return "annihilation 67"; end
+  end
+  -- chaos_strike,if=debuff.dark_slash.up
+  if S.ChaosStrike:IsReadyP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then
+    if HR.Cast(S.ChaosStrike, nil, nil, "Melee") then return "chaos_strike 71"; end
+  end
+end
+
+local function Demonic()
+  -- death_sweep,if=variable.blade_dance
+  if S.DeathSweep:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
+    if HR.Cast(S.DeathSweep, nil, nil, 8) then return "death_sweep 75"; end
+  end
+  -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
+  if S.EyeBeam:IsReadyP(20) then
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 79"; end
+  end
+  -- fel_barrage,if=(buff.metamorphosis.up&raid_event.adds.in>30)|active_enemies>desired_targets
+  if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (Player:BuffP(S.MetamorphosisBuff) or Cache.EnemiesCount[8] > 1) then
+    if HR.Cast(S.FelBarrage, nil, nil, 8) then return "fel_barrage 83"; end
+  end
+  -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
+  if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance) and (S.EyeBeam:CooldownRemainsP() > (5 - S.RevolvingBlades:AzeriteRank() * 3))) then
+    if HR.Cast(S.BladeDance, nil, nil, 8) then return "blade_dance 95"; end
+  end
+  -- immolation_aura
+  if S.ImmolationAura:IsCastableP() then
+    if HR.Cast(S.ImmolationAura) then return "immolation_aura 109"; end
+  end
+  -- annihilation,if=!variable.pooling_for_blade_dance
+  if S.Annihilation:IsReadyP() and IsInMeleeRange() and (not bool(VarPoolingForBladeDance)) then
+    if HR.Cast(S.Annihilation, nil, nil, "Melee") then return "annihilation 111"; end
+  end
+  -- felblade,if=fury.deficit>=40
+  if S.Felblade:IsCastableP(15) and (Player:FuryDeficit() >= 40) then
+    if HR.Cast(S.Felblade) then return "felblade 115"; end
+  end
+  -- chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
+  if S.ChaosStrike:IsReadyP() and IsInMeleeRange() and (not bool(VarPoolingForBladeDance) and not bool(VarPoolingForEyeBeam)) then
+    if HR.Cast(S.ChaosStrike, nil, nil, "Melee") then return "chaos_strike 117"; end
+  end
+  -- fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+  if S.FelRush:IsCastableP(20, true) and (S.DemonBlades:IsAvailable() and not S.EyeBeam:CooldownUpP() and ConserveFelRush()) then
+    if CastFelRush() then return "fel_rush 123"; end
+  end
+  -- demons_bite
+  if S.DemonsBite:IsCastableP() and IsInMeleeRange() then
+    if HR.Cast(S.DemonsBite, nil, nil, "Melee") then return "demons_bite 133"; end
+  end
+  -- throw_glaive,if=buff.out_of_range.up
+  if S.ThrowGlaive:IsCastableP(30) and (not IsInMeleeRange()) then
+    if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 135"; end
+  end
+  -- fel_rush,if=movement.distance>15|buff.out_of_range.up
+  -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and ConserveFelRush()) then
+    -- if CastFelRush() then return "fel_rush 139"; end
+  -- end
+  -- vengeful_retreat,if=movement.distance>15
+  -- if S.VengefulRetreat:IsCastableP("Melee", true) then
+    -- if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 143"; end
+  -- end
+  -- throw_glaive,if=talent.demon_blades.enabled
+  if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
+    if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 145"; end
+  end
+end
+
+local function Normal()
+  -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
+  if S.VengefulRetreat:IsCastableP("Melee", true) and (S.Momentum:IsAvailable() and Player:BuffDownP(S.PreparedBuff) and HL.CombatTime() > 1) then
+    if HR.Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat 149"; end
+  end
+  -- fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+  if S.FelRush:IsCastableP(20, true) and ((bool(VarWaitingForMomentum) or S.FelMastery:IsAvailable()) and ConserveFelRush()) then
+    if CastFelRush() then return "fel_rush 155"; end
+  end
+  -- fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
+  if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (not bool(VarWaitingForMomentum) and Cache.EnemiesCount[8] > 1) then
+    if HR.Cast(S.FelBarrage, nil, nil, 8) then return "fel_barrage 165"; end
+  end
+  -- death_sweep,if=variable.blade_dance
+  if S.DeathSweep:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
+    if HR.Cast(S.DeathSweep, nil, nil, 8) then return "death_sweep 175"; end
+  end
+  -- immolation_aura
+  if S.ImmolationAura:IsCastableP() then
+    if HR.Cast(S.ImmolationAura) then return "immolation_aura 179"; end
+  end
+  -- eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
+  if S.EyeBeam:IsReadyP(20) and (Cache.EnemiesCount[20] > 1 and not bool(VarWaitingForMomentum)) then
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 181"; end
+  end
+  -- blade_dance,if=variable.blade_dance
+  if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
+    if HR.Cast(S.BladeDance, nil, nil, 8) then return "blade_dance 195"; end
+  end
+  -- felblade,if=fury.deficit>=40
+  if S.Felblade:IsCastableP(15) and (Player:FuryDeficit() >= 40) then
+    if HR.Cast(S.Felblade) then return "felblade 199"; end
+  end
+  -- eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_dark_slash&raid_event.adds.in>cooldown
+  if S.EyeBeam:IsReadyP(20) and (not S.BlindFury:IsAvailable() and not bool(VarWaitingForDarkSlash)) then
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 201"; end
+  end
+  -- annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
+  if S.Annihilation:IsReadyP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
+    if HR.Cast(S.Annihilation, nil, nil, "Melee") then return "annihilation 211"; end
+  end
+  -- chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
+  if S.ChaosStrike:IsReadyP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30) and not bool(VarPoolingForMeta) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
+    if HR.Cast(S.ChaosStrike, nil, nil, "Melee") then return "chaos_strike 223"; end
+  end
+  -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
+  if S.EyeBeam:IsReadyP(20) and (S.BlindFury:IsAvailable()) then
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 235"; end
+  end
+  -- demons_bite
+  if S.DemonsBite:IsCastableP() and IsInMeleeRange() then
+    if HR.Cast(S.DemonsBite, nil, nil, "Melee") then return "demons_bite 243"; end
+  end
+  -- fel_rush,if=!talent.momentum.enabled&raid_event.movement.in>charges*10&talent.demon_blades.enabled
+  if S.FelRush:IsCastableP(20, true) and (not S.Momentum:IsAvailable() and S.DemonBlades:IsAvailable() and ConserveFelRush()) then
+    if CastFelRush() then return "fel_rush 245"; end
+  end
+  -- felblade,if=movement.distance>15|buff.out_of_range.up
+  -- if S.Felblade:IsCastableP(15) and (not IsInMeleeRange()) then
+    -- if HR.Cast(S.Felblade) then return "felblade 255"; end
+  -- end
+  -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
+  -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and not S.Momentum:IsAvailable() and ConserveFelRush()) then
+    -- if CastFelRush() then return "fel_rush 259"; end
+  -- end
+  -- vengeful_retreat,if=movement.distance>15
+  -- if S.VengefulRetreat:IsCastableP("Melee", true) then
+    -- if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 265"; end
+  -- end
+  -- throw_glaive,if=talent.demon_blades.enabled
+  if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
+    if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 267"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Essences, Cooldown, DarkSlash, Demonic, Normal
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-  Precombat = function()
-    -- flask
-    -- augmentation
-    -- food
-    -- snapshot_stats
-    -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
-    end
-    -- Immolation Aura
-    if S.ImmolationAura:IsCastableP() then
-      if HR.Cast(S.ImmolationAura) then return "immolation_aura 5"; end
-    end
-    -- metamorphosis,if=!azerite.chaotic_transformation.enabled
-    if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and not S.ChaoticTransformation:AzeriteEnabled()) then
-      if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 6"; end
-    end
-    -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power 7"; end
-    end
-  end
-  Essences = function()
-    -- variable,name=fel_barrage_sync,if=talent.fel_barrage.enabled,value=cooldown.fel_barrage.ready&(((!talent.demonic.enabled|buff.metamorphosis.up)&!variable.waiting_for_momentum&raid_event.adds.in>30)|active_enemies>desired_targets)
-    if (S.FelBarrage:IsAvailable()) then
-      VarFelBarrageSync = num(S.FelBarrage:CooldownUpP() and (((not S.Demonic:IsAvailable() or Player:BuffP(S.MetamorphosisBuff)) and not bool(VarWaitingForMomentum)) or Cache.EnemiesCount[8] > 1))
-    end
-    -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
-    if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD()) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
-    end
-    -- blood_of_the_enemy,if=(!talent.fel_barrage.enabled|cooldown.fel_barrage.remains>45)&!variable.waiting_for_momentum&((!talent.demonic.enabled|buff.metamorphosis.up&!cooldown.blade_dance.ready)|target.time_to_die<=10)
-    if S.BloodoftheEnemy:IsCastableP() and ((not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemainsP() > 45) and not bool(VarWaitingForMomentum) and ((not S.Demonic:IsAvailable() or Player:BuffP(S.MetamorphosisBuff) and not S.BladeDance:CooldownUpP()) or Target:TimeToDie() <= 10)) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
-    end
-    -- blood_of_the_enemy,if=talent.fel_barrage.enabled&variable.fel_barrage_sync
-    if S.BloodoftheEnemy:IsCastableP() and (S.FelBarrage:IsAvailable() and bool(VarFelBarrageSync)) then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy fel_barrage_sync"; end
-    end
-    -- guardian_of_azeroth,if=(buff.metamorphosis.up&cooldown.metamorphosis.ready)|buff.metamorphosis.remains>25|target.time_to_die<=30
-    if S.GuardianofAzeroth:IsCastableP() and ((Player:BuffP(S.MetamorphosisBuff) and S.Metamorphosis:CooldownUpP()) or Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() <= 30) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
-    end
-    -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-    if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or Settings.Havoc.UseFABST) then
-      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
-    end
-    -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-    if S.PurifyingBlast:IsCastableP() and (Cache.EnemiesCount[8] >= 2) then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
-    end
-    -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-    if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
-    end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
-    end
-    -- worldvein_resonance,if=buff.metamorphosis.up|variable.fel_barrage_sync
-    if S.WorldveinResonance:IsCastableP() and (Player:BuffP(S.MetamorphosisBuff) or bool(VarFelBarrageSync)) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
-    end
-    -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
-    if S.MemoryofLucidDreams:IsCastableP() and (Player:Fury() < 40 and Player:BuffP(S.MetamorphosisBuff)) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
-    end
-    -- cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
-    -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
-    if (true) then
-      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-    end
-  end
-  Cooldown = function()
-    -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis)|target.time_to_die<25
-    if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and not (S.Demonic:IsAvailable() or bool(VarPoolingForMeta) or bool(VarWaitingForNemesis)) or Target:TimeToDie() < 25) then
-      if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 12"; end
-    end
-    -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))
-    if S.Metamorphosis:IsCastableP(40) and (Player:BuffDownP(S.MetamorphosisBuff) and S.Demonic:IsAvailable() and (not S.ChaoticTransformation:AzeriteEnabled() or (S.EyeBeam:CooldownRemainsP() > 12 and (not bool(VarBladeDance) or S.BladeDance:CooldownRemainsP() > Player:GCD())))) then
-      if HR.Cast(S.Metamorphosis, Settings.Havoc.OffGCDasOffGCD.Metamorphosis) then return "metamorphosis 20"; end
-    end
-    -- nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
-    -- nemesis,if=!raid_event.adds.exists
-    if S.Nemesis:IsCastableP(50) and (not (Cache.EnemiesCount[40] > 1)) then
-      if HR.Cast(S.Nemesis, Settings.Havoc.GCDasOffGCD.Nemesis) then return "nemesis 51"; end
-    end
-    -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 55"; end
-    end
-    if (Settings.Commons.UseTrinkets) then
-      -- use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
-      if I.GalecallersBoon:IsEquipReady() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownUpP()) then
-        if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 56"; end
-      end
-      -- use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
-      if Everyone.CyclotronicBlastReady() and (Player:BuffP(S.MetamorphosisBuff) and Player:BuffDownP(S.MemoryofLucidDreams) and (not bool(VarBladeDance) or not S.BladeDance:IsReady())) then
-        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 57"; end
-      end
-      -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
-      if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.ConductiveInkDebuff) or Player:BuffRemainsP(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 59"; end
-      end
-      -- use_item,name=azsharas_font_of_power,if=cooldown.metamorphosis.remains<10|cooldown.metamorphosis.remains>60
-      if I.AzsharasFontofPower:IsEquipReady() and (S.Metamorphosis:CooldownRemainsP() < 10 or S.Metamorphosis:CooldownRemainsP() > 60) then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 61"; end
-      end
-    end
-    -- use_items,if=buff.metamorphosis.up
-    if (Player:BuffP(S.MetamorphosisBuff)) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
-    end
-    -- call_action_list,name=essences
-    if (true) then
-      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
-    end
-  end
-  DarkSlash = function()
-    -- dark_slash,if=fury>=80&(!variable.blade_dance|!cooldown.blade_dance.ready)
-    if S.DarkSlash:IsCastableP() and IsInMeleeRange() and (Player:Fury() >= 80 and (not bool(VarBladeDance) or not S.BladeDance:CooldownUpP())) then
-      if HR.Cast(S.DarkSlash, nil, nil, "Melee") then return "dark_slash 65"; end
-    end
-    -- annihilation,if=debuff.dark_slash.up
-    if S.Annihilation:IsReadyP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then
-      if HR.Cast(S.Annihilation, nil, nil, "Melee") then return "annihilation 67"; end
-    end
-    -- chaos_strike,if=debuff.dark_slash.up
-    if S.ChaosStrike:IsReadyP() and IsInMeleeRange() and (Target:DebuffP(S.DarkSlashDebuff)) then
-      if HR.Cast(S.ChaosStrike, nil, nil, "Melee") then return "chaos_strike 71"; end
-    end
-  end
-  Demonic = function()
-    -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
-      if HR.Cast(S.DeathSweep, nil, nil, 8) then return "death_sweep 75"; end
-    end
-    -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
-    if S.EyeBeam:IsReadyP(20) then
-      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 79"; end
-    end
-    -- fel_barrage,if=(buff.metamorphosis.up&raid_event.adds.in>30)|active_enemies>desired_targets
-    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (Player:BuffP(S.MetamorphosisBuff) or Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.FelBarrage, nil, nil, 8) then return "fel_barrage 83"; end
-    end
-    -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
-    if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance) and (S.EyeBeam:CooldownRemainsP() > (5 - S.RevolvingBlades:AzeriteRank() * 3))) then
-      if HR.Cast(S.BladeDance, nil, nil, 8) then return "blade_dance 95"; end
-    end
-    -- immolation_aura
-    if S.ImmolationAura:IsCastableP() then
-      if HR.Cast(S.ImmolationAura) then return "immolation_aura 109"; end
-    end
-    -- annihilation,if=!variable.pooling_for_blade_dance
-    if S.Annihilation:IsReadyP() and IsInMeleeRange() and (not bool(VarPoolingForBladeDance)) then
-      if HR.Cast(S.Annihilation, nil, nil, "Melee") then return "annihilation 111"; end
-    end
-    -- felblade,if=fury.deficit>=40
-    if S.Felblade:IsCastableP(15) and (Player:FuryDeficit() >= 40) then
-      if HR.Cast(S.Felblade) then return "felblade 115"; end
-    end
-    -- chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
-    if S.ChaosStrike:IsReadyP() and IsInMeleeRange() and (not bool(VarPoolingForBladeDance) and not bool(VarPoolingForEyeBeam)) then
-      if HR.Cast(S.ChaosStrike, nil, nil, "Melee") then return "chaos_strike 117"; end
-    end
-    -- fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
-    if S.FelRush:IsCastableP(20, true) and (S.DemonBlades:IsAvailable() and not S.EyeBeam:CooldownUpP() and ConserveFelRush()) then
-      if CastFelRush() then return "fel_rush 123"; end
-    end
-    -- demons_bite
-    if S.DemonsBite:IsCastableP() and IsInMeleeRange() then
-      if HR.Cast(S.DemonsBite, nil, nil, "Melee") then return "demons_bite 133"; end
-    end
-    -- throw_glaive,if=buff.out_of_range.up
-    if S.ThrowGlaive:IsCastableP(30) and (not IsInMeleeRange()) then
-      if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 135"; end
-    end
-    -- fel_rush,if=movement.distance>15|buff.out_of_range.up
-    -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and ConserveFelRush()) then
-      -- if CastFelRush() then return "fel_rush 139"; end
-    -- end
-    -- vengeful_retreat,if=movement.distance>15
-    -- if S.VengefulRetreat:IsCastableP("Melee", true) then
-      -- if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 143"; end
-    -- end
-    -- throw_glaive,if=talent.demon_blades.enabled
-    if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
-      if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 145"; end
-    end
-  end
-  Normal = function()
-    -- vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
-    if S.VengefulRetreat:IsCastableP("Melee", true) and (S.Momentum:IsAvailable() and Player:BuffDownP(S.PreparedBuff) and HL.CombatTime() > 1) then
-      if HR.Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat 149"; end
-    end
-    -- fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
-    if S.FelRush:IsCastableP(20, true) and ((bool(VarWaitingForMomentum) or S.FelMastery:IsAvailable()) and ConserveFelRush()) then
-      if CastFelRush() then return "fel_rush 155"; end
-    end
-    -- fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
-    if S.FelBarrage:IsCastableP() and IsInMeleeRange() and (not bool(VarWaitingForMomentum) and Cache.EnemiesCount[8] > 1) then
-      if HR.Cast(S.FelBarrage, nil, nil, 8) then return "fel_barrage 165"; end
-    end
-    -- death_sweep,if=variable.blade_dance
-    if S.DeathSweep:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
-      if HR.Cast(S.DeathSweep, nil, nil, 8) then return "death_sweep 175"; end
-    end
-    -- immolation_aura
-    if S.ImmolationAura:IsCastableP() then
-      if HR.Cast(S.ImmolationAura) then return "immolation_aura 179"; end
-    end
-    -- eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
-    if S.EyeBeam:IsReadyP(20) and (Cache.EnemiesCount[20] > 1 and not bool(VarWaitingForMomentum)) then
-      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 181"; end
-    end
-    -- blade_dance,if=variable.blade_dance
-    if S.BladeDance:IsReadyP() and IsInMeleeRange() and (bool(VarBladeDance)) then
-      if HR.Cast(S.BladeDance, nil, nil, 8) then return "blade_dance 195"; end
-    end
-    -- felblade,if=fury.deficit>=40
-    if S.Felblade:IsCastableP(15) and (Player:FuryDeficit() >= 40) then
-      if HR.Cast(S.Felblade) then return "felblade 199"; end
-    end
-    -- eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_dark_slash&raid_event.adds.in>cooldown
-    if S.EyeBeam:IsReadyP(20) and (not S.BlindFury:IsAvailable() and not bool(VarWaitingForDarkSlash)) then
-      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 201"; end
-    end
-    -- annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
-    if S.Annihilation:IsReadyP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemainsP(S.MetamorphosisBuff) < 5) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
-      if HR.Cast(S.Annihilation, nil, nil, "Melee") then return "annihilation 211"; end
-    end
-    -- chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
-    if S.ChaosStrike:IsReadyP() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or not bool(VarWaitingForMomentum) or Player:FuryDeficit() < 30) and not bool(VarPoolingForMeta) and not bool(VarPoolingForBladeDance) and not bool(VarWaitingForDarkSlash)) then
-      if HR.Cast(S.ChaosStrike, nil, nil, "Melee") then return "chaos_strike 223"; end
-    end
-    -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
-    if S.EyeBeam:IsReadyP(20) and (S.BlindFury:IsAvailable()) then
-      if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 235"; end
-    end
-    -- demons_bite
-    if S.DemonsBite:IsCastableP() and IsInMeleeRange() then
-      if HR.Cast(S.DemonsBite, nil, nil, "Melee") then return "demons_bite 243"; end
-    end
-    -- fel_rush,if=!talent.momentum.enabled&raid_event.movement.in>charges*10&talent.demon_blades.enabled
-    if S.FelRush:IsCastableP(20, true) and (not S.Momentum:IsAvailable() and S.DemonBlades:IsAvailable() and ConserveFelRush()) then
-      if CastFelRush() then return "fel_rush 245"; end
-    end
-    -- felblade,if=movement.distance>15|buff.out_of_range.up
-    -- if S.Felblade:IsCastableP(15) and (not IsInMeleeRange()) then
-      -- if HR.Cast(S.Felblade) then return "felblade 255"; end
-    -- end
-    -- fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
-    -- if S.FelRush:IsCastableP(20, true) and (not IsInMeleeRange() and not S.Momentum:IsAvailable() and ConserveFelRush()) then
-      -- if CastFelRush() then return "fel_rush 259"; end
-    -- end
-    -- vengeful_retreat,if=movement.distance>15
-    -- if S.VengefulRetreat:IsCastableP("Melee", true) then
-      -- if HR.Cast(S.VengefulRetreat) then return "vengeful_retreat 265"; end
-    -- end
-    -- throw_glaive,if=talent.demon_blades.enabled
-    if S.ThrowGlaive:IsCastableP(30) and (S.DemonBlades:IsAvailable()) then
-      if HR.Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive) then return "throw_glaive 267"; end
-    end
-  end
 
   if Everyone.TargetIsValid() then
     -- Precombat
@@ -508,7 +513,7 @@ local function APL()
   end
 end
 
-local function Init ()
+local function Init()
   -- Register Splash Data Nucleus Abilities
   HL.RegisterNucleusAbility(191427, 8, 6)               -- Metamorphosis
   HL.RegisterNucleusAbility(198013, 20, 6)              -- Eye Beam

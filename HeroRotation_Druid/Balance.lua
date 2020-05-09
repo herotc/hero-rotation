@@ -246,77 +246,80 @@ local function EvaluateCycleStellarFlare348(TargetUnit)
   return (TargetUnit:DebuffRefreshableCP(S.StellarFlareDebuff)) and (AP_Check(S.StellarFlare) and math.floor (TargetUnit:TimeToDie() / (2 * Player:SpellHaste())) >= 5 and (not bool(VarAzSs) or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.StellarFlare)) and not Player:IsCasting(S.StellarFlare))
 end
 
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
+  -- variable,name=az_ss,value=azerite.streaking_stars.rank
+  if (true) then
+    VarAzSs = S.StreakingStars:AzeriteRank()
+  end
+  -- variable,name=az_ap,value=azerite.arcanic_pulsar.rank
+  if (true) then
+    VarAzAp = S.ArcanicPulsar:AzeriteRank()
+  end
+  -- variable,name=sf_targets,value=4
+  if (true) then
+    VarSfTargets = 4
+  end
+  -- variable,name=sf_targets,op=add,value=1,if=azerite.arcanic_pulsar.enabled
+  if (S.ArcanicPulsar:AzeriteEnabled()) then
+    VarSfTargets = VarSfTargets + 1
+  end
+  -- variable,name=sf_targets,op=add,value=1,if=talent.starlord.enabled
+  if (S.Starlord:IsAvailable()) then
+    VarSfTargets = VarSfTargets + 1
+  end
+  -- variable,name=sf_targets,op=add,value=1,if=azerite.streaking_stars.rank>2&azerite.arcanic_pulsar.enabled
+  if (S.StreakingStars:AzeriteRank() > 2 and S.ArcanicPulsar:AzeriteEnabled()) then
+    VarSfTargets = VarSfTargets + 1
+  end
+  -- variable,name=sf_targets,op=sub,value=1,if=!talent.twin_moons.enabled
+  if (not S.TwinMoons:IsAvailable()) then
+    VarSfTargets = VarSfTargets - 1
+  end
+  -- moonkin_form
+  if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) then
+    if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
+  end
+  -- use_item,name=azsharas_font_of_power
+  if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
+    if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
+  end
+  -- potion,dynamic_prepot=1
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+    if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
+  end
+  -- solar_wrath
+  if S.SolarWrath:IsCastableP() and (not Player:PrevGCDP(1, S.SolarWrath) and not Player:PrevGCDP(2, S.SolarWrath)) then
+    if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 43"; end
+  end
+  -- solar_wrath
+  if S.SolarWrath:IsCastableP() and (Player:PrevGCDP(1, S.SolarWrath) and not Player:PrevGCDP(2, S.SolarWrath)) then
+    if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 44"; end
+  end
+  -- starsurge
+  if S.Starsurge:IsReadyP() then
+    if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 45"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat
   EnemiesCount = GetEnemiesCount(15)
   HL.GetEnemies(40) -- To populate Cache.Enemies[40] for CastCycles
-  Precombat = function()
-    -- flask
-    -- food
-    -- augmentation
-    -- snapshot_stats
-    -- variable,name=az_ss,value=azerite.streaking_stars.rank
-    if (true) then
-      VarAzSs = S.StreakingStars:AzeriteRank()
-    end
-    -- variable,name=az_ap,value=azerite.arcanic_pulsar.rank
-    if (true) then
-      VarAzAp = S.ArcanicPulsar:AzeriteRank()
-    end
-    -- variable,name=sf_targets,value=4
-    if (true) then
-      VarSfTargets = 4
-    end
-    -- variable,name=sf_targets,op=add,value=1,if=azerite.arcanic_pulsar.enabled
-    if (S.ArcanicPulsar:AzeriteEnabled()) then
-      VarSfTargets = VarSfTargets + 1
-    end
-    -- variable,name=sf_targets,op=add,value=1,if=talent.starlord.enabled
-    if (S.Starlord:IsAvailable()) then
-      VarSfTargets = VarSfTargets + 1
-    end
-    -- variable,name=sf_targets,op=add,value=1,if=azerite.streaking_stars.rank>2&azerite.arcanic_pulsar.enabled
-    if (S.StreakingStars:AzeriteRank() > 2 and S.ArcanicPulsar:AzeriteEnabled()) then
-      VarSfTargets = VarSfTargets + 1
-    end
-    -- variable,name=sf_targets,op=sub,value=1,if=!talent.twin_moons.enabled
-    if (not S.TwinMoons:IsAvailable()) then
-      VarSfTargets = VarSfTargets - 1
-    end
-    -- moonkin_form
-    if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) then
-      if HR.Cast(S.MoonkinForm, Settings.Balance.GCDasOffGCD.MoonkinForm) then return "moonkin_form 39"; end
-    end
-    -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
-    end
-    -- potion,dynamic_prepot=1
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 42"; end
-    end
-    -- solar_wrath
-    if S.SolarWrath:IsCastableP() and (not Player:PrevGCDP(1, S.SolarWrath) and not Player:PrevGCDP(2, S.SolarWrath)) then
-      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 43"; end
-    end
-    -- solar_wrath
-    if S.SolarWrath:IsCastableP() and (Player:PrevGCDP(1, S.SolarWrath) and not Player:PrevGCDP(2, S.SolarWrath)) then
-      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 44"; end
-    end
-    -- starsurge
-    if S.Starsurge:IsReadyP() then
-      if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 45"; end
-    end
-  end
+
   -- Moonkin Form OOC, if setting is true
   if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) and Settings.Balance.ShowMoonkinFormOOC then
     if HR.Cast(S.MoonkinForm) then return "moonkin_form ooc"; end
   end
+  
   -- call precombat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
+  
   if Everyone.TargetIsValid() then
     -- Defensives
     if S.Renewal:IsCastableP() and Player:HealthPercentage() <= Settings.Balance.RenewalHP then
@@ -481,7 +484,7 @@ local function APL()
   end
 end
 
-local function Init ()
+local function Init()
   HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
   HL.RegisterNucleusAbility(191037, 15, 6)              -- Starfall
   HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
