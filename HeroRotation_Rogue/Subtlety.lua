@@ -338,8 +338,8 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   if Cache.EnemiesCount[10] == 4 and PredictedCP >= 4 then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
-  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
-  if PredictedCPDeficit <= 1 - num(S.DeeperStratagem:IsAvailable() and (VanishBuffCheck or S.TheFirstDance:AzeriteEnabled() and not S.DarkShadow:IsAvailable() and not S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 3)) then
+  -- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&spell_targets.shuriken_storm<3&buff.nights_vengeance.up))
+  if PredictedCPDeficit <= 1 - num(S.DeeperStratagem:IsAvailable() and (VanishBuffCheck or S.TheFirstDance:AzeriteEnabled() and Cache.EnemiesCount[10] < 3 and Player:BuffP(S.NightsVengeanceBuff))) then
     return Finish(ReturnSpellOnly, StealthSpell);
   end
   -- actions.stealthed+=/gloomblade,if=azerite.perforate.rank>=2&spell_targets.shuriken_storm<=2
@@ -462,7 +462,7 @@ local function Essences ()
   -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
   -- ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
   -- if ShouldReturn then return ShouldReturn; end
-  
+
   return false;
 end
 
@@ -903,7 +903,7 @@ end
 
 HR.SetAPL(261, APL, Init);
 
--- Last Update: 2020-03-07
+-- Last Update: 2020-05-14
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -1017,8 +1017,8 @@ HR.SetAPL(261, APL, Init);
 -- actions.stealthed+=/call_action_list,name=finish,if=buff.shuriken_tornado.up&combo_points.deficit<=2
 -- # Also safe to finish at 4+ CP with exactly 4 targets. (Same as outside stealth.)
 -- actions.stealthed+=/call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
--- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish or The First Dance and no Dark Shadow + no Subterfuge
--- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&!talent.dark_shadow.enabled&!talent.subterfuge.enabled&spell_targets.shuriken_storm<3))
+-- # Finish at 4+ CP without DS, 5+ with DS, and 6 with DS after Vanish or The First Dance + Nights Vegeance
+-- actions.stealthed+=/call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&(buff.vanish.up|azerite.the_first_dance.enabled&spell_targets.shuriken_storm<3&buff.nights_vengeance.up))
 -- # Use Gloomblade over Shadowstrike and Storm with 2+ Perforate at 2 or less targets.
 -- actions.stealthed+=/gloomblade,if=azerite.perforate.rank>=2&spell_targets.shuriken_storm<=2&position_back
 -- # At 2 targets with Secret Technique keep up Find Weakness by cycling Shadowstrike.
