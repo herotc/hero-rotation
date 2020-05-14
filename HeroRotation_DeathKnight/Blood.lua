@@ -18,7 +18,6 @@ local HR         = HeroRotation
 -- Azerite Essence Setup
 local AE         = HL.Enum.AzeriteEssences
 local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -77,9 +76,6 @@ Spell.DeathKnight.Blood = {
   Pool                                  = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Blood;
-if AEMajor ~= nil then
-  S.HeartEssence          = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {}; end
@@ -132,11 +128,6 @@ local function UpdateRanges()
   end
 end
 
-HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence();
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
-
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -162,11 +153,21 @@ local function Precombat()
   -- snapshot_stats
   -- potion
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return ""; end
+    if HR.Cast(I.PotionofUnbridledFury, Settings.Commons.OffGCDasOffGCD.Potions) then return "potion 2"; end
+  end
+  if (Settings.Commons.UseTrinkets) then
+    -- use_item,name=azsharas_font_of_power
+    if I.AzsharasFontofPower:IsEquipReady() then
+      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 4"; end
+    end
+    -- use_item,effect_name=cyclotronic_blast
+    if Everyone.CyclotronicBlastReady() then
+      if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "cyclotronic_blast 6"; end
+    end
   end
   -- Manually Added: Death's Caress for ranged pulling
   if S.DeathsCaress:IsReady() then
-    if HR.Cast(S.DeathsCaress, nil, nil, 30) then return "deaths_caress 2"; end
+    if HR.Cast(S.DeathsCaress, nil, nil, 30) then return "deaths_caress 8"; end
   end
 end
 
@@ -232,10 +233,6 @@ local function Standard()
   -- marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*2)|buff.bone_shield.stack<3)&runic_power.deficit>=20
   if S.Marrowrend:IsCastable("Melee") and ((Player:BuffRemainsP(S.BoneShield) <= Player:RuneTimeToX(3) or Player:BuffRemainsP(S.BoneShield) <= (Player:GCD() + num(S.Blooddrinker:CooldownUpP()) * num(S.Blooddrinker:IsAvailable()) * 2) or Player:BuffStackP(S.BoneShield) < 3) and Player:RunicPowerDeficit() >= 20) then
     if HR.Cast(S.Marrowrend) then return "marrowrend 58"; end
-  end
-  -- heart_essence,if=!buff.dancing_rune_weapon.up
-  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() and not (Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame)) and (Player:BuffDownP(S.DancingRuneWeaponBuff)) then
-    if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence 60"; end
   end
   -- blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
   if S.BloodBoil:IsCastable() and Cache.EnemiesCount[10] >= 1 and (S.BloodBoil:ChargesFractionalP() >= 1.8 and (Player:BuffStackP(S.HemostasisBuff) <= (5 - Cache.EnemiesCount[10]) or Cache.EnemiesCount[10] > 2)) then
@@ -365,7 +362,7 @@ local function APL()
       if I.RazdunksBigRedButton:IsEquipReady() then
         if HR.Cast(I.RazdunksBigRedButton, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "razdunks_big_red_button 136"; end
       end
-      -- use_item,name=cyclotronic_blast,if=cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>cast_time
+      -- use_item,effect_name=cyclotronic_blast,if=cooldown.dancing_rune_weapon.remains&!buff.dancing_rune_weapon.up&rune.time_to_4>cast_time
       if Everyone.CyclotronicBlastReady() and (not S.DancingRuneWeapon:CooldownUpP() and Player:BuffDownP(S.DancingRuneWeaponBuff) and Player:RuneTimeToX(4) > 2.5) then
         if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 137"; end
       end
