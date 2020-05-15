@@ -32,6 +32,7 @@ Spell.Hunter.Survival = {
   Harpoon                               = Spell(190925),
   MongooseBite                          = MultiSpell(259387, 265888),
   CoordinatedAssaultBuff                = Spell(266779),
+  BlurofTalons                          = Spell(277653),
   BlurofTalonsBuff                      = Spell(277969),
   RaptorStrike                          = MultiSpell(186270, 265189),
   FlankingStrike                        = Spell(269751),
@@ -76,6 +77,7 @@ Spell.Hunter.Survival = {
   ConcentratedFlameBurn                 = Spell(295368),
   Carve                                 = Spell(187708),
   GuerrillaTactics                      = Spell(264332),
+  LatentPoison                          = Spell(273283),
   LatentPoisonDebuff                    = Spell(273286),
   BloodseekerDebuff                     = Spell(259277),
   Butchery                              = Spell(212436),
@@ -85,6 +87,7 @@ Spell.Hunter.Survival = {
   TermsofEngagement                     = Spell(265895),
   VipersVenom                           = Spell(268501),
   AlphaPredator                         = Spell(269737),
+  HydrasBite                            = Spell(260241),
   BirdsofPrey                           = Spell(260331),
   ArcaneTorrent                         = Spell(50613),
   RazorCoralDebuff                      = Spell(303568)
@@ -153,7 +156,7 @@ local function EvaluateTargetIfFilterMongooseBite396(TargetUnit)
 end
 
 local function EvaluateTargetIfMongooseBite405(TargetUnit)
-  return TargetUnit:DebuffStackP(S.LatentPoisonDebuff) == 10
+  return TargetUnit:DebuffStackP(S.LatentPoisonDebuff) > 8
 end
 
 local function EvaluateTargetIfFilterKillCommand413(TargetUnit)
@@ -177,7 +180,7 @@ local function EvaluateTargetIfFilterSerpentSting497(TargetUnit)
 end
 
 local function EvaluateTargetIfSerpentSting520(TargetUnit)
-  return TargetUnit:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffStackP(S.TipoftheSpearBuff) < 3
+  return (TargetUnit:DebuffRefreshableCP(S.SerpentStingDebuff) and Player:BuffStackP(S.TipoftheSpearBuff) < 3 or S.VolatileBomb:IsLearned() or Target:DebuffRefreshableCP(S.SerpentStingDebuff) and S.LatentPoison:AzeriteEnabled())
 end
 
 local function EvaluateTargetIfFilterMongooseBite526(TargetUnit)
@@ -198,6 +201,26 @@ end
 
 local function EvaluateTargetIfKillCommand547(TargetUnit)
   return (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) + 15 < Player:FocusMax())
+end
+
+local function EvaluateTargetIfKillCommand549(TargetUnit)
+  return (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() - Player:FocusRegen())
+end
+
+local function EvaluateTargetIfKillCommand551(TargetUnit)
+  return (S.KillCommand:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() - 20)
+end
+
+local function EvaluateTargetIfKillCommand553(TargetUnit)
+  return (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() and (Player:BuffStackP(S.MongooseFuryBuff) < 5 or Player:Focus() < S.MongooseBite:Cost()))
+end
+
+local function EvaluateTargetIfFilterMongooseBite555(TargetUnit)
+  return TargetUnit:TimeToDie()
+end
+
+local function EvaluateTargetIfMongooseBite557(TargetUnit)
+  return (TargetUnit:DebuffStackP(S.LatentPoisonDebuff) > (Cache.EnemiesCount[8] or 9) and TargetUnit:TimeToDie() < Cache.EnemiesCount[8] * Player:GCD())
 end
 
 local function Precombat()
@@ -329,9 +352,9 @@ local function Apwfi()
   if S.MongooseBite:IsReadyP() and (bool(Player:BuffRemainsP(S.MongooseFuryBuff)) and S.PheromoneBomb:IsLearned()) then
     if HR.Cast(S.MongooseBite, nil, nil, "Melee") then return "mongoose_bite 206"; end
   end
-  -- kill_command,if=full_recharge_time<1.5*gcd&focus+cast_regen<focus.max-20
-  if S.KillCommand:IsCastableP() and (S.KillCommand:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() - 20) then
-    if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 210"; end
+  -- kill_command,target_if=min:bloodseeker.remains,if=full_recharge_time<1.5*gcd&focus+cast_regen<focus.max-20
+  if S.KillCommand:IsCastableP() then
+    if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand551) then return "kill_command 210"; end
   end
   -- steel_trap,if=focus+cast_regen<focus.max
   if S.SteelTrap:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.SteelTrap:ExecuteTime()) < Player:FocusMax()) then
@@ -357,9 +380,9 @@ local function Apwfi()
   if S.SerpentSting:IsReadyP() and (Target:DebuffRefreshableCP(S.SerpentStingDebuff)) then
     if HR.Cast(S.SerpentSting, nil, nil, 40) then return "serpent_sting 250"; end
   end
-  -- kill_command,if=focus+cast_regen<focus.max&(buff.mongoose_fury.stack<5|focus<action.mongoose_bite.cost)
-  if S.KillCommand:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() and (Player:BuffStackP(S.MongooseFuryBuff) < 5 or Player:Focus() < S.MongooseBite:Cost())) then
-    if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 258"; end
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(buff.mongoose_fury.stack<5|focus<action.mongoose_bite.cost)
+  if S.KillCommand:IsCastableP() then
+    if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand553) then return "kill_command 258"; end
   end
   -- raptor_strike
   if S.RaptorStrike:IsReadyP() then
@@ -473,6 +496,14 @@ end
 local function Cleave()
   -- variable,name=carve_cdr,op=setif,value=active_enemies,value_else=5,condition=active_enemies<5
   VarCarveCdr = math.min(Cache.EnemiesCount[8], 5)
+  -- mongoose_bite,if=azerite.blur_of_talons.rank>0&(buff.coordinated_assault.up&(buff.coordinated_assault.remains<1.5*gcd|buff.blur_of_talons.up&buff.blur_of_talons.remains<1.5*gcd|buff.coordinated_assault.remains&!buff.blur_of_talons.remains))
+  if S.MongooseBite:IsReadyP() and (S.BlurofTalons:AzeriteEnabled() and (Player:BuffP(S.CoordinatedAssaultBuff) and (Player:BuffRemainsP(S.CoordinatedAssaultBuff) < 1.5 * Player:GCD() or Player:BuffP(S.BlurofTalonsBuff) and Player:BuffRemainsP(S.BlurofTalonsBuff) < 1.5 * Player:GCD() or Player:BuffP(S.CoordinatedAssaultBuff) and Player:BuffDownP(S.BlurofTalonsBuff)))) then
+    if HR.Cast(S.MongooseBite, nil, nil, "Melee") then return "mongoose_bite 371"; end
+  end
+  -- mongoose_bite,target_if=min:time_to_die,if=debuff.latent_poison.stack>(active_enemies|9)&target.time_to_die<active_enemies*gcd
+  if S.MongooseBite:IsReadyP() then
+    if HR.CastTargetIf(S.MongooseBite, 15, "min", EvaluateTargetIfFilterMongooseBite555, EvaluateTargetIfMongooseBite557) then return "mongoose_bite 373"; end
+  end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsCastableP() then
     if HR.Cast(S.AMurderofCrows, Settings.Survival.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 375"; end
@@ -481,15 +512,19 @@ local function Cleave()
   if S.CoordinatedAssault:IsCastableP() and HR.CDsON() then
     if HR.Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, 100) then return "coordinated_assault 377"; end
   end
-  -- carve,if=dot.shrapnel_bomb.ticking
-  if S.Carve:IsReadyP() and (Target:DebuffP(S.ShrapnelBombDebuff)) then
+  -- carve,if=dot.shrapnel_bomb.ticking&!talent.hydras_bite.enabled|dot.shrapnel_bomb.ticking&active_enemies>5
+  if S.Carve:IsReadyP() and (Target:DebuffP(S.ShrapnelBombDebuff) and not S.HydrasBite:IsAvailable() or Target:DebuffP(S.ShrapnelBombDebuff) and Cache.EnemiesCount[8] > 5) then
     if HR.Cast(S.Carve, nil, nil, 8) then return "carve 379"; end
   end
-  -- wildfire_bomb,if=!talent.guerrilla_tactics.enabled|full_recharge_time<gcd
+  -- wildfire_bomb,if=!talent.guerrilla_tactics.enabled|full_recharge_time<gcd|raid_event.adds.remains<6&raid_event.adds.exists
   if S.WildfireBomb:IsCastableP() and (not S.GuerrillaTactics:IsAvailable() or S.WildfireBomb:FullRechargeTimeP() < Player:GCD()) then
     if HR.Cast(S.WildfireBomb, nil, nil, 40) then return "wildfire_bomb 383"; end
   end
-  -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=debuff.latent_poison.stack=10
+  -- butchery,if=charges_fractional>2.5|dot.shrapnel_bomb.ticking|cooldown.wildfire_bomb.remains>active_enemies-gcd|debuff.blood_of_the_enemy.remains|raid_event.adds.remains<5&raid_event.adds.exists
+  if S.Butchery:IsReadyP() and (S.Butchery:ChargesFractionalP() > 2.5 or Target:DebuffP(S.ShrapnelBombDebuff) or S.WildfireBomb:CooldownRemainsP() > Cache.EnemiesCount[8] - Player:GCD() or Target:DebuffP(S.BloodoftheEnemy)) then
+    if HR.Cast(S.Butchery, nil, nil, 8) then return "butchery 385"; end
+  end
+  -- mongoose_bite,target_if=max:debuff.latent_poison.stack,if=debuff.latent_poison.stack>8
   if S.MongooseBite:IsReadyP() then
     if HR.CastTargetIf(S.MongooseBite, 8, "max", EvaluateTargetIfFilterMongooseBite396, EvaluateTargetIfMongooseBite405) then return "mongoose_bite 407" end
   end
@@ -501,13 +536,17 @@ local function Cleave()
   if S.KillCommand:IsCastableP() then
     if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand426) then return "kill_command 428" end
   end
-  -- butchery,if=full_recharge_time<gcd|!talent.wildfire_infusion.enabled|dot.shrapnel_bomb.ticking&dot.internal_bleeding.stack<3
-  if S.Butchery:IsCastableP() and (S.Butchery:FullRechargeTimeP() < Player:GCD() or not S.WildfireInfusion:IsAvailable() or Target:DebuffP(S.ShrapnelBombDebuff) and Target:DebuffStackP(S.InternalBleedingDebuff) < 3) then
-    if HR.Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, 8) then return "butchery 429"; end
+  -- harpoon,if=talent.terms_of_engagement.enabled
+  if S.Harpoon:IsCastableP() and (S.TermsofEngagement:IsAvailable()) then
+    if HR.Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, 30) then return "harpoon 430"; end
   end
   -- carve,if=talent.guerrilla_tactics.enabled
   if S.Carve:IsReadyP() and (S.GuerrillaTactics:IsAvailable()) then
     if HR.Cast(S.Carve, nil, nil, 8) then return "carve 441"; end
+  end
+  -- butchery,if=cooldown.wildfire_bomb.remains>(active_enemies|5)
+  if S.Butchery:IsReadyP() and (S.WildfireBomb:CooldownRemainsP() > (Cache.EnemiesCount[8] or 5)) then
+    if HR.Cast(S.Butchery, nil, nil, 8) then return "butchery 443"; end
   end
   -- flanking_strike,if=focus+cast_regen<focus.max
   if S.FlankingStrike:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.FlankingStrike:ExecuteTime()) < Player:FocusMax()) then
@@ -529,11 +568,7 @@ local function Cleave()
   if S.SteelTrap:IsCastableP() then
     if HR.Cast(S.SteelTrap, nil, nil, 40) then return "steel_trap 488"; end
   end
-  -- harpoon,if=talent.terms_of_engagement.enabled
-  if S.Harpoon:IsCastableP() and (S.TermsofEngagement:IsAvailable()) then
-    if HR.Cast(S.Harpoon, Settings.Survival.GCDasOffGCD.Harpoon, nil, 30) then return "harpoon 490"; end
-  end
-  -- serpent_sting,target_if=min:remains,if=refreshable&buff.tip_of_the_spear.stack<3
+  -- serpent_sting,target_if=min:remains,if=refreshable&buff.tip_of_the_spear.stack<3&next_wi_bomb.volatile|refreshable&azerite.latent_poison.rank>0
   if S.SerpentSting:IsReadyP() then
     if HR.CastTargetIf(S.SerpentSting, 8, "min", EvaluateTargetIfFilterSerpentSting497, EvaluateTargetIfSerpentSting520) then return "serpent_sting 522" end
   end
@@ -631,9 +666,9 @@ local function Wfi()
   if S.WildfireBomb:IsCastableP() and (S.WildfireBomb:FullRechargeTimeP() < 1.5 * Player:GCD() and Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() or (S.VolatileBomb:IsLearned() and Target:DebuffP(S.SerpentStingDebuff) and Target:DebuffRefreshableCP(S.SerpentStingDebuff) or S.PheromoneBomb:IsLearned() and Player:BuffDownP(S.MongooseFuryBuff) and Player:Focus() + Player:FocusCastRegen(S.WildfireBomb:ExecuteTime()) < Player:FocusMax() - Player:FocusCastRegen(S.KillCommand:ExecuteTime()) * 3)) then
     if HR.Cast(S.WildfireBomb, nil, nil, 40) then return "wildfire_bomb 697"; end
   end
-  -- kill_command,if=focus+cast_regen<focus.max-focus.regen
-  if S.KillCommand:IsCastableP() and (Player:Focus() + Player:FocusCastRegen(S.KillCommand:ExecuteTime()) < Player:FocusMax() - Player:FocusRegen()) then
-    if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 733"; end
+  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max-focus.regen
+  if S.KillCommand:IsCastableP() then
+    if HR.CastTargetIf(S.KillCommand, 15, "min", EvaluateTargetIfFilterKillCommand413, EvaluateTargetIfKillCommand549) then return "kill_command 733"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsCastableP() then
