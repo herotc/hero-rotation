@@ -87,6 +87,7 @@ Item.Warrior.Protection = {
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   LingeringPsychicShell            = Item(174277, {13, 14}),
+  MchimbasRitualBandages           = Item(159618, {13, 14}),
 };
 local I = Item.Warrior.Protection;
 
@@ -95,7 +96,8 @@ local OnUseExcludes = {
   I.GrongsPrimalRage:ID(),
   I.AshvanesRazorCoral:ID(),
   I.AzsharasFontofPower:ID(),
-  I.LingeringPsychicShell:ID()
+  I.LingeringPsychicShell:ID(),
+  I.MchimbasRitualBandages:ID()
 }
 
 -- Rotation Var
@@ -200,6 +202,10 @@ local function Defensive()
   if Player:HealthPercentage() <= 70 and I.LingeringPsychicShell:IsEquipReady() then
     if HR.CastRightSuggested(I.LingeringPsychicShell) then return "absorb trinket defensive" end
   end
+  if Player:HealthPercentage() <= 70 and I.MchimbasRitualBandages:IsEquipReady() then
+    if HR.CastRightSuggested(I.MchimbasRitualBandages) then return "absorb trinket defensive" end
+  end
+
 end
 
 local function Aoe()
@@ -391,7 +397,7 @@ local function APL()
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
     end
     -- memory_of_lucid_dreams
-    if S.MemoryofLucidDreams:IsCastableP() and S.Avatar:CooldownRemainsP() > 0 then
+    if S.MemoryofLucidDreams:IsCastableP() and S.Avatar:CooldownRemainsP() > 0 and Player:BuffDownP(S.AvatarBuff) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 110"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
