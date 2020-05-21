@@ -197,19 +197,15 @@ local function Aoe()
   if S.Defile:IsCastableP() and (not S.Apocalypse:CooldownUpP()) then
     if HR.Cast(S.Defile) then return "defile 14"; end
   end
-  -- epidemic,if=death_and_decay.ticking&runic_power.deficit<(14+death_knight.fwounded_targets*3)&!variable.pooling_for_gargoyle
+  -- epidemic,if=death_and_decay.ticking&runic_power.deficit<14&!talent.bursting_sores.enabled&!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
-  if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:RunicPowerDeficit() < (14 + S.FesteringWoundDebuff:ActiveCount() * 3) and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
+  if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:RunicPowerDeficit() < 14 and not S.BurstingSores:IsAvailable() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
     if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 16"; end
   end
   -- epidemic,if=death_and_decay.ticking&(!death_knight.fwounded_targets&talent.bursting_sores.enabled)&!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
   if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and (S.FesteringWoundDebuff:ActiveCount() == 0 and S.BurstingSores:IsAvailable()) and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
     if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 18"; end
-  end
-  -- death_coil,if=death_and_decay.ticking&runic_power.deficit<14&!variable.pooling_for_gargoyle
-  if S.DeathCoil:IsUsableP() and (Player:BuffP(S.DeathandDecayBuff) and Player:RunicPowerDeficit() < 14 and not bool(VarPoolingForGargoyle)) then
-    if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 20"; end
   end
   -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
   if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and not S.Apocalypse:CooldownUpP()) then
@@ -259,6 +255,14 @@ local function Aoe()
   -- scourge_strike,if=death_and_decay.ticking
   if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff)) then
     if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 97"; end
+  end
+  -- clawing_shadows,if=death_and_decay.ticking
+  if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff)) then
+    if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 99"; end
+  end
+  -- death_coil,if=!variable.pooling_for_gargoyle
+  if S.DeathCoil:IsReadyP() and (not bool(VarPoolingForGargoyle)) then
+    if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 101"; end
   end
 end
 
