@@ -79,16 +79,16 @@ local Item = HL.Item;
 -- Stagger Tracker
 local StaggerSpellID = 115069;
 local BobandWeave = Spell(280515);
-local NormalizedStagger = 0;
+local StaggerFull = 0;
 
-local function RegisterNormalizedStaggerAbsorb (Amount)
+local function RegisterStaggerFullAbsorb (Amount)
   local StaggerDuration = 10 + (BobandWeave:IsAvailable() and 3 or 0);
-  NormalizedStagger = NormalizedStagger + Amount;
-  C_Timer.After(StaggerDuration, function() NormalizedStagger = NormalizedStagger - Amount; end)
+  StaggerFull = StaggerFull + Amount;
+  C_Timer.After(StaggerDuration, function() StaggerFull = StaggerFull - Amount; end)
 end
 
-function Player:NormalizedStagger ()
-  return NormalizedStagger;
+function Player:StaggerFull ()
+  return StaggerFull;
 end
 
 HL:RegisterForCombatEvent(
@@ -99,10 +99,10 @@ HL:RegisterForCombatEvent(
     if #args == 23 then
       -- 1          2      3           4           5           6            7                8         9         10         11             12             13               14                 15                16                17                 18                     19       20         21           22
       -- TimeStamp, Event, HideCaster, SourceGUID, SourceName, SourceFlags, SourceRaidFlags, DestGUID, DestName, DestFlags, DestRaidFlags, AbsorbSpellId, AbsorbSpellName, AbsorbSpellSchool, AbsorbSourceGUID, AbsorbSourceName, AbsorbSourceFlags, AbsorbSourceRaidFlags, SpellID, SpellName, SpellSchool, Amount
-      local _, _, _, _, _, _, _, DestGUID, _, _, _, AbsorbSpellId, AbsorbSpellName, AbsorbSpellSchool, _, _, _, _, SpellID, _, _, Amount = ...
+      local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
 
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
-        RegisterNormalizedStaggerAbsorb(Amount)
+        RegisterStaggerFullAbsorb(Amount)
       end
     else
       -- 1          2      3           4           5           6            7                8         9         10         11             12                13                14                 15                     16       17         18           19
@@ -110,7 +110,7 @@ HL:RegisterForCombatEvent(
       local _, _, _, _, _, _, _, DestGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = ...
 
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
-        RegisterNormalizedStaggerAbsorb(Amount)
+        RegisterStaggerFullAbsorb(Amount)
       end
     end
   end

@@ -129,11 +129,9 @@ local function HealingSphereAmount()
 end
 
 local function ShouldPurify (BrewMaxCharges)
-  local StaggerDuration = 10 + (S.BobandWeave:IsAvailable() and 3 or 0);
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
-  local StaggerTickPerSecond = 0;
-  local NormalizedStaggerTickPct = 0;
+  local StaggersRatioPct = 0;
 
   if Player:Debuff(S.HeavyStagger) then
     NextStaggerTick = Player:Debuff(S.HeavyStagger, 16)
@@ -145,8 +143,7 @@ local function ShouldPurify (BrewMaxCharges)
 
   if NextStaggerTick > 0 then
     NextStaggerTickMaxHPPct = NextStaggerTick / Player:MaxHealth();
-    StaggerTickPerSec = Player:NormalizedStagger() / StaggerDuration;
-    NormalizedStaggerTickPct = NextStaggerTick / StaggerTickPerSec;
+    StaggersRatioPct = Player:Stagger() / Player:StaggerFull();
   end
 
   -- Purify if we refreshed ISB in the last 3 seconds and we are about to cap our brews charges
@@ -156,13 +153,13 @@ local function ShouldPurify (BrewMaxCharges)
   if HL.CombatTime() <= 9 then return false end;
 
   -- Do purify only if we are loosing more than 3% HP per second (1.5% * 2 since it ticks every 500ms), i.e. above Grey level
-  if NextStaggerTickMaxHPPct > 0.015 and NormalizedStaggerTickPct > 0 then
-    if NextStaggerTickMaxHPPct <= 0.03 then -- Yellow: 6% HP per second, only if the normalized value is > 80%
-      return Settings.Brewmaster.Purify.Low and NormalizedStaggerTickPct > 0.8 or false;
-    elseif NextStaggerTickMaxHPPct <= 0.05 then -- Orange: <= 10% HP per second, only if the normalized value is > 70%
-      return Settings.Brewmaster.Purify.Medium and NormalizedStaggerTickPct > 0.7 or false;
-    elseif NextStaggerTickMaxHPPct <= 0.1 then -- Red: <= 20% HP per second, only if the normalized value is > 50%
-      return Settings.Brewmaster.Purify.High and NormalizedStaggerTickPct > 0.5 or false;
+  if NextStaggerTickMaxHPPct > 0.015 and StaggersRatioPct > 0 then
+    if NextStaggerTickMaxHPPct <= 0.03 then -- Yellow: 6% HP per second, only if the stagger ratio is > 80%
+      return Settings.Brewmaster.Purify.Low and StaggersRatioPct > 0.8 or false;
+    elseif NextStaggerTickMaxHPPct <= 0.05 then -- Orange: <= 10% HP per second, only if the stagger ratio is > 70%
+      return Settings.Brewmaster.Purify.Medium and StaggersRatioPct > 0.7 or false;
+    elseif NextStaggerTickMaxHPPct <= 0.1 then -- Red: <= 20% HP per second, only if the stagger ratio value is > 50%
+      return Settings.Brewmaster.Purify.High and StaggersRatioPct > 0.5 or false;
     else -- Magenta: > 20% HP per second, ASAP
       return true;
     end
