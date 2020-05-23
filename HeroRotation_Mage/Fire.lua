@@ -591,10 +591,6 @@ local function ItemsLowPriority()
 end
 
 local function RopPhase()
-  -- rune_of_power
-  if S.RuneofPower:IsCastableP() then
-    if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 430"; end
-  end
   -- flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
   if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and Player:BuffP(S.HotStreakBuff)) then
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 432"; end
@@ -776,8 +772,8 @@ local function APL()
     if S.TheUnboundForce:IsCastableP() then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 803"; end
     end
-    -- rune_of_power,if=buff.combustion.down&(variable.time_to_combustion>full_recharge_time|variable.time_to_combustion>target.time_to_die)|variable.disable_combustion
-    if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or VarTimeToCombusion > Target:TimeToDie()) or Settings.Fire.DisableCombustion) then
+    -- rune_of_power,if=buff.combustion.down&buff.rune_of_power.down&(variable.time_to_combustion>full_recharge_time|variable.time_to_combustion>target.time_to_die)|variable.disable_combustion
+    if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.RuneofPowerBuff) and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or VarTimeToCombusion > Target:TimeToDie()) or Settings.Fire.DisableCombustion) then
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 807"; end
     end
     -- call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
