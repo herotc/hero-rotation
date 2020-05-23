@@ -181,7 +181,7 @@ local function Precombat()
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 7"; end
     end
-    -- army_of_the_dead,delay=2
+    -- army_of_the_dead,precombat_time=2
     if S.ArmyoftheDead:IsCastableP() then
       if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 8"; end
     end
