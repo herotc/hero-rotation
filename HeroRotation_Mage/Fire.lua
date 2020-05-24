@@ -358,8 +358,8 @@ local function CombustionPhase()
   if S.FireBlast:IsReady() and (S.FireBlast:ChargesP() >= 1 and ((S.FireBlast:ChargesFractional() + (Player:BuffRemainsP(S.CombustionBuff) - S.BlasterMasterBuff:BaseDuration()) % S.FireBlast:Cooldown() - (Player:BuffRemainsP(S.CombustionBuff)) % (S.BlasterMasterBuff:BaseDuration() - 0.5)) >= 0 or not S.BlasterMaster:AzeriteEnabled() or not S.FlameOn:IsAvailable() or Player:BuffRemainsP(S.CombustionBuff) <= S.BlasterMasterBuff:BaseDuration() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5 or I.HyperthreadWristwraps:IsEquipped() and I.HyperthreadWristwraps:CooldownRemains() < 5) and Player:BuffP(S.Combustion) and (not Player:IsCasting(S.Scorch) and not S.Pyroblast:InFlight() and Player:BuffP(S.HeatingUpBuff) or Player:IsCasting(S.Scorch) and Player:BuffDownP(S.HotStreakBuff) and (Player:BuffDownP(S.HeatingUpBuff) or S.BlasterMaster:AzeriteEnabled()) or S.BlasterMaster:AzeriteEnabled() and S.FlameOn:IsAvailable() and S.Pyroblast:InFlight() and Player:BuffP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 248"; end
   end
-  -- rune_of_power,if=buff.combustion.down
-  if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff)) then
+  -- rune_of_power,if=buff.rune_of_power.down&buff.combustion.down
+  if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.CombustionBuff)) then
     if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 250"; end
   end
   -- fire_blast,use_while_casting=1,if=azerite.blaster_master.enabled&(essence.memory_of_lucid_dreams.major|!essence.memory_of_lucid_dreams.minor)&talent.meteor.enabled&talent.flame_on.enabled&buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(variable.time_to_combustion<=0|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight)
@@ -772,8 +772,8 @@ local function APL()
     if S.TheUnboundForce:IsCastableP() then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 803"; end
     end
-    -- rune_of_power,if=buff.combustion.down&buff.rune_of_power.down&(variable.time_to_combustion>full_recharge_time|variable.time_to_combustion>target.time_to_die)|variable.disable_combustion
-    if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.RuneofPowerBuff) and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or VarTimeToCombusion > Target:TimeToDie()) or Settings.Fire.DisableCombustion) then
+    -- rune_of_power,if=buff.rune_of_power.down&(buff.combustion.down&buff.rune_of_power.down&(variable.time_to_combustion>full_recharge_time|variable.time_to_combustion>target.time_to_die)|variable.disable_combustion)
+    if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.RuneofPowerBuff) and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or VarTimeToCombusion > Target:TimeToDie()) or Settings.Fire.DisableCombustion)) then
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 807"; end
     end
     -- call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
