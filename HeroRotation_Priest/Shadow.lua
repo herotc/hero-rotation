@@ -248,8 +248,8 @@ local function CritCds()
 end
 
 local function Cds()
-  -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(26+7*buff.bloodlust.up)|(current_insanity_drain*((gcd.max*2)+action.mind_blast.cast_time)>insanity
-  if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or Player:BuffStackP(S.VoidformBuff) > (26 + 7 * num(Player:HasHeroism())) or (InsanityDrain * ((Player:GCD() * 2) + S.MindBlast:CastTime())) > Player:Insanity()) then
+  -- memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|(current_insanity_drain*((gcd.max*2)+action.mind_blast.cast_time)>insanity
+  if S.MemoryofLucidDreams:IsCastableP() and ((Player:BuffStackP(S.VoidformBuff) > 20 and Player:Insanity() <= 50) or (InsanityDrain * ((Player:GCD() * 2) + S.MindBlast:CastTime())) > Player:Insanity()) then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams cds"; end
   end
   -- blood_of_the_enemy
