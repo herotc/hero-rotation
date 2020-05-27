@@ -463,10 +463,13 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(84714, 8, 6)               -- Frost Orb
-  HL.RegisterNucleusAbility(190356, 8, 6)              -- Blizzard
-  HL.RegisterNucleusAbility(153595, 8, 6)              -- Comet Storm
+  HL.RegisterNucleusAbility(84721, 8, 6)               -- Frozen Orb
+  HL.RegisterNucleusAbility(190357, 8, 6)              -- Blizzard
+  HL.RegisterNucleusAbility(153596, 8, 6)              -- Comet Storm
   HL.RegisterNucleusAbility(120, 12, 6)                -- Cone of Cold
+  HL.RegisterNucleusAbility(228600, 8, 6)              -- Glacial Spike
+  HL.RegisterNucleusAbility(148022, 8, 6)              -- Icicle
+  HL.RegisterNucleusAbility(228598, 8, 6)              -- Ice Lance
 end
 
 HR.SetAPL(64, APL, Init)
