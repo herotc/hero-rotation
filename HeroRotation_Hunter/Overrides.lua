@@ -15,6 +15,7 @@
   local SpellMM = Spell.Hunter.Marksmanship;
   local SpellSV = Spell.Hunter.Survival;
 -- Lua
+  local mathmax = math.max;
 
 --- ============================ CONTENT ============================
 -- Beast Mastery, ID: 253
@@ -27,6 +28,27 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   else
     return BaseCheck
   end
+end
+, 253);
+
+local BMPetBuffRemainsP
+BMPetBuffRemainsP = HL.AddCoreOverride ("Pet.BuffRemainsP",
+function (self, Spell, AnyCaster, Offset)
+  local BaseCheck = BMPetBuffRemainsP(self, Spell, AnyCaster, Offset)
+  -- For short duration pet buffs, if we are in the process of casting an instant spell, fake the duration calculation until we know what it is
+  -- This is due to the fact that instant spells don't trigger SPELL_CAST_START and we could have a refresh in progress 50-150ms before we know about it
+  if Spell == SpellBM.FrenzyBuff then
+    if Player:IsPrevCastPending() then
+      return BaseCheck + (HL.GetTime() - Player:GCDStartTime())
+    end
+  elseif Spell == SpellBM.BeastCleaveBuff then
+    -- If the player buff has duration, grab that one instead. It can be applid a few MS earlier due to latency
+    BaseCheck = mathmax(BaseCheck, Player:BuffRemainsP(SpellBM.BeastCleavePlayerBuff))
+    if Player:IsPrevCastPending() then
+      return BaseCheck + (HL.GetTime() - Player:GCDStartTime())
+    end
+  end
+  return BaseCheck
 end
 , 253);
 

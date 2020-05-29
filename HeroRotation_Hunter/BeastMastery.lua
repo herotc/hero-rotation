@@ -57,6 +57,7 @@ Spell.Hunter.BeastMastery = {
   BarbedShot                            = Spell(217200),
   Multishot                             = Spell(2643),
   BeastCleaveBuff                       = Spell(118455, "pet"),
+  BeastCleavePlayerBuff                 = Spell(268877),
   Stampede                              = Spell(201430),
   ChimaeraShot                          = Spell(53209),
   AMurderofCrows                        = Spell(131894),
@@ -184,20 +185,26 @@ local function bool(val)
   return val ~= 0
 end
 
+-- target_if=min:dot.barbed_shot.remains
 local function EvaluateTargetIfFilterBarbedShot74(TargetUnit)
   return TargetUnit:DebuffRemainsP(S.BarbedShot)
 end
 
+-- if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max
 local function EvaluateTargetIfBarbedShot75(TargetUnit)
-  return (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= (Player:GCD() + 0.150))
+  return (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= GCDMax)
 end
 
+-- if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
 local function EvaluateTargetIfBarbedShot85(TargetUnit)
-  return (S.BarbedShot:FullRechargeTimeP() < (Player:GCD() + 0.150) and bool(S.BestialWrath:CooldownRemainsP()))
+  return (S.BarbedShot:FullRechargeTimeP() < GCDMax and bool(S.BestialWrath:CooldownRemainsP()))
 end
 
+-- if=pet.turtle.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
 local function EvaluateTargetIfBarbedShot123(TargetUnit)
-  return (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff)) or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - Player:GCD() + 0.150 and S.PrimalInstincts:AzeriteEnabled() or S.BarbedShot:ChargesFractionalP() > 1.4 or Target:TimeToDie() < 9)
+  return (Pet:BuffDownP(S.FrenzyBuff) and (S.BarbedShot:ChargesFractionalP() > 1.8 or Player:BuffP(S.BestialWrathBuff))
+    or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled()
+    or S.BarbedShot:ChargesFractionalP() > 1.4 or Target:BossTimeToDie() < 9)
 end
 
 local function Precombat()
@@ -257,27 +264,27 @@ local function Cds()
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 28"; end
   end
   -- berserking,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<13
-  if S.Berserking:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:TimeToDie() > 180 + S.BerserkingBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:TimeToDie() < 13) then
+  if S.Berserking:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:BossTimeToDie() > 180 + S.BerserkingBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:BossTimeToDie() < 13) then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 32"; end
   end
   -- blood_fury,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<16
-  if S.BloodFury:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:TimeToDie() > 120 + S.BloodFuryBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:TimeToDie() < 16) then
+  if S.BloodFury:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:BossTimeToDie() > 120 + S.BloodFuryBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:BossTimeToDie() < 16) then
     if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 46"; end
   end
   -- lights_judgment,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains>gcd.max|!pet.turtle.buff.frenzy.up
-  if S.LightsJudgment:IsCastableP() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) > GCDMax or Pet:BuffDownP(S.FrenzyBuff)) then
+  if S.LightsJudgment:IsCastableP() and (Pet:BuffRemainsP(S.FrenzyBuff) > GCDMax or Pet:BuffDownP(S.FrenzyBuff)) then
     if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 60"; end
   end
   -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&target.health.pct<35|((consumable.potion_of_unbridled_fury|consumable.unbridled_fury)&target.time_to_die<61|target.time_to_die<26)
-  if Settings.Commons.UsePotions and I.PotionofUnbridledFury:IsReady() and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and Target:HealthPercentage() < 35 or Target:TimeToDie() < 61) then
+  if Settings.Commons.UsePotions and I.PotionofUnbridledFury:IsReady() and (Player:BuffP(S.BestialWrathBuff) and Player:BuffP(S.AspectoftheWildBuff) and Target:HealthPercentage() < 35 or Target:BossTimeToDie() < 61) then
     if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_agility 68"; end
   end
   -- worldvein_resonance,if=(prev_gcd.1.aspect_of_the_wild|cooldown.aspect_of_the_wild.remains<gcd|target.time_to_die<20)|!essence.vision_of_perfection.minor
-  if S.WorldveinResonance:IsCastableP() and ((Player:PrevGCDP(1, S.AspectoftheWild) or S.AspectoftheWild:CooldownRemainsP() < Player:GCD() or Target:TimeToDie() < 20) or not Spell:EssenceEnabled(AE.VisionofPerfection)) then
+  if S.WorldveinResonance:IsCastableP() and ((Player:PrevGCDP(1, S.AspectoftheWild) or S.AspectoftheWild:CooldownRemainsP() < Player:GCD() or Target:BossTimeToDie() < 20) or not Spell:EssenceEnabled(AE.VisionofPerfection)) then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
   end
   -- guardian_of_azeroth,if=cooldown.aspect_of_the_wild.remains<10|target.time_to_die>cooldown+duration|target.time_to_die<30
-  if S.GuardianofAzeroth:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() < 10 or Target:TimeToDie() > 210 or Target:TimeToDie() < 30) then
+  if S.GuardianofAzeroth:IsCastableP() and (S.AspectoftheWild:CooldownRemainsP() < 10 or Target:BossTimeToDie() > 210 or Target:BossTimeToDie() < 30) then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
   end
   -- ripple_in_space
@@ -289,34 +296,41 @@ local function Cds()
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
   end
   -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-  if (Target:HealthPercentage() > 80 or Target:HealthPercentage() <= 20 or Target:TimeToX(20) > 30) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-  end
+  ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle);
+  if ShouldReturn then return ShouldReturn; end
 end
 
 local function Cleave()
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max
   if S.BarbedShot:IsCastableP() then
     if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot75) then return "barbed_shot 76"; end
+    if EvaluateTargetIfBarbedShot75(Target) then
+      if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 76 fallback"; end
   end
-  -- multishot,if=gcd.max-pet.turtle.buff.beast_cleave.remains>0.25
-  if S.Multishot:IsReadyP() and Pet:BuffRemainsP(S.BeastCleaveBuff) < GCDMax then
-    if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 82"; end
   end
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
+  -- NOTE: Moved TargetIf logic above the Beast Cleave refresh to avoid flickering. This is a 0 DPS loss according to SimC.
   if S.BarbedShot:IsCastableP() then
     if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot85) then return "barbed_shot 86"; end
+    if EvaluateTargetIfBarbedShot85(Target) then
+      if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 86 fallback"; end
+  end
+  end
+  -- multishot,if=gcd.max-pet.turtle.buff.beast_cleave.remains>0.25
+  -- Check both the player and pet buffs since the pet buff can be impacted by latency
+  if S.Multishot:IsReadyP() and Pet:BuffRemainsP(S.BeastCleaveBuff) < GCDMax then
+    if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 82"; end
   end
   -- aspect_of_the_wild
   if S.AspectoftheWild:IsCastableP() and HR.CDsON() then
     if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 94"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
-  if S.Stampede:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:TimeToDie() < 15) then
+  if S.Stampede:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:BossTimeToDie() < 15) then
     if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, 30) then return "stampede 96"; end
   end
   -- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|talent.one_with_the_pack.enabled|target.time_to_die<15
-  if S.BestialWrath:IsCastableP() and HR.CDsON() and (S.AspectoftheWild:CooldownRemainsP() > 20 or S.OneWithThePack:IsAvailable() or Target:TimeToDie() < 15) then
+  if S.BestialWrath:IsCastableP() and HR.CDsON() and (S.AspectoftheWild:CooldownRemainsP() > 20 or S.OneWithThePack:IsAvailable() or Target:BossTimeToDie() < 15) then
     if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath 102"; end
   end
   -- chimaera_shot
@@ -342,6 +356,9 @@ local function Cleave()
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
   if S.BarbedShot:IsCastableP() then
     if HR.CastTargetIf(S.BarbedShot, 40, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot123) then return "barbed_shot 124"; end
+    if EvaluateTargetIfBarbedShot123(Target) then
+      if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 124 fallback"; end
+  end
   end
   -- focused_azerite_beam
   if S.FocusedAzeriteBeam:IsCastableP() then
@@ -367,6 +384,11 @@ local function Cleave()
   if S.Multishot:IsCastableP() and (S.RapidReload:AzeriteEnabled() and EnemiesCount > 2) then
     if HR.CastPooling(S.Multishot, nil, 40) then return "multishot 140"; end
   end
+  -- NOTE: Experimental line here for non-RR builds. SimC seems to show this as a gain. Submitted for consideration.
+  -- multishot,if=cooldown.kill_command.remains>focus.time_to_max&active_enemies>8
+  if S.Multishot:IsCastableP() and (S.KillCommand:CooldownRemainsP() > Player:FocusTimeToMaxPredicted() and EnemiesCount > 8) then
+    if HR.CastPooling(S.Multishot, nil, 40) then return "multishot focus dump"; end
+  end
   -- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled)
   if S.CobraShot:IsCastableP() and (S.KillCommand:CooldownRemainsP() > Player:FocusTimeToMaxPredicted() and (EnemiesCount < 3 or not S.RapidReload:AzeriteEnabled())) then
     if HR.CastPooling(S.CobraShot, nil, 40) then return "cobra_shot 150"; end
@@ -379,7 +401,9 @@ end
 
 local function St()
   -- barbed_shot,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<gcd|cooldown.bestial_wrath.remains&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd)
-  if S.BarbedShot:IsCastableP() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) < GCDMax or bool(S.BestialWrath:CooldownRemainsP()) and (S.BarbedShot:FullRechargeTimeP() < GCDMax or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < GCDMax)) then
+  if S.BarbedShot:IsCastableP() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) < GCDMax
+    or bool(S.BestialWrath:CooldownRemainsP()) and (S.BarbedShot:FullRechargeTimeP() < GCDMax
+    or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < GCDMax)) then
     if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 164"; end
   end
   -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.bestial_wrath.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
@@ -435,7 +459,7 @@ local function St()
     if HR.Cast(S.DireBeast, nil, nil, 40) then return "dire_beast 198"; end
   end
   -- barbed_shot,if=talent.one_with_the_pack.enabled&charges_fractional>1.5|charges_fractional>1.8|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9
-  if S.BarbedShot:IsCastableP() and (S.OneWithThePack:IsAvailable() and S.BarbedShot:ChargesFractionalP() > 1.5 or S.BarbedShot:ChargesFractionalP() > 1.8 
+  if S.BarbedShot:IsCastableP() and (S.OneWithThePack:IsAvailable() and S.BarbedShot:ChargesFractionalP() > 1.5 or S.BarbedShot:ChargesFractionalP() > 1.8
     or S.AspectoftheWild:CooldownRemainsP() < S.FrenzyBuff:BaseDuration() - GCDMax and S.PrimalInstincts:AzeriteEnabled() or Target:TimeToDie() < 9) then
     if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 200"; end
   end
@@ -500,14 +524,14 @@ local function APL()
     -- use_items,if=prev_gcd.1.aspect_of_the_wild|target.time_to_die<20
     -- NOTE: Above line is very non-optimal and feedback has been given to the SimC APL devs, following logic will be used for now:
     --  if=buff.aspect_of_the_wild.remains>10|cooldown.aspect_of_the_wild.remains>60|target.time_to_die<20
-    if Player:BuffRemainsP(S.AspectoftheWildBuff) > 10 or S.AspectoftheWild:CooldownRemainsP() > 60 or Target:TimeToDie() < 20 then
+    if Player:BuffRemainsP(S.AspectoftheWildBuff) > 10 or S.AspectoftheWild:CooldownRemainsP() > 60 or Target:BossTimeToDie() < 20 then
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- use_item,name=azsharas_font_of_power,if=cooldown.aspect_of_the_wild.remains_guess<15&target.time_to_die>10
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.AspectoftheWild:CooldownRemainsP() < 15 and Target:TimeToDie() > 10) then
+    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (S.AspectoftheWild:CooldownRemainsP() < 15 and Target:BossTimeToDie() > 10) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(!equipped.azsharas_font_of_power|trinket.azsharas_font_of_power.cooldown.remains>86|essence.blood_of_the_enemy.major)&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.remains>9)&(!essence.condensed_lifeforce.major|buff.guardian_of_azeroth.up)&(target.health.pct<35|!essence.condensed_lifeforce.major|!talent.killer_instinct.enabled)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
@@ -515,7 +539,7 @@ local function APL()
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
-    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
+    if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.BestialWrathBuff) or Target:BossTimeToDie() < 5) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast"; end
     end
     -- call_action_list,name=cds
