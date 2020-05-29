@@ -61,6 +61,7 @@ Spell.Rogue.Assassination = {
   MasterAssassin        = Spell(255989),
   Nightstalker          = Spell(14062),
   Subterfuge            = Spell(108208),
+  SubterfugeBuff        = Spell(115192),
   ToxicBlade            = Spell(245388),
   ToxicBladeDebuff      = Spell(245389),
   VenomRush             = Spell(152152),
@@ -370,8 +371,8 @@ local Interrupts = {
 -- APL Action Lists (and Variables)
 -- # Essences
 local function Essences ()
-  -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
-  if S.BloodoftheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (not S.ToxicBlade:IsAvailable()
+  -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(exsanguinated.garrote|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
+  if S.BloodoftheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (HL.Exsanguinated(Target, "Garrote")
     or (Target:DebuffP(S.ToxicBladeDebuff) and Player:ComboPointsDeficit() <= 1) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
@@ -423,9 +424,12 @@ local function Essences ()
 end
 
 local function Trinkets ()
-  -- use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
-  if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and S.Vendetta:CooldownRemains() > 45 then
-    if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Galecallers Boon"; end
+  -- use_item,name=galecallers_boon,if=(debuff.vendetta.up|(!talent.exsanguinate.enabled&cooldown.vendetta.remains>45|talent.exsanguinate.enabled&cooldown.exsanguinate.remains<6))&!exsanguinated.rupture
+  if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
+    if (Target:DebuffP(S.Vendetta) or (not S.Exsanguinate:IsAvailable() and S.Vendetta:CooldownRemains() > 45
+      or S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 6)) and not HL.Exsanguinated(Target, "Rupture") then
+      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Galecallers Boon"; end
+    end
   end
   -- use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
   if I.LustrousGoldenPlumage:IsEquipped() and I.LustrousGoldenPlumage:IsReady() and Target:Debuff(S.Vendetta) then
@@ -436,10 +440,20 @@ local function Trinkets ()
     and not Target:DebuffP(S.ToxicBladeDebuff) and not Player:BuffP(S.LucidDreamsBuff) and Player:EnergyPredicted() < 80 and Target:DebuffRemainsP(S.Rupture) > 4 then
     if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device"; end
   end
-  -- if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20
-  if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() and (S.RazorCoralDebuff:ActiveCount() == 0
-    or Target:DebuffRemainsP(S.Vendetta) > 10 - 4 * num(I.FontOfPower:IsEquipped()) or Target:BossFilteredTimeToDie("<", 20)) then
-    if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Razor Coral"; end
+  if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
+    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|target.time_to_die<20
+    if S.RazorCoralDebuff:ActiveCount() == 0 or Target:BossFilteredTimeToDie("<", 20) then
+      if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Razor Coral"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=(!talent.exsanguinate.enabled|!talent.subterfuge.enabled)&debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power
+    if (not S.Exsanguinate:IsAvailable() or not S.Subterfuge:IsAvailable()) and Target:DebuffRemainsP(S.Vendetta) > 10 - 4 * num(I.FontOfPower:IsEquipped()) then
+      if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Razor Coral Default Sync"; end
+    end
+    -- use_item,name=ashvanes_razor_coral,if=(talent.exsanguinate.enabled&talent.subterfuge.enabled)&debuff.vendetta.up&(exsanguinated.garrote|azerite.shrouded_suffocation.enabled&dot.garrote.pmultiplier>1)
+    if (S.Exsanguinate:IsAvailable() and S.Subterfuge:IsAvailable()) and Target:DebuffRemainsP(S.Vendetta) > 10
+      and (HL.Exsanguinated(Target, "Garrote") or S.ShroudedSuffocation:AzeriteEnabled() and Target:PMultiplier(S.Garrote) > 1) then
+      if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Razor Coral Exsanguinate Sync"; end
+    end
   end
   -- V.I.G.O.R. trinket, emulate SimC default behavior to use at max stacks
   if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
@@ -522,26 +536,26 @@ local function CDs ()
       end
       if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
         local VanishSuggested = false;
-        -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
-        if not VanishSuggested and S.Exsanguinate:IsAvailable() and (S.Nightstalker:IsAvailable() or S.Subterfuge:IsAvailable() and Cache.EnemiesCount[10] < 2)
-          and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1
-          and (not S.Subterfuge:IsAvailable() or not S.ShroudedSuffocation:AzeriteEnabled() or Target:PMultiplier(S.Garrote) <= 1) then
-          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
-          VanishSuggested = true;
-        end
-        -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&(debuff.vendetta.up|essence.vision_of_perfection.enabled)
-        if not VanishSuggested and S.Nightstalker:IsAvailable() and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend()
-          and (Target:Debuff(S.Vendetta) or Spell:EssenceEnabled(AE.VisionofPerfection)) then
-          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
-          VanishSuggested = true;
+        if S.Nightstalker:IsAvailable() then
+          -- actions.cds+=/vanish,if=talent.exsanguinate.enabled&talent.nightstalker.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
+          if not VanishSuggested and S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1 then
+            if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Exsanguinate)"; end
+            VanishSuggested = true;
+          end
+          -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&(debuff.vendetta.up|essence.vision_of_perfection.enabled)
+          if not VanishSuggested and not S.Exsanguinate:IsAvailable() and ComboPoints >= Rogue.CPMaxSpend()
+            and (Target:Debuff(S.Vendetta) or Spell:EssenceEnabled(AE.VisionofPerfection)) then
+            if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish (Nightstalker)"; end
+            VanishSuggested = true;
+          end
         end
         -- actions.cds+=/variable,name=ss_vanish_condition,value=azerite.shrouded_suffocation.enabled&(non_ss_buffed_targets>=1|spell_targets.fan_of_knives=3)&(ss_buffed_targets_above_pandemic=0|spell_targets.fan_of_knives>=6)
         local VarSSVanishCondition = S.ShroudedSuffocation:AzeriteEnabled() and (NonSSBuffedTargets() >= 1 or Cache.EnemiesCount[10] == 3)
           and (SSBuffedTargetsAbovePandemic() == 0 or Cache.EnemiesCount[10] >= 6);
-        -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&(dot.garrote.refreshable|debuff.vendetta.up&dot.garrote.pmultiplier<=1))&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
-        if not VanishSuggested and S.Subterfuge:IsAvailable() and not Player:IsStealthedP(true, false)
-          and S.Garrote:CooldownUpP() and (VarSSVanishCondition or not S.ShroudedSuffocation:AzeriteEnabled() and (Target:DebuffRefreshableP(S.Garrote, 5.4) or Target:DebuffP(S.Vendetta) and Target:PMultiplier(S.Garrote) <= 1))
+        if not VanishSuggested and S.Subterfuge:IsAvailable() and not Player:IsStealthedP(true, false) and S.Garrote:CooldownUpP()
+          and (VarSSVanishCondition or not S.ShroudedSuffocation:AzeriteEnabled()
+            and (Target:DebuffRefreshableP(S.Garrote, 5.4) or Target:DebuffP(S.Vendetta) and Target:PMultiplier(S.Garrote) <= 1))
           and ComboPointsDeficit >= math.min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * Cache.EnemiesCount[10], 4) then
           -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
           if not Settings.Assassination.NoPooling and Player:EnergyPredicted() < 45 then
@@ -564,8 +578,8 @@ local function CDs ()
         if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld"; end
       end
       if S.Exsanguinate:IsCastable() then
-        -- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
-        if Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() and not Target:DebuffRefreshableP(S.Garrote, 5.4) then
+        -- actions.cds+=/exsanguinate,if=!stealthed.rogue&!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend
+        if not Player:IsStealthedP(true, false) and not Target:DebuffRefreshableP(S.Garrote, 5.4) and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
           if HR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
         end
       end
@@ -601,11 +615,10 @@ local function CDs ()
 end
 -- # Stealthed
 local function Stealthed ()
-  -- actions.stealthed=rupture,if=combo_points>=4&(talent.nightstalker.enabled|talent.subterfuge.enabled&(talent.exsanguinate.enabled&cooldown.exsanguinate.remains<=2|!ticking)&variable.single_target)&target.time_to_die-remains>6
-  if S.Rupture:IsCastable("Melee") and ComboPoints >= 4
-    and (S.Nightstalker:IsAvailable() or (S.Subterfuge:IsAvailable() and (S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() <= 2 or not Target:DebuffP(S.Rupture)) and Cache.EnemiesCount[10] < 2))
+  -- actions.stealthed=rupture,if=talent.nightstalker.enabled&combo_points>=4&target.time_to_die-remains>6
+  if S.Rupture:IsCastable("Melee") and S.Nightstalker:IsAvailable() and ComboPoints >= 4
     and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
-    if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
+    if HR.Cast(S.Rupture) then return "Cast Rupture (Nightstalker)"; end
   end
   if S.Garrote:IsCastable("Melee") and S.Subterfuge:IsAvailable() then
     -- actions.stealthed+=/garrote,if=azerite.shrouded_suffocation.enabled&buff.subterfuge.up&buff.subterfuge.remains<1.3&!ss_buffed
@@ -635,12 +648,13 @@ local function Stealthed ()
     if HR.Cast(S.Rupture) then return "Cast Rupture (Shrouded Suffocation)"; end
   end
   if S.Garrote:IsCastable("Melee") and S.Subterfuge:IsAvailable() then
-    -- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains&(remains<18|!ss_buffed)
+    -- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&(active_enemies>1|!talent.exsanguinate.enabled)&target.time_to_die>remains&(remains<18|!ss_buffed)
     local function GarroteTargetIfFunc(TargetUnit)
       return TargetUnit:DebuffRemainsP(S.Garrote);
     end
     local function GarroteIfFunc(TargetUnit)
       return S.ShroudedSuffocation:AzeriteEnabled()
+        and (Cache.EnemiesCount[10] > 1 or not S.Exsanguinate:IsAvailable())
         and (TargetUnit:FilteredTimeToDie(">", 0, -TargetUnit:DebuffRemainsP(S.Garrote)) or TargetUnit:TimeToDieIsNotValid())
         and (TargetUnit:DebuffRemainsP(S.Garrote) < 18 or not SSBuffed(TargetUnit))
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
@@ -654,13 +668,13 @@ local function Stealthed ()
     if GarroteIfFunc(Target) then
       if HR.Cast(S.Garrote) then return "Cast Garrote (Shrouded Suffocation)"; end
     end
-    -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
-    if S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 1 and Player:PrevGCD(1, S.Rupture) and Target:DebuffRemainsP(S.Rupture) > 5+4*Rogue.CPMaxSpend() then
+    -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&active_enemies=1&buff.subterfuge.remains<1.3
+    if S.Exsanguinate:IsAvailable() and Cache.EnemiesCount[10] == 1 and Player:BuffRemainsP(S.SubterfugeBuff) < 1.3 then
       -- actions.stealthed+=/pool_resource,for_next=1
       if not Settings.Assassination.NoPooling and Player:EnergyPredicted() < 45 then
-        if HR.CastPooling(S.Garrote) then return "Pool for Garrote (Exsanguinate)"; end
+        if HR.CastPooling(S.Garrote) then return "Pool for Garrote (Exsanguinate Refresh)"; end
       end
-      if HR.Cast(S.Garrote) then return "Cast Garrote (Exsanguinate)"; end
+      if HR.Cast(S.Garrote) then return "Cast Garrote (Exsanguinate Refresh)"; end
     end
   end
 end
@@ -857,6 +871,10 @@ local function APL ()
         if Settings.Commons.UseTrinkets and I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
           if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Use Font of Power (OOC)"; end
         end
+        -- actions.precombat+=/guardian_of_azeroth,if=talent.exsanguinate.enabled
+        if S.GuardianofAzeroth:IsCastableP() and S.Exsanguinate:IsAvailable() then
+          if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth (OOC)"; end
+        end
       end
     end
   end
@@ -946,6 +964,7 @@ HR.SetAPL(259, APL, Init);
 -- actions.precombat+=/apply_poison
 -- actions.precombat+=/stealth
 -- actions.precombat+=/use_item,name=azsharas_font_of_power
+-- actions.precombat+=/guardian_of_azeroth,if=talent.exsanguinate.enabled
 
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
@@ -973,8 +992,8 @@ HR.SetAPL(259, APL, Init);
 -- actions.cds+=/variable,name=vendetta_nightstalker_condition,value=!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled
 -- actions.cds+=/variable,name=variable,name=vendetta_font_condition,value=!equipped.azsharas_font_of_power|azerite.shrouded_suffocation.enabled|debuff.razor_coral_debuff.down|trinket.ashvanes_razor_coral.cooldown.remains<10&(cooldown.toxic_blade.remains<1|debuff.toxic_blade.up)
 -- actions.cds+=/vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&variable.vendetta_subterfuge_condition&variable.vendetta_nightstalker_condition&variable.vendetta_font_condition
--- # Vanish with Exsg + (Nightstalker, or Subterfuge only on 1T): Maximum CP and Exsg ready for next GCD
--- actions.cds+=/vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&variable.single_target)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier<=1)
+-- # Vanish with Exsg + Nightstalker: Maximum CP and Exsg ready for next GCD
+-- actions.cds+=/vanish,if=talent.exsanguinate.enabled&talent.nightstalker.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
 -- # Vanish with Nightstalker + No Exsg: Maximum CP and Vendetta up (unless using VoP)
 -- actions.cds+=/vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&(debuff.vendetta.up|essence.vision_of_perfection.enabled)
 -- # See full comment on https://github.com/Ravenholdt-TC/Rogue/wiki/Assassination-APL-Research.
@@ -985,16 +1004,18 @@ HR.SetAPL(259, APL, Init);
 -- actions.cds+=/vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&(debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up)&(!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up)|essence.vision_of_perfection.enabled)
 -- # Shadowmeld for Shrouded Suffocation
 -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
--- # Exsanguinate when both Rupture and Garrote are up for long enough
--- actions.cds+=/exsanguinate,if=dot.rupture.remains>4+4*cp_max_spend&!dot.garrote.refreshable
+-- # Exsanguinate when not stealthed and both Rupture and Garrote are up for long enough.
+-- actions.cds+=/exsanguinate,if=!stealthed.rogue&!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend
 -- actions.cds+=/toxic_blade,if=dot.rupture.ticking&(!equipped.azsharas_font_of_power|cooldown.vendetta.remains>10)
 -- actions.cds+=/potion,if=buff.bloodlust.react|debuff.vendetta.up
 -- actions.cds+=/blood_fury,if=debuff.vendetta.up
 -- actions.cds+=/berserking,if=debuff.vendetta.up
 -- actions.cds+=/fireblood,if=debuff.vendetta.up
 -- actions.cds+=/ancestral_call,if=debuff.vendetta.up
--- actions.cds+=/use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
--- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20
+-- actions.cds+=/use_item,name=galecallers_boon,if=(debuff.vendetta.up|(!talent.exsanguinate.enabled&cooldown.vendetta.remains>45|talent.exsanguinate.enabled&cooldown.exsanguinate.remains<6))&!exsanguinated.rupture
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|target.time_to_die<20
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=(!talent.exsanguinate.enabled|!talent.subterfuge.enabled)&debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power
+-- actions.cds+=/use_item,name=ashvanes_razor_coral,if=(talent.exsanguinate.enabled&talent.subterfuge.enabled)&debuff.vendetta.up&(exsanguinated.garrote|azerite.shrouded_suffocation.enabled&dot.garrote.pmultiplier>1)
 -- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=master_assassin_remains=0&!debuff.vendetta.up&!debuff.toxic_blade.up&buff.memory_of_lucid_dreams.down&energy<80&dot.rupture.remains>4
 -- actions.cds+=/use_item,name=lurkers_insidious_gift,if=debuff.vendetta.up
 -- actions.cds+=/use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
@@ -1040,8 +1061,8 @@ HR.SetAPL(259, APL, Init);
 
 -- # Essences
 -- actions.essences=concentrated_flame,if=energy.time_to_max>1&!debuff.vendetta.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
--- # Always use Blood with Vendetta up. Also use with TB up before a finisher (if talented) as long as it runs for 10s during Vendetta.
--- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
+-- # Always use Blood with Vendetta up. Hold for Exsanguinate. Use with TB up before a finisher as long as it runs for 10s during Vendetta.
+-- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(exsanguinated.garrote|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
 -- # Attempt to align Guardian with Vendetta as long as it won't result in losing a full-value cast over the remaining duration of the fight
 -- actions.essences+=/guardian_of_azeroth,if=cooldown.vendetta.remains<3|debuff.vendetta.up|target.time_to_die<30
 -- actions.essences+=/guardian_of_azeroth,if=floor((target.time_to_die-30)%cooldown)>floor((target.time_to_die-30-cooldown.vendetta.remains)%cooldown)
@@ -1051,11 +1072,13 @@ HR.SetAPL(259, APL, Init);
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<50&!cooldown.vendetta.up
--- actions.essences+=/reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+-- # Hold Reaping Flames for execute range or kill buffs, if possible. Always try to get the lowest cooldown based on available enemies.
+-- actions.essences+=/cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
+-- actions.essences+=/reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
 
 -- # Stealthed Actions
--- # Nighstalker, or Subt+Exsg on 1T: Snapshot Rupture
--- actions.stealthed=rupture,if=combo_points>=4&(talent.nightstalker.enabled|talent.subterfuge.enabled&(talent.exsanguinate.enabled&cooldown.exsanguinate.remains<=2|!ticking)&variable.single_target)&target.time_to_die-remains>6
+-- # Nighstalker on 1T: Snapshot Rupture
+-- actions.stealthed=rupture,if=talent.nightstalker.enabled&combo_points>=4&target.time_to_die-remains>6
 -- # Subterfuge + Shrouded Suffocation: Ensure we use one global to apply Garrote to the main target if it is not snapshot yet, so all other main target abilities profit.
 -- actions.stealthed+=/pool_resource,for_next=1
 -- actions.stealthed+=/garrote,if=azerite.shrouded_suffocation.enabled&buff.subterfuge.up&buff.subterfuge.remains<1.3&!ss_buffed
@@ -1066,7 +1089,7 @@ HR.SetAPL(259, APL, Init);
 -- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking&variable.single_target
 -- # Subterfuge w/ Shrouded Suffocation: Reapply for bonus CP and/or extended snapshot duration.
 -- actions.stealthed+=/pool_resource,for_next=1
--- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains&(remains<18|!ss_buffed)
--- # Subterfuge + Exsg: Even override a snapshot Garrote right after Rupture before Exsanguination
+-- actions.stealthed+=/garrote,target_if=min:remains,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&(active_enemies>1|!talent.exsanguinate.enabled)&target.time_to_die>remains&(remains<18|!ss_buffed)
+-- # Subterfuge + Exsg on 1T: Refresh Garrote at the end of stealth to get max duration before Exsanguinate
 -- actions.stealthed+=/pool_resource,for_next=1
--- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
+-- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&active_enemies=1&buff.subterfuge.remains<1.3
