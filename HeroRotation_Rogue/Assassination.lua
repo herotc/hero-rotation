@@ -70,6 +70,7 @@ Spell.Rogue.Assassination = {
   EchoingBlades         = Spell(287649),
   ShroudedSuffocation   = Spell(278666),
   ScentOfBlood          = Spell(277679),
+  TwistTheKnife         = Spell(273488),
   -- Essences
   BloodoftheEnemy       = Spell(297108),
   MemoryofLucidDreams   = Spell(298357),
@@ -184,7 +185,7 @@ S.Rupture:RegisterPMultiplier(
 local ShouldReturn; -- Used to get the return string
 local BleedTickTime, ExsanguinatedBleedTickTime = 2 / Player:SpellHaste(), 1 / Player:SpellHaste();
 local Stealth;
-local RuptureThreshold, RuptureDMGThreshold, GarroteDMGThreshold;
+local RuptureThreshold, RuptureDMGThreshold, GarroteDMGThreshold, CrimsonTempestThreshold;
 local ComboPoints, ComboPointsDeficit, Energy_Regen_Combined, PoisonedBleeds;
 local PriorityRotation;
 
@@ -372,7 +373,7 @@ local Interrupts = {
 -- # Essences
 local function Essences ()
   -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(exsanguinated.garrote|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
-  if S.BloodoftheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (HL.Exsanguinated(Target, "Garrote")
+  if S.BloodoftheEnemy:IsCastableP() and Target:DebuffP(S.Vendetta) and (HL.Exsanguinated(Target, S.Garrote)
     or (Target:DebuffP(S.ToxicBladeDebuff) and Player:ComboPointsDeficit() <= 1) or Target:DebuffRemainsP(S.Vendetta) <= 10) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
@@ -427,7 +428,7 @@ local function Trinkets ()
   -- use_item,name=galecallers_boon,if=(debuff.vendetta.up|(!talent.exsanguinate.enabled&cooldown.vendetta.remains>45|talent.exsanguinate.enabled&cooldown.exsanguinate.remains<6))&!exsanguinated.rupture
   if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
     if (Target:DebuffP(S.Vendetta) or (not S.Exsanguinate:IsAvailable() and S.Vendetta:CooldownRemains() > 45
-      or S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 6)) and not HL.Exsanguinated(Target, "Rupture") then
+      or S.Exsanguinate:IsAvailable() and S.Exsanguinate:CooldownRemainsP() < 6)) and not HL.Exsanguinated(Target, S.Rupture) then
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Galecallers Boon"; end
     end
   end
@@ -451,7 +452,7 @@ local function Trinkets ()
     end
     -- use_item,name=ashvanes_razor_coral,if=(talent.exsanguinate.enabled&talent.subterfuge.enabled)&debuff.vendetta.up&(exsanguinated.garrote|azerite.shrouded_suffocation.enabled&dot.garrote.pmultiplier>1)
     if (S.Exsanguinate:IsAvailable() and S.Subterfuge:IsAvailable()) and Target:DebuffRemainsP(S.Vendetta) > 10
-      and (HL.Exsanguinated(Target, "Garrote") or S.ShroudedSuffocation:AzeriteEnabled() and Target:PMultiplier(S.Garrote) > 1) then
+      and (HL.Exsanguinated(Target, S.Garrote) or S.ShroudedSuffocation:AzeriteEnabled() and Target:PMultiplier(S.Garrote) > 1) then
       if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Razor Coral Exsanguinate Sync"; end
     end
   end
@@ -578,8 +579,9 @@ local function CDs ()
         if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld"; end
       end
       if S.Exsanguinate:IsCastable() then
-        -- actions.cds+=/exsanguinate,if=!stealthed.rogue&!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend
-        if not Player:IsStealthedP(true, false) and not Target:DebuffRefreshableP(S.Garrote, 5.4) and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend() then
+        -- actions.cds+=/exsanguinate,if=!stealthed.rogue&(!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend|dot.rupture.remains*0.5>target.time_to_die)&target.time_to_die>4
+        if not Player:IsStealthedP(true, false) and (not Target:DebuffRefreshableP(S.Garrote, 5.4) and Target:DebuffRemainsP(S.Rupture) > 4+4*Rogue.CPMaxSpend()
+          or Target:FilteredTimeToDie("<", Target:DebuffRemainsP(S.Rupture)*0.5)) and (Target:FilteredTimeToDie(">", 4) or Target:TimeToDieIsNotValid()) then
           if HR.Cast(S.Exsanguinate) then return "Cast Exsanguinate"; end
         end
       end
@@ -690,23 +692,27 @@ local function Dot ()
   -- actions.dot+=/variable,name=skip_rupture,value=debuff.vendetta.up&(debuff.toxic_blade.up|master_assassin_remains>0)&dot.rupture.remains>2
   SkipRupture = Target:DebuffP(S.Vendetta) and (Target:DebuffP(S.ToxicBladeDebuff) or MasterAssassinRemains() > 0) and Target:DebuffRemainsP(S.Rupture) > 2
 
-  -- actions.dot=rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
-  if HR.CDsON() and S.Rupture:IsCastable("Melee") and ComboPoints > 0 and S.Exsanguinate:IsAvailable()
-    and ((ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1)
-      or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (ComboPoints >= 2)))) then
-    if HR.Cast(S.Rupture) then return "Cast Rupture (Exsanguinate)"; end
+  if HR.CDsON() and S.Exsanguinate:IsAvailable() then
+    -- actions.dot+=/garrote,if=talent.exsanguinate.enabled&!exsanguinated.garrote&dot.garrote.pmultiplier<=1&cooldown.exsanguinate.remains<2&spell_targets.fan_of_knives=1&raid_event.adds.in>6&dot.garrote.remains*0.5<target.time_to_die
+    if S.Garrote:IsReadyP("Melee") and Cache.EnemiesCount[10] == 1 and S.Exsanguinate:CooldownRemainsP() < 2 and not HL.Exsanguinated(Target, S.Garrote)
+      and Target:PMultiplier(S.Garrote) <= 1 and Target:FilteredTimeToDie(">", Target:DebuffRemainsP(S.Garrote)*0.5) then
+      if HR.Cast(S.Garrote) then return "Cast Garrote (Pre-Exsanguinate)"; end
+    end
+    -- actions.dot+=/rupture,if=talent.exsanguinate.enabled&(combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&dot.rupture.remains*0.5<target.time_to_die)
+    if S.Rupture:IsCastable("Melee") and ComboPoints > 0 and (ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemainsP() < 1
+      and Target:FilteredTimeToDie(">", Target:DebuffRemainsP(S.Rupture)*0.5)) then
+      if HR.Cast(S.Rupture) then return "Cast Rupture (Pre-Exsanguinate)"; end
+    end
   end
-  -- actions.dot+=/garrote,if=(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>4&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
-  -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&(!talent.subterfuge.enabled|!(cooldown.vanish.up&cooldown.vendetta.remains<=4))&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>12&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
+  -- actions.dot+=/garrote,if=refreshable&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>4&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
+  -- actions.dot+=/garrote,cycle_targets=1,if=!variable.skip_cycle_garrote&target!=self.target&refreshable&combo_points.deficit>=1+3*(azerite.shrouded_suffocation.enabled&cooldown.vanish.up)&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&!ss_buffed&(target.time_to_die-remains)>12&(master_assassin_remains=0|!ticking&azerite.shrouded_suffocation.enabled)
   local EmpoweredDotRefresh = Cache.EnemiesCount[10] >= 3 + num(S.ShroudedSuffocation:AzeriteEnabled())
-  if S.Garrote:IsCastable() and (Settings.Assassination.AlwaysSuggestGarrote or not S.Subterfuge:IsAvailable()
-    or not HR.CDsON() or not (S.Vanish:CooldownUpP() and S.Vendetta:CooldownRemainsP() <= 4))
-    and (ComboPointsDeficit >= 1 + 3 * num(S.ShroudedSuffocation:AzeriteEnabled() and S.Vanish:CooldownUpP())) then
+  if S.Garrote:IsCastable() and (ComboPointsDeficit >= 1 + 3 * num(S.ShroudedSuffocation:AzeriteEnabled() and S.Vanish:CooldownUpP())) then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemainsP(S.Garrote)
-          <= (HL.Exsanguinated(TargetUnit, "Garrote") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
-        and (not HL.Exsanguinated(TargetUnit, "Garrote") or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5 and EmpoweredDotRefresh)
+          <= (HL.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
+        and (not HL.Exsanguinated(TargetUnit, S.Garrote) or TargetUnit:DebuffRemainsP(S.Garrote) <= 1.5 and EmpoweredDotRefresh)
         and not SSBuffed(TargetUnit)
         and (MasterAssassinRemains() <= 0 or not Target:DebuffP(S.Garrote) and S.ShroudedSuffocation:AzeriteEnabled())
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold);
@@ -724,28 +730,37 @@ local function Dot ()
     end
   end
   -- actions.dot+=/crimson_tempest,if=spell_targets>=2&remains<2+(spell_targets>=5)&combo_points>=4
-  if HR.AoEON() and S.CrimsonTempest:IsCastable("Melee") and ComboPoints >= 4 and Cache.EnemiesCount[10] >= 2
+  if HR.AoEON() and S.CrimsonTempest:IsReadyP("Melee") and ComboPoints >= 4 and Cache.EnemiesCount[10] >= 2
     and Target:DebuffRemainsP(S.CrimsonTempest) < 2 + num(Cache.EnemiesCount[10] >= 5) then
-    if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest"; end
+      if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (AoE)"; end
   end
-  -- actions.dot+=/rupture,if=!variable.skip_rupture&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
+  -- actions.dot+=/rupture,if=!variable.skip_rupture&(combo_points>=4&refreshable|!ticking&(time>10|combo_points>=2))&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
   -- actions.dot+=/rupture,cycle_targets=1,if=!variable.skip_cycle_rupture&!variable.skip_rupture&target!=self.target&combo_points>=4&refreshable&(pmultiplier<=1|remains<=tick_time&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&(!exsanguinated|remains<=tick_time*2&spell_targets.fan_of_knives>=3+azerite.shrouded_suffocation.enabled)&target.time_to_die-remains>4
-  if not SkipRupture and ComboPoints >= 4 then
+  if not SkipRupture then
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshableP(S.Rupture, RuptureThreshold)
         and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemainsP(S.Rupture)
-          <= (HL.Exsanguinated(TargetUnit, "Rupture") and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
-        and (not HL.Exsanguinated(TargetUnit, "Rupture") or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2 and EmpoweredDotRefresh)
+          <= (HL.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
+        and (not HL.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemainsP(S.Rupture) <= ExsanguinatedBleedTickTime*2 and EmpoweredDotRefresh)
+        and (TargetUnit:FilteredTimeToDie(">", 4, -TargetUnit:DebuffRemainsP(S.Rupture)) or TargetUnit:TimeToDieIsNotValid())
         and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold);
     end
-    if Target:IsInRange("Melee") and Evaluate_Rupture_Target(Target)
-      and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.Rupture)) or Target:TimeToDieIsNotValid()) then
+    if Target:IsInRange("Melee") and (ComboPoints >= 4 and Target:DebuffRefreshableP(S.Rupture, RuptureThreshold)
+      or (not Target:DebuffP(S.Rupture) and (HL.CombatTime() > 10 or (ComboPoints >= 2)))) and Evaluate_Rupture_Target(Target) then
       if HR.Cast(S.Rupture) then return "Cast Rupture (Refresh)"; end
     end
-    if HR.AoEON() and not SkipCycleRupture then
+    if HR.AoEON() and not SkipCycleRupture and ComboPoints >= 4 then
       SuggestCycleDoT(S.Rupture, Evaluate_Rupture_Target, 4);
     end
   end
+  -- actions.dot+=/crimson_tempest,if=spell_targets=1&combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.toxic_blade.up&master_assassin_remains=0&!azerite.twist_the_knife.enabled&target.time_to_die-remains>4
+  if S.CrimsonTempest:IsReadyP("Melee") and Cache.EnemiesCount[10] == 1 and ComboPoints >= (Rogue.CPMaxSpend() - 1) and Target:DebuffRefreshableP(S.CrimsonTempest, CrimsonTempestThreshold)
+    and not HL.Exsanguinated(Target, S.CrimsonTempest) and not Target:DebuffP(S.ToxicBladeDebuff) and MasterAssassinRemains() <= 0 and not S.TwistTheKnife:AzeriteEnabled()
+    and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemainsP(S.CrimsonTempest)) or Target:TimeToDieIsNotValid()) 
+    and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
+    if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (ST)"; end
+  end
+
   return false;
 end
 -- # Direct damage abilities
@@ -825,6 +840,7 @@ local function APL ()
   ComboPoints = Player:ComboPoints();
   ComboPointsDeficit = Player:ComboPointsMax() - ComboPoints;
   RuptureThreshold = (4 + ComboPoints * 4) * 0.3;
+  CrimsonTempestThreshold = (2 + ComboPoints * 2) * 0.3;
   RuptureDMGThreshold = S.Envenom:Damage()*Settings.Assassination.EnvenomDMGOffset; -- Used to check if Rupture is worth to be casted since it's a finisher.
   GarroteDMGThreshold = S.Mutilate:Damage()*Settings.Assassination.MutilateDMGOffset; -- Used as TTD Not Valid fallback since it's a generator.
   PriorityRotation = UsePriorityRotation();
