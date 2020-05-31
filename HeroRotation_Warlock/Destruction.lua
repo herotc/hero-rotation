@@ -236,73 +236,6 @@ local function Precombat()
   end
 end
 
-local function Aoe()
-  -- rain_of_fire,if=pet.infernal.active&(buff.crashing_chaos.down|!talent.grimoire_of_supremacy.enabled)&(!cooldown.havoc.ready|active_enemies>3)
-  if S.RainofFire:IsReadyP() and (InfernalActive and (Player:BuffDownP(S.CrashingChaosBuff) or not S.GrimoireofSupremacy:IsAvailable()) and (not S.Havoc:CooldownUpP() or EnemiesCount > 3)) then
-    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 18"; end
-  end
-  -- channel_demonfire,if=dot.immolate.remains>cast_time
-  if S.ChannelDemonfire:IsCastableP() and (Target:DebuffRemainsP(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
-    if HR.Cast(S.ChannelDemonfire, nil, nil, 40) then return "channel_demonfire 34"; end
-  end
-  -- immolate,cycle_targets=1,if=remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
-  if S.Immolate:IsCastableP() then
-    if HR.CastCycle(S.Immolate, 40, EvaluateCycleImmolate46) then return "immolate 64" end
-  end
-  -- call_action_list,name=cds
-  if (HR.CDsON()) then
-    local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
-  if S.Havoc:IsCastableP() then
-    if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc71) then return "havoc 81" end
-  end
-  -- chaos_bolt,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active&(havoc_active|talent.cataclysm.enabled|talent.inferno.enabled&active_enemies<4)
-  if S.ChaosBolt:IsReadyP() and (S.GrimoireofSupremacy:IsAvailable() and InfernalActive and (bool(EnemyHasHavoc()) or S.Cataclysm:IsAvailable() or S.Inferno:IsAvailable() and EnemiesCount < 4)) then
-    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 82"; end
-  end
-  -- rain_of_fire
-  if S.RainofFire:IsReadyP() then
-    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 96"; end
-  end
-  -- focused_azerite_beam
-  if S.FocusedAzeriteBeam:IsCastableP() then
-    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 98"; end
-  end
-  -- purifying_blast
-  if S.PurifyingBlast:IsCastableP() then
-    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 100"; end
-  end
-  -- havoc,cycle_targets=1,if=!(target=self.target)&(!talent.grimoire_of_supremacy.enabled|!talent.inferno.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
-  if S.Havoc:IsCastableP() then
-    if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc106) then return "havoc 120" end
-  end
-  -- incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
-  if S.Incinerate:IsCastableP() and (S.FireandBrimstone:IsAvailable() and Player:BuffP(S.BackdraftBuff) and Player:SoulShardsP() < 5 - 0.2 * EnemiesCount) then
-    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 121"; end
-  end
-  -- soul_fire
-  if S.SoulFire:IsCastableP() then
-    if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 133"; end
-  end
-  -- conflagrate,if=buff.backdraft.down
-  if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff)) then
-    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 135"; end
-  end
-  -- shadowburn,if=!talent.fire_and_brimstone.enabled
-  if S.Shadowburn:IsCastableP() and (not S.FireandBrimstone:IsAvailable()) then
-    if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 139"; end
-  end
-  -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
-  if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 143"; end
-  end
-  -- incinerate
-  if S.Incinerate:IsCastableP() then
-    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 157"; end
-  end
-end
-
 local function Cds()
   -- immolate,if=talent.grimoire_of_supremacy.enabled&remains<8&cooldown.summon_infernal.remains<4.5
   if S.Immolate:IsCastableP() and (S.GrimoireofSupremacy:IsAvailable() and Target:DebuffRemainsP(S.ImmolateDebuff) < 8 and S.SummonInfernal:CooldownRemainsP() < 4.5) then
@@ -442,6 +375,73 @@ local function Cds()
   -- use_item,name=vial_of_storms,if=dot.immolate.remains>=5&(cooldown.summon_infernal.remains>=20|target.time_to_die<30)
   if I.VialofStorms:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffRemainsP(S.ImmolateDebuff) >= 5 and (S.SummonInfernal:CooldownRemainsP() >= 20 or Target:TimeToDie() < 30)) then
     if HR.Cast(I.VialofStorms, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "vial_of_storms 253"; end
+  end
+end
+
+local function Aoe()
+  -- rain_of_fire,if=pet.infernal.active&(buff.crashing_chaos.down|!talent.grimoire_of_supremacy.enabled)&(!cooldown.havoc.ready|active_enemies>3)
+  if S.RainofFire:IsReadyP() and (InfernalActive and (Player:BuffDownP(S.CrashingChaosBuff) or not S.GrimoireofSupremacy:IsAvailable()) and (not S.Havoc:CooldownUpP() or EnemiesCount > 3)) then
+    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 18"; end
+  end
+  -- channel_demonfire,if=dot.immolate.remains>cast_time
+  if S.ChannelDemonfire:IsCastableP() and (Target:DebuffRemainsP(S.ImmolateDebuff) > S.ChannelDemonfire:CastTime()) then
+    if HR.Cast(S.ChannelDemonfire, nil, nil, 40) then return "channel_demonfire 34"; end
+  end
+  -- immolate,cycle_targets=1,if=remains<5&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>remains)
+  if S.Immolate:IsCastableP() then
+    if HR.CastCycle(S.Immolate, 40, EvaluateCycleImmolate46) then return "immolate 64" end
+  end
+  -- call_action_list,name=cds
+  if (HR.CDsON()) then
+    local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- havoc,cycle_targets=1,if=!(target=self.target)&active_enemies<4
+  if S.Havoc:IsCastableP() then
+    if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc71) then return "havoc 81" end
+  end
+  -- chaos_bolt,if=talent.grimoire_of_supremacy.enabled&pet.infernal.active&(havoc_active|talent.cataclysm.enabled|talent.inferno.enabled&active_enemies<4)
+  if S.ChaosBolt:IsReadyP() and (S.GrimoireofSupremacy:IsAvailable() and InfernalActive and (bool(EnemyHasHavoc()) or S.Cataclysm:IsAvailable() or S.Inferno:IsAvailable() and EnemiesCount < 4)) then
+    if HR.Cast(S.ChaosBolt, nil, nil, 40) then return "chaos_bolt 82"; end
+  end
+  -- rain_of_fire
+  if S.RainofFire:IsReadyP() then
+    if HR.Cast(S.RainofFire, nil, nil, 40) then return "rain_of_fire 96"; end
+  end
+  -- focused_azerite_beam
+  if S.FocusedAzeriteBeam:IsCastableP() then
+    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 98"; end
+  end
+  -- purifying_blast
+  if S.PurifyingBlast:IsCastableP() then
+    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 100"; end
+  end
+  -- havoc,cycle_targets=1,if=!(target=self.target)&(!talent.grimoire_of_supremacy.enabled|!talent.inferno.enabled|talent.grimoire_of_supremacy.enabled&pet.infernal.remains<=10)
+  if S.Havoc:IsCastableP() then
+    if HR.CastCycle(S.Havoc, 40, EvaluateCycleHavoc106) then return "havoc 120" end
+  end
+  -- incinerate,if=talent.fire_and_brimstone.enabled&buff.backdraft.up&soul_shard<5-0.2*active_enemies
+  if S.Incinerate:IsCastableP() and (S.FireandBrimstone:IsAvailable() and Player:BuffP(S.BackdraftBuff) and Player:SoulShardsP() < 5 - 0.2 * EnemiesCount) then
+    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 121"; end
+  end
+  -- soul_fire
+  if S.SoulFire:IsCastableP() then
+    if HR.Cast(S.SoulFire, nil, nil, 40) then return "soul_fire 133"; end
+  end
+  -- conflagrate,if=buff.backdraft.down
+  if S.Conflagrate:IsCastableP() and (Player:BuffDownP(S.BackdraftBuff)) then
+    if HR.Cast(S.Conflagrate, nil, nil, 40) then return "conflagrate 135"; end
+  end
+  -- shadowburn,if=!talent.fire_and_brimstone.enabled
+  if S.Shadowburn:IsCastableP() and (not S.FireandBrimstone:IsAvailable()) then
+    if HR.Cast(S.Shadowburn, nil, nil, 40) then return "shadowburn 139"; end
+  end
+  -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight&active_enemies<5
+  if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() and EnemiesCount < 5) then
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 143"; end
+  end
+  -- incinerate
+  if S.Incinerate:IsCastableP() then
+    if HR.Cast(S.Incinerate, nil, nil, 40) then return "incinerate 157"; end
   end
 end
 
