@@ -22,6 +22,7 @@ local HR         = HeroRotation
 -- Azerite Essence Setup
 local AE         = HL.Enum.AzeriteEssences
 local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -78,6 +79,9 @@ Spell.Warrior.Protection = {
   MemoryofLucidDreamsBuff               = Spell(298357)
 };
 local S = Spell.Warrior.Protection;
+if AEMajor ~= nil then
+  S.HeartEssence                        = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
@@ -124,6 +128,11 @@ local function UpdateRanges()
     HL.GetEnemies(i);
   end
 end
+
+HL:RegisterForEvent(function()
+  AEMajor        = HL.Spell:MajorEssence();
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -214,18 +223,14 @@ local function Aoe()
     suggestRageDump(5)
     if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
   end
-  -- memory_of_lucid_dreams,if=buff.avatar.down
-  if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.AvatarBuff)) then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 7"; end
-  end
   -- demoralizing_shout,if=talent.booming_voice.enabled
   if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
     suggestRageDump(40)
     if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
   end
-  -- anima_of_death,if=buff.last_stand.up
-  if S.AnimaofDeath:IsCastableP() then
-    if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 9"; end
+  -- shield_slam,if=buff.memory_of_lucid_dreams.up
+  if S.ShieldSlam:IsCastableP() and (Player:BuffP(S.MemoryofLucidDreamsBuff)) then
+    if HR.Cast(S.ShieldSlam) then return "shield_slam 10"; end
   end
   -- dragon_roar
   if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
@@ -256,8 +261,8 @@ local function St()
     suggestRageDump(5)
     if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
   end
-  -- shield_slam,if=buff.shield_block.up
-  if S.ShieldSlam:IsCastableP("Melee") and (Player:BuffP(S.ShieldBlockBuff)) then
+  -- shield_slam
+  if S.ShieldSlam:IsCastableP("Melee") then
     suggestRageDump(15)
     if HR.Cast(S.ShieldSlam) then return "shield_slam 44"; end
   end
@@ -270,15 +275,6 @@ local function St()
   if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
     suggestRageDump(40)
     if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
-  end
-  -- anima_of_death,if=buff.last_stand.up
-  if S.AnimaofDeath:IsCastableP() then
-    if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 61"; end
-  end
-  -- shield_slam
-  if S.ShieldSlam:IsCastableP("Melee") then
-    suggestRageDump(15)
-    if HR.Cast(S.ShieldSlam) then return "shield_slam 70"; end
   end
   -- dragon_roar
   if S.DragonRoar:IsCastableP(12) and HR.CDsON() then
@@ -308,6 +304,8 @@ local function APL()
   gcdTime = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
+  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
+
 
   -- call precombat
   if not Player:AffectingCombat() then
@@ -325,13 +323,6 @@ local function APL()
     -- intercept,if=time=0
     if S.Intercept:IsCastableP(25) and (HL.CombatTime() == 0 and not Target:IsInRange(8)) then
       if HR.Cast(S.Intercept) then return "intercept 84"; end
-    end
-    -- use_items,if=cooldown.avatar.remains>20
-    if (S.Avatar:CooldownRemainsP() > 20) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
-      end
     end
 
     if (HR.CDsON()) then
@@ -361,13 +352,13 @@ local function APL()
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastableP() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 102"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 103"; end
       end
     end
 
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 103"; end
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 105"; end
     end
     if Player:HealthPercentage() < 80 and S.VictoryRush:IsReady("Melee") then
       if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
@@ -381,24 +372,35 @@ local function APL()
     end
     -- worldvein_resonance,if=cooldown.avatar.remains<=2
     if S.WorldveinResonance:IsCastableP() and (S.Avatar:CooldownRemainsP() <= 2) then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 108"; end
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 109"; end
     end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastableP() then
-      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 109"; end
+    -- memory_of_lucid_dreams,if=cooldown.avatar.remains<=gcd
+    if S.MemoryofLucidDreams:IsCastableP() and (S.Avatar:CooldownRemainsP() <= Player:GCD() and Player:BuffDownP(S.AvatarBuff)) then
+      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 111"; end
     end
     -- concentrated_flame,if=buff.avatar.down&!dot.concentrated_flame_burn.remains>0|essence.the_crucible_of_flame.rank<3
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.AvatarBuff) and Target:DebuffDownP(S.ConcentratedFlameBurn) or Spell:EssenceRank(AE.TheCrucibleofFlame) < 3) then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 111"; end
+      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 113"; end
+    end
+    -- last_stand,if=essence.anima_of_life_and_death.major
+    if S.LastStand:IsCastableP() and (Spell:MajorEssenceEnabled(AE.AnimaofLifeandDeath)) then
+      if HR.CastSuggested(S.LastStand) then return "last_stand 115"; end
+    end
+    -- heart_essence,if=!(essence.the_crucible_of_flame.major|essence.worldvein_resonance.major|essence.anima_of_life_and_death.major|essence.memory_of_lucid_dreams.major)
+    if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastableP() and (not (Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame) or Spell:MajorEssenceEnabled(AE.WorldveinResonance) or Spell:MajorEssenceEnabled(AE.AnimaofLifeandDeath) or Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams))) then
+      if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence 117"; end
+    end
+    -- use_items,if=cooldown.avatar.remains<=gcd|buff.avatar.up
+    if (S.Avatar:CooldownRemainsP() <= Player:GCD() or Player:BuffP(S.AvatarBuff)) then
+      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      if TrinketToUse then
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      end
     end
     -- avatar
     if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
     suggestRageDump(20)
-      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 113"; end
-    end
-    -- memory_of_lucid_dreams
-    if S.MemoryofLucidDreams:IsCastableP() and S.Avatar:CooldownRemainsP() > 0 and Player:BuffDownP(S.AvatarBuff) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 110"; end
+      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 119"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
     if (Cache.EnemiesCount[8] >= 3) then
