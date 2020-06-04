@@ -92,7 +92,8 @@ Item.Druid.Balance = {
   PotionofUnbridledFury            = Item(169299),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   ShiverVenomRelic                 = Item(168905, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  ManifestoofMadness               = Item(174103, {13, 14})
 };
 local I = Item.Druid.Balance;
 
@@ -100,7 +101,8 @@ local I = Item.Druid.Balance;
 local OnUseExcludes = {
   I.PocketsizedComputationDevice:ID(),
   I.ShiverVenomRelic:ID(),
-  I.AzsharasFontofPower:ID()
+  I.AzsharasFontofPower:ID(),
+  I.ManifestoofMadness:ID()
 }
 
 -- Rotation Var
@@ -354,6 +356,10 @@ local function APL()
     if I.ShiverVenomRelic:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(CaInc()) and not Player:HasHeroism() and Target:DebuffStackP(S.ShiverVenomDebuff) >= 5) then
       if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "shiver_venom_relic 105"; end
     end
+    -- use_item,name=manifesto_of_madness,if=buff.ca_inc.remains>10|buff.ca_inc.remains>4&buff.arcanic_pulsar.stack>6|fight_remains<21
+    if I.ManifestoofMadness:IsEquipReady() and (Player:BuffRemainsP(CaInc()) > 10 or Player:BuffRemainsP(CaInc()) > 4 and Player:BuffStackP(S.ArcanicPulsarBuff) > 6 or Target:TimeToDie() < 21) then
+      if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness"; end
+    end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
     if S.BloodoftheEnemy:IsCastableP() and (CaInc():CooldownRemainsP() > 30) then
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
@@ -394,8 +400,8 @@ local function APL()
     if S.Thorns:IsCastableP() then
       if HR.Cast(S.Thorns, nil, Settings.Commons.EssenceDisplayStyle) then return "thorns"; end
     end
-    -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up|target.1.time_to_die<20
-    -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up|target.1.time_to_die<20
+    -- use_items,slots=trinket1,if=!trinket.1.has_proc.any|buff.ca_inc.up|fight_remains<20
+    -- use_items,slots=trinket2,if=!trinket.2.has_proc.any|buff.ca_inc.up|fight_remains<20
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
     if TrinketToUse then
@@ -429,11 +435,11 @@ local function APL()
     -- if (Player:BuffRemainsP(S.StarlordBuff) < 3 and not bool(solar_wrath.ap_check)) then
       -- if HR.Cancel(S.StarlordBuff) then return ""; end
     -- end
-    -- starfall,if=(!solar_wrath.ap_check|(buff.starlord.stack<3|buff.starlord.remains>=8)&(target.1.time_to_die+1)*spell_targets>cost%2.5)&spell_targets>=variable.sf_targets
+    -- starfall,if=(!solar_wrath.ap_check|(buff.starlord.stack<3|buff.starlord.remains>=8)&(fight_remains+1)*spell_targets>cost%2.5)&spell_targets>=variable.sf_targets
     if S.Starfall:IsReadyP() and ((not AP_Check(S.SolarWrath) or (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 8) and (Target:TimeToDie() + 1) * EnemiesCount > S.Starfall:Cost() % 2.5) and EnemiesCount >= VarSfTargets) then
       if HR.Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall) then return "starfall 164"; end
     end
-    -- starsurge,if=((talent.starlord.enabled&(buff.starlord.stack<3|buff.starlord.remains>=5&buff.arcanic_pulsar.stack<8)|!talent.starlord.enabled&(buff.arcanic_pulsar.stack<8|buff.ca_inc.up))&buff.solar_empowerment.stack<3&buff.lunar_empowerment.stack<3&buff.reckless_force_counter.stack<19|buff.reckless_force.up)&spell_targets.starfall<variable.sf_targets&(!variable.az_ss|!buff.ca_inc.up|!prev.starsurge)|target.1.time_to_die<=execute_time*astral_power%40|!solar_wrath.ap_check
+    -- starsurge,if=((talent.starlord.enabled&(buff.starlord.stack<3|buff.starlord.remains>=5&buff.arcanic_pulsar.stack<8)|!talent.starlord.enabled&(buff.arcanic_pulsar.stack<8|buff.ca_inc.up))&buff.solar_empowerment.stack<3&buff.lunar_empowerment.stack<3&buff.reckless_force_counter.stack<19|buff.reckless_force.up)&spell_targets.starfall<variable.sf_targets&(!variable.az_ss|!buff.ca_inc.up|!prev.starsurge)|fight_remains<=execute_time*astral_power%40|!solar_wrath.ap_check
     if S.Starsurge:IsReadyP() and (((S.Starlord:IsAvailable() and (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 5 and Player:BuffStackP(S.ArcanicPulsarBuff) < 8) or not S.Starlord:IsAvailable() and (Player:BuffStackP(S.ArcanicPulsarBuff) < 8 or Player:BuffP(CaInc()))) and Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and Player:BuffStackP(S.LunarEmpowermentBuff) < 3 and Player:BuffStackP(S.RecklessForceBuff) < 19 or Player:BuffDownP(S.RecklessForceBuff)) and EnemiesCount < VarSfTargets and (not VarAzSs or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Starsurge)) or Target:TimeToDie() <= S.Starsurge:ExecuteTime() * Player:AstralPower() % 40 or not AP_Check(S.SolarWrath)) then
       if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 188"; end
     end
