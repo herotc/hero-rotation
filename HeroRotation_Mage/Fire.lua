@@ -599,8 +599,9 @@ local function RopPhase()
   if S.Pyroblast:IsCastableP() and (Player:BuffP(S.HotStreakBuff)) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 450"; end
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
-  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (not Player:BuffP(S.HeatingUpBuff) and not Player:BuffP(S.HotStreakBuff) and not Player:PrevGCDP(1, S.FireBlast) and (S.FireBlast:Charges() >= 2 or (S.PhoenixFlames:Charges() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30)))) then
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)))
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (not Player:BuffP(S.HeatingUpBuff) and not Player:BuffP(S.HotStreakBuff) and not Player:PrevGCDP(1, S.FireBlast) and (S.FireBlast:Charges() >= 2 or (S.PhoenixFlames:Charges() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85)))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 454"; end
   end
   -- call_action_list,name=active_talents
@@ -611,24 +612,28 @@ local function RopPhase()
   if S.Pyroblast:IsCastableP() and (Player:BuffP(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemainsP(S.PyroclasmBuff) and Player:BuffRemainsP(S.RuneofPowerBuff) > S.Pyroblast:CastTime()) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 486"; end
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
-  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (Player:BuffP(S.HeatingUpBuff) and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(buff.heating_up.react&spell_crit<1&(target.health.pct>=30|!talent.searing_touch.enabled))
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (Player:BuffP(S.HeatingUpBuff) and Player:CritChancePct() < 85 and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 502"; end
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
-  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 512"; end
   end
-  -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
-  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
+  -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 530"; end
   end
   -- phoenix_flames,if=!prev_gcd.1.phoenix_flames&buff.heating_up.react
   if S.PhoenixFlames:IsCastableP() and (not Player:PrevGCDP(1, S.PhoenixFlames) and Player:BuffP(S.HeatingUpBuff)) then
     if HR.Cast(S.PhoenixFlames, nil, nil, 40) then return "phoenix_flames 546"; end
   end
-  -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
-  if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
+  -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled|spell_crit>=1
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable() or Player:CritChancePct() >= 85) then
     if HR.Cast(S.Scorch, nil, nil, 40) then return "scorch 552"; end
   end
   -- dragons_breath,if=active_enemies>2
@@ -662,24 +667,28 @@ local function StandardRotation()
   if S.PhoenixFlames:IsReadyP() and (S.PhoenixFlames:ChargesP() >= 3 and EnemiesCount > 2 and not bool(VarPhoenixPooling)) then
     if HR.Cast(S.PhoenixFlames, nil, nil, 40) then return "phoenix_flames 615"; end
   end
-  -- pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
-  if S.Pyroblast:IsCastableP() and (Player:BuffP(S.HotStreakBuff) and Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
+  -- pyroblast,if=buff.hot_streak.react&(target.health.pct<=30&talent.searing_touch.enabled|spell_crit>=1)
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.Pyroblast:IsCastableP() and (Player:BuffP(S.HotStreakBuff) and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable() or Player:CritChancePct() >= 85)) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 620"; end
   end
   -- pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains
   if S.Pyroblast:IsCastableP() and (Player:BuffP(S.PyroclasmBuff) and S.Pyroblast:CastTime() < Player:BuffRemainsP(S.PyroclasmBuff)) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 626"; end
   end
-  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(buff.rune_of_power.down&!firestarter.active)&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight)))
-  if S.FireBlast:IsCastableP() and ((Player:BuffDownP(S.RuneofPowerBuff) and not bool(S.Firestarter:ActiveStatus())) and not bool(VarFireBlastPooling) and (((Player:IsCasting(S.Fireball) or Player:IsCasting(S.Pyroblast)) and Player:BuffP(S.HeatingUpBuff)) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HotStreakBuff) and Player:BuffDownP(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())))) then
+  -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(buff.rune_of_power.down&!firestarter.active)&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|((talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight)))
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.FireBlast:IsCastableP() and ((Player:BuffDownP(S.RuneofPowerBuff) and not bool(S.Firestarter:ActiveStatus())) and not bool(VarFireBlastPooling) and (((Player:IsCasting(S.Fireball) or Player:IsCasting(S.Pyroblast)) and Player:BuffP(S.HeatingUpBuff)) or ((S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HotStreakBuff) and Player:BuffDownP(S.HeatingUpBuff) and Player:IsCasting(S.Scorch) and not S.Pyroblast:InFlight() and not S.Fireball:InFlight())))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 636"; end
   end
-  -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
-  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 and not (EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
+  -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and not (EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 726"; end
   end
-  -- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling
-  if S.PhoenixFlames:IsCastableP() and ((Player:BuffP(S.HeatingUpBuff) or (Player:BuffDownP(S.HotStreakBuff) and (S.FireBlast:ChargesP() > 0 or S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30))) and not bool(VarPhoenixPooling)) then
+  -- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)))&!variable.phoenix_pooling
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.PhoenixFlames:IsCastableP() and ((Player:BuffP(S.HeatingUpBuff) or (Player:BuffDownP(S.HotStreakBuff) and (S.FireBlast:ChargesP() > 0 or S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85))) and not bool(VarPhoenixPooling)) then
     if HR.Cast(S.PhoenixFlames, nil, nil, 40) then return "phoenix_flames 750"; end
   end
   -- call_action_list,name=active_talents
@@ -694,8 +703,9 @@ local function StandardRotation()
   if (Settings.Commons.UseTrinkets) then
     local ShouldReturn = ItemsLowPriority(); if ShouldReturn then return ShouldReturn; end
   end
-  -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled
-  if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable()) then
+  -- scorch,if=target.health.pct<=30&talent.searing_touch.enabled|spell_crit>=1
+  -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
+  if S.Scorch:IsCastableP() and (Target:HealthPercentage() <= 30 and S.SearingTouch:IsAvailable() or Player:CritChancePct() >= 85) then
     if HR.Cast(S.Scorch, nil, nil, 40) then return "scorch 780"; end
   end
   -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion)
