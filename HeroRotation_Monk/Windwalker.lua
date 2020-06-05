@@ -323,51 +323,59 @@ local function CDSerenity()
   if S.GuardianofAzeroth:IsCastableP() and (Player:BuffDownP(S.SerenityBuff) and (Target:TimeToDie() > 185 or S.Serenity:CooldownRemainsP() <= 7) or Target:TimeToDie() < 35) then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 44"; end
   end
-  -- arcane_torrent,if=buff.serenity.down&chi.max-chi>=1&energy.time_to_max>=0.5
-  if S.ArcaneTorrent:IsCastableP() and (Player:BuffDownP(S.SerenityBuff) and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() >= 0.5) then
-    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 46"; end
-  end
-  -- ancestral_call,if=cooldown.serenity.remains>20|target.time_to_die<20
-  if S.AncestralCall:IsCastableP() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
-    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 48"; end
-  end
   -- blood_fury,if=cooldown.serenity.remains>20|target.time_to_die<20
   if S.BloodFury:IsCastableP() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
-    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 50"; end
-  end
-  -- fireblood,if=cooldown.serenity.remains>20|target.time_to_die<10
-  if S.Fireblood:IsCastableP() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
-    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 52"; end
+    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 46"; end
   end
   -- berserking,if=cooldown.serenity.remains>20|target.time_to_die<15
   if S.Berserking:IsCastableP() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
-    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 54"; end
+    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 48"; end
+  end
+  -- arcane_torrent,if=buff.serenity.down&chi.max-chi>=1&energy.time_to_max>=0.5
+  if S.ArcaneTorrent:IsCastableP() and (Player:BuffDownP(S.SerenityBuff) and Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() >= 0.5) then
+    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 50"; end
+  end
+  -- lights_judgment
+  if S.LightsJudgment:IsCastableP() then
+    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 52"; end
+  end
+  -- fireblood,if=cooldown.serenity.remains>20|target.time_to_die<10
+  if S.Fireblood:IsCastableP() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
+    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 54"; end
+  end
+  -- ancestral_call,if=cooldown.serenity.remains>20|target.time_to_die<20
+  if S.AncestralCall:IsCastableP() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
+    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 56"; end
+  end
+  -- bag_of_tricks
+  if S.BagofTricks:IsCastableP() then
+    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 58"; end
   end
   -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<25
   if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod or Target:TimeToDie() < 25) then
-    if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 56"; end
+    if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 60"; end
   end
   -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|target.time_to_die<20
-  -- 58
+  -- 61
   -- touch_of_death,if=!variable.hold_tod
   if S.TouchofDeath:IsReadyP() and (not VarHoldTod) then
-    if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 60"; end
+    if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 62"; end
   end
   -- use_item,name=pocketsized_computation_device,if=buff.serenity.down&(cooldown.touch_of_death.remains>10|!variable.hold_tod)|target.time_to_die<5
   if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.SerenityBuff) and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) or Target:TimeToDie() < 5) then
-    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 62"; end
+    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 64"; end
   end
   -- blood_of_the_enemy,if=buff.serenity.down&(cooldown.serenity.remains>20|cooldown.serenity.remains<2)|target.time_to_die<15
   if S.BloodoftheEnemy:IsCastableP() and (Player:BuffDownP(S.SerenityBuff) and (S.Serenity:CooldownRemainsP() > 20 or S.Serenity:CooldownRemainsP() < 2) or Target:TimeToDie() < 15) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 64"; end
+    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 66"; end
   end
   if (Settings.Commons.UseTrinkets) then
     -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>10|!variable.hold_tod
     if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) then
-      if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 66"; end
+      if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 68"; end
     end
     -- use_item,effect_name=gladiators_badge,if=cooldown.serenity.remains>20|target.time_to_die<20
-    -- 68
+    -- 69
     -- use_item,name=galecallers_boon,if=cooldown.serenity.remains>20|target.time_to_die<20
     if I.GalecallersBoon:IsEquipReady() and (S.Serenity:CooldownRemainsP() > 20 or Target:TimeToDie() < 20) then
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 70"; end
@@ -434,10 +442,6 @@ local function CDSEF()
   if S.InvokeXuentheWhiteTiger:IsReadyP() then
     if HR.Cast(S.InvokeXuentheWhiteTiger, nil, nil, 40) then return "invoke_xuen_the_white_tiger 100"; end
   end
-  -- use_item,name=azsharas_font_of_power,if=buff.storm_earth_and_fire.down&!dot.touch_of_death.remains&(cooldown.touch_of_death.remains<15|cooldown.touch_of_death.remains<21&(variable.tod_on_use_trinket|equipped.ashvanes_razor_coral)|variable.hold_tod|target.time_to_die<40)
-  if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.StormEarthandFireBuff) and Target:DebuffDownP(S.TouchofDeathDebuff) and (S.TouchofDeath:CooldownRemainsP() < 15 or S.TouchofDeath:CooldownRemainsP() < 21 and (VarTodOnUse or I.AshvanesRazorCoral:IsEquipped()) or VarHoldTod or Target:TimeToDie() < 40)) then
-    if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 102"; end
-  end
   -- guardian_of_azeroth,if=target.time_to_die>185|!variable.hold_tod&cooldown.touch_of_death.remains<=14|target.time_to_die<35
   if S.GuardianofAzeroth:IsCastableP() and (Target:TimeToDie() > 185 or not VarHoldTod and S.TouchofDeath:CooldownRemainsP() <= 14 or Target:TimeToDie() < 35) then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 104"; end
@@ -476,17 +480,25 @@ local function CDSEF()
   if S.BloodFury:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 20) then
     if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 122"; end
   end
-  -- ancestral_call,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<20
-  if S.AncestralCall:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 20) then
-    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 124"; end
+  -- berserking,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<15
+  if S.Berserking:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 15) then
+    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 124"; end
+  end
+  -- lights_judgment
+  if S.LightsJudgment:IsCastableP() then
+    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 125"; end
   end
   -- fireblood,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<10
   if S.Fireblood:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 10) then
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 126"; end
   end
-  -- berserking,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<15
-  if S.Berserking:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 15) then
-    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 128"; end
+  -- ancestral_call,if=cooldown.touch_of_death.remains>30|variable.hold_tod|target.time_to_die<20
+  if S.AncestralCall:IsCastableP() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod or Target:TimeToDie() < 20) then
+    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 128"; end
+  end
+  -- bag_of_tricks
+  if S.BagofTricks:IsCastableP() then
+    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 129"; end
   end
   if (Settings.Commons.UseTrinkets) then
     -- use_item,name=pocketsized_computation_device,if=cooldown.touch_of_death.remains>30|!variable.hold_tod
@@ -543,6 +555,10 @@ local function CDSEF()
   -- ripple_in_space
   if S.RippleInSpace:IsCastableP() then
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 154"; end
+  end
+  -- bag_of_tricks
+  if S.BagofTricks:IsCastableP() then
+    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 129"; end
   end
 end
 
@@ -748,19 +764,18 @@ end
 -- Action Lists --
 --- ======= MAIN =======
 -- APL Main
-local function APL ()
+local function APL()
   -- Unit Update
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
 
-  -- Out of Combat
-  if not Player:AffectingCombat() then
-    if Everyone.TargetIsValid() then
+  if Everyone.TargetIsValid() then
+    -- Out of Combat
+    if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-  end
-  -- In Combat
-  if Everyone.TargetIsValid() then
+  
+    -- In Combat
     -- Define VarHoldTod here instead of Precombat to allow it to use the constantly changing Target TimeToDie
     if (true) then
       VarHoldTod = ((S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or (not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8) or (Target:TimeToDie() < 130 and Target:TimeToDie() > S.Serenity:CooldownRemains() and S.Serenity:CooldownRemains() > 2) or (Player:Buff(S.SerenityBuff) and Target:TimeToDie() > 11) or Settings.Windwalker.IgnoreToD)
