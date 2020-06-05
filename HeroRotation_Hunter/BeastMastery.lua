@@ -99,6 +99,7 @@ local S = Spell.Hunter.BeastMastery;
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
   PotionofUnbridledFury            = Item(169299),
+  GalecallersBoon                  = Item(159614, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14})
@@ -107,6 +108,7 @@ local I = Item.Hunter.BeastMastery;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.GalecallersBoon:ID(),
   I.PocketsizedComputationDevice:ID(),
   I.AshvanesRazorCoral:ID(),
   I.AzsharasFontofPower:ID()
@@ -537,6 +539,10 @@ local function APL()
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(!equipped.azsharas_font_of_power|trinket.azsharas_font_of_power.cooldown.remains>86|essence.blood_of_the_enemy.major)&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.remains>9)&(!essence.condensed_lifeforce.major|buff.guardian_of_azeroth.up)&(target.health.pct<35|!essence.condensed_lifeforce.major|!talent.killer_instinct.enabled)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffP(S.RazorCoralDebuff) and (not I.AzsharasFontofPower:IsEquipped() or I.AzsharasFontofPower:CooldownRemains() > 86 or Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and (Player:PrevGCDP(1, S.AspectoftheWild) or not Everyone.PSCDEquipped() and Player:BuffRemainsP(S.AspectoftheWildBuff) > 9) and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Player:BuffP(S.GuardianofAzerothBuff)) and (Target:HealthPercentage() < 35 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or not S.KillerInstinct:IsAvailable()) or (Target:DebuffDownP(S.RazorCoralDebuff) or Target:TimeToDie() < 26) and Target:TimeToDie() > (24 * num(I.PocketsizedComputationDevice:CooldownRemains() + 4 < Target:TimeToDie()))) then
       if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral"; end
+    end
+    -- use_item,name=galecallers_boon,if=buff.aspect_of_the_wild.remains>10|cooldown.aspect_of_the_wild.remains>45|target.time_to_die<11
+    if I.GalecallersBoon:IsEquipReady() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 10 or S.AspectoftheWild:CooldownRemainsP() > 45 or Target:TimeToDie() < 11) then
+      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon"; end
     end
     -- use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
     if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.BestialWrathBuff) or Target:BossTimeToDie() < 5) then
