@@ -265,6 +265,10 @@ local function Cds()
   if S.Fireblood:IsCastableP() and (S.BestialWrath:CooldownRemainsP() > 30) then
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 28"; end
   end
+  -- blood_of_the_enemy,if=focus<focus.max&(raid_event.adds.remains>90|!raid_event.adds.exists|active_enemies>1)
+  if S.BloodoftheEnemy:IsCastableP() and (Player:Focus() < Player:FocusMax()) then
+    if HR.Cast(S.BloodoftheEnemy, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_of_the_enemy 30"; end
+  end
   -- berserking,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<13
   if S.Berserking:IsCastableP() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:BossTimeToDie() > 180 + S.BerserkingBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:BossTimeToDie() < 13) then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 32"; end
@@ -374,10 +378,6 @@ local function Cleave()
   if S.ConcentratedFlame:IsCastableP() then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 130"; end
   end
-  -- blood_of_the_enemy
-  if S.BloodoftheEnemy:IsCastableP() then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 132"; end
-  end
   -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
   if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 10) then
     if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 134"; end
@@ -439,10 +439,6 @@ local function St()
   -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd
   if S.BarbedShot:IsCastableP() and (S.DanceofDeath:AzeriteRank() > 1 and Player:BuffRemainsP(S.DanceofDeathBuff) < GCDMax) then
     if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 192"; end
-  end
-  -- blood_of_the_enemy,if=buff.aspect_of_the_wild.remains>10+gcd|target.time_to_die<10+gcd
-  if S.BloodoftheEnemy:IsCastableP() and (Player:BuffRemainsP(S.AspectoftheWildBuff) > 10 + GCDMax or Target:TimeToDie() < 10 + GCDMax) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 193"; end
   end
   -- kill_command
   if S.KillCommand:IsReadyP() then
