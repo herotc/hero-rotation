@@ -350,12 +350,12 @@ local function SingleTarget()
   if S.Ravager:IsCastableP(40) and HR.CDsON() and (Player:BuffDownP(S.DeadlyCalmBuff) and (S.ColossusSmash:CooldownRemainsP() < 2 or (S.Warbreaker:IsAvailable() and S.Warbreaker:CooldownRemainsP() < 2))) then
     if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager) then return "ravager 278"; end
   end
-  -- colossus_smash
-  if S.ColossusSmash:IsCastableP("Melee") and HR.CDsON() then
+  -- colossus_smash,if=!essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>50)|essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>80)|talent.massacre.enabled&(target.time_to_pct_35>10|target.time_to_die>50)
+  if S.ColossusSmash:IsCastableP("Melee") and HR.CDsON() and (not Spell:EssenceEnabled(AE.CondensedLifeForce) and not S.Massacre:IsAvailable() and (Target:TimeToX(20) > 10 or Target:TimeToDie() > 50) or Spell:EssenceEnabled(AE.CondensedLifeForce) and not S.Massacre:IsAvailable() and (Target:TimeToX(20) > 10 or Target:TimeToDie() > 80) or S.Massacre:IsAvailable() and (Target:TimeToX(35) > 10 or Target:TimeToDie() > 50)) then
     if HR.Cast(S.ColossusSmash, Settings.Arms.GCDasOffGCD.ColossusSmash) then return "colossus_smash 288"; end
   end
-  -- warbreaker
-  if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() then
+  -- warbreaker,if=!essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>50)|essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>80)|talent.massacre.enabled&(target.time_to_pct_35>10|target.time_to_die>50)
+  if S.Warbreaker:IsCastableP("Melee") and HR.CDsON() and (not Spell:EssenceEnabled(AE.CondensedLifeForce) and not S.Massacre:IsAvailable() and (Target:TimeToX(20) > 10 or Target:TimeToDie() > 50) or Spell:EssenceEnabled(AE.CondensedLifeForce) and not S.Massacre:IsAvailable() and (Target:TimeToX(20) > 10 or Target:TimeToDie() > 80) or S.Massacre:IsAvailable() and (Target:TimeToX(35) > 10 or Target:TimeToDie() > 50)) then
     if HR.Cast(S.Warbreaker, Settings.Arms.GCDasOffGCD.Warbreaker) then return "warbreaker 292"; end
   end
   -- deadly_calm
@@ -420,8 +420,8 @@ local function APL()
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(40)) then
       return Movement();
     end
-    -- potion,if=target.health.pct<21&buff.memory_of_lucid_dreams.up|!essence.memory_of_lucid_dreams.major
-    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Target:HealthPercentage() < 21 and Player:BuffP(S.MemoryofLucidDreams) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams)) then
+    -- potion,if=(target.health.pct<21|talent.massacre.enabled&target.health.pct<36)&(buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up)|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major&(target.health.pct<21|talent.massacre.enabled&target.health.pct<36)&debuff.colossus_smash.up|target.time_to_die<25
+    if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and ((Target:HealthPercentage() < 21 or S.Massacre:IsAvailable() and Target:HealthPercentage() < 36) and (Player:BuffP(S.MemoryofLucidDreams) or Player:BuffP(S.GuardianofAzeroth)) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and (Target:HealthPercentage() < 21 or S.Massacre:IsAvailable() and Target:HealthPercentage() < 36) and Target:DebuffP(S.ColossusSmashDebuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion 354"; end
     end
     if (HR.CDsON()) then
