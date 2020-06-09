@@ -82,6 +82,7 @@ HR.GUISettings.APL.Druid = {
     GCDasOffGCD = {
       FrenziedRegen = true,
       LunarBeam = true,
+      Incarnation = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

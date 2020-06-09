@@ -305,7 +305,7 @@ local function Cooldowns()
   end
   -- incarnation,if=(dot.moonfire.ticking|active_enemies>1)&dot.thrash_bear.ticking
   if S.Incarnation:IsReadyP() and ((Target:DebuffP(S.MoonfireDebuff) or EnemiesCount > 1) and Target:DebuffP(S.ThrashBearDebuff)) then
-    if HR.Cast(S.Incarnation) then return "incarnation 33"; end
+    if HR.Cast(S.Incarnation, Settings.Guardian.GCDasOffGCD.Incarnation) then return "incarnation 33"; end
   end
   -- use_item,name=ashvanes_razor_coral,if=((equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>25&debuff.razor_coral_debuff.down)|debuff.razor_coral_debuff.down|(debuff.razor_coral_debuff.up&debuff.conductive_ink_debuff.up&target.time_to_pct_30<=2)|(debuff.razor_coral_debuff.up&time_to_die<=20))
   if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemains() > 25 and Target:DebuffDownP(S.RazorCoralDebuff)) or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:DebuffP(S.RazorCoralDebuff) and Target:DebuffP(S.ConductiveInkDebuff) and Target:TimeToX(30) <= 2) or (Target:DebuffP(S.RazorCoralDebuff) and Target:TimeToDie() <= 20))) then
