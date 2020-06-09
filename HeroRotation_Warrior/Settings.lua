@@ -93,8 +93,6 @@ CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms");
 
 -- Fury settings
 CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury");
-CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoOW", "Show Potion of the Old War", "Enable this if you want it to show you when to use Potion of the Old War.");
-CreatePanelOption("CheckButton", CP_Fury, "APL.Warrior.Fury.ShowPoPP", "Show Potion of Prolonged Power", "Enable this if you want it to show you when to use Potion of Prolonged Power.");
 
 -- Protection settings
 CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
