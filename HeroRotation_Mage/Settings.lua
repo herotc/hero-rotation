@@ -37,7 +37,7 @@ HR.GUISettings.APL.Mage = {
   },
   Frost = {
     UseSplashData = true,
-    RotationType = "Standard",
+    RotationType = "No Ice Lance",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
