@@ -371,7 +371,8 @@ local function CombustionPhase()
     local ShouldReturn = ActiveTalents(); if ShouldReturn then return ShouldReturn; end
   end
   -- combustion,use_off_gcd=1,use_while_casting=1,if=((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled&(essence.memory_of_lucid_dreams.major|buff.hot_streak.react|action.scorch.executing&action.scorch.execute_remains<0.5|action.pyroblast.executing&action.pyroblast.execute_remains<0.5))&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
-  if S.Combustion:IsCastableP() and (((S.Meteor:InFlight() and Player:PrevGCDP(1, S.Meteor)) or not S.Meteor:IsAvailable() and (Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.HotStreakBuff) or Player:IsCasting(S.Scorch) and Player:CastRemains() < 0.5 or Player:IsCasting(S.Pyroblast) and Player:CastRemains() < 0.5)) and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
+  -- Increased CastRemains checks to 1s, up from 0.5s, to help visibility
+  if S.Combustion:IsCastableP() and (((S.Meteor:InFlight() and Player:PrevGCDP(1, S.Meteor)) or not S.Meteor:IsAvailable() and (Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) or Player:BuffP(S.HotStreakBuff) or Player:IsCasting(S.Scorch) and Player:CastRemains() < 1 or Player:IsCasting(S.Pyroblast) and Player:CastRemains() < 1)) and (Player:BuffP(S.RuneofPowerBuff) or not S.RuneofPower:IsAvailable())) then
     if HR.Cast(S.Combustion, Settings.Fire.OffGCDasOffGCD.Combustion) then return "combustion 265"; end
   end
   -- potion
