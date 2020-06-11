@@ -10,6 +10,8 @@
   local Target = Unit.Target;
   local Spell = HL.Spell;
   local Item = HL.Item;
+  -- HeroRotation
+  local HR = HeroRotation;
   -- Lua
   local pairs = pairs;
   local select = select;
@@ -417,3 +419,34 @@
     end
     , "SWING_MISSED"
   );
+
+  -- Base Crit Tracker for Outlaw
+  local BaseCritChance = Player:CritChancePct()
+  local BaseCritChecksPending = 0
+  local function UpdateBaseCrit ()
+    if not Player:AffectingCombat() then
+      BaseCritChance = Player:CritChancePct()
+      HL.Debug("Base Crit Set to: " .. BaseCritChance)
+    end
+    if BaseCritChecksPending == nil or BaseCritChecksPending < 0 then
+      BaseCritChecksPending = 0
+    else
+      BaseCritChecksPending = BaseCritChecksPending - 1
+    end
+    if BaseCritChecksPending > 0 then
+      C_Timer.After(3, UpdateBaseCrit)
+    end
+  end
+  HL:RegisterForEvent(
+    function ()
+      if BaseCritChecksPending == 0 then
+        C_Timer.After(3, UpdateBaseCrit)
+        BaseCritChecksPending = 2
+      end
+    end
+    , "PLAYER_EQUIPMENT_CHANGED", "AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED", "AZERITE_ESSENCE_CHANGED", "AZERITE_ESSENCE_ACTIVATED"
+  );
+
+  function HR.Commons.Rogue.BaseAttackCrit ()
+    return BaseCritChance
+  end

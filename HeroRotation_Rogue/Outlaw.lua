@@ -262,10 +262,10 @@ local function RtB_Reroll ()
         if Player:BuffStackP(S.SnakeEyesBuff) >= 2 - num(Player:BuffP(S.Broadside)) then
           Cache.APLVar.RtB_Reroll = false;
         end
-      elseif S.AceUpYourSleeve:AzeriteEnabled() and S.AceUpYourSleeve:AzeriteRank() >= S.Deadshot:AzeriteRank() then
+      elseif S.AceUpYourSleeve:AzeriteEnabled() and S.AceUpYourSleeve:AzeriteRank() >= S.Deadshot:AzeriteRank() and Rogue.BaseAttackCrit() < 42 then
         Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffP(S.LoadedDiceBuff) or
           Player:BuffRemainsP(S.RuthlessPrecision) <= S.BetweentheEyes:CooldownRemainsP())) and true or false;
-      elseif S.Deadshot:AzeriteEnabled() then
+      elseif S.Deadshot:AzeriteEnabled() or Rogue.BaseAttackCrit() >= 42 then
         Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffP(S.LoadedDiceBuff) or not Player:BuffP(S.Broadside))) and true or false;
       else
         Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffP(S.LoadedDiceBuff) or
@@ -327,8 +327,8 @@ end
 
 -- # Essences
 local function Essences ()
-  -- blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition
-  if S.BloodoftheEnemy:IsCastableP() and Blade_Flurry_Sync() and S.BetweentheEyes:CooldownUpP() and BtECondition() then
+  -- blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition|fight_remains<=10
+  if S.BloodoftheEnemy:IsCastableP() and (Blade_Flurry_Sync() and S.BetweentheEyes:CooldownUpP() and BtECondition() or HL.BossFilteredFightRemains("<", 20)) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
@@ -340,11 +340,11 @@ local function Essences ()
   if S.GuardianofAzeroth:IsCastableP() then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth"; end
   end
-  -- focused_azerite_beam
-  if S.FocusedAzeriteBeam:IsCastableP() then
+  -- focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up|fight_remains<10
+  if S.FocusedAzeriteBeam:IsCastableP() and (Cache.EnemiesCount[BladeFlurryRange] >= 2 or not Player:BuffP(S.AdrenalineRush) or HL.BossFilteredFightRemains("<", 10)) then
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast FocusedAzeriteBeam"; end
   end
-  -- purifying_blast
+  -- purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60|fight_remains<10
   if S.PurifyingBlast:IsCastableP() then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast PurifyingBlast"; end
   end
@@ -454,11 +454,11 @@ local function CDs ()
           local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
           if ConductiveInkUnit then
             -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
-            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or Target:BossFilteredTimeToDie("<", 20) or
+            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or HL.BossFilteredFightRemains("<", 20) or
               (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3);
           else
             CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStackP() >= 20 - 10 * num(Target:DebuffP(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
-              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or Target:BossFilteredTimeToDie("<", 20);
+              and Player:BuffRemainsP(S.AdrenalineRush) > 18 or HL.BossFilteredFightRemains("<", 20);
           end
         end
         if CastRazorCoral then
@@ -469,9 +469,9 @@ local function CDs ()
       if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
         if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket"; end
       end
-      -- actions.cds+=/use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+      -- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse and (Player:HasHeroism() or Target:FilteredTimeToDie("<", 20) or Player:ComboPointsDeficit() <= 2) then
+      if TrinketToUse and (Player:HasHeroism() or HL.FilteredFightRemains("<", 20) or Player:ComboPointsDeficit() <= 2) then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
@@ -513,10 +513,10 @@ local function Finish ()
   if S.BetweentheEyes:IsCastableP(20) and BtECondition() then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Pre RtB)"; end
   end
-  -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
+  -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
   -- Note: Added Player:BuffRemainsP(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.SliceandDice:IsAvailable() and S.SliceandDice:IsCastableP()
-    and (Target:FilteredTimeToDie(">", Player:BuffRemainsP(S.SliceandDice)) or Target:TimeToDieIsNotValid() or Player:BuffRemainsP(S.SliceandDice) == 0)
+    and (HL.FilteredFightRemains(BladeFlurryRange, ">", Player:BuffRemainsP(S.SliceandDice), true) or Player:BuffRemainsP(S.SliceandDice) == 0)
     and Player:BuffRemainsP(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
   end
