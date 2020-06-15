@@ -58,6 +58,8 @@ Spell.Druid.Restoration = {
   MemoryofLucidDreams                   = Spell(298357),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
+  WorldveinResonance                    = Spell(295186),
+  Shadowmeld                            = Spell(58984),
   Pool                                  = Spell(9999000010)
 };
 local S = Spell.Druid.Restoration;
@@ -147,6 +149,121 @@ local function EvaluateCycleMoonfire311(TargetUnit)
   return TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff)
 end
 
+local function Precombat()
+  -- flask
+  -- food
+  -- augmentation
+  -- snapshot_stats
+  -- Manual opener tweak: Only do cat stuff with Feral Affinity
+  if S.FeralAffinity:IsAvailable() then
+    -- cat_form
+    if S.CatForm:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
+      if HR.Cast(S.CatForm) then return "cat_form 1"; end
+    end
+    -- prowl
+    if S.Prowl:IsCastableP() and (Player:BuffP(S.CatFormBuff)) then
+      if HR.Cast(S.Prowl, Settings.Restoration.GCDasOffGCD.Prowl) then return "prowl 3"; end
+    end
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 5"; end
+    end
+    -- Manually add Rake opener
+    if S.Rake:IsReadyP() and (Player:IsStealthed(true, false)) then
+      if HR.Cast(S.Rake, nil, nil, "Melee") then return "rake 7"; end
+    end
+  else
+    -- potion
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 9"; end
+    end
+    -- Manually add Solar Wrath for non-cat
+    if S.SolarWrath:IsCastableP() then
+      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 11"; end
+    end
+  end
+end
+
+local function Balance()
+  -- sunfire,target_if=refreshable
+  if S.Sunfire:IsReadyP() then
+    if HR.CastCycle(S.Sunfire, 40, EvaluateCycleSunfire301) then return "sunfire 101" end
+  end
+  -- moonfire,target_if=refreshable&spell_targets.lunar_strike<7
+  if S.Moonfire:IsReadyP() then
+    if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire303) then return "moonfire 103"; end
+  end
+  -- Manually add Moonkin Form, as it's needed for Starsurge and Lunar Strike
+  if S.MoonkinForm:IsCastableP() and (Player:BuffDownP(S.MoonkinFormBuff)) then
+    if HR.Cast(S.MoonkinForm) then return "moonkin_form 105"; end
+  end
+  -- starsurge
+  if S.Starsurge:IsReadyP() then
+    if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 107"; end
+  end
+  -- lunar_strike,if=buff.lunar_empowerment.up|spell_targets>1
+  if S.LunarStrike:IsReadyP() and (Player:BuffP(S.LunarEmpowerment) or EnemiesCountLR > 1) then
+    if HR.Cast(S.LunarStrike, nil, nil, 40) then return "lunar_strike 109"; end
+  end
+  -- solar_wrath
+  if S.SolarWrath:IsCastableP() then
+    if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 111"; end
+  end
+end
+
+local function Feral()
+  -- rake,if=buff.shadowmeld.up|buff.prowl.up
+  -- Manually added DebuffDownP requirement to avoid double Rake opener
+  if S.Rake:IsReadyP() and (not Player:IsStealthed(true, true) and Target:DebuffDownP(S.RakeDebuff)) then
+    if HR.Cast(S.Rake, nil, nil, "Melee") then return "rake 201"; end
+  end
+  -- auto_attack
+  -- sunfire,target_if=refreshable
+  if S.Sunfire:IsReadyP() then
+    if HR.CastCycle(S.Sunfire, 40, EvaluateCycleSunfire301) then return "sunfire 203"; end
+  end
+  -- moonfire,target_if=refreshable&time_to_die>12&(spell_targets.swipe_cat<=4|energy<50)&(!buff.memory_of_lucid_dreams.up|(!ticking&spell_targets.swipe_cat<3))|(prev_gcd.1.sunfire&remains<duration*0.8&spell_targets.sunfire=1)
+  if S.Moonfire:IsReadyP() then
+    if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire305) then return "moonfire 205"; end
+  end
+  -- sunfire,if=prev_gcd.1.moonfire&remains<duration*0.8
+  if S.Sunfire:IsReadyP() and (Player:PrevGCDP(1, S.Moonfire) and Target:DebuffRemainsP(S.SunfireDebuff) < S.SunfireDebuff:BaseDuration() * 0.8) then
+    if HR.Cast(S.Sunfire, nil, nil, 40) then return "sunfire 207"; end
+  end
+  -- cat_form,if=!buff.cat_form.up&energy>50
+  if S.CatForm:IsCastableP() and (Player:BuffDownP(S.CatFormBuff) and Player:Energy() > 50) then
+    if HR.Cast(S.CatForm) then return "cat_form 209"; end
+  end
+  -- solar_wrath,if=!buff.cat_form.up
+  if S.SolarWrath:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
+    if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 211"; end
+  end
+  -- ferocious_bite,if=(combo_points>3&target.1.time_to_die<3)|(combo_points=5&energy>=50&dot.rip.remains>10)&spell_targets.swipe_cat<5
+  if S.FerociousBite:IsReadyP() and ((Player:ComboPoints() > 3 and Target:TimeToDie() < 3) or (Player:ComboPoints() == 5 and Player:Energy() >= 50 and Target:DebuffRemainsP(S.RipDebuff) > 10) and EnemiesCount < 5) then
+    if HR.Cast(S.FerociousBite, nil, nil, "Melee") then return "ferocious_bite 213"; end
+  end
+  -- rip,target_if=(refreshable&(combo_points=5&time_to_die>remains+24|(remains+combo_points*4<time_to_die&remains+4+combo_points*4>time_to_die)))|combo_points=5&energy>90&remains<=10
+  if S.Rip:IsReadyP() then
+    if HR.CastCycle(S.Rip, 8, EvaluateCycleRip307) then return "rip 215"; end
+  end
+  -- rake,target_if=refreshable&time_to_die>10&(combo_points<5|remains<1)&spell_targets.swipe_cat<4
+  if S.Rake:IsReadyP() then
+    if HR.CastCycle(S.Rake, 8, EvaluateCycleRake309) then return "rake 217"; end
+  end
+  -- swipe_cat,if=spell_targets.swipe_cat>=2
+  if S.SwipeCat:IsReadyP() and (EnemiesCount >= 2) then
+    if HR.Cast(S.SwipeCat, nil, nil, 8) then return "swipe_cat 219"; end
+  end
+  -- shred,if=combo_points<5|energy>90
+  if S.Shred:IsReadyP() and (Player:ComboPoints() < 5 or Player:Energy() > 90) then
+    if HR.Cast(S.Shred, nil, nil, "Melee") then return "shred 221"; end
+  end
+  -- Give Pool icon if waiting on energy
+  if (true) then
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Energy"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
   local Precombat, Balance, Feral
@@ -154,118 +271,7 @@ local function APL()
   EnemiesCountLR = GetEnemiesCount(40)
   HL.GetEnemies(8)  -- For CastCycle Calls
   HL.GetEnemies(40) -- For CastCycle Calls
-  Precombat = function()
-    -- flask
-    -- food
-    -- augmentation
-    -- snapshot_stats
-    -- Manual opener tweak: Only do cat stuff with Feral Affinity
-    if S.FeralAffinity:IsAvailable() then
-      -- cat_form
-      if S.CatForm:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
-        if HR.Cast(S.CatForm) then return "cat_form 1"; end
-      end
-      -- prowl
-      if S.Prowl:IsCastableP() and (Player:BuffP(S.CatFormBuff)) then
-        if HR.Cast(S.Prowl, Settings.Restoration.GCDasOffGCD.Prowl) then return "prowl 3"; end
-      end
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 5"; end
-      end
-      -- Manually add Rake opener
-      if S.Rake:IsReadyP() and (Player:IsStealthed(true, false)) then
-        if HR.Cast(S.Rake, nil, nil, "Melee") then return "rake 7"; end
-      end
-    else
-      -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 9"; end
-      end
-      -- Manually add Solar Wrath for non-cat
-      if S.SolarWrath:IsCastableP() then
-        if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 11"; end
-      end
-    end
-  end
-  Balance = function()
-    -- sunfire,target_if=refreshable
-    if S.Sunfire:IsReadyP() then
-      if HR.CastCycle(S.Sunfire, 40, EvaluateCycleSunfire301) then return "sunfire 101" end
-    end
-    -- moonfire,target_if=refreshable&spell_targets.lunar_strike<7
-    if S.Moonfire:IsReadyP() then
-      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire303) then return "moonfire 103"; end
-    end
-    -- Manually add Moonkin Form, as it's needed for Starsurge and Lunar Strike
-    if S.MoonkinForm:IsCastableP() and (Player:BuffDownP(S.MoonkinFormBuff)) then
-      if HR.Cast(S.MoonkinForm) then return "moonkin_form 105"; end
-    end
-    -- starsurge
-    if S.Starsurge:IsReadyP() then
-      if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 107"; end
-    end
-    -- lunar_strike,if=buff.lunar_empowerment.up|spell_targets>1
-    if S.LunarStrike:IsReadyP() and (Player:BuffP(S.LunarEmpowerment) or EnemiesCountLR > 1) then
-      if HR.Cast(S.LunarStrike, nil, nil, 40) then return "lunar_strike 109"; end
-    end
-    -- solar_wrath
-    if S.SolarWrath:IsCastableP() then
-      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 111"; end
-    end
-  end
-  Feral = function()
-    -- rake,if=buff.shadowmeld.up|buff.prowl.up
-    -- Manually added DebuffDownP requirement to avoid double Rake opener
-    if S.Rake:IsReadyP() and (not Player:IsStealthed(true, true) and Target:DebuffDownP(S.RakeDebuff)) then
-      if HR.Cast(S.Rake, nil, nil, "Melee") then return "rake 201"; end
-    end
-    -- auto_attack
-    -- sunfire,target_if=refreshable
-    if S.Sunfire:IsReadyP() then
-      if HR.CastCycle(S.Sunfire, 40, EvaluateCycleSunfire301) then return "sunfire 203"; end
-    end
-    -- moonfire,target_if=refreshable&time_to_die>12&(spell_targets.swipe_cat<=4|energy<50)&(!buff.memory_of_lucid_dreams.up|(!ticking&spell_targets.swipe_cat<3))|(prev_gcd.1.sunfire&remains<duration*0.8&spell_targets.sunfire=1)
-    if S.Moonfire:IsReadyP() then
-      if HR.CastCycle(S.Moonfire, 40, EvaluateCycleMoonfire305) then return "moonfire 205"; end
-    end
-    -- sunfire,if=prev_gcd.1.moonfire&remains<duration*0.8
-    if S.Sunfire:IsReadyP() and (Player:PrevGCDP(1, S.Moonfire) and Target:DebuffRemainsP(S.SunfireDebuff) < S.SunfireDebuff:BaseDuration() * 0.8) then
-      if HR.Cast(S.Sunfire, nil, nil, 40) then return "sunfire 207"; end
-    end
-    -- cat_form,if=!buff.cat_form.up&energy>50
-    if S.CatForm:IsCastableP() and (Player:BuffDownP(S.CatFormBuff) and Player:Energy() > 50) then
-      if HR.Cast(S.CatForm) then return "cat_form 209"; end
-    end
-    -- solar_wrath,if=!buff.cat_form.up
-    if S.SolarWrath:IsCastableP() and (Player:BuffDownP(S.CatFormBuff)) then
-      if HR.Cast(S.SolarWrath, nil, nil, 40) then return "solar_wrath 211"; end
-    end
-    -- ferocious_bite,if=(combo_points>3&target.1.time_to_die<3)|(combo_points=5&energy>=50&dot.rip.remains>10)&spell_targets.swipe_cat<5
-    if S.FerociousBite:IsReadyP() and ((Player:ComboPoints() > 3 and Target:TimeToDie() < 3) or (Player:ComboPoints() == 5 and Player:Energy() >= 50 and Target:DebuffRemainsP(S.RipDebuff) > 10) and EnemiesCount < 5) then
-      if HR.Cast(S.FerociousBite, nil, nil, "Melee") then return "ferocious_bite 213"; end
-    end
-    -- rip,target_if=(refreshable&(combo_points=5&time_to_die>remains+24|(remains+combo_points*4<time_to_die&remains+4+combo_points*4>time_to_die)))|combo_points=5&energy>90&remains<=10
-    if S.Rip:IsReadyP() then
-      if HR.CastCycle(S.Rip, 8, EvaluateCycleRip307) then return "rip 215"; end
-    end
-    -- rake,target_if=refreshable&time_to_die>10&(combo_points<5|remains<1)&spell_targets.swipe_cat<4
-    if S.Rake:IsReadyP() then
-      if HR.CastCycle(S.Rake, 8, EvaluateCycleRake309) then return "rake 217"; end
-    end
-    -- swipe_cat,if=spell_targets.swipe_cat>=2
-    if S.SwipeCat:IsReadyP() and (EnemiesCount >= 2) then
-      if HR.Cast(S.SwipeCat, nil, nil, 8) then return "swipe_cat 219"; end
-    end
-    -- shred,if=combo_points<5|energy>90
-    if S.Shred:IsReadyP() and (Player:ComboPoints() < 5 or Player:Energy() > 90) then
-      if HR.Cast(S.Shred, nil, nil, "Melee") then return "shred 221"; end
-    end
-    -- Give Pool icon if waiting on energy
-    if (true) then
-      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Energy"; end
-    end
-  end
+
   -- Call Precombat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -310,6 +316,10 @@ local function APL()
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
+    -- worldvein_resonance,if=!buff.shadowmeld.up&!buff.prowl.up&dot.sunfire.remains>6&(buff.cat_form.up|!talent.feral_affinity.enabled)
+    if S.WorldveinResonance:IsCastableP() and (not Player:BuffP(S.Shadowmeld) and not Player:BuffP(S.Prowl) and Target:DebuffRemainsP(S.SunfireDebuff) > 6 and (Player:BuffP(S.CatFormBuff) or not S.FeralAffinity:IsAvailable())) then
+      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 44"; end
+    end
     -- potion
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 45"; end
@@ -346,7 +356,7 @@ local function APL()
   end
 end
 
-local function Init ()
+local function Init()
   HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
   HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
 end
