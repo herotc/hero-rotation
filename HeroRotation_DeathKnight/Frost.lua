@@ -67,6 +67,7 @@ Spell.DeathKnight.Frost = {
   UnholyStrengthBuff                    = Spell(53365),
   IcyCitadel                            = Spell(272718),
   IcyCitadelBuff                        = Spell(272723),
+  FrostwhelpsIndignation                = Spell(287283),
   MindFreeze                            = Spell(47528),
   RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = Spell(297108),
@@ -496,8 +497,8 @@ local function Cooldowns()
   if S.BagofTricks:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 5 and S.ColdHeart:IsAvailable() or not S.ColdHeart:IsAvailable() and Player:BuffRemainsP(S.PillarofFrostBuff) < 3) and Cache.EnemiesCount[8] == 1 or Player:BuffP(S.SeethingRageBuff) and Cache.EnemiesCount[8] == 1) then
     if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 432"; end
   end
-  -- pillar_of_frost,if=(cooldown.empower_rune_weapon.remains|talent.icecap.enabled)&!buff.pillar_of_frost.up
-  if S.PillarofFrost:IsCastableP() and ((bool(S.EmpowerRuneWeapon:CooldownRemainsP()) or S.Icecap:IsAvailable()) and Player:BuffDownP(S.PillarofFrostBuff)) then
+  -- pillar_of_frost,if=(cooldown.empower_rune_weapon.remains|talent.icecap.enabled)&!buff.pillar_of_frost.up|talent.icecap.enabled&azerite.frostwhelps_indignation.enabled&buff.pillar_of_frost.remains<2
+  if S.PillarofFrost:IsCastableP() and ((bool(S.EmpowerRuneWeapon:CooldownRemainsP()) or S.Icecap:IsAvailable()) and Player:BuffDownP(S.PillarofFrostBuff) or S.Icecap:IsAvailable() and S.FrostwhelpsIndignation:AzeriteEnabled() and Player:BuffRemainsP(S.PillarofFrostBuff) < 2) then
     if HR.Cast(S.PillarofFrost, Settings.Frost.GCDasOffGCD.PillarofFrost) then return "pillar_of_frost 433"; end
   end
   -- breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
@@ -535,8 +536,8 @@ local function Cooldowns()
 end
 
 local function Essences()
-  -- blood_of_the_enemy,if=buff.pillar_of_frost.up&(buff.pillar_of_frost.remains<10&(buff.breath_of_sindragosa.up|talent.obliteration.enabled|talent.icecap.enabled&!azerite.icy_citadel.enabled)|buff.icy_citadel.up&talent.icecap.enabled)
-  if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and (Player:BuffP(S.BreathofSindragosa) or S.Obliteration:IsAvailable() or S.Icecap:IsAvailable() and not S.IcyCitadel:AzeriteEnabled()) or Player:BuffP(S.IcyCitadelBuff) and S.Icecap:IsAvailable())) then
+  -- blood_of_the_enemy,if=buff.pillar_of_frost.up&(buff.pillar_of_frost.remains<10&(buff.breath_of_sindragosa.up|talent.obliteration.enabled|talent.icecap.enabled&!azerite.icy_citadel.enabled)|buff.icy_citadel.up&talent.icecap.enabled)&(active_enemies=1|!talent.icecap.enabled)|active_enemies>=2&talent.icecap.enabled&cooldown.pillar_of_frost.ready&(azerite.icy_citadel.rank>=1&buff.icy_citadel.up|!azerite.icy_citadel.enabled)
+  if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.PillarofFrostBuff) and (Player:BuffRemainsP(S.PillarofFrostBuff) < 10 and (Player:BuffP(S.BreathofSindragosa) or S.Obliteration:IsAvailable() or S.Icecap:IsAvailable() and not S.IcyCitadel:AzeriteEnabled()) or Player:BuffP(S.IcyCitadelBuff) and S.Icecap:IsAvailable()) and (Cache.EnemiesCount[8] == 1 or not S.Icecap:IsAvailable()) or Cache.EnemiesCount[8] >= 2 and S.Icecap:IsAvailable() and S.PillarofFrost:CooldownUpP() and (S.IcyCitadel:AzeriteRank() >= 1 and Player:BuffP(S.IcyCitadelBuff) or not S.IcyCitadel:AzeriteEnabled())) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 501"; end
   end
   -- guardian_of_azeroth,if=!talent.icecap.enabled|talent.icecap.enabled&azerite.icy_citadel.enabled&buff.pillar_of_frost.remains<6&buff.pillar_of_frost.up|talent.icecap.enabled&!azerite.icy_citadel.enabled
