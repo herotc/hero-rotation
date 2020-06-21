@@ -349,11 +349,11 @@ local function CDSerenity()
   if S.BagofTricks:IsCastableP() then
     if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 58"; end
   end
-  -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|fight_remains<25
-  if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod or HL.BossFilteredFightRemains("<", 25)) then
+  -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<=20
+  if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or VarHoldTod or HL.BossFilteredFightRemains("<=", 20)) then
     if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 60"; end
   end
-  -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|fight_remains<20
+  -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<=20
   -- 61
   -- use_item,effect_name=gladiators_emblem,if=fight_remains>159|cooldown.touch_of_death.remains<1|variable.hold_tod
   -- 62
@@ -365,8 +365,8 @@ local function CDSerenity()
   if S.TouchofKarma:IsReadyP() and (HL.FilteredFightRemains(20, ">", 159, true) or Target:DebuffP(S.TouchofDeathDebuff) or VarHoldTod) then
     if HR.Cast(S.TouchofKarma, nil, nil, 20) then return "touch_of_karma 64"; end
   end
-  -- use_item,name=pocketsized_computation_device,if=buff.serenity.down&(cooldown.touch_of_death.remains>10|!variable.hold_tod)|fight_remains<5
-  if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.SerenityBuff) and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) or HL.BossFilteredFightRemains("<", 5)) then
+  -- use_item,name=pocketsized_computation_device,if=buff.serenity.down&(cooldown.touch_of_death.remains>10|variable.hold_tod)|fight_remains<5
+  if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDownP(S.SerenityBuff) and (S.TouchofDeath:CooldownRemainsP() > 10 or VarHoldTod) or HL.BossFilteredFightRemains("<", 5)) then
     if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 65"; end
   end
   -- blood_of_the_enemy,if=buff.serenity.down&(cooldown.serenity.remains>20|cooldown.serenity.remains<2)|fight_remains<15
@@ -374,8 +374,8 @@ local function CDSerenity()
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 66"; end
   end
   if (Settings.Commons.UseTrinkets) then
-    -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>10|!variable.hold_tod
-    if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) then
+    -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>10|variable.hold_tod
+    if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or VarHoldTod) then
       if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 68"; end
     end
     -- use_item,effect_name=gladiators_badge,if=cooldown.serenity.remains>20|fight_remains<20
@@ -384,8 +384,8 @@ local function CDSerenity()
     if I.GalecallersBoon:IsEquipReady() and (S.Serenity:CooldownRemainsP() > 20 or HL.BossFilteredFightRemains("<", 20)) then
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 70"; end
     end
-    -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>10|!variable.hold_tod
-    if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or not VarHoldTod) then
+    -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>10|variable.hold_tod
+    if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 10 or VarHoldTod) then
       if HR.Cast(I.WrithingSegmentofDrestagath, nil, Settings.Commons.TrinketDisplayStyle, 8) then return "writhing_segment_of_drestagath 72"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.serenity.remains>9|fight_remains<25
@@ -446,8 +446,8 @@ local function CDSEF()
   if S.InvokeXuentheWhiteTiger:IsReadyP() and (Player:BuffDownP(S.SerenityBuff) or HL.BossFilteredFightRemains("<", 25)) then
     if HR.Cast(S.InvokeXuentheWhiteTiger, nil, nil, 40) then return "invoke_xuen_the_white_tiger 100"; end
   end
-  -- guardian_of_azeroth,if=fight_remains>185|!variable.hold_tod&cooldown.touch_of_death.remains<=14|fight_remains<35
-  if S.GuardianofAzeroth:IsCastableP() and (HL.FilteredFightRemains(40, ">", 185, true) or not VarHoldTod and S.TouchofDeath:CooldownRemainsP() <= 14 or HL.BossFilteredFightRemains("<", 35)) then
+  -- guardian_of_azeroth,if=fight_remains>185|!variable.hold_tod&cooldown.touch_of_death.remains<=14|fight_remains<36
+  if S.GuardianofAzeroth:IsCastableP() and (HL.FilteredFightRemains(40, ">", 185, true) or not VarHoldTod and S.TouchofDeath:CooldownRemainsP() <= 14 or HL.BossFilteredFightRemains("<", 36)) then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 104"; end
   end
   -- worldvein_resonance,if=cooldown.touch_of_death.remains>58|cooldown.touch_of_death.remains<2|variable.hold_tod|fight_remains<20
@@ -458,11 +458,11 @@ local function CDSEF()
   if S.ArcaneTorrent:IsCastableP() and (Player:ChiDeficit() >= 1 and Player:EnergyTimeToMaxPredicted() >= 0.5) then
     if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 108"; end
   end
-  -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|fight_remains<25
-  if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod or HL.BossFilteredFightRemains("<", 25)) then
+  -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<=20
+  if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemainsP() < 1 or S.TouchofDeath:CooldownRemainsP() > 20 or VarHoldTod or HL.BossFilteredFightRemains("<=", 20)) then
     if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 110"; end
   end
-  -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|!variable.hold_tod|fight_remains<20
+  -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<=20
   -- 112
   -- use_item,effect_name=gladiators_emblem,if=fight_remains>159|cooldown.touch_of_death.remains<1|variable.hold_tod
   -- 113
@@ -511,22 +511,22 @@ local function CDSEF()
     if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 129"; end
   end
   if (Settings.Commons.UseTrinkets) then
-    -- use_item,name=pocketsized_computation_device,if=cooldown.touch_of_death.remains>30|!variable.hold_tod
-    if Everyone.PSCDEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or not VarHoldTod) then
+    -- use_item,name=pocketsized_computation_device,if=cooldown.touch_of_death.remains>30|variable.hold_tod
+    if Everyone.PSCDEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod) then
       if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 130"; end
     end
-    -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>30|!variable.hold_tod
-    if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or not VarHoldTod) then
+    -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>30|variable.hold_tod
+    if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 30 or VarHoldTod) then
       if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 132"; end
     end
-    -- use_item,effect_name=gladiators_badge,if=cooldown.touch_of_death.remains>20|!variable.hold_tod|fight_remains<20
+    -- use_item,effect_name=gladiators_badge,if=cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<20
     -- 134
     -- use_item,effect_name=galecallers_boon,if=cooldown.touch_of_death.remains>55|variable.hold_tod|fight_remains<12
     if I.GalecallersBoon:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 55 or VarHoldTod or HL.BossFilteredFightRemains("<", 12)) then
       if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 136"; end
     end
-    -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>20|!variable.hold_tod
-    if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 20 or not VarHoldTod) then
+    -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>20|variable.hold_tod
+    if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemainsP() > 20 or VarHoldTod) then
       if HR.Cast(I.WrithingSegmentofDrestagath, nil, Settings.Commons.TrinketDisplayStyle, 8) then return "writhing_segment_of_drestagath 138"; end
     end
     -- use_item,name=ashvanes_razor_coral,if=variable.tod_on_use_trinket&(cooldown.touch_of_death.remains>21|variable.hold_tod)&(debuff.razor_coral_debuff.down|buff.storm_earth_and_fire.remains>13|fight_remains-cooldown.touch_of_death.remains<40&cooldown.touch_of_death.remains<25|fight_remains<25)
