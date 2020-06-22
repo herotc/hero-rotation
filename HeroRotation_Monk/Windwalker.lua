@@ -182,7 +182,7 @@ HL:RegisterForEvent(function()
   VarFoPPreChan = 0
 end, "PLAYER_REGEN_ENABLED")
 
-local EnemyRanges = {8, 5}
+local EnemyRanges = {40, 20, 12, 8, 5}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -362,7 +362,7 @@ local function CDSerenity()
     if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 63"; end
   end
   -- touch_of_karma,if=fight_remains>159|dot.touch_of_death.remains|variable.hold_tod
-  if S.TouchofKarma:IsReadyP() and (HL.FilteredFightRemains(20, ">", 159, true) or Target:DebuffP(S.TouchofDeathDebuff) or VarHoldTod) then
+  if S.TouchofKarma:IsReadyP() and not Settings.Windwalker.IgnoreToK and (HL.FilteredFightRemains(20, ">", 159, true) or Target:DebuffP(S.TouchofDeathDebuff) or VarHoldTod) then
     if HR.Cast(S.TouchofKarma, nil, nil, 20) then return "touch_of_karma 64"; end
   end
   -- use_item,name=pocketsized_computation_device,if=buff.serenity.down&(cooldown.touch_of_death.remains>10|variable.hold_tod)|fight_remains<5
@@ -475,7 +475,7 @@ local function CDSEF()
     if HR.Cast(S.StormEarthandFire, Settings.Windwalker.GCDasOffGCD.StormEarthandFire) then return "storm_earth_and_fire 116"; end
   end
   -- touch_of_karma,if=fight_remains>159|dot.touch_of_death.remains|variable.hold_tod
-  if S.TouchofKarma:IsReadyP() and (HL.FilteredFightRemains(20, ">", 159, true) or Target:DebuffP(S.TouchofDeathDebuff) or VarHoldTod) then
+  if S.TouchofKarma:IsReadyP() and not Settings.Windwalker.IgnoreToK and (HL.FilteredFightRemains(20, ">", 159, true) or Target:DebuffP(S.TouchofDeathDebuff) or VarHoldTod) then
     if HR.Cast(S.TouchofKarma, nil, nil, 20) then return "touch_of_karma 117"; end
   end
   -- blood_of_the_enemy,if=cooldown.touch_of_death.remains>45|variable.hold_tod&cooldown.fists_of_fury.remains<2|fight_remains<12|fight_remains>100&fight_remains<110&(cooldown.fists_of_fury.remains<3|cooldown.whirling_dragon_punch.remains<5|cooldown.rising_sun_kick.remains<5)
