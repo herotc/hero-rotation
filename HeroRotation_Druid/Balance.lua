@@ -357,7 +357,7 @@ local function APL()
       if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "shiver_venom_relic 105"; end
     end
     -- use_item,name=manifesto_of_madness,if=buff.ca_inc.remains>10|buff.ca_inc.remains>4&buff.arcanic_pulsar.stack>6|fight_remains<21
-    if I.ManifestoofMadness:IsEquipReady() and (Player:BuffRemainsP(CaInc()) > 10 or Player:BuffRemainsP(CaInc()) > 4 and Player:BuffStackP(S.ArcanicPulsarBuff) > 6 or Target:TimeToDie() < 21) then
+    if I.ManifestoofMadness:IsEquipReady() and (Player:BuffRemainsP(CaInc()) > 10 or Player:BuffRemainsP(CaInc()) > 4 and Player:BuffStackP(S.ArcanicPulsarBuff) > 6 or HL.BossFilteredFightRemains("<", 21)) then
       if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness"; end
     end
     -- blood_of_the_enemy,if=cooldown.ca_inc.remains>30
@@ -436,11 +436,14 @@ local function APL()
       -- if HR.Cancel(S.StarlordBuff) then return ""; end
     -- end
     -- starfall,if=(!solar_wrath.ap_check|(buff.starlord.stack<3|buff.starlord.remains>=8)&(fight_remains+1)*spell_targets>cost%2.5)&spell_targets>=variable.sf_targets
-    if S.Starfall:IsReadyP() and ((not AP_Check(S.SolarWrath) or (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 8) and (Target:TimeToDie() + 1) * EnemiesCount > S.Starfall:Cost() % 2.5) and EnemiesCount >= VarSfTargets) then
-      if HR.Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall) then return "starfall 164"; end
+    if S.Starfall:IsReadyP() then
+      local FightRemains = HL.FightRemains(40)
+      if ((not AP_Check(S.SolarWrath) or (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 8) and (FightRemains + 1) * EnemiesCount > S.Starfall:Cost() % 2.5) and EnemiesCount >= VarSfTargets) then
+        if HR.Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall) then return "starfall 164"; end
+      end
     end
     -- starsurge,if=((talent.starlord.enabled&(buff.starlord.stack<3|buff.starlord.remains>=5&buff.arcanic_pulsar.stack<8)|!talent.starlord.enabled&(buff.arcanic_pulsar.stack<8|buff.ca_inc.up))&buff.solar_empowerment.stack<3&buff.lunar_empowerment.stack<3&buff.reckless_force_counter.stack<19|buff.reckless_force.up)&spell_targets.starfall<variable.sf_targets&(!variable.az_ss|!buff.ca_inc.up|!prev.starsurge)|fight_remains<=execute_time*astral_power%40|!solar_wrath.ap_check
-    if S.Starsurge:IsReadyP() and (((S.Starlord:IsAvailable() and (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 5 and Player:BuffStackP(S.ArcanicPulsarBuff) < 8) or not S.Starlord:IsAvailable() and (Player:BuffStackP(S.ArcanicPulsarBuff) < 8 or Player:BuffP(CaInc()))) and Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and Player:BuffStackP(S.LunarEmpowermentBuff) < 3 and Player:BuffStackP(S.RecklessForceBuff) < 19 or Player:BuffDownP(S.RecklessForceBuff)) and EnemiesCount < VarSfTargets and (not VarAzSs or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Starsurge)) or Target:TimeToDie() <= S.Starsurge:ExecuteTime() * Player:AstralPower() % 40 or not AP_Check(S.SolarWrath)) then
+    if S.Starsurge:IsReadyP() and (((S.Starlord:IsAvailable() and (Player:BuffStackP(S.StarlordBuff) < 3 or Player:BuffRemainsP(S.StarlordBuff) >= 5 and Player:BuffStackP(S.ArcanicPulsarBuff) < 8) or not S.Starlord:IsAvailable() and (Player:BuffStackP(S.ArcanicPulsarBuff) < 8 or Player:BuffP(CaInc()))) and Player:BuffStackP(S.SolarEmpowermentBuff) < 3 and Player:BuffStackP(S.LunarEmpowermentBuff) < 3 and Player:BuffStackP(S.RecklessForceBuff) < 19 or Player:BuffDownP(S.RecklessForceBuff)) and EnemiesCount < VarSfTargets and (not VarAzSs or Player:BuffDownP(CaInc()) or not Player:PrevGCDP(1, S.Starsurge)) or HL.BossFilteredFightRemains("<", S.Starsurge:ExecuteTime() * Player:AstralPower() % 40) or not AP_Check(S.SolarWrath)) then
       if HR.Cast(S.Starsurge, nil, nil, 40) then return "starsurge 188"; end
     end
     -- sunfire,if=buff.ca_inc.up&buff.ca_inc.remains<gcd.max&variable.az_ss&dot.moonfire.remains>remains
