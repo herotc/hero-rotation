@@ -266,7 +266,6 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local Precombat, Balance, Feral
   EnemiesCount = GetEnemiesCount(8)
   EnemiesCountLR = GetEnemiesCount(40)
   HL.GetEnemies(8)  -- For CastCycle Calls
