@@ -155,31 +155,30 @@ local function IgnorePainWillNotCap()
   end
 end
 
--- The amount of rage above which we dump revenges, below which we conserve for ignore pain.
-local function RevengeThreshold()
-  return 60
+local function ShouldPressShieldBlock()
+  return IsCurrentlyTanking() and S.ShieldBlock:IsReady() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemainsP(S.ShieldBlockBuff) <= 1.5*gcdTime) and Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30)
 end
 
-
--- A bit of logic to dump rage immediately if the next spell suggested would take you past the rage threshold
-local function shouldDumpRageIntoIP(rageGenerated)
-  -- pick a threshold where rage-from-damage-taken doesn't cap you
-  rageMax = 90
-  -- make sure we have enough rage to cast IP
-  if Player:Rage() >= 40 then
-    if Player:BuffRemainsP(S.MemoryofLucidDreamsBuff) > Player:GCD() then
-      -- rage gen is doubled. should dump rage into IP if rage + 2*rageGenerated >= rageMax
-      return Player:Rage() + 2 * rageGenerated >= rageMax
-    else
-      return Player:Rage() + rageGenerated >= rageMax
-    end
-  else
-    return false
+-- A bit of logic to decide whether to pre-cast-rage-dump on ignore pain.
+local function SuggestRageDump(rageFromSpell)
+  -- pick a threshold where rage-from-damage-taken doesn't cap you even after the cast.
+  -- This threshold is chosen somewhat arbitrarily. 
+  -- TODO(mrdmnd) - make this config value in options.
+  rageMax = 80
+  shouldPreRageDump = false
+  -- Rage gen is doubled with lucid dreams up.
+  lucidDreamsUp = (Player:BuffRemainsP(S.MemoryofLucidDreamsBuff) > Player:GCD())
+  -- Make sure we have enough rage to even cast IP, and that it's not on CD.
+  -- Make sure that we account for pressing shield block too - don't want to go too low on rage.
+  if Player:Rage() >= 40 and S.IgnorePain:IsReadyP() and not ShouldPressShieldBlock() then
+    -- should pre-dump rage into IP if rage + rageFromNextSpell >= rageMax
+      shouldPreRageDump = (Player:Rage() + (1 + num(lucidDreamsUp)) * rageFromSpell >= rageMax) or shouldPreRageDump
   end
-end
-
-local function suggestRageDump(baseRageGen)
-  if shouldDumpRageIntoIP(baseRageGen) then
+  -- Dump rage if we're sitting on demo shout for a while
+  if Player:Rage() >= 40 and S.DemoralizingShout:IsReadyP() and not ShouldPressShieldBlock() then
+    shouldPreRageDump = true
+  end
+  if shouldPreRageDump then
     if HR.CastRightSuggested(S.IgnorePain) then return "rage capped"; end
   end
 end
@@ -206,11 +205,17 @@ local function Precombat()
 end
 
 local function Defensive()
-  if S.ShieldBlock:IsReadyP() and ((Player:BuffDownP(S.ShieldBlockBuff) or Player:BuffRemainsP(S.ShieldBlockBuff) <= 1.5*gcdTime) and Player:BuffDownP(S.LastStandBuff) and Player:Rage() >= 30) then
+  if ShouldPressShieldBlock() then
     if HR.CastSuggested(S.ShieldBlock) then return "shield_block defensive" end
   end
-  if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and S.ShieldBlock:RechargeP() > 1.5*gcdTime) then
+  if S.LastStand:IsCastableP() and (Player:BuffDownP(S.ShieldBlockBuff) and S.ShieldBlock:RechargeP() > 0) then
     if HR.CastSuggested(S.LastStand) then return "last_stand defensive" end
+  end
+  if Player:HealthPercentage() < 80 and S.VictoryRush:IsReady("Melee") then
+    if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
+  end
+  if Player:HealthPercentage() < 80 and S.ImpendingVictory:IsReadyP("Melee") then
+    if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
   end
   if Player:HealthPercentage() <= 70 and I.LingeringPsychicShell:IsEquipReady() then
     if HR.CastRightSuggested(I.LingeringPsychicShell) then return "absorb trinket defensive" end
@@ -224,12 +229,12 @@ end
 local function Aoe()
   -- thunder_clap
   if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) then
-    suggestRageDump(5)
+    SuggestRageDump(5)
     if HR.Cast(S.ThunderClap) then return "thunder_clap 6"; end
   end
   -- demoralizing_shout,if=talent.booming_voice.enabled
   if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
-    suggestRageDump(40)
+    SuggestRageDump(40)
     if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 8"; end
   end
   -- shield_slam,if=buff.memory_of_lucid_dreams.up
@@ -241,7 +246,7 @@ local function Aoe()
     if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar) then return "dragon_roar 12"; end
   end
   -- revenge
-  if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() > RevengeThreshold()) then
+  if S.Revenge:IsReadyP("Melee") and Player:Buff(S.FreeRevenge) then
     if HR.Cast(S.Revenge) then return "revenge 14"; end
   end
   -- ravager
@@ -250,7 +255,7 @@ local function Aoe()
   end
   -- shield_slam
   if S.ShieldSlam:IsCastableP("Melee") then
-    suggestRageDump(15)
+    SuggestRageDump(15)
     if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
   end
   -- devastate
@@ -262,22 +267,22 @@ end
 local function St()
   -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
   if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and (Cache.EnemiesCount[8] == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff)) then
-    suggestRageDump(5)
+    SuggestRageDump(5)
     if HR.Cast(S.ThunderClap) then return "thunder_clap 26"; end
   end
   -- shield_slam
   if S.ShieldSlam:IsCastableP("Melee") then
-    suggestRageDump(15)
+    SuggestRageDump(15)
     if HR.Cast(S.ShieldSlam) then return "shield_slam 44"; end
   end
   -- thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
   if (S.ThunderClap:IsCastableP(8) or S.ThunderClap:CooldownRemainsP() < 0.150) and ((S.UnstoppableForce:IsAvailable() and Player:BuffP(S.AvatarBuff))) then
-    suggestRageDump(5)
+    SuggestRageDump(5)
     if HR.Cast(S.ThunderClap) then return "thunder_clap 54"; end
   end
   -- demoralizing_shout,if=talent.booming_voice.enabled
   if S.DemoralizingShout:IsCastableP(10) and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
-    suggestRageDump(40)
+    SuggestRageDump(40)
     if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout) then return "demoralizing_shout 60"; end
   end
   -- dragon_roar
@@ -286,11 +291,11 @@ local function St()
   end
   -- thunder_clap
   if S.ThunderClap:IsCastableP(8) then
-    suggestRageDump(5)
+    SuggestRageDump(5)
     if HR.Cast(S.ThunderClap) then return "thunder_clap 74"; end
   end
   -- revenge
-  if S.Revenge:IsReadyP("Melee") and (Player:Buff(S.FreeRevenge) or Player:Rage() >= RevengeThreshold() or ((not IsCurrentlyTanking()) and Player:Rage() >= 50)) then
+  if S.Revenge:IsReadyP("Melee") and Player:Buff(S.FreeRevenge) then
     if HR.Cast(S.Revenge) then return "revenge 76"; end
   end
   -- ravager
@@ -364,14 +369,9 @@ local function APL()
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvatarBuff) or Target:TimeToDie() < 25) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 105"; end
     end
-    if Player:HealthPercentage() < 80 and S.VictoryRush:IsReady("Melee") then
-      if HR.Cast(S.VictoryRush) then return "victory_rush defensive" end
-    end
-    if Player:HealthPercentage() < 80 and S.ImpendingVictory:IsReadyP("Melee") then
-      if HR.Cast(S.ImpendingVictory) then return "impending_victory defensive" end
-    end
+
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
-    if S.IgnorePain:IsReadyP() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and IgnorePainWillNotCap() and IsCurrentlyTanking()) then
+    if S.IgnorePain:IsReady() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUpP()) and IgnorePainWillNotCap() and IsCurrentlyTanking()) then
       if HR.CastRightSuggested(S.IgnorePain) then return "ignore_pain 107"; end
     end
     -- worldvein_resonance,if=cooldown.avatar.remains<=2
@@ -403,7 +403,7 @@ local function APL()
     end
     -- avatar
     if S.Avatar:IsCastableP() and HR.CDsON() and (Player:BuffDownP(S.AvatarBuff)) then
-    suggestRageDump(20)
+    SuggestRageDump(20)
       if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 119"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
