@@ -46,6 +46,7 @@ Spell.Paladin.Protection = {
   LightoftheProtector                   = Spell(184092),
   HandoftheProtector                    = Spell(213652),
   Rebuke                                = Spell(96231),
+  HammerofJustice                       = Spell(853),
   RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = Spell(297108),
   MemoryofLucidDreams                   = Spell(298357),
