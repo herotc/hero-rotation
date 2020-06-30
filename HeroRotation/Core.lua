@@ -142,8 +142,8 @@
       end
     elseif DisplayStyle == "Suggested" then
       HR.CastSuggested(Object);
-	elseif DisplayStyle == "SuggestedRight" then
-	  HR.CastRightSuggested(Object);
+    elseif DisplayStyle == "SuggestedRight" then
+      HR.CastRightSuggested(Object);
     else
       local PoolResource = 9999000010
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
