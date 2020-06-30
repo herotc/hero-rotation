@@ -570,7 +570,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- Interrupts
-    Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false);
+    local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
     -- bloodlust,if=azerite.ancestral_resonance.enabled
     -- potion,if=expected_combat_length-time<60|cooldown.guardian_of_azeroth.remains<30
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Target:TimeToDie() < 60 or S.GuardianofAzeroth:CooldownRemainsP() <30) then

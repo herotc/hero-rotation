@@ -593,7 +593,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- wind_shear/interrupts
-    Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, StunInterrupts)
+    local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Set Variables; Moved to function for cleanliness
     if (true) then
       SetVariables();

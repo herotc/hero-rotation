@@ -939,7 +939,8 @@ local function APL ()
     if ShouldReturn then return ShouldReturn; end
 
     -- Interrupts
-    Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
+    if ShouldReturn then return ShouldReturn; end
 
     -- actions=variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
     PoisonedBleeds = Rogue.PoisonedBleeds()

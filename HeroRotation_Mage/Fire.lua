@@ -734,7 +734,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell
-    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
+    local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     -- variable,name=time_to_combustion,op=set,value=talent.firestarter.enabled*firestarter.remains+(cooldown.combustion.remains*(1-variable.kindling_reduction*talent.kindling.enabled)-action.rune_of_power.execute_time*talent.rune_of_power.enabled)*!cooldown.combustion.ready*buff.combustion.down
     if (true) then
       VarTimeToCombusion = num(S.Firestarter:IsAvailable()) * S.Firestarter:ActiveRemains() + (S.Combustion:CooldownRemainsP() * (1 - VarKindlingReduction * num(S.Kindling:IsAvailable())) - S.RuneofPower:ExecuteTime() * num(S.RuneofPower:IsAvailable())) * num(not S.Combustion:CooldownUpP()) * num(Player:BuffDownP(S.CombustionBuff))

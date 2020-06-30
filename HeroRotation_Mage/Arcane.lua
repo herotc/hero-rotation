@@ -520,7 +520,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell
-    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
+    local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=essences
     if (true) then
       local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end

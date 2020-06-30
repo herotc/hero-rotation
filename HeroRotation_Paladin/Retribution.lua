@@ -314,7 +314,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- auto_attack
     -- Interrupts
-    Everyone.Interrupt(5, S.Rebuke, Rebuke, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cooldowns
     if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end

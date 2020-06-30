@@ -517,7 +517,7 @@ local function APL()
       if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
     end
     -- Interrupts
-    Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_shot
     -- use_items,if=prev_gcd.1.aspect_of_the_wild|target.time_to_die<20
     -- NOTE: Above line is very non-optimal and feedback has been given to the SimC APL devs, following logic will be used for now:

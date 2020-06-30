@@ -22,6 +22,7 @@ HR.GUISettings.APL.Paladin = {
     EssenceDisplayStyle = "Suggested",
     OffGCDasOffGCD = {
       Racials = true,
+      Rebuke = true,
     }
   },
   Protection = {

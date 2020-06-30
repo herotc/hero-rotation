@@ -739,7 +739,7 @@ local function APL()
       if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
     end
     -- Interrupts
-    Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(5, S.Muzzle, Settings.Survival.OffGCDasOffGCD.Muzzle, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- use_items
     local TrinketToUse = HL.UseTrinkets(OnUseExcludes)

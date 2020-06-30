@@ -793,7 +793,7 @@ local function APL()
     
     -- auto_attack
     -- Interrupts
-    Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
+    local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false); if ShouldReturn then return ShouldReturn; end
     -- variable,name=hold_tod,op=set,value=cooldown.touch_of_death.remains+9>target.time_to_die|!talent.serenity.enabled&!variable.tod_on_use_trinket&equipped.dribbling_inkpod&target.time_to_pct_30.remains<130&target.time_to_pct_30.remains>8|fight_remains<130&fight_remains>cooldown.serenity.remains&cooldown.serenity.remains>2|buff.serenity.up&fight_remains>11
     if (true) then
       VarHoldTod = (((S.TouchofDeath:CooldownRemains() + 9 > Target:TimeToDie() or Target:TimeToDieIsNotValid()) or not S.Serenity:IsAvailable() and not VarTodOnUse and I.DribblingInkpod:IsEquipped() and Target:TimeToX(30) < 130 and Target:TimeToX(30) > 8 or HL.FilteredFightRemains(40, "<", 130) and HL.FilteredFightRemains(40, ">", S.Serenity:CooldownRemainsP(), true) and S.Serenity:CooldownRemains() > 2 or Player:Buff(S.SerenityBuff) and HL.FilteredFightRemains(40, ">", 11, true)) or Settings.Windwalker.IgnoreToD)

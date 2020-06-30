@@ -46,6 +46,7 @@ Spell.Paladin.Protection = {
   LightoftheProtector                   = Spell(184092),
   HandoftheProtector                    = Spell(213652),
   Rebuke                                = Spell(96231),
+  HammerofJustice                       = Spell(853),
   RazorCoralDebuff                      = Spell(303568),
   BloodoftheEnemy                       = Spell(297108),
   MemoryofLucidDreams                   = Spell(298357),
@@ -233,7 +234,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- Interrupts
-    Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(5, S.Rebuke, Settings.Commons.OffGCDasOffGCD.Rebuke, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- Manually added: Defensives
     if (true) then
