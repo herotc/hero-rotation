@@ -422,7 +422,7 @@ local function APL()
       if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
     end
     -- Interrupts
-    Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false);
+    local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false); if ShouldReturn then return ShouldReturn; end
     -- auto_shot
     -- use_item,name=lurkers_insidious_gift,if=cooldown.trueshot.remains_guess<15|target.time_to_die<30
     if I.LurkersInsidiousGift:IsEquipReady() and (S.Trueshot:CooldownRemainsP() < 15 or Target:TimeToDie() < 30) then

@@ -21,8 +21,8 @@ HR.GUISettings.APL.Paladin = {
     TrinketDisplayStyle = "Suggested",
     EssenceDisplayStyle = "Suggested",
     OffGCDasOffGCD = {
-      Rebuke = true,
       Racials = true,
+      Rebuke = true,
     }
   },
   Protection = {

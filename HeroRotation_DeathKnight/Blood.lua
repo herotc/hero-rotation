@@ -322,7 +322,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- Interrupts
-    Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     do
       -- Manually Added: Call Defensives
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end

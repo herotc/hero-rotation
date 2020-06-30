@@ -437,7 +437,7 @@ local function APL()
       if HR.Cast(S.Charge, Settings.Arms.GCDasOffGCD.Charge, nil, 25) then return "charge 351"; end
     end
     -- Interrupts
-    Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(40)) then
       return Movement();

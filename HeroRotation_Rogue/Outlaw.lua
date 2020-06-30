@@ -631,7 +631,8 @@ local function APL ()
     ShouldReturn = TrainingScenario();
     if ShouldReturn then return ShouldReturn; end
     -- Interrupts
-    Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts);
+    if ShouldReturn then return ShouldReturn; end
 
     -- actions+=/call_action_list,name=stealth,if=stealthed.all
     if Player:IsStealthedP(true, true) then

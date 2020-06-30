@@ -331,7 +331,7 @@ local function APL()
       if HR.Cast(S.Barkskin, Settings.Balance.OffGCDasOffGCD.Barkskin) then return "barkskin defensive"; end
     end
     -- Interrupt
-    Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false);
+    local ShouldReturn = Everyone.Interrupt(40, S.SolarBeam, Settings.Balance.OffGCDasOffGCD.SolarBeam, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.celestial_alignment.remains>13|buff.incarnation.remains>16.5
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemainsP(S.CelestialAlignment) > 13 or Player:BuffRemainsP(S.Incarnation) > 16.5) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 57"; end

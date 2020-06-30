@@ -229,7 +229,7 @@ local function APL()
       if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge) then return "charge 78"; end
     end
     -- Interrupts
-    Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts);
+    local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- run_action_list,name=movement,if=movement.distance>5
     -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(40)) then

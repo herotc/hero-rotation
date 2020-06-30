@@ -228,7 +228,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- auto_attack
     -- Interrupts
-    Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false);
+    local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false); if ShouldReturn then return ShouldReturn; end
     -- Defensives
     ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     if HR.CDsON() and Target:IsInRange("Melee") then

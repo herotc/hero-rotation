@@ -344,7 +344,7 @@ local function APL()
       if HR.Cast(S.WildChargeBear, nil, nil, 25) then return "wild_charge in_combat"; end
     end
     -- Interrupts
-    Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
+    local ShouldReturn = Everyone.Interrupt(13, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- call_action_list,name=cooldowns
     if (true) then

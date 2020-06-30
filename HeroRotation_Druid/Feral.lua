@@ -563,10 +563,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- Interrupts
-    --Everyone.Interrupt(InterruptRange, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false);
-    if S.SkullBash:IsCastable() and Target:IsInterruptible() and Target:IsInRange(InterruptRange) then
-      if HR.Cast(S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash) then return "Cast Skull Bash (Interrupt)"; end
-    end
+    local ShouldReturn = Everyone.Interrupt(InterruptRange, S.SkullBash, Settings.Commons.OffGCDasOffGCD.SkullBash, false); if ShouldReturn then return ShouldReturn; end
     -- auto_attack,if=!buff.prowl.up&!buff.shadowmeld.up
     -- run_action_list,name=opener,if=variable.opener_done=0
     if (VarOpenerDone == 0) then

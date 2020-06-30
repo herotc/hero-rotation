@@ -586,7 +586,7 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- counterspell
-    Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false);
+    local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     if (Settings.Frost.RotationType ~= "No Ice Lance") then
       -- ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
       if S.IceLance:IsCastableP() and (Player:PrevGCDP(1, S.Flurry) and Player:BuffDownP(S.FingersofFrostBuff)) then

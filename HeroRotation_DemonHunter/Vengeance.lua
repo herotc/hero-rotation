@@ -393,7 +393,7 @@ local function APL()
     -- auto_attack
     -- consume_magic
     -- Interrupts
-    Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false);
+    local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=brand,if=talent.charred_flesh.enabled
     if S.CharredFlesh:IsAvailable() then
       local ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
