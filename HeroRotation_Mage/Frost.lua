@@ -99,7 +99,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;
-local IncantersFlowGaming;
+local ILIFGaming;
 local Mage = HR.Commons.Mage
 
 -- GUI Settings
@@ -159,7 +159,7 @@ local function Precombat()
   end
   -- variable,name=incanters_flow_gaming,default=1,op=reset
   if (true) then
-    IncantersFlowGaming = 1
+    ILIFGaming = 1
   end
   -- summon_water_elemental
   if S.SummonWaterElemental:IsCastableP() then
@@ -482,7 +482,7 @@ local function Single()
       if HR.Cast(S.Ebonbolt, nil, nil, 40) then return "ebonbolt single nil 11"; end
     end
     -- ice_lance,if=variable.incanters_flow_gaming&buff.brain_freeze.react&(buff.fingers_of_frost.react|prev_gcd.1.flurry)&(buff.icicles.max_stack-buff.icicles.stack)*action.frostbolt.execute_time+action.glacial_spike.cast_time+action.glacial_spike.travel_time<incanters_flow_time_to.5.any&buff.memory_of_lucid_dreams.down
-    if S.IceLance:IsCastableP() and (bool(IncantersFlowGaming) and S.GlacialSpike:IsAvailable() and S.IncantersFlow:IsAvailable() and Player:BuffP(S.BrainFreezeBuff) and (Player:BuffP(S.FingersofFrostBuff) or Player:PrevGCDP(1, S.Flurry)) and (5 - Player:BuffStackP(S.IciclesBuff)) * S.Frostbolt:ExecuteTime() + S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() < Mage.IFTimeToX(5, "any") and Player:BuffDownP(S.MemoryofLucidDreams)) then
+    if S.IceLance:IsCastableP() and (bool(ILIFGaming) and S.GlacialSpike:IsAvailable() and S.IncantersFlow:IsAvailable() and Player:BuffP(S.BrainFreezeBuff) and (Player:BuffP(S.FingersofFrostBuff) or Player:PrevGCDP(1, S.Flurry)) and (5 - Player:BuffStackP(S.IciclesBuff)) * S.Frostbolt:ExecuteTime() + S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() < Mage.IFTimeToX(5, "any") and Player:BuffDownP(S.MemoryofLucidDreams)) then
       if HR.Cast(S.IceLance, nil, nil, 40) then return "ice_lance single nil 13"; end
     end
     -- glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
