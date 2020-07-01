@@ -27,7 +27,7 @@ HR.GUISettings.APL.DeathKnight = {
       Trinkets = true,
       Potions = true,
       Racials = true,
-      MindFreeze = true,
+      MindFreeze = true
     }
   },
   Frost = {
@@ -39,8 +39,8 @@ HR.GUISettings.APL.DeathKnight = {
       FrostwyrmsFury = true,
       PillarofFrost = true,
       EmpowerRuneWeapon = true,
-      BreathofSindragosa = true,
-    },
+      BreathofSindragosa = true
+    }
   },
   Unholy = {
     AotDOff = true,
@@ -49,7 +49,7 @@ HR.GUISettings.APL.DeathKnight = {
       DarkTransformation = true,
       ArmyoftheDead = true,
       DeathandDecay = false,
-      UnholyFrenzy = true,
+      UnholyFrenzy = true
     }
   },
   Blood = {
@@ -60,7 +60,8 @@ HR.GUISettings.APL.DeathKnight = {
       Blooddrinker = true,
       Bonestorm = true,
       VampiricBlood = true,
-      Tombstone = true
+      Tombstone = true,
+      DeathandDecay = false
     },
     OffGCDasOffGCD = {
       DancingRuneWeapon = true

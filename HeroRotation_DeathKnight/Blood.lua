@@ -269,7 +269,7 @@ local function Standard()
   end
   -- death_and_decay,if=spell_targets.death_and_decay>=3
   if S.DeathandDecay:IsReady() and (Cache.EnemiesCount[10] >= 3) then
-    if HR.Cast(S.DeathandDecay) then return "death_and_decay 70"; end
+    if HR.Cast(S.DeathandDecay, Settings.Blood.GCDasOffGCD.DeathandDecay) then return "death_and_decay 70"; end
   end
   -- rune_strike,if=(charges_fractional>=1.8|buff.dancing_rune_weapon.up)&rune.time_to_3>=gcd
   if S.RuneStrike:IsCastable("Melee") and ((S.RuneStrike:ChargesFractionalP() >= 1.8 or Player:BuffP(S.DancingRuneWeaponBuff)) and Player:RuneTimeToX(3) >= Player:GCD()) then
@@ -285,7 +285,7 @@ local function Standard()
   end
   -- death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
   if S.DeathandDecay:IsReady() and Cache.EnemiesCount[10] >= 1 and (Player:BuffP(S.CrimsonScourge) or S.RapidDecomposition:IsAvailable() or Cache.EnemiesCount[10] >= 2) then
-    if HR.Cast(S.DeathandDecay) then return "death_and_decay 78"; end
+    if HR.Cast(S.DeathandDecay, Settings.Blood.GCDasOffGCD.DeathandDecay) then return "death_and_decay 78"; end
   end
   -- consumption
   if HR.CDsON() and S.Consumption:IsCastable("Melee") then
