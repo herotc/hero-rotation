@@ -259,7 +259,7 @@ local function Aoe()
     if HR.Cast(S.ShieldSlam) then return "shield_slam 24"; end
   end
   -- revenge if you've got ignore pain up and you don't need to shield block soon
-  if S.Revenge:IsCastableP("Melee") and not ShouldPressShieldBlock() and IgnorePainWillNotCap() and Player:Buff(S.IgnorePain) and Player:Rage() > 40 then
+  if S.Revenge:IsCastableP("Melee") and not ShouldPressShieldBlock() and Player:Rage() > 40 then -- and IgnorePainWillNotCap() and Player:Buff(S.IgnorePain) and Player:Rage() > 40 then
     if HR.Cast(S.Revenge) then return "revenge for rage dump"; end
   end
   -- devastate
@@ -307,7 +307,7 @@ local function St()
     if HR.Cast(S.Ravager) then return "ravager 78"; end
   end
   -- revenge if you've got ignore pain up and you don't need to shield block soon
-  if S.Revenge:IsCastableP("Melee") and not ShouldPressShieldBlock() and IgnorePainWillNotCap() and Player:Buff(S.IgnorePain) and Player:Rage() > 40 then
+  if S.Revenge:IsCastableP("Melee") and not ShouldPressShieldBlock() and Player:Rage() > 40 then
     if HR.Cast(S.Revenge) then return "revenge for rage dump"; end
   end
   -- devastate
