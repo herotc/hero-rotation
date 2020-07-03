@@ -12,3 +12,4 @@ Settings.lua
 Protection.lua
 Retribution.lua
 Overrides.lua
+Holy.lua

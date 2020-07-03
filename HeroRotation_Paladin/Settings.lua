@@ -61,6 +61,18 @@ HR.GUISettings.APL.Paladin = {
       -- Racials
       -- Abilities
     }
+  },
+  Holy = {
+    GCDasOffGCD = {
+      -- Abilities
+      AvengingWrath = true,
+      HolyAvenger = true,
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Racials
+      -- Abilities
+    }
   }
 };
 -- GUI
@@ -70,6 +82,7 @@ local ARPanel = HR.GUI.Panel;
 local CP_Paladin = CreateChildPanel(ARPanel, "Paladin");
 local CP_Protection = CreateChildPanel(CP_Paladin, "Protection");
 local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution");
+local CP_Holy = CreateChildPanel(CP_Paladin, "Holy");
 
 -- Shared Paladin settings
 CreateARPanelOptions(CP_Paladin, "APL.Paladin.Commons");
@@ -90,3 +103,7 @@ CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.Shield
 CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
 CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.AllowDelayedAW", "Allow Delayed Avenging Wrath", "Enable this to allow Templar's Verdict to be suggested while delaying use of Avenging Wrath/Crusade/Execution Sentence.");
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution");
+
+-- Holy
+CreateARPanelOptions("CheckButton", CP_Holy, "APL.Paladin.Holy.DemoButtonHere", "TODO: DEVS - Experimental", "Devs should enable this.");
+CreateARPanelOptions(CP_Holy, "APL.Paladin.Holy");

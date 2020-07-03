@@ -327,7 +327,7 @@
       [269]   = "HeroRotation_Monk",          -- Windwalker
       [270]   = false,                          -- Mistweaver
     -- Paladin
-      [65]    = false,                          -- Holy
+      [65]    = "HeroRotation_Paladin",       -- Holy
       [66]    = "HeroRotation_Paladin",       -- Protection
       [70]    = "HeroRotation_Paladin",       -- Retribution
     -- Priest
