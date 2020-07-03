@@ -538,8 +538,8 @@ local function ItemsHighPriority()
   if I.ManifestoofMadness:IsEquipReady() and (not I.AzsharasFontofPower:IsEquipped() and VarTimeToCombusion < 8) then
     if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness high_priority"; end
   end
-  -- use_item,name=azsharas_font_of_power,if=variable.time_to_combustion<=5+15*variable.font_double_on_use+5*talent.kindling.enabled&!variable.disable_combustion
-  if I.AzsharasFontofPower:IsEquipReady() and (VarTimeToCombusion <= 5 + 15 * VarFontDoubleOnUse + 5 * num(S.Kindling:IsAvailable()) and not Settings.Fire.DisableCombustion) then
+  -- use_item,name=azsharas_font_of_power,if=variable.time_to_combustion<=5+15*variable.font_double_on_use&variable.time_to_combustion>0&!variable.disable_combustion
+  if I.AzsharasFontofPower:IsEquipReady() and (VarTimeToCombusion <= (5 + 15 * VarFontDoubleOnUse) and VarTimeToCombusion > 0 and not Settings.Fire.DisableCombustion) then
     if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power high_priority"; end
   end
   -- use_item,name=rotcrusted_voodoo_doll,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
