@@ -105,5 +105,5 @@ CreatePanelOption("CheckButton", CP_Retribution, "APL.Paladin.Retribution.AllowD
 CreateARPanelOptions(CP_Retribution, "APL.Paladin.Retribution");
 
 -- Holy
-CreateARPanelOptions("CheckButton", CP_Holy, "APL.Paladin.Holy.DemoButtonHere", "TODO: DEVS - Experimental", "Devs should enable this.");
+--CreateARPanelOptions("CheckButton", CP_Holy, "APL.Paladin.Holy.DemoButtonHere", "TODO: DEVS - Experimental", "Devs should enable this.");
 CreateARPanelOptions(CP_Holy, "APL.Paladin.Holy");
