@@ -159,7 +159,7 @@ local function Precombat()
   end
   -- variable,name=incanters_flow_gaming,default=1,op=reset
   if (true) then
-    ILIFGaming = 1
+    ILIFGaming = 0
   end
   -- summon_water_elemental
   if S.SummonWaterElemental:IsCastableP() then
