@@ -308,8 +308,12 @@ local function Precombat()
       if HR.CastSuggested(I.SuperiorBattlePotionofIntellect) then return "superior_battle_potion_of_intellect 12"; end
     end
     -- pyroblast
-    if S.Pyroblast:IsCastableP() then
+    if S.Pyroblast:IsCastableP() and not Player:IsMoving()  then
       if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 14"; end
+    end
+    -- scorch
+    if S.Scorch:IsCastableP() then
+      if HR.Cast(S.Scorch, nil, nil, 40) then return "scorch"; end
     end
   end
 end
@@ -400,7 +404,7 @@ local function CombustionPhase()
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 300"; end
   end
   -- pyroblast,if=buff.pyroclasm.react&buff.combustion.remains>cast_time
-  if S.Pyroblast:IsCastableP() and (Player:BuffP(S.PyroclasmBuff) and Player:BuffRemainsP(S.CombustionBuff) > S.Pyroblast:CastTime()) then
+  if S.Pyroblast:IsCastableP() and not Player:IsMoving() and (Player:BuffP(S.PyroclasmBuff) and Player:BuffRemainsP(S.CombustionBuff) > S.Pyroblast:CastTime()) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 320"; end
   end
   -- pyroblast,if=buff.hot_streak.react
@@ -408,7 +412,7 @@ local function CombustionPhase()
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 330"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up
-  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff)) then
+  if S.Pyroblast:IsCastableP() and not Player:IsMoving() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff)) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 390"; end
   end
   -- phoenix_flames
@@ -646,7 +650,7 @@ local function RopPhase()
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 564"; end
   end
   -- fireball
-  if S.Fireball:IsCastableP() then
+  if S.Fireball:IsCastableP() and not Player:IsMoving() then
     if HR.Cast(S.Fireball, nil, nil, 40) then return "fireball 580"; end
   end
 end
@@ -714,7 +718,7 @@ local function StandardRotation()
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 783"; end
   end
   -- fireball
-  if S.Fireball:IsCastableP() then
+  if S.Fireball:IsCastableP() and not Player:IsMoving() then
     if HR.Cast(S.Fireball, nil, nil, 40) then return "fireball 784"; end
   end
   -- scorch
