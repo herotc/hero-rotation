@@ -105,6 +105,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;
+local RotType = "Standard";
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -228,8 +229,8 @@ local function Aoe()
     if HR.CastCycle(S.FlameShock, 40, EvaluateCycleFlameShock47) then return "flame_shock 69" end
   end
   -- ascendance,if=talent.ascendance.enabled&(talent.storm_elemental.enabled&cooldown.storm_elemental.remains<cooldown.storm_elemental.duration-30&cooldown.storm_elemental.remains>15|!talent.storm_elemental.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-  if S.Ascendance:IsCastableP() and HR.CDsON() and (S.Ascendance:IsAvailable() and (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120 and S.StormElemental:CooldownRemainsP() > 15 or not S.StormElemental:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP())) then
-    if HR.Cast(S.Ascendance, Settings.Elemental.GCDasOffGCD.Ascendance) then return "ascendance 70"; end
+  if S.Ascendance:IsCastableP() and HR.CDsON() and RotType == "Standard" and (S.Ascendance:IsAvailable() and (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120 and S.StormElemental:CooldownRemainsP() > 15 or not S.StormElemental:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP())) then
+    if HR.Cast(S.Ascendance, Settings.Elemental.GCDasOffGCD.Ascendance) then return "ascendance 70 standard"; end
   end
   -- liquid_magma_totem,if=talent.liquid_magma_totem.enabled
   if S.LiquidMagmaTotem:IsCastableP() and (S.LiquidMagmaTotem:IsAvailable()) then
@@ -247,25 +248,27 @@ local function Aoe()
   if S.ChainLightning:IsCastableP() and (Player:BuffRemainsP(S.StormkeeperBuff) < 3 * Player:GCD() * Player:BuffStackP(S.StormkeeperBuff)) then
     if HR.Cast(S.ChainLightning, nil, nil, 40) then return "chain_lightning 100"; end
   end
-  -- lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30))&dot.flame_shock.ticking
-  if S.LavaBurst:IsCastableP() and (Player:BuffP(S.LavaSurgeBuff) and EnemiesCount < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120) and Target:DebuffP(S.FlameShockDebuff)) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 106"; end
-  end
-  -- icefury,if=spell_targets.chain_lightning<4&!buff.ascendance.up
-  if S.Icefury:IsCastableP() and (EnemiesCount < 4 and Player:BuffDownP(S.AscendanceBuff)) then
-    if HR.Cast(S.Icefury, nil, nil, 40) then return "icefury 116"; end
-  end
-  -- frost_shock,if=spell_targets.chain_lightning<4&buff.icefury.up&!buff.ascendance.up
-  if S.FrostShock:IsCastableP() and (EnemiesCount < 4 and Player:BuffP(S.IcefuryBuff) and Player:BuffDownP(S.AscendanceBuff)) then
-    if HR.Cast(S.FrostShock, nil, nil, 40) then return "frost_shock 120"; end
-  end
-  -- elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30))
-  if S.ElementalBlast:IsCastableP() and (S.ElementalBlast:IsAvailable() and EnemiesCount < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120)) then
-    if HR.Cast(S.ElementalBlast, nil, nil, 40) then return "elemental_blast 126"; end
-  end
-  -- lava_beam,if=talent.ascendance.enabled
-  if S.LavaBeam:IsCastableP() and (S.Ascendance:IsAvailable()) then
-    if HR.Cast(S.LavaBeam, nil, nil, 40) then return "lava_beam 134"; end
+  if (RotType == "Standard") then
+    -- lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30))&dot.flame_shock.ticking
+    if S.LavaBurst:IsCastableP() and (Player:BuffP(S.LavaSurgeBuff) and EnemiesCount < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120) and Target:DebuffP(S.FlameShockDebuff)) then
+      if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 106 standard"; end
+    end
+    -- icefury,if=spell_targets.chain_lightning<4&!buff.ascendance.up
+    if S.Icefury:IsCastableP() and (EnemiesCount < 4 and Player:BuffDownP(S.AscendanceBuff)) then
+      if HR.Cast(S.Icefury, nil, nil, 40) then return "icefury 116 standard"; end
+    end
+    -- frost_shock,if=spell_targets.chain_lightning<4&buff.icefury.up&!buff.ascendance.up
+    if S.FrostShock:IsCastableP() and (EnemiesCount < 4 and Player:BuffP(S.IcefuryBuff) and Player:BuffDownP(S.AscendanceBuff)) then
+      if HR.Cast(S.FrostShock, nil, nil, 40) then return "frost_shock 120 standard"; end
+    end
+    -- elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30))
+    if S.ElementalBlast:IsCastableP() and (S.ElementalBlast:IsAvailable() and EnemiesCount < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120)) then
+      if HR.Cast(S.ElementalBlast, nil, nil, 40) then return "elemental_blast 126 standard"; end
+    end
+    -- lava_beam,if=talent.ascendance.enabled
+    if S.LavaBeam:IsCastableP() and (S.Ascendance:IsAvailable()) then
+      if HR.Cast(S.LavaBeam, nil, nil, 40) then return "lava_beam 134 standard"; end
+    end
   end
   -- chain_lightning
   if S.ChainLightning:IsCastableP() then
@@ -319,8 +322,11 @@ local function Funnel()
     if HR.Cast(S.EarthShock, nil, nil, 40) then return "earth_shock 716"; end
   end
   -- earth_shock,if=!talent.master_of_the_elements.enabled&!(azerite.igneous_potential.rank>2&buff.ascendance.up)&(buff.stormkeeper.up|maelstrom>=90+30*talent.call_the_thunder.enabled|!(cooldown.storm_elemental.remains>(cooldown.storm_elemental.duration-30)&talent.storm_elemental.enabled)&expected_combat_length-time-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration)>=30*(1+(azerite.echo_of_the_elementals.rank>=2)))
-  if S.EarthShock:IsReadyP() and (not S.MasteroftheElements:IsAvailable() and not (S.IgneousPotential:AzeriteRank() > 2 and Player:BuffP(S.AscendanceBuff)) and (Player:BuffP(S.StormkeeperBuff) or Player:Maelstrom() >= 90 + 30 * num(S.CalltheThunder:IsAvailable()) or not (S.StormElemental:CooldownRemainsP() > 120 and S.StormElemental:IsAvailable()) and Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * floor((Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) % 150) >= 30 * (1 + num(S.EchooftheElementals:AzeriteRank() >= 2)))) then
-    if HR.Cast(S.EarthShock, nil, nil, 40) then return "earth_shock 718"; end
+  if S.EarthShock:IsReadyP() then
+    local FightRemains = HL.FightRemains(40)
+    if FightRemains < 7777 and (not S.MasteroftheElements:IsAvailable() and not (S.IgneousPotential:AzeriteRank() > 2 and Player:BuffP(S.AscendanceBuff)) and (Player:BuffP(S.StormkeeperBuff) or Player:Maelstrom() >= 90 + 30 * num(S.CalltheThunder:IsAvailable()) or not (S.StormElemental:CooldownRemainsP() > 120 and S.StormElemental:IsAvailable()) and FightRemains - S.StormElemental:CooldownRemainsP() - 150 * floor((FightRemains - S.StormElemental:CooldownRemainsP()) % 150) >= 30 * (1 + num(S.EchooftheElementals:AzeriteRank() >= 2)))) then
+      if HR.Cast(S.EarthShock, nil, nil, 40) then return "earth_shock 718"; end
+    end
   end
   -- earth_shock,if=talent.surge_of_power.enabled&!buff.surge_of_power.up&cooldown.lava_burst.remains<=gcd&(!talent.storm_elemental.enabled&!(cooldown.fire_elemental.remains>(cooldown.storm_elemental.duration-30))|talent.storm_elemental.enabled&!(cooldown.storm_elemental.remains>(cooldown.storm_elemental.duration-30)))
   if S.EarthShock:IsReadyP() and (S.SurgeofPower:IsAvailable() and Player:BuffDownP(S.SurgeofPowerBuff) and S.LavaBurst:CooldownRemainsP() <= Player:GCD() and (not S.StormElemental:IsAvailable() and not (S.FireElemental:CooldownRemainsP() > 120) or S.StormElemental:IsAvailable() and not (S.StormElemental:CooldownRemainsP() > 120))) then
@@ -347,12 +353,18 @@ local function Funnel()
     if HR.Cast(S.FlameShock, nil, nil, 40) then return "flame_shock 730"; end
   end
   -- lava_burst,if=talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.storm_elemental.remains-150*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%150)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains-150*floor((1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains)%150))<(expected_combat_length-time-cooldown.storm_elemental.remains-150*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%150)))
-  if S.LavaBurst:IsCastableP() and (S.StormElemental:IsAvailable() and Player:BuffP(S.LavaSurgeBuff) and Player:BuffP(S.SurgeofPowerBuff) and (Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * floor((Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) % 150) < 30 * (1 + num(S.EchooftheElementals:AzeriteRank() >= 2)) or (1.16 * Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * floor((1.16 * Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) % 150)) < (Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * floor((Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) % 150)))) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 732"; end
+  if S.LavaBurst:IsCastableP() then
+    local FightRemains = HL.FightRemains(40)
+    if FightRemains < 7777 and (S.StormElemental:IsAvailable() and Player:BuffP(S.LavaSurgeBuff) and Player:BuffP(S.SurgeofPowerBuff) and (FightRemains - S.StormElemental:CooldownRemainsP() - 150 * floor((FightRemains - S.StormElemental:CooldownRemainsP()) % 150) < 30 * (1 + num(S.EchooftheElementals:AzeriteRank() >= 2)) or (1.16 * FightRemains - S.StormElemental:CooldownRemainsP() - 150 * floor((1.16 * FightRemains - S.StormElemental:CooldownRemainsP()) % 150)) < (FightRemains - S.StormElemental:CooldownRemainsP() - 150 * floor((FightRemains - S.StormElemental:CooldownRemainsP()) % 150)))) then
+      if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 732"; end
+    end
   end
   -- lava_burst,if=!talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.fire_elemental.remains-150*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%150)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains-150*floor((1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains)%150))<(expected_combat_length-time-cooldown.fire_elemental.remains-150*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%150)))
-  if S.LavaBurst:IsCastableP() and (not S.StormElemental:IsAvailable() and Player:BuffP(S.LavaSurgeBuff) and Player:BuffP(S.SurgeofPowerBuff) and (Target:TimeToDie() - S.FireElemental:CooldownRemainsP() - 150 * floor((Target:TimeToDie() - S.FireElemental:CooldownRemainsP()) % 150) < 30 * (1 + (num(S.EchooftheElementals:AzeriteRank() >= 2))) or (1.16 * Target:TimeToDie() - S.FireElemental:CooldownRemainsP() - 150 * floor((1.16 * Target:TimeToDie() - S.FireElemental:CooldownRemainsP()) % 150)) < (Target:TimeToDie() - S.FireElemental:CooldownRemainsP() - 150 * floor((Target:TimeToDie() - S.FireElemental:CooldownRemainsP()) % 150)))) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 734"; end
+  if S.LavaBurst:IsCastableP() then
+    local FightRemains = HL.FightRemains(40)
+    if FightRemains < 7777 and (not S.StormElemental:IsAvailable() and Player:BuffP(S.LavaSurgeBuff) and Player:BuffP(S.SurgeofPowerBuff) and (FightRemains - S.FireElemental:CooldownRemainsP() - 150 * floor((FightRemains - S.FireElemental:CooldownRemainsP()) % 150) < 30 * (1 + (num(S.EchooftheElementals:AzeriteRank() >= 2))) or (1.16 * FightRemains - S.FireElemental:CooldownRemainsP() - 150 * floor((1.16 * FightRemains - S.FireElemental:CooldownRemainsP()) % 150)) < (FightRemains - S.FireElemental:CooldownRemainsP() - 150 * floor((FightRemains - S.FireElemental:CooldownRemainsP()) % 150)))) then
+      if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 734"; end
+    end
   end
   -- lightning_bolt,if=buff.surge_of_power.up
   if S.LightningBolt:IsCastableP() and (Player:BuffP(S.SurgeofPowerBuff)) then
@@ -416,17 +428,23 @@ local function Funnel()
 end
 
 local function SingleTarget()
-  -- flame_shock,target_if=(!ticking|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&(buff.wind_gust.stack<14|azerite.igneous_potential.rank>=2|buff.lava_surge.up|!buff.bloodlust.up)&!buff.surge_of_power.up
-  if S.FlameShock:IsCastableP() and ((Target:DebuffDownP(S.FlameShockDebuff) or Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:GCD() or S.Ascendance:IsAvailable() and Target:DebuffRemainsP(S.FlameShockDebuff) < (S.Ascendance:CooldownRemainsP() + 15) and S.Ascendance:CooldownRemainsP() < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120)) and (Player:BuffStackP(S.WindGustBuff) < 14 or S.IgneousPotential:AzeriteRank() >= 2 or Player:BuffP(S.LavaSurgeBuff) or not Player:HasHeroism()) and Player:BuffDownP(S.SurgeofPowerBuff)) then
-    if HR.Cast(S.FlameShock, nil, nil, 40) then return "flame_shock 200"; end
+  if (RotType == "Standard") then
+    -- flame_shock,target_if=(!ticking|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&(buff.wind_gust.stack<14|azerite.igneous_potential.rank>=2|buff.lava_surge.up|!buff.bloodlust.up)&!buff.surge_of_power.up
+    if S.FlameShock:IsCastableP() and ((Target:DebuffDownP(S.FlameShockDebuff) or Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:GCD() or S.Ascendance:IsAvailable() and Target:DebuffRemainsP(S.FlameShockDebuff) < (S.Ascendance:CooldownRemainsP() + 15) and S.Ascendance:CooldownRemainsP() < 4 and (not S.StormElemental:IsAvailable() or S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120)) and (Player:BuffStackP(S.WindGustBuff) < 14 or S.IgneousPotential:AzeriteRank() >= 2 or Player:BuffP(S.LavaSurgeBuff) or not Player:HasHeroism()) and Player:BuffDownP(S.SurgeofPowerBuff)) then
+      if HR.Cast(S.FlameShock, nil, nil, 40) then return "flame_shock 200 standard"; end
+    end
+    -- blood_of_the_enemy,if=!talent.ascendance.enabled&!talent.storm_elemental.enabled|talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&(cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30)|!talent.storm_elemental.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
+    if S.BloodoftheEnemy:IsCastableP() and (not S.Ascendance:IsAvailable() and not S.StormElemental:IsAvailable() or S.Ascendance:IsAvailable() and (HL.CombatTime() >= 60 or Player:HasHeroism()) and S.LavaBurst:CooldownRemainsP() > 0 and (S.StormElemental:CooldownRemainsP() < 120 or not S.StormElemental:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP())) then
+      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 201 standard"; end
+    end
+    -- ascendance,if=talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&(cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30)|!talent.storm_elemental.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
+    if S.Ascendance:IsCastableP() and HR.CDsON() and (S.Ascendance:IsAvailable() and (HL.CombatTime() >= 60 or Player:HasHeroism()) and S.LavaBurst:CooldownRemainsP() > 0 and (S.StormElemental:CooldownRemainsP() < 120 or not S.StormElemental:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP())) then
+      if HR.Cast(S.Ascendance, Settings.Elemental.GCDasOffGCD.Ascendance) then return "ascendance 202 standard"; end
+    end
   end
-  -- blood_of_the_enemy,if=!talent.ascendance.enabled&!talent.storm_elemental.enabled|talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&(cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30)|!talent.storm_elemental.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-  if S.BloodoftheEnemy:IsCastableP() and (not S.Ascendance:IsAvailable() and not S.StormElemental:IsAvailable() or S.Ascendance:IsAvailable() and (HL.CombatTime() >= 60 or Player:HasHeroism()) and S.LavaBurst:CooldownRemainsP() > 0 and (S.StormElemental:CooldownRemainsP() < 120 or not S.StormElemental:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP())) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy 201"; end
-  end
-  -- ascendance,if=talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&(cooldown.storm_elemental.remains<(cooldown.storm_elemental.duration-30)|!talent.storm_elemental.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-  if S.Ascendance:IsCastableP() and HR.CDsON() and (S.Ascendance:IsAvailable() and (HL.CombatTime() >= 60 or Player:HasHeroism()) and S.LavaBurst:CooldownRemainsP() > 0 and (S.StormElemental:CooldownRemainsP() < 120 or not S.StormElemental:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP())) then
-    if HR.Cast(S.Ascendance, Settings.Elemental.GCDasOffGCD.Ascendance) then return "ascendance 202"; end
+  -- flame_shock,target_if=(!ticking|dot.flame_shock.remains<=gcd)&(buff.wind_gust.stack<14|!buff.bloodlust.up)&!buff.surge_of_power.up
+  if S.FlameShock:IsCastableP() and RotType == "High Crit" and ((Target:DebuffDownP(S.FlameShockDebuff) or Target:DebuffRemainsP(S.FlameShockDebuff) <= Player:GCD()) and (Player:BuffStackP(S.WindGustBuff) < 14 or not Player:HasHeroism()) and Player:BuffDownP(S.SurgeofPowerBuff)) then
+    if HR.Cast(S.FlameShock, nil, nil, 40) then return "flame_shock 200 high_crit"; end
   end
   -- elemental_blast,if=talent.elemental_blast.enabled&(talent.master_of_the_elements.enabled&(buff.master_of_the_elements.up&maelstrom<60|!buff.master_of_the_elements.up)|!talent.master_of_the_elements.enabled)&(!(cooldown.storm_elemental.remains>(cooldown.storm_elemental.duration-30)&talent.storm_elemental.enabled)|azerite.natural_harmony.rank=3&buff.wind_gust.stack<14)
   if S.ElementalBlast:IsCastableP() and (S.ElementalBlast:IsAvailable() and (S.MasteroftheElements:IsAvailable() and (Player:BuffP(S.MasteroftheElementsBuff) and Player:Maelstrom() < 60 or Player:BuffDownP(S.MasteroftheElementsBuff)) or not S.MasteroftheElements:IsAvailable()) and (not (S.StormElemental:CooldownRemainsP() > 120 and S.StormElemental:IsAvailable()) or S.NaturalHarmony:AzeriteRank() == 3 and Player:BuffStackP(S.WindGustBuff) < 14)) then
@@ -453,8 +471,11 @@ local function SingleTarget()
     if HR.Cast(S.EarthShock, nil, nil, 40) then return "earth_shock 294"; end
   end
   -- earth_shock,if=!talent.master_of_the_elements.enabled&!(azerite.igneous_potential.rank>2&buff.ascendance.up)&(buff.stormkeeper.up|maelstrom>=90+30*talent.call_the_thunder.enabled|!(cooldown.storm_elemental.remains>(cooldown.storm_elemental.duration-30)&talent.storm_elemental.enabled)&expected_combat_length-time-cooldown.storm_elemental.remains-150*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%150)>=30*(1+(azerite.echo_of_the_elementals.rank>=2)))
-  if S.EarthShock:IsReadyP() and (not S.MasteroftheElements:IsAvailable() and not (S.IgneousPotential:AzeriteRank() > 2 and Player:BuffP(S.AscendanceBuff)) and (Player:BuffP(S.StormkeeperBuff) or Player:Maelstrom() >= 90 + 30 * num(S.CalltheThunder:IsAvailable()) or not (S.StormElemental:CooldownRemainsP() > 120 and S.StormElemental:IsAvailable()) and Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) / 150) >= 30 * (1 + num((S.EchooftheElementals:AzeriteRank() >= 2))))) then
-    if HR.Cast(S.EarthShock, nil, nil, 40) then return "earth_shock 314"; end
+  if S.EarthShock:IsReadyP() then
+    local FightRemains = HL.FightRemains(40)
+    if FightRemains < 7777 and (not S.MasteroftheElements:IsAvailable() and not (S.IgneousPotential:AzeriteRank() > 2 and Player:BuffP(S.AscendanceBuff)) and (Player:BuffP(S.StormkeeperBuff) or Player:Maelstrom() >= 90 + 30 * num(S.CalltheThunder:IsAvailable()) or not (S.StormElemental:CooldownRemainsP() > 120 and S.StormElemental:IsAvailable()) and FightRemains - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((FightRemains - S.StormElemental:CooldownRemainsP()) / 150) >= 30 * (1 + num((S.EchooftheElementals:AzeriteRank() >= 2))))) then
+      if HR.Cast(S.EarthShock, nil, nil, 40) then return "earth_shock 314"; end
+    end
   end
   -- earth_shock,if=talent.surge_of_power.enabled&!buff.surge_of_power.up&cooldown.lava_burst.remains<=gcd&(!talent.storm_elemental.enabled&!(cooldown.fire_elemental.remains>(cooldown.fire_elemental.duration-30))|talent.storm_elemental.enabled&!(cooldown.storm_elemental.remains>(cooldown.storm_elemental.duration-30)))
   if S.EarthShock:IsReadyP() and (S.SurgeofPower:IsAvailable() and Player:BuffDownP(S.SurgeofPowerBuff) and S.LavaBurst:CooldownRemainsP() <= Player:GCD() and (not S.StormElemental:IsAvailable() and not (S.FireElemental:CooldownRemainsP() > 120) or S.StormElemental:IsAvailable() and not (S.StormElemental:CooldownRemainsP() > 120))) then
@@ -477,44 +498,52 @@ local function SingleTarget()
     if HR.Cast(S.FrostShock, nil, nil, 40) then return "frost_shock 372"; end
   end
   -- lava_burst,if=buff.ascendance.up
-  if S.LavaBurst:IsCastableP() and (Player:BuffP(S.AscendanceBuff)) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 382"; end
+  if S.LavaBurst:IsCastableP() and RotType == "Standard" and (Player:BuffP(S.AscendanceBuff)) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 382 standard"; end
   end
   -- flame_shock,target_if=refreshable&active_enemies>1&buff.surge_of_power.up
   if S.FlameShock:IsCastableP() then
     if HR.CastCycle(S.FlameShock, 40, EvaluateCycleFlameShock390) then return "flame_shock 408" end
   end
-  -- lava_burst,if=talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration))<(expected_combat_length-time-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration)))
-  if S.LavaBurst:IsCastableP() and (S.StormElemental:IsAvailable() and S.LavaBurst:CooldownUpP() and Player:BuffP(S.SurgeofPowerBuff) and (Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) / 150) < 30 * (1 + num((S.EchooftheElementals:AzeriteRank() >= 2))) or (1.16 * Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((1.16 * Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) / 150)) < (Target:TimeToDie() - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((Target:TimeToDie() - S.StormElemental:CooldownRemainsP()) / 150)))) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 409"; end
-  end
-  -- lava_burst,if=!talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.fire_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%cooldown.storm_elemental.duration)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains-cooldown.storm_elemental.duration*floor((1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains)%cooldown.storm_elemental.duration))<(expected_combat_length-time-cooldown.fire_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%cooldown.storm_elemental.duration)))
-  if S.LavaBurst:IsCastableP() and (not S.StormElemental:IsAvailable() and S.LavaBurst:CooldownUpP() and Player:BuffP(S.SurgeofPowerBuff) and (Target:TimeToDie() - S.FireElemental:CooldownRemainsP() - 150 * math.floor ((Target:TimeToDie() - S.FireElemental:CooldownRemainsP()) / 150) < 30 * (1 + num((S.EchooftheElementals:AzeriteRank() >= 2))) or (1.16 * Target:TimeToDie() - S.FireElemental:CooldownRemainsP() - 150 * math.floor ((1.16 * Target:TimeToDie() - S.FireElemental:CooldownRemainsP()) / 150)) < (Target:TimeToDie() - S.FireElemental:CooldownRemainsP() - 150 * math.floor ((Target:TimeToDie() - S.FireElemental:CooldownRemainsP()) / 150)))) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 433"; end
+  if (RotType == "Standard") then
+    -- lava_burst,if=talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration))<(expected_combat_length-time-cooldown.storm_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%cooldown.storm_elemental.duration)))
+    if S.LavaBurst:IsCastableP() then
+      local FightRemains = HL.FightRemains(40)
+      if FightRemains < 7777 and (S.StormElemental:IsAvailable() and S.LavaBurst:CooldownUpP() and Player:BuffP(S.SurgeofPowerBuff) and (FightRemains - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((FightRemains - S.StormElemental:CooldownRemainsP()) / 150) < 30 * (1 + num((S.EchooftheElementals:AzeriteRank() >= 2))) or (1.16 * FightRemains - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((1.16 * FightRemains - S.StormElemental:CooldownRemainsP()) / 150)) < (FightRemains - S.StormElemental:CooldownRemainsP() - 150 * math.floor ((FightRemains - S.StormElemental:CooldownRemainsP()) / 150)))) then
+        if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 409 standard"; end
+      end
+    end
+    -- lava_burst,if=!talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.fire_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%cooldown.storm_elemental.duration)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains-cooldown.storm_elemental.duration*floor((1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains)%cooldown.storm_elemental.duration))<(expected_combat_length-time-cooldown.fire_elemental.remains-cooldown.storm_elemental.duration*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%cooldown.storm_elemental.duration)))
+    if S.LavaBurst:IsCastableP() then
+      local FightRemains = HL.FightRemains(40)
+      if FightRemains < 7777 and (not S.StormElemental:IsAvailable() and S.LavaBurst:CooldownUpP() and Player:BuffP(S.SurgeofPowerBuff) and (FightRemains - S.FireElemental:CooldownRemainsP() - 150 * math.floor ((FightRemains - S.FireElemental:CooldownRemainsP()) / 150) < 30 * (1 + num((S.EchooftheElementals:AzeriteRank() >= 2))) or (1.16 * FightRemains - S.FireElemental:CooldownRemainsP() - 150 * math.floor ((1.16 * FightRemains - S.FireElemental:CooldownRemainsP()) / 150)) < (FightRemains - S.FireElemental:CooldownRemainsP() - 150 * math.floor ((FightRemains - S.FireElemental:CooldownRemainsP()) / 150)))) then
+        if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 433 standard"; end
+      end
+    end
   end
   -- lightning_bolt,if=buff.surge_of_power.up
   if S.LightningBolt:IsCastableP() and (Player:BuffP(S.SurgeofPowerBuff)) then
     if HR.Cast(S.LightningBolt, nil, nil, 40) then return "lightning_bolt 457"; end
   end
   -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
-  if S.LavaBurst:IsCastableP() and (S.LavaBurst:CooldownUpP() and not S.MasteroftheElements:IsAvailable()) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 461"; end
+  if S.LavaBurst:IsCastableP() and RotType == "Standard" and (S.LavaBurst:CooldownUpP() and not S.MasteroftheElements:IsAvailable()) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 461 standard"; end
   end
   -- icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<cooldown.storm_elemental.duration-30)
   if S.Icefury:IsCastableP() and (S.Icefury:IsAvailable() and not (Player:Maelstrom() > 75 and S.LavaBurst:CooldownRemainsP() <= 0) and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120)) then
     if HR.Cast(S.Icefury, nil, nil, 40) then return "icefury 469"; end
   end
   -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
-  if S.LavaBurst:IsCastableP() and (S.LavaBurst:CooldownUpP() and S.LavaBurst:ChargesP() > num(S.EchooftheElements:IsAvailable())) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 479"; end
+  if S.LavaBurst:IsCastableP() and RotType == "Standard" and (S.LavaBurst:CooldownUpP() and S.LavaBurst:ChargesP() > num(S.EchooftheElements:IsAvailable())) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 479 standard"; end
   end
   -- frost_shock,if=talent.icefury.enabled&buff.icefury.up&buff.icefury.remains<1.1*gcd*buff.icefury.stack
   if S.FrostShock:IsCastableP() and (S.Icefury:IsAvailable() and Player:BuffP(S.IcefuryBuff) and Player:BuffRemainsP(S.IcefuryBuff) < 1.1 * Player:GCD() * Player:BuffStackP(S.IcefuryBuff)) then
     if HR.Cast(S.FrostShock, nil, nil, 40) then return "frost_shock 491"; end
   end
   -- lava_burst,if=cooldown_react
-  if S.LavaBurst:IsCastableP() and (S.LavaBurst:CooldownUpP()) then
-    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 501"; end
+  if S.LavaBurst:IsCastableP() and RotType == "Standard" and (S.LavaBurst:CooldownUpP()) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 501 standard"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
@@ -563,6 +592,7 @@ end
 local function APL()
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- For CastCycle calls
+  RotType = Settings.Elemental.RotationType
 
   -- call precombat
   if not Player:AffectingCombat() then
@@ -571,10 +601,12 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
-    -- bloodlust,if=azerite.ancestral_resonance.enabled
     -- potion,if=expected_combat_length-time<60|cooldown.guardian_of_azeroth.remains<30
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Target:TimeToDie() < 60 or S.GuardianofAzeroth:CooldownRemainsP() <30) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 577"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+      local FightRemains = HL.FightRemains(40)
+      if FightRemains < 7777 and (FightRemains < 60 or S.GuardianofAzeroth:CooldownRemainsP() <30) then
+        if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 577"; end
+      end
     end
     -- flame_shock,if=!ticking&spell_targets.chainlightning<4&(cooldown.storm_elemental.remains<cooldown.storm_elemental.duration-30|buff.wind_gust.stack<14)
     if S.FlameShock:IsCastableP() and (Target:DebuffDownP(S.FlameShockDebuff) and EnemiesCount < 4 and (S.StormElemental:CooldownRemainsP() < 120 or Player:BuffStackP(S.WindGustBuff) < 14)) then
@@ -589,13 +621,28 @@ local function APL()
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
-    -- guardian_of_azeroth,if=dot.flame_shock.ticking&(!talent.storm_elemental.enabled&(cooldown.fire_elemental.duration-30<cooldown.fire_elemental.remains|expected_combat_length-time>190|expected_combat_length-time<32|!(cooldown.fire_elemental.remains+30<expected_combat_length-time)|cooldown.fire_elemental.remains<2)|talent.storm_elemental.enabled&(cooldown.storm_elemental.duration-30<cooldown.storm_elemental.remains|expected_combat_length-time>190|expected_combat_length-time<35|!(cooldown.storm_elemental.remains+30<expected_combat_length-time)|cooldown.storm_elemental.remains<2))
-    if S.GuardianofAzeroth:IsCastableP() and (Target:DebuffP(S.FlameShockDebuff) and (not S.StormElemental:IsAvailable() and (S.FireElemental:CooldownRemainsP() > 120 or Target:TimeToDie() > 190 or Target:TimeToDie() < 32 or not (S.FireElemental:CooldownRemainsP() + 30 < Target:TimeToDie()) or S.FireElemental.CooldownRemainsP() < 2) or S.StormElemental:IsAvailable() and (S.StormElemental:CooldownRemainsP() > 120 or Target:TimeToDie() > 190 or Target:TimeToDie() < 35 or not (S.StormElemental:CooldownRemainsP() + 30 < Target:TimeToDie()) or S.StormElemental:CooldownRemainsP() < 2))) then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
+    if (RotType == "Standard") then
+      -- guardian_of_azeroth,if=dot.flame_shock.ticking&(!talent.storm_elemental.enabled&(cooldown.fire_elemental.duration-30<cooldown.fire_elemental.remains|expected_combat_length-time>190|expected_combat_length-time<32|!(cooldown.fire_elemental.remains+30<expected_combat_length-time)|cooldown.fire_elemental.remains<2)|talent.storm_elemental.enabled&(cooldown.storm_elemental.duration-30<cooldown.storm_elemental.remains|expected_combat_length-time>190|expected_combat_length-time<35|!(cooldown.storm_elemental.remains+30<expected_combat_length-time)|cooldown.storm_elemental.remains<2))
+      if S.GuardianofAzeroth:IsCastableP() then
+        local FightRemains = HL.FightRemains(40)
+        if FightRemains < 7777 and (Target:DebuffP(S.FlameShockDebuff) and (not S.StormElemental:IsAvailable() and (S.FireElemental:CooldownRemainsP() > 120 or FightRemains > 190 or FightRemains < 32 or not (S.FireElemental:CooldownRemainsP() + 30 < FightRemains) or S.FireElemental.CooldownRemainsP() < 2) or S.StormElemental:IsAvailable() and (S.StormElemental:CooldownRemainsP() > 120 or FightRemains > 190 or FightRemains < 35 or not (S.StormElemental:CooldownRemainsP() + 30 < FightRemains) or S.StormElemental:CooldownRemainsP() < 2))) then
+          if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth standard"; end
+        end
+      end
+      -- fire_elemental,if=!talent.storm_elemental.enabled&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
+      if S.FireElemental:IsCastableP() then
+        local FightRemains = HL.FightRemains(40)
+        if FightRemains < 7777 and (not S.StormElemental:IsAvailable() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or S.GuardianofAzeroth:CooldownRemainsP() > 150 or FightRemains < 30 or FightRemains < 60 or FightRemains > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < FightRemains))) then
+          if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental, nil, 40) then return "fire_elemental 595 standard"; end
+        end
+      end
     end
-    -- fire_elemental,if=!talent.storm_elemental.enabled&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
-    if S.FireElemental:IsCastableP() and (not S.StormElemental:IsAvailable() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
-      if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental, nil, 40) then return "fire_elemental 595"; end
+    -- guardian_of_azeroth,if=talent.storm_elemental.enabled&(cooldown.storm_elemental.duration-30<cooldown.storm_elemental.remains|exepcted_combat_length-time>190|expected_combat_length-time<35|!(cooldown.storm_elemental.remains+30<expected_combat_length-time)|cooldown.storm_elemental.remains<2)
+    if S.GuardianofAzeroth:IsCastableP() and RotType == "High Crit" then
+      local FightRemains = HL.FightRemains(40)
+      if FightRemains < 7777 and (S.StormElemental:IsAvailable() and (S.StormElemental:CooldownRemainsP() > 120 or FightRemains > 190 or FightRemains < 35 or not (S.StormElemental:CooldownRemainsP() + 30 < FightRemains) or S.StormElemental:CooldownRemainsP() < 2)) then
+        if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth high_crit"; end
+      end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then
@@ -626,8 +673,11 @@ local function APL()
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
     -- storm_elemental,if=talent.storm_elemental.enabled&(!cooldown.stormkeeper.up|!talent.stormkeeper.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)&(!talent.ascendance.enabled|!buff.ascendance.up|expected_combat_length-time<32)&(!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>150|expected_combat_length-time<30|expected_combat_length-time<60|expected_combat_length-time>155|!(cooldown.guardian_of_azeroth.remains+30<expected_combat_length-time))
-    if S.StormElemental:IsCastableP() and (S.StormElemental:IsAvailable() and (not S.Stormkeeper:CooldownUpP() or not S.Stormkeeper:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP()) and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff) or Target:TimeToDie() < 32) and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or S.GuardianofAzeroth:CooldownRemainsP() > 150 or Target:TimeToDie() < 30 or Target:TimeToDie() < 60 or Target:TimeToDie() > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < Target:TimeToDie()))) then
-      if HR.Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental, nil, 40) then return "storm_elemental 605"; end
+    if S.StormElemental:IsCastableP() then
+      local FightRemains = HL.FightRemains(40)
+      if FightRemains < 7777 and (S.StormElemental:IsAvailable() and (not S.Stormkeeper:CooldownUpP() or not S.Stormkeeper:IsAvailable()) and (not S.Icefury:IsAvailable() or Player:BuffDownP(S.IcefuryBuff) and not S.Icefury:CooldownUpP()) and (not S.Ascendance:IsAvailable() or Player:BuffDownP(S.AscendanceBuff) or FightRemains < 32) and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or S.GuardianofAzeroth:CooldownRemainsP() > 150 or FightRemains < 30 or FightRemains < 60 or FightRemains > 155 or not (S.GuardianofAzeroth:CooldownRemainsP() + 30 < FightRemains))) then
+        if HR.Cast(S.StormElemental, Settings.Elemental.GCDasOffGCD.StormElemental, nil, 40) then return "storm_elemental 605"; end
+      end
     end
     if (HR.CDsON()) then
       -- blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
@@ -656,7 +706,7 @@ local function APL()
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=funnel,if=active_enemies>=2&(spell_targets.chain_lightning<2|spell_targets.lava_beam<2)
-    if (Cache.EnemiesCount[40] >= 2 and EnemiesCount < 2) then
+    if RotType == "Standard" and (Cache.EnemiesCount[40] >= 2 and EnemiesCount < 2) then
       local ShouldReturn = Funnel(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target,if=active_enemies<=2

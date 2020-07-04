@@ -36,6 +36,7 @@ HR.GUISettings.APL.Shaman = {
     EnableFS = true
   },
   Elemental = {
+    RotationType = "Standard",
     UseSplashData = true,
     ChainInMain = "Never",
     GCDasOffGCD = {
@@ -46,9 +47,9 @@ HR.GUISettings.APL.Shaman = {
       FireElemental = true,
       Ascendance = true,
     },
-    EnableEE = true,
-    EnableFE = true,
-    EnableSE = true
+    --EnableEE = true,
+    --EnableFE = true,
+    --EnableSE = true
   },
 };
 
@@ -72,9 +73,10 @@ CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");
 CreatePanelOption("CheckButton", CP_Enhancement, "APL.Shaman.Enhancement.EnableFS", "Show Feral Spirit in rotation", "Uncheck this if you don't want to see Feral Spirit in the rotation.");
 
 -- Elemental settings
+CreatePanelOption("Dropdown", CP_Elemental, "APL.Shaman.Elemental.RotationType", {"Standard", "High Crit"}, "Rotation Type", "Select which kind of rotation you would like to use.");
 CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Elemental.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
-CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableEE", "Show Earth Elemental in rotation", "Uncheck this if you don't want to see Earth Elemental in the rotation.");
-CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableFE", "Show Fire Elemental in rotation", "Uncheck this if you don't want to see Fire Elemental in the rotation.");
-CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableSE", "Show Storm Elemental in rotation", "Uncheck this if you don't want to see Storm Elemental in the rotation.");
+--CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableEE", "Show Earth Elemental in rotation", "Uncheck this if you don't want to see Earth Elemental in the rotation.");
+--CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableFE", "Show Fire Elemental in rotation", "Uncheck this if you don't want to see Fire Elemental in the rotation.");
+--CreatePanelOption("CheckButton", CP_Elemental, "APL.Shaman.Enhancement.EnableSE", "Show Storm Elemental in rotation", "Uncheck this if you don't want to see Storm Elemental in the rotation.");
 CreatePanelOption("Dropdown", CP_Elemental, "APL.Shaman.Elemental.ChainInMain", {"Never", "Only with Splash Data", "Always"}, "Chain Lightning in the Main Icon", "When to show Chain Lightning in the main icon or as a suggestion");
