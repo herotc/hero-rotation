@@ -106,6 +106,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local PassiveEssence;
 local gcdTime;
 
 -- GUI Settings
@@ -321,7 +322,7 @@ local function APL()
   gcdTime = Player:GCD()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
 
   -- call precombat

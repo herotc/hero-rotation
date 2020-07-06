@@ -91,6 +91,7 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
+local PassiveEssence;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -224,7 +225,7 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
 

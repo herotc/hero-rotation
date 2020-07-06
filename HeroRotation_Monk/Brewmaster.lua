@@ -108,6 +108,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
+local PassiveEssence;
 local ForceOffGCD = {true, false};
 
 -- GUI Settings
@@ -202,7 +203,7 @@ local function APL()
   Everyone.AoEToggleEnemiesUpdate();
 
   -- Misc
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting));
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting));
 
   --- Out of Combat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then

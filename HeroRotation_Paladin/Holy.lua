@@ -46,6 +46,9 @@ if AEMajor ~= nil then
   S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
 end
 
+-- Rotation Vars
+local PassiveEssence;
+
 -- Special Item Handlers
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Holy = {
@@ -134,7 +137,7 @@ local function Cooldowns()
 end
 
 local function APL()
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
 

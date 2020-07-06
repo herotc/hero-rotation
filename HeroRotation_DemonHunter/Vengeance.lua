@@ -96,6 +96,7 @@ local ShouldReturn; -- Used to get the return string
 local CleaveRangeID = tostring(S.Disrupt:ID()); -- 20y range
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment;
 local IsInMeleeRange, IsInAoERange;
+local PassiveEssence;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -379,7 +380,7 @@ end
 local function APL()
   local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-  local PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
   UpdateSoulFragments();
