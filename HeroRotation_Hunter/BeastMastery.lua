@@ -266,7 +266,7 @@ local function Cds()
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 28"; end
   end
   -- blood_of_the_enemy,if=focus<focus.max&(raid_event.adds.remains>90|!raid_event.adds.exists|active_enemies>1)
-  if S.BloodoftheEnemy:IsCastableP() and (Player:Focus() < Player:FocusMax()) then
+  if S.BloodoftheEnemy:IsCastableP() and (Player:FocusPredicted() < Player:FocusMax()) then
     if HR.Cast(S.BloodoftheEnemy, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_of_the_enemy 30"; end
   end
   -- berserking,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<13
@@ -409,7 +409,7 @@ local function St()
     if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 164"; end
   end
   -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.bestial_wrath.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
-  if S.ConcentratedFlame:IsCastableP() and (Player:Focus() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
+  if S.ConcentratedFlame:IsCastableP() and (Player:FocusPredicted() + Player:FocusRegen() * Player:GCD() < Player:FocusMax() and Player:BuffDownP(S.BestialWrathBuff) and (Target:DebuffDownP(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or S.ConcentratedFlame:FullRechargeTimeP() < Player:GCD() or Target:TimeToDie() < 5) then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 165"; end
   end
   -- aspect_of_the_wild,if=buff.aspect_of_the_wild.down&(cooldown.barbed_shot.charges<1|!azerite.primal_instincts.enabled)
@@ -470,7 +470,8 @@ local function St()
     if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 216"; end
   end
   -- cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1
-  if S.CobraShot:IsReadyP() and ((Player:Focus() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost() or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryofLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
+  if S.CobraShot:IsReadyP() and ((Player:FocusPredicted() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemainsP() - 1) > S.KillCommand:Cost()
+    or S.KillCommand:CooldownRemainsP() > 1 + GCDMax or Player:BuffP(S.MemoryofLucidDreams)) and S.KillCommand:CooldownRemainsP() > 1) then
     -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
     -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
     -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
