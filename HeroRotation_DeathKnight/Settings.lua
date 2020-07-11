@@ -48,8 +48,9 @@ HR.GUISettings.APL.DeathKnight = {
       -- Abilities
       DarkTransformation = true,
       ArmyoftheDead = true,
+      UnholyFrenzy = true,
       DeathandDecay = false,
-      UnholyFrenzy = true
+      Epidemic = false
     }
   },
   Blood = {

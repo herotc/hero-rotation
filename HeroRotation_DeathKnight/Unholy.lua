@@ -200,12 +200,12 @@ local function Aoe()
   -- epidemic,if=death_and_decay.ticking&runic_power.deficit<14&!talent.bursting_sores.enabled&!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
   if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:RunicPowerDeficit() < 14 and not S.BurstingSores:IsAvailable() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
-    if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 16"; end
+    if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 16"; end
   end
   -- epidemic,if=death_and_decay.ticking&(!death_knight.fwounded_targets&talent.bursting_sores.enabled)&!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
   if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and (S.FesteringWoundDebuff:ActiveCount() == 0 and S.BurstingSores:IsAvailable()) and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
-    if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 18"; end
+    if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 18"; end
   end
   -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
   if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and not S.Apocalypse:CooldownUpP()) then
@@ -218,7 +218,7 @@ local function Aoe()
   -- epidemic,if=!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
   if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
-    if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 32"; end
+    if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 32"; end
   end
   -- festering_strike,target_if=debuff.festering_wound.stack<=2&cooldown.death_and_decay.remains&cooldown.apocalypse.remains>5&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
   if S.FesteringStrike:IsCastableP() then
@@ -361,7 +361,7 @@ local function Generic()
   end
   -- Manually added: Multiple target Epidemic in place of below Death Coil
   if S.Epidemic:IsReadyP() and (Player:RunicPowerDeficit() < 14 and Player:RuneTimeToX(4) > Player:GCD() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
-    if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 173"; end
+    if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 173"; end
   end
   -- death_coil,if=runic_power.deficit<14&rune.time_to_4>gcd&!variable.pooling_for_gargoyle
   if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 14 and Player:RuneTimeToX(4) > Player:GCD() and not bool(VarPoolingForGargoyle)) then
@@ -377,7 +377,7 @@ local function Generic()
   end
   -- Manually added: Multiple target Epidemic if close to capping RP
   if S.Epidemic:IsReadyP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
-    if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 173"; end
+    if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 173"; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
   if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
@@ -389,7 +389,7 @@ local function Generic()
   end
   -- Manually added: Multiple target Epidemic filler to burn RP
   if S.Epidemic:IsReadyP() and (not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
-    if HR.Cast(S.Epidemic, nil, nil, 100) then return "epidemic 173"; end
+    if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 173"; end
   end
   -- death_coil,if=!variable.pooling_for_gargoyle
   if S.DeathCoil:IsUsableP() and (not bool(VarPoolingForGargoyle)) then
