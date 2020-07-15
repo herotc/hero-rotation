@@ -637,11 +637,15 @@ local function APL()
         end
       end
     end
-    -- guardian_of_azeroth,if=talent.storm_elemental.enabled&(cooldown.storm_elemental.duration-30<cooldown.storm_elemental.remains|exepcted_combat_length-time>190|expected_combat_length-time<35|!(cooldown.storm_elemental.remains+30<expected_combat_length-time)|cooldown.storm_elemental.remains<2)
     if S.GuardianofAzeroth:IsCastableP() and RotType == "High Crit" then
+      -- guardian_of_azeroth,if=talent.storm_elemental.enabled&(cooldown.storm_elemental.duration-30<cooldown.storm_elemental.remains|exepcted_combat_length-time>190|expected_combat_length-time<35|!(cooldown.storm_elemental.remains+30<expected_combat_length-time)|cooldown.storm_elemental.remains<2)
       local FightRemains = HL.FightRemains(40)
       if FightRemains < 7777 and (S.StormElemental:IsAvailable() and (S.StormElemental:CooldownRemainsP() > 120 or FightRemains > 190 or FightRemains < 35 or not (S.StormElemental:CooldownRemainsP() + 30 < FightRemains) or S.StormElemental:CooldownRemainsP() < 2)) then
         if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth high_crit"; end
+      end
+      -- fire_elemental
+      if S.FireElemental:IsCastableP() then
+        if HR.Cast(S.FireElemental, Settings.Elemental.GCDasOffGCD.FireElemental, nil, 40) then return "fire_elemental 597 high_crit"; end
       end
     end
     -- focused_azerite_beam
