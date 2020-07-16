@@ -156,6 +156,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;
+local IgnoreCombustion;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -296,7 +297,7 @@ local function Precombat()
     end
     -- snapshot_stats
     -- use_item,name=azsharas_font_of_power,if=!variable.disable_combustion
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and not Settings.Fire.DisableCombustion then
+    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets and not IgnoreCombustion then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 9"; end
     end
     -- mirror_image
@@ -320,11 +321,11 @@ end
 
 local function ActiveTalents()
   -- living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0|variable.disable_combustion)
-  if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > 12 * Player:SpellHaste() or VarTimeToCombusion <= 0 or Settings.Fire.DisableCombustion)) then
+  if S.LivingBomb:IsCastableP() and (EnemiesCount > 1 and Player:BuffDownP(S.CombustionBuff) and (VarTimeToCombusion > 12 * Player:SpellHaste() or VarTimeToCombusion <= 0 or IgnoreCombustion)) then
     if HR.Cast(S.LivingBomb, nil, nil, 40) then return "living_bomb 16"; end
   end
   -- meteor,if=!variable.disable_combustion&variable.time_to_combustion<=0|(buff.rune_of_power.up|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|!talent.rune_of_power.enabled)&(cooldown.meteor.duration<variable.time_to_combustion|target.time_to_die<variable.time_to_combustion|variable.disable_combustion)
-  if S.Meteor:IsCastableP() and (not Settings.Fire.DisableCombustion and VarTimeToCombusion <= 0 or (Player:BuffP(S.RuneofPowerBuff) or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:Charges() < 1 or not S.RuneofPower:IsAvailable()) and (45 < VarTimeToCombusion or Target:TimeToDie() < VarTimeToCombusion or Settings.Fire.DisableCombustion)) then
+  if S.Meteor:IsCastableP() and (not IgnoreCombustion and VarTimeToCombusion <= 0 or (Player:BuffP(S.RuneofPowerBuff) or S.RuneofPower:CooldownRemainsP() > Target:TimeToDie() and S.RuneofPower:Charges() < 1 or not S.RuneofPower:IsAvailable()) and (45 < VarTimeToCombusion or Target:TimeToDie() < VarTimeToCombusion or IgnoreCombustion)) then
     if HR.Cast(S.Meteor, nil, nil, 40) then return "meteor 32"; end
   end
   -- dragons_breath,if=talent.alexstraszas_fury.enabled&(buff.combustion.down&!buff.hot_streak.react|buff.combustion.up&action.fire_blast.charges<action.fire_blast.max_charges&!buff.hot_streak.react)
@@ -530,7 +531,7 @@ end
 
 local function ItemsHighPriority()
   -- call_action_list,name=items_combustion,if=!variable.disable_combustion&variable.time_to_combustion<=0
-  if (not Settings.Fire.DisableCombustion and VarTimeToCombusion <= 0) then
+  if (not IgnoreCombustion and VarTimeToCombusion <= 0) then
     local ShouldReturn = ItemsCombustion(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_items
@@ -543,23 +544,23 @@ local function ItemsHighPriority()
     if HR.Cast(I.ManifestoofMadness, nil, Settings.Commons.TrinketDisplayStyle) then return "manifesto_of_madness high_priority"; end
   end
   -- use_item,name=azsharas_font_of_power,if=variable.time_to_combustion<=5+15*variable.font_double_on_use&variable.time_to_combustion>0&!variable.disable_combustion
-  if I.AzsharasFontofPower:IsEquipReady() and (VarTimeToCombusion <= (5 + 15 * VarFontDoubleOnUse) and VarTimeToCombusion > 0 and not Settings.Fire.DisableCombustion) then
+  if I.AzsharasFontofPower:IsEquipReady() and (VarTimeToCombusion <= (5 + 15 * VarFontDoubleOnUse) and VarTimeToCombusion > 0 and not IgnoreCombustion) then
     if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power high_priority"; end
   end
   -- use_item,name=rotcrusted_voodoo_doll,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.RotcrustedVoodooDoll:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.RotcrustedVoodooDoll:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.RotcrustedVoodooDoll, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "rotcrusted_voodoo_doll high_priority"; end
   end
   -- use_item,name=aquipotent_nautilus,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.AquipotentNautilus:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.AquipotentNautilus:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.AquipotentNautilus, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "aquipotent_nautilus high_priority"; end
   end
   -- use_item,name=shiver_venom_relic,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.ShiverVenomRelic:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.ShiverVenomRelic:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.ShiverVenomRelic, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "shiver_venom_relic high_priority"; end
   end
   -- use_item,name=forbidden_obsidian_claw,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.ForbiddenObsidianClaw:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.ForbiddenObsidianClaw:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.ForbiddenObsidianClaw, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "forbidden_obsidian_claw high_priority"; end
   end
   -- use_item,effect_name=harmonic_dematerializer
@@ -567,37 +568,37 @@ local function ItemsHighPriority()
     if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "harmonic_dematerializer high_priority"; end
   end
   -- use_item,name=malformed_heralds_legwraps,if=variable.time_to_combustion>=55&buff.combustion.down&variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.MalformedHeraldsLegwraps:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.MalformedHeraldsLegwraps:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.MalformedHeraldsLegwraps, nil, Settings.Commons.TrinketDisplayStyle) then return "malformed_heralds_legwraps high_priority"; end
   end
   -- use_item,name=ancient_knot_of_wisdom,if=variable.time_to_combustion>=55&buff.combustion.down&variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
   -- Two conditions, since the horde and alliance trinkets have different IDs
-  if I.AncientKnotofWisdomAlliance:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.AncientKnotofWisdomAlliance:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.AncientKnotofWisdomAlliance, nil, Settings.Commons.TrinketDisplayStyle) then return "ancient_knot_of_wisdom high_priority"; end
   end
-  if I.AncientKnotofWisdomHorde:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.AncientKnotofWisdomHorde:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.AncientKnotofWisdomHorde, nil, Settings.Commons.TrinketDisplayStyle) then return "ancient_knot_of_wisdom high_priority"; end
   end
   -- use_item,name=neural_synapse_enhancer,if=variable.time_to_combustion>=45&buff.combustion.down&variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.NeuralSynapseEnhancer:IsEquipReady() and (VarTimeToCombusion >= 45 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.NeuralSynapseEnhancer:IsEquipReady() and (VarTimeToCombusion >= 45 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.NeuralSynapseEnhancer, nil, Settings.Commons.TrinketDisplayStyle) then return "neural_synapse_enhancer high_priority"; end
   end
 end
 
 local function ItemsLowPriority()
   -- use_item,name=tidestorm_codex,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if I.TidestormCodex:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if I.TidestormCodex:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex low_priority"; end
   end
   -- use_item,effect_name=cyclotronic_blast,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if Everyone.CyclotronicBlastReady() and (VarTimeToCombusion > VarOnUseCutoff or Settings.Fire.DisableCombustion) then
+  if Everyone.CyclotronicBlastReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast low_priority"; end
   end
 end
 
 local function RopPhase()
   -- flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
-  if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and Player:BuffP(S.HotStreakBuff)) then
+  if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) and Player:BuffP(S.HotStreakBuff)) then
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 432"; end
   end
   -- pyroblast,if=buff.hot_streak.react
@@ -606,7 +607,7 @@ local function RopPhase()
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)))
   -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
-  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (not Player:BuffP(S.HeatingUpBuff) and not Player:BuffP(S.HotStreakBuff) and not Player:PrevGCDP(1, S.FireBlast) and (S.FireBlast:Charges() >= 2 or (S.PhoenixFlames:Charges() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85)))) then
+  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (not Player:BuffP(S.HeatingUpBuff) and not Player:BuffP(S.HotStreakBuff) and not Player:PrevGCDP(1, S.FireBlast) and (S.FireBlast:Charges() >= 2 or (S.PhoenixFlames:Charges() >= 1 and S.PhoenixFlames:IsAvailable()) or (S.AlexstraszasFury:IsAvailable() and S.DragonsBreath:CooldownUpP()) or (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85)))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 454"; end
   end
   -- call_action_list,name=active_talents
@@ -619,17 +620,17 @@ local function RopPhase()
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(buff.heating_up.react&spell_crit<1&(target.health.pct>=30|!talent.searing_touch.enabled))
   -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
-  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (Player:BuffP(S.HeatingUpBuff) and Player:CritChancePct() < 85 and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
+  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (Player:BuffP(S.HeatingUpBuff) and Player:CritChancePct() < 85 and (Target:HealthPercentage() >= 30 or not S.SearingTouch:IsAvailable()))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 502"; end
   end
   -- fire_blast,use_off_gcd=1,use_while_casting=1,if=!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
   -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
-  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
+  if S.FireBlast:IsCastableP() and (not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) and not bool(S.Firestarter:ActiveStatus()) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and (Player:BuffP(S.HeatingUpBuff) and not Player:IsCasting(S.Scorch) or Player:BuffDownP(S.HeatingUpBuff) and Player:BuffDownP(S.HotStreakBuff))) then
     if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 512"; end
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
   -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
-  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
+  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and not (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion))) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 530"; end
   end
   -- phoenix_flames,if=!prev_gcd.1.phoenix_flames&buff.heating_up.react
@@ -646,7 +647,7 @@ local function RopPhase()
     if HR.Cast(S.DragonsBreath, nil, nil, 12) then return "dragons_breath 556"; end
   end
   -- flamestrike,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
-  if S.Flamestrike:IsCastableP() and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) then
+  if S.Flamestrike:IsCastableP() and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) then
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 564"; end
   end
   -- fireball
@@ -657,7 +658,7 @@ end
 
 local function StandardRotation()
   -- flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
-  if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and Player:BuffP(S.HotStreakBuff)) then
+  if S.Flamestrike:IsCastableP() and ((EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) and Player:BuffP(S.HotStreakBuff)) then
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 582"; end
   end
   -- pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
@@ -688,7 +689,7 @@ local function StandardRotation()
   end
   -- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&(talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
   -- Using 85% crit, since CritChancePct() does not include Critical Mass's 15% crit
-  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and not (EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion))) then
+  if S.Pyroblast:IsCastableP() and (Player:PrevGCDP(1, S.Scorch) and Player:BuffP(S.HeatingUpBuff) and (S.SearingTouch:IsAvailable() and Target:HealthPercentage() <= 30 or Player:CritChancePct() >= 85) and not (EnemiesCount >= VarHotStreakFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion))) then
     if HR.Cast(S.Pyroblast, nil, nil, 40) then return "pyroblast 726"; end
   end
   -- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30|spell_crit>=1)))&!variable.phoenix_pooling
@@ -714,7 +715,7 @@ local function StandardRotation()
     if HR.Cast(S.Scorch, nil, nil, 40) then return "scorch 780"; end
   end
   -- flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion)
-  if S.Flamestrike:IsCastableP() and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) then
+  if S.Flamestrike:IsCastableP() and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) then
     if HR.Cast(S.Flamestrike, nil, nil, 40) then return "flamestrike 783"; end
   end
   -- fireball
@@ -731,6 +732,8 @@ end
 local function APL()
   EnemiesCount = GetEnemiesCount(8)
   HL.GetEnemies(40) -- For interrupts
+
+  IgnoreCombustion = (Settings.Fire.DisableCombustion or not HR.CDsON())
 
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then
@@ -760,7 +763,7 @@ local function APL()
       if HR.Cast(S.MirrorImage) then return "mirror_image 791"; end
     end
     -- guardian_of_azeroth,if=(variable.time_to_combustion<10|target.time_to_die<variable.time_to_combustion)&!variable.disable_combustion
-    if S.GuardianofAzeroth:IsCastableP() and ((VarTimeToCombusion < 10 or Target:TimeToDie() < VarTimeToCombusion) and not Settings.Fire.DisableCombustion) then
+    if S.GuardianofAzeroth:IsCastableP() and ((VarTimeToCombusion < 10 or Target:TimeToDie() < VarTimeToCombusion) and not IgnoreCombustion) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 793"; end
     end
     -- concentrated_flame
@@ -788,11 +791,11 @@ local function APL()
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 803"; end
     end
     -- rune_of_power,if=buff.rune_of_power.down&(buff.combustion.down&buff.rune_of_power.down&(variable.time_to_combustion>full_recharge_time|variable.time_to_combustion>target.time_to_die)|variable.disable_combustion)
-    if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.RuneofPowerBuff) and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or VarTimeToCombusion > Target:TimeToDie()) or Settings.Fire.DisableCombustion)) then
+    if S.RuneofPower:IsCastableP() and (Player:BuffDownP(S.RuneofPowerBuff) and (Player:BuffDownP(S.CombustionBuff) and Player:BuffDownP(S.RuneofPowerBuff) and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or VarTimeToCombusion > Target:TimeToDie()) or IgnoreCombustion)) then
       if HR.Cast(S.RuneofPower, Settings.Fire.GCDasOffGCD.RuneofPower) then return "rune_of_power 807"; end
     end
     -- call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
-    if HR.CDsON() and (not Settings.Fire.DisableCombustion and VarTimeToCombusion <= 0) then
+    if (not IgnoreCombustion and VarTimeToCombusion <= 0) then
       local ShouldReturn = CombustionPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- fire_blast,use_while_casting=1,use_off_gcd=1,if=(essence.memory_of_lucid_dreams.major|essence.memory_of_lucid_dreams.minor&azerite.blaster_master.enabled)&charges=max_charges&!buff.hot_streak.react&!(buff.heating_up.react&(buff.combustion.up&(action.fireball.in_flight|action.pyroblast.in_flight|action.scorch.executing)|target.health.pct<=30&action.scorch.executing))&!(!buff.heating_up.react&!buff.hot_streak.react&buff.combustion.down&(action.fireball.in_flight|action.pyroblast.in_flight))
@@ -800,19 +803,19 @@ local function APL()
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 830"; end
     end
     -- call_action_list,name=rop_phase,if=buff.rune_of_power.up&(variable.time_to_combustion>0|variable.disable_combustion)
-    if (Player:BuffP(S.RuneofPowerBuff) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion)) then
+    if (Player:BuffP(S.RuneofPowerBuff) and (VarTimeToCombusion > 0 or IgnoreCombustion)) then
       local ShouldReturn = RopPhase(); if ShouldReturn then return ShouldReturn; end
     end
     -- variable,name=fire_blast_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.fire_blast.full_recharge_time&(variable.time_to_combustion>action.rune_of_power.full_recharge_time|variable.disable_combustion)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|!variable.disable_combustion&variable.time_to_combustion<action.fire_blast.full_recharge_time&variable.time_to_combustion<target.time_to_die
     if (true) then
-      VarFireBlastPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.FireBlast:FullRechargeTimeP() and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or Settings.Fire.DisableCombustion) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:Charges() > 0) or not Settings.Fire.DisableCombustion and VarTimeToCombusion < S.FireBlast:FullRechargeTimeP() and VarTimeToCombusion < Target:TimeToDie())
+      VarFireBlastPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.FireBlast:FullRechargeTimeP() and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or IgnoreCombustion) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:Charges() > 0) or not IgnoreCombustion and VarTimeToCombusion < S.FireBlast:FullRechargeTimeP() and VarTimeToCombusion < Target:TimeToDie())
     end
     -- variable,name=phoenix_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.phoenix_flames.full_recharge_time&(variable.time_to_combustion>action.rune_of_power.full_recharge_time|variable.disable_combustion)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|!variable.disable_combustion&variable.time_to_combustion<action.phoenix_flames.full_recharge_time&variable.time_to_combustion<target.time_to_die
     if (true) then
-      VarPhoenixPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.PhoenixFlames:FullRechargeTimeP() and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or Settings.Fire.DisableCombustion) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:Charges() > 0) or not Settings.Fire.DisableCombustion and VarTimeToCombusion < S.PhoenixFlames:FullRechargeTimeP() and VarTimeToCombusion < Target:TimeToDie())
+      VarPhoenixPooling = num(S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemainsP() < S.PhoenixFlames:FullRechargeTimeP() and (VarTimeToCombusion > S.RuneofPower:FullRechargeTimeP() or IgnoreCombustion) and (S.RuneofPower:CooldownRemainsP() < Target:TimeToDie() or S.RuneofPower:Charges() > 0) or not IgnoreCombustion and VarTimeToCombusion < S.PhoenixFlames:FullRechargeTimeP() and VarTimeToCombusion < Target:TimeToDie())
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=(!variable.fire_blast_pooling|buff.rune_of_power.up)&(variable.time_to_combustion>0|variable.disable_combustion)&(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&buff.hot_streak.down&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)
-    if S.FireBlast:IsCastableP() and ((not VarFireBlastPooling or Player:BuffP(S.RuneofPowerBuff)) and (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion) and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or Settings.Fire.DisableCombustion)) and not bool(S.Firestarter:ActiveStatus()) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
+    if S.FireBlast:IsCastableP() and ((not VarFireBlastPooling or Player:BuffP(S.RuneofPowerBuff)) and (VarTimeToCombusion > 0 or IgnoreCombustion) and (EnemiesCount >= VarHardCastFlamestrike and (S.Combustion:TimeSinceLastCast() - 10 > VarDelayFlamestrike or IgnoreCombustion)) and not bool(S.Firestarter:ActiveStatus()) and Player:BuffDownP(S.HotStreakBuff) and (not S.BlasterMaster:AzeriteEnabled() or Player:BuffRemainsP(S.BlasterMasterBuff) < 0.5)) then
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 832"; end
     end
     -- fire_blast,use_off_gcd=1,use_while_casting=1,if=firestarter.active&charges>=1&(!variable.fire_blast_pooling|buff.rune_of_power.up)&(!azerite.blaster_master.enabled|buff.blaster_master.remains<0.5)&(!action.fireball.executing&!action.pyroblast.in_flight&buff.heating_up.up|action.fireball.executing&buff.hot_streak.down|action.pyroblast.in_flight&buff.heating_up.down&buff.hot_streak.down)
@@ -820,7 +823,7 @@ local function APL()
       if HR.Cast(S.FireBlast, nil, nil, 40) then return "fire_blast 834"; end
     end
     -- call_action_list,name=standard_rotation,if=variable.time_to_combustion>0|variable.disable_combustion
-    if (VarTimeToCombusion > 0 or Settings.Fire.DisableCombustion) then
+    if (VarTimeToCombusion > 0 or IgnoreCombustion) then
       local ShouldReturn = StandardRotation(); if ShouldReturn then return ShouldReturn; end
     end
   end
