@@ -41,13 +41,13 @@ HL.AddCoreOverride ("Player.Insanity",
         return Insanity
       else
         if Player:IsCasting(SpellShadow.MindBlast) then
-          return Insanity + (12 * (SpellShadow.FortressOfTheMind:IsAvailable() and 1.2 or 1.0) * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0))
+          return Insanity + (12 * (SpellShadow.FortressOfTheMind:IsAvailable() and 1.2 or 1.0) * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0) * (Player:BuffP(SpellShadow.MemoryofLucidDreams) and 2.0 or 1.0))
         elseif Player:IsCasting(SpellShadow.ShadowWordVoid) then
-          return Insanity + (15 * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0))
+          return Insanity + (15 * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0) * (Player:BuffP(SpellShadow.MemoryofLucidDreams) and 2.0 or 1.0))
         elseif Player:IsCasting(SpellShadow.DarkVoid) then
-          return Insanity + (30 * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0))
+          return Insanity + (30 * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0) * (Player:BuffP(SpellShadow.MemoryofLucidDreams) and 2.0 or 1.0))
         elseif Player:IsCasting(SpellShadow.VampiricTouch) then
-          return Insanity + (6 * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0))
+          return Insanity + (6 * (Player:BuffP(SpellShadow.SurrenderToMadness) and 2.0 or 1.0) * (Player:BuffP(SpellShadow.MemoryofLucidDreams) and 2.0 or 1.0))
         else
           return Insanity
         end
