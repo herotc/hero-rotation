@@ -435,7 +435,7 @@ local function CDs ()
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
 
     -- Trinkets
-    if Settings.Commons.UseTrinkets then
+    if Settings.Commons.UseTrinkets and HR.CDsON() then
       -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
       if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and not Player:BuffP(S.AdrenalineRush) and not Player:BuffP(S.BladeFlurry) and S.AdrenalineRush:CooldownRemainsP() < 15 then
         if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast FontOfPower"; end
