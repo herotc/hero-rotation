@@ -291,9 +291,10 @@ local function Precombat()
     if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 4"; end
   end
   -- chi_burst,if=!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled
-  if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistoftheWhiteTiger:IsAvailable()) then
-    if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 6"; end
-  end
+  -- Removed, as currently pre-casted Chi Bursts are not giving Chi in simc and it is a dps loss to pre-cast it
+  --if S.ChiBurst:IsReadyP() and (not S.Serenity:IsAvailable() or not S.FistoftheWhiteTiger:IsAvailable()) then
+    --if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 6"; end
+  --end
   -- chi_wave,if=talent.fist_of_the_white_tiger.enabled|essence.conflict_and_strife.major
   if S.ChiWave:IsReadyP() and (S.FistoftheWhiteTiger:IsAvailable() or Spell:MajorEssenceEnabled(AE.ConflictandStrife)) then
     if HR.Cast(S.ChiWave, nil, nil, 40) then return "chi_wave 8"; end
@@ -739,8 +740,8 @@ local function Aoe()
   if S.ReverseHarm:IsReadyP() and (Player:ChiDeficit() >= 2) then
     if HR.Cast(S.ReverseHarm, nil, nil, 10) then return "reverse_harm 242"; end
   end
-  -- chi_burst,if=chi.max-chi>=3
-  if S.ChiBurst:IsReadyP() and (Player:ChiDeficit() >= 3) then
+  -- chi_burst,if=chi.max-chi>=1
+  if S.ChiBurst:IsReadyP() and (Player:ChiDeficit() >= 1) then
     if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 244"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
@@ -822,9 +823,17 @@ local function APL()
     if S.TigerPalm:IsReadyP() and (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (S.Serenity:IsAvailable() or Target:DebuffDownP(S.TouchofDeathDebuff) or Cache.EnemiesCount[8] > 2) and Player:BuffDownP(S.SeethingRageBuff) and Player:BuffDownP(S.SerenityBuff) and (Player:EnergyTimeToMaxPredicted() < 1 or S.Serenity:IsAvailable() and S.Serenity:CooldownRemainsP() < 2 or not S.Serenity:IsAvailable() and S.TouchofDeath:CooldownRemainsP() < 3 and not VarHoldTod or Player:EnergyTimeToMaxPredicted() < 4 and S.FistsofFury:CooldownRemainsP() < 1.5)) then
       if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 27"; end
     end
-    -- chi_wave,if=!talent.fist_of_the_white_tiger.enabled&prev_gcd.1.tiger_palm&time<=3
-    if S.ChiWave:IsReadyP() and (not S.FistoftheWhiteTiger:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() <= 3) then
+    -- chi_wave,if=chi=2&prev_gcd.1.tiger_palm&time<=3
+    if S.ChiWave:IsReadyP() and (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() <= 3) then
       if HR.Cast(S.ChiWave, nil, nil, 40) then return "chi_wave 28"; end
+    end
+    -- chi_burst,if=chi=2&prev_gcd.1.tiger_palm&time<=3
+    if S.ChiBurst:IsReadyP() and (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() <= 3) then
+      if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 30"; end
+    end
+    -- chi_wave,if=chi=2&prev_gcd.1.tiger_palm&time<=3
+    if S.FlyingSerpentKick:IsReadyP() and (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() <= 3) then
+      if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "flying_serpent_kick 32"; end
     end
     -- call_action_list,name=cd_serenity,if=talent.serenity.enabled
     if (HR.CDsON() and S.Serenity:IsAvailable()) then
