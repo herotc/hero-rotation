@@ -831,7 +831,7 @@ local function APL()
     if S.ChiBurst:IsReadyP() and (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() <= 3) then
       if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 30"; end
     end
-    -- chi_wave,if=chi=2&prev_gcd.1.tiger_palm&time<=3
+    -- flying_serpent_kick,if=chi=2&prev_gcd.1.tiger_palm&time<=3
     if S.FlyingSerpentKick:IsReadyP() and (Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) and HL.CombatTime() <= 3) then
       if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "flying_serpent_kick 32"; end
     end
