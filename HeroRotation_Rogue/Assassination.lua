@@ -37,6 +37,7 @@ Spell.Rogue.Assassination = {
   LightsJudgment        = Spell(255647),
   Shadowmeld            = Spell(58984),
   -- Abilities
+  Ambush                = Spell(8676),
   Envenom               = Spell(32645),
   FanofKnives           = Spell(51723),
   Garrote               = Spell(703),
@@ -51,7 +52,6 @@ Spell.Rogue.Assassination = {
   VanishBuff            = Spell(11327),
   Vendetta              = Spell(79140),
   -- Talents
-  Blindside             = Spell(111240),
   BlindsideBuff         = Spell(121153),
   CrimsonTempest        = Spell(121411),
   DeeperStratagem       = Spell(193531),
@@ -862,8 +862,8 @@ local function Direct ()
     end
   end
   -- actions.direct+=/blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled&!azerite.double_dose.enabled)
-  if S.Blindside:IsCastable("Melee") and (Player:BuffP(S.BlindsideBuff) or (not S.VenomRush:IsAvailable() and not S.DoubleDose:AzeriteEnabled() and Target:HealthPercentage() < 30)) then
-    if HR.CastPooling(S.Blindside) then return "Cast Blindside"; end
+  if S.Ambush:IsCastable("Melee") and Player:BuffP(S.BlindsideBuff) then
+    if HR.CastPooling(S.Ambush) then return "Cast Ambush (Blindside)"; end
   end
   -- actions.direct+=/mutilate,target_if=!dot.deadly_poison_dot.ticking,if=variable.use_filler&spell_targets.fan_of_knives=2
   if S.Mutilate:IsCastable("Melee") and Cache.EnemiesCount[10] == 2 then
