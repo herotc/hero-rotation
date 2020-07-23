@@ -38,7 +38,7 @@ Spell.Warrior.Fury = {
   Carnage                               = Spell(202922),
   EnrageBuff                            = Spell(184362),
   Massacre                              = Spell(206315),
-  Execute                               = MultiSpell(5308, 280735),
+  Execute                               = MultiSpell(5308, 280735, 330325),
   Bloodthirst                           = Spell(23881),
   RagingBlow                            = Spell(85288),
   Bladestorm                            = Spell(46924),
@@ -144,7 +144,7 @@ local function Precombat()
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth precombat"; end
     end
     -- recklessness
-    if S.Recklessness:IsCastableP() then
+    if S.Recklessness:IsCastableP("Melee") then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat"; end
     end
     -- potion
@@ -284,7 +284,7 @@ local function APL()
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>1|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
-    if S.Recklessness:IsCastableP() and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or S.GuardianofAzeroth:CooldownRemainsP() > 1 or Player:BuffP(S.GuardianofAzerothBuff) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
+    if S.Recklessness:IsCastableP("Melee") and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or S.GuardianofAzeroth:CooldownRemainsP() > 1 or Player:BuffP(S.GuardianofAzerothBuff) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
