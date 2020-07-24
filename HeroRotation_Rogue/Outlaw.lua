@@ -39,11 +39,11 @@ Spell.Rogue.Outlaw = {
   -- Abilities
   AdrenalineRush                  = Spell(13750),
   Ambush                          = Spell(8676),
-  BetweentheEyes                  = Spell(199804),
+  BetweentheEyes                  = Spell(315341),
   BladeFlurry                     = Spell(13877),
   Opportunity                     = Spell(195627),
   PistolShot                      = Spell(185763),
-  RolltheBones                    = Spell(193316),
+  RolltheBones                    = Spell(315508),
   Dispatch                        = Spell(2098),
   SinisterStrike                  = Spell(193315),
   Stealth                         = Spell(1784),
@@ -58,7 +58,7 @@ Spell.Rogue.Outlaw = {
   LoadedDiceBuff                  = Spell(256171),
   MarkedforDeath                  = Spell(137619),
   QuickDraw                       = Spell(196938),
-  SliceandDice                    = Spell(5171),
+  SliceandDice                    = Spell(315496),
   -- Azerite Traits
   AceUpYourSleeve                 = Spell(278676),
   Deadshot                        = Spell(272935),
@@ -83,6 +83,9 @@ Spell.Rogue.Outlaw = {
   BloodoftheEnemyDebuff           = Spell(297108),
   RecklessForceBuff               = Spell(302932),
   RecklessForceCounter            = Spell(302917),
+  -- Covenant
+  SerratedBoneSpike               = Spell(328547),
+  SerratedBoneSpikeDebuff         = Spell(324073),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -96,6 +99,10 @@ Spell.Rogue.Outlaw = {
   RuthlessPrecision               = Spell(193357),
   SkullandCrossbones              = Spell(199603),
   TrueBearing                     = Spell(193359),
+  -- Poisons
+  CripplingPoison                 = Spell(3408),
+  InstantPoison                   = Spell(315584),
+  NumblingPoison                  = Spell(5761),
   -- Misc
   ConductiveInkDebuff             = Spell(302565),
   VigorTrinketBuff                = Spell(287916),
@@ -130,7 +137,8 @@ local BladeFlurryRange = 6;
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
-  Outlaw = HR.GUISettings.APL.Rogue.Outlaw
+  Assassination = HR.GUISettings.APL.Rogue.Assassination,
+  Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
 };
 
 local function num(val)
@@ -220,25 +228,25 @@ local function RtB_Reroll ()
   if not Cache.APLVar.RtB_Reroll then
     -- 1+ Buff
     if Settings.Outlaw.RolltheBonesLogic == "1+ Buff" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and RtB_Buffs() <= 0) and true or false;
+      Cache.APLVar.RtB_Reroll = (RtB_Buffs() <= 0) and true or false;
     -- Broadside
     elseif Settings.Outlaw.RolltheBonesLogic == "Broadside" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.Broadside)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not Player:BuffP(S.Broadside)) and true or false;
     -- Buried Treasure
     elseif Settings.Outlaw.RolltheBonesLogic == "Buried Treasure" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.BuriedTreasure)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not Player:BuffP(S.BuriedTreasure)) and true or false;
     -- Grand Melee
     elseif Settings.Outlaw.RolltheBonesLogic == "Grand Melee" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.GrandMelee)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not Player:BuffP(S.GrandMelee)) and true or false;
     -- Skull and Crossbones
     elseif Settings.Outlaw.RolltheBonesLogic == "Skull and Crossbones" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.SkullandCrossbones)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not Player:BuffP(S.SkullandCrossbones)) and true or false;
     -- Ruthless Precision
     elseif Settings.Outlaw.RolltheBonesLogic == "Ruthless Precision" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.RuthlessPrecision)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not Player:BuffP(S.RuthlessPrecision)) and true or false;
     -- True Bearing
     elseif Settings.Outlaw.RolltheBonesLogic == "True Bearing" then
-      Cache.APLVar.RtB_Reroll = (not S.SliceandDice:IsAvailable() and not Player:BuffP(S.TrueBearing)) and true or false;
+      Cache.APLVar.RtB_Reroll = (not Player:BuffP(S.TrueBearing)) and true or false;
     -- SimC Default
     else
       -- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
@@ -432,6 +440,36 @@ local function CDs ()
       end
     end
 
+    -- Placeholder Roll the Bones
+    if S.RolltheBones:IsCastableP() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
+      if HR.CastPooling(S.RolltheBones) then return "Cast Roll the Bones"; end
+    end
+
+    -- Placeholder Bone Spike
+    if S.SerratedBoneSpike:IsCastableP() and not Player:IsStealthedP(true, true) then
+      if not Target:Debuff(S.SerratedBoneSpikeDebuff) then
+        if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike"; end
+      else
+        if HR.AoEON() then
+          -- Prefer melee cycle units
+          local BestUnit, BestUnitTTD = nil, 4;
+          local TargetGUID = Target:GUID();
+          for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
+            if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(S.SerratedBoneSpike))
+            and not CycleUnit:Debuff(S.SerratedBoneSpikeDebuff) then
+              BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
+            end
+          end
+          if BestUnit then
+            HR.CastLeftNameplate(BestUnit, S.SerratedBoneSpike);
+          end
+        end
+        if Player:ComboPointsDeficit() > 1 and S.SerratedBoneSpike:ChargesFractionalP() > 2.9 then
+          if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike Filler"; end
+        end
+      end
+    end
+
     -- actions.cds=potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
 
     -- Trinkets
@@ -520,10 +558,6 @@ local function Finish ()
     and Player:BuffRemainsP(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
     if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice"; end
   end
-  -- actions.finish+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
-  if S.RolltheBones:IsCastableP() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
-    if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones"; end
-  end
   -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
   -- actions.finish+=/between_the_eyes,if=azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
   if S.BetweentheEyes:IsCastableP(20) and (S.AceUpYourSleeve:AzeriteEnabled() or S.Deadshot:AzeriteEnabled()) then
@@ -569,6 +603,20 @@ local function APL ()
   -- Feint
   ShouldReturn = Rogue.Feint(S.Feint);
   if ShouldReturn then return ShouldReturn; end
+
+  -- Poisons
+  local PoisonRefreshTime = Player:AffectingCombat() and Settings.Assassination.PoisonRefreshCombat*60 or Settings.Assassination.PoisonRefresh*60;
+  -- Lethal Poison
+  if Player:BuffRemainsP(S.InstantPoison) <= PoisonRefreshTime then
+    HR.CastSuggested(S.InstantPoison);
+  end
+  -- Non-Lethal Poisons
+  if Player:BuffRemainsP(S.CripplingPoison) <= PoisonRefreshTime then
+    HR.CastSuggested(S.CripplingPoison);
+  end
+  if Player:BuffRemainsP(S.NumblingPoison) <= PoisonRefreshTime then
+    HR.CastSuggested(S.NumblingPoison);
+  end
 
   -- Out of Combat
   if not Player:AffectingCombat() then
