@@ -157,7 +157,7 @@ end
 
 -- APL Action Lists (and Variables)
 local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(8); end},
+  {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange("Melee"); end},
   {S.Feint, "Cast Feint (Sapped Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sapped Soul)", function () return true; end}
 };
@@ -380,7 +380,7 @@ local function Essences ()
 end
 
 local function CDs ()
-  if Target:IsInRange(8) then
+  if Target:IsInRange("Melee") then
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
     if HR.CDsON() and not Player:IsStealthedP(true, true) then
       ShouldReturn = Essences();
@@ -537,7 +537,7 @@ local function CDs ()
 end
 
 local function Stealth ()
-  if Target:IsInRange(8) then
+  if Target:IsInRange("Melee") then
     -- actions.stealth=ambush
     if S.Ambush:IsCastable() then
       if HR.Cast(S.Ambush) then return "Cast Ambush"; end
@@ -658,7 +658,7 @@ local function APL ()
       if Player:ComboPoints() >= 5 then
         ShouldReturn = Finish();
         if ShouldReturn then return "Finish: " .. ShouldReturn; end
-      elseif Target:IsInRange(8) then
+      elseif Target:IsInRange("Melee") then
         if Player:IsStealthedP(true, true) and S.Ambush:IsCastable() then
           if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
         elseif S.SinisterStrike:IsCastable() then
