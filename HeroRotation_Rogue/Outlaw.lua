@@ -157,7 +157,7 @@ end
 
 -- APL Action Lists (and Variables)
 local SappedSoulSpells = {
-  {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(S.SinisterStrike); end},
+  {S.Kick, "Cast Kick (Sapped Soul)", function () return Target:IsInRange(8); end},
   {S.Feint, "Cast Feint (Sapped Soul)", function () return true; end},
   {S.CrimsonVial, "Cast Crimson Vial (Sapped Soul)", function () return true; end}
 };
@@ -380,7 +380,7 @@ local function Essences ()
 end
 
 local function CDs ()
-  if Target:IsInRange(S.SinisterStrike) then
+  if Target:IsInRange(8) then
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
     if HR.CDsON() and not Player:IsStealthedP(true, true) then
       ShouldReturn = Essences();
@@ -446,7 +446,7 @@ local function CDs ()
     end
 
     -- Placeholder Bone Spike
-    if S.SerratedBoneSpike:IsCastableP() and not Player:IsStealthedP(true, true) then
+    if S.SerratedBoneSpike:IsCastableP() and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() > 1 then
       if not Target:Debuff(S.SerratedBoneSpikeDebuff) then
         if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike"; end
       else
@@ -454,7 +454,7 @@ local function CDs ()
           -- Prefer melee cycle units
           local BestUnit, BestUnitTTD = nil, 4;
           local TargetGUID = Target:GUID();
-          for _, CycleUnit in pairs(Cache.Enemies["Melee"]) do
+          for _, CycleUnit in pairs(Cache.Enemies[30]) do
             if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemainsP(S.SerratedBoneSpike))
             and not CycleUnit:Debuff(S.SerratedBoneSpikeDebuff) then
               BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie();
@@ -464,7 +464,7 @@ local function CDs ()
             HR.CastLeftNameplate(BestUnit, S.SerratedBoneSpike);
           end
         end
-        if Player:ComboPointsDeficit() > 1 and S.SerratedBoneSpike:ChargesFractionalP() > 2.9 then
+        if S.SerratedBoneSpike:ChargesFractionalP() > 2.9 then
           if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike Filler"; end
         end
       end
@@ -537,7 +537,7 @@ local function CDs ()
 end
 
 local function Stealth ()
-  if Target:IsInRange(S.SinisterStrike) then
+  if Target:IsInRange(8) then
     -- actions.stealth=ambush
     if S.Ambush:IsCastable() then
       if HR.Cast(S.Ambush) then return "Cast Ambush"; end
@@ -593,6 +593,7 @@ local Interrupts = {
 local function APL ()
   -- Unit Update
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6;
+  HL.GetEnemies(30); -- Serrated Bone Spike cycling
   HL.GetEnemies(BladeFlurryRange);
   HL.GetEnemies("Melee");
 
@@ -657,7 +658,7 @@ local function APL ()
       if Player:ComboPoints() >= 5 then
         ShouldReturn = Finish();
         if ShouldReturn then return "Finish: " .. ShouldReturn; end
-      elseif Target:IsInRange(S.SinisterStrike) then
+      elseif Target:IsInRange(8) then
         if Player:IsStealthedP(true, true) and S.Ambush:IsCastable() then
           if HR.Cast(S.Ambush) then return "Cast Ambush (Opener)"; end
         elseif S.SinisterStrike:IsCastable() then
