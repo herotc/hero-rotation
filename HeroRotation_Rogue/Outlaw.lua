@@ -301,10 +301,6 @@ local function Ambush_Condition ()
   return Player:ComboPointsDeficit() >= 2 + 2 * ((S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:CooldownRemainsP() < 1) and 1 or 0)
     + (Player:Buff(S.Broadside) and 1 or 0) and EnergyPredictedRounded() > 60 and not Player:Buff(S.SkullandCrossbones) and not Player:BuffP(S.KeepYourWitsBuff);
 end
--- actions+=/variable,name=bte_condition,value=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
-local function BtECondition ()
-  return Player:BuffP(S.RuthlessPrecision) or (S.Deadshot:AzeriteEnabled() or S.AceUpYourSleeve:AzeriteEnabled()) and RtB_Buffs() >= 1;
-end
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 local function Blade_Flurry_Sync ()
@@ -336,7 +332,7 @@ end
 -- # Essences
 local function Essences ()
   -- blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition|fight_remains<=10
-  if S.BloodoftheEnemy:IsCastableP() and (Blade_Flurry_Sync() and S.BetweentheEyes:CooldownUpP() and BtECondition() or HL.BossFilteredFightRemains("<", 20)) then
+  if S.BloodoftheEnemy:IsCastableP() and (Blade_Flurry_Sync() and S.BetweentheEyes:CooldownUpP() or HL.BossFilteredFightRemains("<", 20)) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy"; end
   end
   -- concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
@@ -548,7 +544,7 @@ end
 local function Finish ()
   -- # BtE over RtB rerolls with 2+ Deadshot traits or Ruthless Precision.
   -- actions.finish=between_the_eyes,if=variable.bte_condition
-  if S.BetweentheEyes:IsCastableP(20) and BtECondition() then
+  if S.BetweentheEyes:IsCastableP(20) then
     if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Pre RtB)"; end
   end
   -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
