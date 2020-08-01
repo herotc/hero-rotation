@@ -83,6 +83,8 @@ Spell.Rogue.Outlaw = {
   BloodoftheEnemyDebuff           = Spell(297108),
   RecklessForceBuff               = Spell(302932),
   RecklessForceCounter            = Spell(302917),
+  -- Legendary
+  MasterAssassinsMark             = Spell(340094),
   -- Covenant
   SerratedBoneSpike               = Spell(328547),
   SerratedBoneSpikeDebuff         = Spell(324073),
@@ -426,7 +428,7 @@ local function CDs ()
       if Settings.Outlaw.UseDPSVanish and not Player:IsStealthedP(true, true) then
         -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
         -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
-        if S.Vanish:IsCastable() and Ambush_Condition() then
+        if S.Vanish:IsCastable() and Ambush_Condition() and not Player:Buff(S.MasterAssassinsMark) then
           if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish"; end
         end
         -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
@@ -442,7 +444,7 @@ local function CDs ()
     end
 
     -- Placeholder Bone Spike
-    if S.SerratedBoneSpike:IsCastableP() and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() > 1 then
+    if HR.CDsON() and S.SerratedBoneSpike:IsCastableP() and not Player:IsStealthedP(true, true) and Player:ComboPointsDeficit() > 1 then
       if not Target:Debuff(S.SerratedBoneSpikeDebuff) then
         if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike"; end
       else
