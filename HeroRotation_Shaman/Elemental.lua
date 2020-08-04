@@ -526,24 +526,42 @@ local function SingleTarget()
     if HR.Cast(S.LightningBolt, nil, nil, 40) then return "lightning_bolt 457"; end
   end
   -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
+  -- Standard Rotation
   if S.LavaBurst:IsCastableP() and RotType == "Standard" and (S.LavaBurst:CooldownUpP() and not S.MasteroftheElements:IsAvailable()) then
     if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 461 standard"; end
+  end
+  -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled&buff.lava_surge.up&!pet.primal_storm_elemental.active
+  -- High Crit Rotation
+  if S.LavaBurst:IsCastableP() and RotType == "High Crit" and (S.LavaBurst:CooldownUpP() and not S.MasteroftheElements:IsAvailable() and Player:BuffP(S.LavaSurgeBuff) and (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120)) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 462 high_crit"; end
   end
   -- icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<cooldown.storm_elemental.duration-30)
   if S.Icefury:IsCastableP() and (S.Icefury:IsAvailable() and not (Player:Maelstrom() > 75 and S.LavaBurst:CooldownRemainsP() <= 0) and (not S.StormElemental:IsAvailable() or S.StormElemental:CooldownRemainsP() < 120)) then
     if HR.Cast(S.Icefury, nil, nil, 40) then return "icefury 469"; end
   end
   -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
+  -- Standard Rotation
   if S.LavaBurst:IsCastableP() and RotType == "Standard" and (S.LavaBurst:CooldownUpP() and S.LavaBurst:ChargesP() > num(S.EchooftheElements:IsAvailable())) then
     if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 479 standard"; end
+  end
+  -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled&buff.lava_surge.up&!pet.primal_storm_elemental.active
+  -- High Crit Rotation
+  if S.LavaBurst:IsCastableP() and RotType == "High Crit" and (S.LavaBurst:CooldownUpP() and S.LavaBurst:ChargesP() > num(S.EchooftheElements:IsAvailable()) and Player:BuffP(S.LavaSurgeBuff) and (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120)) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 480 high_crit"; end
   end
   -- frost_shock,if=talent.icefury.enabled&buff.icefury.up&buff.icefury.remains<1.1*gcd*buff.icefury.stack
   if S.FrostShock:IsCastableP() and (S.Icefury:IsAvailable() and Player:BuffP(S.IcefuryBuff) and Player:BuffRemainsP(S.IcefuryBuff) < 1.1 * Player:GCD() * Player:BuffStackP(S.IcefuryBuff)) then
     if HR.Cast(S.FrostShock, nil, nil, 40) then return "frost_shock 491"; end
   end
   -- lava_burst,if=cooldown_react
+  -- Standard Rotation
   if S.LavaBurst:IsCastableP() and RotType == "Standard" and (S.LavaBurst:CooldownUpP()) then
     if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 501 standard"; end
+  end
+  -- lava_burst,if=cooldown_react&buff.lava_Surge.up&!pet.primal_storm_elemental.active
+  -- High Crit Rotation
+  if S.LavaBurst:IsCastableP() and RotType == "High Crit" and (S.LavaBurst:CooldownUpP() and Player:BuffP(S.LavaSurgeBuff) and (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemainsP() < 120)) then
+    if HR.Cast(S.LavaBurst, nil, nil, 40) then return "lava_burst 502 high_crit"; end
   end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastableP() then
