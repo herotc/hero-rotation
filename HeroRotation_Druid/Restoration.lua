@@ -142,7 +142,7 @@ local function EvaluateCycleRip307(TargetUnit)
 end
 
 local function EvaluateCycleRake309(TargetUnit)
-  return TargetUnit:DebuffRefreshableCP(S.RakeDebuff) and TargetUnit:TimeToDie() > 10 and (Player:ComboPoints() < 5 or TargetUnit:DebuffRefreshableCP(S.RakeDebuff) < 1) and EnemiesCount < 4
+  return TargetUnit:DebuffRefreshableCP(S.RakeDebuff) and TargetUnit:TimeToDie() > 10 and (Player:ComboPoints() < 5 or TargetUnit:DebuffRemainsP(S.RakeDebuff) < 1) and EnemiesCount < 4
 end
 
 local function EvaluateCycleMoonfire311(TargetUnit)
