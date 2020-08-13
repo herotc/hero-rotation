@@ -247,24 +247,26 @@ local function Brand()
       if HR.Cast(S.FieryBrand) then return "Cast Fiery Brand (Brand)"; end
     end
   end
-  -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
-  if S.ImmolationAura:IsCastable() and IsInMeleeRange and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
-  end
-  -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
-  if S.FelDevastation:IsCastable() and IsInMeleeRange and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
-  end
-  -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
-  if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "Cast Infernal Strike (Brand)"; end
-  end
-  -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
-  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if S.ConcentratedSigils:IsAvailable() then
-      if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "Cast Sigil of Flame (Brand, Concentrated)"; end
-    else
-      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
+  if Target:DebuffP(S.FieryBrandDebuff) then
+    -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
+    if S.ImmolationAura:IsCastable() and IsInMeleeRange then
+      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
+    end
+    -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
+    if S.FelDevastation:IsCastable() and IsInMeleeRange then
+      if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
+    end
+    -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
+    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "Cast Infernal Strike (Brand)"; end
+    end
+    -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
+      if S.ConcentratedSigils:IsAvailable() then
+        if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "Cast Sigil of Flame (Brand, Concentrated)"; end
+      else
+        if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
+      end
     end
   end
 end
