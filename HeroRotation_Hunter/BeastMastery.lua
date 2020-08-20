@@ -242,7 +242,7 @@ local function Precombat()
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- aspect_of_the_wild,precast_time=1.3,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
-    if S.AspectoftheWild:IsCastableP() and HR.CDsON() and (not S.PrimalInstincts:AzeriteEnabled() and not Spell:MajorEssenceEnabled(AE.EssenceoftheFocusingIris) and (I.AzsharasFontofPower:IsEquipped() or not Everyone.PSCDEquipped())) then
+    if S.AspectoftheWild:IsCastableP() and HR.CDsON() and Player:BuffDownP(S.AspectoftheWildBuff) and (not S.PrimalInstincts:AzeriteEnabled() and not Spell:MajorEssenceEnabled(AE.EssenceoftheFocusingIris) and (I.AzsharasFontofPower:IsEquipped() or not Everyone.PSCDEquipped())) then
       if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 8"; end
     end
     -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
@@ -328,7 +328,7 @@ local function Cleave()
     if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 82"; end
   end
   -- aspect_of_the_wild
-  if S.AspectoftheWild:IsCastableP() and HR.CDsON() then
+  if S.AspectoftheWild:IsCastableP() and HR.CDsON() and Player:BuffDownP(S.AspectoftheWildBuff) then
     if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 94"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
