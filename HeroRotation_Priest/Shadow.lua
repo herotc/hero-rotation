@@ -361,6 +361,10 @@ local function Boon()
 end
 
 local function Main()
+  -- Moved up from lower in APL: Mind Blast while channeling Mind Flay with Dark Thoughts proc
+  if S.MindBlast:IsCastableP() and (Player:IsChanneling(S.MindFlay) and Player:BuffP(S.DarkThoughtsBuff) and VarDotsUp) then
+    if HR.Cast(S.MindBlast, nil, nil, 40) then return "mind_blast 94"; end
+  end
   -- call_action_list,name=boon,if=buff.boon_of_the_ascended.up
   if (Player:BuffP(S.BoonoftheAscendedBuff)) then
     local ShouldReturn = Boon(); if ShouldReturn then return ShouldReturn; end
@@ -434,9 +438,7 @@ local function Main()
     if HR.CastCycle(S.SearingNightmare, 40, EvaluateCycleSearingNightmare218) then return "searing_nightmare 93"; end
   end
   -- mind_blast,use_while_casting=1,if=variable.dots_up
-  if S.MindBlast:IsCastableP() and (Player:BuffP(S.DarkThoughtsBuff) and VarDotsUp) then
-    if HR.Cast(S.MindBlast, nil, nil, 40) then return "mind_blast 94"; end
-  end
+  -- Moved to top of Main() to ensure it's suggested during Mind Flay channel
   -- mind_blast,if=variable.dots_up&raid_event.movement.in>cast_time+0.5&spell_targets.mind_sear<4
   if S.MindBlast:IsCastableP() and (VarDotsUp and EnemiesCount < 4) then
     if HR.Cast(S.MindBlast, nil, nil, 40) then return "mind_blast 96"; end
