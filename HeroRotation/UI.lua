@@ -67,7 +67,7 @@
   function HR:CreateBackdrop (Frame)
     if Frame.Backdrop or not HR.GUISettings.General.BlackBorderIcon then return; end
 
-    local Backdrop = CreateFrame("Frame", nil, Frame);
+    local Backdrop = CreateFrame("Frame", nil, Frame, BackdropTemplateMixin and "BackdropTemplate");
     Frame.Backdrop = Backdrop;
     Backdrop:ClearAllPoints();
     Backdrop:SetPoint("TOPLEFT", Frame, "TOPLEFT", -1, 1);
