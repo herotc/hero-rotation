@@ -254,7 +254,7 @@ local function Brand()
       if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
     end
     -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
-    if S.FelDevastation:IsReady() and IsInMeleeRange and (Player:BuffDownP(S.Metamorphosis)) then
+    if S.FelDevastation:IsReady() and IsInMeleeRange and (S.Demonic:IsAvailable() and Player:BuffDownP(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
       if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
     end
     -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
@@ -309,8 +309,8 @@ local function Cooldowns()
 end
 
 local function Normal()
-  -- Manual add: fel_devastation,if=!buff.metamorphosis.up&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
-  if S.FelDevastation:IsReady() and (Player:BuffDownP(S.Metamorphosis) and (S.SpiritBomb:IsAvailable() and Target:DebuffP(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
+  -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
+  if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDownP(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffP(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
     if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "Cast Fel Devastation"; end
   end
   -- actions+=/infernal_strike,if=(!talent.flame_crash.enabled|(dot.sigil_of_flame.remains<3&!action.infernal_strike.sigil_placed))
@@ -360,9 +360,9 @@ local function Normal()
     if HR.Cast(S.Fracture) then return "Cast Fracture"; end
   end
   -- actions+=/fel_devastation
-  --if S.FelDevastation:IsReady() and IsInAoERange and (Player:BuffDownP(S.Metamorphosis)) then
-    --if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
-  --end
+  if S.FelDevastation:IsReady() and IsInAoERange and (S.Demonic:IsAvailable() and Player:BuffDownP(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
+    if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
+  end
   -- actions+=/sigil_of_flame
   if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
     if S.ConcentratedSigils:IsAvailable() then
