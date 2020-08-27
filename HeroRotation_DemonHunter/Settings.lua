@@ -42,6 +42,7 @@ HR.GUISettings.APL.DemonHunter = {
       FieryBrand = false,
     },
     GCDasOffGCD = {
+      FelDevastation = true,
     }
   },
   Havoc = {

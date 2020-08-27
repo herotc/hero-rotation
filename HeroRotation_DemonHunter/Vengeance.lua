@@ -28,6 +28,7 @@ local AEMajor    = HL.Spell:MajorEssence()
 if not Spell.DemonHunter then Spell.DemonHunter = {}; end
 Spell.DemonHunter.Vengeance = {
   -- Abilities
+  FelDevastation                        = Spell(212084),
   Frailty                               = Spell(247456),
   ImmolationAura                        = Spell(178740),
   InfernalStrike                        = Spell(189110),
@@ -48,7 +49,6 @@ Spell.DemonHunter.Vengeance = {
   CharredFlesh                          = Spell(264002),
   ConcentratedSigils                    = Spell(207666),
   Felblade                              = Spell(232893),
-  FelDevastation                        = Spell(212084),
   Fracture                              = Spell(263642),
   SoulBarrier                           = Spell(263648),
   SpiritBomb                            = Spell(247454),
@@ -161,6 +161,7 @@ local function UpdateSoulFragments()
   end
 
   -- If we have a higher Soul Fragment "snapshot", use it instead
+  if SoulFragmentsAdjusted == nil then SoulFragmentsAdjusted = 0; end
   if SoulFragmentsAdjusted > SoulFragments then
     SoulFragments = SoulFragmentsAdjusted;
   elseif SoulFragmentsAdjusted > 0 then
@@ -198,7 +199,7 @@ local function Precombat()
   end
   -- Cyclotronic Blast
   if Everyone.CyclotronicBlastReady() then
-    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "PSCD Test"; end
+    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "PSCD Precombat"; end
   end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
@@ -247,24 +248,26 @@ local function Brand()
       if HR.Cast(S.FieryBrand) then return "Cast Fiery Brand (Brand)"; end
     end
   end
-  -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
-  if S.ImmolationAura:IsCastable() and IsInMeleeRange and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
-  end
-  -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
-  if S.FelDevastation:IsCastable() and IsInMeleeRange and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
-  end
-  -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
-  if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "Cast Infernal Strike (Brand)"; end
-  end
-  -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
-  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (Target:DebuffDownP(S.FieryBrandDebuff)) then
-    if S.ConcentratedSigils:IsAvailable() then
-      if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "Cast Sigil of Flame (Brand, Concentrated)"; end
-    else
-      if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
+  if Target:DebuffP(S.FieryBrandDebuff) then
+    -- actions.brand+=/immolation_aura,if=dot.fiery_brand.ticking
+    if S.ImmolationAura:IsCastable() and IsInMeleeRange then
+      if HR.Cast(S.ImmolationAura) then return "Cast Immolation Aura (Brand)"; end
+    end
+    -- actions.brand+=/fel_devastation,if=dot.fiery_brand.ticking
+    if S.FelDevastation:IsReady() and IsInMeleeRange and (Player:BuffDownP(S.Metamorphosis)) then
+      if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "Cast Fel Devastation (Brand)"; end
+    end
+    -- actions.brand+=/infernal_strike,if=dot.fiery_brand.ticking
+    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "Cast Infernal Strike (Brand)"; end
+    end
+    -- actions.brand+=/sigil_of_flame,if=dot.fiery_brand.ticking
+    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
+      if S.ConcentratedSigils:IsAvailable() then
+        if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "Cast Sigil of Flame (Brand, Concentrated)"; end
+      else
+        if HR.Cast(S.SigilofFlame) then return "Cast Sigil of Flame (Brand)"; end
+      end
     end
   end
 end
@@ -306,6 +309,10 @@ local function Cooldowns()
 end
 
 local function Normal()
+  -- Manual add: fel_devastation,if=!buff.metamorphosis.up&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
+  if S.FelDevastation:IsReady() and (Player:BuffDownP(S.Metamorphosis) and (S.SpiritBomb:IsAvailable() and Target:DebuffP(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
+    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "Cast Fel Devastation"; end
+  end
   -- actions+=/infernal_strike,if=(!talent.flame_crash.enabled|(dot.sigil_of_flame.remains<3&!action.infernal_strike.sigil_placed))
   if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (not S.FlameCrash:IsAvailable() or (Target:DebuffRemainsP(S.SigilofFlameDebuff) < 3 and S.InfernalStrike:TimeSinceLastCast() > 2)) then
     if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "Cast Infernal Strike"; end
@@ -315,11 +322,13 @@ local function Normal()
     if HR.Cast(S.SpiritBomb) then return "Cast Spirit Bomb"; end
   end
   -- actions+=/soul_cleave,if=(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4))
-  if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() and ((Player:BuffP(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4)) then
+  -- Manually added FelDevastation CDRemains to make sure we're pooling for FD
+  if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() and (S.FelDevastation:CooldownRemainsP() > 3 or Player:Fury() >= 75) and ((Player:BuffP(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4)) then
     if HR.Cast(S.SoulCleave, nil, nil, "Melee") then return "Cast Soul Cleave"; end
   end
   -- actions+=/soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
-  if S.SoulCleave:IsReady() and (S.SpiritBomb:IsAvailable() and SoulFragments == 0) then
+  -- Manually added FelDevastation CDRemains to make sure we're pooling for FD
+  if S.SoulCleave:IsReady() and (S.SpiritBomb:IsAvailable() and SoulFragments == 0 and (S.FelDevastation:CooldownRemainsP() > 3 or Player:Fury() >= 75)) then
     if HR.Cast(S.SoulCleave, nil, nil, "Melee") then return "Cast Soul Cleave"; end
   end
   -- actions+=/immolation_aura,if=pain<=90
@@ -351,9 +360,9 @@ local function Normal()
     if HR.Cast(S.Fracture) then return "Cast Fracture"; end
   end
   -- actions+=/fel_devastation
-  if S.FelDevastation:IsCastable() and IsInAoERange then
-    if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
-  end
+  --if S.FelDevastation:IsReady() and IsInAoERange and (Player:BuffDownP(S.Metamorphosis)) then
+    --if HR.Cast(S.FelDevastation) then return "Cast Fel Devastation"; end
+  --end
   -- actions+=/sigil_of_flame
   if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemainsP(S.SigilofFlameDebuff) <= 3 then
     if S.ConcentratedSigils:IsAvailable() then
