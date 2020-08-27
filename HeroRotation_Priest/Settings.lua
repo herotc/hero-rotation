@@ -21,6 +21,7 @@ HR.GUISettings.APL.Priest = {
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
     EssenceDisplayStyle = "Suggested",
+    CovenantDisplayStyle = "Suggested",
     GCDasOffGCD = {
       -- Abilities
     },
@@ -33,7 +34,6 @@ HR.GUISettings.APL.Priest = {
   },
   Shadow = {
     DispersionHP = 10,
-    MindbenderUsage = 0,
     UseSplashData = true,
     UseFABST = false,
     -- {Display GCD as OffGCD, ForceReturn}
@@ -65,9 +65,9 @@ CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Sh
 CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
 CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
+CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.");
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow");
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.MindbenderUsage", {0, 30, 1}, "Shadowfiend/Mindbender usage Offset", "Number of vf stacks MB/SF will be delayed that you can push");
