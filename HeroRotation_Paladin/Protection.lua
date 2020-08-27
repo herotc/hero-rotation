@@ -101,7 +101,7 @@ local Settings = {
   Protection = HR.GUISettings.APL.Paladin.Protection
 };
 
-local EnemyRanges = {8}
+local EnemyRanges = {30, 8}
 local function UpdateRanges()
   for _, i in ipairs(EnemyRanges) do
     HL.GetEnemies(i);
@@ -152,7 +152,7 @@ local function Precombat()
 end
 
 local function Defensives()
-  if S.ShieldoftheRighteous:IsCastableP() and (Player:BuffRefreshable(S.ShieldoftheRighteous, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or (not S.AvengersShield:CooldownUp() and S.ShieldoftheRighteous:ChargesFractional() >= 2.65))) then
+  if S.ShieldoftheRighteous:IsReadyP() and (Player:BuffRefreshable(S.ShieldoftheRighteous, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or not S.AvengersShield:CooldownUp())) then
     if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
   end
   if Target:IsInRange(10) and not Player:HealingAbsorbed() then
@@ -179,7 +179,7 @@ local function Cooldowns()
     if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 18"; end
   end
   -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
-  if S.Seraphim:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() >= 2) then
+  if S.Seraphim:IsCastableP() then
     if HR.Cast(S.Seraphim) then return "seraphim 22"; end
   end
   -- avenging_wrath,if=buff.seraphim.up|cooldown.seraphim.remains<2|!talent.seraphim.enabled
@@ -191,7 +191,7 @@ local function Cooldowns()
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 28"; end
   end
   -- bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
-  if S.BastionofLight:IsCastableP() and (S.ShieldoftheRighteous:ChargesFractionalP() <= 0.5) then
+  if S.BastionofLight:IsCastableP() then
     if HR.Cast(S.BastionofLight) then return "bastion_of_light 34"; end
   end
   -- potion,if=buff.avenging_wrath.up
@@ -250,16 +250,20 @@ local function APL()
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
-    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengersValorBuff) and S.ShieldoftheRighteous:ChargesFractionalP() >= 2.5) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
+    if S.ShieldoftheRighteous:IsReadyP() and (Player:BuffP(S.AvengersValorBuff) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, "Melee") then return "shield_of_the_righteous 71"; end
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&!talent.seraphim.enabled)|buff.seraphim.up&buff.avengers_valor.up
-    if S.ShieldoftheRighteous:IsCastableP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff)) then
+    if S.ShieldoftheRighteous:IsReadyP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff)) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, "Melee") then return "shield_of_the_righteous 81"; end
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&buff.avenging_wrath.remains<4&!talent.seraphim.enabled)|(buff.seraphim.remains<4&buff.seraphim.up)
-    if S.ShieldoftheRighteous:IsCastableP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
+    if S.ShieldoftheRighteous:IsReadyP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, "Melee") then return "shield_of_the_righteous 91"; end
+    end
+    -- bastion_of_light,if=(cooldown.shield_of_the_righteous.charges_fractional<=0.2)&(!talent.seraphim.enabled|buff.seraphim.up)
+    if S.BastionofLight:IsCastableP() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
+      if HR.Cast(S.BastionofLight) then return "bastion_of_light 95"; end
     end
     -- lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffP(S.SeraphimBuff) and Player:BuffRemainsP(S.SeraphimBuff) < 3) then
