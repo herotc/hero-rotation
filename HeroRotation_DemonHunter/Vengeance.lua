@@ -53,6 +53,7 @@ Spell.DemonHunter.Vengeance = {
   SoulBarrier                           = Spell(263648),
   SpiritBomb                            = Spell(247454),
   SpiritBombDebuff                      = Spell(247456),
+  Demonic                               = Spell(321453),
   -- Utility
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
