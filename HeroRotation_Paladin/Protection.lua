@@ -27,40 +27,46 @@ local AEMajor    = HL.Spell:MajorEssence()
 -- Spells
 if not Spell.Paladin then Spell.Paladin = {} end
 Spell.Paladin.Protection = {
-  ConsecrationBuff                      = Spell(188370),
-  Consecration                          = Spell(26573),
-  LightsJudgment                        = Spell(255647),
+  -- Racials
   Fireblood                             = Spell(265221),
-  AvengingWrathBuff                     = Spell(31884),
-  Seraphim                              = Spell(152262),
-  ShieldoftheRighteous                  = Spell(53600),
-  AvengingWrath                         = Spell(31884),
-  SeraphimBuff                          = Spell(152262),
-  BastionofLight                        = Spell(204035),
-  Judgment                              = Spell(275779),
-  CrusadersJudgment                     = Spell(204023),
+  LightsJudgment                        = Spell(255647),
+  -- Abilities
   AvengersShield                        = Spell(31935),
-  AvengersValorBuff                     = Spell(197561),
-  BlessedHammer                         = Spell(204019),
-  HammeroftheRighteous                  = Spell(53595),
-  LightoftheProtector                   = Spell(184092),
-  HandoftheProtector                    = Spell(213652),
-  Rebuke                                = Spell(96231),
+  AvengingWrath                         = Spell(31884),
+  AvengingWrathBuff                     = Spell(31884),
+  AvengingWrathHealBuff                 = Spell(294027),
+  Consecration                          = Spell(26573),
+  ConsecrationBuff                      = Spell(188370),
   HammerofJustice                       = Spell(853),
+  Judgment                              = Spell(275779),
+  HammeroftheRighteous                  = Spell(53595),
+  HammerofWrath                         = Spell(24275),
+  Rebuke                                = Spell(96231),
+  ShieldoftheRighteous                  = Spell(53600),
+  ShiningLightBuff                      = Spell(182104),
+  WordofGlory                           = Spell(85673),
+  -- Talents
+  BlessedHammer                         = Spell(204019),
+  CrusadersJudgment                     = Spell(204023),
+  HandoftheProtector                    = Spell(315924),
+  Seraphim                              = Spell(152262),
+  SeraphimBuff                          = Spell(152262),
+  -- Trinket Effects
   RazorCoralDebuff                      = Spell(303568),
+  -- Essences
+  AnimaofDeath                          = Spell(294926),
   BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
+  ConcentratedFlameBurn                 = Spell(295368),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
-  AnimaofDeath                          = Spell(294926),
   LifebloodBuff                         = MultiSpell(295137, 305694),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
   RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368)
+  RippleInSpace                         = Spell(302731),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186)
 };
 local S = Spell.Paladin.Protection;
 if AEMajor ~= nil then
@@ -152,16 +158,14 @@ local function Precombat()
 end
 
 local function Defensives()
+  if S.WordofGlory:IsReadyP() and (Player:BuffStackP(S.ShiningLightBuff) == 3 and Player:HealthPercentage() <= Settings.Protection.WordofGloryHP or Player:BuffRemainsP(S.ShiningLightBuff) < 3) then
+    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordofGlory) then return "word_of_glory defensive free"; end
+  end
   if S.ShieldoftheRighteous:IsReadyP() and (Player:BuffRefreshable(S.ShieldoftheRighteous, 4) and (Player:ActiveMitigationNeeded() or Player:HealthPercentage() <= Settings.Protection.ShieldoftheRighteousHP or not S.AvengersShield:CooldownUp())) then
     if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous) then return "shield_of_the_righteous defensive"; end
   end
-  if Target:IsInRange(10) and not Player:HealingAbsorbed() then
-    if S.HandoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.HandoftheProtectorHP) then
-      if HR.Cast(S.HandoftheProtector, Settings.Protection.GCDasOffGCD.HandoftheProtector) then return "hand_of_the_protector defensive"; end
-    end
-    if S.LightoftheProtector:IsCastableP() and (Player:HealthPercentage() <= Settings.Protection.LightoftheProtectorHP) then
-      if HR.Cast(S.LightoftheProtector, Settings.Protection.GCDasOffGCD.LightoftheProtector) then return "light_of_the_protector defensive"; end
-    end
+  if S.WordofGlory:IsReadyP() and (Player:HealthPercentage() <= Settings.Protection.WordofGloryHP) then
+    if HR.Cast(S.WordofGlory, Settings.Protection.GCDasOffGCD.WordofGlory) then return "word_of_glory defensive"; end
   end
 end
 
@@ -189,10 +193,6 @@ local function Cooldowns()
   -- memory_of_lucid_dreams,if=!talent.seraphim.enabled|cooldown.seraphim.remains<=gcd|buff.seraphim.up
   if S.MemoryofLucidDreams:IsCastableP() and (not S.Seraphim:IsAvailable() or S.Seraphim:CooldownRemainsP() <= Player:GCD() or Player:BuffP(S.SeraphimBuff)) then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 28"; end
-  end
-  -- bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
-  if S.BastionofLight:IsCastableP() then
-    if HR.Cast(S.BastionofLight) then return "bastion_of_light 34"; end
   end
   -- potion,if=buff.avenging_wrath.up
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.AvengingWrathBuff)) then
@@ -245,25 +245,21 @@ local function APL()
     if (HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
+    -- Manually added: hammer_of_wrath
+    if S.HammerofWrath:IsReady() then
+      if HR.Cast(S.HammerofWrath, Settings.Protection.GCDasOffGCD.HammerofWrath, nil, 30) then return "hammer_of_wrath"; end
+    end
     -- worldvein_resonance,if=buff.lifeblood.stack<3
     if S.WorldveinResonance:IsCastableP() and (Player:BuffStackP(S.LifebloodBuff) < 3) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
-    -- shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
-    if S.ShieldoftheRighteous:IsReadyP() and (Player:BuffP(S.AvengersValorBuff) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
-      if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, "Melee") then return "shield_of_the_righteous 71"; end
-    end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&!talent.seraphim.enabled)|buff.seraphim.up&buff.avengers_valor.up
-    if S.ShieldoftheRighteous:IsReadyP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff)) then
+    if S.ShieldoftheRighteous:IsReadyP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff)) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, "Melee") then return "shield_of_the_righteous 81"; end
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&buff.avenging_wrath.remains<4&!talent.seraphim.enabled)|(buff.seraphim.remains<4&buff.seraphim.up)
     if S.ShieldoftheRighteous:IsReadyP() and Settings.Protection.UseSotROffensively and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
       if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, "Melee") then return "shield_of_the_righteous 91"; end
-    end
-    -- bastion_of_light,if=(cooldown.shield_of_the_righteous.charges_fractional<=0.2)&(!talent.seraphim.enabled|buff.seraphim.up)
-    if S.BastionofLight:IsCastableP() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
-      if HR.Cast(S.BastionofLight) then return "bastion_of_light 95"; end
     end
     -- lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
     if S.LightsJudgment:IsCastableP() and HR.CDsON() and (Player:BuffP(S.SeraphimBuff) and Player:BuffRemainsP(S.SeraphimBuff) < 3) then
