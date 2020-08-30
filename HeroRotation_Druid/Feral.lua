@@ -124,12 +124,12 @@ local Settings = {
 };
 
 -- Variables
-local VarUseThrash = 0;
+local VarUseThrash = Settings.Feral.ThrashST and 1 or 0;
 local VarOpenerDone = 0;
 local LastRakeAP = 0;
 
 HL:RegisterForEvent(function()
-  VarUseThrash = 0
+  VarUseThrash = Settings.Feral.ThrashST and 1 or 0
   VarOpenerDone = 0
   LastRakeAP = 0
 end, "PLAYER_REGEN_ENABLED")
@@ -268,7 +268,7 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- variable,name=use_thrash,value=0
     if (true) then
-      VarUseThrash = 0
+      VarUseThrash = Settings.Feral.ThrashST and 1 or 0
     end
     -- variable,name=use_thrash,value=2,if=azerite.wild_fleshrending.enabled
     if (S.WildFleshrending:AzeriteEnabled()) then
