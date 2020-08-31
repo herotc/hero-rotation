@@ -51,7 +51,6 @@ HR.GUISettings.APL.Monk = {
       -- Racials
       -- Abilities
       BlackOxBrew            = true,
-      IronskinBrew           = true,
       PurifyingBrew          = true,
     }
   },
