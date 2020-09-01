@@ -448,7 +448,7 @@ local function Main()
     if HR.CastCycle(S.VampiricTouch, 40, EvaluateCycleVampiricTouch214) then return "vampiric_touch 100"; end
   end
   -- shadow_word_pain,if=refreshable&target.time_to_die>4&!talent.misery.enabled&talent.psychic_link.enabled&spell_targets.mind_sear>2
-  if S.ShadowWordPain:IsCastableP() and (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount > 2) then
+  if S.ShadowWordPain:IsCastableP() and (Target:DebuffRefreshableCP(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount > 2) then
     if HR.Cast(S.ShadowWordPain, nil, nil, 40) then return "shadow_word_pain 98"; end
   end
   -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&(!talent.psychic_link.enabled|(talent.psychic_link.enabled&spell_targets.mind_sear<=2))
