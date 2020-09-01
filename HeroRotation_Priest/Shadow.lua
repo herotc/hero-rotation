@@ -200,7 +200,8 @@ local function EvaluateCycleDamnation200(TargetUnit)
 end
 
 local function EvaluateCycleDevouringPlage202(TargetUnit)
-  return ((TargetUnit:DebuffRefreshableCP(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (not S.PowerInfusion:IsAvailable() or not S.PowerInfusion:CooldownUpP()) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)) and (not S.LegacyOfTheVoid:IsAvailable() or (S.LegacyOfTheVoid:IsAvailable() and Player:BuffDownP(S.VoidformBuff))))
+  -- Added player level check, as Power Infusion isn't learned until 58
+  return ((TargetUnit:DebuffRefreshableCP(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (Player:Level() < 58 or not S.PowerInfusion:CooldownUpP()) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)) and (not S.LegacyOfTheVoid:IsAvailable() or (S.LegacyOfTheVoid:IsAvailable() and Player:BuffDownP(S.VoidformBuff))))
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
@@ -212,15 +213,11 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (DotsUp(TargetUnit, true) and not S.VoidEruption:CooldownUpP() and TargetUnit:TimeToDie() > 4)
+  return (DotsUp(TargetUnit, true) and Player:BuffDownP(S.VoidformBuff) and TargetUnit:TimeToDie() > 4)
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
   return (EnemiesCount > VarMindSearCutoff and Player:BuffP(S.DarkThoughtsBuff))
-end
-
-local function EvaluateCycleShadowWordPain212(TargetUnit)
-  return (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and TargetUnit:TimeToDie() > 4 and S.PsychicLink:IsAvailable() and EnemiesCount > 2)
 end
 
 local function EvaluateCycleVampiricTouch214(TargetUnit)
@@ -232,7 +229,8 @@ local function EvaluateCycleMindSear216(TargetUnit)
 end
 
 local function EvaluateCycleSearingNightmare218(TargetUnit)
-  return ((VarSearingNightmareCutoff and not S.PowerInfusion:CooldownUpP()) or (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and EnemiesCount > 1))
+  -- Added player level check, as Power Infusion isn't learned until 58
+  return ((VarSearingNightmareCutoff and (Player:Level() < 58 or not S.PowerInfusion:CooldownUpP())) or (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and EnemiesCount > 1))
 end
 
 local function EvaluateCycleShadowWordPain220(TargetUnit)
@@ -319,11 +317,12 @@ end
 
 local function Cds()
   -- power_infusion,if=buff.voidform.up
-  if S.PowerInfusion:IsCastableP() and (Player:BuffP(S.VoidformBuff)) then
+  -- Added player level check, as Power Infusion isn't learned until 58.
+  if Player:Level() >= 58 and S.PowerInfusion:IsCastableP() and (Player:BuffP(S.VoidformBuff)) then
     if HR.Cast(S.PowerInfusion) then return "power_infusion 50"; end
   end
-  -- Covenant: fae_guardians,if=insanity>=90&cooldown.void_eruption.up
-  if S.FaeGuardians:IsReadyP() and (Player:Insanity() >= 90 and S.VoidEruption:CooldownUpP()) then
+  -- Covenant: fae_guardians
+  if S.FaeGuardians:IsReadyP() then
     if HR.Cast(S.FaeGuardians, Settings.Commons.CovenantDisplayStyle) then return "fae_guardians 52"; end
   end
   -- Covenant: mindgames,if=insanity<90&!buff.voidform.up
@@ -355,13 +354,13 @@ local function Boon()
     if HR.Cast(S.AscendedBlast, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "ascended_blast 60"; end
   end
   -- ascended_nova,if=spell_targets.ascended_nova>1
-  if S.AscendedNova:IsReadyP() then
+  if S.AscendedNova:IsReadyP() and (EnemiesCount > 1) then
     if HR.Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, 8) then return "ascended_nova 62"; end
   end
 end
 
 local function Main()
-  -- Moved up from lower in APL: Mind Blast while channeling Mind Flay with Dark Thoughts proc
+  -- Manually added: Mind Blast while channeling Mind Flay with Dark Thoughts proc
   if S.MindBlast:IsCastableP() and (Player:IsChanneling(S.MindFlay) and Player:BuffP(S.DarkThoughtsBuff) and VarDotsUp) then
     if HR.Cast(S.MindBlast, nil, nil, 40) then return "mind_blast 94"; end
   end
@@ -369,12 +368,13 @@ local function Main()
   if (Player:BuffP(S.BoonoftheAscendedBuff)) then
     local ShouldReturn = Boon(); if ShouldReturn then return ShouldReturn; end
   end
-  -- Cast free Void Bolt
+  -- Manually added: Cast free Void Bolt
   if S.VoidBolt:CooldownUpP() and (Player:BuffP(S.DissonantEchoesBuff)) then
     if HR.Cast(S.VoidBolt, nil, nil, 40) then return "void_bolt 69"; end
   end
   -- void_eruption,if=if=cooldown.power_infusion.up&insanity>=40&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&dot.devouring_plague.ticking))
-  if S.VoidEruption:IsReadyP() and ((not S.PowerInfusion:IsAvailable() or S.PowerInfusion:CooldownUpP()) and Player:Insanity() >= 40 and (not S.LegacyOfTheVoid:IsAvailable() or (S.LegacyOfTheVoid:IsAvailable() and Target:DebuffP(S.DevouringPlagueDebuff)))) then
+  -- Added player level check, as Power Infusion isn't learned until 58
+  if S.VoidEruption:IsReadyP() and ((Player:Level() < 58 or S.PowerInfusion:CooldownUpP()) and Player:Insanity() >= 40 and (not S.LegacyOfTheVoid:IsAvailable() or (S.LegacyOfTheVoid:IsAvailable() and Target:DebuffP(S.DevouringPlagueDebuff)))) then
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, 40) then return "void_eruption 70"; end
   end
   -- void_bolt,if=!dot.devouring_plague.refreshable
@@ -409,7 +409,7 @@ local function Main()
   if S.Mindbender:IsCastableP() then
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, 40) then return "mindbender 82"; end
   end
-  -- void_torrent,target_if=variable.all_dots_up&!cooldown.void_eruption.up&target.time_to_die>4
+  -- void_torrent,target_if=variable.all_dots_up&!buff.voidform.up&target.time_to_die>4
   if S.VoidTorrent:IsCastableP() then
     if HR.Cast(S.VoidTorrent, 40, EvaluateCycleVoidTorrent208) then return "void_torrent 84"; end
   end
@@ -443,17 +443,17 @@ local function Main()
   if S.MindBlast:IsCastableP() and (VarDotsUp and EnemiesCount < 4) then
     if HR.Cast(S.MindBlast, nil, nil, 40) then return "mind_blast 96"; end
   end
-  -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&talent.psychic_link.enabled&spell_targets.mind_sear>2
-  if S.ShadowWordPain:IsCastableP() and (not S.Misery:IsAvailable()) then
-    if HR.CastCycle(S.ShadowWordPain, 40, EvaluateCycleShadowWordPain212) then return "shadow_word_pain 98"; end
+  -- vampiric_touch,target_if=refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable)|buff.unfurling_darkness.up
+  if S.VampiricTouch:IsCastableP() then
+    if HR.CastCycle(S.VampiricTouch, 40, EvaluateCycleVampiricTouch214) then return "vampiric_touch 100"; end
+  end
+  -- shadow_word_pain,if=refreshable&target.time_to_die>4&!talent.misery.enabled&talent.psychic_link.enabled&spell_targets.mind_sear>2
+  if S.ShadowWordPain:IsCastableP() and (TargetUnit:DebuffRefreshableCP(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount > 2) then
+    if HR.Cast(S.ShadowWordPain, nil, nil, 40) then return "shadow_word_pain 98"; end
   end
   -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&(!talent.psychic_link.enabled|(talent.psychic_link.enabled&spell_targets.mind_sear<=2))
   if S.ShadowWordPain:IsCastableP() and (not S.Misery:IsAvailable()) then
     if HR.CastCycle(S.ShadowWordPain, 40, EvaluateCycleShadowWordPain220) then return "shadow_word_pain 99"; end
-  end
-  -- vampiric_touch,target_if=refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable)|buff.unfurling_darkness.up
-  if S.VampiricTouch:IsCastableP() then
-    if HR.CastCycle(S.VampiricTouch, 40, EvaluateCycleVampiricTouch214) then return "vampiric_touch 100"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindSear:IsCastableP() then
@@ -496,25 +496,27 @@ local function APL()
     VarAllDotsUp = DotsUp(Target, true)
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>2
     VarSearingNightmareCutoff = (EnemiesCount > 2)
-    -- fireblood,if=buff.voidform.up
-    if S.Fireblood:IsCastableP() and HR.CDsON() and (Player:BuffP(S.VoidformBuff)) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
-    end
-    -- berserking
-    if S.Berserking:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 24"; end
-    end
-    -- lights_judgment
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 26"; end
-    end
-    -- ancestral_call,if=buff.voidform.up
-    if S.AncestralCall:IsCastableP() and HR.CDsON() and (Player:BuffP(S.VoidformBuff)) then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
-    end
-    -- bag_of_tricks
-    if S.BagofTricks:IsCastableP() and HR.CDsON() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 30"; end
+    if (HR.CDsON()) then
+      -- fireblood,if=buff.voidform.up
+      if S.Fireblood:IsCastableP() and (Player:BuffP(S.VoidformBuff)) then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
+      end
+      -- berserking
+      if S.Berserking:IsCastableP() then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 24"; end
+      end
+      -- lights_judgment
+      if S.LightsJudgment:IsCastableP() then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment 26"; end
+      end
+      -- ancestral_call,if=buff.voidform.up
+      if S.AncestralCall:IsCastableP() and (Player:BuffP(S.VoidformBuff)) then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
+      end
+      -- bag_of_tricks
+      if S.BagofTricks:IsCastableP() then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks 30"; end
+      end
     end
     -- run_action_list,name=main
     if (true) then
