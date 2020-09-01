@@ -330,7 +330,7 @@ local function Cds()
     if HR.Cast(S.Mindgames, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "mindgames 54"; end
   end
   -- Covenant: unholy_nova,if=raid_event.adds.in>50
-  if S.UnholyNova:IsReadyP() then
+  if S.UnholyNova:IsReadyP() and (Cache.EnemiesCount[15] > 0) then
     if HR.Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up
@@ -473,6 +473,7 @@ end
 local function APL()
   EnemiesCount = GetEnemiesCount(10)
   HL.GetEnemies(8) -- For range checking
+  HL.GetEnemies(15) -- For range checking
   HL.GetEnemies(40) -- For CastCycle calls
 
   -- call precombat
