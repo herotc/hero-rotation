@@ -95,18 +95,18 @@
       -- Damage Offsets
       EviscerateDMGOffset = 3,
       -- Shadow Dance Eco Mode (Min Fractional Charges before using it while CDs are disabled)
-      ShDEcoCharge = 2.55,
+      ShDEcoCharge = 1.75,
       -- Single Target MfD as DPS CD
       STMfDAsDPSCD = false,
       -- {Display GCD as OffGCD, ForceReturn}
       GCDasOffGCD = {
-        ShadowBlades = true,
       },
       -- {Display OffGCD as OffGCD, ForceReturn}
       OffGCDasOffGCD = {
         -- Abilities
         SymbolsofDeath = true,
         ShadowDance = true,
+        ShadowBlades = true,
       },
       -- Stealth Macro Enable/Disable Options
       StealthMacro = {
@@ -157,7 +157,7 @@
   -- Subtlety
   CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", {"Always", "On Bosses", "On Bosses not in Dungeons"}, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.");
   CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.");
-  CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {2, 3, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.");
+  CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {1, 2, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.");
   CreateARPanelOptions(CP_Subtlety, "APL.Rogue.Subtlety");
   CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)");
