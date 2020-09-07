@@ -27,58 +27,67 @@ local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Arcane = {
-  ArcaneIntellectBuff                   = Spell(1459),
-  ArcaneIntellect                       = Spell(1459),
-  ArcaneFamiliarBuff                    = Spell(210126),
-  ArcaneFamiliar                        = Spell(205022),
-  Equipoise                             = Spell(286027),
-  MirrorImage                           = Spell(55342),
-  ArcaneBlast                           = Spell(30451),
-  Evocation                             = Spell(12051),
-  ChargedUp                             = Spell(205032),
-  ArcaneChargeBuff                      = Spell(36032),
-  NetherTempest                         = Spell(114923),
-  NetherTempestDebuff                   = Spell(114923),
-  RuneofPowerBuff                       = Spell(116014),
-  ArcanePowerBuff                       = Spell(12042),
-  RuleofThreesBuff                      = Spell(264774),
-  Overpowered                           = Spell(155147),
-  LightsJudgment                        = Spell(255647),
-  RuneofPower                           = Spell(116011),
-  ArcanePower                           = Spell(12042),
-  Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
-  Fireblood                             = Spell(265221),
+  -- Racials
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BerserkingBuff                        = Spell(26297),
+  BloodFury                             = Spell(20572),
+  BloodFuryBuff                         = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  -- Abilities
+  ArcaneBarrage                         = Spell(44425),
+  ArcaneBlast                           = Spell(30451),
+  ArcaneExplosion                       = Spell(1449),
+  ArcaneIntellect                       = Spell(1459),
+  ArcaneIntellectBuff                   = Spell(1459),
+  ArcaneMissiles                        = Spell(5143),
+  ArcanePower                           = Spell(12042),
+  ArcanePowerBuff                       = Spell(12042),
+  Blink                                 = MultiSpell(1953, 212653),
+  ClearcastingBuff                      = Spell(263725),
+  Counterspell                          = Spell(2139),
+  Evocation                             = Spell(12051),
+  MirrorImage                           = Spell(55342),
   PresenceofMind                        = Spell(205025),
   PresenceofMindBuff                    = Spell(205025),
-  BerserkingBuff                        = Spell(26297),
-  BloodFuryBuff                         = Spell(20572),
-  ArcaneOrb                             = Spell(153626),
-  Resonance                             = Spell(205028),
-  ArcaneBarrage                         = Spell(44425),
-  ArcaneExplosion                       = Spell(1449),
-  ArcaneMissiles                        = Spell(5143),
-  ClearcastingBuff                      = Spell(263725),
+  TouchoftheMagi                        = Spell(321507),
+  -- Talents
   Amplification                         = Spell(236628),
-  ArcanePummeling                       = Spell(270669),
+  ArcaneFamiliar                        = Spell(205022),
+  ArcaneFamiliarBuff                    = Spell(210126),
+  ArcaneOrb                             = Spell(153626),
+  NetherTempest                         = Spell(114923),
+  NetherTempestDebuff                   = Spell(114923),
+  Overpowered                           = Spell(155147),
+  Resonance                             = Spell(205028),
+  RuleofThreesBuff                      = Spell(264774),
+  RuneofPower                           = Spell(116011),
+  RuneofPowerBuff                       = Spell(116014),
   Supernova                             = Spell(157980),
-  Counterspell                          = Spell(2139),
-  Blink                                 = MultiSpell(1953, 212653),
+  -- Covenant Abilities
+  RadiantSpark                          = Spell(307443),
+  MirrorsofTorment                      = Spell(314793),
+  Deathborne                            = Spell(324220),
+  ShiftingPower                         = Spell(314791),
+  -- Azerite Traits (BfA)
+  ArcanePummeling                       = Spell(270669),
+  Equipoise                             = Spell(286027),
+  -- Azerite Essences (BfA)
   BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
+  ConcentratedFlameBurn                 = Spell(295368),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
   GuardianofAzerothBuff                 = Spell(295855),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
   ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368)
+  RippleInSpace                         = Spell(302731),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186)
 };
 local S = Spell.Mage.Arcane;
 
@@ -204,7 +213,7 @@ function BurnPhase:Stop()
 end
 
 function BurnPhase:On()
-  return self.state or (not Player:AffectingCombat() and Player:IsCasting() and (S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0))))
+  return self.state or (not Player:AffectingCombat() and Player:IsCasting() and (S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())))
 end
 
 function BurnPhase:Duration()
@@ -258,7 +267,7 @@ local function Precombat()
   end
   -- mirror_image
   if S.MirrorImage:IsCastableP() and HR.CDsON() then
-    if HR.Cast(S.MirrorImage) then return "mirror_image 115"; end
+    if HR.Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image 115"; end
   end
   -- potion
   if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
@@ -283,13 +292,9 @@ local function Burn()
   if (BurnPhase:On() and Player:PrevGCDP(1, S.Evocation) and Target:TimeToDie() > VarAverageBurnLength and BurnPhase:Duration() > 0) then
     BurnPhase:Stop()
   end
-  -- charged_up,if=buff.arcane_charge.stack<=1
-  if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() <= 1) then
-    if HR.Cast(S.ChargedUp, Settings.Arcane.GCDasOffGCD.ChargedUp) then return "charged_up 201"; end
-  end
   -- mirror_image
   if S.MirrorImage:IsCastableP() then
-    if HR.Cast(S.MirrorImage) then return "mirror_image 203"; end
+    if HR.Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image 203"; end
   end
   -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
   if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or Target:DebuffDownP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
@@ -388,11 +393,11 @@ end
 local function Conserve()
   -- mirror_image
   if S.MirrorImage:IsCastableP() and HR.CDsON() then
-    if HR.Cast(S.MirrorImage) then return "mirror_image 301"; end
+    if HR.Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image 301"; end
   end
-  -- charged_up,if=buff.arcane_charge.stack=0
-  if S.ChargedUp:IsCastableP() and (Player:ArcaneChargesP() == 0) then
-    if HR.Cast(S.ChargedUp, Settings.Arcane.GCDasOffGCD.ChargedUp) then return "charged_up 303"; end
+  -- Manually added: touch_of_the_magi,if=cooldown.arcane_power.remains>45&buff.arcane_charge.stack=0
+  if S.TouchoftheMagi:IsReadyP() and (S.ArcanePower:CooldownRemainsP() > 45 and Player:ArcaneChargesP() == 0) then
+    if HR.Cast(S.TouchoftheMagi) then return "touch_of_the_magi 303"; end
   end
   -- nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
   if S.NetherTempest:IsCastableP() and ((Target:DebuffRefreshableCP(S.NetherTempestDebuff) or Target:DebuffDownP(S.NetherTempestDebuff)) and Player:ArcaneChargesP() == Player:ArcaneChargesMax() and Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff)) then
@@ -522,19 +527,27 @@ local function APL()
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=essences
-    if (true) then
+    if (Player:Level() < 60) then
       local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     -- use_item,name=azsharas_font_of_power,if=buff.rune_of_power.down&buff.arcane_power.down&(cooldown.arcane_power.remains<=4+10*variable.font_double_on_use&cooldown.evocation.remains<=variable.average_burn_length+4+10*variable.font_double_on_use|time_to_die<cooldown.arcane_power.remains)
     if I.AzsharasFontofPower:IsEquipReady() and (Player:BuffDownP(S.RuneofPowerBuff) and Player:BuffDownP(S.ArcanePowerBuff) and (S.ArcanePower:CooldownRemainsP() <= 4 + 10 * VarFontDoubleOnUse and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength + 4 + 10 * VarFontDoubleOnUse or Target:TimeToDie() < S.ArcanePower:CooldownRemainsP())) then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 101"; end
     end
+    -- Manually added: arcane_barrage,if=cooldown.touch_of_the_magi.up&cooldown.arcane_power.up&buff.arcane_charge.stack>0&cooldown.evocation.remains<=variable.average_burn_length
+    if S.ArcaneBarrage:IsReadyP() and (S.TouchoftheMagi:CooldownUpP() and S.ArcanePower:CooldownUpP() and Player:ArcaneChargesP() > 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength) then
+      if HR.Cast(S.ArcaneBarrage, nil, nil, 40) then return "arcane_barrage 103"; end
+    end
+    -- Manually added: touch_of_the_magi,if=cooldown.arcane_power.up&buff.arcane_charge.stack=0&cooldown.evocation.remains<=variable.average_burn_length
+    if S.TouchoftheMagi:IsReadyP() and (S.ArcanePower:CooldownUpP() and Player:ArcaneChargesP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength) then
+      if HR.Cast(S.TouchoftheMagi) then return "touch_of_the_magi 105"; end
+    end
     -- call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length
     if HR.CDsON() and (BurnPhase:On() or Target:TimeToDie() < VarAverageBurnLength) then
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=burn,if=(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0&buff.arcane_charge.stack<=1)))
-    if HR.CDsON() and ((S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax() or (S.ChargedUp:IsAvailable() and S.ChargedUp:CooldownRemainsP() == 0 and Player:ArcaneChargesP() <= 1)))) then
+    if HR.CDsON() and (S.ArcanePower:CooldownRemainsP() == 0 and S.Evocation:CooldownRemainsP() <= VarAverageBurnLength and (Player:ArcaneChargesP() == Player:ArcaneChargesMax())) then
       local ShouldReturn = Burn(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=conserve,if=!burn_phase
