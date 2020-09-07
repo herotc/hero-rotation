@@ -517,7 +517,7 @@ local function CDs ()
       end
     end
     -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5
-    if HR.AoEON() and Player:BuffP(S.SliceandDice) or HL.BossFilteredFightRemains("<=", 5) then
+    if HR.AoEON() and S.SerratedBoneSpike:IsCastable() and Player:BuffP(S.SliceandDice) or HL.BossFilteredFightRemains("<=", 5) then
       local BestUnit, BestUnitTTD = nil, 30;
       for _, Unit in pairs(Cache.Enemies["Melee"]) do -- Shoule we increase range here to match spike range? Not sure about false positives.
         local TTD = Unit:TimeToDie();

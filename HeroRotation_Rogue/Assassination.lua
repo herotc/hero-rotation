@@ -597,7 +597,7 @@ local function CDs ()
         end
       end
       -- actions.cds+=/toxic_blade,if=dot.rupture.ticking&(!equipped.azsharas_font_of_power|cooldown.vendetta.remains>10)
-      if S.Shiv:IsCastableP("Melee") and Target:DebuffP(S.Rupture)
+      if S.Shiv:IsCastableP("Melee") and Target:DebuffP(S.Rupture) and Player:Level() >= 56
         and (not Settings.Commons.UseTrinkets or not I.FontOfPower:IsEquipped() or S.Vendetta:CooldownRemainsP() > 10) then
         if HR.Cast(S.Shiv) then ShouldReturn = "Cast Shiv"; end
       end
