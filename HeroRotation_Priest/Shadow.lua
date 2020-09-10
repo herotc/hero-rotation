@@ -109,7 +109,7 @@ local S = Spell.Priest.Shadow;
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofSpectralIntellect        = Item(171273),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   PainbreakerPsalmChest            = Item(173241),
   PainbreakerPsalmCloak            = Item(173242),
@@ -141,7 +141,7 @@ local VarAllDotsUp = false;
 local VarMindSearCutoff = 1;
 local VarSearingNightmareCutoff = false;
 local PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
-local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
+--local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
 S.MindbenderTalent = S.Mindbender
 
 HL:RegisterForEvent(function()
@@ -241,15 +241,15 @@ local function Precombat(TargetUnit)
   -- Update Painbreaker Psalm equip status; this is in Precombat, as equipment can't be changed once in combat
   PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
   -- Update Call to the Void equip status; this is in Precombat, as equipment can't be changed once in combat
-  CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
+  --CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
   -- flask
   -- food
   -- augmentation
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 2"; end
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofSpectralIntellect) then return "potion_of_spectral_intellect 2"; end
     end
     -- shadowform,if=!buff.shadowform.up
     if S.Shadowform:IsCastableP() and (Player:BuffDownP(S.ShadowformBuff)) then
@@ -263,8 +263,8 @@ local function Precombat(TargetUnit)
     if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
       if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 8"; end
     end
-    -- variable,name=mind_sear_cutoff,op=set,value=1+runeforge.eternal_call_to_the_void.equipped
-    VarMindSearCutoff = 1 + num(CalltotheVoidEquipped)
+    -- variable,name=mind_sear_cutoff,op=set,value=1
+    VarMindSearCutoff = 1
     -- mind_blast
     if S.MindBlast:IsReadyP() and not Player:IsCasting(S.MindBlast) then
       if HR.Cast(S.MindBlast, nil, nil, 40) then return "mind_blast 10"; end
@@ -488,8 +488,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 20"; end
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
+      if HR.CastSuggested(I.PotionofSpectralIntellect) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)
