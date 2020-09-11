@@ -75,6 +75,8 @@ Spell.Priest.Shadow = {
   BoonoftheAscended                     = Spell(325013),
   BoonoftheAscendedBuff                 = Spell(325013),
   FaeGuardians                          = Spell(327661),
+  FaeGuardiansBuff                      = Spell(327661),
+  WrathfulFaerieDebuff                  = Spell(342132),
   Mindgames                             = Spell(323673),
   UnholyNova                            = Spell(324724),
   
@@ -376,6 +378,11 @@ local function Main()
   -- Added player level check, as Power Infusion isn't learned until 58
   if S.VoidEruption:IsReadyP() and ((Player:Level() < 58 or S.PowerInfusion:CooldownUpP()) and Player:Insanity() >= 40 and (not S.LegacyOfTheVoid:IsAvailable() or (S.LegacyOfTheVoid:IsAvailable() and Target:DebuffP(S.DevouringPlagueDebuff)))) then
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, 40) then return "void_eruption 70"; end
+  end
+  -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
+  -- Temporarily(?) changed Wrathful Faerie to SWP, as the WF debuff doesn't show on target currently
+  if S.ShadowWordPain:IsCastableP() and (Player:BuffP(S.FaeGuardiansBuff) and Target:DebuffDownP(S.ShadowWordPainDebuff)) then
+    if HR.Cast(S.ShadowWordPain, nil, nil, 40) then return "shadow_word_pain 71"; end
   end
   -- void_bolt,if=!dot.devouring_plague.refreshable
   if S.VoidBolt:IsReadyP() and (not Target:DebuffRefreshableCP(S.DevouringPlagueDebuff)) then
