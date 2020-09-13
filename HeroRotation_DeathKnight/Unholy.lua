@@ -26,29 +26,38 @@ local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
 -- Spells
 if not Spell.DeathKnight then Spell.DeathKnight = {} end
 Spell.DeathKnight.Unholy = {
+  -- Abilities
   RaiseDead                             = Spell(46584),
   SacrificialPact                       = Spell(327574),
   ArmyoftheDead                         = Spell(42650),
-  DeathandDecay                         = Spell(43265),
-  DeathandDecayBuff                     = Spell(188290),
   Apocalypse                            = Spell(275699),
-  Defile                                = Spell(152280),
+  DeathandDecay                         = Spell(43265),
   Epidemic                              = Spell(207317),
+  FesteringStrike                       = Spell(85948),
   DeathCoil                             = Spell(47541),
   ScourgeStrike                         = Spell(55090),
-  ClawingShadows                        = Spell(207311),
-  FesteringStrike                       = Spell(85948),
-  FesteringWoundDebuff                  = Spell(194310),
+  Outbreak                              = Spell(77575),
+  DeathStrike                           = Spell(49998),
+  -- Talents
+  Defile                                = Spell(152280),
   BurstingSores                         = Spell(207264),
-  SuddenDoomBuff                        = Spell(81340),
-  UnholyFrenzyBuff                      = Spell(207289),
-  DarkTransformation                    = Spell(63560),
-  SummonGargoyle                        = MultiSpell(49206, 207349),
-  UnholyFrenzy                          = Spell(207289),
-  MagusoftheDead                        = Spell(288417),
+  ClawingShadows                        = Spell(207311),
   SoulReaper                            = Spell(130736),
   UnholyBlight                          = Spell(115989),
+  SummonGargoyle                        = MultiSpell(49206, 207349),
   Pestilence                            = Spell(277234),
+  UnholyAssault                          = Spell(207289),
+  ArmyoftheDamned                       = Spell(276837),
+  -- Buffs
+  DeathandDecayBuff                     = Spell(188290),
+  DeathStrikeBuff                       = Spell(101568),
+  SuddenDoomBuff                        = Spell(81340),
+  UnholyAssaultBuff                      = Spell(207289),
+  UnholyStrengthBuff                    = Spell(53365),
+  -- Debuffs
+  FesteringWoundDebuff                  = Spell(194310),
+  VirulentPlagueDebuff                  = Spell(191587),
+  -- Racials
   ArcaneTorrent                         = Spell(50613),
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
@@ -57,14 +66,9 @@ Spell.DeathKnight.Unholy = {
   BagofTricks                           = Spell(312411),
   ArcanePulse                           = Spell(260364),
   Fireblood                             = Spell(265221),
-  UnholyStrengthBuff                    = Spell(53365),
-  FestermightBuff                       = Spell(274373),
-  ArmyoftheDamned                       = Spell(276837),
-  Outbreak                              = Spell(77575),
-  VirulentPlagueDebuff                  = Spell(191587),
-  DeathStrike                           = Spell(49998),
-  DeathStrikeBuff                       = Spell(101568),
+  -- Interrupts
   MindFreeze                            = Spell(47528),
+  -- Custom
   PoolResources                         = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Unholy;
@@ -219,7 +223,7 @@ local function Aoe()
     if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 91"; end
   end
   -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-  if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and DisableAOTD()) then
+  if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyAssaultBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and DisableAOTD()) then
     if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 95"; end
   end
   -- scourge_strike,if=death_and_decay.ticking
@@ -249,28 +253,24 @@ local function Cooldowns()
   if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4) then
     if HR.Cast(S.Apocalypse) then return "apocalypse 115"; end
   end
-  -- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
-  if S.DarkTransformation:IsCastableP() and not Cache.EnemiesCount[8] > 1 then
-    if HR.Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation 119"; end
-  end
   -- summon_gargoyle,if=runic_power.deficit<14
   if S.SummonGargoyle:IsCastableP() and (Player:RunicPowerDeficit() < 14) then
     if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle 123"; end
   end
   -- unholy_frenzy,if=active_enemies=1&pet.apoc_ghoul.active
-  if S.UnholyFrenzy:IsCastableP() and (Cache.EnemiesCount[8] == 1 and S.Apocalypse:TimeSinceLastCast() <= 15) then
-    if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 139"; end
+  if S.UnholyAssault:IsCastableP() and (Cache.EnemiesCount[8] == 1 and S.Apocalypse:TimeSinceLastCast() <= 15) then
+    if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_frenzy 139"; end
   end
   -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
-  if S.UnholyFrenzy:IsCastableP() and (Cache.EnemiesCount[8] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
-    if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 141"; end
+  if S.UnholyAssault:IsCastableP() and (Cache.EnemiesCount[8] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
+    if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_frenzy 141"; end
   end
   -- soul_reaper,target_if=target.time_to_die<8&target.time_to_die>4
   if S.SoulReaper:IsCastableP() then
     if HR.CastCycle(S.SoulReaper, 30, EvaluateCycleSoulReaper163) then return "soul_reaper 165" end
   end
   -- soul_reaper,if=(!raid_event.adds.exists|raid_event.adds.in>20)&rune<=(1-buff.unholy_frenzy.up)
-  if S.SoulReaper:IsCastableP() and ((not (Cache.EnemiesCount[8] > 1)) and Player:Rune() <= (1 - num(Player:BuffP(S.UnholyFrenzyBuff)))) then
+  if S.SoulReaper:IsCastableP() and ((not (Cache.EnemiesCount[8] > 1)) and Player:Rune() <= (1 - num(Player:BuffP(S.UnholyAssaultBuff)))) then
     if HR.Cast(S.SoulReaper, nil, nil, "Melee") then return "soul_reaper 166"; end
   end
   -- raise_dead,if=!pet.risen_ghoul.active
@@ -294,7 +294,7 @@ local function Racials()
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 252"; end
     end
     -- berserking,if=buff.unholy_frenzy.up|pet.gargoyle.active|(talent.army_of_the_damned.enabled&pet.apoc_ghoul.active)
-    if S.Berserking:IsCastableP() and (Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35 or (S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15)) then
+    if S.Berserking:IsCastableP() and (Player:BuffP(S.UnholyAssaultBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35 or (S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15)) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 256"; end
     end
     -- lights_judgment,if=(buff.unholy_strength.up&buff.festermight.remains<=5)|active_enemies>=2&(buff.unholy_strength.up|buff.festermight.remains<=5)

@@ -28,6 +28,7 @@ HR.GUISettings.APL.DeathKnight = {
       Potions = true,
       Racials = true,
       MindFreeze = true,
+      DeathandDecay = false,
       SacrificialPact = true
     }
   },
@@ -47,10 +48,8 @@ HR.GUISettings.APL.DeathKnight = {
     AotDOff = true,
     GCDasOffGCD = {
       -- Abilities
-      DarkTransformation = true,
       ArmyoftheDead = true,
-      UnholyFrenzy = true,
-      DeathandDecay = false,
+      UnholyAssault = true,
       Epidemic = false
     }
   },
@@ -63,7 +62,7 @@ HR.GUISettings.APL.DeathKnight = {
       Bonestorm = true,
       VampiricBlood = true,
       Tombstone = true,
-      DeathandDecay = false
+      
     },
     OffGCDasOffGCD = {
       DancingRuneWeapon = true
