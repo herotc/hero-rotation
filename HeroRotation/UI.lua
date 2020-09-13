@@ -53,7 +53,7 @@
     HR.SuggestedIconFrame:HideIcon();
     if HR.GUISettings.General.BlackBorderIcon then HR.SuggestedIconFrame.Backdrop:Hide(); end
     HR.CastSuggestedOffset = 1;
-	
+
 	-- Right Suggested Icon
 	HR.RightSuggestedIconFrame:HideIcon();
 	if HR.GUISettings.General.BlackBorderIcon then HR.RightSuggestedIconFrame.Backdrop:Hide(); end
@@ -470,7 +470,7 @@
 
       -- Register the Unit for Error Checks (see Not Facing Unit Blacklist in Events.lua)
       HR.LastUnitCycled = ThisUnit;
-      HR.LastUnitCycledTime = HL.GetTime();
+      HR.LastUnitCycledTime = GetTime();
 
       return true;
     end
@@ -521,7 +521,7 @@
   function HR.SuggestedIconFrame:HideIcon ()
     HR.SuggestedIconFrame:Hide();
   end
-  
+
 --- ======= RIGHT SUGGESTED ICON =======
   -- Init
   function HR.RightSuggestedIconFrame:Init ()

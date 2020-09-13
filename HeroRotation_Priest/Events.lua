@@ -12,9 +12,9 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- Lua
-  
+
   -- File Locals
-  
+
 
 
 --- ============================ CONTENT ============================
@@ -27,10 +27,10 @@
       if not HL.PulseInitialized then return; end
       -- Timer to prevent bug due to the double/triple event firing.
       -- Since it takes 5s to change spec, we'll take 3seconds as timer.
-      if HL.GetTime() > SpecTimer then
+      if GetTime() > SpecTimer then
         -- Update the timer only on valid scan.
         if HR.PulseInit() ~= "Invalid SpecID" then
-          SpecTimer = HL.GetTime() + 3;
+          SpecTimer = GetTime() + 3;
         end
       end
     end
@@ -90,14 +90,14 @@
   --- End Combat Log Arguments
 
   -- Arguments Variables
-  
+
     --------------------------
     ----- Shadow --------
     --------------------------
     HL:RegisterForSelfCombatEvent(
       function (...)
         DestGUID, _, _, _, SpellID = select(8, ...);
-		
+
 		if SpellID == 228260 then --void erruption
 			-- print("reset")
 			HL.VTTime = 0
@@ -107,7 +107,7 @@
       end
       , "SPELL_CAST_SUCCESS"
     );
-	
+
 	HL:RegisterForSelfCombatEvent(
       function (...)
 		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
@@ -119,7 +119,7 @@
       end
       , "SPELL_AURA_APPLIED"
     );
-	
+
 	HL:RegisterForSelfCombatEvent(
       function (...)
 		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
@@ -131,5 +131,5 @@
       end
       , "SPELL_AURA_REMOVED"
     );
-	
-    
+
+

@@ -610,11 +610,12 @@ local function APL ()
     HR.CastSuggested(S.InstantPoison);
   end
   -- Non-Lethal Poisons
-  if Player:BuffRemainsP(S.CripplingPoison) <= PoisonRefreshTime then
-    HR.CastSuggested(S.CripplingPoison);
-  end
-  if Player:BuffRemainsP(S.NumblingPoison) <= PoisonRefreshTime then
-    HR.CastSuggested(S.NumblingPoison);
+  if (Player:BuffP(S.CripplingPoison) and Player:BuffRemainsP(S.CripplingPoison) <= PoisonRefreshTime) or (Player:BuffP(S.NumblingPoison) and Player:BuffRemainsP(S.NumblingPoison) <= PoisonRefreshTime) then
+    if Player:BuffP(S.NumblingPoison) then
+      HR.CastSuggested(S.NumblingPoison);
+    else
+      HR.CastSuggested(S.CripplingPoison);
+    end
   end
 
   -- Out of Combat
