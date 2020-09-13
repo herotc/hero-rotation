@@ -29,7 +29,7 @@ Spell.DeathKnight.Frost = {
   -- Abilities
   RaiseDead                             = Spell(46585),
   SacrificialPact                       = Spell(327574),
-  DeathandDecay                         = Spell(43265),
+  DeathAndDecay                         = Spell(43265),
   DeathStrike                           = Spell(49998),
   RemorselessWinter                     = Spell(196770),
   FrostStrike                           = Spell(49143),
@@ -50,6 +50,12 @@ Spell.DeathKnight.Frost = {
   Icecap                                = Spell(207126),
   Obliteration                          = Spell(281238),
   BreathofSindragosa                    = Spell(152279),
+  -- Covenant Abilities
+  ShackleTheUnworthy                    = Spell(312202),
+  SwarmingMist                          = Spell(311648),
+  AbominationLimb                       = Spell(315443),
+  DeathsDue                             = Spell(324128),
+  -- Conduit Effects
   -- Buffs
   RimeBuff                              = Spell(59052),
   KillingMachineBuff                    = Spell(51124),

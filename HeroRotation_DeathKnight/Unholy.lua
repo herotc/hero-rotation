@@ -31,7 +31,7 @@ Spell.DeathKnight.Unholy = {
   SacrificialPact                       = Spell(327574),
   ArmyoftheDead                         = Spell(42650),
   Apocalypse                            = Spell(275699),
-  DeathandDecay                         = Spell(43265),
+  DeathAndDecay                         = Spell(43265),
   Epidemic                              = Spell(207317),
   FesteringStrike                       = Spell(85948),
   DeathCoil                             = Spell(47541),
@@ -46,10 +46,16 @@ Spell.DeathKnight.Unholy = {
   UnholyBlight                          = Spell(115989),
   SummonGargoyle                        = MultiSpell(49206, 207349),
   Pestilence                            = Spell(277234),
-  UnholyAssault                          = Spell(207289),
+  UnholyAssault                         = Spell(207289),
   ArmyoftheDamned                       = Spell(276837),
+  -- Covenant Abilities
+  ShackleTheUnworthy                    = Spell(312202),
+  SwarmingMist                          = Spell(311648),
+  AbominationLimb                       = Spell(315443),
+  DeathsDue                             = Spell(324128),
+  -- Conduit Effects
   -- Buffs
-  DeathandDecayBuff                     = Spell(188290),
+  DeathAndDecayBuff                     = Spell(188290),
   DeathStrikeBuff                       = Spell(101568),
   SuddenDoomBuff                        = Spell(81340),
   UnholyAssaultBuff                      = Spell(207289),
@@ -129,7 +135,7 @@ local function DisableAOTD()
 end
 
 local function EvaluateCycleFesteringStrike40(TargetUnit)
-  return (TargetUnit:DebuffStackP(S.FesteringWoundDebuff) <= 2 and not S.DeathandDecay:CooldownUpP() and S.Apocalypse:CooldownRemainsP() > 5 and DisableAOTD())
+  return (TargetUnit:DebuffStackP(S.FesteringWoundDebuff) <= 2 and not S.DeathAndDecay:CooldownUpP() and S.Apocalypse:CooldownRemainsP() > 5 and DisableAOTD())
 end
 
 local function EvaluateCycleSoulReaper163(TargetUnit)
@@ -141,7 +147,7 @@ local function EvaluateCycleOutbreak303(TargetUnit)
 end
 
 local function EvaluateCycleScourgeClaw90(TargetUnit)
-  return (DisableAOTD() and (S.Apocalypse:CooldownRemainsP() > 5 and TargetUnit:DebuffP(S.FesteringWoundDebuff) or TargetUnit:DebuffStackP(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < S.DeathandDecay:CooldownRemainsP() + 10 or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemainsP()))
+  return (DisableAOTD() and (S.Apocalypse:CooldownRemainsP() > 5 and TargetUnit:DebuffP(S.FesteringWoundDebuff) or TargetUnit:DebuffStackP(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < S.DeathAndDecay:CooldownRemainsP() + 10 or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemainsP()))
 end
 
 local function Precombat()
@@ -164,8 +170,8 @@ end
 
 local function Aoe()
   -- death_and_decay,if=cooldown.apocalypse.remains
-  if S.DeathandDecay:IsCastableP() and (not S.Apocalypse:CooldownUpP()) then
-    if HR.Cast(S.DeathandDecay, Settings.Unholy.GCDasOffGCD.DeathandDecay) then return "death_and_decay 10"; end
+  if S.DeathAndDecay:IsCastableP() and (not S.Apocalypse:CooldownUpP()) then
+    if HR.Cast(S.DeathAndDecay, Settings.Unholy.GCDasOffGCD.DeathAndDecay) then return "death_and_decay 10"; end
   end
   -- defile,if=cooldown.apocalypse.remains
   if S.Defile:IsCastableP() and (not S.Apocalypse:CooldownUpP()) then
@@ -173,20 +179,20 @@ local function Aoe()
   end
   -- epidemic,if=death_and_decay.ticking&runic_power.deficit<14&!talent.bursting_sores.enabled&!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
-  if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and Player:RunicPowerDeficit() < 14 and not S.BurstingSores:IsAvailable() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
+  if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathAndDecayBuff) and Player:RunicPowerDeficit() < 14 and not S.BurstingSores:IsAvailable() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 16"; end
   end
   -- epidemic,if=death_and_decay.ticking&(!death_knight.fwounded_targets&talent.bursting_sores.enabled)&!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
-  if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathandDecayBuff) and (S.FesteringWoundDebuff:ActiveCount() == 0 and S.BurstingSores:IsAvailable()) and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
+  if S.Epidemic:IsReadyP() and (Player:BuffP(S.DeathAndDecayBuff) and (S.FesteringWoundDebuff:ActiveCount() == 0 and S.BurstingSores:IsAvailable()) and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:ActiveCount() > 1) then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, 100) then return "epidemic 18"; end
   end
   -- scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
-  if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and not S.Apocalypse:CooldownUpP()) then
+  if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathAndDecayBuff) and not S.Apocalypse:CooldownUpP()) then
     if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 24"; end
   end
   -- clawing_shadows,if=death_and_decay.ticking&cooldown.apocalypse.remains
-  if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) and not S.Apocalypse:CooldownUpP()) then
+  if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathAndDecayBuff) and not S.Apocalypse:CooldownUpP()) then
     if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 28"; end
   end
   -- epidemic,if=!variable.pooling_for_gargoyle
@@ -227,11 +233,11 @@ local function Aoe()
     if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 95"; end
   end
   -- scourge_strike,if=death_and_decay.ticking
-  if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff)) then
+  if S.ScourgeStrike:IsCastableP() and (Player:BuffP(S.DeathAndDecayBuff)) then
     if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 97"; end
   end
   -- clawing_shadows,if=death_and_decay.ticking
-  if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff)) then
+  if S.ClawingShadows:IsCastableP() and (Player:BuffP(S.DeathAndDecayBuff)) then
     if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 99"; end
   end
   -- death_coil,if=!variable.pooling_for_gargoyle
@@ -262,7 +268,7 @@ local function Cooldowns()
     if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_frenzy 139"; end
   end
   -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
-  if S.UnholyAssault:IsCastableP() and (Cache.EnemiesCount[8] >= 2 and ((S.DeathandDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
+  if S.UnholyAssault:IsCastableP() and (Cache.EnemiesCount[8] >= 2 and ((S.DeathAndDecay:CooldownRemainsP() <= Player:GCD() and not S.Defile:IsAvailable()) or (S.Defile:CooldownRemainsP() <= Player:GCD() and S.Defile:IsAvailable()))) then
     if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_frenzy 141"; end
   end
   -- soul_reaper,target_if=target.time_to_die<8&target.time_to_die>4
