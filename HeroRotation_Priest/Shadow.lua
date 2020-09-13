@@ -335,8 +335,8 @@ local function Cds()
   if S.UnholyNova:IsReadyP() and (Cache.EnemiesCount[15] > 0) then
     if HR.Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "unholy_nova 56"; end
   end
-  -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up
-  if S.BoonoftheAscended:IsReadyP() and (Player:BuffDownP(S.VoidformBuff) and not S.VoidEruption:CooldownUpP()) then
+  -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled)|(buff.voidform.up&talent.searing_nightmare.enabled)
+  if S.BoonoftheAscended:IsReadyP() and (Player:BuffDownP(S.VoidformBuff) and not S.VoidEruption:CooldownUpP() and EnemiesCount > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffP(S.VoidformBuff) and EnemiesCount < 2 and not S.SearingNightmare:IsAvailable()) or (Player:BuffP(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
     if HR.Cast(S.BoonoftheAscended, Settings.Commons.CovenantDisplayStyle) then return "boon_of_the_ascended 58"; end
   end
   -- call_action_list,name=essences
@@ -351,12 +351,12 @@ local function Cds()
 end
 
 local function Boon()
-  -- ascended_blast
-  if S.AscendedBlast:IsReadyP() then
+  -- ascended_blast,if=spell_targets.mind_sear<=3
+  if S.AscendedBlast:IsReadyP() and (EnemiesCount <= 3) then
     if HR.Cast(S.AscendedBlast, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "ascended_blast 60"; end
   end
-  -- ascended_nova,if=spell_targets.ascended_nova>1
-  if S.AscendedNova:IsReadyP() and (EnemiesCount > 1) then
+  -- ascended_nova,if=(spell_targets.mind_sear>2&talent.searing_nightmare.enabled|(spell_targets.mind_sear>1&!talent.searing_nightmare.enabled))&spell_targets.ascended_nova>1
+  if S.AscendedNova:IsReadyP() and ((EnemiesCount > 2 and S.SearingNightmare:IsAvailable() or (EnemiesCount > 1 and not S.SearingNightmare:IsAvailable())) and EnemiesCount > 1) then
     if HR.Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, 8) then return "ascended_nova 62"; end
   end
 end
