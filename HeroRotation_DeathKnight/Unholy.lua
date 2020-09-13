@@ -384,9 +384,9 @@ local function APL()
     if (true) then
       VarPoolingForGargoyle = num(S.SummonGargoyle:CooldownRemainsP() < 5 and S.SummonGargoyle:IsAvailable())
     end
-    
-    --Settings.Commons.UseTrinkets 
-    
+
+    --Settings.Commons.UseTrinkets
+
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsCastableP() then
       if HR.CastCycle(S.Outbreak, 30, EvaluateCycleOutbreak303) then return "outbreak 307" end
