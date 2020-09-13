@@ -15,7 +15,7 @@ local Mage = HR.Commons.Mage;
 
 -- Lua
 local select = select;
-local GetTime = HL.GetTime;
+local GetTime = GetTime;
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -84,7 +84,7 @@ local GetTime = HL.GetTime;
     function (...)
       dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
       if SpellID == 116014 and Player:GUID() == DestGUID then --void RuneofPower
-        HL.RoPTime = HL.GetTime()
+        HL.RoPTime = GetTime()
       end
 
     end
@@ -112,7 +112,7 @@ local GetTime = HL.GetTime;
     local spellID = select(12, ...)
     if spellID == 84721 and FrozenOrbFirstHit then
       FrozenOrbFirstHit = false
-      FrozenOrbHitTime = HL.GetTime()
+      FrozenOrbHitTime = GetTime()
       C_Timer.After(10, function()
         FrozenOrbFirstHit = true
         FrozenOrbHitTime = 0
@@ -121,7 +121,7 @@ local GetTime = HL.GetTime;
   end, "SPELL_DAMAGE")
 
   function Player:FrozenOrbGroundAoeRemains()
-    return math.max(HL.OffsetRemains(FrozenOrbHitTime - (HL.GetTime() - 10), "Auto"), 0)
+    return math.max(HL.OffsetRemains(FrozenOrbHitTime - (GetTime() - 10), "Auto"), 0)
   end
 
   local brain_freeze_active = false

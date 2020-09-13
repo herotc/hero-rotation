@@ -195,21 +195,21 @@ local BurnPhase = Player.ArcaneBurnPhase
 
 function BurnPhase:Reset()
   self.state = false
-  self.last_start = HL.GetTime()
-  self.last_stop = HL.GetTime()
+  self.last_start = GetTime()
+  self.last_stop = GetTime()
 end
 BurnPhase:Reset()
 
 function BurnPhase:Start()
   if Player:AffectingCombat() then
     self.state = true
-    self.last_start = HL.GetTime()
+    self.last_start = GetTime()
   end
 end
 
 function BurnPhase:Stop()
   self.state = false
-  self.last_stop = HL.GetTime()
+  self.last_stop = GetTime()
 end
 
 function BurnPhase:On()
@@ -217,7 +217,7 @@ function BurnPhase:On()
 end
 
 function BurnPhase:Duration()
-  return self.state and (HL.GetTime() - self.last_start) or 0
+  return self.state and (GetTime() - self.last_start) or 0
 end
 
 HL:RegisterForEvent(function()

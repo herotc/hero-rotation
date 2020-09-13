@@ -422,8 +422,8 @@
     Pulse = 0
   };
   function HR.Pulse ()
-    if HL.GetTime() > HR.Timer.Pulse and HR.Locked() then
-      HR.Timer.Pulse = HL.GetTime() + HL.Timer.PulseOffset;
+    if GetTime() > HR.Timer.Pulse and HR.Locked() then
+      HR.Timer.Pulse = GetTime() + HL.Timer.PulseOffset;
 
       HR.ResetIcons();
 
@@ -463,5 +463,5 @@
   -- Used to force a short/long pulse wait, it also resets the icons.
   function HR.ChangePulseTimer (Offset)
     HR.ResetIcons();
-    HR.Timer.Pulse = HL.GetTime() + Offset;
+    HR.Timer.Pulse = GetTime() + Offset;
   end

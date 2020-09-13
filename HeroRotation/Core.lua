@@ -80,7 +80,7 @@
     local StartTime, CastDuration
 
     -- Default GCD and Casting Swirls
-    local CurrentTime = HL.GetTime()
+    local CurrentTime = GetTime()
     if Player:IsCasting() or Player:IsChanneling() then
       StartTime = Player:CastStart()
       CastDuration = Player:CastDuration()
@@ -137,7 +137,7 @@
       if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
         HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind);
         HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1;
-        Object.LastDisplayTime = HL.GetTime();
+        Object.LastDisplayTime = GetTime();
         return false;
       end
     elseif DisplayStyle == "Suggested" then
@@ -161,7 +161,7 @@
       end
       HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, OutofRange);
       DisplayCooldown(Object, ShowPooling, CustomTime);
-      Object.LastDisplayTime = HL.GetTime();
+      Object.LastDisplayTime = GetTime();
       return true;
     end
     return nil;
@@ -190,7 +190,7 @@
     QueueKeybindTable = {};
     for i = 1, QueueLength do
       QueueTextureTable[i] = HR.GetTexture(QueueSpellTable[i]);
-      QueueSpellTable[i].LastDisplayTime = HL.GetTime();
+      QueueSpellTable[i].LastDisplayTime = GetTime();
       QueueKeybindTable[i] = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(QueueTextureTable[i]);
     end
     -- Call ChangeIcon so that the main icon exists to be able to display a cooldown sweep, even though it gets overlapped
@@ -230,7 +230,7 @@
   function HR.CastLeftCommon (Object)
     HR.LeftIconFrame:ChangeIcon(HR.GetTexture(Object));
     HR.CastLeftOffset = HR.CastLeftOffset + 1;
-    Object.LastDisplayTime = HL.GetTime();
+    Object.LastDisplayTime = GetTime();
   end
   function HR.CastLeft (Object)
     if HR.CastLeftOffset == 1 then
@@ -290,22 +290,22 @@
     if HR.CastSuggestedOffset == 1 then
       HR.SuggestedIconFrame:ChangeIcon(HR.GetTexture(Object));
       HR.CastSuggestedOffset = HR.CastSuggestedOffset + 1;
-      Object.LastDisplayTime = HL.GetTime();
+      Object.LastDisplayTime = GetTime();
     end
     return false;
   end
-  
+
   -- Suggested Icon (Right) Cast
   HR.CastRightSuggestedOffset = 1;
   function HR.CastRightSuggested (Object)
 	if HR.CastRightSuggestedOffset == 1 then
 	  HR.RightSuggestedIconFrame:ChangeIcon(HR.GetTexture(Object));
 	  HR.CastRightSuggestedOffset = HR.CastRightSuggestedOffset + 1;
-	  Object.LastDisplayTime = HL.GetTime();
+	  Object.LastDisplayTime = GetTime();
 	end
 	return false;
   end
-	
+
 
 --- ======= COMMANDS =======
   -- Command Handler
