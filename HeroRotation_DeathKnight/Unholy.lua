@@ -27,6 +27,7 @@ local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
 if not Spell.DeathKnight then Spell.DeathKnight = {} end
 Spell.DeathKnight.Unholy = {
   RaiseDead                             = Spell(46584),
+  SacrificialPact                       = Spell(327574),
   ArmyoftheDead                         = Spell(42650),
   DeathandDecay                         = Spell(43265),
   DeathandDecayBuff                     = Spell(188290),
@@ -64,20 +65,6 @@ Spell.DeathKnight.Unholy = {
   DeathStrike                           = Spell(49998),
   DeathStrikeBuff                       = Spell(101568),
   MindFreeze                            = Spell(47528),
-  RazorCoralDebuff                      = Spell(303568),
-  BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
-  ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368),
   PoolResources                         = Spell(9999000010)
 };
 local S = Spell.DeathKnight.Unholy;
@@ -85,28 +72,14 @@ local S = Spell.DeathKnight.Unholy;
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Unholy = {
-  PotionofUnbridledFury            = Item(169299),
-  JesHowler                        = Item(159627, {13, 14}),
-  GalecallersBeak                  = Item(161379, {13, 14}),
-  BygoneBeeAlmanac                 = Item(163936, {13, 14}),
-  GrongsPrimalRage                 = Item(165574, {13, 14}),
-  RampingAmplitudeGigavoltEngine   = Item(165580, {13, 14}),
-  VisionofDemise                   = Item(169307, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
+  -- Potions/Trinkets
+  -- "Other On Use"
 };
 local I = Item.DeathKnight.Unholy;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.JesHowler:ID(),
-  I.GalecallersBeak:ID(),
-  I.BygoneBeeAlmanac:ID(),
-  I.GrongsPrimalRage:ID(),
-  I.RampingAmplitudeGigavoltEngine:ID(),
-  I.VisionofDemise:ID(),
-  I.AshvanesRazorCoral:ID(),
-  I.AzsharasFontofPower:ID()
+  --  I.TrinketName:ID(),
 }
 
 -- Rotation Var
@@ -147,8 +120,12 @@ local function DeathStrikeHeal()
   return (Settings.General.SoloMode and (Player:HealthPercentage() < Settings.Commons.UseDeathStrikeHP or Player:HealthPercentage() < Settings.Commons.UseDarkSuccorHP and Player:BuffP(S.DeathStrikeBuff)))
 end
 
+local function DisableAOTD()
+  return (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)
+end
+
 local function EvaluateCycleFesteringStrike40(TargetUnit)
-  return (TargetUnit:DebuffStackP(S.FesteringWoundDebuff) <= 2 and not S.DeathandDecay:CooldownUpP() and S.Apocalypse:CooldownRemainsP() > 5 and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff))
+  return (TargetUnit:DebuffStackP(S.FesteringWoundDebuff) <= 2 and not S.DeathandDecay:CooldownUpP() and S.Apocalypse:CooldownRemainsP() > 5 and DisableAOTD())
 end
 
 local function EvaluateCycleSoulReaper163(TargetUnit)
@@ -160,7 +137,7 @@ local function EvaluateCycleOutbreak303(TargetUnit)
 end
 
 local function EvaluateCycleScourgeClaw90(TargetUnit)
-  return ((S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff) and (S.Apocalypse:CooldownRemainsP() > 5 and TargetUnit:DebuffP(S.FesteringWoundDebuff) or TargetUnit:DebuffStackP(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < S.DeathandDecay:CooldownRemainsP() + 10 or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemainsP()))
+  return (DisableAOTD() and (S.Apocalypse:CooldownRemainsP() > 5 and TargetUnit:DebuffP(S.FesteringWoundDebuff) or TargetUnit:DebuffStackP(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < S.DeathandDecay:CooldownRemainsP() + 10 or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemainsP()))
 end
 
 local function Precombat()
@@ -169,18 +146,11 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- potion
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 4"; end
-  end
   -- raise_dead
   if S.RaiseDead:IsCastableP() then
     if HR.CastSuggested(S.RaiseDead) then return "raise_dead 6"; end
   end
   if Everyone.TargetIsValid() then
-    -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 7"; end
-    end
     -- army_of_the_dead,precombat_time=2
     if S.ArmyoftheDead:IsCastableP() then
       if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 8"; end
@@ -249,7 +219,7 @@ local function Aoe()
     if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 91"; end
   end
   -- festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-  if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
+  if S.FesteringStrike:IsCastableP() and (((((Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and Player:BuffDownP(S.UnholyFrenzyBuff)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 3) and S.Apocalypse:CooldownRemainsP() < 3) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1) and DisableAOTD()) then
     if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 95"; end
   end
   -- scourge_strike,if=death_and_decay.ticking
@@ -271,20 +241,24 @@ local function Cooldowns()
   if S.ArmyoftheDead:IsCastableP() then
     if HR.Cast(S.ArmyoftheDead, Settings.Unholy.GCDasOffGCD.ArmyoftheDead) then return "army_of_the_dead 113"; end
   end
-  -- apocalypse,if=debuff.festering_wound.stack>=4&(active_enemies>=2|!essence.vision_of_perfection.enabled|!azerite.magus_of_the_dead.enabled|essence.vision_of_perfection.enabled&(talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains<=3|!talent.unholy_frenzy.enabled))
-  if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and (Cache.EnemiesCount[8] >= 2 or not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.MagusoftheDead:AzeriteEnabled() or Spell:EssenceEnabled(AE.VisionofPerfection) and (S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() <= 3 or not S.UnholyFrenzy:IsAvailable()))) then
+  -- unholy_blight,if=cooldown.apocalypse.ready&debuff.festering_wound.stack>=4|cooldown.apocalypse.remains
+  if S.UnholyBlight:IsCastableP() and (S.Apocalypse:CooldownUpP() and Target:DebuffStackP(FesteringWoundDebuff) >= 4 or bool(S.Apocalypse:CooldownRemainsP())) then
+    if HR.Cast(S.UnholyBlight, nil, nil, 10) then return "unholy_blight 172"; end
+  end
+  -- apocalypse,if=debuff.festering_wound.stack>=4
+  if S.Apocalypse:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) >= 4) then
     if HR.Cast(S.Apocalypse) then return "apocalypse 115"; end
   end
   -- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
-  if S.DarkTransformation:IsCastableP() then
+  if S.DarkTransformation:IsCastableP() and not Cache.EnemiesCount[8] > 1 then
     if HR.Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation 119"; end
   end
   -- summon_gargoyle,if=runic_power.deficit<14
   if S.SummonGargoyle:IsCastableP() and (Player:RunicPowerDeficit() < 14) then
     if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle 123"; end
   end
-  -- unholy_frenzy,if=essence.vision_of_perfection.enabled&pet.apoc_ghoul.active|debuff.festering_wound.stack<4&!essence.vision_of_perfection.enabled&(!azerite.magus_of_the_dead.enabled|azerite.magus_of_the_dead.enabled&pet.apoc_ghoul.active)
-  if S.UnholyFrenzy:IsCastableP() and (Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:TimeSinceLastCast() <= 15 or Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and not Spell:EssenceEnabled(AE.VisionofPerfection) and (not S.MagusoftheDead:AzeriteEnabled() or S.MagusoftheDead:AzeriteEnabled() and S.Apocalypse:TimeSinceLastCast() <= 15)) then
+  -- unholy_frenzy,if=active_enemies=1&pet.apoc_ghoul.active
+  if S.UnholyFrenzy:IsCastableP() and (Cache.EnemiesCount[8] == 1 and S.Apocalypse:TimeSinceLastCast() <= 15) then
     if HR.Cast(S.UnholyFrenzy, Settings.Unholy.GCDasOffGCD.UnholyFrenzy) then return "unholy_frenzy 139"; end
   end
   -- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
@@ -299,58 +273,50 @@ local function Cooldowns()
   if S.SoulReaper:IsCastableP() and ((not (Cache.EnemiesCount[8] > 1)) and Player:Rune() <= (1 - num(Player:BuffP(S.UnholyFrenzyBuff)))) then
     if HR.Cast(S.SoulReaper, nil, nil, "Melee") then return "soul_reaper 166"; end
   end
-  -- unholy_blight
-  if S.UnholyBlight:IsCastableP() then
-    if HR.Cast(S.UnholyBlight, nil, nil, 10) then return "unholy_blight 172"; end
+  -- raise_dead,if=!pet.risen_ghoul.active
+  if S.RaiseDead:IsCastableP() then
+    if HR.CastSuggested(S.RaiseDead) then return "raise_dead"; end
+  end
+  -- sacrificial_pact,if=active_enemies>=2
+  if S.SacrificialPact:IsCastableP() and (Cache.EnemiesCount[8] >= 2 and S.RaiseDead:CooldownUpP()) then
+    if HR.Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact, nil, 8) then return "sacrificial pact cd 9"; end
   end
 end
 
-local function Essences()
-  -- memory_of_lucid_dreams,if=rune.time_to_1>gcd&runic_power<40
-  if S.MemoryofLucidDreams:IsCastableP() and (Player:RuneTimeToX(1) > Player:GCD() and Player:RunicPower() < 40) then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
-  end
-  -- blood_of_the_enemy,if=death_and_decay.ticking|pet.apoc_ghoul.active&active_enemies=1
-  if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.DeathandDecayBuff) or S.Apocalypse:TimeSinceLastCast() <= 15 and Cache.EnemiesCount[8] == 1) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
-  end
-  -- guardian_of_azeroth,if=(cooldown.apocalypse.remains<6&cooldown.army_of_the_dead.remains>cooldown.condensed_lifeforce.remains)|cooldown.army_of_the_dead.remains<2|equipped.ineffable_truth|equipped.ineffable_truth_oh
-  -- TODO: Add corruption check
-  if S.GuardianofAzeroth:IsCastableP() and ((S.Apocalypse:CooldownRemainsP() < 6 and S.ArmyoftheDead:CooldownRemainsP() > S.GuardianofAzeroth:CooldownRemainsP()) or S.ArmyoftheDead:CooldownRemainsP() < 2) then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
-  end
-  -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
-  if S.TheUnboundForce:IsCastableP() and (Player:BuffP(RecklessForceBuff) or Player:BuffStackP(S.RecklessForceCounter) < 11) then
-    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
-  end
-  -- focused_azerite_beam,if=!death_and_decay.ticking
-  if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
-    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
-  end
-  -- concentrated_flame,if=dot.concentrated_flame_burn.remains=0
-  if S.ConcentratedFlame:IsCastableP() and (Target:DebuffDownP(S.ConcentratedFlameBurn)) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
-  end
-  -- purifying_blast,if=!death_and_decay.ticking
-  if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
-    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
-  end
-  -- worldvein_resonance,if=talent.army_of_the_damned.enabled&essence.vision_of_perfection.minor&buff.unholy_strength.up|essence.vision_of_perfection.minor&pet.apoc_ghoul.active|talent.army_of_the_damned.enabled&pet.apoc_ghoul.active&cooldown.army_of_the_dead.remains>60|talent.army_of_the_damned.enabled&pet.army_ghoul.active
-  if S.WorldveinResonance:IsCastableP() and (S.ArmyoftheDamned:IsAvailable() and Spell:EssenceEnabled(AE.VisionofPerfection) and Player:BuffP(S.UnholyStrengthBuff) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.Apocalypse:TimeSinceLastCast() <= 15 or S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15 and S.ArmyoftheDead:CooldownRemainsP() > 60 or S.ArmyoftheDamned:IsAvailable() and S.ArmyoftheDead:TimeSinceLastCast() <= 30) then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance with AotDamned"; end
-  end
-  -- worldvein_resonance,if=!death_and_decay.ticking&buff.unholy_strength.up&!essence.vision_of_perfection.minor&!talent.army_of_the_damned.enabled|target.time_to_die<cooldown.apocalypse.remains
-  if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff) and Player:BuffP(S.UnholyStrengthBuff) and not Spell:EssenceEnabled(AE.VisionofPerfection) and not S.ArmyoftheDamned:IsAvailable() or Target:TimeToDie() < S.Apocalypse:CooldownRemainsP()) then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance without AotDamned"; end
-  end
-  -- ripple_in_space,if=!death_and_decay.ticking
-  if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.DeathandDecayBuff)) then
-    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
-  end
-  -- cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
-  -- reaping_flamestarget_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
-  if (true) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
+local function Racials()
+  if (HR.CDsON()) then
+    -- arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
+    if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 65 and (S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable()) and Player:Rune() <= 1) then
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 248"; end
+    end
+    -- blood_fury,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
+    if S.BloodFury:IsCastableP() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable()) then
+      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 252"; end
+    end
+    -- berserking,if=buff.unholy_frenzy.up|pet.gargoyle.active|(talent.army_of_the_damned.enabled&pet.apoc_ghoul.active)
+    if S.Berserking:IsCastableP() and (Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35 or (S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15)) then
+      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 256"; end
+    end
+    -- lights_judgment,if=(buff.unholy_strength.up&buff.festermight.remains<=5)|active_enemies>=2&(buff.unholy_strength.up|buff.festermight.remains<=5)
+    if S.LightsJudgment:IsCastableP() and ((Player:BuffP(S.UnholyStrengthBuff) and Player:BuffRemainsP(S.FestermightBuff) <= 5) or Cache.EnemiesCount[8] >= 2 and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) <= 5)) then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 257"; end
+    end
+    -- ancestral_call,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
+    if S.AncestralCall:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
+      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 258"; end
+    end
+    -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
+    if S.ArcanePulse:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
+      if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_pulse 259"; end
+    end
+    -- fireblood,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
+    if S.Fireblood:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
+      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 260"; end
+    end
+    -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1|buff.festermight.remains<gcd&active_enemies=1
+    if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) and Cache.EnemiesCount[8] == 1 or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD() and Cache.EnemiesCount[8] == 1) then
+      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 260.5"; end
+    end
   end
 end
 
@@ -367,12 +333,12 @@ local function Generic()
   if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 14 and Player:RuneTimeToX(4) > Player:GCD() and not bool(VarPoolingForGargoyle)) then
     if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 180"; end
   end
-  -- scourge_strike,if=((debuff.festering_wound.up&(cooldown.apocalypse.remains>5&(!essence.vision_of_perfection.enabled|!talent.unholy_frenzy.enabled)|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains>6))|debuff.festering_wound.stack>4)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-  if S.ScourgeStrike:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and (S.Apocalypse:CooldownRemainsP() > 5 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.UnholyFrenzy:IsAvailable()) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() > 6)) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
+  -- scourge_strike,if=debuff.festering_wound.up&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&variable.disable_aotd
+  if S.ScourgeStrike:IsCastableP() and (Target:DebuffP(S.FesteringWoundDebuff) and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and DisableAOTD()) then
     if HR.Cast(S.ScourgeStrike, nil, nil, "Melee") then return "scourge_strike 198"; end
   end
-  -- clawing_shadows,if=((debuff.festering_wound.up&(cooldown.apocalypse.remains>5&(!essence.vision_of_perfection.enabled|!talent.unholy_frenzy.enabled)|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains>6))|debuff.festering_wound.stack>4)&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-  if S.ClawingShadows:IsCastableP() and (((Target:DebuffP(S.FesteringWoundDebuff) and (S.Apocalypse:CooldownRemainsP() > 5 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.UnholyFrenzy:IsAvailable()) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() > 6)) or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
+  -- clawing_shadows,if=debuff.festering_wound.up&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&variable.disable_aotd
+  if S.ClawingShadows:IsCastableP() and (Target:DebuffP(S.FesteringWoundDebuff) and (S.Apocalypse:CooldownRemainsP() > 5 or Target:DebuffStackP(S.FesteringWoundDebuff) > 4) and DisableAOTD()) then
     if HR.Cast(S.ClawingShadows, nil, nil, 30) then return "clawing_shadows 208"; end
   end
   -- Manually added: Multiple target Epidemic if close to capping RP
@@ -383,8 +349,8 @@ local function Generic()
   if S.DeathCoil:IsUsableP() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
     if HR.Cast(S.DeathCoil, nil, nil, 30) then return "death_coil 218"; end
   end
-  -- festering_strike,if=debuff.festering_wound.stack<4&(cooldown.apocalypse.remains<3&(!essence.vision_of_perfection.enabled|!talent.unholy_frenzy.enabled|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled&cooldown.unholy_frenzy.remains<7))|debuff.festering_wound.stack<1&(cooldown.army_of_the_dead.remains>5|death_knight.disable_aotd)
-  if S.FesteringStrike:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and (S.Apocalypse:CooldownRemainsP() < 3 and (not Spell:EssenceEnabled(AE.VisionofPerfection) or not S.UnholyFrenzy:IsAvailable() or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable() and S.UnholyFrenzy:CooldownRemainsP() < 7)) or Target:DebuffStackP(S.FesteringWoundDebuff) < 1 and (S.ArmyoftheDead:CooldownRemainsP() > 5 or Settings.Unholy.AotDOff)) then
+  -- festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1&variable.disable_aotd
+  if S.FesteringStrike:IsCastableP() and (Target:DebuffStackP(S.FesteringWoundDebuff) < 4 and S.Apocalypse:CooldownRemainsP() < 3 or Target:DebuffStackP(S.FesteringWoundDebuff) < 1 and DisableAOTD()) then
     if HR.Cast(S.FesteringStrike, nil, nil, "Melee") then return "festering_strike 222"; end
   end
   -- Manually added: Multiple target Epidemic filler to burn RP
@@ -418,116 +384,20 @@ local function APL()
     if (true) then
       VarPoolingForGargoyle = num(S.SummonGargoyle:CooldownRemainsP() < 5 and S.SummonGargoyle:IsAvailable())
     end
-    if (HR.CDsON()) then
-      -- arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
-      if S.ArcaneTorrent:IsCastableP() and (Player:RunicPowerDeficit() > 65 and (S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable()) and Player:Rune() <= 1) then
-        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 248"; end
-      end
-      -- blood_fury,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
-      if S.BloodFury:IsCastableP() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable()) then
-        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 252"; end
-      end
-      -- berserking,if=buff.unholy_frenzy.up|pet.gargoyle.active|(talent.army_of_the_damned.enabled&pet.apoc_ghoul.active)
-      if S.Berserking:IsCastableP() and (Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35 or (S.ArmyoftheDamned:IsAvailable() and S.Apocalypse:TimeSinceLastCast() <= 15)) then
-        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 256"; end
-      end
-      -- lights_judgment,if=(buff.unholy_strength.up&buff.festermight.remains<=5)|active_enemies>=2&(buff.unholy_strength.up|buff.festermight.remains<=5)
-      if S.LightsJudgment:IsCastableP() and ((Player:BuffP(S.UnholyStrengthBuff) and Player:BuffRemainsP(S.FestermightBuff) <= 5) or Cache.EnemiesCount[8] >= 2 and (Player:BuffP(S.UnholyStrengthBuff) or Player:BuffRemainsP(S.FestermightBuff) <= 5)) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 257"; end
-      end
-      -- ancestral_call,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
-      if S.AncestralCall:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
-        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 258"; end
-      end
-      -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
-      if S.ArcanePulse:IsCastableP() and (Cache.EnemiesCount[8] >= 2 or (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
-        if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_pulse 259"; end
-      end
-      -- fireblood,if=(pet.gargoyle.active&talent.summon_gargoyle.enabled)|pet.apoc_ghoul.active
-      if S.Fireblood:IsCastableP() and ((S.SummonGargoyle:IsAvailable() and S.SummonGargoyle:TimeSinceLastCast() <= 35) or S.Apocalypse:TimeSinceLastCast() <= 15) then
-        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 260"; end
-      end
-      -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1|buff.festermight.remains<gcd&active_enemies=1
-      if S.BagofTricks:IsCastableP() and (Player:BuffP(S.UnholyStrengthBuff) and Cache.EnemiesCount[8] == 1 or Player:BuffRemainsP(S.FestermightBuff) < Player:GCD() and Cache.EnemiesCount[8] == 1) then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 260.5"; end
-      end
-    end
-    if (Settings.Commons.UseTrinkets) then
-      -- use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine|!equipped.vision_of_demise
-      if (HL.CombatTime() > 20 or not I.RampingAmplitudeGigavoltEngine:IsEquipped() or not I.VisionofDemise:IsEquipped()) then
-        local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-        if TrinketToUse then
-          if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
-        end
-      end
-      -- use_item,name=azsharas_font_of_power,if=(essence.vision_of_perfection.enabled&!talent.unholy_frenzy.enabled)|(!essence.condensed_lifeforce.major&!essence.vision_of_perfection.enabled)
-      if I.AzsharasFontofPower:IsEquipReady() and ((Spell:EssenceEnabled(AE.VisionofPerfection) and not S.UnholyFrenzy:IsAvailable()) or (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and not Spell:EssenceEnabled(AE.VisionofPerfection))) then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 262"; end
-      end
-      -- use_item,name=azsharas_font_of_power,if=cooldown.apocalypse.remains<14&(essence.condensed_lifeforce.major|essence.vision_of_perfection.enabled&talent.unholy_frenzy.enabled)
-      if I.AzsharasFontofPower:IsEquipReady() and (S.Apocalypse:CooldownRemainsP() < 14 and (Spell:MajorEssenceEnabled(AE.CondensedLifeForce) or Spell:EssenceEnabled(AE.VisionofPerfection) and S.UnholyFrenzy:IsAvailable())) then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 263"; end
-      end
-      -- use_item,name=azsharas_font_of_power,if=target.1.time_to_die<cooldown.apocalypse.remains+34
-      if I.AzsharasFontofPower:IsEquipReady() and (Target:TimeToDie() < S.Apocalypse:CooldownRemainsP() + 34) then
-        if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 264"; end
-      end
-      -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack<1
-      if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDownP(S.RazorCoralDebuff)) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 265"; end
-      end
-      -- use_item,name=ashvanes_razor_coral,if=pet.guardian_of_azeroth.active&pet.apoc_ghoul.active
-      if I.AshvanesRazorCoral:IsEquipReady() and ((S.GuardianofAzeroth:IsAvailable() and S.GuardianofAzeroth:CooldownRemainsP() > 150) and S.Apocalypse:TimeSinceLastCast() <= 15) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 266"; end
-      end
-      -- use_item,name=ashvanes_razor_coral,if=cooldown.apocalypse.ready&(essence.condensed_lifeforce.major&target.1.time_to_die<cooldown.condensed_lifeforce.remains+20|!essence.condensed_lifeforce.major)
-      if I.AshvanesRazorCoral:IsEquipReady() and (S.Apocalypse:CooldownUpP() and (Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:TimeToDie() < S.GuardianofAzeroth:CooldownRemainsP() + 20 or not Spell:MajorEssenceEnabled(AE.CondensedLifeForce))) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 267"; end
-      end
-      -- use_item,name=ashvanes_razor_coral,if=target.1.time_to_die<cooldown.apocalypse.remains+20
-      if I.AshvanesRazorCoral:IsEquipReady() and (Target:TimeToDie() < S.Apocalypse:CooldownRemainsP() + 20) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 268"; end
-      end
-      -- use_item,name=vision_of_demise,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&essence.vision_of_perfection.enabled)|buff.unholy_frenzy.up|pet.gargoyle.active
-      if I.VisionofDemise:IsEquipReady() and ((S.Apocalypse:CooldownUpP() and Target:DebuffStackP(S.FesteringWoundDebuff) >= 4 and Spell:EssenceEnabled(AE.VisionofPerfection)) or Player:BuffP(S.UnholyFrenzyBuff) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
-        if HR.Cast(I.VisionofDemise, nil, Settings.Commons.TrinketDisplayStyle) then return "vision_of_demise 269"; end
-      end
-      -- use_item,name=ramping_amplitude_gigavolt_engine,if=cooldown.apocalypse.remains<2|talent.army_of_the_damned.enabled|raid_event.adds.in<5
-      if I.RampingAmplitudeGigavoltEngine:IsEquipReady() and (S.Apocalypse:CooldownRemainsP() < 2 or S.ArmyoftheDamned:IsAvailable()) then
-        if HR.Cast(I.RampingAmplitudeGigavoltEngine, nil, Settings.Commons.TrinketDisplayStyle) then return "ramping_amplitude_gigavolt_engine 270"; end
-      end
-      -- use_item,name=bygone_bee_almanac,if=cooldown.summon_gargoyle.remains>60|!talent.summon_gargoyle.enabled&time>20|!equipped.ramping_amplitude_gigavolt_engine
-      if I.BygoneBeeAlmanac:IsEquipReady() and (S.SummonGargoyle:CooldownRemainsP() > 60 or not S.SummonGargoyle:IsAvailable() and HL.CombatTime() > 20 or not I.RampingAmplitudeGigavoltEngine:IsEquipped()) then
-        if HR.Cast(I.BygoneBeeAlmanac, nil, Settings.Commons.TrinketDisplayStyle) then return "bygone_bee_almanac 271"; end
-      end
-      -- use_item,name=jes_howler,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled&time>20|!equipped.ramping_amplitude_gigavolt_engine
-      if I.JesHowler:IsEquipReady() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable() and HL.CombatTime() > 20 or not I.RampingAmplitudeGigavoltEngine:IsEquipped()) then
-        if HR.Cast(I.JesHowler, nil, Settings.Commons.TrinketDisplayStyle) then return "jes_howler 277"; end
-      end
-      -- use_item,name=galecallers_beak,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled&time>20|!equipped.ramping_amplitude_gigavolt_engine
-      if I.GalecallersBeak:IsEquipReady() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 or not S.SummonGargoyle:IsAvailable() and HL.CombatTime() > 20 or not I.RampingAmplitudeGigavoltEngine:IsEquipped()) then
-        if HR.Cast(I.GalecallersBeak, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_beak 283"; end
-      end
-      -- use_item,name=grongs_primal_rage,if=rune<=3&(time>20|!equipped.ramping_amplitude_gigavolt_engine)
-      if I.GrongsPrimalRage:IsEquipReady() and (Player:Rune() <= 3 and (HL.CombatTime() > 20 or not I.RampingAmplitudeGigavoltEngine:IsEquipped())) then
-        if HR.Cast(I.GrongsPrimalRage, nil, Settings.Commons.TrinketDisplayStyle) then return "grongs_primal_rage 289"; end
-      end
-    end
-    -- potion,if=cooldown.army_of_the_dead.ready|pet.gargoyle.active|buff.unholy_frenzy.up
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (S.ArmyoftheDead:CooldownUpP() or S.SummonGargoyle:TimeSinceLastCast() <= 35 or Player:BuffP(S.UnholyFrenzyBuff)) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 293"; end
-    end
+    
+    --Settings.Commons.UseTrinkets 
+    
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsCastableP() then
       if HR.CastCycle(S.Outbreak, 30, EvaluateCycleOutbreak303) then return "outbreak 307" end
     end
-    -- call_action_list,name=essences
-    if (true) then
-      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
-    end
     -- call_action_list,name=cooldowns
     if (true) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- racials
+    if (true) then
+      local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=aoe,if=active_enemies>=2
     if (Cache.EnemiesCount[8] >= 2) then

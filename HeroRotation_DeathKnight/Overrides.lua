@@ -17,9 +17,22 @@
 -- Lua
 
 --- ============================ CONTENT ============================
+-- Generic
+
 -- Blood, ID: 250
 
 -- Frost, ID: 251
+local OldFrostIsCastableP
+OldFrostIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldFrostIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self == SpellFrost.RaiseDead then
+    return (not Pet:IsActive()) and BaseCheck
+  else
+    return BaseCheck
+  end
+end
+, 251);
 
 -- Unholy, ID: 252
 local OldUHIsCastableP
