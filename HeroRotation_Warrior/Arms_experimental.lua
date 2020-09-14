@@ -147,6 +147,11 @@ local function bool(val)
   return val ~= 0
 end
 
+-- TODO:
+-- handle "rage dump" mode
+-- hold prediction a few milliseconds waiting for rage refund event to happen (execute is big culprit)
+-- handle lord of war rage refund on colossus smash
+
 -- Rotation Variables
 local ShouldReturn; -- Used to get the return string
 local ExecuteThreshold = 20 + 15 * num(S.Massacre:IsAvailable())
@@ -155,9 +160,16 @@ local NumTargetsInMelee;
 
 local function SomeTargetInExecuteRange()
   for _, Unit in pairs(Cache.Enemies[8]) do
-    if Unit:HealthPercentage() < ExecuteThreshold then return true; end
+    if Unit:HealthPercentage() < ExecuteThreshold then return Unit; end
   end
-  return false;
+  return nil;
+end
+
+local function SomeTargetInCleaveRefreshRange()
+  for _, Unit in pairs(Cache.Enemies[8]) do
+    if Unit:DebuffRemainsP(S.DeepWoundsDebuff) < 1.8 then return Unit; end
+  end
+  return nil;
 end
 
 -- Identify targets around you that are susceptible to executes.
@@ -181,6 +193,7 @@ local function PerformExecuteSniping()
     end
   end
 end
+
 
 -- Target If handler
 -- Mode is "min", "max", or "first"
@@ -482,7 +495,7 @@ local function APL()
     end
 
     -- cleave on CD for deep wounds if available
-    if S.Cleave:IsAvailable() and S.Cleave:CooldownRemainsP() < 0.15 and NumTargetsInMelee >= 3 then
+    if S.Cleave:IsAvailable() and S.Cleave:CooldownRemainsP() < 0.15 and NumTargetsInMelee >= 3 and SomeTargetInCleaveRefreshRange() then
       if HR.Cast(S.Cleave) then return "Cleave"; end
     end
 
@@ -491,7 +504,7 @@ local function APL()
     if S.Skullsplitter:IsCastableP("Melee") and select(3, RageAtNextGCD()) + select(3, RageDeltas("skullsplitter")) < 100 then
       if HR.Cast(S.Skullsplitter) then return "Skullsplitter"; end
     end
-     -- use free overpower if you won't cap rage - consider not doing this at end of TOM window?.
+     -- use free overpower and ms is not on CD if you won't cap rage - consider not doing this at end of TOM window?.
     if S.Overpower:IsCastableP() and Player:BuffDownP(S.MemoryofLucidDreams) and
       select(3, RageAtNextGCD()) + select(3, RageDeltas("overpower")) < 100 then
       if HR.Cast(S.Overpower) then return "non-capping free overpower"; end
@@ -566,8 +579,8 @@ local function APL()
     PerformExecuteSniping();
 
     -- CORE ROTATION
-    if S.Whirlwind:IsReadyP("Melee") and NumTargetsInMelee >= 5 then
-      if HR.Cast(S.Whirlwind) then return "5T+ Whirlwind"; end
+    if S.Whirlwind:IsReadyP("Melee") and NumTargetsInMelee >= 3 then
+      if HR.Cast(S.Whirlwind) then return "3T+ Whirlwind"; end
     end
     if S.Overpower:IsCastableP("Melee") and Target:DebuffP(S.DeepWoundsDebuff) and Player:BuffDownP(S.MemoryofLucidDreams) and Target:DebuffDownP(S.ColossusSmashDebuff) then
       if HR.Cast(S.Overpower) then return "Overpower"; end
@@ -581,12 +594,12 @@ local function APL()
     if S.MortalStrike:CooldownRemainsP() < 0.15 and Target:HealthPercentage() > ExecuteThreshold then
       if HR.Cast(S.MortalStrike) then return "Mortal Strike"; end
     end
-    -- make sure that we don't WW or Slam below the rage we need for MS
-    if S.FervorofBattle:IsAvailable() and S.Whirlwind:IsReadyP("Melee") and
+    -- make sure that we don't WW or Slam below the rage we need for MS when its cooldown is up
+    if S.FervorofBattle:IsAvailable() and S.Whirlwind:IsReadyP("Melee") and S.MortalStrike:CooldownRemainsP() > Player:GCD() and
       select(1, RageAtNextGCD()) + select(1, RageDeltas("whirlwind")) > 30 then
       if HR.Cast(S.Whirlwind) then return "Whirlwind (safely above 30 rage)"; end
     end
-    if not S.FervorofBattle:IsAvailable() and S.Slam:IsReadyP("Melee") and 
+    if not S.FervorofBattle:IsAvailable() and S.Slam:IsReadyP("Melee") and S.MortalStrike:CooldownRemainsP() > Player:GCD() and
       select(1, RageAtNextGCD()) + select(1, RageDeltas("slam")) > 30 then
       if HR.Cast(S.Slam) then return "Slam (safely above 30 rage)"; end
     end
