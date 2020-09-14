@@ -124,21 +124,22 @@ local Settings = {
 };
 
 -- Variables
-local VarUseThrash = 0;
+local VarUseThrash = Settings.Feral.ThrashST and 1 or 0;
 local VarOpenerDone = 0;
 local LastRakeAP = 0;
 
 HL:RegisterForEvent(function()
-  VarUseThrash = 0
+  VarUseThrash = Settings.Feral.ThrashST and 1 or 0
   VarOpenerDone = 0
   LastRakeAP = 0
 end, "PLAYER_REGEN_ENABLED")
 
-local EnemyRanges = {40, 8, 5}
-local function UpdateRanges()
-  for _, i in ipairs(EnemyRanges) do
+local function UpdateRanges(...)
+  local Arg = {...}
+  for _, i in ipairs(Arg) do
     HL.GetEnemies(i);
   end
+  Everyone.AoEToggleEnemiesUpdate()
 end
 
 local function num(val)
@@ -161,7 +162,7 @@ S.Rake:RegisterDamage(
   function()
     return
       -- Attack Power
-      Player:AttackPowerDamageMod() * 
+      Player:AttackPowerDamageMod() *
       -- Rake Modifier
       0.18225 *
       -- Stealth Modifier
@@ -177,7 +178,7 @@ S.Shred:RegisterDamage(
       -- Attack Power
       Player:AttackPowerDamageMod() *
       -- Shred Modifier
-      0.46 * 
+      0.46 *
       ((math.min(Player:Level(), 19) * 18 + 353) / 695) *
       -- Bleeding Bonus
       SwipeBleedMult() *
@@ -194,7 +195,7 @@ S.SwipeCat:RegisterDamage(
       -- Attack Power
       Player:AttackPowerDamageMod() *
       -- Swipe Modifier
-      0.2875 * 
+      0.2875 *
       -- Bleeding Bonus
       SwipeBleedMult() *
       -- Versatility Damage Multiplier
@@ -206,7 +207,7 @@ S.BrutalSlash:RegisterDamage(
   function()
     return
       -- Attack Power
-      Player:AttackPowerDamageMod() * 
+      Player:AttackPowerDamageMod() *
       -- Brutal Slash Modifier
       0.69 *
       -- Versatility Damage Multiplier
@@ -267,7 +268,7 @@ local function Precombat()
   if Everyone.TargetIsValid() then
     -- variable,name=use_thrash,value=0
     if (true) then
-      VarUseThrash = 0
+      VarUseThrash = Settings.Feral.ThrashST and 1 or 0
     end
     -- variable,name=use_thrash,value=2,if=azerite.wild_fleshrending.enabled
     if (S.WildFleshrending:AzeriteEnabled()) then
@@ -427,7 +428,7 @@ local function Finishers()
   -- pool_resource,for_next=1
   -- maim,if=buff.iron_jaws.up
   if S.Maim:IsCastableP() and (Player:BuffP(S.IronJawsBuff)) then
-    if HR.CastPooling(S.Maim, nil, nil, MeleeRange) then return "maim 163"; end
+    if HR.CastPooling(S.Maim, nil, MeleeRange) then return "maim 163"; end
   end
   -- ferocious_bite,max_energy=1
   if S.FerociousBiteMaxEnergy:IsReadyP() and Player:ComboPoints() > 0 then
@@ -454,18 +455,18 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=(refreshable)&(spell_targets.thrash_cat>2)
-  if S.ThrashCat:IsCastableP() and HR.AoEON() and ((Target:DebuffRefreshableCP(S.ThrashCatDebuff)) and (Cache.EnemiesCount[EightRange] > 2)) then
-    if HR.CastPooling(S.ThrashCat, nil, nil, EightRange) then return "thrash_cat 199"; end
+  if S.ThrashCat:IsCastableP() and ((Target:DebuffRefreshableCP(S.ThrashCatDebuff)) and (Cache.EnemiesCount[EightRange] > 2)) then
+    if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 199"; end
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=(talent.scent_of_blood.enabled&buff.scent_of_blood.down)&spell_targets.thrash_cat>3
-  if S.ThrashCat:IsCastableP() and HR.AoEON() and ((S.ScentofBlood:IsAvailable() and Player:BuffDownP(S.ScentofBloodBuff)) and Cache.EnemiesCount[EightRange] > 3) then
-    if HR.CastPooling(S.ThrashCat, nil, nil, EightRange) then return "thrash_cat 209"; end
+  if S.ThrashCat:IsCastableP() and ((S.ScentofBlood:IsAvailable() and Player:BuffDownP(S.ScentofBloodBuff)) and Cache.EnemiesCount[EightRange] > 3) then
+    if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 209"; end
   end
   -- pool_resource,for_next=1
   -- swipe_cat,if=buff.scent_of_blood.up|(action.swipe_cat.damage*spell_targets.swipe_cat>(action.rake.damage+(action.rake_bleed.tick_damage*5)))
-  if S.SwipeCat:IsCastableP() and HR.AoEON() and (Player:BuffP(S.ScentofBloodBuff) or ((S.SwipeCat:Damage() * Cache.EnemiesCount[EightRange]) > (S.Rake:Damage() + (RakeBleedTick() * 5)))) then
-    if HR.CastPooling(S.SwipeCat, nil, nil, EightRange) then return "swipe_cat 217"; end
+  if S.SwipeCat:IsCastableP() and (Player:BuffP(S.ScentofBloodBuff) or ((S.SwipeCat:Damage() * Cache.EnemiesCount[EightRange]) > (S.Rake:Damage() + (RakeBleedTick() * 5)))) then
+    if HR.CastPooling(S.SwipeCat, nil, EightRange) then return "swipe_cat 217"; end
   end
   -- pool_resource,for_next=1
   -- rake,target_if=!ticking|(!talent.bloodtalons.enabled&remains<duration*0.3)&target.time_to_die>4
@@ -491,8 +492,8 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=refreshable&((variable.use_thrash=2&(!buff.incarnation.up|azerite.wild_fleshrending.enabled))|spell_targets.thrash_cat>1)
-  if S.ThrashCat:IsCastableP() and HR.AoEON() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or (HR.AoEON() and Cache.EnemiesCount[EightRange] > 1))) then
-    if HR.CastPooling(S.ThrashCat, nil, nil, EightRange) then return "thrash_cat 312"; end
+  if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) or Cache.EnemiesCount[EightRange] > 1)) then
+    if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 312"; end
   end
   -- thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react&(!buff.incarnation.up|azerite.wild_fleshrending.enabled)
   if S.ThrashCat:IsCastableP() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and VarUseThrash == 1 and bool(Player:BuffStackP(S.ClearcastingBuff)) and (Player:BuffDownP(S.IncarnationBuff) or S.WildFleshrending:AzeriteEnabled())) then
@@ -500,8 +501,8 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- swipe_cat,if=spell_targets.swipe_cat>1
-  if S.SwipeCat:IsCastableP() and HR.AoEON() and (Cache.EnemiesCount[EightRange] > 1) then
-    if HR.CastPooling(S.SwipeCat, nil, nil, EightRange) then return "swipe_cat 344"; end
+  if S.SwipeCat:IsCastableP() and (Cache.EnemiesCount[EightRange] > 1) then
+    if HR.CastPooling(S.SwipeCat, nil, EightRange) then return "swipe_cat 344"; end
   end
   -- shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
   if S.Shred:IsCastableP() and (Target:DebuffRemainsP(S.RakeDebuff) > (S.Shred:Cost() + S.Rake:Cost() - Player:EnergyPredicted()) / Player:EnergyRegen() or bool(Player:BuffStackP(S.ClearcastingBuff))) then
@@ -543,7 +544,6 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  Everyone.AoEToggleEnemiesUpdate()
   if (Player:PrevGCD(1, S.Rake)) then
     LastRakeAP = Player:AttackPowerDamageMod()
   end
@@ -551,12 +551,7 @@ local function APL()
   EightRange = S.BalanceAffinity:IsAvailable() and 11 or 8
   InterruptRange = S.BalanceAffinity:IsAvailable() and 16 or 13
   FortyRange = S.BalanceAffinity:IsAvailable() and 43 or 40
-  HL.GetEnemies(MeleeRange)
-  HL.GetEnemies(EightRange)
-  HL.GetEnemies(InterruptRange)
-  HL.GetEnemies(FortyRange)
-  HL.GetEnemies("Melee")
-
+  UpdateRanges(FortyRange, InterruptRange, EightRange, MeleeRange, "Melee")
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end

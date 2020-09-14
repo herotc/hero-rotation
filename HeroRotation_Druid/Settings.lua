@@ -57,6 +57,7 @@ HR.GUISettings.APL.Druid = {
   },
   Feral = {
     UseFABST = false,
+    ThrashST = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       CatForm = true,
@@ -117,6 +118,7 @@ CreatePanelOption("Dropdown", CP_Druid, "APL.Druid.Commons.EssenceDisplayStyle",
 
 --Feral
 CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
+CreatePanelOption("CheckButton", CP_Feral, "APL.Druid.Feral.ThrashST", "Use Thrash on Single Target", "Suggest Thrash while Clearcasting during single target combat.");
 CreateARPanelOptions(CP_Feral, "APL.Druid.Feral");
 
 --Balance
