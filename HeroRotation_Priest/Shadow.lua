@@ -49,7 +49,7 @@ Spell.Priest.Shadow = {
   ShadowWordDeath                       = Spell(32379),
   ShadowWordPain                        = Spell(589),
   ShadowWordPainDebuff                  = Spell(589),
-  Mindbender                            = MultiSpell(200174,34433),
+  Shadowfiend                           = MultiSpell(200174,34433),
   MindFlay                              = Spell(15407),
   Silence                               = Spell(15487),
   PowerInfusion                         = Spell(10060),
@@ -117,6 +117,8 @@ Item.Priest.Shadow = {
   PainbreakerPsalmCloak            = Item(173242),
   CalltotheVoidGloves              = Item(173244),
   CalltotheVoidWrists              = Item(173249),
+  ShadowflamePrismGloves           = Item(173244),
+  ShadowflamePrismHelm             = Item(173245),
 };
 local I = Item.Priest.Shadow;
 
@@ -128,6 +130,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local EnemiesCount;
+local PetActiveCD;
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -143,8 +146,8 @@ local VarAllDotsUp = false;
 local VarMindSearCutoff = 1;
 local VarSearingNightmareCutoff = false;
 local PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
+local ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
 --local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
-S.MindbenderTalent = S.Mindbender
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -207,7 +210,12 @@ local function EvaluateCycleDevouringPlage202(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
-  return (TargetUnit:HealthPercentage() < 20)
+  if S.Shadowfiend:ID() == 34433 then
+    PetActiveCD = 170
+  else
+    PetActiveCD = 45
+  end
+  return (TargetUnit:HealthPercentage() < 20 or (S.Shadowfiend:CooldownRemainsP() > PetActiveCD and ShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -404,7 +412,7 @@ local function Main()
   if S.DevouringPlague:IsReadyP() then
     if HR.CastCycle(S.DevouringPlague, 40, EvaluateCycleDevouringPlage202) then return "devouring_plague 76"; end
   end
-  -- shadow_word_death,target_if=target.health.pct<20
+  -- shadow_word_death,target_if=target.health.pct<20|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
   if S.ShadowWordDeath:IsCastableP() then
     if HR.CastCycle(S.ShadowWordDeath, 40, EvaluateCycleShadowWordDeath204) then return "shadow_word_death 78"; end
   end
@@ -413,8 +421,8 @@ local function Main()
     if HR.CastCycle(S.SurrenderToMadness, 40, EvaluateCycleSurrenderToMadness206) then return "surrender_to_madness 80"; end
   end
   -- mindbender
-  if S.Mindbender:IsCastableP() then
-    if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, 40) then return "mindbender 82"; end
+  if S.Shadowfiend:IsCastableP() then
+    if HR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend, nil, 40) then return "shadowfiend/mindbender 82"; end
   end
   -- void_torrent,target_if=variable.all_dots_up&!buff.voidform.up&target.time_to_die>4
   if S.VoidTorrent:IsCastableP() then
