@@ -227,6 +227,7 @@ local function EvaluateCycleVoidTorrent208(TargetUnit)
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
+  print("Enemies: "..EnemiesCount)
   return (EnemiesCount > VarMindSearCutoff and Player:BuffP(S.DarkThoughtsBuff))
 end
 
@@ -432,8 +433,8 @@ local function Main()
   if S.VoidTorrent:IsCastableP() then
     if HR.Cast(S.VoidTorrent, 40, EvaluateCycleVoidTorrent208) then return "void_torrent 84"; end
   end
-  -- shadow_word_death,if=runeforge.painbreaker_psalm.equipped&variable.dots_up&target.health.pct>30
-  if S.ShadowWordDeath:IsReadyP() and (PainbreakerEquipped and VarDotsUp and Target:HealthPercentage() > 30) then
+  -- shadow_word_death,if=runeforge.painbreaker_psalm.equipped&variable.dots_up&target.time_to_pct_20>(cooldown.shadow_word_death.duration+gcd)
+  if S.ShadowWordDeath:IsReadyP() and (PainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
     if HR.Cast(S.ShadowWordDeath, nil, nil, 40) then return "shadow_word_death 86"; end
   end
   -- shadow_crash,if=spell_targets.shadow_crash=1&(cooldown.shadow_crash.charges=3|debuff.shadow_crash_debuff.up|action.shadow_crash.in_flight|target.time_to_die<cooldown.shadow_crash.full_recharge_time)&raid_event.adds.in>30
@@ -546,12 +547,14 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(228260, 10, 6)               -- Void Eruption 1st Bolt
-  HL.RegisterNucleusAbility(228261, 10, 6)               -- Void Eruption 2nd Bolt
-  HL.RegisterNucleusAbility(48045, 10, 6)                -- Mind Sear
-  HL.RegisterNucleusAbility(49821, 10, 6)                -- Mind Sear 2nd ID
-  HL.RegisterNucleusAbility(263346, 10, 6)               -- Dark Void
-  HL.RegisterNucleusAbility(205385, 8, 6)                -- Shadow Crash
+  HL.RegisterNucleusAbility({228360, 228361}, 10, 6)     -- Void Eruption
+  HL.RegisterNucleusAbility({48045, 49821}, 10, 6)       -- Mind Sear
+  HL.RegisterNucleusAbility(342835, 8, 6)                -- Shadow Crash
+  HL.RegisterNucleusAbility(589, 6, 6)                   -- Shadow Word: Pain, for multi-dotting
+  HL.RegisterNucleusAbility(34914, 6, 6)                 -- Vampiric Touch, for multi-dotting
+  HL.RegisterNucleusAbility(325203, 10, 6)               -- Covenant Ability: Unholy Nova DoT
+  HL.RegisterNucleusAbility(325020, 8, 6)                -- Covenant Ability: Ascended Nova
+  HL.RegisterNucleusAbility(325326, 10, 6)               -- Covenant Ability: Ascended Explosion
 end
 
 HR.SetAPL(258, APL, Init)
