@@ -550,8 +550,6 @@ local function Init()
   HL.RegisterNucleusAbility({228360, 228361}, 10, 6)     -- Void Eruption
   HL.RegisterNucleusAbility({48045, 49821}, 10, 6)       -- Mind Sear
   HL.RegisterNucleusAbility(342835, 8, 6)                -- Shadow Crash
-  HL.RegisterNucleusAbility(589, 6, 6)                   -- Shadow Word: Pain, for multi-dotting
-  HL.RegisterNucleusAbility(34914, 6, 6)                 -- Vampiric Touch, for multi-dotting
   HL.RegisterNucleusAbility(325203, 10, 6)               -- Covenant Ability: Unholy Nova DoT
   HL.RegisterNucleusAbility(325020, 8, 6)                -- Covenant Ability: Ascended Nova
   HL.RegisterNucleusAbility(325326, 10, 6)               -- Covenant Ability: Ascended Explosion
