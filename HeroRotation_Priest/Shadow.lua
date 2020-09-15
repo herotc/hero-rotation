@@ -390,7 +390,11 @@ local function Main()
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
   -- Temporarily(?) changed Wrathful Faerie to SWP, as the WF debuff doesn't show on target currently
   if S.ShadowWordPain:IsCastableP() and (Player:BuffP(S.FaeGuardiansBuff) and Target:DebuffDownP(S.ShadowWordPainDebuff)) then
-    if HR.Cast(S.ShadowWordPain, nil, nil, 40) then return "shadow_word_pain 71"; end
+    if S.Misery:IsAvailable() then
+      if HR.Cast(S.VampiricTouch, nil, nil, 40) then return "vampiric_touch 71"; end
+    else
+      if HR.Cast(S.ShadowWordPain, nil, nil, 40) then return "shadow_word_pain 71"; end
+    end
   end
   -- void_bolt,if=!dot.devouring_plague.refreshable
   if S.VoidBolt:IsReadyP() and (not Target:DebuffRefreshableCP(S.DevouringPlagueDebuff)) then
