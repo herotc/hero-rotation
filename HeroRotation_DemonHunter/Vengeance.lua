@@ -411,12 +411,14 @@ end
 
 local function Init()
   -- Register Splash Data Nucleus Abilities
-  HL.RegisterNucleusAbility(247454, 8, 6)               -- Spirit Bomb
-  HL.RegisterNucleusAbility(189110, 6, 6)               -- Infernal Strike
-  HL.RegisterNucleusAbility(178740, 8, 6)               -- Immolation Aura
-  HL.RegisterNucleusAbility(228477, 5, 6)               -- Soul Cleave
+  HL.RegisterNucleusAbility(247455, 8, 6)               -- Spirit Bomb
+  HL.RegisterNucleusAbility(189112, 6, 6)               -- Infernal Strike
+  HL.RegisterNucleusAbility({258921, 258922}, 8, 6)     -- Immolation Aura
+  HL.RegisterNucleusAbility(228478, 5, 6)               -- Soul Cleave
   HL.RegisterNucleusAbility(204157, 10, 6)              -- Throw Glaive
-  HL.RegisterNucleusAbility(204513, 8, 6)               -- Sigil of Flame
+  HL.RegisterNucleusAbility(204598, 8, 6)               -- Sigil of Flame
+  HL.RegisterNucleusAbility(212105, 8, 6)               -- Fel Devastation
+  HL.RegisterNucleusAbility(320341, 8, 6)               -- Bulk Extraction
 end
 
 HR.SetAPL(581, APL);
