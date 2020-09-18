@@ -200,7 +200,7 @@
           RangeOK = RangeUnit:IsInRange( Range, AoESpell );
         end
         if self == SpellFrost.GlacialSpike then
-          return self:IsLearned() and RangeOK and (bool(Player:BuffStackP(SpellFrost.GlacialSpikeBuff)) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 5));
+          return self:IsLearned() and RangeOK and (Player:BuffP(SpellFrost.GlacialSpikeBuff) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 5));
         else
           local BaseCheck = FrostOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
           if self == SpellFrost.SummonWaterElemental then
@@ -216,7 +216,7 @@
     FrostOldSpellCooldownRemainsP = HL.AddCoreOverride ("Spell.CooldownRemainsP",
       function (self, BypassRecovery, Offset)
         if self == SpellFrost.Blizzard and Player:IsCasting(self) then
-          return 8;
+          return 8 * (100 - Player:HastePct()) / 100;
         elseif self == SpellFrost.Ebonbolt and Player:IsCasting(self) then
           return 45;
         else
@@ -233,8 +233,6 @@
           return self:IsCasting(SpellFrost.GlacialSpike) and 0 or math.min(BaseCheck + (self:IsCasting(SpellFrost.Frostbolt) and 1 or 0), 5)
         elseif Spell == SpellFrost.GlacialSpikeBuff then
           return self:IsCasting(SpellFrost.GlacialSpike) and 0 or BaseCheck
-        elseif Spell == SpellFrost.WintersReachBuff then
-          return self:IsCasting(SpellFrost.Flurry) and 0 or BaseCheck
         else
           return BaseCheck
         end

@@ -26,56 +26,75 @@ local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
 -- Spells
 if not Spell.Mage then Spell.Mage = {} end
 Spell.Mage.Frost = {
-  ArcaneIntellectBuff                   = Spell(1459),
-  ArcaneIntellect                       = Spell(1459),
-  SummonWaterElemental                  = Spell(31687),
-  MirrorImage                           = Spell(55342),
-  Frostbolt                             = Spell(116),
-  FrozenOrb                             = Spell(84714),
-  Blizzard                              = Spell(190356),
-  CometStorm                            = Spell(153595),
-  IceNova                               = Spell(157997),
-  Flurry                                = Spell(44614),
-  Ebonbolt                              = Spell(257537),
-  BrainFreezeBuff                       = Spell(190446),
-  IciclesBuff                           = Spell(205473),
-  GlacialSpike                          = Spell(199786),
-  IceLance                              = Spell(30455),
-  FingersofFrostBuff                    = Spell(44544),
-  RayofFrost                            = Spell(205021),
-  ConeofCold                            = Spell(120),
-  IcyVeins                              = Spell(12472),
-  RuneofPower                           = Spell(116011),
-  RuneofPowerBuff                       = Spell(116014),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
-  Fireblood                             = Spell(265221),
+  -- Racials
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  -- Base Abilities
+  ArcaneExplosion                       = Spell(1449),
+  ArcaneIntellect                       = Spell(1459),
+  ArcaneIntellectBuff                   = Spell(1459),
   Blink                                 = MultiSpell(1953, 212653),
+  Blizzard                              = Spell(190356),
+  BrainFreezeBuff                       = Spell(190446),
+  ConeofCold                            = Spell(120),
+  Counterspell                          = Spell(2139),
+  FingersofFrostBuff                    = Spell(44544),
+  Flurry                                = Spell(44614),
+  Frostbolt                             = Spell(116),
+  FrozenOrb                             = Spell(84714),
+  IceLance                              = Spell(30455),
+  IciclesBuff                           = Spell(205473),
+  IcyVeins                              = Spell(12472),
+  MirrorImage                           = Spell(55342),
+  SummonWaterElemental                  = Spell(31687),
+  WintersChillDebuff                    = Spell(228358),
+  -- Talents
+  CometStorm                            = Spell(153595),
+  Ebonbolt                              = Spell(257537),
+  FocusMagic                            = Spell(321358),
+  FocusMagicBuff                        = Spell(321363),
+  FreezingRain                          = Spell(270233),
+  GlacialSpike                          = Spell(199786),
+  GlacialSpikeBuff                      = Spell(199844),
   IceFloes                              = Spell(108839),
   IceFloesBuff                          = Spell(108839),
-  WintersChillDebuff                    = Spell(228358),
-  GlacialSpikeBuff                      = Spell(199844),
-  SplittingIce                          = Spell(56377),
-  FreezingRain                          = Spell(240555),
-  Counterspell                          = Spell(2139),
+  IceNova                               = Spell(157997),
   IncantersFlow                         = Spell(1463),
   IncantersFlowBuff                     = Spell(116267),
+  RayofFrost                            = Spell(205021),
+  RuneofPower                           = Spell(116011),
+  RuneofPowerBuff                       = Spell(116014),
+  SplittingIce                          = Spell(56377),
+  -- Covenant Abilities
+  Deathborne                            = Spell(324220),
+  DoorofShadows                         = Spell(300728),
+  Fleshcraft                            = Spell(324631),
+  MirrorsofTorment                      = Spell(314793),
+  RadiantSpark                          = Spell(307443),
+  RadiantSparkDebuff                    = Spell(307443),
+  RaidantSparkVulnerability             = Spell(307454),
+  ShiftingPower                         = Spell(314791),
+  Soulshape                             = Spell(310143),
+  -- Conduit Effects
+  -- Azerite Traits
+  PackedIceDebuff                       = Spell(272970),
+  -- Essences
   BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
+  ConcentratedFlameBurn                 = Spell(295368),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
   ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368),
-  PackedIceDebuff                       = Spell(272970)
+  RippleInSpace                         = Spell(302731),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
 };
 local S = Spell.Mage.Frost;
 
@@ -158,15 +177,14 @@ local function Precombat()
     if HR.Cast(S.ArcaneIntellect) then return "arcane_intellect 3"; end
   end
   -- variable,name=incanters_flow_gaming,default=1,op=reset
-  if (true) then
-    ILIFGaming = 0
-  end
+  ILIFGaming = 0
   -- summon_water_elemental
   if S.SummonWaterElemental:IsCastableP() then
     if HR.Cast(S.SummonWaterElemental) then return "summon_water_elemental 7"; end
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- use_item,name=azsharas_font_of_power
     -- mirror_image
     if S.MirrorImage:IsCastableP() and HR.CDsON() then
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image 10"; end
