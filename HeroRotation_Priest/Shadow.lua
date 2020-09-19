@@ -227,7 +227,6 @@ local function EvaluateCycleVoidTorrent208(TargetUnit)
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
-  print("Enemies: "..EnemiesCount)
   return (EnemiesCount > VarMindSearCutoff and Player:BuffP(S.DarkThoughtsBuff))
 end
 
