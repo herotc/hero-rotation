@@ -30,7 +30,7 @@ Spell.DemonHunter.Vengeance = {
   -- Abilities
   FelDevastation                        = Spell(212084),
   Frailty                               = Spell(247456),
-  ImmolationAura                        = Spell(178740),
+  ImmolationAura                        = Spell(258920),
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
   SigilofFlame                          = MultiSpell(204596, 204513),
