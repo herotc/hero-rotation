@@ -58,7 +58,7 @@ Spell.Monk.Windwalker = {
   BlackoutKick                          = Spell(100784),
   BlackoutKickBuff                      = Spell(116768),
   DanceofChijiBuff                      = Spell(286587),
-  
+
   -- Debuffs
   MarkoftheCraneDebuff                  = Spell(228287),
 
@@ -95,7 +95,7 @@ Spell.Monk.Windwalker = {
   SwiftRoundhouseBuff                   = Spell(278710),
   OpenPalmStrikes                       = Spell(279918),
   GloryoftheDawn                        = Spell(288634),
-  
+
   -- Essences
   BloodoftheEnemy                       = Spell(297108),
   MemoryofLucidDreams                   = Spell(298357),
@@ -111,15 +111,15 @@ Spell.Monk.Windwalker = {
   RecklessForceBuff                     = Spell(302932),
   ConcentratedFlameBurn                 = Spell(295368),
   SeethingRageBuff                      = Spell(297126),
-  
+
   -- Trinket Debuffs
   RazorCoralDebuff                      = Spell(303568),
-  
+
   -- PvP Abilities
   ReverseHarm                           = Spell(287771),
 
   -- Misc
-  PoolEnergy                            = Spell(9999000010)
+  PoolEnergy                            = Spell(999910)
 };
 local S = Spell.Monk.Windwalker;
 
@@ -788,10 +788,10 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-  
+
     -- In Combat
     -- Define VarHoldTod here instead of Precombat to allow it to use the constantly changing Target TimeToDie
-    
+
     -- auto_attack
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false); if ShouldReturn then return ShouldReturn; end
@@ -861,10 +861,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(113656, 8, 6)               -- Fists of Fury
-  HL.RegisterNucleusAbility(101546, 8, 6)               -- Spinning Crane Kick
-  HL.RegisterNucleusAbility(261715, 8, 6)               -- Rushing Jade Wind
-  HL.RegisterNucleusAbility(152175, 8, 6)               -- Whirling Dragon Punch
+
 end
 
 HR.SetAPL(269, APL, Init);

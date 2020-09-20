@@ -562,8 +562,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(1449, 10, 6)               -- Arcane Explosion
-  HL.RegisterNucleusAbility(44425, 10, 6)              -- Arcane Barrage
+
 end
 
 HR.SetAPL(62, APL, Init)

@@ -87,7 +87,7 @@ Spell.Druid.Feral = {
   ConcentratedFlameBurn                 = Spell(295368),
   Thorns                                = Spell(236696),
   -- Icon for pooling energy
-  PoolResource                          = Spell(9999000010)
+  PoolResource                          = Spell(999910)
 };
 local S = Spell.Druid.Feral;
 
@@ -158,7 +158,7 @@ local function RakeBleedTick()
   return LastRakeAP * 0.15561 * (1 + Player:VersatilityDmgPct()/100);
 end
 
-S.Rake:RegisterDamage(
+S.Rake:RegisterDamageFormula(
   function()
     return
       -- Attack Power
@@ -172,7 +172,7 @@ S.Rake:RegisterDamage(
   end
 );
 
-S.Shred:RegisterDamage(
+S.Shred:RegisterDamageFormula(
   function()
     return
       -- Attack Power
@@ -189,7 +189,7 @@ S.Shred:RegisterDamage(
   end
 );
 
-S.SwipeCat:RegisterDamage(
+S.SwipeCat:RegisterDamageFormula(
   function()
     return
       -- Attack Power
@@ -203,7 +203,7 @@ S.SwipeCat:RegisterDamage(
   end
 );
 
-S.BrutalSlash:RegisterDamage(
+S.BrutalSlash:RegisterDamageFormula(
   function()
     return
       -- Attack Power
@@ -605,10 +605,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(285381, 8, 6)               -- Primal Wrath
-  HL.RegisterNucleusAbility(202028, 8, 6)               -- Brutal Slash
-  HL.RegisterNucleusAbility(106830, 8, 6)               -- Thrash (Cat)
-  HL.RegisterNucleusAbility(106785, 8, 6)               -- Swipe (Cat)
+
 end
 
 HR.SetAPL(103, APL, Init)

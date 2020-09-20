@@ -129,7 +129,7 @@ local GetTime = GetTime;
   HL:RegisterForSelfCombatEvent(function(...)
     local spellID = select(12, ...)
     if spellID == Spell.Mage.Frost.Flurry:ID() then
-      brain_freeze_active =     Player:Buff(Spell.Mage.Frost.BrainFreezeBuff)
+      brain_freeze_active =     Player:BuffUp(Spell.Mage.Frost.BrainFreezeBuff)
                             or  Spell.Mage.Frost.BrainFreezeBuff:TimeSinceLastRemovedOnPlayer() < 0.1
     end
   end, "SPELL_CAST_SUCCESS")

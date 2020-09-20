@@ -188,7 +188,7 @@ local function CastFelRush()
       return false;
     end
   end
-  
+
   return HR.Cast(S.FelRush);
 end
 
@@ -369,7 +369,7 @@ local function Demonic()
     if HR.Cast(S.DeathSweep, nil, nil, 8) then return "death_sweep 84"; end
   end
   -- glaive_tempest,if=active_enemies>desired_targets|raid_event.adds.in>10
-  if S.GlaiveTempest:IsReadyP() and (Cache.EnemiesCount[8] > 1) then 
+  if S.GlaiveTempest:IsReadyP() and (Cache.EnemiesCount[8] > 1) then
     if HR.Cast(S.GlaiveTempest, Settings.Havoc.GCDasOffGCD.GlaiveTempest, nil, 8) then return "glaive_tempest 86"; end
   end
   -- throw_glaive,if=conduit.serrated_glaive.enabled&cooldown.eye_beam.remains<6&!buff.metamorphosis.up&!debuff.exposed_wound.up
@@ -519,12 +519,12 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    
+
     -- auto_attack
-    
+
     -- Set Variables
     -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
     VarBladeDance = num(S.FirstBlood:IsAvailable() or Cache.EnemiesCount[8] >= (3 - num(S.TrailofRuin:IsAvailable())))
@@ -538,26 +538,26 @@ local function APL()
     VarWaitingForEssenceBreak = num(S.EssenceBreak:IsAvailable() and (not bool(VarPoolingForBladeDance)) and (not bool(VarPoolingForMeta)) and S.EssenceBreak:CooldownUpP())
     -- variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
     VarWaitingForMomentum = num(S.Momentum:IsAvailable() and Player:BuffDownP(S.MomentumBuff))
-    
+
     -- call_action_list,name=cooldown,if=gcd.remains=0
     if HR.CDsON() then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- pick_up_fragment,if=demon_soul_fragments>0
     -- pick_up_fragment,if=fury.deficit>=35&(!azerite.eyes_of_rage.enabled|cooldown.eye_beam.remains>1.4)
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
-    
+
     -- call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
     if (S.EssenceBreak:IsAvailable() and (bool(VarWaitingForEssenceBreak) or Target:DebuffP(S.EssenceBreakDebuff))) then
       local ShouldReturn = EssenceBreak(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- run_action_list,name=demonic,if=talent.demonic.enabled
     if (S.Demonic:IsAvailable()) then
       local ShouldReturn = Demonic(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- run_action_list,name=normal
     if (true) then
       local ShouldReturn = Normal(); if ShouldReturn then return ShouldReturn; end
@@ -566,13 +566,6 @@ local function APL()
 end
 
 local function Init()
-  -- Register Splash Data Nucleus Abilities
-  HL.RegisterNucleusAbility(191427, 8, 6)               -- Metamorphosis
-  HL.RegisterNucleusAbility(198013, 20, 6)              -- Eye Beam
-  HL.RegisterNucleusAbility(188499, 8, 6)               -- Blade Dance
-  HL.RegisterNucleusAbility(210152, 8, 6)               -- Death Sweep
-  HL.RegisterNucleusAbility(258920, 8, 6)               -- Immolation Aura
-  HL.RegisterNucleusAbility(179057, 8, 6)               -- Chaos Nova
 end
 
 HR.SetAPL(577, APL, Init)

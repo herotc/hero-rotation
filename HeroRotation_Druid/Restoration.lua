@@ -60,7 +60,7 @@ Spell.Druid.Restoration = {
   ConcentratedFlameBurn                 = Spell(295368),
   WorldveinResonance                    = Spell(295186),
   Shadowmeld                            = Spell(58984),
-  Pool                                  = Spell(9999000010)
+  Pool                                  = Spell(999910)
 };
 local S = Spell.Druid.Restoration;
 
@@ -356,8 +356,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
-  HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
+
 end
 
 HR.SetAPL(105, APL, Init)

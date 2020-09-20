@@ -46,12 +46,12 @@ function Mage.IFTracker()
   local CurrStacks = Mage.IFST.CurrStacks
   local CurrStacksTime = Mage.IFST.CurrStacksTime
   local OldStacks = Mage.IFST.OldStacks
-  if (Player:BuffP(S.IncantersFlowBuff)) then
-    if (Player:BuffStackP(S.IncantersFlowBuff) ~= CurrStacks or (Player:BuffStackP(S.IncantersFlowBuff) == CurrStacks and TickDiff > 1)) then
+  if (Player:BuffUp(S.IncantersFlowBuff)) then
+    if (Player:BuffStack(S.IncantersFlowBuff) ~= CurrStacks or (Player:BuffStack(S.IncantersFlowBuff) == CurrStacks and TickDiff > 1)) then
       Mage.IFST.OldStacks = CurrStacks
       Mage.IFST.OldStacksTime = CurrStacksTime
     end
-    Mage.IFST.CurrStacks = Player:BuffStackP(S.IncantersFlowBuff)
+    Mage.IFST.CurrStacks = Player:BuffStack(S.IncantersFlowBuff)
     Mage.IFST.CurrStacksTime = HL.CombatTime()
     if Mage.IFST.CurrStacks > Mage.IFST.OldStacks then
       if Mage.IFST.CurrStacks == 5 then

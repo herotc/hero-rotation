@@ -87,7 +87,7 @@ Spell.Monk.Brewmaster = {
   RazorCoralDebuff             = Spell(303568),
   ConductiveInkDebuff          = Spell(302565),
   -- Misc
-  PoolEnergy                   = Spell(9999000010)
+  PoolEnergy                   = Spell(999910)
 };
 local S = Spell.Monk.Brewmaster;
 if AEMajor ~= nil then
@@ -235,7 +235,7 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-    
+
     -- auto_attack
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, StunInterrupts); if ShouldReturn then return ShouldReturn; end

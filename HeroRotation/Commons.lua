@@ -4,7 +4,7 @@
   local addonName, HR = ...;
   -- HeroLib
   local HL = HeroLib;
-  local Cache = HeroCache;
+  local Cache, Utils = HeroCache, HL.Utils;
   local Unit = HL.Unit;
   local Player = Unit.Player;
   local Target = Unit.Target;
@@ -20,39 +20,23 @@
   local AbilitySettings = HR.GUISettings.Abilities;
 
 --- ============================ CONTENT ============================
-  -- Is the current target valid ?
-  function Commons.TargetIsValid ()
+  -- Is the current target valid?
+  function Commons.TargetIsValid()
     return Target:Exists() and Player:CanAttack(Target) and not Target:IsDeadOrGhost();
   end
 
-  -- Put EnemiesCount to 1 if we have AoEON or are targetting an AoE insensible unit
-  local AoEInsensibleUnit = {
-    --- Legion
-      ----- Dungeons (7.0 Patch) -----
-      --- Mythic+ Affixes
-        -- Fel Explosives (7.2 Patch)
-        [120651] = true
-  }
-  function Commons.AoEToggleEnemiesUpdate ()
-    if not HR.AoEON() or AoEInsensibleUnit[Target:NPCID()] then
-      for Key, Value in pairs(Cache.EnemiesCount) do
-        Cache.EnemiesCount[Key] = math.min(1, Cache.EnemiesCount[Key]);
-      end
-    end
-  end
-
-  -- Is the current unit valid during cycle ?
-  function Commons.UnitIsCycleValid (Unit, BestUnitTTD, TimeToDieOffset)
+  -- Is the current unit valid during cycle?
+  function Commons.UnitIsCycleValid(Unit, BestUnitTTD, TimeToDieOffset)
     return not Unit:IsFacingBlacklisted() and not Unit:IsUserCycleBlacklisted() and (not BestUnitTTD or Unit:FilteredTimeToDie(">", BestUnitTTD, TimeToDieOffset));
   end
 
-  -- Is it worth to DoT the unit ?
-  function Commons.CanDoTUnit (Unit, HealthThreshold)
+  -- Is it worth to DoT the unit?
+  function Commons.CanDoTUnit(Unit, HealthThreshold)
     return Unit:Health() >= HealthThreshold or Unit:IsDummy();
   end
 
   -- Interrupt
-  function Commons.Interrupt (Range, Spell, Setting, StunSpells)
+  function Commons.Interrupt(Range, Spell, Setting, StunSpells)
     if Settings.InterruptEnabled and Target:IsInterruptible() and Target:IsInRange(Range) then
       if Spell:IsCastable() then
         if HR.Cast(Spell, Setting) then return "Cast " .. Spell:Name() .. " (Interrupt)"; end
@@ -68,19 +52,61 @@
     end
   end
 
+  -- Is in Solo Mode?
   function Commons.IsSoloMode()
     return Settings.SoloMode and not Player:IsInRaid() and not Player:IsInDungeon();
   end
 
-  function Commons.PSCDEquipped ()
+  -- Cycle Unit Helper
+  function Commons.CastCycle(Object, Enemies, Condition)
+    if Condition(Target) then
+      return HR.Cast(Object)
+    end
+    if HR.AoEON() then
+      local TargetGUID = Target:GUID()
+      for _, CycleUnit in pairs(Enemies) do
+        if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and Condition(CycleUnit) then
+          HR.CastLeftNameplate(CycleUnit, Object)
+          break
+        end
+      end
+    end
+  end
+
+    -- Target If Helper
+  function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, Condition)
+    local TargetCondition = (not Condition or (Condition and Condition(Target)))
+    if not HR.AoEON() and TargetCondition then
+      return HR.Cast(Object)
+    end
+    if HR.AoEON() then
+      local BestUnit, BestConditionValue = nil, nil
+      for _, CycleUnit in pairs(Enemies) do
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
+          and ((Condition and Condition(CycleUnit)) or not Condition)
+          and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
+          BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
+        end
+      end
+      if BestUnit then
+        if (BestUnit:GUID() == Target:GUID()) or (TargetCondition and (BestConditionValue == TargetIfCondition(Target))) then
+          return HR.Cast(Object)
+        else
+          HR.CastLeftNameplate(BestUnit, Object)
+        end
+      end
+    end
+  end
+
+  function Commons.PSCDEquipped()
     return (HL.Equipment[13] == 167555 or HL.Equipment[14] == 167555)
   end
 
-  function Commons.PSCDEquipReady ()
+  function Commons.PSCDEquipReady()
     return (Commons.PSCDEquipped() and HL.Item(167555):IsReady())
   end
 
-  function Commons.CyclotronicBlastReady ()
+  function Commons.CyclotronicBlastReady()
     local PSCDString = ""
     if HL.Equipment[13] == 167555 then
       PSCDString = GetInventoryItemLink("player", 13)
@@ -98,7 +124,7 @@
       ReapingFlamesBuff = Spell(311202)
     }
 
-    S.ReapingFlames:RegisterDamage(
+    S.ReapingFlames:RegisterDamageFormula(
       function ()
         -- Damage formula is based on ilevel scaling of the neck
         -- 134.6154 coefficient * PLAYER_SPECIAL_SCALE8 damage_replace_stat * Versatility
@@ -110,8 +136,8 @@
       end
     )
 
-    function Commons.ReapingFlamesCast (EssenceDisplayStyle)
-      if not S.ReapingFlames:IsCastableP() then
+    function Commons.ReapingFlamesCast(EssenceDisplayStyle)
+      if not S.ReapingFlames:IsCastable() then
         return nil
       end
 
@@ -122,8 +148,7 @@
         local BestUnitTTD, BestUnitHealth = 0, 0
         local DamageThreshold = S.ReapingFlames:Damage()
 
-        HL.GetEnemies(AbilitySettings.ReapingFlamesSnipingRange)
-        for _, CycleUnit in pairs(Cache.Enemies[AbilitySettings.ReapingFlamesSnipingRange]) do
+        for _, CycleUnit in pairs(Player:GetEnemiesInRange(AbilitySettings.ReapingFlamesSnipingRange)) do
           if CycleUnit:AffectingCombat() and not CycleUnit:IsUserCycleBlacklisted() then
             local CycleHealth = CycleUnit:Health()
             local CycleTTD = HL.OffsetRemains(CycleUnit:TimeToDie(), "Auto")

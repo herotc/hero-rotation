@@ -1,17 +1,17 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
   -- Addon
-  local addonName, addonTable = ...;
+  local addonName, addonTable = ...
   -- HeroRotation
-  local HR = HeroRotation;
+  local HR = HeroRotation
   -- HeroLib
-  local HL = HeroLib;
+  local HL = HeroLib
   -- File Locals
-  local GUI = HL.GUI;
-  local CreateChildPanel = GUI.CreateChildPanel;
-  local CreatePanelOption = GUI.CreatePanelOption;
-  local CreateARPanelOption = HR.GUI.CreateARPanelOption;
-  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
+  local GUI = HL.GUI
+  local CreateChildPanel = GUI.CreateChildPanel
+  local CreatePanelOption = GUI.CreatePanelOption
+  local CreateARPanelOption = HR.GUI.CreateARPanelOption
+  local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 
 
 --- ============================ CONTENT ============================
@@ -117,50 +117,50 @@
       },
       UsePriorityRotation = "Never"
     }
-  };
+  }
 
-  HR.GUI.LoadSettingsRecursively(HR.GUISettings);
+  HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 
   -- Child Panels
-  local ARPanel = HR.GUI.Panel;
-  local CP_Rogue = CreateChildPanel(ARPanel, "Rogue");
-  local CP_Assassination = CreateChildPanel(CP_Rogue, "Assassination");
-  local CP_Outlaw = CreateChildPanel(CP_Rogue, "Outlaw");
-  local CP_Subtlety = CreateChildPanel(CP_Rogue, "Subtlety");
+  local ARPanel = HR.GUI.Panel
+  local CP_Rogue = CreateChildPanel(ARPanel, "Rogue")
+  local CP_Assassination = CreateChildPanel(CP_Rogue, "Assassination")
+  local CP_Outlaw = CreateChildPanel(CP_Rogue, "Outlaw")
+  local CP_Subtlety = CreateChildPanel(CP_Rogue, "Subtlety")
   -- Controls
   -- Rogue
-  CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.");
-  CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, "Feint HP", "Set the Feint HP threshold.");
-  CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.");
-  CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-  CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-  CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
-  CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons");
+  CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.CrimsonVialHP", {0, 100, 1}, "Crimson Vial HP", "Set the Crimson Vial HP threshold.")
+  CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, "Feint HP", "Set the Feint HP threshold.")
+  CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.")
+  CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
+  CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
+  CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.")
+  CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons")
   -- Assassination
-  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.");
-  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.");
-  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)");
-  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)");
-  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.");
-  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.AlwaysSuggestGarrote", "Always Suggest Garrote", "Don't prevent Garrote suggestions when using Subterfuge and Vanish is ready. These should ideally be synced, but can be useful if holding Vanish for specific fights.");
-  CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", {"Never", "On Bosses", "Always"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)");
-  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.NoPooling", "No Pooling", "If you want to ignore energy thresholds. No warranty.");
-  CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination");
+  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.")
+  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", {1, 5, 0.25}, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.")
+  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)")
+  CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)")
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.RangedMultiDoT", "Suggest Ranged Multi-DoT", "Suggest multi-DoT targets at Fan of Knives range (10 yards) instead of only melee range. Disabling will only suggest DoT targets within melee range.")
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.AlwaysSuggestGarrote", "Always Suggest Garrote", "Don't prevent Garrote suggestions when using Subterfuge and Vanish is ready. These should ideally be synced, but can be useful if holding Vanish for specific fights.")
+  CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", {"Never", "On Bosses", "Always"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)")
+  CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.NoPooling", "No Pooling", "If you want to ignore energy thresholds. No warranty.")
+  CreateARPanelOptions(CP_Assassination, "APL.Rogue.Assassination")
   -- Outlaw
-  CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.\n(SimC highly recommended!)");
-  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechKeepHP", {1, 100, 1}, "Keep Leech HP Threshold", "Set the HP threshold for keeping the leech buff instead of rerolling normally (working only if Solo Mode is enabled and does not work in dungeons.)");
-  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechRerollHP", {1, 100, 1}, "Reroll For Leech HP Threshold", "Set the HP threshold to actively re-roll for the leech buff (working only if Solo Mode is enabled and does not work in dungeons.)");
-  CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish -> Ambush for DPS.\nDisable to save Vanish for utility purposes.");
-  CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.PrecombatAR", "Show Precombat Adrenaline Rush", "Display Adrenaline Rush when outside of combat with a valid target.");
-  CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Killing Spree Display Style", "Define which icon display style to use for Killing Spree.");
-  CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw");
+  CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLogic", {"SimC", "1+ Buff", "Broadside", "Buried Treasure", "Grand Melee", "Skull and Crossbones", "Ruthless Precision", "True Bearing"}, "Roll the Bones Logic", "Define the Roll the Bones logic to follow.\n(SimC highly recommended!)")
+  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechKeepHP", {1, 100, 1}, "Keep Leech HP Threshold", "Set the HP threshold for keeping the leech buff instead of rerolling normally (working only if Solo Mode is enabled and does not work in dungeons.)")
+  CreatePanelOption("Slider", CP_Outlaw, "APL.Rogue.Outlaw.RolltheBonesLeechRerollHP", {1, 100, 1}, "Reroll For Leech HP Threshold", "Set the HP threshold to actively re-roll for the leech buff (working only if Solo Mode is enabled and does not work in dungeons.)")
+  CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseDPSVanish", "Use Vanish for DPS", "Suggest Vanish -> Ambush for DPS.\nDisable to save Vanish for utility purposes.")
+  CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.PrecombatAR", "Show Precombat Adrenaline Rush", "Display Adrenaline Rush when outside of combat with a valid target.")
+  CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Killing Spree Display Style", "Define which icon display style to use for Killing Spree.")
+  CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw")
   -- Subtlety
-  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", {"Always", "On Bosses", "On Bosses not in Dungeons"}, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.");
-  CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.");
-  CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {1, 2, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.");
-  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.");
-  CreateARPanelOptions(CP_Subtlety, "APL.Rogue.Subtlety");
-  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)");
-  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)");
-  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.ShadowDance", "Stealth Combo - Shadow Dance", "Allow suggesting Shadow Dance stealth ability combos (recommended)");
-  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.UsePriorityRotation", {"Never", "On Bosses", "Always"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.) Zul Mythic will use priority rotation automatically without setting this.");
+  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", {"Always", "On Bosses", "On Bosses not in Dungeons"}, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.")
+  CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.")
+  CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {1, 2, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.")
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.STMfDAsDPSCD", "ST Marked for Death as DPS CD", "Enable if you want to put Single Target Marked for Death shown as Off GCD (top icons) instead of Suggested.")
+  CreateARPanelOptions(CP_Subtlety, "APL.Rogue.Subtlety")
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
+  CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.ShadowDance", "Stealth Combo - Shadow Dance", "Allow suggesting Shadow Dance stealth ability combos (recommended)")
+  CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.UsePriorityRotation", {"Never", "On Bosses", "Always"}, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.) Zul Mythic will use priority rotation automatically without setting this.")

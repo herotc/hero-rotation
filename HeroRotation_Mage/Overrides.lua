@@ -191,18 +191,18 @@
     , 63);
 
   -- Frost, ID: 64
-    local FrostOldSpellIsCastableP
-    FrostOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+    local FrostOldSpellIsCastable
+    FrostOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
         local RangeOK = true;
         if Range then
           local RangeUnit = ThisUnit or Target;
-          RangeOK = RangeUnit:IsInRange( Range, AoESpell );
+          RangeOK = RangeUnit:IsSpellInRange(self);
         end
         if self == SpellFrost.GlacialSpike then
-          return self:IsLearned() and RangeOK and (Player:BuffP(SpellFrost.GlacialSpikeBuff) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 5));
+          return self:IsLearned() and RangeOK and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5));
         else
-          local BaseCheck = FrostOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+          local BaseCheck = FrostOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
           if self == SpellFrost.SummonWaterElemental then
             return BaseCheck and not Pet:IsActive()
           else
@@ -212,23 +212,23 @@
       end
     , 64);
 
-    local FrostOldSpellCooldownRemainsP
-    FrostOldSpellCooldownRemainsP = HL.AddCoreOverride ("Spell.CooldownRemainsP",
+    local FrostOldSpellCooldownRemains
+    FrostOldSpellCooldownRemains = HL.AddCoreOverride ("Spell.CooldownRemains",
       function (self, BypassRecovery, Offset)
         if self == SpellFrost.Blizzard and Player:IsCasting(self) then
           return 8 * (100 - Player:HastePct()) / 100;
         elseif self == SpellFrost.Ebonbolt and Player:IsCasting(self) then
           return 45;
         else
-          return FrostOldSpellCooldownRemainsP(self, BypassRecovery, Offset)
+          return FrostOldSpellCooldownRemains(self, BypassRecovery, Offset)
         end
       end
     , 64);
 
-    local FrostOldPlayerBuffStackP
-    FrostOldPlayerBuffStackP = HL.AddCoreOverride ("Player.BuffStackP",
+    local FrostOldPlayerBuffStack
+    FrostOldPlayerBuffStack = HL.AddCoreOverride ("Player.BuffStack",
       function (self, Spell, AnyCaster, Offset)
-        local BaseCheck = FrostOldPlayerBuffStackP(self, Spell, AnyCaster, Offset)
+        local BaseCheck = FrostOldPlayerBuffStack(self, Spell, AnyCaster, Offset)
         if Spell == SpellFrost.IciclesBuff then
           return self:IsCasting(SpellFrost.GlacialSpike) and 0 or math.min(BaseCheck + (self:IsCasting(SpellFrost.Frostbolt) and 1 or 0), 5)
         elseif Spell == SpellFrost.GlacialSpikeBuff then

@@ -33,7 +33,7 @@
 
 --- ======= MISC =======
   -- Reset Textures
-  local IdleSpellTexture = HR.GetTexture(Spell(9999000000));
+  local IdleSpellTexture = HR.GetTexture(Spell(999900));
   function HR.ResetIcons ()
     -- Main Icon
     HR.MainIconFrame:Hide();
@@ -457,7 +457,7 @@
       -- Set the Texture
       IconFrame.Texture:SetTexture(HR.GetTexture(Object));
       IconFrame.Texture:SetAllPoints(IconFrame);
-      IconFrame.Texture:SetAlpha(ThisUnit:IsInRange(Object) and 1 or 0.4);
+      IconFrame.Texture:SetAlpha(ThisUnit:IsSpellInRange(Object) and 1 or 0.4);
       IconFrame:ClearAllPoints();
       if not IconFrame:IsVisible() then
         if HR.GUISettings.General.NamePlateIconAnchor == "Life Bar" then

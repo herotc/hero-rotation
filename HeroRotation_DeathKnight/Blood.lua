@@ -74,7 +74,7 @@ Spell.DeathKnight.Blood = {
   RippleInSpace                         = Spell(302731),
   WorldveinResonance                    = Spell(295186),
   -- Misc
-  Pool                                  = Spell(9999000010)
+  Pool                                  = Spell(999910)
 };
 local S = Spell.DeathKnight.Blood;
 if AEMajor ~= nil then
@@ -423,9 +423,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(50842, 10, 6)               -- Blood Boil
-  HL.RegisterNucleusAbility(194844, 8, 6)               -- Bonestorm
-  HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
+
 end
 
 HR.SetAPL(250, APL, Init);

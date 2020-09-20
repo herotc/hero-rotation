@@ -190,7 +190,7 @@ end
 local function AP_Check(spell)
   local APGen = 0
   local CurAP = Player:AstralPower()
-  if spell == S.Sunfire or spell == S.Moonfire then 
+  if spell == S.Sunfire or spell == S.Moonfire then
     APGen = 3
   elseif spell == S.StellarFlare or spell == S.SolarWrath then
     APGen = 8
@@ -201,14 +201,14 @@ local function AP_Check(spell)
   elseif spell == S.LunarStrike then
     APGen = 12
   end
-  
-  if S.ShootingStars:IsAvailable() then 
+
+  if S.ShootingStars:IsAvailable() then
     APGen = APGen + 4
   end
   if S.NaturesBalance:IsAvailable() then
     APGen = APGen + 2
   end
-  
+
   if CurAP + APGen < Player:AstralPowerMax() then
     return true
   else
@@ -316,12 +316,12 @@ local function APL()
   if S.MoonkinForm:IsCastableP() and Player:BuffDownP(S.MoonkinForm) and Settings.Balance.ShowMoonkinFormOOC then
     if HR.Cast(S.MoonkinForm) then return "moonkin_form ooc"; end
   end
-  
+
   -- call precombat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
-  
+
   if Everyone.TargetIsValid() then
     -- Defensives
     if S.Renewal:IsCastableP() and Player:HealthPercentage() <= Settings.Balance.RenewalHP then
@@ -494,9 +494,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(164815, 8, 6)               -- Sunfire DoT
-  HL.RegisterNucleusAbility(191037, 15, 6)              -- Starfall
-  HL.RegisterNucleusAbility(194153, 8, 6)               -- Lunar Strike
+
 end
 
 HR.SetAPL(102, APL, Init)

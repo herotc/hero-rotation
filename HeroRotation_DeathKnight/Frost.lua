@@ -81,7 +81,7 @@ Spell.DeathKnight.Frost = {
   -- Interrupts
   MindFreeze                            = Spell(47528),
   -- Custom
-  PoolRange                             = Spell(9999000010)
+  PoolRange                             = Spell(999910)
 };
 local S = Spell.DeathKnight.Frost;
 
@@ -227,7 +227,7 @@ local function Aoe()
     if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent aoe 18"; end
   end
 end
-  
+
 local function BosPooling()
   -- howling_blast,if=buff.rime.up
   if S.HowlingBlast:IsCastableP(30, true) and (Player:BuffP(S.RimeBuff)) then
@@ -501,7 +501,7 @@ local function Racials()
     --arcane_pulse,if=(!buff.pillar_of_frost.up&active_enemies>=2)|!buff.pillar_of_frost.up&(rune.deficit>=5&runic_power.deficit>=60)
     if S.ArcanePulse:IsCastableP() and ((Player:BuffP(S.PillarofFrostBuff) and Cache.EnemiesCount[8] >= 2) and Player:BuffDownP(S.PillarofFrostBuff) and (Player:Rune() <= 1 and Player:RunicPowerDeficit() >= 60)) then
       if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_pulse racial 3"; end
-    end 
+    end
     --lights_judgment,if=buff.pillar_of_frost.up
     if S.LightsJudgment:IsCastableP() and Player:BuffP(S.PillarofFrostBuff) then
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment racial 4"; end
@@ -589,9 +589,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(196770, 8, 6)               -- Remorseless Winter
-  HL.RegisterNucleusAbility(207230, 8, 6)               -- Frostscythe
-  HL.RegisterNucleusAbility(49184, 10, 6)               -- Howling Blast
+
 end
 
 HR.SetAPL(251, APL, Init)

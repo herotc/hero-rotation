@@ -50,7 +50,7 @@
       local TextureCache = Cache.Persistent.Texture.Spell;
       if not TextureCache[SpellID] then
         -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
-        if SpellID >= 9999000000 then
+        if SpellID >= 999900 then
           TextureCache[SpellID] = "Interface\\Addons\\HeroRotation\\Textures\\"..tostring(SpellID);
         elseif Object.TextureSpellID then
           TextureCache[SpellID] = GetSpellTexture(Object.TextureSpellID);
@@ -129,7 +129,7 @@
   end
   -- Main Cast
   HR.CastOffGCDOffset = 1;
-  function HR.Cast (Object, OffGCD, DisplayStyle, RangeCheck, CustomTime)
+  function HR.Cast (Object, OffGCD, DisplayStyle, OutofRange, CustomTime)
     local ObjectTexture = HR.GetTexture(Object);
     local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(ObjectTexture);
     if OffGCD or DisplayStyle == "Cooldown" then
@@ -145,20 +145,11 @@
     elseif DisplayStyle == "SuggestedRight" then
       HR.CastRightSuggested(Object);
     else
-      local PoolResource = 9999000010
+      local PoolResource = 999910
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
       local ShowPooling = DisplayStyle == "Pooling"
 
       local OutofRange = false
-      if RangeCheck ~= nil then
-        if type(RangeCheck) == "number" then
-          OutofRange = not Target:IsInRange(RangeCheck)
-        elseif (type(RangeCheck) == "string" and RangeCheck == "Melee") then
-          OutofRange = not Target:IsInRange("Melee")
-        else
-          OutofRange = not Target:IsInRange(Object)
-        end
-      end
       HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, OutofRange);
       DisplayCooldown(Object, ShowPooling, CustomTime);
       Object.LastDisplayTime = GetTime();
@@ -176,8 +167,8 @@
     return Result;
   end
   -- Overload for Main Cast (with resource pooling swirl)
-  function HR.CastPooling(Object, CustomTime, RangeCheck)
-    return HR.Cast(Object, false, "Pooling", RangeCheck, CustomTime)
+  function HR.CastPooling(Object, CustomTime, OutofRange)
+    return HR.Cast(Object, false, "Pooling", OutofRange, CustomTime)
   end
 
   -- Queued Casting Support
@@ -243,45 +234,6 @@
       HR.CastLeftCommon(Object);
     end
     return false;
-  end
-
-  function HR.CastCycle(Object, Range, Condition)
-    if Condition(Target) then
-      return HR.Cast(Object)
-    end
-    if HR.AoEON() then
-      local TargetGUID = Target:GUID()
-      for _, CycleUnit in pairs(Cache.Enemies[Range]) do
-        if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and Condition(CycleUnit) then
-          HR.CastLeftNameplate(CycleUnit, Object)
-          break
-        end
-      end
-    end
-  end
-
-  function HR.CastTargetIf(Object, Range, TargetIfMode, TargetIfCondition, Condition)
-    local TargetCondition = (not Condition or (Condition and Condition(Target)))
-    if not HR.AoEON() and TargetCondition then
-      return HR.Cast(Object)
-    end
-    if HR.AoEON() then
-      local BestUnit, BestConditionValue = nil, nil
-      for _, CycleUnit in pairs(Cache.Enemies[Range]) do
-        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
-          and ((Condition and Condition(CycleUnit)) or not Condition)
-          and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
-          BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
-        end
-      end
-      if BestUnit then
-        if (BestUnit:GUID() == Target:GUID()) or (TargetCondition and (BestConditionValue == TargetIfCondition(Target))) then
-          return HR.Cast(Object)
-        else
-          HR.CastLeftNameplate(BestUnit, Object)
-        end
-      end
-    end
   end
 
   -- Suggested Icon Cast
@@ -385,8 +337,18 @@
   end
 
   -- Get if the AoE is enabled.
-  function HR.AoEON ()
-    return HeroRotationCharDB.Toggles[2];
+  do
+    local AoEImmuneNPCID = {
+      --- Legion
+        ----- Dungeons (7.0 Patch) -----
+        --- Mythic+ Affixes
+          -- Fel Explosives (7.2 Patch)
+          [120651] = true
+    }
+    -- Disable the AoE if we target an unit that is immune to AoE spells.
+    function HR.AoEON ()
+      return HeroRotationCharDB.Toggles[2] and not AoEImmuneNPCID[Target:NPCID()];
+    end
   end
 
   -- Get if the main toggle is on.

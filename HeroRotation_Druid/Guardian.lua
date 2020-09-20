@@ -366,8 +366,7 @@ local function APL()
 end
 
 local function Init()
-  HL.RegisterNucleusAbility(77758, 8, 6)               -- Thrash (Bear)
-  HL.RegisterNucleusAbility(213771, 8, 6)              -- Swipe (Bear)
+
 end
 
 HR.SetAPL(104, APL, Init)

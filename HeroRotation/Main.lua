@@ -392,7 +392,6 @@
             -- Spells
             Player:RegisterListenedSpells(SpecID);
             HL.UnregisterAuraTracking();
-            HL.UnregisterNucleusAbilities();
             -- Enums Filters
             Player:FilterTriggerGCD(SpecID);
             Spell:FilterProjectileSpeed(SpecID);

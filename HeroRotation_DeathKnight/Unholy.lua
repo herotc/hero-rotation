@@ -75,7 +75,7 @@ Spell.DeathKnight.Unholy = {
   -- Interrupts
   MindFreeze                            = Spell(47528),
   -- Custom
-  PoolResources                         = Spell(9999000010)
+  PoolResources                         = Spell(999910)
 };
 local S = Spell.DeathKnight.Unholy;
 
@@ -390,9 +390,9 @@ local function APL()
     if (true) then
       VarPoolingForGargoyle = num(S.SummonGargoyle:CooldownRemainsP() < 5 and S.SummonGargoyle:IsAvailable())
     end
-    
-    --Settings.Commons.UseTrinkets 
-    
+
+    --Settings.Commons.UseTrinkets
+
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsCastableP() then
       if HR.CastCycle(S.Outbreak, 30, EvaluateCycleOutbreak303) then return "outbreak 307" end
@@ -423,9 +423,6 @@ end
 local function Init()
   S.VirulentPlagueDebuff:RegisterAuraTracking();
   S.FesteringWoundDebuff:RegisterAuraTracking();
-  HL.RegisterNucleusAbility(152280, 8, 6)               -- Defile
-  HL.RegisterNucleusAbility(115989, 8, 6)               -- Unholy Blight
-  HL.RegisterNucleusAbility(43265, 8, 6)                -- Death and Decay
 end
 
 HR.SetAPL(252, APL, Init)

@@ -36,7 +36,6 @@ HR.GUISettings.APL.Mage = {
     }
   },
   Frost = {
-    UseSplashData = true,
     RotationType = "No Ice Lance",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -108,6 +107,5 @@ CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseSplashData", "Use Sp
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.DisableCombustion", "Disable Combustion", "Disable the usage of Combustion within the Fire rotation.");
 CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
 -- Frost
-CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreatePanelOption("Dropdown", CP_Frost, "APL.Mage.Frost.RotationType", {"Standard", "No Ice Lance", "Frozen Orb"}, "Rotation Type", "Select which kind of rotation you would like to use.");
 CreateARPanelOptions(CP_Frost, "APL.Mage.Frost");
