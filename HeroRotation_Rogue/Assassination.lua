@@ -174,10 +174,10 @@ S.Mutilate:RegisterDamageFormula(
   end
 )
 local function ComputeNighstalkerPMultiplier ()
-  return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.5 or 1
+  return S.Nightstalker:IsAvailable() and Player:StealthUp(true, false, true) and 1.5 or 1
 end
 local function ComputeSubterfugeGarrotePMultiplier ()
-  return S.Subterfuge:IsAvailable() and Player:IsStealthed(true, false) and 2 or 1
+  return S.Subterfuge:IsAvailable() and Player:StealthUp(true, false, true) and 2 or 1
 end
 S.Garrote:RegisterPMultiplier(ComputeNighstalkerPMultiplier, ComputeSubterfugeGarrotePMultiplier)
 S.Rupture:RegisterPMultiplier(ComputeNighstalkerPMultiplier)
@@ -344,7 +344,7 @@ local Interrupts = {
 -- # Essences
 local function Essences ()
   -- actions.essences+=/blood_of_the_enemy,if=debuff.vendetta.up&(exsanguinated.garrote|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|fight_remains<=10
-  if S.BloodoftheEnemy:IsCastable() and (Target:DebuffUp(S.Vendetta) and (HL.Exsanguinated(Target, S.Garrote)
+  if S.BloodoftheEnemy:IsCastable() and (Target:DebuffUp(S.Vendetta) and (Rogue.Exsanguinated(Target, S.Garrote)
     or (Target:DebuffUp(S.ShivDebuff) and Player:ComboPointsDeficit() <= 1) or Target:DebuffRemains(S.Vendetta) <= 10)
     or HL.BossFilteredFightRemains("<=", 10)) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy" end
@@ -414,7 +414,7 @@ local function Trinkets ()
     end
     -- use_item,name=ashvanes_razor_coral,if=(talent.exsanguinate.enabled&talent.subterfuge.enabled)&debuff.vendetta.up&(exsanguinated.garrote|azerite.shrouded_suffocation.enabled&dot.garrote.pmultiplier>1)
     if (S.Exsanguinate:IsAvailable() and S.Subterfuge:IsAvailable()) and Target:DebuffRemains(S.Vendetta) > 10
-      and (HL.Exsanguinated(Target, S.Garrote) or S.ShroudedSuffocation:AzeriteEnabled() and Target:PMultiplier(S.Garrote) > 1) then
+      and (Rogue.Exsanguinated(Target, S.Garrote) or S.ShroudedSuffocation:AzeriteEnabled() and Target:PMultiplier(S.Garrote) > 1) then
       if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Razor Coral Exsanguinate Sync" end
     end
   end
@@ -472,8 +472,8 @@ local function CDs ()
     -- use_item,name=galecallers_boon,if=(debuff.vendetta.up|(!talent.exsanguinate.enabled&cooldown.vendetta.remains>45|talent.exsanguinate.enabled&(cooldown.exsanguinate.remains<6|cooldown.exsanguinate.remains>20&fight_remains>65)))&!exsanguinated.rupture
     if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() then
       if (Target:DebuffUp(S.Vendetta) or (not S.Exsanguinate:IsAvailable() and S.Vendetta:CooldownRemains() > 45
-        or S.Exsanguinate:IsAvailable() and (S.Exsanguinate:CooldownRemains() < 6 or S.Exsanguinate:CooldownRemains() > 20 and HL.FilteredFightRemains(10, ">", 65, true))))
-        and not HL.Exsanguinated(Target, S.Rupture) then
+        or S.Exsanguinate:IsAvailable() and (S.Exsanguinate:CooldownRemains() < 6 or S.Exsanguinate:CooldownRemains() > 20 and HL.FilteredFightRemains(MeleeEnemies10y, ">", 65, true))))
+        and not Rogue.Exsanguinated(Target, S.Rupture) then
         if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Galecallers Boon" end
       end
     end
@@ -692,7 +692,7 @@ local function Dot ()
   if HR.CDsON() and S.Exsanguinate:IsAvailable() then
     -- actions.dot+=/pool_resource,for_next=1
     -- actions.dot+=/garrote,if=talent.exsanguinate.enabled&!exsanguinated.garrote&dot.garrote.pmultiplier<=1&cooldown.exsanguinate.remains<2&spell_targets.fan_of_knives=1&raid_event.adds.in>6&dot.garrote.remains*0.5<target.time_to_die
-    if S.Garrote:IsCastable() and Target:IsInMeleeRange(5) and MeleeEnemies10yCount == 1 and S.Exsanguinate:CooldownRemains() < 2 and not HL.Exsanguinated(Target, S.Garrote)
+    if S.Garrote:IsCastable() and Target:IsInMeleeRange(5) and MeleeEnemies10yCount == 1 and S.Exsanguinate:CooldownRemains() < 2 and not Rogue.Exsanguinated(Target, S.Garrote)
       and Target:PMultiplier(S.Garrote) <= 1 and Target:FilteredTimeToDie(">", Target:DebuffRemains(S.Garrote)*0.5) then
       if HR.CastPooling(S.Garrote) then return "Cast Garrote (Pre-Exsanguinate)" end
     end
@@ -711,8 +711,8 @@ local function Dot ()
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshable(S.Garrote, 5.4)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemains(S.Garrote)
-          <= (HL.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
-        and (not HL.Exsanguinated(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and EmpoweredDotRefresh)
+          <= (Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
+        and (not Rogue.Exsanguinated(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and EmpoweredDotRefresh)
         and not SSBuffed(TargetUnit)
         and (MasterAssassinRemains() <= 0 or not Target:DebuffUp(S.Garrote) and S.ShroudedSuffocation:AzeriteEnabled())
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold)
@@ -740,8 +740,8 @@ local function Dot ()
     local function Evaluate_Rupture_Target(TargetUnit)
       return TargetUnit:DebuffRefreshable(S.Rupture, RuptureThreshold)
         and (TargetUnit:PMultiplier(S.Rupture) <= 1 or TargetUnit:DebuffRemains(S.Rupture)
-          <= (HL.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
-        and (not HL.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= ExsanguinatedBleedTickTime*2 and EmpoweredDotRefresh)
+          <= (Rogue.Exsanguinated(TargetUnit, S.Rupture) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
+        and (not Rogue.Exsanguinated(TargetUnit, S.Rupture) or TargetUnit:DebuffRemains(S.Rupture) <= ExsanguinatedBleedTickTime*2 and EmpoweredDotRefresh)
         and Rogue.CanDoTUnit(TargetUnit, RuptureDMGThreshold)
     end
     if Target:IsInMeleeRange(5) and (ComboPoints >= 4 and Target:DebuffRefreshable(S.Rupture, RuptureThreshold)
@@ -766,7 +766,7 @@ local function Dot ()
     end
     -- actions.dot+=/crimson_tempest,if=spell_targets=1&combo_points>=(cp_max_spend-1)&refreshable&!exsanguinated&!debuff.toxic_blade.up&master_assassin_remains=0&!azerite.twist_the_knife.enabled&target.time_to_die-remains>4
     if Target:IsInMeleeRange(5) and MeleeEnemies10yCount == 1 and ComboPoints >= (Rogue.CPMaxSpend() - 1) and Target:DebuffRefreshable(S.CrimsonTempest, CrimsonTempestThreshold)
-      and not HL.Exsanguinated(Target, S.CrimsonTempest) and not Target:DebuffUp(S.ShivDebuff) and MasterAssassinRemains() <= 0 and not S.TwistTheKnife:AzeriteEnabled()
+      and not Rogue.Exsanguinated(Target, S.CrimsonTempest) and not Target:DebuffUp(S.ShivDebuff) and MasterAssassinRemains() <= 0 and not S.TwistTheKnife:AzeriteEnabled()
       and (Target:FilteredTimeToDie(">", 4, -Target:DebuffRemains(S.CrimsonTempest)) or Target:TimeToDieIsNotValid())
       and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if HR.Cast(S.CrimsonTempest) then return "Cast Crimson Tempest (ST)" end
@@ -780,7 +780,7 @@ local function Dot ()
 
   -- Placeholder Slice and Dice Line Copied from Outlaw
   if S.SliceAndDice:IsCastable() and ComboPoints >= 4
-    and (HL.FilteredFightRemains(10, ">", Player:BuffRemains(S.SliceAndDice), true) or Player:BuffRemains(S.SliceAndDice) == 0)
+    and (HL.FilteredFightRemains(MeleeEnemies10y, ">", Player:BuffRemains(S.SliceAndDice), true) or Player:BuffRemains(S.SliceAndDice) == 0)
     and Player:BuffRemains(S.SliceAndDice) < (1 + ComboPoints) * 1.8 then
     if HR.Cast(S.SliceAndDice) then return "Cast Slice and Dice" end
   end

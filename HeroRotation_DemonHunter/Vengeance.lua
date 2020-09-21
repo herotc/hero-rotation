@@ -38,12 +38,14 @@ Spell.DemonHunter.Vengeance = {
   SoulCleave                            = Spell(228477),
   SoulFragments                         = Spell(203981),
   ThrowGlaive                           = Spell(204157),
+  
   -- Defensive
   DemonSpikes                           = Spell(203720),
   DemonSpikesBuff                       = Spell(203819),
   FieryBrand                            = Spell(204021),
   FieryBrandDebuff                      = Spell(207771),
   Torment                               = Spell(185245),
+  
   -- Talents
   BulkExtraction                        = Spell(320341),
   FlameCrash                            = Spell(227322),
@@ -55,12 +57,28 @@ Spell.DemonHunter.Vengeance = {
   SpiritBomb                            = Spell(247454),
   SpiritBombDebuff                      = Spell(247456),
   Demonic                               = Spell(321453),
+  
   -- Utility
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
+  
+  -- Covenant Abilities
+  DoorofShadows                         = Spell(300728),
+  ElysianDecree                         = Spell(306830),
+  Fleshcraft                            = Spell(324631),
+  FoddertotheFlame                      = Spell(329554),
+  SinfulBrand                           = Spell(317009),
+  Soulshape                             = Spell(310143),
+  SummonSteward                         = Spell(324739),
+  TheHunt                               = Spell(323639),
+  
+  -- Soulbind/Conduit Effects
+  EnduringGloom                         = Spell(319978),
+  
   -- Trinket Effects
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
+  
   -- Essences
   MemoryofLucidDreams                   = Spell(298357),
   RippleInSpace                         = Spell(302731),
@@ -68,6 +86,7 @@ Spell.DemonHunter.Vengeance = {
   WorldveinResonance                    = Spell(295186),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
+  
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -98,6 +117,8 @@ local ShouldReturn -- Used to get the return string
 local CleaveRangeID = tostring(S.Disrupt:ID()) -- 20y range
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
 local IsInMeleeRange, IsInAoERange
+local ActiveMitigationNeeded
+local IsTanking
 local PassiveEssence
 local Enemies8y
 local EnemiesCount8
@@ -220,6 +241,10 @@ local function Defensives()
   if S.FieryBrand:IsCastable() and Target:DebuffDown(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
     if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, 30) then return "fiery_brand defensives"; end
   end
+  -- Manual add: Door of Shadows with Enduring Gloom for the absorb shield
+  if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() and IsTanking then
+    if HR.Cast(S.DoorofShadows, Settings.Commons.CovenantDisplayStyle) then return "door_of_shadows defensives"; end
+  end
 end
 
 local function Brand()
@@ -303,6 +328,10 @@ local function Cooldowns()
 end
 
 local function Normal()
+  -- Manual add: sinful_brand,if=!buff.metamorphosis.up|variable.offensive_sinful_brand
+  if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
+    if HR.Cast(S.SinfulBrand, Settings.Commons.CovenantDisplayStyle, nil, 30) then return "sinful_brand 21"; end
+  end
   -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
   if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffUp(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
     if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "fel_devastation 22"; end
@@ -375,8 +404,8 @@ local function APL()
   UpdateSoulFragments()
   UpdateIsInMeleeRange()
 
-  local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+  ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
+  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
   PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   if Everyone.TargetIsValid() then

@@ -10,8 +10,8 @@
 
 Settings.lua
 Rogue.lua
+Events.lua
 Assassination.lua
 Outlaw.lua
 Subtlety.lua
-Events.lua
 Overrides.lua
