@@ -475,7 +475,7 @@ local function Standard()
   end
   -- obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
   if S.Obliterate:IsCastable() and (Player:RunicPowerDeficit() > (25 + num(S.RunicAttenuation:IsAvailable()) * 3)) then
-    if HR.Cast(S.Obliterat, nil, nil, not TargetIsInRange[8]) then return "obliterate standard 7"; end
+    if HR.Cast(S.Obliterate, nil, nil, not TargetIsInRange[8]) then return "obliterate standard 7"; end
   end
   -- frost_strike
   if no_heal and S.FrostStrike:IsReady() then
