@@ -99,7 +99,8 @@ local CleaveRangeID = tostring(S.Disrupt:ID()) -- 20y range
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
 local IsInMeleeRange, IsInAoERange
 local PassiveEssence
-local Enemies8y, Enemies8yCount
+local Enemies8y
+local EnemiesCount8
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -177,7 +178,7 @@ local function UpdateIsInMeleeRange()
   end
 
   IsInMeleeRange = Target:IsInRange(6)
-  IsInAoERange = IsInMeleeRange or Enemies8yCount > 0
+  IsInAoERange = IsInMeleeRange or EnemiesCount8 > 0
 end
 
 local function Precombat()
@@ -370,7 +371,7 @@ end
 -- APL Main
 local function APL()
   Enemies8y = Player:GetEnemiesInRange(8)
-  Enemies8yCount = #Enemies8y
+  EnemiesCount8 = #Enemies8y
   UpdateSoulFragments()
   UpdateIsInMeleeRange()
 

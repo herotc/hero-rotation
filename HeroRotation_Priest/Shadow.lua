@@ -129,7 +129,8 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local EnemiesCount10, EnemiesCount15
+local Enemies15y, Enemies40y
+local EnemiesCount10
 local PetActiveCD
 
 -- GUI Settings
@@ -167,14 +168,6 @@ end
 
 local function bool(val)
   return val ~= 0
-end
-
-local EnemyRanges = {40, 15, 8}
-local function CacheEnemies()
-  for _, i in ipairs(EnemyRanges) do
-    Cache.Enemies[i] = Player:GetEnemiesInRange(i)
-    Cache.EnemiesCount[i] = #Cache.Enemies[i]
-  end
 end
 
 local function DotsUp(tar, all)
@@ -325,7 +318,7 @@ local function Cds()
     if HR.Cast(S.Mindgames, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "mindgames 54"; end
   end
   -- Covenant: unholy_nova,if=raid_event.adds.in>50
-  if S.UnholyNova:IsReady() and (Cache.EnemiesCount[15] > 0) then
+  if S.UnholyNova:IsReady() and (#Enemies15y > 0) then
     if HR.Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, 40) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled)|(buff.voidform.up&talent.searing_nightmare.enabled)
@@ -391,7 +384,7 @@ local function Main()
   end
   -- damnation,target_if=!variable.all_dots_up
   if S.Damnation:IsCastable() then
-    if HR.CastCycle(S.Damnation, 40, EvaluateCycleDamnation200) then return "damnation 74"; end
+    if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200) then return "damnation 74"; end
   end
   -- devouring_plague,if=talent.legacy_of_the_void.enabled&cooldown.void_eruption.up&insanity=100
   if S.DevouringPlague:IsReady() and (S.LegacyOfTheVoid:IsAvailable() and S.VoidEruption:CooldownUp() and Player:Insanity() == 100) then
@@ -399,15 +392,15 @@ local function Main()
   end
   -- devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&buff.voidform.down))
   if S.DevouringPlague:IsReady() then
-    if HR.CastCycle(S.DevouringPlague, 40, EvaluateCycleDevouringPlage202) then return "devouring_plague 76"; end
+    if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202) then return "devouring_plague 76"; end
   end
   -- shadow_word_death,target_if=target.health.pct<20|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
   if S.ShadowWordDeath:IsCastable() then
-    if HR.CastCycle(S.ShadowWordDeath, 40, EvaluateCycleShadowWordDeath204) then return "shadow_word_death 78"; end
+    if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleShadowWordDeath204) then return "shadow_word_death 78"; end
   end
   -- surrender_to_madness,target_if=target.time_to_die<25&buff.voidform.down
   if S.SurrenderToMadness:IsCastable() then
-    if HR.CastCycle(S.SurrenderToMadness, 40, EvaluateCycleSurrenderToMadness206) then return "surrender_to_madness 80"; end
+    if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206) then return "surrender_to_madness 80"; end
   end
   -- mindbender
   if S.Shadowfiend:IsCastable() then
@@ -431,7 +424,7 @@ local function Main()
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thoughts.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindSear:IsCastable() then
-    if HR.CastCycle(S.MindSear, 40, EvaluateCycleMindSear210) then return "mind_sear 90"; end
+    if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear210) then return "mind_sear 90"; end
   end
   -- mind_flay,if=buff.dark_thoughts.up&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
   if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtsBuff) and VarDotsUp) then
@@ -439,7 +432,7 @@ local function Main()
   end
   -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!cooldown.power_infusion.up)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
   if S.SearingNightmare:IsReady() then
-    if HR.CastCycle(S.SearingNightmare, 40, EvaluateCycleSearingNightmare218) then return "searing_nightmare 93"; end
+    if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleSearingNightmare218) then return "searing_nightmare 93"; end
   end
   -- mind_blast,use_while_casting=1,if=variable.dots_up
   -- Moved to top of Main() to ensure it's suggested during Mind Flay channel
@@ -449,7 +442,7 @@ local function Main()
   end
   -- vampiric_touch,target_if=refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable)|buff.unfurling_darkness.up
   if S.VampiricTouch:IsCastable() then
-    if HR.CastCycle(S.VampiricTouch, 40, EvaluateCycleVampiricTouch214) then return "vampiric_touch 100"; end
+    if Everyone.CastCycle(S.VampiricTouch, Enemies40y, EvaluateCycleVampiricTouch214) then return "vampiric_touch 100"; end
   end
   -- shadow_word_pain,if=refreshable&target.time_to_die>4&!talent.misery.enabled&talent.psychic_link.enabled&spell_targets.mind_sear>2
   if S.ShadowWordPain:IsCastable() and (Target:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount10 > 2) then
@@ -457,11 +450,11 @@ local function Main()
   end
   -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&(!talent.psychic_link.enabled|(talent.psychic_link.enabled&spell_targets.mind_sear<=2))
   if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
-    if HR.CastCycle(S.ShadowWordPain, 40, EvaluateCycleShadowWordPain220) then return "shadow_word_pain 99"; end
+    if Everyone.CastCycle(S.ShadowWordPain, Enemies40y, EvaluateCycleShadowWordPain220) then return "shadow_word_pain 99"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindSear:IsCastable() then
-    if HR.CastCycle(S.MindSear, 40, EvaluateCycleMindSear216) then return "mind_sear 102"; end
+    if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear216) then return "mind_sear 102"; end
   end
   -- mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(cooldown.void_bolt.up|cooldown.mind_blast.up)
   if S.MindFlay:IsCastable() then
@@ -475,9 +468,9 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  CacheEnemies()
+  Enemies15y = Player:GetEnemiesInRange(15)
+  Enemies40y = Player:GetEnemiesInRange(40)
   EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10)
-  EnemiesCount15 = Target:GetEnemiesInSplashRangeCount(15)
 
   -- call precombat
   if not Player:AffectingCombat() then
