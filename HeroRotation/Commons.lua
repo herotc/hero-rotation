@@ -58,9 +58,9 @@
   end
 
   -- Cycle Unit Helper
-  function Commons.CastCycle(Object, Enemies, Condition)
+  function Commons.CastCycle(Object, Enemies, Condition, OutofRange)
     if Condition(Target) then
-      return HR.Cast(Object)
+      return HR.Cast(Object, nil, nil, OutofRange)
     end
     if HR.AoEON() then
       local TargetGUID = Target:GUID()
