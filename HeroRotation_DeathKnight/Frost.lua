@@ -113,7 +113,7 @@ local Settings = {
 
 -- Functions
 --Functions
-local EnemyRanges = {8, 10, 30, 40, 100}
+local EnemyRanges = {5, 8, 10, 30, 40, 100}
 local TargetIsInRange = {}
 local function ComputeTargetRange()
   for _, i in ipairs(EnemyRanges) do
