@@ -38,12 +38,14 @@ Spell.DemonHunter.Vengeance = {
   SoulCleave                            = Spell(228477),
   SoulFragments                         = Spell(203981),
   ThrowGlaive                           = Spell(204157),
+  
   -- Defensive
   DemonSpikes                           = Spell(203720),
   DemonSpikesBuff                       = Spell(203819),
   FieryBrand                            = Spell(204021),
   FieryBrandDebuff                      = Spell(207771),
   Torment                               = Spell(185245),
+  
   -- Talents
   BulkExtraction                        = Spell(320341),
   FlameCrash                            = Spell(227322),
@@ -55,12 +57,18 @@ Spell.DemonHunter.Vengeance = {
   SpiritBomb                            = Spell(247454),
   SpiritBombDebuff                      = Spell(247456),
   Demonic                               = Spell(321453),
+  
   -- Utility
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
+  
+  -- Covenant Abilities
+  SinfulBrand                           = Spell(317009),
+  
   -- Trinket Effects
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
+  
   -- Essences
   MemoryofLucidDreams                   = Spell(298357),
   RippleInSpace                         = Spell(302731),
@@ -68,6 +76,7 @@ Spell.DemonHunter.Vengeance = {
   WorldveinResonance                    = Spell(295186),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
+  
   -- Other
   Pool                                  = Spell(999910)
 }
@@ -303,6 +312,10 @@ local function Cooldowns()
 end
 
 local function Normal()
+  -- Manual add: sinful_brand,if=!buff.metamorphosis.up|variable.offensive_sinful_brand
+  if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
+    if HR.Cast(S.SinfulBrand, Settings.Commons.CovenantDisplayStyle, nil, 30) then return "sinful_brand 21"; end
+  end
   -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
   if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffUp(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
     if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "fel_devastation 22"; end
