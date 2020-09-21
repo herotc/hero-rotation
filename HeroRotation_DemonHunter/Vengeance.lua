@@ -63,7 +63,17 @@ Spell.DemonHunter.Vengeance = {
   Metamorphosis                         = Spell(187827),
   
   -- Covenant Abilities
+  DoorofShadows                         = Spell(300728),
+  ElysianDecree                         = Spell(306830),
+  Fleshcraft                            = Spell(324631),
+  FoddertotheFlame                      = Spell(329554),
   SinfulBrand                           = Spell(317009),
+  Soulshape                             = Spell(310143),
+  SummonSteward                         = Spell(324739),
+  TheHunt                               = Spell(323639),
+  
+  -- Soulbind/Conduit Effects
+  EnduringGloom                         = Spell(319978),
   
   -- Trinket Effects
   RazorCoralDebuff                      = Spell(303568),
@@ -107,6 +117,8 @@ local ShouldReturn -- Used to get the return string
 local CleaveRangeID = tostring(S.Disrupt:ID()) -- 20y range
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
 local IsInMeleeRange, IsInAoERange
+local ActiveMitigationNeeded
+local IsTanking
 local PassiveEssence
 local Enemies8y
 local EnemiesCount8
@@ -228,6 +240,10 @@ local function Defensives()
   -- Fiery Brand
   if S.FieryBrand:IsCastable() and Target:DebuffDown(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
     if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, 30) then return "fiery_brand defensives"; end
+  end
+  -- Manual add: Door of Shadows with Enduring Gloom for the absorb shield
+  if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() and IsTanking then
+    if HR.Cast(S.DoorofShadows, Settings.Commons.CovenantDisplayStyle) then return "door_of_shadows defensives"; end
   end
 end
 
@@ -388,8 +404,8 @@ local function APL()
   UpdateSoulFragments()
   UpdateIsInMeleeRange()
 
-  local ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
+  ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
+  IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
   PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   if Everyone.TargetIsValid() then
