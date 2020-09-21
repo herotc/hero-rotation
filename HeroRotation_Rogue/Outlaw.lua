@@ -616,10 +616,6 @@ local function APL ()
           usingTrinket = true
           if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device" end
         end
-        -- AR
-        if Settings.Outlaw.PrecombatAR and not usingTrinket and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush) then
-          if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush (OOC)" end
-        end
       end
     end
     -- Stealth
