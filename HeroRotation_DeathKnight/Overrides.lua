@@ -23,7 +23,7 @@
 
 -- Frost, ID: 251
 local OldFrostIsCastableP
-OldFrostIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+OldFrostIsCastableP = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldFrostIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellFrost.RaiseDead then
@@ -36,7 +36,7 @@ end
 
 -- Unholy, ID: 252
 local OldUHIsCastableP
-OldUHIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+OldUHIsCastableP = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldUHIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellUnholy.RaiseDead then
