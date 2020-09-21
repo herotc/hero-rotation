@@ -74,10 +74,10 @@
   end
 
     -- Target If Helper
-  function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, Condition)
+  function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, Condition, OutofRange)
     local TargetCondition = (not Condition or (Condition and Condition(Target)))
     if not HR.AoEON() and TargetCondition then
-      return HR.Cast(Object)
+      return HR.Cast(Object, nil, nil, OutofRange)
     end
     if HR.AoEON() then
       local BestUnit, BestConditionValue = nil, nil
@@ -90,7 +90,7 @@
       end
       if BestUnit then
         if (BestUnit:GUID() == Target:GUID()) or (TargetCondition and (BestConditionValue == TargetIfCondition(Target))) then
-          return HR.Cast(Object)
+          return HR.Cast(Object, nil, nil, OutofRange)
         else
           HR.CastLeftNameplate(BestUnit, Object)
         end
