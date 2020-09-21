@@ -149,7 +149,7 @@
       local Usable = Object.SpellID == PoolResource or Object:IsUsable();
       local ShowPooling = DisplayStyle == "Pooling"
 
-      local OutofRange = false
+      local OutofRange = OutofRange or false
       HR.MainIconFrame:ChangeIcon(ObjectTexture, Keybind, Usable, OutofRange);
       DisplayCooldown(Object, ShowPooling, CustomTime);
       Object.LastDisplayTime = GetTime();
