@@ -42,7 +42,8 @@ HR.GUISettings.APL.Rogue = {
       Kick = true,
       MarkedforDeath = true,
       Sprint = true,
-      Stealth = true
+      Stealth = true,
+      FlagellationMastery = true,
     }
   },
   Assassination = {

@@ -102,8 +102,8 @@ Spell.Rogue.Subtlety = {
   SerratedBoneSpikeDot                  = Spell(324073),
   EchoingReprimand                      = Spell(323547),
   Sepsis                                = Spell(328305),
-  Slaughter                             = Spell(323654),
-  SlaughterPoisonBuff                   = Spell(323658),
+  Flagellation                          = Spell(323654),
+  FlagellationMastery                   = Spell(345569),
   -- Defensive
   CrimsonVial                           = Spell(185311),
   Feint                                 = Spell(1966),
@@ -236,7 +236,6 @@ end
 
 -- APL Action Lists (and Variables)
 local function Stealth_Threshold ()
-  -- TODO: actions+=/variable,name=stealth_threshold,op=set,if=conduit.slaughter_scars.enabled&conduit.slaughter_scars.rank>=1+talent.weaponmaster.enabled,value=20+talent.vigor.enabled*5+talent.master_of_shadows.enabled*5+talent.shadow_focus.enabled*10+talent.alacrity.enabled*20+30*(spell_targets.shuriken_storm>=3)
   -- actions+=/variable,name=stealth_threshold,value=25+talent.vigor.enabled*20+talent.master_of_shadows.enabled*20+talent.shadow_focus.enabled*25+talent.alacrity.enabled*20+25*(spell_targets.shuriken_storm>=4)
   return 25 + num(S.Vigor:IsAvailable()) * 20 + num(S.MasterofShadows:IsAvailable()) * 20 + num(S.ShadowFocus:IsAvailable()) * 25 + num(S.Alacrity:IsAvailable()) * 20 + num(MeleeEnemies10yCount >= 4) * 25
 end
@@ -334,15 +333,6 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   local PredictedCPDeficit = Player:ComboPointsMax() - PredictedCP
   local StealthBuff = Player:BuffUp(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   local VanishBuffCheck = Player:BuffUp(VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
-  -- actions.stealthed=slaughter,if=time<1
-  -- Check Slaughter Poison buff
-  if S.Slaughter:IsReady() and Target:IsInMeleeRange(5) and ComboPointsDeficit > 1 and not Player:BuffUp(S.SlaughterPoisonBuff) then
-    if ReturnSpellOnly then
-      return S.Slaughter
-    else
-      if HR.Cast(S.Slaughter) then return "Cast Slaughter (for Buff)" end
-    end
-  end
   -- actions.stealthed+=/shadowstrike,if=(buff.stealth.up|buff.vanish.up)
   if S.Shadowstrike:IsCastable() and (Target:IsSpellInRange(S.Shadowstrike) or Target:IsInMeleeRange(5))
     and (StealthBuff or VanishBuffCheck) then
@@ -498,6 +488,13 @@ local function CDs ()
       elseif S.ShadowDance:IsCastable() and not Player:BuffUp(S.ShadowDanceBuff) then
         if HR.Cast(S.ShadowDance) then return "Cast Shadow Dance (during Tornado)" end
       end
+    end
+    -- Quick and dirty Flagellation
+    if S.Flagellation:IsCastable() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.Flagellation) then return "Cast Flrgrrlation" end
+    end
+    if S.FlagellationMastery:IsCastable() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.FlagellationMastery, Settings.Commons.OffGCDasOffGCD.FlagellationMastery) then return "Cast Flrgrrlation Mastery" end
     end
     -- TODO: actions.cds+=/vanish,if=(runeforge.mark_of_the_master_assassin.equipped|runeforge.deathly_shadows.equipped)&buff.symbols_of_death.up&buff.shadow_dance.up&master_assassin_remains=0&buff.deathly_shadows.down&(combo_points<1|!runeforge.deathly_shadows.equipped)
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&buff.slice_and_dice.up|essence.breath_of_the_dying.major&time>=2
@@ -956,8 +953,6 @@ HR.SetAPL(261, APL, Init)
 -- actions+=/call_action_list,name=stealth_cds,if=variable.use_priority_rotation
 -- # Used to define when to use stealth CDs or builders
 -- actions+=/variable,name=stealth_threshold,value=25+talent.vigor.enabled*20+talent.master_of_shadows.enabled*20+talent.shadow_focus.enabled*25+talent.alacrity.enabled*20+25*(spell_targets.shuriken_storm>=4)
--- # Redefine for Slaughter energy
--- actions+=/variable,name=stealth_threshold,op=set,if=conduit.slaughter_scars.enabled&conduit.slaughter_scars.rank>=1+talent.weaponmaster.enabled,value=20+talent.vigor.enabled*5+talent.master_of_shadows.enabled*5+talent.shadow_focus.enabled*10+talent.alacrity.enabled*20+30*(spell_targets.shuriken_storm>=3)
 -- # Consider using a Stealth CD when reaching the energy threshold
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
 -- actions+=/call_action_list,name=finish,if=runeforge.deathly_shadows.equipped&dot.sepsis.ticking&dot.sepsis.remains<=2&combo_points>=2
@@ -1061,8 +1056,6 @@ HR.SetAPL(261, APL, Init)
 -- actions.stealth_cds+=/shadow_dance,if=variable.shd_combo_points&target.time_to_die<cooldown.symbols_of_death.remains&!raid_event.adds.up
 --
 -- # Stealthed Rotation
--- # TODO: Update when we have proper slaughter poison buff with expiry to make this work as a buff application
--- actions.stealthed=slaughter,if=time<1
 -- # If Stealth/vanish are up, use Shadowstrike to benefit from the passive bonus and Find Weakness, even if we are at max CP (from the precombat MfD).
 -- actions.stealthed+=/shadowstrike,if=(buff.stealth.up|buff.vanish.up)
 -- # Finish at 3+ CP without DS / 4+ with DS with Shuriken Tornado buff up to avoid some CP waste situations.
@@ -1077,11 +1070,10 @@ HR.SetAPL(261, APL, Init)
 -- actions.stealthed+=/shadowstrike,if=!talent.deeper_stratagem.enabled&azerite.blade_in_the_shadows.rank=3&spell_targets.shuriken_storm=3
 -- # For priority rotation, use Shadowstrike over Storm 1) with WM against up to 4 targets, 2) if FW is running off (on any amount of targets), or 3) to maximize SoD extension with Inevitability on 3 targets (4 with BitS).
 -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=4|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
--- actions.stealthed+=/shuriken_storm,if=spell_targets>=3+(conduit.slaughter_scars.rank>12)
+-- actions.stealthed+=/shuriken_storm,if=spell_targets>=3
 -- # Shadowstrike to refresh Find Weakness and to ensure we can carry over a full FW into the next SoD if possible.
 -- actions.stealthed+=/shadowstrike,if=debuff.find_weakness.remains<=1|cooldown.symbols_of_death.remains<18&debuff.find_weakness.remains<cooldown.symbols_of_death.remains
 -- actions.stealthed+=/pool_resource,for_next=1
--- actions.stealthed+=/slaughter,if=!runeforge.akaaris_soul_fragment.equipped&conduit.slaughter_scars.enabled&conduit.slaughter_scars.rank>=1+talent.weaponmaster.enabled
 -- actions.stealthed+=/gloomblade,if=!runeforge.akaaris_soul_fragment.equipped&(azerite.perforate.rank>=2|buff.perforated_veins.stack>=3&conduit.perforated_veins.rank>=(3-conduit.deeper_daggers.enabled*2))
 -- actions.stealthed+=/backstab,if=!runeforge.akaaris_soul_fragment.equipped&buff.perforated_veins.stack>=3&conduit.perforated_veins.rank>=8-talent.weaponmaster.enabled*2
 -- actions.stealthed+=/shadowstrike

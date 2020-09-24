@@ -90,6 +90,8 @@ Spell.Rogue.Outlaw = {
   -- Covenant
   SerratedBoneSpike               = Spell(328547),
   SerratedBoneSpikeDebuff         = Spell(324073),
+  Flagellation                    = Spell(323654),
+  FlagellationMastery             = Spell(345569),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -354,6 +356,14 @@ end
 
 local function CDs ()
   if Target:IsSpellInRange(S.SinisterStrike) then
+    -- Quick and dirty Flagellation
+    if S.Flagellation:IsCastable() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.Flagellation) then return "Cast Flrgrrlation" end
+    end
+    if S.FlagellationMastery:IsCastable() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.FlagellationMastery, Settings.Commons.OffGCDasOffGCD.FlagellationMastery) then return "Cast Flrgrrlation Mastery" end
+    end
+
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
     if CDsON() and not Player:StealthUp(true, true) then
       ShouldReturn = Essences()

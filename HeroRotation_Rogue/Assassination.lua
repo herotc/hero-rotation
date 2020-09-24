@@ -94,6 +94,8 @@ Spell.Rogue.Assassination = {
   -- Covenant
   SerratedBoneSpike       = Spell(328547),
   SerratedBoneSpikeDebuff = Spell(324073),
+  Flagellation            = Spell(323654),
+  FlagellationMastery     = Spell(345569),
   -- Defensive
   CrimsonVial           = Spell(185311),
   Feint                 = Spell(1966),
@@ -480,6 +482,14 @@ local function CDs ()
   end
 
   if Target:IsInMeleeRange(5) then
+    -- Quick and dirty Flagellation
+    if S.Flagellation:IsCastable() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.Flagellation) then return "Cast Flrgrrlation" end
+    end
+    if S.FlagellationMastery:IsCastable() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.FlagellationMastery, Settings.Commons.OffGCDasOffGCD.FlagellationMastery) then return "Cast Flrgrrlation Mastery" end
+    end
+
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all&dot.rupture.ticking&master_assassin_remains=0
     if HR.CDsON() and not Player:StealthUp(true, true) and Target:DebuffUp(S.Rupture) and MasterAssassinRemains() <= 0 then
       ShouldReturn = Essences()
