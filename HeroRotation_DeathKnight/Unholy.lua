@@ -141,7 +141,7 @@ local function DisableAOTD()
   return (S.ArmyoftheDead:CooldownRemains() > 5 or Settings.Unholy.AotDOff)
 end
 
-local function EvaluateCycleFesteringStrike40(TargetUnit)
+local function EvaluateCycleFesteringStrike(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) <= 2 and not S.DeathAndDecay:CooldownUp() and S.Apocalypse:CooldownRemains() > 5 and DisableAOTD())
 end
 
@@ -149,11 +149,11 @@ local function EvaluateCycleSoulReaper(TargetUnit)
   return (TargetUnit:HealthPercentage() < 35 and TargetUnit:TimeToDie() > 5)
 end
 
-local function EvaluateCycleOutbreak303(TargetUnit)
+local function EvaluateCycleOutbreak(TargetUnit)
   return TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) <= Player:GCD()
 end
 
-local function EvaluateCycleScourgeClaw90(TargetUnit)
+local function EvaluateCycleScourgeClaw(TargetUnit)
   return (DisableAOTD() and (S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffUp(S.FesteringWoundDebuff) or TargetUnit:DebuffStack(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < S.DeathAndDecay:CooldownRemains() + 10 or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemains()))
 end
 
@@ -209,7 +209,7 @@ local function Aoe()
   end
   -- festering_strike,target_if=debuff.festering_wound.stack<=2&cooldown.death_and_decay.remains&cooldown.apocalypse.remains>5&variable.disable_aotd
   if S.FesteringStrike:IsCastable() then
-    if Everyone.CastCycle(S.FesteringStrike, Enemies30yd, EvaluateCycleFesteringStrike40) then return "festering_strike 46" end
+    if Everyone.CastCycle(S.FesteringStrike, Enemies30yd, EvaluateCycleFesteringStrike) then return "festering_strike 46" end
   end
   -- death_coil,if=buff.sudden_doom.react&rune.time_to_4>gcd
   if S.DeathCoil:IsUsable() and (Player:BuffUp(S.SuddenDoomBuff) and Player:RuneTimeToX(4) > Player:GCD()) then
@@ -225,11 +225,11 @@ local function Aoe()
   end
   -- scourge_strike,target_if=(variable.disable_aotd&(cooldown.apocalypse.remains>5&debuff.festering_wound.stack>0|debuff.festering_wound.stack>4)&(target.1.time_to_die<cooldown.death_and_decay.remains+10|target.1.time_to_die>cooldown.apocalypse.remains))
   if S.ScourgeStrike:IsCastable() then
-    if Everyone.CastCycle(S.ScourgeStrike, EnemiesMelee, EvaluateCycleScourgeClaw90) then return "scourge_strike 71"; end
+    if Everyone.CastCycle(S.ScourgeStrike, EnemiesMelee, EvaluateCycleScourgeClaw) then return "scourge_strike 71"; end
   end
   -- clawing_shadows,target_if=(variable.disable_aotd&(cooldown.apocalypse.remains>5&debuff.festering_wound.stack>0|debuff.festering_wound.stack>4)&(target.1.time_to_die<cooldown.death_and_decay.remains+10|target.1.time_to_die>cooldown.apocalypse.remains))
   if S.ClawingShadows:IsCastable() then
-    if Everyone.CastCycle(S.ClawingShadows, Enemies30yd, EvaluateCycleScourgeClaw90) then return "clawing_shadows 81"; end
+    if Everyone.CastCycle(S.ClawingShadows, Enemies30yd, EvaluateCycleScourgeClaw) then return "clawing_shadows 81"; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
   if S.DeathCoil:IsUsable() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
@@ -416,7 +416,7 @@ local function APL()
 
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
     if S.Outbreak:IsCastable() then
-      if Everyone.CastCycle(S.Outbreak, Enemies30yd, EvaluateCycleOutbreak303) then return "outbreak 307" end
+      if Everyone.CastCycle(S.Outbreak, Enemies30yd, EvaluateCycleOutbreak) then return "outbreak 307" end
     end
     -- call_action_list,name=cooldowns
     if (true) then
