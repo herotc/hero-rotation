@@ -366,8 +366,7 @@ local function Main()
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 70"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
-  -- Temporarily(?) changed Wrathful Faerie to SWP, as the WF debuff doesn't show on target currently
-  if S.ShadowWordPain:IsCastable() and (Player:BuffUp(S.FaeGuardiansBuff) and Target:DebuffDown(S.ShadowWordPainDebuff)) then
+  if S.ShadowWordPain:IsCastable() and (Player:BuffUp(S.FaeGuardiansBuff) and Target:DebuffDown(S.WrathfulFaerieDebuff)) then
     if S.Misery:IsAvailable() then
       if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 71"; end
     else
