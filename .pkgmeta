@@ -1,38 +1,28 @@
 package-as: HeroRotation
 
-externals:
- HeroLib:
-  url: https://github.com/herotc/hero-lib
-
 required-dependencies:
-  - 271528-herolib
+    - 410191-herodbc
+    - 271528-herolib
 
 move-folders:
- HeroRotation/HeroRotation: HeroRotation
- HeroRotation/HeroRotation_DeathKnight: HeroRotation_DeathKnight
- HeroRotation/HeroRotation_DemonHunter: HeroRotation_DemonHunter
- HeroRotation/HeroRotation_Druid: HeroRotation_Druid
- HeroRotation/HeroRotation_Hunter: HeroRotation_Hunter
- HeroRotation/HeroRotation_Mage: HeroRotation_Mage
- HeroRotation/HeroRotation_Monk: HeroRotation_Monk
- HeroRotation/HeroRotation_Paladin: HeroRotation_Paladin
- HeroRotation/HeroRotation_Priest: HeroRotation_Priest
- HeroRotation/HeroRotation_Rogue: HeroRotation_Rogue
- HeroRotation/HeroRotation_Shaman: HeroRotation_Shaman
- HeroRotation/HeroRotation_Warlock: HeroRotation_Warlock
- HeroRotation/HeroRotation_Warrior: HeroRotation_Warrior
- HeroRotation/HeroLib: HeroLib
- HeroLib/HeroLib: HeroLib
- HeroLib/HeroCache: HeroCache
+     HeroRotation/HeroRotation: HeroRotation
+     HeroRotation/HeroRotation_DeathKnight: HeroRotation_DeathKnight
+     HeroRotation/HeroRotation_DemonHunter: HeroRotation_DemonHunter
+     HeroRotation/HeroRotation_Druid: HeroRotation_Druid
+     HeroRotation/HeroRotation_Hunter: HeroRotation_Hunter
+     HeroRotation/HeroRotation_Mage: HeroRotation_Mage
+     HeroRotation/HeroRotation_Monk: HeroRotation_Monk
+     HeroRotation/HeroRotation_Paladin: HeroRotation_Paladin
+     HeroRotation/HeroRotation_Priest: HeroRotation_Priest
+     HeroRotation/HeroRotation_Rogue: HeroRotation_Rogue
+     HeroRotation/HeroRotation_Shaman: HeroRotation_Shaman
+     HeroRotation/HeroRotation_Warlock: HeroRotation_Warlock
+     HeroRotation/HeroRotation_Warrior: HeroRotation_Warrior
 
 ignore:
- - HeroRotation_ClassTemplate/HeroRotation_Class.toc
- - HeroRotation_ClassTemplate/Class.lua
- - HeroRotation_ClassTemplate/Events.lua
- - HeroRotation_ClassTemplate/Settings.lua
- - HeroRotation_ClassTemplate/Spec.lua
- - symlink.bat
- - symlink.sh
+    - HeroRotation_ClassTemplate
+    - symlink.bat
+    - symlink.sh
 
 enable-nolib-creation: no
 

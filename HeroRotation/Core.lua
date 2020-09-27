@@ -131,7 +131,7 @@
   HR.CastOffGCDOffset = 1;
   function HR.Cast (Object, OffGCD, DisplayStyle, OutofRange, CustomTime)
     local ObjectTexture = HR.GetTexture(Object);
-    local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(ObjectTexture);
+    local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(ObjectTexture);
     if OffGCD or DisplayStyle == "Cooldown" then
       -- If this is the second cooldown, check to ensure we don't have a duplicate icon in the first slot
       if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
@@ -182,7 +182,7 @@
     for i = 1, QueueLength do
       QueueTextureTable[i] = HR.GetTexture(QueueSpellTable[i]);
       QueueSpellTable[i].LastDisplayTime = GetTime();
-      QueueKeybindTable[i] = not HR.GUISettings.General.HideKeyBinds and HL.FindKeyBinding(QueueTextureTable[i]);
+      QueueKeybindTable[i] = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(QueueTextureTable[i]);
     end
     -- Call ChangeIcon so that the main icon exists to be able to display a cooldown sweep, even though it gets overlapped
     HR.MainIconFrame:ChangeIcon(QueueTextureTable[1], QueueKeybindTable[1], QueueSpellTable[1]:IsUsable());

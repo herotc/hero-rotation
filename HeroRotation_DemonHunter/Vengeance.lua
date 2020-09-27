@@ -2,6 +2,8 @@
 --- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
@@ -16,8 +18,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 
 -- Azerite Essence Setup
-local AE         = HL.Enum.AzeriteEssences
-local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AE         = DBC.AzeriteEssences
+local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
@@ -38,14 +40,14 @@ Spell.DemonHunter.Vengeance = {
   SoulCleave                            = Spell(228477),
   SoulFragments                         = Spell(203981),
   ThrowGlaive                           = Spell(204157),
-  
+
   -- Defensive
   DemonSpikes                           = Spell(203720),
   DemonSpikesBuff                       = Spell(203819),
   FieryBrand                            = Spell(204021),
   FieryBrandDebuff                      = Spell(207771),
   Torment                               = Spell(185245),
-  
+
   -- Talents
   BulkExtraction                        = Spell(320341),
   FlameCrash                            = Spell(227322),
@@ -57,11 +59,11 @@ Spell.DemonHunter.Vengeance = {
   SpiritBomb                            = Spell(247454),
   SpiritBombDebuff                      = Spell(247456),
   Demonic                               = Spell(321453),
-  
+
   -- Utility
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
-  
+
   -- Covenant Abilities
   DoorofShadows                         = Spell(300728),
   ElysianDecree                         = Spell(306830),
@@ -71,14 +73,14 @@ Spell.DemonHunter.Vengeance = {
   Soulshape                             = Spell(310143),
   SummonSteward                         = Spell(324739),
   TheHunt                               = Spell(323639),
-  
+
   -- Soulbind/Conduit Effects
   EnduringGloom                         = Spell(319978),
-  
+
   -- Trinket Effects
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
-  
+
   -- Essences
   MemoryofLucidDreams                   = Spell(298357),
   RippleInSpace                         = Spell(302731),
@@ -86,7 +88,7 @@ Spell.DemonHunter.Vengeance = {
   WorldveinResonance                    = Spell(295186),
   LifebloodBuff                         = MultiSpell(295137, 305694),
   ConcentratedFlameBurn                 = Spell(295368),
-  
+
   -- Other
   Pool                                  = Spell(999910)
 }
