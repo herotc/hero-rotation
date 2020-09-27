@@ -263,7 +263,7 @@ local function Cleave()
     if HR.Cast(S.Flare, Settings.Commons.GCDasOffGCD.Flare) then return "flare"; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
-  if S.DeathChakram:IsCastable() and (Player:Focus() < Player:FocusMax()) then
+  if S.DeathChakram:IsCastable() and (Player:Focus() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
     if HR.Cast(S.DeathChakram, nil, Settings.Commons.CovenantDisplayStyle) then return "dark_chakram necrolords covenant"; end
   end
   -- wild_spirits
@@ -369,7 +369,7 @@ local function St()
     if HR.Cast(S.FlayedShot, nil, Settings.Commons.CovenantDisplayStyle) then return "flayed_shot venthyr covenant"; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
-  if S.DeathChakram:IsCastable() and (Player:Focus() < Player:FocusMax()) then
+  if S.DeathChakram:IsCastable() and (Player:Focus() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
     if HR.Cast(S.DeathChakram, nil, Settings.Commons.CovenantDisplayStyle) then return "dark_chakram necrolords covenant"; end
   end
   -- bloodshed

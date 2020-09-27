@@ -71,6 +71,7 @@ HR.GUISettings.APL.Hunter = {
       AMurderofCrows = false,
       Trueshot = false,
       HuntersMark = false,
+      Volley = false,
       DoubleTap = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
