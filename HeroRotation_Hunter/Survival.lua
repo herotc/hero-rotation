@@ -2,6 +2,8 @@
 --- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
@@ -16,8 +18,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 
 -- Azerite Essence Setup
-local AE         = HL.Enum.AzeriteEssences
-local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AE         = DBC.AzeriteEssences
+local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======

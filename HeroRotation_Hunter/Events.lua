@@ -2,6 +2,8 @@
 --- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...;
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL = HeroLib;
 local Cache = HeroCache;
@@ -12,7 +14,6 @@ local Target = Unit.Target;
 local Spell = HL.Spell;
 local Item = HL.Item;
 local Hunter = HR.Commons.Hunter;
-local TriggerGCD = HL.Enum.TriggerGCD;
 -- Lua
 local pairs = pairs;
 local select = select;

@@ -1,6 +1,8 @@
 --- Localize Vars
 -- Addon
 local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL = HeroLib
 local Cache = HeroCache
@@ -24,8 +26,8 @@ local tableinsert = table.insert
 local Everyone = HR.Commons.Everyone
 local Rogue = HR.Commons.Rogue
 -- Azerite Essence Setup
-local AE         = HL.Enum.AzeriteEssences
-local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AE         = DBC.AzeriteEssences
+local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 -- Spells
 if not Spell.Rogue then Spell.Rogue = {} end
 Spell.Rogue.Subtlety = {

@@ -2,6 +2,8 @@
 --- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
@@ -16,8 +18,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 
 -- Azerite Essence Setup
-local AE         = HL.Enum.AzeriteEssences
-local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AE         = DBC.AzeriteEssences
+local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -365,7 +367,7 @@ local function Generic()
   -- clawing_shadows,if=debuff.festering_wound.up&talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&(((cooldown.unholy_blight.remains>5|cooldown.apocalypse.remains>40)&(cooldown.apocalypse.remains|cooldown.apocalypse.ready&!dot.unholy_blight.remains))|debuff.festering_wound.stack>4)&variable.disable_aotd
   if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and (((S.UnholyBlight:CooldownRemains() > 5 or S.Apocalypse:CooldownRemains() > 40) and (bool(S.Apocalypse:CooldownRemains()) or S.Apocalypse:CooldownUp() and not Target:DebuffUp(S.UnholyBlightDebuff))) or Target:DebuffStack(S.FesteringWoundDebuff) >4) and DisableAOTD()) then
     if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows 209"; end
-  end  
+  end
     -- Manually added: Multiple target Epidemic if close to capping RP
   if S.Epidemic:IsReady() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:AuraActiveCount() > 1) then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not TargetIsInRange[30]) then return "epidemic 173"; end
