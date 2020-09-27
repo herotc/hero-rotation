@@ -353,7 +353,7 @@ local function Trickshots()
     if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot trickshots 15"; end
   end
   -- kill_shot,if=buff.dead_eye.down
-  if S.KillShot:IsReady() and not Player:BuffUp(S.DeadEyeBuff) then
+  if S.KillShot:IsReady() and not Player:BuffUp(S.DeadEyeBuff) and Target:HealthPercentage() <= 20 then
     if HR.Cast(S.KillShot) then return "kill_shot trickshots 16"; end
   end
   -- a_murder_of_crows
