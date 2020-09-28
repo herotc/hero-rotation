@@ -113,7 +113,7 @@ local S = Spell.Priest.Shadow
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
-  PotionofSpectralIntellect        = Item(171273),
+  PotionofDeathlyFixation          = Item(171351),
   AzsharasFontofPower              = Item(169314, {13, 14}),
   PainbreakerPsalmChest            = Item(173241),
   PainbreakerPsalmCloak            = Item(173242),
@@ -238,8 +238,8 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofSpectralIntellect) then return "potion_of_spectral_intellect 2"; end
+    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofDeathlyFixation) then return "potion_of_spectral_intellect 2"; end
     end
     -- shadowform,if=!buff.shadowform.up
     if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
@@ -485,8 +485,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
-    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
-      if HR.CastSuggested(I.PotionofSpectralIntellect) then return "potion_of_spectral_intellect 20"; end
+    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
+      if HR.CastSuggested(I.PotionofDeathlyFixation) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)
