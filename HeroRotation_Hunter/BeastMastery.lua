@@ -137,6 +137,7 @@ local SummonPetSpells = {
   S.SummonPet5
 }
 
+-- Function
 local function UpdateGCDMax()
   -- GCD Max + Latency Grace Period
   -- BM APL uses a lot of gcd.max specific timing that is slightly tight for real-world suggestions
@@ -144,6 +145,15 @@ local function UpdateGCDMax()
   -- Aspect of the Wild reduces GCD by 0.2s, before Haste modifiers are applied, reduce the benefit since Haste is applied in Player:GCD()
   if Player:BuffUp(S.AspectoftheWildBuff) then
     GCDMax = mathmax(0.75, GCDMax - 0.2 / (1 + Player:HastePct() / 100))
+  end
+end
+
+local EnemyRanges = {5, 8, 10, 30, 40, 100}
+local TargetIsInRange = {}
+local function ComputeTargetRange()
+  for _, i in ipairs(EnemyRanges) do
+    if i == 8 or 5 then TargetIsInRange[i] = Target:IsInMeleeRange(i) end
+    TargetIsInRange[i] = Target:IsInRange(i)
   end
 end
 
@@ -237,9 +247,9 @@ end
 local function Cleave()
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max
   if S.BarbedShot:IsCastable() then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40yd, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot75) then return "barbed_shot 76 testttttttt"; end
+    if Everyone.CastTargetIf(S.BarbedShot, Enemies40yd, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot75) then return "barbed_shot 76"; end
     if EvaluateTargetIfBarbedShot75(Target) then
-      if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 76 fallback"; end
+      if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 76 fallback"; end
     end
   end
 
@@ -248,13 +258,13 @@ local function Cleave()
   if S.BarbedShot:IsCastable() then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40yd, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot85) then return "barbed_shot 86"; end
     if EvaluateTargetIfBarbedShot85(Target) then
-      if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 86 fallback"; end
+      if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 86 fallback"; end
     end
   end
   -- multishot,if=gcd.max-pet.turtle.buff.beast_cleave.remains>0.25
   -- Check both the player and pet buffs since the pet buff can be impacted by latency
   if S.Multishot:IsReady() and Pet:BuffRemains(S.BeastCleaveBuff) < GCDMax then
-    if HR.Cast(S.Multishot, nil, nil, 40) then return "multishot 82"; end
+    if HR.Cast(S.Multishot, nil, nil, not TargetIsInRange[40]) then return "multishot 82"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
   if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped and not S.TarTrap:CooldownRemains() < Player:GCD() and S.Flare:CooldownRemains() < Player:GCD()) then
@@ -286,7 +296,7 @@ local function Cleave()
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
   if S.Stampede:IsCastable() and Player:BuffUp(S.AspectoftheWildBuff) or Target:BossTimeToDie() < 15 then
-    if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, 30) then return "stampede 96"; end
+    if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetIsInRange[30]) then return "stampede 96"; end
   end
   -- flayed_shot
   if S.FlayedShot:IsCastable() then
@@ -298,7 +308,7 @@ local function Cleave()
   end
   -- chimaera_shot
   if S.ChimaeraShot:IsCastable() then
-    if HR.Cast(S.ChimaeraShot, nil, nil, 40) then return "chimaera_shot 106"; end
+    if HR.Cast(S.ChimaeraShot, nil, nil, not TargetIsInRange[40]) then return "chimaera_shot 106"; end
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
@@ -306,35 +316,35 @@ local function Cleave()
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then
-    if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 108"; end
+    if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, not TargetIsInRange[40]) then return "a_murder_of_crows 108"; end
   end
   -- barrage
   if S.Barrage:IsReady() then
-    if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 110"; end
+    if HR.Cast(S.Barrage, nil, nil, not TargetIsInRange[40]) then return "barrage 110"; end
   end
   -- kill_command,if=focus>cost+action.multishot.cost
   if S.KillCommand:IsReady() and (Player:Focus() > S.KillCommand:Cost() + S.Multishot:Cost()) then
-    if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 112"; end
+    if HR.Cast(S.KillCommand) then return "kill_command 112"; end
   end
   -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
   if S.BagofTricks:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks"; end
+    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not TargetIsInRange[40]) then return "bag_of_tricks"; end
   end
   -- dire_beast
   if S.DireBeast:IsReady() then
-    if HR.Cast(S.DireBeast, nil, nil, 40) then return "dire_beast 122"; end
+    if HR.Cast(S.DireBeast, nil, nil, not TargetIsInRange[40]) then return "dire_beast 122"; end
   end
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.turtle.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.turtle.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
   if S.BarbedShot:IsCastable() then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40yd, "min", EvaluateTargetIfFilterBarbedShot74, EvaluateTargetIfBarbedShot123) then return "barbed_shot 124"; end
     if EvaluateTargetIfBarbedShot123(Target) then
-      if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 124 fallback"; end
+      if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 124 fallback"; end
     end
   end
   -- NOTE: Experimental line here for non-RR builds. SimC seems to show this as a gain. Submitted for consideration.
   -- multishot,if=cooldown.kill_command.remains>focus.time_to_max&active_enemies>8
   if S.Multishot:IsCastable() and (S.KillCommand:CooldownRemains() > Player:FocusTimeToMaxPredicted() and EnemiesCount10 > 8) then
-    if HR.CastPooling(S.Multishot, nil, 40) then return "multishot focus dump"; end
+    if HR.CastPooling(S.Multishot) then return "multishot focus dump"; end
   end
   -- arcane_shot,if=focus.time_to_max<gcd*2
   if S.ArcaneShot:IsCastable() and (Player:FocusTimeToMaxPredicted() < Player:GCD() * 2) then
@@ -348,7 +358,7 @@ local function St()
   if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) < GCDMax
     or bool(S.BestialWrath:CooldownRemains()) and S.BarbedShot:FullRechargeTime() < GCDMax
     or S.BestialWrath:CooldownRemains() < 12 + Player:GCD() and S.ScentOfBlood:IsAvailable()) then
-    if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 164"; end
+    if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 164"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
   if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped and not S.TarTrap:CooldownRemains() < Player:GCD() and S.Flare:CooldownRemains() < Player:GCD()) then
@@ -364,7 +374,7 @@ local function St()
   end
   -- kill_shot
   if S.KillShot:IsCastable() and Target:HealthPercentage() <= 20 then
-    if HR.Cast(S.KillShot) then return "kill_shot"; end
+    if HR.Cast(S.KillShot, nil, nil, not TargetIsInRange[40]) then return "kill_shot"; end
   end
   -- flayed_shot
   if S.FlayedShot:IsCastable() then
@@ -384,11 +394,11 @@ local function St()
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
   if S.Stampede:IsCastable() and Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15 then
-    if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, 30) then return "stampede 182"; end
+    if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetIsInRange[30]) then return "stampede 182"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then
-    if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, 40) then return "a_murder_of_crows 183"; end
+    if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, not TargetIsInRange[40]) then return "a_murder_of_crows 183"; end
   end
   -- bestial_wrath
   if S.BestialWrath:IsCastable() and HR.CDsON() then
@@ -400,27 +410,27 @@ local function St()
   end
   -- chimaera_shot
   if S.ChimaeraShot:IsCastable() then
-    if HR.Cast(S.ChimaeraShot, nil, nil, 40) then return "chimaera_shot 196"; end
+    if HR.Cast(S.ChimaeraShot, nil, nil, not TargetIsInRange[40]) then return "chimaera_shot 196"; end
   end
   -- kill_command
   if S.KillCommand:IsReady() then
-    if HR.Cast(S.KillCommand, nil, nil, 50) then return "kill_command 194"; end
+    if HR.Cast(S.KillCommand) then return "kill_command 194"; end
   end
   -- bag_of_tricks,if=buff.bestial_wrath.down|target.time_to_die<5
   if S.BagofTricks:IsCastable() and (Player:BuffDown(S.BestialWrathBuff) or Target:TimeToDie() < 5) then
-    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks"; end
+    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not TargetIsInRange[40]) then return "bag_of_tricks"; end
   end
   -- dire_beast
   if S.DireBeast:IsReady() then
-    if HR.Cast(S.DireBeast, nil, nil, 40) then return "dire_beast 198"; end
+    if HR.Cast(S.DireBeast, nil, nil, not TargetIsInRange[40]) then return "dire_beast 198"; end
   end
   -- barbed_shot,if=target.time_to_die<9
   if S.BarbedShot:IsCastable() and Target:TimeToDie() < 9 then
-    if HR.Cast(S.BarbedShot, nil, nil, 40) then return "barbed_shot 200"; end
+    if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 200"; end
   end
   -- barrage
   if S.Barrage:IsReady() then
-    if HR.Cast(S.Barrage, nil, nil, 40) then return "barrage 216"; end
+    if HR.Cast(S.Barrage, nil, nil, not TargetIsInRange[40]) then return "barrage 216"; end
   end
   --cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains_guess>focus.time_to_max)&cooldown.kill_command.remains>1|target.time_to_die<3
   if S.CobraShot:IsReady() and ((Player:FocusPredicted() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemains() - 1) > S.KillCommand:Cost()
@@ -431,7 +441,7 @@ local function St()
     if Player:BuffDown(S.BestialWrathBuff) and Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
       if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
     end
-    if HR.Cast(S.CobraShot, nil, nil, 40) then return "cobra_shot 218"; end
+    if HR.Cast(S.CobraShot, nil, nil, not TargetIsInRange[40]) then return "cobra_shot 218"; end
   end
 end
 
@@ -440,6 +450,7 @@ local function APL()
   EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10) -- AOE Toogle
   Enemies40yd = Player:GetEnemiesInRange(40)
   UpdateGCDMax()    -- Update the GCDMax variable
+  ComputeTargetRange()
 
   -- Pet Management
   if S.SummonPet:IsCastable() then
