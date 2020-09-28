@@ -200,7 +200,7 @@ local function UpdateIsInMeleeRange()
     return
   end
 
-  IsInMeleeRange = Target:IsInRange(6)
+  IsInMeleeRange = Target:IsInMeleeRange(5)
   IsInAoERange = IsInMeleeRange or EnemiesCount8 > 0
 end
 
@@ -219,7 +219,7 @@ local function Precombat()
   end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
-    if HR.Cast(S.InfernalStrike, nil, nil, 40) then return "infernal_strike 6"; end
+    if HR.Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike 6"; end
   end
   if S.ImmolationAura:IsCastable() and IsInMeleeRange then
     if HR.Cast(S.ImmolationAura) then return "immolation_aura 8"; end
@@ -241,7 +241,7 @@ local function Defensives()
   end
   -- Fiery Brand
   if S.FieryBrand:IsCastable() and Target:DebuffDown(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
-    if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, 30) then return "fiery_brand defensives"; end
+    if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand defensives"; end
   end
   -- Manual add: Door of Shadows with Enduring Gloom for the absorb shield
   if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() and IsTanking then
@@ -254,14 +254,14 @@ local function Brand()
     -- sigil_of_flame,if=cooldown.fiery_brand.remains<2
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (S.FieryBrand:CooldownRemains() < 2) then
       if S.ConcentratedSigils:IsAvailable() then
-        if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "sigil_of_flame 82 (Concentrated)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 82 (Concentrated)"; end
       else
-        if HR.Cast(S.SigilofFlame) then return "sigil_of_flame 82 (Normal)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsSpellInRange(S.SigilofFlame)) then return "sigil_of_flame 82 (Normal)"; end
       end
     end
     -- infernal_strike,if=cooldown.fiery_brand.remains=0
     if S.InfernalStrike:IsCastable() and (S.FieryBrand:IsReady()) then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "infernal_strike 84"; end
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 84"; end
     end
     -- fiery_brand
     if S.FieryBrand:IsCastable() and IsInMeleeRange then
@@ -276,18 +276,18 @@ local function Brand()
     -- fel_devastation,if=dot.fiery_brand.ticking
     -- Manual add: &talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
     if S.FelDevastation:IsReady() and IsInMeleeRange and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
-      if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "fel_devastation 90"; end
+      if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 90"; end
     end
     -- infernal_strike,if=dot.fiery_brand.ticking
     if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "infernal_strike 92"; end
+      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 92"; end
     end
     -- sigil_of_flame,if=dot.fiery_brand.ticking
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
       if S.ConcentratedSigils:IsAvailable() then
-        if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "sigil_of_flame 94 (Concentrated)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 94 (Concentrated)"; end
       else
-        if HR.Cast(S.SigilofFlame) then return "sigil_of_flame 94 (Normal)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsSpellInRange(S.SigilofFlame)) then return "sigil_of_flame 94 (Normal)"; end
       end
     end
   end
@@ -300,7 +300,7 @@ local function Cooldowns()
   end
   -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
   if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTime() < Player:GCD()) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 62"; end
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.ConcentratedFlame)) then return "concentrated_flame 62"; end
   end
   -- worldvein_resonance,if=buff.lifeblood.stack<3
   if S.WorldveinResonance:IsCastable() and (Player:BuffStack(S.LifebloodBuff) < 3) then
@@ -316,11 +316,11 @@ local function Cooldowns()
   end
   -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
   if Everyone.CyclotronicBlastReady() and (Player:BuffDown(S.MemoryofLucidDreams)) then
-    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 70"; end
+    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, not Target:IsInRange(40)) then return "cyclotronic_blast 70"; end
   end
   -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
   if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDown(S.RazorCoralDebuff) or Target:DebuffUp(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-    if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 72"; end
+    if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, not Target:IsInRange(40)) then return "ashvanes_razor_coral 72"; end
   end
   -- use_items
   local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
@@ -332,15 +332,15 @@ end
 local function Normal()
   -- Manual add: sinful_brand,if=!buff.metamorphosis.up|variable.offensive_sinful_brand
   if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
-    if HR.Cast(S.SinfulBrand, Settings.Commons.CovenantDisplayStyle, nil, 30) then return "sinful_brand 21"; end
+    if HR.Cast(S.SinfulBrand, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 21"; end
   end
   -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
   if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffUp(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
-    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "fel_devastation 22"; end
+    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 22"; end
   end
   -- infernal_strike
   if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
-    if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, 40) then return "infernal_strike 24"; end
+    if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 24"; end
   end
   -- bulk_extraction
   if S.BulkExtraction:IsCastable() then
@@ -353,17 +353,17 @@ local function Normal()
   -- soul_cleave,if=(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4))
   -- Manually added FelDevastation CDRemains to make sure we're pooling for FD
   if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() and (S.FelDevastation:CooldownRemains() > 3 or Player:Fury() >= 75) and ((Player:BuffUp(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4)) then
-    if HR.Cast(S.SoulCleave, nil, nil, 6) then return "soul_cleave 30"; end
+    if HR.Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 30"; end
   end
   -- soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
   -- Manually added FelDevastation CDRemains to make sure we're pooling for FD
   if S.SoulCleave:IsReady() and (S.SpiritBomb:IsAvailable() and SoulFragments == 0 and (S.FelDevastation:CooldownRemains() > 3 or Player:Fury() >= 75)) then
-    if HR.Cast(S.SoulCleave, nil, nil, 6) then return "soul_cleave 32"; end
+    if HR.Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 32"; end
   end
   -- fel_devastation
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
   if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
-    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation) then return "fel_devastation 34"; end
+    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 34"; end
   end
   -- immolation_aura,if=fury<=90
   if S.ImmolationAura:IsCastable() and IsInAoERange and (Player:Fury() <= 90) then
@@ -380,9 +380,9 @@ local function Normal()
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 then
     if S.ConcentratedSigils:IsAvailable() then
-      if HR.Cast(S.SigilofFlame, nil, nil, 8) then return "sigil_of_flame 42 (Concentrated)"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 42 (Concentrated)"; end
     else
-      if HR.Cast(S.SigilofFlame) then return "sigil_of_flame 42 (Normal)"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsSpellInRange(S.SigilofFlame)) then return "sigil_of_flame 42 (Normal)"; end
     end
   end
   -- shear
