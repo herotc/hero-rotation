@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-
 **Not every spec is updated for BfA, so please check the table below (Supported Rotations). If a spec is in WIP or Outdated status, please do not report an issue about it.**
 
-=======
->>>>>>> f53969d... [ReadMe] Update
 **If you are experiencing issues with AoE rotations (likely abilities not being recommended), be sure to have enemies nameplates enabled and enough nameplates shown (camera can hide them).**
 
 **If you see an icon with "POOL" written inside, it means you have to pool your resources. It's a normal behavior. Please see this [link explaining resource pooling](https://wow.gamepedia.com/Resource_pooling).**
@@ -11,12 +7,13 @@
 **If you update the addon via the Twitch Client and wish to get every change as they are released, please set the addon type to Alpha by right clicking the addon name and selecting Alpha under Release Type. Note that this can potentially include updates that break functionality!**
 
 # HeroRotation
+
 [![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/herotc/hero-rotation/master/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/network) [![GitHub stars](https://img.shields.io/github/stars/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/stargazers) [![GitHub issues](https://img.shields.io/github/issues/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/issues)
 
 HeroRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every PvE situation at max level.
-The project is hosted on [GitHub](https://github.com/herotc/hero-rotation) and powered by [HeroLib](https://github.com/herotc/hero-lib).
+The project is hosted on [GitHub](https://github.com/herotc/hero-rotation) and powered by [HeroLib](https://github.com/herotc/hero-lib) and [HeroDBC](https://github.com/herotc/hero-dbc).
 It is maintained by [Aethys](https://github.com/aethys256/) and the [HeroTC](https://github.com/herotc) team.
-Also, you can find it on [Curse](https://www.curseforge.com/wow/addons/herorotation) and [CurseForge](https://wow.curseforge.com/projects/herorotation).
+Also, you can find it on [CurseForge](https://www.curseforge.com/wow/addons/herorotation).
 
 **There are a lot of helpful commands. Do '/hr help' to see them in-game!
 Most of the commands and options are being moved to Addons Panels, and you can see them by going into Interface -> Addons -> HeroRotation.**
