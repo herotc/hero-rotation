@@ -364,7 +364,9 @@ local function Cwc()
   end
   -- searing_nightmare,use_while_casting=1,if=dot.shadow_word_pain.refreshable&!dot.shadow_word_pain.ticking&spell_targets.mind_sear>2
   -- Manually changed to refreshable OR not ticking, as I believe this is the intent -- Cilraaz
-  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and ((Target:DebuffRefreshable(S.ShadowWordPainDebuff) or Target:DebuffDown(S.ShadowWordPainDebuff)) and EnemiesCount10 > 2)
+  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and ((Target:DebuffRefreshable(S.ShadowWordPainDebuff) or Target:DebuffDown(S.ShadowWordPainDebuff)) and EnemiesCount10 > 2) then
+    if HR.Cast(S.SearingNightmare, nil, nil, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 81"; end
+  end
   -- mind_blast,only_cwc=1
   if S.MindBlast:IsCastable() and ((Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear)) and Player:BuffUp(S.DarkThoughtsBuff)) then
     if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 82"; end
