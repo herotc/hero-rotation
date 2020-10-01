@@ -230,6 +230,7 @@ end
 local function EvaluateCycleMindSear222(TargetUnit)
   -- talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&!cooldown.mindbender.up
   return (S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and not S.Mindbender:CooldownUp())
+end
 
 local function Precombat()
   -- Update Painbreaker Psalm equip status; this is in Precombat, as equipment can't be changed once in combat
