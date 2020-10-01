@@ -51,7 +51,7 @@ Spell.Priest.Shadow = {
   ShadowWordDeath                       = Spell(32379),
   ShadowWordPain                        = Spell(589),
   ShadowWordPainDebuff                  = Spell(589),
-  Shadowfiend                           = MultiSpell(200174,34433),
+  Mindbender                            = MultiSpell(200174,34433),
   MindFlay                              = Spell(15407),
   Silence                               = Spell(15487),
   PowerInfusion                         = Spell(10060),
@@ -190,12 +190,12 @@ local function EvaluateCycleDevouringPlage202(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
-  if S.Shadowfiend:ID() == 34433 then
+  if S.Mindbender:ID() == 34433 then
     PetActiveCD = 170
   else
     PetActiveCD = 45
   end
-  return (TargetUnit:HealthPercentage() < 20 or (S.Shadowfiend:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
+  return (TargetUnit:HealthPercentage() < 20 or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -226,6 +226,10 @@ end
 local function EvaluateCycleShadowWordPain220(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and (not S.PsychicLink:IsAvailable() or (S.PsychicLink:IsAvailable() and EnemiesCount10 <= 2)))
 end
+
+local function EvaluateCycleMindSear222(TargetUnit)
+  -- talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&!cooldown.mindbender.up
+  return (S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and not S.Mindbender:CooldownUp())
 
 local function Precombat()
   -- Update Painbreaker Psalm equip status; this is in Precombat, as equipment can't be changed once in combat
@@ -357,6 +361,9 @@ local function Cwc()
   if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
     if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleSearingNightmare218, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
   end
+  -- searing_nightmare,use_while_casting=1,if=dot.shadow_word_pain.refreshable&!dot.shadow_word_pain.ticking&spell_targets.mind_sear>2
+  -- Manually changed to refreshable OR not ticking, as I believe this is the intent -- Cilraaz
+  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and ((Target:DebuffRefreshable(S.ShadowWordPainDebuff) or Target:DebuffDown(S.ShadowWordPainDebuff)) and EnemiesCount10 > 2)
   -- mind_blast,only_cwc=1
   if S.MindBlast:IsCastable() and ((Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear)) and Player:BuffUp(S.DarkThoughtsBuff)) then
     if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 82"; end
@@ -393,6 +400,10 @@ local function Main()
   if (HR.CDsON()) then
     local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
   end
+  -- mind_sear,target_if=talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&!cooldown.mindbender.up
+  if S.MindSear:IsCastable() then
+    if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear222, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 97"; end
+  end
   -- damnation,target_if=!variable.all_dots_up
   if S.Damnation:IsCastable() then
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
@@ -414,8 +425,8 @@ local function Main()
     if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206, not Target:IsSpellInRange(S.SurrenderToMadness)) then return "surrender_to_madness 106"; end
   end
   -- mindbender
-  if S.Shadowfiend:IsCastable() then
-    if HR.Cast(S.Shadowfiend, Settings.Shadow.GCDasOffGCD.Shadowfiend, nil, not Target:IsSpellInRange(S.Shadowfiend)) then return "shadowfiend/mindbender 108"; end
+  if S.Mindbender:IsCastable() then
+    if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
   -- void_torrent,target_if=variable.all_dots_up&!buff.voidform.up&target.time_to_die>4
   if S.VoidTorrent:IsCastable() then
@@ -498,7 +509,7 @@ local function APL()
     -- variable,name=all_dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking&dot.devouring_plague.ticking
     VarAllDotsUp = DotsUp(Target, true)
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>2
-    VarSearingNightmareCutoff = (EnemiesCount10 > 2)
+    VarSearingNightmareCutoff = (EnemiesCount10 > 3)
     if (HR.CDsON()) then
       -- fireblood,if=buff.voidform.up
       if S.Fireblood:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
