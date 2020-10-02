@@ -46,6 +46,7 @@ HR.GUISettings.APL.Priest = {
     OffGCDasOffGCD = {
       -- Abilities
       Dispersion = true,
+      PowerInfusion = false,
       SurrenderToMadness = true,
       -- Items
     }

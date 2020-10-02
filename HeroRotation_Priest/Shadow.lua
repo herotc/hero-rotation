@@ -181,12 +181,12 @@ local function DotsUp(tar, all)
 end
 
 local function EvaluateCycleDamnation200(TargetUnit)
-  return (not VarAllDotsUp)
+  return (not DotsUp(TargetUnit, true))
 end
 
 local function EvaluateCycleDevouringPlage202(TargetUnit)
   -- Added player level check, as Power Infusion isn't learned until 58
-  return ((TargetUnit:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (Player:Level() < 58 or not S.PowerInfusion:CooldownUp()) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)) and (not S.HungeringVoid:IsAvailable() or (S.HungeringVoid:IsAvailable() and not Player:BuffUp(S.VoidformBuff))))
+  return ((TargetUnit:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (Player:Level() < 58 or not S.PowerInfusion:CooldownUp()) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)))
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
@@ -203,7 +203,7 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (VarAllDotsUp and Player:BuffDown(S.VoidformBuff) and TargetUnit:TimeToDie() > 4)
+  return (DotsUp(TargetUnit, true) and Player:BuffDown(S.VoidformBuff) and TargetUnit:TimeToDie() > 4)
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
@@ -233,6 +233,10 @@ end
 
 local function EvaluateCycleMindSear224(TargetUnit)
   return (S.SearingNightmare:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 2)
+end
+
+local function EvaluateCycleMindgames226(TargetUnit)
+  return (Player:Insanity() < 90 and (DotsUp(TargetUnit, true) or Player:BuffUp(S.VoidformBuff)))
 end
 
 local function Precombat()
@@ -315,19 +319,19 @@ end
 
 local function Cds()
   -- power_infusion,if=buff.voidform.up
-  -- Added player level check, as Power Infusion isn't learned until 58.
-  if Player:Level() >= 58 and S.PowerInfusion:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
-    if HR.Cast(S.PowerInfusion) then return "power_infusion 50"; end
+  if S.PowerInfusion:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
+    if HR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion 50"; end
   end
   -- Covenant: fae_guardians
   if S.FaeGuardians:IsReady() then
     if HR.Cast(S.FaeGuardians, Settings.Commons.CovenantDisplayStyle) then return "fae_guardians 52"; end
   end
-  -- Covenant: mindgames,if=insanity<90&(variable.all_dots_up|buff.voidform.up)
-  if S.Mindgames:IsReady() and (Player:Insanity() < 90 and (VarAllDotsUp or Player:BuffUp(S.VoidformBuff))) then
-    if HR.Cast(S.Mindgames, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
+  -- Covenant: mindgames,target_if=insanity<90&(variable.all_dots_up|buff.voidform.up)
+  if S.Mindgames:IsReady() then
+    if HR.Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
   -- Covenant: unholy_nova,if=raid_event.adds.in>50
+  -- Manually added check for targets within 15 yards of player, as this novas, rather than being target-based
   if S.UnholyNova:IsReady() and (#Enemies15y > 0) then
     if HR.Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(15)) then return "unholy_nova 56"; end
   end
@@ -352,11 +356,8 @@ local function Boon()
     if HR.Cast(S.AscendedBlast, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 70"; end
   end
   -- ascended_nova,if=(spell_targets.mind_sear>2&talent.searing_nightmare.enabled|(spell_targets.mind_sear>1&!talent.searing_nightmare.enabled))&spell_targets.ascended_nova>1
-  if S.AscendedNova:IsReady() then
-    local EnemiesCount8 = #Enemies8y
-    if ((EnemiesCount8 > 2 and S.SearingNightmare:IsAvailable() or (EnemiesCount8 > 1 and not S.SearingNightmare:IsAvailable())) and EnemiesCount8 > 1) then
-      if HR.Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(8)) then return "ascended_nova 72"; end
-    end
+  if S.AscendedNova:IsReady() and ((EnemiesCount10 > 2 and S.SearingNightmare:IsAvailable() or (EnemiesCount10 > 1 and not S.SearingNightmare:IsAvailable())) and #Enemies8y > 1) then
+    if HR.Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(8)) then return "ascended_nova 72"; end
   end
 end
 
@@ -370,7 +371,8 @@ local function Cwc()
     if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleMindSear224, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 82"; end
   end
   -- mind_blast,only_cwc=1
-  if S.MindBlast:IsCastable() and ((Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear)) and Player:BuffUp(S.DarkThoughtsBuff)) then
+  -- Manually added condition when MindBlast can be casted while channeling
+  if S.MindBlast:IsCastable() and (Player:BuffUp(S.DarkThoughtsBuff) and (Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear))) then
     if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 84"; end
   end
 end
@@ -385,11 +387,12 @@ local function Main()
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 90"; end
   end
   -- void_eruption,if=if=cooldown.power_infusion.up&insanity>=40&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&dot.devouring_plague.ticking))
-  -- Added player level check, as Power Infusion isn't learned until 58
-  if S.VoidEruption:IsReady() and ((Player:Level() < 58 or S.PowerInfusion:CooldownUp()) and Player:Insanity() >= 40 and (not S.HungeringVoid:IsAvailable() or (S.HungeringVoid:IsAvailable() and Target:DebuffUp(S.DevouringPlagueDebuff)))) then
+  -- Manually removed LotV checks, as the talent doesn't exist any longer
+  if S.VoidEruption:IsReady() and (S.PowerInfusion:CooldownUp() and Player:Insanity() >= 40) then
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
+  -- Manually change to VT if using Misery talent
   if S.ShadowWordPain:IsCastable() and (Player:BuffUp(S.FaeGuardiansBuff) and Target:DebuffDown(S.WrathfulFaerieDebuff)) then
     if S.Misery:IsAvailable() then
       if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 94"; end
@@ -398,7 +401,7 @@ local function Main()
     end
   end
   -- void_bolt,if=!dot.devouring_plague.refreshable
-  if S.VoidBolt:IsReady() and (not Target:DebuffRefreshable(S.DevouringPlagueDebuff)) then
+  if S.VoidBolt:IsCastable() and (not Target:DebuffRefreshable(S.DevouringPlagueDebuff)) then
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 96"; end
   end
   -- call_action_list,name=cds
@@ -414,10 +417,12 @@ local function Main()
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
   end
   -- devouring_plague,if=talent.legacy_of_the_void.enabled&cooldown.void_eruption.up&insanity=100
-  if S.DevouringPlague:IsReady() and (S.HungeringVoid:IsAvailable() and S.VoidEruption:CooldownUp() and Player:Insanity() == 100) then
+  -- Manually removed because LotV no longer exists
+  --[[if S.DevouringPlague:IsReady() and (S.HungeringVoid:IsAvailable() and S.VoidEruption:CooldownUp() and Player:Insanity() == 100) then
     if HR.Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 100"; end
-  end
+  end]]
   -- devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&buff.voidform.down))
+  -- Remove LotV checks, as it no longer exists
   if S.DevouringPlague:IsReady() then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
   end
@@ -513,7 +518,7 @@ local function APL()
     VarDotsUp = DotsUp(Target, false)
     -- variable,name=all_dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking&dot.devouring_plague.ticking
     VarAllDotsUp = DotsUp(Target, true)
-    -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>2
+    -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
     VarSearingNightmareCutoff = (EnemiesCount10 > 3)
     if (HR.CDsON()) then
       -- fireblood,if=buff.voidform.up
