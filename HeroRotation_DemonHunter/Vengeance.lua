@@ -256,7 +256,7 @@ local function Brand()
       if S.ConcentratedSigils:IsAvailable() then
         if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 82 (Concentrated)"; end
       else
-        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsSpellInRange(S.SigilofFlame)) then return "sigil_of_flame 82 (Normal)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 82 (Normal)"; end
       end
     end
     -- infernal_strike,if=cooldown.fiery_brand.remains=0
@@ -287,7 +287,7 @@ local function Brand()
       if S.ConcentratedSigils:IsAvailable() then
         if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 94 (Concentrated)"; end
       else
-        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsSpellInRange(S.SigilofFlame)) then return "sigil_of_flame 94 (Normal)"; end
+        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 94 (Normal)"; end
       end
     end
   end
@@ -382,7 +382,7 @@ local function Normal()
     if S.ConcentratedSigils:IsAvailable() then
       if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 42 (Concentrated)"; end
     else
-      if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsSpellInRange(S.SigilofFlame)) then return "sigil_of_flame 42 (Normal)"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 42 (Normal)"; end
     end
   end
   -- shear
