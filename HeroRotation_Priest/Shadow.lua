@@ -181,7 +181,7 @@ local function DotsUp(tar, all)
 end
 
 local function EvaluateCycleDamnation200(TargetUnit)
-  return (not DotsUp(TargetUnit, true))
+  return (not VarAllDotsUp)
 end
 
 local function EvaluateCycleDevouringPlage202(TargetUnit)
@@ -203,7 +203,7 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (DotsUp(TargetUnit, true) and Player:BuffDown(S.VoidformBuff) and TargetUnit:TimeToDie() > 4)
+  return (VarAllDotsUp and Player:BuffDown(S.VoidformBuff) and TargetUnit:TimeToDie() > 4)
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
@@ -320,8 +320,8 @@ local function Cds()
   if S.FaeGuardians:IsReady() then
     if HR.Cast(S.FaeGuardians, Settings.Commons.CovenantDisplayStyle) then return "fae_guardians 52"; end
   end
-  -- Covenant: mindgames,if=insanity<90&!buff.voidform.up
-  if S.Mindgames:IsReady() and (Player:Insanity() < 90 and Player:BuffDown(S.VoidformBuff)) then
+  -- Covenant: mindgames,if=insanity<90&(variable.all_dots_up|buff.voidform.up)
+  if S.Mindgames:IsReady() and (Player:Insanity() < 90 and (VarAllDotsUp or Player:BuffUp(S.VoidformBuff))) then
     if HR.Cast(S.Mindgames, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
   -- Covenant: unholy_nova,if=raid_event.adds.in>50
@@ -504,7 +504,7 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
-    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions and (Player:HasHeroism() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
+    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions and (Player:BloodlustUp() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
       if HR.CastSuggested(I.PotionofDeathlyFixation) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
