@@ -245,7 +245,7 @@ local function Defensives()
   end
   -- Manual add: Door of Shadows with Enduring Gloom for the absorb shield
   if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() and IsTanking then
-    if HR.Cast(S.DoorofShadows, Settings.Commons.CovenantDisplayStyle) then return "door_of_shadows defensives"; end
+    if HR.Cast(S.DoorofShadows, nil, Settings.Commons.CovenantDisplayStyle) then return "door_of_shadows defensives"; end
   end
 end
 
@@ -332,7 +332,7 @@ end
 local function Normal()
   -- Manual add: sinful_brand,if=!buff.metamorphosis.up|variable.offensive_sinful_brand
   if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
-    if HR.Cast(S.SinfulBrand, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 21"; end
+    if HR.Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 21"; end
   end
   -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
   if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffUp(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
