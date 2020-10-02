@@ -386,8 +386,7 @@ local function Main()
   if S.VoidBolt:CooldownUp() and (Player:BuffUp(S.DissonantEchoesBuff)) then
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 90"; end
   end
-  -- void_eruption,if=if=cooldown.power_infusion.up&insanity>=40&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&dot.devouring_plague.ticking))
-  -- Manually removed LotV checks, as the talent doesn't exist any longer
+  -- void_eruption,if=if=cooldown.power_infusion.up&insanity>=40
   if S.VoidEruption:IsReady() and (S.PowerInfusion:CooldownUp() and Player:Insanity() >= 40) then
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
@@ -416,13 +415,7 @@ local function Main()
   if S.Damnation:IsCastable() then
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
   end
-  -- devouring_plague,if=talent.legacy_of_the_void.enabled&cooldown.void_eruption.up&insanity=100
-  -- Manually removed because LotV no longer exists
-  --[[if S.DevouringPlague:IsReady() and (S.HungeringVoid:IsAvailable() and S.VoidEruption:CooldownUp() and Player:Insanity() == 100) then
-    if HR.Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 100"; end
-  end]]
-  -- devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))&(!talent.legacy_of_the_void.enabled|(talent.legacy_of_the_void.enabled&buff.voidform.down))
-  -- Remove LotV checks, as it no longer exists
+  -- devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
   if S.DevouringPlague:IsReady() then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
   end
