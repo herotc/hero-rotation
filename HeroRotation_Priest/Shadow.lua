@@ -228,8 +228,11 @@ local function EvaluateCycleShadowWordPain220(TargetUnit)
 end
 
 local function EvaluateCycleMindSear222(TargetUnit)
-  -- talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&!cooldown.mindbender.up
   return (S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and not S.Mindbender:CooldownUp())
+end
+
+local function EvaluateCycleMindSear224(TargetUnit)
+  return (S.SearingNightmare:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 2)
 end
 
 local function Precombat()
@@ -362,14 +365,13 @@ local function Cwc()
   if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
     if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleSearingNightmare218, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
   end
-  -- searing_nightmare,use_while_casting=1,if=dot.shadow_word_pain.refreshable&!dot.shadow_word_pain.ticking&spell_targets.mind_sear>2
-  -- Manually changed to refreshable OR not ticking, as I believe this is the intent -- Cilraaz
-  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and ((Target:DebuffRefreshable(S.ShadowWordPainDebuff) or Target:DebuffDown(S.ShadowWordPainDebuff)) and EnemiesCount10 > 2) then
-    if HR.Cast(S.SearingNightmare, nil, nil, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 81"; end
+  -- searing_nightmare,use_while_casting=1,target_if=talent.searing_nightmare.enabled&dot.shadow_word_pain.refreshable&spell_targets.mind_sear>2
+  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
+    if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleMindSear224, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 82"; end
   end
   -- mind_blast,only_cwc=1
   if S.MindBlast:IsCastable() and ((Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear)) and Player:BuffUp(S.DarkThoughtsBuff)) then
-    if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 82"; end
+    if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 84"; end
   end
 end
 
