@@ -83,6 +83,7 @@ Spell.Priest.Shadow = {
   UnholyNova                            = Spell(324724),
 
   -- Conduit Effects
+  DissonantEchoes                       = Spell(338342),
   DissonantEchoesBuff                   = Spell(343144),
 
   -- Racials
@@ -399,10 +400,6 @@ local function Main()
       if HR.Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 94"; end
     end
   end
-  -- void_bolt,if=!dot.devouring_plague.refreshable
-  if S.VoidBolt:IsCastable() and (not Target:DebuffRefreshable(S.DevouringPlagueDebuff)) then
-    if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 96"; end
-  end
   -- call_action_list,name=cds
   if (HR.CDsON()) then
     local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
@@ -418,6 +415,10 @@ local function Main()
   -- devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
   if S.DevouringPlague:IsReady() then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
+  end
+  -- void_bolt,if=spell_targets.mind_sear<(4+conduit.dissonant_echoes.enabled)&insanity<=85
+  if S.VoidBolt:IsCastable() and (EnemiesCount10 < (4 + num(S.DissonantEchoes:IsAvailable())) and Player:Insanity() <= 85) then
+    if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 103"; end
   end
   -- shadow_word_death,target_if=target.health.pct<20|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
   if S.ShadowWordDeath:IsCastable() then
