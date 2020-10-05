@@ -158,7 +158,7 @@
     return nil;
   end
   -- Overload for Main Cast (with text)
-  function HR.CastAnnotated(Object, OffGCD, Text)
+  function HR.CastAnnotated (Object, OffGCD, Text)
     local Result = HR.Cast(Object, OffGCD);
     -- TODO: handle small icon frame if OffGCD is true
     if not OffGCD then
@@ -167,14 +167,14 @@
     return Result;
   end
   -- Overload for Main Cast (with resource pooling swirl)
-  function HR.CastPooling(Object, CustomTime, OutofRange)
+  function HR.CastPooling (Object, CustomTime, OutofRange)
     return HR.Cast(Object, false, "Pooling", OutofRange, CustomTime)
   end
 
   -- Queued Casting Support
   local QueueSpellTable, QueueLength, QueueTextureTable, QueueKeybindTable;
   HR.MaxQueuedCasts = 3;
-  local function DisplayQueue(...)
+  local function DisplayQueue (...)
     QueueSpellTable = {...};
     QueueLength = mathmin(#QueueSpellTable, HR.MaxQueuedCasts);
     QueueTextureTable = {};
