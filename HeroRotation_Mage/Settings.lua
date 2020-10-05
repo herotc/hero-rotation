@@ -21,7 +21,7 @@ HR.GUISettings.APL.Mage = {
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
     EssenceDisplayStyle = "Suggested",
-    UseTimeWarp = false,
+    CovenantDisplayStyle = "Suggested",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -36,14 +36,12 @@ HR.GUISettings.APL.Mage = {
     }
   },
   Frost = {
-    RotationType = "No Ice Lance",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       RuneofPower = true,
       IcyVeins = true,
-      MirrorImage = true,
-      FrozenOrb = true,
+      FocusMagic = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -94,18 +92,19 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost");
 -- Controls
 -- Mage
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons");
-CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTimeWarp", "Use Time Warp", "Enable this if you want the addon to show you when to use Time Warp.");
+--CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTimeWarp", "Use Time Warp", "Enable this if you want the addon to show you when to use Time Warp.");
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
 CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
+CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
+
 -- Arcane
-CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
+--CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
 -- Fire
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
+--CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.");
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.DisableCombustion", "Disable Combustion", "Disable the usage of Combustion within the Fire rotation.");
 CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
 -- Frost
-CreatePanelOption("Dropdown", CP_Frost, "APL.Mage.Frost.RotationType", {"Standard", "No Ice Lance", "Frozen Orb"}, "Rotation Type", "Select which kind of rotation you would like to use.");
 CreateARPanelOptions(CP_Frost, "APL.Mage.Frost");
