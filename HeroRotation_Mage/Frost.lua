@@ -36,42 +36,41 @@ Spell.Mage.Frost = {
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
   -- Base Abilities
-  ArcaneExplosion                       = Spell(1449),
+  ArcaneExplosion                       = Spell(1449), --Melee, 10
   ArcaneIntellect                       = Spell(1459),
-  ArcaneIntellectBuff                   = Spell(1459),
   Blink                                 = MultiSpell(1953, 212653),
-  Blizzard                              = Spell(190356),
+  Blizzard                              = Spell(190356), --splash, 16
   BrainFreezeBuff                       = Spell(190446),
-  ConeofCold                            = Spell(120),
+  ConeofCold                            = Spell(120),--Melee, 12
   Counterspell                          = Spell(2139),
   FingersofFrostBuff                    = Spell(44544),
   Flurry                                = Spell(44614),
   Frostbolt                             = Spell(116),
-  FrozenOrb                             = Spell(84714),
-  FrostNova                             = Spell(122),--Frozen
-  IceLance                              = Spell(30455),
+  FrozenOrb                             = Spell(84714), --splash, 8
+  FrostNova                             = Spell(122), --Melee, 12
+  IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
   IciclesBuff                           = Spell(205473),
   IcyVeins                              = Spell(12472),
   SummonWaterElemental                  = Spell(31687),
   WintersChillDebuff                    = Spell(228358),
   TimeWarp                              = Spell(80353),
   FireBlast                             = Spell(319836),
-  Frostbite                             = Spell(198121),--Frozen
-  Freeze                                = Spell(33395),--Frozen
+  Frostbite                             = Spell(198121),
+  Freeze                                = Spell(33395), --splash, 8
   -- Talents
-  IceNova                               = Spell(157997),
+  IceNova                               = Spell(157997), --splash, 8
   IceFloes                              = Spell(108839),
   IncantersFlow                         = Spell(1463),
   IncantersFlowBuff                     = Spell(116267),
   FocusMagic                            = Spell(321358),
   RuneofPower                           = Spell(116011),
   RuneofPowerBuff                       = Spell(116014),
-  Ebonbolt                              = Spell(257537),
+  Ebonbolt                              = Spell(257537), --splash, 8 (with splitting ice)
   FreezingRain                          = Spell(270233),
-  SplittingIce                          = Spell(56377),
-  CometStorm                            = Spell(153595),
+  SplittingIce                          = Spell(56377), --splash, 8
+  CometStorm                            = Spell(153595), --splash, 6
   RayofFrost                            = Spell(205021),
-  GlacialSpike                          = Spell(199786),
+  GlacialSpike                          = Spell(199786), --splash, 8 (with splitting ice)
   GlacialSpikeBuff                      = Spell(199844),
   -- Covenant Abilities
   Deathborne                            = Spell(324220),
@@ -91,7 +90,7 @@ Spell.Mage.Frost = {
   BloodoftheEnemy                       = Spell(297108),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
+  FocusedAzeriteBeam                    = Spell(295258), --Melee, 30 
   GuardianofAzeroth                     = Spell(295840),
   MemoryofLucidDreams                   = Spell(298357),
   PurifyingBlast                        = Spell(295337),
@@ -121,7 +120,8 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local EnemiesCount
+local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
+local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount18yMelee  --Enemies arround player
 local Mage = HR.Commons.Mage
 
 -- GUI Settings
@@ -153,7 +153,7 @@ local function Precombat ()
   -- food
   -- augmentation
   -- arcane_intellect
-  if S.ArcaneIntellect:IsCastable() and Player:BuffDown(S.ArcaneIntellectBuff, true) then
+  if S.ArcaneIntellect:IsCastable() and Player:BuffDown(S.ArcaneIntellect, true) then
     if HR.Cast(S.ArcaneIntellect) then return "arcane_intellect precombat 1"; end
   end
   -- summon_water_elemental
@@ -179,28 +179,23 @@ local function Essences ()
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences "; end
   end
   --focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
-  -- TODO : manage enemies
-  if S.FocusedAzeriteBeam:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff)) then
+  if S.FocusedAzeriteBeam:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount30ySplash > 3) then
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam essences 2"; end
   end
   --memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10
-  -- TODO : manage enemies
-  if S.MemoryofLucidDreams:IsCastable() and ((Player:BuffStack(S.IciclesBuff) <= 1 or not S.GlacialSpike:IsAvailable()) and S.FrozenOrb:CooldownRemains() > 10) then
+  if S.MemoryofLucidDreams:IsCastable() and (EnemiesCount8ySplash < 5 and (Player:BuffStack(S.IciclesBuff) <= 1 or not S.GlacialSpike:IsAvailable()) and S.FrozenOrb:CooldownRemains() > 10) then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams essences 3"; end
   end
   --blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
-  -- TODO : manage enemies
-  if S.BloodoftheEnemy:IsCastable() and ((S.GlacialSpike:IsAvailable() and Player:BuffStack(S.IciclesBuff) == 5 and (Player:BuffUp(S.BrainFreezeBuff) or Player:IsCasting(S.Ebonbolt))) or ((not S.GlacialSpike:IsAvailable()) and (Player:PrevGCDP(1, S.FrozenOrb) or Player:FrozenOrbGroundAoeRemains() > 5))) then
+  if S.BloodoftheEnemy:IsCastable() and ((S.GlacialSpike:IsAvailable() and Player:BuffStack(S.IciclesBuff) == 5 and (Player:BuffUp(S.BrainFreezeBuff) or Player:IsCasting(S.Ebonbolt))) or ((EnemiesCount8ySplash > 3 or not S.GlacialSpike:IsAvailable()) and (Player:PrevGCDP(1, S.FrozenOrb) or Player:FrozenOrbGroundAoeRemains() > 5))) then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.BloodoftheEnemy)) then return "blood_of_the_enemy essences 4"; end
   end
   --purifying_blast,if=buff.rune_of_power.down|active_enemies>3
-  -- TODO : manage enemies
-  if S.PurifyingBlast:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff)) then
+  if S.PurifyingBlast:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount8ySplash > 3) then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.PurifyingBlast)) then return "purifying_blast essences 5"; end
   end
   --ripple_in_space,if=buff.rune_of_power.down|active_enemies>3
-  -- TODO : manage enemies
-  if S.RippleInSpace:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff)) then
+  if S.RippleInSpace:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount8ySplash > 3) then
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space essences 6"; end
   end
   --concentrated_flame,line_cd=6,if=buff.rune_of_power.down
@@ -216,8 +211,7 @@ local function Essences ()
     if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.TheUnboundForce)) then return "the_unbound_force essences 9"; end
   end
   --worldvein_resonance,if=buff.rune_of_power.down|active_enemies>3
-  -- TODO : manage enemies
-  if S.WorldveinResonance:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff)) then
+  if S.WorldveinResonance:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount8ySplash > 3) then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance essences 10"; end
   end
 end
@@ -298,8 +292,8 @@ local function Movement ()
     if HR.Cast(S.IceFloes, Settings.Frost.OffGCDasOffGCD.IceFloes) then return "ice_floes mvt 2"; end
   end
   -- arcane_explosion,if=mana.pct>30&active_enemies>=2 
-  -- TODO : manage enemies
-  if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
+  -- NYI legendaries disciplinary_command ?
+  if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 and EnemiesCount10yMelee >= 2 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion mvt 3"; end
   end
   -- fire_blast
@@ -352,7 +346,7 @@ local function Aoe ()
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI legendaries
---[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
+  --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
     if HR.Cast(S.FrostNova) then return "frost_nova aoe 10"; end
   end ]]
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
@@ -362,7 +356,7 @@ local function Aoe ()
   end ]]
   --arcane_explosion,if=mana.pct>30&!runeforge.cold_front.equipped
   -- NYI legendaries
---[[   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
+  --[[   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 12"; end
   end ]]
   --ebonbolt
@@ -390,9 +384,8 @@ local function Single ()
     if HR.Cast(S.FrozenOrb, nil, nil, not Target:IsInRange(40)) then return "frozen_orb single 2"; end
   end
   --blizzard,if=buff.freezing_rain.up|active_enemies>=3|active_enemies>=2&!runeforge.cold_front.equipped
-  -- TODO : manage enemies
   -- NYI legendaries
-  if S.Blizzard:IsCastable() then
+  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 3) then
     if HR.Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard single 3"; end
   end
   --ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
@@ -416,7 +409,6 @@ local function Single ()
     if HR.Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova single 8"; end
   end
   --radiant_spark,if=buff.freezing_winds.up&active_enemies=1
-  -- TODO : manage enemies
   -- NYI legendaries
   if S.RadiantSpark:IsCastable() then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
@@ -430,14 +422,12 @@ local function Single ()
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 11"; end
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&(buff.brain_freeze.react|soulbind.combat_meditation.enabled)
-  -- TODO : manage enemies
   -- NYI legendaries
   if S.RadiantSpark:IsCastable() then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
   end
   --shifting_power,if=active_enemies>=3
-  -- TODO : manage enemies
-  if S.ShiftingPower:IsCastable() then
+  if S.ShiftingPower:IsCastable() and EnemiesCount18yMelee >= 3 then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 13"; end
   end
   --shifting_power,line_cd=60,if=(soulbind.field_of_blossoms.enabled|soulbind.grove_invigoration.enabled)&(!talent.rune_of_power.enabled|buff.rune_of_power.down&cooldown.rune_of_power.remains>16)
@@ -450,17 +440,17 @@ local function Single ()
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI legendaries
---[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
+  --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
     if HR.Cast(S.FrostNova) then return "frost_nova single 16"; end
   end ]]
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
   -- NYI legendaries
---[[   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
+  --[[   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion single 17"; end
   end ]]
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
   -- NYI legendaries
---[[ if S.FireBlast:IsCastable() then
+  --[[ if S.FireBlast:IsCastable() then
     if HR.Cast(S.FireBlast) then return "fire_blast single 18"; end
   end ]]
   --glacial_spike,if=buff.brain_freeze.react
@@ -479,7 +469,16 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL ()
-  EnemiesCount = Target:GetEnemiesInSplashRangeCount(8)
+  EnemiesCount6ySplash = Target:GetEnemiesInSplashRangeCount(6)
+  EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
+  EnemiesCount16ySplash = Target:GetEnemiesInSplashRangeCount(16)
+  EnemiesCount30ySplash = Target:GetEnemiesInSplashRangeCount(30)
+  Enemies10yMelee = Player:GetEnemiesInMeleeRange(10)
+  EnemiesCount10yMelee = #Enemies10yMelee
+  Enemies12yMelee = Player:GetEnemiesInMeleeRange(12)
+  EnemiesCount12yMelee = #Enemies12yMelee
+  Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
+  EnemiesCount18yMelee = #Enemies18yMelee
   Mage.IFTracker()
 
   --call precombat
@@ -487,23 +486,23 @@ local function APL ()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
+    print("Splash 6 : "..EnemiesCount6ySplash.." ; Splash 8 : "..EnemiesCount8ySplash.." ; Splash 16 : "..EnemiesCount16ySplash.." ; Splash 30 : "..EnemiesCount30ySplash)
+    print("Melee 10 : "..EnemiesCount10yMelee.." ; Melee 12 : "..EnemiesCount12yMelee.." ; Melee 18 : "..EnemiesCount18yMelee)
     --counterspell
     local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     --call_action_list,name=cds
-    if (HR.CDsON()) then
+    if HR.CDsON() then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=essences
     local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     --call_action_list,name=aoe,if=active_enemies>=5
-    -- TODO : manage enemies
---[[     if HR.AoEON() and EnemiesCount >= 5 then
+    -- TODO : see if the splash 16 range is good
+    if HR.AoEON() and EnemiesCount16ySplash >= 5 then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
-    end ]]
+    end
     --call_action_list,name=single,if=active_enemies<5
-    -- TODO : manage enemies
-    --if not HR.AoEON() or EnemiesCount < 5 then
-    if (true) then
+    if not HR.AoEON() or EnemiesCount16ySplash < 5 then
       local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=movement
