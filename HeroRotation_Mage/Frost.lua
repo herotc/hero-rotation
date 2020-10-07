@@ -132,11 +132,11 @@ local Settings = {
   Frost = HR.GUISettings.APL.Mage.Frost
 }
 
-S.FrozenOrb:RegisterInFlight()
 S.FrozenOrb:RegisterInFlightEffect(84721)
+S.FrozenOrb:RegisterInFlight()
 HL:RegisterForEvent(function() S.FrozenOrb:RegisterInFlight() end, "LEARNED_SPELL_IN_TAB")
-S.Frostbolt:RegisterInFlight()
 S.Frostbolt:RegisterInFlightEffect(228597)--also register hitting spell to track in flight (spell book id ~= hitting id)
+S.Frostbolt:RegisterInFlight()
 
 -- TODO : manage frozen targets
 -- spells : FrostNova, Frostbite, Freeze, WintersChillDebuff
