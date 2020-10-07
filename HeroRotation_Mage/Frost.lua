@@ -46,7 +46,7 @@ Spell.Mage.Frost = {
   FingersofFrostBuff                    = Spell(44544),
   Flurry                                = Spell(44614),
   Frostbolt                             = Spell(116),
-  FrozenOrb                             = Spell(84714), --splash, 8
+  FrozenOrb                             = Spell(84714), --splash, 16
   FrostNova                             = Spell(122), --Melee, 12
   IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
   IciclesBuff                           = Spell(205473),
@@ -90,13 +90,13 @@ Spell.Mage.Frost = {
   BloodoftheEnemy                       = Spell(297108),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258), --Melee, 30 
+  FocusedAzeriteBeam                    = Spell(295258), --Splash, 30 
   GuardianofAzeroth                     = Spell(295840),
   MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
+  PurifyingBlast                        = Spell(295337), --Splash, 8
   ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731),
+  RippleInSpace                         = Spell(302731), --Splash, 8
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
 }
@@ -132,21 +132,14 @@ local Settings = {
   Frost = HR.GUISettings.APL.Mage.Frost
 }
 
+S.FrozenOrb:RegisterInFlight()
 S.FrozenOrb:RegisterInFlightEffect(84721)
 HL:RegisterForEvent(function() S.FrozenOrb:RegisterInFlight() end, "LEARNED_SPELL_IN_TAB")
-S.FrozenOrb:RegisterInFlight()
 S.Frostbolt:RegisterInFlight()
-
-local function num (val)
-  if val then return 1 else return 0 end
-end
-
-local function bool (val)
-  return val ~= 0
-end
+S.Frostbolt:RegisterInFlightEffect(228597)--also register hitting spell to track in flight (spell book id ~= hitting id)
 
 -- TODO : manage frozen targets
--- spells : FrostNova, Frostbite, Freeze
+-- spells : FrostNova, Frostbite, Freeze, WintersChillDebuff
 
 local function Precombat ()
   -- flask
@@ -167,8 +160,12 @@ local function Precombat ()
       if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion precombat 3"; end
     end ]]
     -- frostbolt
-    if S.Frostbolt:IsCastable() then
+    if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
       if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 4"; end
+    end
+    --frozen_orb
+    if S.FrozenOrb:IsCastable() then
+      if HR.Cast(S.FrozenOrb, nil, nil, not Target:IsInRange(40)) then return "frozen_orb precombat 5"; end
     end
   end
 end
@@ -321,29 +318,29 @@ local function Aoe ()
     if HR.Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry aoe 3"; end
   end
   --ice_nova
-  if S.IceNova:IsCastable() then
+  if S.IceNova:IsCastable() and EnemiesCount8ySplash >= 5 then
     if HR.Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova aoe 4"; end
   end
   --comet_storm
-  if S.CometStorm:IsCastable() then
+  if S.CometStorm:IsCastable() and EnemiesCount6ySplash >= 5 then
     if HR.Cast(S.CometStorm, nil, nil, not Target:IsSpellInRange(S.CometStorm)) then return "comet_storm aoe 5"; end
   end
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time|remaining_winters_chill&debuff.winters_chill.remains>travel_time
-  if S.IceLance:IsCastable() and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Frostbite) > S.IceLance:TravelTime() or (Target:DebuffStack(S.WintersChillDebuff) > 1 and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime())) then
+  if S.IceLance:IsCastable() and EnemiesCount8ySplash >= 2 and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Frostbite) > S.IceLance:TravelTime() or (Target:DebuffStack(S.WintersChillDebuff) > 1 and Target:DebuffRemains(S.WintersChillDebuff) > S.IceLance:TravelTime())) then
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 6"; end
   end
   --radiant_spark
-  if S.RadiantSpark:IsCastable() then
+  --[[ if S.RadiantSpark:IsCastable() then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
-  end
+  end ]]
   --shifting_power
-  if S.ShiftingPower:IsCastable() then
+  --[[ if S.ShiftingPower:IsCastable() then
     if HR.Cast(S.ShiftingPower, nil, nil, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 8"; end
-  end
+  end ]]
   --mirrors_of_torment
-  if S.MirrorsofTorment:IsCastable() then
+  --[[ if S.MirrorsofTorment:IsCastable() then
     if HR.Cast(S.MirrorsofTorment, nil, nil, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 9"; end
-  end
+  end ]]
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI legendaries
   --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
@@ -360,7 +357,7 @@ local function Aoe ()
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 12"; end
   end ]]
   --ebonbolt
-  if S.Ebonbolt:IsCastable() then
+  if S.Ebonbolt:IsCastable() and EnemiesCount8ySplash >= 2 then
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 13"; end
   end
   --frostbolt
@@ -410,9 +407,9 @@ local function Single ()
   end
   --radiant_spark,if=buff.freezing_winds.up&active_enemies=1
   -- NYI legendaries
-  if S.RadiantSpark:IsCastable() then
+  --[[ if S.RadiantSpark:IsCastable() then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
-  end
+  end ]]
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
   if S.IceLance:IsCastable() and (Player:BuffUp(S.FingersofFrostBuff) or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 10"; end
@@ -423,21 +420,21 @@ local function Single ()
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&(buff.brain_freeze.react|soulbind.combat_meditation.enabled)
   -- NYI legendaries
-  if S.RadiantSpark:IsCastable() then
+  --[[ if S.RadiantSpark:IsCastable() then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
-  end
+  end ]]
   --shifting_power,if=active_enemies>=3
-  if S.ShiftingPower:IsCastable() and EnemiesCount18yMelee >= 3 then
+  --[[ if S.ShiftingPower:IsCastable() and EnemiesCount18yMelee >= 3 then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 13"; end
-  end
+  end ]]
   --shifting_power,line_cd=60,if=(soulbind.field_of_blossoms.enabled|soulbind.grove_invigoration.enabled)&(!talent.rune_of_power.enabled|buff.rune_of_power.down&cooldown.rune_of_power.remains>16)
-  if S.ShiftingPower:IsCastable() then
+  --[[ if S.ShiftingPower:IsCastable() then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
-  end
+  end ]]
   --mirrors_of_torment
-  if S.MirrorsofTorment:IsCastable() then
+  --[[ if S.MirrorsofTorment:IsCastable() then
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment single 15"; end
-  end
+  end ]]
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI legendaries
   --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
@@ -483,27 +480,27 @@ local function APL ()
 
   --call precombat
   if not Player:AffectingCombat() and (not Player:IsCasting() or Player:IsCasting(S.WaterElemental)) then
-    local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    print("Splash 6 : "..EnemiesCount6ySplash.." ; Splash 8 : "..EnemiesCount8ySplash.." ; Splash 16 : "..EnemiesCount16ySplash.." ; Splash 30 : "..EnemiesCount30ySplash)
-    print("Melee 10 : "..EnemiesCount10yMelee.." ; Melee 12 : "..EnemiesCount12yMelee.." ; Melee 18 : "..EnemiesCount18yMelee)
     --counterspell
-    local ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
+    ShouldReturn = Everyone.Interrupt(40, S.Counterspell, Settings.Commons.OffGCDasOffGCD.Counterspell, false); if ShouldReturn then return ShouldReturn; end
     --call_action_list,name=cds
     if HR.CDsON() then
-      local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=essences
-    local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
+    if HR.CDsON() then
+      ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
+    end
     --call_action_list,name=aoe,if=active_enemies>=5
     -- TODO : see if the splash 16 range is good
     if HR.AoEON() and EnemiesCount16ySplash >= 5 then
-      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=single,if=active_enemies<5
     if not HR.AoEON() or EnemiesCount16ySplash < 5 then
-      local ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
+      ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=movement
     -- TODO : movement
