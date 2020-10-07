@@ -29,47 +29,48 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 if not Spell.Priest then Spell.Priest = {} end
 Spell.Priest.Shadow = {
   -- Azerite Traits
-  WhispersoftheDamned                   = Spell(275722),
-  SearingDialogue                       = Spell(272788),
-  DeathThroes                           = Spell(278659),
-  ThoughtHarvester                      = Spell(288340),
-  SpitefulApparitions                   = Spell(277682),
-  HarvestedThoughtsBuff                 = Spell(288343),
   ChorusofInsanity                      = Spell(278661),
+  DeathThroes                           = Spell(278659),
+  HarvestedThoughtsBuff                 = Spell(288343),
+  SearingDialogue                       = Spell(272788),
+  SpitefulApparitions                   = Spell(277682),
+  ThoughtHarvester                      = Spell(288340),
+  WhispersoftheDamned                   = Spell(275722),
 
   -- Base Spells
-  Shadowform                            = Spell(232698),
-  ShadowformBuff                        = Spell(232698),
-  MindBlast                             = Spell(8092),
-  VampiricTouch                         = Spell(34914),
-  VampiricTouchDebuff                   = Spell(34914),
-  VoidEruption                          = Spell(228260),
-  VoidformBuff                          = Spell(194249),
-  MindSear                              = Spell(48045),
   DarkThoughtsBuff                      = Spell(341207),
-  VoidBolt                              = Spell(205448),
-  ShadowWordDeath                       = Spell(32379),
-  ShadowWordPain                        = Spell(589),
-  ShadowWordPainDebuff                  = Spell(589),
-  Mindbender                            = MultiSpell(200174,34433),
-  MindFlay                              = Spell(15407),
-  Silence                               = Spell(15487),
-  PowerInfusion                         = Spell(10060),
   DevouringPlague                       = Spell(335467),
   DevouringPlagueDebuff                 = Spell(335467),
   Dispersion                            = Spell(47585),
+  Mindbender                            = MultiSpell(200174,34433),
+  MindBlast                             = Spell(8092),
+  MindFlay                              = Spell(15407),
+  MindSear                              = Spell(48045),
+  PowerInfusion                         = Spell(10060),
+  PowerInfusionBuff                     = Spell(10060),
+  Shadowform                            = Spell(232698),
+  ShadowformBuff                        = Spell(232698),
+  ShadowWordDeath                       = Spell(32379),
+  ShadowWordPain                        = Spell(589),
+  ShadowWordPainDebuff                  = Spell(589),
+  Silence                               = Spell(15487),
+  VampiricTouch                         = Spell(34914),
+  VampiricTouchDebuff                   = Spell(34914),
+  VoidBolt                              = Spell(205448),
+  VoidEruption                          = Spell(228260),
+  VoidformBuff                          = Spell(194249),
 
   -- Talents
-  SurrenderToMadness                    = Spell(319952),
-  ShadowCrash                           = Spell(205385),
-  Misery                                = Spell(238558),
-  VoidTorrent                           = Spell(263165),
-  HungeringVoid                         = Spell(345218),
-  FortressOfTheMind                     = Spell(193195),
   Damnation                             = Spell(341374),
-  UnfurlingDarknessBuff                 = Spell(341282),
-  SearingNightmare                      = Spell(341385),
+  FortressOfTheMind                     = Spell(193195),
+  HungeringVoid                         = Spell(345218),
+  Misery                                = Spell(238558),
   PsychicLink                           = Spell(199484),
+  SearingNightmare                      = Spell(341385),
+  ShadowCrash                           = Spell(205385),
+  SurrenderToMadness                    = Spell(319952),
+  UnfurlingDarknessBuff                 = Spell(341282),
+  VoidTorrent                           = Spell(263165),
 
   -- Covenant Abilities
   AscendedBlast                         = Spell(325283),
@@ -78,36 +79,36 @@ Spell.Priest.Shadow = {
   BoonoftheAscendedBuff                 = Spell(325013),
   FaeGuardians                          = Spell(327661),
   FaeGuardiansBuff                      = Spell(327661),
-  WrathfulFaerieDebuff                  = Spell(342132),
   Mindgames                             = Spell(323673),
   UnholyNova                            = Spell(324724),
+  WrathfulFaerieDebuff                  = Spell(342132),
 
   -- Conduit Effects
   DissonantEchoes                       = Spell(338342),
   DissonantEchoesBuff                   = Spell(343144),
 
   -- Racials
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
-  Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
   ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
 
   -- Essences
   BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
+  ConcentratedFlameBurn                 = Spell(295368),
   FocusedAzeriteBeam                    = Spell(295258),
   GuardianofAzeroth                     = Spell(295840),
-  ReapingFlames                         = Spell(310690),
   LifebloodBuff                         = MultiSpell(295137, 305694),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  ReapingFlames                         = Spell(310690),
   RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368)
+  RippleInSpace                         = Spell(302731),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186)
 }
 local S = Spell.Priest.Shadow
 
@@ -116,10 +117,10 @@ if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   PotionofDeathlyFixation          = Item(171351),
   AzsharasFontofPower              = Item(169314, {13, 14}),
-  PainbreakerPsalmChest            = Item(173241),
-  PainbreakerPsalmCloak            = Item(173242),
   CalltotheVoidGloves              = Item(173244),
   CalltotheVoidWrists              = Item(173249),
+  PainbreakerPsalmChest            = Item(173241),
+  PainbreakerPsalmCloak            = Item(173242),
   ShadowflamePrismGloves           = Item(173244),
   ShadowflamePrismHelm             = Item(173245),
 }
@@ -331,7 +332,7 @@ local function Cds()
   if S.Mindgames:IsReady() then
     if HR.Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
-  -- Covenant: unholy_nova,if=raid_event.adds.in>50
+  -- Covenant: unholy_nova,if=raid_event.adds.in>20
   -- Manually added check for targets within 15 yards of player, as this novas, rather than being target-based
   if S.UnholyNova:IsReady() and (#Enemies15y > 0) then
     if HR.Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(15)) then return "unholy_nova 56"; end
@@ -515,20 +516,20 @@ local function APL()
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
     VarSearingNightmareCutoff = (EnemiesCount10 > 3)
     if (HR.CDsON()) then
-      -- fireblood,if=buff.voidform.up
-      if S.Fireblood:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
+      -- fireblood,if=buff.power_infusion.up
+      if S.Fireblood:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
       end
-      -- berserking
-      if S.Berserking:IsCastable() then
+      -- berserking,if=buff.power_infusion.up
+      if S.Berserking:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 24"; end
       end
-      -- lights_judgment
-      if S.LightsJudgment:IsCastable() then
+      -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
+      if S.LightsJudgment:IsCastable() and (EnemiesCount10 >= 2) then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 26"; end
       end
-      -- ancestral_call,if=buff.voidform.up
-      if S.AncestralCall:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
+      -- ancestral_call,if=buff.power_infusion.up
+      if S.AncestralCall:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
       end
       -- bag_of_tricks
