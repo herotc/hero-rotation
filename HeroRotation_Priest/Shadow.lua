@@ -150,6 +150,7 @@ local VarDotsUp = false
 local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
+local VarPIVFCondition = false
 local PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
 local ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
 --local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
@@ -159,6 +160,7 @@ HL:RegisterForEvent(function()
   VarAllDotsUp = false
   VarMindSearCutoff = 1
   VarSearingNightmareCutoff = false
+  VarPIVFCondition = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -187,8 +189,7 @@ local function EvaluateCycleDamnation200(TargetUnit)
 end
 
 local function EvaluateCycleDevouringPlage202(TargetUnit)
-  -- Added player level check, as Power Infusion isn't learned until 58
-  return ((TargetUnit:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and (Player:Level() < 58 or not S.PowerInfusion:CooldownUp()) and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)))
+  return ((TargetUnit:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and not VarPIVFCondition and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)))
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
@@ -221,8 +222,7 @@ local function EvaluateCycleMindSear216(TargetUnit)
 end
 
 local function EvaluateCycleSearingNightmare218(TargetUnit)
-  -- Added player level check, as Power Infusion isn't learned until 58
-  return ((VarSearingNightmareCutoff and (Player:Level() < 58 or not S.PowerInfusion:CooldownUp())) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 1))
+  return ((VarSearingNightmareCutoff and not VarPIVFCondition) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 1))
 end
 
 local function EvaluateCycleShadowWordPain220(TargetUnit)
@@ -364,7 +364,7 @@ local function Boon()
 end
 
 local function Cwc()
-  -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!cooldown.power_infusion.up)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
+  -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!variable.pi_vf_condition)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
   if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
     if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleSearingNightmare218, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
   end
@@ -388,8 +388,8 @@ local function Main()
   if S.VoidBolt:CooldownUp() and (Player:BuffUp(S.DissonantEchoesBuff)) then
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 90"; end
   end
-  -- void_eruption,if=if=cooldown.power_infusion.up&insanity>=40
-  if S.VoidEruption:IsReady() and (S.PowerInfusion:CooldownUp() and Player:Insanity() >= 40) then
+  -- void_eruption,if=if=variable.pi_vf_condition&insanity>=40
+  if S.VoidEruption:IsReady() and (VarPIVFCondition and Player:Insanity() >= 40) then
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
@@ -413,7 +413,7 @@ local function Main()
   if S.Damnation:IsCastable() then
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
   end
-  -- devouring_plague,target_if=(refreshable|insanity>75)&!cooldown.power_infusion.up&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
+  -- devouring_plague,target_if=(refreshable|insanity>75)&!variable.pi_vf_condition&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
   if S.DevouringPlague:IsReady() then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
   end
@@ -515,13 +515,15 @@ local function APL()
     VarAllDotsUp = DotsUp(Target, true)
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
     VarSearingNightmareCutoff = (EnemiesCount10 > 3)
+    -- variable,name=pi_vf_condition,op=set,value=level>=58&cooldown.power_infusion.up|level<58&cooldown.void_eruption.up
+    VarPIVFCondition = Player:Level() >= 58 and S.PowerInfusion:CooldownUp() or Player:Level() < 58 and S.VoidEruption:CooldownUp()
     if (HR.CDsON()) then
       -- fireblood,if=buff.power_infusion.up
-      if S.Fireblood:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
+      if S.Fireblood:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or Player:Level() < 58) then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
       end
       -- berserking,if=buff.power_infusion.up
-      if S.Berserking:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
+      if S.Berserking:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or Player:Level() < 58) then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 24"; end
       end
       -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
@@ -529,7 +531,7 @@ local function APL()
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 26"; end
       end
       -- ancestral_call,if=buff.power_infusion.up
-      if S.AncestralCall:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff)) then
+      if S.AncestralCall:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or Player:Level() < 58) then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
       end
       -- bag_of_tricks
