@@ -123,6 +123,8 @@ Item.Priest.Shadow = {
   PainbreakerPsalmCloak            = Item(173242),
   ShadowflamePrismGloves           = Item(173244),
   ShadowflamePrismHelm             = Item(173245),
+  SunPriestessHelm                 = Item(173245),
+  SunPriestessShoulders            = Item(173247),
 }
 local I = Item.Priest.Shadow
 
@@ -150,9 +152,11 @@ local VarDotsUp = false
 local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
-local VarPIVFCondition = false
+local VarPIVFSyncCondition = false
+local VarSelfPIorSunPriestess = false
 local PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
 local ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
+local SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
 --local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
 
 HL:RegisterForEvent(function()
@@ -160,7 +164,8 @@ HL:RegisterForEvent(function()
   VarAllDotsUp = false
   VarMindSearCutoff = 1
   VarSearingNightmareCutoff = false
-  VarPIVFCondition = false
+  VarPIVFSyncCondition = false
+  VarSelfPIorSunPriestess = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -189,7 +194,7 @@ local function EvaluateCycleDamnation200(TargetUnit)
 end
 
 local function EvaluateCycleDevouringPlage202(TargetUnit)
-  return ((TargetUnit:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and not VarPIVFCondition and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)))
+  return ((TargetUnit:DebuffRefreshable(S.DevouringPlagueDebuff) or Player:Insanity() > 75) and not VarPIVFSyncCondition and (not S.SearingNightmare:IsAvailable() or (S.SearingNightmare:IsAvailable() and not VarSearingNightmareCutoff)))
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
@@ -222,7 +227,7 @@ local function EvaluateCycleMindSear216(TargetUnit)
 end
 
 local function EvaluateCycleSearingNightmare218(TargetUnit)
-  return ((VarSearingNightmareCutoff and not VarPIVFCondition) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 1))
+  return ((VarSearingNightmareCutoff and not VarPIVFSyncCondition) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 1))
 end
 
 local function EvaluateCycleShadowWordPain220(TargetUnit)
@@ -242,9 +247,9 @@ local function EvaluateCycleMindgames226(TargetUnit)
 end
 
 local function Precombat()
-  -- Update Painbreaker Psalm equip status; this is in Precombat, as equipment can't be changed once in combat
+  -- Update legendary equip status; this is in Precombat, as equipment can't be changed once in combat
   PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
-  -- Update Call to the Void equip status; this is in Precombat, as equipment can't be changed once in combat
+  SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
   --CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
   -- flask
   -- food
@@ -364,7 +369,7 @@ local function Boon()
 end
 
 local function Cwc()
-  -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!variable.pi_vf_condition)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
+  -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!variable.pi_or_vf_sync_condition)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
   if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
     if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleSearingNightmare218, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
   end
@@ -388,8 +393,8 @@ local function Main()
   if S.VoidBolt:CooldownUp() and (Player:BuffUp(S.DissonantEchoesBuff)) then
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 90"; end
   end
-  -- void_eruption,if=if=variable.pi_vf_condition&insanity>=40
-  if S.VoidEruption:IsReady() and (VarPIVFCondition and Player:Insanity() >= 40) then
+  -- void_eruption,if=if=variable.pi_or_vf_sync_condition&insanity>=40
+  if S.VoidEruption:IsReady() and (VarPIVFSyncCondition and Player:Insanity() >= 40) then
     if HR.Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
@@ -493,6 +498,8 @@ local function APL()
   Enemies15y = Player:GetEnemiesInRange(15)
   Enemies40y = Player:GetEnemiesInRange(40)
   EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10)
+  
+  VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
 
   -- call precombat
   if not Player:AffectingCombat() then
@@ -515,23 +522,23 @@ local function APL()
     VarAllDotsUp = DotsUp(Target, true)
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
     VarSearingNightmareCutoff = (EnemiesCount10 > 3)
-    -- variable,name=pi_vf_condition,op=set,value=level>=58&cooldown.power_infusion.up|level<58&cooldown.void_eruption.up
-    VarPIVFCondition = Player:Level() >= 58 and S.PowerInfusion:CooldownUp() or Player:Level() < 58 and S.VoidEruption:CooldownUp()
+    -- variable,name=pi_or_vf_sync_condition,op=set,value=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&cooldown.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&cooldown.void_eruption.up
+    VarPIVFSyncCondition = VarSelfPIorSunPriestess and Player:Level() >= 58 and S.PowerInfusion:CooldownUp() or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and S.VoidEruption:CooldownUp()
     if (HR.CDsON()) then
-      -- fireblood,if=buff.power_infusion.up
-      if S.Fireblood:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or Player:Level() < 58) then
+      -- fireblood,if=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&buff.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&buff.voidform.up
+      if S.Fireblood:IsCastable() and (VarSelfPIorSunPriestess and Player:Level() >= 58 and Player:BuffUp(S.PowerInfusionBuff) or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and Player:BuffUp(S.VoidformBuff)) then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
       end
-      -- berserking,if=buff.power_infusion.up
-      if S.Berserking:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or Player:Level() < 58) then
+      -- berserking,if=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&buff.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&buff.voidform.up
+      if S.Berserking:IsCastable() and (VarSelfPIorSunPriestess and Player:Level() >= 58 and Player:BuffUp(S.PowerInfusionBuff) or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and Player:BuffUp(S.VoidformBuff)) then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 24"; end
       end
       -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
       if S.LightsJudgment:IsCastable() and (EnemiesCount10 >= 2) then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 26"; end
       end
-      -- ancestral_call,if=buff.power_infusion.up
-      if S.AncestralCall:IsCastable() and (Player:BuffUp(S.PowerInfusionBuff) or Player:Level() < 58) then
+      -- ancestral_call,if=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&buff.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&buff.voidform.up
+      if S.AncestralCall:IsCastable() and (VarSelfPIorSunPriestess and Player:Level() >= 58 and Player:BuffUp(S.PowerInfusionBuff) or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and Player:BuffUp(S.VoidformBuff)) then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 28"; end
       end
       -- bag_of_tricks

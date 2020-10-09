@@ -35,6 +35,7 @@ HR.GUISettings.APL.Priest = {
   Shadow = {
     DispersionHP = 10,
     UseFABST = false,
+    SelfPI = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -68,5 +69,6 @@ CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.EssenceDisplayStyle
 CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.");
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.");
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow");
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
