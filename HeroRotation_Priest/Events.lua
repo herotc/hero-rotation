@@ -1,41 +1,41 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, HR = ...;
-  -- HeroLib
-  local HL = HeroLib;
-  local HR = HeroRotation;
-  local Cache = HeroCache;
-  local Unit = HL.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = HL.Spell;
-  local Item = HL.Item;
-  -- Lua
-
+-- Addon
+local addonName, HR = ...
+-- HeroLib
+local HL = HeroLib
+local HR = HeroRotation
+local Cache = HeroCache
+local Unit = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Spell = HL.Spell
+local Item = HL.Item
+-- Lua
+local GetTime = GetTime
   -- File Locals
 
 
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
-  -- OnSpecChange
-  local SpecTimer = 0;
-  HL:RegisterForEvent(
-    function (Event)
-      -- Prevent the first event firing (when login)
-      if not HL.PulseInitialized then return; end
-      -- Timer to prevent bug due to the double/triple event firing.
-      -- Since it takes 5s to change spec, we'll take 3seconds as timer.
-      if GetTime() > SpecTimer then
-        -- Update the timer only on valid scan.
-        if HR.PulseInit() ~= "Invalid SpecID" then
-          SpecTimer = GetTime() + 3;
-        end
+-- OnSpecChange
+local SpecTimer = 0
+HL:RegisterForEvent(
+  function (Event)
+    -- Prevent the first event firing (when login)
+    if not HL.PulseInitialized then return; end
+    -- Timer to prevent bug due to the double/triple event firing.
+    -- Since it takes 5s to change spec, we'll take 3seconds as timer.
+    if GetTime() > SpecTimer then
+      -- Update the timer only on valid scan.
+      if HR.PulseInit() ~= "Invalid SpecID" then
+        SpecTimer = GetTime() + 3
       end
     end
-    , "PLAYER_SPECIALIZATION_CHANGED"
-  );
+  end
+  , "PLAYER_SPECIALIZATION_CHANGED"
+)
 
 --- ======= COMBATLOG =======
   --- Combat Log Arguments
@@ -91,45 +91,39 @@
 
   -- Arguments Variables
 
-    --------------------------
-    ----- Shadow --------
-    --------------------------
-    HL:RegisterForSelfCombatEvent(
-      function (...)
-        DestGUID, _, _, _, SpellID = select(8, ...);
+--------------------------
+----- Shadow --------
+--------------------------
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    DestGUID, _, _, _, SpellID = select(8, ...)
+    if SpellID == 228260 then --void erruption
+      -- print("reset")
+      HL.VTTime = 0
+      HL.VTApplied = 0
+    end
+  end
+  , "SPELL_CAST_SUCCESS"
+)
 
-		if SpellID == 228260 then --void erruption
-			-- print("reset")
-			HL.VTTime = 0
-			HL.VTApplied = 0
-		end
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...)
+    if SpellID == 205065 and HL.VTApplied == 0 and Player:GUID() == DestGUID then --void erruption
+      HL.VTApplied = dateEvent
+      -- print("applied : "..HL.VTApplied)
+    end
+  end
+  , "SPELL_AURA_APPLIED"
+)
 
-      end
-      , "SPELL_CAST_SUCCESS"
-    );
-
-	HL:RegisterForSelfCombatEvent(
-      function (...)
-		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
-		if SpellID == 205065 and HL.VTApplied == 0 and Player:GUID() == DestGUID then --void erruption
-			HL.VTApplied = dateEvent
-			-- print("applied : "..HL.VTApplied)
-		end
-
-      end
-      , "SPELL_AURA_APPLIED"
-    );
-
-	HL:RegisterForSelfCombatEvent(
-      function (...)
-		dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...);
-		if SpellID == 205065 and Player:GUID() == DestGUID then --void erruption
-			HL.VTTime = dateEvent - HL.VTApplied
-			-- print("time : "..HL.VTTime)
-		end
-
-      end
-      , "SPELL_AURA_REMOVED"
-    );
-
-
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    dateEvent,_,_,_,_,_,_,DestGUID,_,_,_, SpellID = select(1,...)
+    if SpellID == 205065 and Player:GUID() == DestGUID then --void erruption
+      HL.VTTime = dateEvent - HL.VTApplied
+      -- print("time : "..HL.VTTime)
+    end
+  end
+  , "SPELL_AURA_REMOVED"
+)

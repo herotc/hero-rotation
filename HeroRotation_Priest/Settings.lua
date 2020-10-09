@@ -1,17 +1,17 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
 -- HeroRotation
-local HR = HeroRotation;
+local HR = HeroRotation
 -- HeroLib
-local HL = HeroLib;
+local HL = HeroLib
 -- File Locals
-local GUI = HL.GUI;
-local CreateChildPanel = GUI.CreateChildPanel;
-local CreatePanelOption = GUI.CreatePanelOption;
-local CreateARPanelOption = HR.GUI.CreateARPanelOption;
-local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
+local GUI = HL.GUI
+local CreateChildPanel = GUI.CreateChildPanel
+local CreatePanelOption = GUI.CreatePanelOption
+local CreateARPanelOption = HR.GUI.CreateARPanelOption
+local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 
 --- ============================ CONTENT ============================
 -- All settings here should be moved into the GUI someday.
@@ -52,23 +52,23 @@ HR.GUISettings.APL.Priest = {
       -- Items
     }
   },
-};
+}
 
-HR.GUI.LoadSettingsRecursively(HR.GUISettings);
+HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 
 -- Child Panels
-local ARPanel = HR.GUI.Panel;
-local CP_Priest = CreateChildPanel(ARPanel, "Priest");
-local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow");
+local ARPanel = HR.GUI.Panel
+local CP_Priest = CreateChildPanel(ARPanel, "Priest")
+local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
 
-CreateARPanelOptions(CP_Priest, "APL.Priest.Commons");
-CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.");
-CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
-CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
+CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
+CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.")
+CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
+CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
+CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.")
+CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.")
 
-CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.");
-CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.");
-CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow");
-CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.");
+CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
+CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
+CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.")
