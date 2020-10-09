@@ -50,15 +50,15 @@ Spell.DemonHunter.Vengeance = {
 
   -- Talents
   BulkExtraction                        = Spell(320341),
-  FlameCrash                            = Spell(227322),
   CharredFlesh                          = Spell(264002),
   ConcentratedSigils                    = Spell(207666),
+  Demonic                               = Spell(321453),
   Felblade                              = Spell(232893),
+  FlameCrash                            = Spell(227322),
   Fracture                              = Spell(263642),
   SoulBarrier                           = Spell(263648),
   SpiritBomb                            = Spell(247454),
   SpiritBombDebuff                      = Spell(247456),
-  Demonic                               = Spell(321453),
 
   -- Utility
   Disrupt                               = Spell(183752),
@@ -78,16 +78,16 @@ Spell.DemonHunter.Vengeance = {
   EnduringGloom                         = Spell(319978),
 
   -- Trinket Effects
-  RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
+  RazorCoralDebuff                      = Spell(303568),
 
   -- Essences
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlameBurn                 = Spell(295368),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
   MemoryofLucidDreams                   = Spell(298357),
   RippleInSpace                         = Spell(302731),
-  ConcentratedFlame                     = Spell(295373),
   WorldveinResonance                    = Spell(295186),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  ConcentratedFlameBurn                 = Spell(295368),
 
   -- Other
   Pool                                  = Spell(999910)
