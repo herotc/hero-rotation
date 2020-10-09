@@ -16,6 +16,8 @@ local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+local AoEON      = HR.AoEON
+local CDsON      = HR.CDsON
 
 -- Azerite Essence Setup
 local AE         = DBC.AzeriteEssences
@@ -407,7 +409,7 @@ local function Main()
     end
   end
   -- call_action_list,name=cds
-  if (HR.CDsON()) then
+  if (CDsON()) then
     local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
   end
   -- mind_sear,target_if=talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&!cooldown.mindbender.up
@@ -497,7 +499,11 @@ local function APL()
   Enemies8y = Player:GetEnemiesInRange(8)
   Enemies15y = Player:GetEnemiesInRange(15)
   Enemies40y = Player:GetEnemiesInRange(40)
-  EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10)
+  if AoEON() then
+    EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10)
+  else
+    EnemiesCount10 = 1
+  end
   
   VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
 
@@ -524,7 +530,7 @@ local function APL()
     VarSearingNightmareCutoff = (EnemiesCount10 > 3)
     -- variable,name=pi_or_vf_sync_condition,op=set,value=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&cooldown.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&cooldown.void_eruption.up
     VarPIVFSyncCondition = VarSelfPIorSunPriestess and Player:Level() >= 58 and S.PowerInfusion:CooldownUp() or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and S.VoidEruption:CooldownUp()
-    if (HR.CDsON()) then
+    if (CDsON()) then
       -- fireblood,if=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&buff.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&buff.voidform.up
       if S.Fireblood:IsCastable() and (VarSelfPIorSunPriestess and Player:Level() >= 58 and Player:BuffUp(S.PowerInfusionBuff) or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and Player:BuffUp(S.VoidformBuff)) then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 22"; end
