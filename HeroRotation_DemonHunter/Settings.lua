@@ -48,9 +48,9 @@ HR.GUISettings.APL.DemonHunter = {
     }
   },
   Havoc = {
-    -- {Display OffGCD as OffGCD, ForceReturn}
     FelRushDisplayStyle = "Main Icon",
     UseFABST = false,
+    -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
       Metamorphosis = true,
