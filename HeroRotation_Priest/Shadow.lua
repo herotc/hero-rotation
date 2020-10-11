@@ -71,6 +71,7 @@ Spell.Priest.Shadow = {
   SearingNightmare                      = Spell(341385),
   ShadowCrash                           = Spell(205385),
   SurrenderToMadness                    = Spell(319952),
+  TwistofFate                           = Spell(109142),
   UnfurlingDarknessBuff                 = Spell(341282),
   VoidTorrent                           = Spell(263165),
 
@@ -205,7 +206,7 @@ local function EvaluateCycleShadowWordDeath204(TargetUnit)
   else
     PetActiveCD = 45
   end
-  return (TargetUnit:HealthPercentage() < 20 or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
+  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10 < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -213,7 +214,7 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (DotsUp(TargetUnit, true) and Player:BuffDown(S.VoidformBuff) and TargetUnit:TimeToDie() > 4)
+  return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 4 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10 < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
@@ -276,9 +277,9 @@ local function Precombat()
     end
     -- variable,name=mind_sear_cutoff,op=set,value=1
     VarMindSearCutoff = 1
-    -- mind_blast
-    if S.MindBlast:IsReady() and not Player:IsCasting(S.MindBlast) then
-      if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 10"; end
+    -- vampiric_touch
+    if S.VampiricTouch:IsReady() and not Player:IsCasting(S.VampiricTouch) then
+      if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "mind_blast 10"; end
     end
   end
 end
@@ -428,7 +429,7 @@ local function Main()
   if S.VoidBolt:IsCastable() and (EnemiesCount10 < (4 + num(S.DissonantEchoes:IsAvailable())) and Player:Insanity() <= 85) then
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 103"; end
   end
-  -- shadow_word_death,target_if=target.health.pct<20|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
+  -- shadow_word_death,target_if=(target.health.pct<20&spell_targets.mind_sear<4)|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
   if S.ShadowWordDeath:IsCastable() then
     if Everyone.CastCycle(S.ShadowWordDeath, Enemies40y, EvaluateCycleShadowWordDeath204, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 104"; end
   end
@@ -436,11 +437,11 @@ local function Main()
   if S.SurrenderToMadness:IsCastable() then
     if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206, not Target:IsSpellInRange(S.SurrenderToMadness)) then return "surrender_to_madness 106"; end
   end
-  -- mindbender
-  if S.Mindbender:IsCastable() then
+  -- mindbender,if=variable.dots_up
+  if S.Mindbender:IsCastable() and (VarDotsUp) then
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
-  -- void_torrent,target_if=variable.all_dots_up&!buff.voidform.up&target.time_to_die>4
+  -- void_torrent,target_if=variable.dots_up&target.time_to_die>4&buff.voidform.down&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
   if S.VoidTorrent:IsCastable() then
     if HR.Cast(S.VoidTorrent, 40, EvaluateCycleVoidTorrent208) then return "void_torrent 110"; end
   end
@@ -487,6 +488,10 @@ local function Main()
   -- mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(cooldown.void_bolt.up|cooldown.mind_blast.up)
   if S.MindFlay:IsCastable() then
     if HR.Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 132"; end
+  end
+  -- shadow_word_death
+  if S.ShadowWordDeath:IsCastable() then
+    if HR.Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 133"; end
   end
   -- shadow_word_pain
   if S.ShadowWordPain:IsCastable() then
