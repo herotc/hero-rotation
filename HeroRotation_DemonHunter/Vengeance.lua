@@ -116,7 +116,6 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local CleaveRangeID = tostring(S.Disrupt:ID()) -- 20y range
 local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
