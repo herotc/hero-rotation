@@ -274,7 +274,7 @@ local function Brand()
       if HR.Cast(S.ImmolationAura) then return "immolation_aura 88"; end
     end
     -- fel_devastation,if=dot.fiery_brand.ticking
-    -- Manual add: &talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
+    -- Manual add: &(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)
     if S.FelDevastation:IsReady() and IsInMeleeRange and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
       if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 90"; end
     end
