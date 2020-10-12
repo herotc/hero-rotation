@@ -151,7 +151,7 @@
         for _, CycleUnit in pairs(Player:GetEnemiesInRange(AbilitySettings.ReapingFlamesSnipingRange)) do
           if CycleUnit:AffectingCombat() and not CycleUnit:IsUserCycleBlacklisted() then
             local CycleHealth = CycleUnit:Health()
-            local CycleTTD = HL.OffsetRemains(CycleUnit:TimeToDie(), "Auto")
+            local CycleTTD = CycleUnit:TimeToDie() - math.max(Player:GCDRemains(), Player:CastRemains())
 
             -- Prioritize HP-based sniping over duration sniping to maximize damage
             if CycleHealth < DamageThreshold then
