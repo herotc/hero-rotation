@@ -289,7 +289,12 @@ local function Precombat()
     VarMindSearCutoff = 1
     -- vampiric_touch
     if S.VampiricTouch:IsReady() and not Player:IsCasting(S.VampiricTouch) then
-      if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "mind_blast 10"; end
+      if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 10"; end
+    end
+    -- Manually added: mind_blast
+    -- This is to avoid VT being suggested while being casted precombat
+    if S.MindBlast:IsCastable() then
+      if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 12"; end
     end
   end
 end
