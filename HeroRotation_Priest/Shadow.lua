@@ -128,6 +128,9 @@ Item.Priest.Shadow = {
   ShadowflamePrismHelm             = Item(173245),
   SunPriestessHelm                 = Item(173245),
   SunPriestessShoulders            = Item(173247),
+  SephuzNeck                       = Item(178927),
+  SephuzShoulders                  = Item(173247),
+  SephuzChest                      = Item(173241),
 }
 local I = Item.Priest.Shadow
 
@@ -138,7 +141,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local Enemies8y, Enemies15y, Enemies40y
+local Enemies8y, Enemies15y, Enemies30y, Enemies40y
 local EnemiesCount10
 local PetActiveCD
 
@@ -160,6 +163,7 @@ local VarSelfPIorSunPriestess = false
 local PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
 local ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
 local SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
+local SephuzEquipped = (I.SephuzChest:IsEquipped() or I.SephuzNeck:IsEquipped() or I.SephuzShoulders:IsEquipped())
 --local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
 
 HL:RegisterForEvent(function()
@@ -249,10 +253,16 @@ local function EvaluateCycleMindgames226(TargetUnit)
   return (Player:Insanity() < 90 and (DotsUp(TargetUnit, true) or Player:BuffUp(S.VoidformBuff)))
 end
 
+local function EvaluateCycleSilence228(TargetUnit)
+  return (TargetUnit:IsInterruptible())
+end
+
 local function Precombat()
   -- Update legendary equip status; this is in Precombat, as equipment can't be changed once in combat
   PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
+  ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
   SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
+  SephuzEquipped = (I.SephuzChest:IsEquipped() or I.SephuzNeck:IsEquipped() or I.SephuzShoulders:IsEquipped())
   --CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
   -- flask
   -- food
@@ -331,6 +341,10 @@ local function Cds()
   -- power_infusion,if=buff.voidform.up
   if S.PowerInfusion:IsCastable() and (Player:BuffUp(S.VoidformBuff)) then
     if HR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion 50"; end
+  end
+  -- silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
+  if S.Silence:IsCastable() and SephuzEquipped then
+    if Everyone.CastCycle(S.Silence, Enemies30y, EvaluateCycleSilence228, not Target:IsSpellInRange(S.Silence)) then return "silence 51"; end
   end
   -- Covenant: fae_guardians
   if S.FaeGuardians:IsReady() then
@@ -501,9 +515,10 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  Enemies8y = Player:GetEnemiesInRange(8)
-  Enemies15y = Player:GetEnemiesInRange(15)
-  Enemies40y = Player:GetEnemiesInRange(40)
+  Enemies8y = Player:GetEnemiesInRange(8) -- Ascended Nova
+  Enemies15y = Player:GetEnemiesInRange(15) -- Unholy Nova
+  Enemies30y = Player:GetEnemiesInRange(30) -- Silence, for Sephuz
+  Enemies40y = Player:GetEnemiesInRange(40) -- Multiple CastCycle Spells
   if AoEON() then
     EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10)
   else
