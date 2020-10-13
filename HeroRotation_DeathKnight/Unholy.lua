@@ -12,7 +12,6 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
@@ -25,72 +24,8 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
 
--- Spells
-if not Spell.DeathKnight then Spell.DeathKnight = {} end
-Spell.DeathKnight.Unholy = {
-  -- Abilities
-  RaiseDead                             = Spell(46584),
-  SacrificialPact                       = Spell(327574),
-  ArmyoftheDead                         = Spell(42650),
-  Apocalypse                            = Spell(275699),
-  DeathAndDecay                         = Spell(43265),
-  Epidemic                              = Spell(207317),
-  FesteringStrike                       = Spell(85948),
-  DeathCoil                             = Spell(47541),
-  ScourgeStrike                         = Spell(55090),
-  Outbreak                              = Spell(77575),
-  DeathStrike                           = Spell(49998),
-  DarkTransformation                    = Spell(63560),
-  -- Talents
-  Defile                                = Spell(152280),
-  BurstingSores                         = Spell(207264),
-  ClawingShadows                        = Spell(207311),
-  SoulReaper                            = Spell(130736),
-  UnholyBlight                          = Spell(115989),
-  SummonGargoyle                        = MultiSpell(49206, 207349),
-  Pestilence                            = Spell(277234),
-  UnholyAssault                         = Spell(207289),
-  ArmyoftheDamned                       = Spell(276837),
-  -- Covenant Abilities
-  ShackleTheUnworthy                    = Spell(312202),
-  SwarmingMist                          = Spell(311648),
-  AbominationLimb                       = Spell(315443),
-  DeathsDue                             = Spell(324128),
-  -- Conduit Effects
-  -- Buffs
-  DeathAndDecayBuff                     = Spell(188290),
-  DeathStrikeBuff                       = Spell(101568),
-  SuddenDoomBuff                        = Spell(81340),
-  UnholyAssaultBuff                     = Spell(207289),
-  UnholyStrengthBuff                    = Spell(53365),
-  -- Debuffs
-  FesteringWoundDebuff                  = Spell(194310),
-  VirulentPlagueDebuff                  = Spell(191587),
-  UnholyBlightDebuff                    = Spell(115994),
-  -- Racials
-  ArcaneTorrent                         = Spell(50613),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
-  AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
-  ArcanePulse                           = Spell(260364),
-  Fireblood                             = Spell(265221),
-  -- Interrupts
-  MindFreeze                            = Spell(47528),
-  -- Custom
-  PoolResources                         = Spell(999910)
-};
+-- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Unholy;
-
--- Items
-if not Item.DeathKnight then Item.DeathKnight = {} end
-Item.DeathKnight.Unholy = {
-  -- Potions/Trinkets
-  -- "Other On Use"
-  DeadliestCoilChest = Item(171412),
-  DeadliestCoilBack = Item(173242)
-};
 local I = Item.DeathKnight.Unholy;
 
 -- Create table to exclude above trinkets from On Use function

@@ -12,7 +12,6 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
@@ -25,74 +24,8 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
 
--- Spells
-if not Spell.DeathKnight then Spell.DeathKnight = {} end
-Spell.DeathKnight.Frost = {
-  -- Abilities
-  RaiseDead                             = Spell(46585),
-  SacrificialPact                       = Spell(327574),
-  DeathAndDecay                         = Spell(43265),
-  DeathStrike                           = Spell(49998),
-  RemorselessWinter                     = Spell(196770),
-  FrostStrike                           = Spell(49143),
-  Obliterate                            = Spell(49020),
-  HowlingBlast                          = Spell(49184),
-  ChainsofIce                           = Spell(45524),
-  FrostwyrmsFury                        = Spell(279302),
-  EmpowerRuneWeapon                     = Spell(47568),
-  PillarofFrost                         = Spell(51271),
-  -- Talents
-  GatheringStorm                        = Spell(194912),
-  GlacialAdvance                        = Spell(194913),
-  Frostscythe                           = Spell(207230),
-  RunicAttenuation                      = Spell(207104),
-  FrozenPulse                           = Spell(194909),
-  HornofWinter                          = Spell(57330),
-  ColdHeart                             = Spell(281208),
-  Icecap                                = Spell(207126),
-  Obliteration                          = Spell(281238),
-  BreathofSindragosa                    = Spell(152279),
-  -- Covenant Abilities
-  ShackleTheUnworthy                    = Spell(312202),
-  SwarmingMist                          = Spell(311648),
-  AbominationLimb                       = Spell(315443),
-  DeathsDue                             = Spell(324128),
-  -- Conduit Effects
-  -- Buffs
-  RimeBuff                              = Spell(59052),
-  KillingMachineBuff                    = Spell(51124),
-  PillarofFrostBuff                     = Spell(51271),
-  ColdHeartBuff                         = Spell(281209),
-  FrozenPulseBuff                       = Spell(194909),
-  EmpowerRuneWeaponBuff                 = Spell(47568),
-  IcyTalonsBuff                         = Spell(194879),
-  DeathStrikeBuff                       = Spell(101568),
-  UnholyStrengthBuff                    = Spell(53365),
-  -- Debuffs
-  RazoriceDebuff                        = Spell(51714),
-  FrostFeverDebuff                      = Spell(55095),
-  -- Racials
-  ArcaneTorrent                         = Spell(50613),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  ArcanePulse                           = Spell(260364),
-  LightsJudgment                        = Spell(255647),
-  Fireblood                             = Spell(265221),
-  AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
-  -- Interrupts
-  MindFreeze                            = Spell(47528),
-  -- Custom
-  PoolRange                             = Spell(999910)
-};
+-- Define S/I for spell and item arrays
 local S = Spell.DeathKnight.Frost;
-
--- Items
-if not Item.DeathKnight then Item.DeathKnight = {} end
-Item.DeathKnight.Frost = {
-  -- Potions/Trinkets
-  -- "Other On Use"
-};
 local I = Item.DeathKnight.Frost;
 
 -- Create table to exclude above trinkets from On Use function
