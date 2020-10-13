@@ -10,5 +10,5 @@
 
 Settings.lua
 Class.lua
-Spec.lua
 Events.lua
+Spec.lua

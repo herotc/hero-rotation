@@ -10,8 +10,8 @@
 
 Settings.lua
 Mage.lua
-Frost.lua
-Fire.lua
-Arcane.lua
 Events.lua
+Arcane.lua
+Fire.lua
+Frost.lua
 Overrides.lua

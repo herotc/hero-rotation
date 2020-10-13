@@ -10,8 +10,7 @@
 
 Settings.lua
 Hunter.lua
+Events.lua
 BeastMastery.lua
 Marksmanship.lua
-Survival.lua
-Events.lua
 Overrides.lua

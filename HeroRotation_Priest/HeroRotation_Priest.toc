@@ -1,7 +1,7 @@
 ## Interface: 80300
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFFFFFFFPriest|r]
-## Author: KutiKuti
+## Author: Cilraaz
 ## Notes: Hero Rotation - Priest Module.
 
 ## DefaultState: Enabled

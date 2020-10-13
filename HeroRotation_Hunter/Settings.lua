@@ -81,25 +81,6 @@ HR.GUISettings.APL.Hunter = {
       -- Racials
     }
   },
-  Survival = {
-    AspectoftheEagle = true,
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      -- Abilities
-      Butchery = false,
-      SummonPet = false,
-      CoordinatedAssault = true,
-      Harpoon = true,
-    },
-    -- {Display OffGCD as OffGCD, ForceReturn}
-    OffGCDasOffGCD = {
-      -- Abilities
-      AspectoftheEagle = true,
-      Muzzle = true,
-      -- Items
-      -- Racials
-    }
-  }
 };
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -109,7 +90,6 @@ local ARPanel = HR.GUI.Panel;
 local CP_Hunter = CreateChildPanel(ARPanel, "Hunter");
 local CP_BeastMastery = CreateChildPanel(CP_Hunter, "BeastMastery");
 local CP_Marksmanship = CreateChildPanel(CP_Hunter, "Marksmanship");
-local CP_Survival = CreateChildPanel(CP_Hunter, "Survival");
 
 -- Hunter
 CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
@@ -128,7 +108,3 @@ CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
 -- Marksmanship
 CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseLoneWolf", "Use Lone Wolf", "Enable this if you want to use Lone Wolf and not be notified to summon a pet.");
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
-
--- -- Survival
-CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
-CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival");

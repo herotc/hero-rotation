@@ -11,7 +11,6 @@
 -- HeroRotation
   local HR      = HeroRotation;
 -- Spells
-  local SpellBlood   = Spell.DeathKnight.Blood;
   local SpellFrost   = Spell.DeathKnight.Frost;
   local SpellUnholy  = Spell.DeathKnight.Unholy;
 -- Lua
@@ -50,7 +49,7 @@ end
 , 252);
 
 -- Example (Arcane Mage)
--- HL.AddCoreOverride ("Spell.IsCastableP", 
+-- HL.AddCoreOverride ("Spell.IsCastableP",
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 --   if Range then
 --     local RangeUnit = ThisUnit or Target;

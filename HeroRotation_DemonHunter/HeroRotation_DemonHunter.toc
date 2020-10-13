@@ -9,7 +9,7 @@
 ## Dependencies: HeroRotation
 
 Settings.lua
+Events.lua
 Havoc.lua
 Vengeance.lua
-Events.lua
 Overrides.lua

@@ -1,111 +1,111 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
-  -- Addon
-  local addonName, addonTable = ...;
-  -- HeroLib
-  local HL = HeroLib;
-  local Cache = HeroCache;
-  local Unit = HL.Unit;
-  local Player = Unit.Player;
-  local Target = Unit.Target;
-  local Spell = HL.Spell;
-  local Item = HL.Item;
-  -- HeroRotation
-  local HR = HeroRotation;
-  -- Lua
-  
+-- Addon
+local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
+-- HeroLib
+local HL = HeroLib
+local Cache = HeroCache
+local Unit = HL.Unit
+local Player = Unit.Player
+local Target = Unit.Target
+local Spell = HL.Spell
+local MultiSpell = HL.MultiSpell
+local Item = HL.Item
+-- HeroRotation
+local HR = HeroRotation
+local AoEON = HR.AoEON
+local CDsON = HR.CDsON
+-- Lua
 
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
-  local Everyone = HR.Commons.Everyone;
-  local Class = HR.Commons.Class;
+-- Commons
+local Everyone = HR.Commons.Everyone
+local Class = HR.Commons.Class
 
-  -- Spells
-  if not Spell.Class then Spell.Class = {}; end
-  Spell.Class.Spec = {
-    -- Racials
-    
-    -- Abilities
-    
-    -- Talents
-    
-    -- Artifact
-    
-    -- Defensive
-    
-    -- Utility
-    
-    -- Legendaries
-    
-    -- Misc
-    
-    -- Macros
-    
-  };
-  local S = Spell.Class.Spec;
+-- GUI Settings
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Class.Commons,
+  Spec = HR.GUISettings.APL.Class.Spec
+}
 
-  -- Items
-  if not Item.Class then Item.Class = {}; end
-  Item.Class.Spec = {
-    -- Legendaries
-    
-  };
-  local I = Item.Class.Spec;
+-- Spells
+if not Spell.Class then Spell.Class = {} end
+Spell.Class.Spec = {
+  -- Racials
 
-  -- Rotation Var
-  
+  -- Abilities
 
-  -- GUI Settings
-  local Settings = {
-    General = HR.GUISettings.General,
-    Commons = HR.GUISettings.APL.Class.Commons,
-    Spec = HR.GUISettings.APL.Class.Spec
-  };
+  -- Talents
+
+  -- Artifact
+
+  -- Defensive
+
+  -- Utility
+
+  -- Legendaries
+
+  -- Misc
+
+  -- Macros
+
+}
+local S = Spell.Class.Spec
+
+-- Items
+if not Item.Class then Item.Class = {} end
+Item.Class.Spec = {
+  -- Legendaries
+
+}
+local I = Item.Class.Spec
+
+-- Rotation Var
 
 
 --- ======= ACTION LISTS =======
--- Put here acti lists only if they are called multiple times in the APL
+-- Put here action lists only if they are called multiple times in the APL
 -- If it's only put one time, it's doing a closure call for nothing.
-  
+
 
 
 --- ======= MAIN =======
-  local function APL ()
-    -- Local Update
-    
+local function APL ()
+  -- Local Update
 
-    -- Unit Update
-    
-    Everyone.AoEToggleEnemiesUpdate();
+  -- Unit Update
 
-    -- Defensives
-    
+  -- Defensives
 
-    -- Out of Combat
-    if not Player:AffectingCombat() then
-      -- Flask
-      -- Food
-      -- Rune
-      -- PrePot w/ Bossmod Countdown
-      -- Opener
-      if Everyone.TargetIsValid() then
-        
-      end
-      return;
-    end
-
-    -- In Combat
+  -- Out of Combat
+  if not Player:AffectingCombat() then
+    -- Flask
+    -- Food
+    -- Rune
+    -- PrePot w/ Bossmod Countdown
+    -- Opener
     if Everyone.TargetIsValid() then
-      
-      return;
+
     end
+    return
   end
 
-  HR.SetAPL(000, APL);
+  -- In Combat
+  if Everyone.TargetIsValid() then
+
+    return
+  end
+end
+
+HR.SetAPL(000, APL)
 
 
 --- ======= SIMC =======
---- Last Update: 12/31/2999
+-- Last Update: 12/31/2999
 
 -- APL goes here

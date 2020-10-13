@@ -157,10 +157,6 @@ local function ComputeTargetRange()
   end
 end
 
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
 local function bool(val)
   return val ~= 0
 end

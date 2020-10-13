@@ -1,4 +1,5 @@
---- Localize Vars
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...
 -- HeroDBC
@@ -19,13 +20,20 @@ local CDsON = HR.CDsON
 -- Lua
 local mathmin = math.min
 
---- APL Local Vars
+
+--- ============================ CONTENT ============================
+--- ======= APL LOCALS =======
 -- Commons
 local Everyone = HR.Commons.Everyone
 local Rogue = HR.Commons.Rogue
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
+
+-- GUI Settings
+local Settings = {
+  General = HR.GUISettings.General,
+  Commons = HR.GUISettings.APL.Rogue.Commons,
+  Assassination = HR.GUISettings.APL.Rogue.Assassination,
+  Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
+}
 
 -- Spells
 if not Spell.Rogue then Spell.Rogue = {} end
@@ -128,7 +136,6 @@ Item.Rogue.Outlaw = {
   RazorCoral            = Item(169311, {13, 14}),
 }
 local I = Item.Rogue.Outlaw
-
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.ComputationDevice:ID(),
@@ -141,30 +148,25 @@ local OnUseExcludes = {
 local Enemies30y, EnemiesBF, EnemiesBFCount
 local ShouldReturn; -- Used to get the return string
 local BladeFlurryRange = 6
-
--- GUI Settings
-local Settings = {
-  General = HR.GUISettings.General,
-  Commons = HR.GUISettings.APL.Rogue.Commons,
-  Assassination = HR.GUISettings.APL.Rogue.Assassination,
-  Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
+local Interrupts = {
+  { S.Blind, "Cast Blind (Interrupt)", function () return true end },
 }
 
+-- Utils
 local function num(val)
   if val then return 1 else return 0 end
 end
-
 local function EnergyTimeToMaxRounded ()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
   return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10
 end
-
 local function EnergyPredictedRounded ()
   -- Round to the nearesth int to reduce prediction instability on very high regen rates
   return math.floor(Player:EnergyPredicted() + 0.5)
 end
 
--- APL Action Lists (and Variables)
+
+--- ======= ACTION LISTS =======
 local RtB_BuffsList = {
   S.Broadside,
   S.BuriedTreasure,
@@ -568,13 +570,10 @@ local function Build ()
   end
 end
 
--- Stuns
-local Interrupts = {
-  {S.Blind, "Cast Blind (Interrupt)", function () return true end},
-}
 
--- APL Main
+--- ======= MAIN =======
 local function APL ()
+  -- Local Update
   BladeFlurryRange = S.AcrobaticStrikes:IsAvailable() and 9 or 6
   -- Unit Update
   if AoEON() then
@@ -584,7 +583,6 @@ local function APL ()
   else
     EnemiesBFCount = 1
   end
-
 
   -- Defensives
   -- Crimson Vial
@@ -712,6 +710,7 @@ end
 
 HR.SetAPL(260, APL, Init)
 
+--- ======= SIMC =======
 -- Last Update: 2020-03-09
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
