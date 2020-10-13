@@ -456,8 +456,8 @@ local function Main()
   if S.SurrenderToMadness:IsCastable() then
     if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206, not Target:IsSpellInRange(S.SurrenderToMadness)) then return "surrender_to_madness 106"; end
   end
-  -- mindbender,if=variable.dots_up
-  if S.Mindbender:IsCastable() and (VarDotsUp) then
+  -- mindbender,if=dot.vampiric_touch.ticking&((talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1))|dot.shadow_word_pain.ticking)
+  if S.Mindbender:IsCastable() and (Target:DebuffUp(S.VampiricTouchDebuff) and ((S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1)) or Target:DebuffUp(S.ShadowWordPainDebuff))) then
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
   -- void_torrent,target_if=variable.dots_up&target.time_to_die>4&buff.voidform.down&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
