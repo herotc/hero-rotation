@@ -47,7 +47,7 @@ Spell.Priest.Shadow = {
   Mindbender                            = MultiSpell(200174,34433),
   MindBlast                             = Spell(8092),
   MindFlay                              = Spell(15407),
-  MindSear                              = Spell(48045),
+  MindSear                              = Spell(48045), -- Splash, 10
   PowerInfusion                         = Spell(10060),
   PowerInfusionBuff                     = Spell(10060),
   Shadowform                            = Spell(232698),
@@ -59,7 +59,7 @@ Spell.Priest.Shadow = {
   VampiricTouch                         = Spell(34914),
   VampiricTouchDebuff                   = Spell(34914),
   VoidBolt                              = MultiSpell(205448,343355),
-  VoidEruption                          = Spell(228260),
+  VoidEruption                          = Spell(228260), -- Splash, 10
   VoidformBuff                          = Spell(194249),
 
   -- Talents
@@ -68,8 +68,8 @@ Spell.Priest.Shadow = {
   HungeringVoid                         = Spell(345218),
   Misery                                = Spell(238558),
   PsychicLink                           = Spell(199484),
-  SearingNightmare                      = Spell(341385),
-  ShadowCrash                           = Spell(205385),
+  SearingNightmare                      = Spell(341385), -- Splash, 10
+  ShadowCrash                           = Spell(205385), -- Splash, 8
   SurrenderToMadness                    = Spell(319952),
   TwistofFate                           = Spell(109142),
   UnfurlingDarknessBuff                 = Spell(341282),
@@ -77,13 +77,13 @@ Spell.Priest.Shadow = {
 
   -- Covenant Abilities
   AscendedBlast                         = Spell(325283),
-  AscendedNova                          = Spell(325020),
+  AscendedNova                          = Spell(325020), -- Melee, 8
   BoonoftheAscended                     = Spell(325013),
   BoonoftheAscendedBuff                 = Spell(325013),
   FaeGuardians                          = Spell(327661),
   FaeGuardiansBuff                      = Spell(327661),
   Mindgames                             = Spell(323673),
-  UnholyNova                            = Spell(324724),
+  UnholyNova                            = Spell(324724), -- Melee, 15
   WrathfulFaerieDebuff                  = Spell(342132),
 
   -- Conduit Effects
@@ -141,8 +141,8 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local Enemies8y, Enemies15y, Enemies30y, Enemies40y
-local EnemiesCount10
+local Enemies8yMelee, Enemies15yMelee, Enemies30y, Enemies40y
+local EnemiesCount8ySplash, EnemiesCount10ySplash
 local PetActiveCD
 
 -- GUI Settings
@@ -210,7 +210,7 @@ local function EvaluateCycleShadowWordDeath204(TargetUnit)
   else
     PetActiveCD = 45
   end
-  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10 < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
+  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -218,11 +218,11 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 4 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10 < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
+  return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 4 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
-  return (EnemiesCount10 > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtsBuff))
+  return (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtsBuff))
 end
 
 local function EvaluateCycleVampiricTouch214(TargetUnit)
@@ -230,23 +230,23 @@ local function EvaluateCycleVampiricTouch214(TargetUnit)
 end
 
 local function EvaluateCycleMindSear216(TargetUnit)
-  return (EnemiesCount10 > VarMindSearCutoff)
+  return (EnemiesCount10ySplash > VarMindSearCutoff)
 end
 
 local function EvaluateCycleSearingNightmare218(TargetUnit)
-  return ((VarSearingNightmareCutoff and not VarPIVFSyncCondition) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 1))
+  return ((VarSearingNightmareCutoff and not VarPIVFSyncCondition) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10ySplash > 1))
 end
 
 local function EvaluateCycleShadowWordPain220(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and not (S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1)) and (not S.PsychicLink:IsAvailable() or (S.PsychicLink:IsAvailable() and EnemiesCount10 <= 2)))
+  return (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and not (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1)) and (not S.PsychicLink:IsAvailable() or (S.PsychicLink:IsAvailable() and EnemiesCount10ySplash <= 2)))
 end
 
 local function EvaluateCycleMindSear222(TargetUnit)
-  return (S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and not S.Mindbender:CooldownUp())
+  return (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and not S.Mindbender:CooldownUp())
 end
 
 local function EvaluateCycleMindSear224(TargetUnit)
-  return (S.SearingNightmare:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10 > 2)
+  return (S.SearingNightmare:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10ySplash > 2)
 end
 
 local function EvaluateCycleMindgames226(TargetUnit)
@@ -313,11 +313,11 @@ local function Essences()
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences"; end
   end
   -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-  if S.FocusedAzeriteBeam:IsCastable() and (EnemiesCount10 >= 2 or Settings.Shadow.UseFABST) then
+  if S.FocusedAzeriteBeam:IsCastable() and (EnemiesCount10ySplash >= 2 or Settings.Shadow.UseFABST) then
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam essences"; end
   end
   -- purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-  if S.PurifyingBlast:IsCastable() and (EnemiesCount10 >= 2) then
+  if S.PurifyingBlast:IsCastable() and (EnemiesCount10ySplash >= 2) then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "purifying_blast essences"; end
   end
   -- concentrated_flame,line_cd=6,if=time<=10|full_recharge_time<gcd|target.time_to_die<5
@@ -361,11 +361,11 @@ local function Cds()
   end
   -- Covenant: unholy_nova,if=raid_event.adds.in>20
   -- Manually added check for targets within 15 yards of player, as this novas, rather than being target-based
-  if S.UnholyNova:IsReady() and (#Enemies15y > 0) then
+  if S.UnholyNova:IsReady() and (#Enemies15yMelee > 0) then
     if HR.Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(15)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled)|(buff.voidform.up&talent.searing_nightmare.enabled)
-  if S.BoonoftheAscended:IsReady() and (Player:BuffDown(S.VoidformBuff) and not S.VoidEruption:CooldownUp() and EnemiesCount10 > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffUp(S.VoidformBuff) and EnemiesCount10 < 2 and not S.SearingNightmare:IsAvailable()) or (Player:BuffUp(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
+  if S.BoonoftheAscended:IsReady() and (Player:BuffDown(S.VoidformBuff) and not S.VoidEruption:CooldownUp() and EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffUp(S.VoidformBuff) and EnemiesCount10ySplash < 2 and not S.SearingNightmare:IsAvailable()) or (Player:BuffUp(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
     if HR.Cast(S.BoonoftheAscended, Settings.Commons.CovenantDisplayStyle) then return "boon_of_the_ascended 58"; end
   end
   -- call_action_list,name=essences
@@ -381,11 +381,11 @@ end
 
 local function Boon()
   -- ascended_blast,if=spell_targets.mind_sear<=3
-  if S.AscendedBlast:IsReady() and (EnemiesCount10 <= 3) then
+  if S.AscendedBlast:IsReady() and (EnemiesCount10ySplash <= 3) then
     if HR.Cast(S.AscendedBlast, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 70"; end
   end
   -- ascended_nova,if=(spell_targets.mind_sear>2&talent.searing_nightmare.enabled|(spell_targets.mind_sear>1&!talent.searing_nightmare.enabled))&spell_targets.ascended_nova>1
-  if S.AscendedNova:IsReady() and ((EnemiesCount10 > 2 and S.SearingNightmare:IsAvailable() or (EnemiesCount10 > 1 and not S.SearingNightmare:IsAvailable())) and #Enemies8y > 1) then
+  if S.AscendedNova:IsReady() and ((EnemiesCount10ySplash > 2 and S.SearingNightmare:IsAvailable() or (EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable())) and #Enemies8yMelee > 1) then
     if HR.Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(8)) then return "ascended_nova 72"; end
   end
 end
@@ -445,7 +445,7 @@ local function Main()
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
   end
   -- void_bolt,if=spell_targets.mind_sear<(4+conduit.dissonant_echoes.enabled)&insanity<=85
-  if S.VoidBolt:IsCastable() and (EnemiesCount10 < (4 + num(S.DissonantEchoes:IsAvailable())) and Player:Insanity() <= 85) then
+  if S.VoidBolt:IsCastable() and (EnemiesCount10ySplash < (4 + num(S.DissonantEchoes:IsAvailable())) and Player:Insanity() <= 85) then
     if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 103"; end
   end
   -- shadow_word_death,target_if=(target.health.pct<20&spell_targets.mind_sear<4)|(pet.fiend.active&runeforge.shadowflame_prism.equipped)
@@ -457,7 +457,7 @@ local function Main()
     if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206, not Target:IsSpellInRange(S.SurrenderToMadness)) then return "surrender_to_madness 106"; end
   end
   -- mindbender,if=dot.vampiric_touch.ticking&((talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1))|dot.shadow_word_pain.ticking)
-  if S.Mindbender:IsCastable() and (Target:DebuffUp(S.VampiricTouchDebuff) and ((S.SearingNightmare:IsAvailable() and EnemiesCount10 > (VarMindSearCutoff + 1)) or Target:DebuffUp(S.ShadowWordPainDebuff))) then
+  if S.Mindbender:IsCastable() and (Target:DebuffUp(S.VampiricTouchDebuff) and ((S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1)) or Target:DebuffUp(S.ShadowWordPainDebuff))) then
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
   -- void_torrent,target_if=variable.dots_up&target.time_to_die>4&buff.voidform.down&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
@@ -469,11 +469,11 @@ local function Main()
     if HR.Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 112"; end
   end
   -- shadow_crash,if=spell_targets.shadow_crash=1&(cooldown.shadow_crash.charges=3|debuff.shadow_crash_debuff.up|action.shadow_crash.in_flight|target.time_to_die<cooldown.shadow_crash.full_recharge_time)&raid_event.adds.in>30
-  if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount10 == 1 and (S.ShadowCrash:Charges() == 3 or Target:DebuffUp(S.ShadowCrashDebuff) or S.ShadowCrash:InFlight() or Target:TimeToDie() < S.ShadowCrash:FullRechargeTime())) then
+  if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount8ySplash == 1 and (S.ShadowCrash:Charges() == 3 or Target:DebuffUp(S.ShadowCrashDebuff) or S.ShadowCrash:InFlight() or Target:TimeToDie() < S.ShadowCrash:FullRechargeTime())) then
     if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsSpellInRange(S.ShadowCrash)) then return "shadow_crash 114"; end
   end
   -- shadow_crash,if=raid_event.adds.in>30&spell_targets.shadow_crash>1
-  if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount10 > 1) then
+  if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount8ySplash > 1) then
     if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsSpellInRange(S.ShadowCrash)) then return "shadow_crash 116"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thoughts.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
@@ -485,7 +485,7 @@ local function Main()
     if HR.Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 120"; end
   end
   -- mind_blast,if=variable.dots_up&raid_event.movement.in>cast_time+0.5&spell_targets.mind_sear<4
-  if S.MindBlast:IsCastable() and (VarDotsUp and EnemiesCount10 < 4) then
+  if S.MindBlast:IsCastable() and (VarDotsUp and EnemiesCount10ySplash < 4) then
     if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 122"; end
   end
   -- vampiric_touch,target_if=refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable)|buff.unfurling_darkness.up
@@ -493,7 +493,7 @@ local function Main()
     if Everyone.CastCycle(S.VampiricTouch, Enemies40y, EvaluateCycleVampiricTouch214, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 124"; end
   end
   -- shadow_word_pain,if=refreshable&target.time_to_die>4&!talent.misery.enabled&talent.psychic_link.enabled&spell_targets.mind_sear>2
-  if S.ShadowWordPain:IsCastable() and (Target:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount10 > 2) then
+  if S.ShadowWordPain:IsCastable() and (Target:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and S.PsychicLink:IsAvailable() and EnemiesCount10ySplash > 2) then
     if HR.Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 126"; end
   end
   -- shadow_word_pain,target_if=refreshable&target.time_to_die>4&!talent.misery.enabled&!(talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1))&(!talent.psychic_link.enabled|(talent.psychic_link.enabled&spell_targets.mind_sear<=2))
@@ -520,14 +520,16 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  Enemies8y = Player:GetEnemiesInRange(8) -- Ascended Nova
-  Enemies15y = Player:GetEnemiesInRange(15) -- Unholy Nova
+  Enemies8yMelee = Player:GetEnemiesInMeleeRange(8) -- Ascended Nova
+  Enemies15yMelee = Player:GetEnemiesInMeleeRange(15) -- Unholy Nova
   Enemies30y = Player:GetEnemiesInRange(30) -- Silence, for Sephuz
   Enemies40y = Player:GetEnemiesInRange(40) -- Multiple CastCycle Spells
   if AoEON() then
-    EnemiesCount10 = Target:GetEnemiesInSplashRangeCount(10)
+    EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
+    EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
   else
-    EnemiesCount10 = 1
+    EnemiesCount8ySplash = 1
+    EnemiesCount10ySplash = 1
   end
   
   VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
@@ -552,7 +554,7 @@ local function APL()
     -- variable,name=all_dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking&dot.devouring_plague.ticking
     VarAllDotsUp = DotsUp(Target, true)
     -- variable,name=searing_nightmare_cutoff,op=set,value=spell_targets.mind_sear>3
-    VarSearingNightmareCutoff = (EnemiesCount10 > 3)
+    VarSearingNightmareCutoff = (EnemiesCount10ySplash > 3)
     -- variable,name=pi_or_vf_sync_condition,op=set,value=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&cooldown.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&cooldown.void_eruption.up
     VarPIVFSyncCondition = VarSelfPIorSunPriestess and Player:Level() >= 58 and S.PowerInfusion:CooldownUp() or (Player:Level() < 58 or not VarSelfPIorSunPriestess) and S.VoidEruption:CooldownUp()
     if (CDsON()) then
@@ -565,7 +567,7 @@ local function APL()
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 24"; end
       end
       -- lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
-      if S.LightsJudgment:IsCastable() and (EnemiesCount10 >= 2) then
+      if S.LightsJudgment:IsCastable() and (EnemiesCount10ySplash >= 2) then
         if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 26"; end
       end
       -- ancestral_call,if=(priest.self_power_infusion|runeforge.twins_of_the_sun_priestess.equipped)&level>=58&buff.power_infusion.up|(level<58|!priest.self_power_infusion&!runeforge.twins_of_the_sun_priestess.equipped)&buff.voidform.up
