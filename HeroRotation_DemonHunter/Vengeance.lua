@@ -12,7 +12,6 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
@@ -26,86 +25,12 @@ local AEMajor    = HL.Spell:MajorEssence()
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
 
--- Spell
-if not Spell.DemonHunter then Spell.DemonHunter = {} end
-Spell.DemonHunter.Vengeance = {
-  -- Abilities
-  FelDevastation                        = Spell(212084),
-  Frailty                               = Spell(247456),
-  ImmolationAura                        = Spell(258920),
-  InfernalStrike                        = Spell(189110),
-  Shear                                 = Spell(203782),
-  SigilofFlame                          = MultiSpell(204596, 204513),
-  SigilofFlameDebuff                    = Spell(204598),
-  SoulCleave                            = Spell(228477),
-  SoulFragments                         = Spell(203981),
-  ThrowGlaive                           = Spell(204157),
-
-  -- Defensive
-  DemonSpikes                           = Spell(203720),
-  DemonSpikesBuff                       = Spell(203819),
-  FieryBrand                            = Spell(204021),
-  FieryBrandDebuff                      = Spell(207771),
-  Torment                               = Spell(185245),
-
-  -- Talents
-  BulkExtraction                        = Spell(320341),
-  CharredFlesh                          = Spell(264002),
-  ConcentratedSigils                    = Spell(207666),
-  Demonic                               = Spell(321453),
-  Felblade                              = Spell(232893),
-  FlameCrash                            = Spell(227322),
-  Fracture                              = Spell(263642),
-  SoulBarrier                           = Spell(263648),
-  SpiritBomb                            = Spell(247454),
-  SpiritBombDebuff                      = Spell(247456),
-
-  -- Utility
-  Disrupt                               = Spell(183752),
-  Metamorphosis                         = Spell(187827),
-
-  -- Covenant Abilities
-  DoorofShadows                         = Spell(300728),
-  ElysianDecree                         = Spell(306830),
-  Fleshcraft                            = Spell(324631),
-  FoddertotheFlame                      = Spell(329554),
-  SinfulBrand                           = Spell(317009),
-  Soulshape                             = Spell(310143),
-  SummonSteward                         = Spell(324739),
-  TheHunt                               = Spell(323639),
-
-  -- Soulbind/Conduit Effects
-  EnduringGloom                         = Spell(319978),
-
-  -- Trinket Effects
-  ConductiveInkDebuff                   = Spell(302565),
-  RazorCoralDebuff                      = Spell(303568),
-
-  -- Essences
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  RippleInSpace                         = Spell(302731),
-  WorldveinResonance                    = Spell(295186),
-
-  -- Other
-  Pool                                  = Spell(999910)
-}
+-- Define S/I for spell and item arrays
 local S = Spell.DemonHunter.Vengeance
+local I = Item.DemonHunter.Vengeance
 if AEMajor ~= nil then
   S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
 end
-
--- Items
-if not Item.DemonHunter then Item.DemonHunter = {} end
-Item.DemonHunter.Vengeance = {
-  PotionofUnbridledFury            = Item(169299),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
-}
-local I = Item.DemonHunter.Vengeance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {

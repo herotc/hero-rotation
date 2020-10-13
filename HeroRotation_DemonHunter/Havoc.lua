@@ -12,7 +12,6 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
@@ -27,88 +26,8 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
 
--- Spells
-if not Spell.DemonHunter then Spell.DemonHunter = {} end
-Spell.DemonHunter.Havoc = {
-  -- Racials
-  -- Abilities
-  Annihilation                          = Spell(201427),
-  BladeDance                            = Spell(188499),
-  ChaosNova                             = Spell(179057),
-  ChaosStrike                           = Spell(162794),
-  DeathSweep                            = Spell(210152),
-  DemonsBite                            = Spell(162243),
-  Disrupt                               = Spell(183752),
-  EyeBeam                               = Spell(198013),
-  FelRush                               = Spell(195072),
-  ImmolationAura                        = Spell(258920),
-  ImmolationAuraBuff                    = Spell(258920),
-  Metamorphosis                         = Spell(191427),
-  MetamorphosisBuff                     = Spell(162264),
-  ThrowGlaive                           = Spell(185123),
-  VengefulRetreat                       = Spell(198793),
-  -- Talents
-  BlindFury                             = Spell(203550),
-  DemonBlades                           = Spell(203555),
-  Demonic                               = Spell(213410),
-  EssenceBreak                          = Spell(258860),
-  EssenceBreakDebuff                    = Spell(320338),
-  FelBarrage                            = Spell(258925),
-  FelEruption                           = Spell(211881),
-  Felblade                              = Spell(232893),
-  FirstBlood                            = Spell(206416),
-  GlaiveTempest                         = Spell(342817),
-  Momentum                              = Spell(206476),
-  MomentumBuff                          = Spell(208628),
-  PreparedBuff                          = Spell(203650), -- Procs from Vengeful Retreat with Momentum
-  TrailofRuin                           = Spell(258881),
-  UnboundChaos                          = Spell(275144),
-  UnboundChaosBuff                      = Spell(337313),
-  -- Covenant Abilities
-  ElysianDecree                         = Spell(306830),
-  FoddertotheFlame                      = Spell(329554),
-  SinfulBrand                           = Spell(317009),
-  SinfulBrandDebuff                     = Spell(317009),
-  TheHunt                               = Spell(323639),
-  -- Legendary Effects
-  FelBombardmentBuff                    = Spell(337849),
-  -- Conduits
-  ExposedWoundDebuff                    = Spell(339229), -- Triggered by Serrated Glaive
-  SerratedGlaive                        = Spell(339230),
-  -- Item Buffs/Debuffs
-  ConductiveInkDebuff                   = Spell(302565),
-  RazorCoralDebuff                      = Spell(303568),
-  -- Azerite Traits (BfA)
-  ChaoticTransformation                 = Spell(288754),
-  RevolvingBlades                       = Spell(279581),
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
-}
+-- Define S/I for spell and item arrays
 local S = Spell.DemonHunter.Havoc
-
--- Items
-if not Item.DemonHunter then Item.DemonHunter = {} end
-Item.DemonHunter.Havoc = {
-  PotionofUnbridledFury            = Item(169299),
-  GalecallersBoon                  = Item(159614, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  DribblingInkpod                  = Item(169319, {13, 14})
-}
 local I = Item.DemonHunter.Havoc
 
 -- Create table to exclude above trinkets from On Use function

@@ -9,6 +9,7 @@
 ## Dependencies: HeroRotation
 
 Settings.lua
+DemonHunter.lua
 Events.lua
 Havoc.lua
 Vengeance.lua
