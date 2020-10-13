@@ -532,15 +532,15 @@ local function Aoe ()
     if HR.Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchoftheMagi) then return "touch_of_the_magi aoe 23"; end
   end
   --arcane_power,if=((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=variable.aoe_totm_charges))&buff.rune_of_power.down
-  if S.ArcanePower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_aoe_totm_charges)) then
+  if HR.CDsON() and S.ArcanePower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_aoe_totm_charges)) then
     if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power aoe 24"; end
   end
   --rune_of_power,if=buff.rune_of_power.down&((cooldown.touch_of_the_magi.remains>20&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=variable.aoe_totm_charges))&(cooldown.arcane_power.remains>15|debuff.touch_of_the_magi.up)
-  if S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and ((S.TouchoftheMagi:CooldownRemains() > 20 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_aoe_totm_charges)) and (S.ArcanePower:CooldownRemains() or Target:DebuffUp(S.TouchoftheMagi)) then
+  if HR.CDsON() and S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and ((S.TouchoftheMagi:CooldownRemains() > 20 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() <= var_aoe_totm_charges)) and (S.ArcanePower:CooldownRemains() or Target:DebuffUp(S.TouchoftheMagi)) then
     if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power aoe 25"; end
   end
   --presence_of_mind,if=buff.deathborne.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
-  if S.PresenceofMind:IsCastable() and Player:BuffUp(S.Deathborne) and Target:DebuffUp(S.TouchoftheMagi) and S.TouchoftheMagi:CooldownRemains() <= 2 * S.ArcaneBlast:ExecuteTime() then
+  if HR.CDsON() and S.PresenceofMind:IsCastable() and Player:BuffUp(S.Deathborne) and Target:DebuffUp(S.TouchoftheMagi) and S.TouchoftheMagi:CooldownRemains() <= 2 * S.ArcaneBlast:ExecuteTime() then
     if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind aoe 26"; end
   end
   --arcane_blast,if=buff.deathborne.up&((talent.resonance.enabled&active_enemies<4)|active_enemies<5)
@@ -590,28 +590,28 @@ local function Opener ()
     return "Stop opener 1"
   end
   --lights_judgment,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
-  if S.LightsJudgment:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffRemains(S.TouchoftheMagi) then
+  if HR.CDsON() and S.LightsJudgment:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffRemains(S.TouchoftheMagi) then
     if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials) then return "lights_judgment opener 2"; end
   end
   --bag_of_tricks,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
-  if S.BagofTricks:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffRemains(S.TouchoftheMagi) then
+  if HR.CDsON() and S.BagofTricks:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffRemains(S.TouchoftheMagi) then
     if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials) then return "bag_of_tricks opener 3"; end
   end
   --use_items,if=buff.arcane_power.up
   --berserking,if=buff.arcane_power.up
-  if S.Berserking:IsCastable() and Player:BuffUp(S.ArcanePower) then
+  if HR.CDsON() and S.Berserking:IsCastable() and Player:BuffUp(S.ArcanePower) then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking opener 5"; end
   end
   --blood_fury,if=buff.arcane_power.up
-  if S.BloodFury:IsCastable() and Player:BuffUp(S.ArcanePower) then
+  if HR.CDsON() and S.BloodFury:IsCastable() and Player:BuffUp(S.ArcanePower) then
     if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury opener 6"; end
   end
   --fireblood,if=buff.arcane_power.up
-  if S.Fireblood:IsCastable() and Player:BuffUp(S.ArcanePower) then
+  if HR.CDsON() and S.Fireblood:IsCastable() and Player:BuffUp(S.ArcanePower) then
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood opener 7"; end
   end
   --ancestral_call,if=buff.arcane_power.up
-  if S.AncestralCall:IsCastable() and Player:BuffUp(S.ArcanePower) then
+  if HR.CDsON() and S.AncestralCall:IsCastable() and Player:BuffUp(S.ArcanePower) then
     if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call opener 8"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command_frost.up
@@ -638,24 +638,24 @@ local function Opener ()
     if HR.Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchoftheMagi) then return "touch_of_the_magi opener 16"; end
   end
   --arcane_power
-  if S.ArcanePower:IsCastable() then
+  if HR.CDsON() and S.ArcanePower:IsCastable() then
     if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power opener 17"; end
   end
   --rune_of_power,if=buff.rune_of_power.down
-  if S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
+  if HR.CDsON() and S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
     if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power opener 18"; end
   end
   --use_mana_gem,if=(talent.enlightened.enabled&mana.pct<=80&mana.pct>=65)|(!talent.enlightened.enabled&mana.pct<=85)
   --TODO manage mana gem
   --berserking,if=buff.arcane_power.up
   --TODO useless ?
-  if S.Berserking:IsCastable() and Player:BuffUp(S.ArcanePower) then
+  if HR.CDsON() and S.Berserking:IsCastable() and Player:BuffUp(S.ArcanePower) then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking opener 20"; end
   end
   --time_warp,if=runeforge.temporal_warp.equipped
   --NYI legendaries
   --presence_of_mind,if=debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
-  if S.PresenceofMind:IsCastable() and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) <= 2 * S.ArcaneBlast:ExecuteTime() then
+  if HR.CDsON() and S.PresenceofMind:IsCastable() and Target:DebuffUp(S.TouchoftheMagi) and Target:DebuffRemains(S.TouchoftheMagi) <= 2 * S.ArcaneBlast:ExecuteTime() then
     if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind opener 22"; end
   end
   --arcane_blast,if=dot.radiant_spark.remains>5|debuff.radiant_spark_vulnerability.stack>0
@@ -818,7 +818,7 @@ local function Movement ()
     if HR.Cast(S.Blink) then return "blink_any 501"; end
   end
   -- presence_of_mind
-  if S.PresenceofMind:IsCastable() and HR.CDsON() then
+  if HR.CDsON() and S.PresenceofMind:IsCastable() then
     if HR.Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceofMind) then return "presence_of_mind 503"; end
   end
   -- arcane_missiles
