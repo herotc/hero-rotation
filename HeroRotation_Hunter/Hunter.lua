@@ -1,10 +1,23 @@
+--- ============================ HEADER ============================
+--- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...;
+local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
+local Cache      = HeroCache
+local Unit       = HL.Unit
+local Player     = Unit.Player
+local Target     = Unit.Target
+local Pet        = Unit.Pet
 local Spell      = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
+-- HeroRotation
+local HR         = HeroRotation
+
+--- ============================ CONTENT ============================
 
 -- Spells
 if not Spell.Hunter then Spell.Hunter = {} end
