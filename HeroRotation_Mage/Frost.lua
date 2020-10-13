@@ -90,7 +90,7 @@ Spell.Mage.Frost = {
   BloodoftheEnemy                       = Spell(297108),
   ConcentratedFlame                     = Spell(295373),
   ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258), --Splash, 30 
+  FocusedAzeriteBeam                    = Spell(295258), --Splash, 30
   GuardianofAzeroth                     = Spell(295840),
   MemoryofLucidDreams                   = Spell(298357),
   PurifyingBlast                        = Spell(295337), --Splash, 8
@@ -173,7 +173,7 @@ end
 local function Essences ()
   --guardian_of_azeroth - Essence
   if S.GuardianofAzeroth:IsCastable() then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences "; end
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences 1"; end
   end
   --focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
   if S.FocusedAzeriteBeam:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount30ySplash > 3) then
@@ -224,7 +224,7 @@ local function Cooldowns ()
   end
   --rune_of_power,if=cooldown.icy_veins.remains>15&buff.rune_of_power.down - CD
   if S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (Player:BuffRemains(S.IcyVeins) >= 15 or Target:TimeToDie() < 20) then
-    if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneofPower) then return "rune_of_power cd 3"; end
+    if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 3"; end
   end
   --icy_veins,if=buff.rune_of_power.down - CD
   if S.IcyVeins:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
@@ -330,17 +330,17 @@ local function Aoe ()
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 6"; end
   end
   --radiant_spark
-  --[[ if S.RadiantSpark:IsCastable() then
+  if S.RadiantSpark:IsCastable() then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
-  end ]]
+  end
   --shifting_power
-  --[[ if S.ShiftingPower:IsCastable() then
+  if S.ShiftingPower:IsCastable() then
     if HR.Cast(S.ShiftingPower, nil, nil, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 8"; end
-  end ]]
+  end
   --mirrors_of_torment
-  --[[ if S.MirrorsofTorment:IsCastable() then
+  if S.MirrorsofTorment:IsCastable() then
     if HR.Cast(S.MirrorsofTorment, nil, nil, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 9"; end
-  end ]]
+  end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI legendaries
   --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
@@ -424,17 +424,17 @@ local function Single ()
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
   end ]]
   --shifting_power,if=active_enemies>=3
-  --[[ if S.ShiftingPower:IsCastable() and EnemiesCount18yMelee >= 3 then
+  if S.ShiftingPower:IsCastable() and EnemiesCount18yMelee >= 3 then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 13"; end
-  end ]]
+  end
   --shifting_power,line_cd=60,if=(soulbind.field_of_blossoms.enabled|soulbind.grove_invigoration.enabled)&(!talent.rune_of_power.enabled|buff.rune_of_power.down&cooldown.rune_of_power.remains>16)
-  --[[ if S.ShiftingPower:IsCastable() then
+  if S.ShiftingPower:IsCastable() then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
-  end ]]
+  end
   --mirrors_of_torment
-  --[[ if S.MirrorsofTorment:IsCastable() then
+  if S.MirrorsofTorment:IsCastable() then
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment single 15"; end
-  end ]]
+  end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI legendaries
   --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
