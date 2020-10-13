@@ -121,8 +121,8 @@ local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
 local PassiveEssence
-local Enemies8y
-local EnemiesCount8
+local Enemies8yMelee
+local EnemiesCount8yMelee
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -200,7 +200,7 @@ local function UpdateIsInMeleeRange()
   end
 
   IsInMeleeRange = Target:IsInMeleeRange(5)
-  IsInAoERange = IsInMeleeRange or EnemiesCount8 > 0
+  IsInAoERange = IsInMeleeRange or EnemiesCount8yMelee > 0
 end
 
 local function Precombat()
@@ -400,8 +400,8 @@ end
 
 -- APL Main
 local function APL()
-  Enemies8y = Player:GetEnemiesInRange(8)
-  EnemiesCount8 = #Enemies8y
+  Enemies8yMelee = Player:GetEnemiesInMeleeRange(8)
+  EnemiesCount8yMelee = #Enemies8yMelee
   UpdateSoulFragments()
   UpdateIsInMeleeRange()
 
