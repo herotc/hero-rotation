@@ -8,8 +8,8 @@
 ## LoadOnDemand: 1
 ## Dependencies: HeroRotation
 
-Priest.lua
 Settings.lua
+Priest.lua
 Events.lua
 Shadow.lua
 Overrides.lua
