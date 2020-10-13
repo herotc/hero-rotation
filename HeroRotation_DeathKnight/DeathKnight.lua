@@ -102,6 +102,7 @@ Spell.DeathKnight.Unholy = {
   UnholyBlight                          = Spell(115989),
   SummonGargoyle                        = MultiSpell(49206, 207349),
   Pestilence                            = Spell(277234),
+  UnholyPact                            = Spell(319230),
   UnholyAssault                         = Spell(207289),
   ArmyoftheDamned                       = Spell(276837),
   -- Covenant Abilities

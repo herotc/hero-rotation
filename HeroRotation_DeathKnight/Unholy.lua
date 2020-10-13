@@ -130,7 +130,7 @@ local function Precombat()
 end
 
 local function AOE_Setup()
-  -- death_and_decay,death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
+  -- death_and_decay,if=death_knight.fwounded_targets=active_enemies|raid_event.adds.exists&raid_event.adds.remains<=11
   if S.DeathAndDecay:IsCastable() and (S.FesteringWoundDebuff:AuraActiveCount() == EnemiesMeleeCount) then
     if HR.Cast(S.DeathAndDecay, Settings.Unholy.GCDasOffGCD.DeathAndDecay) then return "death_and_decay aoe_setup 1"; end
   end
@@ -163,11 +163,11 @@ local function AOE_Setup()
 end
 
 local function AOE_Burst()
-  -- epidemic,if=runic_power.deficit<(14+death_knight.fwounded_targets*3&death_knight.fwounded_targets<=5)&!variable.pooling_for_gargoyle
-  if S.Epidemic:IsReady() and (Player:RunicPowerDeficit() < (14 + S.FesteringWoundDebuff:AuraActiveCount() * 3) and S.FesteringWoundDebuff:AuraActiveCount() <= 5 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:AuraActiveCount() > 1) then
+  -- epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_for_gargoyle
+  if S.Epidemic:IsReady() and (Player:RunicPowerDeficit() < (10 + S.FesteringWoundDebuff:AuraActiveCount() * 3) and S.FesteringWoundDebuff:AuraActiveCount() < 6 and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:AuraActiveCount() > 1) then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not TargetIsInRange[100]) then return "epidemic aoe_burst 1"; end
   end
-  -- epidemic,if=runic_power.deficit<(25&death_knight.fwounded_targets>5)&!variable.pooling_for_gargoyle
+  -- epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_for_gargoyle
   if S.Epidemic:IsReady() and (Player:RunicPowerDeficit() < 25 and S.FesteringWoundDebuff:AuraActiveCount() > 5 and not bool(VarPoolingForGargoyle)) then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not TargetIsInRange[100]) then return "epidemic aoe_burst 2"; end
   end
@@ -239,8 +239,8 @@ local function Cooldowns()
   if S.UnholyBlight:IsCastable() and EnemiesMeleeCount >= 2 then
     if HR.Cast(S.UnholyBlight, nil, nil, not TargetIsInRange[10]) then return "unholy_blight cooldown 3"; end
   end
-  -- dark_transformation,if=!raid_event.adds.exists&cooldown.unholy_blight.remains&(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4|cooldown.apocalypse.remains)&(runeforge.deadliest_coil.equipped&!buff.dark_transformation.up|!runeforge.deadliest_coil.equipped)|!talent.unholy_blight.enabled|raid_event.adds.in>15&raid_event.adds.exists
-  if S.DarkTransformation:IsCastable() and (bool(S.UnholyBlight:CooldownRemains()) and (S.Apocalypse:CooldownUp() and Target:DebuffStack(S.FesteringWoundDebuff) >= 4 or bool(S.Apocalypse:CooldownRemains())) and (DeadliestCoilEquipped and not Pet:BuffUp(S.DarkTransformation) or not DeadliestCoilEquipped) or not S.UnholyBlight:IsAvailable()) then
+  -- dark_transformation,if=!raid_event.adds.exists&cooldown.unholy_blight.remains&(runeforge.deadliest_coil.equipped&(!buff.dark_transformation.up&!talent.unholy_pact.enabled|talent.unholy_pact.enabled)|!runeforge.deadliest_coil.equipped)|!talent.unholy_blight.enabled
+  if S.DarkTransformation:IsCastable() and (bool(S.UnholyBlight:CooldownRemains()) and (DeadliestCoilEquipped and (not Pet:BuffUp(S.DarkTransformation) and not S.UnholyPact:IsAvailable() or S.UnholyPact:IsAvailable()) or not DeadliestCoilEquipped) or not S.UnholyBlight:IsAvailable()) then
     if HR.Cast(S.DarkTransformation) then return "dark_transformation cooldown 4"; end
   end
   -- dark_transformation,if=raid_event.adds.exists&(active_enemies>=2|raid_event.adds.in>15)
