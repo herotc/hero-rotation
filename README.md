@@ -1,5 +1,7 @@
 **Not everything is updated for Shadowlands, so please check the table below (Supported Rotations). If a spec is in WIP or KO status, please do not report an issue about it.**
 
+**If you are missing dependencies ([HeroDBC](https://www.curseforge.com/wow/addons/herodbc) and [HeroLib](https://www.curseforge.com/wow/addons/herolib)), you have to install them.**
+
 **If you are experiencing issues with AoE rotations (likely abilities not being recommended), be sure to have enemies nameplates enabled and enough nameplates shown (camera can hide them).**
 
 **If you see an icon with "POOL" written inside, it means you have to pool your resources. It's a normal behavior. Please see this [link explaining resource pooling](https://wow.gamepedia.com/Resource_pooling).**
@@ -8,15 +10,27 @@
 
 # HeroRotation
 
-[![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/herotc/hero-rotation/master/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/network) [![GitHub stars](https://img.shields.io/github/stars/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/stargazers) [![GitHub issues](https://img.shields.io/github/issues/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/issues)
+[![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/herotc/hero-rotation/master/LICENSE)
+[![GitHub contributors](https://img.shields.io/github/contributors/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/graphs/contributors)
+[![GitHub forks](https://img.shields.io/github/forks/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/network)
+[![GitHub stars](https://img.shields.io/github/stars/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/stargazers)\
+[![GitHub issues](https://img.shields.io/github/issues/herotc/hero-rotation.svg)](https://github.com/herotc/hero-rotation/issues?q=is%3Aopen+is%3Aissue)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/pulls?q=is%3Aopen+is%3Apr)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/issues?q=is%3Aissue+is%3Aclosed)
+[![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/pulls?q=is%3Apr+is%3Aclosed)\
+[![GitHub release](https://img.shields.io/github/v/release/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/releases)
+[![GitHub Release Date](https://img.shields.io/github/release-date/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/releases)
+[![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/herotc/hero-rotation/latest)](https://github.com/herotc/hero-rotation/commits/master)
+[![GitHub last commit](https://img.shields.io/github/last-commit/herotc/hero-rotation)](https://github.com/herotc/hero-rotation/commits/master)
+
 
 HeroRotation is a World of Warcraft addon to provide the player useful and precise information to execute the best possible DPS rotation in every PvE situation at max level.\
-The project is hosted on [GitHub](https://github.com/herotc/hero-rotation) and powered by [HeroLib](https://github.com/herotc/hero-lib) and [HeroDBC](https://github.com/herotc/hero-dbc).\
+The project is hosted on [GitHub](https://github.com/herotc/hero-rotation) and powered by [HeroLib](https://github.com/herotc/hero-lib) & [HeroDBC](https://github.com/herotc/hero-dbc).\
 It is maintained by [Aethys](https://github.com/aethys256/) and the [HeroTC](https://github.com/herotc) team.\
 Also, you can find it on [CurseForge](https://www.curseforge.com/wow/addons/herorotation).
 
-**There are a lot of helpful commands. Do '/hr help' to see them in-game!\
-Most of the commands and options are being moved to Addons Panels, and you can see them by going into Interface -> Addons -> HeroRotation.**
+**There are a lot of helpful commands. Do '/hr help' to see them in-game!**\
+**Most of the commands and options are being moved to Addons Panels, and you can see them by going into Interface -> Addons -> HeroRotation.**
 
 Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly appreciated!
 
@@ -29,10 +43,11 @@ Feel free to join our [Discord](https://discord.gg/tFR2uvK). Feedback is highly 
 - One medium-small icon on the upper-left that does proposals about situational defensive abilities (trinkets, potions, ...).
 - Toggles to turn On/Off the CDs or AoE to adjust the rotation according to the situation (the addon can be paused this way aswell).
 
-_Toggles can use directly key bindings, set them in 'Game Menu -> Key Bindings -> AddOns'_
+_Toggles can use directly key bindings, set them in 'Game Menu -> Key Bindings -> AddOns'._
 
 Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Action Priority Lists](https://github.com/simulationcraft/simc/wiki/ActionLists).\
-**It does mean that how accurate/good the addon heavily depends on how well the SimC APL is made. Be aware that some APLs are pretty good in some simulations circumstances but behaves pretty poorly in-game due to too much sequencing / lack of priority.**
+**It does mean that how accurate/good the addon heavily depends on how well the SimC APL is made.**\
+**Be aware that some APLs are pretty good in some simulations circumstances but behaves pretty poorly in-game due to too much sequencing / lack of priority.**
 
 ## Special Features
 
@@ -46,24 +61,24 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 
 ## Supported Rotations
 
-| Class        | Specs                                                                               |                                                                               |                                                                           |
-| :---         | :---                                                                                | :---                                                                          | :---                                                                      |
-| Death Knight | [![Blood](https://img.shields.io/badge/Blood-KO-red.svg)]()                         | [![Frost](https://img.shields.io/badge/Frost-WIP-orange.svg)]()               | [![Unholy](https://img.shields.io/badge/Unholy-WIP-orange.svg)]()         |
-| Demon Hunter | [![Havoc](https://img.shields.io/badge/Havoc-WIP-orange.svg)]()                     | [![Vengeance](https://img.shields.io/badge/Vengeance-OK-brightgreen.svg)]()   |                                                                           |
-| Druid        | [![Balance](https://img.shields.io/badge/Balance-KO-red.svg)]()                     | [![Feral](https://img.shields.io/badge/Feral-KO-red.svg)]()                   | [![Guardian](https://img.shields.io/badge/Guardian-KO-red.svg)]()         |
-| Hunter       | [![Beast Mastery](https://img.shields.io/badge/Beast%20Mastery-WIP-orange.svg)]()   | [![Marksmanship](https://img.shields.io/badge/Marksmanship-WIP-orange.svg)]() | [![Survival](https://img.shields.io/badge/Survival-KO-red.svg)]()         |
-| Mage         | [![Arcane](https://img.shields.io/badge/Arcane-KO-red.svg)]()                       | [![Fire](https://img.shields.io/badge/Fire-KO-red.svg)]()                     |  [![Frost](https://img.shields.io/badge/Frost-WIP-orange.svg)]()          |
-| Monk         | [![Brewmaster](https://img.shields.io/badge/Brewmaster-KO-red.svg)]()               | [![Windwalker](https://img.shields.io/badge/Windwalker-KO-red.svg)]()         |                                                                           |
-| Paladin      | [![Protection](https://img.shields.io/badge/Protection-KO-red.svg)]()               | [![Retribution](https://img.shields.io/badge/Retribution-KO-red.svg)]()       |                                                                           |
-| Priest       | [![Shadow](https://img.shields.io/badge/Shadow-WIP-orange.svg)]()                   |                                                                               |                                                                           |
-| Rogue        | [![Assassination](https://img.shields.io/badge/Assassination-OK-brightgreen.svg)]() | [![Outlaw](https://img.shields.io/badge/Outlaw-OK-brightgreen.svg)]()         | [![Subtlety](https://img.shields.io/badge/Subtlety-OK-brightgreen.svg)]() |
-| Shaman       | [![Elemental](https://img.shields.io/badge/Elemental-KO-red.svg)]()                 | [![Enhancement](https://img.shields.io/badge/Enhancement-KO-red.svg)]()       |                                                                           |
-| Warlock      | [![Affliction](https://img.shields.io/badge/Affliction-KO-red.svg)]()               | [![Demonology](https://img.shields.io/badge/Demonology-WIP-orange.svg)]()     | [![Destruction](https://img.shields.io/badge/Destruction-KO-red.svg)]()   |
-| Warrior      | [![Arms](https://img.shields.io/badge/Arms-KO-red.svg)]()                           | [![Fury](https://img.shields.io/badge/Fury-KO-red.svg)]()                     | [![Protection](https://img.shields.io/badge/Protection-KO-red.svg)]()     |
+| Class        | Specs                                                                           |                                                                           |                                                                       |
+| :---         | :---                                                                            | :---                                                                      | :---                                                                  |
+| Death Knight | ![Blood](https://img.shields.io/badge/Blood-KO-red.svg)                         | ![Frost](https://img.shields.io/badge/Frost-WIP-orange.svg)               | ![Unholy](https://img.shields.io/badge/Unholy-WIP-orange.svg)         |
+| Demon Hunter | ![Havoc](https://img.shields.io/badge/Havoc-WIP-orange.svg)                     | ![Vengeance](https://img.shields.io/badge/Vengeance-OK-brightgreen.svg)   |                                                                       |
+| Druid        | ![Balance](https://img.shields.io/badge/Balance-KO-red.svg)                     | ![Feral](https://img.shields.io/badge/Feral-KO-red.svg)                   | ![Guardian](https://img.shields.io/badge/Guardian-KO-red.svg)         |
+| Hunter       | ![Beast Mastery](https://img.shields.io/badge/Beast%20Mastery-WIP-orange.svg)   | ![Marksmanship](https://img.shields.io/badge/Marksmanship-WIP-orange.svg) | ![Survival](https://img.shields.io/badge/Survival-KO-red.svg)         |
+| Mage         | ![Arcane](https://img.shields.io/badge/Arcane-KO-red.svg)                       | ![Fire](https://img.shields.io/badge/Fire-KO-red.svg)                     | ![Frost](https://img.shields.io/badge/Frost-WIP-orange.svg)           |
+| Monk         | ![Brewmaster](https://img.shields.io/badge/Brewmaster-KO-red.svg)               | ![Windwalker](https://img.shields.io/badge/Windwalker-KO-red.svg)         |                                                                       |
+| Paladin      | ![Protection](https://img.shields.io/badge/Protection-KO-red.svg)               | ![Retribution](https://img.shields.io/badge/Retribution-KO-red.svg)       |                                                                       |
+| Priest       | ![Shadow](https://img.shields.io/badge/Shadow-WIP-orange.svg)                   |                                                                           |                                                                       |
+| Rogue        | ![Assassination](https://img.shields.io/badge/Assassination-OK-brightgreen.svg) | ![Outlaw](https://img.shields.io/badge/Outlaw-OK-brightgreen.svg)         | ![Subtlety](https://img.shields.io/badge/Subtlety-OK-brightgreen.svg) |
+| Shaman       | ![Elemental](https://img.shields.io/badge/Elemental-KO-red.svg)                 | ![Enhancement](https://img.shields.io/badge/Enhancement-KO-red.svg)       |                                                                       |
+| Warlock      | ![Affliction](https://img.shields.io/badge/Affliction-KO-red.svg)               | ![Demonology](https://img.shields.io/badge/Demonology-WIP-orange.svg)     | ![Destruction](https://img.shields.io/badge/Destruction-KO-red.svg)   |
+| Warrior      | ![Arms](https://img.shields.io/badge/Arms-KO-red.svg)                           | ![Fury](https://img.shields.io/badge/Fury-KO-red.svg)                     | ![Protection](https://img.shields.io/badge/Protection-KO-red.svg)     |
 
-[![Spec](https://img.shields.io/badge/Spec-OK-brightgreen.svg)](): The rotation does have an optimal SimC APL and it is optimally implemented in the addon.\
-[![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg)](): The rotation does not have an optimal SimC APL or it is not optimally implemented in the addon.\
-[![Spec](https://img.shields.io/badge/Spec-KO-red.svg)](): The rotation is not supported on SimC or is not yet implemented in the addon.
+![Spec](https://img.shields.io/badge/Spec-OK-brightgreen.svg) - The rotation does have an optimal SimC APL and it is optimally implemented in the addon.\
+![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg) - The rotation does not have an optimal SimC APL or it is not optimally implemented in the addon.\
+![Spec](https://img.shields.io/badge/Spec-KO-red.svg) - The rotation is not supported on SimC or is not yet implemented in the addon.
 
 Do you want to contribute ? Feel free to open a [pull request](https://github.com/herotc/hero-rotation/pulls), an [issue](https://github.com/herotc/hero-rotation/issues) or ask around in our [Discord](https://discord.gg/tFR2uvK).\
 You can look at our [Battle for Azeroth](https://github.com/herotc/hero-rotation/tree/bfa) or [Legion](https://github.com/herotc/hero-rotation/tree/legion) branches too if you want to see earlier versions.
