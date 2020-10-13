@@ -110,6 +110,7 @@ Spell.DeathKnight.Unholy = {
   AbominationLimb                       = Spell(315443),
   DeathsDue                             = Spell(324128),
   -- Conduit Effects
+  ConvocationOfTheDead                  = Spell(338553),
   -- Buffs
   DeathAndDecayBuff                     = Spell(188290),
   DeathStrikeBuff                       = Spell(101568),
