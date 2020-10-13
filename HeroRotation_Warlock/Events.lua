@@ -15,6 +15,7 @@ local Item = HL.Item
 local find = string.find
 local GetTime = GetTime
 -- File Locals
+HR.Commons.Warlock = {}
 local Warlock = HR.Commons.Warlock
 
 --- ============================ CONTENT ============================
