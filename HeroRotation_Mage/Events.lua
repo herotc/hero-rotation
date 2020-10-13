@@ -15,7 +15,6 @@ local Mage = HR.Commons.Mage;
 
 -- Lua
 local select = select;
-local GetTime = GetTime;
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -121,7 +120,7 @@ local GetTime = GetTime;
   end, "SPELL_DAMAGE")
 
   function Player:FrozenOrbGroundAoeRemains()
-    return math.max(HL.OffsetRemains(FrozenOrbHitTime - (GetTime() - 10), "Auto"), 0)
+    return math.max((FrozenOrbHitTime - (GetTime() - 10) - HL.RecoveryTimer()), 0)
   end
 
   local brain_freeze_active = false
