@@ -42,8 +42,8 @@ Spell.Warlock.Demonology = {
   Demonbolt                             = Spell(264178),
   DemonicCoreBuff                       = Spell(264173),
   Felstorm                              = Spell(89751),
-  HandofGuldan                          = Spell(105174),
-  Implosion                             = Spell(196277),
+  HandofGuldan                          = Spell(105174), -- Splash, 8
+  Implosion                             = Spell(196277), -- Splash, 8
   ShadowBolt                            = Spell(686),
   SpellLock                             = Spell(119910),
   SummonDemonicTyrant                   = Spell(265187),
@@ -51,7 +51,7 @@ Spell.Warlock.Demonology = {
   UnendingResolve                       = Spell(104773),
   
   -- Talents
-  BilescourgeBombers                    = Spell(267211),
+  BilescourgeBombers                    = Spell(267211), -- Splash, 8
   DemonicCalling                        = Spell(205145),
   DemonicCallingBuff                    = Spell(205146),
   DemonicConsumption                    = Spell(267215),
@@ -66,6 +66,14 @@ Spell.Warlock.Demonology = {
   PowerSiphon                           = Spell(264130),
   SoulStrike                            = Spell(264057),
   SummonVilefiend                       = Spell(264119),
+  
+  -- Covenant Abilities
+  DecimatingBolt                        = Spell(325289),
+  DoorofShadows                         = Spell(300728),
+  Fleshcraft                            = Spell(324631),
+  ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
+  ScouringTithe                         = Spell(312321),
+  SoulRot                               = Spell(325640), -- Splash, 15
   
   -- Azerite Traits
   BalefulInvocation                     = Spell(287059),
@@ -107,8 +115,8 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local Enemies8y, Enemies40y
-local EnemiesCount8
+--local Enemies8ySplash, Enemies40y
+--local EnemiesCount8ySplash
 local VarTyrantReady = false
 
 -- GUI Settings
@@ -363,9 +371,9 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Update Target Tables
-  Enemies8y = Player:GetEnemiesInRange(8)
-  Enemies40y = Player:GetEnemiesInRange(40)
-  EnemiesCount8 = Target:GetEnemiesInSplashRangeCount(8)
+  --Enemies8ySplash = Player:GetEnemiesInRange(8)
+  --Enemies40y = Player:GetEnemiesInRange(40)
+  --EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
   
   -- Update Demonology-specific Tables
   Warlock.UpdatePetTable()
