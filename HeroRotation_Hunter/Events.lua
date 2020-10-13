@@ -13,6 +13,7 @@ local Player = Unit.Player;
 local Target = Unit.Target;
 local Spell = HL.Spell;
 local Item = HL.Item;
+HR.Commons.Hunter = {};
 local Hunter = HR.Commons.Hunter;
 -- Lua
 local pairs = pairs;
