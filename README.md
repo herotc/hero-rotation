@@ -1,4 +1,4 @@
-**Not everything is updated for Shadowlands, so please check the table below (Supported Rotations). If a spec is in WIP or Outdated status, please do not report an issue about it.**
+**Not everything is updated for Shadowlands, so please check the table below (Supported Rotations). If a spec is in WIP or KO status, please do not report an issue about it.**
 
 **If you are experiencing issues with AoE rotations (likely abilities not being recommended), be sure to have enemies nameplates enabled and enough nameplates shown (camera can hide them).**
 
