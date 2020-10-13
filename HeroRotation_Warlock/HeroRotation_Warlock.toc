@@ -9,6 +9,7 @@
 ## Dependencies: HeroRotation
 
 Settings.lua
+Warlock.lua
 Events.lua
 Demonology.lua
 Overrides.lua
