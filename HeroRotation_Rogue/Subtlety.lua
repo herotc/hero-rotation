@@ -28,101 +28,19 @@ local Rogue = HR.Commons.Rogue
 -- Azerite Essence Setup
 local AE         = DBC.AzeriteEssences
 local AESpellIDs = DBC.AzeriteEssenceSpellIDs
--- Spells
-if not Spell.Rogue then Spell.Rogue = {} end
-Spell.Rogue.Subtlety = {
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  ArcanePulse                           = Spell(260364),
-  ArcaneTorrent                         = Spell(50613),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BloodFury                             = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-  Shadowmeld                            = Spell(58984),
-  -- Abilities
-  Backstab                              = Spell(53),
-  Eviscerate                            = Spell(196819),
-  FindWeaknessDebuff                    = Spell(316220),
-  ShadowBlades                          = Spell(121471),
-  ShadowDance                           = Spell(185313),
-  ShadowDanceBuff                       = Spell(185422),
-  Shadowstrike                          = Spell(185438),
-  ShadowVault                           = Spell(319175),
-  ShurikenStorm                         = Spell(197835),
-  ShurikenToss                          = Spell(114014),
-  SliceandDice                          = Spell(315496),
-  Stealth                               = Spell(1784),
-  Stealth2                              = Spell(115191), -- w/ Subterfuge Talent
-  SymbolsofDeath                        = Spell(212283),
-  Rupture                               = Spell(1943),
-  Vanish                                = Spell(1856),
-  VanishBuff                            = Spell(11327),
-  VanishBuff2                           = Spell(115193), -- w/ Subterfuge Talent
-  -- Talents
-  Alacrity                              = Spell(193539),
-  DarkShadow                            = Spell(245687),
-  DeeperStratagem                       = Spell(193531),
-  EnvelopingShadows                     = Spell(238104),
-  Gloomblade                            = Spell(200758),
-  MarkedforDeath                        = Spell(137619),
-  MasterofShadows                       = Spell(196976),
-  Nightstalker                          = Spell(14062),
-  SecretTechnique                       = Spell(280719),
-  ShadowFocus                           = Spell(108209),
-  ShurikenTornado                       = Spell(277925),
-  Subterfuge                            = Spell(108208),
-  Vigor                                 = Spell(14983),
-  Weaponmaster                          = Spell(193537),
-  -- Azerite Traits
-  BladeInTheShadows                     = Spell(275896),
-  Inevitability                         = Spell(278683),
-  NightsVengeancePower                  = Spell(273418),
-  NightsVengeanceBuff                   = Spell(273424),
-  Perforate                             = Spell(277673),
-  ReplicatingShadows                    = Spell(286121),
-  TheFirstDance                         = Spell(278681),
-  -- Essences
-  BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
-  ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  ReapingFlames                         = Spell(310690),
-  BloodoftheEnemyDebuff                 = Spell(297108),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = Spell(302917),
-  LifebloodBuff                         = Spell(295137),
-  ConcentratedFlameBurn                 = Spell(295368),
-  -- Covenant
-  SerratedBoneSpike                     = Spell(328547),
-  SerratedBoneSpikeDot                  = Spell(324073),
-  EchoingReprimand                      = Spell(323547),
-  Sepsis                                = Spell(328305),
-  Flagellation                          = Spell(323654),
-  FlagellationMastery                   = Spell(345569),
-  -- Defensive
-  CrimsonVial                           = Spell(185311),
-  Feint                                 = Spell(1966),
-  -- Utility
-  Blind                                 = Spell(2094),
-  CheapShot                             = Spell(1833),
-  Kick                                  = Spell(1766),
-  KidneyShot                            = Spell(408),
-  Sprint                                = Spell(2983),
-  -- Misc
-  ConductiveInkDebuff                   = Spell(302565),
-  VigorTrinketBuff                      = Spell(287916),
-  RazorCoralDebuff                      = Spell(303568),
-  TheDreadlordsDeceit                   = Spell(228224),
-  PoolEnergy                            = Spell(999910)
-}
+-- Define S/I for spell and item arrays
 local S = Spell.Rogue.Subtlety
+local I = Item.Rogue.Subtlety
+local AoETrinkets = { }
+
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = {
+  I.ComputationDevice:ID(),
+  I.VigorTrinket:ID(),
+  I.FontOfPower:ID(),
+  I.RazorCoral:ID()
+}
+
 S.Eviscerate:RegisterDamageFormula(
   -- Eviscerate DMG Formula (Pre-Mitigation):
   --- Player Modifier
@@ -163,25 +81,6 @@ S.Rupture:RegisterPMultiplier(
     return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.12 or 1
   end
 )
--- Items
-if not Item.Rogue then Item.Rogue = {} end
-Item.Rogue.Subtlety = {
-  -- Trinkets
-  ComputationDevice     = Item(167555, {13, 14}),
-  VigorTrinket          = Item(165572, {13, 14}),
-  FontOfPower           = Item(169314, {13, 14}),
-  RazorCoral            = Item(169311, {13, 14}),
-}
-local I = Item.Rogue.Subtlety
-local AoETrinkets = { }
-
--- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = {
-  I.ComputationDevice:ID(),
-  I.VigorTrinket:ID(),
-  I.FontOfPower:ID(),
-  I.RazorCoral:ID()
-}
 
 -- Rotation Var
 local Enemies30y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
