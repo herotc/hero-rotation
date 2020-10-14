@@ -128,8 +128,10 @@
       function ()
         -- Damage formula is based on ilevel scaling of the neck
         -- 134.6154 coefficient * PLAYER_SPECIAL_SCALE8 damage_replace_stat * Versatility
-        local Damage = 134.6154 * Spell:EssenceScaling() * (1 + Player:VersatilityDmgPct() / 100)
-        if Player:BuffP(S.ReapingFlamesBuff) then
+        -- local Damage = 134.6154 * Spell:EssenceScaling() * (1 + Player:VersatilityDmgPct() / 100)
+        -- Temp hack until we regenerate the lookup table for the lower item level
+        local Damage = 2400 * (1 + Player:VersatilityDmgPct() / 100)
+        if Player:BuffUp(S.ReapingFlamesBuff) then
           Damage = Damage * 2
         end
         return Damage
