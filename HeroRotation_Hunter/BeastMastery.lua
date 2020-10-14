@@ -214,7 +214,7 @@ local function Cleave()
     if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.CovenantDisplayStyle) then return "resonating_arrow kyrian covenant"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
-  if S.Stampede:IsCastable() and Player:BuffUp(S.AspectoftheWildBuff) or Target:BossTimeToDie() < 15 then
+  if S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:BossTimeToDie() < 15) then
     if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetIsInRange[30]) then return "stampede 96"; end
   end
   -- flayed_shot
@@ -312,7 +312,7 @@ local function St()
     if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 180"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
-  if S.Stampede:IsCastable() and Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15 then
+  if S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15) then
     if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetIsInRange[30]) then return "stampede 182"; end
   end
   -- a_murder_of_crows
