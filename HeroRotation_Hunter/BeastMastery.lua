@@ -357,7 +357,7 @@ local function St()
     -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
     -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
     -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
-    if Player:BuffDown(S.BestialWrathBuff) and Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
+    if Player:BuffDown(S.BestialWrathBuff) and (Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2) then
       if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
     end
     if HR.Cast(S.CobraShot, nil, nil, not TargetIsInRange[40]) then return "cobra_shot 218"; end
