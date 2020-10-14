@@ -15,6 +15,8 @@ local Spell      = HL.Spell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+local AoEON      = HR.AoEON
+local CDsON      = HR.CDsON
 
 -- Azerite Essence Setup
 local AE         = DBC.AzeriteEssences
@@ -145,14 +147,14 @@ local function Precombat()
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
     if HR.Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike 6"; end
   end
-  if S.ImmolationAura:IsCastable() and IsInMeleeRange then
-    if HR.Cast(S.ImmolationAura) then return "immolation_aura 8"; end
+  if S.Fracture:IsCastable() and IsInMeleeRange then
+    if HR.Cast(S.Fracture) then return "fracture 8"; end
   end
 end
 
 local function Defensives()
   -- Demon Spikes
-  if S.DemonSpikes:IsCastable(6) and Player:BuffDown(S.DemonSpikesBuff) then
+  if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) then
     if S.DemonSpikes:ChargesFractional() > 1.9 then
       if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Capped)"; end
     elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
@@ -160,7 +162,7 @@ local function Defensives()
     end
   end
   -- Metamorphosis
-  if S.Metamorphosis:IsCastable(6) and (Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold) then
+  if S.Metamorphosis:IsCastable() and (Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold) then
     if HR.CastSuggested(S.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
@@ -184,7 +186,7 @@ local function Brand()
       end
     end
     -- infernal_strike,if=cooldown.fiery_brand.remains=0
-    if S.InfernalStrike:IsCastable() and (S.FieryBrand:IsReady()) then
+    if S.InfernalStrike:IsCastable() and (S.FieryBrand:CooldownUp() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9)) then
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 84"; end
     end
     -- fiery_brand
@@ -294,8 +296,8 @@ local function Normal()
     if HR.Cast(S.ImmolationAura) then return "immolation_aura 36"; end
   end
   -- felblade,if=fury<=70
-  if S.Felblade:IsCastable(15) and (Player:Fury() <= 70) then
-    if HR.Cast(S.Felblade) then return "felblade 38"; end
+  if S.Felblade:IsCastable() and (Player:Fury() <= 70) then
+    if HR.Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade 38"; end
   end
   -- fracture,if=soul_fragments<=3
   if S.Fracture:IsCastable() and IsInMeleeRange and (SoulFragments <= 3) then
@@ -318,15 +320,20 @@ local function Normal()
     if HR.Cast(S.Fracture) then return "fracture 46"; end
   end
   -- throw_glaive
-  if S.ThrowGlaive:IsCastable(30) then
-    if HR.Cast(S.ThrowGlaive) then return "throw_glaive 48 (OOR)"; end
+  if S.ThrowGlaive:IsCastable() then
+    if HR.Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive 48 (OOR)"; end
   end
 end
 
 -- APL Main
 local function APL()
   Enemies8yMelee = Player:GetEnemiesInMeleeRange(8)
-  EnemiesCount8yMelee = #Enemies8yMelee
+  if (AoEON()) then
+    EnemiesCount8yMelee = #Enemies8yMelee
+  else
+    EnemiesCount8yMelee = 1
+  end
+
   UpdateSoulFragments()
   UpdateIsInMeleeRange()
 
@@ -350,7 +357,7 @@ local function APL()
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cooldowns
-    if (HR.CDsON()) then
+    if (CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=normal

@@ -81,7 +81,7 @@ CreatePanelOption("Dropdown", CP_DemonHunter, "APL.DemonHunter.Commons.CovenantD
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.MetamorphosisHealthThreshold", {5, 100, 5}, "Metamorphosis Health Threshold", "Suggest Metamorphosis when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {5, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.DemonSpikesHealthThreshold", {5, 100, 5}, "Demon Spikes Health Threshold", "Suggest Demon Spikes when below this health percentage.")
-CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.BrandForDamage", "Fiery Brand for DPS", "Use Fiery Brand as a DPS ability when using the Charred Flesh talent.")
+CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.BrandForDamage", "Fiery Brand for DPS", "Use Fiery Brand as a DPS ability, rather than saving it for defensive use.")
 CreatePanelOption("CheckButton", CP_Vengeance, "APL.DemonHunter.Vengeance.ConserveInfernalStrike", "Conserve Infernal Strike", "Save at least 1 Infernal Strike charge for mobility.")
 CreateARPanelOptions(CP_Vengeance, "APL.DemonHunter.Vengeance")
 
