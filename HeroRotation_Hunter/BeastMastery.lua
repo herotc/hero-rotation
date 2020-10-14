@@ -274,9 +274,9 @@ end
 local function St()
   -- barbed_shot,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<gcd|cooldown.bestial_wrath.remains&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd)
   -- barbed_shot,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd|full_recharge_time<gcd&cooldown.bestial_wrath.remains|cooldown.bestial_wrath.remains<12+gcd&talent.scent_of_blood.enabled
-  if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) < GCDMax
-    or bool(S.BestialWrath:CooldownRemains()) and S.BarbedShot:FullRechargeTime() < GCDMax
-    or S.BestialWrath:CooldownRemains() < 12 + Player:GCD() and S.ScentOfBlood:IsAvailable()) then
+  if S.BarbedShot:IsCastable() and ((Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) < GCDMax)
+    or (bool(S.BestialWrath:CooldownRemains()) and S.BarbedShot:FullRechargeTime() < GCDMax)
+    or (S.BestialWrath:CooldownRemains() < 12 + Player:GCD() and S.ScentOfBlood:IsAvailable())) then
     if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 164"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
@@ -357,7 +357,7 @@ local function St()
     -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
     -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
     -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
-    if Player:BuffDown(S.BestialWrathBuff) and (Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2) then
+    if Player:BuffDown(S.BestialWrathBuff) and Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) <= GCDMax * 2 and Player:FocusTimeToMaxPredicted() > GCDMax * 2 then
       if HR.Cast(S.PoolFocus) then return "Barbed Shot Pooling"; end
     end
     if HR.Cast(S.CobraShot, nil, nil, not TargetIsInRange[40]) then return "cobra_shot 218"; end
