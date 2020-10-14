@@ -269,7 +269,7 @@ local function Cooldowns()
   end
   -- soul_reaper,target_if=target.health.pct<35&target.time_to_die>5
   if S.SoulReaper:IsCastable() then
-    if Everyone.CastCycle(S.SoulReaper, Enemies30yd, EvaluateCycleSoulReaper) then return "soul_reaper target_if cooldown 11" end
+    if Everyone.CastCycle(S.SoulReaper, EnemiesMelee, EvaluateCycleSoulReaper) then return "soul_reaper target_if cooldown 11" end
   end
   -- raise_dead,if=!pet.risen_ghoul.active
   if S.RaiseDead:IsCastable() then
