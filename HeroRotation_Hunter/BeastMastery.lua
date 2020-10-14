@@ -354,7 +354,7 @@ local function St()
   --cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains_guess>focus.time_to_max)&cooldown.kill_command.remains>1|target.time_to_die<3
   if S.CobraShot:IsReady() and ((Player:FocusPredicted() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemains() - 1) > S.KillCommand:Cost())
     or (S.KillCommand:CooldownRemains() > 1 + GCDMax) and S.BestialWrath:CooldownRemains() > Player:FocusTimeToMaxPredicted() and S.KillCommand:CooldownRemains() > 1)
-    or Target:TimeToDie() < 3) then
+    or Target:TimeToDie() < 3 then
     -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
     -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
     -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2
