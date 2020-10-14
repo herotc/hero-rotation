@@ -78,7 +78,7 @@ S.Eviscerate:RegisterDamageFormula(
 )
 S.Rupture:RegisterPMultiplier(
   function ()
-    return S.Nightstalker:IsAvailable() and Player:IsStealthed(true, false) and 1.12 or 1
+    return S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) and 1.12 or 1
   end
 )
 
@@ -154,7 +154,11 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   if S.SliceandDice:IsReady() and Target:IsInMeleeRange(5)
     and (HL.FilteredFightRemains(MeleeEnemies5y, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
     and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints * 1.8) then
-    if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+    if ReturnSpellOnly then
+      return S.SliceandDice
+    else
+      if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice" end
+    end
   end
 
   if S.Rupture:IsReady() then
@@ -413,7 +417,7 @@ local function CDs ()
       end
     end
     -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5
-    if HR.AoEON() and S.SerratedBoneSpike:IsCastable() and Player:BuffUp(S.SliceandDice) or HL.BossFilteredFightRemains("<=", 5) then
+    if HR.AoEON() and S.SerratedBoneSpike:IsCastable() and (Player:BuffUp(S.SliceandDice) or HL.BossFilteredFightRemains("<=", 5)) then
       local BestUnit, BestUnitTTD = nil, 30
       for _, Unit in pairs(Enemies30y) do -- Shoule we increase range here to match spike range? Not sure about false positives.
         local TTD = Unit:TimeToDie()
