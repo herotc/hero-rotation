@@ -53,11 +53,11 @@ HR.GUISettings.APL.DemonHunter = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      Metamorphosis = true,
       VengefulRetreat = true,
     },
     GCDasOffGCD = {
       -- Abilities
+      Metamorphosis = true,
       EyeBeam = false,
       GlaiveTempest = false,
       ThrowGlaive = false,
