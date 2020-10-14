@@ -505,7 +505,7 @@ local function CDs ()
         -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.symbols_of_death.remains>8
         if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
           local CastRazorCoral
-          if S.RazorCoralDebuff:ActiveCount() == 0 then
+          if S.RazorCoralDebuff:AuraActiveCount() == 0 then
             CastRazorCoral = true
           else
             local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
