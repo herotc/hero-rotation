@@ -234,26 +234,6 @@
       end
     , 64);
 
-    local FrostOldPlayerBuffUp
-    FrostOldPlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
-      function (self, Spell, AnyCaster, Offset)
-        local BaseCheck = FrostOldPlayerBuffUp(self, Spell, AnyCaster, Offset)
-        if Spell == SpellFrost.FingersofFrostBuff then
-          if SpellFrost.IceLance:InFlight() then
-            if BaseCheck == 0 then
-              return 0
-            else
-              return BaseCheck - 1
-            end
-          else
-            return BaseCheck
-          end
-        else
-          return BaseCheck
-        end
-      end
-    , 64);
-
     local FrostOldTargetDebuffStack
     FrostOldTargetDebuffStack = HL.AddCoreOverride("Target.DebuffStack",
       function (self, Spell, AnyCaster, Offset)

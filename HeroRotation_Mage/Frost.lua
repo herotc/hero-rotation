@@ -337,7 +337,7 @@ local function Single ()
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
   end ]]
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
-  if S.IceLance:IsCastable() and (Player:BuffUp(S.FingersofFrostBuff) or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
+  if S.IceLance:IsCastable() and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 10"; end
   end
   --ebonbolt
