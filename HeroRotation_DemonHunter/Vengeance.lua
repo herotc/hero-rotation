@@ -189,7 +189,7 @@ local function Brand()
     end
     -- fiery_brand
     if S.FieryBrand:IsCastable() and IsInMeleeRange then
-      if HR.Cast(S.FieryBrand) then return "fiery_brand 86"; end
+      if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand 86"; end
     end
   end
   if Target:DebuffUp(S.FieryBrandDebuff) then
