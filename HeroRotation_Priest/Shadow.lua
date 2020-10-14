@@ -336,6 +336,10 @@ local function Main()
   if S.Damnation:IsCastable() then
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
   end
+  -- void_bolt,if=insanity<=85&((talent.hungering_void.enabled&spell_targets.mind_sear<5)|spell_targets.mind_sear=1)
+  if S.VoidBolt:IsCastable() and (Player:Insanity() <= 85 and ((S.HungeringVoid:IsAvailable() and EnemiesCount10ySplash < 5) or EnemiesCount10ySplash == 1)) then
+    if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 100"; end
+  end
   -- devouring_plague,target_if=(refreshable|insanity>75)&!variable.pi_vf_condition&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
   if S.DevouringPlague:IsReady() then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
