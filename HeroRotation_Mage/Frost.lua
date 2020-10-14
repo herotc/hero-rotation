@@ -55,6 +55,10 @@ S.FrozenOrb:RegisterInFlight()
 HL:RegisterForEvent(function() S.FrozenOrb:RegisterInFlight() end, "LEARNED_SPELL_IN_TAB")
 S.Frostbolt:RegisterInFlightEffect(228597)--also register hitting spell to track in flight (spell book id ~= hitting id)
 S.Frostbolt:RegisterInFlight()
+S.Flurry:RegisterInFlightEffect(228354)
+S.Flurry:RegisterInFlight()
+S.IceLance:RegisterInFlightEffect(228598)
+S.IceLance:RegisterInFlight()
 
 -- TODO : manage frozen targets
 -- spells : FrostNova, Frostbite, Freeze, WintersChillDebuff
@@ -73,17 +77,21 @@ local function Precombat ()
   end
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- mirror_image
+    if S.MirrorImage:IsCastable() and HR.CDsON() then
+      if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
+    end
     -- potion
     --[[ if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion precombat 3"; end
+      if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion precombat 4"; end
     end ]]
     -- frostbolt
     if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
-      if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 4"; end
+      if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end
     end
     --frozen_orb
     if S.FrozenOrb:IsCastable() then
-      if HR.Cast(S.FrozenOrb, nil, nil, not Target:IsInRange(40)) then return "frozen_orb precombat 5"; end
+      if HR.Cast(S.FrozenOrb, nil, nil, not Target:IsInRange(40)) then return "frozen_orb precombat 6"; end
     end
   end
 end
