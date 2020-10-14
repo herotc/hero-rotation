@@ -153,7 +153,7 @@ local function AOE_Setup()
   end
   -- festering_strike,target_if=debuff.festering_wound.stack<1
   if S.FesteringStrike:IsCastable() then
-    if Everyone.CastCycle(S.FesteringStrike, Enemies30yd, EvaluateTargetUnitNoFWDebuff) then return "festering_strike target_if aoe_setup 6" end
+    if Everyone.CastCycle(S.FesteringStrike, EnemiesMelee, EvaluateTargetUnitNoFWDebuff) then return "festering_strike target_if aoe_setup 6" end
   end 
   -- epidemic,if=!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
