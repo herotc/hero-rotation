@@ -117,10 +117,6 @@ local function Precombat()
   -- summon_pet
   -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- hunters mark
-    if S.HuntersMark:IsCastable() then
-      if HR.Cast(S.HuntersMark) then return "hunters_mark precombat"; end
-    end
     -- tar_trap,if=runeforge.soulforge_embers.equipped
     if S.TarTrap:IsCastable() and SoulForgeEmbersEquipped then
       if HR.Cast(S.TarTrap) then return "tar_trap soulforge_embers equipped"; end

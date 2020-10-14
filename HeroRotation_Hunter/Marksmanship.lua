@@ -85,10 +85,6 @@ local function Precombat()
   -- food
   -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- hunters_mark
-    if S.HuntersMark:IsReady() and Target:DebuffDown(S.HuntersMarkDebuff) then
-      if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark, nil, not TargetIsInRange[40]) then return "hunters_mark 14"; end
-    end
     -- tar_trap,if=runeforge.soulforge_embers.equipped
     if S.TarTrap:IsReady() and SoulForgeEmbersEquipped then
       if HR.Cast(S.TarTrap) then return "tar_trap soulforge_embers equipped"; end
@@ -105,10 +101,6 @@ local function Precombat()
 end
 
 local function Cds()
-  -- hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
-  if S.HuntersMark:IsReady() and (Target:DebuffDown(S.HuntersMarkDebuff) and not Player:BuffUp(S.Trueshot)) then
-    if HR.Cast(S.HuntersMark, Settings.Marksmanship.GCDasOffGCD.HuntersMark, nil, not TargetIsInRange[60]) then return "hunters_mark 46"; end
-  end
   -- berserking,if=prev_gcd.1.trueshot&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<20|!talent.careful_aim.enabled))|target.time_to_die<13
   if S.Berserking:IsReady() and (Player:PrevGCDP(1, S.Trueshot) and (Target:TimeToDie() > 180 + S.Berserking:BaseDuration() or (Target:HealthPercentage() < 20 or not S.CarefulAim:IsAvailable())) or Target:TimeToDie() < 13) then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 86"; end
