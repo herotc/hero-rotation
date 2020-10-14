@@ -1,7 +1,7 @@
 ## Interface: 80300
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFABD473Hunter|r]
-## Author: Nia
+## Author: Krich
 ## Notes: Hero Rotation - Hunter Module.
 
 ## DefaultState: Enabled

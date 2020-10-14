@@ -1,7 +1,7 @@
 ## Interface: 80300
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFA330C9Demon Hunter|r]
-## Author: Aethys, Kojiyama
+## Author: Cilraaz, Kojiyama
 ## Notes: Hero Rotation - Demon Hunter Module.
 
 ## DefaultState: Enabled
