@@ -375,8 +375,8 @@ local function Essences ()
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams" end
   end
   -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-  -- ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle)
-  -- if ShouldReturn then return ShouldReturn end
+  ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle)
+  if ShouldReturn then return ShouldReturn end
 
   return false
 end
