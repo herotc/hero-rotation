@@ -508,7 +508,7 @@ local function CDs ()
           if S.RazorCoralDebuff:AuraActiveCount() == 0 then
             CastRazorCoral = true
           else
-            local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackPUnit()
+            local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackUnit()
             if ConductiveInkUnit then
               -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
               CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or (Target:IsInBossList() and Target:FilteredTimeToDie("<", 20)) or
