@@ -231,7 +231,7 @@ local function Cleave()
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
-    if HR.Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed) then return "bloodsed"; end
+    if HR.Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed) then return "bloodshed"; end
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then
@@ -305,7 +305,7 @@ local function St()
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
-    if HR.Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed) then return "bloodsed"; end
+    if HR.Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed) then return "bloodshed"; end
   end
   -- aspect_of_the_wild
   if S.AspectoftheWild:IsCastable() and HR.CDsON() and Player:BuffDown(S.AspectoftheWildBuff) then
