@@ -183,7 +183,7 @@
           RangeOK = RangeUnit:IsInRange( Range, AoESpell );
         end
         if self == SpellFrost.GlacialSpike then
-          return self:IsLearned() and RangeOK and (bool(Player:BuffStackP(SpellFrost.GlacialSpikeBuff)) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 5));
+          return self:IsLearned() and RangeOK and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5));
         else
           local BaseCheck = FrostOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
           if self == SpellFrost.SummonWaterElemental then
