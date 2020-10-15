@@ -291,6 +291,10 @@ Spell.Rogue.Subtlety = {
   Kick                                  = Spell(1766),
   KidneyShot                            = Spell(408),
   Sprint                                = Spell(2983),
+  -- Poisons
+  CripplingPoison                       = Spell(3408),
+  InstantPoison                         = Spell(315584),
+  NumbingPoison                         = Spell(5761),
   -- Misc
   ConductiveInkDebuff                   = Spell(302565),
   VigorTrinketBuff                      = Spell(287916),
