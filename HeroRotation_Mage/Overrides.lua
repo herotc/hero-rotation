@@ -183,7 +183,7 @@
           RangeOK = RangeUnit:IsInRange( Range, AoESpell );
         end
         if self == SpellFrost.GlacialSpike then
-          return self:IsLearned() and RangeOK and (bool(Player:BuffStackP(SpellFrost.GlacialSpikeBuff)) or (Player:BuffStackP(SpellFrost.IciclesBuff) == 5));
+          return self:IsLearned() and RangeOK and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5));
         else
           local BaseCheck = FrostOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
           if self == SpellFrost.SummonWaterElemental then
@@ -218,6 +218,50 @@
           return self:IsCasting(SpellFrost.GlacialSpike) and 0 or BaseCheck
         elseif Spell == SpellFrost.WintersReachBuff then
           return self:IsCasting(SpellFrost.Flurry) and 0 or BaseCheck
+        elseif Spell == SpellFrost.FingersofFrostBuff then
+          if SpellFrost.IceLance:InFlight() then
+            if BaseCheck == 0 then
+              return 0
+            else
+              return BaseCheck - 1
+            end
+          else
+            return BaseCheck
+          end
+        else
+          return BaseCheck
+        end
+      end
+    , 64);
+
+    local FrostOldTargetDebuffStack
+    FrostOldTargetDebuffStack = HL.AddCoreOverride("Target.DebuffStack",
+      function (self, Spell, AnyCaster, Offset)
+        local BaseCheck = FrostOldTargetDebuffStack(self, Spell, AnyCaster, Offset)
+        if Spell == SpellFrost.WintersChillDebuff then
+          if SpellFrost.Flurry:InFlight() then
+            return 2
+          elseif SpellFrost.IceLance:InFlight() then
+            if BaseCheck == 0 then
+              return 0
+            else
+              return BaseCheck - 1
+            end
+          else
+            return BaseCheck
+          end
+        else
+          return BaseCheck
+        end
+      end
+    , 64);
+
+    local FrostOldTargetDebuffRemains
+    FrostOldTargetDebuffRemains = HL.AddCoreOverride("Target.DebuffRemains",
+      function (self, Spell, AnyCaster, Offset)
+        local BaseCheck = FrostOldTargetDebuffRemains(self, Spell, AnyCaster, Offset)
+        if Spell == SpellFrost.WintersChillDebuff then
+          return SpellFrost.Flurry:InFlight() and 6 or BaseCheck
         else
           return BaseCheck
         end

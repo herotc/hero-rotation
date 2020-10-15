@@ -214,7 +214,7 @@ local function Cleave()
     if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.CovenantDisplayStyle) then return "resonating_arrow kyrian covenant"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
-  if S.Stampede:IsCastable() and Player:BuffUp(S.AspectoftheWildBuff) or Target:BossTimeToDie() < 15 then
+  if S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:BossTimeToDie() < 15) then
     if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetIsInRange[30]) then return "stampede 96"; end
   end
   -- flayed_shot
@@ -274,9 +274,9 @@ end
 local function St()
   -- barbed_shot,if=pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<gcd|cooldown.bestial_wrath.remains&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd)
   -- barbed_shot,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<=gcd|full_recharge_time<gcd&cooldown.bestial_wrath.remains|cooldown.bestial_wrath.remains<12+gcd&talent.scent_of_blood.enabled
-  if S.BarbedShot:IsCastable() and (Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) < GCDMax
-    or bool(S.BestialWrath:CooldownRemains()) and S.BarbedShot:FullRechargeTime() < GCDMax
-    or S.BestialWrath:CooldownRemains() < 12 + Player:GCD() and S.ScentOfBlood:IsAvailable()) then
+  if S.BarbedShot:IsCastable() and ((Pet:BuffUp(S.FrenzyBuff) and Pet:BuffRemains(S.FrenzyBuff) < GCDMax)
+    or (bool(S.BestialWrath:CooldownRemains()) and S.BarbedShot:FullRechargeTime() < GCDMax)
+    or (S.BestialWrath:CooldownRemains() < 12 + Player:GCD() and S.ScentOfBlood:IsAvailable())) then
     if HR.Cast(S.BarbedShot, nil, nil, not TargetIsInRange[40]) then return "barbed_shot 164"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
@@ -312,7 +312,7 @@ local function St()
     if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "aspect_of_the_wild 180"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
-  if S.Stampede:IsCastable() and Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15 then
+  if S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15) then
     if HR.Cast(S.Stampede, Settings.BeastMastery.GCDasOffGCD.Stampede, nil, not TargetIsInRange[30]) then return "stampede 182"; end
   end
   -- a_murder_of_crows
@@ -352,8 +352,9 @@ local function St()
     if HR.Cast(S.Barrage, nil, nil, not TargetIsInRange[40]) then return "barrage 216"; end
   end
   --cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains_guess>focus.time_to_max)&cooldown.kill_command.remains>1|target.time_to_die<3
-  if S.CobraShot:IsReady() and ((Player:FocusPredicted() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemains() - 1) > S.KillCommand:Cost()
-    or S.KillCommand:CooldownRemains() > 1 + GCDMax) and S.BestialWrath:CooldownRemains() > Player:FocusTimeToMaxPredicted() and S.KillCommand:CooldownRemains() > 1 or Target:TimeToDie() < 3) then
+  if S.CobraShot:IsReady() and ((Player:FocusPredicted() - S.CobraShot:Cost() + Player:FocusRegen() * (S.KillCommand:CooldownRemains() - 1) > S.KillCommand:Cost())
+    or (S.KillCommand:CooldownRemains() > 1 + GCDMax) and S.BestialWrath:CooldownRemains() > Player:FocusTimeToMaxPredicted() and S.KillCommand:CooldownRemains() > 1)
+    or Target:TimeToDie() < 3 then
     -- Special pooling line for HeroRotation -- negiligible effective DPS loss (0.1%), but better for prediction accounting for latency
     -- Avoids cases where Cobra Shot would be suggested but the GCD of Cobra Shot + latency would allow Barbed Shot to fall off
     -- wait,if=!buff.bestial_wrath.up&pet.turtle.buff.frenzy.up&pet.turtle.buff.frenzy.remains<=gcd.max*2&focus.time_to_max>gcd.max*2

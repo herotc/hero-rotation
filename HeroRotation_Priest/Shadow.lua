@@ -174,7 +174,7 @@ local function Precombat()
       if HR.Cast(S.Shadowform, Settings.Shadow.GCDasOffGCD.Shadowform) then return "shadowform 4"; end
     end
     -- arcane_torrent
-    if S.ArcaneTorrent:IsCastable() then
+    if S.ArcaneTorrent:IsCastable() and CDsON() then
       if HR.Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent 6"; end
     end
     -- use_item,name=azsharas_font_of_power
@@ -336,6 +336,10 @@ local function Main()
   if S.Damnation:IsCastable() then
     if Everyone.CastCycle(S.Damnation, Enemies40y, EvaluateCycleDamnation200, not Target:IsSpellInRange(S.Damnation)) then return "damnation 98"; end
   end
+  -- void_bolt,if=insanity<=85&((talent.hungering_void.enabled&spell_targets.mind_sear<5)|spell_targets.mind_sear=1)
+  if S.VoidBolt:IsCastable() and (Player:Insanity() <= 85 and ((S.HungeringVoid:IsAvailable() and EnemiesCount10ySplash < 5) or EnemiesCount10ySplash == 1)) then
+    if HR.Cast(S.VoidBolt, nil, nil, not Target:IsSpellInRange(S.VoidBolt)) then return "void_bolt 100"; end
+  end
   -- devouring_plague,target_if=(refreshable|insanity>75)&!variable.pi_vf_condition&(!talent.searing_nightmare.enabled|(talent.searing_nightmare.enabled&!variable.searing_nightmare_cutoff))
   if S.DevouringPlague:IsReady() then
     if Everyone.CastCycle(S.DevouringPlague, Enemies40y, EvaluateCycleDevouringPlage202, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 102"; end
@@ -353,7 +357,7 @@ local function Main()
     if Everyone.CastCycle(S.SurrenderToMadness, Enemies40y, EvaluateCycleSurrenderToMadness206, not Target:IsSpellInRange(S.SurrenderToMadness)) then return "surrender_to_madness 106"; end
   end
   -- mindbender,if=dot.vampiric_touch.ticking&((talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1))|dot.shadow_word_pain.ticking)
-  if S.Mindbender:IsCastable() and (Target:DebuffUp(S.VampiricTouchDebuff) and ((S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1)) or Target:DebuffUp(S.ShadowWordPainDebuff))) then
+  if S.Mindbender:IsCastable() and CDsON() and (Target:DebuffUp(S.VampiricTouchDebuff) and ((S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1)) or Target:DebuffUp(S.ShadowWordPainDebuff))) then
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
   -- void_torrent,target_if=variable.dots_up&target.time_to_die>4&buff.voidform.down&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))

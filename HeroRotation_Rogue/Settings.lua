@@ -90,6 +90,9 @@ HR.GUISettings.APL.Rogue = {
     }
   },
   Subtlety = {
+    -- Poison Refresh (in minutes)
+    PoisonRefresh = 15,
+    PoisonRefreshCombat = 3,
     -- Burn Shadow Dance charges when the target is about to die
     BurnShadowDance = "On Bosses not in Dungeons",
     -- Damage Offsets
@@ -154,6 +157,8 @@ CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseDPSVanish", "Us
 CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Killing Spree Display Style", "Define which icon display style to use for Killing Spree.")
 CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw")
 -- Subtlety
+CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.PoisonRefresh", {5, 55, 1}, "OOC Poison Refresh", "Set the timer for the Poison Refresh (OOC)")
+CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.PoisonRefreshCombat", {0, 55, 1}, "Combat Poison Refresh", "Set the timer for the Poison Refresh (In Combat)")
 CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", {"Always", "On Bosses", "On Bosses not in Dungeons"}, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.")
 CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", {1, 5, 0.25}, "Eviscerate DMG Offset", "Set the Eviscerate DMG Offset.")
 CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.ShDEcoCharge", {1, 2, 0.1}, "ShD Eco Charge", "Set the Shadow Dance Eco Charge threshold.")

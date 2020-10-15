@@ -370,7 +370,7 @@ local function CDs ()
     end
     if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
       -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|fight_remains<20
-      if S.RazorCoralDebuff:ActiveCount() == 0 or HL.BossFilteredFightRemains("<", 20) then
+      if S.RazorCoralDebuff:AuraActiveCount() == 0 or HL.BossFilteredFightRemains("<", 20) then
         if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Razor Coral" end
       end
     end
@@ -420,7 +420,7 @@ local function CDs ()
           or S.Exsanguinate:CooldownRemains() < 5 - 2 * num(S.DeeperStratagem:IsAvailable()))
         -- actions.cds+=/variable,name=vendetta_font_condition,value=!equipped.azsharas_font_of_power|azerite.shrouded_suffocation.enabled|debuff.razor_coral_debuff.down|trinket.ashvanes_razor_coral.cooldown.remains<10&(cooldown.toxic_blade.remains<1|debuff.toxic_blade.up)
         local FontCondition = (not Settings.Commons.UseTrinkets or not I.FontOfPower:IsEquipped() or S.ShroudedSuffocation:AzeriteEnabled()
-          or S.RazorCoralDebuff:ActiveCount() == 0 or I.RazorCoral:CooldownRemains() < 10 and (S.Shiv:CooldownRemains() < 1 or Target:DebuffUp(S.ShivDebuff)))
+          or S.RazorCoralDebuff:AuraActiveCount() == 0 or I.RazorCoral:CooldownRemains() < 10 and (S.Shiv:CooldownRemains() < 1 or Target:DebuffUp(S.ShivDebuff)))
         if SubterfugeCondition and NightstalkerCondition and FontCondition then
           if HR.Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta" end
         end
