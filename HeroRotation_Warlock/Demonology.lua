@@ -362,7 +362,7 @@ local function APL()
       if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4) then
         if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 36"; end
       end
-      -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.dummon_demonic_tyrant.remains+15
+      -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.summon_demonic_tyrant.remains+15
       if S.GrimoireFelguard:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() + 90 > Target:TimeToDie() or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemains() + 15) then
         if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard 38"; end
       end
@@ -376,6 +376,10 @@ local function APL()
       -- power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
       if S.PowerSiphon:IsCastable() and (WildImpsCount() > 1 and Player:BuffStack(S.DemonicCoreBuff) < 3) then
         if HR.Cast(S.PowerSiphon) then return "power_siphon 40"; end
+      end
+      -- implosion,if=azerite.explosive_potential.rank>1&buff.explosive_potential.remains<3&buff.wild_imps.stack>=3
+      if S.Implosion:IsCastable() and (S.ExplosivePotential:AzeriteRank() > 1 and Player:BuffRemains(S.ExplosivePotentialBuff) < 3 and WildImpsCount() >= 3) then
+        if HR.Cast(S.Implosion, nil, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion 41"; end
       end
       -- soul_strike
       if S.SoulStrike:IsCastable() then
