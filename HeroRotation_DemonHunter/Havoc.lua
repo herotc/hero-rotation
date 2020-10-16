@@ -56,6 +56,9 @@ local Settings = {
   Havoc = HR.GUISettings.APL.DemonHunter.Havoc
 }
 
+-- Variables
+local BurningWoundEquipped
+
 -- Interrupts List
 local StunInterrupts = {
   {S.FelEruption, "Cast Fel Eruption (Interrupt)", function () return true; end},
@@ -119,6 +122,22 @@ end
 
 local function ConserveFelRush()
   return not Settings.Havoc.ConserveFelRush or S.FelRush:Charges() == 2
+end
+
+local function EvalutateTargetIfFilterDemonsBite202(TargetUnit)
+  return TargetUnit:DebuffUp(S.BurningWoundDebuff)
+end
+
+local function EvaluateTargetIfDemonsBite204(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
+end
+
+local function EvalutateTargetIfFilterDemonsBite206(TargetUnit)
+  return TargetUnit:DebuffUp(S.BurningWoundDebuff)
+end
+
+local function EvaluateTargetIfDemonsBite208(TargetUnit)
+  return (TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
 end
 
 local function Precombat()
@@ -252,7 +271,7 @@ local function Cooldown()
   end
   -- call_action_list,name=essences
   -- Manually added HeartEssence castable check. Returns false while not on Azeroth.
-  if (S.HeartEssence:IsCastable()) then
+  if (S.HeartEssence and S.HeartEssence:IsCastable()) then
     local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
   end
 end
@@ -328,6 +347,10 @@ local function Demonic()
   -- fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
   if S.FelRush:IsCastable() and (S.DemonBlades:IsAvailable() and not S.EyeBeam:CooldownUp() and ConserveFelRush()) then
     if CastFelRush() then return "fel_rush 102"; end
+  end
+  -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound.equipped&debuff.burning_wound.remains<4
+  if S.DemonsBite:IsCastable() then
+    if HR.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite206, EvaluateTargetIfDemonsBite208, not Target:IsSpellInRange(S.DemonsBite)) then reutrn "demons_bite 103"; end
   end
   -- demons_bite
   if S.DemonsBite:IsCastable() and IsInMeleeRange() then
@@ -407,6 +430,10 @@ local function Normal()
   -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
   if S.EyeBeam:IsReady() and (S.BlindFury:IsAvailable()) then
     if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsSpellInRange(S.EyeBeam)) then return "eye_beam 148"; end
+  end
+  -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound.equipped&debuff.burning_wound.remains<4
+  if S.DemonsBite:IsCastable() then
+    if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite202, EvaluateTargetIfDemonsBite204, not Target:IsSpellInRange(S.DemonsBite)) then reutrn "demons_bite 149"; end
   end
   -- demons_bite
   if S.DemonsBite:IsCastable() and IsInMeleeRange() then
