@@ -18,10 +18,10 @@ local SpellProtection       = Spell.Warrior.Protection
 
 --- ============================ CONTENT ============================
 -- Fury, ID: 72
-local FuryOldSpellIsCastableP
-FuryOldSpellIsCastableP = HL.AddCoreOverride ("Spell.IsCastableP",
+local FuryOldSpellIsCastable
+FuryOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    local BaseCheck = FuryOldSpellIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = FuryOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellFury.Charge then
       return (not Target:IsInRange(8) and Target:IsInRange(25))
     else
