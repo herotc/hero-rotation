@@ -2,6 +2,8 @@
 --- ======= LOCALIZE =======
 -- Addon
 local addonName, addonTable = ...
+-- HeroDBC
+local DBC = HeroDBC.DBC
 -- HeroLib
 local HL         = HeroLib
 local Cache      = HeroCache
@@ -10,108 +12,65 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+local AoEON      = H
+local CDsON      = HR.CDsON
 
 -- Azerite Essence Setup
-local AE         = HL.Enum.AzeriteEssences
-local AESpellIDs = HL.Enum.AzeriteEssenceSpellIDs
+local AE         = DBC.AzeriteEssences
+local AESpellIDs = DBC.AzeriteEssenceSpellIDs
+local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
 
--- Spells
-if not Spell.Warrior then Spell.Warrior = {} end
-Spell.Warrior.Fury = {
-  RecklessnessBuff                      = Spell(1719),
-  Recklessness                          = Spell(1719),
-  FuriousSlashBuff                      = Spell(202539),
-  FuriousSlash                          = Spell(100130),
-  RecklessAbandon                       = Spell(202751),
-  HeroicLeap                            = Spell(6544),
-  Siegebreaker                          = Spell(280772),
-  Rampage                               = Spell(184367),
-  FrothingBerserker                     = Spell(215571),
-  Carnage                               = Spell(202922),
-  EnrageBuff                            = Spell(184362),
-  Massacre                              = Spell(206315),
-  Execute                               = MultiSpell(5308, 280735),
-  Bloodthirst                           = Spell(23881),
-  RagingBlow                            = Spell(85288),
-  Bladestorm                            = Spell(46924),
-  SiegebreakerDebuff                    = Spell(280773),
-  DragonRoar                            = Spell(118000),
-  Whirlwind                             = Spell(190411),
-  Charge                                = Spell(100),
-  FujiedasFuryBuff                      = Spell(207775),
-  MeatCleaverBuff                       = Spell(85739),
-  BloodFury                             = Spell(20572),
-  Berserking                            = Spell(26297),
-  LightsJudgment                        = Spell(255647),
-  Fireblood                             = Spell(265221),
-  AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
-  Pummel                                = Spell(6552),
-  IntimidatingShout                     = Spell(5246),
-  ColdSteelHotBlood                     = Spell(288080),
-  BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
-  ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  GuardianofAzerothBuff                 = Spell(295855),
-  ReapingFlames                         = Spell(310690),
-  ConcentratedFlameBurn                 = Spell(295368),
-  RecklessForceBuff                     = Spell(302932),
-  RazorCoralDebuff                      = Spell(303568),
-  ConductiveInkDebuff                   = Spell(302565)
-};
-local S = Spell.Warrior.Fury;
-
--- Items
-if not Item.Warrior then Item.Warrior = {} end
-Item.Warrior.Fury = {
-  PotionofUnbridledFury            = Item(169299),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
-};
-local I = Item.Warrior.Fury;
+-- Define S/I for spell and item arrays
+local S = Spell.Warrior.Fury
+local I = Item.Warrior.Fury
+if AEMajor ~= nil then
+  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.AshvanesRazorCoral:ID(),
-  I.AzsharasFontofPower:ID()
+  I.AzsharasFontofPower:ID(),
 }
 
 -- Rotation Var
-local ShouldReturn; -- Used to get the return string
+local ShouldReturn -- Used to get the return string
+local Enemies8y, Enemies20y
+local EnemiesCount8, EnemiesCount20
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
+local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Warrior.Commons,
   Fury = HR.GUISettings.APL.Warrior.Fury
-};
+}
 
--- Stuns
+-- Interrupts List
 local StunInterrupts = {
+  {S.StormBolt, "Cast Storm Bolt (Interrupt)", function () return true; end},
   {S.IntimidatingShout, "Cast Intimidating Shout (Interrupt)", function () return true; end},
-};
+}
 
-local EnemyRanges = {8}
-local function UpdateRanges()
-  for _, i in ipairs(EnemyRanges) do
-    HL.GetEnemies(i);
-  end
-end
+HL:RegisterForEvent(function()
+  S.ConcentratedFlame:RegisterInFlight()
+end, "AZERITE_ESSENCE_ACTIVATED")
+S.ConcentratedFlame:RegisterInFlight()
+
+-- Variables
+--local VarPoolingForMeta = false
+
+
+HL:RegisterForEvent(function()
+  --VarPoolingForMeta = false
+end, "PLAYER_REGEN_ENABLED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -122,97 +81,94 @@ local function bool(val)
 end
 
 local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
-  -- snapshot_stats
-  if Everyone.TargetIsValid() then
-    -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipReady() and Settings.Commons.UseTrinkets then
-      if HR.Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power precombat"; end
-    end
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastableP() then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance precombat"; end
-    end
-    -- memory_of_lucid_dreams
-    if S.MemoryofLucidDreams:IsCastableP() then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams precombat"; end
-    end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastableP() then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth precombat"; end
-    end
-    -- recklessness
-    if S.Recklessness:IsCastableP() then
-      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat"; end
-    end
-    -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion precombat"; end
-    end
+  --# Executed before combat begins. Accepts non-harmful actions only.
+  --actions.precombat=flask
+  --actions.precombat+=/food
+  --actions.precombat+=/augmentation
+  --# Snapshot raid buffed stats before combat begins and pre-potting is done.
+  --actions.precombat+=/snapshot_stats
+  --actions.precombat+=/use_item,name=azsharas_font_of_power
+  if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
+    if HR.Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power"; end
+  end
+  --actions.precombat+=/worldvein_resonance
+  if S.WorldveinResonance:IsCastableP() then
+    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance precombat"; end
+  end
+  --actions.precombat+=/memory_of_lucid_dreams
+  if S.MemoryofLucidDreams:IsCastableP() then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams precombat"; end
+  end
+  --actions.precombat+=/guardian_of_azeroth
+  if S.GuardianofAzeroth:IsCastableP() then
+    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth precombat"; end
+  end
+  --actions.precombat+=/recklessness
+  if S.Recklessness:IsCastableP() then
+    if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat"; end
+  end
+  --actions.precombat+=/potion
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury"; end
   end
 end
 
 local function Movement()
-  -- heroic_leap
+  --actions.movement=heroic_leap
   if S.HeroicLeap:IsCastableP() then
-    if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap 16"; end
+    if HR.Cast(S.HeroicLeap, Settings.Fury.GCDasOffGCD.HeroicLeap) then return "heroic_leap"; end
   end
 end
 
 local function SingleTarget()
-  -- siegebreaker
-  if S.Siegebreaker:IsCastableP("Melee") and HR.CDsON() then
-    if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return "siegebreaker 18"; end
+  --actions.single_target=siegebreaker
+  if S.Siegebreaker:IsCastable("Melee") and HR.CDsON() then
+    if HR.Cast(S.Siegebreaker, Settings.Fury.GCDasOffGCD.Siegebreaker) then return "siegebreaker"; end
   end
-  -- rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
-  if S.Rampage:IsReadyP("Melee") and ((Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryofLucidDreams)) or (S.FrothingBerserker:IsAvailable() or S.Carnage:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or S.Massacre:IsAvailable() and (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90))) then
-    if HR.Cast(S.Rampage) then return "rampage 20"; end
+  --actions.single_target+=/rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(buff.enrage.remains<gcd|rage>90)
+  if S.Rampage:IsReady("Melee") and (Player:BuffP(S.RecklessnessBuff) or Player:BuffP(S.MemoryofLucidDreams)) or (Player:BuffRemainsP(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) then
+    if HR.Cast(S.Rampage) then return "rampage"; end
   end
-  -- execute
+  --actions.single_target+=/execute
   if S.Execute:IsReady("Melee") then
-    if HR.Cast(S.Execute) then return "execute 34"; end
+    if HR.Cast(S.Execute) then return "execute"; end
   end
-  -- furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
-  if S.FuriousSlash:IsCastableP("Melee") and (not Player:HasHeroism() and Player:BuffRemainsP(S.FuriousSlashBuff) < 3) then
-    if HR.Cast(S.FuriousSlash) then return "furious_slash 36"; end
-  end
-  -- bladestorm,if=prev_gcd.1.rampage
+  --actions.single_target+=/bladestorm,if=prev_gcd.1.rampage
   if S.Bladestorm:IsCastableP("Melee") and HR.CDsON() and (Player:PrevGCDP(1, S.Rampage)) then
-    if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm) then return "bladestorm 37"; end
+    if HR.Cast(S.Bladestorm, Settings.Fury.GCDasOffGCD.Bladestorm) then return "bladestorm"; end
   end
-  -- bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
+  --actions.single_target+=/bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
   if S.Bloodthirst:IsCastableP("Melee") and (Player:BuffDownP(S.EnrageBuff) or S.ColdSteelHotBlood:AzeriteRank() > 1) then
-    if HR.Cast(S.Bloodthirst) then return "bloodthirst 38"; end
+    if HR.Cast(S.Bloodthirst) then return "bloodthirst"; end
   end
-  -- dragon_roar,if=buff.enrage.up
+  --actions.single_target+=/onslaught
+  if S.Onslaught:IsReady("Melee") then
+    if HR.Cast(S.Onslaught) then return "onslaught"; end
+  end
+  --actions.single_target+=/dragon_roar,if=buff.enrage.up
   if S.DragonRoar:IsCastableP(12) and HR.CDsON() and (Player:BuffP(S.EnrageBuff)) then
-    if HR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return "dragon_roar 39"; end
+    if HR.Cast(S.DragonRoar, Settings.Fury.GCDasOffGCD.DragonRoar) then return "dragon_roar"; end
   end
-  -- raging_blow,if=charges=2
+  --actions.single_target+=/raging_blow,if=charges=2
   if S.RagingBlow:IsCastableP("Melee") and (S.RagingBlow:ChargesP() == 2) then
-    if HR.Cast(S.RagingBlow) then return "raging_blow 42"; end
+    if HR.Cast(S.RagingBlow) then return "raging_blow"; end
   end
-  -- bloodthirst
+  --actions.single_target+=/bloodthirst
   if S.Bloodthirst:IsCastableP("Melee") then
-    if HR.Cast(S.Bloodthirst) then return "bloodthirst 48"; end
+    if HR.Cast(S.Bloodthirst) then return "bloodthirst"; end
   end
-  -- raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
-  if S.RagingBlow:IsCastableP("Melee") and (S.Carnage:IsAvailable() or (S.Massacre:IsAvailable() and Player:Rage() < 80) or (S.FrothingBerserker:IsAvailable() and Player:Rage() < 90)) then
-    if HR.Cast(S.RagingBlow) then return "raging_blow 62"; end
+  --actions.single_target+=/raging_blow
+  if S.RagingBlow:IsCastableP("Melee") then
+    if HR.Cast(S.RagingBlow) then return "raging_blow"; end
   end
-  -- furious_slash,if=talent.furious_slash.enabled
-  if S.FuriousSlash:IsCastableP("Melee") and (S.FuriousSlash:IsAvailable()) then
-    if HR.Cast(S.FuriousSlash) then return "furious_slash 70"; end
-  end
-  -- whirlwind
+  --actions.single_target+=/whirlwind
   if S.Whirlwind:IsCastableP("Melee") then
     if HR.Cast(S.Whirlwind) then return "whirlwind 74"; end
   end
 end
 
---- ======= ACTION LISTS =======
+---- Action List ----
+
 local function APL()
   UpdateRanges()
   Everyone.AoEToggleEnemiesUpdate()
@@ -223,109 +179,106 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    -- auto_attack
-    -- charge
-    if S.Charge:IsReadyP() and S.Charge:ChargesP() >= 1 then
-      if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge) then return "charge 78"; end
+    --# Executed every time the actor is available.
+    --actions=auto_attack
+    --actions+=/charge
+    if S.Charge:IsReady() and S.Charge:ChargesP() >= 1 then
+      if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge) then return "charge"; end
     end
-    -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    -- run_action_list,name=movement,if=movement.distance>5
-    -- heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
+    --# This is mostly to prevent cooldowns from being accidentally used during movement.
+    --actions+=/run_action_list,name=movement,if=movement.distance>5
+    --actions+=/heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
     if ((not Target:IsInRange("Melee")) and Target:IsInRange(40)) then
       return Movement();
     end
-    -- potion,if=buff.guardian_of_azeroth.up|(!essence.condensed_lifeforce.major&target.time_to_die=60)
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffP(S.GuardianofAzerothBuff) or (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and Target:TimeToDie() == 60)) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_strength 84"; end
+    --actions+=/rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
+    if S.Rampage:IsReadyP("Melee") and (S.Recklessness:CooldownRemainsP() < 3 and S.RecklessAbandon:IsAvailable()) then
+      if HR.Cast(S.Rampage) then return "rampage"; end
     end
-    -- rampage,if=cooldown.recklessness.remains<3
-    if S.Rampage:IsReadyP("Melee") and (S.Recklessness:CooldownRemainsP() < 3) then
-      if HR.Cast(S.Rampage) then return "rampage 108"; end
-    end
-    -- blood_of_the_enemy,if=buff.recklessness.up
-    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
+    --actions+=/blood_of_the_enemy,if=(buff.recklessness.up|cooldown.recklessness.remains<1)&(rage>80&(buff.meat_cleaver.up&buff.enrage.up|spell_targets.whirlwind=1)|dot.noxious_venom.remains)
+    if S.BloodoftheEnemy:IsCastableP() and (Player:BuffP(S.RecklessnessBuff) or S.Recklessness:CooldownRemainsP() < 1) and (Player:Rage() > 80) then -- this one needs some work
       if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, 12) then return "blood_of_the_enemy"; end
     end
-    -- purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
+    --actions+=/purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.PurifyingBlast:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
       if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
     end
-    -- ripple_in_space,if=!buff.recklessness.up&!buff.siegebreaker.up
+    --actions+=/ripple_in_space,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.RippleInSpace:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
       if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
-    -- worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
+    --actions+=/worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.WorldveinResonance:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
       if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
-    -- focused_azerite_beam,if=!buff.recklessness.up&!buff.siegebreaker.up
+    --actions+=/focused_azerite_beam,if=!buff.recklessness.up&!buff.siegebreaker.up
     if S.FocusedAzeriteBeam:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
       if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
-    -- reaping_flames,if=!buff.recklessness.up&!buff.siegebreaker.up
+    --actions+=/reaping_flames,if=!buff.recklessness.up&!buff.siegebreaker.up
     if (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
       local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
-    -- concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
+    --actions+=/concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
     if S.ConcentratedFlame:IsCastableP() and (Player:BuffDownP(S.Recklessness) and Target:DebuffDownP(S.SiegebreakerDebuff) and Target:DebuffDownP(S.ConcentratedFlameBurn)) then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame"; end
     end
-    -- the_unbound_force,if=buff.reckless_force.up
+    --actions+=/the_unbound_force,if=buff.reckless_force.up
     if S.TheUnboundForce:IsCastableP() and (Player:BuffP(S.RecklessForceBuff)) then
       if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force"; end
     end
-    -- guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
+    --actions+=/guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
     if S.GuardianofAzeroth:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and (Target:TimeToDie() > 195 or Target:HealthPercentage() < 20)) then
       if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
-    -- memory_of_lucid_dreams,if=!buff.recklessness.up
+    --actions+=/memory_of_lucid_dreams,if=!buff.recklessness.up
     if S.MemoryofLucidDreams:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff)) then
       if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
-    -- recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>1|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
+    --actions+=/recklessness,if=gcd.remains=0&(!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>1|buff.guardian_of_azeroth.up|buff.blood_of_the_enemy.up)
     if S.Recklessness:IsCastableP() and HR.CDsON() and (not Spell:MajorEssenceEnabled(AE.CondensedLifeForce) and not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy) or S.GuardianofAzeroth:CooldownRemainsP() > 1 or Player:BuffP(S.GuardianofAzerothBuff) or S.BloodoftheEnemy:CooldownRemainsP() < Player:GCD()) then
-      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 112"; end
-    end
-    -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
+      if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness"; end
+    end -- double check this one hard
+    --actions+=/whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
     if S.Whirlwind:IsCastableP("Melee") and (Cache.EnemiesCount[8] > 1 and Player:BuffDownP(S.MeatCleaverBuff)) then
-      if HR.Cast(S.Whirlwind) then return "whirlwind 114"; end
+      if HR.Cast(S.Whirlwind) then return "whirlwind"; end
     end
-    -- use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(buff.guardian_of_azeroth.up|!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+    --actions+=/use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
     if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:TimeToDie() < 20 or Target:DebuffDownP(S.RazorCoralDebuff) or (Target:HealthPercentage() < 30 and Target:DebuffP(S.ConductiveInkDebuff)) or (Target:DebuffDownP(S.ConductiveInkDebuff) and Player:BuffP(S.MemoryofLucidDreams) or Player:PrevGCDP(2, S.GuardianofAzeroth) or Player:PrevGCDP(2, S.Recklessness) and (Player:BuffP(S.GuardianofAzerothBuff) or not Spell:MajorEssenceEnabled(AE.MemoryofLucidDreams) and not Spell:MajorEssenceEnabled(AE.CondensedLifeForce)))) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 115"; end
+      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral"; end
     end
     if (HR.CDsON()) then
-      -- blood_fury,if=buff.recklessness.up
+      --actions+=/blood_fury,if=buff.recklessness.up
       if S.BloodFury:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
-        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 118"; end
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end
       end
-      -- berserking,if=buff.recklessness.up
+      --actions+=/berserking,if=buff.recklessness.up
       if S.Berserking:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
-        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking"; end
       end
-      -- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
+      --actions+=/lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
       if S.LightsJudgment:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and Target:DebuffDownP(S.SiegebreakerDebuff)) then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 126"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment"; end
       end
-      -- fireblood,if=buff.recklessness.up
+      --actions+=/fireblood,if=buff.recklessness.up
       if S.Fireblood:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
-        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 130"; end
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood"; end
       end
-      -- ancestral_call,if=buff.recklessness.up
+      --actions+=/ancestral_call,if=buff.recklessness.up
       if S.AncestralCall:IsCastableP() and (Player:BuffP(S.RecklessnessBuff)) then
-        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 134"; end
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call"; end
       end
-      -- bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
+      --actions+=/bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
       if S.BagofTricks:IsCastableP() and (Player:BuffDownP(S.RecklessnessBuff) and Target:DebuffDownP(S.SiegebreakerDebuff) and Player:BuffP(S.EnrageBuff)) then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 136"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks"; end
       end
     end
-    -- run_action_list,name=single_target
+    --actions+=/run_action_list,name=single_target
     if (true) then
       return SingleTarget();
     end
   end
+
 end
 
 local function Init()
@@ -335,3 +288,62 @@ local function Init()
 end
 
 HR.SetAPL(72, APL, Init)
+--- SIMC APL----
+--last updated 16/10/2020
+
+--# Executed before combat begins. Accepts non-harmful actions only.
+--actions.precombat=flask
+--actions.precombat+=/food
+--actions.precombat+=/augmentation
+--# Snapshot raid buffed stats before combat begins and pre-potting is done.
+--actions.precombat+=/snapshot_stats
+--actions.precombat+=/use_item,name=azsharas_font_of_power
+--actions.precombat+=/worldvein_resonance
+--actions.precombat+=/memory_of_lucid_dreams
+--actions.precombat+=/guardian_of_azeroth
+--actions.precombat+=/recklessness
+--actions.precombat+=/potion
+
+--# Executed every time the actor is available.
+--actions=auto_attack
+--actions+=/charge
+--# This is mostly to prevent cooldowns from being accidentally used during movement.
+--actions+=/run_action_list,name=movement,if=movement.distance>5
+--actions+=/heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
+--actions+=/rampage,if=cooldown.recklessness.remains<3&talent.reckless_abandon.enabled
+--actions+=/blood_of_the_enemy,if=(buff.recklessness.up|cooldown.recklessness.remains<1)&(rage>80&(buff.meat_cleaver.up&buff.enrage.up|spell_targets.whirlwind=1)|dot.noxious_venom.remains)
+--actions+=/purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
+--actions+=/ripple_in_space,if=!buff.recklessness.up&!buff.siegebreaker.up
+--actions+=/worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
+--actions+=/focused_azerite_beam,if=!buff.recklessness.up&!buff.siegebreaker.up
+--actions+=/reaping_flames,if=!buff.recklessness.up&!buff.siegebreaker.up
+--actions+=/concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
+--actions+=/the_unbound_force,if=buff.reckless_force.up
+--actions+=/guardian_of_azeroth,if=!buff.recklessness.up&(target.time_to_die>195|target.health.pct<20)
+--actions+=/memory_of_lucid_dreams,if=!buff.recklessness.up
+--actions+=/recklessness,if=gcd.remains=0&(!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>1|buff.guardian_of_azeroth.up|buff.blood_of_the_enemy.up)
+--actions+=/whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
+--actions+=/use_item,name=ashvanes_razor_coral,if=target.time_to_die<20|!debuff.razor_coral_debuff.up|(target.health.pct<30.1&debuff.conductive_ink_debuff.up)|(!debuff.conductive_ink_debuff.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+--actions+=/blood_fury,if=buff.recklessness.up
+--actions+=/berserking,if=buff.recklessness.up
+--actions+=/lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
+--actions+=/fireblood,if=buff.recklessness.up
+--actions+=/ancestral_call,if=buff.recklessness.up
+--actions+=/bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
+--actions+=/run_action_list,name=single_target
+
+--actions.movement=heroic_leap
+
+--actions.single_target=siegebreaker
+--actions.single_target+=/rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(buff.enrage.remains<gcd|rage>90)
+--actions.single_target+=/execute
+--actions.single_target+=/bladestorm,if=prev_gcd.1.rampage
+--actions.single_target+=/bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
+--actions.single_target+=/onslaught
+--actions.single_target+=/dragon_roar,if=buff.enrage.up
+--actions.single_target+=/raging_blow,if=charges=2
+--actions.single_target+=/bloodthirst
+--actions.single_target+=/raging_blow
+--actions.single_target+=/whirlwind
+
+--(Player:BuffP(S.RecklessnessBuff) or S.Recklessness:CooldownRemainsP() < 1) and (Player:Rage() > 80 and (Player:BuffP(S.MeatCleaverBuff) and ()(Player:BuffP(S.EnrageBuff) or Cache.EnemiesCount[8] > 1))

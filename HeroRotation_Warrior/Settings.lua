@@ -1,35 +1,56 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
--- Addon
-local addonName, addonTable = ...;
+  -- Addon
+local addonName, addonTable = ...
 -- HeroRotation
-local HR = HeroRotation;
--- HeroLib
-local HL = HeroLib;
+local HR = HeroRotation
+
+local HL = HeroLib
 -- File Locals
-local GUI = HL.GUI;
-local CreateChildPanel = GUI.CreateChildPanel;
-local CreatePanelOption = GUI.CreatePanelOption;
-local CreateARPanelOption = HR.GUI.CreateARPanelOption;
-local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
+local GUI = HL.GUI
+local CreateChildPanel = GUI.CreateChildPanel
+local CreatePanelOption = GUI.CreatePanelOption
+local CreateARPanelOption = HR.GUI.CreateARPanelOption
+local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 
 --- ============================ CONTENT ============================
--- Default settings
+-- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Warrior = {
   Commons = {
+    UsePotions  = true,
     UseTrinkets = true,
-    UsePotions = true,
     TrinketDisplayStyle = "Suggested",
     EssenceDisplayStyle = "Suggested",
+    CovenantDisplayStyle = "Suggested",
+    -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      Pummel = true,
       Racials = true,
+      -- Abilities
+      Pummel = true,
       Avatar = true,
-      BattleCry = true,
+      BattleCry = true
+    },
+  },
+  Fury = {
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+    },
+    GCDasOffGCD = {
+      Bladestorm = false,
+      DragonRoar = false,
+      Recklessness = false,
+      Siegebreaker = false,
+      HeroicLeap = false,
+      Charge = false,
     }
   },
   Arms = {
-    -- {Display GCD as OffGCD, ForceReturn}
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+      DeadlyCalm = true,
+    },
     GCDasOffGCD = {
       -- Abilities
       ColossusSmash = false,
@@ -39,60 +60,36 @@ HR.GUISettings.APL.Warrior = {
       HeroicLeap = false,
       Charge = false,
       Avatar = true,
-    },
-    OffGCDasOffGCD = {
-      -- Abilities
-      DeadlyCalm = true,
-      -- Items
+
     },
   },
-  Fury = {
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      -- Abilities
-      Bladestorm = false,
-      DragonRoar = false,
-      Recklessness = false,
-      Siegebreaker = false,
-      HeroicLeap = false,
-      Charge = false,
-    },
+  Protection = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      -- Items
-    }
-  },
-  Protection = {
-    -- {Display GCD as OffGCD, ForceReturn}
+    },
     GCDasOffGCD = {
       Avatar            = true,
       DemoralizingShout = true,
-    },
+    }
   },
-};
+}
 
-HR.GUI.LoadSettingsRecursively(HR.GUISettings);
+  HR.GUI.LoadSettingsRecursively(HR.GUISettings)
+  local ARPanel = HR.GUI.Panel;
+  local CP_Warrior = CreateChildPanel(ARPanel, "Warrior");
+  local CP_Arms = CreateChildPanel(CP_Warrior, "Arms");
+  local CP_Fury = CreateChildPanel(CP_Warrior, "Fury");
+  local CP_Protection = CreateChildPanel(CP_Warrior, "Protection");
 
--- Child Panels
-local ARPanel = HR.GUI.Panel;
-local CP_Warrior = CreateChildPanel(ARPanel, "Warrior");
-local CP_Arms = CreateChildPanel(CP_Warrior, "Arms");
-local CP_Fury = CreateChildPanel(CP_Warrior, "Fury");
-local CP_Protection = CreateChildPanel(CP_Warrior, "Protection");
+  CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons");
+  CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
+  CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
+  CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+  CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 
--- Shared Warrior settings
-CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons");
-CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
-CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
+  CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms");
 
--- Arms settings
-CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms");
+  CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury");
 
--- Fury settings
-CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury");
-
--- Protection settings
-CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
+  CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");

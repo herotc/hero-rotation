@@ -1,7 +1,7 @@
-## Interface: 80300
+## Interface: 90001
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFC79C6EWarrior|r]
-## Author: lithium720, Lockem, Nia, Aethys
+## Title: Hero|cFFA330C9Rotation|r [|cFFA330C9Warrior|r]
+## Author: Kaptiva
 ## Notes: Hero Rotation - Warrior Module.
 
 ## DefaultState: Enabled
@@ -10,7 +10,6 @@
 
 Settings.lua
 Warrior.lua
-Arms.lua
+Events.lua
 Fury.lua
-Protection.lua
 Overrides.lua
