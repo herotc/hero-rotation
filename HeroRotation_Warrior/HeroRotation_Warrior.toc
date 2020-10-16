@@ -1,0 +1,15 @@
+## Interface: 90001
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFA330C9Warrior|r]
+## Author: Kaptiva
+## Notes: Hero Rotation - Warrior Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Warrior.lua
+Events.lua
+Fury.lua
+Overrides.lua
