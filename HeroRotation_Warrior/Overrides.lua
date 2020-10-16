@@ -19,7 +19,7 @@ local SpellProtection       = Spell.Warrior.Protection
 --- ============================ CONTENT ============================
 -- Fury, ID: 72
 -- Arms, ID: 71
--- Protection, ID: 72
+-- Protection, ID: 73
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",

@@ -52,6 +52,8 @@ Spell.Warrior.Fury = {
   Massacre                              = Spell(206315),
   Onslaught                             = Spell(315720),
   RecklessAbandon                       = Spell(202751),
+  SuddenDeath                           = Spell(280721),
+  SuddenDeathBuff                       = Spell(280776),
   Siegebreaker                          = Spell(280772),
   SiegebreakerDebuff                    = Spell(280773),
   -- Covenant Abilities
@@ -83,74 +85,6 @@ Spell.Warrior.Fury = {
   WorldveinResonance                    = Spell(295186)
 }
 
-Spell.Warrior.Arms = {
-  -- Racials
-  -- Abilities
-
-  -- Talents
-
-  -- Covenant Abilities
-
-  -- Legendary Effects
-
-  -- Conduits
-
-  -- Item Buffs/Debuffs
-
-  RazorCoralDebuff                      = Spell(303568),
-  -- Azerite Traits (BfA)
-
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
-}
-
-Spell.Warrior.Protection = {
-  -- Racials
-  -- Abilities
-
-  -- Talents
-
-  -- Covenant Abilities
-
-  -- Legendary Effects
-
-  -- Conduits
-
-  -- Item Buffs/Debuffs
-
-  RazorCoralDebuff                      = Spell(303568),
-  -- Azerite Traits (BfA)
-
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
-}
-
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
@@ -158,18 +92,4 @@ Item.Warrior.Fury = {
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
-}
-
-Item.Warrior.Arms = {
-  PotionofUnbridledFury            = Item(169299),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-}
-
-Item.Warrior.Protection = {
-  PotionofUnbridledFury            = Item(169299),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
 }
