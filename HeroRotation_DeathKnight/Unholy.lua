@@ -79,13 +79,13 @@ local function DisableAOTD()
 end
 -- Festering Wound TargetIf Conditions
 local function EvaluateTargetUnitNoFWDebuff(TargetUnit)
-  return TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1
+  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
 local function EvaluateTargetIfFWStacks(TargetUnit)
   return (S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
 local function EvaluateTargetIfFWBuild(TargetUnit)
-  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 3 and S.Apocalypse:CooldownRemains() < 3 or TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1 or not TargetUnit:DebuffUp(S.FesteringWoundDebuff))
+  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 3 and S.Apocalypse:CooldownRemains() < 3 or TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
 -- Apocalypse Conditions
 local function EvaluateTargetIfApocalypse(TargetUnit)
@@ -408,27 +408,29 @@ local function APL()
       if Everyone.CastCycle(S.Outbreak, Enemies30yd, EvaluateCycleOutbreak) then return "outbreak refresh" end
     end
     -- call_action_list,name=cooldowns
-    if (true) then
+    if (true and HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
     -- racials
-    if (true) then
+    if (true and HR.CDsON()) then
       local ShouldReturn = Racials(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile.enabled|cooldown.defile.remains<10&talent.defile.enabled)&!death_and_decay.ticking
-    if (EnemiesMeleeCount >= 2 and (S.DeathAndDecay:CooldownRemains() < 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() < 10 and S.Defile:IsAvailable()) and not Player:BuffUp(S.DeathAndDecayBuff)) then
-      local ShouldReturn = AOE_Setup(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
-    if (EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
-      local ShouldReturn = AOE_Burst(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile.enabled|cooldown.defile.remains>10&talent.defile.enabled))
-    if (EnemiesMeleeCount >= 2 and (not Player:BuffUp(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
-      local ShouldReturn = AOE_Generic(); if ShouldReturn then return ShouldReturn; end
+    if HR.AoEON() then
+      -- run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile.enabled|cooldown.defile.remains<10&talent.defile.enabled)&!death_and_decay.ticking
+      if (EnemiesMeleeCount >= 2 and (S.DeathAndDecay:CooldownRemains() < 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() < 10 and S.Defile:IsAvailable()) and not Player:BuffUp(S.DeathAndDecayBuff)) then
+        local ShouldReturn = AOE_Setup(); if ShouldReturn then return ShouldReturn; end
+      end
+      -- run_action_list,name=aoe_burst,if=active_enemies>=2&death_and_decay.ticking
+      if (EnemiesMeleeCount >= 2 and Player:BuffUp(S.DeathAndDecayBuff)) then
+        local ShouldReturn = AOE_Burst(); if ShouldReturn then return ShouldReturn; end
+      end
+      -- generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile.enabled|cooldown.defile.remains>10&talent.defile.enabled))
+      if (EnemiesMeleeCount >= 2 and (not Player:BuffUp(S.DeathAndDecayBuff) and (S.DeathAndDecay:CooldownRemains() > 10 and not S.Defile:IsAvailable() or S.Defile:CooldownRemains() > 10 and S.Defile:IsAvailable()))) then
+        local ShouldReturn = AOE_Generic(); if ShouldReturn then return ShouldReturn; end
+      end
     end
     -- call_action_list,name=generic,if=active_enemies=1
-    if EnemiesMeleeCount == 1 then
+    if (EnemiesMeleeCount == 1 or (EnemiesMeleeCount > 1 and not HR.AoEON())) then
       local ShouldReturn = Generic(); if ShouldReturn then return ShouldReturn; end
     end
     -- Add pool resources icon if nothing else to do
