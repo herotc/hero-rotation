@@ -187,10 +187,13 @@ local function Precombat()
     if S.VampiricTouch:IsReady() and not Player:IsCasting(S.VampiricTouch) then
       if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 10"; end
     end
-    -- Manually added: mind_blast
+    -- Manually added: mind_blast,if=talent.misery.enabled and shadow_word_pain,if=!talent.misery.enabled
     -- This is to avoid VT being suggested while being casted precombat
-    if S.MindBlast:IsCastable() then
+    if S.MindBlast:IsCastable() and (S.Misery:IsAvailable()) then
       if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 12"; end
+    end
+    if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
+      if HR.Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 14"; end
     end
   end
 end
