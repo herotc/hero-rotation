@@ -399,7 +399,7 @@ local function CDs ()
       end
       -- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
       local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse and (Player:HasHeroism() or HL.BossFilteredFightRemains("<", 20) or Player:ComboPointsDeficit() <= 2) then
+      if TrinketToUse and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 20) or Player:ComboPointsDeficit() <= 2) then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
       end
     end
