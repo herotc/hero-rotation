@@ -552,7 +552,7 @@ local function Stealthed ()
       end
     end
     if GarroteIfFunc(Target) then
-      if HR.CastPooling(S.Garrote, nil, Target:IsInMeleeRange(5)) then return "Cast Garrote (Subterfuge)" end
+      if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Cast Garrote (Subterfuge)" end
     end
   end
   -- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking&variable.single_target
