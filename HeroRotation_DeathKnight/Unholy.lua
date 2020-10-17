@@ -99,10 +99,6 @@ end
 local function EvaluateCycleSoulReaper(TargetUnit)
   return (TargetUnit:HealthPercentage() < 35 and TargetUnit:TimeToDie() > 5)
 end
--- Outbreak Conditions
-local function EvaluateCycleOutbreak(TargetUnit)
-  return TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) <= Player:GCD()
-end
 -- Scourge Strike / Clawing Shadow TargetIf Conditions
 local function EvaluateTargetIfScourgeClaw(TargetUnit)
   return (S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 1)
@@ -404,8 +400,8 @@ local function APL()
     --Settings.Commons.UseTrinkets
 
     -- outbreak,target_if=dot.virulent_plague.remains<=gcd
-    if S.Outbreak:IsCastable() then
-      if Everyone.CastCycle(S.Outbreak, Enemies30yd, EvaluateCycleOutbreak) then return "outbreak refresh" end
+    if S.Outbreak:IsCastable() and Target:DebuffRemains(S.VirulentPlagueDebuff) <= Player:GCD() then
+      if HR.Cast(S.Outbreak, nil, nil, not TargetIsInRange[30]) then return "outbreak refresh" end
     end
     -- Death Coil/Epidemic when we are not in melee range
     if not Target:IsInMeleeRange(8) then
