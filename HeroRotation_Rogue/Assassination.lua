@@ -529,7 +529,7 @@ local function Stealthed ()
   -- actions.stealthed=rupture,if=talent.nightstalker.enabled&combo_points>=4&target.time_to_die-remains>6
   if S.Rupture:IsReady() and S.Nightstalker:IsAvailable() and ComboPoints >= 4
     and (Target:FilteredTimeToDie(">", 6, -Target:DebuffRemains(S.Rupture)) or Target:TimeToDieIsNotValid()) then
-    if HR.Cast(S.Rupture, nil, nil, Target:IsInMeleeRange(5)) then return "Cast Rupture (Nightstalker)" end
+    if HR.Cast(S.Rupture, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Rupture (Nightstalker)" end
   end
   if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() then
     -- actions.stealthed+=/pool_resource,for_next=1
@@ -558,7 +558,7 @@ local function Stealthed ()
   -- actions.stealthed+=/rupture,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&!dot.rupture.ticking&variable.single_target
   if S.Rupture:IsReady() and S.Subterfuge:IsAvailable() and ComboPoints > 0 and S.ShroudedSuffocation:AzeriteEnabled()
     and not Target:DebuffUp(S.Rupture) and MeleeEnemies10yCount < 2 then
-    if HR.Cast(S.Rupture, nil, nil, Target:IsInMeleeRange(5)) then return "Cast Rupture (Shrouded Suffocation)" end
+    if HR.Cast(S.Rupture, nil, nil, not Target:IsInMeleeRange(5)) then return "Cast Rupture (Shrouded Suffocation)" end
   end
   if S.Garrote:IsCastable() and S.Subterfuge:IsAvailable() then
     -- actions.stealthed+=/pool_resource,for_next=1
@@ -580,12 +580,12 @@ local function Stealthed ()
       end
     end
     if GarroteIfFunc(Target) then
-      if HR.CastPooling(S.Garrote, nil, Target:IsInMeleeRange(5)) then return "Cast Garrote (Shrouded Suffocation)" end
+      if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Cast Garrote (Shrouded Suffocation)" end
     end
     -- actions.stealthed+=/pool_resource,for_next=1
     -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&active_enemies=1&buff.subterfuge.remains<1.3
     if S.Exsanguinate:IsAvailable() and MeleeEnemies10yCount == 1 and Player:BuffRemains(S.SubterfugeBuff) < 1.3 then
-      if HR.CastPooling(S.Garrote, nil, Target:IsInMeleeRange(5)) then return "Pool for Garrote (Exsanguinate Refresh)" end
+      if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (Exsanguinate Refresh)" end
     end
   end
 end
