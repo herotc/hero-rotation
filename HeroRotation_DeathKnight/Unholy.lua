@@ -407,6 +407,15 @@ local function APL()
     if S.Outbreak:IsCastable() then
       if Everyone.CastCycle(S.Outbreak, Enemies30yd, EvaluateCycleOutbreak) then return "outbreak refresh" end
     end
+    -- Death Coil/Epidemic when we are not in melee range
+    if not Target:IsInMeleeRange(8) then
+      if  S.Epidemic:IsUsable() and S.VirulentPlagueDebuff:AuraActiveCount() > 1 then
+        if HR.Cast(S.Epidemic, nil, nil, not TargetIsInRange[100]) then return "epidemic out of range"; end
+      end
+      if S.DeathCoil:IsUsable() then
+        if HR.Cast(S.DeathCoil, nil, nil, not TargetIsInRange[30]) then return "death_coil out of range"; end
+      end
+    end
     -- call_action_list,name=cooldowns
     if (true and HR.CDsON()) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
