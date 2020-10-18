@@ -97,7 +97,7 @@ local function Precombat()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 12"; end
     end
     -- Manually Added: Charge if not in melee. Bloodthirst if in melee
-    if S.Charge:IsCastable() and not Target:IsSpellInRange(S.Bloodthirst) then
+    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and not Target:IsSpellInRange(S.Bloodthirst) then
       if HR.Cast(S.Charge, nil, nil, not Target:IsSpellInRange(S.Charge)) then return "charge 14"; end
     end
     if S.Bloodthirst:IsCastable() and Target:IsSpellInRange(S.Bloodthirst) then
@@ -199,7 +199,7 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.Pummel, Settings.Commons.OffGCDasOffGCD.Pummel, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- charge
-    if S.Charge:IsCastable() and (not Target:IsInMeleeRange(5)) then
+    if S.Charge:IsCastable() and S.Charge:Charges() >= 1 and (not Target:IsInMeleeRange(5)) then
       if HR.Cast(S.Charge, Settings.Fury.GCDasOffGCD.Charge, nil, not Target:IsSpellInRange(S.Charge)) then return "charge 32"; end
     end
     -- run_action_list,name=movement,if=movement.distance>5
