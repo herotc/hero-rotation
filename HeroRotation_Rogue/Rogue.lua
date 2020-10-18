@@ -245,6 +245,7 @@ Spell.Rogue.Subtlety = {
   MarkedforDeath                        = Spell(137619),
   MasterofShadows                       = Spell(196976),
   Nightstalker                          = Spell(14062),
+  PremeditationBuff                     = Spell(343173)
   SecretTechnique                       = Spell(280719),
   ShadowFocus                           = Spell(108209),
   ShurikenTornado                       = Spell(277925),
@@ -282,6 +283,8 @@ Spell.Rogue.Subtlety = {
   Sepsis                                = Spell(328305),
   Flagellation                          = Spell(323654),
   FlagellationMastery                   = Spell(345569),
+  -- Legendaries
+  TheRottenBuff                         = Spell(341134),
   -- Defensive
   CrimsonVial                           = Spell(185311),
   Feint                                 = Spell(1966),
@@ -465,4 +468,14 @@ function Commons.PoisonedBleeds ()
     end
   end
   return PoisonedBleedsCount
+end
+
+-- Master Assassin's Mark Remains Check
+local MasterAssassinLegoBuff, NominalDuration = Spell(340094), 4
+function Commons.MasterAssassinsMarkRemains ()
+  if Player:BuffRemains(MasterAssassinLegoBuff) < 0 then
+    return Player:GCDRemains() + NominalDuration
+  else
+    return Player:BuffRemains(MasterAssassinLegoBuff)
+  end
 end
