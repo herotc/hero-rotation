@@ -74,7 +74,7 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 | Rogue        | ![Assassination](https://img.shields.io/badge/Assassination-OK-brightgreen.svg) | ![Outlaw](https://img.shields.io/badge/Outlaw-OK-brightgreen.svg)         | ![Subtlety](https://img.shields.io/badge/Subtlety-OK-brightgreen.svg) |
 | Shaman       | ![Elemental](https://img.shields.io/badge/Elemental-KO-red.svg)                 | ![Enhancement](https://img.shields.io/badge/Enhancement-KO-red.svg)       |                                                                       |
 | Warlock      | ![Affliction](https://img.shields.io/badge/Affliction-KO-red.svg)               | ![Demonology](https://img.shields.io/badge/Demonology-WIP-orange.svg)     | ![Destruction](https://img.shields.io/badge/Destruction-KO-red.svg)   |
-| Warrior      | ![Arms](https://img.shields.io/badge/Arms-KO-red.svg)                           | ![Fury](https://img.shields.io/badge/Fury-WIP-orange.svg)                     | ![Protection](https://img.shields.io/badge/Protection-KO-red.svg)     |
+| Warrior      | ![Arms](https://img.shields.io/badge/Arms-WIP-orange.svg)                           | ![Fury](https://img.shields.io/badge/Fury-WIP-orange.svg)                     | ![Protection](https://img.shields.io/badge/Protection-KO-red.svg)     |
 
 ![Spec](https://img.shields.io/badge/Spec-OK-brightgreen.svg) - The rotation does have an optimal SimC APL and it is optimally implemented in the addon.\
 ![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg) - The rotation does not have an optimal SimC APL or it is not optimally implemented in the addon.\
