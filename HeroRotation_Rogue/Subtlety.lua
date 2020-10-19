@@ -163,7 +163,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
   -- actions.finish=slice_and_dice,if=spell_targets.shuriken_storm<6&!buff.shadow_dance.up&buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
   if S.SliceandDice:IsReady() and Target:IsInMeleeRange(5)
     and MeleeEnemies10yCount < 6 and not ShadowDanceBuff
-    and HL.FilteredFightRemains(MeleeEnemies5y, ">", Player:BuffRemains(S.SliceandDice), true)
+    and HL.FilteredFightRemains(MeleeEnemies5y, ">", Player:BuffRemains(S.SliceandDice))
     and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints * 1.8) then
     if ReturnSpellOnly then
       return S.SliceandDice
