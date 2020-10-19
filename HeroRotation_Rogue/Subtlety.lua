@@ -31,7 +31,6 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 -- Define S/I for spell and item arrays
 local S = Spell.Rogue.Subtlety
 local I = Item.Rogue.Subtlety
-local AoETrinkets = { }
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -198,11 +197,11 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     -- actions.finish+=/rupture,cycle_targets=1,if=!variable.skip_rupture&!variable.use_priority_rotation&spell_targets.shuriken_storm>=2&target.time_to_die>=(5+(2*combo_points))&refreshable
     if HR.AoEON() and not PriorityRotation and MeleeEnemies10yCount >= 2 then
       local BestUnit, BestUnitTTD = nil, 5 + 2 * ComboPoints
-      for _, Unit in pairs(MeleeEnemies5y) do
-        if Everyone.UnitIsCycleValid(Unit, BestUnitTTD, -Unit:DebuffRemains(S.Rupture))
-          and Everyone.CanDoTUnit(Unit, RuptureDMGThreshold)
-          and Unit:DebuffRefreshable(S.Rupture, RuptureThreshold) then
-          BestUnit, BestUnitTTD = Unit, Unit:TimeToDie()
+      for _, CycleUnit in pairs(MeleeEnemies5y) do
+        if Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(S.Rupture))
+          and Everyone.CanDoTUnit(CycleUnit, RuptureDMGThreshold)
+          and CycleUnit:DebuffRefreshable(S.Rupture, RuptureThreshold) then
+          BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
         end
       end
       if BestUnit then
@@ -296,7 +295,9 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=5|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
-  if ShadowstrikeIsCastable and PriorityRotation and (Target:DebuffRemains(S.FindWeaknessDebuff) < 1 or S.Weaponmaster:IsAvailable() and MeleeEnemies10yCount <= 5 or S.Inevitability:AzeriteEnabled() and Player:BuffUp(S.SymbolsofDeath) and MeleeEnemies10yCount <= 3 + num(S.BladeInTheShadows:AzeriteEnabled())) then
+  if ShadowstrikeIsCastable and PriorityRotation
+    and (Target:DebuffRemains(S.FindWeaknessDebuff) < 1 or S.Weaponmaster:IsAvailable() and MeleeEnemies10yCount <= 5
+      or S.Inevitability:AzeriteEnabled() and Player:BuffUp(S.SymbolsofDeath) and MeleeEnemies10yCount <= 3 + num(S.BladeInTheShadows:AzeriteEnabled())) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -446,10 +447,10 @@ local function CDs ()
     -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=variable.snd_condition&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5
     if HR.AoEON() and S.SerratedBoneSpike:IsCastable() and (SnD_Condition() or HL.BossFilteredFightRemains("<=", 5)) then
       local BestUnit, BestUnitTTD = nil, 30
-      for _, Unit in pairs(Enemies30y) do -- Shoule we increase range here to match spike range? Not sure about false positives.
-        local TTD = Unit:TimeToDie()
-        if not Unit:DebuffUp(S.SerratedBoneSpikeDot) and (not BestUnit or TTD < BestUnitTTD) then
-          BestUnit, BestUnitTTD = Unit, TTD
+      for _, CycleUnit in pairs(Enemies30y) do -- Shoule we increase range here to match spike range? Not sure about false positives.
+        local TTD = CycleUnit:TimeToDie()
+        if not CycleUnit:DebuffUp(S.SerratedBoneSpikeDot) and (not BestUnit or TTD < BestUnitTTD) then
+          BestUnit, BestUnitTTD = CycleUnit, TTD
         end
       end
       if BestUnit and BestUnit:GUID() ~= Target:GUID() then
@@ -586,7 +587,7 @@ local function Stealth_CDs (EnergyThreshold)
     end
     -- actions.stealth_cds+=/shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&combo_points.deficit>1&debuff.find_weakness.remains<1
     if HR.CDsON() and S.Shadowmeld:IsCastable() and S.ShadowDance:TimeSinceLastDisplay() > 0.3 and S.Vanish:TimeSinceLastDisplay() > 0.3 and not Player:IsTanking(Target)
-      and GetUnitSpeed("player") == 0 and Player:EnergyDeficitPredicted() > 10
+      and not Player:IsMoving() and Player:EnergyDeficitPredicted() > 10
       and not ShD_Threshold() and ComboPointsDeficit > 1 and Target:DebuffRemains(S.FindWeaknessDebuff) < 1 then
       -- actions.stealth_cds+=/pool_resource,for_next=1,extra_amount=40
       if Player:Energy() < 40 then
@@ -802,13 +803,13 @@ local function APL ()
 
     -- actions+=/call_action_list,name=stealth_cds,if=variable.use_priority_rotation
     if PriorityRotation then
-      local ShouldReturn = Stealth_CDs()
+      ShouldReturn = Stealth_CDs()
       if ShouldReturn then return "Stealth CDs: (Priority Rotation)" .. ShouldReturn end
     end
 
     -- # Consider using a Stealth CD when reaching the energy threshold, called with params to register potential pooling
     -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
-    local ShouldReturn = Stealth_CDs(Player:EnergyMax() - Stealth_Threshold())
+    ShouldReturn = Stealth_CDs(Player:EnergyMax() - Stealth_Threshold())
     if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
 
     -- TODO: actions+=/call_action_list,name=finish,if=runeforge.deathly_shadows.equipped&dot.sepsis.ticking&dot.sepsis.remains<=2&combo_points>=2
