@@ -148,10 +148,10 @@ local function SnD_Condition ()
   -- actions+=/variable,name=snd_condition,value=buff.slice_and_dice.up|spell_targets.shuriken_storm>=6
   return Player:BuffUp(S.SliceandDice) or MeleeEnemies10yCount >= 6
 end
-local function Skip_Rupture ()
+local function Skip_Rupture (ShadowDanceBuff)
   -- actions.finish+=/variable,name=skip_rupture,value=master_assassin_remains>0|!talent.nightstalker.enabled&talent.dark_shadow.enabled&buff.shadow_dance.up|spell_targets.shuriken_storm>=6
   return Rogue.MasterAssassinsMarkRemains() > 0
-    or not S.Nightstalker:IsAvailable() and S.DarkShadow:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff)
+    or not S.Nightstalker:IsAvailable() and S.DarkShadow:IsAvailable() and ShadowDanceBuff
     or MeleeEnemies10yCount >= 6
 end
 
@@ -162,8 +162,8 @@ local function Finish (ReturnSpellOnly, StealthSpell)
 
   -- actions.finish=slice_and_dice,if=spell_targets.shuriken_storm<6&!buff.shadow_dance.up&buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
   if S.SliceandDice:IsReady() and Target:IsInMeleeRange(5)
-    and MeleeEnemies10yCount < 6 and not Player:BuffUp(S.ShadowDanceBuff)
-    and (HL.FilteredFightRemains(MeleeEnemies5y, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
+    and MeleeEnemies10yCount < 6 and not ShadowDanceBuff
+    and HL.FilteredFightRemains(MeleeEnemies5y, ">", Player:BuffRemains(S.SliceandDice), true)
     and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints * 1.8) then
     if ReturnSpellOnly then
       return S.SliceandDice
@@ -172,7 +172,7 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     end
   end
 
-  local SkipRupture = Skip_Rupture()
+  local SkipRupture = Skip_Rupture(ShadowDanceBuff)
   if S.Rupture:IsReady() and not SkipRupture then
     -- actions.finish+=/rupture,if=!variable.skip_rupture&target.time_to_die-remains>6&refreshable
     if Target:IsInMeleeRange(5)
@@ -244,14 +244,17 @@ end
 -- ReturnSpellOnly and StealthSpell parameters are to Predict Finisher in case of Stealth Macros
 local function Stealthed (ReturnSpellOnly, StealthSpell)
   local PredictedCP = ComboPoints
-  if S.TheFirstDance:AzeriteEnabled() and StealthSpell and StealthSpell:ID() == S.ShadowDance:ID() then
+  if S.TheFirstDance:AzeriteEnabled() and (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID()) then
     PredictedCP = math.min(PredictedCP + 2, Rogue.CPMaxSpend())
   end
   local PredictedCPDeficit = Player:ComboPointsMax() - PredictedCP
   local StealthBuff = Player:BuffUp(Stealth) or (StealthSpell and StealthSpell:ID() == Stealth:ID())
   local VanishBuffCheck = Player:BuffUp(VanishBuff) or (StealthSpell and StealthSpell:ID() == S.Vanish:ID())
+  local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
+  local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() and (StealthBuff or VanishBuffCheck or ShadowDanceBuff)
+
   -- actions.stealthed+=/shadowstrike,if=(buff.stealth.up|buff.vanish.up)
-  if S.Shadowstrike:IsCastable() and (Target:IsSpellInRange(S.Shadowstrike) or Target:IsInMeleeRange(5))
+  if ShadowstrikeIsCastable and (Target:IsSpellInRange(S.Shadowstrike) or Target:IsInMeleeRange(5))
     and (StealthBuff or VanishBuffCheck) then
     if ReturnSpellOnly then
       return S.Shadowstrike
@@ -273,7 +276,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- TODO: actions.stealthed+=/shiv,if=talent.nightstalker.enabled&runeforge.tiny_toxic_blade.equipped
 
   -- actions.stealthed+=/shadowstrike,if=level<52&debuff.find_weakness.remains<1&target.time_to_die-remains>6
-  if S.Shadowstrike:IsCastable() and Player:Level() < 52 and Target:DebuffRemains(S.FindWeaknessDebuff) < 1 and Target:FilteredTimeToDie(">", 6) then
+  if ShadowstrikeIsCastable and Player:Level() < 52 and Target:DebuffRemains(S.FindWeaknessDebuff) < 1 and Target:FilteredTimeToDie(">", 6) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -285,7 +288,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- actions.stealthed+=/shadowstrike,cycle_targets=1,if=debuff.find_weakness.remains<1&spell_targets.shuriken_storm<=3&target.time_to_die-remains>6
 
   -- actions.stealthed+=/shadowstrike,if=!talent.deeper_stratagem.enabled&azerite.blade_in_the_shadows.rank=3&spell_targets.shuriken_storm=3
-  if S.Shadowstrike:IsCastable() and not S.DeeperStratagem:IsAvailable() and S.BladeInTheShadows:AzeriteRank() == 3 and MeleeEnemies10yCount == 3 then
+  if ShadowstrikeIsCastable and not S.DeeperStratagem:IsAvailable() and S.BladeInTheShadows:AzeriteRank() == 3 and MeleeEnemies10yCount == 3 then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -293,7 +296,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
     end
   end
   -- actions.stealthed+=/shadowstrike,if=variable.use_priority_rotation&(debuff.find_weakness.remains<1|talent.weaponmaster.enabled&spell_targets.shuriken_storm<=5|azerite.inevitability.enabled&buff.symbols_of_death.up&spell_targets.shuriken_storm<=3+azerite.blade_in_the_shadows.enabled)
-  if S.Shadowstrike:IsCastable() and PriorityRotation and (Target:DebuffRemains(S.FindWeaknessDebuff) < 1 or S.Weaponmaster:IsAvailable() and MeleeEnemies10yCount <= 5 or S.Inevitability:AzeriteEnabled() and Player:BuffUp(S.SymbolsofDeath) and MeleeEnemies10yCount <= 3 + num(S.BladeInTheShadows:AzeriteEnabled())) then
+  if ShadowstrikeIsCastable and PriorityRotation and (Target:DebuffRemains(S.FindWeaknessDebuff) < 1 or S.Weaponmaster:IsAvailable() and MeleeEnemies10yCount <= 5 or S.Inevitability:AzeriteEnabled() and Player:BuffUp(S.SymbolsofDeath) and MeleeEnemies10yCount <= 3 + num(S.BladeInTheShadows:AzeriteEnabled())) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
@@ -314,7 +317,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   -- TODO: actions.stealthed+=/gloomblade,if=runeforge.akaaris_soul_fragment.equipped&buff.perforated_veins.stack>=3&(conduit.perforated_veins.rank+conduit.deeper_dagger.rank)>=16
 
   -- actions.stealthed+=/shadowstrike
-  if S.Shadowstrike:IsCastable() and (Target:IsSpellInRange(S.Shadowstrike) or Target:IsInMeleeRange(5)) then
+  if ShadowstrikeIsCastable and (Target:IsSpellInRange(S.Shadowstrike) or Target:IsInMeleeRange(5)) then
     if ReturnSpellOnly then
       return S.Shadowstrike
     else
