@@ -38,11 +38,13 @@ Spell.DeathKnight.Frost = {
   -- Talents
   GatheringStorm                        = Spell(194912),
   GlacialAdvance                        = Spell(194913),
+  IcyTalons                             = Spell(194878),
   Frostscythe                           = Spell(207230),
   RunicAttenuation                      = Spell(207104),
   FrozenPulse                           = Spell(194909),
   HornofWinter                          = Spell(57330),
   ColdHeart                             = Spell(281208),
+  HypothermicPresence                   = Spell(321995),
   Icecap                                = Spell(207126),
   Obliteration                          = Spell(281238),
   BreathofSindragosa                    = Spell(152279),
@@ -52,6 +54,9 @@ Spell.DeathKnight.Frost = {
   AbominationLimb                       = Spell(315443),
   DeathsDue                             = Spell(324128),
   -- Conduit Effects
+  EradicatingBlow                       = Spell(337934),
+  BitingCold                            = Spell(337988),
+  UnleashedFrenzy                       = Spell(338492),
   -- Buffs
   RimeBuff                              = Spell(59052),
   KillingMachineBuff                    = Spell(51124),
@@ -59,9 +64,11 @@ Spell.DeathKnight.Frost = {
   ColdHeartBuff                         = Spell(281209),
   FrozenPulseBuff                       = Spell(194909),
   EmpowerRuneWeaponBuff                 = Spell(47568),
-  IcyTalonsBuff                         = Spell(194879),
   DeathStrikeBuff                       = Spell(101568),
+  IcyTalonsBuff                         = Spell(194879),
   UnholyStrengthBuff                    = Spell(53365),
+  EradicatingBlowBuff                   = Spell(337936),
+  UnleashedFrenzyBuff                   = Spell(338501),
   -- Debuffs
   RazoriceDebuff                        = Spell(51714),
   FrostFeverDebuff                      = Spell(55095),

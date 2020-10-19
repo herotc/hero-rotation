@@ -42,6 +42,7 @@ HR.GUISettings.APL.DeathKnight = {
       FrostwyrmsFury = true,
       PillarofFrost = true,
       EmpowerRuneWeapon = true,
+      HypothermicPresence = true,
       BreathofSindragosa = true
     }
   },
