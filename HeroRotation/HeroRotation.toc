@@ -12,6 +12,9 @@
 ## SavedVariables: HeroRotationDB
 ## SavedVariablesPerCharacter: HeroRotationCharDB
 
+# WoW Lib Stuff
+Lib\LibStub\LibStub.lua
+
 # GUI
 Panels.lua
 
@@ -29,3 +32,6 @@ UI.lua
 
 # Main
 Main.lua
+
+
+
