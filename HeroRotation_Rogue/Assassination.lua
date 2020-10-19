@@ -449,7 +449,7 @@ local function CDs ()
         -- actions.cds+=/vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&(dot.garrote.refreshable|debuff.vendetta.up&dot.garrote.pmultiplier<=1))&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
         if not VanishSuggested and S.Subterfuge:IsAvailable() and not Player:StealthUp(true, false) and S.Garrote:CooldownUp()
           and (VarSSVanishCondition or not S.ShroudedSuffocation:AzeriteEnabled()
-            and (Target:DebuffRefreshable(S.Garrote, 5.4) or Target:DebuffUp(S.Vendetta) and Target:PMultiplier(S.Garrote) <= 1))
+            and (Target:DebuffRefreshable(S.Garrote) or Target:DebuffUp(S.Vendetta) and Target:PMultiplier(S.Garrote) <= 1))
           and ComboPointsDeficit >= math.min((1 + 2 * num(S.ShroudedSuffocation:AzeriteEnabled())) * MeleeEnemies10yCount, 4) then
           -- actions.cds+=/pool_resource,for_next=1,extra_amount=45
           if not Settings.Assassination.NoPooling and Player:EnergyPredicted() < 45 then
@@ -468,12 +468,12 @@ local function CDs ()
         end
       end
       -- actions.cds+=/shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
-      if HR.CDsON() and S.Shadowmeld:IsCastable() and not Player:StealthUp(true, true) and S.ShroudedSuffocation:AzeriteEnabled() and Target:DebuffRefreshable(S.Garrote, 5.4) and Target:PMultiplier(S.Garrote) <= 1 and Player:ComboPointsDeficit() >= 1 then
+      if HR.CDsON() and S.Shadowmeld:IsCastable() and not Player:StealthUp(true, true) and S.ShroudedSuffocation:AzeriteEnabled() and Target:DebuffRefreshable(S.Garrote) and Target:PMultiplier(S.Garrote) <= 1 and Player:ComboPointsDeficit() >= 1 then
         if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
       end
       if S.Exsanguinate:IsCastable() then
         -- actions.cds+=/exsanguinate,if=!stealthed.rogue&(!dot.garrote.refreshable&dot.rupture.remains>4+4*cp_max_spend|dot.rupture.remains*0.5>target.time_to_die)&target.time_to_die>4
-        if not Player:StealthUp(true, false) and (not Target:DebuffRefreshable(S.Garrote, 5.4) and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend()
+        if not Player:StealthUp(true, false) and (not Target:DebuffRefreshable(S.Garrote) and Target:DebuffRemains(S.Rupture) > 4+4*Rogue.CPMaxSpend()
           or Target:FilteredTimeToDie("<", Target:DebuffRemains(S.Rupture)*0.5)) and (Target:FilteredTimeToDie(">", 4) or Target:TimeToDieIsNotValid())
           and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
           if HR.Cast(S.Exsanguinate) then return "Cast Exsanguinate" end
@@ -613,7 +613,7 @@ local function Dot ()
       if HR.CastPooling(S.Garrote) then return "Cast Garrote (Pre-Exsanguinate)" end
     end
     -- actions.dot+=/rupture,if=talent.exsanguinate.enabled&!dot.garrote.refreshable&(combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&dot.rupture.remains*0.5<target.time_to_die)
-    if S.Rupture:IsReady() and Target:IsInMeleeRange(5) and ComboPoints > 0 and not Target:DebuffRefreshable(S.Garrote, 5.4)
+    if S.Rupture:IsReady() and Target:IsInMeleeRange(5) and ComboPoints > 0 and not Target:DebuffRefreshable(S.Garrote)
       and (ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemains() < 1 and Target:FilteredTimeToDie(">", Target:DebuffRemains(S.Rupture)*0.5)) then
       if HR.Cast(S.Rupture) then return "Cast Rupture (Pre-Exsanguinate)" end
     end
@@ -625,7 +625,7 @@ local function Dot ()
   local EmpoweredDotRefresh = MeleeEnemies10yCount >= 3 + num(S.ShroudedSuffocation:AzeriteEnabled())
   if S.Garrote:IsCastable() and (ComboPointsDeficit >= 1 + 3 * num(S.ShroudedSuffocation:AzeriteEnabled() and S.Vanish:CooldownUp())) then
     local function Evaluate_Garrote_Target(TargetUnit)
-      return TargetUnit:DebuffRefreshable(S.Garrote, 5.4)
+      return TargetUnit:DebuffRefreshable(S.Garrote)
         and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemains(S.Garrote)
           <= (Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime) and EmpoweredDotRefresh)
         and (not Rogue.Exsanguinated(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and EmpoweredDotRefresh)
@@ -892,7 +892,7 @@ local function APL ()
     -- Poisoned Knife Out of Range [EnergyCap] or [PoisonRefresh]
     if S.PoisonedKnife:IsCastable() and Target:IsInRange(30) and not Player:StealthUp(true, true)
       and ((not Target:IsInMeleeRange(10) and Player:EnergyTimeToMax() <= Player:GCD()*1.2)
-        or (not Target:IsInMeleeRange(5) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff, 4))) then
+        or (not Target:IsInMeleeRange(5) and Target:DebuffRefreshable(S.DeadlyPoisonDebuff))) then
       if HR.Cast(S.PoisonedKnife) then return "Cast Poisoned Knife" end
     end
     -- Trick to take in consideration the Recovery Setting
