@@ -206,7 +206,7 @@ end
 -- Master Assassin Remains Check
 local MasterAssassinBuff, NominalDuration = Spell(256735), 3
 local function MasterAssassinRemains ()
-  local LegoRemains = Rogue.MasterAssassinsMarkRemains() > 0
+  local LegoRemains = Rogue.MasterAssassinsMarkRemains()
   if LegoRemains > 0 then
     return LegoRemains
   elseif Player:BuffRemains(MasterAssassinBuff) < 0 then
