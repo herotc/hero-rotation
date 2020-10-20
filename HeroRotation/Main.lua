@@ -404,7 +404,7 @@
               HR.Print("It looks like enemy nameplates are disabled, you should enable them in order to get proper AoE rotation.");
             end
           else
-            HR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled.");
+            HR.Print("No Rotation found for this class/spec (SpecID: ".. SpecID .. "), addon disabled. This is likely due to the rotation being unsupported at this time. Please check supported rotations here: https://github.com/herotc/hero-rotations#supported-rotations");
             for Key, Value in pairs(UIFrames) do
               Value:Hide();
             end
