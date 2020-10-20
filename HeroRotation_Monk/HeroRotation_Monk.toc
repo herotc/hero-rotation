@@ -1,0 +1,16 @@
+## Interface: 90001
+
+## Title: Hero|cFFA330C9Rotation|r [|cFF00FF96Monk|r]
+## Author: Lockem, Hinalover
+## Notes: Hero Rotation - Monk Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Monk.lua
+Brewmaster.lua
+Windwalker.lua
+Events.lua
+Overrides.lua
