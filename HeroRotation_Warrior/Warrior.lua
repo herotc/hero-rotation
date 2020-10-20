@@ -30,7 +30,7 @@ Spell.Warrior.Fury = {
   Fireblood                             = Spell(265221),
   AncestralCall                         = Spell(274738),
   BagofTricks                           = Spell(312411),
-  
+
   -- Abilities
   RecklessnessBuff                      = Spell(1719),
   Recklessness                          = Spell(1719),
@@ -49,7 +49,7 @@ Spell.Warrior.Fury = {
   MeatCleaverBuff                       = Spell(85739),
   Pummel                                = Spell(6552),
   IntimidatingShout                     = Spell(5246),
-  
+
   -- Talents
   DragonRoar                            = Spell(118000),
   FrothingBerserker                     = Spell(215571),
@@ -61,7 +61,7 @@ Spell.Warrior.Fury = {
   Siegebreaker                          = Spell(280772),
   SiegebreakerDebuff                    = Spell(280773),
   StormBolt                             = Spell(107570),
-  
+
   -- Covenant Abilities
 
   -- Legendary Effects
@@ -72,7 +72,7 @@ Spell.Warrior.Fury = {
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
   NoxiousVenomDebuff                    = Spell(267410),
-  
+
   -- Azerite Traits (BfA)
   ColdSteelHotBlood                     = Spell(288080),
 
@@ -102,7 +102,7 @@ Spell.Warrior.Arms = {
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
-  
+
   -- Abilities
   Bladestorm                            = Spell(227847),
   Charge                                = Spell(100),
@@ -120,7 +120,7 @@ Spell.Warrior.Arms = {
   SweepingStrikes                       = Spell(260708),
   SweepingStrikesBuff                   = Spell(260708),
   Whirlwind                             = Spell(1680),
-  
+
   -- Talents
   AngerManagement                       = Spell(152278),
   Avatar                                = Spell(107574),
@@ -142,23 +142,23 @@ Spell.Warrior.Arms = {
   SuddenDeathBuff                       = Spell(52437),
   Warbreaker                            = Spell(262161),
   WarMachineBuff                        = Spell(262231),
-  
+
   -- Covenant Abilities
-  
+
   -- Legendary Effects
-  
+
   -- Conduits
-  
+
   -- Item Buffs/Debuffs
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
-  
+
   -- Azerite Traits (BfA)
   CrushingAssaultBuff                   = Spell(278826),
   SeismicWave                           = Spell(277639),
   TestofMight                           = Spell(275529),
   TestofMightBuff                       = Spell(275540),
-  
+
   -- Essences (BfA)
   BloodoftheEnemy                       = Spell(297108),
   ConcentratedFlame                     = Spell(295373),
@@ -174,6 +174,56 @@ Spell.Warrior.Arms = {
   SeethingRageBuff                      = Spell(297126),
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
+}
+
+Spell.Warrior.Protection = {
+  ThunderClap                           = Spell(6343),
+  DemoralizingShout                     = Spell(1160),
+  BoomingVoice                          = Spell(202743),
+  Bloodsport                            = Spell(279172),
+  DragonRoar                            = Spell(118000),
+  Revenge                               = Spell(6572),
+  Execute                               = MultiSpell(5308, 280735),
+  FreeRevenge                           = Spell(5302),
+  Ravager                               = Spell(228920),
+  ShieldBlock                           = Spell(2565),
+  ShieldSlam                            = Spell(23922),
+  ShieldBlockBuff                       = Spell(132404),
+  UnstoppableForce                      = Spell(275336),
+  AvatarBuff                            = Spell(107574),
+  BraceForImpact                        = Spell(277636),
+  DeafeningCrash                        = Spell(272824),
+  Devastate                             = Spell(20243),
+  Intercept                             = Spell(198304),
+  BloodFury                             = Spell(20572),
+  Berserking                            = Spell(26297),
+  ArcaneTorrent                         = Spell(50613),
+  LightsJudgment                        = Spell(255647),
+  Fireblood                             = Spell(265221),
+  AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
+  IgnorePain                            = Spell(190456),
+  Avatar                                = Spell(107574),
+  LastStand                             = Spell(12975),
+  LastStandBuff                         = Spell(12975),
+  VictoryRush                           = Spell(34428),
+  ImpendingVictory                      = Spell(202168),
+  Pummel                                = Spell(6552),
+  IntimidatingShout                     = Spell(5246),
+  RazorCoralDebuff                      = Spell(303568),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  AnimaofDeath                          = Spell(294926),
+  ConcentratedFlameBurn                 = Spell(295368),
+  RecklessForceBuff                     = Spell(302932),
+  MemoryofLucidDreamsBuff               = Spell(298357)
 }
 
 -- Items
@@ -192,4 +242,13 @@ Item.Warrior.Arms = {
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AshvanesRazorCoral               = Item(169311, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
+}
+
+Item.Warrior.Protection = {
+  PotionofUnbridledFury            = Item(169299),
+  GrongsPrimalRage                 = Item(165574, {13, 14}),
+  AshvanesRazorCoral               = Item(169311, {13, 14}),
+  AzsharasFontofPower              = Item(169314, {13, 14}),
+  LingeringPsychicShell            = Item(174277, {13, 14}),
+  MchimbasRitualBandages           = Item(159618, {13, 14}),
 }

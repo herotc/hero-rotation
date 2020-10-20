@@ -62,6 +62,15 @@ HR.GUISettings.APL.Warrior = {
       Charge = false,
     }
   },
+  Protection = {
+  OffGCDasOffGCD = {
+    Avatar            = true,
+    },
+  -- {Display GCD as OffGCD, ForceReturn}
+  GCDasOffGCD = {
+    DemoralizingShout = true,
+  },
+},
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -81,3 +90,6 @@ CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms")
 
 -- Fury Settings
 CreateARPanelOptions(CP_Fury, "APL.Warrior.Fury")
+
+-- Protection settings
+CreateARPanelOptions(CP_Protection, "APL.Warrior.Protection");
