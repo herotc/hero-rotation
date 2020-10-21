@@ -128,7 +128,6 @@ Spell.Monk.Windwalker = {
   RazorCoralDebuff                      = Spell(303568),
   
   -- PvP Abilities
-  ReverseHarm                           = Spell(287771),
 
   -- Misc
   PoolEnergy                            = Spell(999910)
