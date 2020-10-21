@@ -129,6 +129,13 @@ Spell.Monk.Windwalker = {
   
   -- PvP Abilities
 
+  -- Shadowland Covenant
+
+  -- Shadowland Essences
+
+  -- Shadowlands Legendary
+  ChiEnergyBuff                         = Spell(337571),
+
   -- Misc
   PoolEnergy                            = Spell(999910)
 }
@@ -147,7 +154,6 @@ Spell.Monk.Brewmaster = {
   -- Abilities
   BlackoutKick                 = Spell(205523),
   BreathofFire                 = Spell(115181),
-  BreathofFireDotDebuff        = Spell(123725),
   Brews                        = Spell(115308),
   CracklingJadeLightning       = Spell(117952),
   ExpelHarm                    = Spell(115072),
@@ -157,8 +163,7 @@ Spell.Monk.Brewmaster = {
   TouchofDeath                 = Spell(115080),
 
   -- Debuffs
-  DampenHarm                   = Spell(122278), --Talent
-  DampenHarmBuff               = Spell(122278),
+  BreathofFireDotDebuff        = Spell(123725),
 
   -- Talents
   BlackoutCombo                = Spell(196736),
@@ -179,6 +184,8 @@ Spell.Monk.Brewmaster = {
 
   -- Defensive
   CelestialBrew                = Spell(322507),
+  DampenHarm                   = Spell(122278), --Talent
+  DampenHarmBuff               = Spell(122278),
   FortifyingBrew               = Spell(115203),
   FortifyingBrewBuff           = Spell(115203),
   HighTolerance                = Spell(196737), -- Talent
