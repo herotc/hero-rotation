@@ -350,7 +350,7 @@ local function Demonic()
   end
   -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound.equipped&debuff.burning_wound.remains<4
   if S.DemonsBite:IsCastable() then
-    if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite206, EvaluateTargetIfDemonsBite208, not Target:IsSpellInRange(S.DemonsBite)) then reutrn "demons_bite 103"; end
+    if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite206, EvaluateTargetIfDemonsBite208, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite 103"; end
   end
   -- demons_bite
   if S.DemonsBite:IsCastable() and IsInMeleeRange() then
