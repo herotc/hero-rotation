@@ -180,7 +180,7 @@ local function EvaluateTargetIfRisingSunKick700(TargetUnit)
 end
 
 local function EvaluateTargetIfTigerPalm702(TargetUnit)
-  return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and Player:BuffDown(S.StormEarthandFireBuff))
+  return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and Player:BuffDown(S.StormEarthAndFireBuff))
 end
 
 local function EvaluateTargetIfBlackoutKick704(TargetUnit)
@@ -237,14 +237,14 @@ local function Aoe()
   end
   -- energizing_elixir,if=chi.max-chi>=2&energy.time_to_max>3|chi.max-chi>=4&(energy.time_to_max>2|!prev_gcd.1.tiger_palm)
   if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 3) or (Player:ChiDeficit() >= 4 and EnergyTimeToMaxRounded() > 2) or (not Player:PrevGCD(1, S.TigerPalm))) then
-    if HR.Cast(S.EnergizingElixir) then return "energizing_elixir 202"; end
+    if HR.Cast(S.EnergizingElixir, Settings.Windwalker.OffGCDasOffGCD.EnergizingElixir) then return "energizing_elixir 202"; end
   end
   -- spinning_crane_kick,if=combo_strike&(buff.dance_of_chiji.up|buff.dance_of_chiji_azerite.up)
   if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceofChijiBuff) or Player:BuffUp(S.DanceofChijiAzeriteBuff)) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, 8) then return "spinning_crane_kick 204"; end
   end
   -- fists_of_fury,if=energy.time_to_max>execute_time-1|buff.storm_earth_and_fire.remains
-  if S.FistsofFury:IsReady() and ((EnergyTimeToMaxRounded() > (S.FistsofFury:ExecuteTime() - 1)) or Player:BuffUp(S.StormEarthandFireBuff)) then
+  if S.FistsofFury:IsReady() and ((EnergyTimeToMaxRounded() > (S.FistsofFury:ExecuteTime() - 1)) or Player:BuffUp(S.StormEarthAndFireBuff)) then
     if HR.Cast(S.FistsofFury, nil, nil, 8) then return "fists_of_fury 206"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.rising_sun_kick.duration>cooldown.whirling_dragon_punch.remains+3)&(cooldown.fists_of_fury.remains>3|chi>=5)
@@ -306,15 +306,15 @@ end
 
 local function CDSEF()
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen|fight_remains<25
-  if S.InvokeXuentheWhiteTiger:IsReady() and (not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
-    if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuentheWhiteTiger, nil, 40) then return "invoke_xuen_the_white_tiger 300"; end
+  if S.InvokeXuenTheWhiteTiger:IsReady() and (not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
+    if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, 40) then return "invoke_xuen_the_white_tiger 300"; end
   end
   -- arcane_torrent,if=chi.max-chi>=1
   if S.ArcaneTorrent:IsCastable() and Player:ChiDeficit() >= 1 then
     if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 302"; end
   end
   -- touch_of_death,if=buff.storm_earth_and_fire.down
-  if S.TouchofDeath:IsReady() and Target:HealthPercentage() <= 15 and Player:BuffDown(S.StormEarthandFireBuff) then
+  if S.TouchofDeath:IsReady() and Target:HealthPercentage() <= 15 and Player:BuffDown(S.StormEarthAndFireBuff) then
     if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 304"; end
   end
   -- blood_of_the_enemy,if=cooldown.fists_of_fury.remains<2|fight_remains<12
@@ -330,7 +330,7 @@ local function CDSEF()
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 310"; end
   end
   -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&((!talent.whirling_dragon_punch.enabled|cooldown.whirling_dragon_punch.remains)&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&buff.storm_earth_and_fire.down)|fight_remains<8
-  if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.WhirlingDragonPunch:IsAvailable() or not S.WhirlingDragonPunch:CooldownUp()) and not S.RisingSunKick:CooldownUp() and not S.FistsofFury:CooldownUp() and Player:BuffDown(S.StormEarthandFireBuff)) or HL.BossFilteredFightRemains("<", 8)) then
+  if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.WhirlingDragonPunch:IsAvailable() or not S.WhirlingDragonPunch:CooldownUp()) and not S.RisingSunKick:CooldownUp() and not S.FistsofFury:CooldownUp() and Player:BuffDown(S.StormEarthAndFireBuff)) or HL.BossFilteredFightRemains("<", 8)) then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 312"; end
   end
   -- the_unbound_force
@@ -358,8 +358,8 @@ local function CDSEF()
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 322"; end
   end
   -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|buff.seething_rage.up|(cooldown.blood_of_the_enemy.remains+1>cooldown.storm_earth_and_fire.full_recharge_time|!essence.blood_of_the_enemy.major)&cooldown.fists_of_fury.remains<10&chi>=2&cooldown.whirling_dragon_punch.remains<12
-  if S.StormEarthandFire:IsReady() and (S.StormEarthandFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or Player:BuffUp(S.SeethingRageBuff) or (((S.BloodoftheEnemy:CooldownRemains() + 1) > S.StormEarthandFire:FullRechargeTime()) or not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and S.FistsofFury:CooldownRemains() < 10 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() < 12) then
-    if HR.Cast(S.StormEarthandFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthandFire) then return "storm_earth_and_fire 324"; end
+  if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or Player:BuffUp(S.SeethingRageBuff) or (((S.BloodoftheEnemy:CooldownRemains() + 1) > S.StormEarthAndFire:FullRechargeTime()) or not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and S.FistsofFury:CooldownRemains() < 10 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() < 12) then
+    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire 324"; end
   end
   if (Settings.Commons.UseTrinkets) then
     if (true) then
@@ -371,11 +371,11 @@ local function CDSEF()
     if HR.Cast(S.TouchofKarma, nil, nil, 20) then return "touch_of_karma 326"; end
   end
   -- blood_fury,if=fight_remains>125|buff.storm_earth_and_fire.up|fight_remains<20
-  if S.BloodFury:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or Player:BuffUp(S.StormEarthandFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
+  if S.BloodFury:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or Player:BuffUp(S.StormEarthAndFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
     if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 328"; end
   end
   -- berserking,if=fight_remains>185|buff.storm_earth_and_fire.up|fight_remains<20
-  if S.Berserking:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or Player:BuffUp(S.StormEarthandFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
+  if S.Berserking:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or Player:BuffUp(S.StormEarthAndFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 330"; end
   end
   -- lights_judgment
@@ -383,11 +383,11 @@ local function CDSEF()
     if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 332"; end
   end
   -- fireblood,if=fight_remains>125|buff.storm_earth_and_fire.up|fight_remains<20
-  if S.Fireblood:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or Player:BuffUp(S.StormEarthandFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
+  if S.Fireblood:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or Player:BuffUp(S.StormEarthAndFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 334"; end
   end
   -- ancestral_call,if=fight_remains>185|buff.storm_earth_and_fire.up|fight_remains<20
-  if S.AncestralCall:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or Player:BuffUp(S.StormEarthandFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
+  if S.AncestralCall:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or Player:BuffUp(S.StormEarthAndFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
     if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 336"; end
   end
   -- bag_of_tricks
@@ -402,8 +402,8 @@ local function CDSerenity()
     VarSerenityBurst = (Player:BuffRemains(S.SerenityBuff) < 1 or (HL.BossFilteredFightRemains("<", 20)))
   end
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen|fight_remains<25
-  if S.InvokeXuentheWhiteTiger:IsReady() and ( not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
-    if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuentheWhiteTiger, nil, 40) then return "invoke_xuen_the_white_tiger 400"; end
+  if S.InvokeXuenTheWhiteTiger:IsReady() and ( not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
+    if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, 40) then return "invoke_xuen_the_white_tiger 400"; end
   end
   -- guardian_of_azeroth,if=fight_remains>185|variable.serenity_burst|fight_remains<35
   if S.GuardianofAzeroth:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 35)) then
@@ -582,7 +582,7 @@ local function St()
   end
   -- energizing_elixir,if=chi.max-chi>=2&energy.time_to_max>3|chi.max-chi>=4&(energy.time_to_max>2|!prev_gcd.1.tiger_palm)
   if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 3) or (Player:ChiDeficit() >= 4 and EnergyTimeToMaxRounded() > 2) or (not Player:PrevGCD(1, S.TigerPalm))) then
-    if HR.Cast(S.EnergizingElixir) then return "energizing_elixir 702"; end
+    if HR.Cast(S.EnergizingElixir, Settings.Windwalker.OffGCDasOffGCD.EnergizingElixir) then return "energizing_elixir 702"; end
   end
   -- spinning_crane_kick,if=combo_strike&(buff.dance_of_chiji.up|buff.dance_of_chiji_azerite.up)
   if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceofChijiBuff) or Player:BuffUp(S.DanceofChijiAzeriteBuff)) then
@@ -691,10 +691,10 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
     -- variable,name=hold_xuen,op=set,value=cooldown.invoke_xuen_the_white_tiger.remains>fight_remains|fight_remains<120&fight_remains>cooldown.serenity.remains&cooldown.serenity.remains>10
     if (true) then
-      VarXuenHold = (HL.BossFilteredFightRemains("<", S.InvokeXuentheWhiteTiger:CooldownRemains()) or HL.BossFilteredFightRemains("<", 120)) and HL.BossFilteredFightRemains(">", S.Serenity:CooldownRemains()) and (S.Serenity:CooldownRemains() > 10)
+      VarXuenHold = (HL.BossFilteredFightRemains("<", S.InvokeXuenTheWhiteTiger:CooldownRemains()) or HL.BossFilteredFightRemains("<", 120)) and HL.BossFilteredFightRemains(">", S.Serenity:CooldownRemains()) and (S.Serenity:CooldownRemains() > 10)
     end
     -- potion,if=(buff.serenity.up|buff.storm_earth_and_fire.up)&pet.xuen_the_white_tiger.active|fight_remains<=60
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.SerenityBuff) or Player:BuffUp(S.StormEarthandFireBuff)) and (S.InvokeXuentheWhiteTiger:TimeSinceLastCast() <= 24 or HL.BossFilteredFightRemains("<=", 60)) then
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.SerenityBuff) or Player:BuffUp(S.StormEarthAndFireBuff)) and (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24 or HL.BossFilteredFightRemains("<=", 60)) then
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 100"; end
     end
     -- call_action_list,name=serenity,if=buff.serenity.up
@@ -702,7 +702,7 @@ local function APL()
       local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=opener,if=time<5&chi<5&!pet.xuen_the_white_tiger.active
-    if HL.CombatTime() < 5 and Player:Chi() < 5 and (not (S.InvokeXuentheWhiteTiger:TimeSinceLastCast() <= 24)) then
+    if HL.CombatTime() < 5 and Player:Chi() < 5 and (not (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24)) then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3&(energy.time_to_max<1|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)

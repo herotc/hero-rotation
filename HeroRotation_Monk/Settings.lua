@@ -44,14 +44,14 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      InvokeNiuzaotheBlackOx = true,
+      InvokeNiuzaoTheBlackOx = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
       BlackOxBrew            = true,
-      IronskinBrew           = true,
+      CelestialBrew          = true,
       PurifyingBrew          = true,
     }
   },
@@ -60,15 +60,16 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      InvokeXuentheWhiteTiger = true,
+      InvokeXuenTheWhiteTiger = true,
       TouchofDeath            = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
+      EnergizingElixir        = true,
       Serenity                = true,
-      StormEarthandFire       = true,
+      StormEarthAndFire       = true,
     }
   }
 };
