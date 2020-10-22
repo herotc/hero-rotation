@@ -50,8 +50,7 @@ Spell.Monk.Windwalker = {
   StormEarthandFire                     = Spell(137639),
   StormEarthandFireBuff                 = Spell(137639),
   TigerPalm                             = Spell(100780),
-  TouchofDeath                          = Spell(115080),
-  TouchofDeathDebuff                    = Spell(115080),
+  TouchofDeath                          = Spell(322109),
   
   -- Debuffs
   MarkoftheCraneDebuff                  = Spell(228287),
@@ -160,7 +159,7 @@ Spell.Monk.Brewmaster = {
   InvokeNiuzaotheBlackOx       = Spell(132578),
   KegSmash                     = Spell(121253),
   TigerPalm                    = Spell(100780),
-  TouchofDeath                 = Spell(115080),
+  TouchofDeath                 = Spell(322109),
 
   -- Debuffs
   BreathofFireDotDebuff        = Spell(123725),

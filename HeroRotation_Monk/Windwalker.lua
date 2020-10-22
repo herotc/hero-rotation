@@ -314,7 +314,7 @@ local function CDSEF()
     if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 302"; end
   end
   -- touch_of_death,if=buff.storm_earth_and_fire.down
-  if S.TouchofDeath:IsReady() and Player:BuffDown(S.StormEarthandFireBuff) then
+  if S.TouchofDeath:IsReady() and Target:HealthPercentage() <= 15 and Player:BuffDown(S.StormEarthandFireBuff) then
     if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 304"; end
   end
   -- blood_of_the_enemy,if=cooldown.fists_of_fury.remains<2|fight_remains<12
@@ -403,10 +403,10 @@ local function CDSerenity()
   end
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen|fight_remains<25
   if S.InvokeXuentheWhiteTiger:IsReady() and ( not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
-    if HR.Cast(S.InvokeXuentheWhiteTiger, nil, nil, 40) then return "invoke_xuen_the_white_tiger 400"; end
+    if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuentheWhiteTiger, nil, 40) then return "invoke_xuen_the_white_tiger 400"; end
   end
   -- guardian_of_azeroth,if=fight_remains>185|variable.serenity_burst|fight_remains<35
-  if S.GuardianofAzeroth:IsCastable() and (HL.FilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 35)) then
+  if S.GuardianofAzeroth:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 35)) then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth 402"; end
   end
   -- worldvein_resonance,if=variable.serenity_burst
@@ -419,113 +419,76 @@ local function CDSerenity()
   end
   -- concentrated_flame,if=(cooldown.serenity.remains|cooldown.concentrated_flame.charges=2)&!dot.concentrated_flame_burn.remains&(cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains|fight_remains<8)
   if S.ConcentratedFlame:IsCastable() and ((not S.Serenity:CooldownUp() or S.ConcentratedFlame:Charges() == 2) and Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.RisingSunKick:CooldownUp() and not S.FistsofFury:CooldownUp()) or HL.BossFilteredFightRemains("<", 8))) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 78"; end
+    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 408"; end
   end
-  -- blood_fury,if=cooldown.serenity.remains>20|fight_remains<20
-  if S.BloodFury:IsCastable() and (S.Serenity:CooldownRemains() > 20 or HL.BossFilteredFightRemains("<", 20)) then
-    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 46"; end
+  -- the_unbound_force
+  if S.TheUnboundForce:IsCastable() then
+    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 410"; end
   end
-  -- berserking,if=cooldown.serenity.remains>20|fight_remains<15
-  if S.Berserking:IsCastable() and (S.Serenity:CooldownRemains() > 20 or HL.BossFilteredFightRemains("<", 15)) then
-    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 48"; end
+  -- purifying_blast
+  if S.PurifyingBlast:IsCastable() then
+    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 412"; end
   end
-  -- arcane_torrent,if=buff.serenity.down&chi.max-chi>=1&energy.time_to_max>=0.5
-  if S.ArcaneTorrent:IsCastable() and (Player:BuffDown(S.SerenityBuff) and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() >= 0.5) then
-    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 50"; end
+  -- reaping_flames,if=target.time_to_pct_20>30|target.health.pct<=20|target.time_to_die<2
+  if (Target:TimeToX(20) > 30 or Target:HealthPercentage() <= 20 or Target:TimeToDie() < 2) then
+    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
+  end
+  -- focused_azerite_beam
+  if S.FocusedAzeriteBeam:IsCastable() then
+    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 414"; end
+  end
+  -- memory_of_lucid_dreams,if=energy<40
+  if S.MemoryofLucidDreams:IsCastable() and (Player:Energy() < 40) then
+    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 416"; end
+  end
+  -- ripple_in_space
+  if S.RippleInSpace:IsCastable() then
+    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 418"; end
+  end
+  -- blood_fury,if=fight_remains>125|variable.serenity_burst
+  if S.BloodFury:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 420"; end
+  end
+  -- berserking,if=fight_remains>185|variable.serenity_burst
+  if S.Berserking:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 422"; end
+  end
+  -- arcane_torrent,if=chi.max-chi>=1
+  if S.ArcaneTorrent:IsCastable() and Player:ChiDeficit() >= 1 then
+    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 424"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 52"; end
+    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 426"; end
   end
-  -- fireblood,if=cooldown.serenity.remains>20|fight_remains<10
-  if S.Fireblood:IsCastable() and (S.Serenity:CooldownRemains() > 20 or HL.BossFilteredFightRemains("<", 10)) then
-    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 54"; end
+  -- fireblood,if=fight_remains>125|variable.serenity_burst
+  if S.Fireblood:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 428"; end
   end
-  -- ancestral_call,if=cooldown.serenity.remains>20|fight_remains<20
-  if S.AncestralCall:IsCastable() and (S.Serenity:CooldownRemains() > 20 or HL.BossFilteredFightRemains("<", 20)) then
-    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 56"; end
+  -- ancestral_call,if=fight_remains>125|variable.serenity_burst
+  if S.AncestralCall:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 430"; end
+  end
+  if (Settings.Commons.UseTrinkets) then
+    if (true) then
+      local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
+    end
+  end
+  -- touch_of_death
+  if S.TouchofDeath:IsReady() and Target:HealthPercentage() <= 15  then
+    if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 432"; end
+  end
+  -- touch_of_karma,interval=90,pct_health=0.5
+  if S.TouchofKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
+    if HR.Cast(S.TouchofKarma, nil, nil, 20) then return "touch_of_karma 434"; end
+  end
+  -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
+  if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 15)) then
+    if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then return "serenity 436"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() then
-    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 58"; end
-  end
-  -- use_item,name=lustrous_golden_plumage,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<=20
-  if I.LustrousGoldenPlumage:IsEquipReady() and Settings.Commons.UseTrinkets and (S.TouchofDeath:CooldownRemains() < 1 or S.TouchofDeath:CooldownRemains() > 20 or VarHoldTod or HL.BossFilteredFightRemains("<=", 20)) then
-    if HR.Cast(I.LustrousGoldenPlumage, nil, Settings.Commons.TrinketDisplayStyle) then return "lustrous_golden_plumage 60"; end
-  end
-  -- use_item,effect_name=gladiators_medallion,if=cooldown.touch_of_death.remains<1|cooldown.touch_of_death.remains>20|variable.hold_tod|fight_remains<=20
-  -- 61
-  -- use_item,effect_name=gladiators_emblem,if=fight_remains>159|cooldown.touch_of_death.remains<1|variable.hold_tod
-  -- 62
-  -- touch_of_death,if=!variable.hold_tod
-  if S.TouchofDeath:IsReady() and (not VarHoldTod) then
-    if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, "Melee") then return "touch_of_death 63"; end
-  end
-  -- touch_of_karma,if=fight_remains>159|dot.touch_of_death.remains|variable.hold_tod
-  if S.TouchofKarma:IsReady() and not Settings.Windwalker.IgnoreToK and (HL.FilteredFightRemains(20, ">", 159, true) or Target:DebuffP(S.TouchofDeathDebuff) or VarHoldTod) then
-    if HR.Cast(S.TouchofKarma, nil, nil, 20) then return "touch_of_karma 64"; end
-  end
-  -- use_item,name=pocketsized_computation_device,if=buff.serenity.down&(cooldown.touch_of_death.remains>10|variable.hold_tod)|fight_remains<5
-  if Everyone.PSCDEquipReady() and Settings.Commons.UseTrinkets and (Player:BuffDown(S.SerenityBuff) and (S.TouchofDeath:CooldownRemains() > 10 or VarHoldTod) or HL.BossFilteredFightRemains("<", 5)) then
-    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "pocketsized_computation_device 65"; end
-  end
-  if (Settings.Commons.UseTrinkets) then
-    -- use_item,name=remote_guidance_device,if=cooldown.touch_of_death.remains>10|variable.hold_tod
-    if I.RemoteGuidanceDevice:IsEquipReady() and (S.TouchofDeath:CooldownRemains() > 10 or VarHoldTod) then
-      if HR.Cast(I.RemoteGuidanceDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "remote_guidance_device 68"; end
-    end
-    -- use_item,effect_name=gladiators_badge,if=cooldown.serenity.remains>20|fight_remains<20
-    -- 69
-    -- use_item,name=galecallers_boon,if=cooldown.serenity.remains>20|fight_remains<20
-    if I.GalecallersBoon:IsEquipReady() and (S.Serenity:CooldownRemains() > 20 or HL.BossFilteredFightRemains("<", 20)) then
-      if HR.Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 70"; end
-    end
-    -- use_item,name=writhing_segment_of_drestagath,if=cooldown.touch_of_death.remains>10|variable.hold_tod
-    if I.WrithingSegmentofDrestagath:IsEquipReady() and (S.TouchofDeath:CooldownRemains() > 10 or VarHoldTod) then
-      if HR.Cast(I.WrithingSegmentofDrestagath, nil, Settings.Commons.TrinketDisplayStyle, 8) then return "writhing_segment_of_drestagath 72"; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|buff.serenity.remains>9|fight_remains<25
-    if I.AshvanesRazorCoral:IsEquipReady() and (Target:DebuffDown(S.RazorCoralDebuff) or Player:BuffRemains(S.SerenityBuff) > 9 or HL.BossFilteredFightRemains("<", 25)) then
-      if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 74"; end
-    end
-  end
-  -- call_action_list,name=use_items
-  if (true) then
-    local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
-  end
-  -- serenity
-  if S.Serenity:IsReady() then
-    if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then return "serenity 80"; end
-  end
-  if (Player:BuffDown(S.SerenityBuff)) then
-    -- the_unbound_force,if=buff.serenity.down
-    if S.TheUnboundForce:IsCastable() then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "the_unbound_force 82"; end
-    end
-    -- purifying_blast,if=buff.serenity.down
-    if S.PurifyingBlast:IsCastable() then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast 84"; end
-    end
-    -- reaping_flames,if=buff.serenity.down&(target.time_to_pct_20>30|target.health.pct<=20)|target.time_to_die<2
-    if (Player:BuffDown(S.SerenityBuff) and (Target:TimeToX(20) > 30 or Target:HealthPercentage() <= 20) or Target:TimeToDie() < 2) then
-      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-    end
-    -- focused_azerite_beam,if=buff.serenity.down
-    if S.FocusedAzeriteBeam:IsCastable() then
-      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 88"; end
-    end
-    -- memory_of_lucid_dreams,if=buff.serenity.down&energy<40
-    if S.MemoryofLucidDreams:IsCastable() and (Player:Energy() < 40) then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 90"; end
-    end
-    -- ripple_in_space,if=buff.serenity.down
-    if S.RippleInSpace:IsCastable() then
-      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 92"; end
-    end
-    -- bag_of_tricks,if=buff.serenity.down
-    if S.BagofTricks:IsCastable() then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 94"; end
-    end
+    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 438"; end
   end
 end
 
@@ -571,7 +534,7 @@ end
 local function Serenity()
   -- fists_of_fury,if=buff.serenity.remains<1|active_enemies>1
   if S.FistsofFury:IsReady() and (Player:BuffRemains(S.SerenityBuff) < 1 or EnemiesCount8 > 1) then
-    if HR.Cast(S.FistsofFury, nil, nil, 8) then reutrn "fists_of_fury 600"; end
+    if HR.Cast(S.FistsofFury, nil, nil, 8) then return "fists_of_fury 600"; end
   end
   -- spinning_crane_kick,if=combo_strike&(active_enemies>2|active_enemies>1&!cooldown.rising_sun_kick.up)
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and (EnemiesCount8 > 2 or (EnemiesCount8 > 1 and not S.RisingSunKick:CooldownUp()))) then
@@ -579,7 +542,7 @@ local function Serenity()
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike
   if S.RisingSunKick:IsReady() then
-    if HR.CastTargetIf(S.RisingSunKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfRisingSunKick600) then return "rising_sun_kick 604"; end
+    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfRisingSunKick600) then return "rising_sun_kick 604"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfRisingSunKick600(Target) then
       if HR.Cast(S.RisingSunKick, nil, nil, "Melee") then return "rising_sun_kick 606"; end
     end
@@ -594,14 +557,14 @@ local function Serenity()
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi<3
   if S.FistoftheWhiteTiger:IsReady() then
-    if HR.CastTargetIf(S.FistoftheWhiteTiger, 8, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger102) then return "fist_of_the_white_tiger 172"; end
+    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger102) then return "fist_of_the_white_tiger 172"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger102(Target) then
       if HR.Cast(S.FistoftheWhiteTiger, nil, nil, "Melee") then return "fist_of_the_white_tiger 612"; end
     end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike|!talent.hit_combo.enabled
   if S.BlackoutKick:IsReady() then
-    if HR.CastTargetIf(S.BlackoutKick, 8, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick602) then return "blackout_kick 614"; end
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick602) then return "blackout_kick 614"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfBlackoutKick602(Target) then
       if HR.Cast(S.BlackoutKick, nil, nil, "Melee") then return "blackout_kick 616"; end
     end

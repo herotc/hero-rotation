@@ -57,14 +57,13 @@ HR.GUISettings.APL.Monk = {
   },
   Windwalker = {
     IgnoreToD = false,
-    IgnoreToK = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       InvokeXuentheWhiteTiger = true,
-      TouchofDeath            = true,
       Serenity                = true,
       StormEarthandFire       = true,
+      TouchofDeath            = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -89,7 +88,6 @@ CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.EssenceDisplayStyle", {
 
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
-CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToD", "Ignore Touch of Death", "Enable this setting to allow you to ignore Touch of Death without stalling the rotation. (NOTE: Touch of Death will never be suggested if this is enabled)");
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToK", "Ignore Touch of Karma", "Enable this setting to allow you to ignore Touch of Karma without stalling the rotation. (NOTE: Touch of Karma will never be suggested if this is enabled)");
 
 -- Brewmaster
