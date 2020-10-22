@@ -258,6 +258,10 @@ local function Aoe()
   if S.RushingJadeWind:IsReady() and (Player:BuffDown(S.RushingJadeWindBuff)) then
     if HR.Cast(S.RushingJadeWind, nil, nil, 8) then return "rushing_jade_wind 212"; end
   end
+  -- spinning_crane_kick,if=combo_strike&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsofFury:CooldownRemains() > 6) and (Player:Chi() > 5 or S.FistsofFury:CooldownRemains() > 2)) or (EnergyTimeToMaxRounded() <= 3)) then
+    if HR.Cast(S.SpinningCraneKick, nil, nil, 8) then return "spinning_crane_kick 204"; end
+  end
   -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major
   if S.ExpelHarm:IsReady() and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
     if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 214"; end
