@@ -53,6 +53,7 @@ Spell.DeathKnight.Blood = {
   UnholyStrengthBuff                    = Spell(53365),
   VampiricBloodBuff                     = Spell(55233),
   -- Debuffs
+  BloodPlagueDebuff                     = Spell(55078),
   -- Racials
   ArcaneTorrent                         = Spell(50613),
   BloodFury                             = Spell(20572),
@@ -65,7 +66,7 @@ Spell.DeathKnight.Blood = {
   -- Interrupts
   MindFreeze                            = Spell(47528),
   -- Custom
-  PoolRange                             = Spell(999910)
+  Pool                                  = Spell(999910)
 }
 
 Spell.DeathKnight.Frost = {

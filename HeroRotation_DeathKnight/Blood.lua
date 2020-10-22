@@ -36,6 +36,7 @@ local ShouldReturn
 local IsTanking
 local EnemiesMelee
 local EnemiesMeleeCount
+local UnitsWithoutBloodPlague
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -61,6 +62,16 @@ end
 
 local function bool(val)
   return val ~= 0
+end
+
+local function UnitsWithoutBP(enemies)
+  local WithoutBPCount = 0
+  for _, CycleUnit in pairs(enemies) do
+    if not CycleUnit:DebuffUp(S.BloodPlagueDebuff) then
+      WithoutBPCount = WithoutBPCount + 1
+    end
+  end
+  return WithoutBPCount
 end
 
 local function Precombat()
@@ -158,10 +169,10 @@ local function Standard()
   -- death_and_decay,if=spell_targets.death_and_decay>=3
   if (EnemiesMeleeCount >= 3) then
     if S.DeathandDecay:IsReady() then
-      if HR.Cast(S.DeathandDecay, nil, nil, not Target:IsSpellInRange(S.DeathandDecay)) then return "death_and_decay"; end
+      if HR.Cast(S.DeathandDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay"; end
     end
     if S.DeathsDue:IsReady() then
-      if HR.Cast(S.DeathsDue, nil, nil, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due"; end
+      if HR.Cast(S.DeathsDue, nil, nil, not Target:IsInRange(30)) then return "deaths_due"; end
     end
   end
   -- heart_strike,if=buff.dancing_rune_weapon.up|rune.time_to_4<gcd
@@ -175,10 +186,10 @@ local function Standard()
   -- death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
   if (Player:BuffUp(S.CrimsonScourgeBuff) or S.RapidDecomposition:IsAvailable() or EnemiesMeleeCount >= 2) then
     if S.DeathandDecay:IsReady() then
-      if HR.Cast(S.DeathandDecay, nil, nil, not Target:IsSpellInRange(S.DeathandDecay)) then return "death_and_decay"; end
+      if HR.Cast(S.DeathandDecay, nil, nil, not Target:IsInRange(30)) then return "death_and_decay"; end
     end
     if S.DeathsDue:IsReady() then
-      if HR.Cast(S.DeathsDue, nil, nil, not Target:IsSpellInRange(S.DeathsDue)) then return "deaths_due"; end
+      if HR.Cast(S.DeathsDue, nil, nil, not Target:IsInRange(30)) then return "deaths_due"; end
     end
   end
   -- consumption
@@ -203,15 +214,18 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   -- Get Enemies Count
+  Enemies10y          = Player:GetEnemiesInRange(10)
   if AoEON() then
     EnemiesMelee      = Player:GetEnemiesInMeleeRange(8)
-    Enemies10y        = Player:GetEnemiesInRange(10)
     EnemiesMeleeCount = #EnemiesMelee
     EnemiesCount10y   = #Enemies10y
   else
     EnemiesMeleeCount = 1
     EnemiesCount10y   = 1
   end
+  
+  -- Check Units without Blood Plague
+  UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
   
   -- Are we actively tanking?
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
@@ -225,6 +239,9 @@ local function APL()
     local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false); if ShouldReturn then return ShouldReturn; end
+    if Settings.Blood.PoolDuringBlooddrinker and Player:IsChanneling(S.Blooddrinker) and Player:BuffUp(S.BoneShieldBuff) and UnitsWithoutBloodPlague == 0 and not Player:ShouldStopCasting() and Player:CastRemains() > 0.2 then
+      if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool During Blooddrinker"; end
+    end
     -- auto_attack
     -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
     if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable())) then
@@ -280,9 +297,9 @@ local function APL()
     -- tombstone,if=buff.bone_shield.stack>=7 (Moved to Defensives)
     -- call_action_list,name=essences (Removed for Shadowlands)
     -- call_action_list,name=standard
-    if (true) then
-      local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
-    end
+    local ShouldReturn = Standard(); if ShouldReturn then return ShouldReturn; end
+    -- Pool if nothing else to do
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 
