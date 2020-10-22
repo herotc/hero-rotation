@@ -322,7 +322,7 @@ local function Demonic()
   end
   -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
   if S.EyeBeam:IsReady() then
-    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsSpellInRange(S.EyeBeam)) then return "eye_beam 90"; end
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 90"; end
   end
   -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
   if S.BladeDance:IsReady() and IsInMeleeRange(8) and (VarBladeDance and (S.EyeBeam:CooldownRemains() > (5 - S.RevolvingBlades:AzeriteRank() * 3))) then
@@ -417,7 +417,7 @@ local function Normal()
   end
   -- eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_essence_break&raid_event.adds.in>cooldown
   if S.EyeBeam:IsReady() and (not S.BlindFury:IsAvailable() and (not VarWaitingForEssenceBreak)) then
-    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsSpellInRange(S.EyeBeam)) then return "eye_beam 142"; end
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 142"; end
   end
   -- annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_essence_break
   if S.Annihilation:IsReady() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or (not VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemains(S.MetamorphosisBuff) < 5) and (not VarPoolingForBladeDance) and (not VarWaitingForEssenceBreak)) then
@@ -429,11 +429,11 @@ local function Normal()
   end
   -- eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
   if S.EyeBeam:IsReady() and (S.BlindFury:IsAvailable()) then
-    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsSpellInRange(S.EyeBeam)) then return "eye_beam 148"; end
+    if HR.Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 148"; end
   end
   -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound.equipped&debuff.burning_wound.remains<4
   if S.DemonsBite:IsCastable() then
-    if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite202, EvaluateTargetIfDemonsBite204, not Target:IsSpellInRange(S.DemonsBite)) then reutrn "demons_bite 149"; end
+    if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite202, EvaluateTargetIfDemonsBite204, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite 149"; end
   end
   -- demons_bite
   if S.DemonsBite:IsCastable() and IsInMeleeRange() then
