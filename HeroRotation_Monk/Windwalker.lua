@@ -163,8 +163,15 @@ local function EvaluateTargetIfBlackoutKick206(TargetUnit)
   return (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and ((Player:ChiDeficit() >= 1 or Player:EnergyTimeToX(50) < 1) or (Player:Chi() == 2 and S.FistsofFury:CooldownRemains() < 3)))))
 end
 
-local function EvaluateTargetIfTigerPalm400(TargetUnit)
+local function EvaluateTargetIfTigerPalm500(TargetUnit)
   return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2)
+end
+
+local function EvaluateTargetIfFilterMarkoftheCrane502(TargetUnit)
+  return TargetUnit:DebuffRemains(S.MarkoftheCraneDebuff)
+end
+local function EvaluateTargetIfTigerPalm504(TargetUnit)
+  return (Player:ChiDeficit() >= 2)
 end
 
 local function EvaluateTargetIfRisingSunKick600(TargetUnit)
@@ -493,42 +500,39 @@ local function CDSerenity()
 end
 
 local function Opener()
-  -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains
---  if S.FistoftheWhiteTiger:IsReady() then
---    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100) then return "fist_of_the_white_tiger 500"; end
---    if EvaluateTargetIfFilterMarkoftheCrane100(Target) then
---      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, "Melee") then return "fist_of_the_white_tiger 502"; end
---    end
---  end
-  -- expel_harm,if=talent.chi_burst.enabled
---  if S.ExpelHarm:IsReady() and S.ChiBurst:IsAvailable() then
---    if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 504"; end
---  end
-  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2
---  if S.TigerPalm:IsReady() then
---    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm400) then return "tiger_palm 624"; end
---    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm400(Target) then
---      if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 506"; end
---    end
---  end
-  -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major
---  if S.ExpelHarm:IsReady() and (Player:ChiDeficit() == 3 or Player:ChiDeficit() == 1) then
---    if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 508"; end
---  end
-  -- flying_serpent_kick,if=talent.hit_combo.enabled
---  if S.FlyingSerpentKickActionBarReplacement:IsReady() then
---    if HR.Cast(S.FlyingSerpentKickActionBarReplacement, nil, nil, 40) then return "flying_serpent_kick 510"; end
---  end
---  if S.FlyingSerpentKick:IsReady() and S.HitCombo:IsAvailable() then
---    if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "flying_serpent_kick 512"; end
---  end
-  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2
---  if S.TigerPalm:IsReady() then
---    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm400) then return "tiger_palm 624"; end
---    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm400(Target) then
---      if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 514"; end
---    end
---  end
+  -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
+  if S.FistoftheWhiteTiger:IsReady() then
+    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger202) then return "fist_of_the_white_tiger 500"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger202(Target) then
+      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, "Melee") then return "fist_of_the_white_tiger 502"; end
+    end
+  end
+  -- expel_harm,if=talent.chi_burst.enabled&chi.max-chi>=3
+  if S.ExpelHarm:IsReady() and S.ChiBurst:IsAvailable() and Player:ChiDeficit() >= 3 then
+    if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 504"; end
+  end
+  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=combo_strike&chi.max-chi>=2
+  if S.TigerPalm:IsReady() then
+    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm500) then return "tiger_palm 624"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm500(Target) then
+      if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 506"; end
+    end
+  end
+  -- chi_wave,if=chi.max-chi=2
+  if S.ChiWave:IsReady() and Player:ChiDeficit() >= 2 then
+    if HR.Cast(S.ChiWave, nil, nil, 40) then return "chi_wave 6"; end
+  end
+  -- expel_harm
+  if S.ExpelHarm:IsReady() then
+    if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 508"; end
+  end
+  -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=chi.max-chi>=2
+  if S.TigerPalm:IsReady() then
+    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm504) then return "tiger_palm 624"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm504(Target) then
+      if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 514"; end
+    end
+  end
 end
 
 local function Serenity()

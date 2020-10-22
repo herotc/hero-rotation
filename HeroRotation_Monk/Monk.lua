@@ -134,6 +134,8 @@ Spell.Monk.Windwalker = {
 
   -- Shadowlands Legendary
   ChiEnergyBuff                         = Spell(337571),
+  RecentlyRushingTigerPalm              = Spell(337340),
+  RecentlyRushingTigerPalm              = Spell(337341),
 
   -- Misc
   PoolEnergy                            = Spell(999910)
