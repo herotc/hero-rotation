@@ -260,9 +260,13 @@ local function Normal()
   if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
     if HR.Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 21"; end
   end
+  -- Manual add: elysian_decree
+  if S.ElysianDecree:IsCastable() then
+    if HR.Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle) then return "elysian_decree 22"; end
+  end
   -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
   if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffUp(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
-    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 22"; end
+    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 23"; end
   end
   -- infernal_strike
   if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
