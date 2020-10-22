@@ -260,46 +260,46 @@ local function Aoe()
   end
   -- spinning_crane_kick,if=combo_strike&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
   if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsofFury:CooldownRemains() > 6) and (Player:Chi() > 5 or S.FistsofFury:CooldownRemains() > 2)) or (EnergyTimeToMaxRounded() <= 3)) then
-    if HR.Cast(S.SpinningCraneKick, nil, nil, 8) then return "spinning_crane_kick 204"; end
+    if HR.Cast(S.SpinningCraneKick, nil, nil, 8) then return "spinning_crane_kick 214"; end
   end
   -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major
   if S.ExpelHarm:IsReady() and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
-    if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 214"; end
+    if HR.Cast(S.ExpelHarm, nil, nil, "Melee") then return "expel_harm 216"; end
   end
   -- chi_burst,if=chi.max-chi>=1
   if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= 1) then
-    if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 216"; end
+    if HR.Cast(S.ChiBurst, nil, nil, 40) then return "chi_burst 218"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
   if S.FistoftheWhiteTiger:IsReady() then
-    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger202) then return "fist_of_the_white_tiger 218"; end
+    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger202) then return "fist_of_the_white_tiger 220"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger202(Target) then
-      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, "Melee") then return "fist_of_the_white_tiger 220"; end
+      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, "Melee") then return "fist_of_the_white_tiger 222"; end
     end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|combo_strike)
   if S.TigerPalm:IsReady() then
-    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm204) then return "tiger_palm 222"; end
+    if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfTigerPalm204) then return "tiger_palm 224"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm204(Target) then
-      if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 224"; end
+      if HR.Cast(S.TigerPalm, nil, nil, "Melee") then return "tiger_palm 226"; end
     end
   end
   -- chi_wave,if=combo_strike
   if S.ChiWave:IsReady() and (ComboStrike(S.ChiWave)) then
-    if HR.Cast(S.ChiWave, nil, nil, 40) then return "chi_wave 226"; end
+    if HR.Cast(S.ChiWave, nil, nil, 40) then return "chi_wave 228"; end
   end
   -- flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
   if S.FlyingSerpentKickActionBarReplacement:IsReady() then
-    if HR.Cast(S.FlyingSerpentKickActionBarReplacement, nil, nil, 40) then return "chi_wave 228"; end
+    if HR.Cast(S.FlyingSerpentKickActionBarReplacement, nil, nil, 40) then return "chi_wave 230"; end
   end
   if S.FlyingSerpentKick:IsReady() then
-    if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "chi_wave 230"; end
+    if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "chi_wave 232"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|talent.hit_combo.enabled&prev_gcd.1.tiger_palm&(chi.max-chi>=14&energy.time_to_50<1|chi=2&cooldown.fists_of_fury.remains<3))
   if S.BlackoutKick:IsReady() then
-    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick206) then return "blackout_kick 232"; end
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick206) then return "blackout_kick 234"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfBlackoutKick206(Target) then
-      if HR.Cast(S.BlackoutKick, nil, nil, "Melee") then return "blackout_kick 234"; end
+      if HR.Cast(S.BlackoutKick, nil, nil, "Melee") then return "blackout_kick 236"; end
     end
   end
 end
