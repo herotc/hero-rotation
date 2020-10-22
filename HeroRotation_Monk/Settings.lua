@@ -57,6 +57,7 @@ HR.GUISettings.APL.Monk = {
   },
   Windwalker = {
     IgnoreToK = false,
+    IgnoreFSK = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -90,6 +91,7 @@ CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.EssenceDisplayStyle", {
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToK", "Ignore Touch of Karma", "Enable this setting to allow you to ignore Touch of Karma without stalling the rotation. (NOTE: Touch of Karma will never be suggested if this is enabled)");
+CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreFSK", "Ignore Flying Serpent Kick", "Enable this setting to allow you to ignore Flying Serpent Kick without stalling the rotation. (NOTE: Flying Serpent Kick will never be suggested if this is enabled)");
 
 -- Brewmaster
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster");

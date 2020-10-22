@@ -296,10 +296,10 @@ local function Aoe()
     if HR.Cast(S.ChiWave, nil, nil, 40) then return "chi_wave 228"; end
   end
   -- flying_serpent_kick,if=buff.bok_proc.down,interrupt=1
-  if S.FlyingSerpentKickActionBarReplacement:IsReady() then
+  if S.FlyingSerpentKickActionBarReplacement:IsReady() and not Settings.Windwalker.IgnoreFSK then
     if HR.Cast(S.FlyingSerpentKickActionBarReplacement, nil, nil, 40) then return "chi_wave 230"; end
   end
-  if S.FlyingSerpentKick:IsReady() then
+  if S.FlyingSerpentKick:IsReady() and not Settings.Windwalker.IgnoreFSK then
     if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "chi_wave 232"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|talent.hit_combo.enabled&prev_gcd.1.tiger_palm&(chi.max-chi>=14&energy.time_to_50<1|chi=2&cooldown.fists_of_fury.remains<3))
@@ -652,10 +652,10 @@ local function St()
     end
   end
   -- flying_serpent_kick,interrupt=1
-  if S.FlyingSerpentKickActionBarReplacement:IsReady() then
+  if S.FlyingSerpentKickActionBarReplacement:IsReady() and not Settings.Windwalker.IgnoreFSK then
     if HR.Cast(S.FlyingSerpentKickActionBarReplacement, nil, nil, 40) then return "flying_serpent_kick 738"; end
   end
-  if S.FlyingSerpentKick:IsReady() then
+  if S.FlyingSerpentKick:IsReady() and not Settings.Windwalker.IgnoreFSK then
     if HR.Cast(S.FlyingSerpentKick, nil, nil, 40) then return "flying_serpent_kick 740"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&cooldown.fists_of_fury.remains<3&chi=2&prev_gcd.1.tiger_palm&energy.time_to_50<1
