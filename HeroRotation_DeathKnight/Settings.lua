@@ -33,6 +33,20 @@ HR.GUISettings.APL.DeathKnight = {
       SacrificialPact = true
     }
   },
+  Blood = {
+    ConsumptionDisplayStyle = "Suggested",
+    PoolDuringBlooddrinker = false,
+    GCDasOffGCD = {
+      DancingRuneWeapon = false,
+      DeathStrike = false,
+      IceboundFortitude = false,
+      Tombstone = false,
+      VampiricBlood = false,
+    },
+    OffGCDasOffGCD = {
+      RuneTap = true,
+    },
+  },
   Frost = {
     DisableBoSPooling = false,
     BoSDisplayStyle = "Suggested",

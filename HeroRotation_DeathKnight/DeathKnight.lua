@@ -21,6 +21,53 @@ local HR         = HeroRotation
 
 -- Spells
 if not Spell.DeathKnight then Spell.DeathKnight = {} end
+Spell.DeathKnight.Blood = {
+  -- Abilities
+  BloodBoil                             = Spell(50842),
+  DancingRuneWeapon                     = Spell(49028),
+  DeathandDecay                         = Spell(43265),
+  DeathsCaress                          = Spell(195292),
+  DeathStrike                           = Spell(49998),
+  HeartStrike                           = Spell(206930),
+  IceboundFortitude                     = Spell(48792),
+  Marrowrend                            = Spell(195182),
+  RuneTap                               = Spell(194679),
+  VampiricBlood                         = Spell(55233),
+  -- Talents
+  Blooddrinker                          = Spell(206931),
+  Bonestorm                             = Spell(194844),
+  Consumption                           = Spell(274156),
+  Heartbreaker                          = Spell(221536),
+  RapidDecomposition                    = Spell(194662),
+  Tombstone                             = Spell(219809),
+  -- Covenant Abilities
+  DeathsDue                             = Spell(324128),
+  -- Conduit Effects
+  -- Buffs
+  BoneShieldBuff                        = Spell(195181),
+  CrimsonScourgeBuff                    = Spell(81141),
+  DancingRuneWeaponBuff                 = Spell(81256),
+  HemostasisBuff                        = Spell(273947),
+  IceboundFortitudeBuff                 = Spell(48792),
+  RuneTapBuff                           = Spell(194679),
+  UnholyStrengthBuff                    = Spell(53365),
+  VampiricBloodBuff                     = Spell(55233),
+  -- Debuffs
+  -- Racials
+  ArcaneTorrent                         = Spell(50613),
+  BloodFury                             = Spell(20572),
+  Berserking                            = Spell(26297),
+  LightsJudgment                        = Spell(255647),
+  AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
+  ArcanePulse                           = Spell(260364),
+  Fireblood                             = Spell(265221),
+  -- Interrupts
+  MindFreeze                            = Spell(47528),
+  -- Custom
+  PoolRange                             = Spell(999910)
+}
+
 Spell.DeathKnight.Frost = {
   -- Abilities
   RaiseDead                             = Spell(46585),
@@ -146,6 +193,12 @@ Spell.DeathKnight.Unholy = {
 
 -- Items
 if not Item.DeathKnight then Item.DeathKnight = {} end
+Item.DeathKnight.Blood = {
+  -- Potions/Trinkets
+  PotionofUnbridledFury                 = Item(169299),
+  -- "Other On Use"
+}
+
 Item.DeathKnight.Frost = {
   -- Potions/Trinkets
   -- "Other On Use"
