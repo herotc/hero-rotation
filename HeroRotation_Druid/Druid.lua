@@ -45,11 +45,13 @@ Spell.Druid.Balance = {
   SunfireDebuff                         = Spell(164815),
   MoonfireDebuff                        = Spell(164812),
   Starfall                              = Spell(191034),
+  StarfallBuff                          = Spell(191034),
   Starsurge                             = Spell(78674),
   Sunfire                               = Spell(93402),
   Moonfire                              = Spell(8921),
   SolarBeam                             = Spell(78675),
   Dash                                  = Spell(1850),
+  ShootingStars                         = Spell(202342),
 
   -- Talents
   NaturesBalance                        = Spell(202430),
@@ -75,11 +77,13 @@ Spell.Druid.Balance = {
   StellarFlareDebuff                    = Spell(202347),
 
   Solstice                              = Spell(343647),
+  SolsticeBuff                          = Spell(343648),
   FuryofElune                           = Spell(202770),
   NewMoon                               = Spell(274281),
   HalfMoon                              = Spell(274282),
   FullMoon                              = Spell(274283),
 
+  -- PvP Talents
   Thorns                                = Spell(236696),
 
   -- Artifact
@@ -108,11 +112,15 @@ Spell.Druid.Balance = {
   ArcanicPulsarBuff                     = Spell(287790),
   ArcanicPulsar                         = Spell(287773),
   LivelySpirit                          = Spell(279642),
-  LivelySpiritBuff                      = Spell(279646)
-
+  LivelySpiritBuff                      = Spell(279646),
+  -- Buffs
+  EclipseLunar                          = Spell(48518),
+  EclipseSolar                          = Spell(48517),
+  StarfallBuff                          = Spell(191034),
   -- Legendaries
 
   -- Misc
+  CancelStarlord                        = Spell(999910)
 
   -- Macros
 
