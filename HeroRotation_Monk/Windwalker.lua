@@ -307,7 +307,7 @@ end
 local function CDSEF()
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen|fight_remains<25
   if S.InvokeXuentheWhiteTiger:IsReady() and (not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
-    if HR.Cast(S.InvokeXuentheWhiteTiger, nil, nil, 40) then return "invoke_xuen_the_white_tiger 300"; end
+    if HR.Cast(S.InvokeXuentheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuentheWhiteTiger, nil, 40) then return "invoke_xuen_the_white_tiger 300"; end
   end
   -- arcane_torrent,if=chi.max-chi>=1
   if S.ArcaneTorrent:IsCastable() and Player:ChiDeficit() >= 1 then
@@ -359,7 +359,7 @@ local function CDSEF()
   end
   -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|buff.seething_rage.up|(cooldown.blood_of_the_enemy.remains+1>cooldown.storm_earth_and_fire.full_recharge_time|!essence.blood_of_the_enemy.major)&cooldown.fists_of_fury.remains<10&chi>=2&cooldown.whirling_dragon_punch.remains<12
   if S.StormEarthandFire:IsReady() and (S.StormEarthandFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or Player:BuffUp(S.SeethingRageBuff) or (((S.BloodoftheEnemy:CooldownRemains() + 1) > S.StormEarthandFire:FullRechargeTime()) or not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and S.FistsofFury:CooldownRemains() < 10 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() < 12) then
-    if HR.Cast(S.StormEarthandFire, Settings.Windwalker.GCDasOffGCD.StormEarthandFire) then return "storm_earth_and_fire 324"; end
+    if HR.Cast(S.StormEarthandFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthandFire) then return "storm_earth_and_fire 324"; end
   end
   if (Settings.Commons.UseTrinkets) then
     if (true) then
@@ -484,7 +484,7 @@ local function CDSerenity()
   end
   -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
   if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 15)) then
-    if HR.Cast(S.Serenity, Settings.Windwalker.GCDasOffGCD.Serenity) then return "serenity 436"; end
+    if HR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "serenity 436"; end
   end
   -- bag_of_tricks
   if S.BagofTricks:IsCastable() then

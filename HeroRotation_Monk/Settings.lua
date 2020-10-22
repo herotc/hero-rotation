@@ -56,19 +56,19 @@ HR.GUISettings.APL.Monk = {
     }
   },
   Windwalker = {
-    IgnoreToD = false,
+    IgnoreToK = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       InvokeXuentheWhiteTiger = true,
-      Serenity                = true,
-      StormEarthandFire       = true,
       TouchofDeath            = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
+      Serenity                = true,
+      StormEarthandFire       = true,
     }
   }
 };
