@@ -84,12 +84,15 @@ end
 local function EvaluateTargetIfFWStacks(TargetUnit)
   return (S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
+local function EvaluateTargetIfFWExists(TargetUnit)
+  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff))
+end
 local function EvaluateTargetIfFWBuild(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 3 and S.Apocalypse:CooldownRemains() < 3 or TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
 -- Apocalypse Conditions
 local function EvaluateTargetIfApocalypse(TargetUnit)
-  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 and EnemiesMeleeCount >= 2 and not Player:BuffUp(S.DeathAndDecayBuff))
+  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 and EnemiesMeleeCount >= 2 and not Player:BuffUp(S.DeathAndDecayBuff) )
 end
 -- Unholy Assault Conditions
 local function EvaluateTargetIfUnholyAssault(TargetUnit)
@@ -252,12 +255,12 @@ local function Cooldowns()
     if Everyone.CastCycle(S.UnholyAssault, EnemiesMelee, EvaluateTargetIfUnholyAssault) then return "unholy_assault target_if cooldown 7"; end
   end
   -- apocalypse,if=debuff.festering_wound.stack>=4&((!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled)|talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&dot.unholy_blight.remains)&active_enemies=1
-  if S.Apocalypse:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and ((not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) or not S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Target:DebuffUp(S.UnholyBlightDebuff)) and EnemiesMeleeCount == 1) then
+  if S.Apocalypse:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and ((not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) or S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Target:DebuffUp(S.UnholyBlightDebuff)) and EnemiesMeleeCount == 1) then
     if HR.Cast(S.Apocalypse) then return "apocalypse cooldown 8"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=4&active_enemies>=2&!death_and_decay.ticking
   if S.Apocalypse:IsCastable() then
-    if Everyone.CastCycle(S.Apocalypse, EnemiesMelee, EvaluateTargetIfApocalypse) then return "apocalypse target_if cooldown 9"; end
+    if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFWExists, EvaluateTargetIfApocalypse) then return "apocalypse target_if cooldown 9"; end
   end
   -- summon_gargoyle,if=runic_power.deficit<14
   if S.SummonGargoyle:IsCastable() and (Player:RunicPowerDeficit() < 14) then
