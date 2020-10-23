@@ -103,11 +103,11 @@ local function ShouldPurify ()
   local StaggersRatioPct = 0;
 
   if Player:DebuffUp(S.HeavyStagger) then
-    NextStaggerTick = Player:AuraInfo(S.HeavyStagger, "HARMFUL", true)
+    NextStaggerTick = select(17, Player:DebuffInfo(S.HeavyStagger, false, true))
   elseif Player:DebuffUp(S.ModerateStagger) then
-    NextStaggerTick = Player:AuraInfo(S.ModerateStagger, "HARMFUL", true)
+    NextStaggerTick = select(17, Player:DebuffInfo(S.ModerateStagger, false, true))
   elseif Player:DebuffUp(S.LightStagger) then
-    NextStaggerTick = Player:AuraInfo(S.LightStagger, "HARMFUL", true)
+    NextStaggerTick = select(17, Player:DebuffInfo(S.LightStagger, false, true))
   end
 
   if NextStaggerTick > 0 then
