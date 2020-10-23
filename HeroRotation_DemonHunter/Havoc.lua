@@ -216,12 +216,12 @@ local function Essences()
 end
 
 local function Cooldown()
-  -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)|target.time_to_die<25
-  if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and not (S.Demonic:IsAvailable() or VarPoolingForMeta) or Target:TimeToDie() < 25) then
+  -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<25
+  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 25) then
     if HR.Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 22"; end
   end
-  -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))
-  if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff) and S.Demonic:IsAvailable() and (not S.ChaoticTransformation:AzeriteEnabled() or (S.EyeBeam:CooldownRemains() > 12 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())))) then
+  -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled&level<54|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
+  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (S.Demonic:IsAvailable() and (not S.ChaoticTransformation:AzeriteEnabled() and Player:Level() < 54 or (S.EyeBeam:CooldownRemains() > 12 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD()))) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
     if HR.Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 24"; end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
