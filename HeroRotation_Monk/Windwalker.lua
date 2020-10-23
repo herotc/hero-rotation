@@ -680,7 +680,7 @@ end
 local function APL()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
-  EnemiesCount8 = Target:GetEnemiesInSplashRangeCount(8) -- AOE Toogle
+  EnemiesCount8 = #Enemies8y -- AOE Toogle
   
   ComputeTargetRange()
 

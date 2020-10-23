@@ -155,11 +155,12 @@ Spell.Monk.Brewmaster = {
   -- Abilities
   BlackoutKick                 = Spell(205523),
   BreathofFire                 = Spell(115181),
-  Brews                        = Spell(115308),
+  Clash                        = Spell(324312),
   CracklingJadeLightning       = Spell(117952),
   ExpelHarm                    = Spell(115072),
   InvokeNiuzaoTheBlackOx       = Spell(132578),
   KegSmash                     = Spell(121253),
+  SpinningCraneKick            = Spell(322729),
   TigerPalm                    = Spell(100780),
   TouchofDeath                 = Spell(322109),
 
