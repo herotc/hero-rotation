@@ -37,22 +37,22 @@ HR.GUISettings.APL.Monk = {
     -- Purify
     Purify = {
       Enabled = true,
-      Low = false,
+      Low = true,
       Medium = true,
       High = true
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      CelestialBrew          = true,
       InvokeNiuzaoTheBlackOx = true,
+      PurifyingBrew          = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
       BlackOxBrew            = true,
-      CelestialBrew          = true,
-      PurifyingBrew          = true,
     }
   },
   Windwalker = {

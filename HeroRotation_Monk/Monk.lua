@@ -187,6 +187,7 @@ Spell.Monk.Brewmaster = {
   CelestialBrew                = Spell(322507),
   DampenHarm                   = Spell(122278), --Talent
   DampenHarmBuff               = Spell(122278),
+  ElusiveBrawlerBuff           = Spell(195630),
   FortifyingBrew               = Spell(115203),
   FortifyingBrewBuff           = Spell(115203),
   HighTolerance                = Spell(196737), -- Talent

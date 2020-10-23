@@ -51,7 +51,9 @@ local EnemiesCount8
 local IsInMeleeRange, IsInAoERange
 local ShouldReturn; -- Used to get the return string
 local PassiveEssence;
-local ForceOffGCD = {true, false};
+local Interrupts = {
+  { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
+}
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -101,34 +103,32 @@ local function ShouldPurify ()
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
   local StaggersRatioPct = 0;
+  HR_Test_StaggerFull = 0;
 
   if Player:DebuffUp(S.HeavyStagger) then
-    NextStaggerTick = select(17, Player:DebuffInfo(S.HeavyStagger, false, true))
+    NextStaggerTick = select(16, Player:DebuffInfo(S.HeavyStagger, false, true))
   elseif Player:DebuffUp(S.ModerateStagger) then
-    NextStaggerTick = select(17, Player:DebuffInfo(S.ModerateStagger, false, true))
+    NextStaggerTick = select(16, Player:DebuffInfo(S.ModerateStagger, false, true))
   elseif Player:DebuffUp(S.LightStagger) then
-    NextStaggerTick = select(17, Player:DebuffInfo(S.LightStagger, false, true))
+    NextStaggerTick = select(16, Player:DebuffInfo(S.LightStagger, false, true))
   end
 
   if NextStaggerTick > 0 then
-    NextStaggerTickMaxHPPct = NextStaggerTick / Player:StaggerMax();
-    StaggersRatioPct = Player:Stagger() / Player:StaggerFull();
+    NextStaggerTickMaxHPPct = (NextStaggerTick / Player:StaggerMax()) * 100;
+    StaggersRatioPct = (Player:Stagger() / Player:StaggerFull()) * 100;
   end
-
-  -- Purify if we refreshed ISB in the last 3 seconds and we are about to cap our brews charges
---  if NextStaggerTickMaxHPPct > 0 and S.Brews:ChargesFractional() >= BrewMaxCharges - 0.2 and Player:BuffRemains(S.Shuffle) >= 18 then return true end;
 
   -- Do not purify at the start of a combat since the normalization is not stable yet
   if HL.CombatTime() <= 9 then return false end;
 
   -- Do purify only if we are loosing more than 3% HP per second (1.5% * 2 since it ticks every 500ms), i.e. above Grey level
-  if NextStaggerTickMaxHPPct > 0.015 and StaggersRatioPct > 0 then
-    if NextStaggerTickMaxHPPct <= 0.03 then -- Yellow: 6% HP per second, only if the stagger ratio is > 80%
-      return Settings.Brewmaster.Purify.Low and StaggersRatioPct > 0.8 or false;
-    elseif NextStaggerTickMaxHPPct <= 0.045 then -- Orange: <= 9% HP per second, only if the stagger ratio is > 71%
-      return Settings.Brewmaster.Purify.Medium and StaggersRatioPct > 0.71 or false;
-    elseif NextStaggerTickMaxHPPct <= 0.09 then -- Red: <= 18% HP per second, only if the stagger ratio value is > 53%
-      return Settings.Brewmaster.Purify.High and StaggersRatioPct > 0.53 or false;
+  if NextStaggerTickMaxHPPct > 1.5 and StaggersRatioPct > 0 then
+    if NextStaggerTickMaxHPPct <= 3 then -- Yellow: 6% HP per second, only if the stagger ratio is > 80%
+      return Settings.Brewmaster.Purify.Low and StaggersRatioPct > 80 or false;
+    elseif NextStaggerTickMaxHPPct <= 4.5 then -- Orange: <= 9% HP per second, only if the stagger ratio is > 71%
+      return Settings.Brewmaster.Purify.Medium and StaggersRatioPct > 71 or false;
+    elseif NextStaggerTickMaxHPPct <= 9 then -- Red: <= 18% HP per second, only if the stagger ratio value is > 53%
+      return Settings.Brewmaster.Purify.High and StaggersRatioPct > 53 or false;
     else -- Magenta: > 18% HP per second, ASAP
       return true;
     end
@@ -139,28 +139,22 @@ local ShuffleDuration = 5;
 local function Defensives()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
 
---  if S.SuppressingPulse:IsCastable() then
---    if HR.Cast(S.SuppressingPulse, true) then return "Suppressing Pulse"; end
---  end
-  -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
-  -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3&buff.ironskin_brew.remains<15
+  -- celestial_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2
   -- Note: Extra handling of the charge management only while tanking.
   --       "- (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0)"
   -- TODO: See if this can be optimized
---  if S.IronskinBrew:IsCastable() and Player:BuffDown(S.BlackoutComboBuff)
---      and S.Brews:ChargesFractional() >= BrewMaxCharges - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0)
---      and S.BlackOxBrew:CooldownRemains() < 3 and Player:BuffRemains(S.Shuffle) < 15 then
---    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return "Ironskin Brew"; end
---  end
-  -- purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
+  if S.CelestialBrew:IsCastable() and Player:BuffDown(S.BlackoutComboBuff) and (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2 then
+    if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew"; end
+  end
+  -- purifying_brew,if=stagger.pct>(6*(1-(cooldown.purifying_brew.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(1-cooldown.purifying_brew.charges_fractional))*stagger.last_tick_damage_30))
   -- Note : We do not use the SimC conditions but rather the usage recommended by the Normalized Stagger WA.
   if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastable() and ShouldPurify() then
-    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
+    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.GCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
   end
   -- BlackoutCombo Stagger Pause w/ Ironskin Brew
---  if S.IronskinBrew:IsCastable() and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify(BrewMaxCharges) then
---    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return "Ironskin Brew 2"; end
---  end
+  if S.CelestialBrew:IsCastable() and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
+    if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew Pause"; end
+  end
 end
 
 --- ======= ACTION LISTS =======
@@ -198,7 +192,7 @@ local function APL()
   if Everyone.TargetIsValid() then
     -- auto_attack
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
     -- Defensives
     ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     if HR.CDsON() then
@@ -241,19 +235,12 @@ local function APL()
         if HR.Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx) then return "Invoke Niuzao the Black Ox"; end
       end
       -- black_ox_brew,if=cooldown.purifying_brew.charges_fractional<0.5
-      if S.BlackOxBrew:IsCastable() then
+      if S.BlackOxBrew:IsCastable() and S.PurifyingBrew:ChargesFractional() < 0.5 then
         if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "Black Ox Brew"; end
       end
       -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
-      if S.BlackOxBrew:IsCastable() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemains())) < 40 and Player:BuffDown(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
-        if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then
-          HR.Cast(S.IronskinBrew, ForceOffGCD);
-          HR.Cast(S.PurifyingBrew, ForceOffGCD);
-          if HR.Cast(S.BlackOxBrew) then return "Black Ox Brew 2"; end
-        else
-          if S.Brews:Charges() >= 1 then HR.Cast(S.IronskinBrew, ForceOffGCD); end
-          if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "Black Ox Brew 3"; end
-        end
+      if S.BlackOxBrew:IsCastable() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemains())) < 40 and Player:BuffDown(S.BlackoutComboBuff) and S.KegSmash:CooldownUp() then
+        if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "Black Ox Brew 2"; end
       end
     end
     -- keg_smash,if=spell_targets>=2
@@ -323,20 +310,21 @@ local function APL()
     end
     -- arcane_torrent,if=energy<31
     if HR.CDsON() and S.ArcaneTorrent:IsCastable() and Player:Energy() < 31 then
-      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent, nil, not Target:IsInMeleeRange(8)) then return ""; end
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "Arcane Torrent"; end
     end
     -- rushing_jade_wind
     if S.RushingJadeWind:IsCastable() then
       if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind 2"; end
     end
-    -- Trick to take in consideration the Recovery Setting (and Melee Range)
-    if S.TigerPalm:IsCastable() then
-      if HR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
-    end
+    -- Manually added Pool filler
+    if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
   end
 end
 
-HR.SetAPL(268, APL)
+local function Init()
+end
+
+HR.SetAPL(268, APL, Init);
 
 -- Last Update: 2020-05-05
 
