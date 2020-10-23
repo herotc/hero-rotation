@@ -305,7 +305,6 @@ local function APL()
     if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() >= 2 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
       if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 3"; end
     end
-    print("Enemy Count 8: ", EnemiesCount8)
     -- spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>execute_time&(energy+(energy.regen*(cooldown.keg_smash.remains+execute_time)))>=65
     if S.SpinningCraneKick:IsCastable() and (EnemiesCount8 >= 3 and S.KegSmash:CooldownRemains() > S.SpinningCraneKick:ExecuteTime() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + S.SpinningCraneKick:ExecuteTime())) >= 65))) then
       if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick"; end
