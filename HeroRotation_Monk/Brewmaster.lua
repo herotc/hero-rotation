@@ -103,7 +103,6 @@ local function ShouldPurify ()
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
   local StaggersRatioPct = 0;
-  HR_Test_StaggerFull = 0;
 
   if Player:DebuffUp(S.HeavyStagger) then
     NextStaggerTick = select(16, Player:DebuffInfo(S.HeavyStagger, false, true))
