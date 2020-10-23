@@ -45,6 +45,9 @@ local OnUseExcludes = {
 }
 
 -- Rotation Var
+local Enemies5y
+local Enemies8y
+local EnemiesCount8
 local IsInMeleeRange, IsInAoERange
 local ShouldReturn; -- Used to get the return string
 local PassiveEssence;
@@ -81,31 +84,39 @@ local function IsInMeleeRange(range)
   return range and Target:IsInMeleeRange(range) or Target:IsInMeleeRange(5)
 end
 
+local function UseItems()
+  -- use_items
+  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  if TrinketToUse then
+    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  end
+end
+
 -- Compute healing amount available from orbs
 local function HealingSphereAmount()
   return 1.5 * Player:AttackPowerDamageMod() * (1 + (Player:VersatilityDmgPct() / 100)) * S.ExpelHarm:Count()
 end
 
-local function ShouldPurify (BrewMaxCharges)
+local function ShouldPurify ()
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
   local StaggersRatioPct = 0;
 
-  if Player:Debuff(S.HeavyStagger) then
-    NextStaggerTick = Player:Debuff(S.HeavyStagger, 16)
-  elseif Player:Debuff(S.ModerateStagger) then
-    NextStaggerTick = Player:Debuff(S.ModerateStagger, 16)
-  elseif Player:Debuff(S.LightStagger) then
-    NextStaggerTick = Player:Debuff(S.LightStagger, 16)
+  if Player:DebuffUp(S.HeavyStagger) then
+    NextStaggerTick = Player:AuraInfo(S.HeavyStagger, "HARMFUL", true)
+  elseif Player:DebuffUp(S.ModerateStagger) then
+    NextStaggerTick = Player:AuraInfo(S.ModerateStagger, "HARMFUL", true)
+  elseif Player:DebuffUp(S.LightStagger) then
+    NextStaggerTick = Player:AuraInfo(S.LightStagger, "HARMFUL", true)
   end
 
   if NextStaggerTick > 0 then
-    NextStaggerTickMaxHPPct = NextStaggerTick / Player:MaxHealth();
+    NextStaggerTickMaxHPPct = NextStaggerTick / Player:StaggerMax();
     StaggersRatioPct = Player:Stagger() / Player:StaggerFull();
   end
 
   -- Purify if we refreshed ISB in the last 3 seconds and we are about to cap our brews charges
-  if NextStaggerTickMaxHPPct > 0 and S.Brews:ChargesFractional() >= BrewMaxCharges - 0.2 and Player:BuffRemains(S.Shuffle) >= 18 then return true end;
+--  if NextStaggerTickMaxHPPct > 0 and S.Brews:ChargesFractional() >= BrewMaxCharges - 0.2 and Player:BuffRemains(S.Shuffle) >= 18 then return true end;
 
   -- Do not purify at the start of a combat since the normalization is not stable yet
   if HL.CombatTime() <= 9 then return false end;
@@ -114,11 +125,11 @@ local function ShouldPurify (BrewMaxCharges)
   if NextStaggerTickMaxHPPct > 0.015 and StaggersRatioPct > 0 then
     if NextStaggerTickMaxHPPct <= 0.03 then -- Yellow: 6% HP per second, only if the stagger ratio is > 80%
       return Settings.Brewmaster.Purify.Low and StaggersRatioPct > 0.8 or false;
-    elseif NextStaggerTickMaxHPPct <= 0.05 then -- Orange: <= 10% HP per second, only if the stagger ratio is > 70%
-      return Settings.Brewmaster.Purify.Medium and StaggersRatioPct > 0.7 or false;
-    elseif NextStaggerTickMaxHPPct <= 0.1 then -- Red: <= 20% HP per second, only if the stagger ratio value is > 50%
-      return Settings.Brewmaster.Purify.High and StaggersRatioPct > 0.5 or false;
-    else -- Magenta: > 20% HP per second, ASAP
+    elseif NextStaggerTickMaxHPPct <= 0.045 then -- Orange: <= 9% HP per second, only if the stagger ratio is > 71%
+      return Settings.Brewmaster.Purify.Medium and StaggersRatioPct > 0.71 or false;
+    elseif NextStaggerTickMaxHPPct <= 0.09 then -- Red: <= 18% HP per second, only if the stagger ratio value is > 53%
+      return Settings.Brewmaster.Purify.High and StaggersRatioPct > 0.53 or false;
+    else -- Magenta: > 18% HP per second, ASAP
       return true;
     end
   end
@@ -127,37 +138,38 @@ end
 local ShuffleDuration = 5;
 local function Defensives()
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-  local BrewMaxCharges = 3 + (S.LightBrewing:IsAvailable() and 1 or 0);
 
-  if S.SuppressingPulse:IsCastableP() then
-    if HR.Cast(S.SuppressingPulse, true) then return "Suppressing Pulse"; end
-  end
+--  if S.SuppressingPulse:IsCastable() then
+--    if HR.Cast(S.SuppressingPulse, true) then return "Suppressing Pulse"; end
+--  end
   -- ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
   -- ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3&buff.ironskin_brew.remains<15
   -- Note: Extra handling of the charge management only while tanking.
   --       "- (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0)"
   -- TODO: See if this can be optimized
-  if S.IronskinBrew:IsCastableP() and Player:BuffDownP(S.BlackoutComboBuff)
-      and S.Brews:ChargesFractional() >= BrewMaxCharges - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0)
-      and S.BlackOxBrew:CooldownRemainsP() < 3 and Player:BuffRemains(S.Shuffle) < 15 then
-    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return "Ironskin Brew"; end
-  end
+--  if S.IronskinBrew:IsCastable() and Player:BuffDown(S.BlackoutComboBuff)
+--      and S.Brews:ChargesFractional() >= BrewMaxCharges - 0.1 - (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0)
+--      and S.BlackOxBrew:CooldownRemains() < 3 and Player:BuffRemains(S.Shuffle) < 15 then
+--    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return "Ironskin Brew"; end
+--  end
   -- purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
   -- Note : We do not use the SimC conditions but rather the usage recommended by the Normalized Stagger WA.
-  if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastableP() and ShouldPurify(BrewMaxCharges) then
+  if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastable() and ShouldPurify() then
     if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
   end
   -- BlackoutCombo Stagger Pause w/ Ironskin Brew
-  if S.IronskinBrew:IsCastableP() and Player:BuffP(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify(BrewMaxCharges) then
-    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return "Ironskin Brew 2"; end
-  end
+--  if S.IronskinBrew:IsCastable() and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify(BrewMaxCharges) then
+--    if HR.Cast(S.IronskinBrew, Settings.Brewmaster.OffGCDasOffGCD.IronskinBrew) then return "Ironskin Brew 2"; end
+--  end
 end
 
 --- ======= ACTION LISTS =======
 local function APL()
   -- Unit Update
   IsInMeleeRange();
-  --Everyone.AoEToggleEnemiesUpdate();
+  Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
+  Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
+  EnemiesCount8 = Target:GetEnemiesInSplashRangeCount(8) -- AOE Toogle
 
   -- Misc
   PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting));
@@ -173,12 +185,12 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "Potion of Unbridled Fury"; end
     end
     -- chi_burst
-    if S.ChiBurst:IsCastableP(10) then
-      if HR.Cast(S.ChiBurst, nil, nil, 40) then return "Chi Burst"; end
+    if S.ChiBurst:IsCastable() then
+      if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Chi Burst"; end
     end
     -- chi_wave
-    if S.ChiWave:IsCastableP(25) then
-      if HR.Cast(S.ChiWave, nil, nil, 40) then return "Chi Wave"; end
+    if S.ChiWave:IsCastable() then
+      if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave"; end
     end
   end
 
@@ -189,58 +201,51 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, false); if ShouldReturn then return ShouldReturn; end
     -- Defensives
     ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
-    if HR.CDsON() and Target:IsInRange("Melee") then
-      -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
-      if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (Target:DebuffDownP(S.RazorCoralDebuff) or Target:DebuffP(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-        if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "Ashvanes Razor Coral"; end
-      end
-      -- Manually placing PSCD here
-      if Everyone.CyclotronicBlastReady() and Settings.Commons.UseTrinkets then
-        if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "Pocketsized Computation Device"; end
-      end
-      -- use_items
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-      if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    if HR.CDsON() then
+      -- use_item
+      if (Settings.Commons.UseTrinkets) then
+        if (true) then
+          local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
+        end
       end
       -- potion
       if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
         if HR.CastSuggested(I.PotionofUnbridledFury) then return "Potion of Unbridled Fury 2"; end
       end
       -- blood_fury
-      if S.BloodFury:IsCastableP() then
+      if S.BloodFury:IsCastable() then
         if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Blood Fury"; end
       end
       -- berserking
-      if S.Berserking:IsCastableP() then
+      if S.Berserking:IsCastable() then
         if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Berserking"; end
       end
       -- lights_judgment
-      if S.LightsJudgment:IsCastableP() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, 40) then return "Lights Judgment"; end
+      if S.LightsJudgment:IsCastable() then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Lights Judgment"; end
       end
       -- fireblood
-      if S.Fireblood:IsCastableP() then
+      if S.Fireblood:IsCastable() then
         if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Fireblood"; end
       end
       -- ancestral_call
-      if S.AncestralCall:IsCastableP() then
+      if S.AncestralCall:IsCastable() then
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Ancestral Call"; end
       end
       -- bag_of_tricks
-      if S.BagofTricks:IsCastableP() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, 40) then return "Bag of Tricks"; end
+      if S.BagofTricks:IsCastable() then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
       end
       -- invoke_niuzao_the_black_ox
-      if S.InvokeNiuzaotheBlackOx:IsCastableP() and Target:TimeToDie() > 25 then
-        if HR.Cast(S.InvokeNiuzaotheBlackOx, Settings.Brewmaster.OffGCDasOffGCD.InvokeNiuzaotheBlackOx) then return "Invoke Niuzao the Black Ox"; end
+      if S.InvokeNiuzaoTheBlackOx:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
+        if HR.Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx) then return "Invoke Niuzao the Black Ox"; end
       end
-      -- black_ox_brew,if=cooldown.brews.charges_fractional<0.5
-      if S.BlackOxBrew:IsCastableP() and S.Brews:ChargesFractional() <= 0.5 then
+      -- black_ox_brew,if=cooldown.purifying_brew.charges_fractional<0.5
+      if S.BlackOxBrew:IsCastable() then
         if HR.Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "Black Ox Brew"; end
       end
       -- black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
-      if S.BlackOxBrew:IsCastableP() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemainsP())) < 40 and Player:BuffDownP(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
+      if S.BlackOxBrew:IsCastable() and (Player:Energy() + (Player:EnergyRegen() * S.KegSmash:CooldownRemains())) < 40 and Player:BuffDown(S.BlackoutComboBuff) and S.KegSmash:CooldownUpP() then
         if S.Brews:Charges() >= 2 and Player:StaggerPercentage() >= 1 then
           HR.Cast(S.IronskinBrew, ForceOffGCD);
           HR.Cast(S.PurifyingBrew, ForceOffGCD);
@@ -252,80 +257,80 @@ local function APL()
       end
     end
     -- keg_smash,if=spell_targets>=2
-    if S.KegSmash:IsCastableP(15) and Cache.EnemiesCount[8] >= 2 then
-      if HR.Cast(S.KegSmash) then return "Keg Smash 1"; end
+    if S.KegSmash:IsCastable() and EnemiesCount8 >= 2 then
+      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 1"; end
     end
     -- tiger_palm,if=talent.rushing_jade_wind.enabled&buff.blackout_combo.up&buff.rushing_jade_wind.up
-    if S.TigerPalm:IsCastableP("Melee") and S.RushingJadeWind:IsAvailable() and Player:BuffP(S.BlackoutComboBuff) and Player:BuffP(S.RushingJadeWind) then
-      if HR.Cast(S.TigerPalm) then return "Tiger Palm 1"; end
+    if S.TigerPalm:IsCastable() and S.RushingJadeWind:IsAvailable() and Player:BuffUp(S.BlackoutComboBuff) and Player:BuffUp(S.RushingJadeWind) then
+      if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 1"; end
     end
     -- tiger_palm,if=(talent.invoke_niuzao_the_black_ox.enabled|talent.special_delivery.enabled)&buff.blackout_combo.up
-    if S.TigerPalm:IsCastableP("Melee") and (S.InvokeNiuzaotheBlackOx:IsAvailable() or S.SpecialDelivery:IsAvailable()) and Player:BuffP(S.BlackoutComboBuff) then
-      if HR.Cast(S.TigerPalm) then return "Tiger Palm 2"; end
+    if S.TigerPalm:IsCastable() and (S.InvokeNiuzaoTheBlackOx:IsAvailable() or S.SpecialDelivery:IsAvailable()) and Player:BuffUp(S.BlackoutComboBuff) then
+      if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 2"; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>4
     -- Note : Extra handling to prevent Expel Harm over-healing
-    if S.ExpelHarm:IsReadyP() and S.ExpelHarm:Count() > 4 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
-      if HR.Cast(S.ExpelHarm) then return "Expel Harm 1"; end
+    if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() > 4 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
+      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 1"; end
     end
     -- blackout_strike
-    if S.BlackoutKick:IsCastableP("Melee") then
-      if HR.Cast(S.BlackoutKick) then return "Blackout Kick"; end
+    if S.BlackoutKick:IsCastable() then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick"; end
     end
     -- keg_smash
-    if S.KegSmash:IsCastableP(15) then
-      if HR.Cast(S.KegSmash) then return "Keg Smash 2"; end
+    if S.KegSmash:IsCastable() then
+      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 2"; end
     end
     if HR.CDsON() then
       -- concentrated_flame,if=dot.concentrated_flame.remains=0
-      if S.ConcentratedFlame:IsCastableP(40) and Target:DebuffDownP(S.ConcentratedFlameBurn) then
-        if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "Concentrated Flame"; end
+      if S.ConcentratedFlame:IsCastable(40) and Target:DebuffDown(S.ConcentratedFlameBurn) then
+        if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "Concentrated Flame"; end
       end
       -- heart_essence,if=!essence.the_crucible_of_flame.major
-      if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastableP() and not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame) then
+      if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() and not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame) then
         if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "Heart Essence"; end
       end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
     -- Note : Extra handling to prevent Expel Harm over-healing
-    if S.ExpelHarm:IsReadyP() and S.ExpelHarm:Count() >= 3 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
-      if HR.Cast(S.ExpelHarm) then return "Expel Harm 2"; end
+    if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() >= 3 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
+      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 2"; end
     end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down
-    if S.RushingJadeWind:IsCastableP() and Player:BuffDownP(S.RushingJadeWind) then
-      if HR.Cast(S.RushingJadeWind) then return "Rushing Jade Wind"; end
+    if S.RushingJadeWind:IsCastable() and Player:BuffDown(S.RushingJadeWind) then
+      if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind"; end
     end
     -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
-    if S.BreathofFire:IsCastableP(10, true) and (Player:BuffDownP(S.BlackoutComboBuff) and (Player:HasNotHeroism() or (Player:HasHeroism() and true and Target:DebuffRefreshableCP(S.BreathofFireDotDebuff)))) then
-      if HR.Cast(S.BreathofFire) then return "Breath of Fire"; end
+    if S.BreathofFire:IsCastable(10, true) and (Player:BuffDown(S.BlackoutComboBuff) and (Player:BloodlustDown() or (Player:BloodlustUp() and Target:BuffRefreshable(S.BreathofFireDotDebuff)))) then
+      if HR.Cast(S.BreathofFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire"; end
     end
     -- chi_burst
-    if S.ChiBurst:IsCastableP(10) then
-      if HR.Cast(S.ChiBurst) then return "Chi Burst 2"; end
+    if S.ChiBurst:IsCastable() then
+      if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Chi Burst 2"; end
     end
     -- chi_wave
-    if S.ChiWave:IsCastableP(25) then
-      if HR.Cast(S.ChiWave) then return "Chi Wave 2"; end
+    if S.ChiWave:IsCastable() then
+      if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave 2"; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=2
     -- Note : Extra handling to prevent Expel Harm over-healing
-    if S.ExpelHarm:IsReadyP() and S.ExpelHarm:Count() >= 2 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
-      if HR.Cast(S.ExpelHarm) then return "Expel Harm 3"; end
+    if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() >= 2 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
+      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 3"; end
     end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
-    if S.TigerPalm:IsCastableP("Melee") and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemainsP() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemainsP() + Player:GCD()))) >= 65) then
-      if HR.Cast(S.TigerPalm) then return "Tiger Palm 3"; end
+    if S.TigerPalm:IsCastable() and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemains() > Player:GCD() and (Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + Player:GCD()))) >= 65) then
+      if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 3"; end
     end
     -- arcane_torrent,if=energy<31
-    if HR.CDsON() and S.ArcaneTorrent:IsCastableP() and Player:Energy() < 31 then
-      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent, nil, 8) then return ""; end
+    if HR.CDsON() and S.ArcaneTorrent:IsCastable() and Player:Energy() < 31 then
+      if HR.Cast(S.ArcaneTorrent, Settings.Brewmaster.OffGCDasOffGCD.ArcaneTorrent, nil, not Target:IsInMeleeRange(8)) then return ""; end
     end
     -- rushing_jade_wind
-    if S.RushingJadeWind:IsCastableP() then
-      if HR.Cast(S.RushingJadeWind) then return "Rushing Jade Wind 2"; end
+    if S.RushingJadeWind:IsCastable() then
+      if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind 2"; end
     end
     -- Trick to take in consideration the Recovery Setting (and Melee Range)
-    if S.TigerPalm:IsCastable("Melee") then
+    if S.TigerPalm:IsCastable() then
       if HR.Cast(S.PoolEnergy) then return "Normal Pooling"; end
     end
   end
