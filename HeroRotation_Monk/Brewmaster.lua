@@ -122,8 +122,10 @@ local function ShouldPurify ()
 
   -- Do purify only if we are loosing more than 3% HP per second (1.5% * 2 since it ticks every 500ms), i.e. above Grey level
   if NextStaggerTickMaxHPPct > 1.5 and StaggersRatioPct > 0 then
+    -- 3% is considered a Moderate Stagger
     if NextStaggerTickMaxHPPct <= 3 then -- Yellow: 6% HP per second, only if the stagger ratio is > 80%
       return Settings.Brewmaster.Purify.Low and StaggersRatioPct > 80 or false;
+    -- 4.5% is considered a Heavy Stagger
     elseif NextStaggerTickMaxHPPct <= 4.5 then -- Orange: <= 9% HP per second, only if the stagger ratio is > 71%
       return Settings.Brewmaster.Purify.Medium and StaggersRatioPct > 71 or false;
     elseif NextStaggerTickMaxHPPct <= 9 then -- Red: <= 18% HP per second, only if the stagger ratio value is > 53%
@@ -148,11 +150,11 @@ local function Defensives()
   -- purifying_brew,if=stagger.pct>(6*(1-(cooldown.purifying_brew.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(1-cooldown.purifying_brew.charges_fractional))*stagger.last_tick_damage_30))
   -- Note : We do not use the SimC conditions but rather the usage recommended by the Normalized Stagger WA.
   if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastable() and ShouldPurify() then
-    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.GCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
+    if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
   end
-  -- BlackoutCombo Stagger Pause w/ Ironskin Brew
+  -- BlackoutCombo Stagger Pause w/ Celestial Brew
   if S.CelestialBrew:IsCastable() and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
-    if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew Pause"; end
+    if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew Stagger Pause"; end
   end
 end
 
@@ -325,7 +327,7 @@ end
 
 HR.SetAPL(268, APL, Init);
 
--- Last Update: 2020-05-05
+-- Last Update: 2020-10-23
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -352,20 +354,19 @@ HR.SetAPL(268, APL, Init);
 -- actions+=/ancestral_call
 -- actions+=/bag_of_tricks
 -- actions+=/invoke_niuzao_the_black_ox,if=target.time_to_die>25
--- # Ironskin Brew priority whenever it took significant damage and ironskin brew buff is missing (adjust the health.max coefficient according to intensity of damage taken), and to dump excess charges before BoB.
--- actions+=/ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
--- actions+=/ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3&buff.ironskin_brew.remains<15
 -- # Purifying behaviour is based on normalization (iE the late expression triggers if stagger size increased over the last 30 ticks or 15 seconds).
--- actions+=/purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
+-- actions+=/purifying_brew,if=stagger.pct>(6*(1-(cooldown.purifying_brew.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(1-cooldown.purifying_brew.charges_fractional))*stagger.last_tick_damage_30))
 -- # Black Ox Brew is currently used to either replenish brews based on less than half a brew charge available, or low energy to enable Keg Smash
--- actions+=/black_ox_brew,if=cooldown.brews.charges_fractional<0.5
+-- actions+=/black_ox_brew,if=cooldown.purifying_brew.charges_fractional<0.5
 -- actions+=/black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
 -- # Offensively, the APL prioritizes KS on cleave, BoS else, with energy spenders and cds sorted below
 -- actions+=/keg_smash,if=spell_targets>=2
+-- # Celestial Brew priority whenever it took significant damage and ironskin brew buff is missing (adjust the health.max coefficient according to intensity of damage taken), and to dump excess charges before BoB.
+-- actions+=/celestial_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2
 -- actions+=/tiger_palm,if=talent.rushing_jade_wind.enabled&buff.blackout_combo.up&buff.rushing_jade_wind.up
--- actions+=/tiger_palm,if=(talent.invoke_niuzao_the_black_ox.enabled|talent.special_delivery.enabled)&buff.blackout_combo.up
+-- actions+=/tiger_palm,if=(1|talent.special_delivery.enabled)&buff.blackout_combo.up
 -- actions+=/expel_harm,if=buff.gift_of_the_ox.stack>4
--- actions+=/blackout_strike
+-- actions+=/blackout_kick
 -- actions+=/keg_smash
 -- actions+=/concentrated_flame,if=dot.concentrated_flame.remains=0
 -- actions+=/heart_essence,if=!essence.the_crucible_of_flame.major
@@ -376,6 +377,7 @@ HR.SetAPL(268, APL, Init);
 -- actions+=/chi_wave
 -- # Expel Harm has higher DPET than TP when you have at least 2 orbs.
 -- actions+=/expel_harm,if=buff.gift_of_the_ox.stack>=2
+-- actions+=/spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
 -- actions+=/tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
 -- actions+=/arcane_torrent,if=energy<31
 -- actions+=/rushing_jade_wind

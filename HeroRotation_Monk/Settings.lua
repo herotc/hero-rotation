@@ -46,13 +46,13 @@ HR.GUISettings.APL.Monk = {
       -- Abilities
       CelestialBrew          = true,
       InvokeNiuzaoTheBlackOx = true,
-      PurifyingBrew          = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
       -- Abilities
       BlackOxBrew            = true,
+      PurifyingBrew          = true,
     }
   },
   Windwalker = {
