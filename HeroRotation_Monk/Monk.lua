@@ -41,7 +41,7 @@ Spell.Monk.Windwalker = {
   BlackoutKickBuff                      = Spell(116768),
   CracklingJadeLightning                = Spell(117952),
   ExpelHarm                             = Spell(322101),
-  FistsofFury                           = Spell(113656),
+  FistsOfFury                           = Spell(113656),
   FlyingSerpentKick                     = Spell(101545),
   FlyingSerpentKickActionBarReplacement = Spell(115057),
   InvokeXuenTheWhiteTiger               = Spell(123904),
@@ -50,18 +50,18 @@ Spell.Monk.Windwalker = {
   StormEarthAndFire                     = Spell(137639),
   StormEarthAndFireBuff                 = Spell(137639),
   TigerPalm                             = Spell(100780),
-  TouchofDeath                          = Spell(322109),
+  TouchOfDeath                          = Spell(322109),
   
   -- Debuffs
-  MarkoftheCraneDebuff                  = Spell(228287),
+  MarkOfTheCraneDebuff                  = Spell(228287),
 
   -- Talents
   Celerity                              = Spell(115173),
   ChiWave                               = Spell(115098),
   ChiBurst                              = Spell(123986),
-  DanceofChijiBuff                      = Spell(325202),
+  DanceOfChijiBuff                      = Spell(325202),
   EyeOfTheTiger                         = Spell(196607),
-  FistoftheWhiteTiger                   = Spell(261947),
+  FistOfTheWhiteTiger                   = Spell(261947),
   GoodKarma                             = Spell(280195),
   HitCombo                              = Spell(196740),
   HitComboBuff                          = Spell(196741),
@@ -79,7 +79,7 @@ Spell.Monk.Windwalker = {
   DampenHarmBuff                        = Spell(122278),
   DiffuseMagic                          = Spell(122783), -- Talent
   FortifyingBrew                        = Spell(243435),
-  TouchofKarma                          = Spell(122470),
+  TouchOfKarma                          = Spell(122470),
 
   -- Utility
   ChiTorpedo                            = Spell(115008), -- Talent
@@ -100,7 +100,7 @@ Spell.Monk.Windwalker = {
   Vivify                                = Spell(116670),
 
   -- Azerite Traits
-  DanceofChijiAzeriteBuff               = Spell(286587),
+  DanceOfChijiAzeriteBuff               = Spell(286587),
   FuryofXuenBuff                        = Spell(287062),
   GloryoftheDawn                        = Spell(288634),
   OpenPalmStrikes                       = Spell(279918),
@@ -108,8 +108,8 @@ Spell.Monk.Windwalker = {
   SwiftRoundhouseBuff                   = Spell(278710),
   
   -- Essences
-  BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
+  BloodOfTheEnemy                       = Spell(297108),
+  MemoryOfLucidDreams                   = Spell(298357),
   PurifyingBlast                        = Spell(295337),
   RippleInSpace                         = Spell(302731),
   ConcentratedFlame                     = Spell(295373),
@@ -154,7 +154,7 @@ Spell.Monk.Brewmaster = {
 
   -- Abilities
   BlackoutKick                 = Spell(205523),
-  BreathofFire                 = Spell(115181),
+  BreathOfFire                 = Spell(115181),
   Clash                        = Spell(324312),
   CracklingJadeLightning       = Spell(117952),
   ExpelHarm                    = Spell(115072),
@@ -162,16 +162,16 @@ Spell.Monk.Brewmaster = {
   KegSmash                     = Spell(121253),
   SpinningCraneKick            = Spell(322729),
   TigerPalm                    = Spell(100780),
-  TouchofDeath                 = Spell(322109),
+  TouchOfDeath                 = Spell(322109),
 
   -- Debuffs
-  BreathofFireDotDebuff        = Spell(123725),
+  BreathOfFireDotDebuff        = Spell(123725),
 
   -- Talents
   BlackoutCombo                = Spell(196736),
   BlackoutComboBuff            = Spell(228563),
   BlackOxBrew                  = Spell(115399),
-  BobandWeave                  = Spell(280515),
+  BobAndWeave                  = Spell(280515),
   Celerity                     = Spell(115173),
   CelestialFlames              = Spell(325177),
   ChiBurst                     = Spell(123986),
@@ -215,8 +215,8 @@ Spell.Monk.Brewmaster = {
   PotentKick                   = Spell(213047),
 
   -- Essences
-  BloodoftheEnemy              = Spell(297108),
-  MemoryofLucidDreams          = Spell(298357),
+  BloodOfTheEnemy              = Spell(297108),
+  MemoryOfLucidDreams          = Spell(298357),
   PurifyingBlast               = Spell(295337),
   RippleInSpace                = Spell(302731),
   ConcentratedFlame            = Spell(295373),

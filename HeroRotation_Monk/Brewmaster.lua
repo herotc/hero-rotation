@@ -99,17 +99,30 @@ local function HealingSphereAmount()
   return 1.5 * Player:AttackPowerDamageMod() * (1 + (Player:VersatilityDmgPct() / 100)) * S.ExpelHarm:Count()
 end
 
+local function GetStaggerTick(ThisSpell)
+  local ThisSpellID = ThisSpell:ID()
+  for i = 1, 40 do
+    local _, _, _, _, _, _, _, _, _, ThisDebuffID, _, _, _, _, _, ThisStaggerTick = UnitDebuff('player', i)
+      if (ThisDebuffID == ThisSpellID) then
+        return ThisStaggerTick
+    end
+  end
+end
+
 local function ShouldPurify ()
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
   local StaggersRatioPct = 0;
 
   if Player:DebuffUp(S.HeavyStagger) then
-    NextStaggerTick = select(16, Player:DebuffInfo(S.HeavyStagger, false, true))
+    NextStaggerTick = GetStaggerTick(S.HeavyStagger)
+--    NextStaggerTick = select(16, Player:DebuffInfo(S.HeavyStagger, true, true))
   elseif Player:DebuffUp(S.ModerateStagger) then
-    NextStaggerTick = select(16, Player:DebuffInfo(S.ModerateStagger, false, true))
+    NextStaggerTick = GetStaggerTick(S.ModerateStagger)
+--    NextStaggerTick = select(16, Player:DebuffInfo(S.ModerateStagger, true, true))
   elseif Player:DebuffUp(S.LightStagger) then
-    NextStaggerTick = select(16, Player:DebuffInfo(S.LightStagger, false, true))
+    NextStaggerTick = GetStaggerTick(S.LightStagger)
+--    NextStaggerTick = select(16, Player:DebuffInfo(S.LightStagger, false, true))
   end
 
   if NextStaggerTick > 0 then
@@ -284,13 +297,16 @@ local function APL()
     if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() >= 3 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
       if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 2"; end
     end
+  if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15 then
+    if HR.Cast(S.TouchOfDeath, Settings.Brewmaster.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "touch_of_death 304"; end
+  end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down
     if S.RushingJadeWind:IsCastable() and Player:BuffDown(S.RushingJadeWind) then
       if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind"; end
     end
     -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
-    if S.BreathofFire:IsCastable(10, true) and (Player:BuffDown(S.BlackoutComboBuff) and (Player:BloodlustDown() or (Player:BloodlustUp() and Target:BuffRefreshable(S.BreathofFireDotDebuff)))) then
-      if HR.Cast(S.BreathofFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire"; end
+    if S.BreathOfFire:IsCastable(10, true) and (Player:BuffDown(S.BlackoutComboBuff) and (Player:BloodlustDown() or (Player:BloodlustUp() and Target:BuffRefreshable(S.BreathOfFireDotDebuff)))) then
+      if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire"; end
     end
     -- chi_burst
     if S.ChiBurst:IsCastable() then

@@ -132,26 +132,26 @@ local function ConflictAndStrifeMajor()
 end
 
 local function EvaluateTargetIfFilterMarkoftheCrane100(TargetUnit)
-  return TargetUnit:DebuffRemains(S.MarkoftheCraneDebuff)
+  return TargetUnit:DebuffRemains(S.MarkOfTheCraneDebuff)
 end
 
-local function EvaluateTargetIfFistoftheWhiteTiger102(TargetUnit)
+local function EvaluateTargetIfFistOfTheWhiteTiger102(TargetUnit)
   return (Player:Chi() < 3)
 end
 
-local function EvaluateTargetIfFistoftheWhiteTiger104(TargetUnit)
-  return (Player:ChiDeficit() >= 3 and ((EnergyTimeToMaxRounded() < 1 or EnergyTimeToMaxRounded() < 4) and S.FistsofFury:CooldownRemains() < 1.5))
+local function EvaluateTargetIfFistOfTheWhiteTiger104(TargetUnit)
+  return (Player:ChiDeficit() >= 3 and ((EnergyTimeToMaxRounded() < 1 or EnergyTimeToMaxRounded() < 4) and S.FistsOfFury:CooldownRemains() < 1.5))
 end
 
 local function EvaluateTargetIfTigerPalm106(TargetUnit)
-  return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (EnergyTimeToMaxRounded() < 1 or S.Serenity:CooldownRemains() < 2 or EnergyTimeToMaxRounded() < 4) and S.FistsofFury:CooldownRemains() < 1.5)
+  return (ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 and (EnergyTimeToMaxRounded() < 1 or S.Serenity:CooldownRemains() < 2 or EnergyTimeToMaxRounded() < 4) and S.FistsOfFury:CooldownRemains() < 1.5)
 end
 
 local function EvaluateTargetIfRisingSunKick200(TargetUnit)
-  return ((S.WhirlingDragonPunch:IsAvailable() and ((10 * Player:SpellHaste()) > (S.WhirlingDragonPunch:CooldownRemains() + 3))) and ((S.FistsofFury:CooldownRemains() > 3) or Player:Chi() >= 5))
+  return ((S.WhirlingDragonPunch:IsAvailable() and ((10 * Player:SpellHaste()) > (S.WhirlingDragonPunch:CooldownRemains() + 3))) and ((S.FistsOfFury:CooldownRemains() > 3) or Player:Chi() >= 5))
 end
 
-local function EvaluateTargetIfFistoftheWhiteTiger202(TargetUnit)
+local function EvaluateTargetIfFistOfTheWhiteTiger202(TargetUnit)
   return (Player:ChiDeficit() >= 3)
 end
 
@@ -160,7 +160,7 @@ local function EvaluateTargetIfTigerPalm204(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick206(TargetUnit)
-  return (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and ((Player:ChiDeficit() >= 1 or Player:EnergyTimeToX(50) < 1) or (Player:Chi() == 2 and S.FistsofFury:CooldownRemains() < 3)))))
+  return (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and ((Player:ChiDeficit() >= 1 or Player:EnergyTimeToX(50) < 1) or (Player:Chi() == 2 and S.FistsOfFury:CooldownRemains() < 3)))))
 end
 
 local function EvaluateTargetIfTigerPalm500(TargetUnit)
@@ -168,7 +168,7 @@ local function EvaluateTargetIfTigerPalm500(TargetUnit)
 end
 
 local function EvaluateTargetIfFilterMarkoftheCrane502(TargetUnit)
-  return TargetUnit:DebuffRemains(S.MarkoftheCraneDebuff)
+  return TargetUnit:DebuffRemains(S.MarkOfTheCraneDebuff)
 end
 local function EvaluateTargetIfTigerPalm504(TargetUnit)
   return (Player:ChiDeficit() >= 2)
@@ -191,7 +191,7 @@ local function EvaluateTargetIfTigerPalm702(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick704(TargetUnit)
-  return (ComboStrike(S.BlackoutKick) and ((S.Serenity:IsAvailable() and S.Serenity:CooldownRemains() < 3) or (S.RisingSunKick:CooldownRemains() > 1 and S.FistsofFury:CooldownRemains() > 1) or (S.RisingSunKick:CooldownRemains() < 3 and S.FistsofFury:CooldownRemains() > 3 and Player:Chi() > 2) or (S.RisingSunKick:CooldownRemains() > 3 and S.FistsofFury:CooldownRemains() < 3 and Player:Chi() > 3) or Player:Chi() > 5 or Player:BuffUp(S.BlackoutKickBuff)))
+  return (ComboStrike(S.BlackoutKick) and ((S.Serenity:IsAvailable() and S.Serenity:CooldownRemains() < 3) or (S.RisingSunKick:CooldownRemains() > 1 and S.FistsOfFury:CooldownRemains() > 1) or (S.RisingSunKick:CooldownRemains() < 3 and S.FistsOfFury:CooldownRemains() > 3 and Player:Chi() > 2) or (S.RisingSunKick:CooldownRemains() > 3 and S.FistsOfFury:CooldownRemains() < 3 and Player:Chi() > 3) or Player:Chi() > 5 or Player:BuffUp(S.BlackoutKickBuff)))
 end
 
 local function EvaluateTargetIfTigerPalm706(TargetUnit)
@@ -199,7 +199,7 @@ local function EvaluateTargetIfTigerPalm706(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick708(TargetUnit)
-  return (ComboStrike(S.BlackoutKick) and (S.FistsofFury:CooldownRemains() < 3 and Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) or Player:EnergyTimeToX(50) < 1))
+  return (ComboStrike(S.BlackoutKick) and (S.FistsOfFury:CooldownRemains() < 3 and Player:Chi() == 2 and Player:PrevGCD(1, S.TigerPalm) or Player:EnergyTimeToX(50) < 1))
 end
 
 local function EvaluateTargetIfBlackoutKick710(TargetUnit)
@@ -228,7 +228,7 @@ local function Precombat()
     VarXuenOnUse = false
   end
   -- chi_burst,if=!talent.serenity.enabled|!talent.fist_of_the_white_tiger.enabled
-  if S.ChiBurst:IsReady() and (not S.Serenity:IsAvailable() or not S.FistoftheWhiteTiger:IsAvailable()) then
+  if S.ChiBurst:IsReady() and (not S.Serenity:IsAvailable() or not S.FistOfTheWhiteTiger:IsAvailable()) then
     if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst 4"; end
   end
   -- chi_wave,if=!talent.energizing_elixer.enabled
@@ -247,12 +247,12 @@ local function Aoe()
     if HR.Cast(S.EnergizingElixir, Settings.Windwalker.OffGCDasOffGCD.EnergizingElixir) then return "energizing_elixir 202"; end
   end
   -- spinning_crane_kick,if=combo_strike&(buff.dance_of_chiji.up|buff.dance_of_chiji_azerite.up)
-  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceofChijiBuff) or Player:BuffUp(S.DanceofChijiAzeriteBuff)) then
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceOfChijiBuff) or Player:BuffUp(S.DanceOfChijiAzeriteBuff)) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 204"; end
   end
   -- fists_of_fury,if=energy.time_to_max>execute_time-1|buff.storm_earth_and_fire.remains
-  if S.FistsofFury:IsReady() and ((EnergyTimeToMaxRounded() > (S.FistsofFury:ExecuteTime() - 1)) or Player:BuffUp(S.StormEarthAndFireBuff)) then
-    if HR.Cast(S.FistsofFury, nil, nil, not Target:IsSpellInRange(S.FistsofFury)) then return "fists_of_fury 206"; end
+  if S.FistsOfFury:IsReady() and ((EnergyTimeToMaxRounded() > (S.FistsOfFury:ExecuteTime() - 1)) or Player:BuffUp(S.StormEarthAndFireBuff)) then
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 206"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.rising_sun_kick.duration>cooldown.whirling_dragon_punch.remains+3)&(cooldown.fists_of_fury.remains>3|chi>=5)
   if S.RisingSunKick:IsReady() then
@@ -266,7 +266,7 @@ local function Aoe()
     if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind 212"; end
   end
   -- spinning_crane_kick,if=combo_strike&((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2)|energy.time_to_max<=3)
-  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsofFury:CooldownRemains() > 6) and (Player:Chi() > 5 or S.FistsofFury:CooldownRemains() > 2)) or (EnergyTimeToMaxRounded() <= 3)) then
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (((Player:Chi() > 3 or S.FistsOfFury:CooldownRemains() > 6) and (Player:Chi() > 5 or S.FistsOfFury:CooldownRemains() > 2)) or (EnergyTimeToMaxRounded() <= 3)) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 214"; end
   end
   -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major
@@ -278,10 +278,10 @@ local function Aoe()
     if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst 218"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
-  if S.FistoftheWhiteTiger:IsReady() then
-    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger202) then return "fist_of_the_white_tiger 220"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger202(Target) then
-      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistoftheWhiteTiger)) then return "fist_of_the_white_tiger 222"; end
+  if S.FistOfTheWhiteTiger:IsReady() then
+    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger202) then return "fist_of_the_white_tiger 220"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger202(Target) then
+      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 222"; end
     end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|combo_strike)
@@ -321,12 +321,12 @@ local function CDSEF()
     if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "arcane_torrent 302"; end
   end
   -- touch_of_death,if=buff.storm_earth_and_fire.down
-  if S.TouchofDeath:IsReady() and Target:HealthPercentage() <= 15 and Player:BuffDown(S.StormEarthAndFireBuff) then
-    if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, not Target:IsSpellInRange(S.TouchofDeath)) then return "touch_of_death 304"; end
+  if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15 and Player:BuffDown(S.StormEarthAndFireBuff) then
+    if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "touch_of_death 304"; end
   end
   -- blood_of_the_enemy,if=cooldown.fists_of_fury.remains<2|fight_remains<12
-  if S.BloodoftheEnemy:IsCastable() and (S.TouchofDeath:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 12)) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(12)) then return "blood_of_the_enemy 306"; end
+  if S.BloodOfTheEnemy:IsCastable() and (S.FistsOfFury:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 12)) then
+    if HR.Cast(S.BloodOfTheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(12)) then return "blood_of_the_enemy 306"; end
   end
   -- guardian_of_azeroth
   if S.GuardianofAzeroth:IsCastable() then
@@ -337,7 +337,7 @@ local function CDSEF()
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 310"; end
   end
   -- concentrated_flame,if=!dot.concentrated_flame_burn.remains&((!talent.whirling_dragon_punch.enabled|cooldown.whirling_dragon_punch.remains)&cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains&buff.storm_earth_and_fire.down)|fight_remains<8
-  if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.WhirlingDragonPunch:IsAvailable() or not S.WhirlingDragonPunch:CooldownUp()) and not S.RisingSunKick:CooldownUp() and not S.FistsofFury:CooldownUp() and Player:BuffDown(S.StormEarthAndFireBuff)) or HL.BossFilteredFightRemains("<", 8)) then
+  if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.WhirlingDragonPunch:IsAvailable() or not S.WhirlingDragonPunch:CooldownUp()) and not S.RisingSunKick:CooldownUp() and not S.FistsOfFury:CooldownUp() and Player:BuffDown(S.StormEarthAndFireBuff)) or HL.BossFilteredFightRemains("<", 8)) then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "concentrated_flame 312"; end
   end
   -- the_unbound_force
@@ -357,15 +357,15 @@ local function CDSEF()
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 318"; end
   end
   -- memory_of_lucid_dreams,if=energy<40
-  if S.MemoryofLucidDreams:IsCastable() and (Player:Energy() < 40) then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 320"; end
+  if S.MemoryOfLucidDreams:IsCastable() and (Player:Energy() < 40) then
+    if HR.Cast(S.MemoryOfLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 320"; end
   end
   -- ripple_in_space
   if S.RippleInSpace:IsCastable() then
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 322"; end
   end
   -- storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|fight_remains<20|buff.seething_rage.up|(cooldown.blood_of_the_enemy.remains+1>cooldown.storm_earth_and_fire.full_recharge_time|!essence.blood_of_the_enemy.major)&cooldown.fists_of_fury.remains<10&chi>=2&cooldown.whirling_dragon_punch.remains<12
-  if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or Player:BuffUp(S.SeethingRageBuff) or (((S.BloodoftheEnemy:CooldownRemains() + 1) > S.StormEarthAndFire:FullRechargeTime()) or not Spell:MajorEssenceEnabled(AE.BloodoftheEnemy)) and S.FistsofFury:CooldownRemains() < 10 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() < 12) then
+  if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or Player:BuffUp(S.SeethingRageBuff) or (((S.BloodOfTheEnemy:CooldownRemains() + 1) > S.StormEarthAndFire:FullRechargeTime()) or not Spell:MajorEssenceEnabled(AE.BloodOfTheEnemy)) and S.FistsOfFury:CooldownRemains() < 10 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() < 12) then
     if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "storm_earth_and_fire 324"; end
   end
   if (Settings.Commons.UseTrinkets) then
@@ -374,8 +374,8 @@ local function CDSEF()
     end
   end
   -- touch_of_karma,interval=90,pct_health=0.5
-  if S.TouchofKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
-    if HR.Cast(S.TouchofKarma, nil, nil, not Target:IsInRange(20)) then return "touch_of_karma 326"; end
+  if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
+    if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "touch_of_karma 326"; end
   end
   -- blood_fury,if=fight_remains>125|buff.storm_earth_and_fire.up|fight_remains<20
   if S.BloodFury:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or Player:BuffUp(S.StormEarthAndFireBuff) or HL.BossFilteredFightRemains("<", 20)) then
@@ -421,11 +421,11 @@ local function CDSerenity()
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 404"; end
   end
   -- blood_of_the_enemy,if=variable.serenity_burst
-  if S.BloodoftheEnemy:IsCastable() and VarSerenityBurst then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(12)) then return "blood_of_the_enemy 406"; end
+  if S.BloodOfTheEnemy:IsCastable() and VarSerenityBurst then
+    if HR.Cast(S.BloodOfTheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(12)) then return "blood_of_the_enemy 406"; end
   end
   -- concentrated_flame,if=(cooldown.serenity.remains|cooldown.concentrated_flame.charges=2)&!dot.concentrated_flame_burn.remains&(cooldown.rising_sun_kick.remains&cooldown.fists_of_fury.remains|fight_remains<8)
-  if S.ConcentratedFlame:IsCastable() and ((not S.Serenity:CooldownUp() or S.ConcentratedFlame:Charges() == 2) and Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.RisingSunKick:CooldownUp() and not S.FistsofFury:CooldownUp()) or HL.BossFilteredFightRemains("<", 8))) then
+  if S.ConcentratedFlame:IsCastable() and ((not S.Serenity:CooldownUp() or S.ConcentratedFlame:Charges() == 2) and Target:DebuffDown(S.ConcentratedFlameBurn) and ((not S.RisingSunKick:CooldownUp() and not S.FistsOfFury:CooldownUp()) or HL.BossFilteredFightRemains("<", 8))) then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "concentrated_flame 408"; end
   end
   -- the_unbound_force
@@ -445,8 +445,8 @@ local function CDSerenity()
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 414"; end
   end
   -- memory_of_lucid_dreams,if=energy<40
-  if S.MemoryofLucidDreams:IsCastable() and (Player:Energy() < 40) then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 416"; end
+  if S.MemoryOfLucidDreams:IsCastable() and (Player:Energy() < 40) then
+    if HR.Cast(S.MemoryOfLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 416"; end
   end
   -- ripple_in_space
   if S.RippleInSpace:IsCastable() then
@@ -482,12 +482,12 @@ local function CDSerenity()
     end
   end
   -- touch_of_death
-  if S.TouchofDeath:IsReady() and Target:HealthPercentage() <= 15  then
-    if HR.Cast(S.TouchofDeath, Settings.Windwalker.GCDasOffGCD.TouchofDeath, nil, not Target:IsSpellInRange(S.TouchofDeath)) then return "touch_of_death 432"; end
+  if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15  then
+    if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "touch_of_death 432"; end
   end
   -- touch_of_karma,interval=90,pct_health=0.5
-  if S.TouchofKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
-    if HR.Cast(S.TouchofKarma, nil, nil, not Target:IsInRange(20)) then return "touch_of_karma 434"; end
+  if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
+    if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "touch_of_karma 434"; end
   end
   -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
   if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 15)) then
@@ -501,10 +501,10 @@ end
 
 local function Opener()
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
-  if S.FistoftheWhiteTiger:IsReady() then
-    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger202) then return "fist_of_the_white_tiger 500"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger202(Target) then
-      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistoftheWhiteTiger)) then return "fist_of_the_white_tiger 502"; end
+  if S.FistOfTheWhiteTiger:IsReady() then
+    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger202) then return "fist_of_the_white_tiger 500"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger202(Target) then
+      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 502"; end
     end
   end
   -- expel_harm,if=talent.chi_burst.enabled&chi.max-chi>=3
@@ -537,8 +537,8 @@ end
 
 local function Serenity()
   -- fists_of_fury,if=buff.serenity.remains<1|active_enemies>1
-  if S.FistsofFury:IsReady() and (Player:BuffRemains(S.SerenityBuff) < 1 or EnemiesCount8 > 1) then
-    if HR.Cast(S.FistsofFury, nil, nil, not Target:IsSpellInRange(S.FistsofFury)) then return "fists_of_fury 600"; end
+  if S.FistsOfFury:IsReady() and (Player:BuffRemains(S.SerenityBuff) < 1 or EnemiesCount8 > 1) then
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 600"; end
   end
   -- spinning_crane_kick,if=combo_strike&(active_enemies>2|active_enemies>1&!cooldown.rising_sun_kick.up)
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and (EnemiesCount8 > 2 or (EnemiesCount8 > 1 and not S.RisingSunKick:CooldownUp()))) then
@@ -552,18 +552,18 @@ local function Serenity()
     end
   end
   -- spinning_crane_kick,if=combo_strike&(buff.dance_of_chiji.up|buff.dance_of_chiji_azerite.up)
-  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceofChijiBuff) or Player:BuffUp(S.DanceofChijiAzeriteBuff)) then
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceOfChijiBuff) or Player:BuffUp(S.DanceOfChijiAzeriteBuff)) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 608"; end
   end
   -- fists_of_fury,interrupt_if=gcd.remains=0
-  if S.FistsofFury:IsReady() then
-    if HR.Cast(S.FistsofFury, nil, nil, not Target:IsSpellInRange(S.FistsofFury)) then return "fists_of_fury 610"; end
+  if S.FistsOfFury:IsReady() then
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 610"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi<3
-  if S.FistoftheWhiteTiger:IsReady() then
-    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger102) then return "fist_of_the_white_tiger 172"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger102(Target) then
-      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistoftheWhiteTiger)) then return "fist_of_the_white_tiger 612"; end
+  if S.FistOfTheWhiteTiger:IsReady() then
+    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger102) then return "fist_of_the_white_tiger 172"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger102(Target) then
+      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 612"; end
     end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike|!talent.hit_combo.enabled
@@ -589,12 +589,12 @@ local function St()
     if HR.Cast(S.EnergizingElixir, Settings.Windwalker.OffGCDasOffGCD.EnergizingElixir) then return "energizing_elixir 702"; end
   end
   -- spinning_crane_kick,if=combo_strike&(buff.dance_of_chiji.up|buff.dance_of_chiji_azerite.up)
-  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceofChijiBuff) or Player:BuffUp(S.DanceofChijiAzeriteBuff)) then
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceOfChijiBuff) or Player:BuffUp(S.DanceOfChijiAzeriteBuff)) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 704"; end
   end
   -- fists_of_fury
-  if S.FistsofFury:IsReady() then
-    if HR.Cast(S.FistsofFury, nil, nil, not Target:IsSpellInRange(S.FistsofFury)) then return "fists_of_fury 706"; end
+  if S.FistsOfFury:IsReady() then
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 706"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=cooldown.serenity.remains>1|!talent.serenity.enabled
   if S.RisingSunKick:IsReady() then
@@ -612,10 +612,10 @@ local function St()
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 714"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi<3
-  if S.FistoftheWhiteTiger:IsReady() then
-    if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger102) then return "fist_of_the_white_tiger 716"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger102(Target) then
-      if HR.Cast(S.FistoftheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistoftheWhiteTiger)) then return "fist_of_the_white_tiger 718"; end
+  if S.FistOfTheWhiteTiger:IsReady() then
+    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger102) then return "fist_of_the_white_tiger 716"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger102(Target) then
+      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 718"; end
     end
   end
   -- chi_burst,if=chi.max-chi>=1
@@ -634,7 +634,7 @@ local function St()
     end
   end
   -- spinning_crane_kick,if=buff.chi_energy.stack>30-5*active_enemies&combo_strike&buff.storm_earth_and_fire.down&(cooldown.rising_sun_kick.remains>2&cooldown.fists_of_fury.remains>2|cooldown.rising_sun_kick.remains<3&cooldown.fists_of_fury.remains>3&chi>3|cooldown.rising_sun_kick.remains>3&cooldown.fists_of_fury.remains<3&chi>4|chi.max-chi<=1&energy.time_to_max<2)|buff.chi_energy.stack>10&fight_remains<7
-  if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.ChiEnergyBuff) > (30 - (5 * EnemiesCount8))) and ComboStrike(S.SpinningCraneKick) and (((S.RisingSunKick:CooldownRemains() > 2 and S.FistsofFury:CooldownRemains() > 2) or (S.RisingSunKick:CooldownRemains() < 3 and S.FistsofFury:CooldownRemains() > 3 and Player:Chi() > 3) or (S.RisingSunKick:CooldownRemains() > 3 and S.FistsofFury:CooldownRemains() < 3 and Player:Chi() > 4) or (Player:ChiDeficit() <= 1 and EnergyTimeToMaxRounded() < 2)) or (Player:BuffStack(S.ChiEnergyBuff) > 10 and HL.BossFilteredFightRemains("<", 7))) then
+  if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.ChiEnergyBuff) > (30 - (5 * EnemiesCount8))) and ComboStrike(S.SpinningCraneKick) and (((S.RisingSunKick:CooldownRemains() > 2 and S.FistsOfFury:CooldownRemains() > 2) or (S.RisingSunKick:CooldownRemains() < 3 and S.FistsOfFury:CooldownRemains() > 3 and Player:Chi() > 3) or (S.RisingSunKick:CooldownRemains() > 3 and S.FistsOfFury:CooldownRemains() < 3 and Player:Chi() > 4) or (Player:ChiDeficit() <= 1 and EnergyTimeToMaxRounded() < 2)) or (Player:BuffStack(S.ChiEnergyBuff) > 10 and HL.BossFilteredFightRemains("<", 7))) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 728"; end
   end
   -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(talent.serenity.enabled&cooldown.serenity.remains<3|cooldown.rising_sun_kick.remains>1&cooldown.fists_of_fury.remains>1|cooldown.rising_sun_kick.remains<3&cooldown.fists_of_fury.remains>3&chi>2|cooldown.rising_sun_kick.remains>3&cooldown.fists_of_fury.remains<3&chi>3|chi>5|buff.bok_proc.up)
@@ -710,14 +710,14 @@ local function APL()
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3&(energy.time_to_max<1|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
-    if S.FistoftheWhiteTiger:IsReady() then
-      if Everyone.CastTargetIf(S.FistoftheWhiteTiger, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistoftheWhiteTiger104) then return "fist_of_the_white_tiger 102"; end
-      if (EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistoftheWhiteTiger104(Target)) then
-        if HR.Cast(S.FistoftheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistoftheWhiteTiger)) then return "fist_of_the_white_tiger 104"; end
+    if S.FistOfTheWhiteTiger:IsReady() then
+      if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger104) then return "fist_of_the_white_tiger 102"; end
+      if (EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger104(Target)) then
+        if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 104"; end
       end
     end
     -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major&(energy.time_to_max<1|cooldown.serenity.remains<2|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
-    if S.ExpelHarm:IsReady() and ((Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) and (EnergyTimeToMaxRounded() < 1 or S.Serenity:CooldownRemains() < 2 or EnergyTimeToMaxRounded() < 4) and S.FistsofFury:CooldownRemains() < 1.5) then
+    if S.ExpelHarm:IsReady() and ((Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) and (EnergyTimeToMaxRounded() < 1 or S.Serenity:CooldownRemains() < 2 or EnergyTimeToMaxRounded() < 4) and S.FistsOfFury:CooldownRemains() < 1.5) then
       if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 106"; end
     end
     -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2&(energy.time_to_max<1|cooldown.serenity.remains<2|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)

@@ -46,6 +46,7 @@ HR.GUISettings.APL.Monk = {
       -- Abilities
       CelestialBrew          = true,
       InvokeNiuzaoTheBlackOx = true,
+      TouchOfDeath            = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -62,7 +63,7 @@ HR.GUISettings.APL.Monk = {
     GCDasOffGCD = {
       -- Abilities
       InvokeXuenTheWhiteTiger = true,
-      TouchofDeath            = true,
+      TouchOfDeath            = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
