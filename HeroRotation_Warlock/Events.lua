@@ -135,8 +135,6 @@ local PetsData = {
   },
 }
 
-local castDTSpell
-
 --------------------------
 ----- Destruction --------
 --------------------------
@@ -243,9 +241,7 @@ HL:RegisterForSelfCombatEvent(
     UnitPetID = tonumber(UnitPetID)
 
     -- Add pet
-    if (Event == "SPELL_CAST_SUCCESS" and SourceGUID == UnitGUID("player") and SpellID == 265187) then
-      castDTSpell = SpellID
-    elseif (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetsData[UnitPetID]) then
+    if (UnitPetGUID ~= UnitGUID("pet") and Event == "SPELL_SUMMON" and PetsData[UnitPetID]) then
       local summonedPet = PetsData[UnitPetID]
       local petDuration
       if summonedPet.name == "Wild Imp" then
@@ -258,19 +254,18 @@ HL:RegisterForSelfCombatEvent(
         HL.GuardiansTable.DreadstalkerDuration = summonedPet.duration
         petDuration = summonedPet.duration
       elseif summonedPet.name == "Demonic Tyrant" then
-        if (castDTSpell == 265187) then
-          castDTSpell = 0
+        if (SpellID == 265187) then
           HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration
           petDuration = summonedPet.duration
         else
           -- If Vision of Perfection is the major essence
           if (Spell:MajorEssenceEnabled(22)) then
             if (Spell:EssenceRank(22) == 1) then
-              HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration * 0.25
               petDuration = summonedPet.duration * 0.25
+              HL.GuardiansTable.DemonicTyrantDuration = petDuration
             elseif (Spell:EssenceRank(22) >= 2) then
-              HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration * 0.35
               petDuration = summonedPet.duration * 0.35
+              HL.GuardiansTable.DemonicTyrantDuration = petDuration
             end
           end
         end
