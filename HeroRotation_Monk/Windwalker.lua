@@ -744,7 +744,7 @@ local function APL()
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added Pool filler
-    if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
+    if HR.Cast(S.PoolEnergy) and not Settings.Windwalker.NoWindwalkerPooling then return "Pool Energy"; end
   end
 end
 

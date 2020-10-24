@@ -157,7 +157,7 @@ local function Defensives()
   -- Note: Extra handling of the charge management only while tanking.
   --       "- (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0)"
   -- TODO: See if this can be optimized
-  if S.CelestialBrew:IsCastable() and Player:BuffDown(S.BlackoutComboBuff) and (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2 then
+  if S.CelestialBrew:IsCastable() and Settings.Brewmaster.ShowCelestialBrewCD and Player:BuffDown(S.BlackoutComboBuff) and (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2 then
     if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew"; end
   end
   -- purifying_brew,if=stagger.pct>(6*(1-(cooldown.purifying_brew.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(1-cooldown.purifying_brew.charges_fractional))*stagger.last_tick_damage_30))
@@ -166,15 +166,15 @@ local function Defensives()
     if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
   end
   -- Blackout Combo Stagger Pause w/ Celestial Brew
-  if S.CelestialBrew:IsCastable() and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
+  if S.CelestialBrew:IsCastable() and Settings.Brewmaster.ShowCelestialBrewCD and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
     if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew Stagger Pause"; end
   end
   -- Dampen Harm
-  if S.DampenHarm:IsCastable() then
+  if S.DampenHarm:IsCastable() and Settings.Brewmaster.ShowDampenHarmCD then
     if HR.Cast(S.DampenHarm, Settings.Brewmaster.GCDasOffGCD.DampenHarm) then return "Dampen Harm"; end
   end
   -- Fortifying Brew
-  if S.FortifyingBrew:IsCastable() then
+  if S.FortifyingBrew:IsCastable() and Settings.Brewmaster.ShowIronskinBrewCD then
     if HR.Cast(S.FortifyingBrew, Settings.Brewmaster.GCDasOffGCD.FortifyingBrew) then return "Fortifying Brew"; end
   end
 end
@@ -346,7 +346,7 @@ local function APL()
       if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind 2"; end
     end
     -- Manually added Pool filler
-    if HR.Cast(S.PoolEnergy) then return "Pool Energy"; end
+    if HR.Cast(S.PoolEnergy) and not Settings.Brewmaster.NoBrewmasterPooling then return "Pool Energy"; end
   end
 end
 
