@@ -398,8 +398,8 @@ local function CDSEF()
     if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 336"; end
   end
   -- bag_of_tricks
-  if S.BagofTricks:IsCastable() then
-    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks 338"; end
+  if S.BagOfTricks:IsCastable() then
+    if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks 338"; end
   end
 end
 
@@ -494,8 +494,8 @@ local function CDSerenity()
     if HR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "serenity 436"; end
   end
   -- bag_of_tricks
-  if S.BagofTricks:IsCastable() then
-    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks 438"; end
+  if S.BagOfTricks:IsCastable() then
+    if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks 438"; end
   end
 end
 

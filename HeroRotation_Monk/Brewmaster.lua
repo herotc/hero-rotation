@@ -165,9 +165,17 @@ local function Defensives()
   if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastable() and ShouldPurify() then
     if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
   end
-  -- BlackoutCombo Stagger Pause w/ Celestial Brew
+  -- Blackout Combo Stagger Pause w/ Celestial Brew
   if S.CelestialBrew:IsCastable() and Player:BuffUp(S.BlackoutComboBuff) and Player:HealingAbsorbed() and ShouldPurify() then
     if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew Stagger Pause"; end
+  end
+  -- Dampen Harm
+  if S.DampenHarm:IsCastable() then
+    if HR.Cast(S.DampenHarm, Settings.Brewmaster.GCDasOffGCD.DampenHarm) then return "Dampen Harm"; end
+  end
+  -- Fortifying Brew
+  if S.FortifyingBrew:IsCastable() then
+    if HR.Cast(S.FortifyingBrew, Settings.Brewmaster.GCDasOffGCD.FortifyingBrew) then return "Fortifying Brew"; end
   end
 end
 
@@ -241,8 +249,8 @@ local function APL()
         if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Ancestral Call"; end
       end
       -- bag_of_tricks
-      if S.BagofTricks:IsCastable() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
+      if S.BagOfTricks:IsCastable() then
+        if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
       end
       -- invoke_niuzao_the_black_ox
       if S.InvokeNiuzaoTheBlackOx:IsCastable() and HL.BossFilteredFightRemains(">", 25) then

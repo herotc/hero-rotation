@@ -26,7 +26,7 @@ Spell.Monk.Windwalker = {
   -- Racials
   AncestralCall                         = Spell(274738),
   ArcaneTorrent                         = Spell(25046),
-  BagofTricks                           = Spell(312411),
+  BagOfTricks                           = Spell(312411),
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
   Bloodlust                             = Spell(2825),
@@ -146,7 +146,7 @@ Spell.Monk.Brewmaster = {
   -- Racials
   AncestralCall                = Spell(274738),
   ArcaneTorrent                = Spell(50613),
-  BagofTricks                  = Spell(312411),
+  BagOfTricks                  = Spell(312411),
   Berserking                   = Spell(26297),
   BloodFury                    = Spell(20572),
   Fireblood                    = Spell(265221),
@@ -192,7 +192,6 @@ Spell.Monk.Brewmaster = {
   FortifyingBrew               = Spell(115203),
   FortifyingBrewBuff           = Spell(115203),
   HighTolerance                = Spell(196737), -- Talent
-  IronskinBrew                 = Spell(115308),
   PurifyingBrew                = Spell(119582),
   Shuffle                      = Spell(215479),
 
