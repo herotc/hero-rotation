@@ -37,6 +37,7 @@ HR.GUISettings.APL.Mage = {
     }
   },
   Frost = {
+    MirrorImagesBeforePull = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -107,4 +108,5 @@ CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
 CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.DisableCombustion", "Disable Combustion", "Disable the usage of Combustion within the Fire rotation.");
 CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
 -- Frost
+CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
 CreateARPanelOptions(CP_Frost, "APL.Mage.Frost");

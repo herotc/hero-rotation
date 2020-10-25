@@ -78,7 +78,7 @@ local function Precombat ()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- mirror_image
-    if S.MirrorImage:IsCastable() and HR.CDsON() then
+    if S.MirrorImage:IsCastable() and HR.CDsON() and Settings.Frost.MirrorImagesBeforePull then
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
     end
     -- potion
