@@ -54,6 +54,12 @@ local PassiveEssence;
 local Interrupts = {
   { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
 }
+local Stuns = {
+  { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
+}
+local Traps = {
+  { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
+}
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -215,6 +221,10 @@ local function APL()
     -- auto_attack
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
+    -- Stun
+    local ShouldReturn = Everyone.Interrupt(5, S.LegSweep, Settings.Commons.GCDasOffGCD.LegSweep, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
+    -- Trap
+    local ShouldReturn = Everyone.Interrupt(5, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
     -- Defensives
     ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     if HR.CDsON() then

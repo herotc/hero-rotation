@@ -200,6 +200,7 @@ Spell.Monk.Brewmaster = {
   Detox                        = Spell(218164),
   Disable                      = Spell(116095),
   LegSweep                     = Spell(119381), -- Talent
+  Paralysis                    = Spell(115078),
   Provoke                      = Spell(115546),
   RingOfPeace                  = Spell(116844), -- Talent
   Roll                         = Spell(109132),
