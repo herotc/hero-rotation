@@ -63,7 +63,7 @@ local Interrupts = {
   { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
 }
 local Stuns = {
-  { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
+  { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
 }
 local Traps = {
   { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
