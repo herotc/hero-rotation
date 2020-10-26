@@ -32,7 +32,7 @@ Spell.Priest.Shadow = {
   WhispersoftheDamned                   = Spell(275722),
 
   -- Base Spells
-  DarkThoughtsBuff                      = Spell(341207),
+  DarkThoughtBuff                       = Spell(341207),
   DevouringPlague                       = Spell(335467),
   DevouringPlagueDebuff                 = Spell(335467),
   Dispersion                            = Spell(47585),

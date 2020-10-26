@@ -118,7 +118,7 @@ local function EvaluateCycleVoidTorrent208(TargetUnit)
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
-  return (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtsBuff))
+  return (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtBuff))
 end
 
 local function EvaluateCycleVampiricTouch214(TargetUnit)
@@ -300,7 +300,7 @@ local function Cwc()
   end
   -- mind_blast,only_cwc=1
   -- Manually added condition when MindBlast can be casted while channeling
-  if S.MindBlast:IsCastable() and (Player:BuffUp(S.DarkThoughtsBuff) and (Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear))) then
+  if S.MindBlast:IsCastable() and (Player:BuffUp(S.DarkThoughtBuff) and (Player:IsChanneling(S.MindFlay) or Player:IsChanneling(S.MindSear))) then
     if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 84"; end
   end
 end
@@ -379,12 +379,12 @@ local function Main()
   if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount8ySplash > 1) then
     if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsSpellInRange(S.ShadowCrash)) then return "shadow_crash 116"; end
   end
-  -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thoughts.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
+  -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thought.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindSear:IsCastable() then
     if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear210, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 118"; end
   end
-  -- mind_flay,if=buff.dark_thoughts.up&!(buff.voidform.up&cooldown.voidbolt.remains<=gcd)&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
-  if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtsBuff) and not (Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:GCD()) and VarDotsUp) then
+  -- mind_flay,if=buff.dark_thought.up&!(buff.voidform.up&cooldown.voidbolt.remains<=gcd)&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
+  if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtBuff) and not (Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:GCD()) and VarDotsUp) then
     if HR.Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 120"; end
   end
   -- mind_blast,if=variable.dots_up&raid_event.movement.in>cast_time+0.5&spell_targets.mind_sear<4
