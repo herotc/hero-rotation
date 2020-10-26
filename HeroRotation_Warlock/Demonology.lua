@@ -249,8 +249,8 @@ local function OffGCD()
 end
 
 local function Essences()
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastable() then
+  -- worldvein_resonance,if=cooldown.summon_demonic_tyrant.remains>45
+  if S.WorldveinResonance:IsCastable() and (S.SummonDemonicTyrant:CooldownRemains() > 45) then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
   end
   -- memory_of_lucid_dreams
