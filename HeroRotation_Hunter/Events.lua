@@ -37,8 +37,8 @@ do
     function (...)
       if SpellBM.AnimalCompanion:IsAvailable() then
         DestGUID, _, _, _, SpellID = select(8, ...);
-        if (SpellID == SpellBM.BeastCleaveBuff:ID() and Hunter.PetTable.LastPetSpellID == SpellBM.Multishot:ID())
-        or (SpellID == SpellBM.FrenzyBuff:ID() and Hunter.PetTable.LastPetSpellID == SpellBM.BarbedShot:ID())
+        if (SpellID == SpellBM.BeastCleavePetBuff:ID() and Hunter.PetTable.LastPetSpellID == SpellBM.MultiShot:ID())
+        or (SpellID == SpellBM.FrenzyPetBuff:ID() and Hunter.PetTable.LastPetSpellID == SpellBM.BarbedShot:ID())
         or (SpellID == SpellBM.BestialWrathPetBuff:ID() and Hunter.PetTable.LastPetSpellID == SpellBM.BestialWrath:ID()) then
           if not PetGUIDs[DestGUID] then
             PetGUIDs[DestGUID] = true
@@ -54,7 +54,7 @@ do
     function (...)
       if SpellBM.AnimalCompanion:IsAvailable() then
         SpellID = select(12, ...)
-        if SpellID == SpellBM.Multishot:ID() or SpellID == SpellBM.BarbedShot:ID() or SpellID == SpellBM.BestialWrath:ID() then
+        if SpellID == SpellBM.MultiShot:ID() or SpellID == SpellBM.BarbedShot:ID() or SpellID == SpellBM.BestialWrath:ID() then
           PetGUIDs = {}
           Hunter.PetTable.LastPetSpellID = SpellID
           Hunter.PetTable.LastPetSpellCount = 0

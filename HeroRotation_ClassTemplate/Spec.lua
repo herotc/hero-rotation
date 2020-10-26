@@ -34,38 +34,22 @@ local Settings = {
 }
 
 -- Spells
-if not Spell.Class then Spell.Class = {} end
-Spell.Class.Spec = {
-  -- Racials
-
-  -- Abilities
-
-  -- Talents
-
-  -- Artifact
-
-  -- Defensive
-
-  -- Utility
-
-  -- Legendaries
-
-  -- Misc
-
-  -- Macros
-
-}
 local S = Spell.Class.Spec
 
 -- Items
-if not Item.Class then Item.Class = {} end
-Item.Class.Spec = {
-  -- Legendaries
-
-}
 local I = Item.Class.Spec
+local TrinketsOnUseExcludes = {
+  --  I.TrinketName:ID(),
+}
 
--- Rotation Var
+-- Enemies
+
+-- Stuns
+
+-- Rotation Variables
+
+
+--- ======= HELPERS =======
 
 
 --- ======= ACTION LISTS =======
@@ -73,10 +57,9 @@ local I = Item.Class.Spec
 -- If it's only put one time, it's doing a closure call for nothing.
 
 
-
 --- ======= MAIN =======
 local function APL ()
-  -- Local Update
+  -- Rotation Variables Update
 
   -- Unit Update
 
@@ -102,7 +85,10 @@ local function APL ()
   end
 end
 
-HR.SetAPL(000, APL)
+local function OnInit ()
+end
+
+HR.SetAPL(000, APL, OnInit)
 
 
 --- ======= SIMC =======
