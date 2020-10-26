@@ -177,7 +177,8 @@ end
 
 local function Brand()
   if Settings.Vengeance.BrandForDamage then
-    -- sigil_of_flame,if=cooldown.fiery_brand.remains<2
+    -- sigil_of_flame,if=!runeforge.razelikhs_defilement.equipped&cooldown.fiery_brand.remains<2
+    -- TODO: Add Legendary Check
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (S.FieryBrand:CooldownRemains() < 2) then
       if S.ConcentratedSigils:IsAvailable() then
         if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 82 (Concentrated)"; end
@@ -208,7 +209,8 @@ local function Brand()
     if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
       if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 92"; end
     end
-    -- sigil_of_flame,if=dot.fiery_brand.ticking
+    -- sigil_of_flame,if=!runeforge.razelikhs_defilement.equipped&dot.fiery_brand.ticking
+    -- TODO: Add Legendary Check
     if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
       if S.ConcentratedSigils:IsAvailable() then
         if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 94 (Concentrated)"; end
@@ -260,7 +262,7 @@ local function Normal()
   if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
     if HR.Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 21"; end
   end
-  -- Manual add: elysian_decree
+  -- elysian_decree
   if S.ElysianDecree:IsCastable() then
     if HR.Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle) then return "elysian_decree 22"; end
   end
