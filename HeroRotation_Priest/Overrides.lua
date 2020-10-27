@@ -13,6 +13,7 @@ local HR      = HeroRotation
 -- Spells
 local SpellShadow  = Spell.Priest.Shadow
 -- Lua
+local _, _, _, TocVer  = GetBuildInfo()
 
 --- ============================ CONTENT ============================
 -- Discipline, ID: 256
@@ -30,7 +31,12 @@ HL.AddCoreOverride ("Player.Insanity",
       local STMMod = Player:BuffUp(SpellShadow.SurrenderToMadness) and 2.0 or 1.0
       local LucidMod = Player:BuffUp(SpellShadow.MemoryofLucidDreams) and 2.0 or 1.0
       if Player:IsCasting(SpellShadow.MindBlast) then
-        return Insanity + (9 * FotMMod * STMMod * LucidMod)
+        -- Return 8 base insanity on beta; 7 on live
+        if TocVer == 90002 then
+          return Insanity + (8 * FotMMod * STMMod * LucidMod)
+        else
+          return Insanity + (7 * FotMMod * STMMod * LucidMod)
+        end
       elseif Player:IsCasting(SpellShadow.VampiricTouch) then
         return Insanity + (5 * STMMod * LucidMod)
       elseif Player:IsCasting(SpellShadow.MindFlay) then
