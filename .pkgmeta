@@ -10,9 +10,11 @@ move-folders:
      HeroRotation/HeroRotation_DemonHunter: HeroRotation_DemonHunter
      HeroRotation/HeroRotation_Hunter: HeroRotation_Hunter
      HeroRotation/HeroRotation_Mage: HeroRotation_Mage
+     HeroRotation/HeroRotation_Monk: HeroRotation_Monk
      HeroRotation/HeroRotation_Priest: HeroRotation_Priest
      HeroRotation/HeroRotation_Rogue: HeroRotation_Rogue
      HeroRotation/HeroRotation_Warlock: HeroRotation_Warlock
+     HeroRotation/HeroRotation_Warrior: HeroRotation_Warrior
 
 ignore:
     - HeroRotation_ClassTemplate
