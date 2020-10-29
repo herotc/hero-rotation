@@ -90,6 +90,10 @@ end
 local function EvaluateTargetIfFWBuild(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 3 and S.Apocalypse:CooldownRemains() < 3 or TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
+-- rune.time_to_4<(cooldown.death_and_decay.remains&!talent.defile.enabled|cooldown.defile.remains&talent.defile.enabled)
+local function EvaluateTargetIfFWMin(TargetUnit)
+  return (Player:RuneTimeToX(4) < ((bool(S.DeathAndDecay:CooldownRemains()) and not S.Defile:IsAvailable() and 1 or 0) or (bool(S.Defile:CooldownRemains()) and S.Defile:IsAvailable() and 1 or 0)))
+end
 -- Apocalypse Conditions
 local function EvaluateTargetIfApocalypse(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 4 and EnemiesMeleeCount >= 2 and not Player:BuffUp(S.DeathAndDecayBuff) )
@@ -153,7 +157,11 @@ local function AOE_Setup()
   -- festering_strike,target_if=debuff.festering_wound.stack<1
   if S.FesteringStrike:IsCastable() then
     if Everyone.CastCycle(S.FesteringStrike, EnemiesMelee, EvaluateTargetUnitNoFWDebuff) then return "festering_strike target_if aoe_setup 6" end
-  end 
+  end
+  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=rune.time_to_4<(cooldown.death_and_decay.remains&!talent.defile.enabled|cooldown.defile.remains&talent.defile.enabled)
+  if S.FesteringStrike:IsCastable() then
+    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFWExists, EvaluateTargetIfFWMin) then return "festering_strike target_if min aoe_setup 7"; end
+  end
   -- epidemic,if=!variable.pooling_for_gargoyle
   -- Added check to ensure at least 2 targets have Plague
   if S.Epidemic:IsReady() and not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:AuraActiveCount() > 1 then
