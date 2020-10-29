@@ -25,6 +25,7 @@ HR.GUISettings.APL.Monk = {
     GCDasOffGCD = {
       -- Abilities
       LegSweep = true,
+      RingOfPeace = true,
       Paralysis = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
@@ -38,8 +39,6 @@ HR.GUISettings.APL.Monk = {
   Brewmaster = {
     -- Do not pool, this option only exists because people keep nagging me about it
     NoBrewmasterPooling = false,
-    -- Show Ironskin Brew as a cooldown
-    ShowIronskinBrewCD = true,
     -- Show Celestial Brew as a cooldown
     ShowCelestialBrewCD = true,
     -- Show Dampen Harm as a cooldown
@@ -70,6 +69,7 @@ HR.GUISettings.APL.Monk = {
   },
   Windwalker = {
   -- Do not pool, this option only exists because people keep nagging me about it
+    ShowFortifyingBrewCD = false,
     NoWindwalkerPooling = false,
     IgnoreToK = false,
     IgnoreFSK = false,
@@ -78,6 +78,7 @@ HR.GUISettings.APL.Monk = {
       -- Abilities
       InvokeXuenTheWhiteTiger = true,
       TouchOfDeath            = true,
+      FortifyingBrew          = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -105,6 +106,7 @@ CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.EssenceDisplayStyle", {
 
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
+CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.ShowFortifyingBrewCD", "Fortifying Brew", "Enable or disable Fortifying Brew recommendations.")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToK", "Ignore Touch of Karma", "Enable this setting to allow you to ignore Touch of Karma without stalling the rotation. (NOTE: Touch of Karma will never be suggested if this is enabled)");
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreFSK", "Ignore Flying Serpent Kick", "Enable this setting to allow you to ignore Flying Serpent Kick without stalling the rotation. (NOTE: Flying Serpent Kick will never be suggested if this is enabled)");
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.NoWindwalkerPooling", "No Pooling", "If you want to ignore energy pooling.")
@@ -114,7 +116,6 @@ CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster");
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.NoBrewmasterPooling", "No Pooling", "If you want to ignore energy pooling.")
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.ShowCelestialBrewCD", "Celestial Brew", "Enable or disable Celestial Brew recommendations.")
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.ShowDampenHarmCD", "Dampen Harm", "Enable or disable Dampen Harmrecommendations.")
-CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.ShowIronskinBrewCD", "Ironskin Brew", "Enable or disable Ironskin Brew recommendations.")
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enabled", "Purify", "Enable or disable Purify recommendations.");
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Medium", "Purify: Medium", "Enable or disable Purify recommendations when the stagger is medium.");

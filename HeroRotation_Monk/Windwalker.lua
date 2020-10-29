@@ -65,6 +65,9 @@ local Interrupts = {
 local Stuns = {
   { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end },
 }
+local KnockBack = {
+  { S.RingOfPeace, "Cast Ring Of Peace (Stun)", function () return true end },
+}
 local Traps = {
   { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
 }
@@ -154,7 +157,7 @@ local function EvaluateTargetIfTigerPalm106(TargetUnit)
 end
 
 local function EvaluateTargetIfRisingSunKick200(TargetUnit)
-  return ((S.WhirlingDragonPunch:IsAvailable() and ((10 * Player:SpellHaste()) > (S.WhirlingDragonPunch:CooldownRemains() + 3))) and ((S.FistsOfFury:CooldownRemains() > 3) or Player:Chi() >= 5))
+  return ((S.WhirlingDragonPunch:IsAvailable() and ((10 * Player:SpellHaste()) > (S.WhirlingDragonPunch:CooldownRemains() + 4))) and ((S.FistsOfFury:CooldownRemains() > 3) or Player:Chi() >= 5))
 end
 
 local function EvaluateTargetIfFistOfTheWhiteTiger202(TargetUnit)
@@ -166,7 +169,7 @@ local function EvaluateTargetIfTigerPalm204(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick206(TargetUnit)
-  return (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and ((Player:ChiDeficit() >= 1 or Player:EnergyTimeToX(50) < 1) or (Player:Chi() == 2 and S.FistsOfFury:CooldownRemains() < 3)))))
+  return (ComboStrike(S.BlackoutKick) and (ComboStrike(S.BlackoutKick) and (Player:BuffUp(S.BlackoutKickBuff) or (S.HitCombo:IsAvailable() and Player:PrevGCD(1, S.TigerPalm) and Player:Chi() == 2 and S.FistsOfFury:CooldownRemains() < 3) or (Player:ChiDeficit() <= 1 and Player:PrevGCD(1, S.SpinningCraneKick)))))
 end
 
 local function EvaluateTargetIfTigerPalm500(TargetUnit)
@@ -248,19 +251,19 @@ local function Aoe()
   if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) then
     if HR.Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "whirling_dragon_punch 200"; end
   end
-  -- energizing_elixir,if=chi.max-chi>=2&energy.time_to_max>3|chi.max-chi>=4&(energy.time_to_max>2|!prev_gcd.1.tiger_palm)
-  if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 3) or (Player:ChiDeficit() >= 4 and EnergyTimeToMaxRounded() > 2) or (not Player:PrevGCD(1, S.TigerPalm))) then
+  -- energizing_elixir,if=chi.max-chi>=2&energy.time_to_max>2|chi.max-chi>=4
+  if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 2) or Player:ChiDeficit() >= 4) then
     if HR.Cast(S.EnergizingElixir, Settings.Windwalker.OffGCDasOffGCD.EnergizingElixir) then return "energizing_elixir 202"; end
   end
   -- spinning_crane_kick,if=combo_strike&(buff.dance_of_chiji.up|buff.dance_of_chiji_azerite.up)
   if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and (Player:BuffUp(S.DanceOfChijiBuff) or Player:BuffUp(S.DanceOfChijiAzeriteBuff)) then
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 204"; end
   end
-  -- fists_of_fury,if=energy.time_to_max>execute_time-1|buff.storm_earth_and_fire.remains
-  if S.FistsOfFury:IsReady() and ((EnergyTimeToMaxRounded() > (S.FistsOfFury:ExecuteTime() - 1)) or Player:BuffUp(S.StormEarthAndFireBuff)) then
+  -- fists_of_fury,if=energy.time_to_max>execute_time-1|chi.max-chi<=1|buff.storm_earth_and_fire.remains
+  if S.FistsOfFury:IsReady() and ((EnergyTimeToMaxRounded() > (S.FistsOfFury:ExecuteTime() - 1)) or Player:ChiDeficit() <= 1 or  Player:BuffUp(S.StormEarthAndFireBuff)) then
     if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 206"; end
   end
-  -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.rising_sun_kick.duration>cooldown.whirling_dragon_punch.remains+3)&(cooldown.fists_of_fury.remains>3|chi>=5)
+  -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.rising_sun_kick.duration>cooldown.whirling_dragon_punch.remains+4)&(cooldown.fists_of_fury.remains>3|chi>=5)
   if S.RisingSunKick:IsReady() then
     if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfRisingSunKick200) then return "rising_sun_kick 208"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfRisingSunKick200(Target) then
@@ -279,16 +282,16 @@ local function Aoe()
   if S.ExpelHarm:IsReady() and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 216"; end
   end
-  -- chi_burst,if=chi.max-chi>=1
-  if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= 1) then
-    if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst 218"; end
-  end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
   if S.FistOfTheWhiteTiger:IsReady() then
     if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger202) then return "fist_of_the_white_tiger 220"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger202(Target) then
       if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 222"; end
     end
+  end
+  -- chi_burst,if=chi.max-chi>=2
+  if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= 2) then
+    if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst 218"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|combo_strike)
   if S.TigerPalm:IsReady() then
@@ -308,7 +311,7 @@ local function Aoe()
   if S.FlyingSerpentKick:IsReady() and not Settings.Windwalker.IgnoreFSK then
     if HR.Cast(S.FlyingSerpentKick, nil, nil, not Target:IsInRange(40)) then return "chi_wave 232"; end
   end
-  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|talent.hit_combo.enabled&prev_gcd.1.tiger_palm&(chi.max-chi>=14&energy.time_to_50<1|chi=2&cooldown.fists_of_fury.remains<3))
+  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&(buff.bok_proc.up|talent.hit_combo.enabled&prev_gcd.1.tiger_palm&chi=2&cooldown.fists_of_fury.remains<3|chi.max-chi<=1&prev_gcd.1.spinning_crane_kick)
   if S.BlackoutKick:IsReady() then
     if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick206) then return "blackout_kick 234"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfBlackoutKick206(Target) then
@@ -687,6 +690,7 @@ local function APL()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
+  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
   
   ComputeTargetRange()
 
@@ -697,10 +701,16 @@ local function APL()
     end
   
     -- auto_attack
+    -- Fortifying Brew
+    if S.FortifyingBrew:IsReady() and IsTanking and Settings.Windwalker.ShowFortifyingBrewCD  then
+      if HR.Cast(S.FortifyingBrew, Settings.Windwalker.GCDasOffGCD.FortifyingBrew, nil, not Target:IsSpellInRange(S.FortifyingBrew)) then return "touch_of_death 432"; end
+    end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
     -- Stun
     local ShouldReturn = Everyone.Interrupt(5, S.LegSweep, Settings.Commons.GCDasOffGCD.LegSweep, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
+    -- Knock Back
+    local ShouldReturn = Everyone.Interrupt(5, S.RingOfPeace, Settings.Commons.GCDasOffGCD.RingOfPeace, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
     -- Trap
     local ShouldReturn = Everyone.Interrupt(5, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
     -- variable,name=hold_xuen,op=set,value=cooldown.invoke_xuen_the_white_tiger.remains>fight_remains|fight_remains<120&fight_remains>cooldown.serenity.remains&cooldown.serenity.remains>10
