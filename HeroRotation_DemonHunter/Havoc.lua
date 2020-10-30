@@ -238,7 +238,7 @@ local function Cooldown()
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
-    if HR.Cast(S.ElysianDecree, nil, nil, not Target:IsSpellInRange(S.ElysianDecree)) then return "elysian_decree 32"; end
+    if HR.Cast(S.ElysianDecree, nil, nil, not Target:IsInRange(30)) then return "elysian_decree 32"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
