@@ -709,10 +709,10 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
     -- Stun
     local ShouldReturn = Everyone.Interrupt(5, S.LegSweep, Settings.Commons.GCDasOffGCD.LegSweep, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
-    -- Knock Back
-    local ShouldReturn = Everyone.Interrupt(5, S.RingOfPeace, Settings.Commons.GCDasOffGCD.RingOfPeace, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
     -- Trap
-    local ShouldReturn = Everyone.Interrupt(5, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(20, S.Paralysis, Settings.Commons.GCDasOffGCD.Paralysis, Stuns); if ShouldReturn and Settings. General.InterruptWithStun then return ShouldReturn; end
+    -- Knock Back
+    local ShouldReturn = Everyone.Interrupt(40, S.RingOfPeace, Settings.Commons.GCDasOffGCD.RingOfPeace, Stuns); if ShouldReturn and Settings.General.InterruptWithStun then return ShouldReturn; end
     -- variable,name=hold_xuen,op=set,value=cooldown.invoke_xuen_the_white_tiger.remains>fight_remains|fight_remains<120&fight_remains>cooldown.serenity.remains&cooldown.serenity.remains>10
     if (true) then
       VarXuenHold = (HL.BossFilteredFightRemains("<", S.InvokeXuenTheWhiteTiger:CooldownRemains()) or HL.BossFilteredFightRemains("<", 120)) and HL.BossFilteredFightRemains(">", S.Serenity:CooldownRemains()) and (S.Serenity:CooldownRemains() > 10)
