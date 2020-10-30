@@ -114,7 +114,7 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 4 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
+  return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 3 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
 end
 
 local function EvaluateCycleMindSear210(TargetUnit)
@@ -363,7 +363,7 @@ local function Main()
   if S.Mindbender:IsCastable() and CDsON() and (Target:DebuffUp(S.VampiricTouchDebuff) and ((S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1)) or Target:DebuffUp(S.ShadowWordPainDebuff))) then
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
-  -- void_torrent,target_if=variable.dots_up&target.time_to_die>4&buff.voidform.down&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
+  -- void_torrent,target_if=variable.dots_up&target.time_to_die>3&buff.voidform.down&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
   if S.VoidTorrent:IsCastable() then
     if HR.Cast(S.VoidTorrent, 40, EvaluateCycleVoidTorrent208) then return "void_torrent 110"; end
   end
@@ -387,8 +387,8 @@ local function Main()
   if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtBuff) and not (Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:GCD()) and VarDotsUp) then
     if HR.Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 120"; end
   end
-  -- mind_blast,if=variable.dots_up&raid_event.movement.in>cast_time+0.5&spell_targets.mind_sear<4
-  if S.MindBlast:IsCastable() and (VarDotsUp and EnemiesCount10ySplash < 4) then
+  -- mind_blast,if=variable.dots_up&raid_event.movement.in>cast_time+0.5&(spell_targets.mind_sear<4|!talent.searing_nightmare.enabled)
+  if S.MindBlast:IsCastable() and (VarDotsUp and (EnemiesCount10ySplash < 4 or not S.SearingNightmare:IsAvailable())) then
     if HR.Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 122"; end
   end
   -- vampiric_touch,target_if=refreshable&target.time_to_die>6|(talent.misery.enabled&dot.shadow_word_pain.refreshable)|buff.unfurling_darkness.up
