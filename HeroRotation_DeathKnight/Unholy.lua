@@ -88,7 +88,7 @@ local function EvaluateTargetIfFWExists(TargetUnit)
   return (TargetUnit:DebuffStack(S.FesteringWoundDebuff))
 end
 local function EvaluateTargetIfFWBuild(TargetUnit)
-  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 3 and S.Apocalypse:CooldownRemains() < 3 or TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
+  return (TargetUnit:DebuffStack(S.FesteringWoundDebuff) <= 3 and S.Apocalypse:CooldownRemains() < 3 or TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 1)
 end
 -- rune.time_to_4<(cooldown.death_and_decay.remains&!talent.defile.enabled|cooldown.defile.remains&talent.defile.enabled)
 local function EvaluateTargetIfFWMin(TargetUnit)
@@ -108,7 +108,7 @@ local function EvaluateCycleSoulReaper(TargetUnit)
 end
 -- Scourge Strike / Clawing Shadow TargetIf Conditions
 local function EvaluateTargetIfScourgeClaw(TargetUnit)
-  return (S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffStack(S.FesteringWoundDebuff) >= 1)
+  return ((S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffUp(S.FesteringWoundDebuff) or TargetUnit:DebuffStack(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < (S.DeathAndDecay:CooldownRemains() + 10) or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemains()))
 end
 local function EvaluateCycleScourgeClaw(TargetUnit)
   return (DisableAOTD() and (S.Apocalypse:CooldownRemains() > 5 and TargetUnit:DebuffUp(S.FesteringWoundDebuff) or TargetUnit:DebuffStack(S.FesteringWoundDebuff) > 4) and (TargetUnit:TimeToDie() < S.DeathAndDecay:CooldownRemains() + 10 or TargetUnit:TimeToDie() > S.Apocalypse:CooldownRemains()))
@@ -149,9 +149,9 @@ local function AOE_Setup()
   if S.Defile:IsCastable() and S.FesteringWoundDebuff:AuraActiveCount() >= 5 then
     if HR.Cast(S.Defile) then return "defile aoe_setup 4"; end
   end
-  -- epidemic,if=!variable.pooling_for_gargoyle&runic_power.deficit<20
+  -- epidemic,if=!variable.pooling_for_gargoyle&runic_power.deficit<20|buff.sudden_doom.react
   -- Added check to ensure at least 2 targets have Plague
-  if S.Epidemic:IsReady() and not bool(VarPoolingForGargoyle) and Player:RunicPowerDeficit() < 20 and S.VirulentPlagueDebuff:AuraActiveCount() > 1 then
+  if S.Epidemic:IsReady() and (not bool(VarPoolingForGargoyle) and Player:RunicPowerDeficit() < 20) or (Player:BuffUp(S.SuddenDoomBuff)) and S.VirulentPlagueDebuff:AuraActiveCount() > 1 then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not TargetIsInRange[100]) then return "epidemic aoe_setup 5"; end
   end
   -- festering_strike,target_if=debuff.festering_wound.stack<1
@@ -207,29 +207,21 @@ local function AOE_Generic()
   if S.Epidemic:IsReady() and (not bool(VarPoolingForGargoyle) and S.VirulentPlagueDebuff:AuraActiveCount() > 1) then
     if HR.Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not TargetIsInRange[100]) then return "epidemic aoe_generic 2"; end
   end
-  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack>=1
+  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(fight_remains<cooldown.death_and_decay.remains+10|fight_remains>cooldown.apocalypse.remains)
   if S.ScourgeStrike:IsCastable() then
-    if Everyone.CastCycle(S.ScourgeStrike, EnemiesMelee, EvaluateTargetIfScourgeClaw) then return "scourge_strike target_if aoe_generic 3"; end
+    if Everyone.CastTargetIf(S.ScourgeStrike, EnemiesMelee, "max", EvaluateTargetIfFWExists ,EvaluateTargetIfScourgeClaw) then return "scourge_strike target_if max aoe_generic 3"; end
   end
-  -- clawing_shadows,target_if=max:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack>=1
+  -- clawing_shadows,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(fight_remains<cooldown.death_and_decay.remains+10|fight_remains>cooldown.apocalypse.remains)
   if S.ClawingShadows:IsCastable() then
-    if Everyone.CastCycle(S.ClawingShadows, Enemies30yd, EvaluateTargetIfScourgeClaw) then return "clawing_shadow target_if aoe_generic 4"; end
+    if Everyone.CastTargetIf(S.ClawingShadows, Enemies30yd, "max", EvaluateTargetIfFWExists ,EvaluateTargetIfScourgeClaw) then return "clawing_shadow target_if max aoe_generic 4"; end
   end
-    -- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack<1
+  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1
   if S.FesteringStrike:IsCastable() then
-    if Everyone.CastCycle(S.FesteringStrike, EnemiesMelee, EvaluateTargetIfFWStacks) then return "festering_strike target_if aoe_generic 5"; end
+    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "max", EvaluateTargetIfFWExists, EvaluateTargetIfFWBuild) then return "festering_strike target_if max aoe_generic 8"; end
   end
-  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(target.1.time_to_die<cooldown.death_and_decay.remains+10|target.1.time_to_die>cooldown.apocalypse.remains)
-  if S.ScourgeStrike:IsCastable() then
-    if Everyone.CastCycle(S.ScourgeStrike, EnemiesMelee, EvaluateCycleScourgeClaw) then return "scourge_strike target_if aoe_generic 6"; end
-  end
-  -- clawing_shadows,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(target.1.time_to_die<cooldown.death_and_decay.remains+10|target.1.time_to_die>cooldown.apocalypse.remains)
-  if S.ClawingShadows:IsCastable() then
-    if Everyone.CastCycle(S.ClawingShadows, Enemies30yd, EvaluateCycleScourgeClaw) then return "clawing_shadow target_if aoe_generic 7"; end
-  end
-  -- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1
+  -- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack<1
   if S.FesteringStrike:IsCastable() then
-    if Everyone.CastCycle(S.FesteringStrike, EnemiesMelee, EvaluateTargetIfFWBuild) then return "festering_strike target_if aoe_generic 8"; end
+    if Everyone.CastTargetIf(S.FesteringStrike, EnemiesMelee, "min", EvaluateTargetIfFWExists, EvaluateTargetIfFWStacks) then return "festering_strike target_if min aoe_generic 5"; end
   end
 end
 
@@ -246,24 +238,20 @@ local function Cooldowns()
   if S.UnholyBlight:IsCastable() and EnemiesMeleeCount >= 2 then
     if HR.Cast(S.UnholyBlight, nil, nil, not TargetIsInRange[10]) then return "unholy_blight cooldown 3"; end
   end
-  -- dark_transformation,if=!raid_event.adds.exists&cooldown.unholy_blight.remains&(runeforge.deadliest_coil.equipped&(!buff.dark_transformation.up&!talent.unholy_pact.enabled|talent.unholy_pact.enabled)|!runeforge.deadliest_coil.equipped)|!talent.unholy_blight.enabled
-  if S.DarkTransformation:IsCastable() and (bool(S.UnholyBlight:CooldownRemains()) and (DeadliestCoilEquipped and (not Pet:BuffUp(S.DarkTransformation) and not S.UnholyPact:IsAvailable() or S.UnholyPact:IsAvailable()) or not DeadliestCoilEquipped) or not S.UnholyBlight:IsAvailable()) then
+  -- dark_transformation,if=!raid_event.adds.exists&cooldown.unholy_blight.remains&(!runeforge.deadliest_coil.equipped|runeforge.deadliest_coil.equipped&(!buff.dark_transformation.up&!talent.unholy_pact.enabled|talent.unholy_pact.enabled))
+  if S.DarkTransformation:IsCastable() and (bool(S.UnholyBlight:CooldownRemains()) and (not DeadliestCoilEquipped or DeadliestCoilEquipped and (not Pet:BuffUp(S.DarkTransformation) and not S.UnholyPact:IsAvailable() or S.UnholyPact:IsAvailable()))) then
     if HR.Cast(S.DarkTransformation) then return "dark_transformation cooldown 4"; end
+  end
+  -- dark_transformation,if=!raid_event.adds.exists&!talent.unholy_blight.enabled
+  if S.DarkTransformation:IsCastable() and not S.UnholyBlight:IsAvailable() then
+    if HR.Cast(S.DarkTransformation) then return "dark_transformation cooldown 5"; end
   end
   -- dark_transformation,if=raid_event.adds.exists&(active_enemies>=2|raid_event.adds.in>15)
   if S.DarkTransformation:IsCastable() and EnemiesMeleeCount >= 2 then
-    if HR.Cast(S.DarkTransformation) then return "dark_transformation cooldown 5"; end
+    if HR.Cast(S.DarkTransformation) then return "dark_transformation cooldown 6"; end
   end
-  -- unholy_assault,if=active_enemies=1&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead.enabled)
-  if S.UnholyAssault:IsCastable() and (EnemiesMeleeCount == 1 and (S.Apocalypse:TimeSinceLastCast() <= 15) or S.ConvocationOfTheDead:IsAvailable()) then
-    if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cooldown 6"; end
-  end
-  -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
-  if S.UnholyAssault:IsCastable() then
-    if Everyone.CastCycle(S.UnholyAssault, EnemiesMelee, EvaluateTargetIfUnholyAssault) then return "unholy_assault target_if cooldown 7"; end
-  end
-  -- apocalypse,if=debuff.festering_wound.stack>=4&((!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled)|talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&dot.unholy_blight.remains)&active_enemies=1
-  if S.Apocalypse:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and ((not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) or S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Target:DebuffUp(S.UnholyBlightDebuff)) and EnemiesMeleeCount == 1) then
+  -- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&((!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled)|talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&dot.unholy_blight.remains)
+  if S.Apocalypse:IsCastable() and EnemiesMeleeCount == 1 and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and ((not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) or S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Target:DebuffUp(S.UnholyBlightDebuff))) then
     if HR.Cast(S.Apocalypse) then return "apocalypse cooldown 8"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=4&active_enemies>=2&!death_and_decay.ticking
@@ -274,11 +262,19 @@ local function Cooldowns()
   if S.SummonGargoyle:IsCastable() and (Player:RunicPowerDeficit() < 14) then
     if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle cooldown 10"; end
   end
-  -- soul_reaper,target_if=target.health.pct<35&target.time_to_die>5
+  -- unholy_assault,if=active_enemies=1&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead.enabled)
+  if S.UnholyAssault:IsCastable() and (EnemiesMeleeCount == 1 and Target:DebuffStack(S.FesteringWoundDebuff) < 2 and (S.Apocalypse:TimeSinceLastCast() <= 15) or S.ConvocationOfTheDead:IsAvailable()) then
+    if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cooldown 7"; end
+  end
+  -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
+  if S.UnholyAssault:IsCastable() then
+    if Everyone.CastTargetIf(S.UnholyAssault, EnemiesMelee, "min", EvaluateTargetIfFWExists, EvaluateTargetIfUnholyAssault) then return "unholy_assault target_if min cooldown 8"; end
+  end
+  -- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5
   if S.SoulReaper:IsCastable() then
     if Everyone.CastCycle(S.SoulReaper, EnemiesMelee, EvaluateCycleSoulReaper) then return "soul_reaper target_if cooldown 11" end
   end
-  -- raise_dead,if=!pet.risen_ghoul.active
+  -- raise_dead,if=!pet.ghoul.active
   if S.RaiseDead:IsCastable() then
     if HR.CastSuggested(S.RaiseDead) then return "raise_dead cooldown 12"; end
   end
@@ -330,52 +326,52 @@ local function Generic()
   if S.DeathCoil:IsUsable() and (Player:BuffUp(S.SuddenDoomBuff)  and not bool(VarPoolingForGargoyle) or S.SummonGargoyle:TimeSinceLastCast() <= 35) then
     if HR.Cast(S.DeathCoil, nil, nil, not TargetIsInRange[30]) then return "death_coil generic 1"; end
   end
-  -- death_coil,if=runic_power.deficit<14&!variable.pooling_for_gargoyle
-  if S.DeathCoil:IsUsable() and (Player:RunicPowerDeficit() < 14 and not bool(VarPoolingForGargoyle)) then
+  -- death_coil,if=runic_power.deficit<13&!variable.pooling_for_gargoyle
+  if S.DeathCoil:IsUsable() and (Player:RunicPowerDeficit() < 13 and not bool(VarPoolingForGargoyle)) then
     if HR.Cast(S.DeathCoil, nil, nil, not TargetIsInRange[30]) then return "death_coil generic 2"; end
   end
   -- defile,if=cooldown.apocalypse.remains
   if S.Defile:IsCastable() and bool(S.Apocalypse:CooldownRemains()) then
     if HR.Cast(S.Defile, Settings.Unholy.GCDasOffGCD.Defile) then return "defile generic 3"; end
   end
-  -- scourge_strike,if=debuff.festering_wound.up&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)&cooldown.apocalypse.remains>5
-  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) and S.Apocalypse:CooldownRemains() > 5) then
-    if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 4"; end
-  end
   -- scourge_strike,if=debuff.festering_wound.stack>4
   if S.ScourgeStrike:IsCastable() and Target:DebuffStack(S.FesteringWoundDebuff) > 4  then
     if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 5"; end
   end
-  -- scourge_strike,if=debuff.festering_wound.up&talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&cooldown.unholy_blight.remains>5&!cooldown.apocalypse.ready&!raid_event.adds.exists
-  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.Apocalypse:CooldownUp())  then
-    if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 6"; end
+  -- scourge_strike,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
+  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
+    if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 4"; end
   end
-  -- clawing_shadows,if=debuff.festering_wound.up&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)&cooldown.apocalypse.remains>5
-  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) and S.Apocalypse:CooldownRemains() > 5) then
-    if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 7"; end
+  -- scourge_strike,if=debuff.festering_wound.up&talent.unholy_blight.enabled&cooldown.unholy_blight.remains>5&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!cooldown.apocalypse.ready&!raid_event.adds.exists
+  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:IsAvailable() and not S.Apocalypse:CooldownUp()) then
+    if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 6"; end
   end
   -- clawing_shadows,if=debuff.festering_wound.stack>4
   if S.ClawingShadows:IsCastable() and Target:DebuffStack(S.FesteringWoundDebuff) > 4  then
     if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 8"; end
   end
-  -- clawing_shadows,if=debuff.festering_wound.up&talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&cooldown.unholy_blight.remains>5&!cooldown.apocalypse.ready&!raid_event.adds.exists
-  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.Apocalypse:CooldownUp())  then
+  -- clawing_shadows,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
+  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
+    if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 7"; end
+  end
+  -- clawing_shadows,if=debuff.festering_wound.up&talent.unholy_blight.enabled&cooldown.unholy_blight.remains>5&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!cooldown.apocalypse.ready&!raid_event.adds.exists
+  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:IsAvailable() and not S.Apocalypse:CooldownUp()) then
     if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 9"; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
   if S.DeathCoil:IsUsable() and (Player:RunicPowerDeficit() < 20 and not bool(VarPoolingForGargoyle)) then
     if HR.Cast(S.DeathCoil, nil, nil, not TargetIsInRange[30]) then return "death_coil generic 10"; end
   end
-  -- festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<3&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
-  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.Apocalypse:CooldownRemains() < 3 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
-    if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 11"; end
-  end
   -- festering_strike,if=debuff.festering_wound.stack<1
   if S.FesteringStrike:IsCastable() and Target:DebuffStack(S.FesteringWoundDebuff) < 1 then
     if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 12"; end
   end
-  -- festering_strike,if=debuff.festering_wound.stack<4&(cooldown.unholy_blight.remains<3|(cooldown.apocalypse.ready&dot.unholy_blight.remains)&talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled)&!raid_event.adds.exists
-  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and (S.UnholyBlight:CooldownRemains() < 3 or (S.Apocalypse:CooldownUp() and Target:DebuffUp(S.UnholyBlightDebuff)) and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable())) then
+  -- festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<3&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
+  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.Apocalypse:CooldownRemains() < 3 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
+    if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 11"; end
+  end
+  -- festering_strike,if=debuff.festering_wound.stack<4&talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!raid_event.adds.exists&cooldown.apocalypse.ready&(cooldown.unholy_blight.remains<3|dot.unholy_blight.remains)
+  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:IsAvailable() and S.Apocalypse:CooldownUp() and (S.UnholyBlight:CooldownRemains() < 3 or Target:DebuffUp(S.UnholyBlightDebuff))) then
     if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 13"; end
   end
   -- death_coil,if=!variable.pooling_for_gargoyle
