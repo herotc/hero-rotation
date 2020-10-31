@@ -12,10 +12,11 @@ local Player     = Unit.Player
 local Target     = Unit.Target
 local Pet        = Unit.Pet
 local Spell      = HL.Spell
-local MultiSpell = HL.MultiSpell
 local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
+local AoEON      = HR.AoEON
+local CDsON      = HR.CDsON
 local Warlock    = HR.Commons.Warlock
 -- lua
 local GetTime    = GetTime
@@ -38,8 +39,6 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
---local Enemies8ySplash, Enemies40y
---local EnemiesCount8ySplash
 local VarTyrantReady = false
 
 -- GUI Settings
@@ -293,11 +292,6 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
-  -- Update Target Tables
-  --Enemies8ySplash = Player:GetEnemiesInRange(8)
-  --Enemies40y = Player:GetEnemiesInRange(40)
-  --EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
-  
   -- Update Demonology-specific Tables
   Warlock.UpdatePetTable()
   Warlock.UpdateSoulShards()
@@ -314,19 +308,19 @@ local function APL()
       if HR.Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return "unending_resolve defensive"; end
     end
     -- call_action_list,name=off_gcd
-    if HR.CDsON() then
+    if CDsON() then
       local ShouldReturn = OffGCD(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=essences
-    if HR.CDsON() then
+    if CDsON() then
       local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
-    if HR.CDsON() and S.SummonDemonicTyrant:CooldownRemains() < 5 and not VarTyrantReady then
+    if CDsON() and S.SummonDemonicTyrant:CooldownRemains() < 5 and not VarTyrantReady then
       local ShouldReturn = TyrantPrep(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=summon_tyrant,if=variable.tyrant_ready
-    if HR.CDsON() and VarTyrantReady then
+    if CDsON() and VarTyrantReady then
       local ShouldReturn = SummonTyrant(); if ShouldReturn then return ShouldReturn; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
