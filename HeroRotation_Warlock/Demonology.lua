@@ -218,7 +218,7 @@ local function SummonTyrant()
     if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 104"; end
   end
   -- summon_demonic_tyrant
-  if S.SummonDemonicTyrant:IsCastable() then
+  if S.SummonDemonicTyrant:IsCastable() and not Player:IsCasting(S.SummonDemonicTyrant) then
     if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, not Target:IsInRange(40)) then return "summon_demonic_tyrant 106"; end
   end
   -- variable,name=tyrant_ready,value=!cooldown.summon_demonic_tyrant.ready
