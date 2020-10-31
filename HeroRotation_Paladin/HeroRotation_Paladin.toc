@@ -1,0 +1,15 @@
+## Interface: 90001
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFF58CBAPaladin|r]
+## Author: Cilraaz
+## Notes: Hero Rotation - Paladin Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Paladin.lua
+Events.lua
+Protection.lua
+Overrides.lua
