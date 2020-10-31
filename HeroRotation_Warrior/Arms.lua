@@ -103,6 +103,9 @@ local function Precombat()
       if S.ColossusSmash:IsCastable() then
         if HR.Cast(S.ColossusSmash) then return "colossus_smash"; end
       end
+      if S.Warbreaker:IsCastable() then
+        if HR.Cast(S.Warbreaker) then return "warbreaker"; end
+      end
       if S.Overpower:IsCastable() then
         if HR.Cast(S.Overpower) then return "overpower"; end
       end
@@ -144,11 +147,11 @@ local function Execute()
     end
   end
   -- mortal_strike,if=dot.deep_wounds.remains<=duration*0.3&(spell_targets.whirlwind=1|!spell_targets.whirlwind>1&!talent.cleave.enabled)
-  if S.MortalStrike:IsCastable() and (Target:DebuffRefreshable(S.DeepWoundsDebuff) and (EnemiesCount8y == 1 or (not EnemiesCount8y > 1) and not S.Cleave:IsAvailable())) then
+  if S.MortalStrike:IsReady() and (Target:DebuffRefreshable(S.DeepWoundsDebuff) and (EnemiesCount8y == 1 or (not EnemiesCount8y > 1) and not S.Cleave:IsAvailable())) then
     if HR.Cast(S.MortalStrike, nil, nil, not Target:IsSpellInRange(S.MortalStrike)) then return "mortal_strike"; end
   end
   -- cleave,if=(spell_targets.whirlwind>2&dot.deep_wounds.remains<=duration*0.3)|(spell_targets.whirlwind>3)
-  if S.Cleave:IsCastable() and ((EnemiesCount8y > 2 and Target:DebuffRefreshable(S.DeepWoundsDebuff)) or EnemiesCount8y > 3)  then
+  if S.Cleave:IsReady() and ((EnemiesCount8y > 2 and Target:DebuffRefreshable(S.DeepWoundsDebuff)) or EnemiesCount8y > 3)  then
     if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
   end
   -- bladestorm,if=!buff.memory_of_lucid_dreams.up&buff.test_of_might.up&rage<30&!buff.deadly_calm.up
@@ -191,11 +194,11 @@ local function SingleTarget()
    if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
   -- mortal_strike,if=dot.deep_wounds.remains<=duration*0.3&(spell_targets.whirlwind=1|!talent.cleave.enabled)
-  if S.MortalStrike:IsCastable() and (Target:DebuffRefreshable(S.DeepWoundsDebuff) and (EnemiesCount8y == 1 or not S.Cleave:IsAvailable())) then
+  if S.MortalStrike:IsReady() and (Target:DebuffRefreshable(S.DeepWoundsDebuff) and (EnemiesCount8y == 1 or not S.Cleave:IsAvailable())) then
     if HR.Cast(S.MortalStrike, nil, nil, not Target:IsSpellInRange(S.MortalStrike)) then return "mortal_strike"; end
   end
   -- cleave,if=spell_targets.whirlwind>2&dot.deep_wounds.remains<=duration*0.3
-  if S.Cleave:IsCastable() and (EnemiesCount8y > 2 and Target:DebuffRefreshable(S.DeepWoundsDebuff)) then
+  if S.Cleave:IsReady() and (EnemiesCount8y > 2 and Target:DebuffRefreshable(S.DeepWoundsDebuff)) then
     if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
   end
   if (not Spell:EssenceEnabled(AE.CondensedLifeForce) and not S.Massacre:IsAvailable() and (Target:TimeToX(20) > 10 or Target:TimeToDie() > 50) or Spell:EssenceEnabled(AE.CondensedLifeForce) and not S.Massacre:IsAvailable() and (Target:TimeToX(20) > 10 or Target:TimeToDie() > 80) or S.Massacre:IsAvailable() and (Target:TimeToX(35) > 10 or Target:TimeToDie() > 50)) then
@@ -213,15 +216,15 @@ local function SingleTarget()
     if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
   end
   -- bladestorm,if=cooldown.mortal_strike.remains&debuff.colossus_smash.down&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down&rage<40
-  if S.Bladestorm:IsReady() and HR.CDsON() and (not S.MortalStrike:CooldownUp() and Target:DebuffDown(S.ColossusSmashDebuff) and (not S.DeadlyCalm:IsAvailable() or Player:BuffDown(S.DeadlyCalmBuff)) and ((Target:DebuffUp(S.ColossusSmashDebuff) and not S.TestofMight:AzeriteEnabled()) or Player:BuffUp(S.TestofMight)) and Player:BuffDown(S.MemoryofLucidDreams) and Player:Rage() < 40) then
-    if HR.Cast(S.Bladestorm, nil, nil, not Target:IsSpellInRange(S.Bladestorm)) then return "bladestorm"; end
+  if S.Bladestorm:IsReady() and HR.CDsON() and (not S.MortalStrike:CooldownUp() and Target:DebuffDown(S.ColossusSmashDebuff) and (not S.DeadlyCalm:IsAvailable() or Player:BuffDown(S.DeadlyCalmBuff)) and (Player:BuffUp(S.TestofMightBuff) or not S.TestofMight:AzeriteEnabled()) and Player:BuffDown(S.MemoryofLucidDreams) and Player:Rage() < 40) then
+    if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- mortal_strike,if=spell_targets.whirlwind=1|!talent.cleave.enabled
   if S.MortalStrike:IsReady() and (EnemiesCount8y == 1 or not S.Cleave:IsAvailable()) then
     if HR.Cast(S.MortalStrike, nil, nil, not Target:IsSpellInRange(S.MortalStrike)) then return "mortal_strike"; end
   end
   -- cleave,if=spell_targets.whirlwind>2
-  if S.Cleave:IsCastable() and (EnemiesCount8y > 2) then
+  if S.Cleave:IsReady() and (EnemiesCount8y > 2) then
     if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
   end
   -- whirlwind,if=(((buff.memory_of_lucid_dreams.up)|(debuff.colossus_smash.up)|(buff.deadly_calm.up))&talent.fervor_of_battle.enabled)|((buff.memory_of_lucid_dreams.up|rage>89)&debuff.colossus_smash.up&buff.test_of_might.down&!talent.fervor_of_battle.enabled)
@@ -237,7 +240,7 @@ local function SingleTarget()
     if HR.Cast(S.Overpower, nil, nil, not Target:IsSpellInRange(S.Overpower)) then return "overpower"; end
   end
   -- whirlwind,if=talent.fervor_of_battle.enabled&(buff.test_of_might.up|debuff.colossus_smash.down&buff.test_of_might.down&rage>60)
-  if S.Whirlwind:IsCastable() and (S.FervorofBattle:IsAvailable() and (Player:BuffUp(S.TestofMight) or Target:DebuffDown(S.ColossusSmashDebuff) and Player:BuffDown(S.TestofMight) and Player:Rage() > 80)) then
+  if S.Whirlwind:IsReady() and (S.FervorofBattle:IsAvailable() and (Player:BuffUp(S.TestofMightBuff) or Target:DebuffDown(S.ColossusSmashDebuff) and Player:BuffDown(S.TestofMightBuff) and Player:Rage() > 80)) then
     if HR.Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind"; end
   end
   -- slam,if=!talent.fervor_of_battle.enabled
@@ -391,6 +394,8 @@ local function APL()
     if (true) then
       local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
     end
+    -- Pool if nothing else to suggest
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
   end
 end
 

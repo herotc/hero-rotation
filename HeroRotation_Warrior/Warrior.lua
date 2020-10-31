@@ -90,7 +90,10 @@ Spell.Warrior.Fury = {
   RecklessForceCounter                  = MultiSpell(298409, 302917),
   RippleInSpace                         = Spell(302731),
   TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
+  WorldveinResonance                    = Spell(295186),
+  
+  -- Pool
+  Pool                                  = Spell(999910),
 }
 
 Spell.Warrior.Arms = {
@@ -174,6 +177,9 @@ Spell.Warrior.Arms = {
   SeethingRageBuff                      = Spell(297126),
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
+  
+  -- Pool
+  Pool                                  = Spell(999910),
 }
 
 -- Items
