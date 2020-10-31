@@ -314,19 +314,19 @@ local function APL()
       if HR.Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return "unending_resolve defensive"; end
     end
     -- call_action_list,name=off_gcd
-    if (true) then
+    if HR.CDsON() then
       local ShouldReturn = OffGCD(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=essences
-    if (true) then
+    if HR.CDsON() then
       local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
-    if (S.SummonDemonicTyrant:CooldownRemains() < 5 and not VarTyrantReady) then
+    if HR.CDsON() and S.SummonDemonicTyrant:CooldownRemains() < 5 and not VarTyrantReady then
       local ShouldReturn = TyrantPrep(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=summon_tyrant,if=variable.tyrant_ready
-    if (VarTyrantReady) then
+    if HR.CDsON() and VarTyrantReady then
       local ShouldReturn = SummonTyrant(); if ShouldReturn then return ShouldReturn; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
