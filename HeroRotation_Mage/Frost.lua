@@ -60,9 +60,6 @@ S.Flurry:RegisterInFlight()
 S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
 
--- TODO : manage frozen targets
--- spells : FrostNova, Frostbite, Freeze, WintersChillDebuff
-
 local function Precombat ()
   -- flask
   -- food
@@ -215,7 +212,6 @@ local function Movement ()
     if HR.Cast(S.IceFloes, Settings.Frost.OffGCDasOffGCD.IceFloes) then return "ice_floes mvt 2"; end
   end
   -- arcane_explosion,if=mana.pct>30&active_enemies>=2 
-  -- NYI legendaries disciplinary_command ?
   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 and EnemiesCount10yMelee >= 2 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion mvt 3"; end
   end
@@ -332,10 +328,9 @@ local function Single ()
     if HR.Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova single 8"; end
   end
   --radiant_spark,if=buff.freezing_winds.up&active_enemies=1
-  -- NYI legendaries
-  --[[ if S.RadiantSpark:IsCastable() then
+  if S.RadiantSpark:IsCastable() and Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1 then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
-  end ]]
+  end
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
   if S.IceLance:IsCastable() and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 10"; end
@@ -420,7 +415,6 @@ local function APL ()
       ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=aoe,if=active_enemies>=5
-    -- TODO : see if the splash 16 range is good
     if HR.AoEON() and EnemiesCount16ySplash >= 5 then
       ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end

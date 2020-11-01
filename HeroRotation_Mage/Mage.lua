@@ -219,6 +219,9 @@ Spell.Mage.Frost = {
   RippleInSpace                         = Spell(302731), --Splash, 8
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
+  -- Legendaries (Shadowlands)
+  ExpandedPotentialBuff                 = Spell(327495),
+  FreezingWindsBuff                     = Spell(327364)
 }
 
 -- Items
