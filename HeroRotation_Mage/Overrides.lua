@@ -191,13 +191,22 @@
     local FrostOldSpellIsCastable
     FrostOldSpellIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+        local MovingOK = true
+        if self:CastTime() > 0 and Player:IsMoving() and Settings.Frost.MovingRotation then
+          if self == SpellFrost.Blizzard and Player:BuffUp(SpellFrost.FreezingRain) then
+            MovingOK = true
+          else
+            return false
+          end
+        end
+
         local RangeOK = true;
         if Range then
           local RangeUnit = ThisUnit or Target;
           RangeOK = RangeUnit:IsInRange( Range, AoESpell );
         end
         if self == SpellFrost.GlacialSpike then
-          return self:IsLearned() and RangeOK and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5));
+          return self:IsLearned() and RangeOK and MovingOK and (Player:BuffUp(SpellFrost.GlacialSpikeBuff) or (Player:BuffStack(SpellFrost.IciclesBuff) == 5));
         else
           local BaseCheck = FrostOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
           if self == SpellFrost.SummonWaterElemental then
