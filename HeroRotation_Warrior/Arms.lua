@@ -147,7 +147,7 @@ local function Execute()
     end
   end
   -- mortal_strike,if=dot.deep_wounds.remains<=duration*0.3&(spell_targets.whirlwind=1|!spell_targets.whirlwind>1&!talent.cleave.enabled)
-  if S.MortalStrike:IsReady() and (Target:DebuffRefreshable(S.DeepWoundsDebuff) and (EnemiesCount8y == 1 or (not EnemiesCount8y > 1) and not S.Cleave:IsAvailable())) then
+  if S.MortalStrike:IsReady() and (Target:DebuffRefreshable(S.DeepWoundsDebuff) and (EnemiesCount8y == 1 or not (EnemiesCount8y > 1) and not S.Cleave:IsAvailable())) then
     if HR.Cast(S.MortalStrike, nil, nil, not Target:IsSpellInRange(S.MortalStrike)) then return "mortal_strike"; end
   end
   -- cleave,if=(spell_targets.whirlwind>2&dot.deep_wounds.remains<=duration*0.3)|(spell_targets.whirlwind>3)
