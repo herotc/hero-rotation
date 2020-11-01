@@ -202,37 +202,13 @@ local function Cooldowns ()
   end
 end
 
-local function Movement ()
-  -- blink,if=movement.distance>10
-  if S.Blink:IsCastable() and (not Target:IsSpellInRange(S.Frostbolt)) then
-    if HR.Cast(S.Blink) then return "blink mvt 1"; end
-  end
-  -- ice_floes,if=buff.ice_floes.down
-  if S.IceFloes:IsCastable() and (Player:BuffDown(S.IceFloes)) then
-    if HR.Cast(S.IceFloes, Settings.Frost.OffGCDasOffGCD.IceFloes) then return "ice_floes mvt 2"; end
-  end
-  -- arcane_explosion,if=mana.pct>30&active_enemies>=2 
-  if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 and EnemiesCount10yMelee >= 2 then
-    if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion mvt 3"; end
-  end
-  -- fire_blast
-  -- NYI legendaries disciplinary_command ?
-  if S.FireBlast:IsCastable() then
-    if HR.Cast(S.FireBlast) then return "fire_blast mvt 4"; end
-  end
-  -- ice_lance
-  if S.IceLance:IsCastable() then
-    if HR.Cast(S.IceLance) then return "ice_lance mvt 5"; end
-  end
-end
-
 local function Aoe ()
   --frozen_orb
   if S.FrozenOrb:IsCastable() then
     if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsSpellInRange(S.FrozenOrb)) then return "frozen_orb aoe 1"; end
   end
   --blizzard
-  if S.Blizzard:IsCastable() then
+  if S.Blizzard:IsCastable() and (not Player:IsMoving() or Player:BuffUp(S.FreezingRain)) then
     if HR.Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard aoe 2"; end
   end
   --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&buff.fingers_of_frost.react=0)
@@ -279,11 +255,11 @@ local function Aoe ()
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 12"; end
   end ]]
   --ebonbolt
-  if S.Ebonbolt:IsCastable() and EnemiesCount8ySplash >= 2 then
+  if S.Ebonbolt:IsCastable() and EnemiesCount8ySplash >= 2 and not Player:IsMoving() then
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 13"; end
   end
   --frostbolt
-  if S.Frostbolt:IsCastable() then
+  if S.Frostbolt:IsCastable() and not Player:IsMoving() then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 14"; end
   end
   --ice_lance
@@ -295,7 +271,7 @@ end
 local function Single ()
   --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.radiant_spark|prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt|(debuff.mirrors_of_torment.up|buff.expanded_potential.react|buff.freezing_winds.up)&buff.fingers_of_frost.react=0))
   -- NYI legendaries
-  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.Ebonbolt) or Player:IsCasting(S.GlacialSpike) or Player:IsCasting(S.FrostBolt) or ((Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingRain)) and Player:BuffStack(S.FingersofFrostBuff) == 0))) then
+  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.Ebonbolt) or Player:IsCasting(S.GlacialSpike) or Player:IsCasting(S.FrostBolt) or Player:IsMoving() or ((Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingRain)) and Player:BuffStack(S.FingersofFrostBuff) == 0))) then
     if HR.Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry single 1"; end
   end
   --frozen_orb
@@ -304,15 +280,15 @@ local function Single ()
   end
   --blizzard,if=buff.freezing_rain.up|active_enemies>=3|active_enemies>=2&!runeforge.cold_front.equipped
   -- NYI legendaries
-  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 3) then
+  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 3) and (not Player:IsMoving() or Player:BuffUp(S.FreezingRain)) then
     if HR.Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard single 3"; end
   end
   --ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
-  if S.RayofFrost:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 1 then
+  if S.RayofFrost:IsCastable() and not Player:IsMoving() and Target:DebuffStack(S.WintersChillDebuff) == 1 then
     if HR.Cast(S.RayofFrost, nil, nil, not Target:IsSpellInRange(S.RayofFrost)) then return "ray_of_frost single 4"; end
   end
   --glacial_spike,if=remaining_winters_chill&debuff.winters_chill.remains>cast_time+travel_time
-  if S.GlacialSpike:IsCastable() and not Player:IsCasting(S.GlacialSpike) and Target:DebuffStack(S.WintersChillDebuff) > 0 and Target:DebuffRemains(S.WintersChillDebuff) > S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() then
+  if S.GlacialSpike:IsCastable() and not Player:IsMoving() and not Player:IsCasting(S.GlacialSpike) and Target:DebuffStack(S.WintersChillDebuff) > 0 and Target:DebuffRemains(S.WintersChillDebuff) > S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() then
     if HR.Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 5"; end
   end
   --ice_lance,if=remaining_winters_chill&remaining_winters_chill>buff.fingers_of_frost.react&debuff.winters_chill.remains>travel_time
@@ -336,7 +312,7 @@ local function Single ()
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance single 10"; end
   end
   --ebonbolt
-  if S.Ebonbolt:IsCastable() then
+  if S.Ebonbolt:IsCastable() and not Player:IsMoving() then
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 11"; end
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&(buff.brain_freeze.react|soulbind.combat_meditation.enabled)
@@ -372,11 +348,11 @@ local function Single ()
     if HR.Cast(S.FireBlast) then return "fire_blast single 18"; end
   end ]]
   --glacial_spike,if=buff.brain_freeze.react
-  if S.GlacialSpike:IsCastable() and not Player:IsCasting(S.GlacialSpike) and Player:BuffUp(S.BrainFreezeBuff) then
+  if S.GlacialSpike:IsCastable() and not Player:IsMoving() and not Player:IsCasting(S.GlacialSpike) and Player:BuffUp(S.BrainFreezeBuff) then
     if HR.Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 19"; end
   end
   --frostbolt
-  if S.Frostbolt:IsCastable() then
+  if S.Frostbolt:IsCastable() and not Player:IsMoving() then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt single 20"; end
   end
   --ice_lance
@@ -422,8 +398,6 @@ local function APL ()
     if not HR.AoEON() or EnemiesCount16ySplash < 5 then
       ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
-    --call_action_list,name=movement
-    -- TODO : movement
   end
 end
 
