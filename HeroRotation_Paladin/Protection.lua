@@ -173,9 +173,6 @@ local function Standard()
   -- judgment,target_if=min:debuff.judgment.remains,if=charges=2|!talent.crusaders_judgment.enabled
   if S.Judgment:IsReady() and (S.Judgment:Charges() == 2 or not S.CrusadersJudgment:IsAvailable()) then
     if Everyone.CastCycle(S.Judgment, Enemies30y, EvaluateCycleJudgment200, not Target:IsSpellInRange(S.Judgment)) then return "judgment 66"; end
-    --[[if Target:DebuffRefreshable(S.JudgmentDebuff) then
-      if HR.Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then reutrn "judgment 67"; end
-    end]]
   end
   -- avengers_shield,if=debuff.vengeful_shock.down&conduit.vengeful_shock.enabled
   if S.AvengersShield:IsCastable() and (Target:DebuffDown(S.VengefulShockDebuff) and S.VengefulShock:IsAvailable()) then
@@ -193,9 +190,6 @@ local function Standard()
   -- judgment,target_if=min:debuff.judgment.remains
   if S.Judgment:IsReady() then
     if Everyone.CastCycle(S.Judgment, Enemies30y, EvaluateCycleJudgment200, not Target:IsSpellInRange(S.Judgment)) then return "judgment 74"; end
-    --[[if Target:DebuffRefreshable(S.JudgmentDebuff) then
-      if HR.Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment 75"; end
-    end]]
   end
   -- vanquishers_hammer
   if S.VanquishersHammer:IsReady() then
