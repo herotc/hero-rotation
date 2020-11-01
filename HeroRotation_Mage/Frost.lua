@@ -149,7 +149,7 @@ local function Cooldowns ()
     if HR.Cast(S.Deathborne, nil, Settings.Commons.CovenantDisplayStyle) then return "deathborne cd 2"; end
   end
   --rune_of_power,if=cooldown.icy_veins.remains>15&buff.rune_of_power.down - CD
-  if S.RuneofPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > 15 or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
+  if S.RuneofPower:IsCastable() and not Player:IsCasting(S.RuneofPower) and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > 15 or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
     if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 3"; end
   end
   --icy_veins,if=buff.rune_of_power.down - CD
@@ -316,7 +316,7 @@ local function Single ()
     if HR.Cast(S.RayofFrost, nil, nil, not Target:IsSpellInRange(S.RayofFrost)) then return "ray_of_frost single 4"; end
   end
   --glacial_spike,if=remaining_winters_chill&debuff.winters_chill.remains>cast_time+travel_time
-  if S.GlacialSpike:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) > 0 and Target:DebuffRemains(S.WintersChillDebuff) > S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() then
+  if S.GlacialSpike:IsCastable() and not Player:IsCasting(S.GlacialSpike) and Target:DebuffStack(S.WintersChillDebuff) > 0 and Target:DebuffRemains(S.WintersChillDebuff) > S.GlacialSpike:CastTime() + S.GlacialSpike:TravelTime() then
     if HR.Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 5"; end
   end
   --ice_lance,if=remaining_winters_chill&remaining_winters_chill>buff.fingers_of_frost.react&debuff.winters_chill.remains>travel_time
@@ -377,7 +377,7 @@ local function Single ()
     if HR.Cast(S.FireBlast) then return "fire_blast single 18"; end
   end ]]
   --glacial_spike,if=buff.brain_freeze.react
-  if S.GlacialSpike:IsCastable() and Player:BuffUp(S.BrainFreezeBuff) then
+  if S.GlacialSpike:IsCastable() and not Player:IsCasting(S.GlacialSpike) and Player:BuffUp(S.BrainFreezeBuff) then
     if HR.Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 19"; end
   end
   --frostbolt
