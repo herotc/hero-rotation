@@ -88,6 +88,20 @@
     end
     , 62);
 
+    HL.AddCoreOverride("Spell.IsCastable",
+    function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+      local RangeOK = true;
+      if Range then
+        local RangeUnit = ThisUnit or Target;
+        RangeOK = RangeUnit:IsInRange( Range, AoESpell );
+      end
+      
+      local BaseCheck = self:IsLearned() and self:CooldownRemains( BypassRecovery, Offset or "Auto") == 0 and RangeOK and Player:Mana() >= self:Cost()
+
+      return BaseCheck
+    end
+    , 62);
+
   -- Fire, ID: 63
     local function HeatLevelPredicted ()
       if Player:BuffUp(SpellFire.HotStreakBuff) then

@@ -67,18 +67,20 @@ HR.GUISettings.APL.Mage = {
   },
   Arcane = {
     UseManaGem = true,
+    AMSpamRotation = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       RuneOfPower = true,
       ArcanePower = true,
       MirrorImage = true,
-      TouchoftheMagi = true,
+      TouchOfTheMagi = true,
+      Evocation = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      PresenceofMind = true,
+      PresenceOfMind = true,
     }
   }
 };
@@ -102,6 +104,8 @@ CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.TrinketDisplayStyle", {
 CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 -- Arcane
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.");
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
 --CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseManaGem", "Use Mana Gem", "Use mana gem during combat.");
 -- Fire

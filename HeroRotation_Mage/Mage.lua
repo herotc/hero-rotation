@@ -91,7 +91,9 @@ Spell.Mage.Arcane = {
   RecklessForceBuff                     = Spell(302932),
   RippleInSpace                         = Spell(302731), --Splash, 8
   TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
+  WorldveinResonance                    = Spell(295186),
+  -- Legendaries (Shadowlands)
+  ExpandedPotentialBuff                 = Spell(327495)
 }
 
 Spell.Mage.Fire = {
