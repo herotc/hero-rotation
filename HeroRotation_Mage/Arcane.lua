@@ -25,7 +25,6 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 ------ TODO -------
 -- mana gem
 -- potion
--- trinkets
 -- conduits
 -- legendaries
 
@@ -231,7 +230,12 @@ local function SharedCds ()
   --use_mana_gem,if=(talent.enlightened.enabled&mana.pct<=80&mana.pct>=65)|(!talent.enlightened.enabled&mana.pct<=85)
   --TODO : manage mana_gem
   --use_items,if=buff.arcane_power.up
-  --TODO : manage trinkets
+  if (true) then
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
   --potion,if=buff.arcane_power.up
   --TODO : manage potion
   --time_warp,if=runeforge.temporal_warp.equipped&buff.exhaustion.up
