@@ -47,12 +47,12 @@ local TrinketsOnUseExcludes = {
 }
 
 -- Enemies
-local Enemies40y, Enemies40yCount
-local SplashEnemies10yCount, SplashEnemies8yCount
+local Enemies40y
+local SplashEnemies8yCount
 
 -- Range
 local TargetInRange40y, TargetInRange30y
-local TargetInRangePet50y, TargetInMeleeRangePet5y
+local TargetInRangePet50y
 
 -- Stuns
 local StunInterrupts = {
@@ -262,11 +262,11 @@ local function Cleave()
   -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
   -- TODO
   -- multishot,if=azerite.rapid_reload.enabled&active_enemies>2
-  if S.MultiShot:IsCastable() and S.RapidReload:AzeriteEnabled() and SplashEnemies10yCount > 2 then
+  if S.MultiShot:IsCastable() and S.RapidReload:AzeriteEnabled() and SplashEnemies8yCount > 2 then
     if HR.CastPooling(S.MultiShot) then return "Multi-Shot (Cleave - 2)"; end
   end
   -- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled)
-  if S.CobraShot:IsCastable() and S.KillCommand:CooldownRemains() > Player:FocusTimeToMaxPredicted() and (SplashEnemies10yCount < 3 or not S.RapidReload:AzeriteEnabled()) then
+  if S.CobraShot:IsCastable() and S.KillCommand:CooldownRemains() > Player:FocusTimeToMaxPredicted() and (SplashEnemies8yCount < 3 or not S.RapidReload:AzeriteEnabled()) then
     if HR.Cast(S.CobraShot) then return "Multi-Shot (Cleave)"; end
   end
 end
@@ -377,19 +377,14 @@ local function APL()
   -- Unit Update
   if AoEON() then
     Enemies40y = Player:GetEnemiesInRange(40) -- Barbed Shot Cycle
-    Enemies40yCount = #Enemies40y
-    SplashEnemies10yCount = Target:GetEnemiesInSplashRangeCount(10) -- Beast Cleave
     SplashEnemies8yCount = Target:GetEnemiesInSplashRangeCount(8) -- Multi-Shot
   else
     Enemies40y = { Target }
-    Enemies40yCount = 1
-    SplashEnemies10yCount = 1
     SplashEnemies8yCount = 1
   end
   TargetInRange40y = Target:IsInRange(40) -- Most abilities
   TargetInRange30y = Target:IsInRange(30) -- Stampede
   TargetInRangePet50y = Target:IsInRange(50) -- Kill Command TODO: Use Pet range once supported in HeroLib
-  TargetInMeleeRangePet5y = Target:IsInMeleeRange(5) -- Melee Abilities TODO: Use Pet range once supported in HeroLib
 
   -- Defensives
   -- Exhilaration
