@@ -104,7 +104,7 @@ local function SetPoolingAbility(PoolingSpell, EnergyThreshold)
 end
 
 local function MayBurnShadowDance()
-  if Settings.Subtlety.BurnShadowDance == "On Bosses not in Dungeons" and Player:IsInDungeon() then
+  if Settings.Subtlety.BurnShadowDance == "On Bosses not in Dungeons" and Player:IsInDungeonArea() then
     return false
   elseif Settings.Subtlety.BurnShadowDance ~= "Always" and not Target:IsInBossList() then
     return false

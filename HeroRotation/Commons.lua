@@ -54,7 +54,7 @@
 
   -- Is in Solo Mode?
   function Commons.IsSoloMode()
-    return Settings.SoloMode and not Player:IsInRaid() and not Player:IsInDungeon();
+    return Settings.SoloMode and not Player:IsInRaidArea() and not Player:IsInDungeonArea();
   end
 
   -- Cycle Unit Helper
