@@ -371,6 +371,13 @@ end
 
 --- ======= MAIN =======
 local function APL()
+  -- HeroLib SplashData Tracking Update
+  if S.Stomp:IsAvailable() then
+    HL.SplashEnemies.ChangeFriendTargetsTracking("Mine Only")
+  else
+    HL.SplashEnemies.ChangeFriendTargetsTracking("All")
+  end
+
   -- Rotation Variables Update
   UpdateGCDMax()
 

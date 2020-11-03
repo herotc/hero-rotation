@@ -57,6 +57,7 @@ Spell.Hunter.BeastMastery = {
   OneWithThePack                        = Spell(199528),
   ScentOfBlood                          = Spell(193532),
   SpittingCobra                         = Spell(257891),
+  Stomp                                 = Spell(199530),
   -- Azerite Traits
   DanceofDeath                          = Spell(274443),
   RapidReload                           = Spell(278530),
