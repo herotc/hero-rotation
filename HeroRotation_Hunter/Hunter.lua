@@ -126,7 +126,7 @@ Spell.Hunter.Marksmanship = {
   DoubleTap                             = Spell(260402),
   MasterMarksman                        = Spell(260309),
   SteadyFocus                           = Spell(193533),
-  Volley                                = Spell(260242),
+  Volley                                = Spell(260243),
   ChimaeraShot                          = Spell(342049),
   DeadEye                               = Spell(321460),
   -- Buffs
