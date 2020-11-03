@@ -21,6 +21,7 @@ HR.GUISettings.APL.Hunter = {
     UseTrinkets = true,
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
+    EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     ExhilarationHP = 30,
     SummonPetSlot = 1,
@@ -92,6 +93,7 @@ local CP_Marksmanship = CreateChildPanel(CP_Hunter, "Marksmanship");
 
 -- Hunter
 CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Covenant Abilities.");
 CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
 CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");

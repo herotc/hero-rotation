@@ -28,6 +28,9 @@ local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 -- Define S/I for spell and item arrays
 local S = Spell.Hunter.Marksmanship;
 local I = Item.Hunter.Marksmanship;
+if AEMajor ~= nil then
+  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
+end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -45,9 +48,15 @@ local Settings = {
   Marksmanship = HR.GUISettings.APL.Hunter.Marksmanship
 };
 
+HL:RegisterForEvent(function()
+  AEMajor        = HL.Spell:MajorEssence()
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
+
 -- Variables
 local VarCAExecute = Target:HealthPercentage() > 70 and S.CarefulAim:IsAvailable()
 local SoulForgeEmbersEquipped = (I.SoulForgeEmbersChest:IsEquipped() or I.SoulForgeEmbersHead:IsEquipped())
+local PassiveEssence
 
 --Functions
 local EnemyRanges = {5, 8, 10, 30, 40, 100}
@@ -128,6 +137,10 @@ local function Cds()
   -- potion wip
   if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.UsePotions then
     if HR.CastSuggested(I.PotionOfSpectralAgility) then return "potion_of_spectral_agility"; end
+  end
+  -- heart_essence
+  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
+    if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence 68"; end
   end
 end
 
@@ -314,6 +327,8 @@ local function APL()
   EnemiesCount = Target:GetEnemiesInSplashRangeCount(10) -- AOE Toogle
   Enemies40yd = Player:GetEnemiesInRange(40)
   ComputeTargetRange()
+  
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   -- call precombat
   if not Player:AffectingCombat() then
