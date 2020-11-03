@@ -279,7 +279,7 @@ local function Aoe()
     if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 214"; end
   end
   -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major
-  if S.ExpelHarm:IsReady() and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
+  if S.ExpelHarm:IsReady() and Player:Level() >= 43 and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 216"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=3
@@ -517,7 +517,7 @@ local function Opener()
     end
   end
   -- expel_harm,if=talent.chi_burst.enabled&chi.max-chi>=3
-  if S.ExpelHarm:IsReady() and S.ChiBurst:IsAvailable() and Player:ChiDeficit() >= 3 then
+  if S.ExpelHarm:IsReady() and Player:Level() >= 43 and S.ChiBurst:IsAvailable() and Player:ChiDeficit() >= 3 then
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 504"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=combo_strike&chi.max-chi>=2
@@ -532,7 +532,7 @@ local function Opener()
     if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "chi_wave 6"; end
   end
   -- expel_harm
-  if S.ExpelHarm:IsReady() then
+  if S.ExpelHarm:IsReady() and Player:Level() >= 43 then
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 508"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=chi.max-chi>=2
@@ -617,7 +617,7 @@ local function St()
     if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "rushing_jade_wind 712"; end
   end
   -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major
-  if S.ExpelHarm:IsReady() and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
+  if S.ExpelHarm:IsReady() and Player:Level() >= 43 and (Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) then
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 714"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi<3
@@ -737,7 +737,7 @@ local function APL()
       end
     end
     -- expel_harm,if=chi.max-chi>=1+essence.conflict_and_strife.major&(energy.time_to_max<1|cooldown.serenity.remains<2|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
-    if S.ExpelHarm:IsReady() and ((Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) and (EnergyTimeToMaxRounded() < 1 or S.Serenity:CooldownRemains() < 2 or EnergyTimeToMaxRounded() < 4) and S.FistsOfFury:CooldownRemains() < 1.5) then
+    if S.ExpelHarm:IsReady() and Player:Level() >= 43 and ((Player:ChiDeficit() >= (1 + ConflictAndStrifeMajor())) and (EnergyTimeToMaxRounded() < 1 or S.Serenity:CooldownRemains() < 2 or EnergyTimeToMaxRounded() < 4) and S.FistsOfFury:CooldownRemains() < 1.5) then
       if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "expel_harm 106"; end
     end
     -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&chi.max-chi>=2&(energy.time_to_max<1|cooldown.serenity.remains<2|energy.time_to_max<4&cooldown.fists_of_fury.remains<1.5)
