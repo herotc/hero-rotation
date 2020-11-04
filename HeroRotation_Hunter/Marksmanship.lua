@@ -77,6 +77,10 @@ local function MasterMarksmanBuffCheck()
   return (Player:BuffUp(S.MasterMarksmanBuff) or (Player:IsCasting(S.AimedShot) and S.MasterMarksman:IsAvailable()))
 end
 
+local function TrickShotsBuffCheck()
+  return (Player:BuffUp(S.TrickShotsBuff) and not Player:IsCasting(S.AimedShot) and not Player:IsChanneling(S.RapidFire)) or Player:BuffUp(S.VolleyBuff)
+end
+
 -- target_if=min:remains,if=refreshable&target.time_to_die>duration
 local function EvaluateTargetIfFilterSerpentRemains(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > S.SerpentStingDebuff:BaseDuration()) 
@@ -282,7 +286,7 @@ local function Trickshots()
     if HR.Cast(S.Trueshot, nil, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
   end 
   -- aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
-  if S.AimedShot:IsReady() and (Player:BuffUp(S.TrickShotsBuff) and (not Player:BuffUp(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot))) then
+  if S.AimedShot:IsReady() and (TrickShotsBuffCheck() and (not Player:BuffUp(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot))) then
     if HR.Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 12"; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
@@ -290,11 +294,11 @@ local function Trickshots()
     if HR.Cast(S.DeathChakram, nil, Settings.Commons.CovenantDisplayStyle) then return "dark_chakram trickshots necrolords covenant"; end
   end
   -- rapid_fire,if=buff.trick_shots.up&buff.double_tap.down
-  if S.RapidFire:IsReady() and (Player:BuffUp(S.TrickShotsBuff) and not Player:BuffUp(S.DoubleTap)) then
+  if S.RapidFire:IsReady() and (TrickShotsBuffCheck() and not Player:BuffUp(S.DoubleTap)) then
     if HR.Cast(S.RapidFire, nil, nil, not TargetInRange40y) then return "rapid_fire trickshots 14"; end
   end
   -- multishot,if=buff.trick_shots.down|buff.precise_shots.up|focus-cost+cast_regen>action.aimed_shot.cost
-  if S.Multishot:IsReady() and (not Player:BuffUp(S.TrickShotsBuff) or Player:BuffUp(S.PreciseShotsBuff) or Player:Focus() - S.Multishot:Cost() + Player:FocusCastRegen(S.Multishot:ExecuteTime()) > S.AimedShot:Cost()) then
+  if S.Multishot:IsReady() and (not TrickShotsBuffCheck() or Player:BuffUp(S.PreciseShotsBuff) or Player:Focus() - S.Multishot:Cost() + Player:FocusCastRegen(S.Multishot:ExecuteTime()) > S.AimedShot:Cost()) then
     if HR.Cast(S.Multishot, nil, nil, not TargetInRange40y) then return "multishot trickshots 15"; end
   end
   -- kill_shot,if=buff.dead_eye.down

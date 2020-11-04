@@ -131,6 +131,7 @@ Spell.Hunter.Marksmanship = {
   ChimaeraShot                          = Spell(342049),
   DeadEye                               = Spell(321460),
   -- Buffs
+  VolleyBuff                            = Spell(260243),
   MasterMarksmanBuff                    = Spell(269576),
   PreciseShotsBuff                      = Spell(260242),
   SteadyFocusBuff                       = Spell(193534),
