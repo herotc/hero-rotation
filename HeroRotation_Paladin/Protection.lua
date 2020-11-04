@@ -96,15 +96,15 @@ local function Precombat()
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if HR.Cast(S.LightsJudgment) then return "lights_judgment 6"; end
+    if HR.Cast(S.LightsJudgment, nil, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 6"; end
   end
   -- Manually added: avengers_shield
   if S.AvengersShield:IsCastable() then
-    if HR.Cast(S.AvengersShield) then return "avengers_shield 8"; end
+    if HR.Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield 8"; end
   end
   -- Manually added: judgment
   if S.Judgment:IsReady() then
-    if HR.Cast(S.Judgment) then return "judgment 10"; end
+    if HR.Cast(S.Judgment, nil, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment 10"; end
   end
 end
 
