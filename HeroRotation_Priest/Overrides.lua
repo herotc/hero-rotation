@@ -57,6 +57,20 @@ HL.AddCoreOverride ("Player.Insanity",
   end
 ,258)
 
+local OldShadowIsCastable
+OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldShadowIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellShadow.VampiricTouch then
+      return (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self)) and BaseCheck
+    elseif self == SpellShadow.MindBlast then
+      return (self:Charges() >= 2 or not Player:IsCasting(self)) and BaseCheck
+    else
+      return BaseCheck
+    end
+  end
+, 258)
+
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP", 
 -- function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)

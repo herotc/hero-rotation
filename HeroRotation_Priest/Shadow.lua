@@ -184,7 +184,7 @@ local function Precombat()
     -- variable,name=mind_sear_cutoff,op=set,value=1
     VarMindSearCutoff = 1
     -- vampiric_touch
-    if S.VampiricTouch:IsReady() and not Player:IsCasting(S.VampiricTouch) then
+    if S.VampiricTouch:IsCastable() then
       if HR.Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 10"; end
     end
     -- Manually added: mind_blast,if=talent.misery.enabled and shadow_word_pain,if=!talent.misery.enabled

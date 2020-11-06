@@ -64,6 +64,7 @@ Spell.Priest.Shadow = {
   ShadowCrash                           = MultiSpell(342834, 205385), -- Splash, 8; 342834 on 9.0.1 Live - 205385 on 9.0.2 Beta
   SurrenderToMadness                    = Spell(319952),
   TwistofFate                           = Spell(109142),
+  UnfurlingDarkness                     = Spell(341273),
   UnfurlingDarknessBuff                 = Spell(341282),
   VoidTorrent                           = Spell(263165),
 
