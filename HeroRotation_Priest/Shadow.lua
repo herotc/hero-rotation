@@ -371,13 +371,9 @@ local function Main()
   if S.ShadowWordDeath:IsReady() and (PainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
     if HR.Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 112"; end
   end
-  -- shadow_crash,if=spell_targets.shadow_crash=1&(cooldown.shadow_crash.charges=3|debuff.shadow_crash_debuff.up|action.shadow_crash.in_flight|target.time_to_die<cooldown.shadow_crash.full_recharge_time)&raid_event.adds.in>30
-  if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount8ySplash == 1 and (S.ShadowCrash:Charges() == 3 or Target:DebuffUp(S.ShadowCrashDebuff) or S.ShadowCrash:InFlight() or Target:TimeToDie() < S.ShadowCrash:FullRechargeTime())) then
-    if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsSpellInRange(S.ShadowCrash)) then return "shadow_crash 114"; end
-  end
-  -- shadow_crash,if=raid_event.adds.in>30&spell_targets.shadow_crash>1
-  if S.ShadowCrash:IsReady() and not Player:IsCasting(S.ShadowCrash) and (EnemiesCount8ySplash > 1) then
-    if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsSpellInRange(S.ShadowCrash)) then return "shadow_crash 116"; end
+  -- shadow_crash,if=raid_event.adds.in>10
+  if S.ShadowCrash:IsCastable() then
+    if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsInRange(40)) then return "shadow_crash 114"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thought.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
   if S.MindSear:IsCastable() then
