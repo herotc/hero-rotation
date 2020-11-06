@@ -143,7 +143,7 @@ local function Execute()
     end
     -- warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
     if S.Warbreaker:IsCastable() then
-      if HR.Cast(S.Warbreaker, nil, nil, not Target:IsSpellInRange(S.Warbreaker)) then return "warbreaker"; end
+      if HR.Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker"; end
     end
   end
   -- mortal_strike,if=dot.deep_wounds.remains<=duration*0.3&(spell_targets.whirlwind=1|!spell_targets.whirlwind>1&!talent.cleave.enabled)
@@ -208,7 +208,7 @@ local function SingleTarget()
     end
     -- warbreaker,if=!essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>50)|essence.condensed_lifeforce.enabled&!talent.massacre.enabled&(target.time_to_pct_20>10|target.time_to_die>80)|talent.massacre.enabled&(target.time_to_pct_35>10|target.time_to_die>50)
     if S.Warbreaker:IsCastable() then
-      if HR.Cast(S.Warbreaker, nil, nil, not Target:IsSpellInRange(S.Warbreaker)) then return "colossus_smash"; end
+      if HR.Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "colossus_smash"; end
     end
   end
   -- execute,if=buff.sudden_death.react
