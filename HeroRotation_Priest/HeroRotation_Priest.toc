@@ -12,4 +12,5 @@ Settings.lua
 Priest.lua
 Events.lua
 Shadow.lua
+Discipline.lua
 Overrides.lua

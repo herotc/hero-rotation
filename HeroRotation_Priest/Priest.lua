@@ -107,6 +107,70 @@ Spell.Priest.Shadow = {
   WorldveinResonance                    = Spell(295186)
 }
 
+Spell.Priest.Discipline = {
+  -- Azerite Traits
+
+  -- Base Spells
+  MindBlast                             = Spell(8092),
+  Smite                                 = Spell(585),
+  ShadowWordPain                        = Spell(589),
+  ShadowWordPainDebuff                  = Spell(589),
+  ShadowWordDeath                       = Spell(32379),
+  HolyNova                              = Spell(132157), -- Melee, 12
+  MindSear                              = Spell(48045), -- Splash, 10
+  Penance                               = Spell(47540),
+  PowerWordRadiance                     = Spell(194509),
+  Shadowfiend                           = Spell(34433),
+  PowerWordFortitude                    = Spell(21562),
+
+  -- Talents
+  Schism                                = Spell(214621),
+  Mindbender                            = Spell(123040),
+  PowerWordSolace                       = Spell(129250),
+  ShadowCovenant                        = Spell(314867),
+  ShadowCovenantBuff                    = Spell(322105),
+  PurgeTheWicked                        = Spell(204197),
+  PurgeTheWickedDebuff                  = Spell(204213),
+  DivineStar                            = Spell(110744),
+  Halo                                  = Spell(120517),
+
+  -- Covenant Abilities
+  AscendedBlast                         = Spell(325315),
+  AscendedNova                          = Spell(325020), -- Melee, 8
+  BoonoftheAscended                     = Spell(325013),
+  BoonoftheAscendedBuff                 = Spell(325013),
+  FaeGuardians                          = Spell(327661),
+  FaeGuardiansBuff                      = Spell(327661),
+  WrathfulFaerieDebuff                  = Spell(342132),
+  Mindgames                             = Spell(323673),
+  UnholyNova                            = Spell(324724), -- Melee, 15
+
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BerserkingBuff                        = Spell(26297),
+  BloodFury                             = Spell(20572),
+  BloodFuryBuff                         = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+
+  -- Essences
+  BloodoftheEnemy                       = Spell(297108),
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlameBurn                 = Spell(295368),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  ReapingFlames                         = Spell(310690),
+  RecklessForceBuff                     = Spell(302932),
+  RippleInSpace                         = Spell(302731),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186)
+}
+
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {

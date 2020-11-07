@@ -52,6 +52,20 @@ HR.GUISettings.APL.Priest = {
       -- Items
     }
   },
+  Discipline = {
+    -- {Display GCD as OffGCD, ForceReturn}
+    GCDasOffGCD = {
+      -- Abilities
+      Mindbender = true,
+      Shadowfiend = true,
+      ShadowCovenant = true,
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+      -- Items
+    }
+  },
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -60,6 +74,7 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings)
 local ARPanel = HR.GUI.Panel
 local CP_Priest = CreateChildPanel(ARPanel, "Priest")
 local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
+local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
 
 CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
 CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.")
@@ -68,7 +83,11 @@ CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.TrinketDisplayStyle
 CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.")
 CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.")
 
+--Shadow
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.")
+
+--Discipline
+CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")

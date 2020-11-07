@@ -331,7 +331,7 @@
       [66]    = "HeroRotation_Paladin",       -- Protection
       [70]    = "HeroRotation_Paladin",       -- Retribution
     -- Priest
-      [256]   = false,                          -- Discipline
+      [256]   = "HeroRotation_Priest",        -- Discipline
       [257]   = false,                          -- Holy
       [258]   = "HeroRotation_Priest",        -- Shadow
     -- Rogue
