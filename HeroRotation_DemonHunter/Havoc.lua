@@ -47,6 +47,7 @@ local OnUseExcludes = {
 local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
+local PassiveEssence
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -271,7 +272,7 @@ local function Cooldown()
   end
   -- call_action_list,name=essences
   -- Manually added HeartEssence castable check. Returns false while not on Azeroth.
-  if (S.HeartEssence and S.HeartEssence:IsCastable()) then
+  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
     local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
   end
 end
@@ -472,6 +473,8 @@ local function APL()
     EnemiesCount8 = 1
     EnemiesCount20 = 1
   end
+  
+  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   if Everyone.TargetIsValid() then
     -- Precombat
