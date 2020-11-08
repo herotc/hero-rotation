@@ -72,7 +72,7 @@ HR.GUISettings.APL.Monk = {
     ShowFortifyingBrewCD = false,
     NoWindwalkerPooling = false,
     IgnoreToK = false,
-    IgnoreFSK = false,
+    IgnoreFSK = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
