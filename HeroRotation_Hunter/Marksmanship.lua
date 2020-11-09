@@ -90,6 +90,9 @@ end
 -- when about to cap aimed shot, essentially.
 -- 4) Trueshot rotation seems a bit wacky? Investigate.
 
+-- TODO(mrdmnd) - if you're casting (aimed or rapid fire) with volley up, you actually only have trick shots for next
+-- aimed shot if volley buff is still up at the end of the cast. also conceivably build in buffer here.
+-- test Player:BuffRemains(S.VolleyBuff) against S.Trueshot:ExecuteTime() for more accuracy 
 local function TrickShotsBuffCheck()
   return (Player:BuffUp(S.TrickShotsBuff) and not Player:IsCasting(S.AimedShot) and not Player:IsChanneling(S.RapidFire)) or Player:BuffUp(S.VolleyBuff)
 end
