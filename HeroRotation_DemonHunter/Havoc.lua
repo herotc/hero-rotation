@@ -57,6 +57,11 @@ local Settings = {
   Havoc = HR.GUISettings.APL.DemonHunter.Havoc
 }
 
+HL:RegisterForEvent(function()
+  AEMajor        = HL.Spell:MajorEssence()
+  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
+end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
+
 -- Variables
 local BurningWoundEquipped
 
