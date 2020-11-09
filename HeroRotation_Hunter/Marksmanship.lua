@@ -77,6 +77,19 @@ local function MasterMarksmanBuffCheck()
   return (Player:BuffUp(S.MasterMarksmanBuff) or (Player:IsCasting(S.AimedShot) and S.MasterMarksman:IsAvailable()))
 end
 
+-- TODO(mrdmnd): Open issues:
+-- APL seems like it could use some love in the following case:
+-- 1) We sometimes suggest rapid fire immediately after an aimed shot, even in aoe,
+-- when the aimed shot would consume a trickshots buff (and therefore we'd be casting a non-aoe Rapid Fire).
+-- We don't want to cast an unbuffed rapid fire so we'd need to recognize this situation and cast multishot first.
+-- This is because the splash tracker (very briefly) swaps us back into ST mode.
+-- Note: this also can somewhat happen with an unbuffed AimedShot (accidentally swapping AOE -> ST mode)
+-- 2) Should do cycle-targets-if on kill shot. Recognize executable targets anywhere in combat with us.
+-- 3) Should be more careful with focus when reaching aimed shot cap. Need to ENSURE we have enough focus avail
+-- when final charge cooldown time is $CAST seconds away (or slightly less, to account for GCD). Don't be at low focus
+-- when about to cap aimed shot, essentially.
+-- 4) Trueshot rotation seems a bit wacky? Investigate.
+
 local function TrickShotsBuffCheck()
   return (Player:BuffUp(S.TrickShotsBuff) and not Player:IsCasting(S.AimedShot) and not Player:IsChanneling(S.RapidFire)) or Player:BuffUp(S.VolleyBuff)
 end
@@ -283,7 +296,7 @@ local function Trickshots()
   end
   -- trueshot,if=cooldown.rapid_fire.remains|focus+action.rapid_fire.cast_regen>focus.max|target.time_to_die<15
   if S.Trueshot:IsReady() and (bool(S.RapidFire:CooldownRemains()) or Player:Focus() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) > Player:FocusMax() or Target:TimeToDie() < 15) then
-    if HR.Cast(S.Trueshot, nil, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
+    if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
   end 
   -- aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
   if S.AimedShot:IsReady() and (TrickShotsBuffCheck() and (not Player:BuffUp(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot))) then
