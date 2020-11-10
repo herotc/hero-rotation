@@ -203,6 +203,9 @@ Spell.Mage.Frost = {
   ShiftingPower                         = Spell(314791),
   Soulshape                             = Spell(310143),
   WastelandPropriety                    = Spell(333251),
+  SiphonedMalice                        = Spell(337090),
+  GroveInvigoration                     = Spell(322721),
+  FieldOfBlossoms                       = Spell(319191),
   -- Conduit Effects
   -- Azerite Traits
   PackedIceDebuff                       = Spell(272970),
