@@ -13,7 +13,7 @@ local Spell = HL.Spell
 local Item = HL.Item
 -- HeroRotation
 local HR = HeroRotation
-local Settings = HR.GUISettings.APL.Class.Commons
+local Settings = HR.GUISettings.APL.Shaman.Commons
 local Everyone = HR.Commons.Everyone
 -- Lua
 -- File Locals

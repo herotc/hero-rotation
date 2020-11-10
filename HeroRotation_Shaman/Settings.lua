@@ -16,12 +16,13 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 
 --- ============================ CONTENT ============================
 -- All settings here should be moved into the GUI someday.
-HR.GUISettings.APL.Class = {
+HR.GUISettings.APL.Shaman = {
   Commons = {
+    UseBloodlust = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-
+      EarthElemental = true
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -31,11 +32,12 @@ HR.GUISettings.APL.Class = {
 
     }
   },
-  Spec = {
+  Enhancement = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-
+      FeralSpirit = true,
+      Ascendance = true
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

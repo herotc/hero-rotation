@@ -24,18 +24,18 @@ local CDsON = HR.CDsON
 --- ======= APL LOCALS =======
 -- Commons
 local Everyone = HR.Commons.Everyone
-local Class = HR.Commons.Class
+local Shaman = HR.Commons.Shaman
 
 -- GUI Settings
 local Settings = {
   General = HR.GUISettings.General,
-  Commons = HR.GUISettings.APL.Class.Commons,
-  Enhancement = HR.GUISettings.APL.Class.Enhancement
+  Commons = HR.GUISettings.APL.Shaman.Commons,
+  Enhancement = HR.GUISettings.APL.Shaman.Enhancement
 }
 
 -- Spells
-if not Spell.Class then Spell.Class = {} end
-Spell.Class.Enhancement = {
+if not Spell.Shaman then Spell.Shaman = {} end
+Spell.Shaman.Enhancement = {
   -- Racials
 
   -- Abilities Shaman
@@ -92,15 +92,15 @@ Spell.Class.Enhancement = {
   -- Macros
 
 }
-local S = Spell.Class.Enhancement
+local S = Spell.Shaman.Enhancement
 
 -- Items
-if not Item.Class then Item.Class = {} end
-Item.Class.Enhancement = {
+if not Item.Shaman then Item.Shaman = {} end
+Item.Shaman.Enhancement = {
   -- Legendaries
 
 }
-local I = Item.Class.Enhancement
+local I = Item.Shaman.Enhancement
 
 -- Rotation Var
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
@@ -218,7 +218,7 @@ local function single()
   end
   --actions.single+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    if HR.Cast(S.EarthElemental) then return "EarthElemental 1"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "EarthElemental 1"; end
   end
   --actions.single+=/windfury_totem,if=buff.windfury_totem.remains<30
   if S.WindfuryTotem:IsCastable() and Player:TotemRemains(totemFinder()) < 30 then
@@ -311,7 +311,7 @@ local function aoe()
   end
   --actions.aoe+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    if HR.Cast(S.EarthElemental) then return "EarthElemental 2"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "EarthElemental 2"; end
   end
   --actions.aoe+=/windfury_totem,if=buff.windfury_totem.remains<30
   if S.WindfuryTotem:IsCastable() and Player:TotemRemains(totemFinder()) < 30 then
@@ -388,11 +388,11 @@ local function APL ()
     --actions+=/bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
     --actions+=/feral_spirit
     if S.FeralSpirit:IsCastable() then
-      if HR.Cast(S.FeralSpirit) then return "FeralSpirit 1"; end
+      if HR.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "FeralSpirit 1"; end
     end
     --actions+=/ascendance
     if S.Ascendance:IsCastable() and S.Ascendance:IsAvailable() then
-      if HR.Cast(S.Ascendance) then return "Ascendance 1"; end
+      if HR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Ascendance 1"; end
     end
     --# If only one enemy, priority follows the 'single' action list.
     --actions+=/call_action_list,name=single,if=active_enemies=1
