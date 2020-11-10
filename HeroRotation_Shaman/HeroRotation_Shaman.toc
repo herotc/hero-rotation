@@ -1,0 +1,14 @@
+## Interface: 90001
+
+## Title: Hero|cFFA330C9Rotation|r [|cFF0070DEShaman|r]
+## Author: (YOUR_NAME)
+## Notes: Hero Rotation - Class Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Shaman.lua
+Events.lua
+Enhancement.lua
