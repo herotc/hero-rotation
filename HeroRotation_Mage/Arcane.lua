@@ -521,11 +521,11 @@ local function Aoe ()
   --NYI legendaries
   --arcane_explosion,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() < Player:ArcaneChargesMax() then
-    if HR.Cast(S.Evocation) then return "arcane_explosion aoe 25"; end
+    if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 25"; end
   end
   --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&prev_gcd.1.arcane_barrage
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:IsCasting(S.ArcaneBarrage) then
-    if HR.Cast(S.Evocation) then return "arcane_explosion aoe 26"; end
+    if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 26"; end
   end
   --arcane_barrage,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack
   if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() then
