@@ -95,7 +95,8 @@ end
 
 local function UnitsWithoutSWP(enemies)
   local WithoutSWPCount = 0
-  for _, CycleUnit in pairs(enemies) do
+  for k in pairs(enemies) do
+    local CycleUnit = enemies[k]
     if CycleUnit:DebuffDown(S.ShadowWordPainDebuff) then
       WithoutSWPCount = WithoutSWPCount + 1
     end
@@ -123,28 +124,12 @@ local function EvaluateCycleVoidTorrent208(TargetUnit)
   return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 3 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
 end
 
-local function EvaluateCycleMindSear210(TargetUnit)
-  return (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtBuff))
-end
-
 local function EvaluateCycleVampiricTouch214(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.VampiricTouchDebuff) and TargetUnit:TimeToDie() > 6 or (S.Misery:IsAvailable() and TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff)) or Player:BuffUp(S.UnfurlingDarknessBuff))
 end
 
-local function EvaluateCycleMindSear216(TargetUnit)
-  return (EnemiesCount10ySplash > VarMindSearCutoff)
-end
-
-local function EvaluateCycleSearingNightmare218(TargetUnit)
-  return ((VarSearingNightmareCutoff and not VarPIVFSyncCondition) or (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and EnemiesCount10ySplash > 1))
-end
-
 local function EvaluateCycleShadowWordPain220(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.ShadowWordPainDebuff) and Target:TimeToDie() > 4 and not S.Misery:IsAvailable() and not (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1)) and (not S.PsychicLink:IsAvailable() or (S.PsychicLink:IsAvailable() and EnemiesCount10ySplash <= 2)))
-end
-
-local function EvaluateCycleMindSear222(TargetUnit)
-  return (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and S.Mindbender:CooldownRemains() < PetActiveCD)
 end
 
 local function EvaluateCycleMindSear224(TargetUnit)
@@ -303,12 +288,12 @@ end
 
 local function Cwc()
   -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!variable.pi_or_vf_sync_condition)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
-  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
-    if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleSearingNightmare218, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
+  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and ((VarSearingNightmareCutoff and not VarPIVFSyncCondition) or (UnitsWithoutSWPain > 0 and EnemiesCount10ySplash > 1)) then
+    if HR.Cast(S.SearingNightmare, nil, nil, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
   end
   -- searing_nightmare,use_while_casting=1,target_if=talent.searing_nightmare.enabled&dot.shadow_word_pain.refreshable&spell_targets.mind_sear>2
-  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) then
-    if Everyone.CastCycle(S.SearingNightmare, Enemies40y, EvaluateCycleMindSear224, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 82"; end
+  if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and (UnitsWithoutSWPain > 0 and EnemiesCount10ySplash > 2) then
+    if HR.Cast(S.SearingNightmare, nil, nil, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 82"; end
   end
   -- mind_blast,only_cwc=1
   -- Manually added condition when MindBlast can be casted while channeling
@@ -344,8 +329,8 @@ local function Main()
     local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
   end
   -- mind_sear,target_if=talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&pet.fiend.down
-  if S.MindSear:IsCastable() then
-    if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear222, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 97"; end
+  if S.MindSear:IsCastable() and (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1) and UnitsWithoutSWPain > 0 and S.Mindbender:CooldownRemains() < PetActiveCD) then
+    if HR.Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 97"; end
   end
   -- damnation,target_if=!variable.all_dots_up
   if S.Damnation:IsCastable() then
@@ -388,8 +373,8 @@ local function Main()
     if HR.Cast(S.ShadowCrash, nil, nil, not Target:IsInRange(40)) then return "shadow_crash 114"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff&buff.dark_thought.up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
-  if S.MindSear:IsCastable() then
-    if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear210, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 118"; end
+  if S.MindSear:IsCastable() and (EnemiesCount10ySplash > VarMindSearCutoff and Player:BuffUp(S.DarkThoughtBuff)) then
+    if HR.Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 118"; end
   end
   -- mind_flay,if=buff.dark_thought.up&!(buff.voidform.up&cooldown.voidbolt.remains<=gcd)&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
   if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtBuff) and not (Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:GCD()) and VarDotsUp) then
@@ -412,8 +397,8 @@ local function Main()
     if Everyone.CastCycle(S.ShadowWordPain, Enemies40y, EvaluateCycleShadowWordPain220, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 128"; end
   end
   -- mind_sear,target_if=spell_targets.mind_sear>variable.mind_sear_cutoff,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
-  if S.MindSear:IsCastable() then
-    if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear216, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 130"; end
+  if S.MindSear:IsCastable() and (EnemiesCount10ySplash > VarMindSearCutoff) then
+    if HR.Cast(S.MindSear, nil, nil, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 130"; end
   end
   -- mind_flay,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(cooldown.void_bolt.up|cooldown.mind_blast.up)
   if S.MindFlay:IsCastable() then
@@ -435,7 +420,7 @@ local function APL()
   Enemies15yMelee = Player:GetEnemiesInMeleeRange(15) -- Unholy Nova
   Enemies30y = Player:GetEnemiesInRange(30) -- Silence, for Sephuz
   Enemies40y = Player:GetEnemiesInRange(40) -- Multiple CastCycle Spells
-  --Enemies10ySplash = TODO: Find a way to get table of targets in splash range 10
+  Enemies10ySplash = Target:GetEnemiesInSplashRange(10)
   if AoEON() then
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
@@ -445,7 +430,11 @@ local function APL()
   end
   
   -- Check units within range of target without SWP
-  --UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
+  if EnemiesCount10ySplash > 1 then
+    UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
+  else
+    UnitsWithoutSWPain = (Target:DebuffDown(S.ShadowWordPainDebuff) and 1 or 0)
+  end
   
   VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
 
