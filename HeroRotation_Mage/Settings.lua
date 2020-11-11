@@ -69,6 +69,7 @@ HR.GUISettings.APL.Mage = {
   Arcane = {
     UseManaGem = true,
     AMSpamRotation = false,
+    StayDistance = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -107,6 +108,7 @@ CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.CovenantDisplayStyle", 
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.");
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.");
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
 --CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseManaGem", "Use Mana Gem", "Use mana gem during combat.");
 -- Fire

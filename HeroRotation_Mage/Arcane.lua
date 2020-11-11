@@ -521,11 +521,19 @@ local function Aoe ()
   --NYI legendaries
   --arcane_explosion,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() < Player:ArcaneChargesMax() then
-    if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 25"; end
+    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then 
+      if HR.CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 25 left"; end
+    else
+      if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 25"; end
+    end
   end
   --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&prev_gcd.1.arcane_barrage
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:IsCasting(S.ArcaneBarrage) then
-    if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 26"; end
+    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then 
+      if HR.CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 26 left"; end
+    else
+      if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 26"; end
+    end
   end
   --arcane_barrage,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack
   if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() then
@@ -878,7 +886,8 @@ local function APL()
       ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=aoe,if=active_enemies>2
-    if HR.AoEON() and EnemiesCount8ySplash > 2 then
+    --if HR.AoEON() and EnemiesCount8ySplash > 2 then
+    if HR.AoEON() then
       ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=opener,if=variable.have_opened=0
