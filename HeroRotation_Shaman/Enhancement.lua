@@ -138,6 +138,11 @@ local function precombat()
   --actions.precombat+=/potion
   --# Snapshot raid buffed stats before combat begins and pre-potting is done.
   --actions.precombat+=/snapshot_stats
+
+  -- no APL but something to start with
+  if S.FlameShock:IsCastable() and Target:DebuffDown(S.FlameShock) then
+    if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock precombat"; end
+  end
 end
 
 local function single()
@@ -146,39 +151,39 @@ local function single()
   --actions.single+=/windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down TODO
   --actions.single+=/flame_shock,if=!ticking
   if S.FlameShock:IsCastable() and Target:DebuffDown(S.FlameShock) then
-    if HR.Cast(S.FlameShock) then return "FlameShock 1"; end
+    if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock 1"; end
   end
   --actions.single+=/vesper_totem
   --actions.single+=/frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsCastable() and Player:BuffUp(S.HailstormBuff) then
-    if HR.Cast(S.FrostShock) then return "FrostShock 1"; end
+    if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "FrostShock 1"; end
   end
   --actions.single+=/earthen_spike
   if S.EarthenSpike:IsCastable() then
-    if HR.Cast(S.EarthenSpike) then return "EarthenSpike 1"; end
+    if HR.Cast(S.EarthenSpike, nil, nil, not Target:IsSpellInRange(S.EarthenSpike)) then return "EarthenSpike 1"; end
   end
   --actions.single+=/fae_transfusion
   --actions.single+=/lightning_bolt,if=buff.stormkeeper.up
   if S.LightningBolt:IsCastable() and Player:BuffUp(S.StormkeeperBuff) then
-    if HR.Cast(S.LightningBolt) then return "LightningBolt 1"; end
+    if HR.Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "LightningBolt 1"; end
   end
   --actions.single+=/elemental_blast,if=buff.maelstrom_weapon.stack>=5
   if S.ElementalBlast:IsCastable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
-    if HR.Cast(S.ElementalBlast) then return "ElementalBlast 1"; end
+    if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "ElementalBlast 1"; end
   end
   --actions.single+=/chain_harvest,if=buff.maelstrom_weapon.stack>=5
   --actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack=10
   if S.LightningBolt:IsCastable() and Player:BuffStack(S.MaelstromWeapon) == 10 then
-    if HR.Cast(S.LightningBolt) then return "LightningBolt 2"; end
+    if HR.Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "LightningBolt 2"; end
   end
   --actions.single+=/lava_lash,if=buff.hot_hand.up|(runeforge.primal_lava_actuators.equipped&buff.primal_lava_actuators.stack>6)
   -- TODO |(runeforge.primal_lava_actuators.equipped&buff.primal_lava_actuators.stack>6)
   if S.LavaLash:IsCastable() and S.HotHand:IsAvailable() and bool(Player:BuffStack(S.HotHandBuff)) then
-    if HR.Cast(S.LavaLash) then return "LavaLash 1"; end
+    if HR.Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "LavaLash 1"; end
   end
   --actions.single+=/stormstrike
   if S.Stormstrike:IsCastable() then
-    if HR.Cast(S.Stormstrike) then return "Stormstrike 1"; end
+    if HR.Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "Stormstrike 1"; end
   end
   --actions.single+=/stormkeeper,if=buff.maelstrom_weapon.stack>=5
   if S.Stormkeeper:IsCastable() and S.Stormkeeper:IsAvailable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
@@ -186,7 +191,7 @@ local function single()
   end
   --actions.single+=/lava_lash
   if S.LavaLash:IsCastable() then
-    if HR.Cast(S.LavaLash) then return "LavaLash 2"; end
+    if HR.Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "LavaLash 2"; end
   end
   --actions.single+=/crash_lightning
   if S.CrashLightning:IsCastable() then
@@ -194,11 +199,11 @@ local function single()
   end
   --actions.single+=/flame_shock,target_if=refreshable
   if S.FlameShock:IsCastable() and Target:DebuffRefreshable(S.FlameShock) then
-    if HR.Cast(S.FlameShock) then return "FlameShock 2"; end
+    if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock 2"; end
   end
   --actions.single+=/frost_shock
   if S.FrostShock:IsCastable() then
-    if HR.Cast(S.FrostShock) then return "FrostShock 2"; end
+    if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "FrostShock 2"; end
   end
   --actions.single+=/ice_strike
   if S.IceStrike:IsCastable() then
@@ -210,18 +215,18 @@ local function single()
   end
   --actions.single+=/fire_nova,if=active_dot.flame_shock
   if S.FireNova:IsCastable() and Target:DebuffUp(S.FlameShock) then
-    if HR.Cast(S.FireNova) then return "FireNova 1"; end
+    if HR.Cast(S.FireNova, nil, nil, not Target:IsSpellInRange(S.FireNova)) then return "FireNova 1"; end
   end
   --actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack>=5
   if S.LightningBolt:IsCastable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
-    if HR.Cast(S.LightningBolt) then return "LightningBolt 3"; end
+    if HR.Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "LightningBolt 3"; end
   end
   --actions.single+=/earth_elemental
   if S.EarthElemental:IsCastable() then
     if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "EarthElemental 1"; end
   end
   --actions.single+=/windfury_totem,if=buff.windfury_totem.remains<30
-  if S.WindfuryTotem:IsCastable() and Player:TotemRemains(totemFinder()) < 30 then
+  if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or Player:TotemRemains(totemFinder()) < 30) then
     if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem 2"; end
   end
 end
@@ -230,7 +235,7 @@ local function aoe()
   --# Multi target action priority list
   --actions.aoe=frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsCastable() and Player:BuffUp(S.HailstormBuff) then
-    if HR.Cast(S.FrostShock) then return "FrostShock 3"; end
+    if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "FrostShock 3"; end
   end
   --actions.aoe+=/windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down TODO
   --actions.aoe+=/flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled|talent.lashing_flames.enabled|covenant.necrolord TODO covenant
@@ -240,7 +245,7 @@ local function aoe()
   --actions.aoe+=/primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up TODO
   --actions.aoe+=/fire_nova,if=active_dot.flame_shock>=3 TODO
   if S.FireNova:IsCastable() and EnemiesFlameShockCount >= 3 then
-    if HR.Cast(S.FireNova) then return "FireNova 2"; end
+    if HR.Cast(S.FireNova, nil, nil, not Target:IsSpellInRange(S.FireNova)) then return "FireNova 2"; end
   end
   --actions.aoe+=/vesper_totem TODO
   --actions.aoe+=/lightning_bolt,if=buff.primordial_wave.up&(buff.stormkeeper.up|buff.maelstrom_weapon.stack>=5) TODO
@@ -255,12 +260,12 @@ local function aoe()
   end
   --actions.aoe+=/chain_lightning,if=buff.stormkeeper.up
   if S.ChainLightning:IsCastable() and Player:BuffUp(S.StormkeeperBuff) then
-    if HR.Cast(S.ChainLightning) then return "ChainLightning 1"; end
+    if HR.Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "ChainLightning 1"; end
   end
   --actions.aoe+=/chain_harvest,if=buff.maelstrom_weapon.stack>=5 TODO
   --actions.aoe+=/elemental_blast,if=buff.maelstrom_weapon.stack>=5
   if S.ElementalBlast:IsCastable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
-    if HR.Cast(S.ElementalBlast) then return "ElementalBlast 2"; end
+    if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "ElementalBlast 2"; end
   end
   --actions.aoe+=/stormkeeper,if=buff.maelstrom_weapon.stack>=5
   if S.Stormkeeper:IsCastable() and S.Stormkeeper:IsAvailable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
@@ -268,7 +273,7 @@ local function aoe()
   end
   --actions.aoe+=/chain_lightning,if=buff.maelstrom_weapon.stack=10
   if S.ChainLightning:IsCastable() and Player:BuffStack(S.MaelstromWeapon) == 10 then
-    if HR.Cast(S.ChainLightning) then return "ChainLightning 2"; end
+    if HR.Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "ChainLightning 2"; end
   end
   --actions.aoe+=/flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled TODO
   --actions.aoe+=/sundering
@@ -278,11 +283,11 @@ local function aoe()
   --actions.aoe+=/lava_lash,target_if=min:debuff.lashing_flames.remains,cycle_targets=1,if=runeforge.primal_lava_actuators.equipped&buff.primal_lava_actuators.stack>6 TODO
   --actions.aoe+=/stormstrike
   if S.Stormstrike:IsCastable() then
-    if HR.Cast(S.Stormstrike) then return "Stormstrike 2"; end
+    if HR.Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "Stormstrike 2"; end
   end
   --actions.aoe+=/lava_lash
   if S.LavaLash:IsCastable() then
-    if HR.Cast(S.LavaLash) then return "LavaLash 3"; end
+    if HR.Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "LavaLash 3"; end
   end
   --actions.aoe+=/flame_shock,target_if=refreshable,cycle_targets=1
   if S.FlameShock:IsCastable() then
@@ -291,7 +296,7 @@ local function aoe()
   --actions.aoe+=/fae_transfusion TODO
   --actions.aoe+=/frost_shock
   if S.FrostShock:IsCastable() then
-    if HR.Cast(S.FrostShock) then return "FrostShock 4"; end
+    if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "FrostShock 4"; end
   end
   --actions.aoe+=/ice_strike
   if S.IceStrike:IsCastable() then
@@ -299,22 +304,22 @@ local function aoe()
   end
   --actions.aoe+=/chain_lightning,if=buff.maelstrom_weapon.stack>=5
   if S.ChainLightning:IsCastable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
-    if HR.Cast(S.ChainLightning) then return "ChainLightning 3"; end
+    if HR.Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "ChainLightning 3"; end
   end
   --actions.aoe+=/fire_nova,if=active_dot.flame_shock>1#
   if S.FireNova:IsCastable() and Target:DebuffUp(S.FlameShock) then
-    if HR.Cast(S.FireNova) then return "FireNova 2"; end
+    if HR.Cast(S.FireNova, nil, nil, not Target:IsSpellInRange(S.FireNova)) then return "FireNova 2"; end
   end
   --actions.aoe+=/earthen_spike
   if S.EarthenSpike:IsCastable() then
-    if HR.Cast(S.EarthenSpike) then return "EarthenSpike 2"; end
+    if HR.Cast(S.EarthenSpike, nil, nil, not Target:IsSpellInRange(S.EarthenSpike)) then return "EarthenSpike 2"; end
   end
   --actions.aoe+=/earth_elemental
   if S.EarthElemental:IsCastable() then
     if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "EarthElemental 2"; end
   end
   --actions.aoe+=/windfury_totem,if=buff.windfury_totem.remains<30
-  if S.WindfuryTotem:IsCastable() and Player:TotemRemains(totemFinder()) < 30 then
+  if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or Player:TotemRemains(totemFinder()) < 30) then
     if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem 3"; end
   end
 end
