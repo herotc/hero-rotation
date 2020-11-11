@@ -886,8 +886,7 @@ local function APL()
       ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=aoe,if=active_enemies>2
-    --if HR.AoEON() and EnemiesCount8ySplash > 2 then
-    if HR.AoEON() then
+    if HR.AoEON() and EnemiesCount8ySplash > 2 then
       ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=opener,if=variable.have_opened=0
