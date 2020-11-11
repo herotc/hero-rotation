@@ -430,12 +430,8 @@ local function APL()
   end
   
   -- Check units within range of target without SWP
-  if EnemiesCount10ySplash > 1 then
-    UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
-  else
-    UnitsWithoutSWPain = (Target:DebuffDown(S.ShadowWordPainDebuff) and 1 or 0)
-  end
-  
+  UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
+
   VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
 
   -- call precombat
