@@ -37,9 +37,10 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local Enemies8yMelee, Enemies15yMelee, Enemies30y, Enemies40y
+local Enemies8yMelee, Enemies15yMelee, Enemies30y, Enemies40y, Enemies10ySplash
 local EnemiesCount8ySplash, EnemiesCount10ySplash
 local PetActiveCD
+local UnitsWithoutSWPain
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -92,6 +93,16 @@ local function DotsUp(tar, all)
   end
 end
 
+local function UnitsWithoutSWP(enemies)
+  local WithoutSWPCount = 0
+  for _, CycleUnit in pairs(enemies) do
+    if CycleUnit:DebuffDown(S.ShadowWordPainDebuff) then
+      WithoutSWPCount = WithoutSWPCount + 1
+    end
+  end
+  return WithoutSWPCount
+end
+
 local function EvaluateCycleDamnation200(TargetUnit)
   return (not DotsUp(TargetUnit, true))
 end
@@ -101,11 +112,6 @@ local function EvaluateCycleDevouringPlage202(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
-  if S.Mindbender:ID() == 34433 then
-    PetActiveCD = 170
-  else
-    PetActiveCD = 45
-  end
   return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
 end
 
@@ -138,7 +144,7 @@ local function EvaluateCycleShadowWordPain220(TargetUnit)
 end
 
 local function EvaluateCycleMindSear222(TargetUnit)
-  return (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and not S.Mindbender:CooldownUp())
+  return (S.SearingNightmare:IsAvailable() and EnemiesCount10ySplash > (VarMindSearCutoff + 1) and TargetUnit:DebuffDown(S.ShadowWordPainDebuff) and S.Mindbender:CooldownRemains() < PetActiveCD)
 end
 
 local function EvaluateCycleMindSear224(TargetUnit)
@@ -160,6 +166,12 @@ local function Precombat()
   SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
   SephuzEquipped = (I.SephuzChest:IsEquipped() or I.SephuzNeck:IsEquipped() or I.SephuzShoulders:IsEquipped())
   --CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
+  -- Update point at which the Mindbender drops; this is in Precombat, as it can't change once in combat
+  if S.Mindbender:ID() == 34433 then
+    PetActiveCD = 170
+  else
+    PetActiveCD = 45
+  end
   -- flask
   -- food
   -- augmentation
@@ -331,7 +343,7 @@ local function Main()
   if (CDsON()) then
     local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
   end
-  -- mind_sear,target_if=talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&!cooldown.mindbender.up
+  -- mind_sear,target_if=talent.searing_nightmare.enabled&spell_targets.mind_sear>(variable.mind_sear_cutoff+1)&!dot.shadow_word_pain.ticking&pet.fiend.down
   if S.MindSear:IsCastable() then
     if Everyone.CastCycle(S.MindSear, Enemies40y, EvaluateCycleMindSear222, not Target:IsSpellInRange(S.MindSear)) then return "mind_sear 97"; end
   end
@@ -423,6 +435,7 @@ local function APL()
   Enemies15yMelee = Player:GetEnemiesInMeleeRange(15) -- Unholy Nova
   Enemies30y = Player:GetEnemiesInRange(30) -- Silence, for Sephuz
   Enemies40y = Player:GetEnemiesInRange(40) -- Multiple CastCycle Spells
+  --Enemies10ySplash = TODO: Find a way to get table of targets in splash range 10
   if AoEON() then
     EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
@@ -430,6 +443,9 @@ local function APL()
     EnemiesCount8ySplash = 1
     EnemiesCount10ySplash = 1
   end
+  
+  -- Check units within range of target without SWP
+  --UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
   
   VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
 
