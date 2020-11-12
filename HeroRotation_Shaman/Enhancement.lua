@@ -72,7 +72,7 @@ Spell.Shaman.Enhancement = {
   ElementalBlast = Spell(117014),
   Stormflurry = Spell(344357),
   HotHand = Spell(201900),
-  HotHandbuff = Spell(215785),
+  HotHandBuff = Spell(215785),
   IceStrike = Spell(342240),
   CrashingStorm = Spell(192246),
   ElementalSpirits = Spell(262624),
@@ -106,6 +106,10 @@ local I = Item.Shaman.Enhancement
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
 
 local EnemiesFlameShockCount
+
+local function bool(val)
+  return val ~= 0
+end
 
 local function totemFinder()
   for i = 1,6,1
