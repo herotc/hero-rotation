@@ -26,6 +26,7 @@ Spell.DemonHunter.Vengeance = {
   FelDevastation                        = Spell(212084),
   Frailty                               = Spell(247456),
   ImmolationAura                        = Spell(258920),
+  ImmolationAuraBuff                    = Spell(258920),
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
   SigilofFlame                          = MultiSpell(204596, 204513),
@@ -42,12 +43,13 @@ Spell.DemonHunter.Vengeance = {
   Torment                               = Spell(185245),
 
   -- Talents
+  AgonizingFlames                       = Spell(207548),
   BulkExtraction                        = Spell(320341),
-  CharredFlesh                          = Spell(264002),
+  BurningAlive                          = Spell(207739),
+  CharredFlesh                          = Spell(336639),
   ConcentratedSigils                    = Spell(207666),
   Demonic                               = Spell(321453),
   Felblade                              = Spell(232893),
-  FlameCrash                            = Spell(227322),
   Fracture                              = Spell(263642),
   SoulBarrier                           = Spell(263648),
   SpiritBomb                            = Spell(247454),
@@ -56,6 +58,7 @@ Spell.DemonHunter.Vengeance = {
   -- Utility
   Disrupt                               = Spell(183752),
   Metamorphosis                         = Spell(187827),
+  MetamorphosisBuff                     = Spell(187827),
 
   -- Covenant Abilities
   DoorofShadows                         = Spell(300728),
@@ -66,6 +69,9 @@ Spell.DemonHunter.Vengeance = {
   Soulshape                             = Spell(310143),
   SummonSteward                         = Spell(324739),
   TheHunt                               = Spell(323639),
+  
+  -- Legendary Effects
+  FelBombardmentBuff                    = Spell(337849),
 
   -- Soulbind/Conduit Effects
   EnduringGloom                         = Spell(319978),

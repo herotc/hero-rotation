@@ -50,6 +50,7 @@ local IsTanking
 local PassiveEssence
 local Enemies8yMelee
 local EnemiesCount8yMelee
+local VarBrandBuild
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -131,6 +132,8 @@ local function UpdateIsInMeleeRange()
 end
 
 local function Precombat()
+  -- variable,name=brand_build,value=talent.agonizing_flames.enabled&talent.burning_alive.enabled&talent.charred_flesh.enabled
+  VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
   -- flask
   -- augmentation
   -- food
@@ -161,8 +164,11 @@ local function Defensives()
       if HR.Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Danger)"; end
     end
   end
-  -- Metamorphosis
-  if S.Metamorphosis:IsCastable() and (Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold) then
+  -- Metamorphosis,if=!(talent.demonic.enabled)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
+  -- Manually changed to:
+  -- if=(!talent.demonic.enabled|buff.metamorphosis.down)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
+  -- Otherwise, Meta would never be suggested if Demonic is talented
+  if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and ((not S.Demonic:IsAvailable() or Player:BuffDown(S.MetamorphosisBuff)) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 15) then
     if HR.CastSuggested(S.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
@@ -176,48 +182,13 @@ local function Defensives()
 end
 
 local function Brand()
-  if Settings.Vengeance.BrandForDamage then
-    -- sigil_of_flame,if=!runeforge.razelikhs_defilement.equipped&cooldown.fiery_brand.remains<2
-    -- TODO: Add Legendary Check
-    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and (S.FieryBrand:CooldownRemains() < 2) then
-      if S.ConcentratedSigils:IsAvailable() then
-        if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 82 (Concentrated)"; end
-      else
-        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 82 (Normal)"; end
-      end
-    end
-    -- infernal_strike,if=cooldown.fiery_brand.remains=0
-    if S.InfernalStrike:IsCastable() and (S.FieryBrand:CooldownUp() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9)) then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 84"; end
-    end
-    -- fiery_brand
-    if S.FieryBrand:IsCastable() and IsInMeleeRange then
-      if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand 86"; end
-    end
+  -- fiery_brand
+  if S.FieryBrand:IsCastable() and IsInMeleeRange then
+    if HR.Cast(S.FieryBrand, Settings.Vengeance.OffGCDasOffGCD.FieryBrand, nil, not Target:IsSpellInRange(S.FieryBrand)) then return "fiery_brand 92"; end
   end
-  if Target:DebuffUp(S.FieryBrandDebuff) then
-    -- immolation_aura,if=dot.fiery_brand.ticking
-    if S.ImmolationAura:IsCastable() and IsInMeleeRange then
-      if HR.Cast(S.ImmolationAura) then return "immolation_aura 88"; end
-    end
-    -- fel_devastation,if=dot.fiery_brand.ticking
-    -- Manual add: &(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)
-    if S.FelDevastation:IsReady() and IsInMeleeRange and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
-      if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 90"; end
-    end
-    -- infernal_strike,if=dot.fiery_brand.ticking
-    if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) then
-      if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 92"; end
-    end
-    -- sigil_of_flame,if=!runeforge.razelikhs_defilement.equipped&dot.fiery_brand.ticking
-    -- TODO: Add Legendary Check
-    if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) then
-      if S.ConcentratedSigils:IsAvailable() then
-        if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 94 (Concentrated)"; end
-      else
-        if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 94 (Normal)"; end
-      end
-    end
+  -- immolation_aura,if=dot.fiery_brand.ticking
+  if S.ImmolationAura:IsCastable() and IsInMeleeRange and (Target:DebuffUp(S.FieryBrandDebuff)) then
+    if HR.Cast(S.ImmolationAura) then return "immolation_aura 88"; end
   end
 end
 
@@ -255,21 +226,25 @@ local function Cooldowns()
   if TrinketToUse then
     if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
-end
-
-local function Normal()
-  -- Manual add: sinful_brand,if=!buff.metamorphosis.up|variable.offensive_sinful_brand
-  if S.SinfulBrand:IsCastable() and (Player:BuffDown(S.Metamorphosis) or Settings.Vengeance.OffensiveSinfulBrand) then
-    if HR.Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 21"; end
+  -- sinful_brand,if=!dot.sinful_brand.ticking
+  if S.SinfulBrand:IsCastable() and (Target:BuffDown(S.SinfulBrandDebuff)) then
+    if HR.Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 74"; end
+  end
+  -- the_hunt
+  if S.TheHunt:IsCastable() then
+    if HR.Cast(S.TheHunt, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 76"; end
+  end
+  -- fodder_to_the_flame
+  if S.FoddertotheFlame:IsCastable() then
+    if HR.Cast(S.FoddertotheFlame, nil, Settings.Commons.CovenantDisplayStyle) then return "fodder_to_the_flame 78"; end
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
-    if HR.Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle) then return "elysian_decree 22"; end
+    if HR.Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle) then return "elysian_decree 80"; end
   end
-  -- Manual add: fel_devastation,if=(talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled)&(talent.spirit_bomb.enabled&debuff.frailty.up|!talent.spirit_bomb.enabled)
-  if S.FelDevastation:IsReady() and ((S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and (S.SpiritBomb:IsAvailable() and Target:DebuffUp(S.Frailty) or not S.SpiritBomb:IsAvailable())) then
-    if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 23"; end
-  end
+end
+
+local function Normal()
   -- infernal_strike
   if S.InfernalStrike:IsCastable() and (not Settings.Vengeance.ConserveInfernalStrike or S.InfernalStrike:ChargesFractional() > 1.9) and (S.InfernalStrike:TimeSinceLastCast() > 2) then
     if HR.Cast(S.InfernalStrike, Settings.Vengeance.OffGCDasOffGCD.InfernalStrike, nil, not Target:IsInRange(30)) then return "infernal_strike 24"; end
@@ -282,52 +257,47 @@ local function Normal()
   if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffUp(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4) then
     if HR.Cast(S.SpiritBomb) then return "spirit_bomb 28"; end
   end
-  -- soul_cleave,if=(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4))
-  -- Manually added FelDevastation CDRemains to make sure we're pooling for FD
-  if S.SoulCleave:IsReady() and (not S.SpiritBomb:IsAvailable() and (S.FelDevastation:CooldownRemains() > 3 or Player:Fury() >= 75) and ((Player:BuffUp(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4)) then
-    if HR.Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 30"; end
-  end
-  -- soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
-  -- Manually added FelDevastation CDRemains to make sure we're pooling for FD
-  if S.SoulCleave:IsReady() and (S.SpiritBomb:IsAvailable() and SoulFragments == 0 and (S.FelDevastation:CooldownRemains() > 3 or Player:Fury() >= 75)) then
-    if HR.Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 32"; end
-  end
   -- fel_devastation
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
+  -- This way we don't waste potential meta uptime
   if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
     if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 34"; end
   end
-  -- immolation_aura,if=fury<=90
-  if S.ImmolationAura:IsCastable() and IsInAoERange and (Player:Fury() <= 90) then
-    if HR.Cast(S.ImmolationAura) then return "immolation_aura 36"; end
+  -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled>=5)|(!talent.fracture.enabled&fury>=20))))
+  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or (not S.Fracture:IsAvailable() and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 5) or (not S.Fracture:IsAvailable() and Player:Fury() >= 20))))) then
+    if HR.Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 36"; end
   end
-  -- felblade,if=fury<=70
-  if S.Felblade:IsCastable() and (Player:Fury() <= 70) then
-    if HR.Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade 38"; end
+  -- immolation_aura,if=((variable.brand_build&cooldown.fiery_brand.remains>10)|!variable.brand_build)&fury<=90
+  if S.ImmolationAura:IsCastable() and (((VarBrandBuild and S.FieryBrand:CooldownRemains() > 10) or not VarBrandBuild) and Player:Fury() <= 90) then
+    if HR.Cast(S.ImmolationAura) then return "immolation_aura 38"; end
+  end
+  -- felblade,if=fury<=60
+  if S.Felblade:IsCastable() and (Player:Fury() <= 60) then
+    if HR.Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade 40"; end
   end
   -- fracture,if=soul_fragments<=3
   if S.Fracture:IsCastable() and IsInMeleeRange and (SoulFragments <= 3) then
-    if HR.Cast(S.Fracture) then return "fracture 40"; end
+    if HR.Cast(S.Fracture) then return "fracture 42"; end
   end
   -- sigil_of_flame
   if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 then
     if S.ConcentratedSigils:IsAvailable() then
-      if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 42 (Concentrated)"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 44 (Concentrated)"; end
     else
-      if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 42 (Normal)"; end
+      if HR.Cast(S.SigilofFlame, nil, nil, not Target:IsInRange(30)) then return "sigil_of_flame 44 (Normal)"; end
     end
   end
   -- shear
   if S.Shear:IsReady() and IsInMeleeRange then
-    if HR.Cast(S.Shear) then return "shear 44"; end
+    if HR.Cast(S.Shear) then return "shear 46"; end
   end
-  -- Manually adding Fracture as a fallback, in cases of Fracture without Spirit Bomb and not enough energy to Soul Cleave
+  -- Manually adding Fracture as a fallback filler
   if S.Fracture:IsCastable() and IsInMeleeRange then
-    if HR.Cast(S.Fracture) then return "fracture 46"; end
+    if HR.Cast(S.Fracture) then return "fracture 48"; end
   end
   -- throw_glaive
   if S.ThrowGlaive:IsCastable() then
-    if HR.Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive 48 (OOR)"; end
+    if HR.Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive 50 (OOR)"; end
   end
 end
 
@@ -353,11 +323,19 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- auto_attack
-    -- consume_magic
-    -- Interrupts
+    -- variable,name=brand_build,value=talent.agonizing_flames.enabled&talent.burning_alive.enabled&talent.charred_flesh.enabled
+    -- Moved to Precombat, as talents can't change once in combat, so no need to continually check
+    -- disrupt (Interrupts)
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
-    -- call_action_list,name=brand
-    local ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
+    -- consume_magic
+    -- throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
+    if S.ThrowGlaive:IsCastable() and (Player:BuffStack(S.FelBombardmentBuff) == 5 and (Player:BuffUp(S.ImmolationAuraBuff) or Player:BuffDown(S.MetamorphosisBuff))) then
+      if HR.Cast(S.ThrowGlaive, nil, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive fel_bombardment"; end
+    end
+    -- call_action_list,name=brand,if=variable.brand_build
+    if VarBrandBuild then
+      local ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
+    end
     -- call_action_list,name=defensives
     if (IsTanking or not Player:HealingAbsorbed()) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
