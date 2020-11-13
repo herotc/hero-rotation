@@ -266,7 +266,7 @@ local function Single ()
   end
   --frozen_orb
   if S.FrozenOrb:IsCastable() then
-    if HR.Cast(S.FrozenOrb, nil, nil, not Target:IsInRange(40)) then return "frozen_orb single 2"; end
+    if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb single 2"; end
   end
   --blizzard,if=buff.freezing_rain.up|active_enemies>=2
   if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 2) then
