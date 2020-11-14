@@ -148,7 +148,7 @@ local function Cooldowns ()
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment cd 3"; end
   end
   --rune_of_power,if=cooldown.icy_veins.remains>15&buff.rune_of_power.down
-  if S.RuneofPower:IsCastable() and not Player:IsCasting(S.RuneofPower) and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > 15 or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
+  if S.RuneofPower:IsCastable() and not Player:IsCasting(S.RuneofPower) and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
     if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 4"; end
   end
   --icy_veins,if=buff.rune_of_power.down
