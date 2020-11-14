@@ -179,7 +179,7 @@ local function St()
     if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsSpellInRange(S.TarTrap)) then return "tar_trap st 4"; end
   end
   -- flare,if=tar_trap.up
-  if S.Flare:IsReady() and not S.TarTrap:CooldownUp() then
+  if S.Flare:IsReady() and not S.TarTrap:CooldownUp() and SoulForgeEmbersEquipped then
     if HR.Cast(S.Flare, Settings.Commons.GCDasOffGCD.Flare) then return "flare st 5"; end
   end
   -- wild_spirits
