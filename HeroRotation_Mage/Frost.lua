@@ -313,9 +313,8 @@ local function Single ()
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment single 13"; end
   end
-  --shifting_power,if=buff.rune_of_power.down&(!cooldown.rune_of_power.ready|soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|runeforge.freezing_winds.equipped|active_enemies>=2)
-  -- NYI legendaries
-  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.RuneofPower:CooldownRemains() > 0 or S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2)then
+  --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|active_enemies>=2)
+  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2)then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
