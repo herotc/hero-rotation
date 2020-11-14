@@ -79,9 +79,12 @@ Spell.Priest.Shadow = {
   UnholyNova                            = Spell(324724), -- Melee, 15
   WrathfulFaerieDebuff                  = Spell(342132),
 
-  -- Conduit Effects
+  -- Conduit/Soulbind Effects
+  CombatMeditation                      = Spell(328266),
   DissonantEchoes                       = Spell(338342),
   DissonantEchoesBuff                   = Spell(343144),
+  FieldofBlossoms                       = Spell(319191),
+  GroveInvigoration                     = Spell(322721),
 
   -- Racials
   AncestralCall                         = Spell(274738),
@@ -174,8 +177,12 @@ Spell.Priest.Discipline = {
 -- Items
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
+  -- Potion
   PotionofDeathlyFixation          = Item(171351),
+  -- Trinkets
   AzsharasFontofPower              = Item(169314, {13, 14}),
+  SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
+  -- Legendaries
   CalltotheVoidGloves              = Item(173244),
   CalltotheVoidWrists              = Item(173249),
   PainbreakerPsalmChest            = Item(173241),
