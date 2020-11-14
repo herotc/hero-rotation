@@ -63,14 +63,11 @@ HR.GUISettings.APL.Hunter = {
     }
   },
   Marksmanship = {
-    UseLoneWolf = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
-      SummonPet = false,
       AMurderofCrows = false,
       Trueshot = false,
-      HuntersMark = false,
       Volley = false,
       DoubleTap = false,
     },
