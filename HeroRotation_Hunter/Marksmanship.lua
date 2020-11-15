@@ -175,7 +175,7 @@ local function St()
     if HR.Cast(S.DoubleTap, Settings.Marksmanship.GCDasOffGCD.DoubleTap) then return "double_tap st 3"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
-  if S.TarTrap:IsReady() and (SoulForgeEmbersEquipped and not S.TarTrap:CooldownRemains() < Player:GCD() and S.Flare:CooldownRemains() < Player:GCD()) then
+  if S.TarTrap:IsReady() and (SoulForgeEmbersEquipped and not (S.TarTrap:CooldownRemains() < Player:GCD()) and S.Flare:CooldownRemains() < Player:GCD()) then
     if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsSpellInRange(S.TarTrap)) then return "tar_trap st 4"; end
   end
   -- flare,if=tar_trap.up
