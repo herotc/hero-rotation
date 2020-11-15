@@ -103,5 +103,4 @@ CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons");
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
 
 -- Marksmanship
-CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.UseLoneWolf", "Use Lone Wolf", "Enable this if you want to use Lone Wolf and not be notified to summon a pet.");
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
