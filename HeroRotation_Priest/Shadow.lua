@@ -17,6 +17,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- lua
+local match      = string.match
 
 -- Azerite Essence Setup
 local AE         = DBC.AzeriteEssences
@@ -58,12 +60,9 @@ local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
-local VarSelfPIorSunPriestess = false
-local PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
-local ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
-local SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
-local SephuzEquipped = (I.SephuzChest:IsEquipped() or I.SephuzNeck:IsEquipped() or I.SephuzShoulders:IsEquipped())
---local CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
+local VarPainbreakerEquipped
+local VarShadowflamePrismEquipped
+local VarSephuzEquipped
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -71,7 +70,6 @@ HL:RegisterForEvent(function()
   VarMindSearCutoff = 1
   VarSearingNightmareCutoff = false
   VarPoolForCDs = false
-  VarSelfPIorSunPriestess = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -117,6 +115,41 @@ local function UnitsRefreshSWP(enemies)
   return RefreshSWPCount
 end
 
+local function CheckSephuz()
+  local LegendaryItemString = ""
+  if HL.Equipment[2] == 178927 then
+    LegendaryItemString = GetInventoryItemLink("player", 2)
+  elseif HL.Equipment[3] == 173247 then
+    LegendaryItemString = GetInventoryItemLink("player", 3)
+  elseif HL.Equipment[5] == 173241 then
+    LegendaryItemString = GetInventoryItemLink("player", 5)
+  end
+  if match(LegendaryItemString, "7103") then return true end
+  return false
+end
+
+local function CheckShadowflame()
+  local LegendaryItemString = ""
+  if HL.Equipment[1] == 173245 then
+    LegendaryItemString = GetInventoryItemLink("player", 1)
+  elseif HL.Equipment[10] == 173244 then
+    LegendaryItemString = GetInventoryItemLink("player", 10)
+  end
+  if match(LegendaryItemString, "6982") then return true end
+  return false
+end
+
+local function CheckPainbreaker()
+  local LegendaryItemString = ""
+  if HL.Equipment[5] == 173241 then
+    LegendaryItemString = GetInventoryItemLink("player", 5)
+  elseif HL.Equipment[15] == 173242 then
+    LegendaryItemString = GetInventoryItemLink("player", 15)
+  end
+  if match(LegendaryItemString, "6981") then return true end
+  return false
+end
+
 local function EvaluateCycleDamnation200(TargetUnit)
   return (not DotsUp(TargetUnit, true))
 end
@@ -126,7 +159,7 @@ local function EvaluateCycleDevouringPlage202(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
-  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
+  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and VarShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -134,7 +167,6 @@ local function EvaluateCycleSurrenderToMadness206(TargetUnit)
 end
 
 local function EvaluateCycleVoidTorrent208(TargetUnit)
-  -- variable.dots_up&target.time_to_die>3&buff.voidform.down&active_dot.vampiric_touch==spell_targets.vampiric_touch&spell_targets.mind_sear<(5+(6*talent.twist_of_fate.enabled))
   return (DotsUp(TargetUnit, false) and TargetUnit:TimeToDie() > 3 and Player:BuffDown(S.VoidformBuff) and EnemiesCount10ySplash < (5 + (6 * num(S.TwistofFate:IsAvailable()))))
 end
 
@@ -160,11 +192,10 @@ end
 
 local function Precombat()
   -- Update legendary equip status; this is in Precombat, as equipment can't be changed once in combat
-  PainbreakerEquipped = (I.PainbreakerPsalmChest:IsEquipped() or I.PainbreakerPsalmCloak:IsEquipped())
-  ShadowflamePrismEquipped = (I.ShadowflamePrismGloves:IsEquipped() or I.ShadowflamePrismHelm:IsEquipped())
-  SunPriestessEquipped = (I.SunPriestessHelm:IsEquipped() or I.SunPriestessShoulders:IsEquipped())
-  SephuzEquipped = (I.SephuzChest:IsEquipped() or I.SephuzNeck:IsEquipped() or I.SephuzShoulders:IsEquipped())
-  --CalltotheVoidEquipped = (I.CalltotheVoidGloves:IsEquipped() or I.CalltotheVoidWrists:IsEquipped())
+  -- TODO: Change this when legendary checking is implemented properly
+  VarSephuzEquipped = CheckSephuz()
+  VarPainbreakerEquipped = CheckPainbreaker()
+  VarShadowflamePrismEquipped = CheckShadowflame()
   -- Update point at which the Mindbender drops; this is in Precombat, as it can't change once in combat
   if S.Mindbender:ID() == 34433 then
     PetActiveCD = 170
@@ -258,7 +289,7 @@ local function Cds()
     if HR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion 50"; end
   end
   -- silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
-  if S.Silence:IsCastable() and SephuzEquipped then
+  if S.Silence:IsCastable() and VarSephuzEquipped then
     if Everyone.CastCycle(S.Silence, Enemies30y, EvaluateCycleSilence228, not Target:IsSpellInRange(S.Silence)) then return "silence 51"; end
   end
   -- Covenant: fae_guardians,if=!buff.voidform.up&!cooldown.void_torrent.up|buff.voidform.up&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled)
@@ -383,7 +414,7 @@ local function Main()
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
   -- shadow_word_death,if=runeforge.painbreaker_psalm.equipped&variable.dots_up&target.time_to_pct_20>(cooldown.shadow_word_death.duration+gcd)
-  if S.ShadowWordDeath:IsReady() and (PainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
+  if S.ShadowWordDeath:IsReady() and (VarPainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
     if HR.Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 112"; end
   end
   -- shadow_crash,if=raid_event.adds.in>10
@@ -450,8 +481,6 @@ local function APL()
   -- Check units within range of target without SWP or with SWP in pandemic range
   UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
   UnitsRefreshSWPain = UnitsRefreshSWP(Enemies10ySplash)
-
-  VarSelfPIorSunPriestess = (Settings.Shadow.SelfPI or SunPriestessEquipped)
 
   -- call precombat
   if not Player:AffectingCombat() then
