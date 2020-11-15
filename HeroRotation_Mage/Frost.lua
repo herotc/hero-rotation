@@ -38,6 +38,11 @@ local ShouldReturn -- Used to get the return string
 local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount18yMelee  --Enemies arround player
 local Mage = HR.Commons.Mage
+local TemporalWarpEquipped = HL.LegendaryEnabled(6834)
+local GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
+local FreezingWindsEquipped = HL.LegendaryEnabled(6829)
+local GlacialFragmentsEquipped = HL.LegendaryEnabled(6830)
+local DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -56,6 +61,14 @@ S.Flurry:RegisterInFlightEffect(228354)
 S.Flurry:RegisterInFlight()
 S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
+
+HL:RegisterForEvent(function()
+  TemporalWarpEquipped = HL.LegendaryEnabled(6834)
+  GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
+  FreezingWindsEquipped = HL.LegendaryEnabled(6829)
+  GlacialFragmentsEquipped = HL.LegendaryEnabled(6830)
+  DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function Precombat ()
   -- flask

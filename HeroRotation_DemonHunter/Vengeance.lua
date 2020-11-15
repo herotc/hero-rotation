@@ -53,7 +53,7 @@ local PassiveEssence
 local Enemies8yMelee
 local EnemiesCount8yMelee
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
-local VarRazelikhsDefilementEquipped = HL.LegendaryEnabled(7046)
+local RazelikhsDefilementEquipped = HL.LegendaryEnabled(7046)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -73,7 +73,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_SPECIALIZATION_CHANGED", "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
-  VarRazelikhsDefilementEquipped = HL.LegendaryEnabled(7046)
+  RazelikhsDefilementEquipped = HL.LegendaryEnabled(7046)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -289,7 +289,7 @@ local function Normal()
     if HR.Cast(S.Fracture) then return "fracture 42"; end
   end
   -- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement.equipped)
-  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (Player:Covenant() == "Kyrian" and VarRazelikhsDefilementEquipped)) then
+  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (Player:Covenant() == "Kyrian" and RazelikhsDefilementEquipped)) then
     if S.ConcentratedSigils:IsAvailable() then
       if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 44 (Concentrated)"; end
     else

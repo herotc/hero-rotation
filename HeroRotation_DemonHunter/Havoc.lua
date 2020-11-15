@@ -50,7 +50,7 @@ local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local PassiveEssence
-local VarBurningWoundEquipped = HL.LegendaryEnabled(7219)
+local BurningWoundEquipped = HL.LegendaryEnabled(7219)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -96,7 +96,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  VarBurningWoundEquipped = HL.LegendaryEnabled(7219)
+  BurningWoundEquipped = HL.LegendaryEnabled(7219)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -139,7 +139,7 @@ local function EvalutateTargetIfFilterDemonsBite202(TargetUnit)
 end
 
 local function EvaluateTargetIfDemonsBite204(TargetUnit)
-  return (VarBurningWoundEquipped and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
+  return (BurningWoundEquipped and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
 end
 
 local function EvalutateTargetIfFilterDemonsBite206(TargetUnit)
@@ -147,7 +147,7 @@ local function EvalutateTargetIfFilterDemonsBite206(TargetUnit)
 end
 
 local function EvaluateTargetIfDemonsBite208(TargetUnit)
-  return (TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
+  return (BurningWoundEquipped and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
 end
 
 local function Precombat()

@@ -60,9 +60,9 @@ local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
-local VarSephuzEquipped = HL.LegendaryEnabled(7103)
-local VarPainbreakerEquipped = HL.LegendaryEnabled(6981)
-local VarShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
+local SephuzEquipped = HL.LegendaryEnabled(7103)
+local PainbreakerEquipped = HL.LegendaryEnabled(6981)
+local ShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -73,9 +73,9 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  VarSephuzEquipped = HL.LegendaryEnabled(7103)
-  VarPainbreakerEquipped = HL.LegendaryEnabled(6981)
-  VarShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
+  SephuzEquipped = HL.LegendaryEnabled(7103)
+  PainbreakerEquipped = HL.LegendaryEnabled(6981)
+  ShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -130,7 +130,7 @@ local function EvaluateCycleDevouringPlage202(TargetUnit)
 end
 
 local function EvaluateCycleShadowWordDeath204(TargetUnit)
-  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and VarShadowflamePrismEquipped))
+  return ((TargetUnit:HealthPercentage() < 20 and EnemiesCount10ySplash < 4) or (S.Mindbender:CooldownRemains() > PetActiveCD and ShadowflamePrismEquipped))
 end
 
 local function EvaluateCycleSurrenderToMadness206(TargetUnit)
@@ -255,7 +255,7 @@ local function Cds()
     if HR.Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion 50"; end
   end
   -- silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
-  if S.Silence:IsCastable() and VarSephuzEquipped then
+  if S.Silence:IsCastable() and SephuzEquipped then
     if Everyone.CastCycle(S.Silence, Enemies30y, EvaluateCycleSilence228, not Target:IsSpellInRange(S.Silence)) then return "silence 51"; end
   end
   -- Covenant: fae_guardians,if=!buff.voidform.up&!cooldown.void_torrent.up|buff.voidform.up&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled)
@@ -380,7 +380,7 @@ local function Main()
     if HR.Cast(S.Mindbender, Settings.Shadow.GCDasOffGCD.Mindbender, nil, not Target:IsSpellInRange(S.Mindbender)) then return "shadowfiend/mindbender 108"; end
   end
   -- shadow_word_death,if=runeforge.painbreaker_psalm.equipped&variable.dots_up&target.time_to_pct_20>(cooldown.shadow_word_death.duration+gcd)
-  if S.ShadowWordDeath:IsReady() and (VarPainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
+  if S.ShadowWordDeath:IsReady() and (PainbreakerEquipped and VarDotsUp and Target:TimeToX(20) > S.ShadowWordDeath:Cooldown() + Player:GCD()) then
     if HR.Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death 112"; end
   end
   -- shadow_crash,if=raid_event.adds.in>10

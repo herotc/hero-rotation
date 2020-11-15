@@ -61,7 +61,7 @@ local StunInterrupts = {
 
 -- Rotation Variables
 local ShouldReturn -- Used to get the return string
-local SoulForgeEmbersEquipped = (I.SoulForgeEmbersChest:IsEquipped() or I.SoulForgeEmbersHead:IsEquipped())
+local SoulForgeEmbersEquipped = HL.LegendaryEnabled(7005)
 local GCDMax
 
 
@@ -75,6 +75,10 @@ local function UpdateGCDMax()
     GCDMax = mathmax(0.75, GCDMax - 0.2 / (1 + Player:HastePct() / 100))
   end
 end
+
+HL:RegisterForEvent(function()
+  SoulForgeEmbersEquipped = HL.LegendaryEnabled(7005)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function bool(val)
   return val ~= 0

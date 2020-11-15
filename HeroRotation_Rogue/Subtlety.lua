@@ -89,6 +89,20 @@ local Stealth, VanishBuff
 local RuptureThreshold, RuptureDMGThreshold
 local ComboPoints, ComboPointsDeficit
 local PriorityRotation
+
+-- Legendaries
+local DeathlyShadowsEquipped = HL.LegendaryEnabled(7126)
+local TinyToxicBladeEquipped = HL.LegendaryEnabled(7112)
+local AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(7124)
+local MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(7111)
+
+HL.RegisterForEvent(function()
+  DeathlyShadowsEquipped = HL.LegendaryEnabled(7126)
+  TinyToxicBladeEquipped = HL.LegendaryEnabled(7112)
+  AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(7124)
+  MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(7111)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 -- GUI Settings
 local Settings = {
   General = HR.GUISettings.General,

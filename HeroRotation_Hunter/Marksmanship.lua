@@ -61,8 +61,12 @@ end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 -- Variables
 local VarCAExecute = Target:HealthPercentage() > 70 and S.CarefulAim:IsAvailable()
-local SoulForgeEmbersEquipped = (I.SoulForgeEmbersChest:IsEquipped() or I.SoulForgeEmbersHead:IsEquipped())
+local SoulForgeEmbersEquipped = HL.LegendaryEnabled(7005)
 local PassiveEssence
+
+HL:RegisterForEvent(function()
+  SoulForgeEmbersEquipped = HL.LegendaryEnabled(7005)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 --Functions
 local function num(val)

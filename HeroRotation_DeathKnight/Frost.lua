@@ -37,6 +37,7 @@ local OnUseExcludes = {
 local ShouldReturn; -- Used to get the return string
 local VarOoUE;
 local no_heal;
+local BitingColdEquipped = HL.LegendaryEnabled(6945);
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -47,7 +48,6 @@ local Settings = {
 };
 
 -- Functions
---Functions
 local EnemyRanges = {5, 8, 10, 30, 40, 100}
 local TargetIsInRange = {}
 local function ComputeTargetRange()
@@ -56,6 +56,10 @@ local function ComputeTargetRange()
     TargetIsInRange[i] = Target:IsInRange(i)
   end
 end
+
+HL:RegisterForEvent(function()
+  BitingColdEquipped = HL.LegendaryEnabled(6945)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -476,7 +480,7 @@ end
 local function Standard()
   -- remorseless_winter,if=talent.gathering_storm.enabled|conduit.biting_cold.enabled|runeforge.biting_cold.equipped
   -- TODO: Implement legendary
-  if S.RemorselessWinter:IsCastable() and (S.GatheringStorm:IsAvailable() or S.BitingCold:IsAvailable()) then
+  if S.RemorselessWinter:IsCastable() and (S.GatheringStorm:IsAvailable() or S.BitingCold:IsAvailable() or BitingColdEquipped) then
     if HR.Cast(S.RemorselessWinter, nil, nil, not TargetIsInRange[8]) then return "remorseless_winter standard 1"; end
   end
   -- glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<15)

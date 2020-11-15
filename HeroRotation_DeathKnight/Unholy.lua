@@ -47,7 +47,7 @@ local Settings = {
 
 -- Variables
 local VarPoolingForGargoyle = 0;
-local DeadliestCoilEquipped = (I.DeadliestCoilChest:IsEquipped() or I.DeadliestCoilBack:IsEquipped())
+local DeadliestCoilEquipped = HL.LegendaryEnabled(6952)
 
 --Functions
 local EnemyRanges = {5, 8, 10, 30, 40, 100}
@@ -58,6 +58,11 @@ local function ComputeTargetRange()
     TargetIsInRange[i] = Target:IsInRange(i)
   end
 end
+
+HL:RegisterForEvent(function()
+  DeadliestCoilEquipped = HL.LegendaryEnabled(6952)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 HL:RegisterForEvent(function()
   VarPoolingForGargoyle = 0
 end, "PLAYER_REGEN_ENABLED")

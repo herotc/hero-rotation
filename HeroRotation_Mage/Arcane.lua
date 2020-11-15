@@ -57,6 +57,19 @@ local Settings = {
 -- Variables
 local EnemiesCount8ySplash, EnemiesCount10ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee --Enemies arround player
+local SiphonStormEquipped = HL.LegendaryEnabled(6928)
+local GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
+local TemporalWarpEquipped = HL.LegendaryEnabled(6834)
+local ArcaneInfinityEquipped = HL.LegendaryEnabled(6926)
+local DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+
+HL:RegisterForEvent(function()
+  SiphonStormEquipped = HL.LegendaryEnabled(6928)
+  GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
+  TemporalWarpEquipped = HL.LegendaryEnabled(6834)
+  ArcaneInfinityEquipped = HL.LegendaryEnabled(6926)
+  DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 local var_prepull_evo
 local var_rs_max_delay
