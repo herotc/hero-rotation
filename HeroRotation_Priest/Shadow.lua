@@ -115,38 +115,24 @@ local function UnitsRefreshSWP(enemies)
   return RefreshSWPCount
 end
 
-local function CheckSephuz()
-  local LegendaryItemString = ""
-  if HL.Equipment[2] == 178927 then
-    LegendaryItemString = GetInventoryItemLink("player", 2)
-  elseif HL.Equipment[3] == 173247 then
-    LegendaryItemString = GetInventoryItemLink("player", 3)
-  elseif HL.Equipment[5] == 173241 then
-    LegendaryItemString = GetInventoryItemLink("player", 5)
-  end
-  if match(LegendaryItemString, "7103") then return true end
-  return false
-end
+-- table is {bonusID, {slotID1, slotID2}, "Effect Name"}
+local Legendaries = {
+  {7103, {2, 3, 5}, "Sephuz's Proclamation"},
+  {6982, {1, 10}, "Shadowflame Prism"},
+  {6981, {5, 15}, "Painbreaker Psalm"},
+  {6983, {9, 10}, "Eternal Call to the Void"}
+}
 
-local function CheckShadowflame()
-  local LegendaryItemString = ""
-  if HL.Equipment[1] == 173245 then
-    LegendaryItemString = GetInventoryItemLink("player", 1)
-  elseif HL.Equipment[10] == 173244 then
-    LegendaryItemString = GetInventoryItemLink("player", 10)
+local function CheckLegendaries(effect)
+  for _, legendary in pairs(Legendaries) do
+    if legendary[3] == effect then
+      for _, slotID in pairs(legendary[2]) do
+        local TempItemString = GetInventoryItemLink("player", slotID)
+        if TempItemString and match(TempItemString, legendary[1]) then return true end
+      end
+    end
   end
-  if match(LegendaryItemString, "6982") then return true end
-  return false
-end
-
-local function CheckPainbreaker()
-  local LegendaryItemString = ""
-  if HL.Equipment[5] == 173241 then
-    LegendaryItemString = GetInventoryItemLink("player", 5)
-  elseif HL.Equipment[15] == 173242 then
-    LegendaryItemString = GetInventoryItemLink("player", 15)
-  end
-  if match(LegendaryItemString, "6981") then return true end
+  
   return false
 end
 
@@ -193,9 +179,9 @@ end
 local function Precombat()
   -- Update legendary equip status; this is in Precombat, as equipment can't be changed once in combat
   -- TODO: Change this when legendary checking is implemented properly
-  VarSephuzEquipped = CheckSephuz()
-  VarPainbreakerEquipped = CheckPainbreaker()
-  VarShadowflamePrismEquipped = CheckShadowflame()
+  VarSephuzEquipped = CheckLegendaries("Sephuz's Proclamation")
+  VarPainbreakerEquipped = CheckLegendaries("Painbreaker Psalm")
+  VarShadowflamePrismEquipped = CheckLegendaries("Shadowflame Prism")
   -- Update point at which the Mindbender drops; this is in Precombat, as it can't change once in combat
   if S.Mindbender:ID() == 34433 then
     PetActiveCD = 170
