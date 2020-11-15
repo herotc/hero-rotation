@@ -60,9 +60,9 @@ local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
-local VarPainbreakerEquipped
-local VarShadowflamePrismEquipped
-local VarSephuzEquipped
+local VarSephuzEquipped = HL.LegendaryEnabled(7103)
+local VarPainbreakerEquipped = HL.LegendaryEnabled(6981)
+local VarShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -71,6 +71,12 @@ HL:RegisterForEvent(function()
   VarSearingNightmareCutoff = false
   VarPoolForCDs = false
 end, "PLAYER_REGEN_ENABLED")
+
+HL:RegisterForEvent(function()
+  VarSephuzEquipped = HL.LegendaryEnabled(7103)
+  VarPainbreakerEquipped = HL.LegendaryEnabled(6981)
+  VarShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   S.ShadowCrash:RegisterInFlight()
@@ -156,10 +162,6 @@ local function EvaluateCycleSilence228(TargetUnit)
 end
 
 local function Precombat()
-  -- Update legendary equip status; this is in Precombat, as equipment can't be changed once in combat
-  VarSephuzEquipped = HL.LegendaryEnabled(7103)
-  VarPainbreakerEquipped = HL.LegendaryEnabled(6981)
-  VarShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
   -- Update point at which the Mindbender drops; this is in Precombat, as it can't change once in combat
   if S.Mindbender:ID() == 34433 then
     PetActiveCD = 170
