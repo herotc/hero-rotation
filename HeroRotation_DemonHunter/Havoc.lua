@@ -50,7 +50,7 @@ local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local PassiveEssence
-local VarBurningWoundEquipped
+local VarBurningWoundEquipped = HL.LegendaryEnabled(7219)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -95,6 +95,10 @@ HL:RegisterForEvent(function()
   VarFelBarrageSync = false
 end, "PLAYER_REGEN_ENABLED")
 
+HL:RegisterForEvent(function()
+  VarBurningWoundEquipped = HL.LegendaryEnabled(7219)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 local function num(val)
   if val then return 1 else return 0 end
 end
@@ -126,17 +130,6 @@ local function CastFelRush()
   return HR.Cast(S.FelRush)
 end
 
-local function CheckBurningWound()
-  local LegendaryItemString = ""
-  if HL.Equipment[15] == 172342 then
-    LegendaryItemString = GetInventoryItemLink("player", 15)
-  elseif HL.Equipment[5] == 172314 then
-    LegendaryItemString = GetInventoryItemLink("player", 5)
-  end
-  if match(LegendaryItemString, "7219") then return true end
-  return false
-end
-
 local function ConserveFelRush()
   return not Settings.Havoc.ConserveFelRush or S.FelRush:Charges() == 2
 end
@@ -158,8 +151,6 @@ local function EvaluateTargetIfDemonsBite208(TargetUnit)
 end
 
 local function Precombat()
-  -- TODO: Change this when legendary checking is implemented properly
-  VarBurningWoundEquipped = CheckBurningWound()
   -- flask
   -- augmentation
   -- food
