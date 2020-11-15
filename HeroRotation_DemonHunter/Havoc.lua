@@ -48,6 +48,7 @@ local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local PassiveEssence
+local VarBurningWoundEquipped
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -61,9 +62,6 @@ HL:RegisterForEvent(function()
   AEMajor        = HL.Spell:MajorEssence()
   S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
 end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
-
--- Variables
-local BurningWoundEquipped
 
 -- Interrupts List
 local StunInterrupts = {
@@ -126,20 +124,31 @@ local function CastFelRush()
   return HR.Cast(S.FelRush)
 end
 
+local function CheckBurningWound()
+  local LegendaryItemString = ""
+  if HL.Equipment[15] == 172342 then
+    LegendaryItemString = GetInventoryItemLink("player", 15)
+  elseif HL.Equipment[5] == 172314 then
+    LegendaryItemString = GetInventoryItemLink("player", 5)
+  end
+  if match(LegendaryItemString, "7219") then return true end
+  return false
+end
+
 local function ConserveFelRush()
   return not Settings.Havoc.ConserveFelRush or S.FelRush:Charges() == 2
 end
 
 local function EvalutateTargetIfFilterDemonsBite202(TargetUnit)
-  return TargetUnit:DebuffUp(S.BurningWoundDebuff)
+  return TargetUnit:DebuffRemains(S.BurningWoundDebuff)
 end
 
 local function EvaluateTargetIfDemonsBite204(TargetUnit)
-  return (TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
+  return (VarBurningWoundEquipped and TargetUnit:DebuffRemains(S.BurningWoundDebuff) < 4)
 end
 
 local function EvalutateTargetIfFilterDemonsBite206(TargetUnit)
-  return TargetUnit:DebuffUp(S.BurningWoundDebuff)
+  return TargetUnit:DebuffRemains(S.BurningWoundDebuff)
 end
 
 local function EvaluateTargetIfDemonsBite208(TargetUnit)
@@ -147,6 +156,8 @@ local function EvaluateTargetIfDemonsBite208(TargetUnit)
 end
 
 local function Precombat()
+  -- TODO: Change this when legendary checking is implemented properly
+  VarBurningWoundEquipped = CheckBurningWound()
   -- flask
   -- augmentation
   -- food
