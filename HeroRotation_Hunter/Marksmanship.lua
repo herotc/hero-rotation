@@ -176,7 +176,7 @@ local function St()
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
   if S.TarTrap:IsReady() and (SoulForgeEmbersEquipped and not (S.TarTrap:CooldownRemains() < Player:GCD()) and S.Flare:CooldownRemains() < Player:GCD()) then
-    if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsSpellInRange(S.TarTrap)) then return "tar_trap st 4"; end
+    if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap st 4"; end
   end
   -- flare,if=tar_trap.up
   if S.Flare:IsReady() and not S.TarTrap:CooldownUp() and SoulForgeEmbersEquipped then
@@ -271,7 +271,7 @@ local function Trickshots()
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped
   if S.TarTrap:IsReady() and SoulForgeEmbersEquipped then
-    if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsSpellInRange(S.TarTrap)) then return "tar_trap soulforge_embers equipped"; end
+    if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap soulforge_embers equipped"; end
   end
   -- flare,if=tar_trap.up
   if S.Flare:IsReady() and not S.TarTrap:CooldownUp() then
