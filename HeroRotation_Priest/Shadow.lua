@@ -115,27 +115,6 @@ local function UnitsRefreshSWP(enemies)
   return RefreshSWPCount
 end
 
--- table is {bonusID, {slotID1, slotID2}, "Effect Name"}
-local Legendaries = {
-  {7103, {2, 3, 5}, "Sephuz's Proclamation"},
-  {6982, {1, 10}, "Shadowflame Prism"},
-  {6981, {5, 15}, "Painbreaker Psalm"},
-  {6983, {9, 10}, "Eternal Call to the Void"}
-}
-
-local function CheckLegendaries(effect)
-  for _, legendary in pairs(Legendaries) do
-    if legendary[3] == effect then
-      for _, slotID in pairs(legendary[2]) do
-        local TempItemString = GetInventoryItemLink("player", slotID)
-        if TempItemString and match(TempItemString, legendary[1]) then return true end
-      end
-    end
-  end
-  
-  return false
-end
-
 local function EvaluateCycleDamnation200(TargetUnit)
   return (not DotsUp(TargetUnit, true))
 end
@@ -178,10 +157,9 @@ end
 
 local function Precombat()
   -- Update legendary equip status; this is in Precombat, as equipment can't be changed once in combat
-  -- TODO: Change this when legendary checking is implemented properly
-  VarSephuzEquipped = CheckLegendaries("Sephuz's Proclamation")
-  VarPainbreakerEquipped = CheckLegendaries("Painbreaker Psalm")
-  VarShadowflamePrismEquipped = CheckLegendaries("Shadowflame Prism")
+  VarSephuzEquipped = HL.LegendaryEnabled(7103)
+  VarPainbreakerEquipped = HL.LegendaryEnabled(6981)
+  VarShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
   -- Update point at which the Mindbender drops; this is in Precombat, as it can't change once in combat
   if S.Mindbender:ID() == 34433 then
     PetActiveCD = 170
