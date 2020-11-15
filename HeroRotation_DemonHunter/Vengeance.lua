@@ -51,6 +51,7 @@ local PassiveEssence
 local Enemies8yMelee
 local EnemiesCount8yMelee
 local VarBrandBuild
+local VarRazelikhsDefilementEquipped
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -134,6 +135,8 @@ end
 local function Precombat()
   -- variable,name=brand_build,value=talent.agonizing_flames.enabled&talent.burning_alive.enabled&talent.charred_flesh.enabled
   VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
+  -- TODO: Set VarRazelikhsDefilementEquipped once legendary checks are implemented
+  VarRazelikhsDefilementEquipped = false
   -- flask
   -- augmentation
   -- food
@@ -253,8 +256,8 @@ local function Normal()
   if S.BulkExtraction:IsCastable() then
     if HR.Cast(S.BulkExtraction) then return "bulk_extraction 26"; end
   end
-  -- spirit_bomb,if=((buff.metamorphosis.up&soul_fragments>=3)|soul_fragments>=4)
-  if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffUp(S.Metamorphosis) and SoulFragments >= 3) or SoulFragments >= 4) then
+  -- spirit_bomb,if=((buff.metamorphosis.up&talent.fracture.enabled&soul_fragments>=3)|soul_fragments>=4)
+  if S.SpiritBomb:IsReady() and IsInAoERange and ((Player:BuffUp(S.Metamorphosis) and S.Fracture:IsAvailable() and SoulFragments >= 3) or SoulFragments >= 4) then
     if HR.Cast(S.SpiritBomb) then return "spirit_bomb 28"; end
   end
   -- fel_devastation
@@ -263,8 +266,8 @@ local function Normal()
   if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
     if HR.Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 34"; end
   end
-  -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled>=5)|(!talent.fracture.enabled&fury>=20))))
-  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or (not S.Fracture:IsAvailable() and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 5) or (not S.Fracture:IsAvailable() and Player:Fury() >= 20))))) then
+  -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
+  if S.SoulCleave:IsReady() and (((S.SpiritBomb:IsAvailable() and SoulFragments == 0) or not S.SpiritBomb:IsAvailable()) and ((S.Fracture:IsAvailable() and Player:Fury() >= 55) or (not S.Fracture:IsAvailable() and Player:Fury() >= 70) or S.FelDevastation:CooldownRemains() > Target:TimeToDie() or (Player:BuffUp(S.MetamorphosisBuff) and ((S.Fracture:IsAvailable() and Player:Fury() >= 35) or (not S.Fracture:IsAvailable() and Player:Fury() >= 50))))) then
     if HR.Cast(S.SoulCleave, nil, nil, not Target:IsSpellInRange(S.SoulCleave)) then return "soul_cleave 36"; end
   end
   -- immolation_aura,if=((variable.brand_build&cooldown.fiery_brand.remains>10)|!variable.brand_build)&fury<=90
@@ -275,12 +278,12 @@ local function Normal()
   if S.Felblade:IsCastable() and (Player:Fury() <= 60) then
     if HR.Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade 40"; end
   end
-  -- fracture,if=soul_fragments<=3
-  if S.Fracture:IsCastable() and IsInMeleeRange and (SoulFragments <= 3) then
+  -- fracture,if=((talent.spirit_bomb.enabled&soul_fragments<=3)|(!talent.spirit_bomb.enabled&((buff.metamorphosis.up&fury<=55)|(buff.metamorphosis.down&fury<=70))))
+  if S.Fracture:IsCastable() and IsInMeleeRange and ((S.SpiritBomb:IsAvailable() and SoulFragments <= 3) or (not S.SpiritBomb:IsAvailable() and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Fury() <= 55) or (Player:BuffDown(S.MetamorphosisBuff) and Player:Fury() <= 70)))) then
     if HR.Cast(S.Fracture) then return "fracture 42"; end
   end
-  -- sigil_of_flame
-  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 then
+  -- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement.equipped)
+  if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (Player:Covenant() == "Kyrian" and VarRazelikhsDefilementEquipped)) then
     if S.ConcentratedSigils:IsAvailable() then
       if HR.Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 44 (Concentrated)"; end
     else
