@@ -17,6 +17,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- lua
+local match      = string.match
 
 -- Azerite Essence Setup
 local AE         = DBC.AzeriteEssences
