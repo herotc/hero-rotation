@@ -17,6 +17,8 @@ local Item       = HL.Item
 local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
+-- lua
+local match      = string.match
 
 -- Azerite Essence Setup
 local AE         = DBC.AzeriteEssences
@@ -132,11 +134,22 @@ local function UpdateIsInMeleeRange()
   IsInAoERange = IsInMeleeRange or EnemiesCount8yMelee > 0
 end
 
+local function CheckRazelikhs()
+  local LegendaryItemString = ""
+  if HL.Equipment[7] == 172318 then
+    LegendaryItemString = GetInventoryItemLink("player", 7)
+  elseif HL.Equipment[9] == 172321 then
+    LegendaryItemString = GetInventoryItemLink("player", 9)
+  end
+  if match(LegendaryItemString, "7046") then return true end
+  return false
+end
+
 local function Precombat()
   -- variable,name=brand_build,value=talent.agonizing_flames.enabled&talent.burning_alive.enabled&talent.charred_flesh.enabled
   VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
-  -- TODO: Set VarRazelikhsDefilementEquipped once legendary checks are implemented
-  VarRazelikhsDefilementEquipped = false
+  -- TODO: Change this when legendary checking is implemented properly
+  VarRazelikhsDefilementEquipped = CheckRazelikhs()
   -- flask
   -- augmentation
   -- food
