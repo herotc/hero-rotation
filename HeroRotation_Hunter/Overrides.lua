@@ -64,12 +64,16 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
 end
 , 254);
 
-local OldMMIsReadyP
-OldMMIsReadyP = HL.AddCoreOverride("Spell.IsReady",
+local OldMMIsReady
+OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldMMIsReadyP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.AimedShot then
-    return BaseCheck and (not Player:IsCasting(SpellMM.AimedShot))
+    if HR.GUISettings.APL.Hunter.Marksmanship.HideAimedWhileMoving then
+      return BaseCheck and not Player:IsCasting(SpellMM.AimedShot) and not Player:IsMoving()
+    else
+      return BaseCheck and not Player:IsCasting(SpellMM.AimedShot)
+    end
   else
     return BaseCheck
   end

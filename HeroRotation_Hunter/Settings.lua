@@ -63,6 +63,7 @@ HR.GUISettings.APL.Hunter = {
     }
   },
   Marksmanship = {
+    HideAimedWhileMoving = false,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -103,4 +104,5 @@ CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons");
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
 
 -- Marksmanship
+CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.HideAimedWhileMoving", "Hide Moving Aimed Shot", "Enable this option to hide Aimed Shot while your character is moving.");
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
