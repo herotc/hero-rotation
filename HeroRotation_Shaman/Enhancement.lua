@@ -18,6 +18,7 @@ local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 -- Lua
+local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 
 
 --- ============================ CONTENT ============================
@@ -33,77 +34,18 @@ local Settings = {
   Enhancement = HR.GUISettings.APL.Shaman.Enhancement
 }
 
--- Spells
-if not Spell.Shaman then Spell.Shaman = {} end
-Spell.Shaman.Enhancement = {
-  -- Racials
-
-  -- Abilities Shaman
-  Bloodlust = Spell(2825),
-  ChainLightning = Spell(188443),
-  EarthElemental = Spell(198103),
-  FlameShock = Spell(188389),
-  FlamentongueWeapon = Spell(318038),
-  FrostShock = Spell(196840),
-  LightningBolt = Spell(188196),
-  LightningShield = Spell(192106),
-  -- Abilities Enhancement
-  CrashLightning = Spell(187874),
-  FeralSpirit = Spell(51533),
-  LavaLash = Spell(60103),
-  Stormstrike = Spell(17364),
-  Windstrike = Spell(115356),
-  WindfuryTotem = Spell(8512),
-  WindfuryTotemBuff = Spell(327942),
-  WindfuryWeapon = Spell(33757),
-  MaelstromWeapon = Spell(344179),
-  CrashLightningBuff = Spell(187878),
-
-  -- Talents
-  Ascendance = Spell(114051),
-  Sundering = Spell(197214),
-  Hailstorm = Spell(334195),
-  HailstormBuff = Spell(334196),
-  Stormkeeper = Spell(320137),
-  StormkeeperBuff = Spell(320137),
-  EarthenSpike = Spell(188089),
-  FireNova = Spell(333974),
-  LashingFlames = Spell(334046),
-  ElementalBlast = Spell(117014),
-  Stormflurry = Spell(344357),
-  HotHand = Spell(201900),
-  HotHandBuff = Spell(215785),
-  IceStrike = Spell(342240),
-  CrashingStorm = Spell(192246),
-  ElementalSpirits = Spell(262624),
-  ForcefulWinds = Spell(262647),
-  -- Artifact
-
-  -- Defensive
-  AstralShift = Spell(10871),
-
-  -- Utility
-  CapacitorTotem = Spell(192058)
-
-  -- Legendaries
-
-  -- Misc
-
-  -- Macros
-
-}
 local S = Spell.Shaman.Enhancement
 
 -- Items
 if not Item.Shaman then Item.Shaman = {} end
-Item.Shaman.Enhancement = {
-  -- Legendaries
-
+Item.Shaman.Enhancement = {-- Legendaries
 }
 local I = Item.Shaman.Enhancement
 
 -- Rotation Var
-local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y
+local hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID, hasOffHandEnchant, offHandExpiration, offHandCharges, offHandEnchantId
+
+local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount, EnemiesCount30ySplash
 
 local EnemiesFlameShockCount
 
@@ -112,7 +54,7 @@ local function bool(val)
 end
 
 local function totemFinder()
-  for i = 1,6,1
+  for i = 1, 6, 1
   do
     if string.match(Player:TotemName(i), 'Totem') then
       return i
@@ -124,20 +66,38 @@ local function EvaluateCycleFlameShock(TargetUnit)
   return (TargetUnit:DebuffDown(S.FlameShock) and TargetUnit:DebuffRefreshable(S.FlameShock))
 end
 
+local function checkWeaponEnchants()
+  local hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID, hasOffHandEnchant, offHandExpiration, offHandCharges, offHandEnchantId = GetWeaponEnchantInfo()
+
+  if not hasMainHandEnchant and S.WindfuryWeapon:IsCastable() then
+    if HR.Cast(S.LightningBolt) then return "WindfuryWeapon enchant"; end
+  end
+end
+
 local function precombat()
   --actions.precombat=flask
   --actions.precombat+=/food
   --actions.precombat+=/augmentation
   --actions.precombat+=/windfury_weapon
+
+  if not hasMainHandEnchant and S.WindfuryWeapon:IsCastable() then
+    if HR.Cast(S.WindfuryWeapon) then return "WindfuryWeapon enchant"; end
+  end
   --actions.precombat+=/flametongue_weapon
+  if not hasOffHandEnchant and S.FlamentongueWeapon:IsCastable() then
+    if HR.Cast(S.FlamentongueWeapon) then return "FlamentongueWeapon enchant"; end
+  end
   --actions.precombat+=/lightning_shield
   if S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShield) then
-    if HR.Cast(S.LightningShield) then return "lightning_shield 6"; end
+    if HR.Cast(S.LightningShield) then return "lightning_shield precombat"; end
   end
   --actions.precombat+=/stormkeeper,if=talent.stormkeeper.enabled
+  if S.Stormkeeper:IsCastable() and S.Stormkeeper:IsAvailable() then
+    if HR.Cast(S.Stormkeeper) then return "Stormkeeper precombat"; end
+  end
   --actions.precombat+=/windfury_totem
   if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) then
-    if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem 1"; end
+    if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem precombat"; end
   end
   --actions.precombat+=/potion
   --# Snapshot raid buffed stats before combat begins and pre-potting is done.
@@ -198,7 +158,7 @@ local function single()
     if HR.Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "LavaLash 2"; end
   end
   --actions.single+=/crash_lightning
-  if S.CrashLightning:IsCastable() then
+  if S.CrashLightning:IsCastable() and Target:IsInRange(5) then
     if HR.Cast(S.CrashLightning) then return "CrashLightning 1"; end
   end
   --actions.single+=/flame_shock,target_if=refreshable
@@ -219,7 +179,7 @@ local function single()
   end
   --actions.single+=/fire_nova,if=active_dot.flame_shock
   if S.FireNova:IsCastable() and Target:DebuffUp(S.FlameShock) then
-    if HR.Cast(S.FireNova, nil, nil, not Target:IsSpellInRange(S.FireNova)) then return "FireNova 1"; end
+    if HR.Cast(S.FireNova) then return "FireNova 1"; end
   end
   --actions.single+=/lightning_bolt,if=buff.maelstrom_weapon.stack>=5
   if S.LightningBolt:IsCastable() and Player:BuffStack(S.MaelstromWeapon) >= 5 then
@@ -249,17 +209,17 @@ local function aoe()
   --actions.aoe+=/primordial_wave,target_if=min:dot.flame_shock.remains,cycle_targets=1,if=!buff.primordial_wave.up TODO
   --actions.aoe+=/fire_nova,if=active_dot.flame_shock>=3 TODO
   if S.FireNova:IsCastable() and EnemiesFlameShockCount >= 3 then
-    if HR.Cast(S.FireNova, nil, nil, not Target:IsSpellInRange(S.FireNova)) then return "FireNova 2"; end
+    if HR.Cast(S.FireNova) then return "FireNova 2"; end
   end
   --actions.aoe+=/vesper_totem TODO
   --actions.aoe+=/lightning_bolt,if=buff.primordial_wave.up&(buff.stormkeeper.up|buff.maelstrom_weapon.stack>=5) TODO
   --actions.aoe+=/crash_lightning,if=talent.crashing_storm.enabled|buff.crash_lightning.down
-  if S.CrashLightning:IsCastable() and (S.CrashingStorm:IsAvailable() or Player:BuffDown(S.CrashLightningBuff)) then
+  if S.CrashLightning:IsCastable() and (S.CrashingStorm:IsAvailable() or Player:BuffDown(S.CrashLightningBuff)) and Target:IsInRange(5) then
     if HR.Cast(S.CrashLightning) then return "CrashLightning 2"; end
   end
   --actions.aoe+=/lava_lash,target_if=min:debuff.lashing_flames.remains,cycle_targets=1,if=talent.lashing_flames.enabled TODO
   --actions.aoe+=/crash_lightning
-  if S.CrashLightning:IsCastable() then
+  if S.CrashLightning:IsCastable() and Target:IsInRange(5) then
     if HR.Cast(S.CrashLightning) then return "CrashLightning 3"; end
   end
   --actions.aoe+=/chain_lightning,if=buff.stormkeeper.up
@@ -281,7 +241,7 @@ local function aoe()
   end
   --actions.aoe+=/flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled TODO
   --actions.aoe+=/sundering
-  if S.Sundering:IsCastable() then
+  if S.Sundering:IsCastable() and Target:IsInRange(5) then
     if HR.Cast(S.Sundering) then return "Sundering 2"; end
   end
   --actions.aoe+=/lava_lash,target_if=min:debuff.lashing_flames.remains,cycle_targets=1,if=runeforge.primal_lava_actuators.equipped&buff.primal_lava_actuators.stack>6 TODO
@@ -295,7 +255,7 @@ local function aoe()
   end
   --actions.aoe+=/flame_shock,target_if=refreshable,cycle_targets=1
   if S.FlameShock:IsCastable() then
-    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock 3"; end
+    if Everyone.CastCycle(S.FlameShock, Enemies40y, EvaluateCycleFlameShock, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock 4"; end
   end
   --actions.aoe+=/fae_transfusion TODO
   --actions.aoe+=/frost_shock
@@ -312,7 +272,7 @@ local function aoe()
   end
   --actions.aoe+=/fire_nova,if=active_dot.flame_shock>1#
   if S.FireNova:IsCastable() and Target:DebuffUp(S.FlameShock) then
-    if HR.Cast(S.FireNova, nil, nil, not Target:IsSpellInRange(S.FireNova)) then return "FireNova 2"; end
+    if HR.Cast(S.FireNova) then return "FireNova 3"; end
   end
   --actions.aoe+=/earthen_spike
   if S.EarthenSpike:IsCastable() then
@@ -334,7 +294,7 @@ local function calcEnemiesFlameShockCount(Object, Enemies)
   if HR.AoEON() then
     for _, CycleUnit in pairs(Enemies) do
       if CycleUnit:DebuffUp(Object) then
-        debuffs = debuffs +1;
+        debuffs = debuffs + 1;
         EnemiesFlameShockCount = debuffs or 0
       end
     end
@@ -348,17 +308,21 @@ end
 
 
 --- ======= MAIN =======
-local function APL ()
+local function APL()
   -- Local Update
   totemFinder()
+  hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID, hasOffHandEnchant, offHandExpiration, offHandCharges, offHandEnchantId = GetWeaponEnchantInfo()
   -- Unit Update
+
+  EnemiesCount30ySplash = Target:GetEnemiesInSplashRangeCount(30)
+  MeleeEnemies10y = Player:GetEnemiesInMeleeRange(10)
+  MeleeEnemies10yCount = #MeleeEnemies10y or 0
   if AoEON() then
     Enemies40y = Player:GetEnemiesInRange(40)
-    MeleeEnemies10y = Player:GetEnemiesInMeleeRange(10) -- Earthen Spike
-    MeleeEnemies10yCount = #MeleeEnemies10y
-    MeleeEnemies5y = Player:GetEnemiesInMeleeRange(5) -- Melee cycle
+    Enemies40yCount = #Enemies40y
+
   else
-    MeleeEnemies10yCount = 1
+    Enemies40yCount = 1
   end
   -- Defensives
 
@@ -386,35 +350,53 @@ local function APL ()
     --actions+=/auto_attack
     --actions+=/windstrike
     if S.Windstrike:IsCastable() then
-      if HR.Cast(S.Windstrike) then return "Windstrike 1"; end
+      if HR.Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "Windstrike 1"; end
     end
     --actions+=/heart_essence
     --actions+=/use_items
-    --actions+=/blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    --actions+=/berserking,if=!talent.ascendance.enabled|buff.ascendance.up
-    --actions+=/fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    --actions+=/ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    --actions+=/bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
+
+    if (CDsON()) then
+      --actions+=/blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+      if S.BloodFury:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.Ascendance) or S.Ascendance:CooldownRemains() > 50) then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racial 1"; end
+      end
+      --actions+=/berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+      if S.BloodFury:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.Ascendance)) then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racial 2"; end
+      end
+      --actions+=/ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+      if S.AncestralCall:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.Ascendance) or S.Ascendance:CooldownRemains() > 50) then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racial 3"; end
+      end
+      --actions+=/fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+      if S.Fireblood:IsCastable() and (not S.Ascendance:IsAvailable() or Player:BuffUp(S.Ascendance) or S.Ascendance:CooldownRemains() > 50) then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racial 4"; end
+      end
+      --actions+=/bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
+      if S.BagofTricks:IsCastable() and (not S.Ascendance:IsAvailable() or not Player:BuffUp(S.Ascendance)) then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:SpellInRange(S.BagofTricks)) then return "bag_of_tricks racial 5"; end
+      end
+    end
     --actions+=/feral_spirit
     if S.FeralSpirit:IsCastable() then
       if HR.Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "FeralSpirit 1"; end
     end
     --actions+=/ascendance
-    if S.Ascendance:IsCastable() and S.Ascendance:IsAvailable() then
+    if S.Ascendance:IsCastable() and S.Ascendance:IsAvailable() and CDsON() then
       if HR.Cast(S.Ascendance, Settings.Enhancement.GCDasOffGCD.Ascendance) then return "Ascendance 1"; end
     end
     --# If only one enemy, priority follows the 'single' action list.
+
     --actions+=/call_action_list,name=single,if=active_enemies=1
-    if MeleeEnemies10yCount == 1 then
+    if Enemies40yCount == 1 then
       local ShouldReturn = single(); if ShouldReturn then return ShouldReturn; end
     end
     --# On multiple enemies, the priority follows the 'aoe' action list.
     --actions+=/call_action_list,name=aoe,if=active_enemies>1
-    if MeleeEnemies10yCount > 1 then
+    if Enemies40yCount > 1 then
       calcEnemiesFlameShockCount(S.FlameShock, Enemies40y)
       local ShouldReturn = aoe(); if ShouldReturn then return ShouldReturn; end
     end
-
 
     return
   end
