@@ -36,7 +36,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
 local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
-local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount18yMelee  --Enemies arround player
+local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount15yMelee, EnemiesCount18yMelee  --Enemies arround player
 local Mage = HR.Commons.Mage
 local TemporalWarpEquipped = HL.LegendaryEnabled(9)
 local GrislyIcicleEquipped = HL.LegendaryEnabled(8)
@@ -242,26 +242,27 @@ local function Aoe ()
     if HR.Cast(S.ShiftingPower, nil, nil, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
-  -- NYI legendaries
-  --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
+  -- NYI frozen
+  if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) and GrislyIcicleEquipped and Target:Level() <= Player:Level() then
     if HR.Cast(S.FrostNova) then return "frost_nova aoe 10"; end
-  end ]]
+  end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
-  -- NYI legendaries
-  --[[ if S.FireBlast:IsCastable() then
+  --NYI legendary ICD
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped then
     if HR.Cast(S.FireBlast) then return "fire_blast aoe 11"; end
-  end ]]
+  end
   --arcane_explosion,if=mana.pct>30
-  -- NYI legendaries
-  --[[   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
+  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and Player:ManaPercentageP() > 30 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 12"; end
-  end ]]
+  end
   --ebonbolt
   if S.Ebonbolt:IsCastable() and EnemiesCount8ySplash >= 2 then
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 13"; end
   end
   --ice_lance,if=runeforge.glacial_fragments.equipped&talent.splitting_ice.enabled
-  -- NYI legendaries
+  if S.IceLance:IsCastable() and GlacialFragmentsEquipped and S.SplittingIce:IsAvailable() then
+    if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 14"; end
+  end
   --frostbolt
   if S.Frostbolt:IsCastable() then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 15"; end
@@ -318,10 +319,9 @@ local function Single ()
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 11"; end
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&buff.brain_freeze.react
-  -- NYI legendaries
-  --[[ if S.RadiantSpark:IsCastable() then
+  if S.RadiantSpark:IsCastable() and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
-  end ]]
+  end
   --mirrors_of_torment
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment single 13"; end
@@ -331,20 +331,20 @@ local function Single ()
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
-  -- NYI legendaries
-  --[[   if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) then
+  -- NYI frozen
+  if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) and GrislyIcicleEquipped and Target:Level() <= Player:Level() then
     if HR.Cast(S.FrostNova) then return "frost_nova single 15"; end
-  end ]]
+  end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
-  -- NYI legendaries
-  --[[   if S.ArcaneExplosion:IsCastable() and Target:IsSpellInRange(S.ArcaneExplosion) and Player:ManaPercentageP() > 30 then
+  -- NYI legendary icd
+  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion single 16"; end
-  end ]]
+  end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
-  -- NYI legendaries
-  --[[ if S.FireBlast:IsCastable() then
+  -- NYI legendary icd
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped then
     if HR.Cast(S.FireBlast) then return "fire_blast single 17"; end
-  end ]]
+  end
   --glacial_spike,if=buff.brain_freeze.react
   if S.GlacialSpike:IsCastable() and not Player:IsCasting(S.GlacialSpike) and Player:BuffUp(S.BrainFreezeBuff) then
     if HR.Cast(S.GlacialSpike, nil, nil, not Target:IsSpellInRange(S.GlacialSpike)) then return "glacial_spike single 18"; end
@@ -369,6 +369,8 @@ local function APL ()
   EnemiesCount10yMelee = #Enemies10yMelee
   Enemies12yMelee = Player:GetEnemiesInMeleeRange(12)
   EnemiesCount12yMelee = #Enemies12yMelee
+  Enemies15yMelee = Player:GetEnemiesInMeleeRange(15)
+  EnemiesCount15yMelee = #Enemies15yMelee
   Enemies18yMelee = Player:GetEnemiesInMeleeRange(18)
   EnemiesCount18yMelee = #Enemies18yMelee
   Mage.IFTracker()
