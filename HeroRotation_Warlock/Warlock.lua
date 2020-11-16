@@ -60,6 +60,7 @@ Spell.Warlock.Demonology = {
   
   -- Covenant Abilities
   DecimatingBolt                        = Spell(325289),
+  DecimatingBoltBuff                    = Spell(325299),
   DoorofShadows                         = Spell(300728),
   Fleshcraft                            = Spell(324631),
   ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?

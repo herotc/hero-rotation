@@ -117,6 +117,8 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and not Player:IsCasting(SpellDemo.SummonVilefiend)
     elseif self == SpellDemo.CallDreadstalkers then
       return BaseCheck and not Player:IsCasting(SpellDemo.CallDreadstalkers)
+    elseif self == SpellDemo.DecimatingBolt then
+      return BaseCheck and not Player:IsCasting(SpellDemo.DecimatingBolt)
     else
       return BaseCheck
     end

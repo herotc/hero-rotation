@@ -40,6 +40,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
 local VarTyrantReady = false
+local VarPoolForDecimatingBolt
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -166,7 +167,8 @@ local function TyrantPrep()
     if HR.Cast(S.CallDreadstalkers, nil, nil, not Target:IsSpellInRange(S.CallDreadstalkers)) then return "call_dreadstalkers 72"; end
   end
   -- demonbolt,if=buff.demonic_core.up&soul_shard<4&(talent.demonic_consumption.enabled|buff.nether_portal.down)
-  if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4 and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff))) then
+  -- Manually added necrolord check to pool demonic_core stacks for DecimatingBolt
+  if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4 and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff)) and not VarPoolForDecimatingBolt) then
     if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 74"; end
   end
   -- shadow_bolt,if=soul_shard<5-4*buff.nether_portal.up
@@ -193,7 +195,7 @@ local function SummonTyrant()
     if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan 92"; end
   end
   -- demonbolt,if=buff.demonic_core.up&(talent.demonic_consumption.enabled|buff.nether_portal.down),line_cd=20
-  if S.Demonbolt:IsCastable() and (S.Demonbolt:TimeSinceLastCast() > 20 and Player:BuffUp(S.DemonicCoreBuff) and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff))) then
+  if S.Demonbolt:IsCastable() and (S.Demonbolt:TimeSinceLastCast() > 20 and Player:BuffUp(S.DemonicCoreBuff) and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff)) and not VarPoolForDecimatingBolt) then
     if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 94"; end
   end
   -- shadow_bolt,if=buff.wild_imps.stack+incoming_imps<4&(talent.demonic_consumption.enabled|buff.nether_portal.down),line_cd=20
@@ -209,7 +211,7 @@ local function SummonTyrant()
     if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan 100"; end
   end
   -- demonbolt,if=buff.demonic_core.up&buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
-  if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:BuffUp(S.NetherPortalBuff) and ((S.SummonVilefiend:CooldownRemains() > 35 or not S.SummonVilefiend:IsAvailable()) and (S.GrimoireFelguard:CooldownRemains() > 108 or S.GrimoireFelguard:CooldownRemains() < 103))) then
+  if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:BuffUp(S.NetherPortalBuff) and ((S.SummonVilefiend:CooldownRemains() > 35 or not S.SummonVilefiend:IsAvailable()) and (S.GrimoireFelguard:CooldownRemains() > 108 or S.GrimoireFelguard:CooldownRemains() < 103)) and not VarPoolForDecimatingBolt) then
     if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 102"; end
   end
   -- shadow_bolt,if=buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
@@ -295,6 +297,9 @@ local function APL()
   -- Update Demonology-specific Tables
   Warlock.UpdatePetTable()
   Warlock.UpdateSoulShards()
+  
+  -- Stop other Demonbolt casts if DecimatingBolt is ready in order to stack Demonic Core buff, unless a lower stack count is about to expire
+  VarPoolForDecimatingBolt = (S.DecimatingBolt:IsReady() and Player:BuffRemains(S.DemonicCoreBuff) > 5)
 
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then
@@ -306,6 +311,18 @@ local function APL()
     -- Manually added: unending_resolve
     if S.UnendingResolve:IsCastable() and (Player:HealthPercentage() < Settings.Demonology.UnendingResolveHP) then
       if HR.Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return "unending_resolve defensive"; end
+    end
+    -- Manually added: Dump shards in prep for DecimatingBolt/Demonbolt
+    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 0 and S.DecimatingBolt:IsReady() and Player:BuffStack(S.DemonicCoreBuff) > 2) then
+      if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt prep"; end
+    end
+    -- Manually added: decimating_bolt,if=soul_shard=0&buff.demonic_core.stack>2
+    if S.DecimatingBolt:IsReady() and (Player:SoulShardsP() == 0 and Player:BuffStack(S.DemonicCoreBuff) > 2) then
+      if HR.Cast(S.DecimatingBolt, nil, nil, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt dbolt"; end
+    end
+    -- Manually added: demonbolt,if=buff.decimating_bolt.react
+    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DecimatingBoltBuff)) then
+      if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt dbolt"; end
     end
     -- call_action_list,name=off_gcd
     if CDsON() then
@@ -353,7 +370,8 @@ local function APL()
       if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan 34"; end
     end
     -- demonbolt,if=buff.demonic_core.react&soul_shard<4
-    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4) then
+    -- Manually added necrolord check to pool demonic_core stacks for DecimatingBolt
+    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4 and not VarPoolForDecimatingBolt) then
       if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 36"; end
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.summon_demonic_tyrant.remains+15
