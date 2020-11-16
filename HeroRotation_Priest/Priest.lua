@@ -50,7 +50,7 @@ Spell.Priest.Shadow = {
   Silence                               = Spell(15487),
   VampiricTouch                         = Spell(34914),
   VampiricTouchDebuff                   = Spell(34914),
-  VoidBolt                              = MultiSpell(205448,343355),
+  VoidBolt                              = Spell(205448),
   VoidEruption                          = Spell(228260), -- Splash, 10
   VoidformBuff                          = Spell(194249),
 
