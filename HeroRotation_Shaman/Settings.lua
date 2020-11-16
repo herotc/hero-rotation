@@ -51,7 +51,22 @@ HR.GUISettings.APL.Shaman = {
       -- Abilities
 
     }
-  }
+  },
+  Elemental = {
+    -- {Display GCD as OffGCD, ForceReturn}
+    GCDasOffGCD = {
+      -- Abilities
+      Ascendance = true,
+      FireElemental = true
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Racials
+
+      -- Abilities
+
+    }
+  },
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -60,6 +75,7 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings);
 local ARPanel = HR.GUI.Panel;
 local CP_Shaman = CreateChildPanel(ARPanel, "Shaman");
 local CP_Enhancement = CreateChildPanel(CP_Shaman, "Enhancement");
+local CP_Elemental = CreateChildPanel(CP_Shaman, "Elemental");
 local aplCommons = "APL.Shaman.Commons";
 
 -- Controls
@@ -73,4 +89,6 @@ CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.EssenceDisplayStyle
 CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");
+-- Elemental
+CreateARPanelOptions(CP_Elemental, "APL.Shaman.Elemental");
 

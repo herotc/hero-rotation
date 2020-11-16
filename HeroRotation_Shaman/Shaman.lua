@@ -114,3 +114,75 @@ Spell.Shaman.Enhancement = {
   -- Macros
 
 }
+
+Spell.Shaman.Elemental = {
+  -- General Abilities
+
+  -- Abilities Shaman
+  Bloodlust                             = Spell(2825),
+  ChainLightning                        = Spell(188443),
+  EarthElemental                        = Spell(198103),
+  FlameShock                            = Spell(188389),
+  FlamentongueWeapon                    = Spell(318038),
+  FrostShock                            = Spell(196840),
+  LightningBolt                         = Spell(188196),
+  LightningShield                       = Spell(192106),
+
+  -- Defensive
+  AstralShift                           = Spell(10871),
+
+  -- Utility
+  CapacitorTotem                        = Spell(192058),
+
+  -- Racials
+  ArcaneTorrent                         = Spell(50613),
+  BloodFury                             = Spell(20572),
+  Berserking                            = Spell(26297),
+  Fireblood                             = Spell(265221),
+  AncestralCall                         = Spell(274738),
+  BagofTricks                           = Spell(312411),
+
+  -- Abilities
+  EarthShock                            = Spell(8042),
+  Earthquake                            = Spell(61882),
+  FireElemental                         = Spell(198067),
+  LavaBurst                             = Spell(51505),
+  LavaSurgeBuff                         = Spell(77762),
+
+  -- Talents
+  EarthenRage                           = Spell(170374),
+  EchoOfTheElements                     = Spell(333919),
+  StaticDischarge                       = Spell(342243),
+
+  Aftershock                            = Spell(273221),
+  EchoingShock                          = Spell(320125),
+  ElementalBlast                        = Spell(117014),
+
+  MasterOfTheElements                   = Spell(16166),
+  StormElemental                        = Spell(192249),
+  LiquidMagmaTotem                      = Spell(192222),
+
+  SurgeOfPower                          = Spell(262303),
+  PrimalElmentalist                     = Spell(117013),
+  Icefury                               = Spell(210714),
+
+  UnlimitedPower                        = Spell(260895),
+  Stormkeeper                           = Spell(191634),
+  Ascendance                            = Spell(114050),
+
+  -- Essences
+  LightningLasso                        = Spell(305483),
+
+  -- Artifact
+
+  -- Defensive
+
+  -- Utility
+
+  -- Legendaries
+
+  -- Misc
+
+  -- Macros
+
+}
