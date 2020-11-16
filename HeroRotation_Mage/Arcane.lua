@@ -57,18 +57,18 @@ local Settings = {
 -- Variables
 local EnemiesCount8ySplash, EnemiesCount10ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee --Enemies arround player
-local SiphonStormEquipped = HL.LegendaryEnabled(6928)
-local GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
-local TemporalWarpEquipped = HL.LegendaryEnabled(6834)
-local ArcaneInfinityEquipped = HL.LegendaryEnabled(6926)
-local DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+local SiphonStormEquipped = HL.LegendaryEnabled(16)
+local GrislyIcicleEquipped = HL.LegendaryEnabled(8)
+local TemporalWarpEquipped = HL.LegendaryEnabled(9)
+local ArcaneInfinityEquipped = HL.LegendaryEnabled(14)
+local DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
 
 HL:RegisterForEvent(function()
-  SiphonStormEquipped = HL.LegendaryEnabled(6928)
-  GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
-  TemporalWarpEquipped = HL.LegendaryEnabled(6834)
-  ArcaneInfinityEquipped = HL.LegendaryEnabled(6926)
-  DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+  SiphonStormEquipped = HL.LegendaryEnabled(16)
+  GrislyIcicleEquipped = HL.LegendaryEnabled(8)
+  TemporalWarpEquipped = HL.LegendaryEnabled(9)
+  ArcaneInfinityEquipped = HL.LegendaryEnabled(14)
+  DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local var_prepull_evo

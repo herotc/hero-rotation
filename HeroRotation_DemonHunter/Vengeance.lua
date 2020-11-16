@@ -53,7 +53,7 @@ local PassiveEssence
 local Enemies8yMelee
 local EnemiesCount8yMelee
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
-local RazelikhsDefilementEquipped = HL.LegendaryEnabled(7046)
+local RazelikhsDefilementEquipped = HL.LegendaryEnabled(27)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -73,7 +73,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_SPECIALIZATION_CHANGED", "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
-  RazelikhsDefilementEquipped = HL.LegendaryEnabled(7046)
+  RazelikhsDefilementEquipped = HL.LegendaryEnabled(27)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()

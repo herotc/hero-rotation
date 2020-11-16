@@ -91,16 +91,16 @@ local ComboPoints, ComboPointsDeficit
 local PriorityRotation
 
 -- Legendaries
-local DeathlyShadowsEquipped = HL.LegendaryEnabled(7126)
-local TinyToxicBladeEquipped = HL.LegendaryEnabled(7112)
-local AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(7124)
-local MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(7111)
+local DeathlyShadowsEquipped = HL.LegendaryEnabled(129)
+local TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
+local AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(127)
+local MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
 
 HL.RegisterForEvent(function()
-  DeathlyShadowsEquipped = HL.LegendaryEnabled(7126)
-  TinyToxicBladeEquipped = HL.LegendaryEnabled(7112)
-  AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(7124)
-  MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(7111)
+  DeathlyShadowsEquipped = HL.LegendaryEnabled(129)
+  TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
+  AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(127)
+  MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- GUI Settings

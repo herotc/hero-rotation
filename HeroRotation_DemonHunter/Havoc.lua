@@ -50,7 +50,7 @@ local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local PassiveEssence
-local BurningWoundEquipped = HL.LegendaryEnabled(7219)
+local BurningWoundEquipped = HL.LegendaryEnabled(25)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -96,7 +96,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  BurningWoundEquipped = HL.LegendaryEnabled(7219)
+  BurningWoundEquipped = HL.LegendaryEnabled(25)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)

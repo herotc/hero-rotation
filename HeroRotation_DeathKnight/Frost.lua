@@ -37,7 +37,7 @@ local OnUseExcludes = {
 local ShouldReturn; -- Used to get the return string
 local VarOoUE;
 local no_heal;
-local BitingColdEquipped = HL.LegendaryEnabled(6945);
+local BitingColdEquipped = HL.LegendaryEnabled(39);
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -58,7 +58,7 @@ local function ComputeTargetRange()
 end
 
 HL:RegisterForEvent(function()
-  BitingColdEquipped = HL.LegendaryEnabled(6945)
+  BitingColdEquipped = HL.LegendaryEnabled(39)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)

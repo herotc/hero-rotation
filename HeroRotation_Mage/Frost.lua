@@ -38,11 +38,11 @@ local ShouldReturn -- Used to get the return string
 local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount18yMelee  --Enemies arround player
 local Mage = HR.Commons.Mage
-local TemporalWarpEquipped = HL.LegendaryEnabled(6834)
-local GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
-local FreezingWindsEquipped = HL.LegendaryEnabled(6829)
-local GlacialFragmentsEquipped = HL.LegendaryEnabled(6830)
-local DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+local TemporalWarpEquipped = HL.LegendaryEnabled(9)
+local GrislyIcicleEquipped = HL.LegendaryEnabled(8)
+local FreezingWindsEquipped = HL.LegendaryEnabled(4)
+local GlacialFragmentsEquipped = HL.LegendaryEnabled(5)
+local DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -63,11 +63,11 @@ S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
 
 HL:RegisterForEvent(function()
-  TemporalWarpEquipped = HL.LegendaryEnabled(6834)
-  GrislyIcicleEquipped = HL.LegendaryEnabled(6937)
-  FreezingWindsEquipped = HL.LegendaryEnabled(6829)
-  GlacialFragmentsEquipped = HL.LegendaryEnabled(6830)
-  DisciplinaryCommandEquipped = HL.LegendaryEnabled(6832)
+  TemporalWarpEquipped = HL.LegendaryEnabled(9)
+  GrislyIcicleEquipped = HL.LegendaryEnabled(8)
+  FreezingWindsEquipped = HL.LegendaryEnabled(4)
+  GlacialFragmentsEquipped = HL.LegendaryEnabled(5)
+  DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function Precombat ()

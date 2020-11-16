@@ -60,9 +60,9 @@ local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
-local SephuzEquipped = HL.LegendaryEnabled(7103)
-local PainbreakerEquipped = HL.LegendaryEnabled(6981)
-local ShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
+local SephuzEquipped = HL.LegendaryEnabled(202)
+local PainbreakerEquipped = HL.LegendaryEnabled(158)
+local ShadowflamePrismEquipped = HL.LegendaryEnabled(159)
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -73,9 +73,9 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  SephuzEquipped = HL.LegendaryEnabled(7103)
-  PainbreakerEquipped = HL.LegendaryEnabled(6981)
-  ShadowflamePrismEquipped = HL.LegendaryEnabled(6982)
+  SephuzEquipped = HL.LegendaryEnabled(202)
+  PainbreakerEquipped = HL.LegendaryEnabled(158)
+  ShadowflamePrismEquipped = HL.LegendaryEnabled(159)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()

@@ -61,7 +61,7 @@ local StunInterrupts = {
 
 -- Rotation Variables
 local ShouldReturn -- Used to get the return string
-local SoulForgeEmbersEquipped = HL.LegendaryEnabled(7005)
+local SoulForgeEmbersEquipped = HL.LegendaryEnabled(68)
 local GCDMax
 
 
@@ -77,7 +77,7 @@ local function UpdateGCDMax()
 end
 
 HL:RegisterForEvent(function()
-  SoulForgeEmbersEquipped = HL.LegendaryEnabled(7005)
+  SoulForgeEmbersEquipped = HL.LegendaryEnabled(68)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function bool(val)
