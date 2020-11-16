@@ -224,7 +224,9 @@ Spell.Mage.Frost = {
   WorldveinResonance                    = Spell(295186),
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
-  FreezingWindsBuff                     = Spell(327364)
+  FreezingWindsBuff                     = Spell(327364),
+  DisciplinaryCommandFireBuff           = Spell(327368),
+  DisciplinaryCommandArcaneBuff         = Spell(327369)
 }
 
 -- Items

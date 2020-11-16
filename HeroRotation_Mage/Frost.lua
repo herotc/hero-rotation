@@ -247,8 +247,7 @@ local function Aoe ()
     if HR.Cast(S.FrostNova) then return "frost_nova aoe 10"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
-  --NYI legendary ICD
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
     if HR.Cast(S.FireBlast) then return "fire_blast aoe 11"; end
   end
   --arcane_explosion,if=mana.pct>30
@@ -307,7 +306,7 @@ local function Single ()
     if HR.Cast(S.IceNova, nil, nil, not Target:IsSpellInRange(S.IceNova)) then return "ice_nova single 8"; end
   end
   --radiant_spark,if=buff.freezing_winds.up&active_enemies=1
-  if S.RadiantSpark:IsCastable() and Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1 then
+  if HR.CDsON() and S.RadiantSpark:IsCastable() and Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1 then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
   end
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
@@ -319,7 +318,7 @@ local function Single ()
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt single 11"; end
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&buff.brain_freeze.react
-  if S.RadiantSpark:IsCastable() and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
+  if HR.CDsON() and S.RadiantSpark:IsCastable() and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
     if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
   end
   --mirrors_of_torment
@@ -336,13 +335,11 @@ local function Single ()
     if HR.Cast(S.FrostNova) then return "frost_nova single 15"; end
   end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
-  -- NYI legendary icd
-  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped then
+  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion single 16"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
-  -- NYI legendary icd
-  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped then
+  if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
     if HR.Cast(S.FireBlast) then return "fire_blast single 17"; end
   end
   --glacial_spike,if=buff.brain_freeze.react
