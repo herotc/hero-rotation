@@ -47,7 +47,7 @@ local hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID
 
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount, EnemiesCount30ySplash
 
-local EnemiesFlameShockCount
+local EnemiesFlameShockCount = 0
 
 local function bool(val)
   return val ~= 0
@@ -295,7 +295,7 @@ local function calcEnemiesFlameShockCount(Object, Enemies)
     for _, CycleUnit in pairs(Enemies) do
       if CycleUnit:DebuffUp(Object) then
         debuffs = debuffs + 1;
-        EnemiesFlameShockCount = debuffs or 0
+        EnemiesFlameShockCount = debuffs
       end
     end
   end
@@ -317,10 +317,11 @@ local function APL()
   EnemiesCount30ySplash = Target:GetEnemiesInSplashRangeCount(30)
   MeleeEnemies10y = Player:GetEnemiesInMeleeRange(10)
   MeleeEnemies10yCount = #MeleeEnemies10y or 0
+
   if AoEON() then
     Enemies40y = Player:GetEnemiesInRange(40)
     Enemies40yCount = #Enemies40y
-
+    calcEnemiesFlameShockCount(S.FlameShock, Enemies40y)
   else
     Enemies40yCount = 1
   end
@@ -394,7 +395,6 @@ local function APL()
     --# On multiple enemies, the priority follows the 'aoe' action list.
     --actions+=/call_action_list,name=aoe,if=active_enemies>1
     if Enemies40yCount > 1 then
-      calcEnemiesFlameShockCount(S.FlameShock, Enemies40y)
       local ShouldReturn = aoe(); if ShouldReturn then return ShouldReturn; end
     end
 
