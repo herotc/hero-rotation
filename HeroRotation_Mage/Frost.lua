@@ -169,10 +169,9 @@ local function Cooldowns ()
     if HR.Cast(S.IcyVeins, Settings.Frost.GCDasOffGCD.IcyVeins) then return "icy_veins cd 5"; end
   end
   --time_warp,if=runeforge.temporal_warp.equipped&buff.exhaustion.up&(prev_off_gcd.icy_veins|fight_remains<30)
-  -- NYI legendaries
-  --[[ if S.TimeWarp:IsCastable() and Player:BuffDown(S.TimeWarp) then
+  if S.TimeWarp:IsCastable() and Settings.Frost.UseTemporalWarp and TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BuffDown(S.TimeWarp) and (Player:BuffUp(S.IcyVeins) or Target:TimeToDie() < 30) then
     if HR.Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 6"; end
-  end ]]
+  end
   --use_items
   local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
   if TrinketToUse and Settings.Commons.UseTrinkets then

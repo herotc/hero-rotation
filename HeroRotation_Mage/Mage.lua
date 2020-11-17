@@ -177,6 +177,7 @@ Spell.Mage.Frost = {
   Frostbite                             = Spell(198121),
   Freeze                                = Spell(33395), --splash, 8
   MirrorImage                           = Spell(55342),
+  TemporalDisplacement                  = Spell(80354),
   -- Talents
   IceNova                               = Spell(157997), --splash, 8
   IceFloes                              = Spell(108839),

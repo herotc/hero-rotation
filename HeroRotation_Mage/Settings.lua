@@ -39,6 +39,7 @@ HR.GUISettings.APL.Mage = {
   Frost = {
     MirrorImagesBeforePull = false,
     MovingRotation = false,
+    UseTemporalWarp = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -117,4 +118,5 @@ CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
 -- Frost
 CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
 CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).");
+CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary");
 CreateARPanelOptions(CP_Frost, "APL.Mage.Frost");
