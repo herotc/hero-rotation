@@ -249,18 +249,22 @@ local function Aoe ()
   if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
     if HR.Cast(S.FireBlast) then return "fire_blast aoe 11"; end
   end
-  --arcane_explosion,if=mana.pct>30
-  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and Player:ManaPercentageP() > 30 then
+  --arcane_explosion,if=mana.pct>30&active_enemies>=6
+  --TODO : change to splash + stay distance option
+  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and Player:ManaPercentageP() > 30 and EnemiesCount10yMelee >= 6 then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 12"; end
   end
   --ebonbolt
   if S.Ebonbolt:IsCastable() and EnemiesCount8ySplash >= 2 then
     if HR.Cast(S.Ebonbolt, nil, nil, not Target:IsSpellInRange(S.Ebonbolt)) then return "ebonbolt aoe 13"; end
   end
-  --ice_lance,if=runeforge.glacial_fragments.equipped&talent.splitting_ice.enabled
+  --ice_lance,if=runeforge.glacial_fragments.equipped&talent.splitting_ice.enabled&travel_time<ground_aoe.blizzard.remains
+  --NYI blizzard.remains
   if S.IceLance:IsCastable() and GlacialFragmentsEquipped and S.SplittingIce:IsAvailable() then
     if HR.Cast(S.IceLance, nil, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance aoe 14"; end
   end
+  --wait,sec=0.1,if=runeforge.glacial_fragments.equipped&talent.splitting_ice.enabled
+  --NYI wait
   --frostbolt
   if S.Frostbolt:IsCastable() then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt aoe 15"; end
@@ -386,12 +390,12 @@ local function APL ()
     if HR.CDsON() then
       ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
-    --call_action_list,name=aoe,if=active_enemies>=5
-    if HR.AoEON() and EnemiesCount16ySplash >= 5 then
+    --call_action_list,name=aoe,if=active_enemies>=4
+    if HR.AoEON() and EnemiesCount16ySplash >= 4 then
       ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
-    --call_action_list,name=single,if=active_enemies<5
-    if not HR.AoEON() or EnemiesCount16ySplash < 5 then
+    --call_action_list,name=single,if=active_enemies<4
+    if not HR.AoEON() or EnemiesCount16ySplash < 4 then
       ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
   end
