@@ -12,4 +12,5 @@ Settings.lua
 Warlock.lua
 Events.lua
 Demonology.lua
+Affliction.lua
 Overrides.lua
