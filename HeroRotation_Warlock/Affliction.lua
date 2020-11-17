@@ -327,6 +327,12 @@ local function APL()
     Enemies40yCount = #Enemies40y
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
 
+    EnemiesAgonyCount = calcEnemiesDotCount(S.Agony, Enemies40y)
+    EnemiesUnstableAfflictionCount = calcEnemiesDotCount(S.UnstableAffliction, Enemies40y)
+    EnemiesSeedOfCorruptionCount = calcEnemiesDotCount(S.SeedOfCorruption, Enemies40y)
+    EnemiesSiphonLifeCount = calcEnemiesDotCount(S.SiphonLife, Enemies40y)
+    EnemiesVileTaintCount = calcEnemiesDotCount(S.VileTaint, Enemies40y)
+
   else
     Enemies40yCount = 1
     EnemiesCount10ySplash = 1
@@ -353,12 +359,6 @@ local function APL()
 
     --actions=call_action_list,name=aoe,if=active_enemies>3
     if EnemiesCount10ySplash > 3 then
-      EnemiesAgonyCount = calcEnemiesDotCount(S.Agony, Enemies40y)
-      EnemiesUnstableAfflictionCount = calcEnemiesDotCount(S.UnstableAffliction, Enemies40y)
-      EnemiesSeedOfCorruptionCount = calcEnemiesDotCount(S.SeedOfCorruption, Enemies40y)
-      EnemiesSiphonLifeCount = calcEnemiesDotCount(S.SiphonLife, Enemies40y)
-      EnemiesVileTaintCount = calcEnemiesDotCount(S.VileTaint, Enemies40y)
-
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn;
     end
     end
@@ -394,7 +394,7 @@ local function APL()
       if HR.Cast(S.SiphonLife) then return "SiphonLife InCombat"; end
     end
     --actions+=/unstable_affliction,if=refreshable
-    if S.UnstableAffliction:IsCastable() and Target:DebuffRefreshable(S.UnstableAffliction) then
+    if S.UnstableAffliction:IsCastable() and Target:DebuffRefreshable(S.UnstableAffliction) and EnemiesUnstableAfflictionCount < 1 then
       if HR.Cast(S.UnstableAffliction) then return "UnstableAffliction InCombat"; end
     end
     --actions+=/unstable_affliction,if=azerite.cascading_calamity.enabled&buff.cascading_calamity.remains<3 TODO
