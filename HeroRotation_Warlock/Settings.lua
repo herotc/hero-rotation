@@ -71,14 +71,14 @@ HR.GUISettings.APL.Warlock = {
       UnendingResolve = true,
     }
   },
-  --[[Affliction = {
+  Affliction = {
     UseSplashData = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       DarkSoul = true,
       SummonDarkglare = true,
-      SummonPet = true,
+      SummonPet = false,
       GrimoireOfSacrifice = true,
       PhantomSingularity = true,
     },
@@ -86,7 +86,7 @@ HR.GUISettings.APL.Warlock = {
     OffGCDasOffGCD = {
       -- Abilities
     }
-  }]]
+  }
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -96,7 +96,7 @@ local ARPanel = HR.GUI.Panel
 local CP_Warlock = CreateChildPanel(ARPanel, "Warlock")
 --local CP_Destruction = CreateChildPanel(CP_Warlock, "Destruction")
 local CP_Demonology = CreateChildPanel(CP_Warlock, "Demonology")
---local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction")
+local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction")
 
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
@@ -116,6 +116,6 @@ CreateARPanelOptions(CP_Destruction, "APL.Warlock.Destruction")]]
 CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResolveHP", {0, 100, 1}, "Unending Resolve HP", "Set the Unending Resolve HP threshold.")
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
---[[ Affliction
-CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.")
-CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")]]
+-- Affliction
+--+CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.")
+CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")

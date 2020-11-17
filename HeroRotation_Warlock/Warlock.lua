@@ -26,7 +26,7 @@ Spell.Warlock.Demonology = {
   Berserking                            = Spell(26297),
   BloodFury                             = Spell(20572),
   Fireblood                             = Spell(265221),
-  
+
   -- Base Abilities
   AxeToss                               = Spell(119914),
   CallDreadstalkers                     = Spell(104316),
@@ -40,7 +40,7 @@ Spell.Warlock.Demonology = {
   SummonDemonicTyrant                   = Spell(265187),
   SummonPet                             = Spell(30146),
   UnendingResolve                       = Spell(104773),
-  
+
   -- Talents
   BilescourgeBombers                    = Spell(267211), -- Splash, 8
   DemonicCalling                        = Spell(205145),
@@ -57,7 +57,7 @@ Spell.Warlock.Demonology = {
   PowerSiphon                           = Spell(264130),
   SoulStrike                            = Spell(264057),
   SummonVilefiend                       = Spell(264119),
-  
+
   -- Covenant Abilities
   DecimatingBolt                        = Spell(325289),
   DecimatingBoltBuff                    = Spell(325299),
@@ -66,14 +66,14 @@ Spell.Warlock.Demonology = {
   ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
   ScouringTithe                         = Spell(312321),
   SoulRot                               = Spell(325640), -- Splash, 15
-  
+
   -- Azerite Traits
   BalefulInvocation                     = Spell(287059),
   ExplosivePotential                    = Spell(275395),
   ExplosivePotentialBuff                = Spell(275398),
   ShadowsBite                           = Spell(272944),
   ShadowsBiteBuff                       = Spell(272945),
-  
+
   -- Azerite Essences
   BloodoftheEnemy                       = Spell(297108),
   ConcentratedFlame                     = Spell(295373),
@@ -88,9 +88,78 @@ Spell.Warlock.Demonology = {
   RippleInSpace                         = Spell(302731),
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
-  
+
   -- Item Effects
   ShiverVenomDebuff                     = Spell(301624),
+}
+
+Spell.Warlock.Affliction = {
+  -- Racials
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Fireblood                             = Spell(265221),
+
+  -- Base Abilities
+  ShadowBolt                            = Spell(686),
+  Corruption                            = Spell(172),
+  CorruptionDebuff                      = Spell(146739),
+  Agony                                 = Spell(980),
+  MaleficRapture                        = Spell(324536),
+  SeedOfCorruption                      = Spell(27243),
+  UnstableAffliction                    = Spell(316099),
+  SummonDarkglare                       = Spell(205180),
+  SummonPet                             = Spell(688),
+  DrainLife                             = Spell(234153),
+  ShadowEmbrace                         = Spell(32388),
+
+  -- Talents
+  Nightfall                             = Spell(108558),
+  InevitableDemise                      = Spell(334319),
+  InvetiableDemiseBuff                  = Spell(334320),
+  DrainSoul                             = Spell(198590),
+
+  WritheInAgony                         = Spell(196102),
+  AbsoluteCorruption                    = Spell(196103),
+  SiphonLife                            = Spell(63106),
+
+  SowTheSeeds                           = Spell(196226),
+  PhantomSingularity                    = Spell(205179),
+  VileTaint                             = Spell(278350),
+
+  Haunt                                 = Spell(48181),
+
+  GrimoureOfSacrifice                   = Spell(108503),
+
+  DarkSoulMisery                        = Spell(113860),
+
+  -- Covenant Abilities
+  DecimatingBolt                        = Spell(325289),
+  DoorofShadows                         = Spell(300728),
+  Fleshcraft                            = Spell(324631),
+  ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
+  ScouringTithe                         = Spell(312321),
+  SoulRot                               = Spell(325640), -- Splash, 15
+
+  -- Azerite Traits
+  CascadingCalamityBuff                 = Spell(275378);
+
+  -- Azerite Essences
+  BloodoftheEnemy                       = Spell(297108),
+  ConcentratedFlame                     = Spell(295373),
+  ConcentratedFlameBurn                 = Spell(295368),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  LifebloodBuff                         = MultiSpell(295137, 305694),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  ReapingFlames                         = Spell(310690),
+  RecklessForceBuff                     = Spell(302932),
+  RippleInSpace                         = Spell(302731),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+
+  -- Item Effects
+
 }
 
 -- Items
