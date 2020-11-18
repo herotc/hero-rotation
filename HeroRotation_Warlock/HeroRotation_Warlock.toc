@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90002
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFF8787EDWarlock|r]
 ## Author: Cilraaz
