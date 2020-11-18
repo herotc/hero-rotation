@@ -58,7 +58,7 @@ S.ShadowBolt:RegisterInFlight()
 local Enemies40y, Enemies40yCount, EnemiesCount10ySplash, EnemiesCount
 
 local EnemiesAgonyCount, EnemiesSeedOfCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
-local EnemiesUnstableAfflictionCount
+local EnemiesWithUnstableAfflictionDebuff
 
 -- Stuns
 
@@ -104,19 +104,35 @@ local function EvaluateCycleSeedOfCorruption(TargetUnit)
   return (not TargetUnit:DebuffUp(S.SeedOfCorruption) and not S.SeedOfCorruption:InFlight())
 end
 
+local function EvaluateCycleUnstableAffliction(TargetUnit)
+  return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRefreshable(S.UnstableAffliction)) or EnemiesWithUnstableAfflictionDebuff == 0)
+end
 
 -- Counter for Debuff on other enemies
 local function calcEnemiesDotCount(Object, Enemies)
-  local debuffs = 0
+local debuffs = 0
 
+for _, CycleUnit in pairs(Enemies) do
+  --if CycleUnit:DebuffUp(Object, nil, 0) then
+  if CycleUnit:DebuffUp(Object) then
+    debuffs = debuffs + 1
+  end
+end
+
+return debuffs
+end
+
+local function returnEnemiesWithDot(Object, Enemies)
   for _, CycleUnit in pairs(Enemies) do
     --if CycleUnit:DebuffUp(Object, nil, 0) then
     if CycleUnit:DebuffUp(Object) then
-      debuffs = debuffs + 1
+      if Object == S.UnstableAffliction then
+        return CycleUnit:GUID()
+      end
     end
   end
+  return 0
 
-  return debuffs
 end
 
 local function Precombat()
@@ -134,20 +150,20 @@ local function Precombat()
   --actions.precombat+=/snapshot_stats
   --actions.precombat+=/use_item,name=azsharas_font_of_power
   --actions.precombat+=/seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3&!equipped.169314
-  if S.SeedOfCorruption:IsCastable() and (EnemiesCount10ySplash >= 3 or Enemies40yCount >= 3) then
-    if HR.Cast(S.SeedOfCorruption) then return "SeedOfCorruption precombat"; end
+  if S.SeedOfCorruption:IsCastable() and (EnemiesCount10ySplash >= 3 or Enemies40yCount >= 3) and Player:SoulShardsP() > 0 then
+    if HR.Cast(S.SeedOfCorruption, nil, nil, not Target:IsSpellInRange(S.SeedOfCorruption)) then return "SeedOfCorruption precombat"; end
   end
   --actions.precombat+=/hauntE
   if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
-    if HR.Cast(S.Haunt) then return "Haunt precombat"; end
+    if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt precombat"; end
   end
   --actions.precombat+=/shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3&!equipped.169314 TODO
   if S.ShadowBolt:IsCastable() and not S.Haunt:IsAvailable() and EnemiesCount10ySplash < 3 then
-    if HR.Cast(S.ShadowBolt) then return "ShadowBolt precombat"; end
+    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt precombat"; end
   end
   -- Custom precombat Agony with talents 3,3,1,1,1,1,3
   if S.Agony:IsCastable() then
-    if HR.Cast(S.Agony) then return "Agony precombat"; end
+    if HR.Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony precombat"; end
   end
 end
 
@@ -228,47 +244,46 @@ end
 local function Se()
   --actions.se=haunt
   if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
-    if HR.Cast(S.Haunt) then return "Haunt Se"; end
+    if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Se"; end
   end
   --actions.se+=/drain_soul,interrupt_if=debuff.shadow_embrace.stack>=3 TODO
   --actions.se+=/shadow_bolt
   if S.ShadowBolt:IsCastable() and S.ShadowBolt:IsAvailable() then
-    if HR.Cast(S.ShadowBolt) then return "ShadowBolt Se"; end
+    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Se"; end
   end
 end
 
 local function Aoe()
   --actions.aoe=phantom_singularity
   if S.PhantomSingularity:IsCastable() and S.PhantomSingularity:IsAvailable() then
-    if HR.Cast(S.PhantomSingularity) then return "PhantomSingularity Aoe"; end
+    if HR.Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity Aoe"; end
   end
   --actions.aoe+=/haunt
   if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
-    if HR.Cast(S.Haunt) then return "Haunt Aoe"; end
+    if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Aoe"; end
   end
   --actions.aoe+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&can_seed TODO
-  if S.SeedOfCorruption:IsCastable() and S.SowTheSeeds:IsAvailable() and Player:SoulShards() > 0 and (EnemiesSeedOfCorruptionCount <= EnemiesCount10ySplash) then
-    if HR.Cast(S.SeedOfCorruption) then return "SeedOfCorruption Aoe 1"; end
+  if S.SeedOfCorruption:IsCastable() and S.SowTheSeeds:IsAvailable() and Player:SoulShardsP() > 0 and (EnemiesSeedOfCorruptionCount <= EnemiesCount10ySplash) then
+    if HR.Cast(S.SeedOfCorruption, nil, nil, not Target:IsSpellInRange(S.SeedOfCorruption)) then return "SeedOfCorruption Aoe 1"; end
   end
   --actions.aoe+=/seed_of_corruption,if=!talent.sow_the_seeds.enabled&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.refreshable
-  if S.SeedOfCorruption:IsCastable() and EnemiesSeedOfCorruptionCount < 1 and (not S.SowTheSeeds:IsAvailable() and not Target:DebuffUp(S.SeedOfCorruption) and not S.SeedOfCorruption:InFlight() and Target:DebuffRefreshable(S.CorruptionDebuff)) and Player:SoulShards() > 0 then
-    if HR.Cast(S.SeedOfCorruption) then return "SeedOfCorruption Aoe 2"; end
+  if S.SeedOfCorruption:IsCastable() and EnemiesSeedOfCorruptionCount < 1 and (not S.SowTheSeeds:IsAvailable() and not Target:DebuffUp(S.SeedOfCorruption) and not S.SeedOfCorruption:InFlight() and Target:DebuffRefreshable(S.CorruptionDebuff)) and Player:SoulShardsP() > 0 then
+    if HR.Cast(S.SeedOfCorruption, nil, nil, not Target:IsSpellInRange(S.SeedOfCorruption)) then return "SeedOfCorruption Aoe 2"; end
   end
   --actions.aoe+=/agony,cycle_targets=1,if=active_dot.agony>=4,target_if=refreshable&dot.agony.ticking
   if S.Agony:IsCastable() and EnemiesAgonyCount >= 4 then
-    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony1) then return "Agony Aoe 1"; end
+    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony1, not Target:IsSpellInRange(S.Agony)) then return "Agony Aoe 1"; end
   end
   --actions.aoe+=/agony,cycle_targets=1,if=active_dot.agony<4,target_if=!dot.agony.ticking
   if S.Agony:IsCastable() and EnemiesAgonyCount < 4 then
-    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony2) then return "Agony Aoe 2"; end
+    if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony2, not Target:IsSpellInRange(S.Agony)) then return "Agony Aoe 2"; end
   end
   --actions.aoe+=/unstable_affliction,if=dot.unstable_affliction.refreshable
-  if S.UnstableAffliction:IsCastable() and Target:DebuffRefreshable(S.UnstableAffliction) and EnemiesUnstableAfflictionCount < 1 then
-    if HR.Cast(S.UnstableAffliction) then return "UnstableAffliction Aoe"; end
+  if S.UnstableAffliction:IsCastable()  then
+    if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction Aoe"; end
   end
-
   --actions.aoe+=/vile_taint,if=soul_shard>1
-  if S.VileTaint:IsCastable() and S.VileTaint:IsAvailable() and Player:SoulShards() > 1 then
+  if S.VileTaint:IsCastable() and S.VileTaint:IsAvailable() and Player:SoulShardsP() > 1 then
     if HR.Cast(S.VileTaint) then return "VileTaint Aoe"; end
   end
   --actions.aoe+=/call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.ready&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
@@ -283,28 +298,28 @@ local function Aoe()
   local cooldowns = Cooldowns(); if cooldowns then return cooldowns; end
   --actions.aoe+=/call_action_list,name=item
   --actions.aoe+=/malefic_rapture,if=dot.vile_taint.ticking
-  if S.MaleficRapture:IsCastable() and S.VileTaint:IsAvailable() and EnemiesVileTaintCount >= 1 and Player:SoulShards() > 0 then
+  if S.MaleficRapture:IsCastable() and S.VileTaint:IsAvailable() and EnemiesVileTaintCount >= 1 and Player:SoulShardsP() > 0 then
     if HR.Cast(S.MaleficRapture) then return "MaleficRapture Aoe 1"; end
   end
   --actions.aoe+=/malefic_rapture,if=!talent.vile_taint.enabled
-  if S.MaleficRapture:IsCastable() and not S.VileTaint:IsAvailable() and Player:SoulShards() > 0 then
+  if S.MaleficRapture:IsCastable() and not S.VileTaint:IsAvailable() and Player:SoulShardsP() > 0 then
     if HR.Cast(S.MaleficRapture) then return "MaleficRapture Aoe 1"; end
   end
   --actions.aoe+=/siphon_life,cycle_targets=1,if=active_dot.siphon_life<=3,target_if=!dot.siphon_life.ticking
   if S.SiphonLife:IsCastable() and S.SiphonLife:IsAvailable() and EnemiesSiphonLifeCount <= 3 then
-    if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife1) then return "SiphonLife Aoe"; end
+    if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife1, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife Aoe"; end
   end
   --actions.aoe+=/drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5
   if S.DrainLife:IsCastable() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff)) and Target:TimeToDie() < 5 then
-    if HR.Cast(S.DrainLife) then return "DrainLife Aoe"; end
+    if HR.Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife Aoe"; end
   end
   --actions.aoe+=/drain_soul
   if S.DrainSoul:IsCastable() and S.DrainSoul:IsAvailable() then
-    if HR.Cast(S.DrainSoul) then return "DrainSoul Aoe"; end
+    if HR.Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "DrainSoul Aoe"; end
   end
   --actions.aoe+=/shadow_bolt
   if S.ShadowBolt:IsCastable() and S.ShadowBolt:IsAvailable() then
-    if HR.Cast(S.ShadowBolt) then return "ShadowBolt Aoe"; end
+    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Aoe"; end
   end
 end
 
@@ -321,21 +336,21 @@ local function APL()
   -- Rotation Variables Update
 
   -- Unit Update
-
+  Enemies40y = Player:GetEnemiesInRange(40)
   if AoEON() then
-    Enemies40y = Player:GetEnemiesInRange(40)
+    --Enemies40y = Player:GetEnemiesInRange(40)
     Enemies40yCount = #Enemies40y
     EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
 
     EnemiesAgonyCount = calcEnemiesDotCount(S.Agony, Enemies40y)
-    EnemiesUnstableAfflictionCount = calcEnemiesDotCount(S.UnstableAffliction, Enemies40y)
     EnemiesSeedOfCorruptionCount = calcEnemiesDotCount(S.SeedOfCorruption, Enemies40y)
     EnemiesSiphonLifeCount = calcEnemiesDotCount(S.SiphonLife, Enemies40y)
     EnemiesVileTaintCount = calcEnemiesDotCount(S.VileTaint, Enemies40y)
-
   else
     Enemies40yCount = 1
     EnemiesCount10ySplash = 1
+
+    EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAffliction, Enemies40y)
   end
 
   -- Defensives
@@ -348,8 +363,7 @@ local function APL()
     -- PrePot w/ Bossmod Countdown
     -- Opener
     if Everyone.TargetIsValid() then
-      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn;
-    end
+      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     return
   end
@@ -359,67 +373,63 @@ local function APL()
 
     --actions=call_action_list,name=aoe,if=active_enemies>3
     if EnemiesCount10ySplash > 3 then
-      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn;
-    end
+      local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/phantom_singularity
     if S.PhantomSingularity:IsCastable() and S.PhantomSingularity:IsAvailable() then
-      if HR.Cast(S.PhantomSingularity) then return "PhantomSingularity InCombat";
-      end
+      if HR.Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity InCombat"; end
     end
     --actions+=/agony,if=refreshable
     if S.Agony:IsCastable() and Target:DebuffRefreshable(S.Agony) then
-      if HR.Cast(S.Agony) then return "Agony InCombat";
-      end
+      if HR.Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony InCombat"; end
     end
     --actions+=/agony,cycle_targets=1,if=active_enemies>1,target_if=refreshable
     if S.Agony:IsCastable() and Enemies40yCount > 1 then
-      if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony) then return "Agony InCombat";
-      end
+      if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony, not Target:IsSpellInRange(S.Agony)) then return "Agony InCombat"; end
     end
     --actions+=/call_action_list,name=darkglare_prep,if=active_enemies>2&cooldown.summon_darkglare.ready&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
     if S.SummonDarkglare:IsReady() and Enemies40yCount > 2 and (Target:DebuffUp(S.PhantomSingularity) or not S.PhantomSingularity:IsAvailable()) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/seed_of_corruption,if=active_enemies>2&!talent.vile_taint.enabled&(!talent.writhe_in_agony.enabled|talent.sow_the_seeds.enabled)&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.refreshable
-    if S.SeedOfCorruption:IsCastable() and Enemies40yCount > 2 and not S.VileTaint:IsAvailable() and (not S.WritheInAgony:IsAvailable() or S.SowTheSeeds:IsAvailable()) and EnemiesSeedOfCorruptionCount < 1 and not S.SeedOfCorruption:InFlight() and Target:DebuffRefreshable(S.CorruptionDebuff) then
-      if HR.Cast(S.SeedOfCorruption) then return "SeedOfCorruption InCombat"; end
+    if S.SeedOfCorruption:IsCastable() and not Player:IsCasting(S.SeedOfCorruption) and Enemies40yCount > 2 and not S.VileTaint:IsAvailable() and (not S.WritheInAgony:IsAvailable() or S.SowTheSeeds:IsAvailable()) and EnemiesSeedOfCorruptionCount < 1 and not S.SeedOfCorruption:InFlight() and Target:DebuffRefreshable(S.CorruptionDebuff) and Player:SoulShardsP() > 0 then
+      if HR.Cast(S.SeedOfCorruption, nil, nil, not Target:IsSpellInRange(S.SeedOfCorruption)) then return "SeedOfCorruption InCombat"; end
     end
     --actions+=/vile_taint,if=(soul_shard>1|active_enemies>2)&cooldown.summon_darkglare.remains>12
-    if S.VileTaint:IsCastable() and S.VileTaint:IsAvailable() and (Player:SoulShards() > 1 or Enemies40yCount > 2) and S.SummonDarkglare:CooldownRemains() > 12 then
+    if S.VileTaint:IsCastable() and S.VileTaint:IsAvailable() and (Player:SoulShardsP() > 1 or Enemies40yCount > 2) and S.SummonDarkglare:CooldownRemains() > 12 then
       if HR.Cast(S.VileTaint) then return "VileTaint InCombat"; end
     end
     --actions+=/siphon_life,if=refreshable
     if S.SiphonLife:IsCastable() and S.SiphonLife:IsAvailable() and Target:DebuffRefreshable(S.SiphonLife) then
-      if HR.Cast(S.SiphonLife) then return "SiphonLife InCombat"; end
+      if HR.Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife InCombat"; end
     end
     --actions+=/unstable_affliction,if=refreshable
-    if S.UnstableAffliction:IsCastable() and Target:DebuffRefreshable(S.UnstableAffliction) and EnemiesUnstableAfflictionCount < 1 then
-      if HR.Cast(S.UnstableAffliction) then return "UnstableAffliction InCombat"; end
+    if S.UnstableAffliction:IsCastable() and not Player:IsCasting(S.UnstableAffliction) then
+      if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction InCombat 1"; end
     end
     --actions+=/unstable_affliction,if=azerite.cascading_calamity.enabled&buff.cascading_calamity.remains<3 TODO
     if S.UnstableAffliction:IsCastable() and Player:BuffUp(S.CascadingCalamityBuff) and Player:BuffRemains(S.CascadingCalamityBuff) < 3 then
-      if HR.Cast(S.UnstableAffliction) then return "UnstableAffliction"; end
+      if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction InCombat 2"; end
     end
     --actions+=/corruption,if=(active_enemies<3|talent.vile_taint.enabled|talent.writhe_in_agony.enabled&!talent.sow_the_seeds.enabled)&refreshable
     if S.Corruption:IsCastable() and (Enemies40yCount < 3 or S.VileTaint:IsAvailable() or S.WritheInAgony:IsAvailable() and not S.SowTheSeeds:IsAvailable()) and Target:DebuffRefreshable(S.CorruptionDebuff) then
-      if HR.Cast(S.Corruption) then return "Corruption InCombat 1"; end
+      if HR.Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 1"; end
     end
     --actions+=/haunt
     if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
-      if HR.Cast(S.Haunt) then return "Haunt InCombat"; end
+      if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt InCombat"; end
     end
     --actions+=/malefic_rapture,if=soul_shard>4
-    if S.MaleficRapture:IsCastable() and Player:SoulShards() > 4 then
+    if S.MaleficRapture:IsCastable() and Player:SoulShardsP() > 4 then
       if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 1"; end
     end
     --actions+=/siphon_life,cycle_targets=1,if=active_enemies>1,target_if=dot.siphon_life.remains<3
     if S.SiphonLife:IsCastable() and S.SiphonLife:IsAvailable() then
-      if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife) then return "SiphonLife InCombat"; end
+      if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife InCombat"; end
     end
     --actions+=/corruption,cycle_targets=1,if=active_enemies<3|talent.vile_taint.enabled|talent.writhe_in_agony.enabled&!talent.sow_the_seeds.enabled,target_if=dot.corruption.remains<3
     if S.Corruption:IsCastable() and Enemies40yCount < 3 or S.VileTaint:IsAvailable() or S.WritheInAgony:IsAvailable() and not S.SowTheSeeds:IsAvailable() then
-      if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruption) then return "Corruption InCombat 2"; end
+      if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruption, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 2"; end
     end
     --actions+=/call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
     if S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularity) or not S.PhantomSingularity:IsAvailable()) then
@@ -437,29 +447,29 @@ local function APL()
       local se = Se(); if se then return se; end
     end
     --actions+=/malefic_rapture,if=dot.vile_taint.ticking
-    if S.MaleficRapture:IsCastable() and S.VileTaint:IsAvailable() and Target:DebuffUp(S.VileTaint) and Player:SoulShards() > 0 then
+    if S.MaleficRapture:IsCastable() and S.VileTaint:IsAvailable() and Target:DebuffUp(S.VileTaint) and Player:SoulShardsP() > 0 then
       if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 2"; end
     end
     --actions+=/malefic_rapture,if=talent.phantom_singularity.enabled&(dot.phantom_singularity.ticking||cooldown.phantom_singularity.remains>12||soul_shard>3)
-    if S.MaleficRapture:IsCastable() and S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.PhantomSingularity) >= 1 or S.PhantomSingularity:CooldownRemains() > 12 or Player:SoulShards() > 3) then
+    if S.MaleficRapture:IsCastable() and S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.PhantomSingularity) or S.PhantomSingularity:CooldownRemains() > 12 or Player:SoulShardsP() > 3) and Player:SoulShardsP() > 0 then
       if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 3"; end
     end
     --actions+=/malefic_rapture,if=talent.sow_the_seeds.enabled
-    if S.MaleficRapture:IsCastable() and S.SowTheSeeds:IsAvailable() and Player:SoulShards() > 0 then
+    if S.MaleficRapture:IsCastable() and S.SowTheSeeds:IsAvailable() and Player:SoulShardsP() > 0 then
       if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 4"; end
     end
     --actions+=/drain_life,if=buff.inevitable_demise.stack>30|buff.inevitable_demise.up&time_to_die<5
-    if S.DrainLife:IsCastable() and (Player:BuffStack(S.InvetiableDemiseBuff) > 30 or Player:BuffUp(S.InvetiableDemiseBuff)) and Target:TimeToDie() < 5 then
-      if HR.Cast(S.DrainLife) then return "DrainLife InCombat"; end
+    if S.DrainLife:IsCastable() and Player:BuffStack(S.InvetiableDemiseBuff) > 30 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5 then
+      if HR.Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife InCombat"; end
     end
     --actions+=/drain_life,if=buff.inevitable_demise_az.stack>30 TODO
     --actions+=/drain_soul
     if S.DrainSoul:IsCastable() and S.DrainSoul:IsAvailable() then
-      if HR.Cast(S.DrainSoul) then return "DrainSoul InCombat"; end
+      if HR.Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "DrainSoul InCombat"; end
     end
     --actions+=/shadow_bolt
     if S.ShadowBolt:IsCastable() and S.ShadowBolt:IsAvailable() then
-      if HR.Cast(S.ShadowBolt) then return "ShadowBolt InCombat"; end
+      if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt InCombat"; end
     end
 
     return

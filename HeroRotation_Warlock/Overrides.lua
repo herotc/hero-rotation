@@ -11,7 +11,7 @@ local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
 -- Spells
---local SpellAffli   = Spell.Warlock.Affliction
+local SpellAffli   = Spell.Warlock.Affliction
 local SpellDemo    = Spell.Warlock.Demonology
 --local SpellDestro  = Spell.Warlock.Destruction
 -- Lua
@@ -20,6 +20,24 @@ local SpellDemo    = Spell.Warlock.Demonology
 --SpellAffli.Haunt:RegisterInFlight()
 --- ============================ CONTENT ============================
 -- Affliction, ID: 265
+
+HL.AddCoreOverride ("Player.SoulShardsP",
+  function ()
+    local Shard = Player:SoulShards()
+    if not Player:IsCasting() then
+      return Shard
+    else
+      if Player:IsCasting(SpellAffli.MaleficRapture) or Player:IsCasting(SpellAffli.SeedOfCorruption)
+        or Player:IsCasting(SpellAffli.VileTaint) or Player:IsCasting(SpellAffli.SummonPet) then
+        return Shard - 1
+      else
+        return Shard
+      end
+    end
+  end
+  , 265)
+
+
 --[[HL.AddCoreOverride ("Spell.IsCastableP",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local RangeOK = true
@@ -32,22 +50,6 @@ local SpellDemo    = Spell.Warlock.Demonology
       return BaseCheck and not (Pet:IsActive() or Player:BuffP(SpellAffli.GrimoireofSacrificeBuff))
     else
       return BaseCheck
-    end
-  end
-, 265)
-
-HL.AddCoreOverride ("Player.SoulShardsP",
-  function (self)
-    local Shard = WarlockPowerBar_UnitPower(self.UnitID)
-    if not Player:IsCasting() then
-      return Shard
-    else
-      if Player:IsCasting(SpellAffli.UnstableAffliction) or Player:IsCasting(SpellAffli.SeedOfCorruption) 
-          or Player:IsCasting(SpellAffli.VileTaint) or Player:IsCasting(SpellAffli.SummonPet) then
-        return Shard - 1
-      else
-        return Shard
-      end
     end
   end
 , 265)
@@ -105,7 +107,7 @@ DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
 , 266)
 
 local DemoOldSpellIsReady
-DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady", 
+DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local RangeOK = true
     if Range then
@@ -137,7 +139,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
         return Shard
       elseif Player:IsCasting(SpellDemo.SummonVilefiend)
           or  Player:IsCasting(SpellDemo.SummonPet)
-          or  Player:IsCasting(SpellDemo.GrimoireFelguard) 
+          or  Player:IsCasting(SpellDemo.GrimoireFelguard)
           or  Player:IsCasting(SpellDemo.NetherPortal) then
         return Shard - 1
       elseif Player:IsCasting(SpellDemo.HandofGuldan) then
@@ -158,7 +160,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
         else
           return Shard + 1
         end
-      elseif Player:IsCasting(SpellDemo.SummonDemonicTyrant) and Player:Level() >= 58 then 
+      elseif Player:IsCasting(SpellDemo.SummonDemonicTyrant) and Player:Level() >= 58 then
         return 5
       else
         return Shard
