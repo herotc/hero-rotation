@@ -350,8 +350,8 @@ local function APL()
     Enemies40yCount = 1
     EnemiesCount10ySplash = 1
 
-    EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAffliction, Enemies40y)
   end
+  EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAffliction, Enemies40y)
 
   -- Defensives
 
