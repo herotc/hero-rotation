@@ -73,39 +73,40 @@ local function bool(val)
 end
 
 local function EvaluateCycleAgony(TargetUnit)
-  return (TargetUnit:DebuffDown(S.Agony) or TargetUnit:DebuffRefreshable(S.Agony))
+  --refreshable&dot.agony.ticking
+  return (TargetUnit:DebuffRefreshable(S.Agony) and TargetUnit:AffectingCombat())
 end
 
 local function EvaluateCycleAgony1(TargetUnit)
-  --refreshable&dot.agony.ticking
-  return (TargetUnit:DebuffRefreshable(S.Agony) and TargetUnit:DebuffUp(S.Agony))
+  --refreshable
+  return (TargetUnit:DebuffRefreshable(S.Agony) and TargetUnit:DebuffUp(S.Agony) and TargetUnit:AffectingCombat())
 end
 
 local function EvaluateCycleSiphonLife1(TargetUnit)
   -- !dot.siphon_life.ticking
-  return (not TargetUnit:DebuffUp(S.SiphonLife))
+  return (not TargetUnit:DebuffUp(S.SiphonLife) and TargetUnit:AffectingCombat())
 end
 
 local function EvaluateCycleAgony2(TargetUnit)
   --refreshable&dot.agony.ticking
-  return (not TargetUnit:DebuffUp(S.Agony))
+  return (not TargetUnit:DebuffUp(S.Agony) and TargetUnit:AffectingCombat())
 end
 
 local function EvaluateCycleSiphonLife(TargetUnit)
   --dot.siphon_life.remains<3
-  return (TargetUnit:DebuffRemains(S.SiphonLife) < 3)
+  return (TargetUnit:DebuffRemains(S.SiphonLife) < 3) and TargetUnit:AffectingCombat()
 end
 
 local function EvaluateCycleCorruption(TargetUnit)
-  return (TargetUnit:DebuffRemains(S.CorruptionDebuff) < 3)
+  return (TargetUnit:DebuffRemains(S.CorruptionDebuff) < 3) and TargetUnit:AffectingCombat()
 end
 
 local function EvaluateCycleSeedOfCorruption(TargetUnit)
-  return (not TargetUnit:DebuffUp(S.SeedOfCorruption) and not S.SeedOfCorruption:InFlight())
+  return (not TargetUnit:DebuffUp(S.SeedOfCorruption) and not S.SeedOfCorruption:InFlight()) and TargetUnit:AffectingCombat()
 end
 
 local function EvaluateCycleUnstableAffliction(TargetUnit)
-  return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRefreshable(S.UnstableAffliction)) or EnemiesWithUnstableAfflictionDebuff == 0)
+  return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRefreshable(S.UnstableAffliction)) or EnemiesWithUnstableAfflictionDebuff == 0) and TargetUnit:AffectingCombat()
 end
 
 -- Counter for Debuff on other enemies
@@ -352,7 +353,6 @@ local function APL()
 
   end
   EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAffliction, Enemies40y)
-
   -- Defensives
 
   -- Out of Combat
@@ -412,7 +412,7 @@ local function APL()
       if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction InCombat 2"; end
     end
     --actions+=/corruption,if=(active_enemies<3|talent.vile_taint.enabled|talent.writhe_in_agony.enabled&!talent.sow_the_seeds.enabled)&refreshable
-    if S.Corruption:IsCastable() and (Enemies40yCount < 3 or S.VileTaint:IsAvailable() or S.WritheInAgony:IsAvailable() and not S.SowTheSeeds:IsAvailable()) and Target:DebuffRefreshable(S.CorruptionDebuff) then
+    if S.Corruption:IsCastable() and Target:AffectingCombat() and (Enemies40yCount < 3 or S.VileTaint:IsAvailable() or S.WritheInAgony:IsAvailable() and not S.SowTheSeeds:IsAvailable()) and Target:DebuffRefreshable(S.CorruptionDebuff) then
       if HR.Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 1"; end
     end
     --actions+=/haunt
