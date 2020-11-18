@@ -1,6 +1,6 @@
 ## Interface: 90001
 
-## Title: Hero|cFFA330C9Rotation|r [|cFFA330C9Warrior|r]
+## Title: Hero|cFFA330C9Rotation|r [|cFFC69B6DWarrior|r]
 ## Author: Kaptiva
 ## Notes: Hero Rotation - Warrior Module.
 
