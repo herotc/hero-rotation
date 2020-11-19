@@ -155,7 +155,7 @@ local function Precombat()
     if HR.Cast(S.SeedOfCorruption, nil, nil, not Target:IsSpellInRange(S.SeedOfCorruption)) then return "SeedOfCorruption precombat"; end
   end
   --actions.precombat+=/hauntE
-  if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
+  if S.Haunt:IsCastable() and not Player:IsCasting(S.Haunt) and S.Haunt:IsAvailable() then
     if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt precombat"; end
   end
   --actions.precombat+=/shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3&!equipped.169314 TODO
@@ -244,7 +244,7 @@ end
 
 local function Se()
   --actions.se=haunt
-  if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
+  if S.Haunt:IsCastable() and not Player:IsCasting(S.Haunt) and S.Haunt:IsAvailable() then
     if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Se"; end
   end
   --actions.se+=/drain_soul,interrupt_if=debuff.shadow_embrace.stack>=3 TODO
@@ -260,7 +260,7 @@ local function Aoe()
     if HR.Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity Aoe"; end
   end
   --actions.aoe+=/haunt
-  if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
+  if S.Haunt:IsCastable() and not Player:IsCasting(S.Haunt) and S.Haunt:IsAvailable() then
     if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Aoe"; end
   end
   --actions.aoe+=/seed_of_corruption,if=talent.sow_the_seeds.enabled&can_seed TODO
@@ -288,11 +288,11 @@ local function Aoe()
     if HR.Cast(S.VileTaint) then return "VileTaint Aoe"; end
   end
   --actions.aoe+=/call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.ready&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-  if S.SummonDarkglare:IsReady() and (Target:DebuffRemains(S.PhantomSingularity) > 2 or not S.PhantomSingularity:IsAvailable()) then
+  if S.SummonDarkglare:IsReady() and CDsON() and (Target:DebuffRemains(S.PhantomSingularity) > 2 or not S.PhantomSingularity:IsAvailable()) then
     local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
   end
   --actions.aoe+=/dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
-  if S.DarkSoulMisery:IsCastable() and S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() then
+  if S.DarkSoulMisery:IsCastable() and CDsON() and S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() then
     if HR.Cast(S.DarkSoulMisery) then return "DarkSoulMisery Aoe"; end
   end
   --actions.aoe+=/call_action_list,name=cooldowns
@@ -388,7 +388,7 @@ local function APL()
       if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony, not Target:IsSpellInRange(S.Agony)) then return "Agony InCombat"; end
     end
     --actions+=/call_action_list,name=darkglare_prep,if=active_enemies>2&cooldown.summon_darkglare.ready&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
-    if S.SummonDarkglare:IsReady() and Enemies40yCount > 2 and (Target:DebuffUp(S.PhantomSingularity) or not S.PhantomSingularity:IsAvailable()) then
+    if S.SummonDarkglare:IsReady() and CDsON() and Enemies40yCount > 2 and (Target:DebuffUp(S.PhantomSingularity) or not S.PhantomSingularity:IsAvailable()) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     --actions+=/seed_of_corruption,if=active_enemies>2&!talent.vile_taint.enabled&(!talent.writhe_in_agony.enabled|talent.sow_the_seeds.enabled)&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.refreshable
@@ -416,7 +416,7 @@ local function APL()
       if HR.Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 1"; end
     end
     --actions+=/haunt
-    if S.Haunt:IsCastable() and S.Haunt:IsAvailable() then
+    if S.Haunt:IsCastable() and not Player:IsCasting(S.Haunt) and S.Haunt:IsAvailable() then
       if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt InCombat"; end
     end
     --actions+=/malefic_rapture,if=soul_shard>4
@@ -432,11 +432,11 @@ local function APL()
       if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruption, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 2"; end
     end
     --actions+=/call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-    if S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularity) or not S.PhantomSingularity:IsAvailable()) then
+    if S.SummonDarkglare:CooldownRemains() < 2 and CDsON() and (Target:DebuffRemains(S.PhantomSingularity) or not S.PhantomSingularity:IsAvailable()) then
       local darkglare_prep = Darkglare_prep(); if darkglare_prep then return darkglare_prep; end
     end
     --actions+=/dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
-    if S.DarkSoulMisery:IsCastable() and S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() then
+    if S.DarkSoulMisery:IsCastable() and CDsON() and S.DarkSoulMisery:IsAvailable() and S.SummonDarkglare:CooldownRemains() > Target:TimeToDie() then
       if HR.Cast(S.DarkSoulMisery) then return "DarkSoulMisery InCombat"; end
     end
     --actions+=/call_action_list,name=cooldowns
