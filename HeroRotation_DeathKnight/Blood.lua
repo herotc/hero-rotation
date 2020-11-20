@@ -243,6 +243,10 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool During Blooddrinker"; end
     end
     -- auto_attack
+    -- shackle_the_unworthy
+    if S.ShackleTheUnworthy:IsCastable() then
+      if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShackleTheUnworthy)) then return "shackle_the_unworthy"; end
+    end
     -- blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
     if S.BloodFury:IsCastable() and (S.DancingRuneWeapon:CooldownUp() and (not S.Blooddrinker:IsReady() or not S.Blooddrinker:IsAvailable())) then
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end

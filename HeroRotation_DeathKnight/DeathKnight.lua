@@ -42,6 +42,7 @@ Spell.DeathKnight.Blood = {
   Tombstone                             = Spell(219809),
   -- Covenant Abilities
   DeathsDue                             = Spell(324128),
+  ShackleTheUnworthy                    = Spell(312202),
   -- Conduit Effects
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
