@@ -40,6 +40,7 @@ Spell.Shaman.Enhancement = {
   FrostShock                            = Spell(196840),
   LightningBolt                         = Spell(188196),
   LightningShield                       = Spell(192106),
+  WindShear                             = Spell(57994),
 
   -- Defensive
   AstralShift                           = Spell(10871),
@@ -113,4 +114,8 @@ Spell.Shaman.Enhancement = {
 
   -- Macros
 
+}
+
+if not Item.Shaman then Item.Shaman = {} end
+Item.Shaman.Enhancement = {
 }
