@@ -46,7 +46,7 @@ local hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID
 
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount, EnemiesCount30ySplash
 
-local EnemiesFlameShockCount
+local EnemiesFlameShockCount = 0
 
 local function bool(val)
   return val ~= 0
@@ -71,7 +71,7 @@ local function calcEnemiesFlameShockCount(Object, Enemies)
     for _, CycleUnit in pairs(Enemies) do
       if CycleUnit:DebuffUp(Object) then
         debuffs = debuffs + 1;
-        EnemiesFlameShockCount = debuffs or 0
+        EnemiesFlameShockCount = debuffs
       end
     end
   end
@@ -298,8 +298,10 @@ local function APL()
   if AoEON() then
     Enemies40y = Player:GetEnemiesInRange(40)
     Enemies40yCount = #Enemies40y
+    calcEnemiesFlameShockCount(S.FlameShock, Enemies40y)
   else
     Enemies40yCount = 1
+    EnemiesFlameShockCount = 1
   end
 
   if Everyone.TargetIsValid() then
@@ -359,7 +361,6 @@ local function APL()
     end
     -- call_action_list,name=aoe,if=active_enemies>1
     if Enemies40yCount > 1 then
-      calcEnemiesFlameShockCount(S.FlameShock, Enemies40y)
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- If nothing else to do, show the Pool icon
