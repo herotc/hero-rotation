@@ -86,7 +86,7 @@ local function Precombat()
   -- food
   -- augmentation
   -- devotion_aura
-  if S.DevotionAura:IsCastable and (Player:BuffDown(S.DevotionAuraBuff)) then
+  if S.DevotionAura:IsCastable() and (Player:BuffDown(S.DevotionAuraBuff)) then
     if HR.Cast(S.DevotionAura) then return "devotion_aura"; end
   end
   -- snapshot_stats
