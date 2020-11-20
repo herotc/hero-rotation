@@ -195,7 +195,6 @@ local function Single()
 end
 
 local function Aoe()
-  --# Multi target action priority list
   --actions.aoe=frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsCastable() and Player:BuffUp(S.HailstormBuff) then
     if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "FrostShock 3"; end
@@ -308,11 +307,8 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-    --# Executed every time the actor is available.
     --actions=bloodlust
-    --# In-combat potion is before combat ends.
     -- potion,if=expected_combat_length-time<60
-    --# Interrupt of casts.
     -- wind_shear
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
@@ -375,4 +371,4 @@ local function Init()
 
 end
 
-HR.SetAPL(263, APL)
+HR.SetAPL(263, APL, Init)
