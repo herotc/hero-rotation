@@ -14,6 +14,7 @@ move-folders:
      HeroRotation/HeroRotation_Paladin: HeroRotation_Paladin
      HeroRotation/HeroRotation_Priest: HeroRotation_Priest
      HeroRotation/HeroRotation_Rogue: HeroRotation_Rogue
+     HeroRotation/HeroRotation_Shaman: HeroRotation_Shaman
      HeroRotation/HeroRotation_Warlock: HeroRotation_Warlock
      HeroRotation/HeroRotation_Warrior: HeroRotation_Warrior
 
