@@ -142,37 +142,37 @@ local function Aoe()
   -- thunder_clap
   if (S.ThunderClap:IsCastable() or S.ThunderClap:CooldownRemains() < 0.150) then
     SuggestRageDump(5)
-    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap 6"; end
+    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap aoe 2"; end
   end
   -- demoralizing_shout,if=talent.booming_voice.enabled
   if S.DemoralizingShout:IsCastable() and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
     SuggestRageDump(40)
-    if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout, nil, not Target:IsInMeleeRange(10)) then return "demoralizing_shout 8"; end
+    if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout, nil, not Target:IsInMeleeRange(10)) then return "demoralizing_shout aoe 4"; end
   end
   -- dragon_roar
   if S.DragonRoar:IsCastable() and HR.CDsON() then
-    if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar 12"; end
+    if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar aoe 6"; end
   end
   -- revenge
   if S.Revenge:IsReady() and Player:BuffUp(S.RevengeBuff) then
-    if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge 14"; end
+    if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge aoe 8"; end
   end
   -- revenge if you've got ignore pain up and you don't need to shield block soon
   if S.Revenge:IsCastable("Melee") and not ShouldPressShieldBlock() and Player:Rage() > 40 then 
-    if HR.Cast(S.Revenge) then return "revenge for rage dump"; end
+    if HR.Cast(S.Revenge) then return "revenge aoe 10 (rage dump)"; end
   end
   -- ravager
   if S.Ravager:IsCastable() then
-    if HR.Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager 16"; end
+    if HR.Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager aoe 12"; end
   end
   -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
   if S.ShieldBlock:IsCastable() and (S.ShieldSlam:CooldownUp() and Player:BuffDown(S.ShieldBlockBuff)) then
-    if HR.Cast(S.ShieldBlock, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_block aoe"; end
+    if HR.Cast(S.ShieldBlock, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_block aoe 14"; end
   end
   -- shield_slam
   if S.ShieldSlam:IsCastable() then
     SuggestRageDump(15)
-    if HR.Cast(S.ShieldSlam, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_slam 24"; end
+    if HR.Cast(S.ShieldSlam, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_slam aoe 16"; end
   end
 end
 
@@ -180,59 +180,59 @@ local function St()
   -- thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
   if (S.ThunderClap:IsCastable() or S.ThunderClap:CooldownRemains() < 0.150) and (EnemiesCount8 == 2 and S.UnstoppableForce:IsAvailable() and Player:BuffUp(S.AvatarBuff)) then
     SuggestRageDump(5)
-    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap 26"; end
+    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap st 32"; end
   end
   -- shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
   if S.ShieldBlock:IsReady() and (S.ShieldSlam:CooldownUp() and Player:BuffDown(S.ShieldBlockBuff)) then
-    if HR.Cast(S.ShieldBlock, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_block st"; end
+    if HR.Cast(S.ShieldBlock, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_block st 34"; end
   end
   -- shield_slam,if=buff.shield_block.up
   if S.ShieldSlam:IsCastable() and (Player:BuffUp(S.ShieldBlockBuff)) then
     SuggestRageDump(15)
-    if HR.Cast(S.ShieldSlam, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_slam 44"; end
+    if HR.Cast(S.ShieldSlam, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_slam st 36"; end
   end
   -- thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
   if S.ThunderClap:IsCastable() and (S.UnstoppableForce:IsAvailable() and Player:BuffUp(S.AvatarBuff)) then
     SuggestRageDump(5)
-    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap 54"; end
+    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap st 38"; end
   end
   -- demoralizing_shout,if=talent.booming_voice.enabled
   if S.DemoralizingShout:IsCastable() and (S.BoomingVoice:IsAvailable() and Player:RageDeficit() >= 40) then
     SuggestRageDump(40)
-    if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout, nil, not Target:IsInMeleeRange(10)) then return "demoralizing_shout 60"; end
+    if HR.Cast(S.DemoralizingShout, Settings.Protection.GCDasOffGCD.DemoralizingShout, nil, not Target:IsInMeleeRange(10)) then return "demoralizing_shout st 40"; end
   end
   -- shield_slam
   if S.ShieldSlam:IsCastable() then
-    if HR.Cast(S.ShieldSlam, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_slam 44"; end
+    if HR.Cast(S.ShieldSlam, nil, nil, not Target:IsInMeleeRange(5)) then return "shield_slam st 42"; end
   end
   -- dragon_roar
   if S.DragonRoar:IsCastable() and CDsON() then
-    if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar 73"; end
+    if HR.Cast(S.DragonRoar, Settings.Protection.GCDasOffGCD.DragonRoar, nil, not Target:IsInMeleeRange(12)) then return "dragon_roar st 44"; end
   end
   -- thunder_clap
   if S.ThunderClap:IsCastable() then
     SuggestRageDump(5)
-    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap 74"; end
+    if HR.Cast(S.ThunderClap, nil, nil, not Target:IsInMeleeRange(12)) then return "thunder_clap st 46"; end
   end
   -- revenge
   if S.Revenge:IsReady() and Player:BuffUp(S.RevengeBuff) then
-    if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge 76"; end
+    if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge st 48"; end
   end
   -- revenge if you've got ignore pain up and you don't need to shield block soon
   if S.Revenge:IsCastable() and not ShouldPressShieldBlock() and Player:Rage() > 40 then
-    if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge for rage dump"; end
+    if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge st 50 (rage dump)"; end
   end
   -- ravager
   if S.Ravager:IsCastable() then
-    if HR.Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager 78"; end
+    if HR.Cast(S.Ravager, nil, nil, not Target:IsSpellInRange(S.Ravager)) then return "ravager st 52"; end
   end
   -- devastate
   if S.Devastate:IsCastable() then
-    if HR.Cast(S.Devastate, nil, nil, not Target:IsInMeleeRange(5)) then return "devastate 80"; end
+    if HR.Cast(S.Devastate, nil, nil, not Target:IsInMeleeRange(5)) then return "devastate st 54"; end
   end
   -- storm_bolt
   if S.StormBolt:IsCastable() then
-    if HR.Cast(S.StormBolt, nil, nil, not Target:IsSpellInRange(S.StormBolt)) then return "storm_bolt st"; end
+    if HR.Cast(S.StormBolt, nil, nil, not Target:IsSpellInRange(S.StormBolt)) then return "storm_bolt st 56"; end
   end
 end
 
@@ -262,45 +262,45 @@ local function APL()
     if (HR.CDsON()) then
       -- blood_fury
       if S.BloodFury:IsCastable() then
-        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 91"; end
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racial"; end
       end
       -- berserking
       if S.Berserking:IsCastable() then
-        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 93"; end
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racial"; end
       end
       -- arcane_torrent
       if S.ArcaneTorrent:IsCastable() then
-        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent 95"; end
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, 8) then return "arcane_torrent racial"; end
       end
       -- lights_judgment
       if S.LightsJudgment:IsCastable() then
-        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment 97"; end
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "lights_judgment racial"; end
       end
       -- fireblood
       if S.Fireblood:IsCastable() then
-        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 99"; end
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racial"; end
       end
       -- ancestral_call
       if S.AncestralCall:IsCastable() then
-        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 101"; end
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racial"; end
       end
       -- bag_of_tricks
       if S.BagofTricks:IsCastable() then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks 103"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, 40) then return "bag_of_tricks racial"; end
       end
     end
     -- potion,if=buff.avatar.up|target.time_to_die<25
     if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.AvatarBuff) or Target:TimeToDie() < 25) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 105"; end
+      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury main 102"; end
     end
     -- ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
     if S.IgnorePain:IsReady() and (Player:RageDeficit() < 25 + 20 * num(S.BoomingVoice:IsAvailable()) * num(S.DemoralizingShout:CooldownUp()) and IgnorePainWillNotCap() and IsCurrentlyTanking()) then
-      if HR.CastRightSuggested(S.IgnorePain) then return "ignore_pain 107"; end
+      if HR.CastRightSuggested(S.IgnorePain) then return "ignore_pain main 104"; end
     end
     -- avatar
     if S.Avatar:IsCastable() and HR.CDsON() and (Player:BuffDown(S.AvatarBuff)) then
     SuggestRageDump(20)
-      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar 119"; end
+      if HR.Cast(S.Avatar, Settings.Protection.GCDasOffGCD.Avatar) then return "avatar main 106"; end
     end
     -- run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
     if (EnemiesCount8 >= 3) then
