@@ -50,7 +50,6 @@ Spell.Shaman.Enhancement = {
   CapacitorTotem                        = Spell(192058),
 
   -- Racials
-  ArcaneTorrent                         = Spell(28730),
   BloodFury                             = Spell(33697),
   Berserking                            = Spell(26297),
   Fireblood                             = Spell(265221),
@@ -149,7 +148,6 @@ Spell.Shaman.Elemental = {
   CapacitorTotem                        = Spell(192058),
 
   -- Racials
-  ArcaneTorrent                         = Spell(28730),
   BloodFury                             = Spell(33697),
   Berserking                            = Spell(26297),
   Fireblood                             = Spell(265221),
