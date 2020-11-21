@@ -132,7 +132,7 @@ local function Aoe()
     if HR.Cast(S.EchoingShock) then return "echoing_shock aoe 12"; end
   end
   -- ascendance,if=talent.ascendance.enabled&(!pet.storm_elemental.active)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-  if S.Ascendance:IsCastable() and (SEActive and (not S.Icefury:IsAvailable() or not Player:BuffUp(S.IcefuryBuff) and not S.Icefury:CooldownUp())) then
+  if S.Ascendance:IsCastable() and ((not SEActive) and (not S.Icefury:IsAvailable() or not Player:BuffUp(S.IcefuryBuff) and not S.Icefury:CooldownUp())) then
     if HR.Cast(S.Ascendance, Settings.Elemental.GCDasOffGCD.Ascendance) then return "ascendance aoe 14"; end
   end
   -- liquid_magma_totem,if=talent.liquid_magma_totem.enabled
@@ -160,11 +160,11 @@ local function Aoe()
     if HR.Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 26"; end
   end
   -- lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!pet.storm_elemental.active)&dot.flame_shock.ticking
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and EnemiesCount10ySplash < 4 and SEActive and Target:DebuffUp(S.FlameShockDebuff)) then
+  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and EnemiesCount10ySplash < 4 and (not SEActive) and Target:DebuffUp(S.FlameShockDebuff)) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 28"; end
   end
   -- elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<5&(!pet.storm_elemental.active)
-  if S.ElementalBlast:IsReady() and (EnemiesCount10ySplash < 5 and SEActive) then
+  if S.ElementalBlast:IsReady() and (EnemiesCount10ySplash < 5 and (not SEActive)) then
     if HR.Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 30"; end
   end
   -- lava_beam,if=talent.ascendance.enabled
@@ -243,7 +243,7 @@ local function SESingle()
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 84"; end
   end
   -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and not S.MasterOfTheElements:IsAvailable()) then
+  if S.LavaBurst:IsReady() and (not S.MasterOfTheElements:IsAvailable()) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 86"; end
   end
   -- icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
@@ -251,7 +251,7 @@ local function SESingle()
     if HR.Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury ses 88"; end
   end
   -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) then
+  if S.LavaBurst:IsReady() and (S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst ses 90"; end
   end
   -- frost_shock,if=talent.icefury.enabled&buff.icefury.up
@@ -267,7 +267,7 @@ local function SESingle()
     if HR.Cast(S.StaticDischarge, nil, nil, not Target:IsSpellInRange(S.StaticDischarge)) then return "static_discharge ses 96"; end
   end
   -- earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(!pet.storm_elemental.active)
-  if S.EarthElemental:IsCastable() and (not S.PrimalElementalist:IsAvailable() or S.PrimalElementalist:IsAvailable() and not SEActive) then
+  if S.EarthElemental:IsCastable() and (not S.PrimalElementalist:IsAvailable() or S.PrimalElementalist:IsAvailable() and (not SEActive)) then
     if HR.Cast(S.EarthElemental) then return "earth_elemental ses 98"; end
   end
   -- lightning_bolt
@@ -343,7 +343,7 @@ local function Single()
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 148"; end
   end
   -- lava_burst,if=cooldown_react&!talent.master_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and not S.MasterOfTheElements:IsAvailable()) then
+  if S.LavaBurst:IsReady() and (not S.MasterOfTheElements:IsAvailable()) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 150"; end
   end
   -- icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)
@@ -351,7 +351,7 @@ local function Single()
     if HR.Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single 152"; end
   end
   -- lava_burst,if=cooldown_react&charges>talent.echo_of_the_elements.enabled
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff) and S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) then
+  if S.LavaBurst:IsReady() and (S.LavaBurst:Charges() > num(S.EchoOfTheElements:IsAvailable())) then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 154"; end
   end
   -- frost_shock,if=talent.icefury.enabled&buff.icefury.up&buff.icefury.remains<1.1*gcd*buff.icefury.stack
@@ -359,7 +359,7 @@ local function Single()
     if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 156"; end
   end
   -- lava_burst,if=cooldown_react
-  if S.LavaBurst:IsReady() and (Player:BuffUp(S.LavaSurgeBuff)) then
+  if S.LavaBurst:IsReady() then
     if HR.Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 158"; end
   end
   -- flame_shock,target_if=refreshable
@@ -420,8 +420,8 @@ local function APL()
     EnemiesFlameShockCount = 1
   end
   
-  SEActive = (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemains() < S.StormElemental:Cooldown() - 30)
-  FEActive = (not S.StormElemental:IsAvailable() and S.FireElemental:CooldownRemains() < S.FireElemental:Cooldown() - 30)
+  SEActive = (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemains() > S.StormElemental:Cooldown() - 30)
+  FEActive = (not S.StormElemental:IsAvailable() and S.FireElemental:CooldownRemains() > S.FireElemental:Cooldown() - 30)
 
   -- In Combat
   if Everyone.TargetIsValid() then
