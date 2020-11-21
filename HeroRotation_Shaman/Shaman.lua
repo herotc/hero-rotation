@@ -198,10 +198,16 @@ Spell.Shaman.Elemental = {
 
   -- Defensive
 
-  -- Utility
+  -- Covenant Abilities
+  ChainHarvest                          = Spell(320674),
+  FaeTransfusion                        = Spell(328923),
+  PrimordialWave                        = Spell(326059),
+  PrimordialWaveBuff                    = Spell(327164),
+  VesperTotem                           = Spell(324386),
 
   -- Legendaries
-  EchoesoftheGreatSunderingBuff         = Spell(336217),
+  EchoesofGreatSunderingBuff            = Spell(336217),
+  ElementalEquilibriumBuff              = Spell(347348),
 
   -- Misc
   Pool                                  = Spell(999910),
