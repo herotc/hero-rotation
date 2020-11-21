@@ -151,6 +151,7 @@ Spell.DemonHunter.Havoc = {
   
   -- Azerite Traits (BfA)
   ChaoticTransformation                 = Spell(288754),
+  FuriousGazeBuff                       = Spell(273232),
   RevolvingBlades                       = Spell(279581),
   
   -- Essences (BfA)

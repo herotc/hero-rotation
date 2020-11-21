@@ -240,8 +240,8 @@ local function Cooldown()
   if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff)) then
     if Cast(S.SinfulBrand, nil, nil, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 26"; end
   end
-  -- the_hunt
-  if S.TheHunt:IsCastable() then
+  -- the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum|buff.furious_gaze.up
+  if S.TheHunt:IsCastable() and (not S.Demonic:IsAvailable() and not VarWaitingForMomentum or Player:BuffUp(S.FuriousGazeBuff)) then
     if Cast(S.TheHunt, nil, nil, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 28"; end
   end
   -- fodder_to_the_flame
@@ -512,7 +512,7 @@ local function APL()
     if CDsON() then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
-    -- pick_up_fragment,if=demon_soul_fragments>0
+    -- pick_up_fragment,type=demon,if=demon_soul_fragments>0
     -- pick_up_fragment,if=fury.deficit>=35&(!azerite.eyes_of_rage.enabled|cooldown.eye_beam.remains>1.4)
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
     -- throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
