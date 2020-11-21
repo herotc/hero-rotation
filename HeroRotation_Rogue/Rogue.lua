@@ -200,6 +200,7 @@ Spell.Rogue.Outlaw = {
   CripplingPoison                 = Spell(3408),
   InstantPoison                   = Spell(315584),
   NumblingPoison                  = Spell(5761),
+  WoundPoison                     = Spell(8679),
   -- Misc
   ConductiveInkDebuff             = Spell(302565),
   VigorTrinketBuff                = Spell(287916),
@@ -298,6 +299,7 @@ Spell.Rogue.Subtlety = {
   CripplingPoison                       = Spell(3408),
   InstantPoison                         = Spell(315584),
   NumbingPoison                         = Spell(5761),
+  WoundPoison                           = Spell(8679),
   -- Misc
   ConductiveInkDebuff                   = Spell(302565),
   VigorTrinketBuff                      = Spell(287916),
