@@ -17,6 +17,7 @@ local Item = HL.Item
 local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
+local Cast = HR.Cast
 -- Lua
 
 
@@ -42,9 +43,9 @@ local TrinketsOnUseExcludes = {
   --  I.TrinketName:ID(),
 }
 
--- Enemies
+-- Interrupts
 
--- Stuns
+-- Enemies
 
 -- Rotation Variables
 
@@ -58,7 +59,7 @@ local TrinketsOnUseExcludes = {
 
 
 --- ======= MAIN =======
-local function APL ()
+local function APL()
   -- Rotation Variables Update
 
   -- Unit Update
@@ -85,7 +86,7 @@ local function APL ()
   end
 end
 
-local function OnInit ()
+local function OnInit()
 end
 
 HR.SetAPL(000, APL, OnInit)

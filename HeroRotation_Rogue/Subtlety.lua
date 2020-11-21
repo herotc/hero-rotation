@@ -692,7 +692,10 @@ local function APL ()
     MeleeEnemies10yCount = #MeleeEnemies10y
     MeleeEnemies5y = Player:GetEnemiesInMeleeRange(5) -- Melee cycle
   else
-    MeleeEnemies10yCount = 1
+    Enemies30y = {}
+    MeleeEnemies10y = {}
+    MeleeEnemies10yCount = 0
+    MeleeEnemies5y = {}
   end
 
   -- Cache updates

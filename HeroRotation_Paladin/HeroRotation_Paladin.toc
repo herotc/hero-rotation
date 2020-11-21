@@ -12,4 +12,5 @@ Settings.lua
 Paladin.lua
 Events.lua
 Protection.lua
+Retribution.lua
 Overrides.lua

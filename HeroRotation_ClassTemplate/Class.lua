@@ -24,3 +24,32 @@ HR.Commons.Class = Commons
 
 
 --- ============================ CONTENT ============================
+-- Spells
+if not Spell.Class then Spell.Class = {} end
+Spell.Class.Spec = {
+  -- Racials
+
+  -- Abilities
+
+  -- Talents
+
+  -- Trinkets
+
+  -- Covenants (Shadowlands)
+
+  -- Soulbinds/Conduits (Shadowlands)
+
+  -- Legendaries (Shadowlands)
+
+  -- Azerite Traits (BfA)
+
+  -- Essences (BfA)
+
+  -- Pool
+  Pool = Spell(999910)
+}
+
+-- Items
+if not Item.Class then Item.Class = {} end
+Item.Class.Spec = {
+}

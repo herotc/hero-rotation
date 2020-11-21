@@ -390,8 +390,8 @@ local function APL()
     Enemies40y = Player:GetEnemiesInRange(40) -- Barbed Shot Cycle
     SplashEnemies8yCount = Target:GetEnemiesInSplashRangeCount(8) -- Multi-Shot
   else
-    Enemies40y = { Target }
-    SplashEnemies8yCount = 1
+    Enemies40y = {}
+    SplashEnemies8yCount = 0
   end
   TargetInRange40y = Target:IsInRange(40) -- Most abilities
   TargetInRange30y = Target:IsInRange(30) -- Stampede

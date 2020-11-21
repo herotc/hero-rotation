@@ -18,8 +18,7 @@ local Item       = HL.Item
 local HR         = HeroRotation
 
 --- ============================ CONTENT ============================
-
--- Spell
+-- Spells
 if not Spell.Paladin then Spell.Paladin = {} end
 Spell.Paladin.Protection = {
   -- Racials
@@ -32,7 +31,7 @@ Spell.Paladin.Protection = {
   Fireblood                             = Spell(265221),
   GiftoftheNaaru                        = Spell(59542),
   LightsJudgment                        = Spell(255647),
-  
+
   -- Abilities
   ArdentDefender                        = Spell(31850),
   ArdentDefenderBuff                    = Spell(31850),
@@ -60,7 +59,7 @@ Spell.Paladin.Protection = {
   ShieldoftheRighteousBuff              = Spell(132403),
   ShiningLightFreeBuff                  = Spell(327510),
   WordofGlory                           = Spell(85673),
-  
+
   -- Talents
   BlessedHammer                         = Spell(204019),
   CrusadersJudgment                     = Spell(204023),
@@ -70,8 +69,10 @@ Spell.Paladin.Protection = {
   SanctifiedWrath                       = Spell(171648),
   Seraphim                              = Spell(152262),
   SeraphimBuff                          = Spell(152262),
-  
-  -- Covenant Abilities
+
+  -- Trinkets
+
+  -- Covenants (Shadowlands)
   AshenHallow                           = Spell(316958),
   BlessingofAutumn                      = Spell(328622),
   BlessingofSpring                      = Spell(328282),
@@ -84,15 +85,15 @@ Spell.Paladin.Protection = {
   SummonSteward                         = Spell(324739),
   VanquishersHammer                     = Spell(328204),
   VanquishersHammerBuff                 = Spell(328204),
-  
-  -- Soulbind/Conduit Effects
+
+  -- Soulbinds/Conduits (Shadowlands)
   VengefulShock                         = Spell(340006),
   VengefulShockDebuff                   = Spell(340007),
-  
-  -- Trinket Effects
-  
+
+
+
   -- Azerite Traits (BfA)
-  
+
   -- Essences (BfA)
   BloodoftheEnemy                       = Spell(297108),
   ConcentratedFlame                     = Spell(295373),
@@ -108,13 +109,61 @@ Spell.Paladin.Protection = {
   RippleInSpace                         = Spell(302731),
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
-  
+
   -- Pool
-  Pool                                  = Spell(999910)
+  Pool                                  = Spell(999910),
+}
+  -- Pool
+Spell.Paladin.Retribution = {
+  -- Racials
+  ArcaneTorrent     = Spell(155145),
+  Fireblood         = Spell(265221),
+  LightsJudgment    = Spell(255647),
+  -- Abilities
+  AvengingWrath     = Spell(31884),
+  BladeofJustice    = Spell(184575),
+  Consecration      = Spell(26573),
+  CrusaderStrike    = Spell(35395),
+  DivineStorm       = Spell(53385),
+  HammerofJustice   = Spell(853),
+  HammerofWrath     = Spell(24275),
+  HammerofWrath2    = Spell(326730),
+  Judgment          = Spell(20271),
+  Rebuke            = Spell(96231),
+  ShieldofVengeance = Spell(184662),
+  TemplarsVerdict   = Spell(85256),
+  WakeofAshes       = Spell(255937),
+  -- Talents
+  BladeofWrath      = Spell(231832),
+  Crusade           = Spell(231895),
+  DivinePurpose     = Spell(223817),
+  EmpyreanPower     = Spell(326732),
+  ExecutionSentence = Spell(343527),
+  FinalReckoning    = Spell(343721),
+  FiresofJustice    = Spell(203316),
+  HolyAvenger       = Spell(105809),
+  RighteousVerdict  = Spell(267610),
+  SanctifiedWrath   = Spell(317866),
+  Seraphim          = Spell(152262),
+  Zeal              = Spell(269569),
+  -- Trinkets
+
+  -- Covenants (Shadowlands)
+  AshenHallow       = Spell(316958),
+  DivineToll        = Spell(304971),
+  VanquishersHammer = Spell(328204),
+
+  -- Soulbinds/Conduits (Shadowlands)
+
+  -- Legendaries (Shadowlands)
+  FinalVerdictBuff  = Spell(337228),
+
+  -- Pool
+  Pool              = Spell(999910),
 }
 
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Protection = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofUnbridledFury = Item(169299),
 }
