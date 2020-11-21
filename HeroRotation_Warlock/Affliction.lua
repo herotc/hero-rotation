@@ -18,6 +18,7 @@ local Item = HL.Item
 local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
+local Cast  = HR.Cast
 -- Lua
 
 
@@ -141,62 +142,62 @@ local function Precombat()
   -- augmentation
   -- summon_pet
   if S.SummonPet:IsReady() then
-    if HR.Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet precombat"; end
+    if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet precombat"; end
   end
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsCastable() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
-    if HR.Cast(S.GrimoireofSacrifice) then return "GrimoureOfSacrifice precombat"; end
+    if Cast(S.GrimoireofSacrifice) then return "GrimoureOfSacrifice precombat"; end
   end
   -- snapshot_stats
   -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
   if S.SeedofCorruption:IsReady() and (EnemiesCount10ySplash >= 3 or Enemies40yCount >= 3) and Player:SoulShardsP() > 0 then
-    if HR.Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption precombat"; end
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption precombat"; end
   end
   -- haunt
   if S.Haunt:IsReady() then
-    if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt precombat"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt precombat"; end
   end
   -- shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3
   if S.ShadowBolt:IsReady() and not S.Haunt:IsAvailable() and EnemiesCount10ySplash < 3 then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt precombat"; end
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt precombat"; end
   end
   -- Custom precombat Agony with talents 3,3,1,1,1,1,3
   if S.Agony:IsReady() then
-    if HR.Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony precombat"; end
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony precombat"; end
   end
 end
 
 local function Darkglare_prep()
   -- vile_taint
-  if S.VileTaint:IsReady() then
-    if HR.Cast(S.VileTaint) then return "VileTaint Darkglare_prep"; end
+  if S.VileTaint:IsReady() and not Player:IsCasting(S.VileTaint) then
+    if Cast(S.VileTaint) then return "VileTaint Darkglare_prep"; end
   end
   -- dark_soul
   if S.DarkSoulMisery:IsReady() then
-    if HR.Cast(S.DarkSoulMisery) then return "DarkSoulMisery Darkglare_prep"; end
+    if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Darkglare_prep"; end
   end
   -- potion TODO
   -- fireblood
   if S.Fireblood:IsCastable() then
-    if HR.Cast(S.Fireblood) then return "Fireblood Darkglare_prep"; end
+    if Cast(S.Fireblood) then return "Fireblood Darkglare_prep"; end
   end
   -- blood_fury
   if S.BloodFury:IsCastable() then
-    if HR.Cast(S.BloodFury) then return "BloodFury Darkglare_prep"; end
+    if Cast(S.BloodFury) then return "BloodFury Darkglare_prep"; end
   end
   -- berserking
   if S.Berserking:IsCastable() then
-    if HR.Cast(S.Berserking) then return "Berserking Darkglare_prep"; end
+    if Cast(S.Berserking) then return "Berserking Darkglare_prep"; end
   end
   -- summon_darkglare
   if S.SummonDarkglare:IsReady() then
-    if HR.Cast(S.SummonDarkglare) then return "SummonDarkglare Darkglare_prep"; end
+    if Cast(S.SummonDarkglare) then return "SummonDarkglare Darkglare_prep"; end
   end
 end
 
 local function ItemFunc()
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = HL.UseTrinkets(TrinketsOnUseExcludes)
   if TrinketToUse then
     if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
@@ -207,31 +208,31 @@ local function Cooldowns()
   if CDsON() then
     -- worldvein_resonance
     if S.WorldveinResonance:IsCastable() then
-      if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
+      if Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
     end
     -- memory_of_lucid_dreams
     if S.MemoryofLucidDreams:IsCastable() then
-      if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
+      if Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
     end
     -- blood_of_the_enemy
     if S.BloodoftheEnemy:IsCastable() then
-      if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
+      if Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
     end
     -- guardian_of_azeroth
     if S.GuardianofAzeroth:IsCastable() then
-      if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
+      if Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
     end
     -- ripple_in_space
     if S.RippleInSpace:IsCastable() then
-      if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
+      if Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastable() then
-      if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
+      if Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
     end
     -- purifying_blast
     if S.PurifyingBlast:IsCastable() then
-      if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
+      if Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
     end
     -- reaping_flames
     if S.ReapingFlames:IsCastable() then
@@ -239,11 +240,11 @@ local function Cooldowns()
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then
-      if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
+      if Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
     end
     -- the_unbound_force,if=buff.reckless_force.remains
     if S.TheUnboundForce:IsCastable() and (Player:BuffUp(S.RecklessForceBuff)) then
-      if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
+      if Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
     end
   end
 end
@@ -251,31 +252,31 @@ end
 local function Se()
   -- haunt
   if S.Haunt:IsReady() then
-    if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Se"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Se"; end
   end
   -- drain_soul,interrupt_if=debuff.shadow_embrace.stack>=3 TODO
   -- shadow_bolt
   if S.ShadowBolt:IsReady() then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Se"; end
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Se"; end
   end
 end
 
 local function Aoe()
   -- phantom_singularity
   if S.PhantomSingularity:IsReady() then
-    if HR.Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity Aoe"; end
+    if Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity Aoe"; end
   end
   -- haunt
   if S.Haunt:IsReady() then
-    if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Aoe"; end
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt Aoe"; end
   end
   -- seed_of_corruption,if=talent.sow_the_seeds.enabled&can_seed
   if S.SeedofCorruption:IsReady() and (S.SowtheSeeds:IsAvailable() and (EnemiesSeedofCorruptionCount <= (EnemiesCount10ySplash < 3 and EnemiesCount10ySplash or 3))) then
-    if HR.Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption Aoe 1"; end
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption Aoe 1"; end
   end
   -- seed_of_corruption,if=!talent.sow_the_seeds.enabled&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.refreshable
   if S.SeedofCorruption:IsReady() and (not S.SowtheSeeds:IsAvailable() and Target:DebuffDown(S.SeedofCorruptionDebuff) and not S.SeedofCorruption:InFlight() and Target:DebuffRefreshable(S.CorruptionDebuff)) then
-    if HR.Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption Aoe 2"; end
+    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption Aoe 2"; end
   end
   -- agony,cycle_targets=1,if=active_dot.agony>=4,target_if=refreshable&dot.agony.ticking
   if S.Agony:IsReady() and (EnemiesAgonyCount >= 4) then
@@ -290,8 +291,8 @@ local function Aoe()
     if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction Aoe"; end
   end
   -- vile_taint,if=soul_shard>1
-  if S.VileTaint:IsReady() and (Player:SoulShardsP() > 1) then
-    if HR.Cast(S.VileTaint) then return "VileTaint Aoe"; end
+  if S.VileTaint:IsReady() and not Player:IsCasting(S.VileTaint) and (Player:SoulShardsP() > 1) then
+    if Cast(S.VileTaint) then return "VileTaint Aoe"; end
   end
   -- call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.ready&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
   if S.SummonDarkglare:IsReady() and CDsON() and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable()) then
@@ -299,7 +300,7 @@ local function Aoe()
   end
   -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
   if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
-    if HR.Cast(S.DarkSoulMisery) then return "DarkSoulMisery Aoe"; end
+    if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Aoe"; end
   end
   -- call_action_list,name=cooldowns
   local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
@@ -307,11 +308,11 @@ local function Aoe()
   local ShouldReturn = ItemFunc(); if ShouldReturn then return ShouldReturn; end
   -- malefic_rapture,if=dot.vile_taint.ticking
   if S.MaleficRapture:IsReady() and (EnemiesVileTaintCount >= 1) then
-    if HR.Cast(S.MaleficRapture) then return "MaleficRapture Aoe 1"; end
+    if Cast(S.MaleficRapture) then return "MaleficRapture Aoe 1"; end
   end
   -- malefic_rapture,if=!talent.vile_taint.enabled
   if S.MaleficRapture:IsReady() and (not S.VileTaint:IsAvailable()) then
-    if HR.Cast(S.MaleficRapture) then return "MaleficRapture Aoe 1"; end
+    if Cast(S.MaleficRapture) then return "MaleficRapture Aoe 1"; end
   end
   -- siphon_life,cycle_targets=1,if=active_dot.siphon_life<=3,target_if=!dot.siphon_life.ticking
   if S.SiphonLife:IsReady() and (EnemiesSiphonLifeCount <= 3) then
@@ -319,15 +320,15 @@ local function Aoe()
   end
   -- drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5
   if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5) then
-    if HR.Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife Aoe"; end
+    if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife Aoe"; end
   end
   -- drain_soul
   if S.DrainSoul:IsReady() then
-    if HR.Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "DrainSoul Aoe"; end
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "DrainSoul Aoe"; end
   end
   -- shadow_bolt
   if S.ShadowBolt:IsReady() then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Aoe"; end
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Aoe"; end
   end
 end
 
@@ -362,11 +363,11 @@ local function APL()
     end
     -- phantom_singularity
     if S.PhantomSingularity:IsReady() then
-      if HR.Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity InCombat"; end
+      if Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity InCombat"; end
     end
     -- agony,if=refreshable
     if S.Agony:IsReady() and (Target:DebuffRefreshable(S.AgonyDebuff)) then
-      if HR.Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony InCombat"; end
+      if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony InCombat"; end
     end
     -- agony,cycle_targets=1,if=active_enemies>1,target_if=refreshable
     if S.Agony:IsReady() and Enemies40yCount > 1 then
@@ -378,15 +379,15 @@ local function APL()
     end
     -- seed_of_corruption,if=active_enemies>2&!talent.vile_taint.enabled&(!talent.writhe_in_agony.enabled|talent.sow_the_seeds.enabled)&!dot.seed_of_corruption.ticking&!in_flight&dot.corruption.refreshable
     if S.SeedofCorruption:IsReady() and (Enemies40yCount > 2 and not S.VileTaint:IsAvailable() and (not S.WritheinAgony:IsAvailable() or S.SowtheSeeds:IsAvailable()) and EnemiesSeedofCorruptionCount < 1 and not S.SeedofCorruption:InFlight() and Target:DebuffRefreshable(S.CorruptionDebuff)) then
-      if HR.Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption InCombat"; end
+      if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption InCombat"; end
     end
     -- vile_taint,if=(soul_shard>1|active_enemies>2)&cooldown.summon_darkglare.remains>12
-    if S.VileTaint:IsReady() and ((Player:SoulShardsP() > 1 or Enemies40yCount > 2) and S.SummonDarkglare:CooldownRemains() > 12) then
-      if HR.Cast(S.VileTaint) then return "VileTaint InCombat"; end
+    if S.VileTaint:IsReady() and not Player:IsCasting(S.VileTaint) and ((Player:SoulShardsP() > 1 or Enemies40yCount > 2) and S.SummonDarkglare:CooldownRemains() > 12) then
+      if Cast(S.VileTaint) then return "VileTaint InCombat"; end
     end
     -- siphon_life,if=refreshable
     if S.SiphonLife:IsReady() and (Target:DebuffRefreshable(S.SiphonLifeDebuff)) then
-      if HR.Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife InCombat"; end
+      if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife InCombat"; end
     end
     -- unstable_affliction,if=refreshable
     if S.UnstableAffliction:IsReady() and not Player:IsCasting(S.UnstableAffliction) then
@@ -394,15 +395,15 @@ local function APL()
     end
     -- corruption,if=(active_enemies<3|talent.vile_taint.enabled|talent.writhe_in_agony.enabled&!talent.sow_the_seeds.enabled)&refreshable
     if S.Corruption:IsReady() and ((EnemiesCount10ySplash < 3 or S.VileTaint:IsAvailable() or S.WritheinAgony:IsAvailable() and not S.SowtheSeeds:IsAvailable()) and Target:DebuffRefreshable(S.CorruptionDebuff)) then
-      if HR.Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 1"; end
+      if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 1"; end
     end
     -- haunt
     if S.Haunt:IsReady() then
-      if HR.Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt InCombat"; end
+      if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt InCombat"; end
     end
     -- malefic_rapture,if=soul_shard>4
     if S.MaleficRapture:IsReady() and (Player:SoulShardsP() > 4) then
-      if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 1"; end
+      if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 1"; end
     end
     -- siphon_life,cycle_targets=1,if=active_enemies>1,target_if=dot.siphon_life.remains<3
     if S.SiphonLife:IsReady() then
@@ -418,7 +419,7 @@ local function APL()
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
     if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
-      if HR.Cast(S.DarkSoulMisery) then return "DarkSoulMisery InCombat"; end
+      if Cast(S.DarkSoulMisery) then return "DarkSoulMisery InCombat"; end
     end
     -- call_action_list,name=cooldowns
     local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
@@ -430,28 +431,28 @@ local function APL()
     end
     -- malefic_rapture,if=dot.vile_taint.ticking
     if S.MaleficRapture:IsReady() and (Target:DebuffUp(S.VileTaintDebuff)) then
-      if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 2"; end
+      if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 2"; end
     end
     -- malefic_rapture,if=talent.phantom_singularity.enabled&(dot.phantom_singularity.ticking||cooldown.phantom_singularity.remains>12||soul_shard>3)
     if S.MaleficRapture:IsReady() and (S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.PhantomSingularityDebuff) or S.PhantomSingularity:CooldownRemains() > 12 or Player:SoulShardsP() > 3)) then
-      if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 3"; end
+      if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 3"; end
     end
     -- malefic_rapture,if=talent.sow_the_seeds.enabled
     if S.MaleficRapture:IsReady() and (S.SowtheSeeds:IsAvailable()) then
-      if HR.Cast(S.MaleficRapture) then return "MaleficRapture InCombat 4"; end
+      if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 4"; end
     end
     -- drain_life,if=buff.inevitable_demise.stack>30|buff.inevitable_demise.up&time_to_die<5
     if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) > 30 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5) then
-      if HR.Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife InCombat"; end
+      if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife InCombat"; end
     end
     -- drain_life,if=buff.inevitable_demise_az.stack>30 TODO
     -- drain_soul
     if S.DrainSoul:IsReady() then
-      if HR.Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "DrainSoul InCombat"; end
+      if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "DrainSoul InCombat"; end
     end
     -- shadow_bolt
     if S.ShadowBolt:IsReady() then
-      if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt InCombat"; end
+      if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt InCombat"; end
     end
 
     return
