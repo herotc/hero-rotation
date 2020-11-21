@@ -26,7 +26,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     if not Player:IsCasting() then
       return Shard
     else
-      if Player:IsCasting(SpellAffli.MaleficRapture) or Player:IsCasting(SpellAffli.SeedOfCorruption)
+      if Player:IsCasting(SpellAffli.MaleficRapture) or Player:IsCasting(SpellAffli.SeedofCorruption)
         or Player:IsCasting(SpellAffli.VileTaint) or Player:IsCasting(SpellAffli.SummonPet) then
         return Shard - 1
       else
@@ -47,6 +47,25 @@ AffOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = AffOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellAffli.SummonPet then
       return BaseCheck and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
+    else
+      return BaseCheck
+    end
+  end
+, 265)
+
+local AffOldSpellIsReady
+AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local RangeOK = true
+    if Range then
+      local RangeUnit = ThisUnit or Target
+      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
+    end
+    local BaseCheck = AffOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellAffli.Haunt then
+      return BaseCheck and not Player:IsCasting(self)
+    elseif self == SpellAffli.SeedofCorruption then
+      return BaseCheck and not Player:IsCasting(self) and not self:InFlight()
     else
       return BaseCheck
     end

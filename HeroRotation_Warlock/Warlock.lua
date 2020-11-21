@@ -100,17 +100,21 @@ Spell.Warlock.Affliction = {
   Fireblood                             = Spell(265221),
 
   -- Base Abilities
-  ShadowBolt                            = Spell(686),
+  Agony                                 = Spell(980),
+  AgonyDebuff                           = Spell(980),
   Corruption                            = Spell(172),
   CorruptionDebuff                      = Spell(146739),
-  Agony                                 = Spell(980),
+  DrainLife                             = Spell(234153),
   MaleficRapture                        = Spell(324536),
   SeedofCorruption                      = Spell(27243),
-  UnstableAffliction                    = Spell(316099),
+  SeedofCorruptionDebuff                = Spell(27243),
+  ShadowBolt                            = Spell(686),
+  ShadowEmbrace                         = Spell(32388),
+  ShadowEmbraceDebuff                   = Spell(32390),
   SummonDarkglare                       = Spell(205180),
   SummonPet                             = Spell(688),
-  DrainLife                             = Spell(234153),
-  ShadowEmbrace                         = Spell(32388),
+  UnstableAffliction                    = Spell(316099),
+  UnstableAfflictionDebuff              = Spell(316099),
 
   -- Talents
   Nightfall                             = Spell(108558),
@@ -118,13 +122,16 @@ Spell.Warlock.Affliction = {
   InvetiableDemiseBuff                  = Spell(334320),
   DrainSoul                             = Spell(198590),
 
-  WritheInAgony                         = Spell(196102),
+  WritheinAgony                         = Spell(196102),
   AbsoluteCorruption                    = Spell(196103),
   SiphonLife                            = Spell(63106),
+  SiphonLifeDebuff                      = Spell(63106),
 
-  SowTheSeeds                           = Spell(196226),
+  SowtheSeeds                           = Spell(196226),
   PhantomSingularity                    = Spell(205179),
+  PhantomSingularityDebuff              = Spell(205179),
   VileTaint                             = Spell(278350),
+  VileTaintDebuff                       = Spell(278350),
 
   Haunt                                 = Spell(48181),
 
@@ -140,9 +147,6 @@ Spell.Warlock.Affliction = {
   ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
   ScouringTithe                         = Spell(312321),
   SoulRot                               = Spell(325640), -- Splash, 15
-
-  -- Azerite Traits
-  CascadingCalamityBuff                 = Spell(275378);
 
   -- Azerite Essences
   BloodoftheEnemy                       = Spell(297108),
