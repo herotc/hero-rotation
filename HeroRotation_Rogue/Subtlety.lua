@@ -713,7 +713,8 @@ local function APL ()
   -- Poisons
   local PoisonRefreshTime = Player:AffectingCombat() and Settings.Subtlety.PoisonRefreshCombat*60 or Settings.Subtlety.PoisonRefresh*60
   -- Lethal Poison
-  if Player:BuffRemains(S.InstantPoison) <= PoisonRefreshTime then
+  if Player:BuffRemains(S.InstantPoison) <= PoisonRefreshTime
+    and Player:BuffRemains(S.WoundPoison) <= PoisonRefreshTime then
     HR.CastSuggested(S.InstantPoison)
   end
   -- Non-Lethal Poisons
