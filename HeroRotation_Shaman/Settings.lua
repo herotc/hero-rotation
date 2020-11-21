@@ -32,9 +32,8 @@ HR.GUISettings.APL.Shaman = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Racials
-
       -- Abilities
-
+      WindShear = true
     }
   },
   Enhancement = {

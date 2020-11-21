@@ -364,7 +364,7 @@ local function APL()
     -- actions=bloodlust
     -- potion,if=expected_combat_length-time<60
     -- wind_shear
-    local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.Disrupt, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- windstrike
     if S.Windstrike:IsCastable() then
