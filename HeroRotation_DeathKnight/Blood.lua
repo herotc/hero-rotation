@@ -46,6 +46,11 @@ local Settings = {
   Blood = HR.GUISettings.APL.DeathKnight.Blood
 }
 
+-- Stun Interrupts List
+local StunInterrupts = {
+  {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
+}
+
 --Functions
 local EnemyRanges = {5, 8, 10, 30, 40, 100}
 local TargetIsInRange = {}
@@ -238,7 +243,7 @@ local function APL()
     -- Defensives
     local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     if Settings.Blood.PoolDuringBlooddrinker and Player:IsChanneling(S.Blooddrinker) and Player:BuffUp(S.BoneShieldBuff) and UnitsWithoutBloodPlague == 0 and not Player:ShouldStopCasting() and Player:CastRemains() > 0.2 then
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool During Blooddrinker"; end
     end

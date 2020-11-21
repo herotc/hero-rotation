@@ -23,6 +23,7 @@ local HR         = HeroRotation
 if not Spell.DeathKnight then Spell.DeathKnight = {} end
 Spell.DeathKnight.Blood = {
   -- Abilities
+  Asphyxiate                            = Spell(221562),
   BloodBoil                             = Spell(50842),
   DancingRuneWeapon                     = Spell(49028),
   DeathandDecay                         = Spell(43265),
@@ -85,6 +86,7 @@ Spell.DeathKnight.Frost = {
   EmpowerRuneWeapon                     = Spell(47568),
   PillarofFrost                         = Spell(51271),
   -- Talents
+  Asphyxiate                            = Spell(108194),
   GatheringStorm                        = Spell(194912),
   GlacialAdvance                        = Spell(194913),
   IcyTalons                             = Spell(194878),
@@ -151,6 +153,7 @@ Spell.DeathKnight.Unholy = {
   DeathStrike                           = Spell(49998),
   DarkTransformation                    = Spell(63560),
   -- Talents
+  Asphyxiate                            = Spell(108194),
   Defile                                = Spell(152280),
   BurstingSores                         = Spell(207264),
   ClawingShadows                        = Spell(207311),

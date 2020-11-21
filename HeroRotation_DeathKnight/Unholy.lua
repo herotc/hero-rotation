@@ -49,6 +49,11 @@ local Settings = {
 local VarPoolingForGargoyle = 0;
 local DeadliestCoilEquipped = HL.LegendaryEnabled(45)
 
+-- Stun Interrupts List
+local StunInterrupts = {
+  {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
+}
+
 --Functions
 local EnemyRanges = {5, 8, 10, 30, 40, 100}
 local TargetIsInRange = {}
@@ -398,7 +403,7 @@ local function APL()
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
   end
   if Everyone.TargetIsValid() then
-    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- use DeathStrike on low HP or with proc in Solo Mode
     if S.DeathStrike:IsReady() and not no_heal then
       if HR.Cast(S.DeathStrike) then return "death_strike low hp or proc"; end

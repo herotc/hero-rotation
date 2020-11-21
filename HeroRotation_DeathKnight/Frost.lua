@@ -47,6 +47,11 @@ local Settings = {
   Frost = HR.GUISettings.APL.DeathKnight.Frost
 };
 
+-- Stun Interrupts List
+local StunInterrupts = {
+  {S.Asphyxiate, "Cast Asphyxiate (Interrupt)", function () return true; end},
+}
+
 -- Functions
 local EnemyRanges = {5, 8, 10, 30, 40, 100}
 local TargetIsInRange = {}
@@ -581,7 +586,7 @@ local function APL()
       if HR.Cast(S.DeathStrike) then return "death_strike low hp or proc"; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(15, S.MindFreeze, Settings.Commons.OffGCDasOffGCD.MindFreeze, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- howling_blast,if=!dot.frost_fever.ticking&(!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>15)
     if S.HowlingBlast:IsCastable() and (Target:DebuffDown(S.FrostFeverDebuff) and (not S.BreathofSindragosa:IsAvailable() or S.BreathofSindragosa:CooldownRemains() > 15)) then
