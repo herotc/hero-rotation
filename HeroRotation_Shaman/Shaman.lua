@@ -36,6 +36,7 @@ Spell.Shaman.Enhancement = {
   ChainLightning                        = Spell(188443),
   EarthElemental                        = Spell(198103),
   FlameShock                            = Spell(188389),
+  FlameShockDebuff                      = Spell(188389),
   FlamentongueWeapon                    = Spell(318038),
   FrostShock                            = Spell(196840),
   LightningBolt                         = Spell(188196),
@@ -64,6 +65,7 @@ Spell.Shaman.Enhancement = {
   FrostShock                            = Spell(196840),
   LightningBolt                         = Spell(188196),
   LightningShield                       = Spell(192106),
+  LightningShieldBuff                   = Spell(192106),
 
   -- Defensive
   AstralShift                           = Spell(10871),
@@ -80,11 +82,12 @@ Spell.Shaman.Enhancement = {
   WindfuryTotem                         = Spell(8512),
   WindfuryTotemBuff                     = Spell(327942),
   WindfuryWeapon                        = Spell(33757),
-  MaelstromWeapon                       = Spell(344179),
+  MaelstromWeaponBuff                   = Spell(344179),
   CrashLightningBuff                    = Spell(187878),
 
   -- Talents
   Ascendance                            = Spell(114051),
+  AscendanceBuff                        = Spell(114051),
   Sundering                             = Spell(197214),
   Hailstorm                             = Spell(334195),
   HailstormBuff                         = Spell(334196),
@@ -93,6 +96,7 @@ Spell.Shaman.Enhancement = {
   EarthenSpike                          = Spell(188089),
   FireNova                              = Spell(333974),
   LashingFlames                         = Spell(334046),
+  LashingFlamesDebuff                   = Spell(334168),
   ElementalBlast                        = Spell(117014),
   Stormflurry                           = Spell(344357),
   HotHand                               = Spell(201900),
@@ -105,9 +109,16 @@ Spell.Shaman.Enhancement = {
 
   -- Defensive
 
-  -- Utility
+  -- Covenant Abilities
+  ChainHarvest                          = Spell(320674),
+  FaeTransfusion                        = Spell(328923),
+  PrimordialWave                        = Spell(326059),
+  PrimordialWaveBuff                    = Spell(327164),
+  VesperTotem                           = Spell(324386),
 
   -- Legendaries
+  DoomWindsBuff                         = Spell(335903),
+  PrimalLavaActuatorsBuff               = Spell(335896),
 
   -- Misc
   Pool                                  = Spell(999910),
