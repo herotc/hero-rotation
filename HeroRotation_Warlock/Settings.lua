@@ -117,5 +117,5 @@ CreatePanelOption("Slider", CP_Demonology, "APL.Warlock.Demonology.UnendingResol
 CreateARPanelOptions(CP_Demonology, "APL.Warlock.Demonology")
 
 -- Affliction
---+CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.")
+-- CreatePanelOption("CheckButton", CP_Affliction, "APL.Warlock.Affliction.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.")
 CreateARPanelOptions(CP_Affliction, "APL.Warlock.Affliction")

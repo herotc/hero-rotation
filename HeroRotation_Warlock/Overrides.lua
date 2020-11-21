@@ -20,7 +20,6 @@ local SpellDemo    = Spell.Warlock.Demonology
 --SpellAffli.Haunt:RegisterInFlight()
 --- ============================ CONTENT ============================
 -- Affliction, ID: 265
-
 HL.AddCoreOverride ("Player.SoulShardsP",
   function ()
     local Shard = Player:SoulShards()
@@ -36,25 +35,25 @@ HL.AddCoreOverride ("Player.SoulShardsP",
     end
   end
   , 265)
-
-
---[[HL.AddCoreOverride ("Spell.IsCastableP",
+  
+local AffOldSpellIsCastable
+AffOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local RangeOK = true
     if Range then
       local RangeUnit = ThisUnit or Target
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
-    local BaseCheck = self:IsLearned() and self:CooldownRemainsP( BypassRecovery, Offset or "Auto") == 0 and RangeOK
+    local BaseCheck = AffOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellAffli.SummonPet then
-      return BaseCheck and not (Pet:IsActive() or Player:BuffP(SpellAffli.GrimoireofSacrificeBuff))
+      return BaseCheck and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
     else
       return BaseCheck
     end
   end
 , 265)
 
-HL.AddCoreOverride ("Spell.CooldownRemainsP",
+--[[HL.AddCoreOverride ("Spell.CooldownRemainsP",
   function (self, BypassRecovery, Offset)
     if self == SpellAffli.VileTaint and Player:IsCasting(self) then
       return 20

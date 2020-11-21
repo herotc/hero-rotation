@@ -105,7 +105,7 @@ Spell.Warlock.Affliction = {
   CorruptionDebuff                      = Spell(146739),
   Agony                                 = Spell(980),
   MaleficRapture                        = Spell(324536),
-  SeedOfCorruption                      = Spell(27243),
+  SeedofCorruption                      = Spell(27243),
   UnstableAffliction                    = Spell(316099),
   SummonDarkglare                       = Spell(205180),
   SummonPet                             = Spell(688),
@@ -128,7 +128,8 @@ Spell.Warlock.Affliction = {
 
   Haunt                                 = Spell(48181),
 
-  GrimoureOfSacrifice                   = Spell(108503),
+  GrimoireofSacrifice                   = Spell(108503),
+  GrimoireofSacrificeBuff               = Spell(196099),
 
   DarkSoulMisery                        = Spell(113860),
 
@@ -166,4 +167,7 @@ Spell.Warlock.Affliction = {
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
   PotionofUnbridledFury            = Item(169299)
+}
+
+Item.Warlock.Affliction = {
 }
