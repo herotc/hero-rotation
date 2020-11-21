@@ -135,7 +135,7 @@ local function Single()
   end
   -- vesper_totem
   if S.VesperTotem:IsReady() then
-    if HR.Cast(S.VesperTotem, nil, Settings.Commons.CovenantDisplayStyle) then return "vesper_totem single 8"; end
+    if HR.Cast(S.VesperTotem, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "vesper_totem single 8"; end
   end
   -- frost_shock,if=buff.hailstorm.up
   if S.FrostShock:IsCastable() and (Player:BuffUp(S.HailstormBuff)) then
@@ -147,7 +147,7 @@ local function Single()
   end
   -- fae_transfusion
   if S.FaeTransfusion:IsReady() then
-    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle) then return "fae_transfusion single 14"; end
+    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "fae_transfusion single 14"; end
   end
   -- lightning_bolt,if=buff.stormkeeper.up
   if S.LightningBolt:IsCastable() and (Player:BuffUp(S.StormkeeperBuff)) then
@@ -242,7 +242,7 @@ local function Aoe()
   end
   -- vesper_totem
   if S.VesperTotem:IsReady() then
-    if HR.Cast(S.VesperTotem, nil, Settings.Commons.CovenantDisplayStyle) then return "vesper_totem aoe 72"; end
+    if HR.Cast(S.VesperTotem, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "vesper_totem aoe 72"; end
   end
   -- lightning_bolt,if=buff.primordial_wave.up&(buff.stormkeeper.up|buff.maelstrom_weapon.stack>=5)
   if S.LightningBolt:IsReady() and (Player:BuffUp(S.PrimordialWaveBuff) and (Player:BuffUp(S.StormkeeperBuff) or Player:BuffStack(S.MaelstromWeaponBuff) >= 5)) then
@@ -306,7 +306,7 @@ local function Aoe()
   end
   -- fae_transfusion
   if S.FaeTransfusion:IsReady() then
-    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle) then return "fae_transfusion aoe 104"; end
+    if HR.Cast(S.FaeTransfusion, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(40)) then return "fae_transfusion aoe 104"; end
   end
   -- frost_shock
   if S.FrostShock:IsCastable() then
