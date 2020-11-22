@@ -156,7 +156,7 @@ local function EvaluateCycleMindSear224(TargetUnit)
 end
 
 local function EvaluateCycleMindgames226(TargetUnit)
-  return (Player:Insanity() < 90 and (DotsUp(TargetUnit, true) or Player:BuffUp(S.VoidformBuff)))
+  return (Player:Insanity() < 90 and (DotsUp(TargetUnit, true) or Player:BuffUp(S.VoidformBuff)) and (not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff) or Player:BuffDown(S.VoidformBuff)))
 end
 
 local function EvaluateCycleSilence228(TargetUnit)
@@ -176,8 +176,8 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions then
-      if CastSuggested(I.PotionofDeathlyFixation) then return "potion_of_spectral_intellect 2"; end
+    if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions then
+      if CastSuggested(I.PotionofEmpoweredExorcisms) then return "potion_of_spectral_intellect 2"; end
     end
     -- shadowform,if=!buff.shadowform.up
     if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
@@ -264,7 +264,7 @@ local function Cds()
   if S.FaeGuardians:IsReady() and (Player:BuffDown(S.VoidformBuff) and (not S.VoidTorrent:CooldownUp() or not s.VoidTorrent:IsAvailable()) or Player:BuffUp(S.VoidformBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable())) then
     if Cast(S.FaeGuardians, Settings.Commons.CovenantDisplayStyle) then return "fae_guardians 52"; end
   end
-  -- Covenant: mindgames,target_if=insanity<90&(variable.all_dots_up|buff.voidform.up)
+  -- Covenant: mindgames,target_if=insanity<90&(variable.all_dots_up|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)
   if S.Mindgames:IsReady() then
     if Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
@@ -462,8 +462,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
-    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions and (Player:BloodlustUp() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
-      if CastSuggested(I.PotionofDeathlyFixation) then return "potion_of_spectral_intellect 20"; end
+    if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions and (Player:BloodlustUp() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
+      if CastSuggested(I.PotionofEmpoweredExorcisms) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)

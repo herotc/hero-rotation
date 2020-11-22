@@ -58,6 +58,7 @@ Spell.Priest.Shadow = {
   Damnation                             = Spell(341374),
   FortressOfTheMind                     = Spell(193195),
   HungeringVoid                         = Spell(345218),
+  HungeringVoidDebuff                   = Spell(345219),
   Misery                                = Spell(238558),
   PsychicLink                           = Spell(199484),
   SearingNightmare                      = Spell(341385), -- Splash, 10
@@ -178,7 +179,7 @@ Spell.Priest.Discipline = {
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   -- Potion
-  PotionofDeathlyFixation          = Item(171351),
+  PotionofEmpoweredExorcisms       = Item(171351),
   -- Trinkets
   AzsharasFontofPower              = Item(169314, {13, 14}),
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
