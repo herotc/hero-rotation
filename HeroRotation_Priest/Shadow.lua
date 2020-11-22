@@ -176,8 +176,8 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions then
-      if CastSuggested(I.PotionofEmpoweredExorcisms) then return "potion_of_spectral_intellect 2"; end
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+      if CastSuggested(I.PotionofPhantomFire) then return "potion_of_spectral_intellect 2"; end
     end
     -- shadowform,if=!buff.shadowform.up
     if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
@@ -462,8 +462,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
-    if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions and (Player:BloodlustUp() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
-      if CastSuggested(I.PotionofEmpoweredExorcisms) then return "potion_of_spectral_intellect 20"; end
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:BloodlustUp() or Target:TimeToDie() <= 80 or Target:HealthPercentage() < 35) then
+      if CastSuggested(I.PotionofPhantomFire) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)
