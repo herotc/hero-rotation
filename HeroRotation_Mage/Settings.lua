@@ -77,13 +77,13 @@ HR.GUISettings.APL.Mage = {
       RuneOfPower = true,
       ArcanePower = true,
       MirrorImage = true,
-      TouchOfTheMagi = true,
+      TouchoftheMagi = true,
       Evocation = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
-      PresenceOfMind = true,
+      PresenceofMind = true,
     }
   }
 };
