@@ -146,7 +146,7 @@ local function Finishers()
   -- &(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains<10)
   -- &(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains<10)
   -- &time_to_hpg=0
-  if CDsON() and S.Seraphim:IsReady() and Target:IsInRange(30) and ((((not S.Crusade:IsAvailable() and Player:BuffUp(S.AvengingWrath)) or S.AvengingWrath:CooldownRemains() > 25) or (Player:BuffUp(S.Crusade) or S.Crusade:CooldownRemains() > 25))
+  if CDsON() and S.Seraphim:IsReady() and Target:IsInRange(30) and ((((not S.Crusade:IsAvailable() or Player:BuffUp(S.AvengingWrath)) or S.AvengingWrath:CooldownRemains() > 25) or (Player:BuffUp(S.Crusade) or S.Crusade:CooldownRemains() > 25))
   and (not S.FinalReckoning:IsAvailable() or S.FinalReckoning:CooldownRemains() < 10)
   and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() < 10)
   and TimeToHPG <= Player:GCDRemains()) then
