@@ -103,21 +103,6 @@
     , 62);
 
   -- Fire, ID: 63
-    local function HeatLevelPredicted ()
-      if Player:BuffUp(SpellFire.HotStreakBuff) then
-        return 2;
-      end
-      return math.min(
-          num(Player:BuffUp(SpellFire.HeatingUpBuff))
-        + num(Player:BuffUp(SpellFire.CombustionBuff) and (Player:IsCasting(SpellFire.Fireball) or Player:IsCasting(SpellFire.Scorch) or Player:IsCasting(SpellFire.Pyroblast)))
-        + num((Player:IsCasting(SpellFire.Scorch) and (Target:HealthPercentage() <= 30 and SpellFire.SearingTouch:IsAvailable())))
-        + num(bool(SpellFire.Firestarter:ActiveStatus()) and (Player:IsCasting(SpellFire.Fireball) or Player:IsCasting(SpellFire.Pyroblast)))
-        + num(SpellFire.PhoenixFlames:InFlight())
-        + num(SpellFire.Pyroblast:InFlight(SpellFire.CombustionBuff))
-        + num(SpellFire.Fireball:InFlight(SpellFire.CombustionBuff))
-        ,2);
-    end
-
     HL.AddCoreOverride("Player.BuffStack",
       function (self, Spell, AnyCaster, Offset)
         if Spell == SpellFire.HotStreakBuff then
