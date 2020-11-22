@@ -161,8 +161,8 @@ local function Finishers()
   end
   -- actions.finishers+=/execution_sentence,if=spell_targets.divine_storm<=3&((!talent.crusade.enabled|buff.crusade.down&cooldown.crusade.remains>10)|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10|debuff.final_reckoning.up)&time_to_hpg=0
   -- Note: Slight reorder for lisibility
-  if CDsON() and S.ExecutionSentence:IsReady() and Target:IsInRange(30) and MeleeEnemies8yCount <= 3 and TimeToHPG <= Player:GCDRemains()
-    and ((not S.Crusade:IsAvailable() or (Player:BuffDown(S.Crusade) and S.Crusade:CooldownRemains() > 10)) or Player:BuffStack(S.Crusade) >= 3 or S.AvengingWrath:CooldownRemains() > 10 or Target:DebuffUp(S.FinalReckoning)) then
+  if CDsON() and S.ExecutionSentence:IsReady() and Target:IsInRange(30) and Target:TimeToDie() > 8 and MeleeEnemies8yCount <= 3 and TimeToHPG <= Player:GCDRemains()
+    and (((not S.Crusade:IsAvailable() or (Player:BuffDown(S.Crusade)) and S.Crusade:CooldownRemains() > 10)) or Player:BuffStack(S.Crusade) >= 3 or S.AvengingWrath:CooldownRemains() > 10 or Target:DebuffUp(S.FinalReckoning)) then
     if Cast(S.ExecutionSentence) then return "Cast Execution Sentence" end
   end
   -- actions.finishers+=/divine_storm,if=variable.ds_castable&!buff.vanquishers_hammer.up
