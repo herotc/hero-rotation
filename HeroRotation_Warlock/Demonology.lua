@@ -39,8 +39,10 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
+local GCDRemain
 local VarTyrantReady = false
 local VarPoolForDecimatingBolt
+local BalespidersEquipped = HL.LegendaryEnabled(173)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -54,6 +56,10 @@ local Settings = {
 local StunInterrupts = {
   {S.AxeToss, "Cast Axe Toss (Interrupt)", function () return true; end},
 }
+
+HL:RegisterForEvent(function()
+  BalespidersEquipped = HL.LegendaryEnabled(173)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   VarTyrantReady = false
@@ -300,6 +306,8 @@ local function APL()
   
   -- Stop other Demonbolt casts if DecimatingBolt is ready in order to stack Demonic Core buff, unless a lower stack count is about to expire
   VarPoolForDecimatingBolt = (S.DecimatingBolt:IsReady() and Player:BuffRemains(S.DemonicCoreBuff) > 5)
+  
+  GCDRemain = Player:GCDRemains()
 
   -- call precombat
   if not Player:AffectingCombat() and not Player:IsCasting() then
@@ -312,15 +320,33 @@ local function APL()
     if S.UnendingResolve:IsCastable() and (Player:HealthPercentage() < Settings.Demonology.UnendingResolveHP) then
       if HR.Cast(S.UnendingResolve, Settings.Demonology.OffGCDasOffGCD.UnendingResolve) then return "unending_resolve defensive"; end
     end
+    -- Manually added: ShadowBolt to keep Balespider's buff up
+    -- shadow_bolt,if=buff.balespiders_burning_core.up&buff.balespiders_burning_core.remains<(execute_time+gcd.remains+1)&(buff.decimating_bolt.down|buff.decimating_bolt.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.decimating_bolt.stack)))
+    if S.ShadowBolt:IsReady() and (Player:BuffUp(S.BalespidersBuff) and Player:BuffRemains(S.BalespidersBuff) < (S.ShadowBolt:ExecuteTime() + GCDRemain + 1) and (Player:BuffDown(S.DecimatingBoltBuff) or Player:BuffRemains(S.DecimatingBoltBuff) > (S.ShadowBolt:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DecimatingBoltBuff))))) then
+      if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt balespiders"; end
+    end
+    -- Manually added: Power Siphon in prep for DecimatingBolt/Demonbolt, if less than 3 stacks of Demonic Core
+    -- power_siphon,if=buff.wild_imps.stack>1&cooldown.decimating_bolt.ready&buff.demonic_core.up&buff.demonic_core.stack<3
+    if S.PowerSiphon:IsReady() and (WildImpsCount() > 1 and S.DecimatingBolt:IsReady() and Player:BuffUp(S.DemonicCoreBuff) and Player:BuffStack(S.DemonicCoreBuff) < 3) then
+      if HR.Cast(S.PowerSiphon) then return "power_siphon dbolt prep"; end
+    end
     -- Manually added: Dump shards in prep for DecimatingBolt/Demonbolt
-    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 0 and S.DecimatingBolt:IsReady() and Player:BuffStack(S.DemonicCoreBuff) > 2) then
+    -- hand_of_guldan,if=soul_shard>1&cooldown.decimating_bolt.ready&buff.demonic_core.stack>2
+    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 1 and S.DecimatingBolt:IsReady() and Player:BuffStack(S.DemonicCoreBuff) > 2) then
       if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt prep"; end
     end
-    -- Manually added: decimating_bolt,if=soul_shard=0&buff.demonic_core.stack>2
-    if S.DecimatingBolt:IsReady() and (Player:SoulShardsP() == 0 and Player:BuffStack(S.DemonicCoreBuff) > 2) then
+    -- Manually added: DecimatingBolt if at 1 or fewer shards and 3+ stacks of Demonic Core
+    -- decimating_bolt,if=soul_shard<=1&buff.demonic_core.stack>2
+    if S.DecimatingBolt:IsReady() and (Player:SoulShardsP() <= 1 and Player:BuffStack(S.DemonicCoreBuff) > 2) then
       if HR.Cast(S.DecimatingBolt, nil, nil, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt dbolt"; end
     end
-    -- Manually added: demonbolt,if=buff.decimating_bolt.react
+    -- Manually added: Burn shards with Hand of Gul'dan if at 4+ during DecimatingBolt/Demonbolt burn
+    -- hand_of_guldan,if=soul_shard>3&buff.decimating_bolt.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.demonic_core.stack))&buff.demonic_core.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.demonic_core.stack))
+    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 3 and Player:BuffRemains(S.DecimatingBoltBuff) > (S.HandofGuldan:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DemonicCoreBuff))) and Player:BuffRemains(S.DemonicCoreBuff) > (S.HandofGuldan:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DemonicCoreBuff)))) then
+      if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt burn shards"; end
+    end
+    -- Manually added: Demonbolt if DecimatingBoltBuff is up
+    -- demonbolt,if=buff.decimating_bolt.react
     if S.Demonbolt:IsReady() and (Player:BuffUp(S.DecimatingBoltBuff)) then
       if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt dbolt"; end
     end
@@ -386,7 +412,8 @@ local function APL()
       end
     end
     -- power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
-    if S.PowerSiphon:IsCastable() and (WildImpsCount() > 1 and Player:BuffStack(S.DemonicCoreBuff) < 3) then
+    -- Manually added: DecimatingBolt checks
+    if S.PowerSiphon:IsCastable() and (WildImpsCount() > 1 and Player:BuffStack(S.DemonicCoreBuff) < 3 and not S.DecimatingBolt:IsAvailable() or WildImpsCount() > 1 and Player:BuffStack(S.DemonicCoreBuff) < 3 and S.DecimatingBolt:CooldownUp()) then
       if HR.Cast(S.PowerSiphon) then return "power_siphon 40"; end
     end
     -- implosion,if=azerite.explosive_potential.rank>1&buff.explosive_potential.remains<3&buff.wild_imps.stack>=3

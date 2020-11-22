@@ -67,6 +67,9 @@ Spell.Warlock.Demonology = {
   ScouringTithe                         = Spell(312321),
   SoulRot                               = Spell(325640), -- Splash, 15
 
+  -- Legendary Effects
+  BalespidersBuff                       = Spell(337161),
+
   -- Azerite Traits
   BalefulInvocation                     = Spell(287059),
   ExplosivePotential                    = Spell(275395),
