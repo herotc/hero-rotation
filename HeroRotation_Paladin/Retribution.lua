@@ -162,7 +162,7 @@ local function Finishers()
   -- actions.finishers+=/execution_sentence,if=spell_targets.divine_storm<=3&((!talent.crusade.enabled|buff.crusade.down&cooldown.crusade.remains>10)|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10|debuff.final_reckoning.up)&time_to_hpg=0
   -- Note: Slight reorder for lisibility
   if CDsON() and S.ExecutionSentence:IsReady() and Target:IsInRange(30) and Target:TimeToDie() > 8 and MeleeEnemies8yCount <= 3 and TimeToHPG <= Player:GCDRemains()
-    and (((not S.Crusade:IsAvailable() or (Player:BuffDown(S.Crusade)) and S.Crusade:CooldownRemains() > 10)) or Player:BuffStack(S.Crusade) >= 3 or S.AvengingWrath:CooldownRemains() > 10 or Target:DebuffUp(S.FinalReckoning)) then
+    and ((not S.Crusade:IsAvailable() or (Player:BuffDown(S.Crusade) and S.Crusade:CooldownRemains() > 10)) or Player:BuffStack(S.Crusade) >= 3 or S.AvengingWrath:CooldownRemains() > 10 or Target:DebuffUp(S.FinalReckoning)) then
     if Cast(S.ExecutionSentence) then return "Cast Execution Sentence" end
   end
   -- actions.finishers+=/divine_storm,if=variable.ds_castable&!buff.vanquishers_hammer.up
@@ -182,9 +182,9 @@ local function Finishers()
   -- |talent.holy_avenger.enabled&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up
   -- |buff.crusade.up&buff.crusade.stack<10|buff.vanquishers_hammer.up
   if S.TemplarsVerdict:IsReady() and Target:IsInMeleeRange(5) and ((not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > Player:GCD() * 3)
-      and (not S.ExecutionSentence:IsAvailable() or not CDsON() or (S.ExecutionSentence:CooldownRemains() > Player:GCD() * 3 and MeleeEnemies8yCount <= 3))
-      and (not S.FinalReckoning:IsAvailable() or not CDsON() or S.FinalReckoning:CooldownRemains() > Player:GCD() * 3)
-      and (not S.VanquishersHammer:IsAvailable() or not CDsON() or S.VanquishersHammer:CooldownRemains() > Player:GCD())
+      and (not S.ExecutionSentence:IsAvailable() or CDsON() or (S.ExecutionSentence:CooldownRemains() > Player:GCD() * 3 and MeleeEnemies8yCount <= 3))
+      and (not S.FinalReckoning:IsAvailable() or CDsON() or S.FinalReckoning:CooldownRemains() > Player:GCD() * 3)
+      and (not S.VanquishersHammer:IsAvailable() or CDsON() or S.VanquishersHammer:CooldownRemains() > Player:GCD())
     or (S.HolyAvenger:IsAvailable() and CDsON() and S.HolyAvenger:CooldownRemains() < Player:GCD() * 3) or Player:BuffUp(S.HolyAvenger)
     or (Player:BuffUp(S.Crusade) and Player:BuffStack(S.Crusade) < 10) or Player:BuffUp(S.VanquishersHammer)) then
     if Cast(S.TemplarsVerdict) then return "Cast Templar's Verdict" end
