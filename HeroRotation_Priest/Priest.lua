@@ -179,7 +179,7 @@ Spell.Priest.Discipline = {
 if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   -- Potion
-  PotionofEmpoweredExorcisms       = Item(171351),
+  PotionofEmpoweredExorcisms       = Item(171352),
   -- Trinkets
   AzsharasFontofPower              = Item(169314, {13, 14}),
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
