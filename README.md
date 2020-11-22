@@ -76,10 +76,10 @@ Every rotation is based on [SimulationCraft](http://simulationcraft.org/) [Actio
 | Warlock      | ![Affliction](https://img.shields.io/badge/Affliction-WIP-orange.svg) :warning:     | ![Demonology](https://img.shields.io/badge/Demonology-WIP-orange.svg)             | ![Destruction](https://img.shields.io/badge/Destruction-KO-red.svg)     |
 | Warrior      | ![Arms](https://img.shields.io/badge/Arms-WIP-orange.svg)                           | ![Fury](https://img.shields.io/badge/Fury-WIP-orange.svg)                         | ![Protection](https://img.shields.io/badge/Protection-KO-red.svg)       |
 
-![Spec](https://img.shields.io/badge/Spec-Good-brightgreen.svg) - The rotation does have an optimal SimC APL and it is optimally implemented in the addon.\
+![Spec](https://img.shields.io/badge/Spec-Good-brightgreen.svg) - The rotation does have an optimal SimC APL and is optimally implemented in the addon.\
 ![Spec](https://img.shields.io/badge/Spec-OK-green.svg) - The rotation does not have an optimal SimC APL but is optimally implemented in the addon.\
 ![Spec](https://img.shields.io/badge/Spec-WIP-orange.svg) - The rotation is not optimally implemented in the addon.\
-![Spec](https://img.shields.io/badge/Spec-KO-red.svg) - The rotation is not supported on SimC or is not yet implemented in the addon.
+![Spec](https://img.shields.io/badge/Spec-KO-red.svg) - The rotation is not supported on SimC or is not yet implemented in the addon.\
 :warning: - The rotation is maintained by the community (through Pull Requests) and not by the core team.
 
 Do you want to contribute ? Feel free to open a [pull request](https://github.com/herotc/hero-rotation/pulls), an [issue](https://github.com/herotc/hero-rotation/issues) or ask around in our [Discord](https://discord.gg/tFR2uvK).\
