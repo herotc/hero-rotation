@@ -169,7 +169,7 @@ end
 
 local function Darkglare_prep()
   -- vile_taint
-  if S.VileTaint:IsReady() and not Player:IsCasting(S.VileTaint) then
+  if S.VileTaint:IsReady() then
     if Cast(S.VileTaint) then return "VileTaint Darkglare_prep"; end
   end
   -- dark_soul
@@ -291,7 +291,7 @@ local function Aoe()
     if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction Aoe"; end
   end
   -- vile_taint,if=soul_shard>1
-  if S.VileTaint:IsReady() and not Player:IsCasting(S.VileTaint) and (Player:SoulShardsP() > 1) then
+  if S.VileTaint:IsReady() and (Player:SoulShardsP() > 1) then
     if Cast(S.VileTaint) then return "VileTaint Aoe"; end
   end
   -- call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.ready&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
@@ -382,7 +382,7 @@ local function APL()
       if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption InCombat"; end
     end
     -- vile_taint,if=(soul_shard>1|active_enemies>2)&cooldown.summon_darkglare.remains>12
-    if S.VileTaint:IsReady() and not Player:IsCasting(S.VileTaint) and ((Player:SoulShardsP() > 1 or Enemies40yCount > 2) and S.SummonDarkglare:CooldownRemains() > 12) then
+    if S.VileTaint:IsReady() and ((Player:SoulShardsP() > 1 or Enemies40yCount > 2) and S.SummonDarkglare:CooldownRemains() > 12) then
       if Cast(S.VileTaint) then return "VileTaint InCombat"; end
     end
     -- siphon_life,if=refreshable
