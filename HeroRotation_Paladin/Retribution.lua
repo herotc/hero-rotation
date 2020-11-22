@@ -181,10 +181,10 @@ local function Finishers()
   --   &(!covenant.necrolord.enabled|cooldown.vanquishers_hammer.remains>gcd)
   -- |talent.holy_avenger.enabled&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up
   -- |buff.crusade.up&buff.crusade.stack<10|buff.vanquishers_hammer.up
-  if S.TemplarsVerdict:IsReady() and Target:IsInMeleeRange(5) and (((not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > Player:GCD() * 3)
+  if S.TemplarsVerdict:IsReady() and Target:IsInMeleeRange(5) and ((not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > Player:GCD() * 3)
       and (not S.ExecutionSentence:IsAvailable() or not CDsON() or (S.ExecutionSentence:CooldownRemains() > Player:GCD() * 3 and MeleeEnemies8yCount <= 3))
       and (not S.FinalReckoning:IsAvailable() or not CDsON() or S.FinalReckoning:CooldownRemains() > Player:GCD() * 3)
-      and (not S.VanquishersHammer:IsAvailable() or not CDsON() or S.VanquishersHammer:CooldownRemains() > Player:GCD()))
+      and (not S.VanquishersHammer:IsAvailable() or not CDsON() or S.VanquishersHammer:CooldownRemains() > Player:GCD())
     or (S.HolyAvenger:IsAvailable() and CDsON() and S.HolyAvenger:CooldownRemains() < Player:GCD() * 3) or Player:BuffUp(S.HolyAvenger)
     or (Player:BuffUp(S.Crusade) and Player:BuffStack(S.Crusade) < 10) or Player:BuffUp(S.VanquishersHammer)) then
     if Cast(S.TemplarsVerdict) then return "Cast Templar's Verdict" end
