@@ -135,7 +135,7 @@ local function Cooldowns()
   end
   -- actions.cooldowns+=/final_reckoning,if=holy_power>=3&cooldown.avenging_wrath.remains>gcd&time_to_hpg=0&(!talent.seraphim.enabled|buff.seraphim.up)
   if CDsON() and S.FinalReckoning:IsCastable() and Player:HolyPower() >= 3 and S.AvengingWrath:CooldownRemains() > Player:GCD() and TimeToHPG <= Player:GCDRemains() and (not S.Seraphim:IsAvailable() or Player:BuffUp(S.Seraphim)) then
-    if Cast(S.FinalReckoning) then return "Cast Ashen Hallow" end
+    if Cast(S.FinalReckoning) then return "Cast Final Reckoning" end
   end
 end
 
