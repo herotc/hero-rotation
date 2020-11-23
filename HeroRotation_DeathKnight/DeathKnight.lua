@@ -32,18 +32,25 @@ Spell.DeathKnight.Blood = {
   HeartStrike                           = Spell(206930),
   IceboundFortitude                     = Spell(48792),
   Marrowrend                            = Spell(195182),
+  RaiseDead                             = Spell(46585),
   RuneTap                               = Spell(194679),
+  SacrificialPact                       = Spell(327574),
   VampiricBlood                         = Spell(55233),
   -- Talents
   Blooddrinker                          = Spell(206931),
+  BloodTap                              = Spell(221699),
   Bonestorm                             = Spell(194844),
   Consumption                           = Spell(274156),
   Heartbreaker                          = Spell(221536),
   RapidDecomposition                    = Spell(194662),
+  RelishinBlood                         = Spell(317610),
   Tombstone                             = Spell(219809),
   -- Covenant Abilities
+  AbominationLimb                       = Spell(315443),
+  AbominationLimbBuff                   = Spell(315443),
   DeathsDue                             = Spell(324128),
   ShackleTheUnworthy                    = Spell(312202),
+  SwarmingMist                          = Spell(311648),
   -- Conduit Effects
   -- Buffs
   BoneShieldBuff                        = Spell(195181),
@@ -212,6 +219,4 @@ Item.DeathKnight.Frost = {
 Item.DeathKnight.Unholy = {
   -- Potions/Trinkets
   -- "Other On Use"
-  DeadliestCoilChest = Item(171412),
-  DeadliestCoilBack = Item(173242)
 }
