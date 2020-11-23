@@ -495,9 +495,8 @@ local function CDs ()
       if Settings.Subtlety.STMfDAsDPSCD and S.MarkedforDeath:IsCastable() and not Player:StealthUp(true, true) and ComboPointsDeficit >= Rogue.CPMaxSpend() then
         if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
       end
-      -- actions.cds+=/shadow_blades,if=!stealthed.all&variable.snd_condition&combo_points.deficit>=2
-      if S.ShadowBlades:IsCastable() and not Player:BuffUp(S.ShadowBlades)
-        and not Player:StealthUp(true, true) and SnD_Condition() and ComboPointsDeficit >= 2 then
+      -- actions.cds+=/shadow_blades,if=variable.snd_condition&combo_points.deficit>=2
+      if S.ShadowBlades:IsCastable() and not Player:BuffUp(S.ShadowBlades) and SnD_Condition() and ComboPointsDeficit >= 2 then
         if HR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades" end
       end
       -- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=3&spell_targets.shuriken_storm<=4
