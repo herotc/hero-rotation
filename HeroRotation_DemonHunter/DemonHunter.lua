@@ -126,6 +126,7 @@ Spell.DemonHunter.Havoc = {
   TheHunt                               = Spell(323639),
   
   -- Legendary Effects
+  ChaosTheoryBuff                       = Spell(337567),
   FelBombardmentBuff                    = Spell(337849),
   BurningWoundDebuff                    = Spell(346278),
   

@@ -241,7 +241,7 @@ local function Normal()
   if S.Fracture:IsCastable() and IsInMeleeRange and ((S.SpiritBomb:IsAvailable() and SoulFragments <= 3) or (not S.SpiritBomb:IsAvailable() and ((Player:BuffUp(S.MetamorphosisBuff) and Player:Fury() <= 55) or (Player:BuffDown(S.MetamorphosisBuff) and Player:Fury() <= 70)))) then
     if Cast(S.Fracture) then return "fracture 42"; end
   end
-  -- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement.equipped)
+  -- sigil_of_flame,if=!(covenant.kyrian.enabled&runeforge.razelikhs_defilement)
   if S.SigilofFlame:IsCastable() and (IsInAoERange or not S.ConcentratedSigils:IsAvailable()) and Target:DebuffRemains(S.SigilofFlameDebuff) <= 3 and (not (Player:Covenant() == "Kyrian" and RazelikhsDefilementEquipped)) then
     if S.ConcentratedSigils:IsAvailable() then
       if Cast(S.SigilofFlame, nil, nil, not IsInAoERange) then return "sigil_of_flame 44 (Concentrated)"; end

@@ -39,6 +39,7 @@ local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local PassiveEssence
+local ChaosTheoryEquipped = HL.LegendaryEnabled(23)
 local BurningWoundEquipped = HL.LegendaryEnabled(25)
 
 -- GUI Settings
@@ -73,6 +74,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  ChaosTheoryEquipped = HL.LegendaryEnabled(23)
   BurningWoundEquipped = HL.LegendaryEnabled(25)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -151,8 +153,8 @@ local function Cooldown()
   if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 25) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 22"; end
   end
-  -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled&level<54|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
-  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (S.Demonic:IsAvailable() and (Player:Level() < 54 or (S.EyeBeam:CooldownRemains() > 12 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD()))) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
+  -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
+  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 24"; end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
@@ -232,7 +234,7 @@ local function Demonic()
   if S.EyeBeam:IsReady() then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 90"; end
   end
-  -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
+  -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>5|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
   if S.BladeDance:IsReady() and IsInMeleeRange(8) and (VarBladeDance and (S.EyeBeam:CooldownRemains() > 5)) then
     if Cast(S.BladeDance) then return "blade_dance 92"; end
   end
@@ -256,7 +258,7 @@ local function Demonic()
   if S.FelRush:IsCastable() and (S.DemonBlades:IsAvailable() and not S.EyeBeam:CooldownUp() and ConserveFelRush()) then
     if CastFelRush() then return "fel_rush 102"; end
   end
-  -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound.equipped&debuff.burning_wound.remains<4
+  -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
   if S.DemonsBite:IsCastable() then
     if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite206, EvaluateTargetIfDemonsBite208, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite 103"; end
   end
@@ -339,7 +341,7 @@ local function Normal()
   if S.EyeBeam:IsReady() and (S.BlindFury:IsAvailable()) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 148"; end
   end
-  -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound.equipped&debuff.burning_wound.remains<4
+  -- demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
   if S.DemonsBite:IsCastable() then
     if Everyone.CastTargetIf(S.DemonsBite, Enemies8y, "min", EvalutateTargetIfFilterDemonsBite202, EvaluateTargetIfDemonsBite204, not Target:IsSpellInRange(S.DemonsBite)) then return "demons_bite 149"; end
   end
@@ -389,8 +391,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
-    -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
-    VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable()))
+    -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)|runeforge.chaos_theory&buff.chaos_theory.down
+    VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())) or ChaosTheoryEquipped and Player:BuffDown(S.ChaosTheoryBuff)
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
     VarPoolingForMeta = not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30
     -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
@@ -407,7 +409,7 @@ local function APL()
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
     -- pick_up_fragment,type=demon,if=demon_soul_fragments>0
-    -- pick_up_fragment,if=fury.deficit>=35&(!azerite.eyes_of_rage.enabled|cooldown.eye_beam.remains>1.4)
+    -- pick_up_fragment,if=fury.deficit>=35
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
     -- throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
     if S.ThrowGlaive:IsCastable() and (Player:BuffStack(S.FelBombardmentBuff) == 5 and (Player:BuffUp(S.ImmolationAuraBuff) or Player:BuffDown(S.MetamorphosisBuff))) then
