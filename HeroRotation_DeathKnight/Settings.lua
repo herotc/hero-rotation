@@ -24,6 +24,7 @@ HR.GUISettings.APL.DeathKnight = {
     TrinketDisplayStyle = "Suggested",
     EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
+    RaiseDeadDisplayStyle = "Suggested",
     OffGCDasOffGCD = {
       Trinkets = true,
       Potions = true,
@@ -88,6 +89,7 @@ CreatePanelOption("CheckButton", CP_Deathknight, "APL.DeathKnight.Commons.UseTri
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
+CreatePanelOption("Dropdown", CP_Deathknight, "APL.DeathKnight.Commons.RaiseDeadDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Raise Dead Display Style", "Define which icon display style to use for Raise Dead.");
 CreateARPanelOptions(CP_Deathknight, "APL.DeathKnight.Commons");
 
 --Unholy Panels

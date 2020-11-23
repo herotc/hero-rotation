@@ -151,7 +151,7 @@ local function Precombat()
   -- variable,name=other_on_use_equipped,value=
   -- raise_dead
   if S.RaiseDead:IsCastable() then
-    if HR.CastSuggested(S.RaiseDead) then return "raise_dead precombat"; end
+    if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead precombat"; end
   end
   -- opener
   if Everyone.TargetIsValid() then
@@ -411,7 +411,7 @@ local function Cooldowns()
   end 
   -- raise_dead
   if S.RaiseDead:IsCastable() and Player:BuffUp(S.PillarofFrostBuff) then
-    if HR.CastSuggested(S.RaiseDead) then return "raise_dead cd 11"; end
+    if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cd 11"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&(pet.ghoul.remains<gcd|target.time_to_die<gcd)
   if S.SacrificialPact:IsCastable() and (EnemiesCount10yd >= 2 and (S.SacrificialPact:TimeSinceLastCast() < (60 - Player:GCD()) or Target:TimeToDie() < Player:GCD())) then

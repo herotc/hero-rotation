@@ -132,7 +132,7 @@ local function Precombat()
   -- potion
   -- raise_dead
   if S.RaiseDead:IsCastable() then
-    if HR.CastSuggested(S.RaiseDead) then return "raise_dead 6"; end
+    if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead 6"; end
   end
   if Everyone.TargetIsValid() then
     -- army_of_the_dead,precombat_time=2
@@ -286,7 +286,7 @@ local function Cooldowns()
   end
   -- raise_dead,if=!pet.ghoul.active
   if S.RaiseDead:IsCastable() then
-    if HR.CastSuggested(S.RaiseDead) then return "raise_dead cooldown 12"; end
+    if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cooldown 12"; end
   end
   -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready 
   if S.SacrificialPact:IsCastable() and (EnemiesMeleeCount >= 2 and not Pet:BuffUp(S.DarkTransformation) and not S.DarkTransformation:CooldownUp() and S.RaiseDead:CooldownUp()) then
