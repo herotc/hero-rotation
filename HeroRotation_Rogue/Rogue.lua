@@ -220,13 +220,14 @@ Spell.Rogue.Subtlety = {
   Shadowmeld                            = Spell(58984),
   -- Abilities
   Backstab                              = Spell(53),
+  BlackPowder                           = Spell(319175),
   Eviscerate                            = Spell(196819),
   FindWeaknessDebuff                    = Spell(316220),
   ShadowBlades                          = Spell(121471),
   ShadowDance                           = Spell(185313),
   ShadowDanceBuff                       = Spell(185422),
   Shadowstrike                          = Spell(185438),
-  ShadowVault                           = Spell(319175),
+  Shiv                                  = Spell(5938),
   ShurikenStorm                         = Spell(197835),
   ShurikenToss                          = Spell(114014),
   SliceandDice                          = Spell(315496),
@@ -281,11 +282,15 @@ Spell.Rogue.Subtlety = {
   SerratedBoneSpike                     = Spell(328547),
   SerratedBoneSpikeDot                  = Spell(324073),
   EchoingReprimand                      = Spell(323547),
+  ERCharge2                             = Spell(323558),
+  ERCharge3                             = Spell(323559),
+  ERCharge4                             = Spell(323560),
   Sepsis                                = Spell(328305),
   Flagellation                          = Spell(323654),
-  FlagellationMastery                   = Spell(345569),
+  FlagellationCleanse                   = Spell(345569),
   -- Legendaries
   TheRottenBuff                         = Spell(341134),
+  DeathlyShadowsBuff                    = Spell(341202),
   -- Defensive
   CrimsonVial                           = Spell(185311),
   Feint                                 = Spell(1966),
@@ -398,6 +403,18 @@ end
 -- "cp_spend"
 function Commons.CPSpend ()
   return mathmin(Player:ComboPoints(), Commons.CPMaxSpend())
+end
+
+-- "animacharged_cp"
+function Commons.AnimachargedCP ()
+  if Player:BuffUp(Spell.Rogue.Subtlety.ERCharge2) then
+    return 2
+  elseif Player:BuffUp(Spell.Rogue.Subtlety.ERCharge3) then
+    return 3
+  elseif Player:BuffUp(Spell.Rogue.Subtlety.ERCharge4) then
+    return 4
+  end
+  return 0
 end
 
 -- poisoned
