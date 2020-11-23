@@ -150,11 +150,11 @@ end
 
 local function Cooldown()
   -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<25
-  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 25) then
+  if S.Metamorphosis:IsCastable() and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 25) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 22"; end
   end
   -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
-  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
+  if S.Metamorphosis:IsCastable() and (S.Demonic:IsAvailable() and (S.EyeBeam:CooldownRemains() > 20 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD())) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 24"; end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
