@@ -83,6 +83,7 @@ HR.GUISettings.APL.Rogue = {
       BladeFlurry = true,
       BladeRush = false,
       GhostlyStrike = false,
+      Dreadblades = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {

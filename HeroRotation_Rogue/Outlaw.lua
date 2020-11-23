@@ -55,6 +55,15 @@ local Interrupts = {
   { S.Blind, "Cast Blind (Interrupt)", function () return true end },
 }
 
+-- Legendaries
+local TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
+local MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
+
+HL.RegisterForEvent(function()
+  TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
+  MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
+end, "PLAYER_EQUIPMENT_CHANGED")
+
 -- Utils
 local function num(val)
   if val then return 1 else return 0 end
@@ -157,36 +166,10 @@ local function RtB_Reroll ()
       Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.TrueBearing)) and true or false
     -- SimC Default
     else
-      -- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
-      -- actions=variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
-      -- # Reroll for 2+ buffs or Broadside with Deadshot.
-      -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.broadside.up)
-      -- # Reroll for 2+ buffs or Ruthless Precision with Ace up your Sleeve, unless there are more Deadshot ranks.
-      -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.ace_up_your_sleeve.enabled&azerite.ace_up_your_sleeve.rank>=azerite.deadshot.rank,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
-      -- # Always reroll for 2+ buffs with Snake Eyes.
-      -- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
-      -- actions+=/variable,name=rtb_reroll,op=set,if=buff.blade_flurry.up,value=rtb_buffs-buff.skull_and_crossbones.up<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up&!buff.broadside.up)
-      if Player:BuffUp(S.LoadedDiceBuff) then
-        Cache.APLVar.RtB_Reroll = (RtB_Buffs() - num(Player:BuffUp(S.BuriedTreasure)) < 2 or RtB_BuffRemains() <= 12.6) and true or false
-      elseif Player:BuffUp(S.BladeFlurry) then
-        Cache.APLVar.RtB_Reroll = (RtB_Buffs() - num(Player:BuffUp(S.SkullandCrossbones)) < 2 and (Player:BuffUp(S.LoadedDiceBuff) or
-          (not Player:BuffUp(S.GrandMelee) and not Player:BuffUp(S.RuthlessPrecision) and not Player:BuffUp(S.Broadside)))) and true or false
-      elseif S.SnakeEyesPower:AzeriteRank() >= 2 then
-        Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2) and true or false
-        -- # Do not reroll if Snake Eyes is at 2+ stacks of the buff (1+ stack with Broadside up)
-        -- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
-        if Player:BuffStack(S.SnakeEyesBuff) >= 2 - num(Player:BuffUp(S.Broadside)) then
-          Cache.APLVar.RtB_Reroll = false
-        end
-      elseif S.AceUpYourSleeve:AzeriteEnabled() and S.AceUpYourSleeve:AzeriteRank() >= S.Deadshot:AzeriteRank() and Rogue.BaseAttackCrit() < 42 then
-        Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffUp(S.LoadedDiceBuff) or
-          Player:BuffRemains(S.RuthlessPrecision) <= S.BetweentheEyes:CooldownRemains())) and true or false
-      elseif S.Deadshot:AzeriteEnabled() or Rogue.BaseAttackCrit() >= 42 then
-        Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffUp(S.LoadedDiceBuff) or not Player:BuffUp(S.Broadside))) and true or false
-      else
-        Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and (Player:BuffUp(S.LoadedDiceBuff) or
-          (not Player:BuffUp(S.GrandMelee) and not Player:BuffUp(S.RuthlessPrecision)))) and true or false
-      end
+      -- # Reroll single BT/GM/TB buffs when possible
+      -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(buff.buried_treasure.up|buff.grand_melee.up|buff.true_bearing.up)
+      Cache.APLVar.RtB_Reroll = (RtB_Buffs() < 2 and
+        (Player:BuffUp(S.GrandMelee) or Player:BuffUp(S.BuriedTreasure) or Player:BuffUp(S.TrueBearing))) and true or false
     end
 
     -- Defensive Override : Grand Melee if HP < 60
@@ -263,23 +246,31 @@ end
 
 local function CDs ()
   if Target:IsSpellInRange(S.SinisterStrike) then
-    -- Quick and dirty Flagellation
-    if S.Flagellation:IsCastable() and not Target:DebuffUp(S.Flagellation) then
-      if HR.Cast(S.Flagellation) then return "Cast Flrgrrlation" end
-    end
-    if S.FlagellationMastery:IsCastable() and not Target:DebuffUp(S.Flagellation) then
-      if HR.Cast(S.FlagellationMastery, Settings.Commons.OffGCDasOffGCD.FlagellationMastery) then return "Cast Flrgrrlation Mastery" end
-    end
-
     -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
     if CDsON() and not Player:StealthUp(true, true) then
       ShouldReturn = Essences()
       if ShouldReturn then return ShouldReturn end
     end
 
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
-    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush) and (not I.FontOfPower:IsEquipped() or I.FontOfPower:CooldownRemains() > 20) then
+    -- actions.cds+=/flagellation
+    if S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
+      if HR.Cast(S.Flagellation) then return "Cast Flagellation" end
+    end
+    -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
+    if S.FlagellationMastery:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
+      if HR.Cast(S.FlagellationMastery, Settings.Commons.OffGCDasOffGCD.FlagellationMastery) then return "Cast Flagellation Cleanse" end
+    end
+
+    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+    if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
+      and (not S.KillingSpree:CooldownUp() or not S.KillingSpree:IsAvailable())
+      and (not I.FontOfPower:IsEquipped() or I.FontOfPower:CooldownRemains() > 20) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
+    end
+
+    -- actions.cds+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
+    if S.RolltheBones:IsReady() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
+      if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
     end
 
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
@@ -294,26 +285,25 @@ local function CDs ()
       end
     end
     if CDsON() then
-      -- actions.cds+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-      if AoEON() and S.BladeFlurry:IsCastable() and EnemiesBFCount >= 2 and not Player:BuffUp(S.BladeFlurry) then
+      -- actions.cds+=/blade_flurry,if=spell_targets>=2-conduit.ambidexterity.enabled&!buff.blade_flurry.up&raid_event.adds.in>10
+      if S.BladeFlurry:IsReady() and (AoEON() and EnemiesBFCount >= 2 or S.Ambidexterity:IsAvailable()) and not Player:BuffUp(S.BladeFlurry) then
         if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
           HR.CastSuggested(S.BladeFlurry)
         else
           if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
         end
       end
+      -- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
+      if S.GhostlyStrike:IsReady() and Target:IsSpellInRange(S.GhostlyStrike) and Player:ComboPointsDeficit() >= (1 + (Player:BuffUp(S.Broadside) and 1 or 0)) then
+        if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
+      end
       if Blade_Flurry_Sync() then
-        -- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
-        if S.GhostlyStrike:IsCastable() and Target:IsSpellInRange(S.GhostlyStrike) and Player:ComboPointsDeficit() >= (1 + (Player:BuffUp(S.Broadside) and 1 or 0)) then
-          if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
-        end
-        -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
-        if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and (EnergyTimeToMaxRounded() > 5 or EnergyPredictedRounded() < 15) then
+        -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&energy.time_to_max>2
+        if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and EnergyTimeToMaxRounded() > 2 then
           if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
         end
-        -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1&(!buff.adrenaline_rush.up|energy<45)
-        if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and EnergyTimeToMaxRounded() > 1
-          and (not Player:BuffUp(S.AdrenalineRush) or EnergyPredictedRounded() < 45) then
+        -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>2
+        if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and EnergyTimeToMaxRounded() > 2 then
           if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
         end
       end
@@ -328,35 +318,13 @@ local function CDs ()
           if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
         end
       end
-    end
-
-    -- Placeholder Roll the Bones
-    if S.RolltheBones:IsCastable() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
-      if HR.CastPooling(S.RolltheBones) then return "Cast Roll the Bones" end
-    end
-
-    -- Placeholder Bone Spike
-    if CDsON() and S.SerratedBoneSpike:IsCastable() and not Player:StealthUp(true, true) and Player:ComboPointsDeficit() > 1 then
-      if not Target:DebuffUp(S.SerratedBoneSpikeDebuff) then
-        if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike" end
-      else
-        if AoEON() then
-          -- Prefer melee cycle units
-          local BestUnit, BestUnitTTD = nil, 4
-          local TargetGUID = Target:GUID()
-          for _, CycleUnit in pairs(Enemies30y) do
-            if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(S.SerratedBoneSpike))
-            and not CycleUnit:DebuffUp(S.SerratedBoneSpikeDebuff) then
-              BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
-            end
-          end
-          if BestUnit then
-            HR.CastLeftNameplate(BestUnit, S.SerratedBoneSpike)
-          end
-        end
-        if S.SerratedBoneSpike:ChargesFractional() > 2.9 then
-          if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike Filler" end
-        end
+      -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=1
+      if S.Dreadblades:IsReady() and Target:IsSpellInRange(S.Dreadblades) and not Player:StealthUp(true, true) and Player:ComboPoints() < 2 then
+        if HR.Cast(S.Dreadblades, Settings.Outlaw.GCDasOffGCD.Dreadblades) then return "Cast Dreadblades" end
+      end
+      -- actions.cds+=/sepsis,if=!stealthed.all
+      if S.Sepsis:IsReady() and not Player:StealthUp(true, true) then
+        if HR.Cast(S.Sepsis) then return "Cast Sepsis" end
       end
     end
 
@@ -427,52 +395,81 @@ local function CDs ()
 end
 
 local function Stealth ()
-  if Target:IsSpellInRange(S.SinisterStrike) then
+  if Target:IsSpellInRange(S.Ambush) then
     -- actions.stealth=ambush
     if S.Ambush:IsCastable() then
-      if HR.Cast(S.Ambush) then return "Cast Ambush" end
+      if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
     end
   end
 end
 
 local function Finish ()
-  -- # BtE over RtB rerolls with 2+ Deadshot traits or Ruthless Precision.
-  -- actions.finish=between_the_eyes,if=variable.bte_condition
+  -- # BtE on cooldown to keep the Crit debuff up
+  -- actions.finish=between_the_eyes
   if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) then
-    if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (Pre RtB)" end
+    if HR.CastPooling(S.BetweentheEyes) then return "Cast Between the Eyes" end
   end
-  -- actions.finish=slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
+  -- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
   -- Note: Added Player:BuffRemains(S.SliceandDice) == 0 to maintain the buff while TTD is invalid (it's mainly for Solo, not an issue in raids)
   if S.SliceandDice:IsCastable() and (HL.FilteredFightRemains(EnemiesBF, ">", Player:BuffRemains(S.SliceandDice), true) or Player:BuffRemains(S.SliceandDice) == 0)
     and Player:BuffRemains(S.SliceandDice) < (1 + Player:ComboPoints()) * 1.8 then
-    if HR.Cast(S.SliceandDice) then return "Cast Slice and Dice" end
-  end
-  -- # BtE with the Ace Up Your Sleeve or Deadshot traits.
-  -- actions.finish+=/between_the_eyes,if=azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
-  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and (S.AceUpYourSleeve:AzeriteEnabled() or S.Deadshot:AzeriteEnabled()) then
-    if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes" end
+    if HR.CastPooling(S.SliceandDice) then return "Cast Slice and Dice" end
   end
   -- actions.finish+=/dispatch
   if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) then
     if HR.CastPooling(S.Dispatch) then return "Cast Dispatch" end
   end
-  -- OutofRange BtE
-  if S.BetweentheEyes:IsCastable() and Target:IsSpellInRange(S.BetweentheEyes) and not Target:IsInRange(10) then
-    if HR.Cast(S.BetweentheEyes) then return "Cast Between the Eyes (OOR)" end
-  end
 end
 
 local function Build ()
-  -- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<10|buff.deadshot.up|energy<45)
-  if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) and (Player:BuffStack(S.KeepYourWitsBuff) < 14 or Player:BuffUp(S.DeadshotBuff) or EnergyPredictedRounded() < 45) then
-    if HR.Cast(S.PistolShot) then return "Cast Pistol Shot" end
+  -- actions.build=shiv,if=runeforge.tiny_toxic_blade.equipped
+  if S.Shiv:IsReady() and TinyToxicBladeEquipped then
+    if HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
+  end
+  -- actions.build+=/echoing_reprimand
+  if S.EchoingReprimand:IsReady() then
+    if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
+  end
+
+  -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
+  if CDsON() and S.SerratedBoneSpike:IsReady() then
+    if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDot)) or HL.BossFilteredFightRemains("<", 5) then
+      if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike" end
+    end
+    if AoEON() then
+      -- Prefer melee cycle units
+      local BestUnit, BestUnitTTD = nil, 4
+      local TargetGUID = Target:GUID()
+      for _, CycleUnit in pairs(Enemies30y) do
+        if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(S.SerratedBoneSpike))
+        and not CycleUnit:DebuffUp(S.SerratedBoneSpikeDot) then
+          BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
+        end
+      end
+      if BestUnit then
+        HR.CastLeftNameplate(BestUnit, S.SerratedBoneSpike)
+      end
+    end
+    if S.SerratedBoneSpike:ChargesFractional() > 2.75 then
+      if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike Filler" end
+    end
+  end
+
+  if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) then
+    -- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled&buff.keep_your_wits_about_you.down)
+    if EnergyPredictedRounded() < 45 or S.QuickDraw:IsAvailable() then
+      if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
+    end
+    -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.deadshot.up|buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
+    if Player:BuffUp(S.DeadshotBuff) or Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) then
+      if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Buffed)" end
+    end
   end
   -- actions.build+=/sinister_strike
   if S.SinisterStrike:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
     if HR.CastPooling(S.SinisterStrike) then return "Cast Sinister Strike" end
   end
 end
-
 
 --- ======= MAIN =======
 local function APL ()
@@ -573,8 +570,11 @@ local function APL ()
     -- actions+=/call_action_list,name=cds
     ShouldReturn = CDs()
     if ShouldReturn then return "CDs: " .. ShouldReturn end
-    -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up|!buff.roll_the_bones.up)
-    if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.Opportunity))) * num(S.QuickDraw:IsAvailable() and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemains() > 1)) * num(S.AceUpYourSleeve:AzeriteRank() < 2 or not S.BetweentheEyes:CooldownUp() or RtB_Buffs() < 1) then
+    -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up)|combo_points=animacharged_cp
+    -- TODO: Animacharged CP
+    if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.Opportunity))) * num(S.QuickDraw:IsAvailable()
+      and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemains() > 1)) * num(S.AceUpYourSleeve:AzeriteRank() < 2 or not S.BetweentheEyes:CooldownUp())
+      or Player:ComboPoints() == Rogue.AnimachargedCP() then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
       -- run_action_list forces the return
@@ -615,46 +615,34 @@ end
 HR.SetAPL(260, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 2020-03-09
+-- Last Update: 2020-11-23
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
--- actions.precombat=flask
+-- actions.precombat=apply_poison
+-- actions.precombat+=/flask
 -- actions.precombat+=/augmentation
 -- actions.precombat+=/food
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
--- actions.precombat+=/potion
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>40
 -- actions.precombat+=/stealth,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
--- actions.precombat+=/roll_the_bones,precombat_seconds=2
+-- actions.precombat+=/roll_the_bones,precombat_seconds=1
 -- actions.precombat+=/slice_and_dice,precombat_seconds=2
--- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
 -- actions.precombat+=/use_item,name=azsharas_font_of_power
 -- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
 
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
--- # Reroll for 2+ buffs with Loaded Dice up. Otherwise reroll for 2+ or Grand Melee or Ruthless Precision.
--- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
--- # Reroll for 2+ buffs or Broadside with Deadshot.
--- actions+=/variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.broadside.up)
--- # Reroll for 2+ buffs or Ruthless Precision with Ace up your Sleeve, unless there are more Deadshot ranks.
--- actions+=/variable,name=rtb_reroll,op=set,if=azerite.ace_up_your_sleeve.enabled&azerite.ace_up_your_sleeve.rank>=azerite.deadshot.rank,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
--- # 2+ Snake Eyes: Always reroll for 2+ buffs.
--- actions+=/variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
--- # 2+ Snake Eyes: Do not reroll with 2+ stacks of the Snake Eyes buff (1+ stack with Broadside up).
--- actions+=/variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
--- # With Blade Flurry up, ignore rules above and take everything that is 2+ (not counting SaC) or single BS, GM, RP
--- actions+=/variable,name=rtb_reroll,op=set,if=buff.blade_flurry.up,value=rtb_buffs-buff.skull_and_crossbones.up<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up&!buff.broadside.up)
+-- # Reroll single BT/GM/TB buffs when possible
+-- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(buff.buried_treasure.up|buff.grand_melee.up|buff.true_bearing.up)
 -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
--- actions+=/variable,name=bte_condition,value=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 -- actions+=/call_action_list,name=stealth,if=stealthed.all
 -- actions+=/call_action_list,name=cds
 -- # Finish at maximum CP. Substract one for each Broadside and Opportunity when Quick Draw is selected and MfD is not ready after the next second. Always max BtE with 2+ Ace.
--- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up|!buff.roll_the_bones.up)
+-- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up)|combo_points=animacharged_cp
 -- actions+=/call_action_list,name=build
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
@@ -662,25 +650,34 @@ HR.SetAPL(260, APL, Init)
 -- actions+=/bag_of_tricks
 
 -- # Builders
--- # Use Pistol Shot if it won't cap combo points and the Oppotunity buff is up. Avoid using when Keep Your Wits stacks are high unless the Deadshot buff is also up.
--- actions.build=pistol_shot,if=buff.opportunity.up&(buff.keep_your_wits_about_you.stack<14|buff.deadshot.up|energy<45)
+-- actions.build=shiv,if=runeforge.tiny_toxic_blade.equipped
+-- actions.build+=/echoing_reprimand
+-- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
+-- # Use Pistol Shot with Opportunity if below 45 energy, or when using Quick Draw and Wits is down.
+-- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled&buff.keep_your_wits_about_you.down)
+-- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.deadshot.up|buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
 -- actions.build+=/sinister_strike
 
 -- # Cooldowns
 -- actions.cds=call_action_list,name=essences,if=!stealthed.all
--- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+-- actions.cds+=/flagellation
+-- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
+-- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+-- actions.cds+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1
--- # Blade Flurry on 2+ enemies. With adds: Use if they stay for 8+ seconds or if your next charge will be ready in time for the next wave.
--- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up&(!raid_event.adds.exists|raid_event.adds.remains>8|raid_event.adds.in>(2-cooldown.blade_flurry.charges_fractional)*25)
--- actions.cds+=/ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
--- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&(energy.time_to_max>5|energy<15)
--- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1&(!buff.adrenaline_rush.up|energy<45)
+-- # Blade Flurry on 2+ enemies. ST with Ambidexterity if no adds in the next 10s.
+-- actions.cds+=/blade_flurry,if=spell_targets>=2-conduit.ambidexterity.enabled&!buff.blade_flurry.up&raid_event.adds.in>10
+-- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
+-- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&energy.time_to_max>2
+-- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>2
 -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
 -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
+-- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=1
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
+-- actions.cds+=/sepsis,if=!stealthed.all
 -- actions.cds+=/potion,if=buff.bloodlust.react|buff.adrenaline_rush.up
 -- actions.cds+=/blood_fury
 -- actions.cds+=/berserking
@@ -691,11 +688,11 @@ HR.SetAPL(260, APL, Init)
 -- # Very roughly rule of thumbified maths below: Use for Inkpod crit, otherwise with AR at 20+ stacks or 10+ with also Blood up.
 -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
 -- # Default fallback for usable items.
--- actions.cds+=/use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
+-- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
 
 -- # Essences
 -- actions.essences=concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
--- actions.essences+=/blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition
+-- actions.essences+=/blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&(spell_targets.blade_flurry>=2|raid_event.adds.in>45)
 -- actions.essences+=/guardian_of_azeroth
 -- actions.essences+=/focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
 -- actions.essences+=/purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
@@ -703,16 +700,16 @@ HR.SetAPL(260, APL, Init)
 -- actions.essences+=/ripple_in_space
 -- actions.essences+=/worldvein_resonance
 -- actions.essences+=/memory_of_lucid_dreams,if=energy<45
--- actions.essences+=/reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
+-- # Hold Reaping Flames for execute range or kill buffs, if possible. Always try to get the lowest cooldown based on available enemies.
+-- actions.essences+=/cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
+-- actions.essences+=/reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
 
 -- # Finishers
--- # BtE over RtB rerolls with Deadshot/Ace traits or Ruthless Precision.
--- actions.finish=between_the_eyes,if=variable.bte_condition
--- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
--- actions.finish+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
--- # BtE with the Ace Up Your Sleeve or Deadshot traits.
--- actions.finish+=/between_the_eyes,if=azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
+-- # BtE on cooldown to keep the Crit debuff up
+-- actions.finish=between_the_eyes
+-- actions.finish+=/slice_and_dice,if=buff.slice_and_dice.remains<fight_remains&buff.slice_and_dice.remains<(1+combo_points)*1.8
 -- actions.finish+=/dispatch
 
 -- # Stealth
--- actions.stealth=ambush
+-- actions.stealth=cheap_shot,target_if=min:debuff.prey_on_the_weak.remains,if=talent.prey_on_the_weak.enabled&!target.is_boss
+-- actions.stealth+=/ambush

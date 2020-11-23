@@ -138,6 +138,7 @@ Spell.Rogue.Outlaw = {
   PistolShot                      = Spell(185763),
   RolltheBones                    = Spell(315508),
   Dispatch                        = Spell(2098),
+  Shiv                            = Spell(5938),
   SinisterStrike                  = Spell(193315),
   Stealth                         = Spell(1784),
   Vanish                          = Spell(1856),
@@ -152,6 +153,7 @@ Spell.Rogue.Outlaw = {
   MarkedforDeath                  = Spell(137619),
   QuickDraw                       = Spell(196938),
   SliceandDice                    = Spell(315496),
+  Dreadblades                     = Spell(343142),
   -- Azerite Traits
   AceUpYourSleeve                 = Spell(278676),
   Deadshot                        = Spell(272935),
@@ -177,12 +179,18 @@ Spell.Rogue.Outlaw = {
   RecklessForceBuff               = Spell(302932),
   RecklessForceCounter            = Spell(302917),
   -- Legendary
+  ConcealedBlunderbuss            = Spell(340587),
+  GreenskinsWickers               = Spell(340573),
   MasterAssassinsMark             = Spell(340094),
   -- Covenant
   SerratedBoneSpike               = Spell(328547),
-  SerratedBoneSpikeDebuff         = Spell(324073),
+  SerratedBoneSpikeDot            = Spell(324073),
+  EchoingReprimand                = Spell(323547),
+  Sepsis                          = Spell(328305),
   Flagellation                    = Spell(323654),
   FlagellationMastery             = Spell(345569),
+  -- Conduit
+  Ambidexterity                   = Spell(341542),
   -- Defensive
   CrimsonVial                     = Spell(185311),
   Feint                           = Spell(1966),
@@ -414,7 +422,7 @@ function Commons.AnimachargedCP ()
   elseif Player:BuffUp(Spell.Rogue.Subtlety.ERCharge4) then
     return 4
   end
-  return 0
+  return -1
 end
 
 -- poisoned
