@@ -138,9 +138,9 @@ Spell.DemonHunter.Havoc = {
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Vengeance = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofPhantomFire              = Item(171349),
 }
 
 Item.DemonHunter.Havoc = {
-  PotionofUnbridledFury            = Item(169299),
+  PotionofPhantomFire              = Item(171349),
 }

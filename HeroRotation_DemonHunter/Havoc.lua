@@ -135,8 +135,8 @@ local function Precombat()
   -- food
   -- snapshot_stats
   -- potion
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 2"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 2"; end
   end
   -- Manually added: Fel Rush if out of range
   if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() then
@@ -174,8 +174,8 @@ local function Cooldown()
     if Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(30)) then return "elysian_decree 32"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
-    if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 34"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
+    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 34"; end
   end
   -- use_items,if=buff.metamorphosis.up
   if (Player:BuffUp(S.MetamorphosisBuff)) then

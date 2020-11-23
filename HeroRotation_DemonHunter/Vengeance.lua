@@ -129,8 +129,8 @@ local function Precombat()
   -- food
   -- snapshot_stats
   -- potion
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 2"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 2"; end
   end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
@@ -180,8 +180,8 @@ end
 
 local function Cooldowns()
   -- potion
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 60"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 60"; end
   end
   -- use_items
   local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
