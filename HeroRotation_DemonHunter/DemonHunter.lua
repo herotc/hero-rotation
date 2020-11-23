@@ -76,18 +76,6 @@ Spell.DemonHunter.Vengeance = {
   -- Soulbind/Conduit Effects
   EnduringGloom                         = Spell(319978),
 
-  -- Trinket Effects
-  ConductiveInkDebuff                   = Spell(302565),
-  RazorCoralDebuff                      = Spell(303568),
-
-  -- Essences
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  RippleInSpace                         = Spell(302731),
-  WorldveinResonance                    = Spell(295186),
-
   -- Other
   Pool                                  = Spell(999910)
 }

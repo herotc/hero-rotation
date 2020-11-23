@@ -22,11 +22,6 @@ local CastSuggested = HR.CastSuggested
 -- lua
 local match      = string.match
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
-
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -34,15 +29,9 @@ local AEMajor    = HL.Spell:MajorEssence()
 -- Define S/I for spell and item arrays
 local S = Spell.DemonHunter.Vengeance
 local I = Item.DemonHunter.Vengeance
-if AEMajor ~= nil then
-  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.PocketsizedComputationDevice:ID(),
-  I.AshvanesRazorCoral:ID(),
-  I.AzsharasFontofPower:ID()
 }
 
 -- Rotation Var
@@ -66,22 +55,12 @@ local Settings = {
 }
 
 HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence()
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
-
-HL:RegisterForEvent(function()
   VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
 end, "PLAYER_SPECIALIZATION_CHANGED", "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
   RazelikhsDefilementEquipped = HL.LegendaryEnabled(27)
 end, "PLAYER_EQUIPMENT_CHANGED")
-
-HL:RegisterForEvent(function()
-  S.ConcentratedFlame:RegisterInFlight()
-end, "LEARNED_SPELL_IN_TAB")
-S.ConcentratedFlame:RegisterInFlight()
 
 -- Soul Fragments function taking into consideration aura lag
 local function UpdateSoulFragments()
@@ -153,10 +132,6 @@ local function Precombat()
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
     if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 2"; end
   end
-  -- use_item,name=azsharas_font_of_power
-  if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-    if Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 4"; end
-  end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
     if Cast(S.InfernalStrike, nil, nil, not Target:IsInRange(30)) then return "infernal_strike 6"; end
@@ -208,30 +183,6 @@ local function Cooldowns()
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
     if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 60"; end
   end
-  -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
-  if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTime() < Player:GCD()) then
-    if Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.ConcentratedFlame)) then return "concentrated_flame 62"; end
-  end
-  -- worldvein_resonance,if=buff.lifeblood.stack<3
-  if S.WorldveinResonance:IsCastable() and (Player:BuffStack(S.LifebloodBuff) < 3) then
-    if Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 64"; end
-  end
-  -- memory_of_lucid_dreams
-  if S.MemoryofLucidDreams:IsCastable() then
-    if Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 66"; end
-  end
-  -- heart_essence
-  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
-    if Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence 68"; end
-  end
-  -- use_item,effect_name=cyclotronic_blast,if=buff.memory_of_lucid_dreams.down
-  if Everyone.CyclotronicBlastReady() and (Player:BuffDown(S.MemoryofLucidDreams)) then
-    if Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, not Target:IsInRange(40)) then return "cyclotronic_blast 70"; end
-  end
-  -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
-  if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDown(S.RazorCoralDebuff) or Target:DebuffUp(S.ConductiveInkDebuff) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-    if Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, not Target:IsInRange(40)) then return "ashvanes_razor_coral 72"; end
-  end
   -- use_items
   local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
   if TrinketToUse then
@@ -270,7 +221,7 @@ local function Normal()
   end
   -- fel_devastation
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
-  -- This way we don't waste potential meta uptime
+  -- This way we don't waste potential Meta uptime
   if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsSpellInRange(S.FelDevastation)) then return "fel_devastation 34"; end
   end
@@ -326,7 +277,6 @@ local function APL()
 
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   if Everyone.TargetIsValid() then
     -- Precombat
