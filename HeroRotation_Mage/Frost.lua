@@ -103,49 +103,6 @@ local function Precombat ()
   end
 end
 
-local function Essences ()
-  --guardian_of_azeroth
-  if S.GuardianofAzeroth:IsCastable() then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences 1"; end
-  end
-  --focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
-  if S.FocusedAzeriteBeam:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount30ySplash > 3) then
-    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam essences 2"; end
-  end
-  --memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10
-  if S.MemoryofLucidDreams:IsCastable() and (EnemiesCount8ySplash < 5 and (Player:BuffStack(S.IciclesBuff) <= 1 or not S.GlacialSpike:IsAvailable()) and S.FrozenOrb:CooldownRemains() > 10) then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams essences 3"; end
-  end
-  --blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
-  if S.BloodoftheEnemy:IsCastable() and ((S.GlacialSpike:IsAvailable() and Player:BuffStack(S.IciclesBuff) == 5 and (Player:BuffUp(S.BrainFreezeBuff) or Player:IsCasting(S.Ebonbolt))) or ((EnemiesCount8ySplash > 3 or not S.GlacialSpike:IsAvailable()) and (Player:PrevGCDP(1, S.FrozenOrb) or Player:FrozenOrbGroundAoeRemains() > 5))) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.BloodoftheEnemy)) then return "blood_of_the_enemy essences 4"; end
-  end
-  --purifying_blast,if=buff.rune_of_power.down|active_enemies>3
-  if S.PurifyingBlast:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount8ySplash > 3) then
-    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.PurifyingBlast)) then return "purifying_blast essences 5"; end
-  end
-  --ripple_in_space,if=buff.rune_of_power.down|active_enemies>3
-  if S.RippleInSpace:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount8ySplash > 3) then
-    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space essences 6"; end
-  end
-  --concentrated_flame,line_cd=6,if=buff.rune_of_power.down
-  if S.ConcentratedFlame:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff)) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.ConcentratedFlame)) then return "concentrated_flame essences 7"; end
-  end
-  --reaping_flames,if=buff.rune_of_power.down
-  if (Player:BuffDown(S.RuneofPowerBuff)) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-  end
-  --the_unbound_force,if=buff.reckless_force.up
-  if S.TheUnboundForce:IsCastable() and (Player:BuffUp(S.RecklessForceBuff)) then
-    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.TheUnboundForce)) then return "the_unbound_force essences 9"; end
-  end
-  --worldvein_resonance,if=buff.rune_of_power.down|active_enemies>3
-  if S.WorldveinResonance:IsCastable() and (Player:BuffDown(S.RuneofPowerBuff) or EnemiesCount8ySplash > 3) then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance essences 10"; end
-  end
-end
-
 local function Cooldowns ()
   --potion,if=prev_off_gcd.icy_veins|fight_remains<30
   -- TODO : potion
@@ -160,7 +117,7 @@ local function Cooldowns ()
   if S.MirrorsofTorment:IsCastable() and EnemiesCount8ySplash < 3 and (S.WastelandPropriety:IsAvailable() or S.SiphonedMalice:IsAvailable()) then
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment cd 3"; end
   end
-  --rune_of_power,if=cooldown.icy_veins.remains>15&buff.rune_of_power.down
+  --rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
   if S.RuneofPower:IsCastable() and not Player:IsCasting(S.RuneofPower) and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
     if HR.Cast(S.RuneofPower, Settings.Frost.GCDasOffGCD.RuneOfPower) then return "rune_of_power cd 4"; end
   end
@@ -385,10 +342,6 @@ local function APL ()
     --call_action_list,name=cds
     if HR.CDsON() then
       ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
-    end
-    --call_action_list,name=essences
-    if HR.CDsON() then
-      ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     --call_action_list,name=aoe,if=active_enemies>=4
     if HR.AoEON() and EnemiesCount16ySplash >= 4 then
