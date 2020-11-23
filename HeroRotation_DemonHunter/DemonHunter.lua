@@ -131,48 +131,15 @@ Spell.DemonHunter.Havoc = {
   
   -- Conduits
   ExposedWoundDebuff                    = Spell(339229), -- Triggered by Serrated Glaive
-  SerratedGlaive                        = Spell(339230),
-  
-  -- Item Buffs/Debuffs
-  ConductiveInkDebuff                   = Spell(302565),
-  RazorCoralDebuff                      = Spell(303568),
-  
-  -- Azerite Traits (BfA)
-  ChaoticTransformation                 = Spell(288754),
-  FuriousGazeBuff                       = Spell(273232),
-  RevolvingBlades                       = Spell(279581),
-  
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
+  SerratedGlaive                        = Spell(339230)
 }
 
 -- Items
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Vengeance = {
   PotionofUnbridledFury            = Item(169299),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14})
 }
 
 Item.DemonHunter.Havoc = {
   PotionofUnbridledFury            = Item(169299),
-  GalecallersBoon                  = Item(159614, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  DribblingInkpod                  = Item(169319, {13, 14})
 }

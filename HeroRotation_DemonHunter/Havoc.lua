@@ -22,11 +22,6 @@ local CastSuggested = HR.CastSuggested
 -- lua
 local match      = string.match
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
-
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -34,17 +29,9 @@ local AEMajor    = HL.Spell:MajorEssence()
 -- Define S/I for spell and item arrays
 local S = Spell.DemonHunter.Havoc
 local I = Item.DemonHunter.Havoc
-if AEMajor ~= nil then
-  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.GalecallersBoon:ID(),
-  I.PocketsizedComputationDevice:ID(),
-  I.AshvanesRazorCoral:ID(),
-  I.AzsharasFontofPower:ID(),
-  I.DribblingInkpod:ID()
 }
 
 -- Rotation Var
@@ -62,21 +49,11 @@ local Settings = {
   Havoc = HR.GUISettings.APL.DemonHunter.Havoc
 }
 
-HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence()
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
-
 -- Interrupts List
 local StunInterrupts = {
   {S.FelEruption, "Cast Fel Eruption (Interrupt)", function () return true; end},
   {S.ChaosNova, "Cast Chaos Nova (Interrupt)", function () return true; end},
 }
-
-HL:RegisterForEvent(function()
-  S.ConcentratedFlame:RegisterInFlight()
-end, "AZERITE_ESSENCE_ACTIVATED")
-S.ConcentratedFlame:RegisterInFlight()
 
 -- Variables
 local VarPoolingForMeta = false
@@ -85,7 +62,6 @@ local VarPoolingForBladeDance = false
 local VarPoolingForEyeBeam = false
 local VarWaitingForEssenceBreak = false
 local VarWaitingForMomentum = false
-local VarFelBarrageSync = false
 
 HL:RegisterForEvent(function()
   VarPoolingForMeta = false
@@ -94,7 +70,6 @@ HL:RegisterForEvent(function()
   VarPoolingForEyeBeam = false
   VarWaitingForEssenceBreak = false
   VarWaitingForMomentum = false
-  VarFelBarrageSync = false
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
@@ -161,10 +136,6 @@ local function Precombat()
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
     if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 2"; end
   end
-  -- use_item,name=azsharas_font_of_power
-  if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-    if Cast(I.AzsharasFontofPower) then return "azsharas_font_of_power 4"; end
-  end
   -- Manually added: Fel Rush if out of range
   if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() then
     if Cast(S.FelRush, nil, nil, not Target:IsInRange(15)) then return "fel_rush 6"; end
@@ -175,104 +146,34 @@ local function Precombat()
   end
 end
 
-local function Essences()
-  -- variable,name=fel_barrage_sync,if=talent.fel_barrage.enabled,value=cooldown.fel_barrage.ready&(((!talent.demonic.enabled|buff.metamorphosis.up)&!variable.waiting_for_momentum&raid_event.adds.in>30)|active_enemies>desired_targets)
-  if (S.FelBarrage:IsAvailable()) then
-    VarFelBarrageSync = num(S.FelBarrage:CooldownUp() and (((not S.Demonic:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff)) and (not VarWaitingForMomentum)) or EnemiesCount8 > 1))
-  end
-  -- concentrated_flame,if=(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
-  if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight() or S.ConcentratedFlame:FullRechargeTime() < Player:GCD()) then
-    if Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.ConcentratedFlame)) then return "concentrated_flame"; end
-  end
-  -- blood_of_the_enemy,if=(!talent.fel_barrage.enabled|cooldown.fel_barrage.remains>45)&!variable.waiting_for_momentum&((!talent.demonic.enabled|buff.metamorphosis.up&!cooldown.blade_dance.ready)|target.time_to_die<=10)
-  if S.BloodoftheEnemy:IsCastable() and ((not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownRemains() > 45) and (not VarWaitingForMomentum) and ((not S.Demonic:IsAvailable() or Player:BuffUp(S.MetamorphosisBuff) and not S.BladeDance:CooldownUp()) or Target:TimeToDie() <= 10)) then
-    if Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(12)) then return "blood_of_the_enemy"; end
-  end
-  -- blood_of_the_enemy,if=talent.fel_barrage.enabled&variable.fel_barrage_sync
-  if S.BloodoftheEnemy:IsCastable() and (S.FelBarrage:IsAvailable() and VarFelBarrageSync) then
-    if Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(12)) then return "blood_of_the_enemy fel_barrage_sync"; end
-  end
-  -- guardian_of_azeroth,if=(buff.metamorphosis.up&cooldown.metamorphosis.ready)|buff.metamorphosis.remains>25|target.time_to_die<=30
-  if S.GuardianofAzeroth:IsCastable() and ((Player:BuffUp(S.MetamorphosisBuff) and S.Metamorphosis:CooldownUp()) or Player:BuffRemains(S.MetamorphosisBuff) > 25 or Target:TimeToDie() <= 30) then
-    if Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
-  end
-  -- focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-  if S.FocusedAzeriteBeam:IsCastable() and (EnemiesCount8 >= 2 or Settings.Havoc.UseFABST) then
-    if Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
-  end
-  -- purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-  if S.PurifyingBlast:IsCastable() and (EnemiesCount8 >= 2) then
-    if Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.PurifyingBlast)) then return "purifying_blast"; end
-  end
-  -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-  if S.TheUnboundForce:IsCastable() and (Player:BuffUp(S.RecklessForceBuff) or Player:BuffStack(S.RecklessForceCounter) < 10) then
-    if Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.TheUnboundForce)) then return "the_unbound_force"; end
-  end
-  -- ripple_in_space
-  if S.RippleInSpace:IsCastable() then
-    if Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
-  end
-  -- worldvein_resonance,if=buff.metamorphosis.up|variable.fel_barrage_sync
-  if S.WorldveinResonance:IsCastable() and (Player:BuffUp(S.MetamorphosisBuff) or VarFelBarrageSync) then
-    if Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
-  end
-  -- memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
-  if S.MemoryofLucidDreams:IsCastable() and (Player:Fury() < 40 and Player:BuffUp(S.MetamorphosisBuff)) then
-    if Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
-  end
-  -- cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
-  -- reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
-  if (true) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-  end
-end
-
 local function Cooldown()
   -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<25
   if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 25) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 22"; end
   end
   -- metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled&level<54|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
-  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (S.Demonic:IsAvailable() and (not S.ChaoticTransformation:AzeriteEnabled() and Player:Level() < 54 or (S.EyeBeam:CooldownRemains() > 12 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD()))) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
+  if S.Metamorphosis:IsCastable() and Player:BuffDown(S.MetamorphosisBuff) and (S.Demonic:IsAvailable() and (Player:Level() < 54 or (S.EyeBeam:CooldownRemains() > 12 and ((not VarBladeDance) or S.BladeDance:CooldownRemains() > Player:GCD()))) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff))) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 24"; end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
   if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff)) then
-    if Cast(S.SinfulBrand, nil, nil, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 26"; end
+    if Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 26"; end
   end
   -- the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum|buff.furious_gaze.up
-  if S.TheHunt:IsCastable() and (not S.Demonic:IsAvailable() and not VarWaitingForMomentum or Player:BuffUp(S.FuriousGazeBuff)) then
-    if Cast(S.TheHunt, nil, nil, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 28"; end
+  if S.TheHunt:IsCastable() and (not S.Demonic:IsAvailable() and not VarWaitingForMomentum) then
+    if Cast(S.TheHunt, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 28"; end
   end
   -- fodder_to_the_flame
   if S.FoddertotheFlame:IsCastable() then
-    if Cast(S.FoddertotheFlame) then return "fodder_to_the_flame 30"; end
+    if Cast(S.FoddertotheFlame, nil, Settings.Commons.CovenantDisplayStyle) then return "fodder_to_the_flame 30"; end
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
-    if Cast(S.ElysianDecree, nil, nil, not Target:IsInRange(30)) then return "elysian_decree 32"; end
+    if Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(30)) then return "elysian_decree 32"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
   if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
     if CastSuggested(I.PotionofUnbridledFury) then return "potion_of_unbridled_fury 34"; end
-  end
-  if (Settings.Commons.UseTrinkets) then
-    -- use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
-    if I.GalecallersBoon:IsEquipped() and I.GalecallersBoon:IsReady() and (not S.FelBarrage:IsAvailable() or S.FelBarrage:CooldownUp()) then
-      if Cast(I.GalecallersBoon, nil, Settings.Commons.TrinketDisplayStyle) then return "galecallers_boon 36"; end
-    end
-    -- use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
-    if Everyone.CyclotronicBlastReady() and (Player:BuffUp(S.MetamorphosisBuff) and Player:BuffDown(S.MemoryofLucidDreams) and ((not VarBladeDance) or not S.BladeDance:IsReady())) then
-      if Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast 38"; end
-    end
-    -- use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
-    if I.AshvanesRazorCoral:IsEquipped() and I.AshvanesRazorCoral:IsReady() and (Target:DebuffDown(S.RazorCoralDebuff) or (Target:DebuffUp(S.ConductiveInkDebuff) or Player:BuffRemains(S.MetamorphosisBuff) > 20) and Target:HealthPercentage() < 31 or Target:TimeToDie() < 20) then
-      if Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 40"; end
-    end
-    -- use_item,name=azsharas_font_of_power,if=cooldown.metamorphosis.remains<10|cooldown.metamorphosis.remains>60
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and (S.Metamorphosis:CooldownRemains() < 10 or S.Metamorphosis:CooldownRemains() > 60) then
-      if Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 42"; end
-    end
   end
   -- use_items,if=buff.metamorphosis.up
   if (Player:BuffUp(S.MetamorphosisBuff)) then
@@ -280,11 +181,6 @@ local function Cooldown()
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
-  end
-  -- call_action_list,name=essences
-  -- Manually added HeartEssence castable check. Returns false while not on Azeroth.
-  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
-    local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
   end
 end
 
@@ -337,7 +233,7 @@ local function Demonic()
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 90"; end
   end
   -- blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
-  if S.BladeDance:IsReady() and IsInMeleeRange(8) and (VarBladeDance and (S.EyeBeam:CooldownRemains() > (5 - S.RevolvingBlades:AzeriteRank() * 3))) then
+  if S.BladeDance:IsReady() and IsInMeleeRange(8) and (VarBladeDance and (S.EyeBeam:CooldownRemains() > 5)) then
     if Cast(S.BladeDance) then return "blade_dance 92"; end
   end
   -- immolation_aura
@@ -484,8 +380,6 @@ local function APL()
     EnemiesCount8 = 1
     EnemiesCount20 = 1
   end
-  
-  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   if Everyone.TargetIsValid() then
     -- Precombat
