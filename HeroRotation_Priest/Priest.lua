@@ -22,15 +22,14 @@ local HR         = HeroRotation
 -- Spells
 if not Spell.Priest then Spell.Priest = {} end
 Spell.Priest.Shadow = {
-  -- Azerite Traits
-  ChorusofInsanity                      = Spell(278661),
-  DeathThroes                           = Spell(278659),
-  HarvestedThoughtsBuff                 = Spell(288343),
-  SearingDialogue                       = Spell(272788),
-  SpitefulApparitions                   = Spell(277682),
-  ThoughtHarvester                      = Spell(288340),
-  WhispersoftheDamned                   = Spell(275722),
-
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  
   -- Base Spells
   DarkThoughtBuff                       = Spell(341207),
   DevouringPlague                       = Spell(335467),
@@ -87,28 +86,7 @@ Spell.Priest.Shadow = {
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
 
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  ArcaneTorrent                         = Spell(50613),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
-
-  -- Essences
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
+  -- Legendary Effects
 }
 
 Spell.Priest.Discipline = {
@@ -181,18 +159,5 @@ Item.Priest.Shadow = {
   -- Potion
   PotionofPhantomFire              = Item(171352),
   -- Trinkets
-  AzsharasFontofPower              = Item(169314, {13, 14}),
-  SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
-  -- Legendaries
-  CalltotheVoidGloves              = Item(173244),
-  CalltotheVoidWrists              = Item(173249),
-  PainbreakerPsalmChest            = Item(173241),
-  PainbreakerPsalmCloak            = Item(173242),
-  ShadowflamePrismGloves           = Item(173244),
-  ShadowflamePrismHelm             = Item(173245),
-  SunPriestessHelm                 = Item(173245),
-  SunPriestessShoulders            = Item(173247),
-  SephuzNeck                       = Item(178927),
-  SephuzShoulders                  = Item(173247),
-  SephuzChest                      = Item(173241),
+  SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14})
 }

@@ -34,7 +34,6 @@ HR.GUISettings.APL.Priest = {
   },
   Shadow = {
     DispersionHP = 10,
-    UseFABST = false,
     SelfPI = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -87,7 +86,6 @@ CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyl
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.")
 CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.SelfPI", "Assume Self-Power Infusion", "Assume the player will be using Power Infusion on themselves.")
 CreateARPanelOptions(CP_Shadow, "APL.Priest.Shadow")
-CreatePanelOption("CheckButton", CP_Shadow, "APL.Priest.Shadow.UseFABST", "Use Focused Azerite Beam ST", "Suggest Focused Azerite Beam usage during single target combat.")
 
 --Discipline
 CreateARPanelOptions(CP_Discipline, "APL.Priest.Discipline")

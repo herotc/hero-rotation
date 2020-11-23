@@ -22,10 +22,6 @@ local CastSuggested = HR.CastSuggested
 -- lua
 local match      = string.match
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -36,7 +32,6 @@ local I = Item.Priest.Shadow
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.AzsharasFontofPower:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID()
 }
 
@@ -187,10 +182,6 @@ local function Precombat()
     if S.ArcaneTorrent:IsCastable() and CDsON() then
       if Cast(S.ArcaneTorrent, nil, nil, not Target:IsSpellInRange(S.ArcaneTorrent)) then return "arcane_torrent 6"; end
     end
-    -- use_item,name=azsharas_font_of_power
-    if I.AzsharasFontofPower:IsEquipped() and I.AzsharasFontofPower:IsReady() and Settings.Commons.UseTrinkets then
-      if Cast(I.AzsharasFontofPower, nil, Settings.Commons.TrinketDisplayStyle) then return "azsharas_font_of_power 8"; end
-    end
     -- variable,name=mind_sear_cutoff,op=set,value=2
     VarMindSearCutoff = 2
     -- vampiric_touch
@@ -205,49 +196,6 @@ local function Precombat()
     if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
       if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 14"; end
     end
-  end
-end
-
-local function Essences()
-  -- memory_of_lucid_dreams
-  if S.MemoryofLucidDreams:IsCastable() then
-    if Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams essences"; end
-  end
-  -- blood_of_the_enemy
-  if S.BloodoftheEnemy:IsCastable() then
-    if Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, nil, nil, not Target:IsSpellInRange(S.BloodoftheEnemy)) then return "blood_of_the_enemy essences"; end
-  end
-  -- guardian_of_azeroth
-  if S.GuardianofAzeroth:IsCastable() then
-    if Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences"; end
-  end
-  -- focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-  if S.FocusedAzeriteBeam:IsCastable() and (EnemiesCount10ySplash >= 2 or Settings.Shadow.UseFABST) then
-    if Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam essences"; end
-  end
-  -- purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-  if S.PurifyingBlast:IsCastable() and (EnemiesCount10ySplash >= 2) then
-    if Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "purifying_blast essences"; end
-  end
-  -- concentrated_flame,line_cd=6,if=time<=10|full_recharge_time<gcd|target.time_to_die<5
-  if S.ConcentratedFlame:IsCastable() and (HL.CombatTime() <= 10 or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() or Target:TimeToDie() < 5) then
-    if Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.ConcentratedFlame)) then return "concentrated_flame essences"; end
-  end
-  -- ripple_in_space
-  if S.RippleInSpace:IsCastable() then
-    if Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space essences"; end
-  end
-  -- reaping_flames
-  if (true) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-  end
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastable() then
-    if Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance essences"; end
-  end
-  -- the_unbound_force
-  if S.TheUnboundForce:IsCastable() then
-    if Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force essences"; end
   end
 end
 
@@ -280,10 +228,6 @@ local function Cds()
   -- use_item,name=sinful_gladiators_badge_of_ferocity,if=buff.voidform.up|time>10&(!covenant.night_fae)
   if I.SinfulGladiatorsBadgeofFerocity:IsEquipped() and I.SinfulGladiatorsBadgeofFerocity:IsReady() and (Player:BuffUp(S.VoidformBuff) or HL.CombatTime() > 10 and not Player:Covenant() == "Night Fae") then
     if Cast(I.SinfulGladiatorsBadgeofFerocity) then return "sinful_gladiators_badge_of_ferocity 60"; end
-  end
-  -- call_action_list,name=essences
-  if (true) then
-    local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_items
   local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
