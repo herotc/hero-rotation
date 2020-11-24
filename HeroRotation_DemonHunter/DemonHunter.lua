@@ -66,6 +66,7 @@ Spell.DemonHunter.Vengeance = {
   Fleshcraft                            = Spell(324631),
   FoddertotheFlame                      = Spell(329554),
   SinfulBrand                           = Spell(317009),
+  SinfulBrandDebuff                     = Spell(317009),
   Soulshape                             = Spell(310143),
   SummonSteward                         = Spell(324739),
   TheHunt                               = Spell(323639),
