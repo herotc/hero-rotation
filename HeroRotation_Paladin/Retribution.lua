@@ -127,7 +127,7 @@ local function Cooldowns()
   end
   -- actions.cooldowns+=/ashen_hallow
   if CDsON() and S.AshenHallow:IsCastable() then
-    if Cast(S.AshenHallow) then return "Cast Ashen Hallow" end
+    if Cast(S.AshenHallow, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Ashen Hallow" end
   end
   -- actions.cooldowns+=/holy_avenger,if=time_to_hpg=0&((buff.avenging_wrath.up|buff.crusade.up)|(buff.avenging_wrath.down&cooldown.avenging_wrath.remains>40|buff.crusade.down&cooldown.crusade.remains>40))
   if CDsON() and S.HolyAvenger:IsCastable() and TimeToHPG <= Player:GCDRemains() and ((Player:BuffUp(S.AvengingWrath) or Player:BuffUp(S.Crusade)) or ((Player:BuffDown(S.AvengingWrath) and S.AvengingWrath:CooldownRemains() > 40) or (Player:BuffDown(S.Crusade) and S.Crusade:CooldownRemains() > 40))) then
@@ -157,7 +157,7 @@ local function Finishers()
   -- &(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*10|debuff.execution_sentence.up)|spell_targets.divine_storm>=2
   if CDsON() and S.VanquishersHammer:IsCastable() and Target:IsInRange(30) and (((not S.FinalReckoning:IsAvailable() or S.FinalReckoning:CooldownRemains() > Player:GCD() * 10 or Target:DebuffUp(S.FinalReckoning))
       and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 10 or Target:DebuffUp(S.ExecutionSentence))) or MeleeEnemies8yCount >= 2 ) then
-    if Cast(S.VanquishersHammer) then return "Cast Vanquisher's Hammer" end
+    if Cast(S.VanquishersHammer, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Vanquisher's Hammer" end
   end
   -- actions.finishers+=/execution_sentence,if=spell_targets.divine_storm<=3&((!talent.crusade.enabled|buff.crusade.down&cooldown.crusade.remains>10)|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10|debuff.final_reckoning.up)&time_to_hpg=0
   -- Note: Slight reorder for lisibility
@@ -206,7 +206,7 @@ local function Generators()
     and (Player:HolyPower() <= 2 or (Player:HolyPower() <= 4 and (S.BladeofJustice:CooldownRemains() > Player:GCD() * 2 or Target:DebuffUp(S.ExecutionSentence) or Target:DebuffUp(S.FinalReckoning))))
     and (not S.FinalReckoning:IsAvailable() or S.FinalReckoning:CooldownRemains() > Player:GCD() * 10)
     and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > Player:GCD() * 10) then
-      if Cast(S.DivineToll) then return "Cast Divine Toll" end
+      if Cast(S.DivineToll, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Divine Toll" end
   end
   -- actions.generators+=/wake_of_ashes,if=(holy_power=0|holy_power<=2&(cooldown.blade_of_justice.remains>gcd*2|debuff.execution_sentence.up|debuff.final_reckoning.up))
   -- &(!raid_event.adds.exists|raid_event.adds.in>20)
