@@ -11,14 +11,26 @@
   local Spell = HL.Spell;
   local Item = HL.Item;
   -- Lua
-  
+
   -- File Locals
-  
+
 
 
 --- ============================ CONTENT ============================
+--- Ghoul Tracking
+HL:RegisterForSelfCombatEvent(function(timestamp, _, _, _, _, _, _, destGUID, _, _, _, spellId)
+  if spellId ~= 46585 then return end
+  HL.GhoulTable.SummonedGhoul = destGUID
+  HL.GhoulTable.SummonedTime = time()
+end, "SPELL_SUMMON")
+
+HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
+  if destGUID ~= HL.GhoulTable.SummonedGhoul then return end
+  HL.GhoulTable.SummonedGhoul = nil
+  HL.GhoulTable.SummonedTime = nil
+end, "UNIT_DESTROYED")
 --- ======= NON-COMBATLOG =======
-  
+
 
 --- ======= COMBATLOG =======
   --- Combat Log Arguments
@@ -73,4 +85,17 @@
   --- End Combat Log Arguments
 
   -- Arguments Variables
-  
+  -- I referenced the warlock events file, not sure if this is correct
+  HL.GhoulTable = {
+    SummonedGhoul = nil,
+    SummonedTime = nil
+  }
+
+  function HL.GhoulTable:remains()
+    if HL.GhoulTable.SummonedTime == nil then return 0 end
+    return HL.GhoulTable.SummonedTime + 60 - time()
+  end
+
+  function HL.GhoulTable:active()
+    return HL.GhoulTable.SummonedGhoul ~= nil
+  end
