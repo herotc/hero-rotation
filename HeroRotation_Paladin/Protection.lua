@@ -197,7 +197,7 @@ local function Standard()
   end
   -- vanquishers_hammer
   if S.VanquishersHammer:IsReady() then
-    if HR.Cast(S.VanquishersHammer, nil, nil, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer 76"; end
+    if HR.Cast(S.VanquishersHammer, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.VanquishersHammer)) then return "vanquishers_hammer 76"; end
   end
   -- consecration,if=!consecration.up
   if S.Consecration:IsCastable() and (Player:BuffDown(S.ConsecrationBuff)) then
@@ -205,7 +205,7 @@ local function Standard()
   end
   -- divine_toll
   if S.DivineToll:IsReady() then
-    if HR.Cast(S.DivineToll, nil, nil, not Target:IsSpellInRange(S.DivineToll)) then return "divine_toll 80"; end
+    if HR.Cast(S.DivineToll, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.DivineToll)) then return "divine_toll 80"; end
   end
   -- blessed_hammer,strikes=2.4,if=charges=3
   if S.BlessedHammer:IsCastable() and (S.BlessedHammer:Charges() == 3) then
@@ -213,7 +213,7 @@ local function Standard()
   end
   -- ashen_hallow
   if S.AshenHallow:IsReady() then
-    if HR.Cast(S.AshenHallow) then return "ashen_hallow 84"; end
+    if HR.Cast(S.AshenHallow, nil, Settings.Commons.CovenantDisplayStyle) then return "ashen_hallow 84"; end
   end
   -- hammer_of_the_righteous,if=charges=2
   if S.HammeroftheRighteous:IsCastable() and (S.HammeroftheRighteous:Charges() == 2) then
