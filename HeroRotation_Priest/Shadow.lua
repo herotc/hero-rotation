@@ -250,11 +250,11 @@ end
 local function Cwc()
   -- searing_nightmare,use_while_casting=1,target_if=(variable.searing_nightmare_cutoff&!variable.pool_for_cds)|(dot.shadow_word_pain.refreshable&spell_targets.mind_sear>1)
   if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and ((VarSearingNightmareCutoff and not VarPoolForCDs) or (UnitsRefreshSWPain > 0 and EnemiesCount10ySplash > 1)) then
-    if Cast(S.SearingNightmare, nil, nil, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 80"; end
+    if Cast(S.SearingNightmare, nil, nil, not Target:IsInRange(40)) then return "searing_nightmare 80"; end
   end
   -- searing_nightmare,use_while_casting=1,target_if=talent.searing_nightmare.enabled&dot.shadow_word_pain.refreshable&spell_targets.mind_sear>2
   if S.SearingNightmare:IsReady() and Player:IsChanneling(S.MindSear) and (UnitsRefreshSWPain > 0 and EnemiesCount10ySplash > 2) then
-    if Cast(S.SearingNightmare, nil, nil, not Target:IsSpellInRange(S.SearingNightmare)) then return "searing_nightmare 82"; end
+    if Cast(S.SearingNightmare, nil, nil, not Target:IsInRange(40)) then return "searing_nightmare 82"; end
   end
   -- mind_blast,only_cwc=1
   -- Manually added condition when MindBlast can be casted while channeling
