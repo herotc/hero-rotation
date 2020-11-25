@@ -103,5 +103,5 @@ end, "UNIT_DESTROYED")
   end
 
   function HL.GhoulTable:active()
-    return HL.GhoulTable.SummonedGhoul ~= nil and UnitExists(HL.GhoulTable.SummonedGhoul)
+    return HL.GhoulTable.SummonedGhoul ~= nil
   end
