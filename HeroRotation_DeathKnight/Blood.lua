@@ -241,7 +241,7 @@ local function Covenants()
   end
   -- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<10|target.time_to_die<gcd)
   -- TODO: Fix buff.deaths_due. SimC references spell ID 324165, but no buff is given in-game
-  if S.SacrificialPact:IsReady() and ghoul.active() and ((Player:Covenant() ~= "Night Fae" or S.DeathsDue:CooldownRemains() > 9) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 10 or Target:TimeToDie() < Player:GCD())) then
+  if ghoul.active() and (S.SacrificialPact:IsReady() and ((Player:Covenant() ~= "Night Fae" or S.DeathsDue:CooldownRemains() > 9) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 10 or Target:TimeToDie() < Player:GCD()))) then
     if HR.Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact) then return "sacrificial_pact"; end
   end
   -- death_strike,if=covenant.venthyr&runic_power>70&cooldown.swarming_mist.remains<3
