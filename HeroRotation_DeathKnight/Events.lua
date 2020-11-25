@@ -24,6 +24,12 @@ HL:RegisterForSelfCombatEvent(function(timestamp, _, _, _, _, _, _, destGUID, _,
   HL.GhoulTable.SummonedTime = time()
 end, "SPELL_SUMMON")
 
+HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
+  if spellId ~= 327574 then return end
+  HL.GhoulTable.SummonedGhoul = nil
+  HL.GhoulTable.SummonedTime = nil
+end, "SPELL_CAST_SUCCESS")
+
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
   if destGUID ~= HL.GhoulTable.SummonedGhoul then return end
   HL.GhoulTable.SummonedGhoul = nil
@@ -97,5 +103,5 @@ end, "UNIT_DESTROYED")
   end
 
   function HL.GhoulTable:active()
-    return HL.GhoulTable.SummonedGhoul ~= nil
+    return HL.GhoulTable.SummonedGhoul ~= nil and UnitExists(HL.GhoulTable.SummonedGhoul)
   end
