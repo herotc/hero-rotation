@@ -37,6 +37,8 @@ local IsTanking
 local EnemiesMelee
 local EnemiesMeleeCount
 local UnitsWithoutBloodPlague
+local ghoul = HL.GhoulTable
+
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -239,8 +241,8 @@ local function Covenants()
   end
   -- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<10|target.time_to_die<gcd)
   -- TODO: Fix buff.deaths_due. SimC references spell ID 324165, but no buff is given in-game
-  if S.SacrificialPact:IsReady() and ((Player:Covenant() ~= "Night Fae" or S.DeathsDue:CooldownRemains() > 9) and Player:BuffDown(S.DancingRuneWeaponBuff) and ((S.RaiseDead:CooldownRemains() >= 60 and S.RaiseDead:CooldownRemains() < 70) or Target:TimeToDie() < Player:GCD())) then
-    if HR.Cast(S.SacrificialPact) then return "sacrificial_pact"; end
+  if S.SacrificialPact:IsReady() and ghoul.active() and ((Player:Covenant() ~= "Night Fae" or S.DeathsDue:CooldownRemains() > 9) and Player:BuffDown(S.DancingRuneWeaponBuff) and (ghoul.remains() < 10 or Target:TimeToDie() < Player:GCD())) then
+    if HR.Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact) then return "sacrificial_pact"; end
   end
   -- death_strike,if=covenant.venthyr&runic_power>70&cooldown.swarming_mist.remains<3
   if S.DeathStrike:IsReady() and (Player:Covenant() == "Venthyr" and Player:RunicPower() > 70 and S.SwarmingMist:CooldownRemains() < 3) then
@@ -276,13 +278,13 @@ local function APL()
     EnemiesMeleeCount = 1
     EnemiesCount10y   = 1
   end
-  
+
   -- Check Units without Blood Plague
   UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
-  
+
   -- Are we actively tanking?
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-  
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
