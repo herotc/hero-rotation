@@ -53,6 +53,8 @@ Spell.Mage.Arcane = {
   Frostbolt                             = Spell(116),
   ConjureManaHem                        = Spell(759),
   FrostNova                             = Spell(122),
+  TimeWarp                              = Spell(80353),
+  FireBlast                             = Spell(319836),
   -- Talents
   Amplification                         = Spell(236628),
   RuleofThrees                          = Spell(264354),
@@ -71,10 +73,13 @@ Spell.Mage.Arcane = {
   Enlightened                           = Spell(321387),
   -- Covenant Abilities
   RadiantSpark                          = Spell(307443),
-  RadiantSparlVulnerability             = Spell(307454),
+  RadiantSparkVulnerability             = Spell(307454),
   MirrorsofTorment                      = Spell(314793),
   Deathborne                            = Spell(324220),
   ShiftingPower                         = Spell(314791),
+  FieldOfBlossoms                       = Spell(319191),
+  ArcaneProdigy                         = Spell(336873),
+  IreOfTheAscended                      = Spell(337058),
   -- Azerite Traits (BfA)
   ArcanePummeling                       = Spell(270669),
   Equipoise                             = Spell(286027),
@@ -93,7 +98,9 @@ Spell.Mage.Arcane = {
   TheUnboundForce                       = Spell(298452),
   WorldveinResonance                    = Spell(295186),
   -- Legendaries (Shadowlands)
-  ExpandedPotentialBuff                 = Spell(327495)
+  ExpandedPotentialBuff                 = Spell(327495),
+  DisciplinaryCommandFireBuff           = Spell(327368),
+  DisciplinaryCommandFrostBuff          = Spell(327366)
 }
 
 Spell.Mage.Fire = {

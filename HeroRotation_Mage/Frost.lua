@@ -233,8 +233,12 @@ local function Aoe ()
 end
 
 local function Single ()
-  --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
-  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or Player:IsCasting(S.Frostbolt) or Player:IsCasting(S.RadiantSpark) or (Player:BuffStack(S.FingersofFrostBuff) == 0 and (Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
+  --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)
+  --&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!conduit.ire_of_the_ascended|cooldown.radiant_spark.remains|runeforge.freezing_winds)
+  --|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
+  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 
+  and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or (Player:IsCasting(S.Frostbolt) and (not S.IreOfTheAscended:IsAvailable() or S.RadiantSpark:CooldownRemains() == 0 or FreezingWindsEquipped)) 
+  or Player:IsCasting(S.RadiantSpark) or (Player:BuffStack(S.FingersofFrostBuff) == 0 and (Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
     if HR.Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry single 1"; end
   end
   --frozen_orb
