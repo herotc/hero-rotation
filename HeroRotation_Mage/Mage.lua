@@ -79,7 +79,6 @@ Spell.Mage.Arcane = {
   ShiftingPower                         = Spell(314791),
   FieldOfBlossoms                       = Spell(319191),
   ArcaneProdigy                         = Spell(336873),
-  IreOfTheAscended                      = Spell(337058),
   -- Azerite Traits (BfA)
   ArcanePummeling                       = Spell(270669),
   Equipoise                             = Spell(286027),
@@ -214,6 +213,7 @@ Spell.Mage.Frost = {
   SiphonedMalice                        = Spell(337090),
   GroveInvigoration                     = Spell(322721),
   FieldOfBlossoms                       = Spell(319191),
+  IreOfTheAscended                      = Spell(337058),
   -- Conduit Effects
   -- Azerite Traits
   PackedIceDebuff                       = Spell(272970),
