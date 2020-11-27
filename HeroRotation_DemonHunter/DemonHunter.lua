@@ -94,6 +94,7 @@ Spell.DemonHunter.Havoc = {
   Disrupt                               = Spell(183752),
   EyeBeam                               = Spell(198013),
   FelRush                               = Spell(195072),
+  FuriousGazeBuff                       = Spell(343312),
   ImmolationAura                        = Spell(258920),
   ImmolationAuraBuff                    = Spell(258920),
   Metamorphosis                         = Spell(191427),
