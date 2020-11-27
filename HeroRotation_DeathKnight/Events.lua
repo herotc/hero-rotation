@@ -18,22 +18,23 @@
 
 --- ============================ CONTENT ============================
 --- Ghoul Tracking
-HL:RegisterForSelfCombatEvent(function(timestamp, _, _, _, _, _, _, destGUID, _, _, _, spellId)
+HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, destGUID, _, _, _, spellId)
   if spellId ~= 46585 then return end
   HL.GhoulTable.SummonedGhoul = destGUID
-  HL.GhoulTable.SummonedTime = time()
+  -- Unsure if there's any items that could extend the ghouls time past 60 seconds
+  HL.GhoulTable.SummonExpiration = time() + 60
 end, "SPELL_SUMMON")
 
 HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
   if spellId ~= 327574 then return end
   HL.GhoulTable.SummonedGhoul = nil
-  HL.GhoulTable.SummonedTime = nil
+  HL.GhoulTable.SummonExpiration = nil
 end, "SPELL_CAST_SUCCESS")
 
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
   if destGUID ~= HL.GhoulTable.SummonedGhoul then return end
   HL.GhoulTable.SummonedGhoul = nil
-  HL.GhoulTable.SummonedTime = nil
+  HL.GhoulTable.SummonExpiration = nil
 end, "UNIT_DESTROYED")
 --- ======= NON-COMBATLOG =======
 
@@ -94,14 +95,14 @@ end, "UNIT_DESTROYED")
   -- I referenced the warlock events file, not sure if this is correct
   HL.GhoulTable = {
     SummonedGhoul = nil,
-    SummonedTime = nil
+    SummonExpiration = nil
   }
 
   function HL.GhoulTable:remains()
-    if HL.GhoulTable.SummonedTime == nil then return 0 end
-    return HL.GhoulTable.SummonedTime + 60 - time()
+    if HL.GhoulTable.SummonExpiration == nil then return 0 end
+    return HL.GhoulTable.SummonExpiration - time()
   end
 
   function HL.GhoulTable:active()
-    return HL.GhoulTable.SummonedGhoul ~= nil
+    return HL.GhoulTable.SummonedGhoul ~= nil and HL.GhoulTable:remains() > 0
   end
