@@ -218,7 +218,7 @@ local function Cds()
   end
   -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10)
   if S.UnholyNova:IsReady() and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10) then
-    if Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(15)) then return "unholy_nova 56"; end
+    if Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&prev_gcd.1.void_bolt)|(buff.voidform.up&talent.searing_nightmare.enabled)
   if S.BoonoftheAscended:IsCastable() and (Player:BuffDown(S.VoidformBuff) and not S.VoidEruption:CooldownUp() and EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffUp(S.VoidformBuff) and EnemiesCount10ySplash < 2 and not S.SearingNightmare:IsAvailable() and Player:PrevGCD(1, S.VoidBolt)) or (Player:BuffUp(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
