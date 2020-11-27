@@ -187,15 +187,15 @@ local function Aoe ()
   end
   --radiant_spark
   if HR.CDsON() and S.RadiantSpark:IsCastable() then
-    if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
   end
   --mirrors_of_torment
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
-    if HR.Cast(S.MirrorsofTorment, nil, nil, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 8"; end
+    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 8"; end
   end
   --shifting_power
   if HR.CDsON() and S.ShiftingPower:IsCastable() then
-    if HR.Cast(S.ShiftingPower, nil, nil, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
+    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
   -- NYI frozen
@@ -233,8 +233,12 @@ local function Aoe ()
 end
 
 local function Single ()
-  --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
-  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or Player:IsCasting(S.Frostbolt) or Player:IsCasting(S.RadiantSpark) or (Player:BuffStack(S.FingersofFrostBuff) == 0 and (Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
+  --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)
+  --&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!conduit.ire_of_the_ascended|cooldown.radiant_spark.remains|runeforge.freezing_winds)
+  --|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
+  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 
+  and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or (Player:IsCasting(S.Frostbolt) and (not S.IreOfTheAscended:IsAvailable() or S.RadiantSpark:CooldownRemains() == 0 or FreezingWindsEquipped)) 
+  or Player:IsCasting(S.RadiantSpark) or (Player:BuffStack(S.FingersofFrostBuff) == 0 and (Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
     if HR.Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry single 1"; end
   end
   --frozen_orb
@@ -267,7 +271,7 @@ local function Single ()
   end
   --radiant_spark,if=buff.freezing_winds.up&active_enemies=1
   if HR.CDsON() and S.RadiantSpark:IsCastable() and Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1 then
-    if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
   end
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
   if S.IceLance:IsCastable() and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
@@ -279,7 +283,7 @@ local function Single ()
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&buff.brain_freeze.react
   if HR.CDsON() and S.RadiantSpark:IsCastable() and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
-    if HR.Cast(S.RadiantSpark, nil, nil, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
   end
   --mirrors_of_torment
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
