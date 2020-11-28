@@ -391,8 +391,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
-    -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)|runeforge.chaos_theory&buff.chaos_theory.down
-    VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())) or ChaosTheoryEquipped and Player:BuffDown(S.ChaosTheoryBuff)
+    -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-(talent.trail_of_ruin.enabled+buff.metamorphosis.up))|runeforge.chaos_theory&buff.chaos_theory.down
+    VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - (num(S.TrailofRuin:IsAvailable()) + num(Player:BuffUp(S.MetamorphosisBuff)))) or ChaosTheoryEquipped and Player:BuffDown(S.ChaosTheoryBuff)
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
     VarPoolingForMeta = not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30
     -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
