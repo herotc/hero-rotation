@@ -37,7 +37,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
-local Enemies8yMelee, Enemies15yMelee, Enemies30y, Enemies40y, Enemies10ySplash
+local Enemies8yMelee, Enemies30y, Enemies40y, Enemies10ySplash
 local EnemiesCount8ySplash, EnemiesCount10ySplash
 local PetActiveCD
 local UnitsWithoutSWPain
@@ -217,9 +217,8 @@ local function Cds()
     if Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
   -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10)
-  -- Manually added check for targets within 15 yards of player, as this novas, rather than being target-based
-  if S.UnholyNova:IsReady() and #Enemies15yMelee > 0 and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10) then
-    if Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(15)) then return "unholy_nova 56"; end
+  if S.UnholyNova:IsReady() and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10) then
+    if Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&prev_gcd.1.void_bolt)|(buff.voidform.up&talent.searing_nightmare.enabled)
   if S.BoonoftheAscended:IsCastable() and (Player:BuffDown(S.VoidformBuff) and not S.VoidEruption:CooldownUp() and EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffUp(S.VoidformBuff) and EnemiesCount10ySplash < 2 and not S.SearingNightmare:IsAvailable() and Player:PrevGCD(1, S.VoidBolt)) or (Player:BuffUp(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
@@ -378,7 +377,6 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   Enemies8yMelee = Player:GetEnemiesInMeleeRange(8) -- Ascended Nova
-  Enemies15yMelee = Player:GetEnemiesInMeleeRange(15) -- Unholy Nova
   Enemies30y = Player:GetEnemiesInRange(30) -- Silence, for Sephuz
   Enemies40y = Player:GetEnemiesInRange(40) -- Multiple CastCycle Spells
   Enemies10ySplash = Target:GetEnemiesInSplashRange(10)

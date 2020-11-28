@@ -415,7 +415,7 @@ local function Cooldowns()
   end
   -- sacrificial_pact,if=active_enemies>=2&(pet.ghoul.remains<gcd|target.time_to_die<gcd)
   if S.SacrificialPact:IsCastable() and (EnemiesCount10yd >= 2 and (S.SacrificialPact:TimeSinceLastCast() < (60 - Player:GCD()) or Target:TimeToDie() < Player:GCD())) then
-    if HR.Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial pact cd 12"; end
+    if HR.Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial pact cd 12"; end
   end
 end
 

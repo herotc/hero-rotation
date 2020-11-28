@@ -215,7 +215,7 @@ local function St()
     if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.CovenantDisplayStyle, not TargetInRange40y) then return "resonating_arrow st kyrian covenant"; end
   end
   -- trueshot,if=buff.precise_shots.down|!talent.chimaera_shot.enabled
-  if S.Trueshot:IsReady() and (not Player:BuffUp(S.PreciseShotsBuff) or not S.ChimaeraShot:IsAvailable()) then
+  if S.Trueshot:IsReady() and HR.CDsON() and (not Player:BuffUp(S.PreciseShotsBuff) or not S.ChimaeraShot:IsAvailable()) then
     if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot st 13"; end
   end
   -- aimed_shot,if=(full_recharge_time<cast_time+gcd|buff.trueshot.up)&(buff.precise_shots.down|!talent.chimaera_shot.enabled|ca_active)|buff.trick_shots.remains>execute_time&(active_enemies>1|runeforge.serpentstalkers_trickery.equipped)
@@ -302,7 +302,7 @@ local function Trickshots()
     if HR.Cast(S.ExplosiveShot, nil, nil, not TargetInRange40y) then return "explosive_shot trickshots 10"; end
   end
   -- trueshot,if=cooldown.rapid_fire.remains|focus+action.rapid_fire.cast_regen>focus.max|target.time_to_die<15
-  if S.Trueshot:IsReady() and (bool(S.RapidFire:CooldownRemains()) or Player:Focus() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) > Player:FocusMax() or Target:TimeToDie() < 15) then
+  if S.Trueshot:IsReady() and HR.CDsON() and (bool(S.RapidFire:CooldownRemains()) or Player:Focus() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) > Player:FocusMax() or Target:TimeToDie() < 15) then
     if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
   end 
   -- aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
