@@ -401,6 +401,22 @@ local function APL()
     if S.Haunt:IsReady() then
       if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt InCombat"; end
     end
+    -- Covenant ability Scouring Tithe
+    if S.ScouringTithe:IsReady() then
+      if Cast(S.ScouringTithe, nil, nil, not Target:IsSpellInRange(S.ScouringTithe)) then return "ScouringTithe InCombat"; end
+    end
+    -- Covenant ability Soul Rot
+    if S.SoulRot:IsReady() then
+      if Cast(S.SoulRot, nil, nil, not Target:IsSpellInRange(S.SoulRot)) then return "SoulRot InCombat"; end
+    end
+    -- Covenant ability Decimating Bolt
+    if S.DecimatingBolt:IsReady() then
+      if Cast(S.DecimatingBolt, nil, nil, not Target:IsSpellInRange(S.DecimatingBolt)) then return "DecimatingBolt InCombat"; end
+    end
+    -- Covenant ability Impending Catastrophe
+    if S.ImpendingCatastrophe:IsReady() then
+      if Cast(S.ImpendingCatastrophe, nil, nil, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "ImpendingCatastrophe InCombat"; end
+    end    
     -- malefic_rapture,if=soul_shard>4
     if S.MaleficRapture:IsReady() and (Player:SoulShardsP() > 4) then
       if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 1"; end
