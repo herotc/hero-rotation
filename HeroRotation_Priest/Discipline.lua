@@ -33,6 +33,7 @@ local OnUseExcludes = {
 
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
+local EnemiesCount10ySplash
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -188,6 +189,8 @@ end
 
 --- ======= ACTION LISTS =======
 local function APL()
+  EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10)
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
