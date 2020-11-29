@@ -287,7 +287,7 @@ local function Single ()
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment single 13"; end
   end
   --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|active_enemies>=2)
-  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2)then
+  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2) then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
   end
   --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
@@ -344,12 +344,12 @@ local function APL ()
     if HR.CDsON() then
       ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    --call_action_list,name=aoe,if=active_enemies>=4
-    if HR.AoEON() and EnemiesCount16ySplash >= 4 then
+    --call_action_list,name=aoe,if=active_enemies>=3
+    if HR.AoEON() and EnemiesCount16ySplash >= 3 then
       ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
-    --call_action_list,name=single,if=active_enemies<4
-    if not HR.AoEON() or EnemiesCount16ySplash < 4 then
+    --call_action_list,name=single,if=active_enemies<3
+    if not HR.AoEON() or EnemiesCount16ySplash < 3 then
       ShouldReturn = Single(); if ShouldReturn then return ShouldReturn; end
     end
   end
