@@ -255,6 +255,7 @@ Spell.Rogue.Subtlety = {
   MarkedforDeath                        = Spell(137619),
   MasterofShadows                       = Spell(196976),
   Nightstalker                          = Spell(14062),
+  Premeditation                         = Spell(343160),
   PremeditationBuff                     = Spell(343173),
   SecretTechnique                       = Spell(280719),
   ShadowFocus                           = Spell(108209),
