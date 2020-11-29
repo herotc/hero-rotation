@@ -296,6 +296,8 @@ Spell.Rogue.Subtlety = {
   Sepsis                                = Spell(328305),
   Flagellation                          = Spell(323654),
   FlagellationCleanse                   = Spell(345569),
+  -- Conduit
+  DeeperDaggers                         = Spell(341549),
   -- Legendaries
   TheRottenBuff                         = Spell(341134),
   DeathlyShadowsBuff                    = Spell(341202),
@@ -314,10 +316,7 @@ Spell.Rogue.Subtlety = {
   NumbingPoison                         = Spell(5761),
   WoundPoison                           = Spell(8679),
   -- Misc
-  ConductiveInkDebuff                   = Spell(302565),
-  VigorTrinketBuff                      = Spell(287916),
-  RazorCoralDebuff                      = Spell(303568),
-  TheDreadlordsDeceit                   = Spell(228224),
+  FlayedwingToxinBuff                   = Spell(345545),
   PoolEnergy                            = Spell(999910)
 }
 
@@ -325,6 +324,7 @@ Spell.Rogue.Subtlety = {
 if not Item.Rogue then Item.Rogue = {} end
 Item.Rogue.Assassination = {
   -- Trinkets
+  FlayedwingToxin       = Item(178742, {13, 14}),
   GalecallersBoon       = Item(159614, {13, 14}),
   LustrousGoldenPlumage = Item(159617, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
@@ -335,6 +335,7 @@ Item.Rogue.Assassination = {
 
 Item.Rogue.Outlaw = {
   -- Trinkets
+  FlayedwingToxin       = Item(178742, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
@@ -342,7 +343,7 @@ Item.Rogue.Outlaw = {
 }
 
 Item.Rogue.Subtlety = {
-  -- Trinkets
+  FlayedwingToxin       = Item(178742, {13, 14}),
   ComputationDevice     = Item(167555, {13, 14}),
   VigorTrinket          = Item(165572, {13, 14}),
   FontOfPower           = Item(169314, {13, 14}),
