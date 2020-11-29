@@ -31,7 +31,7 @@ local Rogue = HR.Commons.Rogue
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
-  Assassination = HR.GUISettings.APL.Rogue.Assassination,
+  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Outlaw = HR.GUISettings.APL.Rogue.Outlaw,
 }
 
@@ -205,8 +205,8 @@ local function CDs ()
       if HR.Cast(S.Flagellation) then return "Cast Flagellation" end
     end
     -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
-    if S.FlagellationMastery:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
-      if HR.Cast(S.FlagellationMastery, Settings.Commons.OffGCDasOffGCD.FlagellationMastery) then return "Cast Flagellation Cleanse" end
+    if S.FlagellationCleanse:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
+      if HR.Cast(S.FlagellationCleanse) then return "Cast Flagellation Cleanse" end
     end
 
     -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
@@ -434,27 +434,14 @@ local function APL ()
 
   -- Defensives
   -- Crimson Vial
-  ShouldReturn = Rogue.CrimsonVial(S.CrimsonVial)
+  ShouldReturn = Rogue.CrimsonVial()
   if ShouldReturn then return ShouldReturn end
   -- Feint
-  ShouldReturn = Rogue.Feint(S.Feint)
+  ShouldReturn = Rogue.Feint()
   if ShouldReturn then return ShouldReturn end
 
   -- Poisons
-  local PoisonRefreshTime = Player:AffectingCombat() and Settings.Assassination.PoisonRefreshCombat*60 or Settings.Assassination.PoisonRefresh*60
-  -- Lethal Poison
-  if Player:BuffRemains(S.InstantPoison) <= PoisonRefreshTime
-    and Player:BuffRemains(S.WoundPoison) <= PoisonRefreshTime then
-    HR.CastSuggested(S.InstantPoison)
-  end
-  -- Non-Lethal Poisons
-  if (Player:BuffUp(S.CripplingPoison) and Player:BuffRemains(S.CripplingPoison) <= PoisonRefreshTime) or (Player:BuffUp(S.NumblingPoison) and Player:BuffRemains(S.NumblingPoison) <= PoisonRefreshTime) then
-    if Player:BuffUp(S.NumblingPoison) then
-      HR.CastSuggested(S.NumblingPoison)
-    else
-      HR.CastSuggested(S.CripplingPoison)
-    end
-  end
+  Rogue.Poisons()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
@@ -507,7 +494,7 @@ local function APL ()
   Rogue.MfDSniping(S.MarkedforDeath)
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts)
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons2.OffGCDasOffGCD.Kick, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
     -- actions+=/call_action_list,name=stealth,if=stealthed.all

@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, addonTable = ...
+local addonName, HR = ...
 -- HeroDBC
 local DBC = HeroDBC.DBC
 -- HeroLib
@@ -14,7 +14,6 @@ local Spell = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item = HL.Item
 -- HeroRotation
-local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 local Cast = HR.Cast
@@ -26,7 +25,7 @@ local mathmin = math.min
 --- ======= APL LOCALS =======
 -- Commons
 local Everyone = HR.Commons.Everyone
-local Class = HR.Commons.Class
+local Paladin = HR.Commons.Paladin
 
 -- GUI Settings
 local Settings = {
@@ -40,14 +39,9 @@ local S = Spell.Paladin.Retribution
 
 -- Items
 local I = Item.Paladin.Retribution
-local TrinketsOnUseExcludes = {
+local OnUseExcludeTrinkets = {
   --  I.TrinketName:ID(),
 }
-
--- Interrupts
-local Interrupts = {
-  { S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end },
-};
 
 -- Enemies
 local MeleeEnemies8y, MeleeEnemies8yCount, MeleeEnemies5y
@@ -56,6 +50,10 @@ local MeleeEnemies8y, MeleeEnemies8yCount, MeleeEnemies5y
 local ShouldReturn
 local TimeToHPG
 
+-- Interrupts
+local Interrupts = {
+  { S.HammerofJustice, "Cast Hammer of Justice (Interrupt)", function () return true; end },
+}
 
 --- ======= HELPERS =======
 -- paladin_t::get_how_availability @ https://github.com/simulationcraft/simc/blob/shadowlands/engine/class_modules/paladin/sc_paladin.cpp#L2614
@@ -112,7 +110,7 @@ local function Cooldowns()
   -- TODO: How to suggest it properly?
   -- actions.cooldowns+=/use_item,name=some_trinket,if=buff.avenging_wrath.up|buff.crusade.up
   if CDsON() and Player:BuffUp(S.AvengingWrath) or Player:BuffUp(S.Crusade) then
-    local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludeTrinkets)
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
@@ -257,10 +255,7 @@ end
 
 --- ======= MAIN =======
 local function APL()
-  -- Rotation Variables Update
-  TimeToHPG = ComputeTimeToHPG()
-
-  -- Unit Update
+  -- Enemies Update
   if AoEON() then
     MeleeEnemies8y = Player:GetEnemiesInMeleeRange(8) -- Divine Storm
     MeleeEnemies8yCount = #MeleeEnemies8y
@@ -270,6 +265,9 @@ local function APL()
     MeleeEnemies8yCount = 0
     MeleeEnemies5y = {}
   end
+
+  -- Rotation Variables Update
+  TimeToHPG = ComputeTimeToHPG()
 
   -- Defensives
 

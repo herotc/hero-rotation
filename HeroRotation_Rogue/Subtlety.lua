@@ -88,7 +88,6 @@ local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
 local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
 local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-
 HL.RegisterForEvent(function()
   DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
   TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
@@ -100,6 +99,7 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Rogue.Commons,
+  Commons2 = HR.GUISettings.APL.Rogue.Commons2,
   Subtlety = HR.GUISettings.APL.Rogue.Subtlety
 }
 
@@ -123,11 +123,11 @@ end
 local function UsePriorityRotation()
   if MeleeEnemies10yCount < 2 then
     return false
-  elseif Settings.Subtlety.UsePriorityRotation == "Always" then
+  elseif Settings.Commons.UsePriorityRotation == "Always" then
     return true
-  elseif Settings.Subtlety.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
+  elseif Settings.Commons.UsePriorityRotation == "On Bosses" and Target:IsInBossList() then
     return true
-  elseif Settings.Subtlety.UsePriorityRotation == "Auto" then
+  elseif Settings.Commons.UsePriorityRotation == "Auto" then
     -- Zul Mythic
     if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
       return true
@@ -151,7 +151,7 @@ local function SuggestCycleDoT(DoTSpell, DoTEvaluation, DoTMinTTD, Enemies)
   if BestUnit then
     HR.CastLeftNameplate(BestUnit, DoTSpell)
   -- Check ranged units next, if the RangedMultiDoT option is enabled
-  elseif Settings.Subtlety.RangedMultiDoT then
+  elseif Settings.Commons.RangedMultiDoT then
     BestUnit, BestUnitTTD = nil, DoTMinTTD
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(DoTSpell))
@@ -500,7 +500,7 @@ local function CDs ()
     -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30&!stealthed.all&combo_points.deficit>=cp_max_spend
     -- Note: With Settings.Subtlety.STMfDAsDPSCD
     if not Player:StealthUp(true, true) and ComboPointsDeficit >= Rogue.CPMaxSpend() then
-      if not Settings.Subtlety.STMfDAsDPSCD then
+      if not Settings.Commons.STMfDAsDPSCD then
         HR.CastSuggested(S.MarkedforDeath)
       elseif HR.CDsON() then
         if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
@@ -673,33 +673,14 @@ local function APL ()
 
   --- Defensives
   -- Crimson Vial
-  ShouldReturn = Rogue.CrimsonVial (S.CrimsonVial)
+  ShouldReturn = Rogue.CrimsonVial()
   if ShouldReturn then return ShouldReturn end
   -- Feint
-  ShouldReturn = Rogue.Feint (S.Feint)
+  ShouldReturn = Rogue.Feint()
   if ShouldReturn then return ShouldReturn end
 
   -- Poisons
-  local PoisonRefreshTime = Player:AffectingCombat() and Settings.Subtlety.PoisonRefreshCombat*60 or Settings.Subtlety.PoisonRefresh*60
-  -- Lethal Poison
-  if Player:BuffRemains(S.InstantPoison) <= PoisonRefreshTime
-    and Player:BuffRemains(S.WoundPoison) <= PoisonRefreshTime then
-    HR.CastSuggested(S.InstantPoison)
-  end
-  -- Non-Lethal Poisons
-  if (Player:BuffUp(S.CripplingPoison) and Player:BuffRemains(S.CripplingPoison) < PoisonRefreshTime)
-    or (Player:BuffUp(S.NumbingPoison) and Player:BuffRemains(S.NumbingPoison) < PoisonRefreshTime)
-    or (not Player:BuffUp(S.CripplingPoison) and not Player:BuffUp(S.NumbingPoison)) then
-    if Player:BuffUp(S.NumbingPoison) then
-      HR.CastSuggested(S.NumbingPoison)
-    else
-      HR.CastSuggested(S.CripplingPoison)
-    end
-  end
-  -- Flayedwing Toxin Poison Trinket
-  if I.FlayedwingToxin:IsEquipped() and Player:BuffRemains(S.FlayedwingToxinBuff) < PoisonRefreshTime then
-    HR.CastSuggested(I.FlayedwingToxin)
-  end
+  Rogue.Poisons()
 
   --- Out of Combat
   if not Player:AffectingCombat() then
@@ -746,7 +727,7 @@ local function APL ()
 
   if Everyone.TargetIsValid() then
     -- Interrupts
-    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons.OffGCDasOffGCD.Kick, Interrupts)
+    ShouldReturn = Everyone.Interrupt(5, S.Kick, Settings.Commons2.OffGCDasOffGCD.Kick, Interrupts)
     if ShouldReturn then return ShouldReturn end
 
     -- # Check CDs at first

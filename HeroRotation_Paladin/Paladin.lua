@@ -109,8 +109,6 @@ Spell.Paladin.Retribution = {
   HammerofWrath     = Spell(24275),
   HammerofWrath2    = Spell(326730),
   Judgment          = Spell(20271),
-  Rebuke            = Spell(96231),
-  ShieldofVengeance = Spell(184662),
   TemplarsVerdict   = Spell(85256),
   WakeofAshes       = Spell(255937),
   -- Talents
@@ -126,6 +124,10 @@ Spell.Paladin.Retribution = {
   SanctifiedWrath   = Spell(317866),
   Seraphim          = Spell(152262),
   Zeal              = Spell(269569),
+  -- Defensive
+  ShieldofVengeance = Spell(184662),
+  -- Utility
+  Rebuke            = Spell(96231),
   -- Trinkets
 
   -- Covenants (Shadowlands)

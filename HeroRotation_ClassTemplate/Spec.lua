@@ -43,11 +43,11 @@ local TrinketsOnUseExcludes = {
   --  I.TrinketName:ID(),
 }
 
--- Interrupts
-
 -- Enemies
 
 -- Rotation Variables
+
+-- Interrupts
 
 
 --- ======= HELPERS =======
