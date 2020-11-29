@@ -20,7 +20,6 @@ HR.GUISettings.APL.Mage = {
     UseTrinkets = true,
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
-    EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     UseTimeWarp = false,
     -- {Display GCD as OffGCD, ForceReturn}
@@ -104,7 +103,6 @@ CreateARPanelOptions(CP_Mage, "APL.Mage.Commons");
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.");

@@ -70,7 +70,7 @@ Spell.DemonHunter.Vengeance = {
   Soulshape                             = Spell(310143),
   SummonSteward                         = Spell(324739),
   TheHunt                               = Spell(323639),
-  
+
   -- Legendary Effects
   FelBombardmentBuff                    = Spell(337849),
 
@@ -83,7 +83,7 @@ Spell.DemonHunter.Vengeance = {
 
 Spell.DemonHunter.Havoc = {
   -- Racials
-  
+
   -- Abilities
   Annihilation                          = Spell(201427),
   BladeDance                            = Spell(188499),
@@ -101,7 +101,7 @@ Spell.DemonHunter.Havoc = {
   MetamorphosisBuff                     = Spell(162264),
   ThrowGlaive                           = Spell(185123),
   VengefulRetreat                       = Spell(198793),
-  
+
   -- Talents
   BlindFury                             = Spell(203550),
   DemonBlades                           = Spell(203555),
@@ -119,19 +119,19 @@ Spell.DemonHunter.Havoc = {
   TrailofRuin                           = Spell(258881),
   UnboundChaos                          = Spell(275144),
   UnboundChaosBuff                      = Spell(337313),
-  
+
   -- Covenant Abilities
   ElysianDecree                         = Spell(306830),
   FoddertotheFlame                      = Spell(329554),
   SinfulBrand                           = Spell(317009),
   SinfulBrandDebuff                     = Spell(317009),
   TheHunt                               = Spell(323639),
-  
+
   -- Legendary Effects
   ChaosTheoryBuff                       = Spell(337567),
   FelBombardmentBuff                    = Spell(337849),
   BurningWoundDebuff                    = Spell(346278),
-  
+
   -- Conduits
   ExposedWoundDebuff                    = Spell(339229), -- Triggered by Serrated Glaive
   SerratedGlaive                        = Spell(339230)

@@ -25,8 +25,6 @@ HR.GUISettings.APL.Rogue = {
     -- Trinkets
     UseTrinkets = true,
     TrinketDisplayStyle = "Suggested",
-    -- Essences
-    EssenceDisplayStyle = "Suggested",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       Racials = true,
@@ -139,7 +137,6 @@ CreatePanelOption("Slider", CP_Rogue, "APL.Rogue.Commons.FeintHP", {0, 100, 1}, 
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.StealthOOC", "Stealth Reminder (OOC)", "Show Stealth Reminder when out of combat.")
 CreatePanelOption("CheckButton", CP_Rogue, "APL.Rogue.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
 CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Rogue, "APL.Rogue.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.")
 CreateARPanelOptions(CP_Rogue, "APL.Rogue.Commons")
 -- Assassination
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", {1, 5, 0.25}, "Envenom DMG Offset", "Set the Envenom DMG Offset.")

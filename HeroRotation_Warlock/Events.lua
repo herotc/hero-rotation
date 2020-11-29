@@ -257,17 +257,6 @@ HL:RegisterForSelfCombatEvent(
         if (SpellID == 265187) then
           HL.GuardiansTable.DemonicTyrantDuration = summonedPet.duration
           petDuration = summonedPet.duration
-        else
-          -- If Vision of Perfection is the major essence
-          if (Spell:MajorEssenceEnabled(22)) then
-            if (Spell:EssenceRank(22) == 1) then
-              petDuration = summonedPet.duration * 0.25
-              HL.GuardiansTable.DemonicTyrantDuration = petDuration
-            elseif (Spell:EssenceRank(22) >= 2) then
-              petDuration = summonedPet.duration * 0.35
-              HL.GuardiansTable.DemonicTyrantDuration = petDuration
-            end
-          end
         end
       end
       local petTable = {

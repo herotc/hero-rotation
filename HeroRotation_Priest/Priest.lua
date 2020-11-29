@@ -29,7 +29,7 @@ Spell.Priest.Shadow = {
   Berserking                            = Spell(26297),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
-  
+
   -- Base Spells
   DarkThoughtBuff                       = Spell(341207),
   DevouringPlague                       = Spell(335467),
@@ -90,7 +90,6 @@ Spell.Priest.Shadow = {
 }
 
 Spell.Priest.Discipline = {
-  -- Azerite Traits
 
   -- Base Spells
   MindBlast                             = Spell(8092),
@@ -136,21 +135,6 @@ Spell.Priest.Discipline = {
   BloodFuryBuff                         = Spell(20572),
   Fireblood                             = Spell(265221),
   LightsJudgment                        = Spell(255647),
-
-  -- Essences
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186)
 }
 
 -- Items

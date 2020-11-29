@@ -203,48 +203,6 @@ local function ItemFunc()
   end
 end
 
-local function Cooldowns()
-
-  if CDsON() then
-    -- worldvein_resonance
-    if S.WorldveinResonance:IsCastable() then
-      if Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
-    end
-    -- memory_of_lucid_dreams
-    if S.MemoryofLucidDreams:IsCastable() then
-      if Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
-    end
-    -- blood_of_the_enemy
-    if S.BloodoftheEnemy:IsCastable() then
-      if Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
-    end
-    -- guardian_of_azeroth
-    if S.GuardianofAzeroth:IsCastable() then
-      if Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
-    end
-    -- ripple_in_space
-    if S.RippleInSpace:IsCastable() then
-      if Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
-    end
-    -- focused_azerite_beam
-    if S.FocusedAzeriteBeam:IsCastable() then
-      if Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
-    end
-    -- purifying_blast
-    if S.PurifyingBlast:IsCastable() then
-      if Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
-    end
-    -- concentrated_flame
-    if S.ConcentratedFlame:IsCastable() then
-      if Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
-    end
-    -- the_unbound_force,if=buff.reckless_force.remains
-    if S.TheUnboundForce:IsCastable() and (Player:BuffUp(S.RecklessForceBuff)) then
-      if Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
-    end
-  end
-end
-
 local function Se()
   -- haunt
   if S.Haunt:IsReady() then
@@ -417,8 +375,6 @@ local function APL()
     if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
       if Cast(S.DarkSoulMisery) then return "DarkSoulMisery InCombat"; end
     end
-    -- call_action_list,name=cooldowns
-    local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=item TODO
     local ShouldReturn = ItemFunc(); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=se,if=debuff.shadow_embrace.stack<(3-action.shadow_bolt.in_flight)|debuff.shadow_embrace.remains<3

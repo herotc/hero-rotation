@@ -21,9 +21,6 @@ local Warlock    = HR.Commons.Warlock
 -- lua
 local GetTime    = GetTime
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -255,45 +252,6 @@ local function OffGCD()
   end
 end
 
-local function Essences()
-  -- worldvein_resonance,if=cooldown.summon_demonic_tyrant.remains>45
-  if S.WorldveinResonance:IsCastable() and (S.SummonDemonicTyrant:CooldownRemains() > 45) then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance"; end
-  end
-  -- memory_of_lucid_dreams
-  if S.MemoryofLucidDreams:IsCastable() then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams"; end
-  end
-  -- blood_of_the_enemy
-  if S.BloodoftheEnemy:IsCastable() then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy"; end
-  end
-  -- guardian_of_azeroth
-  if S.GuardianofAzeroth:IsCastable() then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth"; end
-  end
-  -- ripple_in_space
-  if S.RippleInSpace:IsCastable() then
-    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space"; end
-  end
-  -- focused_azerite_beam
-  if S.FocusedAzeriteBeam:IsCastable() then
-    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam"; end
-  end
-  -- purifying_blast
-  if S.PurifyingBlast:IsCastable() then
-    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
-  end
-  -- concentrated_flame
-  if S.ConcentratedFlame:IsCastable() then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
-  end
-  -- the_unbound_force,if=buff.reckless_force.remains
-  if S.TheUnboundForce:IsCastable() and (Player:BuffUp(S.RecklessForceBuff)) then
-    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force"; end
-  end
-end
-
 --- ======= ACTION LISTS =======
 local function APL()
   -- Update Demonology-specific Tables
@@ -349,10 +307,6 @@ local function APL()
     -- call_action_list,name=off_gcd
     if CDsON() then
       local ShouldReturn = OffGCD(); if ShouldReturn then return ShouldReturn; end
-    end
-    -- call_action_list,name=essences
-    if CDsON() then
-      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
     if CDsON() and S.SummonDemonicTyrant:CooldownRemains() < 5 and not VarTyrantReady then
@@ -411,10 +365,6 @@ local function APL()
     -- Manually added: DecimatingBolt checks
     if S.PowerSiphon:IsCastable() and (WildImpsCount() > 1 and Player:BuffStack(S.DemonicCoreBuff) < 3 and not S.DecimatingBolt:IsAvailable() or WildImpsCount() > 1 and Player:BuffStack(S.DemonicCoreBuff) < 3 and S.DecimatingBolt:CooldownUp()) then
       if HR.Cast(S.PowerSiphon) then return "power_siphon 40"; end
-    end
-    -- implosion,if=azerite.explosive_potential.rank>1&buff.explosive_potential.remains<3&buff.wild_imps.stack>=3
-    if S.Implosion:IsCastable() and (S.ExplosivePotential:AzeriteRank() > 1 and Player:BuffRemains(S.ExplosivePotentialBuff) < 3 and WildImpsCount() >= 3) then
-      if HR.Cast(S.Implosion, nil, nil, not Target:IsSpellInRange(S.Implosion)) then return "implosion 41"; end
     end
     -- soul_strike
     if S.SoulStrike:IsCastable() then

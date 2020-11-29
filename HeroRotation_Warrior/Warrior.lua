@@ -73,25 +73,6 @@ Spell.Warrior.Fury = {
   ConductiveInkDebuff                   = Spell(302565),
   NoxiousVenomDebuff                    = Spell(267410),
 
-  -- Azerite Traits (BfA)
-  ColdSteelHotBlood                     = Spell(288080),
-
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-
   -- Pool
   Pool                                  = Spell(999910),
 }
@@ -155,28 +136,6 @@ Spell.Warrior.Arms = {
   -- Item Buffs/Debuffs
   RazorCoralDebuff                      = Spell(303568),
   ConductiveInkDebuff                   = Spell(302565),
-
-  -- Azerite Traits (BfA)
-  CrushingAssaultBuff                   = Spell(278826),
-  SeismicWave                           = Spell(277639),
-  TestofMight                           = Spell(275529),
-  TestofMightBuff                       = Spell(275540),
-
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  GuardianofAzerothBuff                 = Spell(295855),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731),
-  SeethingRageBuff                      = Spell(297126),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
 
   -- Pool
   Pool                                  = Spell(999910),
@@ -259,3 +218,4 @@ Item.Warrior.Arms = {
 Item.Warrior.Protection = {
   PotionofUnbridledFury            = Item(169299),
 }
+

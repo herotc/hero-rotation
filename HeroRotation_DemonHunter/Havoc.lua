@@ -38,7 +38,6 @@ local OnUseExcludes = {
 local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
-local PassiveEssence
 local ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
 local BurningWoundEquipped = Player:HasLegendaryEquipped(25)
 

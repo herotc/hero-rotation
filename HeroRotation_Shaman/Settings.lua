@@ -21,7 +21,6 @@ HR.GUISettings.APL.Shaman = {
     UseTrinkets = true,
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
-    EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     UseBloodlust = false,
     -- {Display GCD as OffGCD, ForceReturn}
@@ -82,7 +81,6 @@ CreateARPanelOptions(CP_Shaman, aplCommons);
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Shaman, "APL.Shaman.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 CreatePanelOption("Dropdown", CP_Shaman, "APL.Shaman.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 -- Enhancement
 CreateARPanelOptions(CP_Enhancement, "APL.Shaman.Enhancement");

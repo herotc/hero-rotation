@@ -18,10 +18,6 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -30,9 +26,6 @@ local AEMajor    = HL.Spell:MajorEssence()
 -- Define S/I for spell and item arrays
 local S = Spell.Paladin.Protection
 local I = Item.Paladin.Protection
-if AEMajor ~= nil then
-  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -47,7 +40,6 @@ local StunInterrupts = {
 local ShouldReturn -- Used to get the return string
 local ActiveMitigationNeeded
 local IsTanking
-local PassiveEssence
 local Enemies8y, Enemies30y
 local EnemiesCount8y, EnemiesCount30y
 
@@ -140,10 +132,6 @@ local function Cooldowns()
   -- moment_of_glory,if=prev_gcd.1.avengers_shield&cooldown.avengers_shield.remains
   if S.MomentofGlory:IsCastable() and (Player:PrevGCD(1, S.AvengersShield) and not S.AvengersShield:CooldownUp()) then
     if HR.Cast(S.MomentofGlory, Settings.Protection.OffGCDasOffGCD.MomentofGlory) then return "moment_of_glory 42"; end
-  end
-  -- heart_essence
-  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
-    if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "heart_essence 44"; end
   end
 end
 
@@ -245,7 +233,6 @@ local function APL()
 
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   if Everyone.TargetIsValid() then
     -- Precombat

@@ -20,7 +20,6 @@ HR.GUISettings.APL.Monk = {
     UseTrinkets = true,
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
-    EssenceDisplayStyle = "Suggested",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -102,7 +101,6 @@ CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.");
 
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");

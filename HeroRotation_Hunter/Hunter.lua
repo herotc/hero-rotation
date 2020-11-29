@@ -58,12 +58,6 @@ Spell.Hunter.BeastMastery = {
   ScentOfBlood                          = Spell(193532),
   SpittingCobra                         = Spell(257891),
   Stomp                                 = Spell(199530),
-  -- Azerite Traits
-  DanceofDeath                          = Spell(274443),
-  RapidReload                           = Spell(278530),
-  PrimalInstincts                       = Spell(279806),
-  -- Essences
-
   -- Covenants
   DeathChakram                          = Spell(325028),
   FlayedShot                            = Spell(324149),

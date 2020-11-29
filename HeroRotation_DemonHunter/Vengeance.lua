@@ -40,7 +40,6 @@ local SoulFragments, SoulFragmentsAdjusted, LastSoulFragmentAdjustment
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
 local IsTanking
-local PassiveEssence
 local Enemies8yMelee
 local EnemiesCount8yMelee
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())

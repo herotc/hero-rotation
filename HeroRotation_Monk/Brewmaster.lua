@@ -22,10 +22,7 @@ local CDsON      = HR.CDsON
 local mathmin    = math.min
 local pairs      = pairs;
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
+
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
 -- luacheck: max_line_length 9999
@@ -33,9 +30,6 @@ local AEMajor    = HL.Spell:MajorEssence()
 -- Spells
 local S = Spell.Monk.Brewmaster;
 local I = Item.Monk.Brewmaster;
-if AEMajor ~= nil then
-  S.HeartEssence               = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -50,7 +44,6 @@ local Enemies8y
 local EnemiesCount8
 local IsInMeleeRange, IsInAoERange
 local ShouldReturn; -- Used to get the return string
-local PassiveEssence;
 local Interrupts = {
   { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
 }
@@ -69,11 +62,6 @@ local Settings = {
   Commons    = HR.GUISettings.APL.Monk.Commons,
   Brewmaster = HR.GUISettings.APL.Monk.Brewmaster
 };
-
-HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence();
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID]);
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 HL:RegisterForEvent(function()
   S.ConcentratedFlame:RegisterInFlight()
@@ -119,6 +107,7 @@ local function ShouldPurify ()
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
   local StaggersRatioPct = 0;
+
 
   if Player:DebuffUp(S.HeavyStagger) then
     NextStaggerTick = GetStaggerTick(S.HeavyStagger)
@@ -192,9 +181,6 @@ local function APL()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
-
-  -- Misc
-  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting));
 
   --- Out of Combat
   if not Player:AffectingCombat() and Everyone.TargetIsValid() then
@@ -300,16 +286,6 @@ local function APL()
     if S.KegSmash:IsCastable() then
       if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 2"; end
     end
-    if HR.CDsON() then
-      -- concentrated_flame,if=dot.concentrated_flame.remains=0
-      if S.ConcentratedFlame:IsCastable(40) and Target:DebuffDown(S.ConcentratedFlameBurn) then
-        if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "Concentrated Flame"; end
-      end
-      -- heart_essence,if=!essence.the_crucible_of_flame.major
-      if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() and not Spell:MajorEssenceEnabled(AE.TheCrucibleofFlame) then
-        if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle) then return "Heart Essence"; end
-      end
-    end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
     -- Note : Extra handling to prevent Expel Harm over-healing
     if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() >= 3 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
@@ -407,7 +383,6 @@ HR.SetAPL(268, APL, Init);
 -- actions+=/blackout_kick
 -- actions+=/keg_smash
 -- actions+=/concentrated_flame,if=dot.concentrated_flame.remains=0
--- actions+=/heart_essence,if=!essence.the_crucible_of_flame.major
 -- actions+=/expel_harm,if=buff.gift_of_the_ox.stack>=3
 -- actions+=/rushing_jade_wind,if=buff.rushing_jade_wind.down
 -- actions+=/breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))

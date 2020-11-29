@@ -18,9 +18,6 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -68,45 +65,6 @@ local function Precombat()
     if S.ShadowWordDeath:IsCastable() then
       if HR.Cast(S.ShadowWordDeath, nil, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death precombat 1"; end
     end
-  end
-end
-
-local function Essences()
-  -- memory_of_lucid_dreams
-  if S.MemoryofLucidDreams:IsCastable() then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams essences"; end
-  end
-  -- blood_of_the_enemy
-  if S.BloodoftheEnemy:IsCastable() then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle, nil, nil, not Target:IsSpellInRange(S.BloodoftheEnemy)) then return "blood_of_the_enemy essences"; end
-  end
-  -- guardian_of_azeroth
-  if S.GuardianofAzeroth:IsCastable() then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essences"; end
-  end
-  -- focused_azerite_beam
-  if S.FocusedAzeriteBeam:IsCastable() then
-    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam essences"; end
-  end
-  -- purifying_blast
-  if S.PurifyingBlast:IsCastable() then
-    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "purifying_blast essences"; end
-  end
-  -- concentrated_flame,line_cd=6,if=time<=10|full_recharge_time<gcd|target.time_to_die<5
-  if S.ConcentratedFlame:IsCastable() and (HL.CombatTime() <= 10 or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() or Target:TimeToDie() < 5) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.ConcentratedFlame)) then return "concentrated_flame essences"; end
-  end
-  -- ripple_in_space
-  if S.RippleInSpace:IsCastable() then
-    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space essences"; end
-  end
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastable() then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance essences"; end
-  end
-  -- the_unbound_force
-  if S.TheUnboundForce:IsCastable() then
-    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "the_unbound_force essences"; end
   end
 end
 
@@ -240,9 +198,6 @@ local function APL()
     end
     if (CDsON()) then
       local ShouldReturn = Cds(); if ShouldReturn then return ShouldReturn; end
-    end
-    if (CDsON()) then
-      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
     end
     if (true) then
       local ShouldReturn = Main(); if ShouldReturn then return ShouldReturn; end

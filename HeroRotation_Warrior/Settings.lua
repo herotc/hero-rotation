@@ -20,7 +20,6 @@ HR.GUISettings.APL.Warrior = {
     UsePotions  = true,
     UseTrinkets = true,
     TrinketDisplayStyle = "Suggested",
-    EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -69,7 +68,7 @@ HR.GUISettings.APL.Warrior = {
       DragonRoar = false,
       Avatar = false,
     }
-  },  
+  },
 }
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings)
@@ -83,7 +82,6 @@ CreateARPanelOptions(CP_Warrior, "APL.Warrior.Commons")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.")
 CreatePanelOption("CheckButton", CP_Warrior, "APL.Warrior.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
 CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Warrior, "APL.Warrior.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.")
 
 -- Arms Settings
 CreateARPanelOptions(CP_Arms, "APL.Warrior.Arms")

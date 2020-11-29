@@ -189,11 +189,6 @@ Spell.Shaman.Elemental = {
   AscendanceBuff                        = Spell(114050),
   LavaBeam                              = Spell(114074),
 
-  -- Essences
-  LightningLasso                        = Spell(305483),
-
-  -- Artifact
-
   -- Defensive
 
   -- Covenant Abilities

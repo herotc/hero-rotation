@@ -17,10 +17,6 @@ local Item       = HL.Item
 -- HeroRotation
 local HR         = HeroRotation
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -29,9 +25,6 @@ local AEMajor    = HL.Spell:MajorEssence()
 -- Define S/I for spell and item arrays
 local S = Spell.Hunter.Marksmanship;
 local I = Item.Hunter.Marksmanship;
-if AEMajor ~= nil then
-  S.HeartEssence                          = Spell(AESpellIDs[AEMajor.ID])
-end
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
@@ -54,15 +47,9 @@ local Settings = {
   Marksmanship = HR.GUISettings.APL.Hunter.Marksmanship
 };
 
-HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence()
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
-
 -- Variables
 local VarCAExecute = Target:HealthPercentage() > 70 and S.CarefulAim:IsAvailable()
 local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
-local PassiveEssence
 
 HL:RegisterForEvent(function()
   SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
@@ -158,10 +145,6 @@ local function Cds()
   -- potion wip
   if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.UsePotions then
     if HR.CastSuggested(I.PotionOfSpectralAgility) then return "potion_of_spectral_agility"; end
-  end
-  -- heart_essence
-  if S.HeartEssence ~= nil and not PassiveEssence and S.HeartEssence:IsCastable() then
-    if HR.Cast(S.HeartEssence, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsSpellInRange(S.HeartEssence)) then return "heart_essence"; end
   end
 end
 
@@ -348,8 +331,6 @@ local function APL()
   EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10) -- AOE Toogle
   Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
   TargetInRange40y = Target:IsSpellInRange(S.AimedShot) -- Ranged abilities; Distance varies by Mastery
-
-  PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   -- call precombat
   if not Player:AffectingCombat() then

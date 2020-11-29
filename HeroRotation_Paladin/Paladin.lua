@@ -90,26 +90,6 @@ Spell.Paladin.Protection = {
   VengefulShock                         = Spell(340006),
   VengefulShockDebuff                   = Spell(340007),
 
-
-
-  -- Azerite Traits (BfA)
-
-  -- Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RecklessForceCounter                  = MultiSpell(298409, 302917),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-
   -- Pool
   Pool                                  = Spell(999910),
 }

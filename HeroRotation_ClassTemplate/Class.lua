@@ -41,10 +41,6 @@ Spell.Class.Spec = {
 
   -- Legendaries (Shadowlands)
 
-  -- Azerite Traits (BfA)
-
-  -- Essences (BfA)
-
   -- Pool
   Pool = Spell(999910)
 }

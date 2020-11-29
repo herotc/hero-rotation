@@ -79,23 +79,6 @@ Spell.Mage.Arcane = {
   ShiftingPower                         = Spell(314791),
   FieldOfBlossoms                       = Spell(319191),
   ArcaneProdigy                         = Spell(336873),
-  -- Azerite Traits (BfA)
-  ArcanePummeling                       = Spell(270669),
-  Equipoise                             = Spell(286027),
-  -- Azerite Essences (BfA)
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258), --Splash, 30 
-  GuardianofAzeroth                     = Spell(295840),
-  GuardianofAzerothBuff                 = Spell(295855),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337), --Splash, 8
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731), --Splash, 8
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   DisciplinaryCommandFireBuff           = Spell(327368),
@@ -137,19 +120,7 @@ Spell.Mage.Fire = {
   AlexstraszasFury                      = Spell(235870),
   Kindling                              = Spell(155148),
   Counterspell                          = Spell(2139),
-  BloodoftheEnemy                       = Spell(297108),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
-  ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368),
   HarmonicDematerializer                = Spell(293512),
-  ReapingFlames                         = Spell(310690)
 }
 
 Spell.Mage.Frost = {
@@ -215,21 +186,6 @@ Spell.Mage.Frost = {
   FieldOfBlossoms                       = Spell(319191),
   IreOfTheAscended                      = Spell(337058),
   -- Conduit Effects
-  -- Azerite Traits
-  PackedIceDebuff                       = Spell(272970),
-  -- Essences
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258), --Splash, 30
-  GuardianofAzeroth                     = Spell(295840),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337), --Splash, 8
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731), --Splash, 8
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   FreezingWindsBuff                     = Spell(327364),

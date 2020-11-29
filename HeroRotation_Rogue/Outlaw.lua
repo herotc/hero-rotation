@@ -198,57 +198,8 @@ local function Blade_Flurry_Sync ()
   return not AoEON() or EnemiesBFCount < 2 or Player:BuffUp(S.BladeFlurry)
 end
 
--- # Essences
-local function Essences ()
-  -- blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition|fight_remains<=10
-  if S.BloodoftheEnemy:IsCastable() and (Blade_Flurry_Sync() and S.BetweentheEyes:CooldownUp() or HL.BossFilteredFightRemains("<", 20)) then
-    if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast BloodoftheEnemy" end
-  end
-  -- concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
-  if S.ConcentratedFlame:IsCastable() and EnergyTimeToMaxRounded() > 1 and not Player:BuffUp(S.BladeFlurry) and (not Target:DebuffUp(S.ConcentratedFlameBurn)
-    and not Player:PrevGCD(1, S.ConcentratedFlame) or S.ConcentratedFlame:FullRechargeTime() < Player:GCD() + Player:GCDRemains()) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast ConcentratedFlame" end
-  end
-  -- guardian_of_azeroth
-  if S.GuardianofAzeroth:IsCastable() then
-    if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast GuardianofAzeroth" end
-  end
-  -- focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up|fight_remains<10
-  if S.FocusedAzeriteBeam:IsCastable() and (EnemiesBFCount >= 2 or not Player:BuffUp(S.AdrenalineRush) or HL.BossFilteredFightRemains("<", 10)) then
-    if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast FocusedAzeriteBeam" end
-  end
-  -- purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60|fight_remains<10
-  if S.PurifyingBlast:IsCastable() then
-    if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast PurifyingBlast" end
-  end
-  -- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-  if S.TheUnboundForce:IsCastable() and (Player:BuffUp(S.RecklessForceBuff) or Player:BuffStack(S.RecklessForceCounter) < 10) then
-    if HR.Cast(S.TheUnboundForce, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast TheUnboundForce" end
-  end
-  -- ripple_in_space
-  if S.RippleInSpace:IsCastable() then
-    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast RippleInSpace" end
-  end
-  -- worldvein_resonance
-  if S.WorldveinResonance:IsCastable() then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast WorldveinResonance" end
-  end
-  -- memory_of_lucid_dreams,if=energy<45
-  if S.MemoryofLucidDreams:IsCastable() and EnergyPredictedRounded() < 45 then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams" end
-  end
-
-  return false
-end
-
 local function CDs ()
   if Target:IsSpellInRange(S.SinisterStrike) then
-    -- actions.cds+=/call_action_list,name=essences,if=!stealthed.all
-    if CDsON() and not Player:StealthUp(true, true) then
-      ShouldReturn = Essences()
-      if ShouldReturn then return ShouldReturn end
-    end
-
     -- actions.cds+=/flagellation
     if S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
       if HR.Cast(S.Flagellation) then return "Cast Flagellation" end
@@ -567,10 +518,9 @@ local function APL ()
     -- actions+=/call_action_list,name=cds
     ShouldReturn = CDs()
     if ShouldReturn then return "CDs: " .. ShouldReturn end
-    -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up)|combo_points=animacharged_cp
-    -- TODO: Animacharged CP
+    -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))
     if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.Opportunity))) * num(S.QuickDraw:IsAvailable()
-      and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemains() > 1)) * num(S.AceUpYourSleeve:AzeriteRank() < 2 or not S.BetweentheEyes:CooldownUp())
+      and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemains() > 1))
       or Player:ComboPoints() == Rogue.AnimachargedCP() then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
@@ -639,7 +589,7 @@ HR.SetAPL(260, APL, Init)
 -- actions+=/call_action_list,name=stealth,if=stealthed.all
 -- actions+=/call_action_list,name=cds
 -- # Finish at maximum CP. Substract one for each Broadside and Opportunity when Quick Draw is selected and MfD is not ready after the next second. Always max BtE with 2+ Ace.
--- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))*(azerite.ace_up_your_sleeve.rank<2|!cooldown.between_the_eyes.up)|combo_points=animacharged_cp
+-- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))
 -- actions+=/call_action_list,name=build
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
@@ -656,7 +606,6 @@ HR.SetAPL(260, APL, Init)
 -- actions.build+=/sinister_strike
 
 -- # Cooldowns
--- actions.cds=call_action_list,name=essences,if=!stealthed.all
 -- actions.cds+=/flagellation
 -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
 -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
@@ -686,20 +635,6 @@ HR.SetAPL(260, APL, Init)
 -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
 -- # Default fallback for usable items.
 -- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
-
--- # Essences
--- actions.essences=concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
--- actions.essences+=/blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&(spell_targets.blade_flurry>=2|raid_event.adds.in>45)
--- actions.essences+=/guardian_of_azeroth
--- actions.essences+=/focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
--- actions.essences+=/purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
--- actions.essences+=/the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
--- actions.essences+=/ripple_in_space
--- actions.essences+=/worldvein_resonance
--- actions.essences+=/memory_of_lucid_dreams,if=energy<45
--- # Hold Reaping Flames for execute range or kill buffs, if possible. Always try to get the lowest cooldown based on available enemies.
--- actions.essences+=/cycling_variable,name=reaping_delay,op=min,if=essence.breath_of_the_dying.major,value=target.time_to_die
--- actions.essences+=/reaping_flames,target_if=target.time_to_die<1.5|((target.health.pct>80|target.health.pct<=20)&(active_enemies=1|variable.reaping_delay>29))|(target.time_to_pct_20>30&(active_enemies=1|variable.reaping_delay>44))
 
 -- # Finishers
 -- # BtE on cooldown to keep the Crit debuff up

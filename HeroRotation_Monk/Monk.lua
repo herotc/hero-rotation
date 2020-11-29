@@ -51,7 +51,7 @@ Spell.Monk.Windwalker = {
   StormEarthAndFireBuff                 = Spell(137639),
   TigerPalm                             = Spell(100780),
   TouchOfDeath                          = Spell(322109),
-  
+
   -- Debuffs
   MarkOfTheCraneDebuff                  = Spell(228287),
 
@@ -99,38 +99,12 @@ Spell.Monk.Windwalker = {
   TranscendenceTransfer                 = Spell(119996),
   Vivify                                = Spell(116670),
 
-  -- Azerite Traits
-  DanceOfChijiAzeriteBuff               = Spell(286587),
-  FuryofXuenBuff                        = Spell(287062),
-  GloryoftheDawn                        = Spell(288634),
-  OpenPalmStrikes                       = Spell(279918),
-  SwiftRoundhouse                       = Spell(277669),
-  SwiftRoundhouseBuff                   = Spell(278710),
-  
-  -- Essences
-  BloodOfTheEnemy                       = Spell(297108),
-  MemoryOfLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  RippleInSpace                         = Spell(302731),
-  ConcentratedFlame                     = Spell(295373),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  ReapingFlames                         = Spell(310690),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  RecklessForceBuff                     = Spell(302932),
-  ConcentratedFlameBurn                 = Spell(295368),
-  SeethingRageBuff                      = Spell(297126),
-  
   -- Trinket Debuffs
   RazorCoralDebuff                      = Spell(303568),
-  
+
   -- PvP Abilities
 
   -- Shadowland Covenant
-
-  -- Shadowland Essences
 
   -- Shadowlands Legendary
   ChiEnergyBuff                         = Spell(337571),
@@ -210,25 +184,6 @@ Spell.Monk.Brewmaster = {
   Transcendence                = Spell(101643),
   TranscendenceTransfer        = Spell(119996),
   Vivify                       = Spell(116670),
-
-  -- Azerite Traits
-  PotentKick                   = Spell(213047),
-
-  -- Essences
-  BloodOfTheEnemy              = Spell(297108),
-  MemoryOfLucidDreams          = Spell(298357),
-  PurifyingBlast               = Spell(295337),
-  RippleInSpace                = Spell(302731),
-  ConcentratedFlame            = Spell(295373),
-  TheUnboundForce              = Spell(298452),
-  WorldveinResonance           = Spell(295186),
-  FocusedAzeriteBeam           = Spell(295258),
-  GuardianofAzeroth            = Spell(295840),
-  ReapingFlames                = Spell(310690),
-  LifebloodBuff                = MultiSpell(295137, 305694),
-  RecklessForceBuff            = Spell(302932),
-  ConcentratedFlameBurn        = Spell(295368),
-  SeethingRageBuff             = Spell(297126),
 
   -- Trinket Debuffs
   RazorCoralDebuff             = Spell(303568),

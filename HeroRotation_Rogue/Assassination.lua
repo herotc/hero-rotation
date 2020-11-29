@@ -24,9 +24,6 @@ local mathfloor = math.floor
 -- Commons
 local Everyone = HR.Commons.Everyone
 local Rogue = HR.Commons.Rogue
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
 -- Define S/I for spell and item arrays
 local S = Spell.Rogue.Assassination
 local I = Item.Rogue.Assassination

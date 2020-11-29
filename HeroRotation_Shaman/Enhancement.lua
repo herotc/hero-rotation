@@ -370,7 +370,6 @@ local function APL()
     if S.Windstrike:IsCastable() then
       if HR.Cast(S.Windstrike, nil, nil, not Target:IsSpellInRange(S.Windstrike)) then return "windstrike main 142"; end
     end
-    -- heart_essence
     -- use_items
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then

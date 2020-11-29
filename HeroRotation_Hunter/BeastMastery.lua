@@ -19,9 +19,7 @@ local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 -- Lua
 local mathmax    = math.max;
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
+
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -100,12 +98,10 @@ local function EvaluateBarbedShotCycleCondition2(ThisUnit)
 end
 
 -- pet.main.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)
--- |cooldown.aspect_of_the_wild.remains<pet.main.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled
 -- |charges_fractional>1.4
 -- |target.time_to_die<9
 local function EvaluateBarbedShotCycleCondition3(ThisUnit)
   return (Pet:BuffDown(S.FrenzyPetBuff) and (S.BarbedShot:ChargesFractional() > 1.8 or Player:BuffUp(S.BestialWrathBuff)))
-    or (S.AspectoftheWild:CooldownRemains() < S.FrenzyPetBuff:BaseDuration() - GCDMax and bool(S.PrimalInstincts:AzeriteEnabled()))
     or S.BarbedShot:ChargesFractional() > 1.4
     or ThisUnit:TimeToDie() < 9
 end
@@ -119,16 +115,8 @@ local function PreCombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() and TargetInRange40y then
     if CDsON() then
-      if S.PrimalInstincts:AzeriteEnabled() then
-        -- bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
       if S.BestialWrath:IsCastable() then
         if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (PreCombat)"; end
-      end
-      else
-        -- aspect_of_the_wild,precast_time=1.3,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
-        if S.AspectoftheWild:IsCastable() then
-          if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "Aspect of the Wild (PreCombat)"; end
-        end
       end
     else
       -- Barbed Shot
@@ -248,29 +236,15 @@ local function Cleave()
   if S.DireBeast:IsReady() then
     if HR.Cast(S.DireBeast, nil, nil, not TargetInRange40y) then return "Dire Beast (Cleave)"; end
   end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.main.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.main.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
+  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.main.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|charges_fractional>1.4|target.time_to_die<9
   if S.BarbedShot:IsCastable() then
     if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateBarbedShotCycleTargetIfCondition, EvaluateBarbedShotCycleCondition3) then return "Barbed Shot (Cleave - 3)"; end
     if EvaluateBarbedShotCycleCondition3(Target) then
       if HR.Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (Cleave - 3@Target)"; end
     end
   end
-  -- focused_azerite_beam
-  -- TODO
-  -- purifying_blast
-  -- TODO
-  -- concentrated_flame
-  -- TODO
-  -- blood_of_the_enemy
-  -- TODO
-  -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-  -- TODO
-  -- multishot,if=azerite.rapid_reload.enabled&active_enemies>2
-  if S.MultiShot:IsCastable() and S.RapidReload:AzeriteEnabled() and SplashEnemies8yCount > 2 then
-    if HR.CastPooling(S.MultiShot) then return "Multi-Shot (Cleave - 2)"; end
-  end
-  -- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled)
-  if S.CobraShot:IsCastable() and S.KillCommand:CooldownRemains() > Player:FocusTimeToMaxPredicted() and (SplashEnemies8yCount < 3 or not S.RapidReload:AzeriteEnabled()) then
+  -- cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max
+  if S.CobraShot:IsCastable() and S.KillCommand:CooldownRemains() > Player:FocusTimeToMaxPredicted() then
     if HR.Cast(S.CobraShot) then return "Multi-Shot (Cleave)"; end
   end
 end
@@ -285,15 +259,13 @@ local function ST()
     if HR.Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed) then return "Bloodshed (ST)"; end
   end
   -- barbed_shot,if=pet.main.buff.frenzy.up&pet.main.buff.frenzy.remains<gcd
-  --                |cooldown.bestial_wrath.remains&(full_recharge_time<gcd|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd)
+  --                |cooldown.bestial_wrath.remains&(full_recharge_time<gcd)
   if S.BarbedShot:IsCastable() and ((Pet:BuffUp(S.FrenzyPetBuff) and Pet:BuffRemains(S.FrenzyPetBuff) < GCDMax)
-    or (bool(S.BestialWrath:CooldownRemains()) and (S.BarbedShot:FullRechargeTime() < GCDMax or (S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemains() < GCDMax)))) then
+    or (bool(S.BestialWrath:CooldownRemains()) and S.BarbedShot:FullRechargeTime() < GCDMax)) then
     if HR.Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (ST - 1)"; end
   end
-  -- concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.bestial_wrath.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
-  -- TODO
-  -- aspect_of_the_wild,if=buff.aspect_of_the_wild.down&(cooldown.barbed_shot.charges<1|!azerite.primal_instincts.enabled)
-  if CDsON() and S.AspectoftheWild:IsCastable() and Player:BuffDown(S.AspectoftheWildBuff) and (S.BarbedShot:Charges() < 1 or not S.PrimalInstincts:AzeriteEnabled()) then
+  -- aspect_of_the_wild,if=buff.aspect_of_the_wild.down&(cooldown.barbed_shot.charges<1)
+  if CDsON() and S.AspectoftheWild:IsCastable() and Player:BuffDown(S.AspectoftheWildBuff) and S.BarbedShot:Charges() < 1 then
     if HR.Cast(S.AspectoftheWild, Settings.BeastMastery.GCDasOffGCD.AspectoftheWild) then return "Aspect of the Wild (ST)"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
@@ -304,10 +276,6 @@ local function ST()
   if S.AMurderofCrows:IsReady() then
     if HR.Cast(S.AMurderofCrows, Settings.BeastMastery.GCDasOffGCD.AMurderofCrows, nil, not TargetInRange40y) then return "A Murder of Crows (ST)"; end
   end
-  -- focused_azerite_beam,if=buff.bestial_wrath.down|target.time_to_die<5
-  -- TODO
-  -- the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
-  -- TODO
   -- bestial_wrath,if=talent.one_with_the_pack.enabled&buff.bestial_wrath.remains<gcd
   --                  |buff.bestial_wrath.down&cooldown.aspect_of_the_wild.remains>15
   --                  |target.time_to_die<15+gcd
@@ -316,12 +284,6 @@ local function ST()
     or Target:TimeToDie() < 15 + GCDMax) then
     if HR.Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "Bestial Wrath (ST)"; end
   end
-  -- barbed_shot,if=azerite.dance_of_death.rank>1&buff.dance_of_death.remains<gcd
-  if S.BarbedShot:IsCastable() and S.DanceofDeath:AzeriteRank() > 1 and Player:BuffRemains(S.DanceofDeath) < GCDMax then
-    if HR.Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (ST - 2)"; end
-  end
-  -- blood_of_the_enemy,if=buff.aspect_of_the_wild.remains>10+gcd|target.time_to_die<10+gcd
-  -- TODO
   -- kill_command
   if S.KillCommand:IsReady() then
     if HR.Cast(S.KillCommand) then return "Kill Command (ST)"; end
@@ -340,11 +302,9 @@ local function ST()
   end
   -- barbed_shot,if=talent.one_with_the_pack.enabled&charges_fractional>1.5
   --                |charges_fractional>1.8
-  --                |cooldown.aspect_of_the_wild.remains<pet.main.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled
   --                |target.time_to_die<9
   if S.BarbedShot:IsCastable() and ((S.OneWithThePack:IsAvailable() and S.BarbedShot:ChargesFractional() > 1.5)
     or S.BarbedShot:ChargesFractional() > 1.8
-    or (S.AspectoftheWild:CooldownRemains() < Pet:BuffDuration(S.FrenzyPetBuff) - GCDMax and S.PrimalInstincts:AzeriteEnabled())
     or Target:TimeToDie() < 9) then
     if HR.Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (ST - 3)"; end
   end

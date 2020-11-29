@@ -19,7 +19,6 @@ HR.GUISettings.APL.Paladin = {
     UseTrinkets = true,
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
-    EssenceDisplayStyle = "Suggested",
     CovenantDisplayStyle = "Suggested",
     GCDasOffGCD = {
       Racials = false,
@@ -63,7 +62,6 @@ local CP_Retribution = CreateChildPanel(CP_Paladin, "Retribution")
 CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.")
 CreatePanelOption("CheckButton", CP_Paladin, "APL.Paladin.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
 CreatePanelOption("Dropdown", CP_Paladin, "APL.Paladin.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Paladin, "APL.Paladin.Commons.EssenceDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Essence Display Style", "Define which icon display style to use for active Azerite Essences.")
 CreatePanelOption("Dropdown", CP_Paladin, "APL.Paladin.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.")
 CreateARPanelOptions(CP_Paladin, "APL.Paladin.Commons")
 

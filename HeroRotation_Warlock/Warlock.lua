@@ -70,28 +70,6 @@ Spell.Warlock.Demonology = {
   -- Legendary Effects
   BalespidersBuff                       = Spell(337161),
 
-  -- Azerite Traits
-  BalefulInvocation                     = Spell(287059),
-  ExplosivePotential                    = Spell(275395),
-  ExplosivePotentialBuff                = Spell(275398),
-  ShadowsBite                           = Spell(272944),
-  ShadowsBiteBuff                       = Spell(272945),
-
-  -- Azerite Essences
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
-
   -- Item Effects
   ShiverVenomDebuff                     = Spell(301624),
 }
@@ -150,21 +128,6 @@ Spell.Warlock.Affliction = {
   ImpendingCatastrophe                  = Spell(321792), -- Splash, 8/10/12/15?
   ScouringTithe                         = Spell(312321),
   SoulRot                               = Spell(325640), -- Splash, 15
-
-  -- Azerite Essences
-  BloodoftheEnemy                       = Spell(297108),
-  ConcentratedFlame                     = Spell(295373),
-  ConcentratedFlameBurn                 = Spell(295368),
-  FocusedAzeriteBeam                    = Spell(295258),
-  GuardianofAzeroth                     = Spell(295840),
-  LifebloodBuff                         = MultiSpell(295137, 305694),
-  MemoryofLucidDreams                   = Spell(298357),
-  PurifyingBlast                        = Spell(295337),
-  ReapingFlames                         = Spell(310690),
-  RecklessForceBuff                     = Spell(302932),
-  RippleInSpace                         = Spell(302731),
-  TheUnboundForce                       = Spell(298452),
-  WorldveinResonance                    = Spell(295186),
 
   -- Item Effects
 

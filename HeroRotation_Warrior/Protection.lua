@@ -17,10 +17,6 @@ local HR         = HeroRotation
 local AoEON      = HR.AoEON
 local CDsON      = HR.CDsON
 
--- Azerite Essence Setup
-local AE         = DBC.AzeriteEssences
-local AESpellIDs = DBC.AzeriteEssenceSpellIDs
-local AEMajor    = HL.Spell:MajorEssence()
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
@@ -66,7 +62,7 @@ local function IsCurrentlyTanking()
 end
 
 local function IgnorePainWillNotCap()
-  if Player:BuffUp(S.IgnorePain) then 
+  if Player:BuffUp(S.IgnorePain) then
     local absorb = Player:AttackPowerDamageMod() * 3.5 * (1 + Player:VersatilityDmgPct() / 100)
     local _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, IPAmount = Player:AuraInfo(S.IgnorePain, nil, true)
     return IPAmount < (0.5 * math.floor(absorb * 1.3))
@@ -82,7 +78,7 @@ end
 -- A bit of logic to decide whether to pre-cast-rage-dump on ignore pain.
 local function SuggestRageDump(rageFromSpell)
   -- pick a threshold where rage-from-damage-taken doesn't cap you even after the cast.
-  -- This threshold is chosen somewhat arbitrarily. 
+  -- This threshold is chosen somewhat arbitrarily.
   -- TODO(mrdmnd) - make this config value in options.
   rageMax = 80
   shouldPreRageDump = false
@@ -158,7 +154,7 @@ local function Aoe()
     if HR.Cast(S.Revenge, nil, nil, not Target:IsInMeleeRange(5)) then return "revenge aoe 8"; end
   end
   -- revenge if you've got ignore pain up and you don't need to shield block soon
-  if S.Revenge:IsCastable("Melee") and not ShouldPressShieldBlock() and Player:Rage() > 40 then 
+  if S.Revenge:IsCastable("Melee") and not ShouldPressShieldBlock() and Player:Rage() > 40 then
     if HR.Cast(S.Revenge) then return "revenge aoe 10 (rage dump)"; end
   end
   -- ravager
@@ -239,7 +235,7 @@ end
 --- ======= ACTION LISTS =======
 local function APL()
   gcdTime = Player:GCD()
-  
+
   if AoEON() then
     Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
     EnemiesCount8 = #Enemies8y

@@ -288,7 +288,7 @@ do
         BaseCritChecksPending = 2
       end
     end,
-    "PLAYER_EQUIPMENT_CHANGED", "AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED", "AZERITE_ESSENCE_CHANGED", "AZERITE_ESSENCE_ACTIVATED"
+    "PLAYER_EQUIPMENT_CHANGED"
   )
 
   function Rogue.BaseAttackCrit()
