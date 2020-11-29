@@ -32,6 +32,7 @@ local I = Item.DemonHunter.Vengeance
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
+  I.PulsatingStoneheart:ID(),
 }
 
 -- Rotation Var

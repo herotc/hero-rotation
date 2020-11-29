@@ -141,6 +141,7 @@ Spell.DemonHunter.Havoc = {
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Vengeance = {
   PotionofPhantomFire              = Item(171349),
+  PulsatingStoneheart              = Item(178825, {13, 14}),
 }
 
 Item.DemonHunter.Havoc = {
