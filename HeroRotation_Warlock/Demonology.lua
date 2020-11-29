@@ -42,7 +42,7 @@ local ShouldReturn -- Used to get the return string
 local GCDRemain
 local VarTyrantReady = false
 local VarPoolForDecimatingBolt
-local BalespidersEquipped = HL.LegendaryEnabled(173)
+local BalespidersEquipped = Player:HasLegendaryEquipped(173)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -58,7 +58,7 @@ local StunInterrupts = {
 }
 
 HL:RegisterForEvent(function()
-  BalespidersEquipped = HL.LegendaryEnabled(173)
+  BalespidersEquipped = Player:HasLegendaryEquipped(173)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -284,10 +284,6 @@ local function Essences()
   if S.PurifyingBlast:IsCastable() then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
   end
-  -- reaping_flames
-  if S.ReapingFlames:IsCastable() then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-  end
   -- concentrated_flame
   if S.ConcentratedFlame:IsCastable() then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame"; end
@@ -303,10 +299,10 @@ local function APL()
   -- Update Demonology-specific Tables
   Warlock.UpdatePetTable()
   Warlock.UpdateSoulShards()
-  
+
   -- Stop other Demonbolt casts if DecimatingBolt is ready in order to stack Demonic Core buff, unless a lower stack count is about to expire
   VarPoolForDecimatingBolt = (S.DecimatingBolt:IsReady() and Player:BuffRemains(S.DemonicCoreBuff) > 5)
-  
+
   GCDRemain = Player:GCDRemains()
 
   -- call precombat
@@ -406,7 +402,7 @@ local function APL()
     end
     -- use_items
     if (true) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end

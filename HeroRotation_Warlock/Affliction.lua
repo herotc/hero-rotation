@@ -197,7 +197,7 @@ end
 
 local function ItemFunc()
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(TrinketsOnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
   if TrinketToUse then
     if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
@@ -233,10 +233,6 @@ local function Cooldowns()
     -- purifying_blast
     if S.PurifyingBlast:IsCastable() then
       if Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle) then return "purifying_blast"; end
-    end
-    -- reaping_flames
-    if S.ReapingFlames:IsCastable() then
-      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastable() then

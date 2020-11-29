@@ -112,7 +112,7 @@ local function Cooldowns()
   -- TODO: How to suggest it properly?
   -- actions.cooldowns+=/use_item,name=some_trinket,if=buff.avenging_wrath.up|buff.crusade.up
   if CDsON() and Player:BuffUp(S.AvengingWrath) or Player:BuffUp(S.Crusade) then
-    local TrinketToUse = HL.UseTrinkets(TrinketsOnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end

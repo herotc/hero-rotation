@@ -47,7 +47,7 @@ local Settings = {
 
 -- Variables
 local VarPoolingForGargoyle = 0;
-local DeadliestCoilEquipped = HL.LegendaryEnabled(45)
+local DeadliestCoilEquipped = Player:HasLegendaryEquipped(45)
 
 -- Stun Interrupts List
 local StunInterrupts = {
@@ -65,7 +65,7 @@ local function ComputeTargetRange()
 end
 
 HL:RegisterForEvent(function()
-  DeadliestCoilEquipped = HL.LegendaryEnabled(45)
+  DeadliestCoilEquipped = Player:HasLegendaryEquipped(45)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -288,7 +288,7 @@ local function Cooldowns()
   if S.RaiseDead:IsCastable() then
     if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cooldown 12"; end
   end
-  -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready 
+  -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready
   if S.SacrificialPact:IsCastable() and (EnemiesMeleeCount >= 2 and not Pet:BuffUp(S.DarkTransformation) and not S.DarkTransformation:CooldownUp() and S.RaiseDead:CooldownUp()) then
     if HR.Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial_pact cooldown 13"; end
   end

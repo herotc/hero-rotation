@@ -37,7 +37,7 @@ local OnUseExcludes = {
 local ShouldReturn; -- Used to get the return string
 local VarOoUE;
 local no_heal;
-local BitingColdEquipped = HL.LegendaryEnabled(39);
+local BitingColdEquipped = Player:HasLegendaryEquipped(39);
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -63,7 +63,7 @@ local function ComputeTargetRange()
 end
 
 HL:RegisterForEvent(function()
-  BitingColdEquipped = HL.LegendaryEnabled(39)
+  BitingColdEquipped = Player:HasLegendaryEquipped(39)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -359,7 +359,7 @@ end
 
 local function ColdHeart()
   -- chains_of_ice,if=target.1.time_to_die<gcd|buff.pillar_of_frost.remains<3&buff.cold_heart.stack=20&!talent.obliteration.enabled
-  if S.ChainsofIce:IsCastable() and (Target:TimeToDie() < Player:GCD() * 1.5 or Player:BuffRemains(S.PillarofFrostBuff) < 3 and Player:BuffStack(S.ColdHeartBuff) == 20 and not S.Obliteration:IsAvailable()) then 
+  if S.ChainsofIce:IsCastable() and (Target:TimeToDie() < Player:GCD() * 1.5 or Player:BuffRemains(S.PillarofFrostBuff) < 3 and Player:BuffStack(S.ColdHeartBuff) == 20 and not S.Obliteration:IsAvailable()) then
     if HR.Cast(S.ChainsofIce, nil, nil, not TargetIsInRange[30]) then return "chains_of_ice coldheart 1"; end
   end
   -- chains_of_ice,if=talent.obliteration.enabled&!buff.pillar_of_frost.up&(buff.cold_heart.stack>=16&buff.unholy_strength.up|buff.cold_heart.stack>=19)
@@ -408,7 +408,7 @@ local function Cooldowns()
   -- hypothermic_presence,if=talent.breath_of_sindragosa.enabled&runic_power.deficit>40&rune>=3&cooldown.pillar_of_frost.up|!talent.breath_of_sindragosa.enabled&runic_power.deficit>=25
   if S.HypothermicPresence:IsCastable() and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() > 40 and Player:Rune() >= 3 and S.PillarofFrost:CooldownUp() or not S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() >= 25) then
     if HR.Cast(S.HypothermicPresence, Settings.Frost.GCDasOffGCD.HypothermicPresence, nil, nil) then return "hypothermic_presence cd 10"; end
-  end 
+  end
   -- raise_dead
   if S.RaiseDead:IsCastable() and Player:BuffUp(S.PillarofFrostBuff) then
     if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cd 11"; end

@@ -54,7 +54,7 @@ local function bool(val)
 end
 
 local function Precombat()
-  
+
   -- flask
   -- food
   -- augmentation
@@ -99,10 +99,6 @@ local function Essences()
   -- ripple_in_space
   if S.RippleInSpace:IsCastable() then
     if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space essences"; end
-  end
-  -- reaping_flames
-  if (true) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
   end
   -- worldvein_resonance
   if S.WorldveinResonance:IsCastable() then
@@ -156,7 +152,7 @@ local function Cds()
     if HR.Cast(S.ShadowCovenant, Settings.Discipline.GCDasOffGCD.ShadowCovenant) then return "shadow_covenant cd 10"; end
   end
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
     if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end

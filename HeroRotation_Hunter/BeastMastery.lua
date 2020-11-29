@@ -61,7 +61,7 @@ local StunInterrupts = {
 
 -- Rotation Variables
 local ShouldReturn -- Used to get the return string
-local SoulForgeEmbersEquipped = HL.LegendaryEnabled(68)
+local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 local GCDMax
 
 
@@ -77,7 +77,7 @@ local function UpdateGCDMax()
 end
 
 HL:RegisterForEvent(function()
-  SoulForgeEmbersEquipped = HL.LegendaryEnabled(68)
+  SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function bool(val)
@@ -433,7 +433,7 @@ local function APL()
     -- NOTE: Above line is very non-optimal and feedback has been given to the SimC APL devs, following logic will be used for now:
     --  if=buff.aspect_of_the_wild.remains>10|cooldown.aspect_of_the_wild.remains>60|target.time_to_die<20
     if Player:BuffRemains(S.AspectoftheWildBuff) > 10 or S.AspectoftheWild:CooldownRemains() > 60 or Target:TimeToDie() < 20 then
-      local TrinketToUse = HL.UseTrinkets(TrinketsOnUseExcludes)
+      local TrinketToUse = Player:GetUseableTrinkets(TrinketsOnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end

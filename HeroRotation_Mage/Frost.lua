@@ -38,11 +38,11 @@ local ShouldReturn -- Used to get the return string
 local EnemiesCount6ySplash, EnemiesCount8ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee, EnemiesCount12yMelee, EnemiesCount15yMelee, EnemiesCount18yMelee  --Enemies arround player
 local Mage = HR.Commons.Mage
-local TemporalWarpEquipped = HL.LegendaryEnabled(9)
-local GrislyIcicleEquipped = HL.LegendaryEnabled(8)
-local FreezingWindsEquipped = HL.LegendaryEnabled(4)
-local GlacialFragmentsEquipped = HL.LegendaryEnabled(5)
-local DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
+local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
+local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+local FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
+local GlacialFragmentsEquipped = Player:HasLegendaryEquipped(5)
+local DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -63,11 +63,11 @@ S.IceLance:RegisterInFlightEffect(228598)
 S.IceLance:RegisterInFlight()
 
 HL:RegisterForEvent(function()
-  TemporalWarpEquipped = HL.LegendaryEnabled(9)
-  GrislyIcicleEquipped = HL.LegendaryEnabled(8)
-  FreezingWindsEquipped = HL.LegendaryEnabled(4)
-  GlacialFragmentsEquipped = HL.LegendaryEnabled(5)
-  DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
+  TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
+  GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+  FreezingWindsEquipped = Player:HasLegendaryEquipped(4)
+  GlacialFragmentsEquipped = Player:HasLegendaryEquipped(5)
+  DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function Precombat ()
@@ -130,7 +130,7 @@ local function Cooldowns ()
     if HR.Cast(S.TimeWarp, Settings.Commons.OffGCDasOffGCD.TimeWarp) then return "time_warp cd 6"; end
   end
   --use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse and Settings.Commons.UseTrinkets then
     if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 7" end
   end
@@ -236,8 +236,8 @@ local function Single ()
   --flurry,if=(remaining_winters_chill=0|debuff.winters_chill.down)
   --&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!conduit.ire_of_the_ascended|cooldown.radiant_spark.remains|runeforge.freezing_winds)
   --|prev_gcd.1.radiant_spark|buff.fingers_of_frost.react=0&(debuff.mirrors_of_torment.up|buff.freezing_winds.up|buff.expanded_potential.react)))
-  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0 
-  and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or (Player:IsCasting(S.Frostbolt) and (not S.IreOfTheAscended:IsAvailable() or S.RadiantSpark:CooldownRemains() == 0 or FreezingWindsEquipped)) 
+  if S.Flurry:IsCastable() and Target:DebuffStack(S.WintersChillDebuff) == 0
+  and (Player:IsCasting(S.Ebonbolt) or Player:BuffUp(S.BrainFreezeBuff) and (Player:IsCasting(S.GlacialSpike) or (Player:IsCasting(S.Frostbolt) and (not S.IreOfTheAscended:IsAvailable() or S.RadiantSpark:CooldownRemains() == 0 or FreezingWindsEquipped))
   or Player:IsCasting(S.RadiantSpark) or (Player:BuffStack(S.FingersofFrostBuff) == 0 and (Target:DebuffStack(S.MirrorsofTorment) > 0 or Player:BuffUp(S.FreezingWindsBuff) or Player:BuffUp(S.ExpandedPotentialBuff))))) then
     if HR.Cast(S.Flurry, nil, nil, not Target:IsSpellInRange(S.Flurry)) then return "flurry single 1"; end
   end

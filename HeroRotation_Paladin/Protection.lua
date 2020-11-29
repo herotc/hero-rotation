@@ -59,24 +59,6 @@ local Settings = {
   Protection = HR.GUISettings.APL.Paladin.Protection
 }
 
-HL:RegisterForEvent(function()
-  AEMajor        = HL.Spell:MajorEssence()
-  S.HeartEssence = Spell(AESpellIDs[AEMajor.ID])
-end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
-
-HL:RegisterForEvent(function()
-  S.ConcentratedFlame:RegisterInFlight()
-end, "LEARNED_SPELL_IN_TAB")
-S.ConcentratedFlame:RegisterInFlight()
-
-local function num(val)
-  if val then return 1 else return 0 end
-end
-
-local function bool(val)
-  return val ~= 0
-end
-
 local function EvaluateCycleJudgment200(TargetUnit)
   return TargetUnit:DebuffRefreshable(S.JudgmentDebuff)
 end
@@ -150,7 +132,7 @@ local function Cooldowns()
   end
   -- use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if (Player:BuffUp(S.SeraphimBuff) or not S.Seraphim:IsAvailable()) then
-    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
@@ -260,11 +242,11 @@ local function APL()
     EnemiesCount8y = 1
     EnemiesCount30y = 1
   end
-  
+
   ActiveMitigationNeeded = Player:ActiveMitigationNeeded()
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
   PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
-  
+
   if Everyone.TargetIsValid() then
     -- Precombat
     if not Player:AffectingCombat() then

@@ -84,16 +84,16 @@ local ComboPoints, ComboPointsDeficit
 local PriorityRotation
 
 -- Legendaries
-local DeathlyShadowsEquipped = HL.LegendaryEnabled(129)
-local TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
-local AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(127)
-local MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
+local DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
+local AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
+local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 
 HL.RegisterForEvent(function()
-  DeathlyShadowsEquipped = HL.LegendaryEnabled(129)
-  TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
-  AkaarisSoulFragmentEquipped = HL.LegendaryEnabled(127)
-  MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
+  DeathlyShadowsEquipped = Player:HasLegendaryEquipped(129)
+  TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
+  AkaarisSoulFragmentEquipped = Player:HasLegendaryEquipped(127)
+  MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- GUI Settings
@@ -527,7 +527,7 @@ local function CDs ()
       local DefaultTrinketCondition = Player:BuffUp(S.SymbolsofDeath) or HL.BossFilteredFightRemains("<", 20)
       -- actions.cds+=/use_items,if=buff.symbols_of_death.up|fight_remains<20
       if DefaultTrinketCondition then
-        local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+        local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
         if TrinketToUse then
           if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
         end

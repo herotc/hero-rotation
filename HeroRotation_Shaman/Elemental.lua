@@ -35,9 +35,9 @@ local OnUseExcludes = {
 local Enemies40y, Enemies40yCount, EnemiesCount10ySplash
 local SEActive, FEActive
 local EnemiesFlameShockCount = 0
-local DeeptremorStoneEquipped = HL.LegendaryEnabled(131)
-local ElementalEquilibriumEquipped = HL.LegendaryEnabled(135)
-local EchoesofGreatSunderingEquipped = HL.LegendaryEnabled(136)
+local DeeptremorStoneEquipped = Player:HasLegendaryEquipped(131)
+local ElementalEquilibriumEquipped = Player:HasLegendaryEquipped(135)
+local EchoesofGreatSunderingEquipped = Player:HasLegendaryEquipped(136)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -48,9 +48,9 @@ local Settings = {
 }
 
 HL:RegisterForEvent(function()
-  DeeptremorStoneEquipped = HL.LegendaryEnabled(131)
-  ElementalEquilibriumEquipped = HL.LegendaryEnabled(135)
-  EchoesofGreatSunderingEquipped = HL.LegendaryEnabled(136)
+  DeeptremorStoneEquipped = Player:HasLegendaryEquipped(131)
+  ElementalEquilibriumEquipped = Player:HasLegendaryEquipped(135)
+  EchoesofGreatSunderingEquipped = Player:HasLegendaryEquipped(136)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -419,7 +419,7 @@ local function APL()
     Enemies40yCount = 1
     EnemiesFlameShockCount = 1
   end
-  
+
   SEActive = (S.StormElemental:IsAvailable() and S.StormElemental:CooldownRemains() > S.StormElemental:Cooldown() - 30)
   FEActive = (not S.StormElemental:IsAvailable() and S.FireElemental:CooldownRemains() > S.FireElemental:Cooldown() - 30)
 
@@ -432,7 +432,7 @@ local function APL()
     -- wind_shear
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
     -- use_items
-    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end

@@ -276,13 +276,13 @@ local function APL()
     EnemiesMeleeCount = 1
     EnemiesCount10y   = 1
   end
-  
+
   -- Check Units without Blood Plague
   UnitsWithoutBloodPlague = UnitsWithoutBP(Enemies10y)
-  
+
   -- Are we actively tanking?
   IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target)
-  
+
   -- call precombat
   if not Player:AffectingCombat() then
     local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
@@ -332,7 +332,7 @@ local function APL()
     end
     -- use_items
     if (true) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end

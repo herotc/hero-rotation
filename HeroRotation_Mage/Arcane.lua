@@ -57,18 +57,18 @@ local Settings = {
 -- Variables
 local EnemiesCount8ySplash, EnemiesCount10ySplash, EnemiesCount16ySplash, EnemiesCount30ySplash --Enemies arround target
 local EnemiesCount10yMelee --Enemies arround player
-local SiphonStormEquipped = HL.LegendaryEnabled(16)
-local GrislyIcicleEquipped = HL.LegendaryEnabled(8)
-local TemporalWarpEquipped = HL.LegendaryEnabled(9)
-local ArcaneInfinityEquipped = HL.LegendaryEnabled(14)
-local DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
+local SiphonStormEquipped = Player:HasLegendaryEquipped(16)
+local GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+local TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
+local ArcaneInfinityEquipped = Player:HasLegendaryEquipped(14)
+local DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
 
 HL:RegisterForEvent(function()
-  SiphonStormEquipped = HL.LegendaryEnabled(16)
-  GrislyIcicleEquipped = HL.LegendaryEnabled(8)
-  TemporalWarpEquipped = HL.LegendaryEnabled(9)
-  ArcaneInfinityEquipped = HL.LegendaryEnabled(14)
-  DisciplinaryCommandEquipped = HL.LegendaryEnabled(7)
+  SiphonStormEquipped = Player:HasLegendaryEquipped(16)
+  GrislyIcicleEquipped = Player:HasLegendaryEquipped(8)
+  TemporalWarpEquipped = Player:HasLegendaryEquipped(9)
+  ArcaneInfinityEquipped = Player:HasLegendaryEquipped(14)
+  DisciplinaryCommandEquipped = Player:HasLegendaryEquipped(7)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local var_prepull_evo
@@ -119,7 +119,7 @@ local function VarInit()
   var_ap_max_delay = 10
   --variable,name=rop_max_delay,op=set,value=20
   var_rop_max_delay = 20
-  
+
   --variable,name=totm_max_delay,op=reset,default=5
   --variable,name=totm_max_delay,op=set,value=3,if=variable.totm_max_delay=5&runeforge.disciplinary_command.equipped
   --variable,name=totm_max_delay,op=set,value=15,if=variable.totm_max_delay=5&covenant.night_fae.enabled
@@ -244,7 +244,7 @@ local function SharedCds ()
   --TODO : manage mana_gem
   --use_items,if=buff.arcane_power.up
   if (true) then
-    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
@@ -288,9 +288,9 @@ local function Essences ()
   --&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70|variable.am_spam=1))
   --&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|variable.am_spam=1))|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
   --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.BloodoftheEnemy:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and 
-  (not S.Enlightened:IsAvailable() or ((S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70) or Settings.Arcane.AMSpamRotation)) 
-  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and (Player:ArcaneCharges() == Player:ArcaneChargesMax() or Settings.Arcane.AMSpamRotation)) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0)) 
+  if S.BloodoftheEnemy:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and
+  (not S.Enlightened:IsAvailable() or ((S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70) or Settings.Arcane.AMSpamRotation))
+  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and (Player:ArcaneCharges() == Player:ArcaneChargesMax() or Settings.Arcane.AMSpamRotation)) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.BloodoftheEnemy, nil, Settings.Commons.EssenceDisplayStyle) then return "blood_of_the_enemy essence 2"; end
   end
@@ -306,9 +306,9 @@ local function Essences ()
   --&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70|variable.am_spam=1))
   --&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|variable.am_spam=1))|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
   --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.WorldveinResonance:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and 
-  (not S.Enlightened:IsAvailable() or ((S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70) or Settings.Arcane.AMSpamRotation)) 
-  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and (Player:ArcaneCharges() == Player:ArcaneChargesMax() or Settings.Arcane.AMSpamRotation)) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0)) 
+  if S.WorldveinResonance:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and
+  (not S.Enlightened:IsAvailable() or ((S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70) or Settings.Arcane.AMSpamRotation))
+  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and (Player:ArcaneCharges() == Player:ArcaneChargesMax() or Settings.Arcane.AMSpamRotation)) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance essence 5"; end
   end
@@ -320,9 +320,9 @@ local function Essences ()
   --&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70|variable.am_spam=1))
   --&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|variable.am_spam=1))|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
   --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.GuardianofAzeroth:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and 
-  (not S.Enlightened:IsAvailable() or ((S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70) or Settings.Arcane.AMSpamRotation)) 
-  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and (Player:ArcaneCharges() == Player:ArcaneChargesMax() or Settings.Arcane.AMSpamRotation)) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0)) 
+  if S.GuardianofAzeroth:IsCastable() and S.ArcanePower:CooldownRemains() == 0 and
+  (not S.Enlightened:IsAvailable() or ((S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70) or Settings.Arcane.AMSpamRotation))
+  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and (Player:ArcaneCharges() == Player:ArcaneChargesMax() or Settings.Arcane.AMSpamRotation)) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.GuardianofAzeroth, nil, Settings.Commons.EssenceDisplayStyle) then return "guardian_of_azeroth essence 7"; end
   end
@@ -331,11 +331,7 @@ local function Essences ()
   if S.ConcentratedFlame:IsCastable() and Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffRemains(S.TouchoftheMagi) == 0 and Player:ManaTimeToMax() >= S.ConcentratedFlame:ExecuteTime() + Player:GCDRemains() then
     if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle) then return "concentrated_flame essence 8"; end
   end
-  --reaping_flames,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down&mana.time_to_max>=execute_time
-  if Player:BuffDown(S.ArcanePower) and Player:BuffDown(S.RuneofPowerBuff) and Target:DebuffRemains(S.TouchoftheMagi) == 0 and Player:ManaTimeToMax() >= S.ReapingFlames:ExecuteTime() + Player:GCDRemains() then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn.." essence 9"; end
-  end
-  --focused_azerite_beam,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down 
+  --focused_azerite_beam,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
   if S.FocusedAzeriteBeam:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffRemains(S.TouchoftheMagi) == 0 then
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam essence 10"; end
   end
@@ -373,9 +369,9 @@ local function Cooldowns ()
   --&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))
   --&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
   --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.MirrorsofTorment:IsCastable() and S.ArcanePower:CooldownRemains() == 0 
-  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70)) 
-  and ((Player:BuffRemains(S.TouchoftheMagi) > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0)) 
+  if S.MirrorsofTorment:IsCastable() and S.ArcanePower:CooldownRemains() == 0
+  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
+  and ((Player:BuffRemains(S.TouchoftheMagi) > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment cd 6"; end
   end
@@ -387,17 +383,17 @@ local function Cooldowns ()
   --&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))
   --&((cooldown.touch_of_the_magi.remains>10&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
   --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.Deathborne:IsCastable() and S.ArcanePower:CooldownRemains() == 0 
-  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70)) 
-  and ((Player:BuffRemains(S.TouchoftheMagi) > 10 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0)) 
+  if S.Deathborne:IsCastable() and S.ArcanePower:CooldownRemains() == 0
+  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
+  and ((Player:BuffRemains(S.TouchoftheMagi) > 10 and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.Deathborne, nil, Settings.Commons.CovenantDisplayStyle) then return "deathborne cd 8"; end
   end
   --radiant_spark,if=cooldown.touch_of_the_magi.remains>variable.rs_max_delay&cooldown.arcane_power.remains>variable.rs_max_delay
   --&(talent.rune_of_power.enabled&cooldown.rune_of_power.remains<=gcd|talent.rune_of_power.enabled&cooldown.rune_of_power.remains>variable.rs_max_delay|!talent.rune_of_power.enabled)
   --&buff.arcane_charge.stack>2&debuff.touch_of_the_magi.down
-  if S.RadiantSpark:IsCastable() and S.TouchoftheMagi:CooldownRemains() > var_rs_max_delay 
-  and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCDRemains()) or (S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() > var_rs_max_delay) or not S.RuneofPower:IsAvailable()) 
+  if S.RadiantSpark:IsCastable() and S.TouchoftheMagi:CooldownRemains() > var_rs_max_delay
+  and ((S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= Player:GCDRemains()) or (S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() > var_rs_max_delay) or not S.RuneofPower:IsAvailable())
   and Player:ArcaneCharges() > 2 and Target:DebuffDown(S.TouchoftheMagi) then
     if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle) then return "radiant_spark cd 9"; end
   end
@@ -409,9 +405,9 @@ local function Cooldowns ()
   --&((!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))
   --&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))
   --&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct)
-  if S.RadiantSpark:IsCastable() and S.ArcanePower:CooldownRemains() == 0 
-  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70)) 
-  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0)) 
+  if S.RadiantSpark:IsCastable() and S.ArcanePower:CooldownRemains() == 0
+  and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
+  and ((S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax()) or (S.TouchoftheMagi:CooldownRemains() == 0 and Player:ArcaneCharges() == 0))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle) then return "radiant_spark cd 11"; end
   end
@@ -437,7 +433,7 @@ local function Cooldowns ()
   end
   --arcane_power,if=(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))
   --&cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
-  if S.ArcanePower:IsCastable() and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70)) 
+  if S.ArcanePower:IsCastable() and (not S.Enlightened:IsAvailable() or (S.Enlightened:IsAvailable() and Player:ManaPercentage() >= 70))
   and S.TouchoftheMagi:CooldownRemains() > var_ap_max_delay and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:BuffDown(S.RuneofPowerBuff) and Player:ManaPercentage() >= var_ap_minimum_mana_pct then
     if HR.Cast(S.ArcanePower, Settings.Arcane.GCDasOffGCD.ArcanePower) then return "arcane_power cd 17"; end
   end
@@ -534,7 +530,7 @@ local function Aoe ()
   --NYI legendaries
   --arcane_explosion,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() < Player:ArcaneChargesMax() then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then 
+    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
       if HR.CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 25 left"; end
     else
       if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 25"; end
@@ -542,7 +538,7 @@ local function Aoe ()
   end
   --arcane_explosion,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&prev_gcd.1.arcane_barrage
   if S.ArcaneExplosion:IsCastable() and Player:ArcaneCharges() == Player:ArcaneChargesMax() and Player:IsCasting(S.ArcaneBarrage) then
-    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then 
+    if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
       if HR.CastLeft(S.ArcaneExplosion) then return "arcane_explosion aoe 26 left"; end
     else
       if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 26"; end
@@ -779,8 +775,8 @@ local function AMSpam ()
   --evocation,if=mana.pct<=variable.am_spam_evo_pct
   --&(cooldown.touch_of_the_magi.remains<=action.evocation.execute_time|cooldown.arcane_power.remains<=action.evocation.execute_time|(talent.rune_of_power.enabled&cooldown.rune_of_power.remains<=action.evocation.execute_time))
   --&buff.rune_of_power.down&buff.arcane_power.down&debuff.touch_of_the_magi.down
-  if S.Evocation:IsCastable() and ((Player:IsCasting(S.Evocation) and Player:ManaPercentage() <= 95) 
-  or (not Player:IsCasting(S.Evocation) and (Player:ManaPercentage() <= var_am_spam_evo_pct 
+  if S.Evocation:IsCastable() and ((Player:IsCasting(S.Evocation) and Player:ManaPercentage() <= 95)
+  or (not Player:IsCasting(S.Evocation) and (Player:ManaPercentage() <= var_am_spam_evo_pct
   and (S.TouchoftheMagi:CooldownRemains() <= S.Evocation:ExecuteTime() or S.ArcanePower:CooldownRemains() <= S.Evocation:ExecuteTime() or (S.RuneofPower:IsAvailable() and S.RuneofPower:CooldownRemains() <= S.Evocation:ExecuteTime()))
   and Player:BuffDown(S.RuneofPowerBuff) and Player:BuffDown(S.ArcanePower) and Target:DebuffDown(S.TouchoftheMagi)))) then
     if HR.Cast(S.Evocation) then return "evocation AMSpam 1-2"; end
@@ -790,7 +786,7 @@ local function AMSpam ()
     if HR.Cast(S.RuneofPower, Settings.Arcane.GCDasOffGCD.RuneOfPower) then return "rune_of_power AMSpam 3"; end
   end
   --touch_of_the_magi,if=(cooldown.arcane_power.remains=0&buff.rune_of_power.down)|prev_gcd.1.rune_of_power
-  if S.TouchoftheMagi:IsCastable() and not Player:IsCasting(S.TouchoftheMagi) and (Player:IsCasting(S.RuneofPower) or (not Player:IsCasting() and Player:PrevGCD(1,S.RuneOfPower))) 
+  if S.TouchoftheMagi:IsCastable() and not Player:IsCasting(S.TouchoftheMagi) and (Player:IsCasting(S.RuneofPower) or (not Player:IsCasting() and Player:PrevGCD(1,S.RuneOfPower)))
   and S.ArcanePower:CooldownRemains() == 0 and Player:BuffDown(S.RuneofPowerBuff) then
     if HR.Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchoftheMagi) then return "touch_of_the_magi AMSpam 4"; end
   end

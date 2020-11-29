@@ -39,8 +39,8 @@ local ShouldReturn -- Used to get the return string
 local Enemies8y, Enemies20y
 local EnemiesCount8, EnemiesCount20
 local PassiveEssence
-local ChaosTheoryEquipped = HL.LegendaryEnabled(23)
-local BurningWoundEquipped = HL.LegendaryEnabled(25)
+local ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
+local BurningWoundEquipped = Player:HasLegendaryEquipped(25)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -74,8 +74,8 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  ChaosTheoryEquipped = HL.LegendaryEnabled(23)
-  BurningWoundEquipped = HL.LegendaryEnabled(25)
+  ChaosTheoryEquipped = Player:HasLegendaryEquipped(23)
+  BurningWoundEquipped = Player:HasLegendaryEquipped(25)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -179,7 +179,7 @@ local function Cooldown()
   end
   -- use_items,if=buff.metamorphosis.up
   if (Player:BuffUp(S.MetamorphosisBuff)) then
-    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end

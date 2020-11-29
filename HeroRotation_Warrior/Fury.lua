@@ -232,16 +232,12 @@ local function APL()
         if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 44"; end
       end
       -- worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
-      if S.WorldveinResonance:IsCastable() then 
+      if S.WorldveinResonance:IsCastable() then
         if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 46"; end
       end
       -- focused_azerite_beam,if=!buff.recklessness.up&!buff.siegebreaker.up
       if S.FocusedAzeriteBeam:IsCastable() then
         if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 48"; end
-      end
-      -- reaping_flames,if=!buff.recklessness.up&!buff.siegebreaker.up
-      if (true) then
-        local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
       end
       -- concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
       if S.ConcentratedFlame:IsCastable() and (Target:DebuffDown(S.ConcentratedFlameBurn)) then
@@ -286,7 +282,7 @@ local function APL()
         if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, not Target:IsInRange(40)) then return "pocketsized_computation_device 68"; end
       end
       -- use_items
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end

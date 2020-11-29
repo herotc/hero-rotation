@@ -35,8 +35,8 @@ local OnUseExcludes = {
 local hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID, hasOffHandEnchant, offHandExpiration, offHandCharges, offHandEnchantId
 local Enemies40y, MeleeEnemies10y, MeleeEnemies10yCount, MeleeEnemies5y, Enemies40yCount, EnemiesCount30ySplash
 local EnemiesFlameShockCount = 0
-local DoomWindsEquipped = HL.LegendaryEnabled(138)
-local PrimalLavaActuatorsEquipped = HL.LegendaryEnabled(141)
+local DoomWindsEquipped = Player:HasLegendaryEquipped(138)
+local PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -47,8 +47,8 @@ local Settings = {
 }
 
 HL:RegisterForEvent(function()
-  DoomWindsEquipped = HL.LegendaryEnabled(138)
-  PrimalLavaActuatorsEquipped = HL.LegendaryEnabled(141)
+  DoomWindsEquipped = Player:HasLegendaryEquipped(138)
+  PrimalLavaActuatorsEquipped = Player:HasLegendaryEquipped(141)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
@@ -372,7 +372,7 @@ local function APL()
     end
     -- heart_essence
     -- use_items
-    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end

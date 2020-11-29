@@ -113,7 +113,7 @@ Spell.Paladin.Protection = {
   -- Pool
   Pool                                  = Spell(999910),
 }
-  -- Pool
+
 Spell.Paladin.Retribution = {
   -- Racials
   ArcaneTorrent     = Spell(155145),

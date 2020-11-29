@@ -56,12 +56,12 @@ local Interrupts = {
 }
 
 -- Legendaries
-local TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
-local MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
+local TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
+local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 
 HL.RegisterForEvent(function()
-  TinyToxicBladeEquipped = HL.LegendaryEnabled(116)
-  MarkoftheMasterAssassinEquipped = HL.LegendaryEnabled(117)
+  TinyToxicBladeEquipped = Player:HasLegendaryEquipped(116)
+  MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Utils
@@ -237,9 +237,6 @@ local function Essences ()
   if S.MemoryofLucidDreams:IsCastable() and EnergyPredictedRounded() < 45 then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams" end
   end
-  -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-  ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle)
-  if ShouldReturn then return ShouldReturn end
 
   return false
 end
@@ -366,7 +363,7 @@ local function CDs ()
         if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket" end
       end
       -- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 20) or Player:ComboPointsDeficit() <= 2) then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
       end

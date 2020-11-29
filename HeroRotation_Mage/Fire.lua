@@ -445,7 +445,7 @@ local function ItemsHighPriority()
     local ShouldReturn = ItemsCombustion(); if ShouldReturn then return ShouldReturn; end
   end
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
     if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
@@ -473,10 +473,6 @@ local function ItemsHighPriority()
   if I.ForbiddenObsidianClaw:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.ForbiddenObsidianClaw, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "forbidden_obsidian_claw high_priority"; end
   end
-  -- use_item,effect_name=harmonic_dematerializer
-  if Everyone.PSCDEquipReady() and S.HarmonicDematerializer:IsAvailable() then
-    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "harmonic_dematerializer high_priority"; end
-  end
   -- use_item,name=malformed_heralds_legwraps,if=variable.time_to_combustion>=55&buff.combustion.down&variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
   if I.MalformedHeraldsLegwraps:IsEquipReady() and (VarTimeToCombusion >= 55 and Player:BuffDownP(S.CombustionBuff) and VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.MalformedHeraldsLegwraps, nil, Settings.Commons.TrinketDisplayStyle) then return "malformed_heralds_legwraps high_priority"; end
@@ -499,10 +495,6 @@ local function ItemsLowPriority()
   -- use_item,name=tidestorm_codex,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
   if I.TidestormCodex:IsEquipReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
     if HR.Cast(I.TidestormCodex, nil, Settings.Commons.TrinketDisplayStyle, 50) then return "tidestorm_codex low_priority"; end
-  end
-  -- use_item,effect_name=cyclotronic_blast,if=variable.time_to_combustion>variable.on_use_cutoff|variable.disable_combustion
-  if Everyone.CyclotronicBlastReady() and (VarTimeToCombusion > VarOnUseCutoff or IgnoreCombustion) then
-    if HR.Cast(I.PocketsizedComputationDevice, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "cyclotronic_blast low_priority"; end
   end
 end
 
@@ -679,10 +671,6 @@ local function APL()
     -- concentrated_flame
     if S.ConcentratedFlame:IsCastableP() then
       if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 795"; end
-    end
-    -- reaping_flames
-    if (true) then
-      local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
     end
     -- focused_azerite_beam
     if S.FocusedAzeriteBeam:IsCastableP() then

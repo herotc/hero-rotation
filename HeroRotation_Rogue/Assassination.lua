@@ -298,9 +298,6 @@ local function Essences ()
   if S.MemoryofLucidDreams:IsCastable() and Player:EnergyPredicted() < 50 and not S.Vendetta:CooldownUp() then
     if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "Cast MemoryofLucidDreams" end
   end
-  -- reaping_flames,if=target.health.pct>80|target.health.pct<=20|target.time_to_pct_20>30
-  ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle)
-  if ShouldReturn then return ShouldReturn end
 
   return false
 end
@@ -331,7 +328,7 @@ local function Trinkets ()
     if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Vigor Trinket" end
   end
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
     if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
   end

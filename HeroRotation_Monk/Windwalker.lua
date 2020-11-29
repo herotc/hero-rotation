@@ -217,7 +217,7 @@ end
 
 local function UseItems()
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
     if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
@@ -357,10 +357,6 @@ local function CDSEF()
   if S.PurifyingBlast:IsCastable() then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "purifying_blast 316"; end
   end
-  -- reaping_flames,if=target.time_to_pct_20>30|target.health.pct<=20
-  if (Target:TimeToX(20) > 30 or Target:HealthPercentage() <= 20) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
-  end
   -- focused_azerite_beam
   if S.FocusedAzeriteBeam:IsCastable() then
     if HR.Cast(S.FocusedAzeriteBeam, nil, Settings.Commons.EssenceDisplayStyle) then return "focused_azerite_beam 318"; end
@@ -444,10 +440,6 @@ local function CDSerenity()
   -- purifying_blast
   if S.PurifyingBlast:IsCastable() then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, not Target:IsInRange(40)) then return "purifying_blast 412"; end
-  end
-  -- reaping_flames,if=target.time_to_pct_20>30|target.health.pct<=20|target.time_to_die<2
-  if (Target:TimeToX(20) > 30 or Target:HealthPercentage() <= 20 or Target:TimeToDie() < 2) then
-    local ShouldReturn = Everyone.ReapingFlamesCast(Settings.Commons.EssenceDisplayStyle); if ShouldReturn then return ShouldReturn; end
   end
   -- focused_azerite_beam
   if S.FocusedAzeriteBeam:IsCastable() then
@@ -691,7 +683,7 @@ local function APL()
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
   local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
-  
+
   ComputeTargetRange()
 
   if Everyone.TargetIsValid() then
@@ -699,7 +691,7 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-  
+
     -- auto_attack
     -- Fortifying Brew
     if S.FortifyingBrew:IsReady() and IsTanking and Settings.Windwalker.ShowFortifyingBrewCD  then

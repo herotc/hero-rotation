@@ -61,11 +61,11 @@ end, "AZERITE_ESSENCE_ACTIVATED", "AZERITE_ESSENCE_CHANGED")
 
 -- Variables
 local VarCAExecute = Target:HealthPercentage() > 70 and S.CarefulAim:IsAvailable()
-local SoulForgeEmbersEquipped = HL.LegendaryEnabled(68)
+local SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 local PassiveEssence
 
 HL:RegisterForEvent(function()
-  SoulForgeEmbersEquipped = HL.LegendaryEnabled(68)
+  SoulForgeEmbersEquipped = Player:HasLegendaryEquipped(68)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 --Functions
@@ -96,14 +96,14 @@ end
 
 -- TODO(mrdmnd) - if you're casting (aimed or rapid fire) with volley up, you actually only have trick shots for next
 -- aimed shot if volley buff is still up at the end of the cast. also conceivably build in buffer here.
--- test Player:BuffRemains(S.VolleyBuff) against S.Trueshot:ExecuteTime() for more accuracy 
+-- test Player:BuffRemains(S.VolleyBuff) against S.Trueshot:ExecuteTime() for more accuracy
 local function TrickShotsBuffCheck()
   return (Player:BuffUp(S.TrickShotsBuff) and not Player:IsCasting(S.AimedShot) and not Player:IsChanneling(S.RapidFire)) or Player:BuffUp(S.VolleyBuff)
 end
 
 -- target_if=min:remains,if=refreshable&target.time_to_die>duration
 local function EvaluateTargetIfFilterSerpentRemains(TargetUnit)
-  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > S.SerpentStingDebuff:BaseDuration()) 
+  return (TargetUnit:DebuffRefreshable(S.SerpentStingDebuff) and TargetUnit:TimeToDie() > S.SerpentStingDebuff:BaseDuration())
 end
 local function EvaluateTargetIfSerpentSting(TargetUnit)
   return (TargetUnit:TimeToDie() > S.SerpentStingDebuff:BaseDuration())
@@ -304,7 +304,7 @@ local function Trickshots()
   -- trueshot,if=cooldown.rapid_fire.remains|focus+action.rapid_fire.cast_regen>focus.max|target.time_to_die<15
   if S.Trueshot:IsReady() and HR.CDsON() and (bool(S.RapidFire:CooldownRemains()) or Player:Focus() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) > Player:FocusMax() or Target:TimeToDie() < 15) then
     if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
-  end 
+  end
   -- aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
   if S.AimedShot:IsReady() and (TrickShotsBuffCheck() and (not Player:BuffUp(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot))) then
     if HR.Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 12"; end
@@ -348,7 +348,7 @@ local function APL()
   EnemiesCount10ySplash = Target:GetEnemiesInSplashRangeCount(10) -- AOE Toogle
   Enemies40y = Player:GetEnemiesInRange(S.AimedShot.MaximumRange)
   TargetInRange40y = Target:IsSpellInRange(S.AimedShot) -- Ranged abilities; Distance varies by Mastery
-  
+
   PassiveEssence = (Spell:MajorEssenceEnabled(AE.VisionofPerfection) or Spell:MajorEssenceEnabled(AE.ConflictandStrife) or Spell:MajorEssenceEnabled(AE.TheFormlessVoid) or Spell:MajorEssenceEnabled(AE.TouchoftheEverlasting))
 
   -- call precombat
@@ -365,7 +365,7 @@ local function APL()
     -- auto_shot
     -- use_items,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<20
     if (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
-      local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+      local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end

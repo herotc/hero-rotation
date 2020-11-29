@@ -44,7 +44,7 @@ local PassiveEssence
 local Enemies8yMelee
 local EnemiesCount8yMelee
 local VarBrandBuild = (S.AgonizingFlames:IsAvailable() and S.BurningAlive:IsAvailable() and S.CharredFlesh:IsAvailable())
-local RazelikhsDefilementEquipped = HL.LegendaryEnabled(27)
+local RazelikhsDefilementEquipped = Player:HasLegendaryEquipped(27)
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone
@@ -59,7 +59,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_SPECIALIZATION_CHANGED", "PLAYER_TALENT_UPDATE")
 
 HL:RegisterForEvent(function()
-  RazelikhsDefilementEquipped = HL.LegendaryEnabled(27)
+  RazelikhsDefilementEquipped = Player:HasLegendaryEquipped(27)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 -- Soul Fragments function taking into consideration aura lag
@@ -184,7 +184,7 @@ local function Cooldowns()
     if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 60"; end
   end
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
     if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end

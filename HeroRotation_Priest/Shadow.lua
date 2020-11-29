@@ -57,9 +57,9 @@ local VarAllDotsUp = false
 local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
-local SephuzEquipped = HL.LegendaryEnabled(202)
-local PainbreakerEquipped = HL.LegendaryEnabled(158)
-local ShadowflamePrismEquipped = HL.LegendaryEnabled(159)
+local SephuzEquipped = Player:HasLegendaryEquipped(202)
+local PainbreakerEquipped = Player:HasLegendaryEquipped(158)
+local ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
 
 HL:RegisterForEvent(function()
   VarDotsUp = false
@@ -70,9 +70,9 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
-  SephuzEquipped = HL.LegendaryEnabled(202)
-  PainbreakerEquipped = HL.LegendaryEnabled(158)
-  ShadowflamePrismEquipped = HL.LegendaryEnabled(159)
+  SephuzEquipped = Player:HasLegendaryEquipped(202)
+  PainbreakerEquipped = Player:HasLegendaryEquipped(158)
+  ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -229,7 +229,7 @@ local function Cds()
     if Cast(I.SinfulGladiatorsBadgeofFerocity) then return "sinful_gladiators_badge_of_ferocity 60"; end
   end
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
   if TrinketToUse then
     if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
   end
@@ -387,7 +387,7 @@ local function APL()
     EnemiesCount8ySplash = 1
     EnemiesCount10ySplash = 1
   end
-  
+
   -- Check units within range of target without SWP or with SWP in pandemic range
   UnitsWithoutSWPain = UnitsWithoutSWP(Enemies10ySplash)
   UnitsRefreshSWPain = UnitsRefreshSWP(Enemies10ySplash)
