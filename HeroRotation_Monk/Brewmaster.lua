@@ -64,11 +64,6 @@ local Settings = {
 };
 
 HL:RegisterForEvent(function()
-  S.ConcentratedFlame:RegisterInFlight()
-end, "LEARNED_SPELL_IN_TAB")
-S.ConcentratedFlame:RegisterInFlight()
-
-HL:RegisterForEvent(function()
   VarFoPPreChan = 0
 end, "PLAYER_REGEN_ENABLED")
 
