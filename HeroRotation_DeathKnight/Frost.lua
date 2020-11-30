@@ -493,7 +493,7 @@ local function Standard()
     if HR.Cast(S.FrostStrike, nil, nil, not TargetIsInRange[8]) then return "frost_strike standard 3"; end
   end
   -- frost_strike,if=conduit.unleashed_frenzy.enabled&buff.unleashed_frenzy.remains<3|conduit.eradicating_blow.enabled&buff.eradicating_blow.stack=2
-  if no_heal and S.FrostStrike:IsReady() and (S.UnleashedFrenzy:IsAvailable() and Player:BuffRemains(S.UnleashedFrenzyBuff) < 3 or S.EradicatingBlow:IsAvailable() and Player:BuffStack(EradicatingBlowBuff) == 2) then
+  if no_heal and S.FrostStrike:IsReady() and (S.UnleashedFrenzy:IsAvailable() and Player:BuffRemains(S.UnleashedFrenzyBuff) < 3 or S.EradicatingBlow:IsAvailable() and Player:BuffStack(S.EradicatingBlowBuff) == 2) then
     if HR.Cast(S.FrostStrike, nil, nil, not TargetIsInRange[8]) then return "frost_strike standard 4"; end
   end
   -- howling_blast,if=buff.rime.up
