@@ -395,7 +395,7 @@ local function APL()
       end
       -- bag_of_tricks,if=!talent.ascendance.enabled|!buff.ascendance.up
       if S.BagofTricks:IsCastable() and (not S.Ascendance:IsAvailable() or not Player:BuffUp(S.AscendanceBuff)) then
-        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:SpellInRange(S.BagofTricks)) then return "bag_of_tricks racial"; end
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks racial"; end
       end
     end
     -- feral_spirit
