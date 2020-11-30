@@ -148,8 +148,8 @@ local function Precombat()
 end
 
 local function Cooldown()
-  -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<25
-  if S.Metamorphosis:IsCastable() and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 25) then
+  -- metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
+  if S.Metamorphosis:IsCastable() and (not (S.Demonic:IsAvailable() or VarPoolingForMeta) and S.EyeBeam:CooldownRemains() > 20 and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or HL.BossFilteredFightRemains("<", 25)) then
     if Cast(S.Metamorphosis, Settings.Havoc.GCDasOffGCD.Metamorphosis, nil, not Target:IsInRange(40)) then return "metamorphosis 22"; end
   end
   -- metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
@@ -168,12 +168,12 @@ local function Cooldown()
   if S.FoddertotheFlame:IsCastable() then
     if Cast(S.FoddertotheFlame, nil, Settings.Commons.CovenantDisplayStyle) then return "fodder_to_the_flame 30"; end
   end
-  -- elysian_decree
-  if S.ElysianDecree:IsCastable() then
+  -- elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
+  if S.ElysianDecree:IsCastable() and (EnemiesCount8 > 0) then
     if Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(30)) then return "elysian_decree 32"; end
   end
-  -- potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or Target:TimeToDie() < 60) then
+  -- potion,if=buff.metamorphosis.remains>25|fight_remains<60
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or HL.BossFilteredFightRemains("<", 60)) then
     if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 34"; end
   end
   -- use_items,if=buff.metamorphosis.up
@@ -312,8 +312,8 @@ local function Normal()
   if S.ThrowGlaive:IsCastable() and (S.SerratedGlaive:IsAvailable() and S.EyeBeam:CooldownRemains() < 6 and Player:BuffDown(S.MetamorphosisBuff) and Target:DebuffDown(S.ExposedWoundDebuff)) then
     if Cast(S.ThrowGlaive, Settings.Havoc.GCDasOffGCD.ThrowGlaive, nil, not Target:IsSpellInRange(S.ThrowGlaive)) then return "throw_glaive 134"; end
   end
-  -- eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
-  if S.EyeBeam:IsReady() and (EnemiesCount20 > 1 and (not VarWaitingForMomentum)) then
+  -- eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15)
+  if S.EyeBeam:IsReady() and (not VarWaitingForMomentum and EnemiesCount20 > 0) then
     if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam) then return "eye_beam 136"; end
   end
   -- blade_dance,if=variable.blade_dance
@@ -323,10 +323,6 @@ local function Normal()
   -- felblade,if=fury.deficit>=40
   if S.Felblade:IsCastable() and (Player:FuryDeficit() >= 40) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade 140"; end
-  end
-  -- eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_essence_break&raid_event.adds.in>cooldown
-  if S.EyeBeam:IsReady() and (not S.BlindFury:IsAvailable() and (not VarWaitingForEssenceBreak)) then
-    if Cast(S.EyeBeam, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not Target:IsInRange(20)) then return "eye_beam 142"; end
   end
   -- annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_essence_break
   if S.Annihilation:IsReady() and IsInMeleeRange() and ((S.DemonBlades:IsAvailable() or (not VarWaitingForMomentum) or Player:FuryDeficit() < 30 or Player:BuffRemains(S.MetamorphosisBuff) < 5) and (not VarPoolingForBladeDance) and (not VarWaitingForEssenceBreak)) then
