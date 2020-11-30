@@ -226,7 +226,7 @@ local function MasterAssassinRemains ()
   if LegendaryRemains > 0 then
     return LegendaryRemains
   -- Currently stealthed (i.e. Aura)
-  elseif Player:BuffRemains(S.MasterAssassinBuff) <= 0 then
+  elseif Player:BuffRemains(S.MasterAssassinBuff) < 0 then
     return Player:GCDRemains() + 3
   -- Broke stealth recently (i.e. Buff)
   else
@@ -412,10 +412,11 @@ local function Stealthed ()
     if GarroteIfFunc(Target) then
       if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Cast Garrote (Subterfuge)" end
     end
-    -- Not implemented because this is special for simc and we can have a shifting main target in reality where simc checks only a fix target on all normal abilities.
     -- # Subterfuge + Exsg on 1T: Refresh Garrote at the end of stealth to get max duration before Exsanguinate
-    -- actions.stealthed+=/pool_resource,for_next=1
     -- actions.stealthed+=/garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&active_enemies=1&buff.subterfuge.remains<1.3
+    if S.Exsanguinate:IsAvailable() and MeleeEnemies10yCount == 1 and Player:BuffRemains(S.SubterfugeBuff) < 1.3 then
+      if HR.CastPooling(S.Garrote, nil, not Target:IsInMeleeRange(5)) then return "Pool for Garrote (Exsanguinate Refresh)" end
+    end
   end
 end
 
@@ -442,7 +443,7 @@ local function Dot ()
       if HR.CastPooling(S.Garrote) then return "Cast Garrote (Pre-Exsanguinate)" end
     end
     -- actions.dot+=/rupture,if=talent.exsanguinate.enabled&(effective_combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&dot.rupture.remains*0.5<target.time_to_die)
-    if S.Rupture:IsReady() and Target:IsInMeleeRange(5) and ComboPoints > 0 and not Target:DebuffRefreshable(S.Garrote)
+    if S.Rupture:IsReady() and Target:IsInMeleeRange(5) and ComboPoints > 0
       and (ComboPoints >= Rogue.CPMaxSpend() and S.Exsanguinate:CooldownRemains() < 1 and Target:FilteredTimeToDie(">", Target:DebuffRemains(S.Rupture)*0.5)) then
       if Cast(S.Rupture) then return "Cast Rupture (Pre-Exsanguinate)" end
     end
@@ -455,8 +456,9 @@ local function Dot ()
   if S.Garrote:IsCastable() and ComboPointsDeficit >= 1 then
     local function Evaluate_Garrote_Target(TargetUnit)
       return TargetUnit:DebuffRefreshable(S.Garrote)
-        and (TargetUnit:PMultiplier(S.Garrote) <= 1 or TargetUnit:DebuffRemains(S.Garrote) <= (Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime))
-        and (not Rogue.Exsanguinated(TargetUnit, S.Garrote) or (TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and MeleeEnemies10yCount >= 3))
+        and (TargetUnit:PMultiplier(S.Garrote) <= 1 or (MeleeEnemies10yCount >= 3
+          and TargetUnit:DebuffRemains(S.Garrote) <= (Rogue.Exsanguinated(TargetUnit, S.Garrote) and ExsanguinatedBleedTickTime or BleedTickTime)))
+        and (not Rogue.Exsanguinated(TargetUnit, S.Garrote) or TargetUnit:DebuffRemains(S.Garrote) <= 1.5 and MeleeEnemies10yCount >= 3)
         and MasterAssassinRemains() <= 0
         and Rogue.CanDoTUnit(TargetUnit, GarroteDMGThreshold)
     end
@@ -547,7 +549,6 @@ local function Direct ()
   end
   --- !!!! ---
 
-
   if S.FanofKnives:IsCastable() and Target:IsInMeleeRange(10) then
     -- # Fan of Knives at 19+ stacks of Hidden Blades or against 4+ targets.
     -- actions.direct+=/fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|(!priority_rotation&spell_targets.fan_of_knives>=4+stealthed.rogue))
@@ -566,7 +567,7 @@ local function Direct ()
     end
   end
   -- actions.direct+=/echoing_reprimand,if=variable.use_filler&cooldown.vendetta.remains>10
-  if CDsON() and S.EchoingReprimand:IsCastable() and S.Vendetta:CooldownRemains() > 10 then
+  if CDsON() and S.EchoingReprimand:IsReady() and S.Vendetta:CooldownRemains() > 10 then
     if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
   end
   -- actions.direct+=/ambush,if=variable.use_filler
