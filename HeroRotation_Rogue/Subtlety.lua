@@ -212,7 +212,7 @@ end
 local function Finish (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
 
-  if S.SliceandDice:IsCastable() then
+  if S.SliceandDice:IsCastable() and HL.FilteredFightRemains(MeleeEnemies10y, ">", Player:BuffRemains(S.SliceandDice)) then
     -- actions.finish=variable,name=premed_snd_condition,value=talent.premeditation.enabled&spell_targets<(5-covenant.necrolord)&!covenant.kyrian
     if S.Premeditation:IsAvailable() and MeleeEnemies10yCount < 5 - num(Player:Covenant() == "Necrolord") and Player:Covenant() ~= "Kyrian" then
       -- actions.finish+=/slice_and_dice,if=variable.premed_snd_condition&cooldown.shadow_dance.charges_fractional<1.75&buff.slice_and_dice.remains<cooldown.symbols_of_death.remains&(cooldown.shadow_dance.ready&buff.symbols_of_death.remains-buff.shadow_dance.remains<1.2)
@@ -228,7 +228,6 @@ local function Finish (ReturnSpellOnly, StealthSpell)
     else
       -- actions.finish+=/slice_and_dice,if=!variable.premed_snd_condition&spell_targets.shuriken_storm<6&!buff.shadow_dance.up&buff.slice_and_dice.remains<fight_remains&refreshable
       if MeleeEnemies10yCount < 6 and not ShadowDanceBuff
-        and HL.FilteredFightRemains(MeleeEnemies10y, ">", Player:BuffRemains(S.SliceandDice))
         and Player:BuffRemains(S.SliceandDice) < (1 + ComboPoints * 1.8) then
         if ReturnSpellOnly then
           return S.SliceandDice
@@ -788,13 +787,14 @@ local function APL ()
     if ShouldReturn then return "Stealth CDs: " .. ShouldReturn end
 
     -- actions+=/call_action_list,name=finish,if=combo_points=animacharged_cp
-    -- # Finish at 4+ without DS, 5+ with DS (outside stealth)
-    -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&combo_points>=3
+    -- # Finish at 4+ without DS or with SoD crit buff, 5+ with DS (outside stealth)
+    -- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&combo_points>=3|buff.symbols_of_death_autocrit.up&combo_points>=4
     -- # With DS also finish at 4+ against 4 targets (outside stealth)
     -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&combo_points>=4
     if ComboPoints == Rogue.AnimachargedCP()
       or (ComboPointsDeficit <= 1 or (HL.BossFilteredFightRemains("<", 2) and ComboPoints >= 3))
-      or (MeleeEnemies10yCount >= 4 and ComboPoints >= 4) then
+      or (MeleeEnemies10yCount >= 4 and ComboPoints >= 4)
+      or (Player:BuffUp(S.SymbolsofDeathCrit) and ComboPoints >= 4) then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
     else
@@ -882,8 +882,8 @@ HR.SetAPL(261, APL, Init)
 -- # Consider using a Stealth CD when reaching the energy threshold
 -- actions+=/call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
 -- actions+=/call_action_list,name=finish,if=combo_points=animacharged_cp
--- # Finish at 4+ without DS, 5+ with DS (outside stealth)
--- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&combo_points>=3
+-- # Finish at 4+ without DS or with SoD crit buff, 5+ with DS (outside stealth)
+-- actions+=/call_action_list,name=finish,if=combo_points.deficit<=1|fight_remains<=1&combo_points>=3|buff.symbols_of_death_autocrit.up&combo_points>=4
 -- # With DS also finish at 4+ against 4 targets (outside stealth)
 -- actions+=/call_action_list,name=finish,if=spell_targets.shuriken_storm>=4&combo_points>=4
 -- # Use a builder when reaching the energy threshold
