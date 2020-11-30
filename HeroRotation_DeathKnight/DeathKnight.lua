@@ -93,6 +93,7 @@ Spell.DeathKnight.Frost = {
   EmpowerRuneWeapon                     = Spell(47568),
   PillarofFrost                         = Spell(51271),
   -- Talents
+  Avalanche                             = Spell(207142),
   Asphyxiate                            = Spell(108194),
   GatheringStorm                        = Spell(194912),
   GlacialAdvance                        = Spell(194913),
@@ -115,7 +116,9 @@ Spell.DeathKnight.Frost = {
   EradicatingBlow                       = Spell(337934),
   BitingCold                            = Spell(337988),
   UnleashedFrenzy                       = Spell(338492),
+  Everfrost                             = Spell(337988),
   -- Buffs
+  DeathAndDecayBuff                     = Spell(188290),
   RimeBuff                              = Spell(59052),
   KillingMachineBuff                    = Spell(51124),
   PillarofFrostBuff                     = Spell(51271),
