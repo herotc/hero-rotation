@@ -314,7 +314,7 @@ local function Stealthed (ReturnSpellOnly, StealthSpell)
   local ShadowDanceBuff = Player:BuffUp(S.ShadowDanceBuff) or (StealthSpell and StealthSpell:ID() == S.ShadowDance:ID())
   local ShadowstrikeIsCastable = S.Shadowstrike:IsCastable() or StealthBuff or VanishBuffCheck or ShadowDanceBuff
   if StealthBuff or VanishBuffCheck then
-    ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsSpellInRange(S.Shadowstrike)
+    ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsInRange(25)
   else
     ShadowstrikeIsCastable = ShadowstrikeIsCastable and Target:IsInMeleeRange(5)
   end
@@ -391,22 +391,23 @@ end
 -- # Stealth Macros
 -- This returns a table with the original Stealth spell and the result of the Stealthed action list as if the applicable buff was present
 local function StealthMacro (StealthSpell, EnergyThreshold)
-  local MacroTable = {StealthSpell}
+  -- Fetch the predicted ability to use after the stealth spell
+  local MacroAbility = Stealthed(true, StealthSpell)
 
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
-  if StealthSpell == S.Vanish and not Settings.Subtlety.StealthMacro.Vanish then
+  if StealthSpell == S.Vanish and (not Settings.Subtlety.StealthMacro.Vanish or not MacroAbility) then
     if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
     return false
-  elseif StealthSpell == S.Shadowmeld and not Settings.Subtlety.StealthMacro.Shadowmeld then
+  elseif StealthSpell == S.Shadowmeld and (not Settings.Subtlety.StealthMacro.Shadowmeld or not MacroAbility) then
     if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
     return false
-  elseif StealthSpell == S.ShadowDance and not Settings.Subtlety.StealthMacro.ShadowDance then
+  elseif StealthSpell == S.ShadowDance and (not Settings.Subtlety.StealthMacro.ShadowDance or not MacroAbility) then
     if HR.Cast(S.ShadowDance, Settings.Subtlety.OffGCDasOffGCD.ShadowDance) then return "Cast Shadow Dance" end
     return false
   end
 
-  tableinsert(MacroTable, Stealthed(true, StealthSpell))
+  local MacroTable = {StealthSpell, MacroAbility}
 
   -- Set the stealth spell only as a pooling fallback if we did not meet the threshold
   if EnergyThreshold and Player:EnergyPredicted() < EnergyThreshold then
