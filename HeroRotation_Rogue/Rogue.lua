@@ -206,6 +206,7 @@ Spell.Rogue.Subtlety = {
   Stealth               = Spell(1784),
   Stealth2              = Spell(115191), -- w/ Subterfuge Talent
   SymbolsofDeath        = Spell(212283),
+  SymbolsofDeathCrit    = Spell(227151),
   Rupture               = Spell(1943),
   Vanish                = Spell(1856),
   VanishBuff            = Spell(11327),
