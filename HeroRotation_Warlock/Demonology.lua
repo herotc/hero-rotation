@@ -64,10 +64,8 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   S.HandofGuldan:RegisterInFlight()
-  S.ConcentratedFlame:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.HandofGuldan:RegisterInFlight()
-S.ConcentratedFlame:RegisterInFlight()
 
 local function num(val)
   if val then return 1 else return 0 end

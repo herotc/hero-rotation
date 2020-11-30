@@ -46,11 +46,9 @@ local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
 -- Register
 HL:RegisterForEvent(function()
   S.SeedofCorruption:RegisterInFlight()
-  S.ConcentratedFlame:RegisterInFlight()
   S.ShadowBolt:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.SeedofCorruption:RegisterInFlight()
-S.ConcentratedFlame:RegisterInFlight()
 S.ShadowBolt:RegisterInFlight()
 
 
@@ -191,7 +189,7 @@ local function Darkglare_prep()
   end
   -- summon_darkglare
   if S.SummonDarkglare:IsReady() then
-    if Cast(S.SummonDarkglare) then return "SummonDarkglare Darkglare_prep"; end
+    if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "SummonDarkglare Darkglare_prep"; end
   end
 end
 
