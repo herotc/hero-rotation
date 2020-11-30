@@ -228,10 +228,12 @@ local function Cds()
   if I.SinfulGladiatorsBadgeofFerocity:IsEquipped() and I.SinfulGladiatorsBadgeofFerocity:IsReady() and (Player:BuffUp(S.VoidformBuff) or HL.CombatTime() > 10 and not Player:Covenant() == "Night Fae") then
     if Cast(I.SinfulGladiatorsBadgeofFerocity) then return "sinful_gladiators_badge_of_ferocity 60"; end
   end
-  -- use_items
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  -- use_items,if=buff.voidform.up|buff.power_infusion.up
+  if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
   end
 end
 
