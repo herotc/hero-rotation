@@ -1,7 +1,7 @@
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
-local addonName, HR = ...
+local addonName, addonTable = ...
 -- HeroDBC
 local DBC = HeroDBC.DBC
 -- HeroLib
@@ -14,6 +14,7 @@ local Spell = HL.Spell
 local MultiSpell = HL.MultiSpell
 local Item = HL.Item
 -- HeroRotation
+local HR = HeroRotation
 local AoEON = HR.AoEON
 local CDsON = HR.CDsON
 local Cast = HR.Cast
