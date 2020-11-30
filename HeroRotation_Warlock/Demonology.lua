@@ -37,6 +37,7 @@ local OnUseExcludes = {
 -- Rotation Var
 local ShouldReturn -- Used to get the return string
 local GCDRemain
+local EnemiesCount8ySplash
 local VarTyrantReady = false
 local VarPoolForDecimatingBolt
 local BalespidersEquipped = Player:HasLegendaryEquipped(173)
@@ -161,7 +162,7 @@ local function TyrantPrep()
   end
   -- summon_vilefiend
   if S.SummonVilefiend:IsReady() then
-    if HR.Cast(S.SummonVilefiend, nil, nil, not Target:IsInRange(40)) then return "summon_vilefiend 70"; end
+    if HR.Cast(S.SummonVilefiend, nil, nil, not Target:IsSpellInRange(S.SummonVilefiend)) then return "summon_vilefiend 70"; end
   end
   -- call_dreadstalkers
   if S.CallDreadstalkers:IsReady() then
@@ -250,8 +251,55 @@ local function OffGCD()
   end
 end
 
+local function Covenant()
+  -- impending_catastrophe,if=!talent.sacrificed_souls.enabled|active_enemies>1
+  if S.ImpendingCatastrophe:IsReady() and (not S.SacrificedSouls:IsAvailable() or EnemiesCount8ySplash > 1) then
+    if HR.Cast(S.ImpendingCatastrophe, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe 142"; end
+  end
+  -- scouring_tithe,if=talent.sacrificed_souls.enabled&active_enemies=1
+  -- scouring_tithe,if=!talent.sacrificed_souls.enabled&active_enemies<4
+  -- Note: Combined the lines
+  if S.ScouringTithe:IsReady() and ((S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash == 1) or (not S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash < 4)) then
+    if HR.Cast(S.ScouringTithe, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe 144"; end
+  end
+  -- soul_rot
+  if S.SoulRot:IsReady() then
+    if HR.Cast(S.SoulRot, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot 146"; end
+  end
+  -- decimating_bolt
+  -- Note: Replaced default decimating_bolt usage with the below usage
+  -- Manually added: Power Siphon in prep for DecimatingBolt/Demonbolt, if less than 3 stacks of Demonic Core
+  -- power_siphon,if=buff.wild_imps.stack>1&cooldown.decimating_bolt.ready&buff.demonic_core.up&buff.demonic_core.stack<3
+  if S.PowerSiphon:IsReady() and (WildImpsCount() > 1 and S.DecimatingBolt:IsReady() and Player:BuffUp(S.DemonicCoreBuff) and Player:BuffStack(S.DemonicCoreBuff) < 3) then
+    if HR.Cast(S.PowerSiphon) then return "power_siphon dbolt prep"; end
+  end
+  -- Manually added: Dump shards in prep for DecimatingBolt/Demonbolt
+  -- hand_of_guldan,if=soul_shard>1&cooldown.decimating_bolt.ready&buff.demonic_core.stack>2
+  if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 1 and S.DecimatingBolt:IsReady() and Player:BuffStack(S.DemonicCoreBuff) > 2) then
+    if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt prep"; end
+  end
+  -- Manually added: DecimatingBolt if at 1 or fewer shards and 3+ stacks of Demonic Core
+  -- decimating_bolt,if=soul_shard<=1&buff.demonic_core.stack>2
+  if S.DecimatingBolt:IsReady() and (Player:SoulShardsP() <= 1 and Player:BuffStack(S.DemonicCoreBuff) > 2) then
+    if HR.Cast(S.DecimatingBolt, nil, nil, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt dbolt"; end
+  end
+  -- Manually added: Burn shards with Hand of Gul'dan if at 4+ during DecimatingBolt/Demonbolt burn
+  -- hand_of_guldan,if=soul_shard>3&buff.decimating_bolt.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.demonic_core.stack))&buff.demonic_core.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.demonic_core.stack))
+  if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 3 and Player:BuffRemains(S.DecimatingBoltBuff) > (S.HandofGuldan:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DemonicCoreBuff))) and Player:BuffRemains(S.DemonicCoreBuff) > (S.HandofGuldan:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DemonicCoreBuff)))) then
+    if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt burn shards"; end
+  end
+  -- Manually added: Demonbolt if DecimatingBoltBuff is up
+  -- demonbolt,if=buff.decimating_bolt.react
+  if S.Demonbolt:IsReady() and (Player:BuffUp(S.DecimatingBoltBuff)) then
+    if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt dbolt"; end
+  end
+end
+
 --- ======= ACTION LISTS =======
 local function APL()
+  -- Update Enemy Counts
+  EnemiesCount8ySplash = Target:GetEnemiesInSplashRangeCount(8)
+
   -- Update Demonology-specific Tables
   Warlock.UpdatePetTable()
   Warlock.UpdateSoulShards()
@@ -277,37 +325,17 @@ local function APL()
     if S.ShadowBolt:IsReady() and (Player:BuffUp(S.BalespidersBuff) and Player:BuffRemains(S.BalespidersBuff) < (S.ShadowBolt:ExecuteTime() + GCDRemain + 1) and (Player:BuffDown(S.DecimatingBoltBuff) or Player:BuffRemains(S.DecimatingBoltBuff) > (S.ShadowBolt:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DecimatingBoltBuff))))) then
       if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt balespiders"; end
     end
-    -- Manually added: Power Siphon in prep for DecimatingBolt/Demonbolt, if less than 3 stacks of Demonic Core
-    -- power_siphon,if=buff.wild_imps.stack>1&cooldown.decimating_bolt.ready&buff.demonic_core.up&buff.demonic_core.stack<3
-    if S.PowerSiphon:IsReady() and (WildImpsCount() > 1 and S.DecimatingBolt:IsReady() and Player:BuffUp(S.DemonicCoreBuff) and Player:BuffStack(S.DemonicCoreBuff) < 3) then
-      if HR.Cast(S.PowerSiphon) then return "power_siphon dbolt prep"; end
-    end
-    -- Manually added: Dump shards in prep for DecimatingBolt/Demonbolt
-    -- hand_of_guldan,if=soul_shard>1&cooldown.decimating_bolt.ready&buff.demonic_core.stack>2
-    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 1 and S.DecimatingBolt:IsReady() and Player:BuffStack(S.DemonicCoreBuff) > 2) then
-      if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt prep"; end
-    end
-    -- Manually added: DecimatingBolt if at 1 or fewer shards and 3+ stacks of Demonic Core
-    -- decimating_bolt,if=soul_shard<=1&buff.demonic_core.stack>2
-    if S.DecimatingBolt:IsReady() and (Player:SoulShardsP() <= 1 and Player:BuffStack(S.DemonicCoreBuff) > 2) then
-      if HR.Cast(S.DecimatingBolt, nil, nil, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt dbolt"; end
-    end
-    -- Manually added: Burn shards with Hand of Gul'dan if at 4+ during DecimatingBolt/Demonbolt burn
-    -- hand_of_guldan,if=soul_shard>3&buff.decimating_bolt.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.demonic_core.stack))&buff.demonic_core.remains>(execute_time+gcd.remains+1+(demonbolt.execute_time*buff.demonic_core.stack))
-    if S.HandofGuldan:IsReady() and (Player:SoulShardsP() > 3 and Player:BuffRemains(S.DecimatingBoltBuff) > (S.HandofGuldan:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DemonicCoreBuff))) and Player:BuffRemains(S.DemonicCoreBuff) > (S.HandofGuldan:ExecuteTime() + GCDRemain + 1 + (S.Demonbolt:ExecuteTime() * Player:BuffStack(S.DemonicCoreBuff)))) then
-      if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan dbolt burn shards"; end
-    end
-    -- Manually added: Demonbolt if DecimatingBoltBuff is up
-    -- demonbolt,if=buff.decimating_bolt.react
-    if S.Demonbolt:IsReady() and (Player:BuffUp(S.DecimatingBoltBuff)) then
-      if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt dbolt"; end
+    -- Manually added: Go to the Covenant function if DecimatingBoltBuff is up
+    -- call_action_list,name=covenant,if=buff.decimating_bolt.up
+    if (Player:BuffUp(S.DecimatingBoltBuff)) then
+      local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=off_gcd
     if CDsON() then
       local ShouldReturn = OffGCD(); if ShouldReturn then return ShouldReturn; end
     end
-    -- run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<5&!variable.tyrant_ready
-    if CDsON() and S.SummonDemonicTyrant:CooldownRemains() < 5 and not VarTyrantReady then
+    -- run_action_list,name=tyrant_prep,if=cooldown.summon_demonic_tyrant.remains<4&!variable.tyrant_ready
+    if CDsON() and S.SummonDemonicTyrant:CooldownRemains() < 4 and not VarTyrantReady then
       local ShouldReturn = TyrantPrep(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=summon_tyrant,if=variable.tyrant_ready
@@ -316,7 +344,7 @@ local function APL()
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
     if S.SummonVilefiend:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() > 40 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemains() + 25) then
-      if HR.Cast(S.SummonVilefiend, nil, nil, not Target:IsInRange(40)) then return "summon_vilefiend 22"; end
+      if HR.Cast(S.SummonVilefiend, nil, nil, not Target:IsSpellInRange(S.SummonVilefiend)) then return "summon_vilefiend 22"; end
     end
     -- call_dreadstalkers
     if S.CallDreadstalkers:IsReady() then
@@ -335,13 +363,25 @@ local function APL()
     if S.BilescourgeBombers:IsReady() then
       if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsSpellInRange(S.BilescourgeBombers)) then return "bilescourge_bombers 30"; end
     end
+    -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=8&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= 8 and S.SummonDemonicTyrant:CooldownRemains() < 75 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
+      if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 31"; end
+    end
+    -- implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= 8 and S.SummonDemonicTyrant:CooldownRemains() < 75) then
+      if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 32"; end
+    end
     -- hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
     if S.HandofGuldan:IsReady() and (Player:SoulShardsP() == 5 or Player:BuffUp(S.NetherPortalBuff)) then
-      if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan 32"; end
+      if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan 33"; end
     end
     -- hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains>20&(cooldown.summon_vilefiend.remains>5|!talent.summon_vilefiend.enabled)&cooldown.call_dreadstalkers.remains>2
     if S.HandofGuldan:IsReady() and (Player:SoulShardsP() >= 3 and S.SummonDemonicTyrant:CooldownRemains() > 20 and (S.SummonVilefiend:CooldownRemains() > 5 or not S.SummonVilefiend:IsAvailable()) and S.CallDreadstalkers:CooldownRemains() > 2) then
       if HR.Cast(S.HandofGuldan, nil, nil, not Target:IsSpellInRange(S.HandofGuldan)) then return "hand_of_guldan 34"; end
+    end
+    -- call_action_list,name=covenant,if=(covenant.necrolord|covenant.night_fae)&!talent.nether_portal.enabled
+    if ((Player:Covenant() == "Necrolord" or Player:Covenant() == "Night Fae") and not S.NetherPortal:IsAvailable()) then
+      local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
     end
     -- demonbolt,if=buff.demonic_core.react&soul_shard<4
     -- Manually added necrolord check to pool demonic_core stacks for DecimatingBolt
@@ -367,6 +407,10 @@ local function APL()
     -- soul_strike
     if S.SoulStrike:IsCastable() then
       if HR.Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike 42"; end
+    end
+    -- call_action_list,name=covenant
+    if (true) then
+      local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
     end
     -- shadow_bolt
     if S.ShadowBolt:IsCastable() then

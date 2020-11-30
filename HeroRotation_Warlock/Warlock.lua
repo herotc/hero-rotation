@@ -55,6 +55,7 @@ Spell.Warlock.Demonology = {
   NetherPortal                          = Spell(267217),
   NetherPortalBuff                      = Spell(267218),
   PowerSiphon                           = Spell(264130),
+  SacrificedSouls                       = Spell(267214),
   SoulStrike                            = Spell(264057),
   SummonVilefiend                       = Spell(264119),
 
