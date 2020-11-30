@@ -190,7 +190,7 @@ end
 local function Ambush_Condition ()
   -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
   return Player:ComboPointsDeficit() >= 2 + 2 * ((S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:CooldownRemains() < 1) and 1 or 0)
-    + (Player:BuffUp(S.Broadside) and 1 or 0) and EnergyPredictedRounded() > 60 and not Player:BuffUp(S.SkullandCrossbones) and not Player:BuffUp(S.KeepYourWitsBuff)
+    + (Player:BuffUp(S.Broadside) and 1 or 0) and EnergyPredictedRounded() > 60 and not Player:BuffUp(S.SkullandCrossbones)
 end
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
@@ -409,7 +409,7 @@ local function Build ()
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
     end
     -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.deadshot.up|buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
-    if Player:BuffUp(S.DeadshotBuff) or Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) then
+    if Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Buffed)" end
     end
   end
