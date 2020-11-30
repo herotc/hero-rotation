@@ -52,6 +52,12 @@ Spell.Hunter.BeastMastery = {
   SummonPet3                            = Spell(83243),
   SummonPet4                            = Spell(83244),
   SummonPet5                            = Spell(83245),
+  -- Pet Abilities
+  Bite                                 = Spell(17253, "pet"),
+  BloodBolt                            = Spell(288962, "pet"),
+  Claw                                 = Spell(16827, "pet"),
+  Growl                                = Spell(2649, "pet"),
+  Smack                                = Spell(49966, "pet"),
   -- Talents
   Bloodshed                             = Spell(321530),
   OneWithThePack                        = Spell(199528),
@@ -63,6 +69,9 @@ Spell.Hunter.BeastMastery = {
   FlayedShot                            = Spell(324149),
   ResonatingArrow                       = Spell(308491),
   WildSpirits                           = Spell(328231),
+  WildSpiritsBuff                       = Spell(328275),
+  -- Legendaries (Shadowlands)
+  NesingwarysTrappingApparatusBuff      = Spell(336744),
   -- Buffs
   AspectoftheWildBuff                   = Spell(193530),
   BeastCleavePetBuff                    = Spell(118455, "pet"),

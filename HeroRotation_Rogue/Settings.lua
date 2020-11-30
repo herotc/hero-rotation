@@ -54,9 +54,9 @@ HR.GUISettings.APL.Rogue = {
     MutilateDMGOffset = 3,
     AlwaysSuggestGarrote = false, -- Suggest Garrote even when Vanish is up
     GCDasOffGCD = {
-      Vendetta = true,
     },
     OffGCDasOffGCD = {
+      Vendetta = true,
     }
   },
   Outlaw = {
@@ -69,13 +69,13 @@ HR.GUISettings.APL.Rogue = {
     UseDPSVanish = false, -- Use Vanish in the rotation for DPS
     KillingSpreeDisplayStyle = "Suggested",
     GCDasOffGCD = {
-      AdrenalineRush = true,
-      BladeFlurry = true,
+      BladeFlurry = false,
       BladeRush = false,
       GhostlyStrike = false,
       Dreadblades = false,
     },
     OffGCDasOffGCD = {
+      AdrenalineRush = true,
     }
   },
   Subtlety = {

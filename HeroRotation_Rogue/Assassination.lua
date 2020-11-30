@@ -302,7 +302,7 @@ local function CDs ()
         -- actions.cds+=/variable,name=vendetta_nightstalker_condition,value=!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled
         local NightstalkerCondition = not S.Nightstalker:IsAvailable() or not S.Exsanguinate:IsAvailable() or S.Exsanguinate:CooldownRemains() < 5 - 2 * BoolToInt(S.DeeperStratagem:IsAvailable())
         if NightstalkerCondition then
-          if Cast(S.Vendetta, Settings.Assassination.GCDasOffGCD.Vendetta) then return "Cast Vendetta" end
+          if Cast(S.Vendetta, Settings.Assassination.OffGCDasOffGCD.Vendetta) then return "Cast Vendetta" end
         end
       end
       if S.Vanish:IsCastable() and not Player:IsTanking(Target) then
@@ -724,7 +724,8 @@ end
 
 HR.SetAPL(259, APL, Init)
 
--- Last Update: 2020-06-10
+--- ======= SIMC =======
+-- Last Update: 11/29/2020
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison

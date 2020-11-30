@@ -213,7 +213,7 @@ local function CDs ()
     if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
       and (not S.KillingSpree:CooldownUp() or not S.KillingSpree:IsAvailable())
       and (not I.FontOfPower:IsEquipped() or I.FontOfPower:CooldownRemains() > 20) then
-      if HR.Cast(S.AdrenalineRush, Settings.Outlaw.GCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
+      if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
     end
 
     -- actions.cds+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
