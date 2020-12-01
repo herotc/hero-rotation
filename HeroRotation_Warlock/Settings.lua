@@ -17,10 +17,15 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Warlock = {
   Commons = {
-    UseTrinkets = true,
-    UsePotions = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Trinkets = "Suggested",
+      Covenant = "Suggested",
+    },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities

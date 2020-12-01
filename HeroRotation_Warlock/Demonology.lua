@@ -129,8 +129,8 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "battle_potion_of_intellect 4"; end
+    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.Enabled.Potions then
+      if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.DisplayStyle.Potions) then return "battle_potion_of_intellect 4"; end
     end
     -- demonbolt
     if S.Demonbolt:IsCastable() then
@@ -236,8 +236,8 @@ local function OffGCD()
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
   end
   -- potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.Berserking) or DemonicTyrantTime() > 0 and Player:Race() ~= "Troll") then
-    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 124"; end
+  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Berserking) or DemonicTyrantTime() > 0 and Player:Race() ~= "Troll") then
+    if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 124"; end
   end
   -- blood_fury,if=pet.demonic_tyrant.active
   if S.BloodFury:IsCastable() and (DemonicTyrantTime() > 0) then
@@ -252,21 +252,21 @@ end
 local function Covenant()
   -- impending_catastrophe,if=!talent.sacrificed_souls.enabled|active_enemies>1
   if S.ImpendingCatastrophe:IsReady() and (not S.SacrificedSouls:IsAvailable() or EnemiesCount8ySplash > 1) then
-    if HR.Cast(S.ImpendingCatastrophe, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe 142"; end
+    if HR.Cast(S.ImpendingCatastrophe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe 142"; end
   end
   -- scouring_tithe,if=talent.sacrificed_souls.enabled&active_enemies=1
   -- scouring_tithe,if=!talent.sacrificed_souls.enabled&active_enemies<4
   -- Note: Combined the lines
   if S.ScouringTithe:IsReady() and ((S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash == 1) or (not S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash < 4)) then
-    if HR.Cast(S.ScouringTithe, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe 144"; end
+    if HR.Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe 144"; end
   end
   -- soul_rot
   if S.SoulRot:IsReady() then
-    if HR.Cast(S.SoulRot, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot 146"; end
+    if HR.Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot 146"; end
   end
   -- decimating_bolt
   if S.DecimatingBolt:IsReady() then
-    if HR.Cast(S.DecimatingBolt, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt 148"; end
+    if HR.Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt 148"; end
   end
 end
 
@@ -359,10 +359,10 @@ local function APL()
       if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard 38"; end
     end
     -- use_items
-    if (true) then
+    if (Settings.Commons.Enabled.Trinkets) then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
