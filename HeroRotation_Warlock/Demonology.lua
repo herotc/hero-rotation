@@ -331,11 +331,11 @@ local function APL()
       if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsSpellInRange(S.BilescourgeBombers)) then return "bilescourge_bombers 30"; end
     end
     -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=8&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
-    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= 8 and S.SummonDemonicTyrant:CooldownRemains() < 75 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= 8 and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
       if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 31"; end
     end
     -- implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down
-    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= 8 and S.SummonDemonicTyrant:CooldownRemains() < 75) then
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= 8 and DemonicTyrantTime() == 0) then
       if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 32"; end
     end
     -- hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
