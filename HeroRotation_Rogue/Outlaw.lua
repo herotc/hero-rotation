@@ -234,7 +234,7 @@ local function CDs ()
     end
     if CDsON() then
       -- actions.cds+=/blade_flurry,if=spell_targets>=2-conduit.ambidexterity.enabled&!buff.blade_flurry.up&raid_event.adds.in>10
-      if S.BladeFlurry:IsReady() and (AoEON() and EnemiesBFCount >= 2 or S.Ambidexterity:IsAvailable()) and not Player:BuffUp(S.BladeFlurry) then
+      if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2 and not Player:BuffUp(S.BladeFlurry) then
         if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
           HR.CastSuggested(S.BladeFlurry)
         else
