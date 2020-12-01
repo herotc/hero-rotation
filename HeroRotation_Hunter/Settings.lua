@@ -17,65 +17,57 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Hunter = {
   Commons = {
-    CounterShot = false,
-    UseTrinkets = true,
-    UsePotions = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
-    ExhilarationHP = 30,
-    SummonPetSlot = 1,
-    -- SoloMode Settings
-    -- {Display GCD as OffGCD, ForceReturn}
-    GCDasOffGCD = {
-      -- Abilities
-      Exhilaration = true,
-      WildSpirits = false,
-      TarTrap = false,
-      Flare = false,
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
+    DisplayStyle = {
+      Covenant = "Suggested",
+      Potions = "Suggested",
+      Trinkets = "Suggested"
+    },
+    GCDasOffGCD = {
+      AMurderofCrows = false,
+      Racials = false,
+    },
     OffGCDasOffGCD = {
-      -- Racials
       Racials = true,
-      -- Abilities
+    }
+  },
+  Commons2 = {
+    SummonPetSlot = 1,
+    ExhilarationHP = 20,
+    MendPetHighHP = 40,
+    MendPetLowHP = 80,
+    GCDasOffGCD = {
+      Exhilaration = true,
+      Flare = false,
+      RevivePet = false,
+      SummonPet = false,
+      TarTrap = false,
+    },
+    OffGCDasOffGCD = {
       CounterShot = true,
     }
   },
   BeastMastery = {
-    -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Abilities
-      AMurderofCrows = false,
-      AspectoftheWild = false,
       BestialWrath = false,
-      SummonPet = false,
-      SpittingCobra = false,
-      Stampede = false,
       Bloodshed = false,
-      RevivePet = false,
+      Stampede = false,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
-      -- Items
-      -- Racials
+      AspectoftheWild = true,
     }
   },
   Marksmanship = {
     HideAimedWhileMoving = false,
-    -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
-      -- Abilities
-      AMurderofCrows = false,
-      Trueshot = false,
-      Volley = false,
       DoubleTap = false,
+      Volley = false,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
-      -- Abilities
-      -- Items
-      -- Racials
+      Trueshot = true,
     }
   },
 };
@@ -85,18 +77,19 @@ HR.GUI.LoadSettingsRecursively(HR.GUISettings);
 -- Child Panels
 local ARPanel = HR.GUI.Panel;
 local CP_Hunter = CreateChildPanel(ARPanel, "Hunter");
-local CP_BeastMastery = CreateChildPanel(CP_Hunter, "BeastMastery");
-local CP_Marksmanship = CreateChildPanel(CP_Hunter, "Marksmanship");
+local CP_Hunter2 = CreateChildPanel(ARPanel, "Hunter 2");
+local CP_BeastMastery = CreateChildPanel(ARPanel, "BeastMastery");
+local CP_Marksmanship = CreateChildPanel(ARPanel, "Marksmanship");
 
 -- Hunter
-CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Hunter, "APL.Hunter.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style (WIP)", "Define which icon display style to use for active Covenant Abilities.");
-CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.CounterShot", "Counter Shot to Interrupt", "Enable this to show Counter Shot to interrupt enemies.");
-CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
-CreatePanelOption("CheckButton", CP_Hunter, "APL.Hunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold.");
-CreatePanelOption("Slider", CP_Hunter, "APL.Hunter.Commons.SummonPetSlot", {1, 5, 1}, "Summon Pet Slot", "Which pet stable slot to suggest when summoning a pet. Visual only.");
 CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons");
+
+-- Hunter 2
+CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.ExhilarationHP", {0, 100, 1}, "Exhilaration HP", "Set the Exhilaration HP threshold. Set to 0 to disable.");
+CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.MendPetHighHP", {0, 100, 1}, "Mend Pet High HP", "Set the Mend Pet HP High Priority (ASAP) threshold. Set to 0 to disable.");
+CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.MendPetLowHP", {0, 100, 1}, "Mend Pet Low HP", "Set the Mend Pet HP Low Priority (Pooling) threshold. Set to 0 to disable.");
+CreatePanelOption("Slider", CP_Hunter2, "APL.Hunter.Commons2.SummonPetSlot", {1, 5, 1}, "Summon Pet Slot", "Which pet stable slot to suggest when summoning a pet.");
+CreateARPanelOptions(CP_Hunter2, "APL.Hunter.Commons2");
 
 -- Beast Mastery
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");

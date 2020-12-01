@@ -37,8 +37,8 @@ HR.GUISettings.APL.Rogue = {
     }
   },
   Commons2 = {
-    CrimsonVialHP = 0,
-    FeintHP = 0,
+    CrimsonVialHP = 20,
+    FeintHP = 10,
     StealthOOC = true,
     GCDasOffGCD = {
       CrimsonVial = true,

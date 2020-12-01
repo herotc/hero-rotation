@@ -44,6 +44,7 @@ local Everyone = HR.Commons.Everyone;
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Hunter.Commons,
+  Commons2 = HR.GUISettings.APL.Hunter.Commons2,
   Marksmanship = HR.GUISettings.APL.Hunter.Marksmanship
 };
 
@@ -136,14 +137,14 @@ local function Cds()
   end
   -- lights_judgment,if=buff.trueshot.down
   if S.LightsJudgment:IsReady() and (not Player:BuffUp(S.Trueshot)) then
-    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 102"; end
+    if HR.Cast(S.LightsJudgment, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment 102"; end
   end
   -- bag_of_tricks,if=buff.trueshot.down
   if S.BagofTricks:IsReady() then
-    if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
+    if HR.Cast(S.BagofTricks, Settings.Commons.GCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
   end
   -- potion wip
-  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.UsePotions then
+  if I.PotionOfSpectralAgility:IsReady() and Settings.Commons.Enabled.Trinkets then
     if HR.CastSuggested(I.PotionOfSpectralAgility) then return "potion_of_spectral_agility"; end
   end
 end
@@ -163,23 +164,23 @@ local function St()
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
   if S.TarTrap:IsReady() and (SoulForgeEmbersEquipped and not (S.TarTrap:CooldownRemains() < Player:GCD()) and S.Flare:CooldownRemains() < Player:GCD()) then
-    if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap st 4"; end
+    if HR.Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap st 4"; end
   end
   -- flare,if=tar_trap.up
   if S.Flare:IsReady() and not S.TarTrap:CooldownUp() and SoulForgeEmbersEquipped then
-    if HR.Cast(S.Flare, Settings.Commons.GCDasOffGCD.Flare) then return "flare st 5"; end
+    if HR.Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare st 5"; end
   end
   -- wild_spirits
   if S.WildSpirits:IsReady() and HR.CDsON() then
-    if HR.Cast(S.WildSpirits, nil, Settings.Commons.CovenantDisplayStyle, not TargetInRange40y) then return "wild_spirits fae st covenant "; end
+    if HR.Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "wild_spirits fae st covenant "; end
   end
   -- flayed_shot
   if S.FlayedShot:IsReady() then
-    if HR.Cast(S.FlayedShot, nil, Settings.Commons.CovenantDisplayStyle, not TargetInRange40y) then return "flayed_shot st venthyr covenant"; end
+    if HR.Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "flayed_shot st venthyr covenant"; end
   end
   -- death_chakram,if=focus+cast_regen<focus.max
   if S.DeathChakram:IsReady() and (Player:Focus() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
-    if HR.Cast(S.DeathChakram, nil, Settings.Commons.CovenantDisplayStyle, not TargetInRange40y) then return "dark_chakram st necrolords covenant"; end
+    if HR.Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "dark_chakram st necrolords covenant"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
@@ -191,15 +192,15 @@ local function St()
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then
-    if HR.Cast(S.AMurderofCrows, Settings.Marksmanship.GCDasOffGCD.AMurderofCrows, nil, not TargetInRange40y) then return "a_murder_of_crows 136"; end
+    if HR.Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not TargetInRange40y) then return "a_murder_of_crows 136"; end
   end
   -- resonating_arrow
   if S.ResonatingArrow:IsReady() then
-    if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.CovenantDisplayStyle, not TargetInRange40y) then return "resonating_arrow st kyrian covenant"; end
+    if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant, not TargetInRange40y) then return "resonating_arrow st kyrian covenant"; end
   end
   -- trueshot,if=buff.precise_shots.down|!talent.chimaera_shot.enabled
   if S.Trueshot:IsReady() and HR.CDsON() and (not Player:BuffUp(S.PreciseShotsBuff) or not S.ChimaeraShot:IsAvailable()) then
-    if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot) then return "trueshot st 13"; end
+    if HR.Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot st 13"; end
   end
   -- aimed_shot,if=(full_recharge_time<cast_time+gcd|buff.trueshot.up)&(buff.precise_shots.down|!talent.chimaera_shot.enabled|ca_active)|buff.trick_shots.remains>execute_time&(active_enemies>1|runeforge.serpentstalkers_trickery.equipped)
   if S.AimedShot:IsReady() and ((S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot)) and (not Player:BuffUp(S.PreciseShotsBuff) or not S.ChimaeraShot:IsAvailable() or VarCAExecute) or Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and (EnemiesCount10ySplash > 1 or SerpentStalkersEquipped)) then
@@ -258,15 +259,15 @@ local function Trickshots()
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped
   if S.TarTrap:IsReady() and SoulForgeEmbersEquipped then
-    if HR.Cast(S.TarTrap, Settings.Commons.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap soulforge_embers equipped"; end
+    if HR.Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap soulforge_embers equipped"; end
   end
   -- flare,if=tar_trap.up
   if S.Flare:IsReady() and not S.TarTrap:CooldownUp() then
-    if HR.Cast(S.Flare, Settings.Commons.GCDasOffGCD.Flare) then return "flare trickshots 3 5"; end
+    if HR.Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare trickshots 3 5"; end
   end
   -- wild_spirits
   if S.WildSpirits:IsReady() and HR.CDsON() then
-    if HR.Cast(S.WildSpirits, nil, Settings.Commons.CovenantDisplayStyle) then return "wild_spirits fae trickshots covenant "; end
+    if HR.Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits fae trickshots covenant "; end
   end
   -- volley
   if S.Volley:IsReady() then
@@ -274,7 +275,7 @@ local function Trickshots()
   end
   -- resonating_arrow
   if S.ResonatingArrow:IsReady() then
-    if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.CovenantDisplayStyle) then return "resonating_arrow trickshots kyrian covenant"; end
+    if HR.Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow trickshots kyrian covenant"; end
   end
   -- barrage
   if S.Barrage:IsReady() then
@@ -286,7 +287,7 @@ local function Trickshots()
   end
   -- trueshot,if=cooldown.rapid_fire.remains|focus+action.rapid_fire.cast_regen>focus.max|target.time_to_die<15
   if S.Trueshot:IsReady() and HR.CDsON() and (bool(S.RapidFire:CooldownRemains()) or Player:Focus() + Player:FocusCastRegen(S.RapidFire:ExecuteTime()) > Player:FocusMax() or Target:TimeToDie() < 15) then
-    if HR.Cast(S.Trueshot, Settings.Marksmanship.GCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
+    if HR.Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot, nil, not TargetInRange40y) then return "trueshot trickshots 11"; end
   end
   -- aimed_shot,if=buff.trick_shots.up&(buff.precise_shots.down|full_recharge_time<cast_time+gcd|buff.trueshot.up)
   if S.AimedShot:IsReady() and (TrickShotsBuffCheck() and (not Player:BuffUp(S.PreciseShotsBuff) or S.AimedShot:FullRechargeTime() < S.AimedShot:CastTime() + Player:GCD() or Player:BuffUp(S.Trueshot))) then
@@ -294,7 +295,7 @@ local function Trickshots()
   end
   -- death_chakram,if=focus+cast_regen<focus.max
   if S.DeathChakram:IsReady() and (Player:Focus() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
-    if HR.Cast(S.DeathChakram, nil, Settings.Commons.CovenantDisplayStyle) then return "dark_chakram trickshots necrolords covenant"; end
+    if HR.Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant) then return "dark_chakram trickshots necrolords covenant"; end
   end
   -- rapid_fire,if=buff.trick_shots.up&buff.double_tap.down
   if S.RapidFire:IsReady() and (TrickShotsBuffCheck() and not Player:BuffUp(S.DoubleTap)) then
@@ -310,11 +311,11 @@ local function Trickshots()
   end
   -- a_murder_of_crows
   if S.AMurderofCrows:IsReady() then
-    if HR.Cast(S.AMurderofCrows, Settings.Marksmanship.GCDasOffGCD.AMurderofCrows, nil, not TargetInRange40y) then return "a_murder_of_crows 250"; end
+    if HR.Cast(S.AMurderofCrows, Settings.Commons.GCDasOffGCD.AMurderofCrows, nil, not TargetInRange40y) then return "a_murder_of_crows 250"; end
   end
   -- flayed_shot
   if S.FlayedShot:IsReady() then
-    if HR.Cast(S.FlayedShot, nil, Settings.Commons.CovenantDisplayStyle) then return "flayed_shot st venthyr covenant"; end
+    if HR.Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot st venthyr covenant"; end
   end
   -- serpent_sting,target_if=min:dot.serpent_sting.remains,if=refreshable
   if S.SerpentSting:IsReady()  then
@@ -338,17 +339,17 @@ local function APL()
   end
   if Everyone.TargetIsValid() then
     -- Self heal, if below setting value
-    if S.Exhilaration:IsReady() and Player:HealthPercentage() <= Settings.Commons.ExhilarationHP then
-      if HR.Cast(S.Exhilaration, Settings.Commons.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
+    if S.Exhilaration:IsReady() and Player:HealthPercentage() <= Settings.Commons2.ExhilarationHP then
+      if HR.Cast(S.Exhilaration, Settings.Commons2.GCDasOffGCD.Exhilaration) then return "exhilaration"; end
     end
     -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons.OffGCDasOffGCD.CounterShot, false); if ShouldReturn then return ShouldReturn; end
+    local ShouldReturn = Everyone.Interrupt(40, S.CounterShot, Settings.Commons2.OffGCDasOffGCD.CounterShot, false); if ShouldReturn then return ShouldReturn; end
     -- auto_shot
     -- use_items,if=prev_gcd.1.trueshot|!talent.calling_the_shots.enabled|target.time_to_die<20
-    if (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
+    if HR.CDsON() and Settings.Commons.Enabled.Trinkets and (Player:PrevGCDP(1, S.Trueshot) or not S.CallingtheShots:IsAvailable() or Target:TimeToDie() < 20) then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- call_action_list,name=cds
