@@ -33,6 +33,7 @@ local I = Item.DemonHunter.Vengeance
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   I.PulsatingStoneheart:ID(),
+  I.DarkmoonDeckIndomitable:ID(),
 }
 
 -- Rotation Var
@@ -129,8 +130,8 @@ local function Precombat()
   -- food
   -- snapshot_stats
   -- potion
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 2"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury 2"; end
   end
   -- First attacks
   if S.InfernalStrike:IsCastable() and not IsInMeleeRange then
@@ -150,6 +151,9 @@ local function Defensives()
       if Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Danger)"; end
     end
   end
+  if I.DarkmoonDeckIndomitable:IsReady() and Settings.Commons.Enabled.Trinkets and Player:HealthPercentage() <= 75 then
+    if Cast(I.DarkmoonDeckIndomitable, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_indomitable defensives"; end
+  end
   -- Metamorphosis,if=!(talent.demonic.enabled)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
   -- Manually changed to:
   -- if=(!talent.demonic.enabled|buff.metamorphosis.down)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
@@ -163,7 +167,7 @@ local function Defensives()
   end
   -- Manual add: Door of Shadows with Enduring Gloom for the absorb shield
   if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() and IsTanking then
-    if Cast(S.DoorofShadows, nil, Settings.Commons.CovenantDisplayStyle) then return "door_of_shadows defensives"; end
+    if Cast(S.DoorofShadows, nil, Settings.Commons.DisplayStyle.Covenant) then return "door_of_shadows defensives"; end
   end
 end
 
@@ -180,29 +184,31 @@ end
 
 local function Cooldowns()
   -- potion
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 60"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury 60"; end
   end
   -- use_items
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  if Settings.Commons.Enabled.Trinkets then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
   if S.SinfulBrand:IsCastable() and (Target:BuffDown(S.SinfulBrandDebuff)) then
-    if Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 74"; end
+    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 74"; end
   end
   -- the_hunt
   if S.TheHunt:IsCastable() then
-    if Cast(S.TheHunt, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 76"; end
+    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 76"; end
   end
   -- fodder_to_the_flame
   if S.FoddertotheFlame:IsCastable() then
-    if Cast(S.FoddertotheFlame, nil, Settings.Commons.CovenantDisplayStyle) then return "fodder_to_the_flame 78"; end
+    if Cast(S.FoddertotheFlame, nil, Settings.Commons.DisplayStyle.Covenant) then return "fodder_to_the_flame 78"; end
   end
   -- elysian_decree
   if S.ElysianDecree:IsCastable() then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle) then return "elysian_decree 80"; end
+    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant) then return "elysian_decree 80"; end
   end
 end
 

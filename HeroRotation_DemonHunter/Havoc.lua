@@ -134,8 +134,8 @@ local function Precombat()
   -- food
   -- snapshot_stats
   -- potion
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 2"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury 2"; end
   end
   -- Manually added: Fel Rush if out of range
   if not Target:IsInMeleeRange(5) and S.FelRush:IsCastable() then
@@ -158,29 +158,29 @@ local function Cooldown()
   end
   -- sinful_brand,if=!dot.sinful_brand.ticking
   if S.SinfulBrand:IsCastable() and (Target:DebuffDown(S.SinfulBrandDebuff)) then
-    if Cast(S.SinfulBrand, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 26"; end
+    if Cast(S.SinfulBrand, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SinfulBrand)) then return "sinful_brand 26"; end
   end
   -- the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum|buff.furious_gaze.up
   if S.TheHunt:IsCastable() and (not S.Demonic:IsAvailable() and not VarWaitingForMomentum or Player:BuffUp(S.FuriousGazeBuff)) then
-    if Cast(S.TheHunt, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 28"; end
+    if Cast(S.TheHunt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.TheHunt)) then return "the_hunt 28"; end
   end
   -- fodder_to_the_flame
   if S.FoddertotheFlame:IsCastable() then
-    if Cast(S.FoddertotheFlame, nil, Settings.Commons.CovenantDisplayStyle) then return "fodder_to_the_flame 30"; end
+    if Cast(S.FoddertotheFlame, nil, Settings.Commons.DisplayStyle.Covenant) then return "fodder_to_the_flame 30"; end
   end
   -- elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
   if S.ElysianDecree:IsCastable() and (EnemiesCount8 > 0) then
-    if Cast(S.ElysianDecree, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(30)) then return "elysian_decree 32"; end
+    if Cast(S.ElysianDecree, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsInRange(30)) then return "elysian_decree 32"; end
   end
   -- potion,if=buff.metamorphosis.remains>25|fight_remains<60
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or HL.BossFilteredFightRemains("<", 60)) then
-    if CastSuggested(I.PotionofPhantomFire) then return "potion_of_unbridled_fury 34"; end
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffRemains(S.MetamorphosisBuff) > 25 or HL.BossFilteredFightRemains("<", 60)) then
+    if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_unbridled_fury 34"; end
   end
   -- use_items,if=buff.metamorphosis.up
-  if (Player:BuffUp(S.MetamorphosisBuff)) then
+  if Settings.Commons.Enabled.Trinkets and (Player:BuffUp(S.MetamorphosisBuff)) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
 end

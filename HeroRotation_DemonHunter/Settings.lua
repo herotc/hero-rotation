@@ -17,10 +17,15 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.DemonHunter = {
   Commons = {
-    UsePotions  = true,
-    UseTrinkets = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Covenant = "Suggested",
+      Trinkets = "Suggested",
+    },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       Racials = true,
@@ -69,10 +74,6 @@ HR.GUISettings.APL.DemonHunter = {
   local CP_Vengeance = CreateChildPanel(CP_DemonHunter, "Vengeance")
 
 CreateARPanelOptions(CP_DemonHunter, "APL.DemonHunter.Commons")
-CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UsePotions", "Use Potions", "Use Potions as part of the rotation")
-CreatePanelOption("CheckButton", CP_DemonHunter, "APL.DemonHunter.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
-CreatePanelOption("Dropdown", CP_DemonHunter, "APL.DemonHunter.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_DemonHunter, "APL.DemonHunter.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.")
 
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.MetamorphosisHealthThreshold", {5, 100, 5}, "Metamorphosis Health Threshold", "Suggest Metamorphosis when below this health percentage.")
 CreatePanelOption("Slider", CP_Vengeance, "APL.DemonHunter.Vengeance.FieryBrandHealthThreshold", {5, 100, 5}, "Fiery Brand Health Threshold", "Suggest Fiery Brand when below this health percentage.")
