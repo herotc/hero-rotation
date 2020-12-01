@@ -49,8 +49,14 @@
   end
 
   do
+    local function GCDName (Name)
+      return stringformat("Show GCD as Off GCD: %s", Name);
+    end
+    local function GCDDesc (Name)
+      return stringformat("Enable if you want to put %s shown as Off GCD (top icons) instead of Main (Middle icon).", Name);
+    end
     local function OffGCDName (Name)
-      return stringformat("Show as Off GCD: %s", Name);
+      return stringformat("Show Off GCD as Off GCD: %s", Name);
     end
     local function OffGCDDesc (Name)
       return stringformat("Enable if you want to put %s shown as Off GCD (top icons) instead of Main (Middle icon).", Name);
@@ -59,10 +65,13 @@
       Enabled = function (Panel, Setting, Name)
         CreatePanelOption("CheckButton", Panel, Setting, "Show: " .. Name, "Enable if you want to show when to use " .. Name .. ".");
       end,
-      GCDasOffGCD = function (Panel, Setting, Name)
-        CreatePanelOption("CheckButton", Panel, Setting, OffGCDName(Name), OffGCDDesc(Name));
+      DisplayStyle = function(Panel, Setting, Name)
+        CreatePanelOption("Dropdown", Panel, Setting, {"Main Icon", "Suggested", "Cooldown"}, "Display Style: " .. Name, "Define which icon display style to use for " .. Name .. ".");
       end,
-      OffGCDasOffGCD = function (Panel, Setting, Name)
+      GCDasOffGCD = function(Panel, Setting, Name)
+        CreatePanelOption("CheckButton", Panel, Setting, GCDName(Name), GCDDesc(Name));
+      end,
+      OffGCDasOffGCD = function(Panel, Setting, Name)
         CreatePanelOption("CheckButton", Panel, Setting, OffGCDName(Name), OffGCDDesc(Name));
       end
     };
