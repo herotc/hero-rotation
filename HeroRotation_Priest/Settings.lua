@@ -17,10 +17,15 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Priest = {
   Commons = {
-    UseTrinkets = true,
-    UsePotions = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Trinkets = "Suggested",
+      Covenant = "Suggested",
+    },
     GCDasOffGCD = {
       -- Abilities
     },
@@ -32,7 +37,7 @@ HR.GUISettings.APL.Priest = {
     }
   },
   Shadow = {
-    DispersionHP = 10,
+    DispersionHP = 30,
     SelfPI = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -75,10 +80,6 @@ local CP_Shadow = CreateChildPanel(CP_Priest, "Shadow")
 local CP_Discipline = CreateChildPanel(CP_Priest, "Discipline")
 
 CreateARPanelOptions(CP_Priest, "APL.Priest.Commons")
-CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use potions.")
-CreatePanelOption("CheckButton", CP_Priest, "APL.Priest.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
-CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Priest, "APL.Priest.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.")
 
 --Shadow
 CreatePanelOption("Slider", CP_Shadow, "APL.Priest.Shadow.DispersionHP", {0, 100, 1}, "Dispersion HP", "Set the Dispersion HP threshold.")

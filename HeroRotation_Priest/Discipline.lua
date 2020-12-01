@@ -111,20 +111,22 @@ local function Cds()
     if HR.Cast(S.ShadowCovenant, Settings.Discipline.GCDasOffGCD.ShadowCovenant) then return "shadow_covenant cd 10"; end
   end
   -- use_items
-  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  if Settings.Commons.Enabled.Trinkets then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
   end
 end
 
 local function Boon()
   -- ascended_blast,if=spell_targets.mind_sear<=3
   if S.AscendedBlast:IsReady() and (EnemiesCount10ySplash <= 3) then
-    if HR.Cast(S.AscendedBlast, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 1"; end
+    if HR.Cast(S.AscendedBlast, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 1"; end
   end
   -- ascended_nova,if=(spell_targets.mind_sear>2&talent.searing_nightmare.enabled|(spell_targets.mind_sear>1&!talent.searing_nightmare.enabled))&spell_targets.ascended_nova>1
   if S.AscendedNova:IsReady() and EnemiesCount10ySplash > 1 then
-    if HR.Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(8)) then return "ascended_nova 2"; end
+    if HR.Cast(S.AscendedNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsInRange(8)) then return "ascended_nova 2"; end
   end
 end
 

@@ -171,8 +171,8 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
-      if CastSuggested(I.PotionofPhantomFire) then return "potion_of_spectral_intellect 2"; end
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions then
+      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 2"; end
     end
     -- shadowform,if=!buff.shadowform.up
     if S.Shadowform:IsCastable() and (Player:BuffDown(S.ShadowformBuff)) then
@@ -210,7 +210,7 @@ local function Cds()
   end
   -- Covenant: fae_guardians,if=!buff.voidform.up&(!cooldown.void_torrent.up|!talent.void_torrent.enabled)|buff.voidform.up&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled)
   if S.FaeGuardians:IsReady() and (Player:BuffDown(S.VoidformBuff) and (not S.VoidTorrent:CooldownUp() or not S.VoidTorrent:IsAvailable()) or Player:BuffUp(S.VoidformBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable())) then
-    if Cast(S.FaeGuardians, Settings.Commons.CovenantDisplayStyle) then return "fae_guardians 52"; end
+    if Cast(S.FaeGuardians, Settings.Commons.DisplayStyle.Covenant) then return "fae_guardians 52"; end
   end
   -- Covenant: mindgames,target_if=insanity<90&(variable.all_dots_up|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)&(!talent.searing_nightmare.enabled|spell_targets.mind_sear<5)
   if S.Mindgames:IsReady() then
@@ -218,21 +218,21 @@ local function Cds()
   end
   -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10)
   if S.UnholyNova:IsReady() and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10) then
-    if Cast(S.UnholyNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
+    if Cast(S.UnholyNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&prev_gcd.1.void_bolt)|(buff.voidform.up&talent.searing_nightmare.enabled)
   if S.BoonoftheAscended:IsCastable() and (Player:BuffDown(S.VoidformBuff) and not S.VoidEruption:CooldownUp() and EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffUp(S.VoidformBuff) and EnemiesCount10ySplash < 2 and not S.SearingNightmare:IsAvailable() and Player:PrevGCD(1, S.VoidBolt)) or (Player:BuffUp(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
-    if Cast(S.BoonoftheAscended, Settings.Commons.CovenantDisplayStyle) then return "boon_of_the_ascended 58"; end
+    if Cast(S.BoonoftheAscended, Settings.Commons.DisplayStyle.Covenant) then return "boon_of_the_ascended 58"; end
   end
   -- use_item,name=sinful_gladiators_badge_of_ferocity,if=buff.voidform.up|time>10&(!covenant.night_fae)
   if I.SinfulGladiatorsBadgeofFerocity:IsEquipped() and I.SinfulGladiatorsBadgeofFerocity:IsReady() and (Player:BuffUp(S.VoidformBuff) or HL.CombatTime() > 10 and not Player:Covenant() == "Night Fae") then
     if Cast(I.SinfulGladiatorsBadgeofFerocity) then return "sinful_gladiators_badge_of_ferocity 60"; end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up
-  if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
+  if Settings.Commons.Enabled.Trinkets and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
 end
@@ -240,11 +240,11 @@ end
 local function Boon()
   -- ascended_blast,if=spell_targets.mind_sear<=3
   if S.AscendedBlast:IsReady() and (EnemiesCount10ySplash <= 3) then
-    if Cast(S.AscendedBlast, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 70"; end
+    if Cast(S.AscendedBlast, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.AscendedBlast)) then return "ascended_blast 70"; end
   end
   -- ascended_nova,if=spell_targets.ascended_nova>1&spell_targets.mind_sear>1+talent.searing_nightmare.enabled
   if S.AscendedNova:IsReady() and (#Enemies8yMelee > 1 and EnemiesCount10ySplash > (1 + num(S.SearingNightmare:IsAvailable()))) then
-    if Cast(S.AscendedNova, Settings.Commons.CovenantDisplayStyle, nil, not Target:IsInRange(8)) then return "ascended_nova 72"; end
+    if Cast(S.AscendedNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsInRange(8)) then return "ascended_nova 72"; end
   end
 end
 
@@ -406,8 +406,8 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(30, S.Silence, Settings.Commons.OffGCDasOffGCD.Silence, false); if ShouldReturn then return ShouldReturn; end
     -- potion,if=buff.voidform.up|buff.power_infusion.up
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
-      if CastSuggested(I.PotionofPhantomFire) then return "potion_of_spectral_intellect 20"; end
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
+      if Cast(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion_of_spectral_intellect 20"; end
     end
     -- variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
     VarDotsUp = DotsUp(Target, false)
