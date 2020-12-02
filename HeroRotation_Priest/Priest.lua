@@ -143,5 +143,13 @@ Item.Priest.Shadow = {
   -- Potion
   PotionofPhantomFire              = Item(171352),
   -- Trinkets
-  SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14})
+  DarkmoonDeckPutrescence          = Item(173069, {13, 14}),
+  DreadfireVessel                  = Item(184030, {13, 14}),
+  EmpyrealOrdinance                = Item(180117, {13, 14}),
+  GlyphofAssimilation              = Item(184021, {13, 14}),
+  InscrutableQuantumDevice         = Item(179350, {13, 14}),
+  MacabreSheetMusic                = Item(184024, {13, 14}),
+  SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
+  SoullettingRuby                  = Item(178809, {13, 14}),
+  SunbloodAmethyst                 = Item(178826, {13, 14}),
 }

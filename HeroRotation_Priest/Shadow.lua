@@ -32,7 +32,15 @@ local I = Item.Priest.Shadow
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.SinfulGladiatorsBadgeofFerocity:ID()
+  I.DarkmoonDeckPutrescence:ID(),
+  I.DreadfireVessel:ID(),
+  I.EmpyrealOrdinance:ID(),
+  I.GlyphofAssimilation:ID(),
+  I.InscrutableQuantumDevice:ID(),
+  I.MacabreSheetMusic:ID(),
+  I.SinfulGladiatorsBadgeofFerocity:ID(),
+  I.SoullettingRuby:ID(),
+  I.SunbloodAmethyst:ID()
 }
 
 -- Rotation Var
@@ -151,11 +159,19 @@ local function EvaluateCycleMindSear224(TargetUnit)
 end
 
 local function EvaluateCycleMindgames226(TargetUnit)
-  return (Player:Insanity() < 90 and (DotsUp(TargetUnit, true) or Player:BuffUp(S.VoidformBuff)) and (not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff) or Player:BuffDown(S.VoidformBuff)) and (not S.SearingNightmare:IsAvailable() or Enemies10ySplash < 5))
+  return (Player:Insanity() < 90 and ((DotsUp(TargetUnit, true) and (not S.VoidEruption:CooldownUp() or not S.HungeringVoid:IsAvailable())) or Player:BuffUp(S.VoidformBuff)) and (not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff) or Player:BuffDown(S.VoidformBuff)) and (not S.SearingNightmare:IsAvailable() or EnemiesCount10ySplash < 5))
 end
 
 local function EvaluateCycleSilence228(TargetUnit)
   return (TargetUnit:IsInterruptible())
+end
+
+local function EvaluateTargetIfFilterSoullettingRuby230(TargetUnit)
+  return TargetUnit:HealthPercentage()
+end
+
+local function EvaluateTargetIfSoullettingRuby232(TargetUnit)
+  return Player:BuffUp(S.PowerInfusionBuff)
 end
 
 local function Precombat()
@@ -199,6 +215,59 @@ local function Precombat()
   end
 end
 
+local function DmgTrinkets()
+  -- use_item,name=darkmoon_deck_putrescence
+  if I.DarkmoonDeckPutrescence:IsReady() then
+    if Cast(I.DarkmoonDeckPutrescence, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "darkmoon_deck_putrescence"; end
+  end
+  -- use_item,name=sunblood_amethyst
+  if I.SunbloodAmethyst:IsReady() then
+    if Cast(I.SunbloodAmethyst, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "sunblood_amethyst"; end
+  end
+  -- use_item,name=glyph_of_assimilation
+  if I.GlyphofAssimilation:IsReady() then
+    if Cast(I.GlyphofAssimilation, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "glyph_of_assimilation"; end
+  end
+  -- use_item,name=dreadfire_vessel
+  if I.DreadfireVessel:IsReady() then
+    if Cast(I.DreadfireVessel, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(50)) then return "dreadfire_vessel"; end
+  end
+end
+
+local function Trinkets()
+  -- use_item,name=empyreal_ordnance,if=cooldown.void_eruption.remains<=12|buff.voidform.up|cooldown.void_eruption.remains>27
+  if I.EmpyrealOrdinance:IsReady() and (S.VoidEruption:CooldownRemains() <= 12 or Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 27) then
+    if Cast(I.EmpyrealOrdinance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance"; end
+  end
+  -- use_item,name=inscrutable_quantum_device,if=buff.voidform.up|cooldown.void_eruption.remains>10
+  if I.InscrutableQuantumDevice:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10) then
+    if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device"; end
+  end
+  -- use_item,name=macabre_sheet_music,if=buff.voidform.up|cooldown.void_eruption.remains>10
+  if I.MacabreSheetMusic:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10) then
+    if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music"; end
+  end
+  -- use_item,name=soulletting_ruby,if=buff.power_infusion.up,target_if=min:target.health.pct
+  if I.SoullettingRuby:IsReady() then
+    if Everyone.CastTargetIf(I.SoullettingRuby, Enemies40y, "min", EvaluateTargetIfFilterSoullettingRuby230, EvaluateTargetIfSoullettingRuby232) then return "soulletting_ruby"; end
+  end
+  -- use_item,name=sinful_gladiators_badge_of_ferocity,if=buff.voidform.up|cooldown.void_eruption.remains>=10
+  if I.SinfulGladiatorsBadgeofFerocity:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() >= 10) then
+    if Cast(I.SinfulGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_gladiators_badge_of_ferocity"; end
+  end
+  -- call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
+  if ((not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff)) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10)) then
+    local ShouldReturn = DmgTrinkets(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- use_items,if=buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10
+  if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10) then
+    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
+    if TrinketToUse then
+      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
+    end
+  end
+end
+
 local function Cds()
   -- power_infusion,if=buff.voidform.up|!soulbind.combat_meditation.enabled&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains
   if S.PowerInfusion:IsCastable() and (Player:BuffUp(S.VoidformBuff) or not S.CombatMeditation:IsAvailable() and S.VoidEruption:CooldownRemains() >= 10 or HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains())) then
@@ -212,7 +281,7 @@ local function Cds()
   if S.FaeGuardians:IsReady() and (Player:BuffDown(S.VoidformBuff) and (not S.VoidTorrent:CooldownUp() or not S.VoidTorrent:IsAvailable()) or Player:BuffUp(S.VoidformBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldofBlossoms:IsAvailable())) then
     if Cast(S.FaeGuardians, Settings.Commons.DisplayStyle.Covenant) then return "fae_guardians 52"; end
   end
-  -- Covenant: mindgames,target_if=insanity<90&(variable.all_dots_up|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)&(!talent.searing_nightmare.enabled|spell_targets.mind_sear<5)
+  -- Covenant: mindgames,target_if=insanity<90&((variable.all_dots_up&(!cooldown.void_eruption.up|!talent.hungering_void.enabled))|buff.voidform.up)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)&(!talent.searing_nightmare.enabled|spell_targets.mind_sear<5)
   if S.Mindgames:IsReady() then
     if Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
@@ -224,16 +293,9 @@ local function Cds()
   if S.BoonoftheAscended:IsCastable() and (Player:BuffDown(S.VoidformBuff) and not S.VoidEruption:CooldownUp() and EnemiesCount10ySplash > 1 and not S.SearingNightmare:IsAvailable() or (Player:BuffUp(S.VoidformBuff) and EnemiesCount10ySplash < 2 and not S.SearingNightmare:IsAvailable() and Player:PrevGCD(1, S.VoidBolt)) or (Player:BuffUp(S.VoidformBuff) and S.SearingNightmare:IsAvailable())) then
     if Cast(S.BoonoftheAscended, Settings.Commons.DisplayStyle.Covenant) then return "boon_of_the_ascended 58"; end
   end
-  -- use_item,name=sinful_gladiators_badge_of_ferocity,if=buff.voidform.up|time>10&(!covenant.night_fae)
-  if I.SinfulGladiatorsBadgeofFerocity:IsEquipped() and I.SinfulGladiatorsBadgeofFerocity:IsReady() and (Player:BuffUp(S.VoidformBuff) or HL.CombatTime() > 10 and not Player:Covenant() == "Night Fae") then
-    if Cast(I.SinfulGladiatorsBadgeofFerocity) then return "sinful_gladiators_badge_of_ferocity 60"; end
-  end
-  -- use_items,if=buff.voidform.up|buff.power_infusion.up
-  if Settings.Commons.Enabled.Trinkets and (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff)) then
-    local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-    if TrinketToUse then
-      if Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name(); end
-    end
+  -- call_action_list,name=trinkets
+  if (Settings.Commons.Enabled.Trinkets) then
+    local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
   end
 end
 
