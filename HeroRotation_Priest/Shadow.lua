@@ -171,7 +171,7 @@ local function EvaluateTargetIfFilterSoullettingRuby230(TargetUnit)
 end
 
 local function EvaluateTargetIfSoullettingRuby232(TargetUnit)
-  return Player:BuffUp(S.PowerInfusionBuff)
+  return (Player:BuffUp(S.PowerInfusionBuff) or not Settings.Shadow.SelfPI)
 end
 
 local function Precombat()
@@ -247,7 +247,7 @@ local function Trinkets()
   if I.MacabreSheetMusic:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10) then
     if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music"; end
   end
-  -- use_item,name=soulletting_ruby,if=buff.power_infusion.up,target_if=min:target.health.pct
+  -- use_item,name=soulletting_ruby,if=buff.power_infusion.up|!priest.self_power_infusion,target_if=min:target.health.pct
   if I.SoullettingRuby:IsReady() then
     if Everyone.CastTargetIf(I.SoullettingRuby, Enemies40y, "min", EvaluateTargetIfFilterSoullettingRuby230, EvaluateTargetIfSoullettingRuby232) then return "soulletting_ruby"; end
   end
@@ -285,8 +285,8 @@ local function Cds()
   if S.Mindgames:IsReady() then
     if Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
-  -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10)
-  if S.UnholyNova:IsReady() and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10) then
+  -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10|!priest.self_power_infusion)
+  if S.UnholyNova:IsReady() and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10 or not Settings.Shadow.SelfPI) then
     if Cast(S.UnholyNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&prev_gcd.1.void_bolt)|(buff.voidform.up&talent.searing_nightmare.enabled)
