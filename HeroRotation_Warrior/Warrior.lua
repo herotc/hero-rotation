@@ -23,6 +23,9 @@ local HR         = HeroRotation
 if not Spell.Warrior then Spell.Warrior = {} end
 
 Spell.Warrior.Fury = {
+  -- Raid Buffs
+  Bloodlust                             = Spell(2825),
+
   -- Racials
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
@@ -42,7 +45,6 @@ Spell.Warrior.Fury = {
   Bloodbath                             = Spell(335096),
   CrushingBlow                          = Spell(335097),
   RagingBlow                            = Spell(85288),
-  Bladestorm                            = Spell(46924),
   Whirlwind                             = Spell(190411),
   Charge                                = Spell(100),
   FujiedasFuryBuff                      = Spell(207775),
@@ -51,6 +53,8 @@ Spell.Warrior.Fury = {
   IntimidatingShout                     = Spell(5246),
 
   -- Talents
+  Bladestorm                            = Spell(46924),
+  Cruelty                               = Spell(335070),
   DragonRoar                            = Spell(118000),
   FrothingBerserker                     = Spell(215571),
   Massacre                              = Spell(206315),
@@ -61,12 +65,23 @@ Spell.Warrior.Fury = {
   Siegebreaker                          = Spell(280772),
   SiegebreakerDebuff                    = Spell(280773),
   StormBolt                             = Spell(107570),
+  Frenzy                                = Spell(335077),
+  FrenzyBuff                            = Spell(335077),
+  AngerManagement                       = Spell(152278),
 
   -- Covenant Abilities
-
+  AncientAftershock                     = Spell(325886),
+  Condemn                               = Spell(317349),
+  CondemnDebuff                         = Spell(317491),
+  ConquerorsBanner                      = Spell(324143),
+  ConquerorsFrenzyBuff                  = Spell(343672),
+  SpearofBastion                        = Spell(307865),
+  SpearofBastionBuff                    = Spell(307871),
+  
   -- Legendary Effects
-
+  WilloftheBerserker                    = Spell(335594),
   -- Conduits
+  ViciousContempt                       = Spell(337302),
 
   -- Item Buffs/Debuffs
   RazorCoralDebuff                      = Spell(303568),
@@ -93,7 +108,7 @@ Spell.Warrior.Arms = {
   ColossusSmash                         = Spell(167105),
   ColossusSmashDebuff                   = Spell(208086),
   DeepWoundsDebuff                      = Spell(262115),
-  Execute                               = MultiSpell(163201, 281000),
+  Execute                               = Spell(163201),
   HeroicLeap                            = Spell(6544),
   IntimidatingShout                     = Spell(5246),
   MortalStrike                          = Spell(12294),
@@ -128,7 +143,13 @@ Spell.Warrior.Arms = {
   WarMachineBuff                        = Spell(262231),
 
   -- Covenant Abilities
-
+  AncientAftershock                     = Spell(325886),
+  Condemn                               = Spell(317349),
+  CondemnDebuff                         = Spell(317491),
+  ConquerorsBanner                      = Spell(324143),
+  ConquerorsFrenzyBuff                  = Spell(343672),
+  SpearofBastion                        = Spell(307865),
+  SpearofBastionBuff                    = Spell(307871),
   -- Legendary Effects
 
   -- Conduits
@@ -200,19 +221,14 @@ Spell.Warrior.Protection = {
 -- Items
 if not Item.Warrior then Item.Warrior = {} end
 Item.Warrior.Fury = {
-  PotionofUnbridledFury            = Item(169299),
-  GrongsPrimalRage                 = Item(165574, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
+  PotionofPhantomFire              = Item(171349),
+  GrimCodex                        = Item(178811, {13, 14}),
+  DDVoracity                       = Item(173087, {13, 14}),
 }
 
 Item.Warrior.Arms = {
-  PotionofUnbridledFury            = Item(169299),
-  GrongsPrimalRage                 = Item(165574, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14}),
-  AshvanesRazorCoral               = Item(169311, {13, 14}),
-  AzsharasFontofPower              = Item(169314, {13, 14}),
+  PotionofPhantomFire              = Item(171349),
+  GrimCodex                        = Item(178811, {13, 14}),
 }
 
 Item.Warrior.Protection = {
