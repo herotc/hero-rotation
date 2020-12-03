@@ -241,7 +241,7 @@ local function Aoe()
     if Everyone.CastCycle(S.Agony, Enemies40y, EvaluateCycleAgony2, not Target:IsSpellInRange(S.Agony)) then return "Agony Aoe 2"; end
   end
   -- unstable_affliction,if=dot.unstable_affliction.refreshable
-  if S.UnstableAffliction:IsReady()  then
+  if S.UnstableAffliction:IsReady() and not Player:IsCasting(S.UnstableAffliction) then
     if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction Aoe"; end
   end
   -- vile_taint,if=soul_shard>1
