@@ -187,6 +187,10 @@ local function Darkglare_prep()
   if S.Berserking:IsCastable() then
     if Cast(S.Berserking) then return "Berserking Darkglare_prep"; end
   end
+  -- call_action_list,name=covenant,if=!covenant.necrolord&cooldown.summon_darkglare.remains<2
+  if not Player:Covenant() == "Necrolord" and S.SummonDarkglare:CooldownRemains() < 2 then
+    local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
+  end
   -- summon_darkglare
   if S.SummonDarkglare:IsReady() then
     if Cast(S.SummonDarkglare, Settings.Affliction.GCDasOffGCD.SummonDarkglare) then return "SummonDarkglare Darkglare_prep"; end
@@ -248,6 +252,10 @@ local function Aoe()
   if S.VileTaint:IsReady() and (Player:SoulShardsP() > 1) then
     if Cast(S.VileTaint) then return "VileTaint Aoe"; end
   end
+  -- call_action_list,name=covenant,if=!covenant.necrolord
+  if not Player:Covenant() == "Necrolord" then
+    local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
+  end
   -- call_action_list,name=darkglare_prep,if=cooldown.summon_darkglare.ready&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
   if S.SummonDarkglare:IsReady() and CDsON() and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable()) then
     local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
@@ -272,6 +280,10 @@ local function Aoe()
   if S.SiphonLife:IsReady() and (EnemiesSiphonLifeCount <= 3) then
     if Everyone.CastCycle(S.SiphonLife, Enemies40y, EvaluateCycleSiphonLife1, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife Aoe"; end
   end
+  -- call_action_list,name=covenant
+  if (true) then
+    local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
+  end
   -- drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5
   if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5) then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife Aoe"; end
@@ -283,6 +295,28 @@ local function Aoe()
   -- shadow_bolt
   if S.ShadowBolt:IsReady() then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt Aoe"; end
+  end
+end
+
+local function Covenant()
+  -- impending_catastrophe,if=cooldown.summon_darkglare.remains<10|cooldown.summon_darkglare.remains>50
+  if S.ImpendingCatastrophe:IsReady() and (S.SummonDarkglare:CooldownRemains() < 10 or S.SummonDarkglare:CooldownRemains() > 50) then
+    if HR.Cast(S.ImpendingCatastrophe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ImpendingCatastrophe)) then return "impending_catastrophe 142"; end
+  end
+
+  -- decimating_bolt,if=cooldown.summon_darkglare.remains>5&(debuff.haunt.remains>4|!talent.haunt.enabled)
+  if S.DecimatingBolt:IsReady() and S.SummonDarkglare:CooldownRemains() > 5 and (not S.Haunt:IsAvailable() or Target:DebuffRemains(S.Haunt) > 4) then
+    if HR.Cast(S.DecimatingBolt, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.DecimatingBolt)) then return "decimating_bolt 148"; end
+  end
+
+  -- soul_rot,if=cooldown.summon_darkglare.remains<5|cooldown.summon_darkglare.remains>50
+  if S.SoulRot:IsReady() and (S.SummonDarkglare:CooldownRemains() < 5 or S.SummonDarkglare:CooldownRemains() > 50) then
+    if HR.Cast(S.SoulRot, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.SoulRot)) then return "soul_rot 146"; end
+  end
+
+  -- scouring_tithe
+  if S.ScouringTithe:IsReady() and not Player:IsCasting(S.ScouringTithe) then
+    if HR.Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe 144"; end
   end
 end
 
@@ -347,6 +381,10 @@ local function APL()
     if S.UnstableAffliction:IsReady() and (Target:DebuffRefreshable(S.UnstableAfflictionDebuff)) and not Player:IsCasting(S.UnstableAffliction) then
       if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction InCombat 1"; end
     end
+    -- call_action_list,name=covenant,if=!covenant.necrolord
+    if not Player:Covenant() == "Necrolord" then
+      local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
+    end
     -- corruption,if=(active_enemies<3|talent.vile_taint.enabled|talent.writhe_in_agony.enabled&!talent.sow_the_seeds.enabled)&refreshable
     if S.Corruption:IsReady() and ((EnemiesCount10ySplash < 3 or S.VileTaint:IsAvailable() or S.WritheinAgony:IsAvailable() and not S.SowtheSeeds:IsAvailable()) and Target:DebuffRefreshable(S.CorruptionDebuff)) then
       if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 1"; end
@@ -396,6 +434,10 @@ local function APL()
     -- drain_life,if=buff.inevitable_demise.stack>30|buff.inevitable_demise.up&time_to_die<5
     if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) > 30 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5) then
       if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife InCombat"; end
+    end
+    -- call_action_list,name=covenant
+    if (true) then
+      local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
     end
     -- drain_life,if=buff.inevitable_demise_az.stack>30 TODO
     -- drain_soul
