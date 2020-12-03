@@ -172,7 +172,7 @@ local function Darkglare_prep()
   end
   -- dark_soul
   if S.DarkSoulMisery:IsReady() then
-    if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Darkglare_prep"; end
+    if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery Darkglare_prep"; end
   end
   -- potion TODO
   -- fireblood
@@ -254,7 +254,7 @@ local function Aoe()
   end
   -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
   if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
-    if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Aoe"; end
+    if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery Aoe"; end
   end
   -- call_action_list,name=cooldowns
   local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
@@ -344,8 +344,8 @@ local function APL()
       if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "SiphonLife InCombat"; end
     end
     -- unstable_affliction,if=refreshable
-    if S.UnstableAffliction:IsReady() and not Player:IsCasting(S.UnstableAffliction) then
-      if Everyone.CastCycle(S.UnstableAffliction, Enemies40y, EvaluateCycleUnstableAffliction, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction InCombat 1"; end
+    if S.UnstableAffliction:IsReady() and (Target:DebuffRefreshable(S.UnstableAfflictionDebuff)) and not Player:IsCasting(S.UnstableAffliction) then
+      if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction InCombat 1"; end
     end
     -- corruption,if=(active_enemies<3|talent.vile_taint.enabled|talent.writhe_in_agony.enabled&!talent.sow_the_seeds.enabled)&refreshable
     if S.Corruption:IsReady() and ((EnemiesCount10ySplash < 3 or S.VileTaint:IsAvailable() or S.WritheinAgony:IsAvailable() and not S.SowtheSeeds:IsAvailable()) and Target:DebuffRefreshable(S.CorruptionDebuff)) then
@@ -373,7 +373,7 @@ local function APL()
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
     if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
-      if Cast(S.DarkSoulMisery) then return "DarkSoulMisery InCombat"; end
+      if Cast(S.DarkSoulMisery, Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery InCombat"; end
     end
     -- call_action_list,name=item TODO
     local ShouldReturn = ItemFunc(); if ShouldReturn then return ShouldReturn; end
