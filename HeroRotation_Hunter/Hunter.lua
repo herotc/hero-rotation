@@ -150,13 +150,9 @@ if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
   -- Potions/Trinkets
   -- "Other On Use"
-  PotionOfSpectralAgility = Item(171270),
-  SoulForgeEmbersChest = Item(172327),
-  SoulForgeEmbersHead = Item(172325)
+  PotionOfSpectralAgility = Item(171270)
 }
 
 Item.Hunter.Marksmanship = {
-  PotionOfSpectralAgility = Item(171270),
-  SoulForgeEmbersChest = Item(172327),
-  SoulForgeEmbersHead = Item(172325)
+  PotionOfSpectralAgility = Item(171270)
 }
