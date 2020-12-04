@@ -21,34 +21,33 @@ local HR         = HeroRotation
 
 -- Spells
 
-local S = Spell.Druid.Guardian;
-local I = Item.Druid.Guardian;
+local S = Spell.Druid.Guardian
 
--- Create table to exclude above trinkets from On Use function
-local OnUseExcludes = {
-  I.PocketsizedComputationDevice:ID(),
-  I.AshvanesRazorCoral:ID()
+-- Items
+local I = Item.Druid.Guardian
+local OnUseExcludeTrinkets = {
+  --  I.TrinketName:ID(),
 }
 
 -- Rotation Var
-local ShouldReturn; -- Used to get the return string
-local IsTanking;
-local AoERadius; -- Range variables
-local EnemiesCount;
-local UseMaul;
+local ShouldReturn -- Used to get the return string
+local IsTanking
+local AoERadius -- Range variables
+local EnemiesCount
+local UseMaul
 
 -- GUI Settings
-local Everyone = HR.Commons.Everyone;
+local Everyone = HR.Commons.Everyone
 local Settings = {
   General = HR.GUISettings.General,
   Commons = HR.GUISettings.APL.Druid.Commons,
   Guardian = HR.GUISettings.APL.Druid.Guardian
-};
+}
 
 HL:RegisterForEvent(function()
-  S.ConcentratedFlame:RegisterInFlight();
+  S.ConcentratedFlame:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
-S.ConcentratedFlame:RegisterInFlight();
+S.ConcentratedFlame:RegisterInFlight()
 
 local function num(val)
   if val then return 1 else return 0 end
@@ -63,12 +62,20 @@ local function EvaluateCyclePulverize77(TargetUnit)
 end
 
 local function EvaluateCycleMoonfire88(TargetUnit)
-  return TargetUnit:DebuffRefreshableCP(S.MoonfireDebuff) and EnemiesCount < 2
+  return TargetUnit:DebuffRefreshable(S.MoonfireDebuff) and EnemiesCount < 2
 end
 
 local function EvaluateCycleMoonfire139(TargetUnit)
   return Player:BuffUp(S.GalacticGuardianBuff) and EnemiesCount < 2
 end
+
+local function Trinkets ()
+  -- use_items
+  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludeTrinkets)
+  if TrinketToUse then
+    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() end
+  end  
+end 
 
 local function Precombat()
   -- flask
@@ -114,7 +121,7 @@ local function Cleave()
     if HR.Cast(S.Mangle, nil, nil, "Melee") then return "mangle 59"; end
   end
   -- moonfire,target_if=buff.galactic_guardian.up&active_enemies=1|dot.moonfire.refreshable
-  if S.Moonfire:IsCastable() and (Player:BuffUp(S.GalacticGuardianBuff) and Enemies8y == 1 or Target:DebuffRefreshableCP(S.MoonfireDebuff)) then
+  if S.Moonfire:IsCastable() and (Player:BuffUp(S.GalacticGuardianBuff) and #Enemies8y == 1 or Target:DebuffRefreshable(S.MoonfireDebuff)) then
     if HR.Cast(S.Moonfire, nil, nil, 40) then return "moonfire 61"; end
   end
   -- maul
@@ -131,28 +138,6 @@ local function Cleave()
   end
 end
 
-local function Essences()
-  -- concentrated_flame,if=essence.the_crucible_of_flame.major&((!dot.concentrated_flame_burn.ticking&!action.concentrated_flame_missile.in_flight)^time_to_die<=7)
-  if S.ConcentratedFlame:IsCastable() and ((Target:DebuffDown(S.ConcentratedFlameBurn) and not S.ConcentratedFlame:InFlight()) or Target:TimeToDie() <= 7) then
-    if HR.Cast(S.ConcentratedFlame, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "concentrated_flame 71"; end
-  end
-  -- anima_of_death,if=essence.anima_of_life_and_death.major
-  if S.AnimaofDeath:IsCastable() then
-    if HR.Cast(S.AnimaofDeath, nil, Settings.Commons.EssenceDisplayStyle, 8) then return "anima_of_death 73"; end
-  end
-  -- memory_of_lucid_dreams,if=essence.memory_of_lucid_dreams.major
-  if S.MemoryofLucidDreams:IsCastable() then
-    if HR.Cast(S.MemoryofLucidDreams, nil, Settings.Commons.EssenceDisplayStyle) then return "memory_of_lucid_dreams 75"; end
-  end
-  -- worldvein_resonance,if=essence.worldvein_resonance.major
-  if S.WorldveinResonance:IsCastable() then
-    if HR.Cast(S.WorldveinResonance, nil, Settings.Commons.EssenceDisplayStyle) then return "worldvein_resonance 77"; end
-  end
-  -- ripple_in_space,if=essence.ripple_in_space.major
-  if S.RippleInSpace:IsCastable() then
-    if HR.Cast(S.RippleInSpace, nil, Settings.Commons.EssenceDisplayStyle) then return "ripple_in_space 79"; end
-  end
-end
 
 local function Multi()
 
@@ -175,7 +160,7 @@ local function Multi()
     if HR.Cast(S.Mangle, nil, nil, "Melee") then return "mangle 97"; end
   end
   -- moonfire,if=dot.moonfire.refreshable&active_enemies<=4
-  if S.Moonfire:IsCastable() and (Target:DebuffRefreshableCP(S.MoonfireDebuff) and Enemies8y <= 4) then
+  if S.Moonfire:IsCastable() and (Target:DebuffRefreshable(S.MoonfireDebuff) and Enemies8y <= 4) then
     if HR.Cast(S.Moonfire, nil, nil, 40) then return "moonfire 98"; end
   end
   -- swipe,if=buff.incarnation.down
@@ -248,24 +233,21 @@ local function Cooldowns()
   if S.Incarnation:IsReady() and ((Target:DebuffUp(S.MoonfireDebuff) or EnemiesCount > 1) and Target:DebuffUp(S.ThrashBearDebuff)) then
     if HR.Cast(S.Incarnation, Settings.Guardian.GCDasOffGCD.Incarnation) then return "incarnation 33"; end
   end
-  -- use_item,name=ashvanes_razor_coral,if=((equipped.cyclotronic_blast&cooldown.cyclotronic_blast.remains>25&debuff.razor_coral_debuff.down)|debuff.razor_coral_debuff.down|(debuff.razor_coral_debuff.up&debuff.conductive_ink_debuff.up&target.time_to_pct_30<=2)|(debuff.razor_coral_debuff.up&time_to_die<=20))
-  if I.AshvanesRazorCoral:IsEquipReady() and Settings.Commons.UseTrinkets and (((Everyone.PSCDEquipped() and I.PocketsizedComputationDevice:CooldownRemains() > 25 and Target:DebuffDown(S.RazorCoralDebuff)) or Target:DebuffDown(S.RazorCoralDebuff) or (Target:DebuffUp(S.RazorCoralDebuff) and Target:DebuffUp(S.ConductiveInkDebuff) and Target:TimeToX(30) <= 2) or (Target:DebuffUp(S.RazorCoralDebuff) and Target:TimeToDie() <= 20))) then
-    if HR.Cast(I.AshvanesRazorCoral, nil, Settings.Commons.TrinketDisplayStyle, 40) then return "ashvanes_razor_coral 35"; end
-  end
+  
   -- use_items
-  local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
-  if TrinketToUse then
-    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+  if Settings.Commons.UseTrinkets then
+	return Trinkets()
   end
+  
 end
 
 --- ======= ACTION LISTS =======
 local function APL()
   AoERadius = S.BalanceAffinity:IsAvailable() and 11 or 8
-  UpdateRanges()
-  Everyone.AoEToggleEnemiesUpdate()
   
-  EnemiesCount = Player:GetEnemiesInRange(AoERadius)
+-- ??  Everyone.AoEToggleEnemiesUpdate()
+  
+  EnemiesCount = #Player:GetEnemiesInRange(AoERadius)
   IsTanking = Player:IsTankingAoE(AoERadius) or Player:IsTanking(Target)
   
   UseMaul = false
@@ -292,17 +274,13 @@ local function APL()
     if (true) then
       local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=essences
-    if (true) then
-      local ShouldReturn = Essences(); if ShouldReturn then return ShouldReturn; end
-    end
     -- call_action_list,name=cleave,if=active_enemies<=2
-    if (Enemies8y <= 2) then
-      local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
+    if (#Enemies8y <= 2) then
+      local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end	  
     end
     -- call_action_list,name=multi,if=active_enemies>=3
-    if (Enemies8y >= 3) then
-      local ShouldReturn = Multi(); if ShouldReturn then return ShouldReturn; end
+    if (#Enemies8y >= 3) then
+      local ShouldReturn = Multi(); if ShouldReturn then return ShouldReturn; end	  	  
     end
   end
 end
