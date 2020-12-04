@@ -23,6 +23,13 @@ local HR         = HeroRotation
 local S = Spell.Druid.Feral;
 local I = Item.Druid.Feral;
 
+-- Create table to exclude above trinkets from On Use function
+local OnUseExcludes = {
+  I.PocketsizedComputationDevice:ID(),
+  I.AshvanesRazorCoral:ID(),
+--  I.AzsharasFontofPower:ID()
+}
+
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
 local MeleeRange = 5;
@@ -162,7 +169,7 @@ local function EvaluateCycleRake257(TargetUnit)
 end
 
 local function EvaluateCycleMoonfireCat302(TargetUnit)
-  return TargetUnit:DebuffRefreshable(S.MoonfireCatDebuff)
+  return TargetUnit:DebuffRefreshableCP(S.MoonfireCatDebuff)
 end
 
 local function EvaluateCycleFerociousBite418(TargetUnit)
@@ -273,7 +280,8 @@ local function Cooldowns()
   end
   -- use_items,if=buff.tigers_fury.up|target.time_to_die<20
   if (Player:BuffUp(S.TigersFuryBuff) or Target:TimeToDie() < 20) then
-    if Settings.Commons.UseTrinkets then
+    local TrinketToUse = HL.UseTrinkets(OnUseExcludes)
+    if TrinketToUse then
       if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
     end
   end
@@ -336,7 +344,7 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=(refreshable)&(spell_targets.thrash_cat>2)
-  if S.ThrashCat:IsCastable() and ((Target:DebuffRefreshable(S.ThrashCatDebuff)) and (Cache.EnemiesCount[EightRange] > 2)) then
+  if S.ThrashCat:IsCastable() and ((Target:DebuffRefreshableCP(S.ThrashCatDebuff)) and (Cache.EnemiesCount[EightRange] > 2)) then
     if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 199"; end
   end
   -- pool_resource,for_next=1
@@ -373,11 +381,11 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=refreshable&((variable.use_thrash=2&(!buff.incarnation.up))|spell_targets.thrash_cat>1)
-  if S.ThrashCat:IsCastable() and (Target:DebuffRefreshable(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDown(S.IncarnationBuff))) or Cache.EnemiesCount[EightRange] > 1)) then
+  if S.ThrashCat:IsCastable() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDown(S.IncarnationBuff))) or Cache.EnemiesCount[EightRange] > 1)) then
     if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 312"; end
   end
   -- thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react&(!buff.incarnation.up
-  if S.ThrashCat:IsCastable() and (Target:DebuffRefreshable(S.ThrashCatDebuff) and VarUseThrash == 1 and bool(Player:BuffStackP(S.ClearcastingBuff)) and (Player:BuffDown(S.IncarnationBuff))) then
+  if S.ThrashCat:IsCastable() and (Target:DebuffRefreshableCP(S.ThrashCatDebuff) and VarUseThrash == 1 and bool(Player:BuffStackP(S.ClearcastingBuff)) and (Player:BuffDown(S.IncarnationBuff))) then
     if HR.Cast(S.ThrashCat, nil, nil, EightRange) then return "thrash_cat 327"; end
   end
   -- pool_resource,for_next=1
