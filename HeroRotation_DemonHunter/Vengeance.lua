@@ -154,12 +154,9 @@ local function Defensives()
   if I.DarkmoonDeckIndomitable:IsReady() and Settings.Commons.Enabled.Trinkets and Player:HealthPercentage() <= 75 then
     if Cast(I.DarkmoonDeckIndomitable, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_indomitable defensives"; end
   end
-  -- Metamorphosis,if=!(talent.demonic.enabled)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
-  -- Manually changed to:
-  -- if=(!talent.demonic.enabled|buff.metamorphosis.down)&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
-  -- Otherwise, Meta would never be suggested if Demonic is talented
-  if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and ((not S.Demonic:IsAvailable() or Player:BuffDown(S.MetamorphosisBuff)) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 15) then
-    if CastSuggested(S.Metamorphosis) then return "metamorphosis defensives"; end
+  -- Metamorphosis,if=!buff.metamorphosis.up&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
+  if S.Metamorphosis:IsCastable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold and (Player:BuffDown(S.MetamorphosisBuff) and (not S.SinfulBrand:IsAvailable() or Target:DebuffDown(S.SinfulBrandDebuff)) or Target:TimeToDie() < 15) then
+    if Cast(S.Metamorphosis, nil, Settings.Commons.DisplayStyle.Metamorphosis) then return "metamorphosis defensives"; end
   end
   -- Fiery Brand
   if S.FieryBrand:IsCastable() and Target:DebuffDown(S.FieryBrandDebuff) and (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.FieryBrandHealthThreshold) then
