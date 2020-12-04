@@ -72,6 +72,7 @@ Spell.Hunter.BeastMastery = {
   WildSpiritsBuff                       = Spell(328275),
   -- Legendaries (Shadowlands)
   NesingwarysTrappingApparatusBuff      = Spell(336744),
+  SoulforgeEmbersDebuff                 = Spell(336746),
   -- Buffs
   AspectoftheWildBuff                   = Spell(193530),
   BeastCleavePetBuff                    = Spell(118455, "pet"),

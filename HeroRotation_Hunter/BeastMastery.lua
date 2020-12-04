@@ -193,10 +193,12 @@ local function Cleave()
     if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "Multi-Shot (Cleave - 1)"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
-  if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped and not (S.TarTrap:CooldownRemains() < Player:GCD()) and S.Flare:CooldownRemains() < Player:GCD()) then
+  -- TODO: Find a way to track traps
+  if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped and Target:BuffDown(S.SoulforgeEmbersDebuff) and S.Flare:CooldownRemains() < Player:GCD()) then
     if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap st 4"; end
   end
   -- flare,if=tar_trap.up&runeforge.soulforge_embers
+  -- TODO: Find a way to track traps
   if S.Flare:IsCastable() and not S.TarTrap:CooldownUp() and SoulForgeEmbersEquipped then
     if Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare st 5"; end
   end
@@ -288,10 +290,12 @@ local function ST()
     if Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (ST - 1)"; end
   end
   -- tar_trap,if=runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd
-  if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped and not (S.TarTrap:CooldownRemains() < Player:GCD()) and S.Flare:CooldownRemains() < Player:GCD()) then
+  -- TODO: Find a way to track traps
+  if S.TarTrap:IsCastable() and (SoulForgeEmbersEquipped and Target:BuffDown(S.SoulforgeEmbersDebuff) and S.Flare:CooldownRemains() < Player:GCD()) then
     if Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap st 4"; end
   end
   -- flare,if=tar_trap.up&runeforge.soulforge_embers
+  -- TODO: Find a way to track traps
   if S.Flare:IsCastable() and not S.TarTrap:CooldownUp() and SoulForgeEmbersEquipped then
     if Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare st 5"; end
   end
