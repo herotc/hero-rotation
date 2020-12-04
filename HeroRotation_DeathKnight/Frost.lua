@@ -151,7 +151,7 @@ local function EvaluateTargetIfObliterationOblit(TargetUnit)
   return (Player:BuffUp(S.KillingMachineBuff) or not Player:BuffUp(S.RimeBuff) and EnemiesCount10yd >= 3)
 end
 local function EvaluateTargetIfObliterationFrostStrike(TargetUnit)
-  return (not S.Avalanche:IsAvailable() and not Player:BuffUp(S.KillingMachineBuff) or not Player:BuffUp(S.RimeBuff) and EnemiesCount10yd >= 3)
+  return (not S.Avalanche:IsAvailable() and not Player:BuffUp(S.KillingMachineBuff) or S.Avalanche:IsAvailable() and not Player:BuffUp(S.RimeBuff))
 end
 
 
@@ -337,7 +337,7 @@ end
 local function Covenants()
   --deaths_due,if=raid_event.adds.in>15|!raid_event.adds.exists|active_enemies>=2
   if S.DeathsDue:IsCastable() and EnemiesCount10yd >= 2 then
-    if HR.Cast(S.DeathsDue, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "deaths due covenant"; end
+    if HR.Cast(S.DeathsDue, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "deaths due covenant"; end
   end
   --swarming_mist,if=active_enemies=1&runic_power.deficit>3&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&(!raid_event.adds.exists|raid_event.adds.in>15)
   if S.SwarmingMist:IsCastable() and (EnemiesCount10yd == 1 and Player:RunicPowerDeficit() > 3 and S.PillarofFrost:CooldownRemains() < 3 and not S.BreathofSindragosa:IsAvailable()) then
@@ -345,23 +345,23 @@ local function Covenants()
   end
   --swarming_mist,if=active_enemies>=2&!talent.breath_of_sindragosa
   if S.SwarmingMist:IsCastable() and (EnemiesCount10yd >= 2 and not S.BreathofSindragosa:IsAvailable()) then
-    if HR.Cast(S.SwarmingMist, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "swarming mist aoe"; end
+    if HR.Cast(S.SwarmingMist, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "swarming mist aoe"; end
   end
   --abomination_limb,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15)
   if S.AbominationLimb:IsCastable() and (EnemiesCount10yd == 1 and S.PillarofFrost:CooldownRemains() < 3) then
-    if HR.Cast(S.AbominationLimb, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "abomination limb st"; end
+    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "abomination limb st"; end
   end
   --abomination_limb,if=active_enemies>=2
   if S.AbominationLimb:IsCastable() and EnemiesCount10yd >= 2 then
-    if HR.Cast(S.AbominationLimb, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "abomination limb aoe"; end
+    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "abomination limb aoe"; end
   end
   --shackle_the_unworthy,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15)
   if S.ShackleTheUnworthy:IsCastable() and (EnemiesCount10yd == 1 and S.PillarofFrost:CooldownRemains() < 3) then
-    if HR.Cast(S.ShackleTheUnworthy, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "shackle unworthy st"; end
+    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "shackle unworthy st"; end
   end
   --shackle_the_unworthy,if=active_enemies>=2
   if S.ShackleTheUnworthy:IsCastable() and EnemiesCount10yd >= 2 then
-    if HR.Cast(S.ShackleTheUnworthy, Settings.Commons.CovenantDisplayStyle, nil, not TargetIsInRange[10]) then return "shackle unworthy aoe"; end
+    if HR.Cast(S.ShackleTheUnworthy, nil, Settings.Commons.CovenantDisplayStyle, not TargetIsInRange[10]) then return "shackle unworthy aoe"; end
   end
 end
 
@@ -416,7 +416,7 @@ local function Cooldowns()
     if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead cd 11"; end
   end
   -- "Sacrificial Pact", "if=active_enemies>=2&(pet.ghoul.remains<gcd|target.time_to_die<gcd)
-  if S.SacrificialPact:IsCastable() and (EnemiesCount10yd >= 2 and (S.SacrificialPact:TimeSinceLastCast() < (60 - Player:GCD()) or Target:TimeToDie() < Player:GCD())) then
+  if S.SacrificialPact:IsCastable() and (EnemiesCount10yd >= 2 and ((S.RaiseDead:TimeSinceLastCast() > (55 + Player:GCD()) and S.RaiseDead:TimeSinceLastCast() < (60 - Player:GCD())) or Target:TimeToDie() < Player:GCD())) then
     if HR.Cast(S.SacrificialPact, Settings.Commons.OffGCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial pact cd 12"; end
   end
   -- "Death and Decay", "if=active_enemies>5|runeforge.phearomones"
@@ -454,7 +454,10 @@ local function Obliteration_Pooling()
   if S.Frostscythe:IsCastable() and (EnemiesCount10yd >= 4 and (not Player:BuffUp(S.DeathAndDecayBuff) and Player:Covenant() == "Night Fae" or not Player:Covenant() == "Night Fae")) then
     if HR.Cast(S.Frostscythe, nil, nil, not TargetIsInRange[8]) then return "frostscythe obliteration_pool 7"; end
   end
+  -- wait for resources
+  if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources Obliteration Pooling"; end
 end
+
 local function Obliteration()
   -- remorseless_winter,if=talent.gathering_storm&active_enemies>=3
   if S.RemorselessWinter:IsCastable() and (S.GatheringStorm:IsAvailable() and EnemiesCount10yd >= 3) then
@@ -631,7 +634,7 @@ local function APL()
     if S.PillarofFrost:CooldownUp() or S.PillarofFrost:CooldownRemains() > 20 then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
-        if HR.Cast(TrinketToUse, Settings.Commons.TrinketDisplayStyle, nil) then return "Generic use_items for " .. TrinketToUse:Name(); end
+        if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
     -- call_action_list,name=covenants
