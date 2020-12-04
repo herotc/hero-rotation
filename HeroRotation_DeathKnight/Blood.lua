@@ -333,7 +333,7 @@ local function APL()
       if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion"; end
     end
     -- use_items
-    if (true) then
+    if (false) then
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse then
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
