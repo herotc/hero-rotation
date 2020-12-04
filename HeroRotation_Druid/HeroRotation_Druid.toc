@@ -10,9 +10,9 @@
 
 Settings.lua
 Druid.lua
-# Balance.lua
+Balance.lua
 Feral.lua
 Guardian.lua
-# Restoration.lua
+Restoration.lua
 Events.lua
 Overrides.lua
