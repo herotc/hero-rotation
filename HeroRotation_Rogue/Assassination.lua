@@ -525,7 +525,7 @@ local function Direct ()
     if Cast(S.Envenom) then return "Cast Envenom" end
   end
   -- actions.direct+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
-  if S.SerratedBoneSpike:IsCastable() and Player:Buff(S.SliceandDice) then
+  if S.SerratedBoneSpike:IsCastable() and Player:BuffUp(S.SliceandDice) then
     if not Target:DebuffUp(S.SerratedBoneSpikeDebuff) then
       if Cast(S.SerratedBoneSpike) then ShouldReturn = "Cast Serrated Bone Spike" end
     else
