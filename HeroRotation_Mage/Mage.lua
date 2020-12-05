@@ -197,7 +197,7 @@ Spell.Mage.Frost = {
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
   ManaGem                          = Item (36799),
-  PotionofFocusedResolve           = Item(168506),
+  PotionofPhantomFire              = Item(171349),
   TidestormCodex                   = Item(165576, {13, 14}),
   PocketsizedComputationDevice     = Item(167555, {13, 14}),
   AzsharasFontofPower              = Item(169314, {13, 14}),
@@ -228,8 +228,8 @@ Item.Mage.Arcane = {
 }
 
 Item.Mage.Fire = {
-  -- Potion
-  SuperiorBattlePotionofIntellect  = Item(168498),
+  -- Potion,
+  PotionofPhantomFire              = Item(171349),
   -- Non-trinket items
   HyperthreadWristwraps            = Item(168989),
   MalformedHeraldsLegwraps         = Item(167835),
@@ -270,7 +270,8 @@ Item.Mage.Fire = {
 Item.Mage.Frost = {
   BalefireBranch                   = Item(159630, {13, 14}),
   TidestormCodex                   = Item(165576, {13, 14}),
-  PocketsizedComputationDevice     = Item(167555, {13, 14})
+  PocketsizedComputationDevice     = Item(167555, {13, 14}),
+  PotionofPhantomFire              = Item(171349)
 }
 
 -- Variables

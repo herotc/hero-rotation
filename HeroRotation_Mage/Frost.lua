@@ -86,9 +86,9 @@ local function Precombat ()
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
     end
     -- potion
-    --[[ if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion precombat 4"; end
-    end ]]
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofPhantomFire) then return "potion precombat 4"; end
+    end
     -- frostbolt
     if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
       if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end
@@ -102,10 +102,9 @@ end
 
 local function Cooldowns ()
   --potion,if=prev_off_gcd.icy_veins|fight_remains<30
-  -- TODO : potion
-  --[[ if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
-    if HR.CastSuggested(I.PotionofFocusedResolve) then return "potion cd 1"; end
-  end ]]
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion cd 1"; end
+  end
   --deathborne
   if S.Deathborne:IsCastable() then
     if HR.Cast(S.Deathborne, nil, Settings.Commons.CovenantDisplayStyle) then return "deathborne cd 2"; end
@@ -193,11 +192,6 @@ local function Aoe ()
   --shifting_power
   if HR.CDsON() and S.ShiftingPower:IsCastable() then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
-  end
-  --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
-  -- NYI frozen
-  if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) and GrislyIcicleEquipped and Target:Level() <= Player:Level() then
-    if HR.Cast(S.FrostNova) then return "frost_nova aoe 10"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
   if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
@@ -289,11 +283,6 @@ local function Single ()
   --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|active_enemies>=2)
   if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2) then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
-  end
-  --frost_nova,if=runeforge.grisly_icicle.equipped&target.level<=level&debuff.frozen.down
-  -- NYI frozen
-  if S.FrostNova:IsCastable() and Target:IsSpellInRange(S.FrostNova) and GrislyIcicleEquipped and Target:Level() <= Player:Level() then
-    if HR.Cast(S.FrostNova) then return "frost_nova single 15"; end
   end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
   if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) then
