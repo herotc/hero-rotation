@@ -383,8 +383,6 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
-    -- Interrupts
-    local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-(talent.trail_of_ruin.enabled+buff.metamorphosis.up))|runeforge.chaos_theory&buff.chaos_theory.down
     VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - (num(S.TrailofRuin:IsAvailable()) + num(Player:BuffUp(S.MetamorphosisBuff)))) or ChaosTheoryEquipped and Player:BuffDown(S.ChaosTheoryBuff)
@@ -398,7 +396,8 @@ local function APL()
     VarWaitingForEssenceBreak = S.EssenceBreak:IsAvailable() and (not VarPoolingForBladeDance) and (not VarPoolingForMeta) and S.EssenceBreak:CooldownUp()
     -- variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
     VarWaitingForMomentum = S.Momentum:IsAvailable() and Player:BuffDown(S.MomentumBuff)
-    -- disrupt (Manually moved above variable declarations)
+    -- disrupt (and stun interrupts)
+    local ShouldReturn = Everyone.Interrupt(10, S.Disrupt, Settings.Commons.OffGCDasOffGCD.Disrupt, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- call_action_list,name=cooldown,if=gcd.remains=0
     if CDsON() then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
