@@ -173,6 +173,7 @@ Spell.Rogue.Outlaw = {
   Ambidexterity         = Spell(341542),
   -- Legendaries (Shadowlands)
   ConcealedBlunderbuss  = Spell(340587),
+  DeathlyShadowsBuff    = Spell(341202),
   GreenskinsWickers     = Spell(340573),
   MasterAssassinsMark   = Spell(340094),
   -- Misc
