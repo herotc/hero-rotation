@@ -188,9 +188,8 @@ local function RtB_Reroll ()
 end
 -- # Condition to use Stealth cooldowns for Ambush
 local function Ambush_Condition ()
-  -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
-  return Player:ComboPointsDeficit() >= 2 + 2 * ((S.GhostlyStrike:IsAvailable() and S.GhostlyStrike:CooldownRemains() < 1) and 1 or 0)
-    + (Player:BuffUp(S.Broadside) and 1 or 0) and EnergyPredictedRounded() > 60 and not Player:BuffUp(S.SkullandCrossbones)
+  -- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+buff.broadside.up&energy>=50
+  return Player:ComboPointsDeficit() >= 2 + num(Player:BuffUp(S.Broadside)) and EnergyPredictedRounded() > 50
 end
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
@@ -200,6 +199,13 @@ end
 
 local function CDs ()
   if Target:IsSpellInRange(S.SinisterStrike) then
+    -- # Using Ambush is a 2% increase, so Vanish can be sometimes be used as a utility spell unless using Master Assassin or Deathly Shadows
+    -- actions.cds=vanish,if=!stealthed.all&variable.ambush_condition&master_assassin_remains=0&buff.deathly_shadows.down
+    if Settings.Outlaw.UseDPSVanish and CDsON() and S.Vanish:IsCastable()
+      and not Player:StealthUp(true, true) and Ambush_Condition()
+      and Rogue.MasterAssassinsMarkRemains() <= 0 and not Player:BuffUp(S.DeathlyShadowsBuff) then
+      if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
+    end
     -- actions.cds+=/flagellation
     if S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
       if HR.Cast(S.Flagellation) then return "Cast Flagellation" end
@@ -208,19 +214,15 @@ local function CDs ()
     if S.FlagellationCleanse:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
       if HR.Cast(S.FlagellationCleanse) then return "Cast Flagellation Cleanse" end
     end
-
-    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+    -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)
     if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
-      and (not S.KillingSpree:CooldownUp() or not S.KillingSpree:IsAvailable())
-      and (not I.FontOfPower:IsEquipped() or I.FontOfPower:CooldownRemains() > 20) then
+      and (not S.KillingSpree:CooldownUp() or not S.KillingSpree:IsAvailable()) then
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
     end
-
     -- actions.cds+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
     if S.RolltheBones:IsReady() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
       if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
     end
-
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
     if S.MarkedforDeath:IsCastable() then
       -- Note: Increased the SimC condition by 50% since we are slower.
@@ -233,7 +235,7 @@ local function CDs ()
       end
     end
     if CDsON() then
-      -- actions.cds+=/blade_flurry,if=spell_targets>=2-conduit.ambidexterity.enabled&!buff.blade_flurry.up&raid_event.adds.in>10
+      -- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
       if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2 and not Player:BuffUp(S.BladeFlurry) then
         if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
           HR.CastSuggested(S.BladeFlurry)
@@ -255,16 +257,9 @@ local function CDs ()
           if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
         end
       end
-      if Settings.Outlaw.UseDPSVanish and not Player:StealthUp(true, true) then
-        -- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
-        -- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
-        if S.Vanish:IsCastable() and Ambush_Condition() and not Player:BuffUp(S.MasterAssassinsMark) then
-          if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
-        end
-        -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
-        if S.Shadowmeld:IsCastable() and Ambush_Condition() then
-          if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
-        end
+      -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
+      if Settings.Outlaw.UseDPSVanish and S.Shadowmeld:IsCastable() and Ambush_Condition() then
+        if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
       end
       -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=1
       if S.Dreadblades:IsReady() and Target:IsSpellInRange(S.Dreadblades) and not Player:StealthUp(true, true) and Player:ComboPoints() < 2 then
@@ -280,39 +275,6 @@ local function CDs ()
 
     -- Trinkets
     if Settings.Commons.UseTrinkets and CDsON() then
-      -- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
-      if I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() and not Player:BuffUp(S.AdrenalineRush) and not Player:BuffUp(S.BladeFlurry) and S.AdrenalineRush:CooldownRemains() < 15 then
-        if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast FontOfPower" end
-      end
-      -- if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
-      if I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() and not Player:StealthUp(true, true)
-        and not Player:BuffUp(S.AdrenalineRush) and not Player:BuffUp(S.LucidDreamsBuff) and EnergyTimeToMaxRounded() > 4 and RtB_Buffs() < 5 then
-        if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast ComputationDevice" end
-      end
-      -- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
-      if I.RazorCoral:IsEquipped() and I.RazorCoral:IsReady() then
-        local CastRazorCoral
-        if S.RazorCoralDebuff:AuraActiveCount() == 0 then
-          CastRazorCoral = true
-        else
-          local ConductiveInkUnit = S.ConductiveInkDebuff:MaxDebuffStackUnit()
-          if ConductiveInkUnit then
-            -- Cast if we are at 31%, if the enemy will die within 20s, or if the time to reach 30% will happen within 3s
-            CastRazorCoral = ConductiveInkUnit:HealthPercentage() <= 32 or HL.BossFilteredFightRemains("<", 20) or
-              (ConductiveInkUnit:HealthPercentage() <= 35 and ConductiveInkUnit:TimeToX(30) < 3)
-          else
-            CastRazorCoral = (S.RazorCoralDebuff:MaxDebuffStack() >= 20 - 10 * num(Target:DebuffUp(S.BloodoftheEnemyDebuff)) or Target:FilteredTimeToDie("<", 60))
-              and Player:BuffRemains(S.AdrenalineRush) > 18 or HL.BossFilteredFightRemains("<", 20)
-          end
-        end
-        if CastRazorCoral then
-          if HR.Cast(I.RazorCoral, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast RazorCoral" end
-        end
-      end
-      -- Emulate SimC default behavior to use at max stacks
-      if I.VigorTrinket:IsEquipped() and I.VigorTrinket:IsReady() and Player:BuffStack(S.VigorTrinketBuff) == 6 then
-        if HR.Cast(I.VigorTrinket, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast VigorTrinket" end
-      end
       -- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
       local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
       if TrinketToUse and (Player:BloodlustUp() or HL.BossFilteredFightRemains("<", 20) or Player:ComboPointsDeficit() <= 2) then
@@ -404,11 +366,11 @@ local function Build ()
   end
 
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) then
-    -- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled&buff.keep_your_wits_about_you.down)
+    -- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled)
     if EnergyPredictedRounded() < 45 or S.QuickDraw:IsAvailable() then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot" end
     end
-    -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.deadshot.up|buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
+    -- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
     if Player:BuffUp(S.GreenskinsWickers) or Player:BuffUp(S.ConcealedBlunderbuss) then
       if HR.CastPooling(S.PistolShot) then return "Cast Pistol Shot (Buffed)" end
     end
@@ -417,6 +379,8 @@ local function Build ()
   if S.SinisterStrike:IsCastable() and Target:IsSpellInRange(S.SinisterStrike) then
     if HR.CastPooling(S.SinisterStrike) then return "Cast Sinister Strike" end
   end
+  -- actions.build+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1+buff.broadside.up
+  -- TODO
 end
 
 --- ======= MAIN =======
@@ -450,17 +414,6 @@ local function APL ()
       if Everyone.TargetIsValid() then
         if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
-        end
-        local usingTrinket = false
-        -- actions.precombat+=/use_item,name=azsharas_font_of_power
-        if Settings.Commons.UseTrinkets and I.FontOfPower:IsEquipped() and I.FontOfPower:IsReady() then
-          usingTrinket = true
-          if HR.Cast(I.FontOfPower, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Font of Power" end
-        end
-        -- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-        if Settings.Commons.UseTrinkets and I.ComputationDevice:IsEquipped() and I.ComputationDevice:IsReady() then
-          usingTrinket = true
-          if HR.Cast(I.ComputationDevice, nil, Settings.Commons.TrinketDisplayStyle) then return "Cast Computation Device" end
         end
       end
     end
@@ -505,14 +458,14 @@ local function APL ()
     -- actions+=/call_action_list,name=cds
     ShouldReturn = CDs()
     if ShouldReturn then return "CDs: " .. ShouldReturn end
-    -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))
-    if Player:ComboPoints() >= Rogue.CPMaxSpend() - (num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.Opportunity))) * num(S.QuickDraw:IsAvailable()
-      and (not S.MarkedforDeath:IsAvailable() or S.MarkedforDeath:CooldownRemains() > 1))
+    -- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*talent.quick_draw.enabled)|combo_points=animacharged_cp
+    if Player:ComboPoints() >= (Rogue.CPMaxSpend() - num(Player:BuffUp(S.Broadside)) - (num(Player:BuffUp(S.Opportunity)) * num(S.QuickDraw:IsAvailable())))
       or Player:ComboPoints() == Rogue.AnimachargedCP() then
       ShouldReturn = Finish()
       if ShouldReturn then return "Finish: " .. ShouldReturn end
       -- run_action_list forces the return
-      return "Waiting to Finish..."
+      HR.Cast(S.PoolEnergy)
+      return "Finish Pooling"
     end
     -- actions+=/call_action_list,name=build
     ShouldReturn = Build()
@@ -549,7 +502,7 @@ end
 HR.SetAPL(260, APL, Init)
 
 --- ======= SIMC =======
--- Last Update: 2020-11-23
+-- Last Update: 2020-12-05
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=apply_poison
@@ -559,24 +512,22 @@ HR.SetAPL(260, APL, Init)
 -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
 -- actions.precombat+=/snapshot_stats
 -- actions.precombat+=/marked_for_death,precombat_seconds=5,if=raid_event.adds.in>40
--- actions.precombat+=/stealth,if=(!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration|raid_event.invulnerable.exists)
+-- actions.precombat+=/stealth,if=raid_event.invulnerable.exists
 -- actions.precombat+=/roll_the_bones,precombat_seconds=1
 -- actions.precombat+=/slice_and_dice,precombat_seconds=2
--- actions.precombat+=/use_item,name=azsharas_font_of_power
--- actions.precombat+=/use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
 
 -- # Executed every time the actor is available.
 -- # Restealth if possible (no vulnerable enemies in combat)
 -- actions=stealth
 -- # Reroll single BT/GM/TB buffs when possible
 -- actions+=/variable,name=rtb_reroll,value=rtb_buffs<2&(buff.buried_treasure.up|buff.grand_melee.up|buff.true_bearing.up)
--- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
+-- actions+=/variable,name=ambush_condition,value=combo_points.deficit>=2+buff.broadside.up&energy>=50
 -- # With multiple targets, this variable is checked to decide whether some CDs should be synced with Blade Flurry
 -- actions+=/variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
 -- actions+=/call_action_list,name=stealth,if=stealthed.all
 -- actions+=/call_action_list,name=cds
--- # Finish at maximum CP. Substract one for each Broadside and Opportunity when Quick Draw is selected and MfD is not ready after the next second. Always max BtE with 2+ Ace.
--- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-(buff.broadside.up+buff.opportunity.up)*(talent.quick_draw.enabled&(!talent.marked_for_death.enabled|cooldown.marked_for_death.remains>1))
+-- # Finish at maximum CP but avoid wasting Broadside and Quick Draw bonus combo points
+-- actions+=/run_action_list,name=finish,if=combo_points>=cp_max_spend-buff.broadside.up-(buff.opportunity.up*talent.quick_draw.enabled)|combo_points=animacharged_cp
 -- actions+=/call_action_list,name=build
 -- actions+=/arcane_torrent,if=energy.deficit>=15+energy.regen
 -- actions+=/arcane_pulse
@@ -584,30 +535,31 @@ HR.SetAPL(260, APL, Init)
 -- actions+=/bag_of_tricks
 
 -- # Builders
--- actions.build=shiv,if=runeforge.tiny_toxic_blade.equipped
+-- actions.build=shiv,if=runeforge.tiny_toxic_blade
 -- actions.build+=/echoing_reprimand
 -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
--- # Use Pistol Shot with Opportunity if below 45 energy, or when using Quick Draw and Wits is down.
--- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled&buff.keep_your_wits_about_you.down)
--- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.deadshot.up|buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
+-- # Use Pistol Shot with Opportunity if below 45 energy, or when using Quick Draw
+-- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled)
+-- actions.build+=/pistol_shot,if=buff.opportunity.up&(buff.greenskins_wickers.up|buff.concealed_blunderbuss.up)
 -- actions.build+=/sinister_strike
+-- actions.build+=/gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1+buff.broadside.up
 
 -- # Cooldowns
+-- # Using Ambush is a 2% increase, so Vanish can be sometimes be used as a utility spell unless using Master Assassin or Deathly Shadows
+-- actions.cds=vanish,if=!stealthed.all&variable.ambush_condition&master_assassin_remains=0&buff.deathly_shadows.down
 -- actions.cds+=/flagellation
 -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
--- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+-- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)
 -- actions.cds+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
 -- # If adds are up, snipe the one with lowest TTD. Use when dying faster than CP deficit or without any CP.
 -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
 -- # If no adds will die within the next 30s, use MfD on boss without any CP.
 -- actions.cds+=/marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1
--- # Blade Flurry on 2+ enemies. ST with Ambidexterity if no adds in the next 10s.
--- actions.cds+=/blade_flurry,if=spell_targets>=2-conduit.ambidexterity.enabled&!buff.blade_flurry.up&raid_event.adds.in>10
+-- # Blade Flurry on 2+ enemies
+-- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
 -- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
 -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&energy.time_to_max>2
 -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>2
--- # Using Vanish/Ambush is only a very tiny increase, so in reality, you're absolutely fine to use it as a utility spell.
--- actions.cds+=/vanish,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/dreadblades,if=!stealthed.all&combo_points<=1
 -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
 -- actions.cds+=/sepsis,if=!stealthed.all
@@ -616,10 +568,6 @@ HR.SetAPL(260, APL, Init)
 -- actions.cds+=/berserking
 -- actions.cds+=/fireblood
 -- actions.cds+=/ancestral_call
--- actions.cds+=/use_item,effect_name=cyclotronic_blast,if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
--- actions.cds+=/use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
--- # Very roughly rule of thumbified maths below: Use for Inkpod crit, otherwise with AR at 20+ stacks or 10+ with also Blood up.
--- actions.cds+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
 -- # Default fallback for usable items.
 -- actions.cds+=/use_items,if=buff.bloodlust.react|fight_remains<=20|combo_points.deficit<=2
 
