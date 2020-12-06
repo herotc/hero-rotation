@@ -249,7 +249,11 @@ Spell.Rogue.Subtlety = {
   -- Legendaries (Shadowlands)
   TheRottenBuff         = Spell(341134),
   DeathlyShadowsBuff    = Spell(341202),
+  FinalityEviscerate    = Spell(340600),
+  FinalityBlackPowder   = Spell(340603),
+  FinalityRupture       = Spell(340601),
   -- Misc
+  SinfulRevelation      = Spell(324260),
   PoolEnergy            = Spell(999910)
 }
 

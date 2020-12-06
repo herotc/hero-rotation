@@ -36,9 +36,9 @@ local OnUseExcludes = {
 S.Eviscerate:RegisterDamageFormula(
   -- Eviscerate DMG Formula (Pre-Mitigation):
   --- Player Modifier
-    -- AP * CP * EviscR1_APCoef * EviscR2_M * Aura_M * NS_M * DS_M * DSh_M * SoD_M * ShC_M * Mastery_M * Versa_M
+    -- AP * CP * EviscR1_APCoef * Aura_M * NS_M * DS_M * DSh_M * SoD_M * Finality_M * Mastery_M * Versa_M
   --- Target Modifier
-    -- NB_M
+    -- EviscR2_M * Sinful_M
   function ()
     return
       --- Player Modifier
@@ -51,7 +51,7 @@ S.Eviscerate:RegisterDamageFormula(
         -- Aura Multiplier (SpellID: 137035)
         1.21 *
         -- Nightstalker Multiplier
-        (S.Nightstalker:IsAvailable() and Player:StealthUp(true) and 1.12 or 1) *
+        (S.Nightstalker:IsAvailable() and Player:StealthUp(true, false) and 1.12 or 1) *
         -- Deeper Stratagem Multiplier
         (S.DeeperStratagem:IsAvailable() and 1.05 or 1) *
         -- Shadow Dance Multiplier
@@ -59,13 +59,17 @@ S.Eviscerate:RegisterDamageFormula(
         (not S.DarkShadow:IsAvailable() and Player:BuffUp(S.ShadowDanceBuff) and 1.15 or 1) *
         -- Symbols of Death Multiplier
         (Player:BuffUp(S.SymbolsofDeath) and 1.15 or 1) *
+        -- Finality Multiplier
+        (Player:BuffUp(S.FinalityEviscerate) and 1.25 or 1) *
         -- Mastery Finisher Multiplier
         (1 + Player:MasteryPct() / 100) *
         -- Versatility Damage Multiplier
         (1 + Player:VersatilityDmgPct() / 100) *
       --- Target Modifier
         -- Eviscerate R2 Multiplier
-        (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1)
+        (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1) *
+        -- Sinful Revelation Enchant
+        (Target:DebuffUp(S.SinfulRevelation) and 1.06 or 1)
   end
 )
 S.Rupture:RegisterPMultiplier(
@@ -444,7 +448,7 @@ local function CDs ()
 
   if Target:IsInMeleeRange(5) then
     -- actions.cds+=/flagellation,if=variable.snd_condition&!stealthed.mantle
-    if HR.CDsON() and S.Flagellation:IsReady() and SnDCondition and not Player:StealthUp(true, true) then
+    if HR.CDsON() and S.Flagellation:IsReady() and SnDCondition and not Player:StealthUp(false, false) then
       if HR.Cast(S.Flagellation) then return "Cast Flrgrrlation" end
     end
 
