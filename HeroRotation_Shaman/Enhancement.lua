@@ -225,7 +225,7 @@ local function Aoe()
     if HR.Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock aoe 62"; end
   end
   -- windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down
-  if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff)) then
+  if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff) and not Player:DebuffUp(S.doom_winds_debuff)) then
     if HR.Cast(S.WindfuryTotem) then return "windfury_totem aoe 64"; end
   end
   -- flame_shock,target_if=refreshable,cycle_targets=1,if=talent.fire_nova.enabled|talent.lashing_flames.enabled|covenant.necrolord
