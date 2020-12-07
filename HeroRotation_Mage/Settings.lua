@@ -17,16 +17,21 @@ local CreateARPanelOptions = HR.GUI.CreateARPanelOptions;
 -- All settings here should be moved into the GUI someday.
 HR.GUISettings.APL.Mage = {
   Commons = {
-    UseTrinkets = true,
-    UsePotions = true,
-    TrinketDisplayStyle = "Suggested",
-    CovenantDisplayStyle = "Suggested",
-    UseTimeWarp = false,
-    -- {Display GCD as OffGCD, ForceReturn}
+    Enabled = {
+      Potions = true,
+      Trinkets = true,
+      TimeWarp = false,
+    },
+    DisplayStyle = {
+      Potions = "Suggested",
+      Trinkets = "Suggested",
+      Covenant = "Suggested",
+    },
+    -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
+    -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Racials
       Racials = true,
@@ -39,7 +44,7 @@ HR.GUISettings.APL.Mage = {
     MirrorImagesBeforePull = false,
     MovingRotation = false,
     UseTemporalWarp = true,
-    -- {Display GCD as OffGCD, ForceReturn}
+    -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
       RuneOfPower = true,
@@ -47,7 +52,7 @@ HR.GUISettings.APL.Mage = {
       MirrorImage = true,
       FrozenOrb = true,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
+    -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Abilities
       IceFloes = true,
@@ -55,34 +60,42 @@ HR.GUISettings.APL.Mage = {
   },
   Fire = {
     DisableCombustion = false,
-    -- {Display GCD as OffGCD, ForceReturn}
+    MirrorImagesBeforePull = false,
+    MovingRotation = false,
+    UseTemporalWarp = true,
+    -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
       RuneOfPower = true,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
+    -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Abilities
       Combustion = true,
     }
   },
   Arcane = {
-    UseManaGem = true,
+    Enabled={
+      UseManaGem = true,
+    },
     AMSpamRotation = false,
     StayDistance = false,
-    -- {Display GCD as OffGCD, ForceReturn}
+    UseTemporalWarp = true,
+    MovingRotation = false,
+    MirrorImagesBeforePull = false,
+    -- {Display GCD as OffGCD}
     GCDasOffGCD = {
       -- Abilities
       RuneOfPower = true,
       ArcanePower = true,
       MirrorImage = true,
-      TouchoftheMagi = true,
+      TouchOfTheMagi = true,
       Evocation = true,
     },
-    -- {Display OffGCD as OffGCD, ForceReturn}
+    -- {Display OffGCD as OffGCD}
     OffGCDasOffGCD = {
       -- Abilities
-      PresenceofMind = true,
+      PresenceOfMind = true,
     }
   }
 };
@@ -99,19 +112,14 @@ local CP_Frost = CreateChildPanel(CP_Mage, "Frost");
 -- Controls
 -- Mage
 CreateARPanelOptions(CP_Mage, "APL.Mage.Commons");
---CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTimeWarp", "Use Time Warp (NYI)", "Enable this if you want the addon to show you when to use Time Warp.");
-CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
-CreatePanelOption("CheckButton", CP_Mage, "APL.Mage.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
-CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
-CreatePanelOption("Dropdown", CP_Mage, "APL.Mage.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AMSpamRotation", "Use AM spam rotation", "Enable the use of the Arcane Missile Spam rotation.");
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.StayDistance", "Stay at distance", "Only use Arcane Explosion if in range or on the left icon.");
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MovingRotation", "Disable cast abilities when moving", "Don't show abilities where a ca&st is needed (makes the rotation a bit clunky with small steps).");
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseTemporalWarp", "Suggest Time Warp with Temporal Warp legendary", "Show time warp ability when using the Temporal Warp legendary");
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane");
---CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.UseManaGem", "Use Mana Gem", "Use mana gem during combat.");
 -- Fire
-CreatePanelOption("CheckButton", CP_Fire, "APL.Mage.Fire.DisableCombustion", "Disable Combustion", "Disable the usage of Combustion within the Fire rotation.");
 CreateARPanelOptions(CP_Fire, "APL.Mage.Fire");
 -- Frost
 CreatePanelOption("CheckButton", CP_Frost, "APL.Mage.Frost.MirrorImagesBeforePull", "Use Mirror Image before combat", "Enable the use of Mirror image before starting combat (very low dps).");

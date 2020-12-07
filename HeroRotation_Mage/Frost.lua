@@ -86,7 +86,7 @@ local function Precombat ()
       if HR.Cast(S.MirrorImage, Settings.Frost.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
     end
     -- potion
-    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
       if HR.CastSuggested(I.PotionofPhantomFire) then return "potion precombat 4"; end
     end
     -- frostbolt
@@ -102,16 +102,16 @@ end
 
 local function Cooldowns ()
   --potion,if=prev_off_gcd.icy_veins|fight_remains<30
-  if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
     if HR.CastSuggested(I.PotionofPhantomFire) then return "potion cd 1"; end
   end
   --deathborne
   if S.Deathborne:IsCastable() then
-    if HR.Cast(S.Deathborne, nil, Settings.Commons.CovenantDisplayStyle) then return "deathborne cd 2"; end
+    if HR.Cast(S.Deathborne, nil, Settings.Commons.DisplayStyle.Covenant) then return "deathborne cd 2"; end
   end
   --mirrors_of_torment,if=active_enemies<3&(conduit.siphoned_malice.enabled|soulbind.wasteland_propriety.enabled)
   if S.MirrorsofTorment:IsCastable() and EnemiesCount8ySplash < 3 and (S.WastelandPropriety:IsAvailable() or S.SiphonedMalice:IsAvailable()) then
-    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment cd 3"; end
+    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment cd 3"; end
   end
   --rune_of_power,if=cooldown.icy_veins.remains>12&buff.rune_of_power.down
   if S.RuneofPower:IsCastable() and not Player:IsCasting(S.RuneofPower) and Player:BuffDown(S.RuneofPowerBuff) and (S.IcyVeins:CooldownRemains() > S.RuneofPower:BaseDuration() or Target:TimeToDie() < S.RuneofPower:BaseDuration() + S.RuneofPower:CastTime() + Player:GCD()) then
@@ -127,8 +127,8 @@ local function Cooldowns ()
   end
   --use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
-  if TrinketToUse and Settings.Commons.UseTrinkets then
-    if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 7" end
+  if TrinketToUse and Settings.Commons.Enabled.UseTrinkets then
+    if HR.Cast(TrinketToUse, nil, Settings.Commons.DisplayStyle.Trinkets) then return "Generic use_items for " .. TrinketToUse:Name() .. " cd 7" end
   end
   --blood_fury
   if S.BloodFury:IsCastable() then
@@ -183,15 +183,15 @@ local function Aoe ()
   end
   --radiant_spark
   if HR.CDsON() and S.RadiantSpark:IsCastable() then
-    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark aoe 7"; end
   end
   --mirrors_of_torment
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
-    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 8"; end
+    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.MirrorsofTorment)) then return "mirrors_of_torment aoe 8"; end
   end
   --shifting_power
   if HR.CDsON() and S.ShiftingPower:IsCastable() then
-    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
+    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ShiftingPower)) then return "shifting_power aoe 9"; end
   end
   --fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down
   if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
@@ -262,7 +262,7 @@ local function Single ()
   end
   --radiant_spark,if=buff.freezing_winds.up&active_enemies=1
   if HR.CDsON() and S.RadiantSpark:IsCastable() and Player:BuffUp(S.FreezingWindsBuff) and EnemiesCount16ySplash == 1 then
-    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 9"; end
   end
   --ice_lance,if=buff.fingers_of_frost.react|debuff.frozen.remains>travel_time
   if S.IceLance:IsCastable() and (Player:BuffStack(S.FingersofFrostBuff) > 0 or Target:DebuffRemains(S.Freeze) > S.IceLance:TravelTime()) then
@@ -274,15 +274,15 @@ local function Single ()
   end
   --radiant_spark,if=(!runeforge.freezing_winds.equipped|active_enemies>=2)&buff.brain_freeze.react
   if HR.CDsON() and S.RadiantSpark:IsCastable() and (not FreezingWindsEquipped or EnemiesCount15yMelee >= 2) and Player:BuffUp(S.BrainFreezeBuff) then
-    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
+    if HR.Cast(S.RadiantSpark, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.RadiantSpark)) then return "radiant_spark single 12"; end
   end
   --mirrors_of_torment
   if HR.CDsON() and S.MirrorsofTorment:IsCastable() then
-    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.CovenantDisplayStyle) then return "mirrors_of_torment single 13"; end
+    if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 13"; end
   end
   --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|active_enemies>=2)
   if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2) then
-    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.CovenantDisplayStyle) then return "shifting_power single 14"; end
+    if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant) then return "shifting_power single 14"; end
   end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
   if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandArcaneBuff) then
