@@ -1,9 +1,3 @@
------- TODO -------
--- mana gem
--- potion
--- conduits
--- legendaries
-
 --- ============================ HEADER ============================
 --- ======= LOCALIZE =======
 -- Addon
@@ -221,9 +215,9 @@ local function Precombat ()
     if HR.Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 3"; end
   end
   -- potion
-  --[[ if I.PotionofFocusedResolve:IsReady() and Settings.Commons.UsePotions then
-    if HR.CastSuggested(I.PotionofFocusedResolve) then return "battle_potion_of_intellect precombat 4"; end
-  end ]]
+  if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
+    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion precombat 4"; end
+  end
   -- frostbolt,if=variable.prepull_evo=0
   if not var_prepull_evo and S.Frostbolt:IsReady() then
     if HR.Cast(S.Frostbolt, nil, nil, not Target:IsSpellInRange(S.Frostbolt)) then return "frostbolt precombat 5"; end
@@ -245,7 +239,9 @@ local function SharedCds ()
     end
   end
   --potion,if=buff.arcane_power.up
-  --TODO : manage potion
+  if I.PotionofPhantomFire:IsReady() and Player:BuffUp(S.ArcanePower) and Settings.Commons.Enabled.UsePotions then
+    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion Shared_cd 3"; end
+  end
   --time_warp,if=runeforge.temporal_warp.equipped&buff.exhaustion.up
   --NYI legendaries
   --lights_judgment,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down
