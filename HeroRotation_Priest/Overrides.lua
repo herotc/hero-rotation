@@ -11,12 +11,25 @@ local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
 -- Spells
+local SpellDisc    = Spell.Priest.Discipline
 local SpellShadow  = Spell.Priest.Shadow
 -- Lua
-local _, _, _, TocVer  = GetBuildInfo()
 
 --- ============================ CONTENT ============================
 -- Discipline, ID: 256
+local OldDiscIsCastable
+OldDiscIsCastable = HL.AddCoreOverride("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldDiscIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellDisc.MindBlast or self == SpellDisc.Schism then
+      return BaseCheck and (not Player:IsCasting(self))
+    elseif self == SpellDisc.Smite or self == SpellDisc.DivineStar or self == SpellDisc.Halo or self == SpellDisc.Penance or self == SpellDisc.PowerWordSolace then
+      return BaseCheck and (not Player:BuffUp(SpellDisc.ShadowCovenantBuff))
+    else
+      return BaseCheck
+    end
+  end
+, 256)
 
 -- Holy, ID: 257
 
@@ -30,12 +43,7 @@ HL.AddCoreOverride ("Player.Insanity",
       local FotMMod = SpellShadow.FortressOfTheMind:IsAvailable() and 1.2 or 1.0
       local STMMod = Player:BuffUp(SpellShadow.SurrenderToMadness) and 2.0 or 1.0
       if Player:IsCasting(SpellShadow.MindBlast) then
-        -- Return 8 base insanity on beta; 7 on live
-        if TocVer == 90002 then
-          return Insanity + (8 * FotMMod * STMMod)
-        else
-          return Insanity + (7 * FotMMod * STMMod)
-        end
+        return Insanity + (8 * FotMMod * STMMod)
       elseif Player:IsCasting(SpellShadow.VampiricTouch) then
         return Insanity + (5 * STMMod)
       elseif Player:IsCasting(SpellShadow.MindFlay) then

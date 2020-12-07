@@ -60,7 +60,7 @@ HR.GUISettings.APL.Priest = {
     GCDasOffGCD = {
       -- Abilities
       Mindbender = true,
-      Shadowfiend = true,
+      PowerInfusion = true,
       ShadowCovenant = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}

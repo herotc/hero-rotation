@@ -90,6 +90,16 @@ Spell.Priest.Shadow = {
 }
 
 Spell.Priest.Discipline = {
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  ArcaneTorrent                         = Spell(50613),
+  BagofTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BerserkingBuff                        = Spell(26297),
+  BloodFury                             = Spell(20572),
+  BloodFuryBuff                         = Spell(20572),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
 
   -- Base Spells
   MindBlast                             = Spell(8092),
@@ -100,13 +110,13 @@ Spell.Priest.Discipline = {
   HolyNova                              = Spell(132157), -- Melee, 12
   MindSear                              = Spell(48045), -- Splash, 10
   Penance                               = Spell(47540),
+  PowerInfusion                         = Spell(10060),
   PowerWordRadiance                     = Spell(194509),
-  Shadowfiend                           = Spell(34433),
   PowerWordFortitude                    = Spell(21562),
 
   -- Talents
   Schism                                = Spell(214621),
-  Mindbender                            = Spell(123040),
+  Mindbender                            = MultiSpell(123040, 34433),
   PowerWordSolace                       = Spell(129250),
   ShadowCovenant                        = Spell(314867),
   ShadowCovenantBuff                    = Spell(322105),
@@ -126,15 +136,12 @@ Spell.Priest.Discipline = {
   Mindgames                             = Spell(323673),
   UnholyNova                            = Spell(324724), -- Melee, 15
 
-  -- Racials
-  AncestralCall                         = Spell(274738),
-  BagofTricks                           = Spell(312411),
-  Berserking                            = Spell(26297),
-  BerserkingBuff                        = Spell(26297),
-  BloodFury                             = Spell(20572),
-  BloodFuryBuff                         = Spell(20572),
-  Fireblood                             = Spell(265221),
-  LightsJudgment                        = Spell(255647),
+  -- Conduit/Soulbind Effects
+
+  -- Legendary Effects
+
+  -- Other
+  Pool                                  = Spell(999910)
 }
 
 -- Items
@@ -152,4 +159,7 @@ Item.Priest.Shadow = {
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
   SoullettingRuby                  = Item(178809, {13, 14}),
   SunbloodAmethyst                 = Item(178826, {13, 14}),
+}
+
+Item.Priest.Discipline = {
 }
