@@ -29,9 +29,7 @@ local I = Item.Mage.Arcane;
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  I.TidestormCodex:ID(),
-  I.PocketsizedComputationDevice:ID(),
-  I.AzsharasFontofPower:ID()
+
 }
 
 -- Rotation Var
