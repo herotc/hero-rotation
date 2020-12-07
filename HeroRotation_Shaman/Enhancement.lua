@@ -126,7 +126,7 @@ local function Single()
     if HR.Cast(S.PrimordialWave, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.PrimordialWave)) then return "primordial_wave single 2"; end
   end
   -- windfury_totem,if=runeforge.doom_winds.equipped&buff.doom_winds_debuff.down
-  if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff)) then
+  if S.WindfuryTotem:IsReady() and (DoomWindsEquipped and Player:BuffDown(S.DoomWindsBuff) and not Player:DebuffUp(S.doom_winds_debuff)) then
     if HR.Cast(S.WindfuryTotem) then return "windfury_totem single 4"; end
   end
   -- flame_shock,if=!ticking
