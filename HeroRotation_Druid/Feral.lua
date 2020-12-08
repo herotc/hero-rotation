@@ -4,7 +4,6 @@
 local addonName, addonTable = ...
 -- HeroLib
 local HL         = HeroLib
-local Cache      = HeroCache
 local Unit       = HL.Unit
 local Player     = Unit.Player
 local Target     = Unit.Target
@@ -29,6 +28,12 @@ local MeleeRange = 5;
 local EightRange = 8;
 local InterruptRange = 13;
 local FortyRange = 40;
+
+local EnemiesMelee
+local Enemies8y
+local EnemiesInterrupt
+local EnemiesForty
+
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -220,7 +225,7 @@ local function Cooldowns()
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 38"; end
   end
   -- thorns,if=active_enemies>desired_targets|raid_event.adds.in>45
-  if S.Thorns:IsCastable() and HR.AoEON() and (Cache.EnemiesCount[EightRange] > 1) then
+  if S.Thorns:IsCastable() and HR.AoEON() and (#Enemies8y > 1) then
     if HR.Cast(S.Thorns, nil, Settings.Commons.EssenceDisplayStyle) then return "thorns"; end
   end
   -- the_unbound_force,if=buff.reckless_force.up|buff.tigers_fury.up
@@ -240,7 +245,7 @@ local function Cooldowns()
     if HR.Cast(S.FeralFrenzy, nil, nil, MeleeRange) then return "feral_frenzy 40"; end
   end
   -- purifying_blast,if=active_enemies>desired_targets|raid_event.adds.in>60
-  if S.PurifyingBlast:IsCastable() and HR.AoEON() and (Cache.EnemiesCount[EightRange] > 1) then
+  if S.PurifyingBlast:IsCastable() and HR.AoEON() and (#Enemies8y > 1) then
     if HR.Cast(S.PurifyingBlast, nil, Settings.Commons.EssenceDisplayStyle, 40) then return "purifying_blast"; end
   end
   -- guardian_of_azeroth,if=buff.tigers_fury.up
@@ -274,7 +279,10 @@ local function Cooldowns()
   -- use_items,if=buff.tigers_fury.up|target.time_to_die<20
   if (Player:BuffUp(S.TigersFuryBuff) or Target:TimeToDie() < 20) then
     if Settings.Commons.UseTrinkets then
-      if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+	  local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludeTrinkets)
+	  if (TrinketToUse ~= nil) then
+		if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
+	  end
     end
   end
 end
@@ -331,22 +339,22 @@ local function Generators()
     if HR.Cast(S.Regrowth) then return "regrowth 184"; end
   end
   -- brutal_slash,if=spell_targets.brutal_slash>desired_targets
-  if S.BrutalSlash:IsCastable() and HR.AoEON() and (Cache.EnemiesCount[EightRange] > 1) then
+  if S.BrutalSlash:IsCastable() and HR.AoEON() and (#Enemies8y > 1) then
     if HR.Cast(S.BrutalSlash, nil, nil, EightRange) then return "brutal_slash 196"; end
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=(refreshable)&(spell_targets.thrash_cat>2)
-  if S.ThrashCat:IsCastable() and ((Target:DebuffRefreshable(S.ThrashCatDebuff)) and (Cache.EnemiesCount[EightRange] > 2)) then
+  if S.ThrashCat:IsCastable() and ((Target:DebuffRefreshable(S.ThrashCatDebuff)) and (#Enemies8y > 2)) then
     if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 199"; end
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=(talent.scent_of_blood.enabled&buff.scent_of_blood.down)&spell_targets.thrash_cat>3
-  if S.ThrashCat:IsCastable() and ((S.ScentofBlood:IsAvailable() and Player:BuffDown(S.ScentofBloodBuff)) and Cache.EnemiesCount[EightRange] > 3) then
+  if S.ThrashCat:IsCastable() and ((S.ScentofBlood:IsAvailable() and Player:BuffDown(S.ScentofBloodBuff)) and #Enemies8y > 3) then
     if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 209"; end
   end
   -- pool_resource,for_next=1
   -- swipe_cat,if=buff.scent_of_blood.up|(action.swipe_cat.damage*spell_targets.swipe_cat>(action.rake.damage+(action.rake_bleed.tick_damage*5)))
-  if S.SwipeCat:IsCastable() and (Player:BuffUp(S.ScentofBloodBuff) or ((S.SwipeCat:Damage() * Cache.EnemiesCount[EightRange]) > (S.Rake:Damage() + (RakeBleedTick() * 5)))) then
+  if S.SwipeCat:IsCastable() and (Player:BuffUp(S.ScentofBloodBuff) or ((S.SwipeCat:Damage() * #Enemies8y) > (S.Rake:Damage() + (RakeBleedTick() * 5)))) then
     if HR.CastPooling(S.SwipeCat, nil, EightRange) then return "swipe_cat 217"; end
   end
   -- pool_resource,for_next=1
@@ -364,7 +372,7 @@ local function Generators()
     if HR.Cast(S.MoonfireCat, nil, nil, FortyRange) then return "moonfire_cat 276"; end
   end
   -- brutal_slash,if=(buff.tigers_fury.up&(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time))&(spell_targets.brutal_slash*action.brutal_slash.damage%action.brutal_slash.cost)>(action.shred.damage%action.shred.cost)
-  if S.BrutalSlash:IsCastable() and HR.AoEON() and ((Player:BuffUp(S.TigersFuryBuff) and (10000000000 > (1 + S.BrutalSlash:MaxCharges() - S.BrutalSlash:ChargesFractionalP()) * S.BrutalSlash:RechargeP())) and (Cache.EnemiesCount[EightRange] * S.BrutalSlash:Damage() % S.BrutalSlash:Cost()) > (S.Shred:Damage() % S.Shred:Cost())) then
+  if S.BrutalSlash:IsCastable() and HR.AoEON() and ((Player:BuffUp(S.TigersFuryBuff) and (10000000000 > (1 + S.BrutalSlash:MaxCharges() - S.BrutalSlash:ChargesFractionalP()) * S.BrutalSlash:RechargeP())) and (#Enemies8y * S.BrutalSlash:Damage() % S.BrutalSlash:Cost()) > (S.Shred:Damage() % S.Shred:Cost())) then
     if HR.Cast(S.BrutalSlash, nil, nil, EightRange) then return "brutal_slash 282"; end
   end
   -- moonfire_cat,target_if=refreshable
@@ -373,7 +381,7 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- thrash_cat,if=refreshable&((variable.use_thrash=2&(!buff.incarnation.up))|spell_targets.thrash_cat>1)
-  if S.ThrashCat:IsCastable() and (Target:DebuffRefreshable(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDown(S.IncarnationBuff))) or Cache.EnemiesCount[EightRange] > 1)) then
+  if S.ThrashCat:IsCastable() and (Target:DebuffRefreshable(S.ThrashCatDebuff) and ((VarUseThrash == 2 and (Player:BuffDown(S.IncarnationBuff))) or #Enemies8y > 1)) then
     if HR.CastPooling(S.ThrashCat, nil, EightRange) then return "thrash_cat 312"; end
   end
   -- thrash_cat,if=refreshable&variable.use_thrash=1&buff.clearcasting.react&(!buff.incarnation.up
@@ -382,12 +390,14 @@ local function Generators()
   end
   -- pool_resource,for_next=1
   -- swipe_cat,if=spell_targets.swipe_cat>1
-  if S.SwipeCat:IsCastable() and (Cache.EnemiesCount[EightRange] > 1) then
+  if S.SwipeCat:IsCastable() and (#Enemies8y > 1) then
     if HR.CastPooling(S.SwipeCat, nil, EightRange) then return "swipe_cat 344"; end
   end
+  
   -- shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
-  if S.Shred:IsCastable() and (Target:DebuffRemains(S.RakeDebuff) > (S.Shred:Cost() + S.Rake:Cost() - Player:EnergyPredicted()) / Player:EnergyRegen() or bool(Player:BuffStackP(S.ClearcastingBuff))) then
- 	
+  if S.Shred:IsCastable() and 
+  (Target:DebuffRemains(S.RakeDebuff) > (S.Shred:Cost() + S.Rake:Cost() - Player:EnergyPredicted()) / Player:EnergyRegen()
+  or bool(Player:BuffStack(S.ClearcastingBuff))) then 	
     if HR.Cast(S.Shred, nil, nil, MeleeRange) then return "shred 347"; end
   end
   -- Pool if nothing else to do
@@ -420,7 +430,7 @@ local function Opener()
   end
   -- rip,if=!ticking
   -- Manual addition: Use Primal Wrath if >= 2 targets or Rip if only 1 target
-  if S.PrimalWrath:IsCastable() and HR.AoEON() and (S.PrimalWrath:IsAvailable() and Target:DebuffDown(S.RipDebuff) and Cache.EnemiesCount[EightRange] >= 2) then
+  if S.PrimalWrath:IsCastable() and HR.AoEON() and (S.PrimalWrath:IsAvailable() and Target:DebuffDown(S.RipDebuff) and #Enemies8y >= 2) then
     if HR.Cast(S.PrimalWrath, nil, nil, EightRange) then return "primal_wrath opener"; end
   end
   if S.Rip:IsCastable() and (Target:DebuffDown(S.RipDebuff)) then
