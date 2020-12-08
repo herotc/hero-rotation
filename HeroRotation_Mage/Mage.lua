@@ -78,11 +78,13 @@ Spell.Mage.Arcane = {
   Deathborne                            = Spell(324220),
   ShiftingPower                         = Spell(314791),
   FieldOfBlossoms                       = Spell(319191),
+  -- Conduit
   ArcaneProdigy                         = Spell(336873),
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   DisciplinaryCommandFireBuff           = Spell(327368),
-  DisciplinaryCommandFrostBuff          = Spell(327366)
+  DisciplinaryCommandFrostBuff          = Spell(327366),
+  SiphonStormBuff                       = Spell(327366)
 }
 
 Spell.Mage.Fire = {
@@ -187,7 +189,7 @@ Spell.Mage.Frost = {
   GroveInvigoration                     = Spell(322721),
   FieldOfBlossoms                       = Spell(319191),
   IreOfTheAscended                      = Spell(337058),
-  -- Conduit Effects
+  -- Conduit
   -- Legendaries (Shadowlands)
   ExpandedPotentialBuff                 = Spell(327495),
   FreezingWindsBuff                     = Spell(327364),
@@ -198,7 +200,7 @@ Spell.Mage.Frost = {
 -- Items
 if not Item.Mage then Item.Mage = {} end
 Item.Mage.Arcane = {
-  ManaGem                          = Item (36799),
+  ManaGem                          = Item(36799),
   PotionofPhantomFire              = Item(171349),
 }
 
