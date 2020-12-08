@@ -235,24 +235,24 @@ local function DmgTrinkets()
 end
 
 local function Trinkets()
-  -- use_item,name=empyreal_ordnance,if=cooldown.void_eruption.remains<=12|buff.voidform.up|cooldown.void_eruption.remains>27
-  if I.EmpyrealOrdinance:IsReady() and (S.VoidEruption:CooldownRemains() <= 12 or Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 27) then
+  -- use_item,name=empyreal_ordnance,if=cooldown.void_eruption.remains<=12|cooldown.void_eruption.remains>27
+  if I.EmpyrealOrdinance:IsReady() and (S.VoidEruption:CooldownRemains() <= 12 or S.VoidEruption:CooldownRemains() > 27) then
     if Cast(I.EmpyrealOrdinance, nil, Settings.Commons.DisplayStyle.Trinkets, not Target:IsInRange(40)) then return "empyreal_ordnance"; end
   end
-  -- use_item,name=inscrutable_quantum_device,if=buff.voidform.up|cooldown.void_eruption.remains>10
-  if I.InscrutableQuantumDevice:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10) then
+  -- use_item,name=inscrutable_quantum_device,if=cooldown.void_eruption.remains>10
+  if I.InscrutableQuantumDevice:IsReady() and (S.VoidEruption:CooldownRemains() > 10) then
     if Cast(I.InscrutableQuantumDevice, nil, Settings.Commons.DisplayStyle.Trinkets) then return "inscrutable_quantum_device"; end
   end
-  -- use_item,name=macabre_sheet_music,if=buff.voidform.up|cooldown.void_eruption.remains>10
-  if I.MacabreSheetMusic:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10) then
+  -- use_item,name=macabre_sheet_music,if=cooldown.void_eruption.remains>10
+  if I.MacabreSheetMusic:IsReady() and (S.VoidEruption:CooldownRemains() > 10) then
     if Cast(I.MacabreSheetMusic, nil, Settings.Commons.DisplayStyle.Trinkets) then return "macabre_sheet_music"; end
   end
   -- use_item,name=soulletting_ruby,if=buff.power_infusion.up|!priest.self_power_infusion,target_if=min:target.health.pct
   if I.SoullettingRuby:IsReady() then
     if Everyone.CastTargetIf(I.SoullettingRuby, Enemies40y, "min", EvaluateTargetIfFilterSoullettingRuby230, EvaluateTargetIfSoullettingRuby232) then return "soulletting_ruby"; end
   end
-  -- use_item,name=sinful_gladiators_badge_of_ferocity,if=buff.voidform.up|cooldown.void_eruption.remains>=10
-  if I.SinfulGladiatorsBadgeofFerocity:IsReady() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() >= 10) then
+  -- use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
+  if I.SinfulGladiatorsBadgeofFerocity:IsReady() and (S.VoidEruption:CooldownRemains() >= 10) then
     if Cast(I.SinfulGladiatorsBadgeofFerocity, nil, Settings.Commons.DisplayStyle.Trinkets) then return "sinful_gladiators_badge_of_ferocity"; end
   end
   -- call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
@@ -285,8 +285,8 @@ local function Cds()
   if S.Mindgames:IsReady() then
     if Cast(S.Mindgames, Enemies40y, EvaluateCycleMindgames226, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 54"; end
   end
-  -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10|!priest.self_power_infusion)
-  if S.UnholyNova:IsReady() and (Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10 or not Settings.Shadow.SelfPI) then
+  -- Covenant: unholy_nova,if=((!raid_event.adds.up&raid_event.adds.in>20)|raid_event.adds.remains>=15|raid_event.adds.duration<15)&(buff.power_infusion.up|cooldown.power_infusion.remains>=10|!priest.self_power_infusion)&(!talent.hungering_void.enabled|debuff.hungering_void.up|!buff.voidform.up)
+  if S.UnholyNova:IsReady() and ((Player:BuffUp(S.PowerInfusionBuff) or S.PowerInfusion:CooldownRemains() >= 10 or not Settings.Shadow.SelfPI) and (not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff) or Player:BuffDown(S.VoidformBuff))) then
     if Cast(S.UnholyNova, Settings.Commons.DisplayStyle.Covenant, nil, not Target:IsSpellInRange(S.UnholyNova)) then return "unholy_nova 56"; end
   end
   -- Covenant: boon_of_the_ascended,if=!buff.voidform.up&!cooldown.void_eruption.up&spell_targets.mind_sear>1&!talent.searing_nightmare.enabled|(buff.voidform.up&spell_targets.mind_sear<2&!talent.searing_nightmare.enabled&prev_gcd.1.void_bolt)|(buff.voidform.up&talent.searing_nightmare.enabled)
