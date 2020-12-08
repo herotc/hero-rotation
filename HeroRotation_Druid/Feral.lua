@@ -21,6 +21,9 @@ local HR         = HeroRotation
 
 local S = Spell.Druid.Feral;
 local I = Item.Druid.Feral;
+local OnUseExcludeTrinkets = {
+  --  I.TrinketName:ID(),
+}
 
 -- Rotation Var
 local ShouldReturn; -- Used to get the return string
