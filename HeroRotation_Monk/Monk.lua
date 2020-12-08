@@ -105,11 +105,23 @@ Spell.Monk.Windwalker = {
   -- PvP Abilities
 
   -- Shadowland Covenant
+  WeaponsOfOrder                        = Spell(310454),
+  WeaponsOfOrderChiBuff                 = Spell(311054),
+  WeaponsOfOrderDebuff                  = Spell(312106),
+  BonedustBrew                          = Spell(325216),
+  FaelineStomp                          = Spell(327104),
+  FaelineStompDebuff                    = Spell(327257),
+  FallenOrder                           = Spell(326860),
+
+  -- Shadowland Essences
+  FortifyingIngrediencesBuff            = Spell(336874),
 
   -- Shadowlands Legendary
   ChiEnergyBuff                         = Spell(337571),
-  RecentlyRushingTigerPalm              = Spell(337340),
+  InvokersDelight                       = Spell(338321),
+  KeefersSkyreachDebuff                 = Spell(344021),
   RecentlyRushingTigerPalm              = Spell(337341),
+  TheEmperorsCapacitor                  = Spell(337291),
 
   -- Misc
   PoolEnergy                            = Spell(999910)
@@ -184,6 +196,22 @@ Spell.Monk.Brewmaster = {
   Transcendence                = Spell(101643),
   TranscendenceTransfer        = Spell(119996),
   Vivify                       = Spell(116670),
+
+  -- Shadowlands Covenants
+  WeaponsOfOrder               = Spell(310454),
+  WeaponsOfOrderDebuff         = Spell(312106),
+  BonedustBrew                 = Spell(325216),
+  FaelineStomp                 = Spell(327104),
+  FaelineStompBuff             = Spell(347480),
+  FaelineStompDebuff           = Spell(327257),
+  FallenOrder                  = Spell(326860),
+
+  -- Shadowlands Legendary
+  CharredPassions              = Spell(338140),
+  InvokersDelight              = Spell(338321),
+  KeefersSkyreach              = Spell(344021),
+  MightyPour                   = Spell(337994),
+  RecentlyRushingTigerPalm     = Spell(337341),
 
   -- Trinket Debuffs
   RazorCoralDebuff             = Spell(303568),

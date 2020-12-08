@@ -20,6 +20,7 @@ HR.GUISettings.APL.Monk = {
     UseTrinkets = true,
     UsePotions = true,
     TrinketDisplayStyle = "Suggested",
+    CovenantDisplayStyle = "Suggested",
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
@@ -101,6 +102,7 @@ CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation");
 CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.");
+CreatePanelOption("Dropdown", CP_Monk, "APL.Monk.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.");
 
 -- Windwalker
 CreateARPanelOptions(CP_Windwalker, "APL.Monk.Windwalker");
@@ -115,6 +117,6 @@ CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.NoBrewmaste
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.ShowCelestialBrewCD", "Celestial Brew", "Enable or disable Celestial Brew recommendations.")
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.ShowDampenHarmCD", "Dampen Harm", "Enable or disable Dampen Harmrecommendations.")
 CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enabled", "Purify", "Enable or disable Purify recommendations.");
-CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
-CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Medium", "Purify: Medium", "Enable or disable Purify recommendations when the stagger is medium.");
-CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.High", "Purify: High", "Enable or disable Purify recommendations when the stagger is high.");
+--CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
+--CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Medium", "Purify: Medium", "Enable or disable Purify recommendations when the stagger is medium.");
+--CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.High", "Purify: High", "Enable or disable Purify recommendations when the stagger is high.");

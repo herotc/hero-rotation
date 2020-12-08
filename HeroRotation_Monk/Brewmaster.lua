@@ -63,6 +63,16 @@ local Settings = {
   Brewmaster = HR.GUISettings.APL.Monk.Brewmaster
 };
 
+-- Legendary variables
+local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
+local CharredPassionsEquipped = Player:HasLegendaryEquipped(86)
+local EscapeFromRealityEquipped = Player:HasLegendaryEquipped(82)
+local FatalTouchEquipped = Player:HasLegendaryEquipped(85)
+local InvokersDelightEquipped = Player:HasLegendaryEquipped(83)
+local ShaohaosMightEquipped = Player:HasLegendaryEquipped(89)
+local StormstoutsLastKegEquipped = Player:HasLegendaryEquipped(87)
+local SwiftsureWrapsEquipped = Player:HasLegendaryEquipped(84)
+
 HL:RegisterForEvent(function()
   VarFoPPreChan = 0
 end, "PLAYER_REGEN_ENABLED")
@@ -98,11 +108,13 @@ local function GetStaggerTick(ThisSpell)
   end
 end
 
+-- I am going keep this function in place in case it is needed in the future.
+-- The code is sound for a smoothing of damage intake.
+-- However this is not needed in the current APL.
 local function ShouldPurify ()
   local NextStaggerTick = 0;
   local NextStaggerTickMaxHPPct = 0;
   local StaggersRatioPct = 0;
-
 
   if Player:DebuffUp(S.HeavyStagger) then
     NextStaggerTick = GetStaggerTick(S.HeavyStagger)
@@ -150,9 +162,8 @@ local function Defensives()
   if S.CelestialBrew:IsCastable() and Settings.Brewmaster.ShowCelestialBrewCD and Player:BuffDown(S.BlackoutComboBuff) and (IsTanking and 1 + (Player:BuffRemains(S.Shuffle) <= ShuffleDuration * 0.5 and 0.5 or 0) or 0) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2 then
     if HR.Cast(S.CelestialBrew, Settings.Brewmaster.GCDasOffGCD.CelestialBrew) then return "Celestial Brew"; end
   end
-  -- purifying_brew,if=stagger.pct>(6*(1-(cooldown.purifying_brew.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(1-cooldown.purifying_brew.charges_fractional))*stagger.last_tick_damage_30))
-  -- Note : We do not use the SimC conditions but rather the usage recommended by the Normalized Stagger WA.
-  if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastable() and ShouldPurify() then
+  -- purifying_brew
+  if Settings.Brewmaster.Purify.Enabled and S.PurifyingBrew:IsCastable() then
     if HR.Cast(S.PurifyingBrew, Settings.Brewmaster.OffGCDasOffGCD.PurifyingBrew) then return "Purifying Brew"; end
   end
   -- Blackout Combo Stagger Pause w/ Celestial Brew
@@ -164,7 +175,7 @@ local function Defensives()
     if HR.Cast(S.DampenHarm, Settings.Brewmaster.GCDasOffGCD.DampenHarm) then return "Dampen Harm"; end
   end
   -- Fortifying Brew
-  if S.FortifyingBrew:IsCastable() and Settings.Brewmaster.ShowIronskinBrewCD then
+  if S.FortifyingBrew:IsCastable() then
     if HR.Cast(S.FortifyingBrew, Settings.Brewmaster.GCDasOffGCD.FortifyingBrew) then return "Fortifying Brew"; end
   end
 end
@@ -243,6 +254,18 @@ local function APL()
       if S.BagOfTricks:IsCastable() then
         if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, not Target:IsInRange(40)) then return "Bag of Tricks"; end
       end
+      -- weapons_of_order
+      if S.WeaponsOfOrder:IsCastable() then
+        if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order cd 1"; end
+      end
+      -- fallen_order
+      if S.FallenOrder:IsCastable() then
+        if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Fallen Order cd 1"; end
+      end
+      -- bonedust_brew
+      if S.BonedustBrew:IsCastable() then
+        if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew cd 1"; end
+      end
       -- invoke_niuzao_the_black_ox
       if S.InvokeNiuzaoTheBlackOx:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
         if HR.Cast(S.InvokeNiuzaoTheBlackOx, Settings.Brewmaster.GCDasOffGCD.InvokeNiuzaoTheBlackOx) then return "Invoke Niuzao the Black Ox"; end
@@ -260,18 +283,21 @@ local function APL()
     if S.KegSmash:IsCastable() and EnemiesCount8 >= 2 then
       if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 1"; end
     end
+    -- faeline_stomp,if=spell_targets>=2
+    if S.FaelineStomp:IsCastable() and EnemiesCount8 >= 2 then
+      if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp cd 1"; end
+    end
+    -- keg_smash,if=buff.weapons_of_order.up
+    if S.KegSmash:IsCastable() and Player:BuffUp(S.WeaponsOfOrder) then
+      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 2"; end
+    end
     -- tiger_palm,if=talent.rushing_jade_wind.enabled&buff.blackout_combo.up&buff.rushing_jade_wind.up
     if S.TigerPalm:IsCastable() and S.RushingJadeWind:IsAvailable() and Player:BuffUp(S.BlackoutComboBuff) and Player:BuffUp(S.RushingJadeWind) then
       if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 1"; end
     end
-    -- tiger_palm,if=(talent.invoke_niuzao_the_black_ox.enabled|talent.special_delivery.enabled)&buff.blackout_combo.up
-    if S.TigerPalm:IsCastable() and (S.InvokeNiuzaoTheBlackOx:IsAvailable() or S.SpecialDelivery:IsAvailable()) and Player:BuffUp(S.BlackoutComboBuff) then
-      if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 2"; end
-    end
-    -- expel_harm,if=buff.gift_of_the_ox.stack>4
-    -- Note : Extra handling to prevent Expel Harm over-healing
-    if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() > 4 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
-      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 1"; end
+    -- breath_of_fire,if=buff.charred_passions.down&runeforge.charred_passions.equipped
+    if S.BreathOfFire:IsCastable(10, true) and (Player:BuffDown(S.CharredPassions) and CharredPassionsEquipped) then
+      if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire 1"; end
     end
     -- blackout_strike
     if S.BlackoutKick:IsCastable() then
@@ -279,7 +305,11 @@ local function APL()
     end
     -- keg_smash
     if S.KegSmash:IsCastable() then
-      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 2"; end
+      if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 3"; end
+    end
+    -- faeline_stomp
+    if S.FaelineStomp:IsCastable() then
+      if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp cd 2"; end
     end
     -- expel_harm,if=buff.gift_of_the_ox.stack>=3
     -- Note : Extra handling to prevent Expel Harm over-healing
@@ -287,15 +317,19 @@ local function APL()
       if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 2"; end
     end
   if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15 then
-    if HR.Cast(S.TouchOfDeath, Settings.Brewmaster.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "touch_of_death 304"; end
+    if HR.Cast(S.TouchOfDeath, Settings.Brewmaster.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "Touch Of Death 1"; end
   end
     -- rushing_jade_wind,if=buff.rushing_jade_wind.down
     if S.RushingJadeWind:IsCastable() and Player:BuffDown(S.RushingJadeWind) then
       if HR.Cast(S.RushingJadeWind, nil, nil, not Target:IsInMeleeRange(8)) then return "Rushing Jade Wind"; end
     end
-    -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
+    -- spinning_crane_kick,if=buff.charred_passions.up
+    if S.SpinningCraneKick:IsCastable() and Player:BuffUp(S.CharredPassions) then
+      if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 1"; end
+    end
+    -- breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&dot.breath_of_fire_dot.refreshable))
     if S.BreathOfFire:IsCastable(10, true) and (Player:BuffDown(S.BlackoutComboBuff) and (Player:BloodlustDown() or (Player:BloodlustUp() and Target:BuffRefreshable(S.BreathOfFireDotDebuff)))) then
-      if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire"; end
+      if HR.Cast(S.BreathOfFire, nil, nil, not Target:IsInMeleeRange(8)) then return "Breath of Fire 2"; end
     end
     -- chi_burst
     if S.ChiBurst:IsCastable() then
@@ -305,22 +339,17 @@ local function APL()
     if S.ChiWave:IsCastable() then
       if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave 2"; end
     end
-    -- expel_harm,if=buff.gift_of_the_ox.stack>=2
-    -- Note : Extra handling to prevent Expel Harm over-healing
-    if S.ExpelHarm:IsReady() and S.ExpelHarm:Count() >= 2 and Player:Health() + HealingSphereAmount() < Player:MaxHealth() then
-      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 3"; end
-    end
-    -- spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>execute_time&(energy+(energy.regen*(cooldown.keg_smash.remains+execute_time)))>=65
-    if S.SpinningCraneKick:IsCastable() and (EnemiesCount8 >= 3 and S.KegSmash:CooldownRemains() > S.SpinningCraneKick:ExecuteTime() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + S.SpinningCraneKick:ExecuteTime())) >= 65))) then
-      if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick"; end
+    -- spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+execute_time)))>=65&(!talent.spitfire.enabled|!runeforge.charred_passions.equipped)
+    if S.SpinningCraneKick:IsCastable() and (EnemiesCount8 >= 3 and S.KegSmash:CooldownRemains() > Player:GCD() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + S.SpinningCraneKick:ExecuteTime())) >= 65)) and (not S.Spitfire:IsAvailable() or not CharredPassionsEquipped)) then
+      if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 2"; end
     end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
     if S.TigerPalm:IsCastable() and (not S.BlackoutCombo:IsAvailable() and S.KegSmash:CooldownRemains() > Player:GCD() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + Player:GCD()))) >= 65)) then
       if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 3"; end
     end
     -- arcane_torrent,if=energy<31
-    if HR.CDsON() and S.ArcaneTorrent:IsCastable() and Player:Energy() < 31 then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "Arcane Torrent"; end
+    if S.ArcaneTorrent:IsCastable() and Player:Energy() < 31 then
+      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "arcane_torrent"; end
     end
     -- rushing_jade_wind
     if S.RushingJadeWind:IsCastable() then
@@ -336,7 +365,7 @@ end
 
 HR.SetAPL(268, APL, Init);
 
--- Last Update: 2020-10-23
+-- Last Update: 2020-12-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
@@ -350,11 +379,11 @@ HR.SetAPL(268, APL, Init);
 
 -- # Executed every time the actor is available.
 -- actions=auto_attack
+-- actions+=/spear_hand_strike,if=target.debuff.casting.react
 -- actions+=/gift_of_the_ox,if=health<health.max*0.65
 -- actions+=/dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down
 -- actions+=/fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
--- actions+=/use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<31|target.time_to_die<20
--- actions+=/use_items
+-- actions+=/use_item,name=dreadfire_vessel
 -- actions+=/potion
 -- actions+=/blood_fury
 -- actions+=/berserking
@@ -363,29 +392,34 @@ HR.SetAPL(268, APL, Init);
 -- actions+=/ancestral_call
 -- actions+=/bag_of_tricks
 -- actions+=/invoke_niuzao_the_black_ox,if=target.time_to_die>25
--- # Purifying behaviour is based on normalization (iE the late expression triggers if stagger size increased over the last 30 ticks or 15 seconds).
--- actions+=/purifying_brew,if=stagger.pct>(6*(1-(cooldown.purifying_brew.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(1-cooldown.purifying_brew.charges_fractional))*stagger.last_tick_damage_30))
+-- actions+=/touch_of_death,if=target.health.pct<=15
+-- actions+=/weapons_of_order
+-- actions+=/fallen_order
+-- actions+=/bonedust_brew
+-- actions+=/purifying_brew
 -- # Black Ox Brew is currently used to either replenish brews based on less than half a brew charge available, or low energy to enable Keg Smash
 -- actions+=/black_ox_brew,if=cooldown.purifying_brew.charges_fractional<0.5
 -- actions+=/black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
 -- # Offensively, the APL prioritizes KS on cleave, BoS else, with energy spenders and cds sorted below
 -- actions+=/keg_smash,if=spell_targets>=2
--- # Celestial Brew priority whenever it took significant damage and ironskin brew buff is missing (adjust the health.max coefficient according to intensity of damage taken), and to dump excess charges before BoB.
+-- actions+=/faeline_stomp,if=spell_targets>=2
+-- # cast KS at top prio during WoO buff
+-- actions+=/keg_smash,if=buff.weapons_of_order.up
+-- # Celestial Brew priority whenever it took significant damage (adjust the health.max coefficient according to intensity of damage taken), and to dump excess charges before BoB.
 -- actions+=/celestial_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2
 -- actions+=/tiger_palm,if=talent.rushing_jade_wind.enabled&buff.blackout_combo.up&buff.rushing_jade_wind.up
--- actions+=/tiger_palm,if=(1|talent.special_delivery.enabled)&buff.blackout_combo.up
--- actions+=/expel_harm,if=buff.gift_of_the_ox.stack>4
+-- actions+=/breath_of_fire,if=buff.charred_passions.down&runeforge.charred_passions.equipped
 -- actions+=/blackout_kick
 -- actions+=/keg_smash
--- actions+=/concentrated_flame,if=dot.concentrated_flame.remains=0
+-- actions+=/faeline_stomp
 -- actions+=/expel_harm,if=buff.gift_of_the_ox.stack>=3
+-- actions+=/touch_of_death
 -- actions+=/rushing_jade_wind,if=buff.rushing_jade_wind.down
--- actions+=/breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
+-- actions+=/spinning_crane_kick,if=buff.charred_passions.up
+-- actions+=/breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&dot.breath_of_fire_dot.refreshable))
 -- actions+=/chi_burst
 -- actions+=/chi_wave
--- # Expel Harm has higher DPET than TP when you have at least 2 orbs.
--- actions+=/expel_harm,if=buff.gift_of_the_ox.stack>=2
--- actions+=/spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
+-- actions+=/spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+execute_time)))>=65&(!talent.spitfire.enabled|!runeforge.charred_passions.equipped)
 -- actions+=/tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
 -- actions+=/arcane_torrent,if=energy<31
 -- actions+=/rushing_jade_wind
