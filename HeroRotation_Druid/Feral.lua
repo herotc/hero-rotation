@@ -70,8 +70,6 @@ local function RakeBleedTick()
   return LastRakeAP * 0.15561 * (1 + Player:VersatilityDmgPct()/100);
 end
 
-
---[[
 S.Rake:RegisterDamageFormula(
   function()
     return
@@ -141,10 +139,10 @@ local function ComputeRakeDebuggPMultiplier ()
 	return Player:StealthUp(true, true) and 2 or 1;
 end
 
+
 S.Rip:RegisterPMultiplier({S.BloodtalonsBuff, 1.2}, {S.SavageRoar, 1.15}, {S.TigersFury, 1.15})
 S.Rake:RegisterPMultiplier(ComputeRakeDebuggPMultiplier) 
 
-]]--
 
 local function EvaluateCyclePrimalWrath95(TargetUnit)
   return HR.AoEON() and #Player:GetEnemiesInMeleeRange(MeleeRange) > 1 and TargetUnit:DebuffRemains(S.RipDebuff) < 4
