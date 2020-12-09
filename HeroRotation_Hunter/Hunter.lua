@@ -146,6 +146,76 @@ Spell.Hunter.Marksmanship = {
   HuntersMarkDebuff                     = Spell(257284),
 }
 
+Spell.Hunter.Survival = {
+  
+  SummonPet                             = Spell(883),
+  SteelTrapDebuff                       = Spell(162487),
+  SteelTrap                             = Spell(162488),
+  Harpoon                               = Spell(190925),
+  MongooseBite                          = MultiSpell(259387, 265888),
+  CoordinatedAssaultBuff                = Spell(266779),
+  BlurofTalons                          = Spell(277653),
+  BlurofTalonsBuff                      = Spell(277969),
+  RaptorStrike                          = MultiSpell(186270, 265189),
+  FlankingStrike                        = Spell(269751),
+  KillCommand                           = Spell(259489),
+  WildfireBomb                          = MultiSpell(259495, 270335, 270323, 271045),
+  WildfireBombDebuff                    = Spell(269747),
+  ShrapnelBomb                          = Spell(270335),
+  PheromoneBomb                         = Spell(270323),
+  VolatileBomb                          = Spell(271045),
+  SerpentSting                          = Spell(259491),
+  SerpentStingDebuff                    = Spell(259491),
+  MongooseFuryBuff                      = Spell(259388),
+  AMurderofCrows                        = Spell(131894),
+  CoordinatedAssault                    = Spell(266779),
+  TipoftheSpearBuff                     = Spell(260286),
+  ShrapnelBombDebuff                    = Spell(270339),
+  Chakrams                              = Spell(259391),
+  BloodFury                             = Spell(20572),
+  AncestralCall                         = Spell(274738),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  Berserking                            = Spell(26297),
+  BagofTricks                           = Spell(312411),
+  BerserkingBuff                        = Spell(26297),
+  BloodFuryBuff                         = Spell(20572),
+  AspectoftheEagle                      = Spell(186289),
+  Exhilaration                          = Spell(109304),
+  Muzzle                                = Spell(187707),
+  Intimidation                          = Spell(19577),
+  BloodoftheEnemy                       = Spell(297108),
+  MemoryofLucidDreams                   = Spell(298357),
+  PurifyingBlast                        = Spell(295337),
+  RippleInSpace                         = Spell(302731),
+  ConcentratedFlame                     = Spell(295373),
+  TheUnboundForce                       = Spell(298452),
+  WorldveinResonance                    = Spell(295186),
+  FocusedAzeriteBeam                    = Spell(295258),
+  GuardianofAzeroth                     = Spell(295840),
+  GuardianofAzerothBuff                 = Spell(295855),
+  ReapingFlames                         = Spell(310690),
+  RecklessForceBuff                     = Spell(302932),
+  ConcentratedFlameBurn                 = Spell(295368),
+  Carve                                 = Spell(187708),
+  GuerrillaTactics                      = Spell(264332),
+  LatentPoison                          = Spell(273283),
+  LatentPoisonDebuff                    = Spell(273286),
+  BloodseekerDebuff                     = Spell(259277),
+  Butchery                              = Spell(212436),
+  WildfireInfusion                      = Spell(271014),
+  InternalBleedingDebuff                = Spell(270343),
+  VipersVenomBuff                       = Spell(268552),
+  TermsofEngagement                     = Spell(265895),
+  VipersVenom                           = Spell(268501),
+  AlphaPredator                         = Spell(269737),
+  HydrasBite                            = Spell(260241),
+  BirdsofPrey                           = Spell(260331),
+  ArcaneTorrent                         = Spell(50613),
+  RazorCoralDebuff                      = Spell(303568),
+  PoolFocus                             = Spell(999910),
+}
+
 -- Items
 if not Item.Hunter then Item.Hunter = {} end
 Item.Hunter.BeastMastery = {
@@ -155,5 +225,9 @@ Item.Hunter.BeastMastery = {
 }
 
 Item.Hunter.Marksmanship = {
+  PotionOfSpectralAgility = Item(171270)
+}
+
+Item.Hunter.Survival = {
   PotionOfSpectralAgility = Item(171270)
 }
