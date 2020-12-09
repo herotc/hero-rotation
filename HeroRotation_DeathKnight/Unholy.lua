@@ -290,7 +290,9 @@ local function Cooldowns()
   end
   -- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready 
   if S.SacrificialPact:IsCastable() and (EnemiesMeleeCount >= 2 and not Pet:BuffUp(S.DarkTransformation) and not S.DarkTransformation:CooldownUp() and S.RaiseDead:CooldownUp()) then
-    if HR.Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial_pact cooldown 13"; end
+    if Settings.Commons.GCDasOffGCD ~= nil then
+      if HR.Cast(S.SacrificialPact, Settings.Commons.GCDasOffGCD.SacrificialPact, nil, not TargetIsInRange[8]) then return "sacrificial_pact cooldown 13"; end
+    end
   end
 end
 
