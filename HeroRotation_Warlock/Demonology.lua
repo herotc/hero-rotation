@@ -161,7 +161,7 @@ local function TyrantPrep()
   end
   -- summon_vilefiend
   if S.SummonVilefiend:IsReady() then
-    if HR.Cast(S.SummonVilefiend, nil, nil, not Target:IsSpellInRange(S.SummonVilefiend)) then return "summon_vilefiend 70"; end
+    if HR.Cast(S.SummonVilefiend) then return "summon_vilefiend 70"; end
   end
   -- call_dreadstalkers
   if S.CallDreadstalkers:IsReady() then
@@ -257,7 +257,7 @@ local function Covenant()
   -- scouring_tithe,if=talent.sacrificed_souls.enabled&active_enemies=1
   -- scouring_tithe,if=!talent.sacrificed_souls.enabled&active_enemies<4
   -- Note: Combined the lines
-  if S.ScouringTithe:IsReady() and ((S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash == 1) or (not S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash < 4)) then
+  if S.ScouringTithe:IsReady() and not Player:IsCasting(S.ScouringTithe) and ((S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash == 1) or (not S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash < 4)) then
     if HR.Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe 144"; end
   end
   -- soul_rot
@@ -310,8 +310,8 @@ local function APL()
       local ShouldReturn = SummonTyrant(); if ShouldReturn then return ShouldReturn; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|time_to_die<cooldown.summon_demonic_tyrant.remains+25
-    if S.SummonVilefiend:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() > 40 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemains() + 25) then
-      if HR.Cast(S.SummonVilefiend, nil, nil, not Target:IsSpellInRange(S.SummonVilefiend)) then return "summon_vilefiend 22"; end
+    if S.SummonVilefiend:IsReady() and ((S.SummonDemonicTyrant:CooldownRemains() > 40 or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemains() + 25) or not CDsON()) then
+      if HR.Cast(S.SummonVilefiend) then return "summon_vilefiend 22"; end
     end
     -- call_dreadstalkers
     if S.CallDreadstalkers:IsReady() then
@@ -331,11 +331,11 @@ local function APL()
       if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsSpellInRange(S.BilescourgeBombers)) then return "bilescourge_bombers 30"; end
     end
     -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=8&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
-    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= 8 and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
       if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 31"; end
     end
     -- implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down
-    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= 8 and DemonicTyrantTime() == 0) then
+    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0) then
       if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 32"; end
     end
     -- hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
@@ -355,7 +355,7 @@ local function APL()
       if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 36"; end
     end
     -- grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains+cooldown.summon_demonic_tyrant.duration>time_to_die|time_to_die<cooldown.summon_demonic_tyrant.remains+15
-    if S.GrimoireFelguard:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() + 90 > Target:TimeToDie() or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemains() + 15) then
+    if CDsON() and S.GrimoireFelguard:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() + 90 > Target:TimeToDie() or Target:TimeToDie() < S.SummonDemonicTyrant:CooldownRemains() + 15) then
       if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard 38"; end
     end
     -- use_items
