@@ -69,9 +69,9 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = OldShadowIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellShadow.VampiricTouch then
-      return (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self)) and BaseCheck
+      return BaseCheck and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then
-      return (self:Charges() >= 2 or not Player:IsCasting(self)) and BaseCheck
+      return BaseCheck and (self:Charges() >= 2 or not Player:IsCasting(self))
     else
       return BaseCheck
     end
