@@ -232,7 +232,7 @@ local function APL()
     -- end
     -- starfall,if=(!solar_wrath.ap_check|(buff.starlord.stack<3|buff.starlord.remains>=8)&(fight_remains+1)*spell_targets>cost%2.5)&spell_targets>=variable.sf_targets
     if S.Starfall:IsReady() then
-      local FightRemains = HL.FightRemains(40)
+      local FightRemains = HL.FightRemains(EnemiesFourty, false)
       if ((not AP_Check(S.SolarWrath) or (Player:BuffStack(S.StarlordBuff) < 3 or Player:BuffRemains(S.StarlordBuff) >= 8) and (FightRemains + 1) * EnemiesCount > S.Starfall:Cost() % 2.5) and EnemiesCount >= VarSfTargets) then
         if HR.Cast(S.Starfall, Settings.Balance.GCDasOffGCD.Starfall) then return "starfall 164"; end
       end
