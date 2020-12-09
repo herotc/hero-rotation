@@ -70,6 +70,25 @@ HR.GUISettings.APL.Hunter = {
       Trueshot = true,
     }
   },
+  Survival = {
+    AspectoftheEagle = true,
+    -- {Display GCD as OffGCD, ForceReturn}
+    GCDasOffGCD = {
+      -- Abilities
+      Butchery = false,
+      SummonPet = false,
+      CoordinatedAssault = true,
+      Harpoon = true,
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Abilities
+      AspectoftheEagle = true,
+      Muzzle = true,
+      -- Items
+      -- Racials
+    }
+  }
 };
 
 HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -80,6 +99,7 @@ local CP_Hunter = CreateChildPanel(ARPanel, "Hunter");
 local CP_Hunter2 = CreateChildPanel(ARPanel, "Hunter 2");
 local CP_BeastMastery = CreateChildPanel(ARPanel, "BeastMastery");
 local CP_Marksmanship = CreateChildPanel(ARPanel, "Marksmanship");
+local CP_Survival = CreateChildPanel(ARPanel, "Survival");
 
 -- Hunter
 CreateARPanelOptions(CP_Hunter, "APL.Hunter.Commons");
@@ -97,3 +117,7 @@ CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery");
 -- Marksmanship
 CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.HideAimedWhileMoving", "Hide Moving Aimed Shot", "Enable this option to hide Aimed Shot while your character is moving.");
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship");
+
+-- Survival
+CreatePanelOption("CheckButton", CP_Survival, "APL.Hunter.Survival.AspectoftheEagle", "Show Aspect of the Eagle", "Show Aspect of the Eagle when out of Melee Range.")
+CreateARPanelOptions(CP_Survival, "APL.Hunter.Survival");

@@ -13,6 +13,7 @@
 -- Spells
   local SpellBM = Spell.Hunter.BeastMastery;
   local SpellMM = Spell.Hunter.Marksmanship;
+  local SpellSV = Spell.Hunter.Survival;
 -- Lua
   local mathmax = math.max;
 
@@ -79,6 +80,25 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   end
 end
 , 254);
+
+-- Survival, ID: 255
+local OldSVIsCastableP
+OldSVIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  if self.SpellID == 259387 or self.SpellID == 186270 then
+    return OldSVIsCastableP(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
+  else
+    local BaseCheck = OldSVIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellSV.SummonPet then
+      return (not Pet:IsActive()) and BaseCheck
+    elseif self == SpellSV.AspectoftheEagle then
+      return HR.GUISettings.APL.Hunter.Survival.AspectoftheEagle and BaseCheck
+    else
+      return BaseCheck
+    end
+  end
+end
+, 255);
 
 -- Example (Arcane Mage)
 -- HL.AddCoreOverride ("Spell.IsCastableP",
