@@ -265,7 +265,7 @@ local function Precombat ()
   end
   --potion
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
-    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion precombat 4"; end
+    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
   end
   --frostbolt,if=!variable.prepull_evo=1&runeforge.disciplinary_command
   if not var_prepull_evo and S.Frostbolt:IsReady() and DisciplinaryCommandEquipped then
@@ -288,7 +288,7 @@ local function SharedCds ()
   end
   --potion,if=buff.arcane_power.up
   if I.PotionofPhantomFire:IsReady() and Player:BuffUp(S.ArcanePower) and Settings.Commons.Enabled.UsePotions then
-    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion Shared_cd 2"; end
+    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion Shared_cd 2"; end
   end
   --time_warp,if=runeforge.temporal_warp&buff.exhaustion.up&(cooldown.arcane_power.ready|fight_remains<=40)
   if S.TimeWarp:IsCastable() and Settings.Arcane.UseTemporalWarp and TemporalWarpEquipped and Player:BloodlustExhaustUp() and Player:BloodlustDown() and (S.ArcanePower:CooldownRemains() == 0 or Target:TimeToDie() <= 40) then
@@ -374,7 +374,7 @@ local function Opener ()
   end
   --potion,if=variable.inverted_opener=1&!(runeforge.siphon_storm|runeforge.temporal_warp)
   if I.PotionofPhantomFire:IsReady() and var_inverted_opener and Settings.Commons.Enabled.UsePotions and (SiphonStormEquipped or TemporalWarpEquipped) then
-    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion opener 11"; end
+    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion opener 11"; end
   end
   --deathborne,if=buff.rune_of_power.down
   if S.Deathborne:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) then
@@ -675,7 +675,7 @@ local function Rotation ()
     if HR.Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage rotation 23"; end
   end  
   --arcane_explosion,if=target.health.pct<35&buff.arcane_charge.stack<buff.arcane_charge.max_stack&runeforge.arcane_bombardment&active_enemies>1&buff.deathborne.down
-  if S.ArcaneExplosion:IsCastable()and Target:HealthPercentage() < 35 and Player:ArcaneCharges() < Player:ArcaneChargesMax() and ArcaneBombardmentEquipped and EnemiesCount10ySplash > 1 and Player:BuffDown(S.Deathborne) then
+  if S.ArcaneExplosion:IsCastable() and Target:HealthPercentage() < 35 and Player:ArcaneCharges() < Player:ArcaneChargesMax() and ArcaneBombardmentEquipped and EnemiesCount10ySplash > 1 and Player:BuffDown(S.Deathborne) then
     if Settings.Arcane.StayDistance and not Target:IsInRange(10) then
       if HR.CastLeft(S.ArcaneExplosion) then return "arcane_explosion rotation 24 left"; end
     else
