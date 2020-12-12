@@ -87,7 +87,7 @@ local function Precombat ()
     end
     -- potion
     if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions then
-      if HR.CastSuggested(I.PotionofPhantomFire) then return "potion precombat 4"; end
+      if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat 4"; end
     end
     -- frostbolt
     if S.Frostbolt:IsCastable() and not Player:IsCasting(S.Frostbolt) then
@@ -103,7 +103,7 @@ end
 local function Cooldowns ()
   --potion,if=prev_off_gcd.icy_veins|fight_remains<30
   if I.PotionofPhantomFire:IsReady() and Settings.Commons.Enabled.UsePotions and (Player:PrevGCDP(1, S.IcyVeins) or Target:TimeToDie() < 30) then
-    if HR.CastSuggested(I.PotionofPhantomFire) then return "potion cd 1"; end
+    if HR.CastSuggested(I.PotionofPhantomFire, nil, Settings.Commons.DisplayStyle.Potions) then return "potion cd 1"; end
   end
   --deathborne
   if S.Deathborne:IsCastable() then
