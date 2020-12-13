@@ -12,6 +12,5 @@ Settings.lua
 Mage.lua
 Events.lua
 Arcane.lua
-Fire.lua
 Frost.lua
 Overrides.lua
