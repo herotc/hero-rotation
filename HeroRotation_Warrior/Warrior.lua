@@ -108,7 +108,7 @@ Spell.Warrior.Arms = {
   ColossusSmash                         = Spell(167105),
   ColossusSmashDebuff                   = Spell(208086),
   DeepWoundsDebuff                      = Spell(262115),
-  Execute                               = Spell(163201),
+  Execute                               = MultiSpell(163201, 281000),
   HeroicLeap                            = Spell(6544),
   IntimidatingShout                     = Spell(5246),
   MortalStrike                          = Spell(12294),
@@ -229,6 +229,7 @@ Item.Warrior.Fury = {
 Item.Warrior.Arms = {
   PotionofPhantomFire              = Item(171349),
   GrimCodex                        = Item(178811, {13, 14}),
+  DDVoracity                       = Item(173087, {13, 14}),
 }
 
 Item.Warrior.Protection = {
