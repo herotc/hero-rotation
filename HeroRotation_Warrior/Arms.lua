@@ -138,7 +138,7 @@ local function Hac()
 		if HR.Cast(S.Condemn, nil, nil, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
 	end
 	-- execute,if=buff.sweeping_strikes.up
-	if S.Execute:IsReady() and ((Target:HealthPercentage() < 20 or Player:BuffUp(S.SuddenDeathBuff)) and Player:BuffUp(S.SweepingStrikesBuff)) then
+	if S.Execute:IsReady() and ((Target:HealthPercentage() < 20 or (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35)) or Player:BuffUp(S.SuddenDeathBuff)) and Player:BuffUp(S.SweepingStrikesBuff) then
 		if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
 	end
 	-- overpower
