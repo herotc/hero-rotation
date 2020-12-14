@@ -28,6 +28,42 @@ local GetTime = GetTime
 
 
 --- ============================ CONTENT ============================
+
+--- Roll the Bones Tracking
+--- As buff is "hidden" from the client but we get apply/refresh events for it
+do
+  local RtBExpiryTime = GetTime()
+  function Rogue.RtBRemains()
+    local Remains = RtBExpiryTime - GetTime() - HL.RecoveryOffset()
+    return Remains >= 0 and Remains or 0
+  end
+
+  HL:RegisterForSelfCombatEvent(
+    function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
+      if SpellID == 315508 then
+        RtBExpiryTime = GetTime() + 30
+      end
+    end,
+    "SPELL_AURA_APPLIED"
+  )
+  HL:RegisterForSelfCombatEvent(
+    function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
+      if SpellID == 315508 then
+        RtBExpiryTime = GetTime() + mathmin(40, 30 + Rogue.RtBRemains())
+      end
+    end,
+    "SPELL_AURA_REFRESH"
+  )
+  HL:RegisterForSelfCombatEvent(
+    function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
+      if SpellID == 315508 then
+        RtBExpiryTime = GetTime()
+      end
+    end,
+    "SPELL_AURA_REMOVED"
+  )
+end
+
 --- Exsanguinated Tracking
 do
   -- Variables

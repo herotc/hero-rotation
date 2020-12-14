@@ -116,18 +116,6 @@ local function RtB_List (Type, List)
   end
   return Cache.APLVar.RtB_List[Type][Sequence]
 end
-local function RtB_BuffRemains ()
-  if not Cache.APLVar.RtB_BuffRemains then
-    Cache.APLVar.RtB_BuffRemains = 0
-    for i = 1, #RtB_BuffsList do
-      if Player:BuffUp(RtB_BuffsList[i]) then
-        Cache.APLVar.RtB_BuffRemains = Player:BuffRemains(RtB_BuffsList[i])
-        break
-      end
-    end
-  end
-  return Cache.APLVar.RtB_BuffRemains
-end
 -- Get the number of Roll the Bones buffs currently on
 local function RtB_Buffs ()
   if not Cache.APLVar.RtB_Buffs then
@@ -220,7 +208,7 @@ local function CDs ()
       if HR.Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then return "Cast Adrenaline Rush" end
     end
     -- actions.cds+=/roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
-    if S.RolltheBones:IsReady() and (RtB_BuffRemains() <= 3 or RtB_Reroll()) then
+    if S.RolltheBones:IsReady() and (Rogue.RtBRemains() <= 3 or RtB_Reroll()) then
       if HR.Cast(S.RolltheBones) then return "Cast Roll the Bones" end
     end
     -- actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
