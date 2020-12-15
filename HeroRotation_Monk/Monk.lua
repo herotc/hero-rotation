@@ -231,36 +231,20 @@ Spell.Monk.Brewmaster = {
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Windwalker = {
-  PotionofUnbridledFury                = Item(169299),
-  GalecallersBoon                      = Item(159614, {13, 14}),
-  LustrousGoldenPlumage                = Item(159617, {13, 14}),
-  PocketsizedComputationDevice         = Item(167555, {13, 14}),
-  AshvanesRazorCoral                   = Item(169311, {13, 14}),
-  AzsharasFontofPower                  = Item(169314, {13, 14}),
-  RemoteGuidanceDevice                 = Item(169769, {13, 14}),
-  WrithingSegmentofDrestagath          = Item(173946, {13, 14}),
-  -- For VarTodOnUse
-  DribblingInkpod                      = Item(169319, {13, 14}),
-  -- Gladiator Badges/Medallions
-  DreadGladiatorsMedallion             = Item(161674, {13, 14}),
-  DreadCombatantsInsignia              = Item(161676, {13, 14}),
-  DreadCombatantsMedallion             = Item(161811, {13, 14}),
-  DreadGladiatorsBadge                 = Item(161902, {13, 14}),
-  DreadAspirantsMedallion              = Item(162897, {13, 14}),
-  DreadAspirantsBadge                  = Item(162966, {13, 14}),
-  SinisterGladiatorsMedallion          = Item(165055, {13, 14}),
-  SinisterGladiatorsBadge              = Item(165058, {13, 14}),
-  SinisterAspirantsMedallion           = Item(165220, {13, 14}),
-  SinisterAspirantsBadge               = Item(165223, {13, 14}),
-  NotoriousGladiatorsMedallion         = Item(167377, {13, 14}),
-  NotoriousGladiatorsBadge             = Item(167380, {13, 14}),
-  NotoriousAspirantsMedallion          = Item(167525, {13, 14}),
-  NotoriousAspirantsBadge              = Item(167528, {13, 14})
+  PotionofPhantomFire                  = Item(171349),
+  PotionofSpectralAgility              = Item(171270),
+  PotionofDeathlyFixation              = Item(171351),
+  PotionofEmpoweredExorcisms           = Item(171352),
+  PotionofHardenedShadows              = Item(171271),
+  PotionofSpectralStamina              = Item(171274)
 }
 
 Item.Monk.Brewmaster = {
-  -- BfA
-  PotionofUnbridledFury        = Item(169299),
-  PocketsizedComputationDevice = Item(167555, {13, 14}),
-  AshvanesRazorCoral           = Item(169311, {13, 14}),
+  -- Potions
+  PotionofPhantomFire          = Item(171349),
+  PotionofSpectralAgility      = Item(171270),
+  PotionofDeathlyFixation      = Item(171351),
+  PotionofEmpoweredExorcisms   = Item(171352),
+  PotionofHardenedShadows      = Item(171271),
+  PotionofSpectralStamina      = Item(171274)
 }

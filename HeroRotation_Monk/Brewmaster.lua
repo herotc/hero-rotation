@@ -195,8 +195,23 @@ local function APL()
     -- augmentation
     -- snapshot_stats
     -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "Potion of Unbridled Fury"; end
+    if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofPhantomFire) then return "Potion of Phantom Fire"; end
+    end
+    if I.PotionofSpectralAgility:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofSpectralAgility) then return "Potion of Spectral Agility"; end
+    end
+    if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofDeathlyFixation) then return "Potion of Deathly Fixation"; end
+    end
+    if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofEmpoweredExorcisms) then return "Potion of Empowered Exorcisms"; end
+    end
+    if I.PotionofHardenedShadows:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofHardenedShadows) then return "Potion of Hardened Shadows"; end
+    end
+    if I.PotionofSpectralStamina:IsReady() and Settings.Commons.UsePotions then
+      if HR.CastSuggested(I.PotionofSpectralStamina) then return "Potion of Spectral Stamina"; end
     end
     -- chi_burst
     if S.ChiBurst:IsCastable() then
@@ -227,8 +242,23 @@ local function APL()
         end
       end
       -- potion
-      if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-        if HR.CastSuggested(I.PotionofUnbridledFury) then return "Potion of Unbridled Fury 2"; end
+      if I.PotionofPhantomFire:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofPhantomFire) then return "Potion of Phantom Fire 2"; end
+      end
+      if I.PotionofSpectralAgility:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofSpectralAgility) then return "Potion of Spectral Agility 2"; end
+      end
+      if I.PotionofDeathlyFixation:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofDeathlyFixation) then return "Potion of Deathly Fixation 2"; end
+      end
+      if I.PotionofEmpoweredExorcisms:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofEmpoweredExorcisms) then return "Potion of Empowered Exorcisms 2"; end
+      end
+      if I.PotionofHardenedShadows:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofHardenedShadows) then return "Potion of Hardened Shadows 2"; end
+      end
+      if I.PotionofSpectralStamina:IsReady() and Settings.Commons.UsePotions then
+        if HR.CastSuggested(I.PotionofSpectralStamina) then return "Potion of Spectral Stamina 2"; end
       end
       -- blood_fury
       if S.BloodFury:IsCastable() then
@@ -280,11 +310,11 @@ local function APL()
       end
     end
     -- keg_smash,if=spell_targets>=2
-    if S.KegSmash:IsCastable() and EnemiesCount8 >= 2 then
+    if S.KegSmash:IsCastable() and HR.AoEON() and EnemiesCount8 >= 2 then
       if HR.Cast(S.KegSmash, nil, nil, not Target:IsSpellInRange(S.KegSmash)) then return "Keg Smash 1"; end
     end
     -- faeline_stomp,if=spell_targets>=2
-    if S.FaelineStomp:IsCastable() and EnemiesCount8 >= 2 then
+    if S.FaelineStomp:IsCastable() and HR.AoEON() and EnemiesCount8 >= 2 then
       if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp cd 1"; end
     end
     -- keg_smash,if=buff.weapons_of_order.up
@@ -340,7 +370,7 @@ local function APL()
       if HR.Cast(S.ChiWave, nil, nil, not Target:IsInRange(40)) then return "Chi Wave 2"; end
     end
     -- spinning_crane_kick,if=active_enemies>=3&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+execute_time)))>=65&(!talent.spitfire.enabled|!runeforge.charred_passions.equipped)
-    if S.SpinningCraneKick:IsCastable() and (EnemiesCount8 >= 3 and S.KegSmash:CooldownRemains() > Player:GCD() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + S.SpinningCraneKick:ExecuteTime())) >= 65)) and (not S.Spitfire:IsAvailable() or not CharredPassionsEquipped)) then
+    if S.SpinningCraneKick:IsCastable() and (HR.AoEON() and EnemiesCount8 >= 3 and S.KegSmash:CooldownRemains() > Player:GCD() and ((Player:Energy() + (Player:EnergyRegen() * (S.KegSmash:CooldownRemains() + S.SpinningCraneKick:ExecuteTime())) >= 65)) and (not S.Spitfire:IsAvailable() or not CharredPassionsEquipped)) then
       if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 2"; end
     end
     -- tiger_palm,if=!talent.blackout_combo.enabled&cooldown.keg_smash.remains>gcd&(energy+(energy.regen*(cooldown.keg_smash.remains+gcd)))>=65
