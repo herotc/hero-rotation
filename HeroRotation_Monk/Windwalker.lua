@@ -76,6 +76,16 @@ local Settings = {
   Windwalker = HR.GUISettings.APL.Monk.Windwalker
 };
 
+-- Legendary variables
+local CelestialInfusionEquipped = Player:HasLegendaryEquipped(88)
+local EscapeFromRealityEquipped = Player:HasLegendaryEquipped(82)
+local FatalTouchEquipped = Player:HasLegendaryEquipped(85)
+local InvokersDelightEquipped = Player:HasLegendaryEquipped(83)
+local JadeIgnitionEquipped = Player:HasLegendaryEquipped(96)
+local KeefersSkyreachEquipped = Player:HasLegendaryEquipped(95)
+local LastEmperorsCapacitorEquipped = Player:HasLegendaryEquipped(97)
+local XuensTreasureEquipped = Player:HasLegendaryEquipped(94)
+
 HL:RegisterForEvent(function()
   VarFoPPreChan = 0
 end, "PLAYER_REGEN_ENABLED")
@@ -208,9 +218,9 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- potion
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
-    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 2"; end
-  end
+--  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions then
+--    if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 2"; end
+--  end
   -- variable,name=xuen_on_use_trinket,op=set,value=0
   if (true) then
     VarXuenOnUse = false
@@ -617,9 +627,9 @@ local function APL()
       VarXuenHold = (HL.BossFilteredFightRemains("<", S.InvokeXuenTheWhiteTiger:CooldownRemains()) or HL.BossFilteredFightRemains("<", 120)) and HL.BossFilteredFightRemains(">", S.Serenity:CooldownRemains()) and (S.Serenity:CooldownRemains() > 10)
     end
     -- potion,if=(buff.serenity.up|buff.storm_earth_and_fire.up)&pet.xuen_the_white_tiger.active|fight_remains<=60
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.SerenityBuff) or Player:BuffUp(S.StormEarthAndFireBuff)) and (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24 or HL.BossFilteredFightRemains("<=", 60)) then
-      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 100"; end
-    end
+--    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.UsePotions and (Player:BuffUp(S.SerenityBuff) or Player:BuffUp(S.StormEarthAndFireBuff)) and (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24 or HL.BossFilteredFightRemains("<=", 60)) then
+--      if HR.CastSuggested(I.PotionofUnbridledFury) then return "potion 100"; end
+--    end
     -- call_action_list,name=serenity,if=buff.serenity.up
     if Player:BuffUp(S.SerenityBuff) then
       local ShouldReturn = Serenity(); if ShouldReturn then return ShouldReturn; end
@@ -659,7 +669,7 @@ local function APL()
       local ShouldReturn = St(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>=3
-    if (EnemiesCount8 >= 3) then
+    if HR.AoEON() and (EnemiesCount8 >= 3) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
     end
     -- Manually added Pool filler
