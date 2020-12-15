@@ -70,7 +70,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.AimedShot then
     if HR.GUISettings.APL.Hunter.Marksmanship.HideAimedWhileMoving then
-      return BaseCheck and not Player:IsCasting(SpellMM.AimedShot) and not Player:IsMoving()
+      return BaseCheck and not Player:IsCasting(SpellMM.AimedShot) and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
     else
       return BaseCheck and not Player:IsCasting(SpellMM.AimedShot)
     end

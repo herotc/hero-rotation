@@ -141,6 +141,7 @@ Spell.Hunter.Marksmanship = {
   SteadyFocusBuff                       = Spell(193534),
   DeadEyeBuff                           = Spell(321461),
   TrickShotsBuff                        = Spell(257622),
+  LockandLoadBuff                       = Spell(194594),
   -- Debuffs
   SerpentStingDebuff                    = Spell(271788),
   HuntersMarkDebuff                     = Spell(257284),
