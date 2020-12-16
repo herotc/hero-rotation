@@ -152,7 +152,7 @@ local function TyrantPrep()
     if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 64"; end
   end
   -- nether_portal
-  if S.NetherPortal:IsReady() then
+  if S.NetherPortal:IsReady() and not Player:IsCasting(S.NetherPortal) then
     if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, not Target:IsSpellInRange(S.NetherPortal)) then return "nether_portal 66"; end
   end
   -- grimoire_felguard
