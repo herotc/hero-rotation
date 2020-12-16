@@ -126,7 +126,7 @@ local function PreCombat()
         if Cast(S.BarbedShot) then return "Barbed Shot (PreCombat)"; end
       end
       -- Kill Shot
-      if S.KillShot:IsCastable() and Target:HealthPercentage() <= 20 then
+      if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
         if Cast(S.KillShot) then return "Kill Shot (PreCombat)"; end
       end
       -- Kill Command
@@ -234,7 +234,7 @@ local function Cleave()
     Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant)
   end
   -- kill_shot
-  if S.KillShot:IsCastable() and Target:HealthPercentage() <= 20 then
+  if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "Kill Shot (Cleave)"; end
   end
   -- chimaera_shot
@@ -312,7 +312,7 @@ local function ST()
     Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant)
   end
   -- kill_shot,if=buff.flayers_mark.remains<5|target.health.pct<=20
-  if S.KillShot:IsCastable() and Target:HealthPercentage() <= 20 then
+  if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "Kill Shot (ST)"; end
   end
   -- barbed_shot,if=(cooldown.wild_spirits.remains>full_recharge_time|!covenant.night_fae)
