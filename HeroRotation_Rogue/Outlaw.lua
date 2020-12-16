@@ -195,7 +195,7 @@ local function CDs ()
       if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
     end
     -- actions.cds+=/flagellation
-    if S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
+    if CDsON() and S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
       if HR.Cast(S.Flagellation) then return "Cast Flagellation" end
     end
     -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
@@ -218,8 +218,12 @@ local function CDs ()
         or (((Player:BuffRemains(S.TrueBearing) > 15 - (Player:BuffUp(S.AdrenalineRush) and 5 or 0)) or Target:IsDummy())
           and not Player:StealthUp(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1) then
         if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
-      elseif not Player:StealthUp(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
-        HR.CastSuggested(S.MarkedforDeath)
+      elseif CDsON() and not Player:StealthUp(true, true) and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() - 1 then
+        if Settings.Commons.STMfDAsDPSCD then
+          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death" end
+        else
+          HR.CastSuggested(S.MarkedforDeath)
+        end
       end
     end
     if CDsON() then
@@ -325,10 +329,9 @@ local function Build ()
     if HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
   end
   -- actions.build+=/echoing_reprimand
-  if S.EchoingReprimand:IsReady() then
+  if CDsON() and S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) then
     if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
   end
-
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
   if CDsON() and S.SerratedBoneSpike:IsReady() then
     if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDot)) or HL.BossFilteredFightRemains("<", 5) then
@@ -352,7 +355,6 @@ local function Build ()
       if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike Filler" end
     end
   end
-
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) then
     -- actions.build+=/pistol_shot,if=buff.opportunity.up&(energy<45|talent.quick_draw.enabled)
     if EnergyPredictedRounded() < 45 or S.QuickDraw:IsAvailable() then
@@ -398,10 +400,12 @@ local function APL ()
   -- Out of Combat
   if not Player:AffectingCombat() then
     -- Precombat CDs
-    if CDsON() then
-      if Everyone.TargetIsValid() then
-        if S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+    if Everyone.TargetIsValid() then
+      if CDsON() and S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        if Settings.Commons.STMfDAsDPSCD then
           if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
+        else
+          if HR.CastSuggested(S.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
         end
       end
     end
