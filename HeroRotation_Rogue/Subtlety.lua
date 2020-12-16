@@ -520,7 +520,7 @@ local function CDs ()
       if HR.Cast(S.ShadowBlades, Settings.Subtlety.OffGCDasOffGCD.ShadowBlades) then return "Cast Shadow Blades" end
     end
     -- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4)
-    if S.EchoingReprimand:IsReady() and SnDCondition and ComboPointsDeficit >= 2 and (PriorityRotation or MeleeEnemies10yCount <= 4) then
+    if S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) and SnDCondition and ComboPointsDeficit >= 2 and (PriorityRotation or MeleeEnemies10yCount <= 4) then
       if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
     end
     -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up
