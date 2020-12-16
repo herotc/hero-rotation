@@ -197,9 +197,9 @@ local function Aoe ()
   if S.FireBlast:IsCastable() and DisciplinaryCommandEquipped and S.DisciplinaryCommandArcaneBuff:TimeSinceLastAppliedOnPlayer() > 30 and S.DisciplinaryCommandFireBuff:TimeSinceLastAppliedOnPlayer() > 30 and Player:BuffDown(S.DisciplinaryCommandFireBuff) then
     if HR.Cast(S.FireBlast) then return "fire_blast aoe 11"; end
   end
-  --arcane_explosion,if=mana.pct>30&active_enemies>=6
+  --arcane_explosion,if=mana.pct>30&active_enemies>=6&!runeforge.glacial_fragments
   --TODO : change to splash + stay distance option
-  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and Player:ManaPercentageP() > 30 and EnemiesCount10yMelee >= 6 then
+  if S.ArcaneExplosion:IsCastable() and Target:IsInRange(10) and Player:ManaPercentageP() > 30 and EnemiesCount10yMelee >= 6 and not GlacialFragmentsEquipped then
     if HR.Cast(S.ArcaneExplosion) then return "arcane_explosion aoe 12"; end
   end
   --ebonbolt
@@ -236,8 +236,8 @@ local function Single ()
   if S.FrozenOrb:IsCastable() then
     if HR.Cast(S.FrozenOrb, Settings.Frost.GCDasOffGCD.FrozenOrb, nil, not Target:IsInRange(40)) then return "frozen_orb single 2"; end
   end
-  --blizzard,if=buff.freezing_rain.up|active_enemies>=2
-  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 2) then
+  --blizzard,if=buff.freezing_rain.up|active_enemies>=2|runeforge.glacial_fragments&remaining_winters_chill=2
+  if S.Blizzard:IsCastable() and (Player:BuffUp(S.FreezingRain) or EnemiesCount16ySplash >= 2 or (GlacialFragmentsEquipped and Target:DebuffStack(S.WintersChillDebuff) == 2)) then
     if HR.Cast(S.Blizzard, nil, nil, not Target:IsInRange(40)) then return "blizzard single 3"; end
   end
   --ray_of_frost,if=remaining_winters_chill=1&debuff.winters_chill.remains
@@ -281,7 +281,7 @@ local function Single ()
     if HR.Cast(S.MirrorsofTorment, nil, Settings.Commons.DisplayStyle.Covenant) then return "mirrors_of_torment single 13"; end
   end
   --shifting_power,if=buff.rune_of_power.down&(soulbind.grove_invigoration.enabled|soulbind.field_of_blossoms.enabled|active_enemies>=2)
-  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount8ySplash >= 2) then
+  if HR.CDsON() and S.ShiftingPower:IsCastable() and Player:BuffDown(S.RuneofPowerBuff) and (S.GroveInvigoration:IsAvailable() or S.FieldOfBlossoms:IsAvailable() or EnemiesCount18yMelee >= 2) then
     if HR.Cast(S.ShiftingPower, nil, Settings.Commons.DisplayStyle.Covenant) then return "shifting_power single 14"; end
   end
   --arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down
