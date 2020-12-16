@@ -226,29 +226,29 @@ local function CDs ()
         end
       end
     end
+    -- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
+    if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2 and not Player:BuffUp(S.BladeFlurry) then
+      if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
+        HR.CastSuggested(S.BladeFlurry)
+      else
+        if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
+      end
+    end
+    -- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
+    if S.GhostlyStrike:IsReady() and Target:IsSpellInRange(S.GhostlyStrike) and Player:ComboPointsDeficit() >= (1 + (Player:BuffUp(S.Broadside) and 1 or 0)) then
+      if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
+    end
+    if Blade_Flurry_Sync() then
+      -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&energy.time_to_max>2
+      if CDsON() and S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and EnergyTimeToMaxRounded() > 2 then
+        if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
+      end
+      -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>2
+      if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and EnergyTimeToMaxRounded() > 2 then
+        if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
+      end
+    end
     if CDsON() then
-      -- actions.cds+=/blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up
-      if S.BladeFlurry:IsReady() and AoEON() and EnemiesBFCount >= 2 and not Player:BuffUp(S.BladeFlurry) then
-        if Settings.Outlaw.GCDasOffGCD.BladeFlurry then
-          HR.CastSuggested(S.BladeFlurry)
-        else
-          if HR.Cast(S.BladeFlurry) then return "Cast Blade Flurry" end
-        end
-      end
-      -- actions.cds+=/ghostly_strike,if=combo_points.deficit>=1+buff.broadside.up
-      if S.GhostlyStrike:IsReady() and Target:IsSpellInRange(S.GhostlyStrike) and Player:ComboPointsDeficit() >= (1 + (Player:BuffUp(S.Broadside) and 1 or 0)) then
-        if HR.Cast(S.GhostlyStrike, Settings.Outlaw.GCDasOffGCD.GhostlyStrike) then return "Cast Ghostly Strike" end
-      end
-      if Blade_Flurry_Sync() then
-        -- actions.cds+=/killing_spree,if=variable.blade_flurry_sync&energy.time_to_max>2
-        if S.KillingSpree:IsCastable() and Target:IsSpellInRange(S.KillingSpree) and EnergyTimeToMaxRounded() > 2 then
-          if HR.Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle) then return "Cast Killing Spree" end
-        end
-        -- actions.cds+=/blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>2
-        if S.BladeRush:IsCastable() and Target:IsSpellInRange(S.BladeRush) and EnergyTimeToMaxRounded() > 2 then
-          if HR.Cast(S.BladeRush, Settings.Outlaw.GCDasOffGCD.BladeRush) then return "Cast Blade Rush" end
-        end
-      end
       -- actions.cds+=/shadowmeld,if=!stealthed.all&variable.ambush_condition
       if Settings.Outlaw.UseDPSVanish and S.Shadowmeld:IsCastable() and Ambush_Condition() then
         if HR.Cast(S.Shadowmeld, Settings.Commons.OffGCDasOffGCD.Racials) then return "Cast Shadowmeld" end
