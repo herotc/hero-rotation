@@ -34,8 +34,8 @@ local I = Item.Monk.Brewmaster;
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
   -- BfA
-  I.PocketsizedComputationDevice:ID(),
-  I.AshvanesRazorCoral:ID(),
+--  I.PocketsizedComputationDevice:ID(),
+--  I.AshvanesRazorCoral:ID(),
 }
 
 -- Rotation Var
