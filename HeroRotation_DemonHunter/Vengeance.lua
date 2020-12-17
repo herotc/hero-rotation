@@ -20,7 +20,6 @@ local CDsON         = HR.CDsON
 local Cast          = HR.Cast
 local CastSuggested = HR.CastSuggested
 -- lua
-local match      = string.match
 
 --- ============================ CONTENT ===========================
 --- ======= APL LOCALS =======
