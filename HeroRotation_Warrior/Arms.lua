@@ -371,11 +371,11 @@ local function APL()
 	end
     -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
     if (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or (Target:HealthPercentage() < 20) or (Target:HealthPercentage() > 80 and Player:Covenant() == "Venthyr") then
-      local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
+		local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target
     if (true) then
-      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+		local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
     end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end

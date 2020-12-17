@@ -204,7 +204,7 @@ local function APL()
       if HR.Cast(S.Rampage, nil, nil, not Target:IsSpellInRange(S.Rampage)) then return "rampage 38"; end
     end
     -- recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
-    if S.Recklessness:IsCastable() and ((Player:BuffUp(S.Bloodlust) or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or Target:TimeToDie() < 15 and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
+    if S.Recklessness:IsCastable() and ((Player:BloodlustUp() or S.AngerManagement:IsAvailable()) or Target:TimeToDie() > 100 or (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20 or Target:TimeToDie() < 15 and (EnemiesCount8 == 1 or Player:BuffUp(S.MeatCleaverBuff))) then
       if HR.Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness 58"; end
     end
     -- whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up

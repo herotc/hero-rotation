@@ -23,9 +23,6 @@ local HR         = HeroRotation
 if not Spell.Warrior then Spell.Warrior = {} end
 
 Spell.Warrior.Fury = {
-  -- Raid Buffs
-  Bloodlust                             = Spell(2825),
-
   -- Racials
   BloodFury                             = Spell(20572),
   Berserking                            = Spell(26297),
