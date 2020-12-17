@@ -130,9 +130,9 @@ local function PreCombat()
         if Cast(S.KillShot) then return "Kill Shot (PreCombat)"; end
       end
       -- Kill Command
-      -- if S.KillCommand:IsCastable() and TargetInRangePet30y then
-      --   if Cast(S.KillCommand) then return "Kill Shot (PreCombat)"; end
-      -- end
+      if S.KillCommand:IsCastable() and TargetInRangePet30y then
+        if Cast(S.KillCommand) then return "Kill Shot (PreCombat)"; end
+      end
       if PetEnemiesMixedyCount > 1 then
         -- Multi Shot
         if S.MultiShot:IsCastable()  then
