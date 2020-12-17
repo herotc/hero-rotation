@@ -257,7 +257,7 @@ local function Aoe()
     if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Aoe"; end
   end
   -- call_action_list,name=cooldowns
-  local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
+  --local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
   -- call_action_list,name=item
   local ShouldReturn = ItemFunc(); if ShouldReturn then return ShouldReturn; end
   -- malefic_rapture,if=dot.vile_taint.ticking
