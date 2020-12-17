@@ -148,26 +148,28 @@ Spell.Hunter.Marksmanship = {
 }
 
 Spell.Hunter.Survival = {
-  
   SummonPet                             = Spell(883),
+  Flare                                 = Spell(1543),
   SteelTrapDebuff                       = Spell(162487),
   SteelTrap                             = Spell(162488),
+  TarTrap                               = Spell(187698),
   Harpoon                               = Spell(190925),
   MongooseBite                          = MultiSpell(259387, 265888),
+  MongooseFuryBuff                      = Spell(259388),
   CoordinatedAssaultBuff                = Spell(266779),
   BlurofTalons                          = Spell(277653),
   BlurofTalonsBuff                      = Spell(277969),
   RaptorStrike                          = MultiSpell(186270, 265189),
   FlankingStrike                        = Spell(269751),
   KillCommand                           = Spell(259489),
-  WildfireBomb                          = MultiSpell(259495, 270335, 270323, 271045),
+  KillShot                              = Spell(320976),
+  WildfireBomb                          = Spell(259495),
   WildfireBombDebuff                    = Spell(269747),
   ShrapnelBomb                          = Spell(270335),
   PheromoneBomb                         = Spell(270323),
   VolatileBomb                          = Spell(271045),
   SerpentSting                          = Spell(259491),
   SerpentStingDebuff                    = Spell(259491),
-  MongooseFuryBuff                      = Spell(259388),
   AMurderofCrows                        = Spell(131894),
   CoordinatedAssault                    = Spell(266779),
   TipoftheSpearBuff                     = Spell(260286),
@@ -215,6 +217,13 @@ Spell.Hunter.Survival = {
   ArcaneTorrent                         = Spell(50613),
   RazorCoralDebuff                      = Spell(303568),
   PoolFocus                             = Spell(999910),
+  -- Covenants
+  DeathChakram                          = Spell(325028),
+  FlayedShot                            = Spell(324149),
+  ResonatingArrow                       = Spell(308491),
+  WildSpirits                           = Spell(328231),
+  WildSpiritsBuff                       = Spell(328275),
+  --legendary_debuffs
 }
 
 -- Items
