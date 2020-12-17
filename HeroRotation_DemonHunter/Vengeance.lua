@@ -300,7 +300,7 @@ local function APL()
       local ShouldReturn = Brand(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=defensives
-    if (IsTanking or not Player:HealingAbsorbed()) then
+    if (IsTanking) then
       local ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=cooldowns
