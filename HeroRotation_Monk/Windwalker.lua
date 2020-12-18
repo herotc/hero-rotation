@@ -431,7 +431,7 @@ local function CDSerenity()
   end
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen|fight_remains<25
   if S.InvokeXuenTheWhiteTiger:IsReady() and ( not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
-    if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger 400"; end
+    if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "Invoke Xuen the White Tiger 500"; end
   end
   if (Settings.Commons.UseTrinkets) then
     if (true) then
@@ -440,59 +440,59 @@ local function CDSerenity()
   end
   -- blood_fury,if=variable.serenity_burst
   if S.BloodFury:IsCastable() and VarSerenityBurst then
-    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 420"; end
+    if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "Blood Fury 502"; end
   end
   -- berserking,if=variable.serenity_burst
   if S.Berserking:IsCastable() and VarSerenityBurst then
-    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 422"; end
+    if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "Berserking 504"; end
   end
   -- arcane_torrent,if=chi.max-chi>=1
   if S.ArcaneTorrent:IsCastable() and Player:ChiDeficit() >= 1 then
-    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "arcane_torrent 424"; end
+    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInMeleeRange(8)) then return "Arcane Torrent 506"; end
   end
   -- lights_judgment
   if S.LightsJudgment:IsCastable() then
-    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment 426"; end
+    if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "Lights Judgment 508"; end
   end
   -- fireblood,if=variable.serenity_burst
   if S.Fireblood:IsCastable() and VarSerenityBurst then
-    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 428"; end
+    if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "Fireblood 510"; end
   end
   -- ancestral_call,if=variable.serenity_burst
   if S.AncestralCall:IsCastable() and VarSerenityBurst then
-    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 430"; end
+    if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "Ancestral Call 512"; end
   end
   -- touch_of_death,if=fight_remains>180|pet.xuen_the_white_tiger.active|fight_remains<10
   if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15 and ((HL.BossFilteredFightRemains(">", 180)) or S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24 or (HL.BossFilteredFightRemains("<", 10))) then
-    if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "touch_of_death 432"; end
+    if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "Touch of Death 514"; end
   end
   -- touch_of_karma,if=fight_remains>90|pet.xuen_the_white_tiger.active|fight_remains<10
   if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
-    if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "touch_of_karma 434"; end
+    if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "Touch of Karma 516"; end
   end
   -- weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
   if S.WeaponsOfOrder:IsReady() and S.RisingSunKick:CooldownRemains() < Player:GCD() then
-    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order 406"; end
+    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order 518"; end
   end
   -- faeline_stomp
   if S.FaelineStomp:IsReady() and ComboStrike(S.FaelineStomp) then
-    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 408"; end
+    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 520"; end
   end
   -- fallen_order
   if S.FallenOrder:IsReady() then
-    if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 410"; end
+    if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 522"; end
   end
   -- bonedust_brew
   if S.BonedustBrew:IsReady() then
-    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew 412"; end
+    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew 524"; end
   end
   -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
   if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 15)) then
-    if HR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "serenity 436"; end
+    if HR.Cast(S.Serenity, Settings.Windwalker.OffGCDasOffGCD.Serenity) then return "Serenity 526"; end
   end
   -- bag_of_tricks
   if S.BagOfTricks:IsCastable() then
-    if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "bag_of_tricks 438"; end
+    if HR.Cast(S.BagOfTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "Bag of Tricks 528"; end
   end
 end
 
