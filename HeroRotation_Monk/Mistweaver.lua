@@ -215,6 +215,10 @@ local function APL()
       if S.BonedustBrew:IsCastable() then
         if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew"; end
       end
+      -- summon_jade_serpent_statue
+      if S.SummonJadeSerpentStatue:IsCastable() and S.SummonJadeSerpentStatue:TimeSinceLastCast() >= 900 then
+        if HR.Cast(S.SummonJadeSerpentStatue, Settings.Mistweaver.GCDasOffGCD.SummonJadeSerpentStatue) then return "Summon Jade Serpent Statue"; end
+      end
       -- invoke_yulon_the_jade_serpent
       if S.InvokeYulonTheJadeSerpent:IsCastable() and HL.BossFilteredFightRemains(">", 25) then
         if HR.Cast(S.InvokeYulonTheJadeSerpent, Settings.Mistweaver.GCDasOffGCD.InvokeYulonTheJadeSerpent) then return "Invoke Yu'lon the Jade Serpent"; end
@@ -226,6 +230,10 @@ local function APL()
       -- thunder_focus_tea
       if S.ThunderFocusTea:IsCastable() and EnemiesCount8 < 3 then
         if HR.Cast(S.ThunderFocusTea, Settings.Mistweaver.OffGCDasOffGCD.ThunderFocusTea) then return "Thunder Focus Tea"; end
+      end
+      -- renewing_mist
+      if S.RenewingMist:IsCastable() then
+        if HR.Cast(S.RenewingMist, Settings.Mistweaver.GCDasOffGCD.RenewingMist) then return "Renewing Mist"; end
       end
       ShouldReturn = Defensives(); if ShouldReturn then return ShouldReturn; end
       -- use_item

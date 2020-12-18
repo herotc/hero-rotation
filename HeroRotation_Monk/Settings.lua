@@ -93,13 +93,13 @@ HR.GUISettings.APL.Monk = {
   -- Do not pool, this option only exists because people keep nagging me about it
     ShowFortifyingBrewCD = false,
     NoMistweaverPooling = false,
-    IgnoreToK = false,
-    IgnoreFSK = true,
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
       InvokeYulonTheJadeSerpent = true,
       InvokeChiJiTheRedCrane    = true,
+      SummonJadeSerpentStatue   = true,
+      RenewingMist              = true,
       TouchOfDeath              = true,
       FortifyingBrew            = true,
     },

@@ -867,7 +867,7 @@ end
 
 HR.SetAPL(269, APL, Init);
 
--- Last Update: 2020-12-07
+-- Last Update: 2020-12-18
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask
