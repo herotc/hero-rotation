@@ -172,6 +172,10 @@ local function EvaluateTargetIfRisingSunKick600(TargetUnit)
 end
 
 local function EvaluateTargetIfBlackoutKick602(TargetUnit)
+  return (ComboStrike(S.BlackoutKick) and Player:BuffUp(S.WeaponsOfOrder) and S.RisingSunKick:CooldownRemains() > 2)
+end
+
+local function EvaluateTargetIfBlackoutKick604(TargetUnit)
   return (ComboStrike(S.BlackoutKick) or not S.HitCombo:IsAvailable())
 end
 
@@ -421,20 +425,25 @@ local function CDSEF()
 end
 
 local function CDSerenity()
-  -- variable,name=serenity_burst,op=set,value=cooldown.serenity.remains<1|fight_remains<20
+  -- variable,name=serenity_burst,op=set,value=cooldown.serenity.remains<1|pet.xuen_the_white_tiger.active&cooldown.serenity.remains>30|fight_remains<20
   if (true) then
-    VarSerenityBurst = (Player:BuffRemains(S.SerenityBuff) < 1 or (HL.BossFilteredFightRemains("<", 20)))
+    VarSerenityBurst = (Player:BuffRemains(S.SerenityBuff) < 1 or (S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24 and S.Serenity:CooldownRemains() < 30) or (HL.BossFilteredFightRemains("<", 20)))
   end
   -- invoke_xuen_the_white_tiger,if=!variable.hold_xuen|fight_remains<25
   if S.InvokeXuenTheWhiteTiger:IsReady() and ( not VarXuenHold or HL.BossFilteredFightRemains("<", 25)) then
     if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "invoke_xuen_the_white_tiger 400"; end
   end
-  -- blood_fury,if=fight_remains>125|variable.serenity_burst
-  if S.BloodFury:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+  if (Settings.Commons.UseTrinkets) then
+    if (true) then
+      local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
+    end
+  end
+  -- blood_fury,if=variable.serenity_burst
+  if S.BloodFury:IsCastable() and VarSerenityBurst then
     if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury 420"; end
   end
-  -- berserking,if=fight_remains>185|variable.serenity_burst
-  if S.Berserking:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+  -- berserking,if=variable.serenity_burst
+  if S.Berserking:IsCastable() and VarSerenityBurst then
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 422"; end
   end
   -- arcane_torrent,if=chi.max-chi>=1
@@ -445,26 +454,37 @@ local function CDSerenity()
   if S.LightsJudgment:IsCastable() then
     if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(40)) then return "lights_judgment 426"; end
   end
-  -- fireblood,if=fight_remains>125|variable.serenity_burst
-  if S.Fireblood:IsCastable() and (HL.BossFilteredFightRemains(">", 125) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+  -- fireblood,if=variable.serenity_burst
+  if S.Fireblood:IsCastable() and VarSerenityBurst then
     if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood 428"; end
   end
-  -- ancestral_call,if=fight_remains>125|variable.serenity_burst
-  if S.AncestralCall:IsCastable() and (HL.BossFilteredFightRemains(">", 185) or VarSerenityBurst or HL.BossFilteredFightRemains("<", 20)) then
+  -- ancestral_call,if=variable.serenity_burst
+  if S.AncestralCall:IsCastable() and VarSerenityBurst then
     if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call 430"; end
   end
-  if (Settings.Commons.UseTrinkets) then
-    if (true) then
-      local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
-    end
-  end
-  -- touch_of_death
-  if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15  then
+  -- touch_of_death,if=fight_remains>180|pet.xuen_the_white_tiger.active|fight_remains<10
+  if S.TouchOfDeath:IsReady() and Target:HealthPercentage() <= 15 and ((HL.BossFilteredFightRemains(">", 180)) or S.InvokeXuenTheWhiteTiger:TimeSinceLastCast() <= 24 or (HL.BossFilteredFightRemains("<", 10))) then
     if HR.Cast(S.TouchOfDeath, Settings.Windwalker.GCDasOffGCD.TouchOfDeath, nil, not Target:IsSpellInRange(S.TouchOfDeath)) then return "touch_of_death 432"; end
   end
-  -- touch_of_karma,interval=90,pct_health=0.5
+  -- touch_of_karma,if=fight_remains>90|pet.xuen_the_white_tiger.active|fight_remains<10
   if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
     if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "touch_of_karma 434"; end
+  end
+  -- weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
+  if S.WeaponsOfOrder:IsReady() and S.RisingSunKick:CooldownRemains() < Player:GCD() then
+    if HR.Cast(S.WeaponsOfOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Weapons Of Order 406"; end
+  end
+  -- faeline_stomp
+  if S.FaelineStomp:IsReady() and ComboStrike(S.FaelineStomp) then
+    if HR.Cast(S.FaelineStomp, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 408"; end
+  end
+  -- fallen_order
+  if S.FallenOrder:IsReady() then
+    if HR.Cast(S.FallenOrder, nil, Settings.Commons.CovenantDisplayStyle) then return "Faeline Stomp 410"; end
+  end
+  -- bonedust_brew
+  if S.BonedustBrew:IsReady() then
+    if HR.Cast(S.BonedustBrew, nil, Settings.Commons.CovenantDisplayStyle) then return "Bonedust Brew 412"; end
   end
   -- serenity,if=cooldown.rising_sun_kick.remains<2|fight_remains<15
   if S.Serenity:IsReady() and (S.RisingSunKick:CooldownRemains() < 2 or HL.BossFilteredFightRemains("<", 15)) then
@@ -477,46 +497,66 @@ local function CDSerenity()
 end
 
 local function Serenity()
-  -- fists_of_fury,if=buff.serenity.remains<1|active_enemies>1
-  if S.FistsOfFury:IsReady() and (Player:BuffRemains(S.SerenityBuff) < 1 or EnemiesCount8 > 1) then
-    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 600"; end
+  -- fists_of_fury,if=buff.serenity.remains<1
+  if S.FistsOfFury:IsReady() and Player:BuffRemains(S.SerenityBuff) < 1 then
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "Fists of Fury 600"; end
   end
-  -- spinning_crane_kick,if=combo_strike&(active_enemies>2|active_enemies>1&!cooldown.rising_sun_kick.up)
-  if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and (EnemiesCount8 > 2 or (EnemiesCount8 > 1 and not S.RisingSunKick:CooldownUp()))) then
-    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 602"; end
+  if (Settings.Commons.UseTrinkets) then
+    if (true) then
+      local ShouldReturn = UseItems(); if ShouldReturn then return ShouldReturn; end
+    end
+  end
+  -- spinning_crane_kick,if=combo_strike&(active_enemies>=3|active_enemies>1&!cooldown.rising_sun_kick.up)
+  if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and ((HR.AoEON() and EnemiesCount8 >= 3) or (EnemiesCount8 > 1 and not S.RisingSunKick:CooldownUp()))) then
+    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 602"; end
   end
   -- rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike
   if S.RisingSunKick:IsReady() then
-    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfRisingSunKick600) then return "rising_sun_kick 604"; end
+    if Everyone.CastTargetIf(S.RisingSunKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfRisingSunKick600) then return "Rising Sun Kick 604"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfRisingSunKick600(Target) then
-      if HR.Cast(S.RisingSunKick, nil, nil, not Target:IsSpellInRange(S.RisingSunKick)) then return "rising_sun_kick 606"; end
+      if HR.Cast(S.RisingSunKick, nil, nil, not Target:IsSpellInRange(S.RisingSunKick)) then return "Rising Sun Kick 606"; end
     end
+  end
+  -- fists_of_fury,if=active_enemies>=3
+  if S.FistsOfFury:IsReady() and HR.AoEON() and EnemiesCount8 >= 3 then
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "Fists of Fury 608"; end
   end
   -- spinning_crane_kick,if=combo_strike&buff.dance_of_chiji.up
   if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.DanceOfChijiBuff) then
-    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 608"; end
+    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 610"; end
   end
-  -- fists_of_fury,interrupt_if=gcd.remains=0
+  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike&buff.weapons_of_order_ww.up&cooldown.rising_sun_kick.remains>2
+  if S.BlackoutKick:IsReady() then
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick602) then return "Blackout Kick 612"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfBlackoutKick602(Target) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick 614"; end
+    end
+  end
+  -- fists_of_fury,interrupt_if=!cooldown.rising_sun_kick.up
   if S.FistsOfFury:IsReady() then
-    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "fists_of_fury 610"; end
+    if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsSpellInRange(S.FistsOfFury)) then return "Fists of Fury 616"; end
+  end
+  -- spinning_crane_kick,if=combo_strike&debuff.bonedust_brew.up
+  if S.SpinningCraneKick:IsReady() and Target:DebuffUp(S.BonedustBrew) then
+    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 618"; end
   end
   -- fist_of_the_white_tiger,target_if=min:debuff.mark_of_the_crane.remains,if=chi<3
   if S.FistOfTheWhiteTiger:IsReady() then
-    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger102) then return "fist_of_the_white_tiger 172"; end
+    if Everyone.CastTargetIf(S.FistOfTheWhiteTiger, Enemies8y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfFistOfTheWhiteTiger102) then return "Fist of the White Tiger 620"; end
     if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfFistOfTheWhiteTiger102(Target) then
-      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "fist_of_the_white_tiger 612"; end
+      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "Fist of the White Tiger 622"; end
     end
   end
-  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike|!talent.hit_combo.enabled
+  -- blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=combo_strike|!talent.hit_combo
   if S.BlackoutKick:IsReady() then
-    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick602) then return "blackout_kick 614"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfBlackoutKick602(Target) then
-      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "blackout_kick 616"; end
+    if Everyone.CastTargetIf(S.BlackoutKick, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane100, EvaluateTargetIfBlackoutKick604) then return "Blackout Kick 624"; end
+    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfBlackoutKick604(Target) then
+      if HR.Cast(S.BlackoutKick, nil, nil, not Target:IsSpellInRange(S.BlackoutKick)) then return "Blackout Kick 626"; end
     end
   end
   -- spinning_crane_kick
   if S.SpinningCraneKick:IsReady() then
-    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick 618"; end
+    if HR.Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Spinning Crane Kick 628"; end
   end
 end
 
