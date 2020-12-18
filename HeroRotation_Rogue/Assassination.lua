@@ -272,11 +272,11 @@ local function CDs ()
   if Target:IsInMeleeRange(5) then
     -- actions.cds=flagellation
     if HR.CDsON() and S.Flagellation:IsCastable() and not Target:DebuffUp(S.Flagellation) then
-      if Cast(S.Flagellation) then return "Cast Flagellation" end
+      if Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation" end
     end
     -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
     if S.FlagellationCleanse:IsCastable() and Target:DebuffRemains(S.Flagellation) < 2 then
-      if Cast(S.FlagellationCleanse) then return "Cast Flagellation Cleanse" end
+      if Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation Cleanse" end
     end
 
     if S.MarkedforDeath:IsCastable() then
@@ -509,7 +509,7 @@ local function Dot ()
   end
   -- actions.dot+=/sepsis
   if HR.CDsON() and S.Sepsis:IsReady() then
-    if HR.Cast(S.Sepsis) then return "Cast Sepsis" end
+    if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
   end
 
   return false
@@ -527,7 +527,7 @@ local function Direct ()
   -- actions.direct+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
   if S.SerratedBoneSpike:IsCastable() and Player:BuffUp(S.SliceandDice) then
     if not Target:DebuffUp(S.SerratedBoneSpikeDebuff) then
-      if Cast(S.SerratedBoneSpike) then ShouldReturn = "Cast Serrated Bone Spike" end
+      if Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then ShouldReturn = "Cast Serrated Bone Spike" end
     else
       if HR.AoEON() then
         local function Evaluate_Bone_Spike_Target(TargetUnit)
@@ -536,7 +536,7 @@ local function Direct ()
         SuggestCycleDoT(S.SerratedBoneSpike, Evaluate_Bone_Spike_Target, 4, Enemies30y)
       end
       if HL.FightRemains(MeleeEnemies10y, false) <= 5 or S.SerratedBoneSpike:ChargesFractional() >= 2.75 or (S.LeadbyExample:SoulbindEnabled() and not Player:BuffUp(S.LeadbyExampleBuff)) then
-        if Cast(S.SerratedBoneSpike) then ShouldReturn = "Cast Serrated Bone Spike Filler" end
+        if Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then ShouldReturn = "Cast Serrated Bone Spike Filler" end
       end
     end
   end
@@ -568,7 +568,7 @@ local function Direct ()
   end
   -- actions.direct+=/echoing_reprimand,if=variable.use_filler&cooldown.vendetta.remains>10
   if CDsON() and S.EchoingReprimand:IsReady() and S.Vendetta:CooldownRemains() > 10 then
-    if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
+    if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
   -- actions.direct+=/ambush,if=variable.use_filler
   if S.Ambush:IsCastable() and Target:IsInMeleeRange(5) and (Player:StealthUp(true, true) or Player:BuffUp(S.BlindsideBuff)) then

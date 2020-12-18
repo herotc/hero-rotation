@@ -196,11 +196,11 @@ local function CDs ()
     end
     -- actions.cds+=/flagellation
     if CDsON() and S.Flagellation:IsReady() and not Target:DebuffUp(S.Flagellation) then
-      if HR.Cast(S.Flagellation) then return "Cast Flagellation" end
+      if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation" end
     end
     -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
     if S.FlagellationCleanse:IsReady() and Target:DebuffUp(S.Flagellation) and Target:DebuffRemains(S.Flagellation) < 2 then
-      if HR.Cast(S.FlagellationCleanse) then return "Cast Flagellation Cleanse" end
+      if HR.Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flagellation Cleanse" end
     end
     -- actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&(!cooldown.killing_spree.up|!talent.killing_spree.enabled)
     if CDsON() and S.AdrenalineRush:IsCastable() and not Player:BuffUp(S.AdrenalineRush)
@@ -259,7 +259,7 @@ local function CDs ()
       end
       -- actions.cds+=/sepsis,if=!stealthed.all
       if S.Sepsis:IsReady() and not Player:StealthUp(true, true) then
-        if HR.Cast(S.Sepsis) then return "Cast Sepsis" end
+        if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
       end
     end
 
@@ -330,12 +330,12 @@ local function Build ()
   end
   -- actions.build+=/echoing_reprimand
   if CDsON() and S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) then
-    if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
+    if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
   if CDsON() and S.SerratedBoneSpike:IsReady() then
     if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDot)) or HL.BossFilteredFightRemains("<", 5) then
-      if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike" end
+      if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike" end
     end
     if AoEON() then
       -- Prefer melee cycle units
@@ -352,7 +352,7 @@ local function Build ()
       end
     end
     if S.SerratedBoneSpike:ChargesFractional() > 2.75 then
-      if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike Filler" end
+      if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike Filler" end
     end
   end
   if S.PistolShot:IsCastable() and Target:IsSpellInRange(S.PistolShot) and Player:BuffUp(S.Opportunity) then

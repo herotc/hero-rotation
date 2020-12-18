@@ -449,12 +449,12 @@ local function CDs ()
   if Target:IsInMeleeRange(5) then
     -- actions.cds+=/flagellation,if=variable.snd_condition&!stealthed.mantle
     if HR.CDsON() and S.Flagellation:IsReady() and SnDCondition and not Player:StealthUp(false, false) then
-      if HR.Cast(S.Flagellation) then return "Cast Flrgrrlation" end
+      if HR.Cast(S.Flagellation, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flrgrrlation" end
     end
 
     -- actions.cds+=/flagellation_cleanse,if=debuff.flagellation.remains<2
     if S.FlagellationCleanse:IsCastable() and Player:BuffRemains(S.Flagellation) < 2 then
-      if HR.Cast(S.FlagellationCleanse) then return "Cast Flrgrrlation Cleanse" end
+      if HR.Cast(S.FlagellationCleanse, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Flrgrrlation Cleanse" end
     end
   end
   -- actions.cds+=/vanish,if=(runeforge.mark_of_the_master_assassin.equipped&combo_points.deficit<=3|runeforge.deathly_shadows.equipped&combo_points<1)&buff.symbols_of_death.up&buff.shadow_dance.up&master_assassin_remains=0&buff.deathly_shadows.down
@@ -479,7 +479,7 @@ local function CDs ()
       return not TargetUnit:DebuffUp(S.SerratedBoneSpikeDot)
     end
     if Target:IsInRange(30) and Evaluate_BoneSpike_Target(Target) and Target:FilteredTimeToDie(">", 21) then
-      if HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike (ST)" end
+      if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike (ST)" end
     end
     if HR.AoEON() then
       SuggestCycleDoT(S.SerratedBoneSpike, Evaluate_BoneSpike_Target, 21, Enemies30y)
@@ -488,7 +488,7 @@ local function CDs ()
   if Target:IsInMeleeRange(5) then
     -- actions.cds+=/sepsis,if=variable.snd_condition&combo_points.deficit>=1
     if HR.CDsON() and S.Sepsis:IsReady() and SnDCondition and ComboPointsDeficit >= 1 then
-      if HR.Cast(S.Sepsis) then return "Cast Sepsis" end
+      if HR.Cast(S.Sepsis, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Sepsis" end
     end
     -- actions.cds+=/symbols_of_death,if=variable.snd_condition&(talent.enveloping_shadows.enabled|cooldown.shadow_dance.charges>=1)&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
     if S.SymbolsofDeath:IsCastable() and SnDCondition
@@ -521,7 +521,7 @@ local function CDs ()
     end
     -- actions.cds+=/echoing_reprimand,if=variable.snd_condition&combo_points.deficit>=2&(variable.use_priority_rotation|spell_targets.shuriken_storm<=4)
     if S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) and SnDCondition and ComboPointsDeficit >= 2 and (PriorityRotation or MeleeEnemies10yCount <= 4) then
-      if HR.Cast(S.EchoingReprimand) then return "Cast Echoing Reprimand" end
+      if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
     end
     -- actions.cds+=/shuriken_tornado,if=talent.shadow_focus.enabled&variable.snd_condition&buff.symbols_of_death.up
     if S.ShurikenTornado:IsReady() and S.ShadowFocus:IsAvailable() and SnDCondition and Player:BuffUp(S.SymbolsofDeath) then
@@ -625,7 +625,7 @@ local function Build (EnergyThreshold)
   -- actions.build+=/serrated_bone_spike,if=cooldown.serrated_bone_spike.charges_fractional>=2.75|soulbind.lead_by_example.enabled&!buff.lead_by_example.up
   -- TODO: Lead by Example fishing
   if S.SerratedBoneSpike:IsCastable() and S.SerratedBoneSpike:ChargesFractional() >= 2.75 then
-    if ThresholdMet and HR.Cast(S.SerratedBoneSpike) then return "Cast Serrated Bone Spike (Capping Filler)" end
+    if ThresholdMet and HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike (Capping Filler)" end
     SetPoolingAbility(S.SerratedBoneSpike, EnergyThreshold)
   end
   if Target:IsInMeleeRange(5) then
