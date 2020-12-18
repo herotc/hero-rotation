@@ -95,11 +95,11 @@ local function SingleTarget()
     if HR.Cast(S.Rampage, nil, nil, not Target:IsSpellInRange(S.Rampage)) then return "rampage"; end
   end
   -- condemn
-  if S.Condemn:IsReady() and ((Target:HealthPercentage() > 80 or Target:HealthPercentage() < 20) and Player:Covenant() == "Venthyr") then
-    if HR.Cast(S.Condemn, nil, nil, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+  if S.Condemn:IsCastable() and S.Condemn:IsUsable() then
+    if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
   end
   -- execute
-  if S.Execute:IsReady() and (((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20) and Player:Covenant() ~= Venthyr) then
+  if S.Execute:IsCastable() and S.Execute:IsUsable() then
     if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
   end
   -- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
@@ -120,7 +120,7 @@ local function SingleTarget()
   end
   -- Ancient Aftershock while enraged
   if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and Player:Covenant() == "Night Fae") then
-    if HR.Cast(S.AncientAftershock, nil, nil, not Target:IsInRange(8)) then return "AncientAftershock"; end
+    if HR.Cast(S.AncientAftershock, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsInRange(8)) then return "AncientAftershock"; end
   end
   -- onslaught
   if S.Onslaught:IsCastable() then
