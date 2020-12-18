@@ -316,7 +316,7 @@ local function Aoe()
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=chi.max-chi>=2&(!talent.hit_combo|combo_strike)
   if S.TigerPalm:IsReady() then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane304, EvaluateTargetIfTigerPalm302) then return "Tiger Palm 326"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm302(Target) then
+    if EvaluateTargetIfFilterMarkoftheCrane304(Target) and EvaluateTargetIfTigerPalm302(Target) then
       if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 328"; end
     end
   end
@@ -587,7 +587,7 @@ local function St()
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=combo_strike&chi.max-chi>=2
   if S.TigerPalm:IsReady() then
     if Everyone.CastTargetIf(S.TigerPalm, Enemies5y, "min", EvaluateTargetIfFilterMarkoftheCrane304, EvaluateTargetIfTigerPalm202) then return "Tiger Palm 836"; end
-    if EvaluateTargetIfFilterMarkoftheCrane100(Target) and EvaluateTargetIfTigerPalm202(Target) then
+    if EvaluateTargetIfFilterMarkoftheCrane304(Target) and EvaluateTargetIfTigerPalm202(Target) then
       if HR.Cast(S.TigerPalm, nil, nil, not Target:IsSpellInRange(S.TigerPalm)) then return "Tiger Palm 838"; end
     end
   end
