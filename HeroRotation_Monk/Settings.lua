@@ -88,6 +88,27 @@ HR.GUISettings.APL.Monk = {
       Serenity                = true,
       StormEarthAndFire       = true,
     }
+  },
+  Mistweaver = {
+  -- Do not pool, this option only exists because people keep nagging me about it
+    ShowFortifyingBrewCD = false,
+    NoMistweaverPooling = false,
+    IgnoreToK = false,
+    IgnoreFSK = true,
+    -- {Display GCD as OffGCD, ForceReturn}
+    GCDasOffGCD = {
+      -- Abilities
+      InvokeYulonTheJadeSerpent = true,
+      InvokeChiJiTheRedCrane    = true,
+      TouchOfDeath              = true,
+      FortifyingBrew            = true,
+    },
+    -- {Display OffGCD as OffGCD, ForceReturn}
+    OffGCDasOffGCD = {
+      -- Racials
+      -- Abilities
+      ThunderFocusTea         = true,
+122    }
   }
 };
 HR.GUI.LoadSettingsRecursively(HR.GUISettings);
@@ -97,6 +118,7 @@ local ARPanel = HR.GUI.Panel;
 local CP_Monk = CreateChildPanel(ARPanel, "Monk");
 local CP_Windwalker = CreateChildPanel(CP_Monk, "Windwalker");
 local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster");
+local CP_Mistweaver = CreateChildPanel(CP_Monk, "Mistweaver");
 -- Monk
 CreateARPanelOptions(CP_Monk, "APL.Monk.Commons");
 CreatePanelOption("CheckButton", CP_Monk, "APL.Monk.Commons.UsePotions", "Show Potions", "Enable this if you want the addon to show you when to use Potions.");
@@ -120,3 +142,6 @@ CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Enab
 --CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Low", "Purify: Low", "Enable or disable Purify recommendations when the stagger is low.");
 --CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.Medium", "Purify: Medium", "Enable or disable Purify recommendations when the stagger is medium.");
 --CreatePanelOption("CheckButton", CP_Brewmaster, "APL.Monk.Brewmaster.Purify.High", "Purify: High", "Enable or disable Purify recommendations when the stagger is high.");
+
+-- Mistweaver
+CreateARPanelOptions(CP_Mistweaver, "APL.Monk.Mistweaver");

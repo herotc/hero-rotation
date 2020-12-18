@@ -846,7 +846,7 @@ local function APL()
       local ShouldReturn = CDSerenity(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=st,if=active_enemies<3
-    if (EnemiesCount8 < 3) then
+    if ((EnemiesCount8 < 3) or (not HR.AoEON())) then
       local ShouldReturn = St(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=aoe,if=active_enemies>=3
@@ -867,7 +867,7 @@ end
 
 HR.SetAPL(269, APL, Init);
 
--- Last Update: 2020-12-18
+-- Last Update: 2020-12-07
 
 -- # Executed before combat begins. Accepts non-harmful actions only.
 -- actions.precombat=flask

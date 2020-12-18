@@ -79,6 +79,7 @@ Spell.Monk.Windwalker = {
   DampenHarmBuff                        = Spell(122278),
   DiffuseMagic                          = Spell(122783), -- Talent
   FortifyingBrew                        = Spell(243435),
+  HealingElixir                         = Spell(122281), -- Talent
   TouchOfKarma                          = Spell(122470),
 
   -- Utility
@@ -86,10 +87,10 @@ Spell.Monk.Windwalker = {
   Detox                                 = Spell(218164),
   Disable                               = Spell(116095),
   EnergizingElixir                      = Spell(115288), -- Talent
-  HealingElixir                         = Spell(122281), -- Talent
   LegSweep                              = Spell(119381), -- Talent
   Paralysis                             = Spell(115078),
   Provoke                               = Spell(115546),
+  Resuscitate                           = Spell(115178),
   RingOfPeace                           = Spell(116844), -- Talent
   Roll                                  = Spell(109132),
   SpearHandStrike                       = Spell(116705),
@@ -100,7 +101,6 @@ Spell.Monk.Windwalker = {
   Vivify                                = Spell(116670),
 
   -- Trinket Debuffs
-  RazorCoralDebuff                      = Spell(303568),
 
   -- PvP Abilities
 
@@ -188,6 +188,7 @@ Spell.Monk.Brewmaster = {
   LegSweep                     = Spell(119381), -- Talent
   Paralysis                    = Spell(115078),
   Provoke                      = Spell(115546),
+  Resuscitate                  = Spell(115178),
   RingOfPeace                  = Spell(116844), -- Talent
   Roll                         = Spell(109132),
   SpearHandStrike              = Spell(116705),
@@ -214,8 +215,6 @@ Spell.Monk.Brewmaster = {
   RecentlyRushingTigerPalm     = Spell(337341),
 
   -- Trinket Debuffs
-  RazorCoralDebuff             = Spell(303568),
-  ConductiveInkDebuff          = Spell(302565),
 
   -- PvP Abilities
 
@@ -226,6 +225,111 @@ Spell.Monk.Brewmaster = {
 
   -- Misc
   PoolEnergy                   = Spell(999910)
+}
+
+Spell.Monk.Mistweaver = {
+
+  -- Racials
+  AncestralCall                         = Spell(274738),
+  ArcaneTorrent                         = Spell(25046),
+  BagOfTricks                           = Spell(312411),
+  Berserking                            = Spell(26297),
+  BloodFury                             = Spell(20572),
+  Bloodlust                             = Spell(2825),
+  GiftoftheNaaru                        = Spell(59547),
+  Fireblood                             = Spell(265221),
+  LightsJudgment                        = Spell(255647),
+  QuakingPalm                           = Spell(107079),
+  Shadowmeld                            = Spell(58984),
+
+  -- Abilities
+  BlackoutKick                          = Spell(100784),
+  CracklingJadeLightning                = Spell(117952),
+  EnvelopingMist                        = Spell(124682),
+  EssenceFont                           = Spell(191837),
+  EssenceFontBuff                       = Spell(191840),
+  ExpelHarm                             = Spell(322101),
+  InvokeYulonTheJadeSerpent             = Spell(123904),
+  LifeCocoon                            = Spell(116849),
+  RenewingMist                          = Spell(115151),
+  Revival                               = Spell(115310),
+  RisingSunKick                         = Spell(107428),
+  SoothingMist                          = Spell(115175),
+  SpinningCraneKick                     = Spell(101546),
+  TeachingsOfTheMonasteryBuff           = Spell(202090),
+  ThunderFocusTea                       = Spell(116680),
+  TigerPalm                             = Spell(100780),
+  TouchOfDeath                          = Spell(322109),
+
+  -- Debuffs
+
+  -- Talents
+  Celerity                              = Spell(115173),
+  ChiWave                               = Spell(115098),
+  ChiBurst                              = Spell(123986),
+  EyeOfTheTiger                         = Spell(196607),
+  GoodKarma                             = Spell(280195),
+  InnerStrengthBuff                     = Spell(261769),
+  InvokeChiJiTheRedCrane                = Spell(325197),
+  LifecyclesEnvelopingMistBuff          = Spell(197919),
+  LifecyclesVivifyBuff                  = Spell(197916),
+  ManaTea                               = Spell(197908),
+  RefreshingJadeWind                    = Spell(196725),
+  SummonJadeSerpentStatue               = Spell(115313),
+
+
+  -- Defensive
+  DampenHarm                            = Spell(122278), -- Talent
+  DampenHarmBuff                        = Spell(122278),
+  DiffuseMagic                          = Spell(122783), -- Talent
+  FortifyingBrew                        = Spell(243435),
+  HealingElixir                         = Spell(122281), -- Talent
+
+  -- Utility
+  ChiTorpedo                            = Spell(115008), -- Talent
+  Detox                                 = Spell(218164),
+  Disable                               = Spell(116095),
+  EnergizingElixir                      = Spell(115288), -- Talent
+  LegSweep                              = Spell(119381), -- Talent
+  Paralysis                             = Spell(115078),
+  Provoke                               = Spell(115546),
+  Reawaken                              = Spell(212051),
+  Resuscitate                           = Spell(115178),
+  RingOfPeace                           = Spell(116844), -- Talent
+  Roll                                  = Spell(109132),
+  SongOfChiJi                           = Spell(198898), -- Talent
+  SpearHandStrike                       = Spell(116705),
+  TigersLust                            = Spell(116841), -- Talent
+  TigerTailSweep                        = Spell(264348),
+  Transcendence                         = Spell(101643),
+  TranscendenceTransfer                 = Spell(119996),
+  Vivify                                = Spell(116670),
+
+  -- Trinket Debuffs
+
+  -- PvP Abilities
+
+  -- Shadowland Covenant
+  WeaponsOfOrder                        = Spell(310454),
+  WeaponsOfOrderChiBuff                 = Spell(311054),
+  WeaponsOfOrderDebuff                  = Spell(312106),
+  BonedustBrew                          = Spell(325216),
+  FaelineStomp                          = Spell(327104),
+  FaelineStompDebuff                    = Spell(327257),
+  FallenOrder                           = Spell(326860),
+
+  -- Shadowland Essences
+  FortifyingIngrediencesBuff            = Spell(336874),
+
+  -- Shadowlands Legendary
+  ChiEnergyBuff                         = Spell(337571),
+  InvokersDelight                       = Spell(338321),
+  KeefersSkyreachDebuff                 = Spell(344021),
+  RecentlyRushingTigerPalm              = Spell(337341),
+  TheEmperorsCapacitor                  = Spell(337291),
+
+  -- Misc
+  PoolEnergy                            = Spell(999910)
 }
 
 -- Items
@@ -247,4 +351,13 @@ Item.Monk.Brewmaster = {
   PotionofEmpoweredExorcisms   = Item(171352),
   PotionofHardenedShadows      = Item(171271),
   PotionofSpectralStamina      = Item(171274)
+}
+
+Item.Monk.Mistweaver = {
+  PotionofPhantomFire                  = Item(171349),
+  PotionofSpectralIntellect            = Item(171273),
+  PotionofDeathlyFixation              = Item(171351),
+  PotionofEmpoweredExorcisms           = Item(171352),
+  PotionofHardenedShadows              = Item(171271),
+  PotionofSpectralStamina              = Item(171274)
 }
