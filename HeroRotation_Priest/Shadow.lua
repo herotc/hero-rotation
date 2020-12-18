@@ -270,7 +270,7 @@ end
 
 local function Cds()
   -- power_infusion,if=buff.voidform.up|!soulbind.combat_meditation.enabled&cooldown.void_eruption.remains>=10|fight_remains<cooldown.void_eruption.remains
-  if S.PowerInfusion:IsCastable() and (Player:BuffUp(S.VoidformBuff) or not S.CombatMeditation:IsAvailable() and S.VoidEruption:CooldownRemains() >= 10 or HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains())) then
+  if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and (Player:BuffUp(S.VoidformBuff) or not S.CombatMeditation:IsAvailable() and S.VoidEruption:CooldownRemains() >= 10 or HL.BossFilteredFightRemains("<", S.VoidEruption:CooldownRemains())) then
     if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion 50"; end
   end
   -- silence,target_if=runeforge.sephuzs_proclamation.equipped&(target.is_add|target.debuff.casting.react)
