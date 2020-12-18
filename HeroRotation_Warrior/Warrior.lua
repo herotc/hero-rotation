@@ -68,7 +68,7 @@ Spell.Warrior.Fury = {
 
   -- Covenant Abilities
   AncientAftershock                     = Spell(325886),
-  Condemn                               = Spell(317349),
+  Condemn                               = Spell(330325),
   CondemnDebuff                         = Spell(317491),
   ConquerorsBanner                      = Spell(324143),
   ConquerorsFrenzyBuff                  = Spell(343672),

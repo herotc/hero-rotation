@@ -82,78 +82,78 @@ local function Precombat()
 end
 
 local function SingleTarget()
-	-- raging_blow,if=runeforge.will_of_the_berserker.equipped&buff.will_of_the_berserker.remains<gcd
-	if S.RagingBlow:IsCastable() and (S.WilloftheBerserker:IsAvailable() and Player:BuffRemains(S.WilloftheBerserker) < Player:GCD()) then
-		if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
-	end
-	-- siegebreaker
-	if S.Siegebreaker:IsCastable() then
-		if HR.Cast(S.Siegebreaker, nil, nil, not Target:IsSpellInRange(S.Siegebreaker)) then return "siegebreaker"; end
-	end
-	-- rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
-	if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or (Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or Player:BuffRemains(S.FrenzyBuff) < 1.5) then
-		if HR.Cast(S.Rampage, nil, nil, not Target:IsSpellInRange(S.Rampage)) then return "rampage"; end
-	end
-	-- condemn
-	if S.Condemn:IsReady() and ((Target:HealthPercentage() > 80 or Target:HealthPercentage() < 20) and Player:Covenant() == "Venthyr") then
-		if HR.Cast(S.Condemn, nil, nil, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
-	end
-	-- execute
-	if S.Execute:IsReady() and (((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20) and Player:Covenant() ~= Venthyr) then
-		if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
-	end
-	-- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
-	if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
-		if HR.Cast(S.Bladestorm, nil, nil, not Target:IsInRange(8)) then return "bladestorm"; end
-	end
-	-- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
-	if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
-		if HR.Cast(S.Bloodthirst, nil, nil, not Target:IsSpellInRange(S.Bloodthirst)) then return "bloodthirst"; end
-	end
-	-- bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
-	if S.Bloodbath:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
-		if HR.Cast(S.Bloodbath, nil, nil, not Target:IsSpellInRange(S.Bloodbath)) then return "bloodbath"; end
-	end
-	-- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-	if S.DragonRoar:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
-		if HR.Cast(S.DragonRoar, nil, nil, not Target:IsInRange(12)) then return "dragon_roar"; end
-	end
-	-- Ancient Aftershock while enraged
-	if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and Player:Covenant() == "Night Fae") then
-		if HR.Cast(S.AncientAftershock, nil, nil, not Target:IsInRange(8)) then return "AncientAftershock"; end
-	end
-	-- onslaught
-	if S.Onslaught:IsCastable() then
-		if HR.Cast(S.Onslaught, nil, nil, not Target:IsSpellInRange(S.Onslaught)) then return "onslaught"; end
-	end
-	-- raging_blow,if=charges=2
-	if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
-		if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
-	end
-	-- crushing_blow,if=charges=2
-	if S.CrushingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
-		if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
-	end
-	-- bloodthirst
-	if S.Bloodthirst:IsCastable() then
-		if HR.Cast(S.Bloodthirst, nil, nil, not Target:IsSpellInRange(S.Bloodthirst)) then return "bloodthirst"; end
-	end
-	-- bloodbath
-	if S.Bloodbath:IsCastable() then
-		if HR.Cast(S.Bloodbath, nil, nil, not Target:IsSpellInRange(S.Bloodbath)) then return "bloodbath"; end
-	end
-	-- raging_blow
-	if S.RagingBlow:IsCastable() then
-		if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
-	end
-	-- crushing_blow
-	if S.CrushingBlow:IsCastable() then
-		if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
-	end
-	-- whirlwind
-	if S.Whirlwind:IsCastable() then
-		if HR.Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind"; end
-	end
+  -- raging_blow,if=runeforge.will_of_the_berserker.equipped&buff.will_of_the_berserker.remains<gcd
+  if S.RagingBlow:IsCastable() and (S.WilloftheBerserker:IsAvailable() and Player:BuffRemains(S.WilloftheBerserker) < Player:GCD()) then
+    if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
+  end
+  -- siegebreaker
+  if S.Siegebreaker:IsCastable() then
+    if HR.Cast(S.Siegebreaker, nil, nil, not Target:IsSpellInRange(S.Siegebreaker)) then return "siegebreaker"; end
+  end
+  -- rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
+  if S.Rampage:IsReady() and (Player:BuffUp(S.RecklessnessBuff) or (Player:BuffRemains(S.EnrageBuff) < Player:GCD() or Player:Rage() > 90) or Player:BuffRemains(S.FrenzyBuff) < 1.5) then
+    if HR.Cast(S.Rampage, nil, nil, not Target:IsSpellInRange(S.Rampage)) then return "rampage"; end
+  end
+  -- condemn
+  if S.Condemn:IsReady() and ((Target:HealthPercentage() > 80 or Target:HealthPercentage() < 20) and Player:Covenant() == "Venthyr") then
+    if HR.Cast(S.Condemn, nil, nil, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
+  end
+  -- execute
+  if S.Execute:IsReady() and (((S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or Target:HealthPercentage() < 20) and Player:Covenant() ~= Venthyr) then
+    if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
+  end
+  -- bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
+  if S.Bladestorm:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
+    if HR.Cast(S.Bladestorm, nil, nil, not Target:IsInRange(8)) then return "bladestorm"; end
+  end
+  -- bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
+  if S.Bloodthirst:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
+    if HR.Cast(S.Bloodthirst, nil, nil, not Target:IsSpellInRange(S.Bloodthirst)) then return "bloodthirst"; end
+  end
+  -- bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
+  if S.Bloodbath:IsCastable() and (Player:BuffDown(S.EnrageBuff) or S.ViciousContempt:ConduitRank() > 5 and Target:HealthPercentage() < 35 and not S.Cruelty:IsAvailable()) then
+    if HR.Cast(S.Bloodbath, nil, nil, not Target:IsSpellInRange(S.Bloodbath)) then return "bloodbath"; end
+  end
+  -- dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
+  if S.DragonRoar:IsCastable() and (Player:BuffUp(S.EnrageBuff) and EnemiesCount8 > 1) then
+    if HR.Cast(S.DragonRoar, nil, nil, not Target:IsInRange(12)) then return "dragon_roar"; end
+  end
+  -- Ancient Aftershock while enraged
+  if S.AncientAftershock:IsCastable() and (Player:BuffUp(S.EnrageBuff) and Player:Covenant() == "Night Fae") then
+    if HR.Cast(S.AncientAftershock, nil, nil, not Target:IsInRange(8)) then return "AncientAftershock"; end
+  end
+  -- onslaught
+  if S.Onslaught:IsCastable() then
+    if HR.Cast(S.Onslaught, nil, nil, not Target:IsSpellInRange(S.Onslaught)) then return "onslaught"; end
+  end
+  -- raging_blow,if=charges=2
+  if S.RagingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
+    if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
+  end
+  -- crushing_blow,if=charges=2
+  if S.CrushingBlow:IsCastable() and (S.RagingBlow:Charges() == 2) then
+    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
+  end
+  -- bloodthirst
+  if S.Bloodthirst:IsCastable() then
+    if HR.Cast(S.Bloodthirst, nil, nil, not Target:IsSpellInRange(S.Bloodthirst)) then return "bloodthirst"; end
+  end
+  -- bloodbath
+  if S.Bloodbath:IsCastable() then
+    if HR.Cast(S.Bloodbath, nil, nil, not Target:IsSpellInRange(S.Bloodbath)) then return "bloodbath"; end
+  end
+  -- raging_blow
+  if S.RagingBlow:IsCastable() then
+    if HR.Cast(S.RagingBlow, nil, nil, not Target:IsSpellInRange(S.RagingBlow)) then return "raging_blow"; end
+  end
+  -- crushing_blow
+  if S.CrushingBlow:IsCastable() then
+    if HR.Cast(S.CrushingBlow, nil, nil, not Target:IsSpellInRange(CrushingBlow)) then return "CrushingBlow"; end
+  end
+  -- whirlwind
+  if S.Whirlwind:IsCastable() then
+    if HR.Cast(S.Whirlwind, nil, nil, not Target:IsInRange(8)) then return "whirlwind"; end
+  end
 end
 
 local function Movement()
@@ -218,31 +218,31 @@ local function APL()
         if HR.Cast(TrinketToUse, nil, Settings.Commons.TrinketDisplayStyle) then return "Generic use_items for " .. TrinketToUse:Name(); end
       end
     end
-	if CDsON() then
-		-- blood_fury
-		if S.BloodFury:IsCastable() then
-			if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end
-		end
-		-- berserking,if=buff.recklessness.up
-		if S.Berserking:IsCastable() and (Player:BuffUp(S.RecklessnessBuff)) then
-			if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking"; end
-		end
-		-- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
-		if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff)) then
-			if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
-        end
-		-- fireblood
-		if S.Fireblood:IsCastable() then
-			if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood"; end
-		end
-		-- ancestral_call
-		if S.AncestralCall:IsCastable() then
-			if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call"; end
-		end
-		-- bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
-		if S.BagofTricks:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff) and Player:BuffUp(S.EnrageBuff)) then
-			if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
-        end
+    if CDsON() then
+      -- blood_fury
+      if S.BloodFury:IsCastable() then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end
+      end
+      -- berserking,if=buff.recklessness.up
+      if S.Berserking:IsCastable() and (Player:BuffUp(S.RecklessnessBuff)) then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking"; end
+      end
+      -- lights_judgment,if=buff.recklessness.down&debuff.siegebreaker.down
+      if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff)) then
+      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
+      end
+      -- fireblood
+      if S.Fireblood:IsCastable() then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood"; end
+      end
+      -- ancestral_call
+      if S.AncestralCall:IsCastable() then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call"; end
+      end
+      -- bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
+      if S.BagofTricks:IsCastable() and (Player:BuffDown(S.RecklessnessBuff) and Target:DebuffDown(S.SiegebreakerDebuff) and Player:BuffUp(S.EnrageBuff)) then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
+      end
     end
     if (true) then
       local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
