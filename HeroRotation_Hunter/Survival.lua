@@ -200,7 +200,7 @@ local function apst()
     -- resonating_arrow
     -- wild_spirits
     if HR.CDsON() and S.WildSpirits:IsCastable() then
-        HR.Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant)
+        if HR.Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "[APST] Wild Spirits"; end
     end
     -- coordinated_assault
     if HR.CDsON() and S.CoordinatedAssault:IsCastable() then
@@ -331,7 +331,7 @@ local function cleave()
     -- serpent_sting,target_if=min:remains,if=talent.hydras_bite.enabled&buff.vipers_venom.remains&buff.vipers_venom.remains<gcd
     -- wild_spirits
     if HR.CDsON() and S.WildSpirits:IsCastable() then
-        HR.Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant)
+        if HR.Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "[Cleave] Wild Spirits"; end
     end
     -- resonating_arrow
     -- wildfire_bomb,if=full_recharge_time<gcd

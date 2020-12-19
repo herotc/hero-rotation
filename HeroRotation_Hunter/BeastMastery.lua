@@ -204,11 +204,11 @@ local function Cleave()
   end
   -- death_chakram,if=focus+cast_regen<focus.max
   if CDsON() and S.DeathChakram:IsCastable() and (Player:Focus() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
-    Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant) then return "death_chakram st"; end
   end
   -- wild_spirits
   if CDsON() and S.WildSpirits:IsCastable() then
-    Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits st"; end
   end
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd&cooldown.bestial_wrath.remains|cooldown.bestial_wrath.remains<12+gcd&talent.scent_of_blood
   if S.BarbedShot:IsCastable() then
@@ -223,7 +223,7 @@ local function Cleave()
   end
   -- resonating_arrow
   if CDsON() and S.ResonatingArrow:IsCastable() then
-    Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow cleave"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
   if CDsON() and S.Stampede:IsCastable() and (Player:BuffUp(S.AspectoftheWildBuff) or Target:TimeToDie() < 15) then
@@ -231,7 +231,7 @@ local function Cleave()
   end
   -- flayed_shot
   if CDsON() and S.FlayedShot:IsCastable() then
-    Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot cleave"; end
   end
   -- kill_shot
   if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
@@ -305,11 +305,11 @@ local function ST()
   end
   -- wild_spirits
   if CDsON() and S.WildSpirits:IsCastable() then
-    Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.WildSpirits, nil, Settings.Commons.DisplayStyle.Covenant) then return "wild_spirits st"; end
   end
   -- flayed_shot
   if CDsON() and S.FlayedShot:IsCastable() then
-    Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.FlayedShot, nil, Settings.Commons.DisplayStyle.Covenant) then return "flayed_shot st"; end
   end
   -- kill_shot,if=buff.flayers_mark.remains<5|target.health.pct<=20
   if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
@@ -327,7 +327,7 @@ local function ST()
   end
   -- death_chakram,if=focus+cast_regen<focus.max
   if CDsON() and S.DeathChakram:IsCastable() and (Player:Focus() + Player:FocusCastRegen(S.DeathChakram:ExecuteTime()) < Player:FocusMax()) then
-    Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.DeathChakram, nil, Settings.Commons.DisplayStyle.Covenant) then return "death_chakram st"; end
   end
   -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
   if S.Stampede:IsCastable() and ((Player:BuffUp(S.AspectoftheWildBuff) and Player:BuffUp(S.BestialWrathBuff)) or Target:TimeToDie() < 15) then
@@ -339,7 +339,7 @@ local function ST()
   end
   -- resonating_arrow,if=buff.bestial_wrath.up|target.time_to_die<10
   if CDsON() and S.ResonatingArrow:IsCastable() and (Player:BuffUp(S.BestialWrathBuff) or Target:TimeToDie() < 10) then
-    Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant)
+    if Cast(S.ResonatingArrow, nil, Settings.Commons.DisplayStyle.Covenant) then return "resonating_arrow st"; end
   end
   -- bestial_wrath,if=cooldown.wild_spirits.remains>15|!covenant.night_fae|target.time_to_die<15
   if CDsON() and S.BestialWrath:IsCastable() and (not S.WildSpirits:IsAvailable() or S.WildSpirits:CooldownRemains() > 15 or Target:TimeToDie() < 15) then
