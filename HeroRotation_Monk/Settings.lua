@@ -78,6 +78,7 @@ HR.GUISettings.APL.Monk = {
       -- Abilities
       InvokeXuenTheWhiteTiger = true,
       TouchOfDeath            = true,
+      TouchOfKarma            = true,
       FortifyingBrew          = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}

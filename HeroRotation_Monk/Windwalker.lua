@@ -396,7 +396,7 @@ local function CDSEF()
   end
   -- touch_of_karma,if=fight_remains>159|pet.xuen_the_white_tiger.active|variable.hold_xuen
   if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
-    if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "Touch of Karma 418"; end
+    if HR.Cast(S.TouchOfKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "Touch of Karma 418"; end
   end
   -- blood_fury,if=cooldown.invoke_xuen_the_white_tiger.remains>30|variable.hold_xuen|fight_remains<20
   if S.BloodFury:IsCastable() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 30 or VarXuenHold or HL.BossFilteredFightRemains("<", 20)) then
@@ -468,7 +468,7 @@ local function CDSerenity()
   end
   -- touch_of_karma,if=fight_remains>90|pet.xuen_the_white_tiger.active|fight_remains<10
   if S.TouchOfKarma:IsReady() and not Settings.Windwalker.IgnoreToK then
-    if HR.Cast(S.TouchOfKarma, nil, nil, not Target:IsInRange(20)) then return "Touch of Karma 516"; end
+    if HR.Cast(S.TouchOfKarma, Settings.Windwalker.GCDasOffGCD.TouchOfKarma, nil, not Target:IsInRange(20)) then return "Touch of Karma 516"; end
   end
   -- weapons_of_order,if=cooldown.rising_sun_kick.remains<execute_time
   if S.WeaponsOfOrder:IsReady() and S.RisingSunKick:CooldownRemains() < Player:GCD() then
