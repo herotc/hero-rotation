@@ -68,7 +68,7 @@ Spell.Warrior.Fury = {
 
   -- Covenant Abilities
   AncientAftershock                     = Spell(325886),
-  Condemn                               = Spell(330325),
+  Condemn                               = MultiSpell(330325, 330334),
   CondemnDebuff                         = Spell(317491),
   ConquerorsBanner                      = Spell(324143),
   ConquerorsFrenzyBuff                  = Spell(343672),
@@ -141,7 +141,7 @@ Spell.Warrior.Arms = {
 
   -- Covenant Abilities
   AncientAftershock                     = Spell(325886),
-  Condemn                               = Spell(330325),
+  Condemn                               = MultiSpell(330325, 330334),
   CondemnDebuff                         = Spell(317491),
   ConquerorsBanner                      = Spell(324143),
   ConquerorsFrenzyBuff                  = Spell(343672),
@@ -198,7 +198,7 @@ Spell.Warrior.Protection = {
 
   -- Covenant Abilities
   AncientAftershock                     = Spell(325886),
-  Condemn                               = Spell(330325),
+  Condemn                               = MultiSpell(330325, 330334),
   CondemnDebuff                         = Spell(317491),
   ConquerorsBanner                      = Spell(324143),
   ConquerorsFrenzyBuff                  = Spell(343672),
