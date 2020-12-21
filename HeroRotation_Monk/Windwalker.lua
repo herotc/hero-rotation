@@ -625,7 +625,7 @@ local function WeaponsOfOrder()
     if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm 726"; end
   end
   -- chi_burst,if=chi.max-chi>=(1+active_enemies>1)
-  if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= (1 + EnemiesCount8 > 1)) then
+  if S.ChiBurst:IsReady() and (Player:ChiDeficit() >= 1) then
     if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Chi Burst 728"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains+(debuff.recently_rushing_tiger_palm.up*20),if=(!talent.hit_combo|combo_strike)&chi.max-chi>=2
