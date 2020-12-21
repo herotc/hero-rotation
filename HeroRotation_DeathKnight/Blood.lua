@@ -258,7 +258,7 @@ local function Covenants()
   end
   -- abomination_limb,if=!buff.dancing_rune_weapon.up
   if S.AbominationLimb:IsCastable() and (Player:BuffDown(S.DancingRuneWeaponBuff)) then
-    if HR.Cast(S.AbominationLimb) then return "abomination_limb"; end
+    if HR.Cast(S.AbominationLimb, nil, Settings.Commons.CovenantDisplayStyle) then return "abomination_limb"; end
   end
   -- shackle_the_unworthy,if=cooldown.dancing_rune_weapon.remains<3|!buff.dancing_rune_weapon.up
   if S.ShackleTheUnworthy:IsCastable() and (S.DancingRuneWeapon:CooldownRemains() < 3 or Player:BuffDown(S.DancingRuneWeaponBuff)) then
