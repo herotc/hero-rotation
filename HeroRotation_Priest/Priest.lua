@@ -157,6 +157,7 @@ Item.Priest.Shadow = {
   InscrutableQuantumDevice         = Item(179350, {13, 14}),
   MacabreSheetMusic                = Item(184024, {13, 14}),
   SinfulGladiatorsBadgeofFerocity  = Item(175921, {13, 14}),
+  SoulIgniter                      = Item(184019, {13, 14}),
   SoullettingRuby                  = Item(178809, {13, 14}),
   SunbloodAmethyst                 = Item(178826, {13, 14}),
 }

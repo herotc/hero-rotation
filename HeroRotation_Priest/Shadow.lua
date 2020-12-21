@@ -39,6 +39,7 @@ local OnUseExcludes = {
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
+  I.SoulIgniter:ID()
   I.SoullettingRuby:ID(),
   I.SunbloodAmethyst:ID()
 }
