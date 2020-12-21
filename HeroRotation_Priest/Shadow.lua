@@ -67,6 +67,7 @@ local VarMindSearCutoff = 1
 local VarSearingNightmareCutoff = false
 local VarPoolForCDs = false
 local SephuzEquipped = Player:HasLegendaryEquipped(202)
+local TalbadarEquipped = Player:HasLegendaryEquipped(161)
 local PainbreakerEquipped = Player:HasLegendaryEquipped(158)
 local ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
 
@@ -80,6 +81,7 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   SephuzEquipped = Player:HasLegendaryEquipped(202)
+  TalbadarEquipped = Player:HasLegendaryEquipped(161)
   PainbreakerEquipped = Player:HasLegendaryEquipped(158)
   ShadowflamePrismEquipped = Player:HasLegendaryEquipped(159)
 end, "PLAYER_EQUIPMENT_CHANGED")
@@ -205,13 +207,17 @@ local function Precombat()
     if S.VampiricTouch:IsCastable() then
       if Cast(S.VampiricTouch, nil, nil, not Target:IsSpellInRange(S.VampiricTouch)) then return "vampiric_touch 10"; end
     end
-    -- Manually added: mind_blast,if=talent.misery.enabled and shadow_word_pain,if=!talent.misery.enabled
-    -- This is to avoid VT being suggested while being casted precombat
-    if S.MindBlast:IsCastable() and (S.Misery:IsAvailable()) then
+    -- Manually added: mind_blast,if=talent.misery.enabled&(!runeforge.talbadars_stratagem.equipped|!talent.void_torrent.enabled)
+    if S.MindBlast:IsCastable() and (S.Misery:IsAvailable() and (not TalbadarEquipped or not S.VoidTorrent:IsAvailable())) then
       if Cast(S.MindBlast, nil, nil, not Target:IsSpellInRange(S.MindBlast)) then return "mind_blast 12"; end
     end
+    -- Manually added: void_torrent,if=talent.misery.enabled&runeforge.talbadars_stratagem.equipped
+    if S.VoidTorrent:IsCastable() and (S.Misery:IsAvailable() and TalbadarEquipped) then
+      if Cast(S.VoidTorrent, nil, nil, not Target:IsSpellInRange(S.VoidTorrent)) then return "void_torrent 14"; end
+    end
+    -- Manually added: shadow_word_pain,if=!talent.misery.enabled
     if S.ShadowWordPain:IsCastable() and (not S.Misery:IsAvailable()) then
-      if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 14"; end
+      if Cast(S.ShadowWordPain, nil, nil, not Target:IsSpellInRange(S.ShadowWordPain)) then return "shadow_word_pain 16"; end
     end
   end
 end
@@ -408,6 +414,10 @@ local function Main()
   -- mind_flay,if=buff.dark_thought.up&!(buff.voidform.up&cooldown.voidbolt.remains<=gcd)&variable.dots_up,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&cooldown.void_bolt.up
   if S.MindFlay:IsCastable() and not Player:IsCasting(S.MindFlay) and (Player:BuffUp(S.DarkThoughtBuff) and not (Player:BuffUp(S.VoidformBuff) and S.VoidBolt:CooldownRemains() <= Player:GCD()) and VarDotsUp) then
     if Cast(S.MindFlay, nil, nil, not Target:IsSpellInRange(S.MindFlay)) then return "mind_flay 120"; end
+  end
+  -- Manually added: devouring_plague,if=runeforge.talbadars_stratagem.equipped&variable.dots_up&!variable.all_dots_up
+  if S.DevouringPlague:IsReady() and (TalbadarEquipped and VarDotsUp and not VarAllDotsUp) then
+    if Cast(S.DevouringPlague, nil, nil, not Target:IsSpellInRange(S.DevouringPlague)) then return "devouring_plague 121"; end
   end
   -- mind_blast,if=variable.dots_up&raid_event.movement.in>cast_time+0.5&(spell_targets.mind_sear<4&!talent.misery.enabled|spell_targets.mind_sear<6&talent.misery.enabled)
   if S.MindBlast:IsCastable() and (VarDotsUp and (EnemiesCount10ySplash < 4 and not S.Misery:IsAvailable() or EnemiesCount10ySplash < 6 and S.Misery:IsAvailable())) then
