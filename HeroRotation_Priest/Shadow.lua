@@ -39,7 +39,7 @@ local OnUseExcludes = {
   I.InscrutableQuantumDevice:ID(),
   I.MacabreSheetMusic:ID(),
   I.SinfulGladiatorsBadgeofFerocity:ID(),
-  I.SoulIgniter:ID()
+  I.SoulIgniter:ID(),
   I.SoullettingRuby:ID(),
   I.SunbloodAmethyst:ID()
 }
@@ -259,6 +259,10 @@ local function Trinkets()
   -- call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
   if ((not S.HungeringVoid:IsAvailable() or Target:DebuffUp(S.HungeringVoidDebuff)) and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownRemains() > 10)) then
     local ShouldReturn = DmgTrinkets(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- use_item,name=soul_igniter
+  if I.SoulIgniter:IsReady() and Target:IsInRange(40) and Player:BuffDown(S.SoulIgniterBuff) then
+    if Cast(I.SoulIgniter, nil, Settings.Commons.DisplayStyle.Trinkets) then return "soul_igniter"; end
   end
   -- use_items,if=buff.voidform.up|buff.power_infusion.up|cooldown.void_eruption.remains>10
   if (Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.PowerInfusionBuff) or S.VoidEruption:CooldownRemains() > 10) then

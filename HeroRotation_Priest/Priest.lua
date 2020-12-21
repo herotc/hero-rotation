@@ -68,6 +68,9 @@ Spell.Priest.Shadow = {
   UnfurlingDarknessBuff                 = Spell(341282),
   VoidTorrent                           = Spell(263165),
 
+  -- Trinket Effects
+  SoulIgniterBuff                       = Spell(345211),
+
   -- Covenant Abilities
   AscendedBlast                         = Spell(325283),
   AscendedNova                          = Spell(325020), -- Melee, 8
