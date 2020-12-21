@@ -1,18 +1,18 @@
 --- ============================ HEADER ============================
-  -- HeroLib
-  local HL      = HeroLib;
-  local Cache   = HeroCache;
-  local Unit    = HL.Unit;
-  local Player  = Unit.Player;
-  local Pet     = Unit.Pet;
-  local Target  = Unit.Target;
-  local Spell   = HL.Spell;
-  local Item    = HL.Item;
+-- HeroLib
+local HL      = HeroLib;
+local Cache   = HeroCache;
+local Unit    = HL.Unit;
+local Player  = Unit.Player;
+local Pet     = Unit.Pet;
+local Target  = Unit.Target;
+local Spell   = HL.Spell;
+local Item    = HL.Item;
 -- HeroRotation
-  local HR      = HeroRotation;
+local HR      = HeroRotation;
 -- Spells
-  local SpellFrost   = Spell.DeathKnight.Frost;
-  local SpellUnholy  = Spell.DeathKnight.Unholy;
+local SpellFrost   = Spell.DeathKnight.Frost;
+local SpellUnholy  = Spell.DeathKnight.Unholy;
 -- Lua
 
 --- ============================ CONTENT ============================
@@ -21,31 +21,31 @@
 -- Blood, ID: 250
 
 -- Frost, ID: 251
-local OldFrostIsCastableP
-OldFrostIsCastableP = HL.AddCoreOverride("Spell.IsCastable",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldFrostIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self == SpellFrost.RaiseDead then
-    return (not Pet:IsActive()) and BaseCheck
-  else
-    return BaseCheck
+local OldFrostIsCastable
+OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldFrostIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellFrost.RaiseDead then
+      return (not Pet:IsActive()) and BaseCheck
+    else
+      return BaseCheck
+    end
   end
-end
 , 251);
 
 -- Unholy, ID: 252
-local OldUHIsCastableP
-OldUHIsCastableP = HL.AddCoreOverride("Spell.IsCastable",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldUHIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self == SpellUnholy.RaiseDead then
-    return (not Pet:IsActive()) and BaseCheck
-  elseif self == SpellUnholy.DarkTransformation then
-    return (Pet:IsActive() and Pet:NPCID() == 26125) and BaseCheck
-  else
-    return BaseCheck
+local OldUHIsCastable
+OldUHIsCastable = HL.AddCoreOverride("Spell.IsCastable",
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldUHIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellUnholy.RaiseDead then
+      return (not Pet:IsActive()) and BaseCheck
+    elseif self == SpellUnholy.DarkTransformation then
+      return (Pet:IsActive() and Pet:NPCID() == 26125) and BaseCheck
+    else
+      return BaseCheck
+    end
   end
-end
 , 252);
 
 -- Example (Arcane Mage)
