@@ -305,7 +305,7 @@ local function BosTicking()
   end
   -- "Horn of Winter", "if=runic_power.deficit>=40&rune.time_to_3>gcd"
   if S.HornofWinter:IsCastable() and (Player:RunicPowerDeficit() >= 40 and Player:RuneTimeToX(3) > Player:GCD()) then
-    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter, nil, nil) then return "horn_of_winter bos ticking 6"; end
+    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter bos ticking 6"; end
   end
   -- "Frostscythe", "if=spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae)"
   if S.Frostscythe:IsCastable() and (EnemiesCount10yd >= 2 and (Player:BuffStack(S.DeathsDue) == 8 or not Player:BuffUp(S.DeathAndDecayBuff) or not Player:Covenant() == "Night Fae")) then
@@ -317,7 +317,7 @@ local function BosTicking()
   end
   -- arcane_torrent,if=runic_power.deficit>50
   if S.ArcaneTorrent:IsCastable() and Player:RunicPowerDeficit() > 50 and HR.CDsON() then
-    if HR.Cast(S.ArcaneTorrent, Settings.Commons.GCDasOffGCD.ArcaneTorrent, nil, nil) then return "arcane_torrent bos ticking 9"; end
+    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials) then return "arcane_torrent bos ticking 9"; end
   end
   -- wait for resources
   if HR.CastAnnotated(S.PoolRange, false, "WAIT") then return "Wait Resources BoS Ticking"; end
@@ -409,7 +409,7 @@ local function Cooldowns()
   end
   -- "Hypothermic Presence", "if=talent.breath_of_sindragosa&runic_power.deficit>40&rune>=3&buff.pillar_of_frost.up|!talent.breath_of_sindragosa&runic_power.deficit>=25"
   if S.HypothermicPresence:IsCastable() and (S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() > 40 and Player:Rune() >= 3 and S.PillarofFrost:CooldownUp() or not S.BreathofSindragosa:IsAvailable() and Player:RunicPowerDeficit() >= 25) then
-    if HR.Cast(S.HypothermicPresence, Settings.Frost.GCDasOffGCD.HypothermicPresence, nil, nil) then return "hypothermic_presence cd 10"; end
+    if HR.Cast(S.HypothermicPresence, Settings.Frost.GCDasOffGCD.HypothermicPresence) then return "hypothermic_presence cd 10"; end
   end 
   -- "Raise Dead", "if=buff.pillar_of_frost.up"
   if S.RaiseDead:IsCastable() and Player:BuffUp(S.PillarofFrostBuff) then
@@ -421,7 +421,7 @@ local function Cooldowns()
   end
   -- "Death and Decay", "if=active_enemies>5|runeforge.phearomones"
   if S.DeathAndDecay:IsCastable() and EnemiesCount10yd > 5 then
-    if HR.Cast(S.DeathAndDecay, nil, nil) then return "dnd aoe 13"; end
+    if HR.Cast(S.DeathAndDecay) then return "dnd aoe 13"; end
   end
 end
 
@@ -556,11 +556,11 @@ local function Standard()
   end
   -- Horn of Winter
   if S.HornofWinter:IsCastable() then
-    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter, nil, nil) then return "horn_of_winter standard 13"; end
+    if HR.Cast(S.HornofWinter, Settings.Frost.GCDasOffGCD.HornofWinter) then return "horn_of_winter standard 13"; end
   end
   -- Arcane Torrent
   if S.ArcaneTorrent:IsCastable() and HR.CDsON() then
-    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent, nil, nil) then return "arcane_torrent standard 14"; end
+    if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.ArcaneTorrent) then return "arcane_torrent standard 14"; end
   end
 end
 

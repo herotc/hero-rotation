@@ -31,8 +31,7 @@ HR.GUISettings.APL.DeathKnight = {
       Racials = true,
       MindFreeze = true,
       DeathAndDecay = false,
-      SacrificialPact = true,
-      ArcaneTorrent = true
+      SacrificialPact = true
     }
   },
   Blood = {
