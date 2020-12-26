@@ -186,6 +186,12 @@
       return;
     end
 
+    if ((Start + Duration - 0.3) <= GetTime()) then
+      self.CooldownFrame:SetCooldown(0, 0);
+      self.CooldownFrame:Hide();
+      return;
+    end
+
     self.CooldownFrame:SetCooldown(Start, Duration);
   end
   function HR.MainIconFrame:InitParts ()

@@ -88,38 +88,6 @@ local function EvaluateCycleLavaLash(TargetUnit)
   return (TargetUnit:DebuffRefreshable(S.LashingFlamesDebuff))
 end
 
-local function Precombat()
-  -- flask
-  -- food
-  -- augmentation
-  -- windfury_weapon
-  if not hasMainHandEnchant and S.WindfuryWeapon:IsCastable() then
-    if HR.Cast(S.WindfuryWeapon) then return "WindfuryWeapon enchant"; end
-  end
-  -- flametongue_weapon
-  if not hasOffHandEnchant and S.FlamentongueWeapon:IsCastable() then
-    if HR.Cast(S.FlamentongueWeapon) then return "FlamentongueWeapon enchant"; end
-  end
-  -- lightning_shield
-  if S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShieldBuff) then
-    if HR.Cast(S.LightningShield) then return "lightning_shield precombat"; end
-  end
-  -- stormkeeper,if=talent.stormkeeper.enabled
-  if S.Stormkeeper:IsCastable() then
-    if HR.Cast(S.Stormkeeper) then return "Stormkeeper precombat"; end
-  end
-  -- windfury_totem
-  if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) then
-    if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem precombat"; end
-  end
-  -- potion
-  -- snapshot_stats
-  -- Manually added: flame_shock
-  if S.FlameShock:IsCastable() and Target:DebuffDown(S.FlameShockDebuff) then
-    if HR.Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "FlameShock precombat"; end
-  end
-end
-
 local function Single()
   -- actions.single=windstrike
   if S.Windstrike:IsCastable() then
@@ -223,7 +191,7 @@ local function Single()
   end
   -- actions.single+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental single 46"; end
+    --if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental single 46"; end
   end
   -- actions.single+=/windfury_totem,if=buff.windfury_totem.remains<30
   if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or Player:TotemRemains(totemFinder()) < 30) then
@@ -356,7 +324,7 @@ local function Aoe()
   end
   -- actions.aoe+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental aoe 116"; end
+    --if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental aoe 116"; end
   end
   -- actions.aoe+=/windfury_totem,if=buff.windfury_totem.remains<30
   if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or Player:TotemRemains(totemFinder()) < 30) then
@@ -383,15 +351,30 @@ local function APL()
   end
 
   if Everyone.TargetIsValid() then
-    -- Precombat
-    if not Player:AffectingCombat() then
-      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+    -- windfury_weapon
+    if not hasMainHandEnchant and S.WindfuryWeapon:IsCastable() then
+      if HR.Cast(S.WindfuryWeapon) then return "WindfuryWeapon enchant"; end
     end
-    -- actions=bloodlust
-    -- potion,if=expected_combat_length-time<60
+    -- flametongue_weapon
+    if not hasOffHandEnchant and S.FlamentongueWeapon:IsCastable() then
+      if HR.Cast(S.FlamentongueWeapon) then return "FlamentongueWeapon enchant"; end
+    end
+    -- lightning_shield
+    if S.LightningShield:IsCastable() and Player:BuffDown(S.LightningShieldBuff) then
+      if HR.Cast(S.LightningShield) then return "lightning_shield precombat"; end
+    end
+    -- stormkeeper,if=talent.stormkeeper.enabled
+    if S.Stormkeeper:IsCastable() then
+      if HR.Cast(S.Stormkeeper) then return "Stormkeeper precombat"; end
+    end
+    -- windfury_totem
+    if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) then
+      if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem precombat"; end
+    end
+
     -- wind_shear
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
-    -- auto_attack
+
     -- use_items
     local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
     if TrinketToUse then
