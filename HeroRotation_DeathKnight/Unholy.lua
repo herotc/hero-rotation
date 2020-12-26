@@ -305,7 +305,7 @@ local function Racials()
       if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury racial 2"; end
     end
     -- berserking,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned.enabled&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>target.time_to_die)
-    if S.Berserking:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or S.UnholyAssault:BuffUp() and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
+    if S.Berserking:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or Player:BuffUp(S.UnholyAssaultBuff) and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
       if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking racial 3"; end
     end
     -- lights_judgment,if=buff.unholy_strength.up
@@ -313,7 +313,7 @@ local function Racials()
       if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not TargetIsInRange[40]) then return "lights_judgment racial 4"; end
     end
     -- ancestral_call,if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned.enabled&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>target.time_to_die)
-    if S.AncestralCall:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or S.UnholyAssault:BuffUp() and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
+    if S.AncestralCall:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or Player:BuffUp(S.UnholyAssaultBuff) and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
       if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call racial 5"; end
     end
     -- arcane_pulse,if=active_enemies>=2|(rune.deficit>=5&runic_power.deficit>=60)
@@ -321,7 +321,7 @@ local function Racials()
       if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not TargetIsInRange[8]) then return "arcane_pulse racial 6"; end
     end
     -- fireblood, if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned.enabled&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>target.time_to_die)
-    if S.Fireblood:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or S.UnholyAssault:BuffUp() and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
+    if S.Fireblood:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or Player:BuffUp(S.UnholyAssaultBuff) and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racial 7"; end
     end
     -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
