@@ -315,13 +315,11 @@ local function ST()
   if S.KillShot:IsCastable() and S.KillShot:IsUsable() then
     if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "Kill Shot (ST)"; end
   end
-  -- barbed_shot,if=(cooldown.wild_spirits.remains>full_recharge_time|!covenant.night_fae)
-  --   &(cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood
-  --     |full_recharge_time<gcd&cooldown.bestial_wrath.remains)
+  -- barbed_shot,if=cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood
+  --   |full_recharge_time<gcd&cooldown.bestial_wrath.remains
   --   |target.time_to_die<9
-  if S.BarbedShot:IsCastable() and (((not S.WildSpirits:IsAvailable() or S.WildSpirits:CooldownRemains() > S.BarbedShot:FullRechargeTime())
-    and ((S.BestialWrath:CooldownRemains() < 12 * S.BarbedShot:ChargesFractional() + GCDMax and S.ScentOfBlood:IsAvailable())
-      or (S.BarbedShot:FullRechargeTime() < GCDMax and bool(S.BestialWrath:CooldownRemains()))))
+  if S.BarbedShot:IsCastable() and ((S.BestialWrath:CooldownRemains() < 12 * S.BarbedShot:ChargesFractional() + GCDMax and S.ScentOfBlood:IsAvailable())
+    or (S.BarbedShot:FullRechargeTime() < GCDMax and bool(S.BestialWrath:CooldownRemains()))
     or Target:TimeToDie() < 9) then
     if Cast(S.BarbedShot, nil, nil, not TargetInRange40y) then return "Barbed Shot (ST - 1)"; end
   end
@@ -549,7 +547,7 @@ HR.SetAPL(253, APL, OnInit)
 -- actions.st+=/wild_spirits
 -- actions.st+=/flayed_shot
 -- actions.st+=/kill_shot,if=buff.flayers_mark.remains<5|target.health.pct<=20
--- actions.st+=/barbed_shot,if=(cooldown.wild_spirits.remains>full_recharge_time|!covenant.night_fae)&(cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood|full_recharge_time<gcd&cooldown.bestial_wrath.remains)|target.time_to_die<9
+-- actions.st+=/barbed_shot,if=cooldown.bestial_wrath.remains<12*charges_fractional+gcd&talent.scent_of_blood|full_recharge_time<gcd&cooldown.bestial_wrath.remains|target.time_to_die<9
 -- actions.st+=/death_chakram,if=focus+cast_regen<focus.max
 -- actions.st+=/stampede,if=buff.aspect_of_the_wild.up|target.time_to_die<15
 -- actions.st+=/a_murder_of_crows
