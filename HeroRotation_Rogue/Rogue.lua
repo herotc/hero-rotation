@@ -171,6 +171,7 @@ Spell.Rogue.Outlaw = {
   FlagellationCleanse   = Spell(345569),
   -- Soulbinds/Conduits (Shadowlands)
   Ambidexterity         = Spell(341542),
+  CountTheOdds          = Spell(341546),
   -- Legendaries (Shadowlands)
   ConcealedBlunderbuss  = Spell(340587),
   DeathlyShadowsBuff    = Spell(341202),
