@@ -243,6 +243,7 @@ Spell.Rogue.Subtlety = {
   SerratedBoneSpikeDot  = Spell(324073),
   EchoingReprimand      = Spell(323547),
   Sepsis                = Spell(328305),
+  SepsisBuff            = Spell(347037),
   Flagellation          = Spell(323654),
   FlagellationCleanse   = Spell(345569),
   -- Soulbinds/Conduits (Shadowlands)
