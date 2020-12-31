@@ -141,6 +141,9 @@ local function UsePriorityRotation()
     -- Zul Mythic
     if Player:InstanceDifficulty() == 16 and Target:NPCID() == 138967 then
       return true
+    -- Council of Blood
+    elseif Target:NPCID() == 166969 or Target:NPCID() == 166971 or Target:NPCID() == 166970 then
+      return true
     end
   end
 
