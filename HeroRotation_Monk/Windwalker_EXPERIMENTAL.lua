@@ -43,9 +43,6 @@ local Enemies5y
 local Enemies8y
 local EnemiesCount8
 local ShouldReturn
-local VarXuenOnUse = false
-local VarXuenHold = false
-local VarSerenityBurst = false
 local Interrupts = {
   { S.SpearHandStrike, "Cast Spear Hand Strike (Interrupt)", function () return true end },
 }
@@ -58,8 +55,6 @@ local KnockBack = {
 local Traps = {
   { S.Paralysis, "Cast Paralysis (Stun)", function () return true end },
 }
-local VarHoldTod = false
-local VarFoPPreChan = 0
 
 -- GUI Settings
 local Everyone = HR.Commons.Everyone;
@@ -109,12 +104,12 @@ local function bool(val)
   return val ~= 0
 end
 
-local function EnergyTimeToMaxRounded ()
+local function EnergyTimeToMaxRounded()
   -- Round to the nearesth 10th to reduce prediction instability on very high regen rates
   return math.floor(Player:EnergyTimeToMaxPredicted() * 10 + 0.5) / 10
 end
 
-local function EnergyPredictedRounded ()
+local function EnergyPredictedRounded()
   -- Round to the nearesth int to reduce prediction instability on very high regen rates
   return math.floor(Player:EnergyPredicted() + 0.5)
 end
@@ -135,10 +130,13 @@ end
 
 -- assume MH/OH setup, better because 2x enchants
 -- TODO: handle weapon swapping; need to update these values on swaps.
-local mh_dps = GetItemStats(GetInventoryItemLink("player", 16))["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
-local oh_dps = GetItemStats(GetInventoryItemLink("player", 17))["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
+--local mh_dps = GetItemStats(GetInventoryItemLink("player", 16))["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
+--local oh_dps = GetItemStats(GetInventoryItemLink("player", 17))["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
+--local function AbilityPower()
+--  return 1.02 * (4*mh_dps + 2*oh_dps + Player:AttackPower())
+--end
 local function AbilityPower()
-  return 1.02 * (4*mh_dps + 2*oh_dps + Player:AttackPower())
+  return Player:AttackPower()
 end
 
 local armor_reduction_coeff = 0.70
@@ -222,27 +220,19 @@ end
 local function BestDamagePerChi()
   local bok_val = GetBlackoutKickValue()
   local sck_val = GetSpinningCraneKickValue()
-  --local fof_val = GetFistsOfFuryValue()
   local rsk_val = GetRisingSunKickValue()
   local rjw_val = GetRushingJadeWindValue()
 
   -- TODO: don't hardcode, some CDs change these values!
   local bok_chi = 1.0
   local sck_chi = 2.0
-  --local fof_chi = 3.0
   local rsk_chi = 2.0
   local rjw_chi = 1.0
 
   local bok_eff = bok_val / bok_chi
   local sck_eff = sck_val / sck_chi
-  --local fof_eff = fof_val / fof_chi
   local rsk_eff = rsk_val / rsk_chi
   local rjw_eff = rjw_val / rjw_chi
-  --print("BOK val " .. bok_val .. " eff " .. bok_eff)
-  --print("SCK val " .. sck_val .. " eff " .. sck_eff)
-  --print("FOF val " .. fof_val .. " eff " .. fof_eff)
-  --print("RSK val " .. rsk_val .. " eff " .. rsk_eff)
-  --print("RJW val " .. rjw_val .. " eff " .. rjw_eff)
  
   
   local best_move = nil
@@ -256,10 +246,6 @@ local function BestDamagePerChi()
     best_move = S.SpinningCraneKick
     best_eff = sck_eff
   end
-  --if fof_eff > best_eff then
-    --best_move = S.FistsOfFury
-    --best_eff = fof_eff
-  --end
   if rjw_eff > best_eff then
     best_move = S.RushingJadeWind
     best_eff = rjw_eff
@@ -271,19 +257,6 @@ local function BestDamagePerChi()
 
   -- Note: it's not always the case that FOF is better than SCK on aoe - consider 6t with 6 MOTC stacks up: SCK damage per chi is 8543, FOF damage per chi is 8412
   -- this gets more pronounced if you have calculated strikes conduit.
-  --print("BEST: ")
-  --if best_move == S.RisingSunKick then
-    --print("RSK val " .. rsk_val .. " eff " .. best_eff)
-  --elseif best_move == S.RushingJadeWind then
-    --print("RJW val " .. rjw_val .. " eff " .. best_eff)
-  --elseif best_move == S.FistsOfFury then
-    --print("FOF val " .. fof_val .. " eff " .. best_eff)
-  --elseif best_move == S.SpinningCraneKick then
-    --print("SCK val " .. sck_val .. " eff " .. best_eff)
-  --elseif best_move == S.BlackoutKick then
-    --print("BOK val " .. bok_val .. " eff " .. best_eff)
-  --end
-  --print("----------------------------")
   return best_move
 end
 
@@ -293,20 +266,17 @@ end
 local function BestAvailableDamagePerChi()
   local bok_val = GetBlackoutKickValue()
   local sck_val = GetSpinningCraneKickValue()
-  --local fof_val = GetFistsOfFuryValue()
   local rsk_val = GetRisingSunKickValue()
   local rjw_val = GetRushingJadeWindValue()
 
   -- TODO: don't hardcode, some CDs change these values!
   local bok_chi = 1.0
   local sck_chi = 2.0
-  --local fof_chi = 3.0
   local rsk_chi = 2.0
   local rjw_chi = 1.0
 
   local bok_eff = bok_val / bok_chi
   local sck_eff = sck_val / sck_chi
-  --local fof_eff = fof_val / fof_chi
   local rsk_eff = rsk_val / rsk_chi
   local rjw_eff = rjw_val / rjw_chi
   
@@ -321,10 +291,6 @@ local function BestAvailableDamagePerChi()
     best_move = S.SpinningCraneKick
     best_eff = sck_eff
   end
-  --if fof_eff > best_eff and S.FistsOfFury:IsReady() and ComboStrike(S.FistsOfFury) then
-    --best_move = S.FistsOfFury
-    --best_eff = fof_eff
-  --end
   if rjw_eff > best_eff and S.RushingJadeWind:IsReady() and ComboStrike(S.RushingJadeWind) then
     best_move = S.RushingJadeWind
     best_eff = rjw_eff
@@ -333,20 +299,6 @@ local function BestAvailableDamagePerChi()
     best_move = S.RisingSunKick
     best_eff = rsk_eff
   end
-  -- note: this version CAN return nil if none of the spells are ready
-  print("BEST AVAIL: ")
-  if best_move == S.RisingSunKick then
-    print("RSK val " .. rsk_val .. " eff " .. rsk_eff)
-  elseif best_move == S.RushingJadeWind then
-    print("RJW val " .. rjw_val .. " eff " .. rjw_eff)
-  --elseif best_move == S.FistsOfFury then
-    --print("FOF val " .. fof_val .. " eff " .. fof_eff)
-  elseif best_move == S.SpinningCraneKick then
-    print("SCK val " .. sck_val .. " eff " .. sck_eff)
-  elseif best_move == S.BlackoutKick then
-    print("BOK val " .. bok_val .. " eff " .. bok_eff)
-  end
-  print("----------------------------")
   return best_move
 end
 
@@ -359,16 +311,31 @@ local function UseItems()
 end
 
 local function UseCooldowns()
-  -- notably: i put energizing elixir into main rotation
-  -- elixir is off gcd, as is serenity/SEF
-  -- expel harm incurs a "half-gcd"
-  -- should consider how to handle sef.
-  -- xuen
-  -- long-ish on-use trinkets
-  -- serenity
-  -- weapons of order
-  -- that venthyr tiger spawning guy
-  -- touch of death
+  -- notable TODO: consider putting energizing elixir into main rotation
+  -- elixir is off gcd, as is serenity/SEF, but elixir is less of a CD and more of a rotational thing
+  if S.InvokeXuenTheWhiteTiger:IsReady() then
+    if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "Invoke Xuen the White Tiger"; end
+  end
+  if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or ((not S.WeaponsOfOrder:IsAvailable()) and ((S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) and (S.FistsOfFury:CooldownRemains() <= 9) and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
+    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "Storm Earth and Fire non-kyrian"; end
+  end
+  if S.StormEarthAndFire:IsReady() and S.WeaponsOfOrder:IsAvailable() and (Player:BuffUp(S.WeaponsOfOrder) or ((HL.BossFilteredFightRemains("<", S.WeaponsOfOrder:CooldownRemains()) or (S.WeaponsOfOrder:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) and S.FistsOfFury:CooldownRemains() <= 9 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
+    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "Storm Earth and Fire kyrian"; end
+  end
+
+  if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 2) or Player:ChiDeficit() >= 4) then
+    if HR.CastRightSuggested(S.EnergizingElixir) then return "Elixir CD"; end
+  end
+  if S.TouchOfDeath:IsReady() and Target:Health() < Player:Health() then
+    if HR.CastRightSuggested(S.TouchOfDeath) then return "Touch of Death Main Target"; end
+  end
+  -- TODO: TOD on off-targets
+  -- touch of death as suggested-right if current target and on nameplate if not?
+  -- should consider how to handle sef and xuen
+  -- put SEF as suggested-left icon?
+  -- put long-ish on-use trinkets here
+  -- put weapons of order here
+  -- put venthyr portal thing here
 end
 
 local function Precombat()
@@ -384,33 +351,12 @@ local function APL()
   Enemies5y = Player:GetEnemiesInMeleeRange(5) -- Multiple Abilities
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
-  local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target);
+  ComputeTargetRange()
   local FOFChannelTime = 4.0 / (1 + Player:HastePct() / 100.0)
   local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
-  ComputeTargetRange()
-
-  -- TODO: handle this check better, consider time-to-50-energy or time-to-FOTWT or time-to-energizing or time-to-expel harm
-  -- general idea is that you don't want to spend *any* chi when low on chi before an important CD chi spender comes up
-  -- "important" here means a chi spender you'd want to cast if it were off CD - i.e. RSK is not important in aoe (unless WDP is ready; handled separately)
-  local ConserveChi = false
-  if EnemiesCount8 == 1 then
-    ConserveChi =
-      (S.RisingSunKick:CooldownRemains() < 5 and Player:Chi() < 2) or
-      (S.FistsOfFury:CooldownRemains() < 5 and Player:Chi() < 3)
-  else
-    -- handle AOE conserve, not assuming BOk is going to drop CDs.
-    ConserveChi = 
-      (S.FistsOfFury:CooldownRemains() < 5 and Player:Chi() < 3)
-  end
-
-  local DumpChi = (Player:ChiDeficit() < 2) -- a tiger palm would carry us too high, so dump
-
-
-
 
 
   if Everyone.TargetIsValid() then
-    BestDamagePerChi()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
@@ -419,6 +365,7 @@ local function APL()
     UseCooldowns()
     UseItems()
 
+    -- If you're about to cap energy, use an energy spender.
     if EnergyTimeToMaxRounded() < Player:GCD() then
       if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
         if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "FOTWT @ Energy Cap" end
@@ -435,6 +382,7 @@ local function APL()
     if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) then
       if HR.Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "Whirling Dragon Punch" end
     end
+
     if S.WhirlingDragonPunch:IsAvailable() and S.RisingSunKick:IsReady() and S.WhirlingDragonPunch:CooldownRemains() < 5 and (S.FistsOfFury:CooldownRemains() > 3 or Player:Chi() >= 5) then
       if HR.Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Rising Sun Kick to enable WDP" end
     end
