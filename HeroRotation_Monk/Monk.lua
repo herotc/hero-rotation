@@ -66,8 +66,8 @@ Spell.Monk.Windwalker = {
   HitCombo                              = Spell(196740),
   HitComboBuff                          = Spell(196741),
   InnerStrengthBuff                     = Spell(261769),
-  RushingJadeWind                       = Spell(261715),
-  RushingJadeWindBuff                   = Spell(261715),
+  RushingJadeWind                       = Spell(116847),
+  RushingJadeWindBuff                   = Spell(116847),
   WhirlingDragonPunch                   = Spell(152175),
   WhirlingDragonPunchBuff               = Spell(196742),
   Serenity                              = Spell(152173),
@@ -122,6 +122,10 @@ Spell.Monk.Windwalker = {
   KeefersSkyreachDebuff                 = Spell(344021),
   RecentlyRushingTigerPalm              = Spell(337341),
   TheEmperorsCapacitor                  = Spell(337291),
+
+  -- Conduits
+  InnerFury                             = Spell(336452),
+  CalculatedStrikes                     = Spell(336526),
 
   -- Misc
   PoolEnergy                            = Spell(999910)
@@ -213,6 +217,9 @@ Spell.Monk.Brewmaster = {
   KeefersSkyreach              = Spell(344021),
   MightyPour                   = Spell(337994),
   RecentlyRushingTigerPalm     = Spell(337341),
+
+
+
 
   -- Trinket Debuffs
 
