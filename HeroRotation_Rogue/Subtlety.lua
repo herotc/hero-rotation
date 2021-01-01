@@ -69,7 +69,7 @@ S.Eviscerate:RegisterDamageFormula(
         -- Eviscerate R2 Multiplier
         (Target:DebuffUp(S.FindWeaknessDebuff) and 1.5 or 1) *
         -- Sinful Revelation Enchant
-        (Target:DebuffUp(S.SinfulRevelation) and 1.06 or 1)
+        (Target:DebuffUp(S.SinfulRevelationDebuff) and 1.06 or 1)
   end
 )
 S.Rupture:RegisterPMultiplier(
@@ -488,7 +488,7 @@ local function CDs ()
   -- actions.cds+=/serrated_bone_spike,cycle_targets=1,if=variable.snd_condition&!dot.serrated_bone_spike_dot.ticking&target.time_to_die>=21|fight_remains<=5&spell_targets.shuriken_storm<3
   if S.SerratedBoneSpike:IsReady() and (SnDCondition or HL.BossFilteredFightRemains("<=", 5) and MeleeEnemies10yCount < 3) then
     local function Evaluate_BoneSpike_Target(TargetUnit)
-      return not TargetUnit:DebuffUp(S.SerratedBoneSpikeDot)
+      return not TargetUnit:DebuffUp(S.SerratedBoneSpikeDebuff)
     end
     if Target:IsInRange(30) and Evaluate_BoneSpike_Target(Target) and Target:FilteredTimeToDie(">", 21) then
       if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike (ST)" end

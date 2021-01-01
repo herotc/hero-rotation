@@ -344,7 +344,7 @@ local function Build ()
   end
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
   if S.SerratedBoneSpike:IsReady() then
-    if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDot)) or HL.BossFilteredFightRemains("<", 5) then
+    if (Player:BuffUp(S.SliceandDice) and not Target:DebuffUp(S.SerratedBoneSpikeDebuff)) or HL.BossFilteredFightRemains("<", 5) then
       if HR.Cast(S.SerratedBoneSpike, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Serrated Bone Spike" end
     end
     if AoEON() then
@@ -353,7 +353,7 @@ local function Build ()
       local TargetGUID = Target:GUID()
       for _, CycleUnit in pairs(Enemies30y) do
         if CycleUnit:GUID() ~= TargetGUID and Everyone.UnitIsCycleValid(CycleUnit, BestUnitTTD, -CycleUnit:DebuffRemains(S.SerratedBoneSpike))
-        and not CycleUnit:DebuffUp(S.SerratedBoneSpikeDot) then
+        and not CycleUnit:DebuffUp(S.SerratedBoneSpikeDebuff) then
           BestUnit, BestUnitTTD = CycleUnit, CycleUnit:TimeToDie()
         end
       end
@@ -496,8 +496,6 @@ local function APL ()
 end
 
 local function Init ()
-  S.RazorCoralDebuff:RegisterAuraTracking()
-  S.ConductiveInkDebuff:RegisterAuraTracking()
 end
 
 HR.SetAPL(260, APL, Init)
