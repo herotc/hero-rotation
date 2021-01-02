@@ -137,7 +137,7 @@ Spell.Warlock.Affliction = {
 -- Items
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Demonology = {
-  PotionofUnbridledFury            = Item(169299)
+  PotionofSpectralIntellect             = Item(307096)
 }
 
 Item.Warlock.Affliction = {

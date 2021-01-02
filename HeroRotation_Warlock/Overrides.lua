@@ -118,6 +118,8 @@ DemoOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     local BaseCheck = DemoOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellDemo.SummonPet then
       return BaseCheck and not Pet:IsActive() and Player:SoulShardsP() > 0
+    elseif self == SpellDemo.SummonDemonicTyrant then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end
@@ -133,12 +135,8 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = DemoOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellDemo.SummonVilefiend then
-      return BaseCheck and not Player:IsCasting(SpellDemo.SummonVilefiend)
-    elseif self == SpellDemo.CallDreadstalkers then
-      return BaseCheck and not Player:IsCasting(SpellDemo.CallDreadstalkers)
-    elseif self == SpellDemo.DecimatingBolt then
-      return BaseCheck and not Player:IsCasting(SpellDemo.DecimatingBolt)
+    if self == SpellDemo.SummonVilefiend or self == SpellDemo.CallDreadstalkers or self == SpellDemo.NetherPortal or self == SpellDemo.DecimatingBolt or self == SpellDemo.ScouringTithe then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end

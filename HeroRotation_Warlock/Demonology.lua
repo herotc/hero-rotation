@@ -129,8 +129,8 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- potion
-    if I.PotionofUnbridledFury:IsReady() and Settings.Commons.Enabled.Potions then
-      if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.DisplayStyle.Potions) then return "battle_potion_of_intellect 4"; end
+    if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
+      if HR.Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "battle_potion_of_intellect 4"; end
     end
     -- demonbolt
     if S.Demonbolt:IsCastable() then
@@ -152,7 +152,7 @@ local function TyrantPrep()
     if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 64"; end
   end
   -- nether_portal
-  if S.NetherPortal:IsReady() and not Player:IsCasting(S.NetherPortal) then
+  if S.NetherPortal:IsReady() then
     if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, not Target:IsSpellInRange(S.NetherPortal)) then return "nether_portal 66"; end
   end
   -- grimoire_felguard
@@ -219,7 +219,7 @@ local function SummonTyrant()
     if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 104"; end
   end
   -- summon_demonic_tyrant
-  if S.SummonDemonicTyrant:IsCastable() and not Player:IsCasting(S.SummonDemonicTyrant) then
+  if S.SummonDemonicTyrant:IsCastable() then
     if HR.Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant, nil, not Target:IsInRange(40)) then return "summon_demonic_tyrant 106"; end
   end
   -- variable,name=tyrant_ready,value=!cooldown.summon_demonic_tyrant.ready
@@ -236,8 +236,8 @@ local function OffGCD()
     if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking 122"; end
   end
   -- potion,if=buff.berserking.up|pet.demonic_tyrant.active&!race.troll
-  if I.PotionofUnbridledFury:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Berserking) or DemonicTyrantTime() > 0 and Player:Race() ~= "Troll") then
-    if HR.Cast(I.PotionofUnbridledFury, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 124"; end
+  if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions and (Player:BuffUp(S.Berserking) or DemonicTyrantTime() > 0 and Player:Race() ~= "Troll") then
+    if HR.Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion 124"; end
   end
   -- blood_fury,if=pet.demonic_tyrant.active
   if S.BloodFury:IsCastable() and (DemonicTyrantTime() > 0) then
@@ -257,7 +257,7 @@ local function Covenant()
   -- scouring_tithe,if=talent.sacrificed_souls.enabled&active_enemies=1
   -- scouring_tithe,if=!talent.sacrificed_souls.enabled&active_enemies<4
   -- Note: Combined the lines
-  if S.ScouringTithe:IsReady() and not Player:IsCasting(S.ScouringTithe) and ((S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash == 1) or (not S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash < 4)) then
+  if S.ScouringTithe:IsReady() and ((S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash == 1) or (not S.SacrificedSouls:IsAvailable() and EnemiesCount8ySplash < 4)) then
     if HR.Cast(S.ScouringTithe, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.ScouringTithe)) then return "scouring_tithe 144"; end
   end
   -- soul_rot

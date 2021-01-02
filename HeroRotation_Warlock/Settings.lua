@@ -105,10 +105,6 @@ local CP_Affliction = CreateChildPanel(CP_Warlock, "Affliction")
 
 -- Warlock
 CreateARPanelOptions(CP_Warlock, "APL.Warlock.Commons")
-CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.UsePotions", "Show Potions", "Enable this if you want it to show you to use Potions.")
-CreatePanelOption("CheckButton", CP_Warlock, "APL.Warlock.Commons.UseTrinkets", "Use Trinkets", "Use Trinkets as part of the rotation")
-CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.TrinketDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Trinket Display Style", "Define which icon display style to use for Trinkets.")
-CreatePanelOption("Dropdown", CP_Warlock, "APL.Warlock.Commons.CovenantDisplayStyle", {"Main Icon", "Suggested", "Cooldown"}, "Covenant Display Style", "Define which icon display style to use for active Shadowlands Covenant Abilities.")
 
 --[[ Destruction
 CreatePanelOption("CheckButton", CP_Destruction, "APL.Warlock.Destruction.UseSplashData", "Use Splash Data for AoE", "For AoE purposes, only count enemies previously hit by AoE abilities.")
