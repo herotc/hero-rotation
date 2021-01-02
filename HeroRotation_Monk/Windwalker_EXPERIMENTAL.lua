@@ -118,188 +118,143 @@ local function ComboStrike(SpellObject)
   return (not Player:PrevGCD(1, SpellObject))
 end
 
+-- Cast the spell, but choose the target with the minimum remaining timer on it's crane stacks.
+local function CastAtBestCraneTarget(SpellObject, DebugMessage)
+  local BestUnit = Target
+  local min_time = Target:DebuffRemains(S.MarkOfTheCraneDebuff)
+  for _, Unit in pairs(Enemies8y) do
+    local unit_time = Unit:DebuffRemains(S.MarkOfTheCraneDebuff)
+    if unit_time < min_time then
+      BestUnit = Unit
+      min_time = unit_time
+    end
+  end
+  if BestUnit:GUID() == Target:GUID()  then
+    if HR.Cast(SpellObject, nil, nil, not Target:IsInMeleeRange(8)) then return DebugMessage end
+  else
+    if HR.CastLeftNameplate(BestUnit, SpellObject) then return DebugMessage end
+  end
+end
+
+-- This function returns a table, indexed by spell object (S.XXX) keys.
+-- It contains the current-state chi costs of each chi spender (perhaps zero).
+-- Assumption here is that we always want to fists on CD, so we don't bother tracking it here.
+local function ChiSpenderCosts()
+  costs = {}
+  costs[S.RisingSunKick] = 2
+  costs[S.SpinningCraneKick] = 2
+  costs[S.RushingJadeWind] = 1
+  costs[S.BlackoutKick] = 1
+  if Player:BuffUp(S.WeaponsOfOrder) then
+    for spell, cost in pairs(costs) do
+      costs[spell] = max(0, cost-1)
+    end
+  end
+  if Player:BuffUp(S.DanceOfChijiBuff) then
+    costs[S.SpinningCraneKick] = 0
+  end
+  if Player:BuffUp(S.BlackoutKickBuff) then
+    costs[S.BlackoutKick] = 0
+  end
+  if Player:BuffUp(S.SerenityBuff) then
+    for spell, cost in pairs(costs) do
+      costs[spell] = 0
+    end
+  end
+  return costs
+end
+
 local function MarkOfTheCraneStacks()
   return GetSpellCount(101546)
 end
 
--- Reward Estimation for Chi Spenders
--- See https://docs.google.com/spreadsheets/d/1Agwilw8sG5PeBBgACneZl3J4jumS1EBWQAJK8BIUzgE/edit#gid=0
--- TODO: inner fury, calculated strikes, coordinated offensive computation
--- TODO: autoattack loss
--- TODO: BOK value from CDR
-
--- assume MH/OH setup, better because 2x enchants
--- TODO: handle weapon swapping; need to update these values on swaps.
---local mh_dps = GetItemStats(GetInventoryItemLink("player", 16))["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
---local oh_dps = GetItemStats(GetInventoryItemLink("player", 17))["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
---local function AbilityPower()
---  return 1.02 * (4*mh_dps + 2*oh_dps + Player:AttackPower())
---end
 local function AbilityPower()
-  return Player:AttackPower()
+  local mh = GetInventoryItemLink("player", 16)
+  local mh_dps = GetItemStats(mh)["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
+  local oh = GetInventoryItemLink("player", 17)
+  if oh ~= nil then
+    local oh_dps = GetItemStats(oh)["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
+    return 1.02 * (4*mh_dps + 2*oh_dps + Player:AttackPower())
+  else
+    return 0.98 * (6*mh_dps + Player:AttackPower())
+  end
 end
 
-local armor_reduction_coeff = 0.70
-local mystic_touch_coeff = 1.05
-local inner_fury_coeff = 1.0
-if S.InnerFury:ConduitEnabled() then inner_fury_coeff = 1.04 + 0.004*(S.InnerFury:ConduitRank() - 1) end
-local calculated_strikes_effect = 0.0
-if S.CalculatedStrikes:ConduitEnabled() then calculated_strikes_effect = 0.1 + 0.01*(S.CalculatedStrikes:ConduitRank() - 1) end
-
--- TODO: handle autoattack loss
-local function GetSpinningCraneKickValue()
+-- This function returns a table, indexed by spell object (S.XXX) keys.
+-- It returns a table of values of using the given chi spender in the current state.
+-- See https://docs.google.com/spreadsheets/d/1Agwilw8sG5PeBBgACneZl3J4jumS1EBWQAJK8BIUzgE/edit#gid=0
+-- TODO: autoattack loss on SCK
+-- TODO: BOK value from CDR
+local function ChiSpenderValues()
+  -- Set up some variables/constants here.
+  -- Base multipliers
   local ability_power = AbilityPower()
   local mastery_coeff = 1 + Player:MasteryPct() / 100.0
   local vers_coeff = 1 + Player:VersatilityDmgPct() / 100.0
-  local ap_coeff = 0.40
-  local aura_coeff = 0.87 * 2.4
+  local armor_reduction_coeff = 0.70
+  local mystic_touch_coeff = 1.05
+
+  values = {}
+  -- RSK
+  local rsk_ap_coeff = 1.438
+  local rsk_aura_coeff = 0.87 * 1.26 * 1.7
+  local rsk_tooltip = ability_power * rsk_ap_coeff * rsk_aura_coeff * vers_coeff
+  local rsk_damage = rsk_tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
+  values[S.RisingSunKick] = rsk_damage
+  -- SCK
+  local sck_ap_coeff = 0.40
+  local sck_aura_coeff = 0.87 * 2.4
+  local calculated_strikes_effect = 0.0
+  if S.CalculatedStrikes:ConduitEnabled() then calculated_strikes_effect = 0.1 + 0.01*(S.CalculatedStrikes:ConduitRank() - 1) end
   local crane_coeff = 1 + (0.1 + calculated_strikes_effect) * MarkOfTheCraneStacks()
   local chiji_coeff = 1.0
   if Player:BuffUp(S.DanceOfChijiBuff) then chiji_coeff = 3.0 end
-  local tooltip = ability_power * ap_coeff * aura_coeff * vers_coeff * crane_coeff * chiji_coeff
-  local damage = tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
+  local sck_tooltip = ability_power * sck_ap_coeff * sck_aura_coeff * vers_coeff * crane_coeff * chiji_coeff
+  local sck_damage = sck_tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
   local num_targets = min(6, EnemiesCount8)
-  return damage * num_targets
-end
-
--- TODO: handle autoattack loss
-local function GetFistsOfFuryValue()
-  local ability_power = AbilityPower()
-  local mastery_coeff = 1 + Player:MasteryPct() / 100.0
-  local vers_coeff = 1 + Player:VersatilityDmgPct() / 100.0
-  local ap_coeff = 6.0375
-  local aura_coeff = 0.87
-  local tooltip = ability_power * ap_coeff * aura_coeff * vers_coeff
-  local damage = tooltip * inner_fury_coeff * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
-  local num_off_targets = max(0, min(5, EnemiesCount8-1))
-  return damage * (1 + 0.5*num_off_targets)
-end
-
--- TODO: handle CD reduction value
-local function GetBlackoutKickValue()
-  local ability_power = AbilityPower()
-  local mastery_coeff = 1 + Player:MasteryPct() / 100.0
-  local vers_coeff = 1 + Player:VersatilityDmgPct() / 100.0
-  local ap_coeff = 0.847
-  local aura_coeff = 0.87 * 1.26 * 1.1
-  local tooltip = ability_power * ap_coeff * aura_coeff * vers_coeff
-  local damage = tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
-  return damage
-end
-
-local function GetRisingSunKickValue()
-  local ability_power = AbilityPower()
-  local mastery_coeff = 1 + Player:MasteryPct() / 100.0
-  local vers_coeff = 1 + Player:VersatilityDmgPct() / 100.0
-  local ap_coeff = 1.438
-  local aura_coeff = 0.87 * 1.26 * 1.7
-  local tooltip = ability_power * ap_coeff * aura_coeff * vers_coeff
-  local damage = tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
-  return damage
-end
-
-
-local function GetRushingJadeWindValue()
-  local ability_power = AbilityPower()
-  local mastery_coeff = 1 + Player:MasteryPct() / 100.0
-  local vers_coeff = 1 + Player:VersatilityDmgPct() / 100.0
-  local ap_coeff = 0.90
-  local aura_coeff = 0.87 * 1.22
-  local tooltip = ability_power * ap_coeff * aura_coeff * vers_coeff
-  local damage = tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
+  values[S.SpinningCraneKick] = sck_damage * num_targets
+  -- RJW
+  local rjw_ap_coeff = 0.90
+  local rjw_aura_coeff = 0.87 * 1.22
+  local rjw_tooltip = ability_power * rjw_ap_coeff * rjw_aura_coeff * vers_coeff
+  local rjw_damage = rjw_tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
   local num_targets = min(6, EnemiesCount8)
-  return num_targets * damage
+  values[S.RushingJadeWind] = num_targets * rjw_damage
+  -- BOK
+  local bok_ap_coeff = 0.847
+  local bok_aura_coeff = 0.87 * 1.26 * 1.1
+  local bok_tooltip = ability_power * bok_ap_coeff * bok_aura_coeff * vers_coeff
+  local bok_damage = bok_tooltip * mastery_coeff * armor_reduction_coeff * mystic_touch_coeff
+  values[S.BlackoutKick] = bok_damage
+
+  return values
 end
 
 
 
--- Returns the ability (completely not subject to any constraints)
--- that is the "best damage per chi" in the given scenario.
--- There is also a "best available" version of this that takes the readiness + combo-strike-itude of the abilities into account in case we
--- have to forcibly spend chi at cap
-local function BestDamagePerChi()
-  local bok_val = GetBlackoutKickValue()
-  local sck_val = GetSpinningCraneKickValue()
-  local rsk_val = GetRisingSunKickValue()
-  local rjw_val = GetRushingJadeWindValue()
+-- Returns the ability (completely not subject to any constraints) that is the "best damage per chi" in the given scenario.
+-- This function takes a parameter "constrain_to_available" which, if set true, only considers spells that are off CD and a combo strike.
+-- The second form of this function is useful if we *have* to spend chi at chi-cap.
+local function BestDamagePerChi(constrain_to_available)
+  local values_table = ChiSpenderValues()
+  local costs_table = ChiSpenderCosts()
 
-  -- TODO: don't hardcode, some CDs change these values!
-  local bok_chi = 1.0
-  local sck_chi = 2.0
-  local rsk_chi = 2.0
-  local rjw_chi = 1.0
-
-  local bok_eff = bok_val / bok_chi
-  local sck_eff = sck_val / sck_chi
-  local rsk_eff = rsk_val / rsk_chi
-  local rjw_eff = rjw_val / rjw_chi
- 
-  
-  local best_move = nil
+  local best_spell = nil
   local best_eff = 0
 
-  if bok_eff > best_eff then
-    best_move = S.BlackoutKick
-    best_eff = bok_eff
+  for spell, cost in pairs(costs_table) do
+   --print("Spell: " .. spell.SpellName .. " cost=" .. cost .. " val=" .. values_table[spell])
+    local mod_cost = cost
+    -- Avoid divide-by-zero here>
+    if cost == 0 then mod_cost = 0.001 end
+    local eff = values_table[spell] / mod_cost
+    if eff > best_eff and (not constrain_to_available or (spell:IsReady() and ComboStrike(spell))) then
+      best_spell = spell
+      best_eff = eff
+    end
   end
-  if sck_eff > best_eff then
-    best_move = S.SpinningCraneKick
-    best_eff = sck_eff
-  end
-  if rjw_eff > best_eff then
-    best_move = S.RushingJadeWind
-    best_eff = rjw_eff
-  end
-  if rsk_eff > best_eff then
-    best_move = S.RisingSunKick
-    best_eff = rsk_eff
-  end
-
-  -- Note: it's not always the case that FOF is better than SCK on aoe - consider 6t with 6 MOTC stacks up: SCK damage per chi is 8543, FOF damage per chi is 8412
-  -- this gets more pronounced if you have calculated strikes conduit.
-  return best_move
-end
-
--- Very similar to best damage per chi, except this conditions on a) CD is ready and b) this is a combo strike
--- if the result of this fn is the same as the last one, then it's good to spend chi (it's almost always FOF for the last one)
--- if the result of this fn is NOT the same as the last one, but we're ~chi capped, go ahead and fire off this spender.
-local function BestAvailableDamagePerChi()
-  local bok_val = GetBlackoutKickValue()
-  local sck_val = GetSpinningCraneKickValue()
-  local rsk_val = GetRisingSunKickValue()
-  local rjw_val = GetRushingJadeWindValue()
-
-  -- TODO: don't hardcode, some CDs change these values!
-  local bok_chi = 1.0
-  local sck_chi = 2.0
-  local rsk_chi = 2.0
-  local rjw_chi = 1.0
-
-  local bok_eff = bok_val / bok_chi
-  local sck_eff = sck_val / sck_chi
-  local rsk_eff = rsk_val / rsk_chi
-  local rjw_eff = rjw_val / rjw_chi
-  
-  local best_move = nil
-  local best_eff = 0
-
-  if bok_eff > best_eff and S.BlackoutKick:IsReady() and ComboStrike(S.BlackoutKick) then
-    best_move = S.BlackoutKick
-    best_eff = bok_eff
-  end
-  if sck_eff > best_eff and S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) then
-    best_move = S.SpinningCraneKick
-    best_eff = sck_eff
-  end
-  if rjw_eff > best_eff and S.RushingJadeWind:IsReady() and ComboStrike(S.RushingJadeWind) then
-    best_move = S.RushingJadeWind
-    best_eff = rjw_eff
-  end
-  if rsk_eff > best_eff and S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
-    best_move = S.RisingSunKick
-    best_eff = rsk_eff
-  end
-  return best_move
+  --print("------------------------")
+  return best_spell
 end
 
 local function UseItems()
@@ -317,24 +272,23 @@ local function UseCooldowns()
     if HR.Cast(S.InvokeXuenTheWhiteTiger, Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger, nil, not Target:IsInRange(40)) then return "Invoke Xuen the White Tiger"; end
   end
   if S.StormEarthAndFire:IsReady() and (S.StormEarthAndFire:Charges() == 2 or HL.BossFilteredFightRemains("<", 20) or ((not S.WeaponsOfOrder:IsAvailable()) and ((S.InvokeXuenTheWhiteTiger:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) and (S.FistsOfFury:CooldownRemains() <= 9) and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
-    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "Storm Earth and Fire non-kyrian"; end
+    if HR.CastSuggested(S.StormEarthAndFire) then return "Storm Earth and Fire non-kyrian"; end
   end
   if S.StormEarthAndFire:IsReady() and S.WeaponsOfOrder:IsAvailable() and (Player:BuffUp(S.WeaponsOfOrder) or ((HL.BossFilteredFightRemains("<", S.WeaponsOfOrder:CooldownRemains()) or (S.WeaponsOfOrder:CooldownRemains() > S.StormEarthAndFire:FullRechargeTime())) and S.FistsOfFury:CooldownRemains() <= 9 and Player:Chi() >= 2 and S.WhirlingDragonPunch:CooldownRemains() <= 12)) then
-    if HR.Cast(S.StormEarthAndFire, Settings.Windwalker.OffGCDasOffGCD.StormEarthAndFire) then return "Storm Earth and Fire kyrian"; end
+    if HR.CastSuggested(S.StormEarthAndFire) then return "Storm Earth and Fire kyrian"; end
   end
 
   if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 2) or Player:ChiDeficit() >= 4) then
     if HR.CastRightSuggested(S.EnergizingElixir) then return "Elixir CD"; end
   end
-  if S.TouchOfDeath:IsReady() and Target:Health() < Player:Health() then
+  if S.TouchOfDeath:IsReady() and Target:Health() < UnitHealthMax("player") then
     if HR.CastRightSuggested(S.TouchOfDeath) then return "Touch of Death Main Target"; end
   end
-  -- TODO: TOD on off-targets
+  if S.WeaponsOfOrder:IsReady() then
+    if HR.Cast(S.WeaponsOfOrder, true, nil, not Target:IsInRange(40)) then return "Weapons of Order" end
+  end
+  -- TODO: TOD on off-targets?
   -- touch of death as suggested-right if current target and on nameplate if not?
-  -- should consider how to handle sef and xuen
-  -- put SEF as suggested-left icon?
-  -- put long-ish on-use trinkets here
-  -- put weapons of order here
   -- put venthyr portal thing here
 end
 
@@ -342,6 +296,18 @@ local function Precombat()
   if S.ChiBurst:IsReady() then
     if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Precombat Chi Burst"; end
   end
+end
+
+local function SpendEnergy()
+    if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
+      CastAtBestCraneTarget(S.FistOfTheWhiteTiger, "FOTWT @ Energy Cap")
+    end
+    if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then
+      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm @ Energy Cap" end
+    end
+    if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 1 then
+      return CastAtBestCraneTarget(S.TigerPalm, "Tiger Palm @ Energy Cap")
+    end
 end
 
 -- Action Lists --
@@ -366,16 +332,10 @@ local function APL()
     UseItems()
 
     -- If you're about to cap energy, use an energy spender.
-    if EnergyTimeToMaxRounded() < Player:GCD() then
-      if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
-        if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "FOTWT @ Energy Cap" end
-      end
-      if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then -- todo: handle pvp talent for 2 chi here
-        if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm @ Energy Cap" end
-      end
-      if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 1 then -- todo: handle any case where TP gives more chi?
-        if HR.Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(8)) then return "Tiger Palm @ Energy Cap" end
-      end
+    -- If your next spell is a FOF channel that would cap energy then try to dump energy now too.
+    if (EnergyTimeToMaxRounded() < Player:GCD()) or 
+       (EnergyTimeToMaxRounded() < Player:GCD() + FOFChannelTime and S.FistsOfFury:CooldownRemains() < Player:GCD())  then
+      SpendEnergy()
     end
 
     -- Handle WDP + WDP setup as a highest priority
@@ -384,83 +344,76 @@ local function APL()
     end
 
     if S.WhirlingDragonPunch:IsAvailable() and S.RisingSunKick:IsReady() and S.WhirlingDragonPunch:CooldownRemains() < 5 and (S.FistsOfFury:CooldownRemains() > 3 or Player:Chi() >= 5) then
-      if HR.Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(8)) then return "Rising Sun Kick to enable WDP" end
+      CastAtBestCraneTarget(S.RisingSunKick, "RSK to enable WDP")
     end
 
     if S.FaelineStomp:IsReady() then
       if HR.Cast(S.FaelineStomp, nil, nil, not Target:IsInMeleeRange(8)) then return "Faeline Stomp" end
     end
 
-    -- Handle free spells
-    -- TODO: if FOF or RSK are up in ST, put them on CD before using a free BOK?
-    local best_free_spell = nil
-    local best_free_spell_value = 0
-    if Player:BuffUp(S.BlackoutKickBuff) and ComboStrike(S.BlackoutKick) then 
-      local bok_dam = GetBlackoutKickValue()
-      if bok_dam > best_free_spell_value then
-        best_free_spell = S.BlackoutKick
-        best_free_spell_value = bok_dam
-      end
-    end
-    if Player:BuffUp(S.DanceOfChijiBuff) and ComboStrike(S.SpinningCraneKick) then
-      local sck_dam = GetSpinningCraneKickValue()
-      if sck_dam > best_free_spell_value then
-        best_free_spell = S.SpinningCraneKick
-        best_free_spell_value = sck_dam
-      end
-    end
-    if best_free_spell ~= nil then
-      if HR.Cast(best_free_spell, nil, nil, not Target:IsInMeleeRange(8)) then return "Free Chi Spender" end
+    -- Get the chi-reduction ASAP in Weapons of Order buff.
+    if Player:BuffUp(S.WeaponsOfOrder) and S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
+      return CastAtBestCraneTarget(S.RisingSunKick, "RSK inside of WOO")
     end
 
-    -- You don't want to spend chi below 3 (or 2) if you're about to fists or RSK
-    -- You do want to spend chi if you're at the chi cap
-    -- definitely dump chi if you have energizing elixir or FOTWT coming off CD soon
-
-    -- If your next spell is a FOF channel that would cap energy then try to dump energy now too.
-    -- TODO: idea here is that we have to rule out casting anything higher prio before we dump like this
-    if EnergyTimeToMaxRounded() < Player:GCD() + FOFChannelTime and S.FistsOfFury:CooldownRemains() < Player:GCD() then 
-      if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
-        if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "FOTWT @ PreFists EnergyCap" end
-      end
-      if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then -- todo: handle pvp talent for 2 chi here
-        if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm @ PreFists Energy Cap" end
-      end
-      if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 1 then -- todo: handle any case where TP gives more chi?
-        if HR.Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(8)) then return "Tiger Palm @ PreFists Energy Cap" end
-      end
-    end
-
-    if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
-      if HR.Cast(S.FistOfTheWhiteTiger, nil, nil, not Target:IsSpellInRange(S.FistOfTheWhiteTiger)) then return "FOTWT @ PreFists EnergyCap" end
-    end
-    if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then -- todo: handle pvp talent for 2 chi here
-      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm @ PreFists Energy Cap" end
-    end
-    if S.ChiBurst:IsReady() and Player:ChiDeficit() >= min(2, EnemiesCount8) and EnergyTimeToMaxRounded() > ChiBurstCastTime then
-      if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInMeleeRange(8)) then return "Chi Burst" end
-    end
-
+    -- Fist on CD otherwise.
     if S.FistsOfFury:IsReady() then
       if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsInMeleeRange(8)) then return "Fists of Fury" end
     end
 
-    local true_best_spender = BestDamagePerChi() -- cannot be nil
-    local available_best_spender = BestAvailableDamagePerChi() -- can be nil
-    if available_best_spender ~= nil and true_best_spender == available_best_spender then
-      if HR.Cast(true_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return "Most efficient spender is available" end
+
+    -- "smart logic" section!!
+    local true_best_spender = BestDamagePerChi(false) -- cannot be nil
+    local available_best_spender = BestDamagePerChi(true) -- can be nil
+
+    if true_best_spender == available_best_spender then
+      if true_best_spender == S.RisingSunKick or true_best_spender == S.BlackoutKick then
+        return CastAtBestCraneTarget(true_best_spender, "Best spender " .. true_best_spender.SpellName .. " is available.")
+      else
+        if HR.Cast(true_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return "Best spender " .. true_best_spender.SpellName .. " is available." end
+      end
     end
 
-    if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 then -- todo: handle any case where TP gives more chi?
-      if HR.Cast(S.TigerPalm, nil, nil, not Target:IsInMeleeRange(8)) then return "Tiger Palm" end
+    if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
+      return CastAtBestCraneTarget(S.FistOfTheWhiteTiger, "Fist of the White Tiger off CD")
     end
 
-    if S.ChiBurst:IsReady() and Player:ChiDeficit() >= min(2, EnemiesCount8) then
+    if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then
+      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm off CD" end
+    end
+
+    if S.ChiBurst:IsReady() and Player:ChiDeficit() >= min(2, EnemiesCount8) and EnergyTimeToMaxRounded() > ChiBurstCastTime then
       if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInMeleeRange(8)) then return "Chi Burst" end
     end
 
+    if S.ChiWave:IsReady() then
+      if HR.Cast(S.ChiWave, nil, nil, not Target:IsInMeleeRange(8)) then return "Chi Wave" end
+    end
+
+    -- Use generic builder/spenders (tiger palm, blackout kick, spinning crane kick)
+    -- TODO: consider ordering on logic here
+    if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 then -- todo: handle any case where TP gives more chi?
+      return CastAtBestCraneTarget(S.TigerPalm, "Tiger Palm")
+    end
+
     if Player:ChiDeficit() < 2 and available_best_spender ~= nil then
-      if HR.Cast(available_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return "Chi cap spender" end
+      if available_best_spender == S.RisingSunKick or available_best_spender == S.BlackoutKick then
+        return CastAtBestCraneTarget(available_best_spender, "Chi-cap spender: " .. available_best_spender.SpellName .. " is best available.")
+      else
+        if HR.Cast(available_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return  "Chi-cap spender: " .. available_best_spender.SpellName .. " is best available."end
+      end
+    end
+
+    -- Freely spend chi when FOF CD (or RSK, in ST) are far away
+    if (S.FistOfTheWhiteTiger:CooldownRemains() < S.FistsOfFury:CooldownRemains()+2 or 
+        ((Player:Chi() > 3 or S.FistsOfFury:CooldownRemains() > 6) and
+         (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemains() > 2)))
+        and available_best_spender ~= nil then
+      if available_best_spender == S.RisingSunKick or available_best_spender == S.BlackoutKick then
+        return CastAtBestCraneTarget(available_best_spender, "Safe spender: " .. available_best_spender.SpellName .. " is best available.")
+      else
+        if HR.Cast(available_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return  "Safe spender: " .. available_best_spender.SpellName .. " is best available."end
+      end
     end
 
     -- Manually added Pool filler
