@@ -367,7 +367,7 @@ local function cleave()
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Carve:IsReady() then
-    if S.WildfireBomb:FullRechargeTime() > Target:IsInRange(8) then
+    if S.WildfireBomb:FullRechargeTime() > (EnemyCount8y % 2) then
       if HR.Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "[Cleave] Carve 3"; end
     end
   end
