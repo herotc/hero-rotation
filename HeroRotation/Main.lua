@@ -188,7 +188,7 @@
             ["Top Icons"] = HR.SmallIconFrame,
             ["Left Icon"] = HR.LeftIconFrame,
             ["Suggested Icon"] = HR.SuggestedIconFrame,
-			["Right Suggested Icon"] = HR.RightSuggestedIconFrame,
+            ["Right Suggested Icon"] = HR.RightSuggestedIconFrame,
             ["Part Overlay"] = HR.MainIconPartOverlayFrame,
           };
           if not Masque then
@@ -227,7 +227,7 @@
           HR.SmallIconFrame:Init();
           HR.LeftIconFrame:Init();
           HR.SuggestedIconFrame:Init();
-		  HR.RightSuggestedIconFrame:Init();
+          HR.RightSuggestedIconFrame:Init();
           HR.ToggleIconFrame:Init();
           if HeroRotationDB.GUISettings["General.ScaleUI"] then
             HR.MainFrame:ResizeUI(HeroRotationDB.GUISettings["General.ScaleUI"]);

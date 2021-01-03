@@ -19,23 +19,6 @@ local GetTime = GetTime
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
--- OnSpecChange
-local SpecTimer = 0
-HL:RegisterForEvent(
-  function (Event)
-    -- Prevent the first event firing (when login)
-    if not HL.PulseInitialized then return; end
-    -- Timer to prevent bug due to the double/triple event firing.
-    -- Since it takes 5s to change spec, we'll take 3seconds as timer.
-    if GetTime() > SpecTimer then
-      -- Update the timer only on valid scan.
-      if HR.PulseInit() ~= "Invalid SpecID" then
-        SpecTimer = GetTime() + 3
-      end
-    end
-  end
-  , "PLAYER_SPECIALIZATION_CHANGED"
-)
 
 --- ======= COMBATLOG =======
   --- Combat Log Arguments

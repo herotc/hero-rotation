@@ -208,6 +208,7 @@ local function CDs ()
     -- actions.cds=vanish,if=!stealthed.all&variable.ambush_condition&master_assassin_remains=0&buff.deathly_shadows.down
     if Settings.Outlaw.UseDPSVanish and CDsON() and S.Vanish:IsCastable() and not Player:IsTanking(Target)
       and not Player:StealthUp(true, true) and Ambush_Condition()
+      and (not Settings.Outlaw.Enabled.VanishEchoingReprimand or not S.EchoingReprimand:IsAvailable() or S.EchoingReprimand:CooldownUp() or S.EchoingReprimand:CooldownRemains() >= 35) -- Note: Vanish / ER sync for ER FW Bug
       and Rogue.MasterAssassinsMarkRemains() <= 0 and not Player:BuffUp(S.DeathlyShadowsBuff) then
       if HR.Cast(S.Vanish, Settings.Commons.OffGCDasOffGCD.Vanish) then return "Cast Vanish" end
     end
@@ -297,14 +298,18 @@ local function CDs ()
 end
 
 local function Stealth ()
+  -- ER FW Bug
+  if Settings.Outlaw.Enabled.VanishEchoingReprimand and CDsON() and S.EchoingReprimand:IsReady() and Target:IsSpellInRange(S.EchoingReprimand) then
+    if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
+  end
   -- actions.stealth=dispatch,if=combo_points>=cp_max_spend
   if S.Dispatch:IsCastable() and Target:IsSpellInRange(S.Dispatch) and Player:ComboPoints() >= Rogue.CPMaxSpend() then
     if HR.CastPooling(S.Dispatch) then return "Cast Dispatch" end
   end
     -- actions.stealth=ambush
   if S.Ambush:IsCastable() and Target:IsSpellInRange(S.Ambush) then
-      if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
-    end
+    if HR.CastPooling(S.Ambush) then return "Cast Ambush" end
+  end
 end
 
 local function Finish ()
@@ -339,7 +344,7 @@ local function Build ()
     if HR.Cast(S.Shiv) then return "Cast Shiv (TTB)" end
   end
   -- actions.build+=/echoing_reprimand
-  if CDsON() and S.EchoingReprimand:IsReady() and Target:IsInMeleeRange(5) then
+  if CDsON() and S.EchoingReprimand:IsReady() and (not Settings.Outlaw.Enabled.VanishEchoingReprimand or not Settings.Outlaw.UseDPSVanish or S.Vanish:CooldownRemains() >= 100) and Target:IsSpellInRange(S.EchoingReprimand) then
     if HR.Cast(S.EchoingReprimand, nil, Settings.Commons.CovenantDisplayStyle) then return "Cast Echoing Reprimand" end
   end
   -- actions.build+=/serrated_bone_spike,cycle_targets=1,if=buff.slice_and_dice.up&!dot.serrated_bone_spike_dot.ticking|fight_remains<=5|cooldown.serrated_bone_spike.charges_fractional>=2.75
@@ -409,16 +414,6 @@ local function APL ()
 
   -- Out of Combat
   if not Player:AffectingCombat() then
-    -- Precombat CDs
-    if Everyone.TargetIsValid() then
-      if CDsON() and S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
-        if Settings.Commons.STMfDAsDPSCD then
-          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
-        else
-          if HR.CastSuggested(S.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
-        end
-      end
-    end
     -- Stealth
     if not Player:BuffUp(S.VanishBuff) then
       ShouldReturn = Rogue.Stealth(S.Stealth)
@@ -430,16 +425,24 @@ local function APL ()
     -- PrePot w/ Bossmod Countdown
     -- Opener
     if Everyone.TargetIsValid() then
+      -- Precombat CDs
+      if CDsON() and S.MarkedforDeath:IsCastable() and Player:ComboPointsDeficit() >= Rogue.CPMaxSpend() then
+        if Settings.Commons.STMfDAsDPSCD then
+          if HR.Cast(S.MarkedforDeath, Settings.Commons.OffGCDasOffGCD.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
+        else
+          if HR.CastSuggested(S.MarkedforDeath) then return "Cast Marked for Death (OOC)" end
+        end
+      end
       if Player:StealthUp(true, true) then
         ShouldReturn = Stealth()
         if ShouldReturn then return "Stealth (Opener): " .. ShouldReturn end
       elseif Player:ComboPoints() >= 5 then
         ShouldReturn = Finish()
         if ShouldReturn then return "Finish (Opener): " .. ShouldReturn end
-        elseif S.SinisterStrike:IsCastable() then
-          if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
-        end
+      elseif S.SinisterStrike:IsCastable() then
+        if HR.Cast(S.SinisterStrike) then return "Cast Sinister Strike (Opener)" end
       end
+    end
     return
   end
 
