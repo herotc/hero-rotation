@@ -144,7 +144,7 @@ local function Precombat()
   end
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsCastable() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
-    if Cast(S.GrimoireofSacrifice) then return "GrimoureOfSacrifice precombat"; end
+    if Cast(S.GrimoireofSacrifice,Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "GrimoureOfSacrifice precombat"; end
   end
   -- snapshot_stats
   -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
@@ -172,7 +172,7 @@ local function Darkglare_prep()
   end
   -- dark_soul
   if S.DarkSoulMisery:IsReady() then
-    if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Darkglare_prep"; end
+    if Cast(S.DarkSoulMisery,Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery Darkglare_prep"; end
   end
   -- potion TODO
   -- fireblood
@@ -218,7 +218,7 @@ end
 local function Aoe()
   -- phantom_singularity
   if S.PhantomSingularity:IsReady() then
-    if Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity Aoe"; end
+    if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity Aoe"; end
   end
   -- haunt
   if S.Haunt:IsReady() then
@@ -254,7 +254,7 @@ local function Aoe()
   end
   -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
   if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
-    if Cast(S.DarkSoulMisery) then return "DarkSoulMisery Aoe"; end
+    if Cast(S.DarkSoulMisery,Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery Aoe"; end
   end
   -- call_action_list,name=cooldowns
   --local ShouldReturn = Cooldowns(); if ShouldReturn then return ShouldReturn; end
@@ -317,7 +317,7 @@ local function APL()
     end
     -- phantom_singularity
     if S.PhantomSingularity:IsReady() then
-      if Cast(S.PhantomSingularity, nil, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity InCombat"; end
+      if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity InCombat"; end
     end
     -- agony,if=refreshable
     if S.Agony:IsReady() and (Target:DebuffRefreshable(S.AgonyDebuff)) then
@@ -373,7 +373,7 @@ local function APL()
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
     if S.DarkSoulMisery:IsReady() and CDsON() and (S.SummonDarkglare:CooldownRemains() > Target:TimeToDie()) then
-      if Cast(S.DarkSoulMisery) then return "DarkSoulMisery InCombat"; end
+      if Cast(S.DarkSoulMisery,Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery InCombat"; end
     end
     -- call_action_list,name=item TODO
     local ShouldReturn = ItemFunc(); if ShouldReturn then return ShouldReturn; end
