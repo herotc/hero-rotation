@@ -421,7 +421,7 @@ local function Cooldowns()
   end
   -- "Death and Decay", "if=active_enemies>5|runeforge.phearomones"
   if S.DeathAndDecay:IsCastable() and EnemiesCount10yd > 5 then
-    if HR.Cast(S.DeathAndDecay) then return "dnd aoe 13"; end
+    if HR.Cast(S.DeathAndDecay, Settings.Commons.OffGCDasOffGCD.DeathAndDecay) then return "dnd aoe 13"; end
   end
 end
 
