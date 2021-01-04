@@ -269,7 +269,7 @@ local function SingleTarget()
     if HR.Cast(S.Overpower, nil, nil, not Target:IsSpellInRange(S.Overpower)) then return "overpower"; end
   end
   -- condemn,if=buff.sudden_death.react
-  if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Player:BuffUp(SuddenDeathBuff)) then
+  if S.Condemn:IsCastable() and S.Condemn:IsUsable() and (Player:BuffUp(S.SuddenDeathBuff)) then
     if HR.Cast(S.Condemn, nil, Settings.Commons.CovenantDisplayStyle, not Target:IsSpellInRange(S.Condemn)) then return "condemn"; end
   end
   -- execute,if=buff.sudden_death.react
