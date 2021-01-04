@@ -34,6 +34,7 @@ Spell.DemonHunter.Vengeance = {
   SoulCleave                            = Spell(228477),
   SoulFragments                         = Spell(203981),
   ThrowGlaive                           = Spell(204157),
+  Blur                                  = Spell(198589),
 
   -- Defensive
   DemonSpikes                           = Spell(203720),
