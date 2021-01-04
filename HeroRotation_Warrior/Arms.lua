@@ -95,7 +95,7 @@ local function Hac()
   end
   -- cleave,if=dot.deep_wounds.remains<=gcd
   if S.Cleave:IsReady() and (Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
-    if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
+    if HR.Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
@@ -119,7 +119,7 @@ local function Hac()
   end
   -- cleave
   if S.Cleave:IsReady() then
-    if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
+    if HR.Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave"; end
   end
   -- mortal_strike,if=buff.sweeping_strikes.up|dot.deep_wounds.remains<gcd&!talent.cleave.enabled
   if S.MortalStrike:IsReady() and (Player:BuffUp(S.SweepingStrikesBuff) or Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD() and not S.Cleave:IsAvailable()) then
@@ -174,7 +174,7 @@ local function Execute()
   end
   -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
   if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
-    if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
+    if HR.Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
@@ -230,7 +230,7 @@ local function SingleTarget()
   end
   -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
   if S.Cleave:IsReady() and (EnemiesCount8y > 1 and Target:DebuffRemains(S.DeepWoundsDebuff) < Player:GCD()) then
-    if HR.Cast(S.Cleave, nil, nil, not Target:IsSpellInRange(S.Cleave)) then return "cleave"; end
+    if HR.Cast(S.Cleave, nil, nil, not Target:IsInRange(8)) then return "cleave"; end
   end
   -- warbreaker
   if S.Warbreaker:IsCastable() then
@@ -363,7 +363,7 @@ local function APL()
     end
     -- sweeping_strikes,if=spell_targets.whirlwind>1&cooldown.bladestorm.remains>12
     if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1 and (S.Bladestorm:CooldownRemains() > 12)) then
-      if HR.Cast(S.SweepingStrikes, nil, nil, not Target:IsSpellInRange(S.SweepingStrikes)) then return "sweeping_strikes"; end
+      if HR.Cast(S.SweepingStrikes, nil, nil, not Target:IsInRange(8)) then return "sweeping_strikes"; end
     end
   -- run_action_list,name=hac,if=raid_event.adds.exists
   if EnemiesCount8y >= 3 then
