@@ -375,7 +375,7 @@ local function APL()
     EnemiesCount20 = #Enemies20y
   else
     EnemiesCount8 = 1
-    EnemiesCount20 = 1
+    EnemiesCount20 = 11
   end
 
   if Everyone.TargetIsValid() then
@@ -383,6 +383,7 @@ local function APL()
     if not Player:AffectingCombat() then
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
+    -- HL.Print(Target:TimeToDie())
     -- auto_attack
     -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-(talent.trail_of_ruin.enabled+buff.metamorphosis.up))|runeforge.chaos_theory&buff.chaos_theory.down
     VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - (num(S.TrailofRuin:IsAvailable()) + num(Player:BuffUp(S.MetamorphosisBuff)))) or ChaosTheoryEquipped and Player:BuffDown(S.ChaosTheoryBuff)
@@ -401,6 +402,10 @@ local function APL()
     -- call_action_list,name=cooldown,if=gcd.remains=0
     if CDsON() then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
+    end
+
+    if S.Blur:IsCastable() and Player:HealthPercentage() <= Settings.Havoc.BlurHealthThreshold then
+      if Cast(S.Blur, Settings.Havoc.OffGCDasOffGCD.Blur) then return "Blur defensives (Danger)"; end
     end
     -- pick_up_fragment,type=demon,if=demon_soul_fragments>0
     -- pick_up_fragment,if=fury.deficit>=35
