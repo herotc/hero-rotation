@@ -402,6 +402,10 @@ local function APL()
     if CDsON() then
       local ShouldReturn = Cooldown(); if ShouldReturn then return ShouldReturn; end
     end
+    -- Defensive Blur
+    if S.Blur:IsCastable() and Player:HealthPercentage() <= Settings.Havoc.BlurHealthThreshold then
+      if Cast(S.Blur, Settings.Havoc.OffGCDasOffGCD.Blur) then return "Blur defensives (Danger)"; end
+    end
     -- pick_up_fragment,type=demon,if=demon_soul_fragments>0
     -- pick_up_fragment,if=fury.deficit>=35
     -- TODO: Can't detect when orbs actually spawn, we could possibly show a suggested icon when we DON'T want to pick up souls so people can avoid moving?
