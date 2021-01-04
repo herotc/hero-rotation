@@ -52,7 +52,6 @@ HR.GUISettings.APL.DemonHunter = {
   },
   Havoc = {
     FelRushDisplayStyle = "Main Icon",
-    UseFABST = false,
     BlurHealthThreshold = 65,
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
