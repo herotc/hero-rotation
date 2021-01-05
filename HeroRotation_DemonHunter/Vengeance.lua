@@ -143,7 +143,7 @@ end
 
 local function Defensives()
   -- Demon Spikes
-  if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) then
+  if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) and Player:BuffDown(S.MetamorphosisBuff) then
     if S.DemonSpikes:ChargesFractional() > 1.9 then
       if Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Capped)"; end
     elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
