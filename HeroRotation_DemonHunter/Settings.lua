@@ -56,11 +56,11 @@ HR.GUISettings.APL.DemonHunter = {
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
       -- Abilities
+      Blur = true,
       VengefulRetreat = true,
     },
     GCDasOffGCD = {
       -- Abilities
-      Blur = true,
       Metamorphosis = true,
       EyeBeam = false,
       GlaiveTempest = false,
