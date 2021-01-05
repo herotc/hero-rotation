@@ -143,7 +143,7 @@ end
 
 local function Defensives()
   -- Demon Spikes
-  if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) then
+  if S.DemonSpikes:IsCastable() and Player:BuffDown(S.DemonSpikesBuff) and not Player:BuffUp(S.Metamorphosis) then
     if S.DemonSpikes:ChargesFractional() > 1.9 then
       if Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Capped)"; end
     elseif (ActiveMitigationNeeded or Player:HealthPercentage() <= Settings.Vengeance.DemonSpikesHealthThreshold) then
@@ -164,6 +164,9 @@ local function Defensives()
   -- Manual add: Door of Shadows with Enduring Gloom for the absorb shield
   if S.DoorofShadows:IsCastable() and S.EnduringGloom:IsAvailable() and IsTanking then
     if Cast(S.DoorofShadows, nil, Settings.Commons.DisplayStyle.Covenant) then return "door_of_shadows defensives"; end
+  end
+  if S.FelDevastation:IsReady() and S.Demonic:IsAvailable() and Player:HealthPercentage() <= Settings.Vengeance.MetamorphosisHealthThreshold) then
+    if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation defensives"; end
   end
 end
 
@@ -224,7 +227,7 @@ local function Normal()
   -- fel_devastation
   -- Manual add: ,if=talent.demonic.enabled&!buff.metamorphosis.up|!talent.demonic.enabled
   -- This way we don't waste potential Meta uptime
-  if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) then
+  if S.FelDevastation:IsReady() and (S.Demonic:IsAvailable() and Player:BuffDown(S.Metamorphosis) or not S.Demonic:IsAvailable()) and not Player:BuffUp(S.DemonSpikesBuff) then
     if Cast(S.FelDevastation, Settings.Vengeance.GCDasOffGCD.FelDevastation, nil, not Target:IsInMeleeRange(20)) then return "fel_devastation 34"; end
   end
   -- soul_cleave,if=((talent.spirit_bomb.enabled&soul_fragments=0)|!talent.spirit_bomb.enabled)&((talent.fracture.enabled&fury>=55)|(!talent.fracture.enabled&fury>=70)|cooldown.fel_devastation.remains>target.time_to_die|(buff.metamorphosis.up&((talent.fracture.enabled&fury>=35)|(!talent.fracture.enabled&fury>=50))))
