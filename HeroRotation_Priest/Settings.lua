@@ -51,6 +51,7 @@ HR.GUISettings.APL.Priest = {
       -- Abilities
       Dispersion = true,
       PowerInfusion = false,
+      SurrenderToMadness = false,
       -- Items
     }
   },
