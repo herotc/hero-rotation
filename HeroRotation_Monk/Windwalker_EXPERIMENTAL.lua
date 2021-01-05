@@ -118,22 +118,33 @@ local function ComboStrike(SpellObject)
   return (not Player:PrevGCD(1, SpellObject))
 end
 
--- Cast the spell, but choose the target with the minimum remaining timer on it's crane stacks.
-local function CastAtBestCraneTarget(SpellObject, DebugMessage)
-  local BestUnit = Target
-  local min_time = Target:DebuffRemains(S.MarkOfTheCraneDebuff)
-  for _, Unit in pairs(Enemies8y) do
-    local unit_time = Unit:DebuffRemains(S.MarkOfTheCraneDebuff)
-    if unit_time < min_time then
-      BestUnit = Unit
-      min_time = unit_time
+-- Cast the given spell, but if it's a crane-stack applying spell, 
+-- choose the nearby target with the minimum remaining timer on it's crane stacks.
+local function OptimallyTargetedCast(SpellObject, DebugMessage)
+  -- Spell is NIL, error.
+  if SpellObject == nil then
+    return "Spell object passed in was nil!"
+  -- Spell applices MOTC
+  elseif (SpellObject == S.TigerPalm or SpellObject == S.RisingSunKick or SpellObject == S.FistOfTheWhiteTiger or SpellObject == S.BlackoutKick) then
+    local BestUnit = Target
+    local min_time = Target:DebuffRemains(S.MarkOfTheCraneDebuff)
+    for _, Unit in pairs(Enemies5y) do
+      local unit_time = Unit:DebuffRemains(S.MarkOfTheCraneDebuff)
+      if unit_time < min_time then
+        BestUnit = Unit
+        min_time = unit_time
+      end
     end
-  end
-  if BestUnit:GUID() == Target:GUID()  then
-    if HR.Cast(SpellObject, nil, nil, not Target:IsInMeleeRange(8)) then return DebugMessage end
+    if BestUnit and BestUnit:GUID() == Target:GUID()  then
+      HR.Cast(SpellObject, nil, nil, not Target:IsInMeleeRange(8)) 
+    else
+      HR.CastLeftNameplate(BestUnit, SpellObject)
+    end
   else
-    if HR.CastLeftNameplate(BestUnit, SpellObject) then return DebugMessage end
+  -- Spell does not apply MOTC, just regular cast it.
+    HR.Cast(SpellObject, nil, nil, not Target:IsInMeleeRange(8)) 
   end
+  return DebugMessage
 end
 
 -- This function returns a table, indexed by spell object (S.XXX) keys.
@@ -183,8 +194,8 @@ end
 -- This function returns a table, indexed by spell object (S.XXX) keys.
 -- It returns a table of values of using the given chi spender in the current state.
 -- See https://docs.google.com/spreadsheets/d/1Agwilw8sG5PeBBgACneZl3J4jumS1EBWQAJK8BIUzgE/edit#gid=0
--- TODO: autoattack loss on SCK
--- TODO: BOK value from CDR
+-- TODO: autoattack loss on SCK (low importance)
+-- TODO: BOK value from CDR (high importance)
 local function ChiSpenderValues()
   -- Set up some variables/constants here.
   -- Base multipliers
@@ -230,33 +241,7 @@ local function ChiSpenderValues()
   return values
 end
 
-
-
--- Returns the ability (completely not subject to any constraints) that is the "best damage per chi" in the given scenario.
--- This function takes a parameter "constrain_to_available" which, if set true, only considers spells that are off CD and a combo strike.
--- The second form of this function is useful if we *have* to spend chi at chi-cap.
-local function BestDamagePerChi(constrain_to_available)
-  local values_table = ChiSpenderValues()
-  local costs_table = ChiSpenderCosts()
-
-  local best_spell = nil
-  local best_eff = 0
-
-  for spell, cost in pairs(costs_table) do
-   --print("Spell: " .. spell.SpellName .. " cost=" .. cost .. " val=" .. values_table[spell])
-    local mod_cost = cost
-    -- Avoid divide-by-zero here>
-    if cost == 0 then mod_cost = 0.001 end
-    local eff = values_table[spell] / mod_cost
-    if eff > best_eff and (not constrain_to_available or (spell:IsReady() and ComboStrike(spell))) then
-      best_spell = spell
-      best_eff = eff
-    end
-  end
-  --print("------------------------")
-  return best_spell
-end
-
+-- Can return nil
 local function UseItems()
   -- use_items
   local TrinketToUse = Player:GetUseableTrinkets(OnUseExcludes)
@@ -265,6 +250,7 @@ local function UseItems()
   end
 end
 
+-- Can return nil
 local function UseCooldowns()
   -- notable TODO: consider putting energizing elixir into main rotation
   -- elixir is off gcd, as is serenity/SEF, but elixir is less of a CD and more of a rotational thing
@@ -287,27 +273,146 @@ local function UseCooldowns()
   if S.WeaponsOfOrder:IsReady() then
     if HR.Cast(S.WeaponsOfOrder, true, nil, not Target:IsInRange(40)) then return "Weapons of Order" end
   end
-  -- TODO: TOD on off-targets?
-  -- touch of death as suggested-right if current target and on nameplate if not?
-  -- put venthyr portal thing here
 end
 
+-- Can return nil
 local function Precombat()
   if S.ChiBurst:IsReady() then
     if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Precombat Chi Burst"; end
   end
 end
 
-local function SpendEnergy()
-    if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
-      CastAtBestCraneTarget(S.FistOfTheWhiteTiger, "FOTWT @ Energy Cap")
+-- Returns true if any chi-generating energy-spender would push you to the chi cap or beyond.
+local function ChiCapped()
+  return Player:ChiDeficit() <= 1 or (Player:ChiDeficit() <= 3 and S.FistOfTheWhiteTiger:IsReady())
+end
+
+-- Return true if you'll be energy capped before the GCD is up, or if you'll be energy capped during your FOF channel given that it's your next spell.
+local function EnergyCapped(chi_costs)
+  local FOFChannelTime = 4.0 / (1 + Player:HastePct() / 100.0)
+  return (EnergyTimeToMaxRounded() < Player:GCD()) or 
+         (EnergyTimeToMaxRounded() < Player:GCD() + FOFChannelTime and S.FistsOfFury:CooldownRemains() < Player:GCD() and Player:Chi() >= 3)
+end
+
+-- This function can return nil if force_spend is not true.
+-- If it returns nil, that means you'd actually rather not spend chi, because the best chi spender you want to use in this situation wouldn't be a combo strike.
+local function SpendChi(force_spend, chi_costs, chi_values)
+  -- Fists of Fury, if it's ready.
+  if S.FistsOfFury:IsReady() then
+    return OptimallyTargetedCast(S.FistsOfFury, "Fists of Fury")
+  end
+
+  -- Use the best free spell that's ready and a combo strike.
+  -- TODO: decide where to actually prioritize free casts of chi spenders. First experiment is with then below FOF priority.
+  local best_free_spell = nil
+  local best_free_spell_value = 0
+  for spell, cost in pairs(chi_costs) do
+    if cost == 0 then
+      local value = chi_values[spell]
+      if value > best_free_spell_value and spell:IsReady() and ComboStrike(spell) then
+        best_free_spell = spell
+        best_free_spell_value = value
+      end
     end
-    if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then
-      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm @ Energy Cap" end
+  end
+  if best_free_spell ~= nil then
+    return OptimallyTargetedCast(best_free_spell, "Free cast of " .. best_free_spell.SpellName)
+  end
+
+  -- Use the situationally best chi spender if it's ready!
+  local rsk_efficiency = chi_values[S.RisingSunKick] / (chi_costs[S.RisingSunKick] + 0.0001)
+  local rjw_efficiency = chi_values[S.RushingJadeWind] / (chi_costs[S.RushingJadeWind] + 0.0001)
+  local bok_efficiency = chi_values[S.BlackoutKick] / (chi_costs[S.BlackoutKick] + 0.0001)
+  local sck_efficiency = chi_values[S.SpinningCraneKick] / (chi_costs[S.SpinningCraneKick] + 0.0001)
+  if rsk_efficiency > max(rjw_efficiency, bok_efficiency, sck_efficiency) then
+    if S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
+      return OptimallyTargetedCast(S.RisingSunKick, "RSK is best possible chi spender and it's ready.")
     end
-    if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 1 then
-      return CastAtBestCraneTarget(S.TigerPalm, "Tiger Palm @ Energy Cap")
+  end
+  if rjw_efficiency > max(rsk_efficiency, bok_efficiency, sck_efficiency) then
+    if S.RushingJadeWind:IsReady() and ComboStrike(S.RushingJadeWind) then
+      return OptimallyTargetedCast(S.RushingJadeWind, "RJW is best possible chi spender and it's ready.")
     end
+  end
+  if bok_efficiency > max(rsk_efficiency, rjw_efficiency, sck_efficiency) then
+    if S.BlackoutKick:IsReady() and ComboStrike(S.BlackoutKick) then
+      return OptimallyTargetedCast(S.BlackoutKick, "BOK is best possible chi spender and it's ready.")
+    end
+  end
+  if sck_efficiency > max(rsk_efficiency, rjw_efficiency, bok_efficiency) then
+    if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) then
+      return OptimallyTargetedCast(S.SpinningCraneKick, "SCK is best possible chi spender and it's ready.")
+    end
+  end
+
+  -- If we're being forced to spend since we're at the chi cap, pick the most efficient spell that's available.
+  if force_spend then
+    local efficiencies = {}
+    efficiencies[S.RisingSunKick] = rsk_efficiency
+    efficiencies[S.RushingJadeWind] = rjw_efficiency
+    efficiencies[S.BlackoutKick] = bok_efficiency
+    efficiencies[S.SpinningCraneKick] = sck_efficiency
+    local best_available_spell = nil
+    local best_available_efficiency = 0
+    for spell, efficiency in pairs(efficiencies) do
+      if efficiency > best_available_efficiency and spell:IsReady() and ComboStrike(spell) then
+        best_available_spell = spell
+        best_available_efficiency = efficiency
+      end
+    end
+    return OptimallyTargetedCast(best_available_spell, "Forced to spend chi, " .. best_available_spell.SpellName .. " has the best efficiency right now.")
+  end
+
+  -- Otherwise, try not to spend chi on the non-situationally-best chi spender - don't just burn Chi on BOK in aoe if you've cast SCK, try to tiger's palm first or something
+  return nil
+end
+
+
+-- This function is called when you are about to cap energy in the next GCD, or the next spell you cast will cap your energy during it (consider FOF + Chi Burst here)
+-- It is POSSIBLE that this function returns nil, even if force_spend is true: this happens when you're basically energy capped *and* Tiger Palm was the last spell you cast.
+-- If this is the cast, we just try to Flying Serpent Kick ourselves to victory.
+local function SpendEnergy(force_spend)
+  if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
+    return OptimallyTargetedCast(S.FistOfTheWhiteTiger, "FOTWT @ Energy Cap")
+  end
+  if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then
+    return OptimallyTargetedCast(S.ExpelHarm, "Expel Harm @ Energy Cap")
+  end
+  -- NOTE: this is a chi deficit of ONE here if force_spend, because if you're about to cap energy then it's better to get the 1 chi and cap anyways.
+  if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 - num(force_spend) then
+    return OptimallyTargetedCast(S.TigerPalm, "Tiger Palm @ Energy Cap")
+  end
+  return nil
+end
+
+-- Can return nil.
+local function SpecialCases()
+  -- Handle WDP + WDP setup as a highest priority
+  if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) then
+    return OptimallyTargetedCast(S.WhirlingDragonPunch, "Whirling Dragon Punch")
+  end
+  -- Fire off RSK to enable WDP
+  if S.WhirlingDragonPunch:IsAvailable() and S.RisingSunKick:IsReady() and S.WhirlingDragonPunch:CooldownRemains() < 3 and (S.FistsOfFury:CooldownRemains() > 3 or Player:Chi() >= 5) then
+    return OptimallyTargetedCast(S.RisingSunKick, "RSK to Enable WDP")
+  end
+  -- Faeline stomp on CD
+  if S.FaelineStomp:IsReady() then
+    return OptimallyTargetedCast(S.FaelineStomp, "Faeline Stomp")
+  end
+  -- Get the chi-reduction ASAP in Weapons of Order buff.
+  if Player:BuffUp(S.WeaponsOfOrder) and S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
+    return OptimallyTargetedCast(S.RisingSunKick, "RSK during Weapons of Order")
+  end
+end
+
+local function ShortCDs()
+  local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
+  if S.ChiBurst:IsReady() and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() > ChiBurstCastTime + 0.200 then
+    return OptimallyTargetedCast(S.ChiBurst, "ChiBurst")
+  end
+  if S.ChiWave:IsReady() then
+    return OptimallyTargetedCast(S.ChiWave, "ChiWave")
+  end
 end
 
 -- Action Lists --
@@ -318,106 +423,50 @@ local function APL()
   Enemies8y = Player:GetEnemiesInMeleeRange(8) -- Multiple Abilities
   EnemiesCount8 = #Enemies8y -- AOE Toogle
   ComputeTargetRange()
-  local FOFChannelTime = 4.0 / (1 + Player:HastePct() / 100.0)
-  local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
+  local DebugMessage;
 
 
   if Everyone.TargetIsValid() then
     if not Player:AffectingCombat() then
-      local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
+      DebugMessage = Precombat(); if DebugMessage then return DebugMessage; end
     end
-    local ShouldReturn = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if ShouldReturn then return ShouldReturn; end
+    DebugMessage = Everyone.Interrupt(5, S.SpearHandStrike, Settings.Commons.OffGCDasOffGCD.SpearHandStrike, Interrupts); if DebugMessage then return DebugMessage; end
+
+    local chi_costs = ChiSpenderCosts()
+    local chi_values = ChiSpenderValues()
 
     UseCooldowns()
     UseItems()
+    
+    DebugMessage = SpecialCases()
+    if DebugMessage then return DebugMessage end
 
-    -- If you're about to cap energy, use an energy spender.
-    -- If your next spell is a FOF channel that would cap energy then try to dump energy now too.
-    if (EnergyTimeToMaxRounded() < Player:GCD()) or 
-       (EnergyTimeToMaxRounded() < Player:GCD() + FOFChannelTime and S.FistsOfFury:CooldownRemains() < Player:GCD())  then
-      SpendEnergy()
+    if ChiCapped() then
+      DebugMessage = SpendChi(true, chi_costs, chi_values)
+      if DebugMessage then return DebugMessage end
     end
 
-    -- Handle WDP + WDP setup as a highest priority
-    if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) then
-      if HR.Cast(S.WhirlingDragonPunch, nil, nil, not Target:IsInMeleeRange(8)) then return "Whirling Dragon Punch" end
+    if EnergyCapped(chi_costs) then
+      DebugMessage = SpendEnergy(true)
+      if DebugMessage then return DebugMessage end
     end
 
-    if S.WhirlingDragonPunch:IsAvailable() and S.RisingSunKick:IsReady() and S.WhirlingDragonPunch:CooldownRemains() < 5 and (S.FistsOfFury:CooldownRemains() > 3 or Player:Chi() >= 5) then
-      CastAtBestCraneTarget(S.RisingSunKick, "RSK to enable WDP")
-    end
+    DebugMessage = SpendChi(false, chi_costs, chi_values)
+    if DebugMessage then return DebugMessage end
 
-    if S.FaelineStomp:IsReady() then
-      if HR.Cast(S.FaelineStomp, nil, nil, not Target:IsInMeleeRange(8)) then return "Faeline Stomp" end
-    end
+    DebugMessage = ShortCDs()
+    if DebugMessage then return DebugMessage end
 
-    -- Get the chi-reduction ASAP in Weapons of Order buff.
-    if Player:BuffUp(S.WeaponsOfOrder) and S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
-      return CastAtBestCraneTarget(S.RisingSunKick, "RSK inside of WOO")
-    end
+    DebugMessage = SpendEnergy(false)
+    if DebugMessage then return DebugMessage end
 
-    -- Fist on CD otherwise.
-    if S.FistsOfFury:IsReady() then
-      if HR.Cast(S.FistsOfFury, nil, nil, not Target:IsInMeleeRange(8)) then return "Fists of Fury" end
-    end
-
-
-    -- "smart logic" section!!
-    local true_best_spender = BestDamagePerChi(false) -- cannot be nil
-    local available_best_spender = BestDamagePerChi(true) -- can be nil
-
-    if true_best_spender == available_best_spender then
-      if true_best_spender == S.RisingSunKick or true_best_spender == S.BlackoutKick then
-        return CastAtBestCraneTarget(true_best_spender, "Best spender " .. true_best_spender.SpellName .. " is available.")
-      else
-        if HR.Cast(true_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return "Best spender " .. true_best_spender.SpellName .. " is available." end
-      end
-    end
-
-    if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
-      return CastAtBestCraneTarget(S.FistOfTheWhiteTiger, "Fist of the White Tiger off CD")
-    end
-
-    if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then
-      if HR.Cast(S.ExpelHarm, nil, nil, not Target:IsInMeleeRange(8)) then return "Expel Harm off CD" end
-    end
-
-    if S.ChiBurst:IsReady() and Player:ChiDeficit() >= min(2, EnemiesCount8) and EnergyTimeToMaxRounded() > ChiBurstCastTime then
-      if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInMeleeRange(8)) then return "Chi Burst" end
-    end
-
-    if S.ChiWave:IsReady() then
-      if HR.Cast(S.ChiWave, nil, nil, not Target:IsInMeleeRange(8)) then return "Chi Wave" end
-    end
-
-    -- Use generic builder/spenders (tiger palm, blackout kick, spinning crane kick)
-    -- TODO: consider ordering on logic here
-    if ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 then -- todo: handle any case where TP gives more chi?
-      return CastAtBestCraneTarget(S.TigerPalm, "Tiger Palm")
-    end
-
-    if Player:ChiDeficit() < 2 and available_best_spender ~= nil then
-      if available_best_spender == S.RisingSunKick or available_best_spender == S.BlackoutKick then
-        return CastAtBestCraneTarget(available_best_spender, "Chi-cap spender: " .. available_best_spender.SpellName .. " is best available.")
-      else
-        if HR.Cast(available_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return  "Chi-cap spender: " .. available_best_spender.SpellName .. " is best available."end
-      end
-    end
-
-    -- Freely spend chi when FOF CD (or RSK, in ST) are far away
-    if (S.FistOfTheWhiteTiger:CooldownRemains() < S.FistsOfFury:CooldownRemains()+2 or 
-        ((Player:Chi() > 3 or S.FistsOfFury:CooldownRemains() > 6) and
-         (Player:Chi() >= 5 or S.FistsOfFury:CooldownRemains() > 2)))
-        and available_best_spender ~= nil then
-      if available_best_spender == S.RisingSunKick or available_best_spender == S.BlackoutKick then
-        return CastAtBestCraneTarget(available_best_spender, "Safe spender: " .. available_best_spender.SpellName .. " is best available.")
-      else
-        if HR.Cast(available_best_spender, nil, nil, not Target:IsInMeleeRange(8)) then return  "Safe spender: " .. available_best_spender.SpellName .. " is best available."end
-      end
+    -- No buttons left to press; try Flying Serpent Kick
+    if S.FlyingSerpentKick:IsReady() then
+      if HR.Cast(S.FlyingSerpentKick) then return "Flying Serpent Kick for Mastery" end
     end
 
     -- Manually added Pool filler
-    if HR.Cast(S.PoolEnergy) and not Settings.Windwalker.NoWindwalkerPooling then return "Pool Energy"; end
+    if HR.Cast(S.PoolEnergy) then return "Pool Energy" end
   end
 end
 
