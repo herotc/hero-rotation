@@ -191,11 +191,11 @@ local function Single()
   end
   -- actions.single+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    --if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental single 46"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental single 46"; end
   end
   -- actions.single+=/windfury_totem,if=buff.windfury_totem.remains<30
-  if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or Player:TotemRemains(totemFinder()) < 30) then
-    if HR.Cast(S.WindfuryTotem) then return "windfury_totem single 48"; end
+  if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) then
+    if HR.Cast(S.WindfuryTotem) then return "wf1"; end
   end
 end
 
@@ -324,11 +324,11 @@ local function Aoe()
   end
   -- actions.aoe+=/earth_elemental
   if S.EarthElemental:IsCastable() then
-    --if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental aoe 116"; end
+    if HR.Cast(S.EarthElemental, Settings.Commons.GCDasOffGCD.EarthElemental) then return "earth_elemental aoe 116"; end
   end
   -- actions.aoe+=/windfury_totem,if=buff.windfury_totem.remains<30
-  if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or Player:TotemRemains(totemFinder()) < 30) then
-    if HR.Cast(S.WindfuryTotem) then return "windfury_totem aoe 118"; end
+  if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) then
+    if HR.Cast(S.WindfuryTotem) then return "wf2"; end
   end
 end
 
@@ -368,10 +368,9 @@ local function APL()
       if HR.Cast(S.Stormkeeper) then return "Stormkeeper precombat"; end
     end
     -- windfury_totem
-    if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) then
-      if HR.Cast(S.WindfuryTotem) then return "WindfuryTotem precombat"; end
+    if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) or (DoomWindsEquipped and Player:DebuffDown(S.DoomWindsDebuff)) then
+      if HR.Cast(S.WindfuryTotem) then return "wf3"; end
     end
-
     -- wind_shear
     local ShouldReturn = Everyone.Interrupt(30, S.WindShear, Settings.Commons.OffGCDasOffGCD.WindShear, false); if ShouldReturn then return ShouldReturn; end
 

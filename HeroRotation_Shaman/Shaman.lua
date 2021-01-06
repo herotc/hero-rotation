@@ -117,6 +117,7 @@ Spell.Shaman.Enhancement = {
 
   -- Legendaries
   DoomWindsBuff                         = Spell(335903),
+  DoomWindsDebuff                       = Spell(335904),
   PrimalLavaActuatorsBuff               = Spell(335896),
 
   -- Misc
