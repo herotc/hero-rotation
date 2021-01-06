@@ -128,6 +128,8 @@ local function Precombat()
   -- inner_demons,if=talent.inner_demons.enabled
   -- snapshot_stats
   if Everyone.TargetIsValid() then
+    -- variable,name=tyrant_ready,value=0
+    VarTyrantReady = false
     -- potion
     if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
       if HR.Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "battle_potion_of_intellect 4"; end
@@ -136,8 +138,17 @@ local function Precombat()
     if S.Demonbolt:IsCastable() then
       if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 6"; end
     end
-    -- variable,name=tyrant_ready,value=0
-    VarTyrantReady = false
+  end
+end
+
+local function BuildShard()
+  -- soul_strike
+  if S.SoulStrike:IsCastable() then
+    if HR.Cast(S.SoulStrike, nil, nil, not Target:IsSpellInRange(S.SoulStrike)) then return "soul_strike build_shard 1"; end
+  end
+  -- shadow_bolt
+  if S.ShadowBolt:IsCastable() then
+    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt build_shard 1"; end
   end
 end
 
@@ -145,11 +156,6 @@ local function TyrantPrep()
   -- doom,line_cd=30
   if S.Doom:IsCastable() and (S.Doom:TimeSinceLastCast() > 30) then
     if HR.Cast(S.Doom, nil, nil, not Target:IsSpellInRange(S.Doom)) then return "doom 62"; end
-  end
-  -- demonic_strength,if=!talent.demonic_consumption.enabled
-  -- Added check to make sure that we're not suggesting this during pet's Felstorm
-  if S.DemonicStrength:IsCastable() and (not S.DemonicConsumption:IsAvailable() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100))))) then
-    if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength 64"; end
   end
   -- nether_portal
   if S.NetherPortal:IsReady() then
@@ -173,7 +179,7 @@ local function TyrantPrep()
   end
   -- shadow_bolt,if=soul_shard<5-4*buff.nether_portal.up
   if S.ShadowBolt:IsCastable() and (Player:SoulShardsP() < (5 - 4 * num(Player:BuffUp(S.NetherPortalBuff)))) then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 76"; end
+    local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
   end
   -- variable,name=tyrant_ready,value=1
   if (true) then
@@ -186,6 +192,13 @@ local function TyrantPrep()
 end
 
 local function SummonTyrant()
+  -- for proper display of what spell is next while casting tyrant
+  if Player:IsCasting(S.SummonDemonicTyrant) and S.DemonicStrength:IsCastable() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) then
+    if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength post_tyrant"; end
+  end
+  if Player:IsCasting(S.SummonDemonicTyrant) and S.BilescourgeBombers:IsReady() then
+    if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsSpellInRange(S.BilescourgeBombers)) then return "bilescourge_bombers post_tyrant"; end
+  end
   -- Moved from lower in the function so we abort this function right after using Demonic Tyrant
   if (not S.SummonDemonicTyrant:CooldownUp()) then
     VarTyrantReady = false
@@ -200,7 +213,15 @@ local function SummonTyrant()
   end
   -- shadow_bolt,if=buff.wild_imps.stack+incoming_imps<4&(talent.demonic_consumption.enabled|buff.nether_portal.down),line_cd=20
   if S.ShadowBolt:IsCastable() and (S.ShadowBolt:TimeSinceLastCast() > 20 and WildImpsCount() + ImpsSpawnedDuring(Spell(Player:PrevGCD(1)):CastTime()) < 4 and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff))) then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 96"; end
+    local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
+  end
+  -- grimoire_felguard
+  if S.GrimoireFelguard:IsReady() then
+    if HR.Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard, nil, not Target:IsSpellInRange(S.GrimoireFelguard)) then return "grimoire_felguard 68"; end
+  end
+  -- summon_vilefiend
+  if S.SummonVilefiend:IsReady() then
+    if HR.Cast(S.SummonVilefiend) then return "summon_vilefiend 70"; end
   end
   -- call_dreadstalkers
   if S.CallDreadstalkers:IsReady() then
@@ -216,7 +237,7 @@ local function SummonTyrant()
   end
   -- shadow_bolt,if=buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
   if S.ShadowBolt:IsCastable() and (Player:BuffUp(S.NetherPortalBuff) and ((S.SummonVilefiend:CooldownRemains() > 35 or not S.SummonVilefiend:IsAvailable()) and (S.GrimoireFelguard:CooldownRemains() > 108 or S.GrimoireFelguard:CooldownRemains() < 103))) then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 104"; end
+    local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
   end
   -- summon_demonic_tyrant
   if S.SummonDemonicTyrant:IsCastable() then
@@ -226,7 +247,7 @@ local function SummonTyrant()
   -- Moved to top of function for better flow
   -- shadow_bolt
   if S.ShadowBolt:IsCastable() then
-    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 108"; end
+    local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
   end
 end
 
@@ -331,12 +352,12 @@ local function APL()
       if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsSpellInRange(S.BilescourgeBombers)) then return "bilescourge_bombers 30"; end
     end
     -- implosion,if=active_enemies>1&!talent.sacrificed_souls.enabled&buff.wild_imps.stack>=8&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains>5
-    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
-      if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 31"; end
+    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 1 and not S.SacrificedSouls:IsAvailable() and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0 and S.SummonDemonicTyrant:CooldownRemains() > 5) then
+      if HR.Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion 31"; end
     end
     -- implosion,if=active_enemies>2&buff.wild_imps.stack>=8&buff.tyrant.down
-    if S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0) then
-      if HR.Cast(S.Implosion, nil, nil, not Target:IsInRange(40)) then return "implosion 32"; end
+    if AoEON() and S.Implosion:IsReady() and (EnemiesCount8ySplash > 2 and WildImpsCount() >= Settings.Demonology.ImpsRequiredForImplosion and DemonicTyrantTime() == 0) then
+      if HR.Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion 32"; end
     end
     -- hand_of_guldan,if=soul_shard=5|buff.nether_portal.up
     if S.HandofGuldan:IsReady() and (Player:SoulShardsP() == 5 or Player:BuffUp(S.NetherPortalBuff)) then

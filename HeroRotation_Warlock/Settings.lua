@@ -69,6 +69,7 @@ HR.GUISettings.APL.Warlock = {
       SummonDemonicTyrant = false,
       DemonicStrength = false,
       NetherPortal = true,
+      Implosion = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
