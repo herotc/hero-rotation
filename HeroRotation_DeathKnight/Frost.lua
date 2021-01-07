@@ -62,9 +62,9 @@ local function ComputeTargetRange()
   end
 end
 
-local BitingColdEquipped = Player.HasLegendaryEquipped(39);
+local BitingColdEquipped = Player:HasLegendaryEquipped(39);
 HL:RegisterForEvent(function()
-  BitingColdEquipped = Player.HasLegendaryEquipped(39)
+  BitingColdEquipped = Player:HasLegendaryEquipped(39)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
