@@ -92,7 +92,7 @@ end
 
 -- if=buff.mongoose_fury.up&buff.mongoose_fury.remains<focus%(action.mongoose_bite.cost-cast_regen)*gcd&!buff.wild_spirits.remains|buff.mongoose_fury.remains&next_wi_bomb.pheromone
 local function EvaluateMangooseBiteCycleCondition1(TargetUnit) 
-  return Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:Focus() % (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() and not Player:BuffRemains(S.WildSpiritsBuff) or Player:BuffRemains(S.MongooseFuryBuff) and S.PheromoneBomb:IsCastable()
+  return Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:Focus() / (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD() and not Player:BuffRemains(S.WildSpiritsBuff) or Player:BuffRemains(S.MongooseFuryBuff) and S.PheromoneBomb:IsCastable()
 end
 
 -- if=buff.mongoose_fury.up|focus+action.kill_command.cast_regen>focus.max-15|dot.shrapnel_bomb.ticking|buff.wild_spirits.remains
@@ -165,15 +165,15 @@ local function Cds()
   -- tar_trap,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus+cast_regen<focus.max|focus+cast_regen<focus.max&runeforge.soulforge_embers.equipped&tar_trap.remains<gcd&cooldown.flare.remains<gcd&(active_enemies>1|active_enemies=1&time_to_die>5*gcd)
   -- flare,if=focus+cast_regen<focus.max&tar_trap.up&runeforge.soulforge_embers.equipped&time_to_die>4*gcd
   -- kill_shot,if=active_enemies=1&target.time_to_die<focus%(action.mongoose_bite.cost-cast_regen)*gcd
-  if S.KillShot:IsCastable() and (EnemyCount8y == 1 and Target:TimeToDie() < Player:Focus() % (S.KillShot:Cost() - Player:FocusCastRegen(S.KillShot:ExecuteTime())) * Player:GCD()) then
+  if S.KillShot:IsCastable() and (EnemyCount8y == 1 and Target:TimeToDie() < Player:Focus() / (S.KillShot:Cost() - Player:FocusCastRegen(S.KillShot:ExecuteTime())) * Player:GCD()) then
     if HR.Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "[CDs] KillShot CD"; end
   end
   -- mongoose_bite,if=active_enemies=1&target.time_to_die<focus%(action.mongoose_bite.cost-cast_regen)*gcd
-  if S.MongooseBite:IsCastable() and (EnemyCount8y == 1 and Target:TimeToDie() < Player:Focus() % (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD()) then
+  if S.MongooseBite:IsCastable() and (EnemyCount8y == 1 and Target:TimeToDie() < Player:Focus() / (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD()) then
     if HR.Cast(S.MongooseBite, nil, nil, not Target:IsSpellInRange(S.MongooseBite)) then return "[CDs] MongooseBite CD"; end
   end
   -- raptor_strike,if=active_enemies=1&target.time_to_die<focus%(action.mongoose_bite.cost-cast_regen)*gcd
-  if S.RaptorStrike:IsReady() and (EnemyCount8y == 1 and Target:TimeToDie() < Player:Focus() % (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD()) then
+  if S.RaptorStrike:IsReady() and (EnemyCount8y == 1 and Target:TimeToDie() < Player:Focus() / (S.MongooseBite:Cost() - Player:FocusCastRegen(S.MongooseBite:ExecuteTime())) * Player:GCD()) then
     if HR.Cast(S.RaptorStrike, nil, nil, not Target:IsSpellInRange(S.RaptorStrike)) then return "[CDs] RaptorStrike CD"; end
   end
   -- aspect_of_the_eagle,if=target.distance>=6
@@ -358,7 +358,7 @@ local function cleave()
   -- flanking_strike,if=focus+cast_regen<focus.max
   -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2&talent.alpha_predator.enabled
   if S.Carve:IsReady() then
-    if S.Carve:FullRechargeTime() > (EnemyCount8y % 2) and S.AlphaPredator:IsLearned() then
+    if S.Carve:FullRechargeTime() > (EnemyCount8y / 2) and S.AlphaPredator:IsLearned() then
       if HR.Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "[Cleave] Carve 2"; end
     end
   end
@@ -367,7 +367,7 @@ local function cleave()
   -- butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   -- carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
   if S.Carve:IsReady() then
-    if S.WildfireBomb:FullRechargeTime() > (EnemyCount8y % 2) then
+    if S.WildfireBomb:FullRechargeTime() > (EnemyCount8y / 2) then
       if HR.Cast(S.Carve, nil, nil, not Target:IsInRange(8)) then return "[Cleave] Carve 3"; end
     end
   end
