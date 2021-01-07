@@ -128,8 +128,6 @@ local function Precombat()
   -- inner_demons,if=talent.inner_demons.enabled
   -- snapshot_stats
   if Everyone.TargetIsValid() then
-    -- variable,name=tyrant_ready,value=0
-    VarTyrantReady = false
     -- potion
     if I.PotionofSpectralIntellect:IsReady() and Settings.Commons.Enabled.Potions then
       if HR.Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "battle_potion_of_intellect 4"; end
@@ -138,6 +136,8 @@ local function Precombat()
     if S.Demonbolt:IsCastable() then
       if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 6"; end
     end
+    -- variable,name=tyrant_ready,value=0
+    VarTyrantReady = false
   end
 end
 
