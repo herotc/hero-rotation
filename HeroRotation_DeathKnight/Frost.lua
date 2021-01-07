@@ -162,11 +162,6 @@ local function Precombat()
   -- augmentation
   -- snapshot_stats
   -- potion
-  -- variable,name=other_on_use_equipped,value=
-  -- raise_dead
-  if S.RaiseDead:IsCastable() then
-    if HR.Cast(S.RaiseDead, nil, Settings.Commons.RaiseDeadDisplayStyle) then return "raise_dead precombat"; end
-  end
   -- opener
   if Everyone.TargetIsValid() then
     if S.HowlingBlast:IsCastable() and (Target:DebuffDown(S.FrostFeverDebuff)) then
