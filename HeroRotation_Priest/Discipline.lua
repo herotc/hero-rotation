@@ -175,6 +175,10 @@ local function APL()
     if S.ShadowCovenant:IsCastable() and (Player:Covenant() ~= "Kyrian" or (not S.BoonoftheAscended:CooldownUp() and Player:BuffDown(S.BoonoftheAscendedBuff))) then
       if Cast(S.ShadowCovenant, Settings.Discipline.GCDasOffGCD.ShadowCovenant) then return "shadow_covenant main 50"; end
     end
+    -- mindgames
+    if S.Mindgames:IsReady() then
+      if Cast(S.Mindgames, nil, Settings.Commons.DisplayStyle.Covenant, not Target:IsSpellInRange(S.Mindgames)) then return "mindgames 57"; end
+    end
     --schism
     if S.Schism:IsCastable() then
       if Cast(S.Schism, nil, nil, not Target:IsSpellInRange(S.Schism)) then return "schism main 52"; end
