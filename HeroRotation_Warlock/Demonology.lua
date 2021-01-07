@@ -177,7 +177,7 @@ local function TyrantPrep()
   if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:SoulShardsP() < 4 and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff))) then
     if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 74"; end
   end
-  -- shadow_bolt,if=soul_shard<5-4*buff.nether_portal.up
+  -- run_action_list,name=build_shard,if=soul_shard<5-4*buff.nether_portal.up
   if S.ShadowBolt:IsCastable() and (Player:SoulShardsP() < (5 - 4 * num(Player:BuffUp(S.NetherPortalBuff)))) then
     local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
   end
@@ -213,7 +213,7 @@ local function SummonTyrant()
   end
   -- shadow_bolt,if=buff.wild_imps.stack+incoming_imps<4&(talent.demonic_consumption.enabled|buff.nether_portal.down),line_cd=20
   if S.ShadowBolt:IsCastable() and (S.ShadowBolt:TimeSinceLastCast() > 20 and WildImpsCount() + ImpsSpawnedDuring(Spell(Player:PrevGCD(1)):CastTime()) < 4 and (S.DemonicConsumption:IsAvailable() or Player:BuffDown(S.NetherPortalBuff))) then
-    local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
+    if HR.Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt 96"; end
   end
   -- grimoire_felguard
   if S.GrimoireFelguard:IsReady() then
@@ -235,7 +235,7 @@ local function SummonTyrant()
   if S.Demonbolt:IsReady() and (Player:BuffUp(S.DemonicCoreBuff) and Player:BuffUp(S.NetherPortalBuff) and ((S.SummonVilefiend:CooldownRemains() > 35 or not S.SummonVilefiend:IsAvailable()) and (S.GrimoireFelguard:CooldownRemains() > 108 or S.GrimoireFelguard:CooldownRemains() < 103))) then
     if HR.Cast(S.Demonbolt, nil, nil, not Target:IsSpellInRange(S.Demonbolt)) then return "demonbolt 102"; end
   end
-  -- shadow_bolt,if=buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
+  -- run_action_list,name=build_shard,if=buff.nether_portal.up&((buff.vilefiend.remains>5|!talent.summon_vilefiend.enabled)&(buff.grimoire_felguard.remains>5|buff.grimoire_felguard.down))
   if S.ShadowBolt:IsCastable() and (Player:BuffUp(S.NetherPortalBuff) and ((S.SummonVilefiend:CooldownRemains() > 35 or not S.SummonVilefiend:IsAvailable()) and (S.GrimoireFelguard:CooldownRemains() > 108 or S.GrimoireFelguard:CooldownRemains() < 103))) then
     local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
   end
@@ -245,7 +245,7 @@ local function SummonTyrant()
   end
   -- variable,name=tyrant_ready,value=!cooldown.summon_demonic_tyrant.ready
   -- Moved to top of function for better flow
-  -- shadow_bolt
+  -- run_action_list,name=build_shard
   if S.ShadowBolt:IsCastable() then
     local ShouldReturn = BuildShard(); if ShouldReturn then return ShouldReturn; end
   end
