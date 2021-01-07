@@ -109,7 +109,7 @@ HR.GUISettings.APL.Monk = {
       -- Racials
       -- Abilities
       ThunderFocusTea         = true,
-122    }
+    }
   }
 };
 HR.GUI.LoadSettingsRecursively(HR.GUISettings);
