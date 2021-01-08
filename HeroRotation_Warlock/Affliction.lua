@@ -156,10 +156,7 @@ local function Precombat()
   -- flask
   -- food
   -- augmentation
-  -- summon_pet
-  if S.SummonPet:IsReady() then
-    if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet precombat"; end
-  end
+  -- summon_pet - Moved to APL()
   -- grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
   if S.GrimoireofSacrifice:IsCastable() and Player:BuffDown(S.GrimoireofSacrificeBuff) then
     if Cast(S.GrimoireofSacrifice,Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "GrimoureOfSacrifice precombat"; end
@@ -383,6 +380,11 @@ local function APL()
 
   end
   EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
+
+  -- summon_pet - Added here to show even when out of combat and while having no target
+  if S.SummonPet:IsReady() then
+    if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
+  end
 
   -- +In Combat
   if Everyone.TargetIsValid() then
