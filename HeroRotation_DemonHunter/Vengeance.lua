@@ -150,7 +150,7 @@ local function Defensives()
       if Cast(S.DemonSpikes, Settings.Vengeance.OffGCDasOffGCD.DemonSpikes) then return "demon_spikes defensives (Danger)"; end
     end
   end
-  if I.DarkmoonDeckIndomitable:IsReady() and Settings.Commons.Enabled.Trinkets and Player:HealthPercentage() <= 75 then
+  if I.DarkmoonDeckIndomitable:IsEquipped() and I.DarkmoonDeckIndomitable:IsReady() and Settings.Commons.Enabled.Trinkets and Player:HealthPercentage() <= 75 then
     if Cast(I.DarkmoonDeckIndomitable, nil, Settings.Commons.DisplayStyle.Trinkets) then return "darkmoon_deck_indomitable defensives"; end
   end
   -- Metamorphosis,if=!buff.metamorphosis.up&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|target.time_to_die<15
