@@ -57,12 +57,16 @@ local function ComputeTargetRange()
 end
 
 local BitingColdEquipped = Player:HasLegendaryEquipped(39)
-local _, _, MainHandRuneforge = strsplit(":", GetInventoryItemLink("player", 16))
-local _, _, OffHandRuneforge = strsplit(":", GetInventoryItemLink("player", 17))
+local MainHandLink = GetInventoryItemLink("player", 16) or ""
+local OffHandLink = GetInventoryItemLink("player", 17) or ""
+local _, _, MainHandRuneforge = strsplit(":", MainHandLink)
+local _, _, OffHandRuneforge = strsplit(":", OffHandLink)
 HL:RegisterForEvent(function()
   BitingColdEquipped = Player:HasLegendaryEquipped(39)
-  _, _, MainHandRuneforge = strsplit(":", GetInventoryItemLink("player", 16))
-  _, _, OffHandRuneforge = strsplit(":", GetInventoryItemLink("player", 17))
+  MainHandLink = GetInventoryItemLink("player", 16) or ""
+  OffHandLink = GetInventoryItemLink("player", 17) or ""
+  _, _, MainHandRuneforge = strsplit(":", MainHandLink)
+  _, _, OffHandRuneforge = strsplit(":", OffHandLink)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 local function num(val)
