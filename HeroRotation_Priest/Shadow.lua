@@ -341,7 +341,7 @@ local function Main()
     if Cast(S.VoidBolt, nil, nil, not Target:IsInRange(40)) then return "void_bolt 90"; end
   end
   -- void_eruption,if=variable.pool_for_cds&insanity>=40&(insanity<=85|talent.searing_nightmare.enabled&variable.searing_nightmare_cutoff)&!cooldown.fiend.up&(!cooldown.mind_blast.up|spell_targets.mind_sear>2)
-  if S.VoidEruption:IsReady() and (VarPoolForCDs and Player:Insanity() >= 40 and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and (not S.MindBlast:CooldownUp() or Enemies10ySplash > 2)) then
+  if S.VoidEruption:IsReady() and (VarPoolForCDs and Player:Insanity() >= 40 and (Player:Insanity() <= 85 or S.SearingNightmare:IsAvailable() and VarSearingNightmareCutoff) and not S.Mindbender:CooldownUp() and (not S.MindBlast:CooldownUp() or EnemiesCount10ySplash > 2)) then
     if Cast(S.VoidEruption, Settings.Shadow.GCDasOffGCD.VoidEruption, nil, not Target:IsSpellInRange(S.VoidEruption)) then return "void_eruption 92"; end
   end
   -- shadow_word_pain,if=buff.fae_guardians.up&!debuff.wrathful_faerie.up
