@@ -59,6 +59,8 @@ local Enemies40y, Enemies40yCount, EnemiesCount10ySplash, EnemiesCount
 local EnemiesAgonyCount, EnemiesSeedofCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
 local EnemiesWithUnstableAfflictionDebuff
 
+local FirstTarGUID
+
 -- Stuns
 
 -- Rotation Variables
@@ -153,6 +155,7 @@ local function returnEnemiesWithDot(Object, Enemies)
 end
 
 local function Precombat()
+  FirstTarGUID = Target:GUID()
   -- flask
   -- food
   -- augmentation
@@ -162,21 +165,44 @@ local function Precombat()
     if Cast(S.GrimoireofSacrifice,Settings.Affliction.GCDasOffGCD.GrimoireOfSacrifice) then return "GrimoureOfSacrifice precombat"; end
   end
   -- snapshot_stats
-  -- seed_of_corruption,if=spell_targets.seed_of_corruption_aoe>=3
-  if S.SeedofCorruption:IsReady() and (EnemiesCount10ySplash >= 3 and Player:SoulShardsP() > 0) then
-    if Cast(S.SeedofCorruption, nil, nil, not Target:IsSpellInRange(S.SeedofCorruption)) then return "SeedofCorruption precombat"; end
+  -- potion
+  if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
+    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion precombat"; end
   end
   -- haunt
   if S.Haunt:IsReady() then
     if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "Haunt precombat"; end
   end
-  -- shadow_bolt,if=!talent.haunt.enabled&spell_targets.seed_of_corruption_aoe<3
-  if S.ShadowBolt:IsReady() and (not S.Haunt:IsAvailable() and EnemiesCount10ySplash < 3) then
-    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "ShadowBolt precombat"; end
+  -- Manually added: unstable_affliction
+  if S.UnstableAffliction:IsReady() then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "UnstableAffliction precombat"; end
   end
-  -- Custom precombat Agony with talents 3,3,1,1,1,1,3
+  -- Manually added: agony
   if S.Agony:IsReady() then
     if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "Agony precombat"; end
+  end
+end
+
+local function Opener()
+  -- haunt,if=!dot.haunt.ticking
+  if S.Haunt:IsReady() and (Target:DebuffDown(S.HauntDebuff)) then
+    if Cast(S.Haunt, nil, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt opener"; end
+  end
+  -- unstable_affliction,if=!dot.unstable_affliction.ticking
+  if S.UnstableAffliction:IsReady() and (Target:DebuffDown(S.UnstableAfflictionDebuff)) then
+    if Cast(S.UnstableAffliction, nil, nil, not Target:IsSpellInRange(S.UnstableAffliction)) then return "unstable_affliction opener"; end
+  end
+  -- agony,if=!dot.agony.ticking
+  if S.Agony:IsReady() and (Target:DebuffDown(S.AgonyDebuff)) then
+    if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony opener"; end
+  end
+  -- corruption=!dot.corruption.ticking
+  if S.Corruption:IsReady() and (Target:DebuffDown(S.CorruptionDebuff)) then
+    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption opener"; end
+  end
+  -- siphon_life=!dot.siphon_life.ticking
+  if S.SiphonLife:IsReady() and (Target:DebuffDown(S.SiphonLifeDebuff)) then
+    if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life opener"; end
   end
 end
 
@@ -211,7 +237,10 @@ local function Darkglare_prep()
   if S.DarkSoulMisery:IsReady() then
     if Cast(S.DarkSoulMisery,Settings.Affliction.GCDasOffGCD.DarkSoul) then return "DarkSoulMisery Darkglare_prep"; end
   end
-  -- potion TODO
+  -- potion
+  if Settings.Commons.Enabled.Potions and I.PotionofSpectralIntellect:IsReady() then
+    if Cast(I.PotionofSpectralIntellect, nil, Settings.Commons.DisplayStyle.Potions) then return "potion Darkglare_prep"; end
+  end
   -- fireblood
   if S.Fireblood:IsCastable() then
     if Cast(S.Fireblood) then return "Fireblood Darkglare_prep"; end
@@ -278,7 +307,7 @@ local function Aoe()
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
-    if (Player:Covenant() ~= "Venthyr" and Player:Covenant() ~= "Night Fae" and Target:DebuffTicksRemain(S.PhantomSingularityDebuff) > 0 and Target:DebuffRemains(S.PhantomSingularityDebuff) < 2) then
+    if (Player:Covenant() ~= "Venthyr" and Player:Covenant() ~= "Night Fae" and Target:DebuffUp(S.PhantomSingularityDebuff) and Target:DebuffRemains(S.PhantomSingularityDebuff) < 2) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
   end
@@ -403,6 +432,12 @@ local function APL()
     -- call_action_list,name=aoe,if=active_enemies>3
     if (EnemiesCount10ySplash > 3) then
       local ShouldReturn = Aoe(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- Manually added: Opener function to ensure that all DoTs are applied before anything else
+    -- Added this because sometimes the rotation tries to go into Darkglare_prep before applying all DoTs on single target
+    -- 12 seconds chosen arbitrarily, as it's enough time to get all DoTs up and not have any wear off
+    if HL.CombatTime() < 12 and Target:GUID() == FirstTarGUID then
+      local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- phantom_singularity,if=time>30
     if S.PhantomSingularity:IsReady() and (HL.CombatTime() > 30) then

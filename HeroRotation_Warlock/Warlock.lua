@@ -116,6 +116,7 @@ Spell.Warlock.Affliction = {
   VileTaintDebuff                       = Spell(278350),
 
   Haunt                                 = Spell(48181),
+  HauntDebuff                           = Spell(48181),
 
   GrimoireofSacrifice                   = Spell(108503),
   GrimoireofSacrificeBuff               = Spell(196099),
@@ -141,4 +142,5 @@ Item.Warlock.Demonology = {
 }
 
 Item.Warlock.Affliction = {
+  PotionofSpectralIntellect             = Item(307096)
 }
