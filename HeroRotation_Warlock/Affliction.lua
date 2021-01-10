@@ -21,7 +21,6 @@ local CDsON = HR.CDsON
 local Cast  = HR.Cast
 -- Lua
 
-
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
 -- Commons
@@ -47,18 +46,16 @@ local TrinketsOnUseExcludes = {--  I.TrinketName:ID(),
 HL:RegisterForEvent(function()
   S.SeedofCorruption:RegisterInFlight()
   S.ShadowBolt:RegisterInFlight()
+  S.Haunt:RegisterInFlight()
 end, "LEARNED_SPELL_IN_TAB")
 S.SeedofCorruption:RegisterInFlight()
 S.ShadowBolt:RegisterInFlight()
-
-
+S.Haunt:RegisterInFlight()
 
 -- Enemies
 local Enemies40y, Enemies40yCount, EnemiesCount10ySplash, EnemiesCount
-
 local EnemiesAgonyCount, EnemiesSeedofCorruptionCount, EnemiesSiphonLifeCount, EnemiesVileTaintCount = 0, 0, 0, 0
 local EnemiesWithUnstableAfflictionDebuff
-
 local FirstTarGUID
 
 -- Stuns
