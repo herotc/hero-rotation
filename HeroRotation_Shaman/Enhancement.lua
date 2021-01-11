@@ -368,7 +368,7 @@ local function APL()
       if HR.Cast(S.Stormkeeper) then return "Stormkeeper precombat"; end
     end
     -- windfury_totem
-    if S.WindfuryTotem:IsCastable() and Player:BuffDown(S.WindfuryTotemBuff) or (DoomWindsEquipped and Player:DebuffDown(S.DoomWindsDebuff)) then
+    if S.WindfuryTotem:IsCastable() and (Player:BuffDown(S.WindfuryTotemBuff) or (DoomWindsEquipped and Player:DebuffDown(S.DoomWindsDebuff))) then
       if HR.Cast(S.WindfuryTotem) then return "wf3"; end
     end
     -- wind_shear
