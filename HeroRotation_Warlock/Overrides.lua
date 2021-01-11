@@ -62,7 +62,7 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = AffOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-    if self == SpellAffli.VileTaint or self == SpellAffli.ScouringTithe or self == SpellAffli.UnstableAffliction then
+    if self == SpellAffli.VileTaint or self == SpellAffli.ScouringTithe or self == SpellAffli.UnstableAffliction or self == SpellAffli.SoulRot then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellAffli.SeedofCorruption or self == SpellAffli.Haunt then
       return BaseCheck and not Player:IsCasting(self) and not self:InFlight()
