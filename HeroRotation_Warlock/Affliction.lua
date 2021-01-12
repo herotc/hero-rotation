@@ -142,7 +142,8 @@ end
 local function returnEnemiesWithDot(Object, Enemies)
   for _, CycleUnit in pairs(Enemies) do
     --if CycleUnit:DebuffUp(Object, nil, 0) then
-    if CycleUnit:DebuffTicksRemain(Object) > 0 then
+    --if CycleUnit:DebuffTicksRemain(Object) > 0 then
+    if CycleUnit:DebuffUp(Object) then
       if Object == S.UnstableAfflictionDebuff then
         return CycleUnit:GUID()
       end
@@ -416,7 +417,7 @@ local function APL()
   EnemiesWithUnstableAfflictionDebuff = returnEnemiesWithDot(S.UnstableAfflictionDebuff, Enemies40y)
 
   -- summon_pet - Added here to show even when out of combat and while having no target
-  if S.SummonPet:IsReady() then
+  if S.SummonPet:IsCastable() then
     if Cast(S.SummonPet, Settings.Affliction.GCDasOffGCD.SummonPet) then return "summon_pet ooc"; end
   end
 

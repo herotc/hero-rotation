@@ -46,7 +46,7 @@ AffOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
     end
     local BaseCheck = AffOldSpellIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellAffli.SummonPet then
-      return BaseCheck and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
+      return BaseCheck and Player:SoulShardsP() > 0 and not (Pet:IsActive() or Player:BuffUp(SpellAffli.GrimoireofSacrificeBuff))
     else
       return BaseCheck
     end
