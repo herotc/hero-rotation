@@ -267,7 +267,7 @@ local function UseCooldowns()
   if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 2) or Player:ChiDeficit() >= 4) then
     if HR.CastRightSuggested(S.EnergizingElixir) then return "Elixir CD"; end
   end
-  if S.TouchOfDeath:IsReady() and Target:Health() < UnitHealthMax("player") then
+  if S.TouchOfDeath:IsReady() and (Target:Health() < UnitHealthMax("player") or (Target:Health() < 0.35*UnitHealthMax("player") and UnitIsPlayer("target")))  then
     if HR.CastRightSuggested(S.TouchOfDeath) then return "Touch of Death Main Target"; end
   end
   if S.WeaponsOfOrder:IsReady() then
@@ -297,26 +297,14 @@ end
 -- This function can return nil if force_spend is not true.
 -- If it returns nil, that means you'd actually rather not spend chi, because the best chi spender you want to use in this situation wouldn't be a combo strike.
 local function SpendChi(force_spend, chi_costs, chi_values)
-  -- Fists of Fury, if it's ready.
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and chi_costs[S.SpinningCraneKick] == 0 then
+    return OptimallyTargetedCast(S.SpinningCraneKick, "Chiji Proc")
+  end
   if S.FistsOfFury:IsReady() then
     return OptimallyTargetedCast(S.FistsOfFury, "Fists of Fury")
   end
-
-  -- Use the best free spell that's ready and a combo strike.
-  -- TODO: decide where to actually prioritize free casts of chi spenders. First experiment is with then below FOF priority.
-  local best_free_spell = nil
-  local best_free_spell_value = 0
-  for spell, cost in pairs(chi_costs) do
-    if cost == 0 then
-      local value = chi_values[spell]
-      if value > best_free_spell_value and spell:IsReady() and ComboStrike(spell) then
-        best_free_spell = spell
-        best_free_spell_value = value
-      end
-    end
-  end
-  if best_free_spell ~= nil then
-    return OptimallyTargetedCast(best_free_spell, "Free cast of " .. best_free_spell.SpellName)
+  if S.BlackoutKick:IsReady() and ComboStrike(S.BlackoutKick) and chi_costs[S.BlackoutKick] == 0 then
+    return OptimallyTargetedCast(S.BlackoutKick, "Free BOK")
   end
 
   -- Use the situationally best chi spender if it's ready!
@@ -338,12 +326,19 @@ local function SpendChi(force_spend, chi_costs, chi_values)
     if S.BlackoutKick:IsReady() and ComboStrike(S.BlackoutKick) then
       return OptimallyTargetedCast(S.BlackoutKick, "BOK is best possible chi spender and it's ready.")
     end
+    if S.BlackoutKick:IsReady() and S.FlyingSerpentKick:IsReady() and not ComboStrike(S.BlackoutKick) then
+      return OptimallyTargetedCast(S.FlyingSerpentKick, "FSK to enable BOK")
+    end
   end
   if sck_efficiency > max(rsk_efficiency, rjw_efficiency, bok_efficiency) then
     if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) then
       return OptimallyTargetedCast(S.SpinningCraneKick, "SCK is best possible chi spender and it's ready.")
     end
+    if S.SpinningCraneKick:IsReady() and S.FlyingSerpentKick:IsReady() and not ComboStrike(S.SpinningCraneKick) then
+      return OptimallyTargetedCast(S.FlyingSerpentKick, "FSK to enable SCK")
+    end
   end
+
 
   -- If we're being forced to spend since we're at the chi cap, pick the most efficient spell that's available.
   if force_spend then
@@ -459,11 +454,6 @@ local function APL()
 
     DebugMessage = SpendEnergy(false)
     if DebugMessage then return DebugMessage end
-
-    -- No buttons left to press; try Flying Serpent Kick
-    if S.FlyingSerpentKick:IsReady() then
-      if HR.Cast(S.FlyingSerpentKick) then return "Flying Serpent Kick for Mastery" end
-    end
 
     -- Manually added Pool filler
     if HR.Cast(S.PoolEnergy) then return "Pool Energy" end
