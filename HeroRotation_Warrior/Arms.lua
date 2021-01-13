@@ -245,7 +245,7 @@ local function SingleTarget()
     if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- ravager,if=debuff.colossus_smash.up&!covenant.venthyr
-  if S.Ravager:IsCastable() and (Target:DebuffUp(ColossusSmashDebuff) and Player:Covenant() ~= "Venthyr") then
+  if S.Ravager:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Covenant() ~= "Venthyr") then
     if HR.Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
   -- overpower,if=charges=2
