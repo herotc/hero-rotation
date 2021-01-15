@@ -159,7 +159,7 @@ local function TyrantPrep()
   end
   -- nether_portal
   if S.NetherPortal:IsReady() then
-    if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, not Target:IsSpellInRange(S.NetherPortal)) then return "nether_portal 66"; end
+    if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, nil) then return "nether_portal 66"; end
   end
   -- grimoire_felguard
   if S.GrimoireFelguard:IsReady() then
@@ -192,15 +192,8 @@ local function TyrantPrep()
 end
 
 local function SummonTyrant()
-  -- for proper display of what spell is next while casting tyrant
-  if Player:IsCasting(S.SummonDemonicTyrant) and S.DemonicStrength:IsCastable() and (S.Felstorm:CooldownRemains() < 30 - (5 * (1 - (Player:HastePct() / 100)))) then
-    if HR.Cast(S.DemonicStrength, Settings.Demonology.GCDasOffGCD.DemonicStrength) then return "demonic_strength post_tyrant"; end
-  end
-  if Player:IsCasting(S.SummonDemonicTyrant) and S.BilescourgeBombers:IsReady() then
-    if HR.Cast(S.BilescourgeBombers, nil, nil, not Target:IsSpellInRange(S.BilescourgeBombers)) then return "bilescourge_bombers post_tyrant"; end
-  end
-  -- Moved from lower in the function so we abort this function right after using Demonic Tyrant
-  if (not S.SummonDemonicTyrant:CooldownUp()) then
+-- Moved from lower in the function so we abort this function right after using Demonic Tyrant
+  if (not S.SummonDemonicTyrant:CooldownUp() or Player:BuffRemains(S.NetherPortalBuff) > 4) then
     VarTyrantReady = false
   end
   -- hand_of_guldan,if=soul_shard=5,line_cd=20
