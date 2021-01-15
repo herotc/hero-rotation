@@ -87,6 +87,7 @@ Spell.Priest.Shadow = {
   DissonantEchoesBuff                   = Spell(343144),
   FieldofBlossoms                       = Spell(319191),
   GroveInvigoration                     = Spell(322721),
+  RedirectedAnimaBuff                   = Spell(342814),
 
   -- Legendary Effects
 }
