@@ -212,7 +212,7 @@ end
 local function SESingle()
   -- additional apl cause its not listed and the Storm Elemental does not automatically cast eye of the storm
   if SEActive and Pet:BuffUp(S.StormElementalPetBuff) and S.PEEyeOfTheStorm:CooldownRemains() <= 0 and Settings.Elemental.Commons.ShowSpeiclaElementalAblities then
-    if HR.Cast(S.PEEyeOfTheStorm, Settings.Elemental.OffGCDasOffGCD.PEEyeOfTheStorm then return "eye_of_the_storm ses 001"; end
+    if HR.Cast(S.PEEyeOfTheStorm, Settings.Elemental.OffGCDasOffGCD.PEEyeOfTheStorm) then return "eye_of_the_storm ses 001"; end
   end
 
   -- flame_shock,target_if=(remains<=gcd)&(buff.lava_surge.up|!buff.bloodlust.up)
