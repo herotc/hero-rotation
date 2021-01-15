@@ -117,12 +117,20 @@ end
 
 local function EvaluateCycleUnstableAfflictionRemains(TargetUnit)
   --dot.unstable_affliction.remains<4
-  return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRemains(S.UnstableAfflictionDebuff) < 4) or EnemiesWithUnstableAfflictionDebuff == 0) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy())
+  if (EnemiesWithUnstableAfflictionDebuff == 0 and TargetUnit:DebuffUp(S.UnstableAfflictionDebuff)) then
+    return (TargetUnit:DebuffRemains(S.UnstableAfflictionDebuff) < 4) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy())
+  else
+    return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRemains(S.UnstableAfflictionDebuff) < 4) or EnemiesWithUnstableAfflictionDebuff == 0) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy())
+  end
 end
 
 local function EvaluateCycleUnstableAfflictionRefresh(TargetUnit)
   --refreshable
-  return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRefreshable(S.UnstableAfflictionDebuff)) or EnemiesWithUnstableAfflictionDebuff == 0) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy())
+  if (EnemiesWithUnstableAfflictionDebuff == 0 and TargetUnit:DebuffUp(S.UnstableAfflictionDebuff)) then
+    return (TargetUnit:DebuffRefreshable(S.UnstableAfflictionDebuff) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy()))
+  else
+    return ((TargetUnit:GUID() == EnemiesWithUnstableAfflictionDebuff and TargetUnit:DebuffRefreshable(S.UnstableAfflictionDebuff)) or EnemiesWithUnstableAfflictionDebuff == 0) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy())
+  end
 end
 
 -- Counter for Debuff on other enemies
@@ -434,7 +442,7 @@ local function APL()
     -- Manually added: Opener function to ensure that all DoTs are applied before anything else
     -- Added this because sometimes the rotation tries to go into Darkglare_prep before applying all DoTs on single target
     -- 12 seconds chosen arbitrarily, as it's enough time to get all DoTs up and not have any wear off
-    if HL.CombatTime() < 12 and Target:GUID() == FirstTarGUID then
+    if HL.CombatTime() < 10 and Target:GUID() == FirstTarGUID then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- phantom_singularity,if=time>30
