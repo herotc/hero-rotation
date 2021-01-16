@@ -267,7 +267,7 @@ local function UseCooldowns()
   if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 2) or Player:ChiDeficit() >= 4) then
     if HR.CastRightSuggested(S.EnergizingElixir) then return "Elixir CD"; end
   end
-  if S.TouchOfDeath:IsReady() and (Target:Health() < UnitHealthMax("player") or (Target:Health() < 0.35*UnitHealthMax("player") and UnitIsPlayer("target")))  then
+  if S.TouchOfDeath:IsReady() and (Target:Health() < UnitHealthMax("player") or (Target:Health() < 0.35*UnitHealthMax("player") and Target:HealthPercentage() < 15 and UnitIsPlayer("target")))  then
     if HR.CastRightSuggested(S.TouchOfDeath) then return "Touch of Death Main Target"; end
   end
   if S.WeaponsOfOrder:IsReady() then
@@ -380,8 +380,66 @@ local function SpendEnergy(force_spend)
   return nil
 end
 
+-- Precondition here is that WOO is up if we're in this handler.
+-- This is yoinked out of the APL for now until we can unify it.
+local function WeaponsOfOrderHandler()
+  -- Get the chi-reduction ASAP in Weapons of Order buff.
+  if S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
+    return OptimallyTargetedCast(S.RisingSunKick, "RSK during Weapons of Order")
+  end
+  if S.SpinningCraneKick:IsReady() and Player:BuffUp(S.DanceOfChijiBuff) and ComboStrike(S.SpinningCraneKick) then
+    return OptimallyTargetedCast(S.SpinningCraneKick, "ChijiSCK during WOO")
+  end
+  if S.FistsOfFury:IsReady() and EnemiesCount8 >= 2 and Player:BuffRemains(S.WeaponsOfOrder) < 1 then
+    return OptimallyTargetedCast(S.FistsOfFury, "FOF last second of WOO")
+  end
+  if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) and EnemiesCount8 >= 2 then
+    return OptimallyTargetedCast(S.WhirlingDragonPunch, "WDP on 2t+ inside WOO")
+  end
+  if S.SpinningCraneKick:IsReady() and ComboStrike(S.SpinningCraneKick) and EnemiesCount8 >= 3 then
+    return OptimallyTargetedCast(S.SpinningCraneKick, "SCK 3t+ inside WOO")
+  end
+  if S.BlackoutKick:IsReady() and ComboStrike(S.BlackoutKick) and EnemiesCount8 <= 2 then
+    return OptimallyTargetedCast(S.BlackoutKick, "BOK on 1/2t inside WOO")
+  end
+  if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) then
+    return OptimallyTargetedCast(S.WhirlingDragonPunch, "WDP ST inside WOO")
+  end
+  -- TODO: change the icon here to a custom one like rogues for SEF cancel
+  if S.FistsOfFury:IsReady() and Player:BuffUp(S.StormEarthAndFire) then
+    return OptimallyTargetedCast(S.FistsOfFury, "FOF SEF CANCEL! inside WOO")
+  end
+  -- TODO: handle chi_energy buff thing from the legendary here for SCK
+  if S.FistOfTheWhiteTiger:IsReady() and Player:ChiDeficit() >= 3 then
+    return OptimallyTargetedCast(S.FistOfTheWhiteTiger, "FOTWT inside WOO")
+  end
+  if S.ExpelHarm:IsReady() and Player:ChiDeficit() >= 1 then
+    return OptimallyTargetedCast(S.ExpelHarm, "Expel Harm inside WOO")
+  end
+  local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
+  if S.ChiBurst:IsReady() and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() > ChiBurstCastTime + 0.200 then
+    return OptimallyTargetedCast(S.ChiBurst, "ChiBurst inside WOO")
+  end
+  if S.TigerPalm:IsReady() and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 then
+    return OptimallyTargetedCast(S.TigerPalm, "TigerPalm inside WOO")
+  end
+  if S.ChiWave:IsReady() then
+    return OptimallyTargetedCast(S.ChiWave, "ChiWave inside WOO")
+  end
+  if S.BlackoutKick:IsReady() then
+    return OptimallyTargetedCast(S.BlackoutKick, "BOK inside WOO")
+  end
+  if S.FlyingSerpentKick:IsReady() then
+    return OptimallyTargetedCast(S.FlyingSerpentKick, "FSK filler")
+  end
+end
+
 -- Can return nil.
 local function SpecialCases()
+  if Player:BuffUp(S.WeaponsOfOrder) then
+    return WeaponsOfOrderHandler()
+  end
+
   -- Handle WDP + WDP setup as a highest priority
   if S.WhirlingDragonPunch:IsReady() and Player:BuffUp(S.WhirlingDragonPunchBuff) then
     return OptimallyTargetedCast(S.WhirlingDragonPunch, "Whirling Dragon Punch")
@@ -394,11 +452,8 @@ local function SpecialCases()
   if S.FaelineStomp:IsReady() then
     return OptimallyTargetedCast(S.FaelineStomp, "Faeline Stomp")
   end
-  -- Get the chi-reduction ASAP in Weapons of Order buff.
-  if Player:BuffUp(S.WeaponsOfOrder) and S.RisingSunKick:IsReady() and ComboStrike(S.RisingSunKick) then
-    return OptimallyTargetedCast(S.RisingSunKick, "RSK during Weapons of Order")
-  end
 end
+
 
 local function ShortCDs()
   local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
