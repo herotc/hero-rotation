@@ -100,7 +100,7 @@ end
 
 -- prioritize targets with flame shock when casting lava burst
 local function EvaluateCycleLavaBurstOnFlameShockTargets(TargetUnit)
-  return TargetUnit:DebuffUp(S.FlameShockDebuff)
+  return TargetUnit:DebuffUp(S.FlameShockDebuff) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy())
 end
 
 local function Precombat()
