@@ -62,6 +62,7 @@ HR.GUISettings.APL.Shaman = {
       FireElemental = true,
       StormElemental = true,
       Stormkeeper =  true,
+      EchoingShock = true,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
