@@ -202,13 +202,21 @@ local function Opener()
   if S.Agony:IsReady() and (Target:DebuffDown(S.AgonyDebuff)) then
     if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony opener"; end
   end
-  -- corruption=!dot.corruption.ticking
+  -- corruption,if=!dot.corruption.ticking
   if S.Corruption:IsReady() and (Target:DebuffDown(S.CorruptionDebuff)) then
     if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption opener"; end
   end
-  -- siphon_life=!dot.siphon_life.ticking
+  -- siphon_life,if=!dot.siphon_life.ticking
   if S.SiphonLife:IsReady() and (Target:DebuffDown(S.SiphonLifeDebuff)) then
     if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life opener"; end
+  end
+  -- drain_soul,if=active_enemies<3&debuff.shadow_embrace.stack<3
+  if S.DrainSoul:IsReady() and (EnemiesCount10ySplash < 3 and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
+    if Cast(S.DrainSoul, nil, nil, not Target:IsSpellInRange(S.DrainSoul)) then return "drain_soul opener"; end
+  end
+  -- shadow_bolt,if=active_enemies<3&!talent.drain_soul.enabled&debuff.shadow_embrace.stack<3
+  if S.ShadowBolt:IsReady() and (EnemiesCount10ySplash < 3 and not S.DrainSoul:IsAvailable() and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
+    if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt opener"; end
   end
 end
 
@@ -442,7 +450,7 @@ local function APL()
     -- Manually added: Opener function to ensure that all DoTs are applied before anything else
     -- Added this because sometimes the rotation tries to go into Darkglare_prep before applying all DoTs on single target
     -- 12 seconds chosen arbitrarily, as it's enough time to get all DoTs up and not have any wear off
-    if HL.CombatTime() < 10 and Target:GUID() == FirstTarGUID then
+    if HL.CombatTime() < 12 and Target:GUID() == FirstTarGUID then
       local ShouldReturn = Opener(); if ShouldReturn then return ShouldReturn; end
     end
     -- phantom_singularity,if=time>30
