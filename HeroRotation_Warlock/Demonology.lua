@@ -159,7 +159,7 @@ local function TyrantPrep()
   end
   -- nether_portal
   if S.NetherPortal:IsReady() then
-    if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal, nil, nil) then return "nether_portal 66"; end
+    if HR.Cast(S.NetherPortal, Settings.Demonology.GCDasOffGCD.NetherPortal) then return "nether_portal 66"; end
   end
   -- grimoire_felguard
   if S.GrimoireFelguard:IsReady() then
