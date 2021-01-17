@@ -202,13 +202,13 @@ local function Opener()
   if S.Agony:IsReady() and (Target:DebuffDown(S.AgonyDebuff)) then
     if Cast(S.Agony, nil, nil, not Target:IsSpellInRange(S.Agony)) then return "agony opener"; end
   end
-  -- corruption,if=!dot.corruption.ticking
-  if S.Corruption:IsReady() and (Target:DebuffDown(S.CorruptionDebuff)) then
-    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption opener"; end
-  end
   -- siphon_life,if=!dot.siphon_life.ticking
   if S.SiphonLife:IsReady() and (Target:DebuffDown(S.SiphonLifeDebuff)) then
     if Cast(S.SiphonLife, nil, nil, not Target:IsSpellInRange(S.SiphonLife)) then return "siphon_life opener"; end
+  end
+  -- corruption,if=!dot.corruption.ticking
+  if S.Corruption:IsReady() and (Target:DebuffDown(S.CorruptionDebuff)) then
+    if Cast(S.Corruption, nil, nil, not Target:IsSpellInRange(S.Corruption)) then return "corruption opener"; end
   end
   -- drain_soul,if=active_enemies<3&debuff.shadow_embrace.stack<3
   if S.DrainSoul:IsReady() and (EnemiesCount10ySplash < 3 and Target:DebuffStack(S.ShadowEmbraceDebuff) < 3) then
