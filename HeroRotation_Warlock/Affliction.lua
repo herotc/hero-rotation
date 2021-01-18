@@ -82,7 +82,7 @@ end
 
 local function EvaluateCycleAgonyRefreshTicking(TargetUnit)
   --refreshable&dot.agony.ticking
-  return (TargetUnit:DebuffRefreshable(S.AgonyDebuff) and TargetUnit:DebuffTicksRemain(S.AgonyDebuff) > 0 and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy()))
+  return (TargetUnit:DebuffRefreshable(S.AgonyDebuff) and TargetUnit:DebuffUp(S.AgonyDebuff) and (TargetUnit:AffectingCombat() or TargetUnit:IsDummy()))
 end
 
 local function EvaluateCycleSiphonLifeNotTicking(TargetUnit)
@@ -139,7 +139,7 @@ local function calcEnemiesDotCount(Object, Enemies)
 
   for _, CycleUnit in pairs(Enemies) do
     --if CycleUnit:DebuffUp(Object, nil, 0) then
-    if CycleUnit:DebuffTicksRemain(Object) > 0 then
+    if CycleUnit:DebuffUp(Object) then
       debuffs = debuffs + 1
     end
   end
@@ -313,11 +313,11 @@ local function Aoe()
   end
   if CDsON() then
     -- call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-    if (Player:Covenant() == "Venthyr" and Target:DebuffTicksRemain(S.ImpendingCatastrophe) > 0 and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+    if (Player:Covenant() == "Venthyr" and Target:DebuffUp(S.ImpendingCatastrophe) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-    if (Player:Covenant() == "Night Fae" and Target:DebuffTicksRemain(S.SoulRot) > 0 and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+    if (Player:Covenant() == "Night Fae" and Target:DebuffUp(S.SoulRot) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
@@ -355,7 +355,7 @@ local function Aoe()
   end
   if CDsON() then
     -- call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-    if (Player:Covenant() == "Venthyr" and (S.ImpendingCatastrophe:IsReady() or Target:DebuffTicksRemain(S.ImpendingCatastrophe) > 0) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+    if (Player:Covenant() == "Venthyr" and (S.ImpendingCatastrophe:IsReady() or Target:DebuffUp(S.ImpendingCatastrophe)) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
@@ -363,7 +363,7 @@ local function Aoe()
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-    if (Player:Covenant() == "Night Fae" and (S.SoulRot:IsReady() or Target:DebuffTicksRemain(S.SoulRot) > 0) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+    if (Player:Covenant() == "Night Fae" and (S.SoulRot:IsReady() or Target:DebuffUp(S.SoulRot)) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
       local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
     end
     -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
@@ -400,7 +400,7 @@ local function Aoe()
     local ShouldReturn = Covenant(); if ShouldReturn then return ShouldReturn; end
   end
   -- drain_life,if=buff.inevitable_demise.stack>=50|buff.inevitable_demise.up&time_to_die<5|buff.inevitable_demise.stack>=35&dot.soul_rot.ticking
-  if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffTicksRemain(S.SoulRot) > 0) then
+  if S.DrainLife:IsReady() and (Player:BuffStack(S.InvetiableDemiseBuff) >= 50 or Player:BuffUp(S.InvetiableDemiseBuff) and Target:TimeToDie() < 5 or Player:BuffStack(S.InvetiableDemiseBuff) >= 35 and Target:DebuffUp(S.SoulRot)) then
     if Cast(S.DrainLife, nil, nil, not Target:IsSpellInRange(S.DrainLife)) then return "DrainLife Aoe"; end
   end
   -- drain_soul,interrupt=1
@@ -459,15 +459,15 @@ local function APL()
     end
     if CDsON() then
       -- call_action_list,name=darkglare_prep,if=covenant.venthyr&dot.impending_catastrophe_dot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-      if (Player:Covenant() == "Venthyr" and Target:DebuffTicksRemain(S.ImpendingCatastrophe) > 0 and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+      if (Player:Covenant() == "Venthyr" and Target:DebuffUp(S.ImpendingCatastrophe) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=darkglare_prep,if=covenant.night_fae&dot.soul_rot.ticking&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-      if (Player:Covenant() == "Night Fae" and Target:DebuffTicksRemain(S.SoulRot) > 0 and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+      if (Player:Covenant() == "Night Fae" and Target:DebuffUp(S.SoulRot) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&dot.phantom_singularity.ticking&dot.phantom_singularity.remains<2
-      if (Player:Covenant() ~= "Venthyr" and Player:Covenant() ~= "Night Fae" and Target:DebuffTicksRemain(S.PhantomSingularityDebuff) > 0 and Target:DebuffRemains(S.PhantomSingularityDebuff) < 2) then
+      if (Player:Covenant() ~= "Venthyr" and Player:Covenant() ~= "Night Fae" and Target:DebuffUp(S.PhantomSingularityDebuff) and Target:DebuffRemains(S.PhantomSingularityDebuff) < 2) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
     end
@@ -485,15 +485,15 @@ local function APL()
     end
     if CDsON() then
       -- call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
-      if (Enemies40yCount > 2 and Player:Covenant() == "Venthyr" and (S.ImpendingCatastrophe:IsReady() or Target:DebuffTicksRemain(S.ImpendingCatastrophe) > 0) and (Target:DebuffTicksRemain(S.PhantomSingularityDebuff) > 0 or not S.PhantomSingularity:IsAvailable())) then
+      if (Enemies40yCount > 2 and Player:Covenant() == "Venthyr" and (S.ImpendingCatastrophe:IsReady() or Target:DebuffUp(S.ImpendingCatastrophe)) and (Target:DebuffUp(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=darkglare_prep,if=active_enemies>2&(covenant.necrolord|covenant.kyrian|covenant.none)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
-      if (Enemies40yCount > 2 and Player:Covenant() ~= "Venthyr" and Player:Covenant() ~= "Night Fae" and (Target:DebuffTicksRemain(S.PhantomSingularityDebuff) > 0 or not S.PhantomSingularity:IsAvailable())) then
+      if (Enemies40yCount > 2 and Player:Covenant() ~= "Venthyr" and Player:Covenant() ~= "Night Fae" and (Target:DebuffUp(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=darkglare_prep,if=active_enemies>2&covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&(dot.phantom_singularity.ticking|!talent.phantom_singularity.enabled)
-      if (Enemies40yCount > 2 and Player:Covenant() == "Night Fae" and (S.SoulRot:IsReady() or Target:DebuffTicksRemain(S.SoulRot) > 0) and (Target:DebuffTicksRemain(S.PhantomSingularityDebuff) > 0 or not S.PhantomSingularity:IsAvailable())) then
+      if (Enemies40yCount > 2 and Player:Covenant() == "Night Fae" and (S.SoulRot:IsReady() or Target:DebuffUp(S.SoulRot)) and (Target:DebuffUp(S.PhantomSingularityDebuff) or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
     end
@@ -543,7 +543,7 @@ local function APL()
     end
     if CDsON() then
       -- call_action_list,name=darkglare_prep,if=covenant.venthyr&(cooldown.impending_catastrophe.ready|dot.impending_catastrophe_dot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-      if (Player:Covenant() == "Venthyr" and (S.ImpendingCatastrophe:IsReady() or Target:DebuffTicksRemain(S.ImpendingCatastrophe) > 0) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+      if (Player:Covenant() == "Venthyr" and (S.ImpendingCatastrophe:IsReady() or Target:DebuffUp(S.ImpendingCatastrophe)) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=darkglare_prep,if=(covenant.necrolord|covenant.kyrian|covenant.none)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
@@ -551,7 +551,7 @@ local function APL()
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=darkglare_prep,if=covenant.night_fae&(cooldown.soul_rot.ready|dot.soul_rot.ticking)&cooldown.summon_darkglare.remains<2&(dot.phantom_singularity.remains>2|!talent.phantom_singularity.enabled)
-      if (Player:Covenant() == "Night Fae" and (S.SoulRot:IsReady() or Target:DebuffTicksRemain(S.SoulRot) > 0) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
+      if (Player:Covenant() == "Night Fae" and (S.SoulRot:IsReady() or Target:DebuffUp(S.SoulRot)) and S.SummonDarkglare:CooldownRemains() < 2 and (Target:DebuffRemains(S.PhantomSingularityDebuff) > 2 or not S.PhantomSingularity:IsAvailable())) then
         local ShouldReturn = Darkglare_prep(); if ShouldReturn then return ShouldReturn; end
       end
       -- dark_soul,if=cooldown.summon_darkglare.remains>time_to_die
@@ -568,19 +568,19 @@ local function APL()
       local ShouldReturn = Se(); if ShouldReturn then return ShouldReturn; end
     end
     -- malefic_rapture,if=dot.vile_taint.ticking
-    if S.MaleficRapture:IsReady() and (Target:DebuffTicksRemain(S.VileTaintDebuff) > 0) then
+    if S.MaleficRapture:IsReady() and (Target:DebuffUp(S.VileTaintDebuff)) then
       if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 2"; end
     end
     -- malefic_rapture,if=dot.impending_catastrophe_dot.ticking
-    if S.MaleficRapture:IsReady() and (Target:DebuffTicksRemain(S.ImpendingCatastrophe) > 0) then
+    if S.MaleficRapture:IsReady() and (Target:DebuffUp(S.ImpendingCatastrophe)) then
       if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 3"; end
     end
     -- malefic_rapture,if=dot.soul_rot.ticking
-    if S.MaleficRapture:IsReady() and (Target:DebuffTicksRemain(S.SoulRot) > 0) then
+    if S.MaleficRapture:IsReady() and (Target:DebuffUp(S.SoulRot)) then
       if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 4"; end
     end
     -- malefic_rapture,if=talent.phantom_singularity.enabled&(dot.phantom_singularity.ticking|soul_shard>3|time_to_die<cooldown.phantom_singularity.remains)
-    if S.MaleficRapture:IsReady() and (S.PhantomSingularity:IsAvailable() and (Target:DebuffTicksRemain(S.PhantomSingularityDebuff) > 0 or Player:SoulShardsP() > 3 or Target:TimeToDie() < S.PhantomSingularity:CooldownRemains())) then
+    if S.MaleficRapture:IsReady() and (S.PhantomSingularity:IsAvailable() and (Target:DebuffUp(S.PhantomSingularityDebuff) or Player:SoulShardsP() > 3 or Target:TimeToDie() < S.PhantomSingularity:CooldownRemains())) then
       if Cast(S.MaleficRapture) then return "MaleficRapture InCombat 5"; end
     end
     -- malefic_rapture,if=talent.sow_the_seeds.enabled
