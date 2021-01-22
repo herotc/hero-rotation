@@ -105,6 +105,7 @@ Spell.DemonHunter.Havoc = {
 
   -- Talents
   BlindFury                             = Spell(203550),
+  CycleofHatred                         = Spell(258887),
   DemonBlades                           = Spell(203555),
   Demonic                               = Spell(213410),
   EssenceBreak                          = Spell(258860),

@@ -384,8 +384,14 @@ local function APL()
       local ShouldReturn = Precombat(); if ShouldReturn then return ShouldReturn; end
     end
     -- auto_attack
-    -- variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-(talent.trail_of_ruin.enabled+buff.metamorphosis.up))|runeforge.chaos_theory&buff.chaos_theory.down
-    VarBladeDance = S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - (num(S.TrailofRuin:IsAvailable()) + num(Player:BuffUp(S.MetamorphosisBuff)))) or ChaosTheoryEquipped and Player:BuffDown(S.ChaosTheoryBuff)
+    -- variable,name=blade_dance,if=!runeforge.chaos_theory,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+    if (not ChaosTheoryEquipped) then
+      VarBladeDance = (S.FirstBlood:IsAvailable() or EnemiesCount8 >= (3 - num(S.TrailofRuin:IsAvailable())))
+    end
+    -- variable,name=blade_dance,if=runeforge.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled&spell_targets.blade_dance1>=(2-talent.trail_of_ruin.enabled)|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
+    if (ChaosTheoryEquipped) then
+      VarBladeDance = (Player:BuffDown(S.ChaosTheoryBuff) or S.FirstBlood:IsAvailable() and EnemiesCount8 >= (2 - num(S.TrailofRuin:IsAvailable())) or not S.CycleofHatred:IsAvailable() and EnemiesCount8 >= (4 - num(S.TrailofRuin:IsAvailable())))
+    end
     -- variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
     VarPoolingForMeta = not S.Demonic:IsAvailable() and S.Metamorphosis:CooldownRemains() < 6 and Player:FuryDeficit() > 30
     -- variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
