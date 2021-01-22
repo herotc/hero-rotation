@@ -90,7 +90,7 @@ local function Hac()
     if HR.Cast(S.Skullsplitter, nil, nil, not Target:IsSpellInRange(S.Skullsplitter)) then return "skullsplitter"; end
   end
   -- avatar,if=cooldown.colossus_smash.remains<1
-  if S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() < 1) then
+  if S.Avatar:IsCastable() and CDsON() and (S.ColossusSmash:CooldownRemains() < 1) then
     if HR.Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar"; end
   end
   -- cleave,if=dot.deep_wounds.remains<=gcd
@@ -102,11 +102,11 @@ local function Hac()
     if HR.Cast(S.Warbreaker, nil, nil, not Target:IsInRange(8)) then return "warbreaker"; end
   end
   -- bladestorm
-  if S.Bladestorm:IsCastable() then
+  if S.Bladestorm:IsCastable() and CDsON() then
     if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- ravager
-  if S.Ravager:IsCastable() then
+  if S.Ravager:IsCastable() and CDsON() then
     if HR.Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
   -- colossus_smash
@@ -152,12 +152,9 @@ local function Hac()
   
 end
 
-local function FiveTarget()
-end
-
 local function Execute()
   -- deadly_calm
-  if S.DeadlyCalm:IsCastable() then
+  if S.DeadlyCalm:IsCastable() and CDsON() then
     if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm"; end
   end
   -- rend,if=remains<=duration*0.3
@@ -169,7 +166,7 @@ local function Execute()
     if HR.Cast(S.Skullsplitter, nil, nil, not Target:IsSpellInRange(S.Skullsplitter)) then return "skullsplitter"; end
   end
   -- avatar,if=cooldown.colossus_smash.remains<1
-  if S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() < 1) then
+  if S.Avatar:IsCastable() and CDsON() and (S.ColossusSmash:CooldownRemains() < 1) then
     if HR.Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar"; end
   end
   -- cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
@@ -209,11 +206,11 @@ local function Execute()
     if HR.Cast(S.Execute, nil, nil, not Target:IsSpellInRange(S.Execute)) then return "execute"; end
   end
   -- bladestorm,if=rage<80
-  if S.Bladestorm:IsCastable() and (Player:Rage() < 80) then
+  if S.Bladestorm:IsCastable() and CDsON() and (Player:Rage() < 80) then
     if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- ravager,if=rage<80
-  if S.Ravager:IsCastable() and (Player:Rage() < 80) then
+  if S.Ravager:IsCastable() and CDsON() and (Player:Rage() < 80) then
     if HR.Cast(S.Ravager, Settings.Arms.GCDasOffGCD.Ravager, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
     
@@ -221,7 +218,7 @@ end
 
 local function SingleTarget()
   -- avatar,if=cooldown.colossus_smash.remains<1
-  if S.Avatar:IsCastable() and (S.ColossusSmash:CooldownRemains() < 1) then
+  if S.Avatar:IsCastable() and CDsON() and (S.ColossusSmash:CooldownRemains() < 1) then
     if HR.Cast(S.Avatar, Settings.Arms.GCDasOffGCD.Avatar) then return "avatar"; end
   end
   -- rend,if=remains<=duration*0.3
@@ -241,11 +238,11 @@ local function SingleTarget()
     if HR.Cast(S.ColossusSmash, nil, nil, not Target:IsSpellInRange(S.ColossusSmash)) then return "colossus_smash"; end
   end
   -- bladestorm,if=debuff.colossus_smash.up&!covenant.venthyr
-  if S.Bladestorm:IsCastable() and ((Target:DebuffUp(S.ColossusSmashDebuff) and (Player:Covenant() ~= "Venthyr"))) then
+  if S.Bladestorm:IsCastable() and CDsON() and ((Target:DebuffUp(S.ColossusSmashDebuff) and (Player:Covenant() ~= "Venthyr"))) then
     if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- ravager,if=debuff.colossus_smash.up&!covenant.venthyr
-  if S.Ravager:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Covenant() ~= "Venthyr") then
+  if S.Ravager:IsCastable() and CDsON() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Covenant() ~= "Venthyr") then
     if HR.Cast(S.Ravager, nil, nil, not Target:IsInRange(40)) then return "ravager"; end
   end
   -- overpower,if=charges=2
@@ -257,7 +254,7 @@ local function SingleTarget()
     if HR.Cast(S.MortalStrike, nil, nil, not Target:IsSpellInRange(S.MortalStrike)) then return "mortal_strike"; end
   end
   -- deadly_calm
-  if S.DeadlyCalm:IsCastable() then
+  if S.DeadlyCalm:IsCastable() and CDsON() then
     if HR.Cast(S.DeadlyCalm, Settings.Arms.OffGCDasOffGCD.DeadlyCalm) then return "deadly_calm"; end
   end
   -- skullsplitter,if=rage<60&buff.deadly_calm.down
@@ -285,7 +282,7 @@ local function SingleTarget()
     if HR.Cast(S.MortalStrike, nil, nil, not Target:IsSpellInRange(S.MortalStrike)) then return "mortal_strike"; end
   end
   -- bladestorm,if=debuff.colossus_smash.up&covenant.venthyr
-  if S.Bladestorm:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Covenant() == "Venthyr") then
+  if S.Bladestorm:IsCastable() and CDsON() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:Covenant() == "Venthyr") then
     if HR.Cast(S.Bladestorm, Settings.Arms.GCDasOffGCD.Bladestorm, nil, not Target:IsInRange(8)) then return "bladestorm"; end
   end
   -- whirlwind,if=talent.fervor_of_battle.enabled&rage>60
@@ -325,34 +322,34 @@ local function APL()
       if HR.CastSuggested(I.PotionofPhantomFire) then return "potion"; end
     end
     if CDsON() then
-    -- blood_fury,if=debuff.colossus_smash.up
-    if S.BloodFury:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-      if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end
-    end
-    -- berserking,if=debuff.colossus_smash.remains>6
-    if S.Berserking:IsCastable() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
-      if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking"; end
-    end
-    -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
-    if S.ArcaneTorrent:IsCastable() and (S.MortalStrike:CooldownRemains() > 1.5 and Player:Rage() < 50) then
-      if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent"; end
-    end
-    -- lights_judgment,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
-    if S.LightsJudgment:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
-      if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
-        end
-    -- fireblood,if=debuff.colossus_smash.up
-    if S.Fireblood:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-      if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood"; end
-    end
-    -- ancestral_call,if=debuff.colossus_smash.up
-    if S.AncestralCall:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
-      if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call"; end
-    end
-    -- bag_of_tricks,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
-    if S.BagofTricks:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
-      if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
-        end
+      -- blood_fury,if=debuff.colossus_smash.up
+      if S.BloodFury:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+        if HR.Cast(S.BloodFury, Settings.Commons.OffGCDasOffGCD.Racials) then return "blood_fury"; end
+      end
+      -- berserking,if=debuff.colossus_smash.remains>6
+      if S.Berserking:IsCastable() and (Target:DebuffRemains(S.ColossusSmashDebuff) > 6) then
+        if HR.Cast(S.Berserking, Settings.Commons.OffGCDasOffGCD.Racials) then return "berserking"; end
+      end
+      -- arcane_torrent,if=cooldown.mortal_strike.remains>1.5&rage<50
+      if S.ArcaneTorrent:IsCastable() and (S.MortalStrike:CooldownRemains() > 1.5 and Player:Rage() < 50) then
+        if HR.Cast(S.ArcaneTorrent, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsInRange(8)) then return "arcane_torrent"; end
+      end
+      -- lights_judgment,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
+      if S.LightsJudgment:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
+        if HR.Cast(S.LightsJudgment, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment"; end
+      end
+      -- fireblood,if=debuff.colossus_smash.up
+      if S.Fireblood:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+        if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood"; end
+      end
+      -- ancestral_call,if=debuff.colossus_smash.up
+      if S.AncestralCall:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff)) then
+        if HR.Cast(S.AncestralCall, Settings.Commons.OffGCDasOffGCD.Racials) then return "ancestral_call"; end
+      end
+      -- bag_of_tricks,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains
+      if S.BagofTricks:IsCastable() and (Target:DebuffDown(S.ColossusSmashDebuff) and not S.MortalStrike:CooldownUp()) then
+        if HR.Cast(S.BagofTricks, Settings.Commons.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.BagofTricks)) then return "bag_of_tricks"; end
+      end
     end
     if (Settings.Commons.UseTrinkets) then
       -- use_items
@@ -365,17 +362,17 @@ local function APL()
     if S.SweepingStrikes:IsCastable() and (EnemiesCount8y > 1 and (S.Bladestorm:CooldownRemains() > 12)) then
       if HR.Cast(S.SweepingStrikes, nil, nil, not Target:IsInRange(8)) then return "sweeping_strikes"; end
     end
-  -- run_action_list,name=hac,if=raid_event.adds.exists
-  if EnemiesCount8y >= 3 then
-    local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
-  end
+    -- run_action_list,name=hac,if=raid_event.adds.exists
+    if EnemiesCount8y >= 3 then
+      local ShouldReturn = Hac(); if ShouldReturn then return ShouldReturn; end
+    end
     -- run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
     if (S.Massacre:IsAvailable() and Target:HealthPercentage() < 35) or (Target:HealthPercentage() < 20) or (Target:HealthPercentage() > 80 and Player:Covenant() == "Venthyr") then
-    local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = Execute(); if ShouldReturn then return ShouldReturn; end
     end
     -- run_action_list,name=single_target
     if (true) then
-    local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
+      local ShouldReturn = SingleTarget(); if ShouldReturn then return ShouldReturn; end
     end
     -- Pool if nothing else to suggest
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait/Pool Resources"; end
