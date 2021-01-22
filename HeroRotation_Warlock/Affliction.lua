@@ -533,8 +533,8 @@ local function APL()
     if S.Corruption:IsReady() and (EnemiesCount10ySplash < 4 - num(S.SowtheSeeds:IsAvailable() or S.SiphonLife:IsAvailable())) then
       if Everyone.CastCycle(S.Corruption, Enemies40y, EvaluateCycleCorruptionRemains, not Target:IsSpellInRange(S.Corruption)) then return "Corruption InCombat 2"; end
     end
-    -- phantom_singularity,if=covenant.necrolord|covenant.night_fae|covenant.kyrian|covenant.none
-    if S.PhantomSingularity:IsReady() and (Player:Covenant() ~= "Venthyr") then
+    -- phantom_singularity
+    if S.PhantomSingularity:IsReady() then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "PhantomSingularity InCombat 2"; end
     end
     -- malefic_rapture,if=soul_shard>4
