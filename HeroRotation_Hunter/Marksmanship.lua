@@ -262,7 +262,7 @@ local function Trickshots()
     if HR.Cast(S.TarTrap, Settings.Commons2.GCDasOffGCD.TarTrap, nil, not Target:IsInRange(40)) then return "tar_trap soulforge_embers equipped"; end
   end
   -- flare,if=tar_trap.up
-  if S.Flare:IsReady() and not S.TarTrap:CooldownUp() then
+  if S.Flare:IsReady() and not S.TarTrap:CooldownUp() and SoulForgeEmbersEquipped then
     if HR.Cast(S.Flare, Settings.Commons2.GCDasOffGCD.Flare) then return "flare trickshots 3 5"; end
   end
   -- wild_spirits
