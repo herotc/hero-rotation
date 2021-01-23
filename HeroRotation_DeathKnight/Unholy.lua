@@ -321,7 +321,7 @@ local function Racials()
       if HR.Cast(S.ArcanePulse, Settings.Commons.OffGCDasOffGCD.Racials, nil, not TargetIsInRange[8]) then return "arcane_pulse racial 6"; end
     end
     -- fireblood, if=pet.gargoyle.active|buff.unholy_assault.up|talent.army_of_the_damned.enabled&(pet.army_ghoul.active|cooldown.army_of_the_dead.remains>target.time_to_die)
-    if S.Fireblood:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or Player:BuffUp(S.UnholyAssaultBuff) and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
+    if S.Fireblood:IsCastable() and (S.SummonGargoyle:TimeSinceLastCast() <= 35 and S.SummonGargoyle:IsAvailable() or Player:BuffUp(S.UnholyAssaultBuff) and S.UnholyAssault:IsAvailable() or S.ArmyoftheDamned:IsAvailable() and (S.ArmyoftheDead:TimeSinceLastCast() <= 30 or S.ArmyoftheDead:CooldownRemains() > Target:TimeToDie())) then
       if HR.Cast(S.Fireblood, Settings.Commons.OffGCDasOffGCD.Racials) then return "fireblood racial 7"; end
     end
     -- bag_of_tricks,if=buff.unholy_strength.up&active_enemies=1
