@@ -267,8 +267,12 @@ local function UseCooldowns()
   if S.EnergizingElixir:IsReady() and ((Player:ChiDeficit() >= 2 and EnergyTimeToMaxRounded() > 2) or Player:ChiDeficit() >= 4) then
     if HR.CastRightSuggested(S.EnergizingElixir) then return "Elixir CD"; end
   end
-  if S.TouchOfDeath:IsReady() and (Target:Health() < UnitHealthMax("player") or (Target:Health() < 0.35*UnitHealthMax("player") and Target:HealthPercentage() < 15 and UnitIsPlayer("target")))  then
+  if S.TouchOfDeath:IsReady() and Target:Health() < UnitHealthMax("player") and not UnitIsPlayer("target") then
+     --or (Target:Health() < 0.35*UnitHealthMax("player") and Target:HealthPercentage() < 15 and UnitIsPlayer("target")))  then
     if HR.CastRightSuggested(S.TouchOfDeath) then return "Touch of Death Main Target"; end
+  end
+  if S.TouchOfDeath:IsReady() and Target:HealthPercentage() < 15 and UnitIsPlayer("target") then
+    if HR.Cast(S.TouchOfDeath) then return "Touch of Death PVP Main Target"; end
   end
   if S.WeaponsOfOrder:IsReady() then
     if HR.Cast(S.WeaponsOfOrder, true, nil, not Target:IsInRange(40)) then return "Weapons of Order" end
@@ -277,7 +281,7 @@ end
 
 -- Can return nil
 local function Precombat()
-  if S.ChiBurst:IsReady() then
+  if S.ChiBurst:IsReady() and not Player:IsMoving() then
     if HR.Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "Precombat Chi Burst"; end
   end
 end
@@ -417,7 +421,7 @@ local function WeaponsOfOrderHandler()
     return OptimallyTargetedCast(S.ExpelHarm, "Expel Harm inside WOO")
   end
   local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
-  if S.ChiBurst:IsReady() and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() > ChiBurstCastTime + 0.200 then
+  if S.ChiBurst:IsReady() and not Player:IsMoving() and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() > ChiBurstCastTime + 0.200 then
     return OptimallyTargetedCast(S.ChiBurst, "ChiBurst inside WOO")
   end
   if S.TigerPalm:IsReady() and ComboStrike(S.TigerPalm) and Player:ChiDeficit() >= 2 then
@@ -457,7 +461,7 @@ end
 
 local function ShortCDs()
   local ChiBurstCastTime = 1.0 / (1 + Player:HastePct() / 100.0)
-  if S.ChiBurst:IsReady() and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() > ChiBurstCastTime + 0.200 then
+  if S.ChiBurst:IsReady() and not Player:IsMoving() and Player:ChiDeficit() >= 1 and EnergyTimeToMaxRounded() > ChiBurstCastTime + 0.200 then
     return OptimallyTargetedCast(S.ChiBurst, "ChiBurst")
   end
   if S.ChiWave:IsReady() then
