@@ -108,7 +108,7 @@ local function Precombat()
   -- snapshot_stats
   if Everyone.TargetIsValid() then
     -- Kill Shot
-    if S.KillShot:IsCastable() and Target:HealthPercentage() <= 20 then
+    if S.KillShot:IsCastable() then
       if HR.Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "Kill Shot (PreCombat)"; end
     end
     -- REMOVE coordinated_assault
@@ -372,7 +372,7 @@ local function cleave()
     end
   end
   -- kill_shot
-  if S.KillShot:IsReady() and Target:HealthPercentage() <= 20 then
+  if S.KillShot:IsCastable() then
     if HR.Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "[Cleave] Kill Shot"; end
   end
   -- flayed_shot

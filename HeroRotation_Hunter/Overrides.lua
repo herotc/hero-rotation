@@ -19,10 +19,10 @@
 
 --- ============================ CONTENT ============================
 -- Beast Mastery, ID: 253
-local OldBMIsCastableP
-OldBMIsCastableP = HL.AddCoreOverride("Spell.IsCastable",
+local OldBMIsCastable
+OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldBMIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldBMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellBM.SummonPet then
     return (not Pet:IsActive()) and BaseCheck
   else
@@ -53,10 +53,10 @@ end
 , 253);
 
 -- Marksmanship, ID: 254
-local OldMMIsCastableP
-OldMMIsCastableP = HL.AddCoreOverride("Spell.IsCastable",
+local OldMMIsCastable
+OldMMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldMMIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  local BaseCheck = OldMMIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self == SpellMM.SummonPet then
     return (not Pet:IsActive() and not HR.GUISettings.APL.Hunter.Marksmanship.UseLoneWolf) and BaseCheck
   else
@@ -82,17 +82,19 @@ end
 , 254);
 
 -- Survival, ID: 255
-local OldSVIsCastableP
-OldSVIsCastableP = HL.AddCoreOverride("Spell.IsCastableP",
+local OldSVIsCastable
+OldSVIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
   if self.SpellID == 259387 or self.SpellID == 186270 then
-    return OldSVIsCastableP(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
+    return OldSVIsCastable(self, "Melee", AoESpell, ThisUnit, BypassRecovery, Offset)
   else
-    local BaseCheck = OldSVIsCastableP(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldSVIsCastable(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellSV.SummonPet then
       return (not Pet:IsActive()) and BaseCheck
     elseif self == SpellSV.AspectoftheEagle then
       return HR.GUISettings.APL.Hunter.Survival.AspectoftheEagle and BaseCheck
+    elseif self == SpellSV.KillShot then
+      return BaseCheck and self:IsUsable()
     else
       return BaseCheck
     end
