@@ -1,0 +1,15 @@
+## Interface: 90002
+
+## Title: Hero|cFFA330C9Rotation|r [|cFFFF7C0ADruid|r]
+## Author: Cilraaz
+## Notes: Hero Rotation - Druid Module.
+
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: HeroRotation
+
+Settings.lua
+Druid.lua
+Events.lua
+Balance.lua
+Overrides.lua
