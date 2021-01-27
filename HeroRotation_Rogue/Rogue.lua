@@ -210,6 +210,7 @@ Spell.Rogue.Outlaw = {
   MasterAssassinsMark     = Spell(340094),
   -- Misc
   PoolEnergy              = Spell(999910),
+  SinfulRevelationDebuff  = Spell(324260),
 }
 
 Spell.Rogue.Subtlety = {
