@@ -83,7 +83,6 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
     local BestUnit, BestConditionValue = nil, nil
     for _, CycleUnit in pairs(Enemies) do
       if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
-        and ((Condition and Condition(CycleUnit)) or not Condition)
         and (not BestConditionValue or Utils.CompareThis(TargetIfMode, TargetIfCondition(CycleUnit), BestConditionValue)) then
         BestUnit, BestConditionValue = CycleUnit, TargetIfCondition(CycleUnit)
       end
@@ -91,7 +90,7 @@ function Commons.CastTargetIf(Object, Enemies, TargetIfMode, TargetIfCondition, 
     if BestUnit then
       if (BestUnit:GUID() == Target:GUID()) or (TargetCondition and (BestConditionValue == TargetIfCondition(Target))) then
         return HR.Cast(Object, OffGCD, nil, OutofRange)
-      else
+      elseif ((Condition and Condition(BestUnit)) or not Condition) then
         HR.CastLeftNameplate(BestUnit, Object)
       end
     end
