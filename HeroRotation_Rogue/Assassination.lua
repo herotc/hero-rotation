@@ -51,7 +51,7 @@ local OnUseExcludeTrinkets = {
 -- Legendaries
 local DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
 local MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
-HL.RegisterForEvent(function()
+HL:RegisterForEvent(function()
   DashingScoundrelEquipped = Player:HasLegendaryEquipped(118)
   MarkoftheMasterAssassinEquipped = Player:HasLegendaryEquipped(117)
 end, "PLAYER_EQUIPMENT_CHANGED")
