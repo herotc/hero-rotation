@@ -137,7 +137,7 @@ end
 
 local function Standard()
   -- shield_of_the_righteous,if=debuff.judgment.up&(debuff.vengeful_shock.up|!conduit.vengeful_shock.enabled)
-  if S.ShieldoftheRighteous:IsReady() and (Target:DebuffUp(S.JudgmentDebuff) and (Target:DebuffUp(S.VengefulShockDebuff) or not S.VengefulShock:IsAvailable())) then
+  if S.ShieldoftheRighteous:IsReady() and (Target:DebuffUp(S.JudgmentDebuff) and (Target:DebuffUp(S.VengefulShockDebuff) or not S.VengefulShock:ConduitEnabled())) then
     if HR.Cast(S.ShieldoftheRighteous, Settings.Protection.OffGCDasOffGCD.ShieldoftheRighteous, nil, not Target:IsSpellInRange(S.ShieldoftheRighteous)) then return "shield_of_the_righteous 62"; end
   end
   -- shield_of_the_righteous,if=holy_power=5|buff.holy_avenger.up|holy_power=4&talent.sanctified_wrath.enabled&buff.avenging_wrath.up
@@ -149,7 +149,7 @@ local function Standard()
     if Everyone.CastCycle(S.Judgment, Enemies30y, EvaluateCycleJudgment200, not Target:IsSpellInRange(S.Judgment)) then return "judgment 66"; end
   end
   -- avengers_shield,if=debuff.vengeful_shock.down&conduit.vengeful_shock.enabled
-  if S.AvengersShield:IsCastable() and (Target:DebuffDown(S.VengefulShockDebuff) and S.VengefulShock:IsAvailable()) then
+  if S.AvengersShield:IsCastable() and (Target:DebuffDown(S.VengefulShockDebuff) and S.VengefulShock:ConduitEnabled()) then
     if HR.Cast(S.AvengersShield, nil, nil, not Target:IsSpellInRange(S.AvengersShield)) then return "avengers_shield 68"; end
   end
   -- hammer_of_wrath

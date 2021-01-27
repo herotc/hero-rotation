@@ -261,7 +261,7 @@ local function Cooldowns()
     if HR.Cast(S.DarkTransformation) then return "dark_transformation cooldown 6"; end
   end
   -- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&((!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled)|talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&dot.unholy_blight.remains)
-  if S.Apocalypse:IsCastable() and EnemiesMeleeCount == 1 and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and ((not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable()) or S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Target:DebuffUp(S.UnholyBlightDebuff))) then
+  if S.Apocalypse:IsCastable() and EnemiesMeleeCount == 1 and (Target:DebuffStack(S.FesteringWoundDebuff) >= 4 and ((not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:ConduitEnabled()) or S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and Target:DebuffUp(S.UnholyBlightDebuff))) then
     if HR.Cast(S.Apocalypse) then return "apocalypse cooldown 8"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=4&active_enemies>=2&!death_and_decay.ticking
@@ -273,7 +273,7 @@ local function Cooldowns()
     if HR.Cast(S.SummonGargoyle) then return "summon_gargoyle cooldown 10"; end
   end
   -- unholy_assault,if=active_enemies=1&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead.enabled)
-  if S.UnholyAssault:IsCastable() and (EnemiesMeleeCount == 1 and Target:DebuffStack(S.FesteringWoundDebuff) < 2 and (S.Apocalypse:TimeSinceLastCast() <= 15) or S.ConvocationOfTheDead:IsAvailable()) then
+  if S.UnholyAssault:IsCastable() and (EnemiesMeleeCount == 1 and Target:DebuffStack(S.FesteringWoundDebuff) < 2 and (S.Apocalypse:TimeSinceLastCast() <= 15) or S.ConvocationOfTheDead:ConduitEnabled()) then
     if HR.Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault) then return "unholy_assault cooldown 7"; end
   end
   -- unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2
@@ -349,11 +349,11 @@ local function Generic()
     if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 5"; end
   end
   -- scourge_strike,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
-  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
+  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:ConduitEnabled())) then
     if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 4"; end
   end
   -- scourge_strike,if=debuff.festering_wound.up&talent.unholy_blight.enabled&cooldown.unholy_blight.remains>5&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!cooldown.apocalypse.ready&!raid_event.adds.exists
-  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:IsAvailable() and not S.Apocalypse:CooldownUp()) then
+  if S.ScourgeStrike:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:ConduitEnabled() and not S.Apocalypse:CooldownUp()) then
     if HR.Cast(S.ScourgeStrike, nil, nil, not TargetIsInRange[8]) then return "scourge_strike generic 6"; end
   end
   -- clawing_shadows,if=debuff.festering_wound.stack>4
@@ -361,11 +361,11 @@ local function Generic()
     if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 8"; end
   end
   -- clawing_shadows,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
-  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
+  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.Apocalypse:CooldownRemains() > 5 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:ConduitEnabled())) then
     if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 7"; end
   end
   -- clawing_shadows,if=debuff.festering_wound.up&talent.unholy_blight.enabled&cooldown.unholy_blight.remains>5&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!cooldown.apocalypse.ready&!raid_event.adds.exists
-  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:IsAvailable() and not S.Apocalypse:CooldownUp()) then
+  if S.ClawingShadows:IsCastable() and (Target:DebuffUp(S.FesteringWoundDebuff) and S.UnholyBlight:IsAvailable() and S.UnholyBlight:CooldownRemains() > 5 and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:ConduitEnabled() and not S.Apocalypse:CooldownUp()) then
     if HR.Cast(S.ClawingShadows, nil, nil, not TargetIsInRange[30]) then return "clawing_shadows generic 9"; end
   end
   -- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
@@ -377,11 +377,11 @@ local function Generic()
     if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 12"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<3&(!talent.unholy_blight.enabled|talent.army_of_the_damned.enabled|conduit.convocation_of_the_dead.enabled|raid_event.adds.exists)
-  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.Apocalypse:CooldownRemains() < 3 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:IsAvailable())) then
+  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.Apocalypse:CooldownRemains() < 3 and (not S.UnholyBlight:IsAvailable() or S.ArmyoftheDamned:IsAvailable() or S.ConvocationOfTheDead:ConduitEnabled())) then
     if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 11"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<4&talent.unholy_blight.enabled&!talent.army_of_the_damned.enabled&!conduit.convocation_of_the_dead.enabled&!raid_event.adds.exists&cooldown.apocalypse.ready&(cooldown.unholy_blight.remains<3|dot.unholy_blight.remains)
-  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:IsAvailable() and S.Apocalypse:CooldownUp() and (S.UnholyBlight:CooldownRemains() < 3 or Target:DebuffUp(S.UnholyBlightDebuff))) then
+  if S.FesteringStrike:IsCastable() and (Target:DebuffStack(S.FesteringWoundDebuff) < 4 and S.UnholyBlight:IsAvailable() and not S.ArmyoftheDamned:IsAvailable() and not S.ConvocationOfTheDead:ConduitEnabled() and S.Apocalypse:CooldownUp() and (S.UnholyBlight:CooldownRemains() < 3 or Target:DebuffUp(S.UnholyBlightDebuff))) then
     if HR.Cast(S.FesteringStrike, nil, nil, not TargetIsInRange[8]) then return "festering_strike generic 13"; end
   end
   -- death_coil,if=!variable.pooling_for_gargoyle
